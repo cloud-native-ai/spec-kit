@@ -1,6 +1,6 @@
 # 不言自明（Self-explanatory）— 概念定义
 
-> **Owner 声明**：本文件是“不言自明（Self-explanatory）”概念的单一真源。实践方法见 `shared/guidelines/self-explanatory.md`；Constitution 与 instructions 只持有指针或摘要，不复制本定义。
+> **Owner 声明**：本文件是“不言自明（Self-explanatory）”概念的单一真源。实践方法见 `.specify/shared/guidelines/self-explanatory.md`；Constitution 与 instructions 只持有指针或摘要，不复制本定义。
 >
 > **命名史**：本概念最初以“望文生义”引入；2026-11-04 按用户决定，中文规范名改为“不言自明”，英文规范名为“Self-explanatory”。旧名只作为历史记录保留，后续引用一律使用新名。
 >
@@ -34,9 +34,9 @@
 
 ## 5. 权威归属与强制力
 
-- 定义由 **shared 层**拥有：框架源为本文件 `shared/definitions/self-explanatory-definitions.md`；运行时镜像为 `.specify/shared/definitions/self-explanatory-definitions.md`。
-- **Constitution 与 instructions 是输出机制**：在客户项目中，它们把 shared 层的定义投射到该项目的 harness 配置中，只持有指针或摘要，不复制定义文本；在 framework hat 下，自优化的输出目标由执行流程决定（见 `shared/workflow/best-practice-optimization.md` §2、§6）。
-- 输出与应用映射见 `shared/workflow/best-practice-optimization.md`。
+- 定义由 **shared 层**拥有：框架源为本文件 `.specify/shared/definitions/self-explanatory-definitions.md`；运行时镜像为 `.specify/shared/definitions/self-explanatory-definitions.md`。
+- **Constitution 与 instructions 是输出机制**：在客户项目中，它们把 shared 层的定义投射到该项目的 harness 配置中，只持有指针或摘要，不复制定义文本；在 framework hat 下，自优化的输出目标由执行流程决定（见 `.specify/shared/workflow/best-practice-optimization.md` §2、§6）。
+- 输出与应用映射见 `.specify/shared/workflow/best-practice-optimization.md`。
 - 强制力为 **SHOULD**，以**最佳实践条目**的方式嵌入框架自主的优化流程。
 
 ## 6. 被编码属性的真源与投影
@@ -53,4 +53,4 @@
 2. **框架自身规则**；
 3. **每次最多只增加一个维度**（小步快跑、及时止损）。
 
-该顺序是概念层的约束；具体操作步骤见 `shared/guidelines/self-explanatory.md`。
+该顺序是概念层的约束；具体操作步骤见 `.specify/shared/guidelines/self-explanatory.md`。

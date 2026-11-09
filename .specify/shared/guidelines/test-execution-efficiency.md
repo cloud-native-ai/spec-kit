@@ -1,6 +1,6 @@
 # 测试执行效率 (Test Execution Efficiency)
 
-原则名 (principle title): **Efficient Test Execution (Concurrent by Default)**。文件路径:`shared/guidelines/test-execution-efficiency.md`。
+原则名 (principle title): **Efficient Test Execution (Concurrent by Default)**。文件路径:`.specify/shared/guidelines/test-execution-efficiency.md`。
 
 本文件是**测试执行效率**纪律的唯一真源 (single source of truth)：它持有本纪律的全部判定内容——覆盖为何必要而不充分、效率何时成为质量属性、进程级并行与异步并发的**选择决策表**、并行合法的**隔离前置条件**、效率的测量口径，以及不可采纳的提速手段——这六项只在此定义，其余位置只承载指针。
 
@@ -114,10 +114,10 @@
 本纪律只规定测试**以什么代价执行**；「测试做什么、何时写、断言什么」归既有的测试相关原则，二者是分工而非重叠。每条边界按同一格式声明：对方拥有什么、本纪律拥有什么、本纪律 MUST NOT 重定义什么。
 
 - **分工面（既有的测试相关原则）**：对方拥有覆盖率下限、测试何时先写、断言的粒度与命名。本纪律拥有执行方式、进程数、串行例外与隔离前置条件。MUST NOT 重定义对方的任何一条；同一条要求出现在两侧即为契约违反，按第一段的指针纪律修复（内容归回其 owner，另一侧改为路径引用）。
-- **证据纪律**（`shared/guidelines/single-run-evidence.md`）：对方拥有一次昂贵执行的**输出是否被完整保全、是否被重复支付**；本纪律拥有**这份输出被用来比较什么**。两侧共用「同一次运行只付一次」的原则，但一次保全的证据可以被本纪律的四锚点判为不可比较（例如环境未声明），两者结论可以不同，那不是冲突。
-- **单一真源**（`shared/guidelines/one-source-of-truth.md`）：对方拥有「为什么判据表与前置条件只能在一处定义」的论证；本纪律 MUST NOT 重定义「仅三种合法重复（机械复制 / 守卫副本 / 带日期记录）」。
-- **临时目录纪律**（`shared/guidelines/temp-directory-discipline.md`）：对方拥有仓库内临时产物的落点与清理；本纪律只要求留痕落盘、可再寻址，MUST NOT 规定存放路径与命名。
-- **快速失败**（`shared/guidelines/fast-fail.md`）：对方拥有并行下出现新失败时「该继续还是停下」的纠正 / 裁定二分；本纪律只规定处置的**类别**（修根因 / 具名例外 / 归入既存），MUST NOT 重定义分流判据。
+- **证据纪律**（`.specify/shared/guidelines/single-run-evidence.md`）：对方拥有一次昂贵执行的**输出是否被完整保全、是否被重复支付**；本纪律拥有**这份输出被用来比较什么**。两侧共用「同一次运行只付一次」的原则，但一次保全的证据可以被本纪律的四锚点判为不可比较（例如环境未声明），两者结论可以不同，那不是冲突。
+- **单一真源**（`.specify/shared/guidelines/one-source-of-truth.md`）：对方拥有「为什么判据表与前置条件只能在一处定义」的论证；本纪律 MUST NOT 重定义「仅三种合法重复（机械复制 / 守卫副本 / 带日期记录）」。
+- **临时目录纪律**（`.specify/shared/guidelines/temp-directory-discipline.md`）：对方拥有仓库内临时产物的落点与清理；本纪律只要求留痕落盘、可再寻址，MUST NOT 规定存放路径与命名。
+- **快速失败**（`.specify/shared/guidelines/fast-fail.md`）：对方拥有并行下出现新失败时「该继续还是停下」的纠正 / 裁定二分；本纪律只规定处置的**类别**（修根因 / 具名例外 / 归入既存），MUST NOT 重定义分流判据。
 - **机器与预算层**：哪一个命令被算作全量运行、一次流程能负担几次全量运行，归驱动侧的效率模型与预算台账；本文件只以路径引用，MUST NOT 复述其取值。
 
 ## 范围限制

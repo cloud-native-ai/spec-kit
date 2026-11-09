@@ -44,7 +44,7 @@ The structure I report on, its cadence, and my own stream artifact are read from
 
 - The roster row that seats me (`reporting-territory`, `reporting-cadence`)
 - The run's state surfaces inside my read territory — the state spine and the run's own artifacts
-- The cadence definition and the element floor, reached by anchor to `shared/guidelines/progress-reporting.md`
+- The cadence definition and the element floor, reached by anchor to `.specify/shared/guidelines/progress-reporting.md`
 
 ## Downstream (Outputs)
 
@@ -67,12 +67,12 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 - 先问一个问题:解决它需要**纠正**还是**裁定**?纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。
 - 纠正 ⇒ 就地修完,并在回传中披露。裁定(须在两种以上读法间选择,或须发明工件未记录的意图)⇒ **停在本层、回抛编排者,MUST NOT 就地修平后继续**。
 - 回传 MUST 含一条显式异常行:有异常则逐条以**行首** `ANOMALY:` 列出;无异常则明写 `未发现异常`。缺该行即回传不完整,沉默 MUST NOT 被读作干净。
-- 判据、两份封闭清单与上送件形态的唯一真源:`shared/guidelines/fast-fail.md`。
+- 判据、两份封闭清单与上送件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
 <!-- fast-fail-clause:end -->
 
 ## Reporting Obligations Carried by Reference
 
 The seat is itself a dispatchable agent, so two duty sections apply to it and to the dispatches it makes. Both are cited by path plus anchor and are deliberately **not restated** here — the owner text is the one source:
 
-- `shared/guidelines/fast-fail.md` § 子代理派发注入 — the anomaly-return line every return must carry.
-- `shared/guidelines/progress-reporting.md` § 子代理与委托(派发时注入) — the duty that must be written into a dispatch payload rather than assumed to travel through the conversation.
+- `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入 — the anomaly-return line every return must carry.
+- `.specify/shared/guidelines/progress-reporting.md` § 子代理与委托(派发时注入) — the duty that must be written into a dispatch payload rather than assumed to travel through the conversation.

@@ -14,7 +14,7 @@
 # host shell library, checks the dependency and returns 0 — the same work it does for every
 # caller, in a subshell, so that a missing dependency is reported without ending the caller.
 #
-# Authority: shared/definitions/script-interface-definitions.md sections 3 and 4.
+# Authority: .specify/shared/definitions/script-interface-definitions.md sections 3 and 4.
 # ---------------------------------------------------------------------------------------
 
 # The executable half: what this file does when it is run.

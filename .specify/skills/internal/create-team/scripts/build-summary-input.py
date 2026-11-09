@@ -351,7 +351,7 @@ def _parse_targets_section(raw: str) -> list[dict[str, str]]:
 
 
 #: 053 FR-035 — the criterion-subject reference form, understood LOCALLY. The literal and
-#: its semantics are owned by shared/definitions/goal-definitions.md § 判据主体指代形; the
+#: its semantics are owned by .specify/shared/definitions/goal-definitions.md § 判据主体指代形; the
 #: agreement between this derivation and goal-utils.py's is pinned by
 #: tests/contract/test_criterion_subject.py rather than left to memory.
 SUBJECT_REF = re.compile(r"\[subjects:\s*([^\]]+)\]")
@@ -377,8 +377,8 @@ def expand_subjects(criterion: str, repo_root: Path) -> str:
 def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | None:
     """Read the archived definition's objective and criteria, or None if absent.
 
-    This parses locally rather than importing `scripts/python/goal-utils.py`:
-    the two files live in different mirrored trees (`skills/` and `scripts/`) at
+    This parses locally rather than importing `.specify/scripts/python/goal-utils.py`:
+    the two files live in different mirrored trees (`skills/` and `.specify/scripts/`) at
     different relative depths, so a cross-tree import breaks once installed into a
     consuming project. The reader is deliberately minimal and read-only —
     `goal-utils.py` stays the single writer and the single validator.
@@ -387,7 +387,7 @@ def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | No
     `expand_subjects` above derives the member set locally instead of importing the
     engine's `derive_subjects`. That is a deliberate second derivation, not an oversight,
     and its cost is stated where it can be acted on — the owner document
-    (`shared/definitions/goal-definitions.md` § 判据主体指代形) records the disposition, and
+    (`.specify/shared/definitions/goal-definitions.md` § 判据主体指代形) records the disposition, and
     `tests/contract/test_criterion_subject.py` asserts the two derivations agree on the
     same input, because a sync left to memory is the failure mode this form exists to end.
     This reader renders the reference into member names and never validates it: an
@@ -1159,7 +1159,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -1215,8 +1215,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -1228,7 +1228,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/internal/create-team/scripts/build-summary-input.py'
+_SIG_SCRIPT = '.specify/skills/internal/create-team/scripts/build-summary-input.py'
 _SIG_DECLARED = ('--baseline', '--goal', '--json', '--out', '--repo-root', '--team')
 _SIG_HELP = (
     'usage: build-summary-input.py [options]\n'

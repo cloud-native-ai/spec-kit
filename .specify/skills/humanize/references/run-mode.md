@@ -1,6 +1,6 @@
 # Run mode — 行为细则（`/speckit.humanize` 的运行模式分支）
 
-**归属**: 本文件是 `skills/external/humanize/SKILL.md` 运行模式分支的行为细则所有者：入口解析、模式路由、迁移提示与派发。报告面（五节、元数据块、证据与来源清单、语言与保真）的所有者是 `references/report-shape.md`；`SKILL.md` 正文只声明分支边界，不复述这里的步骤、字段或字面量。
+**归属**: 本文件是 `.specify/skills/humanize/SKILL.md` 运行模式分支的行为细则所有者：入口解析、模式路由、迁移提示与派发。报告面（五节、元数据块、证据与来源清单、语言与保真）的所有者是 `references/report-shape.md`；`SKILL.md` 正文只声明分支边界，不复述这里的步骤、字段或字面量。
 
 **外部所有者**: 派发载体的步骤、拓扑声明与快速失败注入子句归 `run-agent` 技能的 Run Mode；`data-model.md` § E2 / § E5 拥有解析字段与信封字段；requirements FR-019 拥有 verdict 集合与映射；requirements § Shared Strings 拥有全部固定 literal。本文件只固定 humanize 侧必须满足的部分，不复制它们。
 
@@ -62,7 +62,7 @@
 
 派发载荷是执行体在本跳能看到的**全部**上下文——它拿不到本会话的其余部分。载荷 MUST 按下列顺序携带六项，顺序本身是契约面（EX-06）：
 
-1. **快速失败注入子句**：第一项，置于载荷开头的**独立段落**，不与其他规则混排。其内容 MUST 与 `shared/guidelines/fast-fail.md` § 子代理派发注入 的拥有者字面量**逐字节相等**；本文件只引用该所有者，MUST NOT 在此改写、摘要、缩写或重排它。缺该子句即判载荷不合格，按 `contracts/execution-dispatch.contract.md` EX-11 处理：MUST NOT 以「补发一次」修复。
+1. **快速失败注入子句**：第一项，置于载荷开头的**独立段落**，不与其他规则混排。其内容 MUST 与 `.specify/shared/guidelines/fast-fail.md` § 子代理派发注入 的拥有者字面量**逐字节相等**；本文件只引用该所有者，MUST NOT 在此改写、摘要、缩写或重排它。缺该子句即判载荷不合格，按 `contracts/execution-dispatch.contract.md` EX-11 处理：MUST NOT 以「补发一次」修复。
 2. **指令原文**：逐字（含换行与引号），与 § Parse 解析出的 `instruction_text` 完全相同。MUST NOT 附加步骤编号、注释、执行提示或「建议先读某文件」一类的先验。
 3. **回传信封的字段与封闭取值**：点名回传 MUST 是 `data-model.md` § E5 的信封，并列全该表的字段名；`status` 的取值域只引用 requirements FR-012（本文件不复述枚举）。执行体 MUST NOT 自创字段或改写取值。
 4. **不得撰写最终报告**：执行体只回传信封；报告由 humanize 主会话撰写，形态归 `references/report-shape.md`。执行体写了报告也算违约，其输出不做报告来源。

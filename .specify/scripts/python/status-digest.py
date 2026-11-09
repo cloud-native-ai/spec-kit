@@ -17,13 +17,13 @@ Authority map (this file owns no rule; it names the owner of each):
   ``.specify/specs/088-speckit-visualization/contracts/reporting-obligations.contract.md`` C-01…C-13. This file
   names each proposition by id and states only *what it reads on disk*; it restates no proposition.
 * The reporting obligation itself (scope predicate, cadence default, seat obligation, master duty, transition
-  triggers, digest contract, machinery prohibition) is owned by ``shared/guidelines/reporting-obligations.md``.
+  triggers, digest contract, machinery prohibition) is owned by ``.specify/shared/guidelines/reporting-obligations.md``.
 * The content floor, the cadence anchor and the interactive default are owned by
-  ``shared/guidelines/progress-reporting.md``.
-* The artifact triplet and the three execution modes are owned by ``shared/definitions/subagent-definitions.md``.
-* The stall threshold numbers are owned by ``skills/internal/create-team/references/patterns.md`` § Monitoring →
+  ``.specify/shared/guidelines/progress-reporting.md``.
+* The artifact triplet and the three execution modes are owned by ``.specify/shared/definitions/subagent-definitions.md``.
+* The stall threshold numbers are owned by ``.specify/skills/internal/create-team/references/patterns.md`` § Monitoring →
   Stall Detection; this file carries none of them.
-* The line state vocabulary is owned by ``skills/external/sdd-loop-driver/scripts/line-registry.py``
+* The line state vocabulary is owned by ``.specify/skills/sdd-loop-driver/scripts/line-registry.py``
   (``STATE_VALUES`` / ``ACTIVE_STATES``); this file never re-enumerates it — it projects whatever the entry says and
   derives activity from the same two names, which it reads from that engine's source.
 
@@ -115,7 +115,7 @@ DEFAULT_ELEMENT_BOUND = 160
 
 #: The element's two render literals — the marker a quantity the record does not carry renders instead of a value,
 #: and the explicit store-availability state. Both are rendered VERBATIM from their single definition site, the owner
-#: document's § 九 (``shared/guidelines/reporting-obligations.md``; contract ``ownership-map.contract.md`` C-47 row
+#: document's § 九 (``.specify/shared/guidelines/reporting-obligations.md``; contract ``ownership-map.contract.md`` C-47 row
 #: "Not-evaluated marker literal"): the constants below are the fallback for the framework's own bootstrap state, and
 #: :func:`efficiency_vocabulary` prefers the owner's text whenever that document is readable.
 NOT_EVALUATED_MARKER = "not-evaluated"
@@ -166,7 +166,7 @@ GATE_MARKERS = (
 )
 
 #: The label convention a dispatched sub-flow's identity comes from (``data-model.md`` E3 / E7): its owner is
-#: ``shared/definitions/subagent-definitions.md`` § External Dispatch Visibility Contract point 5. The pattern is
+#: ``.specify/shared/definitions/subagent-definitions.md`` § External Dispatch Visibility Contract point 5. The pattern is
 #: read here rather than copied there because the owner states the convention in prose, and the projection needs a
 #: decidable form of it; the shape, not the rule, is what this constant fixes.
 SUPERVISION_LABEL_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*--[A-Za-z0-9._-]+--[A-Za-z0-9._-]+$")
@@ -185,7 +185,7 @@ SUB_FLOW_STATES = ("running", "completed", "stalled", "failed")
 MANDATORY_THRESHOLD_ROW = "No manifest created"
 
 #: The four framework-source trees the owner-literal scan reads (``test-evidence/owner-literal-baseline.txt``:
-#: ``shared/ templates/ skills/ agents/``). ``.specify/`` and the per-tool copy trees are projections of these four,
+#: ``.specify/shared/ .specify/templates/ skills/ agents/``). ``.specify/`` and the per-tool copy trees are projections of these four,
 #: so a hit there is a projection of a source hit rather than an independent definition site.
 OWNER_LITERAL_SCAN_ROOTS = ("shared", "templates", "skills", "agents")
 
@@ -200,8 +200,8 @@ OWNER_LITERAL_FORMS = (_CD + " 秒", _CD + " seconds")
 #: diagram-tool blurb and a skill-authoring heuristic. A future unrelated hit in another file legitimately fails
 #: the scan — that is the scan working as designed (``quickstart.md`` Scenario E.2 premise 1).
 OWNER_LITERAL_WHITELIST = (
-    "skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md",
-    "skills/external/improve-skills/references/skill-slimming-principles.md",
+    ".specify/skills/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md",
+    ".specify/skills/improve-skills/references/skill-slimming-principles.md",
 )
 
 #: Source-file extensions the owner-literal scan reads. A binary or an unreadable file is skipped, never guessed at.
@@ -414,7 +414,7 @@ def load_store_engine():
 
 
 #: The record's elapsed node slot and the run record's mode field, read from the engine's own source at run
-#: time: both field slots are owned elsewhere (the record schema declaration via ``scripts/python/exec-quant.py``;
+#: time: both field slots are owned elsewhere (the record schema declaration via ``.specify/scripts/python/exec-quant.py``;
 #: ``mode`` is a member of the declaration's ``config_fields`` roster) and this file MUST NOT re-spell them as
 #: literals (C-70/C-71). Both bind in :func:`load_store_engine` from the engine module's own faces; ``None``
 #: until then, and an unresolvable slot is an unavailable input reported as such — never guessed.
@@ -552,7 +552,7 @@ def _newer(stamp: str, identity: str, incumbent: tuple) -> bool:
 def efficiency_vocabulary() -> dict:
     """The element's two render literals, read from their single definition site (the owner document).
 
-    ``ownership-map.contract.md`` C-47 makes ``shared/guidelines/reporting-obligations.md`` § 九 the marker's one
+    ``ownership-map.contract.md`` C-47 makes ``.specify/shared/guidelines/reporting-obligations.md`` § 九 the marker's one
     declaration point. The owner's forms are matched at run time so the rendered literals follow the owner rather than
     a copy of it; the module constants are the bootstrap fallback for a tree where the owner is unreadable.
     """
@@ -1065,7 +1065,7 @@ def render_status_line(args) -> str:
     * the four content-element labels, then the carrier that receives the line (C-26).
 
     The labels are named here; their definitions are reached by anchor to
-    ``shared/guidelines/progress-reporting.md`` § 汇报内容下限 and are deliberately not restated (contract C-23).
+    ``.specify/shared/guidelines/progress-reporting.md`` § 汇报内容下限 and are deliberately not restated (contract C-23).
 
     ``--transition`` replaces the trigger with that transition's own class, so a supervising flow reports a
     significant transition through this same line shape rather than growing a second status renderer
@@ -1180,7 +1180,7 @@ def action_report(args) -> int:
 def read_threshold_rows():
     """Read the declared stall-threshold rows from their owner at render time.
 
-    The numbers are owned by ``skills/internal/create-team/references/patterns.md`` § Monitoring → Stall Detection
+    The numbers are owned by ``.specify/skills/internal/create-team/references/patterns.md`` § Monitoring → Stall Detection
     (``data-model.md`` E4); this function parses the table's ``Condition`` and ``Threshold`` cells so the projection
     can name a row and judge against its value without carrying either a copy of the table or a number of its own.
     A failed read is an *unavailable input*, reported as such — never replaced by a hard-coded default.
@@ -1946,7 +1946,7 @@ def proposition_ro_12(args, run_record_path):
     The *reading surface* is stated because "recorded" and "supplied" are easy to confuse. `--carrier` is the
     value the caller hands this invocation and is the engine's declared carrier input; `--run-record` is the file
     the run already writes, read here for the `carrier` field the owner
-    (`shared/guidelines/reporting-obligations.md` § 八) requires it to hold. The record is a **fallback**, and the
+    (`.specify/shared/guidelines/reporting-obligations.md` § 八) requires it to hold. The record is a **fallback**, and the
     precedence is deliberate: `--carrier` wins when both are given, because a reading that silently preferred the
     record would make a wrong `--carrier` unobservable — a green check that cannot go red proves nothing. The
     reason names which surface answered, and `mode` is echoed when the record carries it, so a reading shows the
@@ -2136,7 +2136,7 @@ def build_parser():
         prog="status-digest.py",
         description=(
             "Current-state digest, reporting-obligation guard and status-line renderer"
-            " (owner: shared/guidelines/reporting-obligations.md)."
+            " (owner: .specify/shared/guidelines/reporting-obligations.md)."
         ),
     )
     parser.add_argument("--action", required=True, choices=("digest", "guard", "report"))

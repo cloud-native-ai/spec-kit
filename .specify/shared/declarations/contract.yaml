@@ -1,7 +1,7 @@
 # Declaration layer contract — the single owner of this feature's machine-read value domains.
 #
 # Harness triple structure. Every value below appears ONCE in the repository:
-# markdown owners reference this file, engines read it through scripts/python/declaration_reader.py.
+# markdown owners reference this file, engines read it through .specify/scripts/python/declaration_reader.py.
 # A second copy of any of these values is a defect, not a convenience (contract C-002).
 #
 # Written in the allowed YAML subset (contracts/declaration-schema.contract.md C-008):
@@ -54,7 +54,7 @@ required_exclusion_keys:
 # (contract C-040, plan D8): its flag defaults off so an existing closed finding-name set in
 # tests/contract/test_acceptance_premises.py does not move.
 gate_call_sites:
-  - path: skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+  - path: .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py
     mode: opt-in-flag
     flag: --triple-structure
     stages: requirements plan tasks

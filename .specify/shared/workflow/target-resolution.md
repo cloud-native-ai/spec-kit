@@ -25,8 +25,8 @@ baseline.
 - Walk **upward** from the start directory and return the first ancestor `p` where:
   - `p/.specify/` is a directory, and
   - `p` is not named `.specify`, and
-  - `.specify/` looks like a Spec Kit store: it contains at least one of `memory/`,
-    `scripts/`, `templates/` (this skips a stray empty `.specify/`).
+  - `.specify/` looks like a Spec Kit store: it contains at least one of `.specify/memory/`,
+    `.specify/scripts/`, `.specify/templates/` (this skips a stray empty `.specify/`).
 - **If no such ancestor is found, refuse to execute.** Report the start path searched and
   the remediation:
   - run `sdd-project-setup` in `install` mode, or
@@ -60,7 +60,7 @@ Empty output = no `.specify/` ancestor → refuse and hand off `sdd-project-setu
 - **No silent local fallback for a partial remote triple**: if only the host or only the run
   user is given, ask one clarifying question.
 - **No execution-side substitution**: a remote target is scanned and mutated only on the
-  execution side (see `shared/workflow/execution-topology.md`).
+  execution side (see `.specify/shared/workflow/execution-topology.md`).
 
 ## Mode and tool defaults (owned by each skill)
 

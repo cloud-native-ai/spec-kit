@@ -13,7 +13,7 @@ Actions landed here by slice `074a-authorized-routing`:
 
 --action route
 --------------
-    python3 scripts/python/sdd-route.py --action route \
+    python3 .specify/scripts/python/sdd-route.py --action route \
         --nature <change_nature> --traceability <traceability> \
         --blast-radius <blast_radius> --reversibility <reversibility> \
         --complexity <complexity> [--rationale TEXT] [--actor ID] \
@@ -27,7 +27,7 @@ is a missing input.
 
 --action golden
 ---------------
-    python3 scripts/python/sdd-route.py --action golden [--owner-doc PATH] [--format json|text]
+    python3 .specify/scripts/python/sdd-route.py --action golden [--owner-doc PATH] [--format json|text]
 
 It parses the owner document's § Golden case table and judges every row, in table order. A
 row that does not match its expected verdict / reason code is reported as a judged finding
@@ -36,7 +36,7 @@ an engine failure, and this exit alphabet has exactly two meanings (see below).
 
 --action authorize
 ------------------
-    python3 scripts/python/sdd-route.py --action authorize \
+    python3 .specify/scripts/python/sdd-route.py --action authorize \
         --agent <agent-definition.md> --team <team-slug> --seat <seat-slug> [--format json|text]
 
 It reads exactly two sources: the agent definition's frontmatter (the agent half) and
@@ -48,7 +48,7 @@ Owner pointers (cited, never restated here):
 
   * the routing rule's four owned facts — the five inputs' closed value domains, the
     three-value verdict table, the fixed precedence and the reason-code vocabulary — plus the
-    golden case table: `shared/definitions/sdd-routing-definitions.md`, the only surface that
+    golden case table: `.specify/shared/definitions/sdd-routing-definitions.md`, the only surface that
     writes them out. This engine reads them from that document at run time and carries no
     copy of them: no domain list, no condition-to-verdict mapping, no precedence order, no
     reason-code literal, no verdict literal. What it does carry is the *interface* — the five
@@ -58,7 +58,7 @@ Owner pointers (cited, never restated here):
     host-rendered) status of the authorization key: NEUTRAL_AGENT_METADATA_KEYS /
     NEUTRAL_AGENT_FRAMEWORK_KEYS in src/specify_cli/__init__.py;
   * the seat-side block map in team.md and its malformed/dangling rules:
-    skills/internal/create-team/references/create-mode.md, section "Persisted team.md schema";
+    .specify/skills/internal/create-team/references/create-mode.md, section "Persisted team.md schema";
   * the two-half AND, the refused-but-not-an-error exit alphabet, and the requirement that a
     refusal be recheckable: `.specify/specs/074a-authorized-routing/contracts/
     hierarchy-and-authorization.md`, clauses C-6, C-7, C-8 and C-14;
@@ -399,7 +399,7 @@ def action_authorize(args) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Owner document (shared/definitions/sdd-routing-definitions.md)
+# Owner document (.specify/shared/definitions/sdd-routing-definitions.md)
 #
 # Every fact the routing decision consumes is read here, at run time. Nothing below
 # restates a value domain, a condition-to-verdict mapping, the precedence order or a

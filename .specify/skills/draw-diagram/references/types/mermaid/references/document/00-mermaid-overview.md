@@ -32,9 +32,9 @@
 
 ## 4. 本技能使用的工具链
 
-- 渲染：`scripts/render-mermaid.sh`（服务器 mermaid.ink + 本地 mmdc 双后端）；
-- 量测：`scripts/measure-svg-layout.py`（WBS/甘特版面三判据）；
-- 兜底：`scripts/svg-to-png-cjk.cjs`（SVG→PNG，CJK 字体与内容裁剪）；
+- 渲染：`.specify/scripts/render-mermaid.sh`（服务器 mermaid.ink + 本地 mmdc 双后端）；
+- 量测：`.specify/scripts/measure-svg-layout.py`（WBS/甘特版面三判据）；
+- 兜底：`.specify/scripts/svg-to-png-cjk.cjs`（SVG→PNG，CJK 字体与内容裁剪）；
 - 输出：HTML 文档 + PNG/SVG + `.mmd` 源文件。
 
 ## 5. 版本注意

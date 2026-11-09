@@ -103,7 +103,7 @@ suggestion: "候选工作；如需 SDD 全流程推进可调用 sdd-loop-driver�
 - 候选来源：未完成 feature、大规模反馈改进、SPECKIT TODO。本 skill 是候选清单的唯一所有者；setup 不再产出 `sdd-candidates-*.yaml`。
 - 候选清单是建议，不携带「必须调用 sdd-loop-driver」的语义。
 - `check` 模式下 `removed` / `remaining` / `ledger` 允许为 null；`record-retention.py` 缺席时 `sanitize_retention.status = not_evaluated`，不得填 0 冒充。
-- 不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告落 `.specify/memory/housekeeping/`（存储登记 owner：`shared/definitions/framework-map.md`）。
+- 不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告落 `.specify/memory/housekeeping/`（存储登记 owner：`.specify/shared/definitions/framework-map.md`）。
 
 **就绪判据差异（有意）**：house-keeping H0 以 `.specify/` + constitution 为前置；`source.json` 缺失在 H1 记为 provenance warning，不阻断本 skill。loop-driver 的 preflight ⑤ 额外要求 `source.json`，因为它需要框架版本用于派发；两者差异在此声明，不在两处各自发挥。
 

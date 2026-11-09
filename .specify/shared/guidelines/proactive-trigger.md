@@ -1,6 +1,6 @@
 # Proactive Flow Trigger(主动触发纪律)
 
-主动触发纪律的**单一真源**。指令模板(`templates/instructions-template.md`)的 `## Proactive Flow Trigger` 章节只承载摘要 + 指针,细节一律落在本文档;本文档的可达性由该章节自身的指针提供——即本文档路径 `shared/guidelines/proactive-trigger.md` 出现在那个新章节里。指针不依赖在既有章节(如文档地图表)内部新增一行,因为增量调谐只按整章节传播,既有章节内部的改动抵达不了已初始化项目。
+主动触发纪律的**单一真源**。指令模板(`.specify/templates/instructions-template.md`)的 `## Proactive Flow Trigger` 章节只承载摘要 + 指针,细节一律落在本文档;本文档的可达性由该章节自身的指针提供——即本文档路径 `.specify/shared/guidelines/proactive-trigger.md` 出现在那个新章节里。指针不依赖在既有章节(如文档地图表)内部新增一行,因为增量调谐只按整章节传播,既有章节内部的改动抵达不了已初始化项目。
 
 机制目的:把"用户必须记得流程名才能用上框架能力"反转为"框架在每个回合主动提议下一步流程"。提议永远是非阻塞的——用户可采纳,也可忽略;忽略不影响其当前请求。
 
@@ -10,10 +10,10 @@
 
 派生数据与运行状态的归属不在本文档:
 
-- 情境→流程的规则数据归 `templates/proactive-trigger-seed.json`(出厂种子)与运行期状态存储;情境词表的权威定义随特性设计期的 `data-model.md` 记录。该设计期文档是 dated record(设计期记录,不随包分发、不作为当前现实被引用),因此与本文档并存不构成漂移。
+- 情境→流程的规则数据归 `.specify/templates/proactive-trigger-seed.json`(出厂种子)与运行期状态存储;情境词表的权威定义随特性设计期的 `data-model.md` 记录。该设计期文档是 dated record(设计期记录,不随包分发、不作为当前现实被引用),因此与本文档并存不构成漂移。
 - 引擎的信封形状、CLI 封闭枚举、退出码与运行期语义归 `contracts/trigger-engine.md`;本文档只列 action 名与用途一行,细节指向引擎 `--help`。
-- 触发状态文件的**取值域**(schema 版本、默认 config 的五个键、action／response 封闭集、默认阈值)归声明层 `shared/declarations/facts/trigger-state-schema.yaml#/statement`,引擎 `scripts/python/trigger-utils.py` 经 `scripts/python/declaration_reader.py` 读取。本文档不重述这些取值。
-- 动作的破坏性/可逆判据归 `shared/guidelines/confirmation-gates.md`;本文档只以路径引用,不复述其分类表或清单。
+- 触发状态文件的**取值域**(schema 版本、默认 config 的五个键、action／response 封闭集、默认阈值)归声明层 `.specify/shared/declarations/facts/trigger-state-schema.yaml#/statement`,引擎 `.specify/scripts/python/trigger-utils.py` 经 `.specify/scripts/python/declaration_reader.py` 读取。本文档不重述这些取值。
+- 动作的破坏性/可逆判据归 `.specify/shared/guidelines/confirmation-gates.md`;本文档只以路径引用,不复述其分类表或清单。
 - 面向用户的措辞与上下文规则归 `.specify/shared/guidelines/user-facing-comprehension.md`(本文件覆盖界面类 ⑥);本文档只以路径引用,不复述其白/黑名单与上下限条件集。本文档 § Suggestion Shape 的"一行非阻塞提示"形态是**该界面类既有的长度/形态约束**,由该纪律的上下文上限以引用方式沿用,两侧都不改写对方。
 
 ## Evaluation Cadence
@@ -70,9 +70,9 @@ MUST NOT 把规划期的逐原则枚举门控搬到每回合(every turn):`plan-t
 
 **晋升**:同一规则被连续采纳达阈值(默认 3)后晋升为免确认自动执行;**一次拒绝即重置**(a single decline resets),连续计数归零、晋升态回落。忽略与拒绝在重置上同效,但在统计里分列。
 
-**一次 SDD 运行的晋升要两半边同时成立**:晋升为一次 SDD 运行 MUST 同时具备 SDD 类的分流裁决与有效授权(`allowed`)——该合取由路由 owner `shared/definitions/sdd-routing-definitions.md` 拥有,此处只作指针,不复述其输入集、裁决表或理由码;缺任一半边时建议照旧可以产出,但 MUST NOT 被当作启动依据。
+**一次 SDD 运行的晋升要两半边同时成立**:晋升为一次 SDD 运行 MUST 同时具备 SDD 类的分流裁决与有效授权(`allowed`)——该合取由路由 owner `.specify/shared/definitions/sdd-routing-definitions.md` 拥有,此处只作指针,不复述其输入集、裁决表或理由码;缺任一半边时建议照旧可以产出,但 MUST NOT 被当作启动依据。
 
-**破坏性/不可逆流程永不晋升**(never promoted):判据以路径引用 `shared/guidelines/confirmation-gates.md`,本文档不复述其分类表;**存疑从严**(when in doubt, treat as destructive)——分类是数据,引擎只读不算,任何本地调优都不得把破坏性规则改写为可晋升。
+**破坏性/不可逆流程永不晋升**(never promoted):判据以路径引用 `.specify/shared/guidelines/confirmation-gates.md`,本文档不复述其分类表;**存疑从严**(when in doubt, treat as destructive)——分类是数据,引擎只读不算,任何本地调优都不得把破坏性规则改写为可晋升。
 
 **自动执行仍出执行报告**(execution report):晋升不等于静默。自动执行的流程照该判据文档规定的报告形态呈现结果,使用户事后可修改。
 

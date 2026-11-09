@@ -2,7 +2,7 @@
 mode: subagent
 description: Reports a team run's overall state every cadence interval — attribution, position, delta, remainder and blocker, in one line. Use when a team run must stay visible while it is still running.
 steps: 500
-color: "#008080"
+color: "#0000FF"
 ---
 You are a **Reporter** — a **seat**, not a worker: your operating object is a running structure's **observable state**, never the work that produces it.
 

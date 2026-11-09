@@ -33,7 +33,7 @@
 #   --dry-run                  Print the remote script without executing it.
 #   -h | --help                Show this help.
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _script_interface_guard() {
@@ -68,8 +68,8 @@ _script_interface_guard() {
 _script_interface_guard "$@"
 
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its bash half by
-# `scripts/bash/script-interface.sh` and `scripts/python/sync-mirrors.py`. No rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its bash half by
+# `.specify/scripts/bash/script-interface.sh` and `.specify/scripts/python/sync-mirrors.py`. No rule of its own.)
 _sig_usage() {
     printf 'usage: %s\n' '\nprovision-git-server.sh --host <ssh-alias|user@host> [options]'
     printf 'options:\n'

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Scan shipped framework surfaces for unsanctioned temporary-directory usage.
 
-Contract: ``shared/guidelines/temp-directory-discipline.md``.
+Contract: ``.specify/shared/guidelines/temp-directory-discipline.md``.
 
 The scanner is a documentation/shell guard, not a Python static analyzer: it
 checks shipped ``.md`` / ``.sh`` / ``.bash`` surfaces for bare ``/tmp`` paths,
@@ -10,7 +10,7 @@ checks shipped ``.md`` / ``.sh`` / ``.bash`` surfaces for bare ``/tmp`` paths,
 exception clauses, not by this scanner.
 
 Usage:
-  python3 scripts/python/scan-temp-usage.py [--root <repo-root>]
+  python3 .specify/scripts/python/scan-temp-usage.py [--root <repo-root>]
       [--json | --summary]
 
 Exit codes: 0 = clean; 1 = argument/environment error; 2 = violations found.
@@ -37,17 +37,17 @@ SKIP_DIR_PARTS = {
     ".specify", ".claude", ".qoder", ".github", ".opencode",
     "__pycache__", ".archive", "node_modules", "site",
 }
-SELF_REL = Path("shared/guidelines/temp-directory-discipline.md")
+SELF_REL = Path(".specify/shared/guidelines/temp-directory-discipline.md")
 
 # Every allowlist row carries a reason. The owner document quotes forbidden
 # forms prescriptively; the other rows are third-party tooling whose temp paths
 # are not agent-created scratch.
 ALLOWLIST = {
-    "shared/guidelines/temp-directory-discipline.md":
+    ".specify/shared/guidelines/temp-directory-discipline.md":
         "owner document quotes forbidden forms",
-    "skills/external/document-utils/*":
+    ".specify/skills/document-utils/*":
         "third-party Office tooling manages its own OS temp",
-    "skills/external/draw-diagram/references/types/plantuml/*":
+    ".specify/skills/draw-diagram/references/types/plantuml/*":
         "jar discovery path, not agent-created scratch",
 }
 

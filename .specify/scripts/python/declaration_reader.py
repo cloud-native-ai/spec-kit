@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The one YAML-subset parser for the declaration layer (`shared/declarations/`).
+"""The one YAML-subset parser for the declaration layer (`.specify/shared/declarations/`).
 
 Feature 084 (harness triple structure). Contracts: `contracts/shared-reader.contract.md`
 C-052…C-059 and `contracts/declaration-schema.contract.md` C-008…C-010.
@@ -9,11 +9,11 @@ lives in an engine constant and again in prose drifts, and nobody sees it drift.
 what turns a second implementation into a visible defect instead of a style remark — every consumer engine
 imports this module, so a parser written anywhere else is a finding (`C-058`'s boundary guard).
 
-**Surface.** Importable (every consumer is invoked as ``python3 scripts/python/<name>.py``, so this
+**Surface.** Importable (every consumer is invoked as ``python3 .specify/scripts/python/<name>.py``, so this
 script's own directory is ``sys.path[0]``) and callable for humans:
 
-    python3 scripts/python/declaration_reader.py --action list --repo .
-    python3 scripts/python/declaration_reader.py --action get --fact <fact-slug> --repo .
+    python3 .specify/scripts/python/declaration_reader.py --action list --repo .
+    python3 .specify/scripts/python/declaration_reader.py --action get --fact <fact-slug> --repo .
 
 Functions: :func:`load_contract`, :func:`load_fact`, :func:`load_facts`, :func:`load_exclusions`,
 :func:`normalize_path`, plus the two helpers a consumer engine needs to reach the layer at all:
@@ -36,7 +36,7 @@ basis: "mostly works" is a contract violation, not a lenient success.
 
 **Not a proof of anything else.** This module parses and loads. It does not judge a declaration: required
 keys, slug/stem agreement, duplicate slugs, anchor resolvability, dispositions and completeness are
-`scripts/python/harness-triple-check.py`'s judgements, because they need the whole file set in view.
+`.specify/scripts/python/harness-triple-check.py`'s judgements, because they need the whole file set in view.
 """
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ import sys
 from pathlib import Path
 
 #: The layer's location in the framework source, and its mirror form in a client project (C-001, C-010).
-DECLARATIONS_DIR = "shared/declarations"
+DECLARATIONS_DIR = ".specify/shared/declarations"
 DECLARATIONS_MIRROR = ".specify/shared/declarations"
 MIRROR_PREFIX = ".specify/"
 
@@ -122,7 +122,7 @@ def find_repo(start=None):
 
     Every engine this feature touches exists in three physical copies — the framework source, this
     repository's byte-identical mirror, and a client project's ``.specify/`` copy — so the root is the
-    nearest ancestor holding ``shared/declarations`` (source form) or ``.specify/shared/declarations``
+    nearest ancestor holding ``.specify/shared/declarations`` (source form) or ``.specify/shared/declarations``
     (mirror form), in that order per :func:`layer_dir`. This is a **read-only** lookup: nothing is
     written, so a nested tree next to a copy cannot misdirect a write the way a workspace-state
     resolution can. When no ancestor holds a layer the nearest root-shaped ancestor is returned and

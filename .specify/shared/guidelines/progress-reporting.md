@@ -1,6 +1,6 @@
 # 进展汇报纪律(Progress Reporting Discipline)
 
-> **Single Source of Truth**: 本文档是框架「进展汇报」纪律的唯一定义处:默认间隔的数值、间隔的锚点与覆盖方式、汇报内容下限、补报与豁免规则、与相邻纪律的边界都只在此定义。任何命令、技能、代理或共享工作流引用本纪律时 MUST 以路径引用本文件,MUST NOT 复制本文件的规则文本。指令文件(`templates/instructions-template.md` 生成的 `.specify/instructions.md`)的常驻章节 `## Progress Reporting Discipline` 只承载摘要 + 指针;该摘要节报出默认间隔的数值,作为**可达性提醒**(见「默认间隔与覆盖」一节的说明),不描述规则的其余任何细节。
+> **Single Source of Truth**: 本文档是框架「进展汇报」纪律的唯一定义处:默认间隔的数值、间隔的锚点与覆盖方式、汇报内容下限、补报与豁免规则、与相邻纪律的边界都只在此定义。任何命令、技能、代理或共享工作流引用本纪律时 MUST 以路径引用本文件,MUST NOT 复制本文件的规则文本。指令文件(`.specify/templates/instructions-template.md` 生成的 `.specify/instructions.md`)的常驻章节 `## Progress Reporting Discipline` 只承载摘要 + 指针;该摘要节报出默认间隔的数值,作为**可达性提醒**(见「默认间隔与覆盖」一节的说明),不描述规则的其余任何细节。
 
 **本纪律防的失效是「长跑静默」**:一次需要几十分钟的任务里,Agent 在工具循环中连续工作而不发一言——用户那一侧看到的与卡死、跑飞、正在等待输入完全无法区分,他唯一可用的恢复手段是中断一件可能已经接近完成的工作。反向失效同样成立:把每一小步都播报一遍,噪音会淹掉真正的信号(阻塞、风险、阶段完成),并挤占本可用于工作的上下文。
 
@@ -88,9 +88,9 @@
 ## 判定边界
 
 - 本纪律约束**运行进行中的可见性节奏**,不约束任务本身如何分步、如何验证(后者归各流程自身的纪律)。
-- 与 Token 效率纪律(`shared/guidelines/token-efficiency.md`)的边界:汇报是**摘要优先**的极小投影——只带判定结果与计数,不带原文;本纪律不授权把日志或文件内容搬进对话。
-- 与单次执行证据纪律(`shared/guidelines/single-run-evidence.md`)的边界:那侧管昂贵执行的输出是否**完整落盘、后续不重跑**;本侧管运行**进行中**向用户暴露什么。汇报中的数字 SHOULD 取自那份留痕,而不是再跑一遍去取数。
-- 与运行判定(`shared/workflow/feedback-step.md` § Run Determination)的边界:本纪律是**运行中、每隔一段时间**的节奏;运行判定是**收尾时一次**的测量;两者不互相替代,也不互相触发。
-- 与确认门纪律(`shared/guidelines/confirmation-gates.md`)的边界:汇报是陈述,确认门是征询;见「汇报不是确认门」。
-- 与快速失败纪律(`shared/guidelines/fast-fail.md`)的边界:异常的分流判据与上送件形态归那侧,本纪律只规定「异常消息相对节奏的优先级」。
+- 与 Token 效率纪律(`.specify/shared/guidelines/token-efficiency.md`)的边界:汇报是**摘要优先**的极小投影——只带判定结果与计数,不带原文;本纪律不授权把日志或文件内容搬进对话。
+- 与单次执行证据纪律(`.specify/shared/guidelines/single-run-evidence.md`)的边界:那侧管昂贵执行的输出是否**完整落盘、后续不重跑**;本侧管运行**进行中**向用户暴露什么。汇报中的数字 SHOULD 取自那份留痕,而不是再跑一遍去取数。
+- 与运行判定(`.specify/shared/workflow/feedback-step.md` § Run Determination)的边界:本纪律是**运行中、每隔一段时间**的节奏;运行判定是**收尾时一次**的测量;两者不互相替代,也不互相触发。
+- 与确认门纪律(`.specify/shared/guidelines/confirmation-gates.md`)的边界:汇报是陈述,确认门是征询;见「汇报不是确认门」。
+- 与快速失败纪律(`.specify/shared/guidelines/fast-fail.md`)的边界:异常的分流判据与上送件形态归那侧,本纪律只规定「异常消息相对节奏的优先级」。
 - **不引入机制**:无定时器、无注册表、无汇报落盘工件的要求。若某流程本就要落运行日志,汇报可从中取数,但不得为汇报新增一个日志面。

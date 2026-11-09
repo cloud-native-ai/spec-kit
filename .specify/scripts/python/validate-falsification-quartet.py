@@ -3,7 +3,7 @@
 
 The quartet turns "the falsification attempt ran" from a claim into a fact the artifact can
 distinguish. The owner of the field semantics and of the rejection rules is
-``shared/guidelines/critique-and-self-critique.md`` § 产出形态:四元组; this checker consumes them
+``.specify/shared/guidelines/critique-and-self-critique.md`` § 产出形态:四元组; this checker consumes them
 and prints a verdict, it never restates them.
 
 Payload form: the four literal keys ``attempt`` / ``exit_code`` / ``observation`` /
@@ -60,7 +60,7 @@ REASONS = (
     "input-unreadable",
 )
 
-# The closed quartet (owner: shared/guidelines/critique-and-self-critique.md).
+# The closed quartet (owner: .specify/shared/guidelines/critique-and-self-critique.md).
 KEYS = ("attempt", "exit_code", "observation", "would_go_red_if")
 
 KEY_RE = re.compile(r"^(?:[-*+][ \t]+|#{1,6}[ \t]+)?(%s)[ \t]*:[ \t]*(.*)$" % "|".join(KEYS))

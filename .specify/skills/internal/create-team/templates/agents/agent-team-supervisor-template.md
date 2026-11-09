@@ -86,7 +86,7 @@ Default dimensions (override per task):
 
 ## Continuous Mode (operating loop)
 
-When I supervise a **`continuous`** team (long-lived operating loop) rather than a bounded **`iteration`**, one `run` is **one cycle** and I follow the operating discipline in `skills/internal/create-team/references/operating-loops.md`:
+When I supervise a **`continuous`** team (long-lived operating loop) rather than a bounded **`iteration`**, one `run` is **one cycle** and I follow the operating discipline in `.specify/skills/internal/create-team/references/operating-loops.md`:
 
 1. **Read** `constraints.md` + budget + kill-switch at cycle start; if kill-switch is set or spend ≥ 100% → **halt immediately** (one-line note to `STATE.md`).
 2. **Budget-gate**: if spend ≥ 80% of the daily cap → run this cycle **report-only** (no worker dispatch, no changes).

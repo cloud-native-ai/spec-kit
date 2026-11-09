@@ -30,10 +30,10 @@ does not restate their rows.
 |---|---|
 | Repository root and source directories | `.specify/instructions.md` § Tech Stack & Resources → Key Directories |
 | Documentation space | `docs/concepts/documentation-model.md` |
-| Framework runtime layout | `shared/definitions/framework-map.md` |
-| Feature artifacts | `shared/definitions/framework-map.md` (Feature specs row) |
-| Agent / team / skill layers | `shared/definitions/agent-definitions.md` + `framework-map.md` |
-| Temporary and scratch data | `shared/guidelines/temp-directory-discipline.md` |
+| Framework runtime layout | `.specify/shared/definitions/framework-map.md` |
+| Feature artifacts | `.specify/shared/definitions/framework-map.md` (Feature specs row) |
+| Agent / team / skill layers | `.specify/shared/definitions/agent-definitions.md` + `framework-map.md` |
+| Temporary and scratch data | `.specify/shared/guidelines/temp-directory-discipline.md` |
 
 ## 3. Registration obligation (创建即登记)
 
@@ -49,7 +49,7 @@ does not restate their rows.
 
 - A temporary or scratch directory MUST use a sanctioned root and MUST be matched by
   `.gitignore` before its first write inside the repository. Roots, the pre-write check,
-  cleanup, and exceptions are owned by `shared/guidelines/temp-directory-discipline.md`.
+  cleanup, and exceptions are owned by `.specify/shared/guidelines/temp-directory-discipline.md`.
 - A temporary directory MUST NOT become permanent by being left in place: it is either
   registered under § 3 or removed when its work item ends.
 
@@ -68,7 +68,7 @@ Registered runtime roots:
 
 | Root | Owner | Lifecycle | What it holds |
 |---|---|---|---|
-| `<repo>/.specify/.tmp/sdd-loop/` | `skills/external/sdd-loop-driver` (`scripts/line-registry.py`, `references/dispatch-recipes.md`) | temporary — covered by `.specify/.gitignore`'s `.tmp/` rule; cleaned up when the work item ends | per-line worktrees, cache, and tmp |
+| `<repo>/.specify/.tmp/sdd-loop/` | `skills/external/sdd-loop-driver` (`.specify/scripts/line-registry.py`, `references/dispatch-recipes.md`) | temporary — covered by `.specify/.gitignore`'s `.tmp/` rule; cleaned up when the work item ends | per-line worktrees, cache, and tmp |
 | `<repo>/.specify/state/` | the same skill | long-lived archive — one file per line (`<line_id>.md`), never one shared aggregate | per-line state spines |
 | `$XDG_STATE_HOME/spec-kit/lines/` (fallback `~/.local/state/spec-kit/lines/`) | the same skill | long-lived archive, outside any repository | environment-level Line Registry entries, locks, manifests, and reservations |
 
@@ -90,7 +90,7 @@ declares different roots.
 
 ## 7. Boundaries with adjacent disciplines
 
-- `shared/guidelines/temp-directory-discipline.md` — owns temp-dir roots, the pre-write ignore
+- `.specify/shared/guidelines/temp-directory-discipline.md` — owns temp-dir roots, the pre-write ignore
   check, cleanup, and exceptions; this file only routes to it.
 - `docs/concepts/documentation-model.md` — owns the `docs/` directory taxonomy and the notes
   lifecycle.

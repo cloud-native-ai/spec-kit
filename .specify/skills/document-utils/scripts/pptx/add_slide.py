@@ -170,7 +170,7 @@ def parse_source(source: str) -> tuple[str, str | None]:
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -226,8 +226,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -239,7 +239,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/external/document-utils/scripts/pptx/add_slide.py'
+_SIG_SCRIPT = '.specify/skills/document-utils/scripts/pptx/add_slide.py'
 _SIG_DECLARED = ()
 _SIG_HELP = (
     'usage: add_slide.py [options]\n'

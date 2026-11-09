@@ -54,7 +54,7 @@
 
 **现象**：HTML 引用 `vendor/echarts.min.js` 但 vendor/ 为空，加载器用 document.write 回退 CDN。
 **后果**：离线/内网环境图全空白（R1 点名：*"离线打开 HTML 无法渲染"*）；document.write 阻塞解析且被 CSP 拦截。
-**规避**：交付前真实放置 vendor/echarts.min.js（`scripts/vendor-echarts.sh`），加载器改为本地优先 + CDN `onerror` 动态回退；`verify-deliverable.mjs` 检查。
+**规避**：交付前真实放置 vendor/echarts.min.js（`.specify/scripts/vendor-echarts.sh`），加载器改为本地优先 + CDN `onerror` 动态回退；`verify-deliverable.mjs` 检查。
 
 ## 10. 交付无静态渲染产物
 
@@ -72,7 +72,7 @@
 
 **现象**：双副本标注 "keep both in sync" 但靠手工维护。
 **后果**：任一侧漏改即漂移，HTML 与校验结果不一致（R1 点名）。
-**规避**：JSON 为唯一权威，JS 包装由 `scripts/sync-config.mjs` 生成；`--check` 模式防漂移。
+**规避**：JSON 为唯一权威，JS 包装由 `.specify/scripts/sync-config.mjs` 生成；`--check` 模式防漂移。
 
 ## 13. 多图色板散落各 config
 
@@ -84,7 +84,7 @@
 
 **现象**：手写固定坐标 graph 节点/分区无越界/重叠检查（18 节点挤 900px 画布）。
 **后果**：长期维护后节点重叠、出画布，图不可读（R1 点名）。
-**规避**：meta 记录画布尺寸与栅格规则；交付前跑 `scripts/check-layout.mjs`。
+**规避**：meta 记录画布尺寸与栅格规则；交付前跑 `.specify/scripts/check-layout.mjs`。
 
 ## 15. 校正源描述无依据
 

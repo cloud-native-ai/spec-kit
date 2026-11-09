@@ -1,6 +1,6 @@
 # 单次执行证据纪律(Single-Run Evidence Discipline)
 
-> **Single Source of Truth**: 本文档是框架「单次执行证据」纪律的唯一定义处。任何命令、技能、代理或共享工作流引用本纪律时 MUST 以路径引用本文件,MUST NOT 复制规则文本。原则层声明见宪法原则 XV(`templates/constitution-template.md`);本文档由指令文件的 `## Single-Run Evidence Discipline` 章节以指针引用,该章节只承载摘要,细则归此处。
+> **Single Source of Truth**: 本文档是框架「单次执行证据」纪律的唯一定义处。任何命令、技能、代理或共享工作流引用本纪律时 MUST 以路径引用本文件,MUST NOT 复制规则文本。原则层声明见宪法原则 XV(`.specify/templates/constitution-template.md`);本文档由指令文件的 `## Single-Run Evidence Discipline` 章节以指针引用,该章节只承载摘要,细则归此处。
 
 Agent 的工作充满昂贵执行——长时测试套件、构建、批量查询、远端调用。每一次这样的执行都是一次性的证据采集机会:**执行本身才是成本,完整输出近乎免费可留**。同一份证据 MUST NOT 被支付两次。
 
@@ -63,4 +63,4 @@ Agent 的工作充满昂贵执行——长时测试套件、构建、批量查�
 
 - 本纪律约束**证据的保全与消费方式**,不约束命令本身的选择与正确性(后者归各流程自身的验证纪律)。
 - 留痕工件的位置与命名由执行它的流程决定;本纪律只要求"落盘且可再寻址"。
-- 与 Token 效率纪律(`shared/guidelines/token-efficiency.md`)的边界:那侧管注入上下文的内容量(程序读原文、模型读摘要),本侧管昂贵执行的输出是否完整保全、后续是否重跑——两侧同向:文件是廉价外部记忆。
+- 与 Token 效率纪律(`.specify/shared/guidelines/token-efficiency.md`)的边界:那侧管注入上下文的内容量(程序读原文、模型读摘要),本侧管昂贵执行的输出是否完整保全、后续是否重跑——两侧同向:文件是廉价外部记忆。

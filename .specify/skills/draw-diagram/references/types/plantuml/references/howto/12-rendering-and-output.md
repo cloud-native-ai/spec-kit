@@ -68,7 +68,7 @@ fc-cache -f ${HOME}/.local/share/fonts
 bash ${SKILL_HOME}/references/types/plantuml/scripts/render-plantuml.sh diagram-01.puml output_dir 01-system-overview
 ```
 
-**渲染脚本**：[scripts/render-plantuml.sh](../../scripts/render-plantuml.sh)
+**渲染脚本**：[.specify/scripts/render-plantuml.sh](../../scripts/render-plantuml.sh)
 
 ### 1.2 SVG/PNG 双策略渲染
 

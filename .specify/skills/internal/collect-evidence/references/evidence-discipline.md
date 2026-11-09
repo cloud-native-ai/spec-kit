@@ -2,7 +2,7 @@
 
 > 语义移植自 Better Harness `models/agent-work-loop.md`(上游 commit `b2e621d`);
 > 本文件是全部证据消费方共享的**语义单一事实源**(各态语义、四条纪律)。七态的**取值域**——成员、次序、基数——
-> 不在这里,由 `shared/declarations/facts/evidence-seven-states.yaml#/statement` 单一拥有。任何消费方不得裁剪或
+> 不在这里,由 `.specify/shared/declarations/facts/evidence-seven-states.yaml#/statement` 单一拥有。任何消费方不得裁剪或
 > 重定义状态语义,只能自定义响应方式。
 
 ## 四条证据纪律
@@ -15,7 +15,7 @@
 ## evidenceState 七态
 
 **取值域不在本节。** 七态的**成员、次序与基数**由声明层单一拥有：
-`shared/declarations/facts/evidence-seven-states.yaml#/statement`（`kind: closed-set`，框架源相对路径；
+`.specify/shared/declarations/facts/evidence-seven-states.yaml#/statement`（`kind: closed-set`，框架源相对路径；
 客户项目读 `.specify/shared/declarations/` 下的同一份镜像）。本节只保留各态**语义**——语义是本文件拥有的
 判据，取值表不是；MUST NOT 把本节读作第二份封闭集，也 MUST NOT 据此新增或重排状态。
 
@@ -33,7 +33,7 @@
 
 ## 采集子集边界(防侵蚀)
 
-采集子集(`scripts/js/better-harness/`)**只进事实,不进观点**:上游的评分、严重度、建议目录、渲染层永久排除在子集之外(清单见其 `UPSTREAM.md` 与 contracts/engine-subset-boundary.md)。向子集新增文件必须同步更新 UPSTREAM.md 清单,且不得来自排除清单。
+采集子集(`.specify/scripts/js/better-harness/`)**只进事实,不进观点**:上游的评分、严重度、建议目录、渲染层永久排除在子集之外(清单见其 `UPSTREAM.md` 与 contracts/engine-subset-boundary.md)。向子集新增文件必须同步更新 UPSTREAM.md 清单,且不得来自排除清单。
 
 ## 消费方响应约定(参考)
 

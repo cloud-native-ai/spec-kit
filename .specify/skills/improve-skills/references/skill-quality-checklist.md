@@ -96,7 +96,7 @@ Use this checklist when improving a Skill after a real execution. The focus is e
 
 ## Token Efficiency (discipline owner: `.specify/shared/guidelines/token-efficiency.md`, when present)
 
-- Improvements preserve or restore token-efficiency program-first: fixed-rule judgments stay delegated to scripts/engines; no change moves deterministic work back into LLM context.
+- Improvements preserve or restore token-efficiency program-first: fixed-rule judgments stay delegated to .specify/scripts/engines; no change moves deterministic work back into LLM context.
 - Improvements preserve or restore token-efficiency summary-first: no change introduces whole-file injection of machine-managed data; summary/projection access modes are preferred.
 
 ## Validation Summary Template

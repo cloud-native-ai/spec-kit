@@ -31,7 +31,7 @@ Each entry is local-scoped (``scope: local``: one unit + one run); a
 framework-wide view exists only as the aggregation built over recorded entries.
 ``/speckit.review`` is a separate SDD-flow mechanism that reviews one feature's
 process — not a whole-framework report (boundary owner:
-``shared/workflow/feedback-step.md`` § Mechanism boundary).
+``.specify/shared/workflow/feedback-step.md`` § Mechanism boundary).
 
 Positioning: feedback targets the Spec Kit framework itself (templates,
 commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the
@@ -97,7 +97,7 @@ STATE_DIRNAME = "state"
 INDEX_NAME = "index.json"
 STORE_NAME = "feedback"
 # Feature 084, batch 1 row 1: the prompt threshold is a declaration-layer fact. This engine carries no
-# copy of the value — it reads `shared/declarations/facts/feedback-prompt-threshold.yaml` through the
+# copy of the value — it reads `.specify/shared/declarations/facts/feedback-prompt-threshold.yaml` through the
 # shared read entry, and a project without the layer is labelled rather than defaulted (FR-012 /
 # C-049: the compatibility path MUST NOT be readable as a pass).
 THRESHOLD_FACT = "feedback-prompt-threshold"

@@ -120,7 +120,7 @@ BLANK_FORM = """\
 # 字段类型/取值域/关联约束的权威是 schema/project.sql（DDL，由数据库强制）。
 # 档位：[R] 必填-阻断  [I] 可推断（留空即可，模型/装载器会推断并留痕）  [O] 可选
 # 日期一律 yyyy-mm-dd。留空 = 「本表未提供」，按档位处置，绝不臆造。
-# 本表由 scripts/project-db.py --load 装载进 SQLite；装载即校验（约束违规会报可读原因）。
+# 本表由 .specify/scripts/project-db.py --load 装载进 SQLite；装载即校验（约束违规会报可读原因）。
 
 schema: project-input/v1
 
@@ -576,7 +576,7 @@ def main() -> int:
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -632,8 +632,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -645,7 +645,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/internal/summarize-project/scripts/validate-project-input.py'
+_SIG_SCRIPT = '.specify/skills/internal/summarize-project/scripts/validate-project-input.py'
 _SIG_DECLARED = ('--blank-form', '--db', '--emit-json', '--form-skeleton', '--input', '--json', '--print-required')
 _SIG_HELP = (
     'usage: validate-project-input.py [options]\n'

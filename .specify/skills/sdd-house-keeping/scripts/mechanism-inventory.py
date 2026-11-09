@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Provenance: mirrored from skills/external/sdd-project-setup/scripts/mechanism-inventory.py
+# Provenance: mirrored from .specify/skills/sdd-project-setup/scripts/mechanism-inventory.py
 # so this external skill stays independently runnable. Parity is enforced by
 # tests/contract/test_sdd_house_keeping_skill.py (the three provenance lines are ignored).
 """mechanism-inventory — spec-kit 安装机制的确定性盘点脚本（sdd-project-setup S1）.
@@ -93,14 +93,14 @@ def main() -> int:
 
     matrix = {
         "specify_dir": os.path.isdir(sp),
-        "const": exists("memory/constitution.md"),
-        "feat": exists("memory/features.md") and os.path.isdir(os.path.join(sp, "memory/features")),
-        "gloss": exists("memory/glossary.md"),
-        "fb": os.path.isdir(os.path.join(sp, "memory/feedback")),
-        "reg": exists("memory/register.md"),
-        "kb": os.path.isdir(os.path.join(sp, "memory/knowledge")),
-        "session": os.path.isdir(os.path.join(sp, "memory/session")),
-        "tools": exists("memory/tools.md"),
+        "const": exists(".specify/memory/constitution.md"),
+        "feat": exists(".specify/memory/features.md") and os.path.isdir(os.path.join(sp, ".specify/memory/features")),
+        "gloss": exists(".specify/memory/glossary.md"),
+        "fb": os.path.isdir(os.path.join(sp, ".specify/memory/feedback")),
+        "reg": exists(".specify/memory/register.md"),
+        "kb": os.path.isdir(os.path.join(sp, ".specify/memory/knowledge")),
+        "session": os.path.isdir(os.path.join(sp, ".specify/memory/session")),
+        "tools": exists(".specify/memory/tools.md"),
         "skills": skills_count > 0,
         "skills_count": skills_count,
         "tmpl": os.path.isdir(os.path.join(sp, "templates")),
@@ -128,7 +128,7 @@ def main() -> int:
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -184,8 +184,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -197,7 +197,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/external/sdd-house-keeping/scripts/mechanism-inventory.py'
+_SIG_SCRIPT = '.specify/skills/sdd-house-keeping/scripts/mechanism-inventory.py'
 _SIG_DECLARED = ('--json', '--project')
 _SIG_HELP = (
     'usage: mechanism-inventory.py [options]\n'

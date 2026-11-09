@@ -92,7 +92,7 @@ flowchart LR
 ## 7. 量测自检（交付前必做）
 
 ```bash
-python3 skills/external/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py wbs.svg --display-width 1400
+python3 .specify/skills/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py wbs.svg --display-width 1400
 ```
 
 三判据：**正文有效字号 ≥12px**、**长宽比 1.2~1.8:1**、**标签不越界**（判断依据见脚本输出 `checks`）。

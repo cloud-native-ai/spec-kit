@@ -65,7 +65,7 @@ ${SKILL_WORKDIR}/.specify/
 /external/draw-diagram/SKILL.md
 /external/draw-diagram/references/routing-matrix.md
 /external/draw-diagram/references/semantic-model.md
-/external/draw-drawio/ # path rewritten to skills/external/draw-diagram/references/types/drawio/; destination verified present
+/external/draw-drawio/ # path rewritten to .specify/skills/draw-diagram/references/types/drawio/; destination verified present
 /false
 /github.com/jgraph/drawio-mcp/blob/main/shared/mxfile.xsd
 /github.com/jgraph/drawio-mcp/blob/main/shared/style-reference.md
@@ -87,7 +87,7 @@ ${SKILL_WORKDIR}/.specify/
 /scripts/python/feedback-utils.py
 /sds-realization.md
 /shared/workflow/feedback-step.md
-/skills/draw-drawio/ # path rewritten to skills/external/draw-diagram/references/types/drawio/; destination verified present
+/skills/draw-drawio/ # path rewritten to .specify/skills/draw-diagram/references/types/drawio/; destination verified present
 /skills/draw-drawio/SKILL.md # retired skill_id/path of source drawio; the engine layer is a reference doc, not a skill
 /tooltips/connect/arrows/fold/page
 /value
@@ -305,17 +305,17 @@ sketch=1
 skill-draw-drawio-evaluation-form # per-engine evaluation-form probe retired; skill-draw-diagram-evaluation-form carries `engine: <name>` in the review's first line
 skill_id
 skills/external/draw-diagram
-skills/external/draw-diagram/SKILL.md
-skills/external/draw-diagram/references/routing-matrix.md
-skills/external/draw-diagram/references/semantic-model.md
-skills/external/draw-drawio/ # path rewritten to skills/external/draw-diagram/references/types/drawio/; destination verified present
+.specify/skills/draw-diagram/SKILL.md
+.specify/skills/draw-diagram/references/routing-matrix.md
+.specify/skills/draw-diagram/references/semantic-model.md
+.specify/skills/draw-drawio/ # path rewritten to .specify/skills/draw-diagram/references/types/drawio/; destination verified present
 source
 source=
 sourcePoint
 span
 specify/memory/feedback/
 specify/shared/workflow/feedback-step.md
-specify/skills/draw-drawio/ # path rewritten to skills/external/draw-diagram/references/types/drawio/; destination verified present
+specify/skills/draw-drawio/ # path rewritten to .specify/skills/draw-diagram/references/types/drawio/; destination verified present
 startSize
 strokeColor
 strokeWidth

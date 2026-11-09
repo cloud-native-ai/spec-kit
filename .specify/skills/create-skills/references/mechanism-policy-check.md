@@ -1,6 +1,6 @@
 # Mechanism / policy check — how to locate a misplacement
 
-The criteria are owned by `shared/definitions/mechanism-policy-definitions.md`: the boundary test
+The criteria are owned by `.specify/shared/definitions/mechanism-policy-definitions.md`: the boundary test
 (§ Terminology), the two sides (§ Boundary Test), the symptoms (§ Misplacement Symptoms) and the
 corrections. This file only says **where to look** and **how to read a hit**. It is not a second
 owner and it adds no rule.
@@ -24,5 +24,5 @@ owner and it adds no rule.
   parameter the caller or the environment supplies, and when it is absent ask (§ Consumption
   Contract of the owner), never inherit the value already in the text.
 - Mechanism left in the run-environment side: move the rule, step order or branch into the skill
-  assets — the body, `references/` or `scripts/` — and leave the run-environment note carrying
+  assets — the body, `references/` or `.specify/scripts/` — and leave the run-environment note carrying
   only which input this run uses.

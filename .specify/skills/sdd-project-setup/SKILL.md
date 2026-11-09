@@ -11,7 +11,7 @@ classification: external
 
 把「让一个项目进入 spec-kit 框架的可用基线」固化为 **bootstrap 程序**：先做确定性盘点定缺口，再安装/刷新，随后完成 constitution 与首批内容，最后把周期性维护 handoff 给 `sdd-house-keeping`。本 skill **不执行**周期性 reconcile/strengthen/verify/report，也不执行任何破坏性清理；这些归 house-keeping 的 H1–H5。
 
-bootstrap 对象是**双层框架**：**物理机制**（`.specify/` 目录/脚本/链接）与**逻辑框架**（instructions / feature / docs 为必选层，goal / agent / team 按需层）。只把目录铺齐而逻辑资产缺位，不算 bootstrap 完成。两层各有确定性盘点：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py`。
+bootstrap 对象是**双层框架**：**物理机制**（`.specify/` 目录/脚本/链接）与**逻辑框架**（instructions / feature / docs 为必选层，goal / agent / team 按需层）。只把目录铺齐而逻辑资产缺位，不算 bootstrap 完成。两层各有确定性盘点：`.specify/scripts/mechanism-inventory.py` 与 `.specify/scripts/logical-framework.py`。
 
 **幂等契约**：本技能对同一项目可多次执行——每次执行先 S1 盘点定缺口，S2/S2.5 只执行缺口项；稳定态（机制 complete 且首批内容在位）上的重复执行零结构写动作、零内容重建；`specify` 在位即跳过安装。收敛语义见 `references/setup-recipes.md`。
 
@@ -34,8 +34,8 @@ bootstrap 对象是**双层框架**：**物理机制**（`.specify/` 目录/脚�
 
 ```text
 S0 ENTRY     一遍性入口：目标、模式、目标工具
-S1 ASSESS    双盘点：scripts/mechanism-inventory.py 扫物理机制 → absent/partial/
-             degraded/complete + provenance；scripts/logical-framework.py 扫逻辑
+S1 ASSESS    双盘点：.specify/scripts/mechanism-inventory.py 扫物理机制 → absent/partial/
+             degraded/complete + provenance；.specify/scripts/logical-framework.py 扫逻辑
              框架 → required/recommended/conditional 三层判定
 S2 INSTALL   （全部在执行侧=目标项目所在环境运行；编排侧本地宿主无需
              speckit，不误触发安装链——拓扑真源见
@@ -54,7 +54,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
              不冒充 ready；候选清单由 house-keeping H5 产出
 ```
 
-**Dispatch carrier**：未给远程三元组 → **本地**，目标=当前项目，由编排者或宿主**原生子代理**执行，MUST NOT 启动 `qodercli`；远程三元组给全 → `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，经 run-agent 驱动 subagent CLI；CLI 缺省取 execution-config defaults（`cli: qodercli`）。完整判据见 `.specify/shared/workflow/execution-topology.md` § Carrier decision。**SSH 传输 owner 是 `ssh-utils`**：选项、引号、stdin 推送与退出码由其 `scripts/ssh-exec.py` 承载（固定 `-o RemoteCommand=none`），本技能只声明拓扑形态。
+**Dispatch carrier**：未给远程三元组 → **本地**，目标=当前项目，由编排者或宿主**原生子代理**执行，MUST NOT 启动 `qodercli`；远程三元组给全 → `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，经 run-agent 驱动 subagent CLI；CLI 缺省取 execution-config defaults（`cli: qodercli`）。完整判据见 `.specify/shared/workflow/execution-topology.md` § Carrier decision。**SSH 传输 owner 是 `ssh-utils`**：选项、引号、stdin 推送与退出码由其 `.specify/scripts/ssh-exec.py` 承载（固定 `-o RemoteCommand=none`），本技能只声明拓扑形态。
 
 **S2.5 carrier**：本地由编排者在当前项目执行，或交给宿主的原生子代理；远端每个 S2.5 命令经 run-agent 在 `<project-dir>` 下执行（`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`），CLI 缺省 qodercli；SSH 传输细则见 `ssh-utils`。
 
@@ -76,7 +76,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 12. **Bootstrap 后 handoff**：S2.5 完成后，周期性调协、强化、验证、记录回收与候选清单 MUST handoff 给 `sdd-house-keeping`；本 skill MUST NOT 复制其 H1–H5 执行细则。目标项目已初始化且本次只需维护时，直接加载 `sdd-house-keeping`，不重跑 `specify init`。
 13. **无破坏性动作**：本 skill MUST NOT 执行 `/speckit.sanitize`、retention apply 或任何删除/归档；破坏性门归 house-keeping 调用的 sanitize。setup 只做可逆的安装/刷新/内容初始化。
 14. **不做 SDD 阶段推进**：本技能不做任何 SDD 阶段推进；requirements → … → review 归 `sdd-loop-driver`；S2.5 只调用 bootstrap 内容类命令（constitution/feature/docs/goal/agents/team）。
-15. **远端命令经 ssh-utils 承载**：任何远端执行 MUST 使用 `ssh-utils` 的 `scripts/ssh-exec.py`（或等价地带 `-o RemoteCommand=none` 的形态）；MUST NOT 手写裸 `ssh <alias> "..."`——目标主机可能在 ssh_config 预置 `RemoteCommand`，与命令行冲突。传输失败先跑 `ssh-exec.py --check` 诊断。
+15. **远端命令经 ssh-utils 承载**：任何远端执行 MUST 使用 `ssh-utils` 的 `.specify/scripts/ssh-exec.py`（或等价地带 `-o RemoteCommand=none` 的形态）；MUST NOT 手写裸 `ssh <alias> "..."`——目标主机可能在 ssh_config 预置 `RemoteCommand`，与命令行冲突。传输失败先跑 `ssh-exec.py --check` 诊断。
 
 ## Discipline Defaults
 
@@ -89,10 +89,10 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 
 - `.specify/shared/workflow/target-resolution.md` — 三技能共享的目标解析唯一契约（显式目标 > git root > cwd；拒绝 `.specify` 根；不向上搜索）。
 - `.specify/shared/workflow/execution-topology.md` — 执行拓扑真源：编排侧/执行侧两侧角色划分、speckit 安装归属（只在执行侧）。
-- `scripts/mechanism-inventory.py` — 物理机制盘点（只读）。
-- `scripts/logical-framework.py` — 逻辑框架盘点（只读；S1 跑一次）。
+- `.specify/scripts/mechanism-inventory.py` — 物理机制盘点（只读）。
+- `.specify/scripts/logical-framework.py` — 逻辑框架盘点（只读；S1 跑一次）。
 - `references/setup-recipes.md` — bootstrap 侧执行细则：机制矩阵、逻辑矩阵、S1/S2 命令、S2.5 首批内容、handoff 与幂等语义。
-- `ssh-utils`（外部技能） — 远端 SSH 传输 owner：`-o RemoteCommand=none`、引号、stdin 脚本推送、su 包装与退出码；setup 的远端命令一律经其 `scripts/ssh-exec.py`。
+- `ssh-utils`（外部技能） — 远端 SSH 传输 owner：`-o RemoteCommand=none`、引号、stdin 脚本推送、su 包装与退出码；setup 的远端命令一律经其 `.specify/scripts/ssh-exec.py`。
 - `sdd-house-keeping`（外部技能） — bootstrap 之后的周期性维护 owner：H1 盘点、H2 调协（含 `/speckit.sanitize --lane retention`）、H3 强化、H4 验证、H5 报告。
 - `sdd-loop-driver`（外部技能） — SDD 开发阶段循环 owner；候选清单仅建议。
 
@@ -100,9 +100,9 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 
 本手册是**编排者**：bootstrap 动作的执行主体按**执行拓扑**选择承载形态（承接技能可选——本技能独立运行时不强制）：
 
-- **盘点**：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行。
+- **盘点**：`.specify/scripts/mechanism-inventory.py` 与 `.specify/scripts/logical-framework.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行。
 - **本地拓扑（默认）**：`specify init` / bootstrap 内容命令由编排者**亲自执行**，或交给**当前宿主 agent 的原生子代理**——MUST NOT 启动 `qodercli` / `claude -p` 等外部 agent CLI 作为本地子代理。
-- **远端拓扑**：bootstrap 命令经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发外部子代理，`ssh + su` 进入执行侧。
+- **远端拓扑**：bootstrap 命令经 **run-agent**（`.specify/skills/internal/run-agent/SKILL.md`）以拓扑声明派发外部子代理，`ssh + su` 进入执行侧。
 - **职责切分线**：bootstrap（install/refresh + 首批内容 + handoff）= 本技能；周期性维护（reconcile/strengthen/verify/report）= `sdd-house-keeping`；SDD 阶段循环 = `sdd-loop-driver`；创建/派发/修正 = create-agent / run-agent / improve-agent。
 
 ## Boundary
@@ -117,7 +117,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -127,4 +127,3 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:sdd-project-setup" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
-6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

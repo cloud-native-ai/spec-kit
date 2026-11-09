@@ -10,7 +10,7 @@ implements the mechanical faces only — it never re-defines a value domain:
                   lines of every explicitly named document (C-4);
 * ``evidence``  — the syntax and pairing of the ``证据：`` annotation
                   (grade / as-of / source), grammar owned by
-                  ``shared/workflow/expression-gates.md`` § 证据分级与 as-of (C-3);
+                  ``.specify/shared/workflow/expression-gates.md`` § 证据分级与 as-of (C-3);
 * ``duplicate`` — cross-file hand-written fact copies against the face owners
                   (C-5), with the two detection thresholds;
 * ``count``     — **delegated** to ``pre-analyze-check.py``; this checker never
@@ -76,22 +76,22 @@ MIRROR_DIR_NAME = ".specify"
 # S3: the six-face owner set — the comparison side of the duplicate face only
 # (C-2, C-5 rule 3). Paths only; no judgment text is copied here.
 OWNER_PATHS = (
-    "shared/guidelines/requirements-guidelines.md",
-    "shared/guidelines/user-facing-comprehension.md",
-    "shared/workflow/expression-gates.md",
-    "shared/guidelines/one-source-of-truth.md",
-    "skills/external/create-docs/SKILL.md",
-    "skills/external/create-docs/scripts/docs-utils.py",
-    "skills/internal/review-sdd-process/SKILL.md",
-    "templates/review-template.md",
-    "scripts/python/validate-requirements.py",
+    ".specify/shared/guidelines/requirements-guidelines.md",
+    ".specify/shared/guidelines/user-facing-comprehension.md",
+    ".specify/shared/workflow/expression-gates.md",
+    ".specify/shared/guidelines/one-source-of-truth.md",
+    ".specify/skills/create-docs/SKILL.md",
+    ".specify/skills/create-docs/scripts/docs-utils.py",
+    ".specify/skills/internal/review-sdd-process/SKILL.md",
+    ".specify/templates/review-template.md",
+    ".specify/scripts/python/validate-requirements.py",
 )
 
 # The two owners of the *other* evidence value domains (data-model E6 object
 # boundary): their own annotation grammar is not this face's subject.
 EVIDENCE_FACE_EXCLUDED_PATHS = (
-    "shared/workflow/evidence-step.md",
-    "shared/guidelines/single-run-evidence.md",
+    ".specify/shared/workflow/evidence-step.md",
+    ".specify/shared/guidelines/single-run-evidence.md",
 )
 
 # Line-level exclusions (closed set).
@@ -114,7 +114,7 @@ DUPLICATE_FUZZY_RATIO = 0.90
 # client project (where only the mirror exists) finds its copy without a second
 # hard-coded path.
 DELEGATE_PATHS = (
-    "skills/external/sdd-loop-driver/scripts/pre-analyze-check.py",
+    ".specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py",
 )
 
 # --------------------------------------------------------------------------- #
@@ -127,7 +127,7 @@ DELEGATE_PATHS = (
 # operator/face owners are untouched: this is an ACTION, never a seventh face.
 # --------------------------------------------------------------------------- #
 STRUCTURE_ACTION = "structure"
-FLOW_CLASS_ENGINE = "scripts/python/flow-class-check.py"
+FLOW_CLASS_ENGINE = ".specify/scripts/python/flow-class-check.py"
 STRUCTURE_HEADING = "## Document Structure"        # [[STR-002]]
 STRUCTURE_SUBSECTIONS = (
     "### Chapter Tree",      # [[STR-003]]
@@ -190,7 +190,7 @@ def find_repo_root(script_path):
 
     Two hats, one tree: the canonical copy lives at ``<root>/scripts/python/`` and
     the delivered copy at ``<root>/.specify/scripts/python/``; both MUST resolve
-    to ``<root>``. Walking up to the nearest ancestor holding ``shared/`` and
+    to ``<root>``. Walking up to the nearest ancestor holding ``.specify/shared/`` and
     ``skills/`` is not enough — inside a client project (and inside this framework
     repo's own runtime mirror) ``.specify/`` itself holds both, which is the
     two-hats path-resolution trap: the mirror copy then resolves owner paths

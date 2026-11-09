@@ -10,9 +10,9 @@
 
 | 问题 | Owner（打开它；不要从这里复制） |
 |------|--------------------------------|
-| 语义模型（实体、层级、结构、关联；SDS/LDM schema） | `skills/external/draw-diagram/references/semantic-model.md`（**现存**） |
-| **引擎选择**——含本引擎与他引擎的取舍、`drawio` ↔ `excalidraw` 可判优先序、独占登记、tie-break、反路由红线 | `skills/external/draw-diagram/references/routing-matrix.md`（**现存**：§0 能力轴层 / §1 独占 / §2 图类矩阵 / §3 tie-break / §4 红线） |
-| 语义分析、图类选择、版面规划、样式配色、内容措辞、类专属约定 | 前门 `skills/external/draw-diagram/SKILL.md`（**现存**）。这些问题的**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**——今日该 `references/` 树下只有上两行那两个文件。故此处**不预建具体路径**；在专章落盘前一律回前门 `SKILL.md`，不在本技能内自答 |
+| 语义模型（实体、层级、结构、关联；SDS/LDM schema） | `.specify/skills/draw-diagram/references/semantic-model.md`（**现存**） |
+| **引擎选择**——含本引擎与他引擎的取舍、`drawio` ↔ `excalidraw` 可判优先序、独占登记、tie-break、反路由红线 | `.specify/skills/draw-diagram/references/routing-matrix.md`（**现存**：§0 能力轴层 / §1 独占 / §2 图类矩阵 / §3 tie-break / §4 红线） |
+| 语义分析、图类选择、版面规划、样式配色、内容措辞、类专属约定 | 前门 `.specify/skills/draw-diagram/SKILL.md`（**现存**）。这些问题的**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**——今日该 `references/` 树下只有上两行那两个文件。故此处**不预建具体路径**；在专章落盘前一律回前门 `SKILL.md`，不在本技能内自答 |
 
 > **本技能不含任何路由叙事。** 「何时该选我而不选别的引擎」属引擎选择策略，owner 是 `routing-matrix.md`。绕开前门直接调用本技能不在其职责范围内。
 
@@ -75,7 +75,7 @@
 - **几何事实**：`.drawio` 格式自身**不做任何布局计算**——vertex 必须携带显式 `x/y/width/height`。但布局与走线 pass 是**可选叠加**的：默认内建 router 很基础（直线或简单直角，**无避障**，连线会直接穿过中间的形状）。
 - **三个 pass 的调用面尚未确证**：`routing=libavoid` / `postLayout=elk` / `applyLayouts` 在官方文档中是 **MCP server `create_diagram` 的参数名**；其在 Desktop CLI 上的等价开关**只确证了 `--layout`**。首次真实出图前不得把这三者当作 CLI 开关直接调用——详见 `./references/render-and-export.md` §4 未决项 9。
 
-> **轴②「渲染位置」不在本技能内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定；本文件与其 references 只登记**引擎能力事实**，不声明本套件采用哪条渲染路径。选路判据的 owner 是 `skills/external/draw-diagram/references/routing-matrix.md` §0。
+> **轴②「渲染位置」不在本技能内声明。** 渲染方式（本地 / 远端 / 共享渲染服务）正在另一条流程中重新裁定；本文件与其 references 只登记**引擎能力事实**，不声明本套件采用哪条渲染路径。选路判据的 owner 是 `.specify/skills/draw-diagram/references/routing-matrix.md` §0。
 
 ## 交付形态（Delivery）
 

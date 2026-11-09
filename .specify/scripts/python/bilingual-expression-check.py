@@ -3,7 +3,7 @@
 
 Behavior contract: ``.specify/specs/079-bilingual-expression/contracts/checker.md``
 (C-001..C-012). Rule owner (signals / coverage faces / unique form / exemption
-faces): ``shared/guidelines/bilingual-expression.md`` — read at runtime; no
+faces): ``.specify/shared/guidelines/bilingual-expression.md`` — read at runtime; no
 rule enumeration is embedded in this script (One Source Of Truth).
 
 Actions::
@@ -54,9 +54,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-OWNER_DOC_REL = "shared/guidelines/bilingual-expression.md"
+OWNER_DOC_REL = ".specify/shared/guidelines/bilingual-expression.md"
 GLOSSARY_REL = ".specify/memory/glossary.md"
-GLOSSARY_UTILS_REL = "scripts/python/glossary-utils.py"
+GLOSSARY_UTILS_REL = ".specify/scripts/python/glossary-utils.py"
 E6_REL = ".specify/specs/079-bilingual-expression/test-evidence/us10-e6-legacy-divergence.txt"
 
 COVERAGE_HEADING = "## 覆盖定义面（封闭集）"
@@ -176,7 +176,7 @@ def coverage_paths(items: List[str]) -> List[Path]:
             p = REPO_ROOT / token
             if p.exists():
                 paths.append(p)
-    for carrier in ("templates/commands", "templates/skills", "skills"):
+    for carrier in (".specify/templates/commands", ".specify/templates/skills", "skills"):
         p = REPO_ROOT / carrier
         if p.is_dir():
             paths.append(p)
@@ -467,7 +467,7 @@ def action_coverage(items: List[str]) -> List[Dict[str, Any]]:
                     "severity": "error",
                 })
         else:
-            carriers = [REPO_ROOT / c for c in ("templates/commands", "templates/skills", "skills")]
+            carriers = [REPO_ROOT / c for c in (".specify/templates/commands", ".specify/templates/skills", "skills")]
             if not any(_face_nonempty(c) for c in carriers):
                 findings.append({
                     "path": OWNER_DOC_REL,

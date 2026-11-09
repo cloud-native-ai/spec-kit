@@ -1,8 +1,8 @@
 # Harness 三重结构定义 — markdown + yaml + script
 
-**Owner（唯一所有者）**: 本文件 `shared/definitions/harness-triple-definitions.md` 是「harness 三重结构」这条纪律的唯一所有者，拥有六件事：**三层各自拥有什么**、**「归 yaml 的事实」判据**、**候选屏幕 S 的定义**、**范围判据与三个排除理由的语义**、**迁移时的权威取值顺序**、**非目标**。命令模板、技能、契约、测试、门户文档 MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制其判据句。
+**Owner（唯一所有者）**: 本文件 `.specify/shared/definitions/harness-triple-definitions.md` 是「harness 三重结构」这条纪律的唯一所有者，拥有六件事：**三层各自拥有什么**、**「归 yaml 的事实」判据**、**候选屏幕 S 的定义**、**范围判据与三个排除理由的语义**、**迁移时的权威取值顺序**、**非目标**。命令模板、技能、契约、测试、门户文档 MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制其判据句。
 
-**取值域的 owner 不是本文件**: 五类 fact kind、二值完整性状态、三值排除理由、三个退出码、必填键集与门禁调用点清单全部由 `shared/declarations/contract.yaml` 拥有。本文件描述**它们是什么意思、什么时候用哪一条**，MUST NOT 再列一份取值；任一取值问题的抵达方式是 `<path>#/<key>`。
+**取值域的 owner 不是本文件**: 五类 fact kind、二值完整性状态、三值排除理由、三个退出码、必填键集与门禁调用点清单全部由 `.specify/shared/declarations/contract.yaml` 拥有。本文件描述**它们是什么意思、什么时候用哪一条**，MUST NOT 再列一份取值；任一取值问题的抵达方式是 `<path>#/<key>`。
 
 **读者**: 一位被告知「这个取值现在归声明层了」的维护者。他打开本文件要回答三个问题：我的单元在不在范围内、它欠哪一种记录、各面已经漂移时该信哪一面的值。他不需要读过本特性的规划过程。
 
@@ -10,10 +10,10 @@
 
 | 主题 | 所有者 |
 |------|--------|
-| 取值域（kind／状态／理由／退出码／必填键／调用点） | `shared/declarations/contract.yaml` |
-| 声明文件的语法、目录形态、路径规范 | `shared/definitions/…` 见 `shared/declarations/contract.yaml#/yaml_subset` 所指子集；目录形态与登记见 `shared/definitions/framework-map.md` |
-| 判定引擎的动作面与判定算法 | `contracts/harness-triple-check.contract.md`（`scripts/python/harness-triple-check.py`） |
-| 共享读取入口的函数面与降级契约 | `contracts/shared-reader.contract.md`（`scripts/python/declaration_reader.py`） |
+| 取值域（kind／状态／理由／退出码／必填键／调用点） | `.specify/shared/declarations/contract.yaml` |
+| 声明文件的语法、目录形态、路径规范 | `.specify/shared/definitions/…` 见 `.specify/shared/declarations/contract.yaml#/yaml_subset` 所指子集；目录形态与登记见 `.specify/shared/definitions/framework-map.md` |
+| 判定引擎的动作面与判定算法 | `contracts/harness-triple-check.contract.md`（`.specify/scripts/python/harness-triple-check.py`） |
+| 共享读取入口的函数面与降级契约 | `contracts/shared-reader.contract.md`（`.specify/scripts/python/declaration_reader.py`） |
 | 批次名单与每批验收读数 | `contracts/migration-batches.contract.md` |
 | 分发与镜像义务 | `contracts/distribution-and-mirror.contract.md` |
 
@@ -77,16 +77,16 @@
 
 **三处载体面**（只有这三处）：
 
-- `templates/commands/*.md`
+- `.specify/templates/commands/*.md`
 - `skills/{external,internal}/*/SKILL.md`
-- `shared/workflow/*.md`
+- `.specify/shared/workflow/*.md`
 
-**进入候选集的条件**：载体文本中出现至少一处指向框架内确定性引擎的路径引用 —— `scripts/python/<name>.py` 形态，或 `skills/<layer>/<name>/scripts/<file>` 形态。
+**进入候选集的条件**：载体文本中出现至少一处指向框架内确定性引擎的路径引用 —— `.specify/scripts/python/<name>.py` 形态，或 `skills/<layer>/<name>/scripts/<file>` 形态。
 
 三条必须一起读的限定：
 
 1. **每次运行在树上重算**。候选集 MUST NOT 由任何手写清单代替；一份手写清单会在第一次新增命令时开始腐坏，而腐坏是静默的。
-2. **`shared/definitions/*.md` 不是流程单元**。它们是事实的散文 owner：它们拥有判据，不领处置。给它们发处置会把「事实归谁」与「单元在不在范围内」两件事混成一件。
+2. **`.specify/shared/definitions/*.md` 不是流程单元**。它们是事实的散文 owner：它们拥有判据，不领处置。给它们发处置会把「事实归谁」与「单元在不在范围内」两件事混成一件。
 3. **文本测试的保守侧是被接受的**。只在散文里提到脚本路径、实际并不调用它的载体，仍会进入候选集。这是设计选择，不是缺陷：为此发明「是否真的调用」的第二套语义判定，正是屏幕存在的意义所要避免的东西。它的处置是一条排除记录，不是一段解释。
 
 **排除与处置的关系**：候选集给出「谁要被处置」，不给出「处置是什么」。后者见下一章。
@@ -97,7 +97,7 @@
 
 **范围判据 = 两条合取**（判据句的唯一位置是本节）：
 
-**(D1) 资产面** —— 该流程单元的验收交付物包含至少一件由 `shared/guidelines/better-harness.md` § 消费者清单 点名的 harness 资产，且能指认落点。
+**(D1) 资产面** —— 该流程单元的验收交付物包含至少一件由 `.specify/shared/guidelines/better-harness.md` § 消费者清单 点名的 harness 资产，且能指认落点。
 
 **(D2) 机器面** —— 该单元至少有一条按 `## 归 yaml 的判据` 归属 yaml 的事实。
 

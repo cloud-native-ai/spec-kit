@@ -97,7 +97,7 @@ Territory: agent-<N>
 
 **Key principle**: Issue all sub-agent calls in ONE response block — sequential dispatch defeats the purpose.
 
-**Dispatch modality**: choose each member's execution mode per `.specify/shared/definitions/subagent-definitions.md` — **native** subagent when the runtime supports it, **virtual** (simulated in-session) when the tool has no subagent capability, **external** CLI process for long-running/parallel/isolated work. External dispatch MUST go through `scripts/dispatch.sh` (stream-json → compact filter → `.live.log`/`.jsonl`/`.status` triplet); silent `cli -p … > log 2>&1` dispatch is prohibited — a buffered log yields zero progress signal and defeats stall detection.
+**Dispatch modality**: choose each member's execution mode per `.specify/shared/definitions/subagent-definitions.md` — **native** subagent when the runtime supports it, **virtual** (simulated in-session) when the tool has no subagent capability, **external** CLI process for long-running/parallel/isolated work. External dispatch MUST go through `.specify/scripts/dispatch.sh` (stream-json → compact filter → `.live.log`/`.jsonl`/`.status` triplet); silent `cli -p … > log 2>&1` dispatch is prohibited — a buffered log yields zero progress signal and defeats stall detection.
 
 Per-Agent Payload:
 

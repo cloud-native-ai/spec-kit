@@ -1,7 +1,7 @@
 # Finding validation and report format
 
 Owns §5.5 (independent validation wave), §6 (report) and §7 (next actions) of the analysis
-skill. Extracted from `templates/commands/analyze.md`; content preserved, form re-expressed.
+skill. Extracted from `.specify/templates/commands/analyze.md`; content preserved, form re-expressed.
 
 ## 5.5 Finding validation (independent subagent pass)
 

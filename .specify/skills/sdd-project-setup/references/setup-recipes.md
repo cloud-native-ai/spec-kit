@@ -14,7 +14,7 @@
 
 ## 机制矩阵维度定义（S1）
 
-`scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
+`.specify/scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|

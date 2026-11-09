@@ -8,7 +8,7 @@
 
 **示范声明（C-02）**：本文件自身的定义行均按登记的逐字形态示范双语（声明：是）；读者可直接以本文件标题与章节标题为形态样例。
 
-**Readers**: 框架维护者（编写与评审 `shared/`、`templates/` 文档的作者）、词汇表维护者、下游项目使用者——复用 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者，不新建第二套读者定义。
+**Readers**: 框架维护者（编写与评审 `.specify/shared/`、`.specify/templates/` 文档的作者）、词汇表维护者、下游项目使用者——复用 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者，不新建第二套读者定义。
 **Reading scenario**: 判断一处概念/流程的定义行是否必须双语、其形态（方向/括号宽度/紧贴/用词）是否合规时打开本文件核对对应章节，并据其决定提交或放行。
 
 ## 头部与 owner 声明
@@ -59,11 +59,11 @@
 下列定义面 MUST 双语（信号见 § 定义处与可判定信号）；封闭集增删只能经本文件修订（FR-007 封闭集纪律），任何消费方 MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复述本清单条目。
 
 - 词汇表条目 Canonical：`.specify/memory/glossary.md` 全部词条。
-- `shared/definitions/` 概念条目。
-- `shared/guidelines/` 与 `shared/workflow/` 文档的标题与定义行。
+- `.specify/shared/definitions/` 概念条目。
+- `.specify/shared/guidelines/` 与 `.specify/shared/workflow/` 文档的标题与定义行。
 - 宪法原则标题：`.specify/memory/constitution.md` 的编号原则标题。
 - instructions ambient 小节标题：`.specify/instructions.md` 的 `## ` 小节标题。
-- `templates/` 章节标题。
+- `.specify/templates/` 章节标题。
 - 命令与技能名首次定义处的承载文件。
 
 清单本身之外的面不受约束；检查器 `coverage` 动作核验本清单每面存在且非空，整面缺失即 `coverage-missing`。
@@ -87,7 +87,7 @@
 - 同一概念在不同文档中的中英双语形态 MUST 一致（FR-005）。
 - 中文侧用词以项目词汇表（`.specify/memory/glossary.md`）的 Canonical 为准：不一致处以词汇表为准并登记变体（A8）；census 的中文侧比对逐字执行。
 - 词汇表 Canonical 的双语化形态按 requirements Assumptions A5 执行。
-- 词汇表登记协议（谁可登记、字段协议、消费纪律）归 `shared/workflow/glossary.md`，本文件不复述、不承载词条本身。
+- 词汇表登记协议（谁可登记、字段协议、消费纪律）归 `.specify/shared/workflow/glossary.md`，本文件不复述、不承载词条本身。
 
 ## 迁移边界与存量差异
 
@@ -104,7 +104,7 @@
 
 ## 检查器与守卫
 
-机械守卫的入口是 `scripts/python/bilingual-expression-check.py`（已分发脚本，镜像于 `.specify/scripts/python/`）；**行为说明（入口/退出码/扫描规则/判定边界）见该脚本的 `--help` 与模块 docstring，本节只指针**。
+机械守卫的入口是 `.specify/scripts/python/bilingual-expression-check.py`（已分发脚本，镜像于 `.specify/scripts/python/`）；**行为说明（入口/退出码/扫描规则/判定边界）见该脚本的 `--help` 与模块 docstring，本节只指针**。
 
 - 能判（三类机械判定）：(a) 信号行是否含登记的半角紧贴双语形态；(b) 括号语言是否与文档主语言相反；(c) 覆盖定义面是否齐全。
 - 不能判：语义——「括号内英文是否译得准」「这行是否在信号清单外仍是定义处」；检查器的绿是必要条件，MUST NOT 被援引为内容正确性证据（A7/C-012），最终验收归读者 oracle。
