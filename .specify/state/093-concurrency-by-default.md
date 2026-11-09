@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: checkpoint 03 + commit the plan artifacts, then dispatch tasks in the 093 worktree (main tree stays on the 092 line)
+next_action: dispatch tasks in the 093 worktree (main tree stays on the 092 line); checkpoint 03 and the plan commit 88699b99 are done
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
@@ -57,7 +57,7 @@ gates: |
   plan stage: decomposition-check --mode plan proceed — test-evidence/decomposition-plan.json (33 FR, no reason)
   plan stage: overlap-check reading=overlap (84 specs / 195 hits / 113 nested-path) — test-evidence/overlap-plan.json; verdict NOT taken from the engine, file-level adjudication in feature-ref.md § Overlap adjudication (F-093-001 resolved, F-093-002 workaround recorded)
 wrapup: done (requirements stage) — run-determination 093-requirements-a1 recorded; exec-quant recorded; feedback recorded
-wrapup_plan: pending — run-determination + exec-quant + feedback to be recorded after checkpoint 03
+wrapup_plan: done — run-determination 093-plan-a1 (skill:create-plan, all four axes not_evaluated with named reasons) + exec-quant record + feedback entry recorded; checkpoint 03 written; plan commit 88699b99
 wrapup_clarify: done — run-determination 093-clarify-a1 recorded for /speckit.clarify + skill:clarify-artifact; exec-quant + feedback recorded (both)
 feature_binding: "Feature 093 Concurrency by Default (Draft) — index header 86→87 + row + memory/features/093.md"
 findings: "F-093-001 delivery-surface overlap vs 064/070/086 — RESOLVED at plan: file-level adjudication table in feature-ref.md § Overlap adjudication (5 real same-file overlaps, each split by section); F-093-002 overlap-check nested-worktree relativization (open, framework) — plan uses the main-repo-root run + file-level reading as the recorded workaround, not a fix; F-093-003 coordinator dispatch verdict (open, STR-011) — registered as coordinator-dispatch-verdict.yaml and carried as plan T-004, deliberately NOT self-adjudicated"
