@@ -959,8 +959,139 @@ def action_coverage(repo, args):
     return _not_implemented("coverage")
 
 
+# --------------------------------------------------------------------------- #
+# dispatch capability (C-037…C-040, T095–T097)
+# --------------------------------------------------------------------------- #
+def frontmatter_list(text, key):
+    """One flow-list frontmatter value (``capability-tools: [Read, Grep]``), or ``None``."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        head, sep, value = line.partition(":")
+        if not sep or head.strip() != key:
+            continue
+        value = value.strip()
+        if value.startswith("[") and value.endswith("]"):
+            return [item.strip().strip("\"'") for item in value[1:-1].split(",")
+                    if item.strip()]
+        return [value.strip().strip("\"'")] if value else []
+    return None
+
+
+def classify_capability(tools, body_text):
+    """C-037's three-way test over the existing frontmatter list and the body text."""
+    tool_names = {str(tool).strip().lower() for tool in (tools or [])}
+    if any(tool in DISPATCH_TOOLS or "dispatch" in tool for tool in tool_names):
+        return "dispatch-capable", "a dispatch tool is present in capability-tools"
+    lowered = body_text.lower()
+    if any(marker in lowered for marker in HANDOFF_MARKERS):
+        return "handoff-declared", "the body declares an explicit handoff"
+    if any(marker in lowered for marker in EXTERNAL_PROCESS_MARKERS):
+        return "external-process", "the body declares an external-process form"
+    return "incapable", "no dispatch tool, handoff or external-process form is declared"
+
+
 def action_capability(repo, args):
-    return _not_implemented("capability")
+    """C-037…C-040: the static capability sweep plus the coordinator verdict."""
+    verdict_body = load_fact(repo, "coordinator-dispatch-verdict")
+    verdict_statement = fact_statement(verdict_body, "coordinator-dispatch-verdict")
+    allowed = [str(value).strip() for value in (verdict_statement.get("allowed_values") or [])]
+    verdict = str(verdict_statement.get("verdict", "")).strip()
+    record = load_record(args.record)
+    record_ref = str(args.record)
+
+    findings = []
+    measured = {
+        "verdict_fact": "shared/declarations/facts/coordinator-dispatch-verdict.yaml",
+        "verdict_allowed_values": allowed,
+        "agents": [],
+    }
+    if not verdict or verdict not in allowed:
+        return envelope(
+            "capability", "owner-unavailable",
+            [finding(
+                "owner-unavailable", measured["verdict_fact"],
+                "no adjudicated verdict readable (decision_state=%r, verdict=%r); the "
+                "allowed values are %s — the owner's ruling is required, never a default"
+                % (verdict_statement.get("decision_state"), verdict or None, allowed),
+                measured["verdict_fact"])],
+            measured, verdict=None)
+
+    measured["verdict"] = verdict
+    agents_dir = repo / "agents"
+    for path in sorted(agents_dir.glob("*.agent.md")) if agents_dir.is_dir() else []:
+        text = path.read_text(encoding="utf-8")
+        tools = frontmatter_list(text, "capability-tools")
+        name, detail = classify_capability(tools, text)
+        rel = path.relative_to(repo).as_posix()
+        measured["agents"].append({
+            "body": rel,
+            "capability_tools": tools,
+            "verdict": name,
+            "detail": detail,
+        })
+
+    declared_body = str(record.get("body") or record.get("declared_body") or "").strip()
+    declared_units = numeric_reading(record.get("declared_units"))
+    if declared_body:
+        body_path = repo / declared_body
+        if not body_path.is_file():
+            findings.append(finding(
+                "body-unavailable", declared_body,
+                "the record names a body that does not resolve", declared_body))
+        else:
+            text = body_path.read_text(encoding="utf-8")
+            tools = frontmatter_list(text, "capability-tools")
+            name, detail = classify_capability(tools, text)
+            if declared_units is not None and declared_units >= 2 and name == "incapable":
+                findings.append(finding(
+                    "declaration-execution-mismatch", declared_body,
+                    "the record declares %d units while the body's capability-tools lacks a "
+                    "dispatch tool and no handoff is declared (%s)" % (declared_units, detail),
+                    declared_body, kind="inconsistency",
+                    compared=[{"declared_units": declared_units},
+                              {"capability_tools": tools, "verdict": name}],
+                    record=record_ref))
+
+    units = record.get("units")
+    if isinstance(units, list) and len(units) >= 2:
+        executor_ids = set()
+        pairs = []
+        complete = True
+        for position, unit in enumerate(units):
+            if not isinstance(unit, dict):
+                complete = False
+                continue
+            executor_ids.add(str(unit.get("executor_id", "")).strip())
+            start = epoch_seconds(unit.get("dispatched_at"))
+            end = epoch_seconds(unit.get("settled_at"))
+            if start is None or end is None:
+                complete = False
+                continue
+            pairs.append((start, end))
+        measured["record_units"] = {
+            "count": len(units),
+            "executor_ids": sorted(executor_ids),
+            "intervals_complete": complete,
+            "max_overlap": maximum_overlap(pairs) if complete and pairs else NOT_EVALUATED,
+        }
+        if complete and len(executor_ids) == 1 and "" not in executor_ids \
+                and maximum_overlap(pairs) <= 1:
+            findings.append(finding(
+                "declaration-execution-mismatch", record_ref,
+                "the run record shows %d units all executed by %r with no interval "
+                "overlap (max overlap %d): a declared-parallel run executed serially"
+                % (len(units), next(iter(executor_ids)), maximum_overlap(pairs)),
+                record_ref + "#units", kind="inconsistency",
+                compared=[{"declared_units": len(units)},
+                          {"executor_ids": sorted(executor_ids)}],
+                record=record_ref))
+
+    return envelope("capability", "fail" if findings else "pass",
+                    findings, measured, verdict=verdict)
 
 
 DISPATCH = {
