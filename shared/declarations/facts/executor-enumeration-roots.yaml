@@ -15,6 +15,7 @@ statement:
       class: concurrent-by-default
       excluded_layers:
         - .specify/skills/
+        - .github/skills/
     - root_id: commands
       pattern: templates/commands/<stem>.md
       class: concurrent-by-default
@@ -22,11 +23,13 @@ statement:
         - .claude/commands/
         - .qoder/commands/
         - .opencode/command/
+        - .github/prompts/
     - root_id: agents
       pattern: agents/*.agent.md
       class: serial-only
       excluded_layers:
         - .specify/agents/templates/
+        - .github/agents/
     - root_id: teams
       pattern: .specify/teams/<slug>/
       class: partition-required
@@ -41,4 +44,4 @@ consumers:
   - scripts/python/concurrency-check.py
   - tests/contract/test_concurrency_class_table.py
 former_carriers: []
-note: "Exactly five roots. The exclusions are the mirror discipline's own projections (C-005, FR-031): `.specify/skills/` is the flat runtime projection of skills/{internal,external}/ (measured 2026-11-09: the flat layer holds the 16 external projections plus the nested internal/ directory), the per-tool command directories are generated from templates/commands/, and `.specify/agents/templates/` is the agent-template projection. The two spec-local layers are 085 projections, never roots: a spec-scope goal lives under .specify/specs/<id>/goal/<slug>/ and a spec-scope team under .specify/specs/<id>/team/. `class` names the single candidate class of that root; the class table's decision rule still owns the assignment (C-004), so the engine reads both facts and stores neither as a constant."
+note: "Exactly five roots. The exclusions are the mirror discipline's own projections (C-005, FR-031): `.specify/skills/` is the flat runtime projection of skills/{internal,external}/ (measured 2026-11-09: the flat layer holds the 16 external projections plus the nested internal/ directory), the per-tool command directories (.claude/commands/, .qoder/commands/, .opencode/command/, .github/prompts/) are generated from templates/commands/ (measured 2026-11-09: 29 copies in .github/prompts too), `.specify/agents/templates/` and `.github/agents/` are agent-definition projections, and `.github/skills/` projects the .specify/skills/ layer. The two spec-local layers are 085 projections, never roots: a spec-scope goal lives under .specify/specs/<id>/goal/<slug>/ and a spec-scope team under .specify/specs/<id>/team/. `class` names the single candidate class of that root; the class table's decision rule still owns the assignment (C-004), so the engine reads both facts and stores neither as a constant."
