@@ -64,6 +64,17 @@ So the practical rule when building a roster: decide **what the member writes to
 - **Team (static structure)** — a **Role × Stage × Type** matrix describing the roster: which agents participate, in what role, at what stage, and of what type. This is what a persisted team's `## Static Structure` section renders.
 - **Loop (dynamic structure)** — the runtime collaboration pattern: how the roster executes (parallel / serial / iteration / continuous), its parallelism/DAG/iteration/operating settings, and the execution flow (dispatch → handoff → loop edges). This is what a persisted team's `## Dynamic Structure` section renders.
 
+## Seat territories judged at binding time (席位写领地,绑定期判定)
+
+A seat's **territory** — the path set it may write and read — is a property of the static structure, and it is judged when the roster is **bound**, not left for the run to avoid collisions at runtime. The judgement is a gate of the create-team roster step; `run-team` re-checks it before dispatch.
+
+- **Undeclared is red.** Every seat MUST declare its territory. A seat with no territory declaration is `territory-undeclared` and red — it MUST NOT be read as "no territory, therefore no intersection". (Measured 2026-11-09 in this repository: 2 of the 12 team definitions declare no territory anywhere in their tree.)
+- **Intersection is red before any run.** Two seats' write territories MUST NOT intersect (`territory-intersect`); a declared shared read-only resource is the only permitted overlap.
+- **File-level, not directory-level.** A territory is a file-level path set (the same form as a unit's write domain); a directory-level entry declares a region rather than a path set and is red for that reason.
+- **Capability bounds the roster.** The team is not instantiated with more concurrent members than its stated concurrency capability supports; the instantiation step reads the per-agent capability verdict (from the existing `capability-tools` frontmatter key) and reports the reduction when it applies.
+
+The obligation's three-part statement, the class table and the slot/reserve values are reached by pointer — `shared/definitions/subagent-definitions.md` § The Concurrency Obligation and `shared/declarations/facts/` ([[STR-001]]/[[STR-008]] class and roots entries, `concurrency-slot-and-reserve.yaml`); this section restates none of their values.
+
 ## The Team Supervisor (single Meta role)
 
 - **Team Supervisor** is the single **Meta role** — Meta at all stages, and it never performs real project tasks.
