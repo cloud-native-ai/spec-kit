@@ -56,6 +56,10 @@ config:
   sync_constraint: >
     改动命中 skills/external/draw-diagram/ 后必须与 .specify/skills/draw-diagram/ 双写同步
     (diff -rq 校验字节一致),二者均为独立 git 副本、非符号链接(沿用 draw-plantuml-optimizer 先例)。
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

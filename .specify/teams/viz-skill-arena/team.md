@@ -150,6 +150,10 @@ config:
     enabled: true
     every: 5
     interactive: false
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

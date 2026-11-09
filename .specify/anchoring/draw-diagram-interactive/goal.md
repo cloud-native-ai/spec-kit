@@ -2,6 +2,10 @@
 status: active
 created: 2026-10-14
 updated: 2026-10-14
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 # Goal: draw-diagram-interactive

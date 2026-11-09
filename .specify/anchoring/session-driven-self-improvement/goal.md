@@ -2,6 +2,10 @@
 status: achieved
 created: 2026-10-05
 updated: 2026-10-08
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 # Goal: session-driven-self-improvement

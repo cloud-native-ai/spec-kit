@@ -1,0 +1,21 @@
+# T083 byte rule — every resident minus its binding block equals its HEAD bytes
+OK .specify/anchoring/command-logic-as-classified-skills/goal.md
+OK .specify/anchoring/draw-diagram-interactive/goal.md
+OK .specify/anchoring/draw-two-layer-structure/goal.md
+OK .specify/anchoring/post-refactor-mechanism-integrity/goal.md
+OK .specify/anchoring/session-driven-self-improvement/goal.md
+OK .specify/anchoring/skill-layer-install-separation/goal.md
+OK .specify/teams/command-logic-as-classified-skills/team.md
+OK .specify/teams/cws-workspace-cluster/team.md
+OK .specify/teams/demo-seat-dispatch/team.md
+OK .specify/teams/draw-diagram-interactive/team.md
+OK .specify/teams/draw-plantuml-optimizer/team.md
+OK .specify/teams/draw-two-layer-structure/team.md
+OK .specify/teams/post-refactor-mechanism-integrity/team.md
+OK .specify/teams/requirement-implement-monitor/team.md
+OK .specify/teams/session-driven-self-improvement/team.md
+OK .specify/teams/skill-layer-install-separation/team.md
+OK .specify/teams/summarize-project-optimizer/team.md
+OK .specify/teams/viz-skill-arena/team.md
+identical=18/18
+EXIT=0

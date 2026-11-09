@@ -43,6 +43,10 @@ config:
   run_log: .specify/teams/requirement-implement-monitor/run-log.jsonl
 created: 2026-07-29
 updated: 2026-08-20
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

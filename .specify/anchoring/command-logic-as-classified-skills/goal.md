@@ -2,6 +2,10 @@
 status: active
 created: 2026-10-04
 updated: 2026-10-05
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 # Goal: command-logic-as-classified-skills
