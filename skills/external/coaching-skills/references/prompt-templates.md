@@ -21,9 +21,10 @@ ordering evidence.
 ## Trainee
 - identifier (verbatim):
 - resolved-path:
-- layer: external | internal
+- executor-kind: skill | command   (a leading `/` names a command template)
+- layer: external | internal   (skill Trainees; `n/a` for a command)
 - subject-resolution: self (Trainee is the subject) | delegated to the Trainee (meta-skill)
-- failure-semantics: <extracted from the Trainee's own text>
+- failure-semantics: <extracted from the Trainee's own text or the command template>
 
 ## Outcome Correctness
 <!-- `OC-1` MUST name the primary deliverable: an artifact path, or a checkable
