@@ -1,0 +1,17 @@
+# WP3 evidence — T061 / T078 (WG-15 unit-level write-domain form)
+# date: 2026-11-09 (worktree 093-wp3, branch 093-wp3)
+# command: PYTHONPATH=tests python3 - <<'PY' ... (wp-gate --check preflight, five cases)
+# exit: 0
+
+--- probe readings (5 cases, temp repo; 'shared/' exists as a directory in the repo) ---
+write + file-level path                exit=0 verdict=single-package codes=[]
+write + empty domain                   exit=1 verdict=reject codes=['kind-mismatch', 'write-domain-empty']
+write + existing directory             exit=1 verdict=reject codes=['write-domain-directory']
+write + glob region                    exit=1 verdict=reject codes=['write-domain-directory']
+read-only + empty domain               exit=0 verdict=single-package codes=[]
+
+--- regression: existing wp-gate suites (unchanged, must stay green) ---
+# command: bash scripts/bash/run-tests.sh tests/unit/test_wp_gate.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/integration/test_wp_coordination_dry_runs.py -q
+.........................................                                [100%]
+113 passed in 6.78s
+# exit: 0 (113 passed)

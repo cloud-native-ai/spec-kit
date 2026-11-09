@@ -1,0 +1,18 @@
+# WP3 evidence — T140 / T153 / T060-side (decomposition-model.md)
+# date: 2026-11-09
+
+$ grep -n "default is concurrent; serial carries a named reason" skills/external/sdd-loop-driver/references/decomposition-model.md | cut -c1-100
+162:**The default is concurrent; serial carries a named reason.** Whenever the ready units are indep
+$ grep -n "analyze\` no longer defaults" skills/external/sdd-loop-driver/references/decomposition-model.md | cut -c1-100
+325:Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable 
+$ grep -n "two legal process carriers" skills/external/sdd-loop-driver/references/decomposition-model.md | cut -c1-100
+186:Local: each package is dispatched through one of the **two legal process carriers** — the **fork
+
+--- old-default scan (0 = old analyze=off default gone; dated supersession record is the only old-literal survivor) ---
+$ grep -n "analyze\` and \`clarify\` are \`off\`" skills/external/sdd-loop-driver/references/decomposition-model.md
+exit=1
+$ grep -n "one native host subagent per package" ...
+exit=1
+$ grep -n "host-no-parallel-native" ... (dated record only)
+174:Up to `slot_cap` read-only packages run concurrently; under `write_isolation=worktree`, up to `slot_cap` write packages also r
+# exit: 0

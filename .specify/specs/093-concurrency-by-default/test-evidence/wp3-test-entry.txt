@@ -1,0 +1,30 @@
+# WP3 evidence — T156 / T157 / T158 (FR-036 test entry)
+# date: 2026-11-09
+
+--- T156: shipped template Testing line ---
+245:- **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded to the framework (single-test debugging included); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry.
+
+--- T157: driver dispatch surfaces (one sentence each, no raw invocation shapes) ---
+41:- 测试执行唯一入口是 `scripts/bash/run-tests.sh`（缺省 xdist 形态 `-n <effective> --dist load`；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
+43:- **测试入口（FR-036）**：任何测试执行 MUST 经 `scripts/bash/run-tests.sh`（缺省 xdist 形态；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
+
+--- T158: executor guidance (MUST form) ---
+178:**Test runs — the runner is the only entry**: every test execution in this skill MUST go through
+agents/sdd-implement-executor.agent.md:37:4. Verify your own output exists and is non-empty; every test execut
+agents/sdd-implement-coordinator.agent.md:37:4. Verify your own output exists and is non-empty; when verificat
+
+--- T158: sweep of the measured offenders (each now names the runner) ---
+skills/external/create-skills/SKILL.md:167:- [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`bash scripts/bash/run-
+skills/external/create-skills/SKILL.md:168:- [ ] Spec Kit project mode: **attribute every red before reporting it** — when that suite is red, re-run i
+skills/external/merge-skills/references/decommission-and-wiring.md:73:  obsolete-asset contract checks pass (spec-kit: `bash scripts/bash/run-tests.sh
+shared/definitions/non-disposable-definitions.md:704:既有守卫（`bash scripts/bash/run-tests.sh -m contract`）、三份历史面的**指针行**（只加一行，MUST NOT 新增常驻顶级 `##` 章节，否则
+docs/reference/history/00-cross-cutting-lessons.md:52:- **同口径才可求差**。仓库存在长期既存失败时,绝对通过数不可比;独立验证的最小充分形式是**同一条命令、同一过滤口径**跑 A/B,只对失败集的差集逐项归因。任何回归数字 MUST 标注
+docs/reference/history/00-cross-cutting-lessons.md:57:- **套件红先按被测单元归因**。多个同族单元被并行编辑时,先以规范 runner 追 `--tb=line`(`bash scripts/bash/run-tests.sh <paths>
+
+--- T158: raw-invocation scan over the T159 scan set (expect zero) ---
+$ grep -rnE "(python3?|py) -m pytest" skills/ templates/ agents/ shared/ docs/reference/ .specify/instructions.md | grep -v run-tests.sh
+exit=1
+$ grep -rnE "(^|[^A-Za-z0-9_./-])pytest +(-|tests?/|[A-Za-z0-9_][A-Za-z0-9_./-]*\.py|--collect)" ... | grep -v run-tests.sh
+exit=1
+# reading: zero invocation-shaped hits outside the T159 allowlist; remaining 'pytest' occurrences are prose mentions (framework name, marker names, prose about selectors)
+# exit: 0

@@ -1,0 +1,35 @@
+# WP3 evidence — T156 live instructions refresh (instructions flow run record)
+# date: 2026-11-09
+# flow: /speckit.instructions -> skills/internal/manage-instructions/SKILL.md
+# mode: targeted partial update (full-reconcile auto-update section 'Tech Stack & Resources' / testing line)
+# refresh base: existing .specify/instructions.md kept in place; the section is converged in place; no other section touched
+# compliance: non-destructive guarantee observed (no re-render from template; no user-authored content lost)
+
+--- section diff (git diff, one line in / one line out) ---
+diff --git a/.specify/instructions.md b/.specify/instructions.md
+index a7f5f0e5..5ade5b32 100644
+--- a/.specify/instructions.md
++++ b/.specify/instructions.md
+@@ -253,7 +253,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
+ - **Languages**: Python `>=3.8` (`pyproject.toml`)
+ - **Build / Packaging**: `hatchling` (PEP 517); entrypoint `specify = "specify_cli:main"`; install via `uv tool install` or `pipx`.
+ - **Runtime Dependencies**: `typer` (CLI), `rich` (TTY), `httpx[socks]`, `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
+-- **Test Framework**: `pytest` (markers `contract`, `integration`): `pytest`, `pytest -m contract`, `pytest -m integration`.
++- **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded (single-test debugging included, e.g. `bash scripts/bash/run-tests.sh tests/contract/test_x.py -q`); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry. The suite carries the `contract` and `integration` markers — select them by passing `-m <marker>` through the runner.
+ - **Key Directories**:
+   - `src/specify_cli/`: single-module Typer CLI.
+   - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, tools/skills).
+
+--- refreshed live Testing line (quoted) ---
+256:- **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded (single-test debugging included, e.g. `bash scripts/bash/run-tests.sh tests/contract/test_x.py -q`); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry. The suite carries the `contract` and `integration` markers — select them by passing `-m <marker>` through the runner.
+
+--- coverage check of the section's required content ---
+present: scripts/bash/run-tests.sh
+present: -n <effective> --dist load
+present: forwarded
+present: never the entry
+present: contract
+present: integration
+
+--- residual report: sections observed stale outside this targeted update: none ---
+# exit: 0
