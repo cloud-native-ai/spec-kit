@@ -1,0 +1,4 @@
+  File "/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal/code-review/scripts/git-delta-review.sh", line 25
+    --) _sig_stop=1 ;;
+      ^
+SyntaxError: closing parenthesis ')' does not match opening parenthesis '{' on line 19

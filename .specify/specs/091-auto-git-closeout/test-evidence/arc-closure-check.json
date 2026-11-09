@@ -1,0 +1,51 @@
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": false,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": false
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 0,
+    "total": 6,
+    "unknown": 6
+  },
+  "flow_class": "execution",
+  "reasons": [
+    {
+      "code": "zero-final-path-pass",
+      "target": ""
+    },
+    {
+      "code": "runtime-dependency-not-owned",
+      "target": "RS-002"
+    },
+    {
+      "code": "status-claims-implemented-but-blocked",
+      "target": ""
+    }
+  ],
+  "smoke": {
+    "command": "SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/091-auto-git-closeout/test-evidence/T062-smoke.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/091-auto-git-closeout",
+  "tasks": {
+    "closed": 62,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "block",
+  "waived": []
+}
