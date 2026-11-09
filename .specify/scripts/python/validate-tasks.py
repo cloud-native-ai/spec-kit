@@ -41,10 +41,13 @@ Checks performed:
                   cannot leave that contract green at its own phase (warning;
                   compares the same `order` counter blockedBy uses — this script
                   has no numeric phase index and MUST NOT grow one)
-  green-clause-collision  two rows claim the same contract clause, i.e. the
-                  clause partition (条款分区 (Clause Partition),
-                  `.specify/memory/glossary.md`) was cut over the same clause
-                  twice (warning)
+  green-clause-collision  two rows claim the same contract clause. A `[green:]`
+                  tag is a red-first marker — the row that first turns that
+                  clause green; a claimed clause belongs to one row, while a
+                  feature MAY claim a strict subset of its contract clauses, so
+                  unclaimed clauses are admissible and every claim resolves once
+                  (warning; the clause partition, 条款分区 (Clause Partition),
+                  `.specify/memory/glossary.md`, is scoped to claimed clauses)
   green-path-divergence  one TEST path is claimed green by two rows at two
                   different green points, so the pair cannot each be the row that
                   turns that file green (warning; scoped to test paths because an
@@ -496,8 +499,10 @@ def validate(path: Path, claims_out: list | None = None):
                     f"at its own phase; move the earlier clause's row up or re-cut the partition"
                 )
 
-        # one clause claimed by two rows: the clause partition was cut over it twice
-        # (条款分区 (Clause Partition), `.specify/memory/glossary.md`)
+        # one clause claimed by two rows: a claimed clause belongs to one row, while
+        # a feature MAY claim a strict subset of its contract clauses — the clause
+        # partition (条款分区 (Clause Partition), `.specify/memory/glossary.md`) is
+        # scoped to the clauses a feature actually claims
         first_claim = {}
         for claim in sorted(resolved, key=lambda c: c["order"]):
             key = (claim["resolved"], claim["clause_id"])
@@ -508,9 +513,11 @@ def validate(path: Path, claims_out: list | None = None):
             warnings.append(
                 f"{previous['line']}: green-clause-collision: {previous['task_id']} "
                 f"(line {previous['line']}) and {claim['task_id']} (line {claim['line']}) both "
-                f"claim {claim['contract_file']}#{claim['clause_id']} — one clause belongs to "
-                f"one row, so re-cut the partition (条款分区 (Clause Partition), "
-                f".specify/memory/glossary.md) rather than dropping one of the two claims"
+                f"claim {claim['contract_file']}#{claim['clause_id']} — a claimed clause "
+                f"belongs to one row; a feature MAY claim a strict subset of its contract "
+                f"clauses, so keep one claim and drop the other (条款分区 (Clause Partition) "
+                f"is scoped to claimed clauses, .specify/memory/glossary.md) rather than "
+                f"silencing the conflict"
             )
 
         # one write target claimed green at two different points by two rows: the pair
@@ -577,14 +584,16 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
     def _sig_guard(_argv=None, declared=None, **_kwargs):
         return None
 
-def main(argv=None) -> int:
-    _sig_guard(argv, declared=['--json'])  # answer --version / reject an undeclared option
+def build_parser() -> argparse.ArgumentParser:
+    """The CLI surface; `main()` parses through the same object the contract suite reads."""
     parser = argparse.ArgumentParser(
         prog="validate-tasks.py",
         description="Deterministic structural validator for a feature's tasks.md "
                     "(row format, ID uniqueness, blockedBy resolvability, [P] "
                     "parallel safety, story-label placement, DoD format, and the "
-                    "four green-point attribution checks).",
+                    "four green-point attribution checks). A [green:] tag is a "
+                    "red-first marker: a claimed clause belongs to one row, and a "
+                    "feature MAY claim a strict subset of its contract clauses.",
         epilog="Exit codes: 0 = no errors (warnings possible), 1 = errors found, "
                "2 = file missing / no task rows.",
     )
@@ -593,6 +602,12 @@ def main(argv=None) -> int:
     parser.add_argument("tasks_md", help="path to the tasks.md file to validate")
     parser.add_argument("--json", action="store_true",
                         help="emit a machine-readable JSON report instead of text")
+    return parser
+
+
+def main(argv=None) -> int:
+    _sig_guard(argv, declared=['--json'])  # answer --version / reject an undeclared option
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     path = Path(args.tasks_md)
