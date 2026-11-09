@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261109T080000Z-093a
 slice: 093
-stage: clarify
-stage_started_at: 1794210342
-stage_deadline_epoch: 1794221142
+stage: plan
+stage_started_at: 1794211047
+stage_deadline_epoch: 1794221847
 stage_base_commit: e55d8136
 attempt: 1
 retry_limit: 3
-last_verdict: "U4 pass — CLARIFY-DONE; Mode A on requirements.md; 15 ruled questions (each machine-read); 33 FR / 12 SC / 11 STR; validate ok 0/0; pre-analyze --stage requirements pass 0/0; overlap-check decision=clear but checked_specs=1 (VACUOUS — 093 declares no delivery surface yet); Feature 093 bound (Draft, index 86→87 + detail); F-093-001/002/003 registered; checkpoint 02; commit 11d49f18; next = plan in its own worktree"
+last_verdict: "U4 pass — CLARIFY-DONE; 15 ruled questions; 33 FR / 12 SC / 11 STR; validate ok 0/0; pre-analyze pass 0/0; overlap clear (vacuous: no feature-ref; nested-path collision risk with 064/070/086); commits 11d49f18 + 6b291bb7; checkpoint 02; F-093-001/002/003 registered; next = plan"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch plan in the 093 worktree (its own branch/worktree per the 092 parallel-line addendum); plan MUST write feature-ref.md with file-level paths and adjudicate F-093-001 against 064/070/086
+next_action: dispatch plan in the 093 worktree (main tree stays on the 092 line)
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
@@ -46,7 +46,8 @@ project_config:
   breakpoint_verdict: "clarify CLARIFY-DONE; next stage = plan (its own worktree)"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
-  requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 36 FR / 12 SC; commit a6b571f4 (executor claim only; independent verifier not yet run)
+  requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 36 FR / 12 SC; commit a6b571f4
+  clarify U4: pass — 33 FR / 12 SC; 15 rulings; overlap clear (vacuous); validate ok 0/0; pre-analyze pass 0/0; commits 11d49f18 + 6b291bb7 (executor claim only; independent verifier not yet run)
   clarify U4: pass (executor claim only; independent verifier not yet run) — validate ok 0/0 (33 FR / 12 SC / 11 STR); pre-analyze --stage requirements pass 0/0; overlap-check clear but VACUOUS (checked_specs=1)
   validate-requirements: pass — .specify/specs/093-concurrency-by-default/test-evidence/validate-requirements.txt ; clarify: test-evidence/validate-requirements-clarify.txt
   pre-analyze-check (stage=requirements): pass — .specify/specs/093-concurrency-by-default/test-evidence/pre-analyze-check.txt ; clarify: test-evidence/pre-analyze-check-clarify.txt
