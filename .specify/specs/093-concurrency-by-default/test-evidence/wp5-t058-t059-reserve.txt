@@ -1,0 +1,47 @@
+# WP5 readings — T058 (inconsistency independence) · T059/T079 (verifier reserve, C-008/FR-015)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T058 — a code and a condition that disagree: the report names both sides
+-- the record carries code write-conflict, but its evidence is a dependency-style edge
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/judge --record .specify/.tmp/wp5/judge/rec-disagree.yaml --json-out .specify/.tmp/wp5/judge/f1.json
+serial-reason: decision=fail findings=1 -> .specify/.tmp/wp5/judge/f1.json
+EXIT=1
+
+[
+ {
+  "code": "evidence-form-mismatch",
+  "record_code": "write-conflict",
+  "condition": "FR-005(c)",
+  "evidence_ptr": ".specify/.tmp/wp5/judge/rec-disagree.yaml#evidence.write-conflict",
+  "message": "write-conflict: write-conflict needs the intersecting file-level path set"
+ }
+]
+-- no side is silently preferred: the finding carries the code, its condition, and the evidence pointer
+
+-- the second disagreement shape: two codes whose evidence sets are swapped
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/judge --record .specify/.tmp/wp5/judge/rec-swapped.yaml --json-out .specify/.tmp/wp5/judge/f2.json
+serial-reason: decision=fail findings=2 -> .specify/.tmp/wp5/judge/f2.json
+EXIT=1
+
+[('evidence-form-mismatch', 'dependency-edge', 'FR-005(b)'), ('evidence-form-mismatch', 'write-conflict', 'FR-005(c)')]
+
+## T059 / T079 — the verifier reserve is a pre-dispatch deduction (the fact + the reader path)
+-- the slot fact owns the reserve and the degradation rule
+3:# The one machine-read owner of `slot_cap_default` and `verifier_reserve`, the per-unit budget bound and
+14:  verifier_reserve: 1
+15:  reserve_deduction: pre-dispatch, from the slot budget
+23:  effective_available: min(slot_cap, ceiling, remaining_budget) - verifier_reserve
+24:  degradation_rule: effective_available < 2 => serial with the budget-reserve code
+-- the engine recomputes the bound: slot 6, gate ceiling 4, reserve 1 -> available 3
+$ python3 scripts/python/concurrency-check.py coverage --repo . --json-out .specify/.tmp/wp5/judge/cover.json
+coverage: decision=pass findings=0 -> .specify/.tmp/wp5/judge/cover.json
+EXIT=0
+
+bound: {'ceiling': 4, 'ceiling_source': 'skills/external/sdd-loop-driver/scripts/wp-gate.py declared default', 'effective_available': 3, 'slot_cap': 6, 'verifier_reserve': 1}
+-- under two available slots after deduction the body degrades to serial with the budget code
+$ python3 scripts/python/concurrency-check.py coverage --repo . --goal command-logic-as-classified-skills --ceiling 1 --json-out .specify/.tmp/wp5/judge/cover1.json
+coverage: decision=pass findings=0 -> .specify/.tmp/wp5/judge/cover1.json
+EXIT=0
+
+bound: {'ceiling': 1, 'ceiling_source': '--ceiling at call time', 'effective_available': 0, 'slot_cap': 6, 'verifier_reserve': 1}
+goal: {'goal': 'command-logic-as-classified-skills', 'effective_available': 0, 'packages': [], 'serial_reason': 'budget-reserve'}

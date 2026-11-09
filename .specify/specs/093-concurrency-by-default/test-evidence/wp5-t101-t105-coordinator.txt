@@ -1,0 +1,33 @@
+# WP5 readings — the coordinator rows T101–T105
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T101 — partition before dispatch (a partition stays usable without dispatch capability)
+152:- **先划分后派发（C-073）**：协调者 MUST 先产出包集再派发——每个包命名其范围、输入与输出路径；派发临时包（ad hoc packages）即 `unpartitioned`。协调者自身工具集缺派发能力时，该包集仍是可用的交付物（后到的可派发执行者无需重新推导）。
+164:**Concurrency obligations travel with the dispatch (C-076/C-077)**: every dispatched sub-agent's brief MUST carry the concurrency obligation as brief content — the three parts of § The Concurrency Obligation, or an explicit pointer to that section — injected at dispatch rather than inherited from an ambient layer. Every sub-agent **return** MUST carry its own `requested` / `effective` / `effective_reason` triple; a return without it is `report-incomplete` and MUST be reported by the coordinator, never filled in by the coordinator. A coordinator that plans parallel packages MUST emit the packages (each naming its scope, inputs and output path) before dispatching and MUST state the execution shape actually achieved — including a serial shape: "partition ready, execution serial" is a named disclosure with its reason code, never a silence (C-059, C-073, C-074).
+
+## T102 — the real execution shape is reported even when serial
+153:- **真实执行形态（C-074）**：协调者 MUST 报告实际达成的执行形态，即使它是串行——「划分就绪、执行串行」是具名披露（附理由码），MUST NOT 沉默；不得把串行运行呈现为并发。
+
+## T103 — the concurrency obligation is injected into every dispatch brief
+164:**Concurrency obligations travel with the dispatch (C-076/C-077)**: every dispatched sub-agent's brief MUST carry the concurrency obligation as brief content — the three parts of § The Concurrency Obligation, or an explicit pointer to that section — injected at dispatch rather than inherited from an ambient layer. Every sub-agent **return** MUST carry its own `requested` / `effective` / `effective_reason` triple; a return without it is `report-incomplete` and MUST be reported by the coordinator, never filled in by the coordinator. A coordinator that plans parallel packages MUST emit the packages (each naming its scope, inputs and output path) before dispatching and MUST state the execution shape actually achieved — including a serial shape: "partition ready, execution serial" is a named disclosure with its reason code, never a silence (C-059, C-073, C-074).
+
+## T104 — every sub-agent return carries its own triple; absent = report-incomplete
+164:**Concurrency obligations travel with the dispatch (C-076/C-077)**: every dispatched sub-agent's brief MUST carry the concurrency obligation as brief content — the three parts of § The Concurrency Obligation, or an explicit pointer to that section — injected at dispatch rather than inherited from an ambient layer. Every sub-agent **return** MUST carry its own `requested` / `effective` / `effective_reason` triple; a return without it is `report-incomplete` and MUST be reported by the coordinator, never filled in by the coordinator. A coordinator that plans parallel packages MUST emit the packages (each naming its scope, inputs and output path) before dispatching and MUST state the execution shape actually achieved — including a serial shape: "partition ready, execution serial" is a named disclosure with its reason code, never a silence (C-059, C-073, C-074).
+
+## T105 — capability verdict and slot cap are passed down per dispatch
+154:- **能力裁决与槽位上限逐次下传（C-071）**：每次派发 MUST 携带当次读出的能力裁决与槽位上限；一次派发 MUST NOT 继承上一次派发的读数；本规则只加派发载荷，不改任何步骤顺序。
+
+## The driver surfaces still pass their own contract modules
+$ bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_carrier_contract.py -q
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_carrier_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+...............................                                          [100%]
+31 passed in 6.24s
+.                                                                        [100%]
+1 passed, 31 deselected in 17.19s
+EXIT=0
+

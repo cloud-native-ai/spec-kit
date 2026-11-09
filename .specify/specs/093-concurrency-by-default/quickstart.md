@@ -89,7 +89,7 @@ fails on a fourth source (C-036).
 
 ```bash
 python3 -m pytest tests/contract/test_concurrency_reproduction_092.py -q   # red before the repair
-python3 scripts/python/concurrency-check.py capability --repo . --json-out /tmp/capability.json
+python3 scripts/python/concurrency-check.py capability --repo . --record <run-record>.yaml --json-out /tmp/capability.json
 ```
 
 **A passer sees**: the reproduction fixture (6 packages, an executor whose `capability-tools` has no dispatch tool,

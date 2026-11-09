@@ -1,0 +1,61 @@
+# WP5 readings — T110 (this feature's own coordination report) · T111 (091 baseline) · T112 (goal-slice coverage)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T110 — the live report read (the test stops skipping now that the report exists)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_real_run_evidence.py::test_this_features_coordination_report_is_decidable_or_not_evaluated -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_real_run_evidence.py::test_this_features_coordination_report_is_decidable_or_not_evaluated -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.19s
+EXIT=0
+
+-- the report: notes/coordination-report.md
+12:| `requested` | **6** (the stage plan's slot cap; `shared/declarations/facts/concurrency-slot-and-reserve.yaml`) |
+13:| `effective` | `not_evaluated` |
+14:| `effective_reason` | `mechanism-not-yet-landed` — the FR-035 fork carrier was authored *during* this run (WP3 T142) and the implement fold dispatched one package at a time in declared order; the run has no pair of overlapping unit intervals to measure |
+15:| missing mechanism | the fold's package dispatches were serialized by the driver (WP1 → WP2 → WP3 → WP4 → enginefix → WP5); no two units were in flight together, so `effective` is not evaluated from interval overlap — it is **not** `0` and **not** an estimate |
+37:`notes/serial-baseline.md` records the 091 comparison row: 62 tasks, 1 agent, 116 minutes, cited
+38:from 091's recorded run — never re-measured here.
+44:`>= 2` claim, so `effective` is `not_evaluated` and the reason is the missing mechanism at dispatch
+
+## T111 — the serial baseline row
+# Serial baseline — 091's own run record (T111, SC-006 comparison)
+
+**Purpose**: the serial comparison row SC-006 requires, written from the existing record — **not**
+re-measured in this feature. Every quantity 091 did not produce is marked `not_evaluated`.
+
+| Quantity | Value | Source |
+|----------|-------|--------|
+| tasks | **62** | 091's own state spine `.specify/state/091-auto-git-closeout.md` line 57 (`implement U4: pass — 62/62 tasks`) and line 186 (`tasks: 62/62 rows checked`) |
+| agents | **1** (single-agent fold) | 091's implement-stage record (`.specify/specs/091-auto-git-closeout/checkpoints/09-implement.md`; the whole run is one executor) |
+| minutes | **116** | Cited from `requirements.md` § Overview / SC-006 / line 179 and `.specify/memory/features/093.md` line 5, which record the 091 measurement "62 任务、单代理、116 分钟"; the 091 spine in this tree does not itself carry the duration field, so the figure travels as the spec's dated citation of the 091 run and is **not** re-measured here |
+| wall-clock per unit | `not_evaluated` | 091 did not produce per-unit durations |
+
+**Concurrency side (this feature's own run)**: `effective: not_evaluated` with reason code
+`mechanism-not-yet-landed` — see `notes/coordination-report.md`. The comparison is therefore a
+citation pair, not a speedup claim: the serial baseline is 091's recorded fact; the concurrent
+reading does not exist yet, and writing one from an estimate or from `0` is forbidden (SC-006,
+FR-008).
+
+**Reading chain**: `requirements.md` line 19 / line 179 / SC-006 (owner of the citation) →
+`.specify/memory/features/093.md` line 5 → 091's state spine and checkpoint (owner of the task and
+
+## T112 — goal-slice decomposition recording resolves through the coverage fact
+$ python3 scripts/python/concurrency-check.py coverage --repo . --json-out .specify/.tmp/wp5/judge/cover-live.json
+coverage: decision=pass findings=0 -> .specify/.tmp/wp5/judge/cover-live.json
+EXIT=0
+
+decision: pass findings: 0
+stages: {'analyze': 'covered', 'checklist': 'covered-by-default', 'clarify': 'covered-by-default', 'implement': 'covered-by-default', 'plan': 'covered-by-default', 'requirements': 'covered-by-default', 'review': 'covered-by-default', 'tasks': 'covered-by-default'}
+goals: [('command-logic-as-classified-skills', 3, ['T-001', 'T-002', 'T-003'], [['T-001', 'T-002', 'T-003']]), ('draw-diagram-interactive', 0, [], []), ('draw-two-layer-structure', 3, [], []), ('post-refactor-mechanism-integrity', 1, [], [])]
+a goal with open targets lists them as packages; a goal with none claims no coverage (no hollow claim)
+-- the fact is the owner; the three spine keys are projections (C-084)
+35:  spine_relation:
+36-    decomposition: projection of this entry, feature-level opt-out
+37-    decomposition_stages: projection of this entry, per-stage coverage
+38-    decomposition_slot_cap: projection of concurrency-slot-and-reserve.yaml slot_cap_default
+39-  fourth_source_of_stage_coverage: defect
+41:  decomposition_slot_cap: 6

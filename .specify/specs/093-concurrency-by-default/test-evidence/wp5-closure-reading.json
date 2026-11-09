@@ -1,0 +1,43 @@
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp5/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": false,
+    "no_open_rows": false,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 1,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 5,
+    "total": 6,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [
+    {
+      "code": "final-path-not-pass",
+      "target": "SC-006"
+    }
+  ],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/contract/test_concurrency_declarations.py tests/contract/test_concurrency_class_table.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_concurrency_units.py tests/contract/test_concurrency_high_order.py tests/contract/test_concurrency_dispatch_capability.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_real_run_evidence.py tests/contract/test_concurrency_reproduction_092.py tests/contract/test_test_entry_guard.py tests/unit/test_concurrency_check_engine.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/093-concurrency-by-default/test-evidence/wp5-acceptance-final.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp5/.specify/specs/093-concurrency-by-default",
+  "tasks": {
+    "closed": 0,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 159
+  },
+  "verdict": "block",
+  "waived": []
+}

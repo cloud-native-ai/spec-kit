@@ -1,0 +1,68 @@
+# WP5 mutation readings — T028 (C-015) · T043 (C-028) · T045 (C-030)
+# Date: 2026-11-09 · Worktree: 093-wp5 · Branch: 093-wp5 · Base: 6001c9ad1
+# Test entry: bash scripts/bash/run-tests.sh <paths> -q (FR-036)
+
+## A. T027's drift-guard tests (the assertions the mutations must move)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_class_table.py::test_body_added_without_a_class_turns_the_check_red tests/contract/test_concurrency_class_table.py::test_removed_root_from_the_enumeration_leaves_a_red_assertion tests/contract/test_concurrency_class_table.py::test_live_classify_is_green_and_counts_are_measured -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_class_table.py::test_body_added_without_a_class_turns_the_check_red tests/contract/test_concurrency_class_table.py::test_removed_root_from_the_enumeration_leaves_a_red_assertion tests/contract/test_concurrency_class_table.py::test_live_classify_is_green_and_counts_are_measured -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.22s
+EXIT=0
+
+## B. C-015 mutation 1 — a body added without a class (class member renamed)
+$ python3 scripts/python/concurrency-check.py classify --repo .specify/.tmp/wp5/mut/c1 --json-out .specify/.tmp/wp5/mut/c1/out.json
+classify: decision=fail findings=2 -> .specify/.tmp/wp5/mut/c1/out.json
+EXIT=1
+
+decision: fail
+findings: [('class-unknown', 'decision-rule'), ('class-unknown', 'decision-rule')]
+## C. C-015 mutation 2 — a root removed from the enumeration
+dropped skills root block
+$ python3 scripts/python/concurrency-check.py classify --repo .specify/.tmp/wp5/mut/c2 --json-out .specify/.tmp/wp5/mut/c2/out.json
+classify: decision=fail findings=2 -> .specify/.tmp/wp5/mut/c2/out.json
+EXIT=1
+
+decision: fail
+findings: [('uncovered', 'roots'), ('uncovered', 'decision-rule')]
+## D. C-028 mutation 1 — a condition with no code (budget-reserve entry removed)
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/mut/d1 --record .specify/.tmp/wp5/mut/rec-single.yaml --json-out .specify/.tmp/wp5/mut/d1/out.json
+serial-reason: decision=fail findings=1 -> .specify/.tmp/wp5/mut/d1/out.json
+EXIT=1
+
+decision: fail
+findings: [('bijection-gap', "condition<->code bijection is short: conditions without a code ['FR-005(e)']; condition-bound codes without a ")]
+## E. C-028 mutation 2 — a condition-bound code with no condition (host-no-parallel)
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/mut/e1 --record .specify/.tmp/wp5/mut/rec-single.yaml --json-out .specify/.tmp/wp5/mut/e1/out.json
+serial-reason: decision=fail findings=1 -> .specify/.tmp/wp5/mut/e1/out.json
+EXIT=1
+
+decision: fail
+findings: [('bijection-gap', "condition<->code bijection is short: conditions without a code ['FR-005(d)']; condition-bound codes without a ")]
+## F. C-030 mutation 1 — pattern=concurrent carrying a serial code
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/mut/f1 --record .specify/.tmp/wp5/mut/rec-f1.yaml --json-out .specify/.tmp/wp5/mut/f1/out.json
+serial-reason: decision=fail findings=1 -> .specify/.tmp/wp5/mut/f1/out.json
+EXIT=1
+
+decision: fail
+findings: [('form-reason-inconsistent', "pattern=concurrent carries a non-empty code list ['single-unit']")]
+## G. C-030 mutation 2 — pattern=serial carrying no codes
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/mut/g1 --record .specify/.tmp/wp5/mut/rec-g1.yaml --json-out .specify/.tmp/wp5/mut/g1/out.json
+serial-reason: decision=fail findings=1 -> .specify/.tmp/wp5/mut/g1/out.json
+EXIT=1
+
+decision: fail
+findings: [('form-reason-inconsistent', 'pattern=serial carries an empty code list')]
+## H. The live readings the mutations are measured against
+$ python3 scripts/python/concurrency-check.py classify --repo . --json-out .specify/.tmp/wp5/mut/live-classify.json
+classify: decision=pass findings=0 -> .specify/.tmp/wp5/mut/live-classify.json
+EXIT=0
+
+$ python3 scripts/python/concurrency-check.py serial-reason --repo . --record .specify/.tmp/wp5/mut/rec-live.yaml --json-out .specify/.tmp/wp5/mut/live-serial.json
+serial-reason: decision=pass findings=0 -> .specify/.tmp/wp5/mut/live-serial.json
+EXIT=0
+
+live decision: pass findings: 0
