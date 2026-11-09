@@ -4,9 +4,9 @@
 spine_state: running
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
-stage: tasks (U4 candidate written; awaiting independent verification)
-stage_started_at: 1794192617
-stage_deadline_epoch: 1794203417
+stage: checklist (U4 candidate written; awaiting independent verification)
+stage_started_at: 1794193264
+stage_deadline_epoch: 1794204064
 stage_base_commit: 7cf87dad
 attempt: 0
 retry_limit: 3
@@ -43,12 +43,13 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages will be recomputed per stage
   verifier_reserve: 1
-  breakpoint_verdict: "requirements + clarify + plan complete; next stage = tasks"
+  breakpoint_verdict: "requirements + clarify + plan + tasks complete; next stage = checklist"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 27 FR / 7 SC; evidence .specify/specs/091-auto-git-closeout/test-evidence/requirements-gates.txt
   clarify U4: pass with corrections — validate ok 0/0; pre-analyze pass 0/0 after RS-001 cell + feature-ref count fixes; overlap adjudicated (completed-only, 0 active); decomposition-check plan proceed (28 FR < 120); workspace-guard clean
   plan U4: pass — pre-analyze plan 0/0; 26 clauses across 4 contracts; 5 decision tensions 0/0; 22/22 Constitution; checkpoint 03 accepted; Temporary Team created (validate-roster conforming)
+  tasks U4: pass — decomposition proceed (60 tasks < 160); pre-analyze tasks pass 0 errors/46 advisories; validate-tasks 0 errors/46 warnings adjudicated; forward condition: implement T056 freezes the clause baseline
   clarify U4 (pending verifier):
     overlap_check: decision=overlap — before the declaration artifact the gate was clear with
       checked=1 and note "no declaration artifact" (vacuous); after it: checked=82, overlaps=36
