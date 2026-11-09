@@ -248,7 +248,7 @@
 
 ## 10. 语义层与引擎选择指针（本文件不承载）
 
-- 语义模型（实体、层级、结构、关联；SDS/LDM schema）→ `.specify/skills/draw-diagram/references/semantic-model.md`（**现存**）
-- **引擎选择**（何时由前门选到本引擎、`drawio` ↔ `excalidraw` 优先序）→ `.specify/skills/draw-diagram/references/routing-matrix.md`（**现存**）
-- 语义分析、图类选择、版面规划与自由度判据、样式配色取值、内容措辞、类专属约定 → 前门 `.specify/skills/draw-diagram/SKILL.md`（**现存**）。其**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**，故此处不预建具体路径；落盘前一律回前门 `SKILL.md`
+- 语义模型（实体、层级、结构、关联；SDS/LDM schema）→ `skills/external/draw-diagram/references/semantic-model.md`（**现存**）
+- **引擎选择**（何时由前门选到本引擎、`drawio` ↔ `excalidraw` 优先序）→ `skills/external/draw-diagram/references/routing-matrix.md`（**现存**）
+- 语义分析、图类选择、版面规划与自由度判据、样式配色取值、内容措辞、类专属约定 → 前门 `skills/external/draw-diagram/SKILL.md`（**现存**）。其**专章参考文件**（`references/howto/*`、`references/guide/*`、`references/document/*`）由 stage S1d 规划、**尚未落盘**，故此处不预建具体路径；落盘前一律回前门 `SKILL.md`
 - 渲染路径、CLI 导出、布局与走线 pass → `./render-and-export.md`（同技能内）

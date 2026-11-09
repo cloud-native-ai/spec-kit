@@ -1,7 +1,7 @@
 # Exclusion records — reason `no-harness-asset` (requirements.md FR-002 / FR-005; data-model.md E-2).
 #
 # One row per candidate unit that fails **D1** (FR-002's asset side): its acceptance deliverable
-# contains no item named by `.specify/shared/guidelines/better-harness.md` § 消费者清单 — no evidence record,
+# contains no item named by `shared/guidelines/better-harness.md` § 消费者清单 — no evidence record,
 # no feedback / learning record, no gate verdict on someone else's artifact, and no change to
 # `skills/`, `agents/`, `teams/`, `tools/`, `docs/`, the constitution or the instructions.
 #
@@ -26,15 +26,15 @@
 # framework engine the unit's text invokes unconditionally is the feedback record it writes for
 # itself (`SKILL.md` § Self-Improvement Contract, `python3 …/.specify/scripts/python/feedback-utils.py
 # --action record`). A row names one carrier; this is that one, measured with `grep -n`.
-- unit: .specify/skills/draw-diagram/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/draw-diagram/SKILL.md#Step 4: 验收与回报
+- unit: skills/external/draw-diagram/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/external/draw-diagram/SKILL.md#Step 4: 验收与回报
 
 # D1 unsatisfied: the deliverable is a query result over a configured database.
-# Engine the unit does reach: its own dispatcher, `.specify/scripts/query.py` (`SKILL.md` § Usage).
-- unit: .specify/skills/database-utils/SKILL.md
-  carrier: .specify/skills/database-utils/scripts/query.py
-  anchor: .specify/skills/database-utils/SKILL.md#Overview
+# Engine the unit does reach: its own dispatcher, `scripts/query.py` (`SKILL.md` § Usage).
+- unit: skills/external/database-utils/SKILL.md
+  carrier: skills/external/database-utils/scripts/query.py
+  anchor: skills/external/database-utils/SKILL.md#Overview
 
 # --- T032 rows (tasks.md T032), appended 2026-11-05 (implement, part 6): the screen's remaining
 # candidates, 30 rows. The 2 rows above are untouched — data-model.md E-2 says a new unit appends a
@@ -45,225 +45,225 @@
 # carrier is unchanged.
 # Their text does still reach a deterministic engine, which is why the screen accepts them at all
 # (FR-004's accepted conservative side) and why every row carries a `carrier`: `grep` at write time
-# found either a `.specify/scripts/python/<name>.py` reference or the unit's own
+# found either a `scripts/python/<name>.py` reference or the unit's own
 # `${SKILL_HOME}/scripts/<file>` asset invoked by relative path. 8 of these units own no subject
-# engine and reach the record engine their own § Wrap-up calls (`.specify/scripts/python/feedback-utils.py`),
+# engine and reach the record engine their own § Wrap-up calls (`scripts/python/feedback-utils.py`),
 # recorded per row rather than left to be re-derived.
 # Count after this append: 32 rows (2 + 30). Measured, not projected: the merged file was read by
 # `harness-triple-check.py --action coverage`, which reported `exclusion-anchor-unresolvable` 0 and
 # `unclassified` 0 on this tree.
 
-# `.specify/shared/workflow/*.md` — protocol documents (3 rows)
+# `shared/workflow/*.md` — protocol documents (3 rows)
 # These carry protocols a driver follows. What they deliver is a memory-store or spec-directory file
 # (`features.md`, `glossary.md`, a dispatch plan) — none of the four kinds — and each still names
 # one engine in prose.
 #
-# .specify/shared/workflow/external-dispatch-recipes.md — the deliverable is a recipe catalogue a driver
+# shared/workflow/external-dispatch-recipes.md — the deliverable is a recipe catalogue a driver
 # reads; nothing lands on a governed tree and no record or verdict is produced
-# carrier: .specify/skills/internal/create-team/scripts/dispatch.sh
-- unit: .specify/shared/workflow/external-dispatch-recipes.md
-  carrier: .specify/skills/internal/create-team/scripts/dispatch.sh
-  anchor: .specify/shared/workflow/external-dispatch-recipes.md#Two Topologies
+# carrier: skills/internal/create-team/scripts/dispatch.sh
+- unit: shared/workflow/external-dispatch-recipes.md
+  carrier: skills/internal/create-team/scripts/dispatch.sh
+  anchor: shared/workflow/external-dispatch-recipes.md#Two Topologies
 #
-# .specify/shared/workflow/feature-integration.md — the deliverable is registry rows in
+# shared/workflow/feature-integration.md — the deliverable is registry rows in
 # `.specify/memory/features.md` and `features/<ID>.md` — the memory registry, which the consumer
 # list does not name
-# carrier: .specify/scripts/python/closure-acceptance-check.py
-- unit: .specify/shared/workflow/feature-integration.md
-  carrier: .specify/scripts/python/closure-acceptance-check.py
-  anchor: .specify/shared/workflow/feature-integration.md#Core Protocol
+# carrier: scripts/python/closure-acceptance-check.py
+- unit: shared/workflow/feature-integration.md
+  carrier: scripts/python/closure-acceptance-check.py
+  anchor: shared/workflow/feature-integration.md#Core Protocol
 #
-# .specify/shared/workflow/glossary.md — the deliverable is glossary entries in
+# shared/workflow/glossary.md — the deliverable is glossary entries in
 # `.specify/memory/glossary.md`; the protocol edits a memory-store file, not one of the four kinds
-# carrier: .specify/scripts/python/glossary-utils.py
-- unit: .specify/shared/workflow/glossary.md
-  carrier: .specify/scripts/python/glossary-utils.py
-  anchor: .specify/shared/workflow/glossary.md#5. Scope
+# carrier: scripts/python/glossary-utils.py
+- unit: shared/workflow/glossary.md
+  carrier: scripts/python/glossary-utils.py
+  anchor: shared/workflow/glossary.md#5. Scope
 
 # `skills/external/*/SKILL.md` (2 rows)
 # A coaching run and an office-document toolkit. The coaching plan is handed to `improve-skills`,
 # which is the unit that changes `skills/`; the document toolkit's product is a document.
 #
-# .specify/skills/coaching-skills/SKILL.md — the deliverable is four coaching run files (expectation
+# skills/external/coaching-skills/SKILL.md — the deliverable is four coaching run files (expectation
 # / observation / deviations / improvement-plan); the plan is only handed to `improve-skills`, so no
 # `skills/` file is changed here
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/coaching-skills/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/coaching-skills/SKILL.md#Artifacts and Order
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/external/coaching-skills/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/external/coaching-skills/SKILL.md#Artifacts and Order
 #
-# .specify/skills/document-utils/SKILL.md — the deliverable is an office document (DOCX / PDF / PPTX
-# / XLSX); the format tools under its own `.specify/scripts/` are what it reaches
-# carrier: .specify/skills/document-utils/scripts/office/validate.py
-- unit: .specify/skills/document-utils/SKILL.md
-  carrier: .specify/skills/document-utils/scripts/office/validate.py
-  anchor: .specify/skills/document-utils/SKILL.md#Overview
+# skills/external/document-utils/SKILL.md — the deliverable is an office document (DOCX / PDF / PPTX
+# / XLSX); the format tools under its own `scripts/` are what it reaches
+# carrier: skills/external/document-utils/scripts/office/validate.py
+- unit: skills/external/document-utils/SKILL.md
+  carrier: skills/external/document-utils/scripts/office/validate.py
+  anchor: skills/external/document-utils/SKILL.md#Overview
 
 # `skills/internal/*/SKILL.md` (15 rows)
 # Authoring and analysis skills whose product is a spec artifact, a registry file, a ledger, a
 # report or a relayed third-party product. Where a unit owns a subject engine that engine is the
 # carrier; where it owns none, the carrier is the record engine its § Wrap-up calls.
 #
-# .specify/skills/internal/archive-session/SKILL.md — the deliverable is an exported CLI-session bundle in a
+# skills/internal/archive-session/SKILL.md — the deliverable is an exported CLI-session bundle in a
 # user-named directory outside the memory store
-# carrier: .specify/skills/internal/archive-session/scripts/export.py
-- unit: .specify/skills/internal/archive-session/SKILL.md
-  carrier: .specify/skills/internal/archive-session/scripts/export.py
-  anchor: .specify/skills/internal/archive-session/SKILL.md#调用
+# carrier: skills/internal/archive-session/scripts/export.py
+- unit: skills/internal/archive-session/SKILL.md
+  carrier: skills/internal/archive-session/scripts/export.py
+  anchor: skills/internal/archive-session/SKILL.md#调用
 #
-# .specify/skills/internal/clarify-artifact/SKILL.md — the deliverable is ratified answers encoded back into
+# skills/internal/clarify-artifact/SKILL.md — the deliverable is ratified answers encoded back into
 # the phase artifact (requirements.md / plan.md)
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/clarify-artifact/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/clarify-artifact/SKILL.md#Goal
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/clarify-artifact/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/clarify-artifact/SKILL.md#Goal
 #
-# .specify/skills/internal/create-checklist/SKILL.md — the deliverable is a requirements-quality checklist
+# skills/internal/create-checklist/SKILL.md — the deliverable is a requirements-quality checklist
 # file under the feature's `checklists/`
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/create-checklist/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/create-checklist/SKILL.md#Goal
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/create-checklist/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/create-checklist/SKILL.md#Goal
 #
-# .specify/skills/internal/create-plan/SKILL.md — the deliverable is plan.md plus its design artifacts
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/create-plan/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/create-plan/SKILL.md#Goal
+# skills/internal/create-plan/SKILL.md — the deliverable is plan.md plus its design artifacts
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/create-plan/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/create-plan/SKILL.md#Goal
 #
-# .specify/skills/internal/create-requirements/SKILL.md — the deliverable is requirements.md
-# carrier: .specify/scripts/python/validate-requirements.py
-- unit: .specify/skills/internal/create-requirements/SKILL.md
-  carrier: .specify/scripts/python/validate-requirements.py
-  anchor: .specify/skills/internal/create-requirements/SKILL.md#Goal
+# skills/internal/create-requirements/SKILL.md — the deliverable is requirements.md
+# carrier: scripts/python/validate-requirements.py
+- unit: skills/internal/create-requirements/SKILL.md
+  carrier: scripts/python/validate-requirements.py
+  anchor: skills/internal/create-requirements/SKILL.md#Goal
 #
-# .specify/skills/internal/create-tasks/SKILL.md — the deliverable is tasks.md
-# carrier: .specify/scripts/python/validate-tasks.py
-- unit: .specify/skills/internal/create-tasks/SKILL.md
-  carrier: .specify/scripts/python/validate-tasks.py
-  anchor: .specify/skills/internal/create-tasks/SKILL.md#Goal
+# skills/internal/create-tasks/SKILL.md — the deliverable is tasks.md
+# carrier: scripts/python/validate-tasks.py
+- unit: skills/internal/create-tasks/SKILL.md
+  carrier: scripts/python/validate-tasks.py
+  anchor: skills/internal/create-tasks/SKILL.md#Goal
 #
-# .specify/skills/internal/derive-architecture/SKILL.md — the deliverable is a derivation archive at
+# skills/internal/derive-architecture/SKILL.md — the deliverable is a derivation archive at
 # `.specify/derive/<slug>/derive.md`
-# carrier: .specify/scripts/python/derive-utils.py
-- unit: .specify/skills/internal/derive-architecture/SKILL.md
-  carrier: .specify/scripts/python/derive-utils.py
-  anchor: .specify/skills/internal/derive-architecture/SKILL.md#Workflow
+# carrier: scripts/python/derive-utils.py
+- unit: skills/internal/derive-architecture/SKILL.md
+  carrier: scripts/python/derive-utils.py
+  anchor: skills/internal/derive-architecture/SKILL.md#Workflow
 #
-# .specify/skills/internal/manage-features/SKILL.md — the deliverable is the feature registry (`features.md`
+# skills/internal/manage-features/SKILL.md — the deliverable is the feature registry (`features.md`
 # plus per-feature detail files)
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/manage-features/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/manage-features/SKILL.md#Goal
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/manage-features/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/manage-features/SKILL.md#Goal
 #
-# .specify/skills/internal/manage-goal/SKILL.md — the deliverable is goal definitions under `.specify/goal/`
-# carrier: .specify/scripts/python/goal-utils.py
-- unit: .specify/skills/internal/manage-goal/SKILL.md
-  carrier: .specify/scripts/python/goal-utils.py
-  anchor: .specify/skills/internal/manage-goal/SKILL.md#Goal
+# skills/internal/manage-goal/SKILL.md — the deliverable is goal definitions under `.specify/goal/`
+# carrier: scripts/python/goal-utils.py
+- unit: skills/internal/manage-goal/SKILL.md
+  carrier: scripts/python/goal-utils.py
+  anchor: skills/internal/manage-goal/SKILL.md#Goal
 #
-# .specify/skills/internal/manage-todo/SKILL.md — the deliverable is TODO blocks and parked ideas in
+# skills/internal/manage-todo/SKILL.md — the deliverable is TODO blocks and parked ideas in
 # workspace files
-# carrier: .specify/scripts/python/search-todo.py
-- unit: .specify/skills/internal/manage-todo/SKILL.md
-  carrier: .specify/scripts/python/search-todo.py
-  anchor: .specify/skills/internal/manage-todo/SKILL.md#Goal
+# carrier: scripts/python/search-todo.py
+- unit: skills/internal/manage-todo/SKILL.md
+  carrier: scripts/python/search-todo.py
+  anchor: skills/internal/manage-todo/SKILL.md#Goal
 #
-# .specify/skills/internal/research-feature/SKILL.md — the deliverable is research.md
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/research-feature/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/research-feature/SKILL.md#Goal
+# skills/internal/research-feature/SKILL.md — the deliverable is research.md
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/research-feature/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/research-feature/SKILL.md#Goal
 #
-# .specify/skills/internal/run-agent/SKILL.md — the deliverable is the dispatched agent's own output plus its
+# skills/internal/run-agent/SKILL.md — the deliverable is the dispatched agent's own output plus its
 # run report
-# carrier: .specify/skills/internal/create-team/scripts/dispatch.sh
-- unit: .specify/skills/internal/run-agent/SKILL.md
-  carrier: .specify/skills/internal/create-team/scripts/dispatch.sh
-  anchor: .specify/skills/internal/run-agent/SKILL.md#Goal
+# carrier: skills/internal/create-team/scripts/dispatch.sh
+- unit: skills/internal/run-agent/SKILL.md
+  carrier: skills/internal/create-team/scripts/dispatch.sh
+  anchor: skills/internal/run-agent/SKILL.md#Goal
 #
-# .specify/skills/internal/run-interview/SKILL.md — the deliverable is the target artifact edited in place
+# skills/internal/run-interview/SKILL.md — the deliverable is the target artifact edited in place
 # plus the decision ledger (spec dir or memory session store)
-# carrier: .specify/scripts/python/interview-utils.py
-- unit: .specify/skills/internal/run-interview/SKILL.md
-  carrier: .specify/scripts/python/interview-utils.py
-  anchor: .specify/skills/internal/run-interview/SKILL.md#Goal
+# carrier: scripts/python/interview-utils.py
+- unit: skills/internal/run-interview/SKILL.md
+  carrier: scripts/python/interview-utils.py
+  anchor: skills/internal/run-interview/SKILL.md#Goal
 #
-# .specify/skills/internal/run-skills/SKILL.md — the deliverable is the target skill's own product, relayed
+# skills/internal/run-skills/SKILL.md — the deliverable is the target skill's own product, relayed
 # unchanged
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/skills/internal/run-skills/SKILL.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/skills/internal/run-skills/SKILL.md#Goal
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/run-skills/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/run-skills/SKILL.md#Goal
 #
-# .specify/skills/internal/run-team/SKILL.md — the deliverable is the team's work plus the mandatory run
+# skills/internal/run-team/SKILL.md — the deliverable is the team's work plus the mandatory run
 # report; a run changes no governed tree
-# carrier: .specify/scripts/python/goal-utils.py
-- unit: .specify/skills/internal/run-team/SKILL.md
-  carrier: .specify/scripts/python/goal-utils.py
-  anchor: .specify/skills/internal/run-team/SKILL.md#Goal
+# carrier: scripts/python/goal-utils.py
+- unit: skills/internal/run-team/SKILL.md
+  carrier: scripts/python/goal-utils.py
+  anchor: skills/internal/run-team/SKILL.md#Goal
 
-# `.specify/templates/commands/*.md` (10 rows)
+# `templates/commands/*.md` (10 rows)
 # The command face of the same ten deliverables. Each template carries entry, parameters and the
 # command-lifecycle wrap-up and delegates the product to its skill; the product is named per row.
 #
-# .specify/templates/commands/checklist.md — delivers a checklist file through create-checklist
-# carrier: .specify/scripts/python/flow-class-check.py
-- unit: .specify/templates/commands/checklist.md
-  carrier: .specify/scripts/python/flow-class-check.py
-  anchor: .specify/templates/commands/checklist.md#Delegation
+# templates/commands/checklist.md — delivers a checklist file through create-checklist
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/checklist.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/checklist.md#Delegation
 #
-# .specify/templates/commands/clarify.md — delivers ratified answers written back into the phase artifact
-# carrier: .specify/scripts/python/flow-class-check.py
-- unit: .specify/templates/commands/clarify.md
-  carrier: .specify/scripts/python/flow-class-check.py
-  anchor: .specify/templates/commands/clarify.md#Delegation
+# templates/commands/clarify.md — delivers ratified answers written back into the phase artifact
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/clarify.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/clarify.md#Delegation
 #
-# .specify/templates/commands/derive.md — delivers the `.specify/derive/` archive
-# carrier: .specify/scripts/python/derive-utils.py
-- unit: .specify/templates/commands/derive.md
-  carrier: .specify/scripts/python/derive-utils.py
-  anchor: .specify/templates/commands/derive.md#Outline
+# templates/commands/derive.md — delivers the `.specify/derive/` archive
+# carrier: scripts/python/derive-utils.py
+- unit: templates/commands/derive.md
+  carrier: scripts/python/derive-utils.py
+  anchor: templates/commands/derive.md#Outline
 #
-# .specify/templates/commands/goal.md — delivers goal definitions under `.specify/goal/`
-# carrier: .specify/scripts/python/goal-utils.py
-- unit: .specify/templates/commands/goal.md
-  carrier: .specify/scripts/python/goal-utils.py
-  anchor: .specify/templates/commands/goal.md#Outline
+# templates/commands/goal.md — delivers goal definitions under `.specify/goal/`
+# carrier: scripts/python/goal-utils.py
+- unit: templates/commands/goal.md
+  carrier: scripts/python/goal-utils.py
+  anchor: templates/commands/goal.md#Outline
 #
-# .specify/templates/commands/interview.md — delivers the edited target artifact plus the interview ledger
-# carrier: .specify/scripts/python/interview-utils.py
-- unit: .specify/templates/commands/interview.md
-  carrier: .specify/scripts/python/interview-utils.py
-  anchor: .specify/templates/commands/interview.md#Skill Delegation
+# templates/commands/interview.md — delivers the edited target artifact plus the interview ledger
+# carrier: scripts/python/interview-utils.py
+- unit: templates/commands/interview.md
+  carrier: scripts/python/interview-utils.py
+  anchor: templates/commands/interview.md#Skill Delegation
 #
-# .specify/templates/commands/plan.md — delivers plan.md plus its design artifacts
-# carrier: .specify/scripts/python/flow-class-check.py
-- unit: .specify/templates/commands/plan.md
-  carrier: .specify/scripts/python/flow-class-check.py
-  anchor: .specify/templates/commands/plan.md#Skill Delegation
+# templates/commands/plan.md — delivers plan.md plus its design artifacts
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/plan.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/plan.md#Skill Delegation
 #
-# .specify/templates/commands/research.md — delivers research.md
-# carrier: .specify/scripts/python/feedback-utils.py
-- unit: .specify/templates/commands/research.md
-  carrier: .specify/scripts/python/feedback-utils.py
-  anchor: .specify/templates/commands/research.md#Delegation
+# templates/commands/research.md — delivers research.md
+# carrier: scripts/python/feedback-utils.py
+- unit: templates/commands/research.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: templates/commands/research.md#Delegation
 #
-# .specify/templates/commands/session.md — delivers the exported session bundle
-# carrier: .specify/skills/internal/archive-session/scripts/export.py
-- unit: .specify/templates/commands/session.md
-  carrier: .specify/skills/internal/archive-session/scripts/export.py
-  anchor: .specify/templates/commands/session.md#Modes
+# templates/commands/session.md — delivers the exported session bundle
+# carrier: skills/internal/archive-session/scripts/export.py
+- unit: templates/commands/session.md
+  carrier: skills/internal/archive-session/scripts/export.py
+  anchor: templates/commands/session.md#Modes
 #
-# .specify/templates/commands/tasks.md — delivers tasks.md
-# carrier: .specify/scripts/python/validate-tasks.py
-- unit: .specify/templates/commands/tasks.md
-  carrier: .specify/scripts/python/validate-tasks.py
-  anchor: .specify/templates/commands/tasks.md#Delegation
+# templates/commands/tasks.md — delivers tasks.md
+# carrier: scripts/python/validate-tasks.py
+- unit: templates/commands/tasks.md
+  carrier: scripts/python/validate-tasks.py
+  anchor: templates/commands/tasks.md#Delegation
 #
-# .specify/templates/commands/todo.md — delivers the TODO surface (workspace blocks and parked ideas)
-# carrier: .specify/scripts/python/search-todo.py
-- unit: .specify/templates/commands/todo.md
-  carrier: .specify/scripts/python/search-todo.py
-  anchor: .specify/templates/commands/todo.md#Delegation
+# templates/commands/todo.md — delivers the TODO surface (workspace blocks and parked ideas)
+# carrier: scripts/python/search-todo.py
+- unit: templates/commands/todo.md
+  carrier: scripts/python/search-todo.py
+  anchor: templates/commands/todo.md#Delegation

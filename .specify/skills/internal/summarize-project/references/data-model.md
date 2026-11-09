@@ -23,7 +23,7 @@
 - **记录（Record）** = 格式化结构表示：采集到的项目信息先按本文档的四个结构归集，再**装载进关系模型**——字段类型、必填性、日期形态、状态取值域**由数据库约束在装载时强制**（规则见 [`../schema/project.sql`](../schema/project.sql)），不靠文档里的格式提醒。
 - **呈现（Presentation）** = 可视化表示：报告中的一切表格、图表（WBS、甘特图、里程碑视图、脑图）与叙述**只能从这四个结构派生**，不得绕过结构直接从原始材料落笔。
 - 中间结构是**报告生成过程中的口径**，以报告内表格的形态呈现（记录表即报告表格）；它在库里的对应物就是 `work_items` / `milestones` / `people` / `project` 四张表。
-- **结构 B/C 同时是进度引擎的输入**：引擎直接读数据库（`.specify/scripts/progress-engine.py --db <交付目录>/data/project.db`），用 SQL 取数与聚合，算出状态、进度%、延期天数、聚合与甘特参数；表格里的状态/进度/逾期列一律**回填引擎输出**，不在文档或报告里手算（见 [consistency-rules.md](consistency-rules.md) §0.1）。
+- **结构 B/C 同时是进度引擎的输入**：引擎直接读数据库（`scripts/progress-engine.py --db <交付目录>/data/project.db`），用 SQL 取数与聚合，算出状态、进度%、延期天数、聚合与甘特参数；表格里的状态/进度/逾期列一律**回填引擎输出**，不在文档或报告里手算（见 [consistency-rules.md](consistency-rules.md) §0.1）。
 - **数据库是派生产物**：落在**交付目录的 `data/` 子目录**（`<交付目录>/data/project.db`，与之并列的 `project-input.yaml` 是用户维护的表单——技能只读它），默认**每次运行由表单重建**（`project-db.py --load`）；用户希望基于历史库按最新信息演进时用 `project-db.py --update`（UPSERT + 变更摘要），并在 `## 元信息` 注明。本技能保持只读呈现定位，除交付目录外**绝不向目标项目写入任何持久化数据**，也**不改写表单内容**。
 - 结构在上下文中定稿后进入确认门禁；门禁通过即冻结，所有派生物（图表、叙述）必须与冻结的结构逐字一致。
   > Gate probe: gate-summarize-project-structure-freeze — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
@@ -185,7 +185,7 @@
 
 - [ ] 四个结构齐备（无人员数据时结构 D 至少含一行 `未记录` 说明或在叙述中显式声明「项目材料未记录人员信息」）
 - [ ] 人员维度覆盖率已取引擎输出 `people.coverage_formula`（分子分母由 SQL 统计得出）供报告 `### 人员与分工` 首句声明使用——不自行做除法
-- [ ] 已跑过 `.specify/scripts/validate-project-input.py`（`status=ready`，R 档齐备）、`.specify/scripts/project-db.py --load`（装载即校验，落 `<交付目录>/data/project.db`），再跑过 `.specify/scripts/progress-engine.py --db`（基准日 = 库中 `baseline_date` 或 `--baseline`，退出码 0）；结构 B/C 的状态、进度%、延期天数与依据列均为**引擎回填**（`status` / `progress_pct` / `delay_days` / `evidence`），记录层未自行比较日期或计算天数差
+- [ ] 已跑过 `scripts/validate-project-input.py`（`status=ready`，R 档齐备）、`scripts/project-db.py --load`（装载即校验，落 `<交付目录>/data/project.db`），再跑过 `scripts/progress-engine.py --db`（基准日 = 库中 `baseline_date` 或 `--baseline`，退出码 0）；结构 B/C 的状态、进度%、延期天数与依据列均为**引擎回填**（`status` / `progress_pct` / `delay_days` / `evidence`），记录层未自行比较日期或计算天数差
 - [ ] 每行来源列非空；来源可定位（文件#章节 / git 命令 / 用户描述）
 - [ ] 全部日期呈现为 `yyyy-mm-dd`；推断日期均带 `（推断）` 且已登记假设（字面量与日历日合法性由数据库约束保证，无需人工核对）
 - [ ] 状态取值域由数据库约束保证（无需人工核对枚举成员）；仅需人工确认：合法终态 `未知` 未与 `not-started` 混用；每条 in-progress / delayed 记录都有「进度依据」（可计数事实的出处）与引擎进度%（空值一律写 `-（无可计数依据）`，未在记录层推算）；delayed 均有延期天数；引擎 `diagnostics.warnings` / `unmapped_statuses` 已判读并写入元信息

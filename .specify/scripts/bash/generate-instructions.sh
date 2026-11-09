@@ -1,4 +1,67 @@
 #!/bin/bash
+# projected mirror: source + bash-version-guard; regenerate it, never hand-edit it
+#
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
+# that exists only in the source tree: it re-derives its own version line (C-36).
+#
+# The guard block is the FIRST executable block of the script that carries it: above
+# every `source`, every `mkdir`, every `git` write and every manifest generation.
+# The insertion rule is owned by `shared/definitions/script-interface-definitions.md`.
+script_interface_version_text() {
+    local _name _dir _level _ver
+    local _source="${_SCRIPT_INTERFACE_VERSION_SOURCE:-pyproject.toml}"
+    local _max="${_SCRIPT_INTERFACE_MAX_LEVELS:-12}"
+    # The printed name is the BASENAME of what the caller passed, exactly as the Python half
+    # prints `Path(argv[0]).name`: a caller that forwards `$0` gets the same word the other
+    # side of the tree writes, and a downstream copy's path never leaks into the line.
+    _name="${1:-$0}"
+    _name="${_name##*/}"
+    _dir="${2:-$(dirname -- "$0")}"
+    case "$_dir" in /*) ;; *) _dir="./$_dir" ;; esac
+    _ver="unknown"
+    _level=0
+    while [ -d "$_dir" ] && [ "$_level" -le "$_max" ]; do
+    if [ -f "$_dir/$_source" ] && [ -e "$_dir/.git" ]; then
+    _ver="$(sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+    "$_dir/$_source" 2>/dev/null | head -n 1)"
+    break
+    fi
+    [ "$_dir" = "/" ] && break
+    _dir="$(dirname -- "$_dir")"
+    _level=$((_level + 1))
+    done
+    [ -n "$_ver" ] || _ver="unknown"
+    printf '%s %s\n' "$_name" "$_ver"
+    return 0
+}
+_script_interface_guard() {
+    local _arg _wanted=
+    local _stop=0
+    for _arg in "$@"; do
+        [ "$_stop" -eq 1 ] && continue
+        case "$_arg" in
+            --) _stop=1 ;;
+            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
+            --version) [ -n "$_wanted" ] || _wanted=version ;;
+        esac
+    done
+    case "$_wanted" in
+        help)
+            printf 'usage: %s %s\n' "${0##*/}" '(no options)'
+            printf 'options:\n'
+            printf '  -h, --help   print this help and exit\n'
+            printf '  --version    print the script name and the framework version, then exit\n'
+            printf 'side-effects: %s\n' 'rewrites .specify/instructions.md, backs it up beside itself, appends patterns to .gitignore and writes .specify/tools/*.json; the flags write nothing'
+            printf 'exit-codes: %s\n' '0 generated or answered; 1 the template or a prerequisite is missing; 2 an unrecognized option'
+            exit 0 ;;
+        version)
+            script_interface_version_text "$0" "$(dirname -- "$0")"
+            exit 0 ;;
+    esac
+    return 0
+}
+_script_interface_guard "$@"
 set -e
 
 # Script-interface guard (feature 086). It MUST stay ahead of `source common.sh` and of every
@@ -377,7 +440,7 @@ PYEOF
 
     # Create the skills/tools explanation docs at .specify top level (create-only,
     # never overwrite — same non-destructive policy as the glossary). These carry
-    # the no-registry discovery model; canonical sources live in .specify/templates/.
+    # the no-registry discovery model; canonical sources live in templates/.
     for doc_name in skills tools; do
       DOC_TEMPLATE=".specify/templates/${doc_name}.md"
       DOC_TARGET="$TARGET_DIR/${doc_name}.md"

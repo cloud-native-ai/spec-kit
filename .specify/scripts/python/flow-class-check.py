@@ -2,10 +2,10 @@
 """Flow-class ledger engine (069a / 069b): reconcile, resolve and verify bindings.
 
 The single owner of the execution/expression classification is
-``.specify/shared/definitions/flow-class-definitions.md``; this engine never restates the
+``shared/definitions/flow-class-definitions.md``; this engine never restates the
 criteria or the values' meaning. It only:
 
-* ``--action check`` — scan the repository inventory (``.specify/templates/commands/*.md``
+* ``--action check`` — scan the repository inventory (``templates/commands/*.md``
   and ``skills/{external,internal}/*/SKILL.md``), parse the owner's per-unit
   ledger, and report every defect as one of the contracted finding kinds. The
   069a eight (``missing`` / ``unknown`` / ``duplicate`` / ``dual-class`` /
@@ -63,11 +63,11 @@ and ``ledger-reconciler.md`` C-3 / C-14):
 
 Usage::
 
-    python3 .specify/scripts/python/flow-class-check.py --action check [--repo <root>] [--format text|json]
-    python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id <id> [--repo <root>] [--format text|json]
-    python3 .specify/scripts/python/flow-class-check.py --action isomorphism [--repo <root>] [--format text|json]
-    python3 .specify/scripts/python/flow-class-check.py --action delegation [--repo <root>] [--format text|json]
-    python3 .specify/scripts/python/flow-class-check.py --action faces [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action check [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action lookup --unit-id <id> [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action isomorphism [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action delegation [--repo <root>] [--format text|json]
+    python3 scripts/python/flow-class-check.py --action faces [--repo <root>] [--format text|json]
 
 The ledger is parsed by header name, never by column position; a row whose cell
 count or required values do not fit the declared grammar is reported as
@@ -91,7 +91,7 @@ CLASS_KEY = "flow_class"            # [[STR-003]]
 DEFAULT_MARKER = "未声明·按默认"    # [[STR-004]]
 
 # Feature 084, batch 1 rows 4-8: the five closed sets this engine compares against are
-# declaration-layer facts (`.specify/shared/declarations/facts/flow-class-*.yaml`). The engine carries no copy of
+# declaration-layer facts (`shared/declarations/facts/flow-class-*.yaml`). The engine carries no copy of
 # them — it reads each through the shared read entry, so adding one legal member to a declaration makes
 # the gate accept it with no script edit (FR-007 (c), US2 acceptance 2) and a second tuple anywhere is
 # the finding these reads exist to make impossible.
@@ -151,7 +151,7 @@ if not FACES_SECTION_KEYWORD or FACES_EXPECTED is None:
 
 #: The operator table's columns, by position. A header that does not match this tuple is a gate-owner
 #: error, and every row is then resolved by position — so the five column names exist once, in
-#: `.specify/shared/declarations/facts/expression-stage-operator-table.yaml`, not again in this file.
+#: `shared/declarations/facts/expression-stage-operator-table.yaml`, not again in this file.
 if len(OPERATOR_COLUMNS) == 5:
     STEP_COLUMN, GATE_ID_COLUMN, OPERATOR_COLUMN, FACE_COLUMN, LEVEL_COLUMN = OPERATOR_COLUMNS
 else:
@@ -186,7 +186,7 @@ SKILL_LAYERS = ("external", "internal")
 LEDGER_SECTION_KEYWORD = "逐流程台账"
 NEUTRAL_SECTION_KEYWORD = "类中立清单"
 # ``REQUIRED_LEDGER_COLUMNS`` is NOT defined here: feature 084 batch 1 row 7 moved the ledger's
-# required column set to ``.specify/shared/declarations/facts/flow-class-ledger-columns.yaml`` and the read at
+# required column set to ``shared/declarations/facts/flow-class-ledger-columns.yaml`` and the read at
 # the top of this module binds the same ordered tuple the header check compared before (T012). A
 # local re-assignment would shadow that read and put the second copy back — this module refuses to
 # judge when the read is empty (see :func:`main`), so no local fallback belongs here either.
@@ -843,7 +843,7 @@ def action_check(repo: Path, output_format: str) -> int:
         return check_input_error(
             record,
             RED_FRAMEWORK_SOURCE_REQUIRED,
-            "neither .specify/templates/commands/ nor a parseable skills/{external,internal}/ "
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
             "is present in %s" % repo,
             output_format,
         )
@@ -945,7 +945,7 @@ DECLARATION_PROBE_RE = re.compile(r"^\s*\*\*\s*flow\s+class\s*\*\*", re.IGNORECA
 DECLARATION_ABSENT = "declaration-absent"
 
 # The document type: a subordinate attribute of ``flow_class`` (owner:
-# ``.specify/shared/definitions/flow-class-definitions.md`` § 文档类型). It is optional —
+# ``shared/definitions/flow-class-definitions.md`` § 文档类型). It is optional —
 # a line that is absent leaves ``flow_type: null`` — but when present it is
 # closed-set and only meaningful for ``expression`` lines; an ``execution`` line
 # may carry only the explicit ``-``. Extending the set is an owner revision.
@@ -1113,7 +1113,7 @@ def parse_spec_flow_type(text: str, class_value) -> dict:
     """Read the optional ``**Flow Type**`` line; absent is legal, malformed is not.
 
     Same head-region and verbatim rules as the class line (owner:
-    ``.specify/shared/definitions/flow-class-definitions.md`` § 文档类型). The type is
+    ``shared/definitions/flow-class-definitions.md`` § 文档类型). The type is
     subordinate: an ``execution`` line — or the default class when the class line
     is absent — accepts only the explicit ``-``. Author errors use the same exit 1
     as class errors; an absent line leaves ``flow_type: null``.
@@ -1442,7 +1442,7 @@ STATUS_VALUES = (ENFORCED, DECLARED_UNENFORCED)
 # semantics stay with the review face (C-10) — the checker never claims to judge
 # whether the 24 cells *mean* what they cite.
 # ``GATE_ID_COLUMN`` is NOT defined here: feature 084 batch 2 moved the operator table's column set
-# to ``.specify/shared/declarations/facts/expression-stage-operator-table.yaml`` and the positional read at the
+# to ``shared/declarations/facts/expression-stage-operator-table.yaml`` and the positional read at the
 # top of this module binds member 1 to that name (T014). A local re-assignment would put the second
 # copy back.
 GATE_REF_PREFIX = "gate:"
@@ -1467,7 +1467,7 @@ class GateOwnerError(Exception):
 
 
 def resolve_shared(repo: Path, rel: Path):
-    """Resolve a ``.specify/shared/``-relative path in the framework source, then its mirror."""
+    """Resolve a ``shared/``-relative path in the framework source, then its mirror."""
     for root in (repo, repo / MIRROR_DIR_NAME):
         path = root / rel
         if path.is_file():
@@ -1560,7 +1560,7 @@ def parse_gate_owner(repo: Path) -> GateOwner:
         raise GateOwnerError("gate owner § 阶段算子表 has no parseable table")
     op_header, op_rows = operator_table
     # The five column names are NOT spelled here: feature 084 batch 2 moved them to
-    # `.specify/shared/declarations/facts/expression-stage-operator-table.yaml`, and the positional read at the
+    # `shared/declarations/facts/expression-stage-operator-table.yaml`, and the positional read at the
     # top of this module binds them in declaration order. The check keeps its shape — each required
     # column must be present in the header, and every row is then resolved by column name — so the
     # refusal message and the exit code are unchanged.
@@ -2067,7 +2067,7 @@ def action_isomorphism(repo: Path, output_format: str) -> int:
         return isomorphism_input_error(
             record,
             "framework-source-required",
-            "neither .specify/templates/commands/ nor a parseable skills/{external,internal}/ is present in %s"
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ is present in %s"
             % repo,
             output_format,
         )
@@ -2192,7 +2192,7 @@ def formal_spec_artifacts(repo: Path) -> list[Path]:
 
 
 def scope_markdown_files(repo: Path) -> list[Path]:
-    """The closed scan scope: .specify/shared/, the command templates, skills/, the spec."""
+    """The closed scan scope: shared/, the command templates, skills/, the spec."""
     files: list[Path] = []
     for root_rel in (Path("shared"), COMMANDS_REL, SKILLS_REL):
         root = repo / root_rel
@@ -2317,7 +2317,7 @@ def scan_hand_lists(repo: Path) -> list[dict]:
 
     A row counts as a pair when it carries a command id and a skill id; three such
     rows in one table are the contracted minimum. The command templates are the
-    only legitimate place for delegation facts, so ``.specify/templates/commands/`` is
+    only legitimate place for delegation facts, so ``templates/commands/`` is
     skipped as a source and used as the parse side instead.
     """
     findings: list[dict] = []
@@ -2405,7 +2405,7 @@ def action_delegation(repo: Path, output_format: str) -> int:
     if not is_framework_source(repo):
         label = payload_root_label(repo)
         detail = (
-            "neither .specify/templates/commands/ nor a parseable skills/{external,internal}/ "
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
             "is present in %s" % repo
         )
         record["error"] = {"label": label, "detail": detail}
@@ -2426,7 +2426,7 @@ def action_delegation(repo: Path, output_format: str) -> int:
 # 069b: six-face bindings (contract contracts/ledger-reconciler.md C-11 / C-12)
 # --------------------------------------------------------------------------- #
 # ``FACES_SECTION_KEYWORD`` / ``FACES_EXPECTED`` are NOT assigned here: feature 084 batch 2 moved the
-# six-face gate's shape to ``.specify/shared/declarations/facts/expression-gate-faces.yaml`` and the read at the
+# six-face gate's shape to ``shared/declarations/facts/expression-gate-faces.yaml`` and the read at the
 # top of this module binds them (T014). A local re-assignment would shadow that read and put the second
 # copy back — this module refuses to judge when the read is empty (see :func:`main`), so no local
 # fallback belongs here either.
@@ -2659,7 +2659,7 @@ def action_faces(repo: Path, output_format: str) -> int:
     if not is_framework_source(repo):
         label = payload_root_label(repo)
         detail = (
-            "neither .specify/templates/commands/ nor a parseable skills/{external,internal}/ "
+            "neither templates/commands/ nor a parseable skills/{external,internal}/ "
             "is present in %s" % repo
         )
         record["error"] = {"label": label, "detail": detail}
@@ -2715,7 +2715,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="flow-class-check.py",
         description=(
             "Reconcile the flow-class ledger and resolve a unit's class "
-            "(owner: .specify/shared/definitions/flow-class-definitions.md)."
+            "(owner: shared/definitions/flow-class-definitions.md)."
         ),
     )
     _sig_configure(parser)

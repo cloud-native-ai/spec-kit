@@ -644,7 +644,7 @@ For multi-chart pages, keep shared context (task title, dataset notes) in the pa
 
 ### Pinned Version & Offline Fallback
 
-Always pin the ECharts version (e.g. `echarts@5.6.0`), never a floating `echarts@5` tag. For offline-critical deliverables, the local copy must be REAL: place `vendor/echarts.min.js` (download + verify with `.specify/scripts/vendor-echarts.sh <dir>`), then use an **offline-first loader**: vendored copy first, pinned CDN fallback. **Never use `document.write`** for the loader (deprecated, blocking, CSP-hostile) — use a dynamic script with `onerror`:
+Always pin the ECharts version (e.g. `echarts@5.6.0`), never a floating `echarts@5` tag. For offline-critical deliverables, the local copy must be REAL: place `vendor/echarts.min.js` (download + verify with `scripts/vendor-echarts.sh <dir>`), then use an **offline-first loader**: vendored copy first, pinned CDN fallback. **Never use `document.write`** for the loader (deprecated, blocking, CSP-hostile) — use a dynamic script with `onerror`:
 
 ```html
 <script>
@@ -690,8 +690,8 @@ For complex or regenerable deliverables, keep data and the `option` in a separat
 
 ```bash
 # canonical: foo.config.json  ->  generated wrapper: foo.config.js
-node .specify/scripts/sync-config.mjs foo.config.json
-node .specify/scripts/sync-config.mjs --check foo.config.json   # fails when the pair drifted
+node scripts/sync-config.mjs foo.config.json
+node scripts/sync-config.mjs --check foo.config.json   # fails when the pair drifted
 ```
 
 ```html
@@ -744,8 +744,8 @@ Each chart config then uses `window.DESIGN_TOKENS.palette[0]` etc. — one edit 
 For `layout: 'none'` graphs with hand-written coordinates: record the canvas size and grid rules in the config `meta` (e.g. `meta.canvasWidth`, `meta.canvasHeight`), and run the overlap/bounds check before delivery:
 
 ```bash
-node .specify/scripts/check-layout.mjs foo.config.json        # OUT_OF_BOUNDS / OVERLAP / ZONE_OUT_OF_BOUNDS
-node .specify/scripts/verify-deliverable.mjs foo.html          # includes the layout check
+node scripts/check-layout.mjs foo.config.json        # OUT_OF_BOUNDS / OVERLAP / ZONE_OUT_OF_BOUNDS
+node scripts/verify-deliverable.mjs foo.html          # includes the layout check
 ```
 
 Rules of thumb: keep node spacing ≥ 1.5× the largest neighbor size; keep partition zones inside the canvas with a margin; record the canvas width explicitly (the checker defaults to 1200×800 when `meta.canvasWidth/Height` is absent — an absent width is itself a finding).

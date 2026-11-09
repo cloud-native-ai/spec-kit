@@ -8,10 +8,10 @@ proposal, which flow a missed situation belongs to) stays with the agent and is
 handed back through `semanticJudgmentPending`.
 
 Contract: .specify/specs/050-proactive-flow-trigger/contracts/trigger-engine.md
-Discipline: .specify/shared/guidelines/proactive-trigger.md (the single source of truth)
-Paradigm source: .specify/scripts/python/derive-utils.py (camelCase envelope, atomic
+Discipline: shared/guidelines/proactive-trigger.md (the single source of truth)
+Paradigm source: scripts/python/derive-utils.py (camelCase envelope, atomic
 write, graded exit codes). Threshold semantics are isomorphic to
-feedback-utils.py's, re-implemented locally rather than imported: .specify/scripts/ is
+feedback-utils.py's, re-implemented locally rather than imported: scripts/ is
 mirrored as independent STRICT copies, so a cross-engine import would couple two
 separately mirrored files.
 
@@ -53,7 +53,7 @@ if REPO_ROOT.name == ".specify":
 STORE_RELPATH = Path(".specify") / "memory" / "trigger"
 INDEX_NAME = "index.json"
 TELEMETRY_NAME = "telemetry.jsonl"
-IGNORE_ENTRY = ".specify/memory/trigger/telemetry.jsonl"
+IGNORE_ENTRY = "memory/trigger/telemetry.jsonl"
 SEED_CANDIDATES = (
     Path(".specify") / "templates" / "proactive-trigger-seed.json",
     Path("templates") / "proactive-trigger-seed.json",
@@ -68,7 +68,7 @@ import declaration_reader  # noqa: E402  (import follows the sys.path entry abov
 # The state file's schema — a declaration-layer fact (Feature 084, batch 3; C-045)
 # --------------------------------------------------------------------------- #
 # The schema version, the default config, the closed action/response sets and the default threshold are
-# owned by `.specify/shared/declarations/facts/trigger-state-schema.yaml#/statement` and read here through the
+# owned by `shared/declarations/facts/trigger-state-schema.yaml#/statement` and read here through the
 # shared read entry, so none of them is spelled in this engine again. The `_TRIGGER_FALLBACK` mapping
 # below is the **FR-012 compatibility value** for a tree with no declaration layer; when the
 # declaration is readable it is never consulted (no double read).

@@ -4,4 +4,4 @@ Records every submodule-pointer (gitlink) bump made from this parent project whi
 
 | Date | Submodule | Branch | Old SHA | New SHA | Parent Commit | Validation | Notes |
 |------|-----------|--------|---------|---------|---------------|------------|-------|
-<!-- new rows appended below by .specify/scripts/record-bump.sh -->
+<!-- new rows appended below by scripts/record-bump.sh -->

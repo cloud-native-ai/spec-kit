@@ -13,7 +13,7 @@ statement:
   - design-note
   - "-"
 consumers:
-  - .specify/scripts/python/flow-class-check.py
+  - scripts/python/flow-class-check.py
 former_carriers:
-  - .specify/shared/definitions/flow-class-definitions.md
+  - shared/definitions/flow-class-definitions.md
 note: "Both faces agreed before migration (FLOW_TYPE_VALUES and the carrier's § 文档类型 table), so the authority order picked the code-side value with nothing to correct. The `-` member is quoted because a bare `-` is a YAML null item, not a scalar."

@@ -8,8 +8,8 @@
 // generate the JS wrapper; never hand-edit both copies.
 //
 // Usage:
-//   node .specify/scripts/sync-config.mjs <file>          # write the counterpart
-//   node .specify/scripts/sync-config.mjs --check <file>  # exit 1 if counterpart is stale
+//   node scripts/sync-config.mjs <file>          # write the counterpart
+//   node scripts/sync-config.mjs --check <file>  # exit 1 if counterpart is stale
 //
 // Input forms:
 //   foo.config.json  -> writes foo.config.js  (window.CHART_CONFIG = <json>;)
@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const JS_WRAPPER = (json) =>
-  `// AUTO-GENERATED from ${path.basename(json)} by .specify/scripts/sync-config.mjs — do not hand-edit.\n` +
+  `// AUTO-GENERATED from ${path.basename(json)} by scripts/sync-config.mjs — do not hand-edit.\n` +
   `// 数据/配置外置：重生成只改本配置，HTML 壳不动。\n` +
   `window.CHART_CONFIG = ${JSON.stringify(JSON.parse(fs.readFileSync(json, 'utf8')), null, 2)};\n`;
 
@@ -52,7 +52,7 @@ function main() {
   const file = check ? args[1] : args[0];
   if (!file || !fs.existsSync(file)) {
     console.error('ERROR: config file not found');
-    console.error('usage: node .specify/scripts/sync-config.mjs [--check] <foo.config.json|foo.config.js>');
+    console.error('usage: node scripts/sync-config.mjs [--check] <foo.config.json|foo.config.js>');
     process.exit(1);
   }
 
@@ -61,12 +61,12 @@ function main() {
 
   if (check) {
     if (!fs.existsSync(target)) {
-      console.error(`STALE: ${target} is missing (run: node .specify/scripts/sync-config.mjs ${file})`);
+      console.error(`STALE: ${target} is missing (run: node scripts/sync-config.mjs ${file})`);
       process.exit(1);
     }
     const targetNorm = normalizedJson(target);
     if (targetNorm !== current) {
-      console.error(`STALE: ${target} differs from ${file} (run: node .specify/scripts/sync-config.mjs ${file})`);
+      console.error(`STALE: ${target} differs from ${file} (run: node scripts/sync-config.mjs ${file})`);
       process.exit(1);
     }
     console.log(`OK: ${file} and ${target} are in sync`);

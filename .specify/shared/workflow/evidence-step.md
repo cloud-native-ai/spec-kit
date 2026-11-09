@@ -4,11 +4,11 @@
 
 ## Positioning & Red Lines
 
-1. **证据层对消费者中立**:证据由 `evidence-utils.py` 采集并规范化为 findings.json(合同见 `.specify/skills/internal/collect-evidence/references/evidence-contract.md`);证据层不含严重度、修复方案、优先级等观点字段——那些属于消费层。
+1. **证据层对消费者中立**:证据由 `evidence-utils.py` 采集并规范化为 findings.json(合同见 `skills/internal/collect-evidence/references/evidence-contract.md`);证据层不含严重度、修复方案、优先级等观点字段——那些属于消费层。
 2. **Unobserved 红线**:`Unobserved` 状态的证据只可记录,**禁止**当作缺陷去修、禁止推断为结论。未观察 ≠ 不存在,也 ≠ 存在。
 3. **计数只路由**:资产/会话/运行的计数信号只用于路由检查方向,**不得**直接生成优化点或候选。
 4. **候选冻结**:Step B 分拣完成后候选清单即冻结,后续步骤**不得**增删候选——防止"想修什么就把什么说成证据"。
-5. **evidenceState 七态语义不可重定义**:`Present / Wired / Exercised / Outcome-supported / Missing / Unobserved / Not applicable`(定义见 `.specify/skills/internal/collect-evidence/references/evidence-discipline.md`);消费方只能自定义**响应方式**,不能裁剪或重定义状态语义。
+5. **evidenceState 七态语义不可重定义**:`Present / Wired / Exercised / Outcome-supported / Missing / Unobserved / Not applicable`(定义见 `skills/internal/collect-evidence/references/evidence-discipline.md`);消费方只能自定义**响应方式**,不能裁剪或重定义状态语义。
 
 ## Canonical block (steps for the embedding unit)
 
@@ -60,5 +60,5 @@ python3 .specify/scripts/python/evidence-utils.py --action collect --target <uni
 
 - 本步骤插入消费单元的证据输入位置(通常替代原"从历史回忆执行效果"类步骤),不改变该单元的收尾 Feedback 步骤。
 - 引用方式:在 SKILL.md 相应步骤写"按 `.specify/shared/workflow/evidence-step.md` 执行 Step A/B(+E)",零复制定义。
-- Node 环境缺失时 Node 型泳道降级、纯 Python 型泳道仍可用——消费流程按可用泳道进行,边界如实申明。泳道的**成员与次序**由 `.specify/shared/declarations/facts/evidence-lanes.yaml#/statement` 单一拥有（本行不枚举；Node 型/原生型的划分归 `.specify/scripts/python/evidence-utils.py`）。
+- Node 环境缺失时 Node 型泳道降级、纯 Python 型泳道仍可用——消费流程按可用泳道进行,边界如实申明。泳道的**成员与次序**由 `shared/declarations/facts/evidence-lanes.yaml#/statement` 单一拥有（本行不枚举；Node 型/原生型的划分归 `scripts/python/evidence-utils.py`）。
 - `.specify/memory/evidence/` 不进入 feedback 打包(package)范围。

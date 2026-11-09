@@ -7,7 +7,7 @@ one ``run_determination`` record. The record *is* the 改点 (owner:
 ``.specify/memory/glossary.md`` → `改点`): an observation sensor inside the
 improve flow, never a feedback entry and never an intervention ledger.
 
-Program-First (``.specify/shared/guidelines/token-efficiency.md`` § 程序优先) is the whole
+Program-First (``shared/guidelines/token-efficiency.md`` § 程序优先) is the whole
 reason this file exists: every fixed-rule judgment below — source-hierarchy
 resolution, name-level set difference, literal-substring evidence search, the
 satisfaction decision table, the trigger conjunction — is computed here, and the
@@ -16,7 +16,7 @@ model supplies only the coarse classifications it is the sole competent judge of
 ``--unresolved-red``). Summary-First (§ 摘要优先) binds the read side: this
 engine reads originals freely and emits projections only.
 
-Ownership (``.specify/shared/guidelines/one-source-of-truth.md``, tier 1 = code). This
+Ownership (``shared/guidelines/one-source-of-truth.md``, tier 1 = code). This
 module is the code-side owner of the ``run_determination`` record schema and of
 every value domain the program branches on. The design-time owner of the four
 quantities' 判定口径, the three lanes' read surfaces, the two consumption points
@@ -28,27 +28,27 @@ block and MUST NOT be cited as current reality afterwards.
 Deliberately reached by reference, never restated here:
 
 * Exit codes — the house table, owned by the ``EXIT_*`` constants shared across
-  ``.specify/scripts/python/`` engines and by STR-007 in
+  ``scripts/python/`` engines and by STR-007 in
   ``.specify/specs/053-machine-decidable-artifacts/requirements.md`` § Shared
   Strings. One code never carries two meanings across actions of this binary.
 * ``not_evaluated`` and the comparison words — owned by STR-004 (same file) and
-  ``.specify/shared/workflow/self-improvement-workflow.md`` SI-8.
+  ``shared/workflow/self-improvement-workflow.md`` SI-8.
 * The four feedback red lines and the never-solicit line — owned by
-  ``.specify/shared/workflow/feedback-step.md`` § Positioning & Red Lines.
+  ``shared/workflow/feedback-step.md`` § Positioning & Red Lines.
 * The name-level baseline form, red-first evidence, mutation drill and the
   anti-vacuity sentinel — owned by ``.specify/memory/glossary.md``.
 * Which agent CLIs have a resolvable session store, and which do not — owned by
   ``STORE_RESOLVERS`` / ``UNSUPPORTED_TOOL_HINTS`` in
-  ``.specify/scripts/python/history-utils.py``.
+  ``scripts/python/history-utils.py``.
 * The memory store's layout, entry format and index — owned by
-  ``.specify/scripts/python/memory-utils.py``, which is the only writer this engine uses.
+  ``scripts/python/memory-utils.py``, which is the only writer this engine uses.
 * The evidence store's run layout and freshness gate — owned by
-  ``.specify/scripts/python/evidence-utils.py``.
-* ``should_prompt`` and its threshold — owned by ``.specify/scripts/python/feedback-utils.py``.
+  ``scripts/python/evidence-utils.py``.
+* ``should_prompt`` and its threshold — owned by ``scripts/python/feedback-utils.py``.
   This engine composes with it and never re-implements it.
 
 Hard separation from 情境评估 (Situational Assessment, owner
-``.specify/shared/guidelines/proactive-trigger.md``): the two are structural siblings with
+``shared/guidelines/proactive-trigger.md``): the two are structural siblings with
 disjoint jobs. This engine writes no per-turn row, adds no situation or signal
 vocabulary, and never calls that engine.
 
@@ -60,7 +60,7 @@ Actions:
   history     read-only projection of past records (never record bodies)
 
 No aggregate score exists in this engine and none may be added: a scalar roll-up
-is rejected by ``.specify/shared/guidelines/fast-fail.md`` § 范围限制 and by the B2
+is rejected by ``shared/guidelines/fast-fail.md`` § 范围限制 and by the B2
 adjudication in ``.specify/teams/session-driven-self-improvement/team.md``.
 The only roll-up is the boolean ``passive_trigger.trigger_feedback``.
 
@@ -79,7 +79,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # Exit codes: the house table. Owner is code (the EXIT_* constants shared across
-# .specify/scripts/python/ engines) plus STR-007; see the module docstring.
+# scripts/python/ engines) plus STR-007; see the module docstring.
 EXIT_OK = 0
 EXIT_INPUT_ERROR = 2
 EXIT_NOT_FOUND = 3
@@ -87,7 +87,7 @@ EXIT_INVALID = 4
 
 RECORD_KIND = "speckit.run-determination"
 SCHEMA_VERSION = 1
-ENGINE_REL_PATH = ".specify/scripts/python/run-determination.py"
+ENGINE_REL_PATH = "scripts/python/run-determination.py"
 
 ACTIONS = ("determine", "settle", "history", "args-manifest")
 
@@ -744,7 +744,7 @@ def read_red_state(args: argparse.Namespace) -> Tuple[str, str]:
 
 def _signal(axis: str) -> Dict[str, str]:
     """The ``{key, direction}`` shape of ``expectedSignal`` in
-    ``.specify/shared/workflow/evidence-step.md`` § Step E, so a finding can become a
+    ``shared/workflow/evidence-step.md`` § Step E, so a finding can become a
     ledger entry without a translation layer."""
     direction = SIGNAL_DIRECTIONS[axis]
     if direction not in DIRECTIONS:
@@ -851,7 +851,7 @@ def apply_qualification_gate(record: Dict[str, Any]) -> None:
 
 def observation_for(axis: str, body: Dict[str, Any]) -> str:
     """One bounded line: what was measured, never what to fix. Counts route; they
-    do not conclude (``.specify/shared/workflow/evidence-step.md`` red line 3)."""
+    do not conclude (``shared/workflow/evidence-step.md`` red line 3)."""
     verdict = body.get("verdict")
     reason = body.get("reason")
     if axis in ("token_consumption", "elapsed"):

@@ -2,7 +2,7 @@
 
 > **Owner**：shared 层。本工作流拥有**优化编排与输出映射**；它不定义任何单项最佳实践。
 >
-> **单项最佳实践 owner 示例**：`.specify/shared/definitions/self-explanatory-definitions.md`（概念）+ `.specify/shared/guidelines/self-explanatory.md`（实践）。
+> **单项最佳实践 owner 示例**：`shared/definitions/self-explanatory-definitions.md`（概念）+ `shared/guidelines/self-explanatory.md`（实践）。
 >
 > **Status**: confirmed at exit gate — 2026-11-04. 最终文件名按同族约定取定。
 
@@ -19,10 +19,10 @@
 
 ## 2. 两顶帽子（Two Hats）
 
-- **Framework hat（框架自身）**：工作流作用在 spec-kit 自身；`.specify/shared/*` 是源，自优化的输出落到框架自己的治理或运行目标（例如框架自身的 `.specify/memory/constitution.md`、`.specify/instructions.md`，或执行流程解析出的其他目标）。
+- **Framework hat（框架自身）**：工作流作用在 spec-kit 自身；`shared/*` 是源，自优化的输出落到框架自己的治理或运行目标（例如框架自身的 `.specify/memory/constitution.md`、`.specify/instructions.md`，或执行流程解析出的其他目标）。
 - **Client hat（客户项目）**：工作流作用在用户项目；`/speckit.constitution` 输出到客户项目的 `.specify/memory/constitution.md`，`/speckit.instructions` 输出到客户项目的 `.specify/instructions.md`。
 - **先定帽子，再定目标**：同一个命令可以在两种帽子下运行；不得把框架源内容写进客户项目运行时而当作源修改，也不得把客户运行时修改当作框架源修改。
-- 拓扑与路径解析规则的 owner 是 `.specify/shared/definitions/dogfooding-definitions.md` §2.1；本节只引用，不重述。
+- 拓扑与路径解析规则的 owner 是 `shared/definitions/dogfooding-definitions.md` §2.1；本节只引用，不重述。
 
 ## 3. 触发与上下文分析
 
@@ -35,15 +35,15 @@
 
 - 一项最佳实践**可以是一个目录条目，也可以是一份独立文档**，取决于内容多少。
 - “不言自明”的条目是两份独立文档：
-  - 概念 owner：`.specify/shared/definitions/self-explanatory-definitions.md`
-  - 实践 owner：`.specify/shared/guidelines/self-explanatory.md`
+  - 概念 owner：`shared/definitions/self-explanatory-definitions.md`
+  - 实践 owner：`shared/guidelines/self-explanatory.md`
 - 查找时以条目声明的 owner 路径为准；工作流不复制条目的定义或阈值。
 - 新增最佳实践时，在本节登记条目，或登记其独立文档路径与 owner。
 
 ## 5. 选择与应用
 
 - 每个优化任务选择一个最佳实践；应用时以该实践的指南为准。
-- 任务层与实现层的粒度区分由所选最佳实践的指南定义。例如“不言自明”的任务层约束见 `.specify/shared/definitions/self-explanatory-definitions.md` §7，实现层的调协过程见其 `.specify/shared/guidelines/self-explanatory.md` §9。
+- 任务层与实现层的粒度区分由所选最佳实践的指南定义。例如“不言自明”的任务层约束见 `shared/definitions/self-explanatory-definitions.md` §7，实现层的调协过程见其 `shared/guidelines/self-explanatory.md` §9。
 - 应用前必须确认具体目的；没有具体用户信息或优化需求时，不做预防性改造。目的性约束的 owner 是所选最佳实践。
 - 既有结构按 reconcile 模式逐步迁移；改名类改造先评估引用面、工作量与向前兼容性。
 
@@ -56,11 +56,11 @@
 | `/speckit.improve` 及其他 `/speckit.*` | 该命令自己的目标制品 | 该命令在框架自身执行时的目标制品 |
 
 - 目标**不全局硬编码**；按当前执行流程与帽子解析。
-- 自优化可以落在框架源（`.specify/shared/*`），也可以落在框架运行时；由对应执行流程决定。
+- 自优化可以落在框架源（`shared/*`），也可以落在框架运行时；由对应执行流程决定。
 
 ## 7. 输出形态
 
-- 目标制品承载**摘要 + 指针**，不复制 shared 层的完整定义；shared 层仍是唯一 owner（见 `.specify/shared/guidelines/one-source-of-truth.md`）。
+- 目标制品承载**摘要 + 指针**，不复制 shared 层的完整定义；shared 层仍是唯一 owner（见 `shared/guidelines/one-source-of-truth.md`）。
 - 摘要必须自足到让读者能行动，并指明 owner 路径。
 - 如果目标制品没有指针机制，可以承载简短摘要，但必须指明 owner。
 

@@ -1,6 +1,6 @@
 # 不言自明（Self-explanatory）— 实践指南
 
-> **概念 owner**：`.specify/shared/definitions/self-explanatory-definitions.md`。本文件只拥有**实践方法**，不重述概念定义与判据阈值。
+> **概念 owner**：`shared/definitions/self-explanatory-definitions.md`。本文件只拥有**实践方法**，不重述概念定义与判据阈值。
 >
 > **强制力**：见概念定义 §5；本指南不重复该值。
 >
@@ -44,7 +44,7 @@
 
 ## 6. 与最佳实践优化工作流的关系
 
-本指南是“不言自明”这一项最佳实践的实践 owner。承载最佳实践的优化工作流是 `.specify/shared/workflow/best-practice-optimization.md`；每次 `/speckit.improve` 都参考该工作流，其他 `/speckit.*` 命令在输出或集成最佳实践时也应用它。
+本指南是“不言自明”这一项最佳实践的实践 owner。承载最佳实践的优化工作流是 `shared/workflow/best-practice-optimization.md`；每次 `/speckit.improve` 都参考该工作流，其他 `/speckit.*` 命令在输出或集成最佳实践时也应用它。
 
 本指南不定义该工作流的上下文分析、最佳实践查找、选择与输出映射；这些由工作流 owner 负责。
 
@@ -69,7 +69,7 @@
 ## 9. 既有结构的迁移（reconcile 模式）
 
 - 既有结构**逐步迁移**，不一次性重排。
-- 使用 reconcile pattern（`.specify/shared/patterns/reconcile-pattern.md`）；本指南只补充本实践的迁移规则，不重定义该模式。
+- 使用 reconcile pattern（`shared/patterns/reconcile-pattern.md`）；本指南只补充本实践的迁移规则，不重定义该模式。
 - **粒度区分**：概念定义 §7 的“每次最多一个维度”是**优化任务**层面的约束，任务目标就是增加一个维度；本节描述的是**实现该目标**的过程——通过多次调协，每次生成一个具体的、向目标靠近的动作，直到该维度的改造完成。调协动作与维度不是同一粒度，调协可以分多步完成同一个维度。
 - **新结构**：直接执行。
 - **既有结构**：先评估影响，再由用户决定是否执行。

@@ -55,7 +55,7 @@ import declaration_reader  # noqa: E402  (import follows the sys.path entry abov
 # The record's schema — a declaration-layer fact (Feature 084, batch 3; C-045)
 # --------------------------------------------------------------------------- #
 # The schema version, the four closed vocabularies, the eleven config-group fields and the per-action
-# argument manifest are owned by `.specify/shared/declarations/facts/quant-record-schema.yaml#/statement` and
+# argument manifest are owned by `shared/declarations/facts/quant-record-schema.yaml#/statement` and
 # read here through the shared read entry, so none of them is spelled in this engine again. The
 # `_QUANT_FALLBACK` mapping below is the **FR-012 compatibility value** for a tree with no declaration
 # layer; when the declaration is readable it is never consulted (no double read).

@@ -3,7 +3,7 @@
 
 Canonical sources fan out to their runtime mirrors in one command:
 
-  .specify/templates/            -> .specify/templates/   (excluding commands/, see below)
+  templates/            -> .specify/templates/   (excluding commands/, see below)
   skills/external/<name>/ -> .specify/skills/<name>/           (flat runtime layer;
                            discoverable by host agents via the one-level scan)
   skills/internal/<name>/ -> .specify/skills/internal/<name>/  (nested runtime layer;
@@ -11,12 +11,12 @@ Canonical sources fan out to their runtime mirrors in one command:
                            workflows via explicit paths)
   agents/               -> .specify/agents/templates/  (Agent Template layer; instances/
                            and execution/ are project-local, never mirrored)
-  .specify/scripts/              -> .specify/scripts/
-  .specify/shared/               -> .specify/shared/
-  .specify/templates/commands/*  -> per-tool copies (delegated to regen-command-copies.py)
+  scripts/              -> .specify/scripts/
+  shared/               -> .specify/shared/
+  templates/commands/*  -> per-tool copies (delegated to regen-command-copies.py)
 
 The .specify/templates/commands/ mirror is intentionally NO LONGER maintained:
-per-tool command copies are generated directly from .specify/templates/commands/ by
+per-tool command copies are generated directly from templates/commands/ by
 regen-command-copies.py, so the subtree is excluded from the templates pair on
 both sides.
 
@@ -24,7 +24,7 @@ A few mirrors are not plain copies: they carry one declared *projection* on top 
 their source, because a mirror-side flag surface cannot live inside a copy that is an
 exact replica of the source. ``PROJECTED_FILES`` below is the ONE declaration of that rule (contract
 ``contracts/mirror-projection.contract.md`` C-34, owner page
-``.specify/shared/definitions/script-interface-definitions.md`` section
+``shared/definitions/script-interface-definitions.md`` section
 "projection declaration"). Every consumer -- this engine's check and write modes,
 the mirror parity suite and ``script-interface-check.py --check-projection`` --
 reads that table instead of keeping a second list.
@@ -35,10 +35,10 @@ Modes:
             byte equality, and each projected pair's line names its kind -- the
             two verdicts are never merged into one "mirrors agree" sentence.
   --only PATH  (repeatable) restrict the run to the given repo-relative path
-            prefix (e.g. --only .specify/scripts/python/feedback-utils.py), so a
+            prefix (e.g. --only scripts/python/feedback-utils.py), so a
             feature-scoped sync never drags unrelated mirror drift into the
             change surface; the regen-command-copies delegation is skipped
-            unless a prefix targets .specify/templates/commands/.
+            unless a prefix targets templates/commands/.
 
 Write-mode failures are collected per file, never fatal mid-pass: an unwritable
 mirror file (e.g. a root-owned leftover) is reported as FAIL, the remaining
@@ -86,7 +86,7 @@ if REPO_ROOT.name == ".specify":
 # mirrors nested into .specify/skills/internal/<name>/ (path-referenced only).
 # exclude_parts are path components skipped on BOTH sides of the pair; the
 # templates pair excludes commands/ because the .specify/templates/commands
-# mirror is retired (per-tool copies come straight from .specify/templates/commands/
+# mirror is retired (per-tool copies come straight from templates/commands/
 # via regen-command-copies.py). The external pair additionally releases
 # `internal`: that name is the internal layer's RESERVED runtime namespace, so
 # .specify/skills/internal/** is sibling-pair-owned, never an unsourced extra.
@@ -114,17 +114,17 @@ PROJECTED_TABLE_NAME = "PROJECTED_FILES"
 #: (C-34); a third MUST NOT appear here before that contract is revised.
 PROJECTED_FILES = (
     (".specify/scripts/python/script_interface_cli.py",
-     "python-version-bridge", ".specify/scripts/python/script_interface_cli.py"),
+     "python-version-bridge", "scripts/python/script_interface_cli.py"),
     (".specify/scripts/python/sync-mirrors.py",
-     "python-version-bridge", ".specify/scripts/python/sync-mirrors.py"),
+     "python-version-bridge", "scripts/python/sync-mirrors.py"),
     (".specify/scripts/python/script-interface-check.py",
-     "python-version-bridge", ".specify/scripts/python/script-interface-check.py"),
+     "python-version-bridge", "scripts/python/script-interface-check.py"),
     (".specify/scripts/bash/check-prerequisites.sh",
-     "bash-version-guard", ".specify/scripts/bash/check-prerequisites.sh"),
+     "bash-version-guard", "scripts/bash/check-prerequisites.sh"),
     (".specify/scripts/bash/generate-instructions.sh",
-     "bash-version-guard", ".specify/scripts/bash/generate-instructions.sh"),
+     "bash-version-guard", "scripts/bash/generate-instructions.sh"),
     (".specify/scripts/bash/run-tests.sh",
-     "bash-version-guard", ".specify/scripts/bash/run-tests.sh"),
+     "bash-version-guard", "scripts/bash/run-tests.sh"),
 )
 
 #: The kinds the declaration may carry, in the order the contract states them.
@@ -239,7 +239,7 @@ def _marker(kind):
 #: The sourceable bash library that defines ``script_interface_version_text``. The sentinel's
 #: body is read from HERE for every guard projection: a consumer carries the guard by sourcing
 #: the library, so the library -- never the consumer's own text -- holds the function.
-GUARD_LIBRARY_SOURCE = ".specify/scripts/bash/script-interface.sh"
+GUARD_LIBRARY_SOURCE = "scripts/bash/script-interface.sh"
 
 
 def version_text_function_body(source_text):
@@ -271,7 +271,7 @@ def python_version_bridge():
     header = [
         "# " + _marker("python-version-bridge"),
         "#",
-        "# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is",
+        "# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is",
         "# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing",
         "# that exists only in the source tree: it re-derives its own version line (C-36).",
         "",
@@ -344,13 +344,13 @@ def bash_version_guard(version_body, declaration=None):
     lines = [
         "# " + _marker("bash-version-guard"),
         "#",
-        "# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is",
+        "# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is",
         "# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing",
         "# that exists only in the source tree: it re-derives its own version line (C-36).",
         "#",
         "# The guard block is the FIRST executable block of the script that carries it: above",
         "# every `source`, every `mkdir`, every `git` write and every manifest generation.",
-        "# The insertion rule is owned by `.specify/shared/definitions/script-interface-definitions.md`.",
+        "# The insertion rule is owned by `shared/definitions/script-interface-definitions.md`.",
         "script_interface_version_text() {",
         "    __SCRIPT_INTERFACE_VERSION_BODY__",
         "}",
@@ -693,7 +693,7 @@ def main() -> int:
     parser.add_argument("--only", action="append", default=None, metavar="PATH",
                         help="restrict the run to this repo-relative path prefix "
                              "(repeatable); skips the regen-command-copies "
-                             "delegation unless a prefix targets .specify/templates/commands/")
+                             "delegation unless a prefix targets templates/commands/")
     args = parser.parse_args()
     check_only = args.check
     only = [p.strip().strip("/") for p in (args.only or []) if p.strip()]
@@ -717,8 +717,8 @@ def main() -> int:
 
     if only:
         matched = any(pair_subprefixes(src) for src, _d, _s, _e in MIRROR_PAIRS)
-        regen_targeted = any(p == ".specify/templates/commands"
-                             or p.startswith(".specify/templates/commands/") for p in only)
+        regen_targeted = any(p == "templates/commands"
+                             or p.startswith("templates/commands/") for p in only)
         if not matched and not regen_targeted:
             print(f"error: --only prefix matches no mirror pair or regen surface: "
                   f"{', '.join(only)}")
@@ -807,9 +807,9 @@ def main() -> int:
                 print(f"note  extra file only in mirror: {dst_name}/{rel}")
 
     # Per-tool command copies: delegate to the existing canonical generator.
-    regen = REPO_ROOT / ".specify/scripts/python/regen-command-copies.py"
+    regen = REPO_ROOT / "scripts/python/regen-command-copies.py"
     run_regen = not only or any(
-        p == ".specify/templates/commands" or p.startswith(".specify/templates/commands/")
+        p == "templates/commands" or p.startswith("templates/commands/")
         for p in only)
     if run_regen:
         regen_args = [sys.executable, str(regen)] + (["--check"] if check_only else [])
@@ -825,7 +825,7 @@ def main() -> int:
             print(f"  FAIL {rel}: {err}")
         print(
             "  Remedy for root-owned mirrors: `sudo chown -R $USER <dir>`, then "
-            "re-run `python3 .specify/scripts/python/sync-mirrors.py --write`"
+            "re-run `python3 scripts/python/sync-mirrors.py --write`"
         )
         return 1
     if check_only and orphans:
@@ -833,16 +833,73 @@ def main() -> int:
             "ORPHANS detected — a mirror-only file cannot be distributed by "
             "`specify init`, which only copies canonical source -> mirror.\n"
             "  Fix by either: (a) adding the canonical source (e.g. "
-            ".specify/scripts/bash/<name>.sh) if the file should ship to downstream "
+            "scripts/bash/<name>.sh) if the file should ship to downstream "
             "projects, or (b) deleting the mirror copy if it is a superseded "
             "leftover."
         )
     if check_only and drift:
-        print("DRIFT detected — run: python3 .specify/scripts/python/sync-mirrors.py --write")
+        print("DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write")
     if check_only and (drift or orphans):
         return 2
     return 0
 
 
+# projected mirror: source + python-version-bridge; regenerate it, never hand-edit it
+#
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
+# that exists only in the source tree: it re-derives its own version line (C-36).
+_VERSION_SOURCE = "pyproject.toml"
+_VERSION_QUOTES = chr(39) + chr(34)
+_MAX_UPWARD_LEVELS = 12
+
+
+def _bridge_version(start):
+    _here = start.resolve()
+    for _ in range(_MAX_UPWARD_LEVELS + 1):
+        if (_here / _VERSION_SOURCE).is_file() and (_here / ".git").exists():
+            try:
+                _text = (_here / _VERSION_SOURCE).read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                return "unknown"
+            _in_project = False
+            for _raw in _text.splitlines():
+                _line = _raw.strip()
+                if not _line or _line.startswith("#"):
+                    continue
+                if _line.startswith("[") and _line.endswith("]"):
+                    _in_project = _line == "[project]"
+                    continue
+                if not _in_project:
+                    continue
+                _key, _sep, _value = _line.partition("=")
+                if _sep and _key.strip() == "version":
+                    _value = _value.strip()
+                    if len(_value) >= 2 and _value[0] == _value[-1] and _value[0] in _VERSION_QUOTES:
+                        _value = _value[1:-1]
+                    return _value or "unknown"
+            return "unknown"
+        if _here.parent == _here:
+            return "unknown"
+        _here = _here.parent
+    return "unknown"
+
+def _bridge_main():
+    import sys as _bridge_sys
+    from pathlib import Path as _bridge_path
+
+    _argv = list(_bridge_sys.argv[1:])
+    if "--version" not in _argv:
+        return
+    if "--" in _argv and _argv.index("--version") > _argv.index("--"):
+        return
+    _invoked = _bridge_sys.argv[0] if _bridge_sys.argv[0] else "."
+    _name = _bridge_path(_invoked).name or "script"
+    print("%s %s" % (_name, _bridge_version(_bridge_path(_invoked).resolve().parent)))
+    raise SystemExit(0)
+
+
+_bridge_main()
+del _bridge_main
 if __name__ == "__main__":
     sys.exit(main())

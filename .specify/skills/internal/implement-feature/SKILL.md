@@ -17,7 +17,7 @@ loop, and the commit discipline — while the command template keeps entry, the 
 block, user-input handling, and the wrap-up lifecycle (Feature Integration / Feedback /
 Documentation / Handoffs).
 
-Canonical extraction source: `.specify/templates/commands/implement.md` § Outline (steps 1–9), §
+Canonical extraction source: `templates/commands/implement.md` § Outline (steps 1–9), §
 Mid-Run User Directives, § Optional: Long-Run Mode, the Fast Fail instance pointer, and §
 Optional: Git Commit. Content moved here verbatim in substance.
 
@@ -25,7 +25,7 @@ Optional: Git Commit. Content moved here verbatim in substance.
 
 - **Feature artifacts**: `REQUIREMENTS_DIR` and `AVAILABLE_DOCS` come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
+  `scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
   must be absolute. `tasks.md` and `plan.md` are REQUIRED inputs (step 3).
 - **User parameters**: arrive already processed by the command's User Input Protocol —
   treated as command parameters, never as standalone instructions.
@@ -175,7 +175,7 @@ and everything after it (including a `git commit`) never happens while the check
 reports success. Use `;`, or append `|| true`, and confirm the chain's tail actually
 executed.
 
-**Test runs**: prefer the canonical runner `.specify/scripts/bash/run-tests.sh` (resolves the
+**Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the
 pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc
 `python -m pytest | tail` pipelines whose exit codes mask interpreter failures.
 **Baseline captures names, not just counts**: record the baseline with
@@ -204,9 +204,9 @@ hard-coded `len(...) == N`) and update them in the same task.
 **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go
 into NEW commits — never `--amend` an already-created commit.
 
-**Command/template edits**: after editing anything under `.specify/templates/commands/`, regenerate
+**Command/template edits**: after editing anything under `templates/commands/`, regenerate
 every per-tool copy and the `.specify` mirror with
-`python3 .specify/scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
+`python3 scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
 the 5 tool dirs.
 
 ### Step 7 — Progress tracking
@@ -219,7 +219,7 @@ the 5 tool dirs.
   Never leave deferred work as `[ ]`. When a `[~]` makes the Completion Gate (step 8) fail,
   that fail is an EXPECTED outcome — it MUST NOT be turned green by rewriting the task
   description or relaxing the gate criteria (the task-side disposition forms are owned by
-  `.specify/templates/commands/tasks.md`).
+  `templates/commands/tasks.md`).
 - **Evidence-backed closure — Gate Function (IDENTIFY→RUN→READ→VERIFY→CLAIM)**: only mark
   `[X]` for work you have actually executed and verified. Before every completion claim:
   IDENTIFY the command that proves the work (test id, build, grep, diff of the named target
@@ -259,10 +259,10 @@ All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass.
   total), and its current value is written into `verification.md` so a resumed run reads
   the real count instead of inheriting a stale one.
 - **Closure verdict re-validation** (the status-liberating judgement): re-run
-  `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` against the
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` against the
   tree this gate is about to close, exactly as Step 9 states it. A verdict read earlier in the run
   is a measurement of an older tree, not evidence about this one — and the four conditions it
-  answers are owned by `.specify/shared/workflow/acceptance-hardening.md`, not by this step.
+  answers are owned by `shared/workflow/acceptance-hardening.md`, not by this step.
 
 - **Gate-premise decay** (named action): when a premise a gate item or DoD row rests on —
   a frozen SHA, a line number, a count — is falsified by measurement, re-reference the
@@ -323,9 +323,9 @@ narrow it to a subset (a gate or DoD row reading `pass|deferred` silently forbid
 honest `partial`).
 
 - **Closure verdict — the status-landing judgement**: before the flip, run
-  `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the
   repository root. That command is the one source of the verdict, the closed reason set and the
-  `final_path` counts; their schema owner is `.specify/shared/workflow/acceptance-hardening.md` § Closure
+  `final_path` counts; their schema owner is `shared/workflow/acceptance-hardening.md` § Closure
   Verdict, and this step calls it by path instead of restating a condition. It MUST NOT be
   replaced by a model judgement, another script, or an ad-hoc grep over the artifacts. On `block`,
   land `Blocked` — recording the emitted reasons in `verification.md` — and MUST NOT write
@@ -348,7 +348,7 @@ honest `partial`).
 
 When the user changes scope or adds a design constraint while the implementation run is
 in progress, do NOT improvise: apply the Scope Revision Protocol from
-`.specify/templates/commands/clarify.md` adapted to implement:
+`templates/commands/clarify.md` adapted to implement:
 
 1. **Upstream first**: amend `requirements.md` (FR/SC/entities/edge cases) and record the
    directive verbatim under `## Clarifications` (dated, append-only — never replace
@@ -395,7 +395,7 @@ supported agent tools as pure prompt flow (no Stop-hook required).
 
 Fallback for runs whose phase-boundary commits were declined or skipped (see the Commit
 gate's approval routing in step 8). After implementation, generate commit command using
-`.specify/templates/commit-template.md`:
+`templates/commit-template.md`:
 
 - Collect: BRANCH, REQUIREMENTS_KEY, FEATURE_TITLE, TYPE, SCOPE, SUBJECT
 - Display `git add -A && git commit -m "{msg}"` — only execute on explicit user approval
@@ -410,7 +410,7 @@ gate's approval routing in step 8). After implementation, generate commit comman
   this skill's Pre-Status-Flip Gate passes; the gate protocol itself is owned by
   `.specify/shared/workflow/feature-integration.md` (pointer, never restatement).
 - **Task-side disposition forms** (how a `[~]` is recorded and dispositioned on the task
-  side) are owned by `.specify/templates/commands/tasks.md` — this skill only consumes and updates
+  side) are owned by `templates/commands/tasks.md` — this skill only consumes and updates
   `tasks.md` rows per the rules above.
 - **Standalone scope clarification** (a clarify pass outside a running implementation)
   belongs to `/speckit.clarify`; only the mid-run adaptation above lives here.
@@ -420,7 +420,7 @@ gate's approval routing in step 8). After implementation, generate commit comman
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -430,3 +430,4 @@ gate's approval routing in step 8). After implementation, generate commit comman
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:implement-feature" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
+6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

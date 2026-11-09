@@ -103,13 +103,13 @@
 
 > 专项图表的渲染同样走 Step 8 的渲染脚本；除 ER 图外均无需 Graphviz（`dot`）即可渲染（ER 走 Graphviz 布局，**仅限用户确认后的本地渲染**才需要本机 `dot`）。样式与美观要点见各操作指南的「布局与美观技巧」小节。
 >
-> **WBS / 甘特图交付前必做量测自检**：这两类图的"清晰度、版面、日期定位"都不能靠肉眼判断，用 [measure-svg-layout.py](.specify/scripts/measure-svg-layout.py) 量三条判据——**正文有效字号 ≥12px**（`= font-size × 显示宽度 ÷ viewBox 宽`；放大 zoom 无效）、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**（不能用 `viewBox 宽 − 最右元素 x`，该值结构性 ≈0）；判断某个写法（依赖箭头、资源分配、标题字号）有没有改写排期，用 `--compare` 做 A/B 并看 `scheduleChanged`。详见 [13-wbs-diagram.md](references/howto/13-wbs-diagram.md)、[14-gantt-diagram.md](references/howto/14-gantt-diagram.md)。
+> **WBS / 甘特图交付前必做量测自检**：这两类图的"清晰度、版面、日期定位"都不能靠肉眼判断，用 [measure-svg-layout.py](scripts/measure-svg-layout.py) 量三条判据——**正文有效字号 ≥12px**（`= font-size × 显示宽度 ÷ viewBox 宽`；放大 zoom 无效）、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**（不能用 `viewBox 宽 − 最右元素 x`，该值结构性 ≈0）；判断某个写法（依赖箭头、资源分配、标题字号）有没有改写排期，用 `--compare` 做 A/B 并看 `scheduleChanged`。详见 [13-wbs-diagram.md](references/howto/13-wbs-diagram.md)、[14-gantt-diagram.md](references/howto/14-gantt-diagram.md)。
 
 ## 输出要求
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
 - 输出为单个 HTML 文档，包含渲染的图表（渲染图为主体；原始 PlantUML 文本不嵌入正文，仅放入可折叠的「复现性附录」`<details>` 块，默认收起）
-- 图表通过 [render-plantuml.sh](.specify/scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `PLANTUML_BACKEND=server`；本地渲染必须先在用户确认后以 `PLANTUML_BACKEND=local` 显式启用）
+- 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `PLANTUML_BACKEND=server`；本地渲染必须先在用户确认后以 `PLANTUML_BACKEND=local` 显式启用）
 - **HTML 附复现性附录**：本图渲染命令（render-plantuml.sh 调用 + CJK 补跑脚本，一律 `${SKILL_HOME}` 相对路径、禁止写死绝对路径）、依赖说明（后端/CJK/本地工具链，含离线 fallback）与可折叠的 puml 源码——**附录源码必须与磁盘实际渲染的 `.puml` 逐字节一致**（含渲染脚本注入的样式块，直接从磁盘复制），保证"这张图怎么重新生成"可复现（详见 [12-rendering-and-output.md §4.4](references/howto/12-rendering-and-output.md)）
 - **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大触及 PNG 4096px 上限或需任意无损缩放时改用 SVG
 - **嵌入 Markdown 文档时（最佳实践）**：默认看 PNG、细节不够可开 SVG 无损放大，**SVG/PNG 必须同时产出**。⚠️ Markdown 图片 `![]()` 与内联 HTML `<a>` 走**不同的路径解析管线**（有的渲染器会代理/改写 Markdown 图片 URL 却透传 HTML `href`），混用会导致两条路径不一致——故 **PNG 与 SVG 引用须用同一机制**：首选**全内联 HTML**（`<a href=x.svg target=_blank rel=noopener><img src=x.png></a>`，点图即开 SVG 新标签），渲染器会剥 HTML 时回退**全纯 Markdown**（同标签打开）。→ 见 [12-rendering-and-output.md §4.3](references/howto/12-rendering-and-output.md)

@@ -1,6 +1,6 @@
 # Acceptance Hardening — Feature Status, Verification Vocabulary, Gates and Closure Verdict
 
-**Owner (single definition point)**: this file, `.specify/shared/workflow/acceptance-hardening.md`, owns the schemas that
+**Owner (single definition point)**: this file, `shared/workflow/acceptance-hardening.md`, owns the schemas that
 make "may this feature be called `Implemented`?" a deterministic question: the feature-status value `Blocked`
 and its four transitions, the verification vocabulary and its measurement ladder, the gate conditions that read
 them, the closure verdict with its closed reason set, exit codes and `final_path` counts, and the three artifact
@@ -9,9 +9,9 @@ execution-premises table and the inherited-blockers table. Every other surface �
 doc — reaches these by path plus `§ section anchor`, and **none restates** a table, a value domain, a threshold or
 a reason literal.
 
-**Declared carriers (projections, never second owners)**: `.specify/templates/feature-details-template.md` § Canonical
-Status State Machine, `.specify/templates/verification-log-template.md`, `.specify/templates/tasks-template.md` (§ GATE-4) and
-`.specify/templates/plan-template.md` (the two plan-table skeletons, which carry **column names only**) physically hold what
+**Declared carriers (projections, never second owners)**: `templates/feature-details-template.md` § Canonical
+Status State Machine, `templates/verification-log-template.md`, `templates/tasks-template.md` (§ GATE-4) and
+`templates/plan-template.md` (the two plan-table skeletons, which carry **column names only**) physically hold what
 this file defines, because a consumer that is editing a template must find the rules where it is editing. A carrier
 is a **declared projection**: it may not widen a value domain, and where a carrier and this file disagree, this file
 wins and the carrier is stale. Each carrier also owes a narrowing assertion of its own — the plan skeleton, in
@@ -25,7 +25,7 @@ which paths, is owned by § Schema Uniqueness.
 Sections belonging to later slices are listed in § Extension Points, together with the owner their obligations
 currently have. Nothing here is inferred from a slice that has not landed.
 
-**Machine-readable form**: `.specify/scripts/python/closure-acceptance-check.py` is the only program that turns these
+**Machine-readable form**: `scripts/python/closure-acceptance-check.py` is the only program that turns these
 schemas into a verdict. Its calling surface is fixed by a contract; its verdict is **not** re-derivable by a
 model, by an ad-hoc grep, or by a second script.
 
@@ -111,10 +111,10 @@ carrier keeps its own vocabulary and points here, and no carrier restates this t
 
 | Literal | What it is | Owner — and the only place its domain is decided |
 |---------|-----------|--------------------------------------------------|
-| `Blocked` | a **feature status** | `.specify/templates/feature-details-template.md` § Canonical Status State Machine, whose rows and conditions this file's § Feature Status owns |
-| `blocked` | a **verification status** of one success criterion | `.specify/templates/verification-log-template.md`, whose six values and ladder this file's § Verification Vocabulary owns |
-| `blocked` | a **line state** in the driver's registry | `.specify/skills/sdd-loop-driver/scripts/line-registry.py` (`STATE_VALUES`; the state's consequences are A6's, not this row's) |
-| `blockedBy` | a **task dependency tag** | `.specify/templates/tasks-template.md` — a tag, **not** a state |
+| `Blocked` | a **feature status** | `templates/feature-details-template.md` § Canonical Status State Machine, whose rows and conditions this file's § Feature Status owns |
+| `blocked` | a **verification status** of one success criterion | `templates/verification-log-template.md`, whose six values and ladder this file's § Verification Vocabulary owns |
+| `blocked` | a **line state** in the driver's registry | `skills/external/sdd-loop-driver/scripts/line-registry.py` (`STATE_VALUES`; the state's consequences are A6's, not this row's) |
+| `blockedBy` | a **task dependency tag** | `templates/tasks-template.md` — a tag, **not** a state |
 
 The four stay four. No fifth meaning may be introduced, and none of the four may borrow another's value
 domain: the domains themselves — the values, the transition rows, the thresholds, the guard sets — are decided
@@ -133,7 +133,7 @@ alone — which is why no per-site list is carried here:
 2. **An unrelated pre-existing closed set that merely shares the spelling.** A set that exists for its own
    reason and would still exist if this feature had never been written. The framework has one: the driver's
    queue report groups runnable lines by the dependencies they are waiting on (`blocked_by`, emitted by
-   `.specify/skills/sdd-loop-driver/scripts/line-registry.py`'s `--action next-runnable`), which names a line's
+   `skills/external/sdd-loop-driver/scripts/line-registry.py`'s `--action next-runnable`), which names a line's
    **unmet dependencies**, never the line's own state.
 
 An occurrence that fits neither class is not classified — it is the third meaning this subsection exists to
@@ -148,13 +148,13 @@ never by quietly widening one of the four.
 is: **no `final`-path criterion sits in `blocked` / `deferred` / `fail`, unless an explicit user waiver names
 it.** A waiver is a user-authored artifact or the user's own ruling; a driver's or an agent's confirmation, and
 the absence of objection, are never waivers. The reachable block consumers cite is § Canonical Status State
-Machine of `.specify/templates/feature-details-template.md`; `/speckit.review`, `/speckit.checklist` and
-`.specify/shared/workflow/feature-integration.md` § Pre-Status-Flip Gate reference that block and do not restate it.
+Machine of `templates/feature-details-template.md`; `/speckit.review`, `/speckit.checklist` and
+`shared/workflow/feature-integration.md` § Pre-Status-Flip Gate reference that block and do not restate it.
 
 ### GATE-4 (tasks stage)
 
 For every `final`-path criterion, GATE-4 requires a `pass` status **and** a present smoke record — or an
-explicit user waiver naming the criterion. The carrier is `.specify/templates/tasks-template.md`; the condition set is
+explicit user waiver naming the criterion. The carrier is `templates/tasks-template.md`; the condition set is
 this section's.
 
 ### The A13 boundary — three carriers, one fact each
@@ -250,7 +250,7 @@ outside the two-value domain is a format violation reported with file and line �
 parsed makes the closure check an **input error** (exit `2`), never a `block`.
 
 **The two members are declared, not restated.** `final` / `supporting` are machine-read values, so their single
-home is `.specify/shared/declarations/facts/success-criterion-path-values.yaml#/statement`; both checkers read that
+home is `shared/declarations/facts/success-criterion-path-values.yaml#/statement`; both checkers read that
 declaration through the shared read entry. This section keeps the rule they apply — the marker's position, the
 one-`final` floor, the refusal template and the exit-code meaning above — and carries no second copy of the
 member set.
@@ -504,20 +504,20 @@ here or in the guard: the test reads them out of those three tables, which is th
 
 **The domain literals are explicitly NOT the subject**, and a guard restated as "the owner's value-domain literals
 appear zero times in the scan domain" is **wrong on a real tree** — three of those literals are simultaneously
-members of unrelated closed sets that legitimately live in `.specify/templates/` and `.specify/shared/`: `not-required` is the
-traceability binary in `.specify/shared/definitions/sdd-routing-definitions.md`; `not-applicable` is the code-review
-segment verdict in `.specify/templates/review-template.md` and `.specify/templates/commands/review.md` and the site-layer verdict in
-`.specify/shared/workflow/expression-gates.md`; `in-scope` occurs as ordinary English in
-`.specify/shared/definitions/derivation-definitions.md`. A literal-set guard therefore has to carry an exclusion list of
+members of unrelated closed sets that legitimately live in `templates/` and `shared/`: `not-required` is the
+traceability binary in `shared/definitions/sdd-routing-definitions.md`; `not-applicable` is the code-review
+segment verdict in `templates/review-template.md` and `templates/commands/review.md` and the site-layer verdict in
+`shared/workflow/expression-gates.md`; `in-scope` occurs as ordinary English in
+`shared/definitions/derivation-definitions.md`. A literal-set guard therefore has to carry an exclusion list of
 its own — which would make the guard's `expected` a second definition point, the very defect it exists to
 prevent. The subject is the column set precisely because a column set has no third-party meaning.
 
-**Scan domain**: `.specify/templates/` and `.specify/shared/` — framework source. `.specify/` copies are mirrors of these paths and
-are never scanned; a divergence there is a mirror defect, judged by `.specify/scripts/python/sync-mirrors.py --check`, not
+**Scan domain**: `templates/` and `shared/` — framework source. `.specify/` copies are mirrors of these paths and
+are never scanned; a divergence there is a mirror defect, judged by `scripts/python/sync-mirrors.py --check`, not
 by this guard.
 
 **Assertion**: across that domain the three column sets appear **zero** times outside this file, with exactly one
-allowed surface: **`.specify/templates/plan-template.md`**, which carries the Execution Premises and Inherited Blockers
+allowed surface: **`templates/plan-template.md`**, which carries the Execution Premises and Inherited Blockers
 column sets as its two skeletons, because an empty table whose columns are not given forces every future plan to
 invent its own — the columns are precisely what the skeleton exists to hand down. Its narrowing assertion is that
 it carries the column names and **zero** owner-exported domain literals (measured: 0). This file is the definition
@@ -526,10 +526,10 @@ site and is the hit the guard excludes by identity, not by a list entry.
 **A hit is a whole column set, matched as the ordered cell sequence of a table header row** — not an individual
 name. That distinction is what makes the assertion true rather than aspirational: `Status`, `Form`, `Owner`, `ID`
 and `Evidence` are ordinary column names of unrelated tables in the same domain (measured: `Status` in
-`.specify/templates/feature-index-template.md`, `.specify/templates/glossary-template.md` and `.specify/templates/plan-template.md`'s
-Constitution Check table; `Form` in `.specify/shared/definitions/agent-definitions.md`; `Owner` in
-`.specify/shared/definitions/derivation-definitions.md` and `.specify/shared/guidelines/directory-governance.md`; `Capability` in
-`.specify/shared/guidelines/dogfooding.md`). Matching a single name would either fail on the tree as it stands or force the
+`templates/feature-index-template.md`, `templates/glossary-template.md` and `templates/plan-template.md`'s
+Constitution Check table; `Form` in `shared/definitions/agent-definitions.md`; `Owner` in
+`shared/definitions/derivation-definitions.md` and `shared/guidelines/directory-governance.md`; `Capability` in
+`shared/guidelines/dogfooding.md`). Matching a single name would either fail on the tree as it stands or force the
 guard to name those tables one by one — a hand-maintained exclusion list is exactly the drift the guard exists to
 prevent. The set as a whole has no second user, which is why it is the subject.
 
@@ -548,13 +548,13 @@ What `/speckit.review` runs, in what order, and what each part is allowed to ans
 composition's **content** — the four segments and their fixed order, each segment's judgment object and boundary
 sentence, the expected-artifact denominator and its derivation rule, the Acceptance Reality Check's clause and the
 feedback unit census of one composed run. It owns no segment's **method**: the dimension sets and the report slots
-belong to the skills, and the two segments a skill carries are named in `.specify/skills/internal/review-feature-quality/SKILL.md`
+belong to the skills, and the two segments a skill carries are named in `skills/internal/review-feature-quality/SKILL.md`
 § Segment A / § Segment B.
 
 **The two layers, and which one this is.** A **content** owner is the one place a fact about the composition is
 written. A **declaration** owner repeats only the shape a caller must find where it is editing: the four segment
 headings and the five per-segment field names (`Skill`, `Judgment object`, `Severity vocabulary`, `Inputs`,
-`Outputs`) are declared in `.specify/templates/commands/review.md` § Composition **by anchor** to this section. A declaration
+`Outputs`) are declared in `templates/commands/review.md` § Composition **by anchor** to this section. A declaration
 made of headings and field names is not a second definition; a copy of this section's segment prose, order rationale
 or boundary sentences at that anchor would be, and is a defect. Every other surface — the report template, the two
 sibling skills, the docs page — reaches this content by path plus `§ Review Composition`.
@@ -594,7 +594,7 @@ not the code that produced them and not the process that produced them.
 **Implementation** judges **this slice's `base..head` delta** against `requirements.md` and `tasks.md` for
 correctness, scope and regression, and it runs or verifies the feature's smoke test, recording the command, the exit
 code and the evidence path. `base..head` resolution has one route, the code skill's
-`.specify/skills/internal/code-review/scripts/git-delta-review.sh`; this segment implements no second base resolution. The
+`skills/internal/code-review/scripts/git-delta-review.sh`; this segment implements no second base resolution. The
 `final_path` record appears here only as a **quotation** — the hard condition stays the implement gate's.
 
 **Code** judges the committed code delta for verifiable defects under its own method and its own six-level family.
@@ -614,8 +614,8 @@ and this section does not restate it.
 The four conclusions are never merged. Not into one severity system, not into one score, not through a mapping
 table, not through a numeric conversion, and not through a "highest severity wins" rule: no mapping table between
 the `P0`/`P1`/`P2` family and the six-level code family may exist anywhere in the tree, and the run stores no
-combined value. Each family keeps its own owner — `P0`/`P1`/`P2` by `.specify/skills/internal/review-sdd-process/SKILL.md`,
-the six-level family by `.specify/skills/internal/code-review/SKILL.md` — and neither skill redefines, relabels or reweights a
+combined value. Each family keeps its own owner — `P0`/`P1`/`P2` by `skills/internal/review-sdd-process/SKILL.md`,
+the six-level family by `skills/internal/code-review/SKILL.md` — and neither skill redefines, relabels or reweights a
 level of the other's family. Two vocabularies that can be converted into one another are one vocabulary, and the
 second one then no longer means what its owner says.
 
@@ -707,7 +707,7 @@ number still. Three rules follow:
 Sections later slices add to **this** file. Each line names the owner its obligations have **today**, so that
 nothing is undefined while the section is absent.
 
-- The closed status **value domain** of `.specify/templates/feature-index-template.md` (**081d**; owner today: the
+- The closed status **value domain** of `templates/feature-index-template.md` (**081d**; owner today: the
   declaring specification's **FR-018**, via SV-06) — that file carries only the `Status` **column header** of its
   index table today, so its obligation is to **add** a value domain rather than to insert one value into an
   existing list, and the transition rows and row-level semantics stay with the owner named in § Feature Status.

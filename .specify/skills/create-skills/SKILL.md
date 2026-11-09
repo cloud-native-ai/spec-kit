@@ -32,7 +32,7 @@ State the detected mode briefly in the final report.
 
 Parse `skill name` and `description` from the user input:
 
-- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. A reference form is accepted — `/name`, `@name`, `skill:name` normalize to the bare name per `.specify/shared/definitions/skill-reference-definitions.md` (a new skill is **named**, not resolved). When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
+- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. A reference form is accepted — `/name`, `@name`, `skill:name` normalize to the bare name per `shared/definitions/skill-reference-definitions.md` (a new skill is **named**, not resolved). When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
 - **description**: A capability summary plus trigger keyword list. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`. **No-workflow-summary rule**: the description MUST NOT summarize the workflow steps or body content — an agent that sees a workflow summary in the description will skip loading the body and execute a degraded version. Capability + triggers only.
 
 If the input contains only a valid name and the Skill already exists at the detected mode's skills root (`.specify/skills/<name>/SKILL.md` in a Spec Kit project; `<skills-root>/<name>/SKILL.md` otherwise), redirect to `improve-skills` rather than creating a duplicate.
@@ -55,7 +55,7 @@ Distill a reusable Skill from the current conversation history:
 
 - **skill name** determines `SKILL_HOME`. Example: `name = "testing"` → `SKILL_HOME = <skills-root>/testing/` (root resolved per Step 0: `.specify/skills/` in a Spec Kit project; the project `skills/` root or the host skills directory otherwise).
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
-- **Both layers before any write**: read the policy items this creation needs (where the new skill's runtime inputs come from, where its outputs land), then judge them with the owner's read-judge-stop check (§ Consumption Contract of `.specify/shared/definitions/mechanism-policy-definitions.md`), and stop on any item that has no value or two readings. A policy item the user did not state is **missing**, not a default to be invented. This check runs **before** the writability touch-test below and before the first file of § 3 — the touch-test writes a probe file, so a stop leaves no half product behind. **Policy missing** vs **environment error** are different wordings with different follow-ups (the user never said which one / the user named it but the path cannot be read): never report one as the other. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to the skill-reference owner cited in § 1 and is not restated here.
+- **Both layers before any write**: read the policy items this creation needs (where the new skill's runtime inputs come from, where its outputs land), then judge them with the owner's read-judge-stop check (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`), and stop on any item that has no value or two readings. A policy item the user did not state is **missing**, not a default to be invented. This check runs **before** the writability touch-test below and before the first file of § 3 — the touch-test writes a probe file, so a stop leaves no half product behind. **Policy missing** vs **environment error** are different wordings with different follow-ups (the user never said which one / the user named it but the path cannot be read): never report one as the other. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to the skill-reference owner cited in § 1 and is not restated here.
 - **Writability pre-flight (fail fast)**: before drafting any content, touch-test the parent directory of `SKILL_HOME` (e.g. `mkdir -p "$SKILL_HOME" && touch "$SKILL_HOME/.wtest" && rm "$SKILL_HOME/.wtest"`). The host skills directory may be root-owned in some environments (container-created leftovers); report an unwritable target up front with the `sudo chown -R $USER <dir>` remedy instead of discovering it at the first write.
 
 Storage location options (`SKILL_HOME`) — the root is an **input resolved per Step 0**, never a hard dependency:
@@ -103,7 +103,7 @@ Optional frontmatter (on demand):
 ```
 ${SKILL_HOME}/
 ├── SKILL.md            # Required, Skill main body
-├── .specify/scripts/            # Executable scripts (optional)
+├── scripts/            # Executable scripts (optional)
 ├── references/         # Reference materials loaded on demand (optional)
 └── assets/             # Static assets for outputs (optional)
 ```
@@ -114,7 +114,7 @@ The project creation script may create standard empty resource directories durin
 
 1. Discovery: Read `name` + `description`
 2. After match: Read `SKILL.md` body
-3. When needed: Read `.specify/scripts/`, `references/`, `assets/`
+3. When needed: Read `scripts/`, `references/`, `assets/`
 
 Constraints:
 - `SKILL.md` recommended < 500 lines
@@ -166,7 +166,7 @@ Minimum checks:
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
 - [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape); a later full-suite regression is the wrong place to discover a miss. **Fallback**: if the project has no `tests/` or `tests/contract/` directory, the suite is not applicable — verify conformance via the manual checklist items above (frontmatter / Feedback section / registry / size) and state "contract suite not applicable" explicitly in the completion report; do not spin on the missing suite or report it as a failure
 - [ ] Spec Kit project mode: **attribute every red before reporting it** — when that suite is red, re-run it with `--tb=line` (`pytest tests/contract/ --tb=line -k "skill or runtime_mode"`) and read, per failing assertion, **which skill it names**; then split the failures into **pre-existing debt** (skills this run never touched — an unsynced `.specify/skills/**` mirror is the common case) and **this new Skill's regression**. Quote the attribution command and that split in the completion report. A bare pass/fail count attributes nothing: while several skills of one family are edited in parallel, an unattributed red cannot be routed back to its author
-- [ ] **Mechanism / policy separation**: for each added line, answer the boundary test — does the skill body or `references/` hard-code an environment path, a user directory name or a default output location (policy written into the mechanism), or does reusable logic (a rule, a step order, a branch) live in the run-environment notes instead (mechanism left in the policy side)? Continue to judge the other side after a hit; on a hit name the file and the line or quoted sentence, and refuse to report completion until it is corrected. Judgement method: [mechanism-policy-check.md](./references/mechanism-policy-check.md); criteria owner: `.specify/shared/definitions/mechanism-policy-definitions.md` § Misplacement Symptoms
+- [ ] **Mechanism / policy separation**: for each added line, answer the boundary test — does the skill body or `references/` hard-code an environment path, a user directory name or a default output location (policy written into the mechanism), or does reusable logic (a rule, a step order, a branch) live in the run-environment notes instead (mechanism left in the policy side)? Continue to judge the other side after a hit; on a hit name the file and the line or quoted sentence, and refuse to report completion until it is corrected. Judgement method: [mechanism-policy-check.md](./references/mechanism-policy-check.md); criteria owner: `shared/definitions/mechanism-policy-definitions.md` § Misplacement Symptoms
 
 ### 6.5 Pressure Test (RED-GREEN)
 
@@ -182,7 +182,7 @@ Pure utility skills (deterministic script wrappers) may substitute a smoke invoc
 
 Applies only when creating a **new** Skill **in Spec Kit project mode** — in standalone mode skip this step (no built-in role agents exist). Wire it into the built-in role agents so they prefer it for role-relevant work, following the Skill Enablement convention (the `## Skill Enablement` section pattern on the built-in role agents under `.specify/agents/templates/`).
 
-**Before the first edit of § 7 and of § 8**, re-run the owner's read-judge-stop check over this creation's policy items — read them, judge each one, stop on any that is unstaked (§ Consumption Contract of `.specify/shared/definitions/mechanism-policy-definitions.md`). Both steps write (agent definitions here, the report there), so a missing policy stops here first with no file touched and no half-written report; a policy that is named but unreadable is the **environment error** class and reports that value, never the **policy missing** class.
+**Before the first edit of § 7 and of § 8**, re-run the owner's read-judge-stop check over this creation's policy items — read them, judge each one, stop on any that is unstaked (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`). Both steps write (agent definitions here, the report there), so a missing policy stops here first with no file touched and no half-written report; a policy that is named but unreadable is the **environment error** class and reports that value, never the **policy missing** class.
 
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`, `create-tools`, `improve-tools`). Normal user-created Skills proceed.
 2. **Analyze**: read the 7 built-in role agents from `.specify/agents/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) and judge each agent's role against the new Skill's capability + trigger keywords.
@@ -195,7 +195,7 @@ Applies only when creating a **new** Skill **in Spec Kit project mode** — in s
 
 ### 8. Report completion
 
-Before writing the report, re-read this creation's policy items and judge them once more — the same read-judge-stop check, § Consumption Contract of `.specify/shared/definitions/mechanism-policy-definitions.md`. A policy item that turned out missing during Step 6 stops here rather than being reported as a completed creation, so a stop leaves no half-written report behind. Keep the two classes apart: **policy missing** (Step 6 never settled the item) versus **environment error** (an item was named but its value could not be read) — never report one as the other.
+Before writing the report, re-read this creation's policy items and judge them once more — the same read-judge-stop check, § Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`. A policy item that turned out missing during Step 6 stops here rather than being reported as a completed creation, so a stop leaves no half-written report behind. Keep the two classes apart: **policy missing** (Step 6 never settled the item) versus **environment error** (an item was named but its value could not be read) — never report one as the other.
 
 Summarize:
 - Detected runtime mode (Spec Kit project vs standalone) and which Spec-Kit-specific steps were skipped
@@ -212,7 +212,7 @@ Summarize:
 - **High freedom**: Text strategies for multi-path problems
 - **Medium freedom**: Pseudocode / parameterized scripts for configurable primary paths
 - **Low freedom**: Fixed scripts / steps for high-risk error-prone operations
-- **Implement landing point**: which directory the new Skill lands in, and where its runtime inputs and outputs come from, are policy inputs the caller supplies. Ask for a landing point and offer the ready options; never bake one into the Skill's mechanism (§ Consumption Contract of `.specify/shared/definitions/mechanism-policy-definitions.md`).
+- **Implement landing point**: which directory the new Skill lands in, and where its runtime inputs and outputs come from, are policy inputs the caller supplies. Ask for a landing point and offer the ready options; never bake one into the Skill's mechanism (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`).
 
 ### Discoverable Descriptions
 
@@ -243,7 +243,7 @@ This `create-skills` Skill is itself an Execution Subject: its own qualified run
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -253,3 +253,4 @@ This `create-skills` Skill is itself an Execution Subject: its own qualified run
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:create-skills" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
+6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

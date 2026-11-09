@@ -7,7 +7,7 @@
 Every agent participating in a team is described by three orthogonal dimensions:
 
 - **Role** — the responsibility/perspective (e.g. `system-designer`, `test-engineer`, `team-supervisor`); a Role is a **seat** filled by an agent whose **Capacity** is defined in a `agent-capacity-<X>-template.md` (create-agent) or, for the sole Meta role, `agent-team-supervisor-template.md` (create-team). Role is the responsibility; Capacity is what the filling agent can do (see `capacity-vs-responsibility.md`).
-- **Stage** — one of `executor`, `evaluator`, `optimizer` (canonical names; the deprecated dimension name "SubRole" and stage name "improver" are removed). 本 Stage 维度**不是** SDD 阶段名册:SDD 的阶段名册(阶段链与其顺序、哨兵、状态脊)仍由驱动所有,唯一真源是 `.specify/skills/sdd-loop-driver/SKILL.md`,本维度只按路径抵达它、不复述也不枚举;本维度不重命名、不重载任何取值,任何 SDD 阶段名都 MUST NOT 被当作一个 team Stage 取值使用。
+- **Stage** — one of `executor`, `evaluator`, `optimizer` (canonical names; the deprecated dimension name "SubRole" and stage name "improver" are removed). 本 Stage 维度**不是** SDD 阶段名册:SDD 的阶段名册(阶段链与其顺序、哨兵、状态脊)仍由驱动所有,唯一真源是 `skills/external/sdd-loop-driver/SKILL.md`,本维度只按路径抵达它、不复述也不枚举;本维度不重命名、不重载任何取值,任何 SDD 阶段名都 MUST NOT 被当作一个 team Stage 取值使用。
 - **Type** — `Worker` or `Meta`, **judged independently by what the agent operates on** (see the criterion below). Stage does NOT determine Type; it only supplies a default tendency.
 
 ## Type criterion: judged by operating object, not by stage
@@ -53,7 +53,7 @@ So the practical rule when building a roster: decide **what the member writes to
 
 ### 消解条款:「每席皆 Worker」vs canonical 写权(本节为该消解的唯一真源)
 
-一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `.specify/templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
+一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
 
 - **Worker 只产补丁到工作区** —— 交付物落在业务路径或运行工作区(`.specify/teams/.work/<slug>/`);这是 Worker 的合法写面,不需要 Meta 身份。
 - **交付物本身就是 agent / skill / team 定义时**,花名册 MUST 含**唯一 Meta supervisor**(Team Supervisor),由它把 Worker 产出的补丁落到 canonical 路径;Worker MUST NOT 直接写 canonical 定义文件。
@@ -108,4 +108,4 @@ A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow 
 
 ## Template home
 
-The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `.specify/skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `.specify/skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).
+The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).

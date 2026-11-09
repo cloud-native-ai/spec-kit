@@ -1,6 +1,6 @@
 # 渲染服务部署指南（excalidraw-render-server）
 
-渲染服务源码在技能目录 `.specify/scripts/server/`。它是 excalidraw 的渲染后端：
+渲染服务源码在技能目录 `scripts/server/`。它是 excalidraw 的渲染后端：
 headless Chromium 承载官方 @excalidraw/excalidraw 导出管线，POST 场景 JSON → SVG/PNG。
 
 ## 部署形态选择

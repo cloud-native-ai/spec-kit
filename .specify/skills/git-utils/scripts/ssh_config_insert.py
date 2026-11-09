@@ -34,7 +34,7 @@ Modes: default = converge (insert when absent), --check = observe only,
 --verify = assert the effective resolution, --dry-run = print without writing.
 """
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -90,8 +90,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -103,7 +103,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/git-utils/scripts/ssh_config_insert.py'
+_SIG_SCRIPT = 'skills/external/git-utils/scripts/ssh_config_insert.py'
 _SIG_DECLARED = ('--alias', '--check', '--comment', '--config', '--dry-run', '--hostname', '--identities-only', '--identity-file', '--indent', '--option', '--port', '--update', '--user', '--verify')
 _SIG_HELP = (
     'usage: ssh_config_insert.py [options]\n'

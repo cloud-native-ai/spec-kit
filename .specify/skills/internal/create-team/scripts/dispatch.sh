@@ -2,7 +2,7 @@
 # dispatch.sh — visible external-subagent dispatch (Spec Kit reference implementation).
 #
 # Implements the External Dispatch Visibility Contract defined in
-# .specify/shared/definitions/subagent-definitions.md. It replaces the silent anti-pattern:
+# shared/definitions/subagent-definitions.md. It replaces the silent anti-pattern:
 #
 #   qodercli -p "<prompt>" > agent.log 2>&1 &   # buffered until exit -> zero progress signal
 #
@@ -28,7 +28,7 @@
 #
 # Exit code: the agent CLI's exit code (via PIPESTATUS), also recorded in .status.
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _script_interface_guard() {
@@ -63,8 +63,8 @@ _script_interface_guard() {
 _script_interface_guard "$@"
 
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its bash half by
-# `.specify/scripts/bash/script-interface.sh` and `.specify/scripts/python/sync-mirrors.py`. No rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its bash half by
+# `scripts/bash/script-interface.sh` and `scripts/python/sync-mirrors.py`. No rule of its own.)
 _sig_usage() {
     printf 'usage: %s\n' 'dispatch.sh <label> <workdir> <prompt-file> [-- <extra cli args>]'
     printf 'options:\n'
@@ -123,7 +123,7 @@ shift 3
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI="${DISPATCH_CLI:-qodercli}"
 # Default to the tracked-repo runtime-log location documented in
-# .specify/shared/definitions/agent-definitions.md (git-ignored via .specify/.gitignore), so the
+# shared/definitions/agent-definitions.md (git-ignored via .specify/.gitignore), so the
 # visibility triplet lands where every consumer expects it. Outside a Spec Kit tree the
 # temp-dir fallback keeps the script usable.
 if [[ -n "${DISPATCH_LOG_DIR:-}" ]]; then

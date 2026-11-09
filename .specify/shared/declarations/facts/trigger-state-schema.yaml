@@ -2,12 +2,12 @@
 #
 # The one machine-read copy of the proactive-trigger state file's schema: its schema version, the
 # default config, the closed action/response sets and the default threshold. The engine
-# `.specify/scripts/python/trigger-utils.py` reads it through `.specify/scripts/python/declaration_reader.py`; the
-# carrier reaches it by `.specify/shared/declarations/facts/trigger-state-schema.yaml#/statement`.
+# `scripts/python/trigger-utils.py` reads it through `scripts/python/declaration_reader.py`; the
+# carrier reaches it by `shared/declarations/facts/trigger-state-schema.yaml#/statement`.
 #
 # Authority order: code > generated > authored.
 #
-# Carrier correction: the roster names `.specify/shared/definitions/probe-definitions.md` as this row's
+# Carrier correction: the roster names `shared/definitions/probe-definitions.md` as this row's
 # carrier, but that file documents neither the state schema nor the config defaults (measured
 # 2026-11-05: none of `telemetryWindow`, `probeBudgetPct`, `minSample` appears there). The fact's
 # second face is the test-pinned literal (`tests/contract/test_trigger_engine.py`), which FR-006 (ii)
@@ -41,7 +41,7 @@ statement:
     - ignored
   threshold_default: 3
 consumers:
-  - .specify/scripts/python/trigger-utils.py
-  - .specify/shared/guidelines/proactive-trigger.md
+  - scripts/python/trigger-utils.py
+  - shared/guidelines/proactive-trigger.md
 former_carriers: []
 note: "`default_config` is the seed a new state file is written with, so its five keys and their values are one record; the `threshold` is also exposed on its own as `threshold_default` because callers read and clamp it independently of the rest of the config. `actions` is the closed action enumeration — an action outside it is an input error, never a new branch. The values are unchanged from the pre-migration engine constants."

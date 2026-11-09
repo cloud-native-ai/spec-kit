@@ -109,7 +109,7 @@ Rows come from the **Phase-1 source inventory**, not from the source's table of 
   **layer attribution** — whether the inherited capability is mechanism-side (reusable logic
   that belongs in the target's skill assets) or policy-side (an environment binding the caller
   supplies) — as prose inside the existing cell, judged against
-  `.specify/shared/definitions/mechanism-policy-definitions.md` § Boundary Test. The attribution never
+  `shared/definitions/mechanism-policy-definitions.md` § Boundary Test. The attribution never
   becomes a new column and never a second record table, and it is not a substitute for the
   check itself. An empty cell is a finding: a checklist whose items cannot be checked is a
   description.

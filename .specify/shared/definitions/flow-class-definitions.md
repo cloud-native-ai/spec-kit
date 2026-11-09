@@ -1,24 +1,24 @@
 # Flow Class Definitions — 执行 / 表达流程分类
 
-**Owner（唯一所有者）**: 本文件 `.specify/shared/definitions/flow-class-definitions.md` 是「执行 / 表达」分类轴的唯一所有者。
+**Owner（唯一所有者）**: 本文件 `shared/definitions/flow-class-definitions.md` 是「执行 / 表达」分类轴的唯一所有者。
 它拥有：**判据、两个取值、判定依据（`basis`）、边界例、命名空间、逐流程台账、类中立封闭清单、变更记录、同构映射（8 阶段 × 3 面）、不可同构边界**。
 其他任何位置（命令模板、技能、契约、测试、门户文档）MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制判据句或取值定义，MUST NOT 以表格 / YAML / JSON / 代码常量的形式再声明一份「流程单元 → 类别」的映射；仓库中 MUST NOT 出现第二份分类数据文件。
 
 **机器键**: `flow_class`（[[STR-003]]）。**取值域的成员与次序不在本文件**——它们由声明层
-`.specify/shared/declarations/facts/flow-class-classes.yaml#/statement`（`kind: closed-set`，有序：成员 0 是未声明单元的缺省类别）
+`shared/declarations/facts/flow-class-classes.yaml#/statement`（`kind: closed-set`，有序：成员 0 是未声明单元的缺省类别）
 单一拥有；父规格 069 的 `[[STR-001]]` / `[[STR-002]]` 登记的是这两个字面量的语义，本节只引用语义、不重列取值。
 四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
-**覆盖范围**: 框架内全部流程单元——命令模板（`.specify/templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
-清单规模（实测 2026-10-30：`ls .specify/templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。
+**覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
+清单规模（实测 2026-10-30：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。
 
 **不在本文件**（只给指针，不复述）：
 
 | 主题 | 所有者 |
 |------|--------|
-| 门禁算子集、文档型六面、阶段算子表、调用点表 | `.specify/shared/workflow/expression-gates.md` |
-| 复杂度轴（复杂 / 简单命令，决定有无 wrap-up 面） | `.specify/shared/workflow/feedback-step.md` |
-| 读取类别的唯一引擎 | `.specify/scripts/python/flow-class-check.py` |
+| 门禁算子集、文档型六面、阶段算子表、调用点表 | `shared/workflow/expression-gates.md` |
+| 复杂度轴（复杂 / 简单命令，决定有无 wrap-up 面） | `shared/workflow/feedback-step.md` |
+| 读取类别的唯一引擎 | `scripts/python/flow-class-check.py` |
 
 ## 判据
 
@@ -42,7 +42,7 @@
 
 ### 判定依据 `basis`
 
-`basis` 的**取值域**（成员与次序）由 `.specify/shared/declarations/facts/flow-class-basis.yaml#/statement`
+`basis` 的**取值域**（成员与次序）由 `shared/declarations/facts/flow-class-basis.yaml#/statement`
 单一拥有（有序：成员 2 即 mixed-oracle，见下条不变量）。本节只保留各取值**含义**——含义是本文件的判据：
 
 - 机器可观测事实给出的判定（运行行为、生成物可用性、脚本退出码、可对回制品的核验结论）。
@@ -70,27 +70,27 @@
 
 ### 不变量指针
 
-类别 MUST NOT 被用作跳过或缩短阶段的开关：阶段集合、门禁数量与 analyze / review 的调用率不因类别改变（规范条款归 `.specify/shared/workflow/expression-gates.md` § 阶段不变量与 requirements FR-012 / FR-013 / FR-014，本文件不复述）。
+类别 MUST NOT 被用作跳过或缩短阶段的开关：阶段集合、门禁数量与 analyze / review 的调用率不因类别改变（规范条款归 `shared/workflow/expression-gates.md` § 阶段不变量与 requirements FR-012 / FR-013 / FR-014，本文件不复述）。
 
 ## 命名空间
 
 - `flow_class` 是本分类的机器键：台账列头、JSON 键、CLI 参数统一用它；裸 `execution` MUST NOT 充当键名。
-- `execution` 与既有 **Agent Execution**（Agent 三层分类法第三层，概念见 `.specify/shared/definitions/agent-definitions.md`，词汇表见 `.specify/memory/glossary.md` 的 `Agent Execution` 行）**同词异义**：前者描述「流程主交付物的验收 oracle」，后者描述「Agent 模板 / 实例 / 执行」三层的第三层。
+- `execution` 与既有 **Agent Execution**（Agent 三层分类法第三层，概念见 `shared/definitions/agent-definitions.md`，词汇表见 `.specify/memory/glossary.md` 的 `Agent Execution` 行）**同词异义**：前者描述「流程主交付物的验收 oracle」，后者描述「Agent 模板 / 实例 / 执行」三层的第三层。
 - 读法约束：`execution` 只有在 `flow_class` 语境下（本文件判据、台账列、`lookup` 输出）才读作本分类；出现在 `.specify/agents/execution/`、`execution-config.py` 等既有名称中时 MUST NOT 读作本分类。
 - 词汇表侧的同词消歧行（`流程分类 (Flow Class)` / `执行类流程` / `表达类流程`）以本文件为 owner 指针；本文件不复述词汇表的同音 / 易混词列。
 
 ## 与复杂度轴正交
 
-复杂度轴（复杂命令 / 简单命令）的 owner 是 `.specify/shared/workflow/feedback-step.md`：它决定**有没有 wrap-up 面**。本分类轴决定**门禁算子集**（owner：`.specify/shared/workflow/expression-gates.md`）。
+复杂度轴（复杂命令 / 简单命令）的 owner 是 `shared/workflow/feedback-step.md`：它决定**有没有 wrap-up 面**。本分类轴决定**门禁算子集**（owner：`shared/workflow/expression-gates.md`）。
 两轴 MUST NOT 互相推导：由复杂度推类别、或由类别推 wrap-up 面，都是缺陷。可核对的对照：`/speckit.docs` 是复杂命令、`/speckit.humanize` 是简单命令，二者在本台账同为 `expression`。
 
 ## 同构映射（8 阶段 × 3 面）
 
-一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`.specify/skills/sdd-loop-driver/scripts/loop-state.py` 的 `STAGE_ARTIFACTS` 顶层键，声明见 `.specify/specs/066-loop-state-awareness-a/requirements.md` FR-006）；名册变更时映射跟着增删行，**不另立版本**。
+一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`skills/external/sdd-loop-driver/scripts/loop-state.py` 的 `STAGE_ARTIFACTS` 顶层键，声明见 `.specify/specs/066-loop-state-awareness-a/requirements.md` FR-006）；名册变更时映射跟着增删行，**不另立版本**。
 
 legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实体 / 关系 / 边界**——该阶段的产物由哪些实体构成、彼此是什么关系、到哪里为止；**流程 = 阶段与门禁角色**——该阶段在流程中的位置，以及哪个门禁面扮演出口判定；**逻辑 = 证据 / 契约 / 验收 / 版本 / 所有权**——该阶段用什么证明、与谁有契约、由谁验收、版本与所有权如何登记。
 
-每个面格写成 `代码型：… ↔ 文档型：…`：左侧是执行类流程赖以验收的产物或判定面，右侧是表达类流程赖以验收的产物或判定面。`强制门禁` 列写出该行声称被强制的 face id；`强制门禁引用` 列写出与之对应的 `gate:<算子 id>`，算子 id 取自门禁 owner `.specify/shared/workflow/expression-gates.md` § 阶段算子表的 `算子 id` 列；`强制状态` 列取封闭两值。三列都只引用门禁 owner，不复述算子文本。
+每个面格写成 `代码型：… ↔ 文档型：…`：左侧是执行类流程赖以验收的产物或判定面，右侧是表达类流程赖以验收的产物或判定面。`强制门禁` 列写出该行声称被强制的 face id；`强制门禁引用` 列写出与之对应的 `gate:<算子 id>`，算子 id 取自门禁 owner `shared/workflow/expression-gates.md` § 阶段算子表的 `算子 id` 列；`强制状态` 列取封闭两值。三列都只引用门禁 owner，不复述算子文本。
 
 - `已强制`：该行点名的**每个** `(阶段, face)` 都有一个 `gate:<算子 id>` 引用解析到该 `(阶段, face)` 的 blocking 算子行。
 - `已声明未强制`：该阶段此刻没有任何 blocking 算子行——它只是如实标注，不构成通过、不构成豁免，也不构成新增未强制行的许可。
@@ -119,7 +119,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | c | 失败可见性：运行期偏差 vs 构建通过而事实陈旧的静默失败 | 运行期偏差会以退出码或异常暴露；文档型失败可以在构建全绿时静默存在，只能靠证据与评审面显式暴露 | `evidence-asof` 面强制断言的等级、as-of 与来源三件套；`review` 面复核事实一致性 |
 | d | 语义 oracle 缺失：文档没有编译器，意义只能由人判定 | 编译与测试不产生「意义是否正确」的判定；文档型交付物的语义只能由读者与外部事实给出 | `review` 面承担语义判定；`reader-purpose` 面要求声明读者与阅读场景作为判定前提 |
 
-机械下限：24 格两侧成对（缺一侧即缺陷）；`.specify/templates/commands/` 与 `skills/` MUST NOT 出现以「文档即代码」为理由的许可句；上述两张表的单元格 MUST NOT 用介质作为分类理由（扩展名、语言种类、是否含代码块、是否由脚本生成）；门禁 owner 的算子列 MUST NOT 出现代码型算子。强制声明的可证伪粒度是**引用级**：每行 `强制门禁引用` 的 `gate:<算子 id>` 必须解析到门禁 owner 在该 `(阶段, face)` 的 blocking 算子行，缺失 / 未知 / 非 blocking / 错 `(阶段, face)` 都转红；引用级通过 MUST NOT 被读作「24 格自由文本的语义已被证明」。语义判定（一句主张是否真的落地）归评审面，检查器不声称能判定自由文本的可判定性。核对入口：`.specify/scripts/python/flow-class-check.py --action isomorphism`（只读；判据归本文件与门禁 owner）。
+机械下限：24 格两侧成对（缺一侧即缺陷）；`templates/commands/` 与 `skills/` MUST NOT 出现以「文档即代码」为理由的许可句；上述两张表的单元格 MUST NOT 用介质作为分类理由（扩展名、语言种类、是否含代码块、是否由脚本生成）；门禁 owner 的算子列 MUST NOT 出现代码型算子。强制声明的可证伪粒度是**引用级**：每行 `强制门禁引用` 的 `gate:<算子 id>` 必须解析到门禁 owner 在该 `(阶段, face)` 的 blocking 算子行，缺失 / 未知 / 非 blocking / 错 `(阶段, face)` 都转红；引用级通过 MUST NOT 被读作「24 格自由文本的语义已被证明」。语义判定（一句主张是否真的落地）归评审面，检查器不声称能判定自由文本的可判定性。核对入口：`scripts/python/flow-class-check.py --action isomorphism`（只读；判据归本文件与门禁 owner）。
 
 ## 所有权：归框架，客户项目只为自己新增的流程声明
 
@@ -135,7 +135,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-5）。
 
 一行一个流程单元，首格是单元 id（命令 `/speckit.<stem>`，技能 `skill:<dir-name>`）；列按**表头名**解析，解析器 MUST NOT 猜列。
-**必填列集合（含列序）**由 `.specify/shared/declarations/facts/flow-class-ledger-columns.yaml#/statement` 单一拥有（有序算子表）；
+**必填列集合（含列序）**由 `shared/declarations/facts/flow-class-ledger-columns.yaml#/statement` 单一拥有（有序算子表）；
 本节只保留列语义：`flow_class` 列逐字取机器键，`basis` 取 § 判定依据 所述取值域的成员，`neutral` 只允许留空或 `yes`
 （`yes` 仅用于 § 类中立清单 中的技能），`notes` 是该行的判定要点、不复述判据正文（`notes` 不是必填列）。
 `mixed-oracle` 行一律取 `execution`（父 069 §Edge Cases 首条；规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7），行内 `notes` 保留父指针。
@@ -226,13 +226,13 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:study-project | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
 | skill:summarize-project | expression | reader-oracle |  | 交付项目总结报告；呈现是否可用由读者判定 |
 
-台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `.specify/scripts/python/flow-class-check.py --action check` 执行）。
+台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `scripts/python/flow-class-check.py --action check` 执行）。
 同一单元在台账中 MUST 恰好一行；两行同值 → 重复，两行反值 → 双类冲突。
 
 ## 类中立清单
 
 类中立是**封闭清单**：登记「承载调用方产物、没有自己的交付物」的共享技能，用来豁免「命令与其委托技能 MUST 同类」这一条约束。
-`category` 列的取值域由 `.specify/shared/declarations/facts/flow-class-neutral-categories.yaml#/statement` 单一拥有（引擎以它作成员测试），
+`category` 列的取值域由 `shared/declarations/facts/flow-class-neutral-categories.yaml#/statement` 单一拥有（引擎以它作成员测试），
 本节的表只登记「哪个技能属于哪一类」与理由。
 类中立**不改变**该单元自身的类别键（仍是一个二值），也**不豁免任何门禁**——门禁是否执行只由门禁 owner 的调用点表决定。
 清单外出现 `neutral: yes` 即缺陷；清单内条目 MUST 存在于技能清单且台账该行为 `neutral: yes`。
@@ -260,24 +260,24 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 本节是**类条件追加**：它只登记「特性线把类别写在哪、由谁解析、谁消费」，不重定义 § 判据 的两个取值，也不在 § 逐流程台账 里增行。
 
 - **声明单位是特性线**：一条 spec 目录声明自己的类别，载体是该线 `requirements.md` 头部区（`## Related Feature` 之前）**至多一行**的声明字段；字段行文法、位置、四个作者错误码（`invalid-class` / `declaration-malformed` / `declaration-duplicate` / `declaration-misplaced`）与三段退出码（0 已解析 / 1 作者输入错误 / 2 输入非法或 owner 不可解析）归 `.specify/specs/077-doc-sdd-integration/requirements.md` 的 FR-001 / FR-003 / FR-005。取值仍只有 § 判据 的两个取值，本节不复述判据句。
-- **解析入口仍是唯一引擎**：`.specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:<spec 目录名>"`。键取该 spec 目录的 basename（不取路径、不取 Feature 号），记录与单元键**逐字段同形**；新增第二个解析函数或第二份分类数据文件即违反本节。
-- **不进逐流程台账**：特性线声明 MUST NOT 写入 § 逐流程台账——该表的行集等于框架单元清单（`.specify/templates/commands/*.md` + `skills/{external,internal}/*/SKILL.md`），写入即产生 `unknown` 发现。本节不登记任何特性线的取值：类别只由作者判定，MUST NOT 从路径、文件名、内容或提交信息推断。
-- **消费方**：七个阶段命令模板（`requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement`）与 `sdd-loop-driver` 的阶段派发载荷；接线形态归 `.specify/shared/workflow/expression-gates.md` § 特性线阶段命令，本文件不登记算子、面名或槽位。
+- **解析入口仍是唯一引擎**：`scripts/python/flow-class-check.py --action lookup --unit-id "spec:<spec 目录名>"`。键取该 spec 目录的 basename（不取路径、不取 Feature 号），记录与单元键**逐字段同形**；新增第二个解析函数或第二份分类数据文件即违反本节。
+- **不进逐流程台账**：特性线声明 MUST NOT 写入 § 逐流程台账——该表的行集等于框架单元清单（`templates/commands/*.md` + `skills/{external,internal}/*/SKILL.md`），写入即产生 `unknown` 发现。本节不登记任何特性线的取值：类别只由作者判定，MUST NOT 从路径、文件名、内容或提交信息推断。
+- **消费方**：七个阶段命令模板（`requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement`）与 `sdd-loop-driver` 的阶段派发载荷；接线形态归 `shared/workflow/expression-gates.md` § 特性线阶段命令，本文件不登记算子、面名或槽位。
 
 ## 文档类型（`flow_type`，从属轴）
 
 本节是 `flow_class` 的**从属属性**：它只在 `expression` 线上细分「这是什么文档」，不改变两值判据、不改门禁算子集，也不在 § 逐流程台账 里增行。取值集扩展是本文件的 owner 修订，MUST NOT 由消费方就地增删。
 
-- **载体与文法**：与类别同一条声明区、`**Flow Type**: <type>` 单行；位置、重复 / 错位 / 形态判定复用类别行的规则（实现入口 `.specify/scripts/python/flow-class-check.py` 的 `parse_spec_flow_type`）。
-- **封闭取值**：取值域（成员与次序，含未细分的 `-`）由 `.specify/shared/declarations/facts/flow-class-document-types.yaml#/statement` 单一拥有；本节只声明各取值的**含义**（技术文档 / 用户手册 / 参考手册 / 运维手册 / 设计说明 / 未细分）。新增类型 MUST 同趟修订该声明与本文件 § 文档类型。
+- **载体与文法**：与类别同一条声明区、`**Flow Type**: <type>` 单行；位置、重复 / 错位 / 形态判定复用类别行的规则（实现入口 `scripts/python/flow-class-check.py` 的 `parse_spec_flow_type`）。
+- **封闭取值**：取值域（成员与次序，含未细分的 `-`）由 `shared/declarations/facts/flow-class-document-types.yaml#/statement` 单一拥有；本节只声明各取值的**含义**（技术文档 / 用户手册 / 参考手册 / 运维手册 / 设计说明 / 未细分）。新增类型 MUST 同趟修订该声明与本文件 § 文档类型。
 - **类约束**：`expression` 可带任一取值或 `-`；`execution` 只允许 `-`（文档类型对执行类无意义），违者 `flow-type-mismatch`（退出码 1）。
 - **缺省**：该行可以缺失——缺失记 `flow_type: null`，不构成缺陷；作者显式写 `-` 与缺失的区别只在记录（`null` vs `"-"`），门禁等价。
 - **解析与消费**：同一引擎的同一 `lookup`，记录多一个 `flow_type` 字段；消费方（阶段命令模板、驱动派发载荷）以路径引用本节，MUST NOT 复制取值集。
 
 ## 消费方指针
 
-- 读取类别：`.specify/scripts/python/flow-class-check.py --action lookup --unit-id <id>`（唯一读取路径；命令模板与技能 MUST NOT 内嵌类别副本）。
+- 读取类别：`scripts/python/flow-class-check.py --action lookup --unit-id <id>`（唯一读取路径；命令模板与技能 MUST NOT 内嵌类别副本）。
 - 读取特性线类别：同一入口的 `spec:` 键（`--unit-id "spec:<spec 目录名>"`），声明面见 § 特性线声明面（`spec:` 键）；本文件不为特性线存取值。
 - 对账：同引擎 `--action check`（八类 finding 与反空真下限归契约 `contracts/flow-class-ledger.md`）。
 - 同构映射与边界核对：同引擎 `--action isomorphism`（只读；判定归本文件 § 同构映射 / § 不可同构边界与门禁 owner）。
-- 门禁算子与调用点：`.specify/shared/workflow/expression-gates.md`（本文件不列举面名、算子与调用点）。
+- 门禁算子与调用点：`shared/workflow/expression-gates.md`（本文件不列举面名、算子与调用点）。

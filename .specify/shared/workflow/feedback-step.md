@@ -5,10 +5,10 @@ unit's compiled `## Wrap-up` section wires to (056: the section is rendered by
 `probe-utils.py --action compile-embeds`, not hand-embedded). The compiled section is
 the final workflow section of a skill; complex command templates carry it at their
 wrap-up / Git-commit-prompt stage. Simple commands carry no wrap-up face at all — a
-command is complex iff it invokes .specify/scripts/CLI tools, produces an artifact another flow
+command is complex iff it invokes scripts/CLI tools, produces an artifact another flow
 consumes, or consumes another flow's artifact.
 
-**Orthogonal axis — no derivation either way.** The complexity criterion above decides only whether a wrap-up face exists; the execution / expression class axis decides only the set of gate operators. The two axes are orthogonal and MUST NOT be derived from each other; their criteria, two values and per-unit ledger are owned by `.specify/shared/definitions/flow-class-definitions.md`.
+**Orthogonal axis — no derivation either way.** The complexity criterion above decides only whether a wrap-up face exists; the execution / expression class axis decides only the set of gate operators. The two axes are orthogonal and MUST NOT be derived from each other; their criteria, two values and per-unit ledger are owned by `shared/definitions/flow-class-definitions.md`.
 
 **Embedding units reference this file; they do not copy it.** Each embedded
 `## Feedback` section is one of the two short pointer forms in § *Embedded reference
@@ -162,7 +162,7 @@ reason set and no decision table — those are code's. Everything else below rea
 owner by path.
 
 **Engine and code-side owner.** `.specify/scripts/python/run-determination.py` (framework
-source `.specify/scripts/python/run-determination.py`) owns the record schema, every value domain
+source `scripts/python/run-determination.py`) owns the record schema, every value domain
 the program branches on, the routing-bit derivation (`derive_trigger_feedback`) and the
 CLI flag set. No invocation is written out here on purpose: the parser generates the
 engine's own `--help`, so a flag list copied into prose could only drift. The record *is*
@@ -201,7 +201,7 @@ continue on available run evidence, never fabricate — per
 
 **Unresolved-red input — engine exit codes only.** The satisfaction axis's red-adjacency
 exception has exactly one producer: a non-zero exit from an engine this run invoked,
-reported through the exit-code table the `.specify/scripts/python/` engines share. The producer
+reported through the exit-code table the `scripts/python/` engines share. The producer
 formerly named beside it — an anomaly the agent surfaced and the user never answered
 (`surfaced_anomaly_unanswered`) — is **dropped**, not deferred, and MUST NOT be declared.
 The per-turn telemetry store `.specify/memory/trigger/telemetry.jsonl` MUST NOT be read
@@ -227,7 +227,7 @@ record's `out_of_scope[]`, one bounded line each, with **no carrier assigned**
 (`parked_via: none`); assigning one belongs to the **active** improve flow, which chooses
 between two carriers that already exist — `/speckit.todo` Park Mode (the default: a
 free-floating improvement idea; mode, store path and frontmatter owned by
-`.specify/templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
+`templates/commands/todo.md`) and a new spec through `/speckit.requirements` (when the
 finding constrains what this project's source must implement, which is the Requirement
 plane's call, not this flow's). The passive turn names carriers; it MUST NOT open either
 flow, widen the current turn, or emit anything beyond the single non-blocking notification
@@ -252,7 +252,7 @@ inference side of the never-solicit rule above.
 
 The embedded wrap-up section is **compiled, not hand-embedded** (056): `probe-utils.py
 --action compile-embeds` renders each unit's single AUTO-GENERATED `## Wrap-up` from the
-registry (`.specify/shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
+registry (`shared/definitions/probe-definitions.md` ## Handler / ## HandlerBinding) and
 migrates away any manual `## Feedback` / `## Documentation` section it finds. They do
 not copy it — each call line points here; the agent executing the section follows its
 lines in order, which lands on this file's own sections. Nothing is per-surface beyond
@@ -329,7 +329,7 @@ its class-③ instance):
    part of what the batch is declared to contain. The receive-side flow (per-bundle
    ingest plus degradation counters; aggregation only as a suggested explicit
    follow-up) is owned by `/speckit.feedback` Path A —
-   `.specify/skills/internal/manage-feedback/references/path-a-digest.md` § A2. This step adds
+   `skills/internal/manage-feedback/references/path-a-digest.md` § A2. This step adds
    no command, no blocking user gate, and no transmission path (red line 3 unchanged:
    the payload only rides inside the same manually-delivered zip).
 2. **Skip this time** — do nothing; the prompt will naturally reappear only after more
@@ -359,14 +359,14 @@ workaround applied. This is a read-only aid — it never gates execution.
 ## Notes for embedders
 
 - **Which form**: command templates take the command form, `skills/*/SKILL.md` and
-  `.specify/templates/skills-template.md` take the skill form (its runtime-mode gate is
+  `templates/skills-template.md` take the skill form (its runtime-mode gate is
   mandatory — detection semantics live in `.specify/shared/workflow/runtime-mode.md`).
 - **Skills**: `--unit-id "skill:<name>"`, `--unit-type skill`.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`.
 - **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` § Probe Injection.
 - **Simple commands** (`agents`, `constitution`, `feature`): omit this step entirely. This list is *derived* from the complexity criterion at the top of this file — when a command gains or loses script invocations, or starts or stops producing or consuming another flow's artifact, re-derive the list rather than editing it alone.
 - The engine store lives at `.specify/memory/feedback/`; the threshold's default **value** is owned by
-  `.specify/shared/declarations/facts/feedback-prompt-threshold.yaml#/statement` — this carrier states no number
+  `shared/declarations/facts/feedback-prompt-threshold.yaml#/statement` — this carrier states no number
   of its own. `--threshold` and `SPECKIT_FEEDBACK_THRESHOLD` still override it, and a project whose
   declaration layer is absent gets `declaration-absent: feedback-prompt-threshold` on the engine's output
   line instead of a silent default.

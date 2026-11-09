@@ -1,6 +1,6 @@
 # Mechanism–Policy Separation — 机制/策略分离
 
-**Owner（唯一所有者）**: 本文件 `.specify/shared/definitions/mechanism-policy-definitions.md` 是「机制/策略分离」（`Mechanism–Policy Separation`）这条一等原则的 single source of truth。它拥有**七组事实**，且只有本文件可以把它们写出来：
+**Owner（唯一所有者）**: 本文件 `shared/definitions/mechanism-policy-definitions.md` 是「机制/策略分离」（`Mechanism–Policy Separation`）这条一等原则的 single source of truth。它拥有**七组事实**，且只有本文件可以把它们写出来：
 
 | # | 事实 | 本文件落点 |
 |---|------|-----------|
@@ -18,10 +18,10 @@
 
 | 主题 | 所有者 |
 |------|--------|
-| 一个目录能否存在、叫什么、在哪登记 | `.specify/shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 3 登记义务） |
-| 「机制 vs 问题」的修复方向 | `.specify/shared/definitions/dogfooding-definitions.md` § 1 |
-| 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | `.specify/skills/create-skills/SKILL.md` § 2 |
-| 运行期根的登记与生命周期 | `.specify/shared/guidelines/directory-governance.md` § 5 |
+| 一个目录能否存在、叫什么、在哪登记 | `shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 3 登记义务） |
+| 「机制 vs 问题」的修复方向 | `shared/definitions/dogfooding-definitions.md` § 1 |
+| 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | `skills/external/create-skills/SKILL.md` § 2 |
+| 运行期根的登记与生命周期 | `shared/guidelines/directory-governance.md` § 5 |
 | 引用纪律本身（什么算一次合法重复） | 只源真指南（见 § Boundaries 的同一行） |
 | 双语的方向、形态与覆盖面 | 双语表述指南（见 § Boundaries 的同一行） |
 | 临时目录的受制裁根与清理 | 临时目录纪律指南（见 § Boundaries 的同一行） |
@@ -83,7 +83,7 @@
 | 可复用方法 | 同上 |
 | 技能定义本体（`SKILL.md`） | 它是「这类工件怎么产」的载体，与某次运行环境无关 |
 | `references/` 下的知识与方法 | 随技能分发，换环境仍成立 |
-| `.specify/scripts/` 中的逻辑 | 同 A4：逻辑属机制 |
+| `scripts/` 中的逻辑 | 同 A4：逻辑属机制 |
 | `assets/` 中随技能分发的模板 | 模板是产物的形状，不是某次落点 |
 
 **策略侧成员**（每行：换掉运行环境，规则必须改）
@@ -97,7 +97,7 @@
 | 输出落点与输出形态 | 同上 |
 | 运行模式绑定 | 项目模式 / 独立模式的差异属运行环境 |
 
-两侧路径取值的写法归 `.specify/skills/create-skills/SKILL.md` § 2 的路径约定——本表只判「谁住哪一侧」，不复制那两个占位符的定义（见 § 不在本文件）。
+两侧路径取值的写法归 `skills/external/create-skills/SKILL.md` § 2 的路径约定——本表只判「谁住哪一侧」，不复制那两个占位符的定义（见 § 不在本文件）。
 
 ### 脚本的裁决（A4）
 
@@ -122,7 +122,7 @@
 | 症状 | 可观测表现 | 改正方向 |
 |------|-----------|----------|
 | 判定规则住在用户目录 | 某用户目录下的运行说明 / `NOTES.md` 里出现「先满足 A 才做 B」一类判定规则 | 移回**技能资产**（`SKILL.md` 正文或 `references/`），运行说明只保留「这次用哪份输入」 |
-| 算法分支住在 `.specify/` 侧 | `.specify/` 下的笔记文件里出现 `if … else …`、分支表或步骤顺序 | 移回**技能资产**的 `.specify/scripts/` 逻辑或 `references/`，`.specify/` 侧只留运行期状态 |
+| 算法分支住在 `.specify/` 侧 | `.specify/` 下的笔记文件里出现 `if … else …`、分支表或步骤顺序 | 移回**技能资产**的 `scripts/` 逻辑或 `references/`，`.specify/` 侧只留运行期状态 |
 
 ### 策略误置（运行环境绑定被固化进机制侧）
 
@@ -133,12 +133,12 @@
 
 ## Archival Rules
 
-- **机制 → 技能资产**：技能定义本体，及其 `references/`、`.specify/scripts/` 的逻辑、`assets/` 中随技能分发的模板。
+- **机制 → 技能资产**：技能定义本体，及其 `references/`、`scripts/` 的逻辑、`assets/` 中随技能分发的模板。
 - **策略 → 运行环境**：用户指定的目录、当前工作目录、`.specify/` 侧、输入来源、输出落点与形态、运行模式绑定。
 
-**与目录治理的关系是引用，不是复制**：一个目录能否存在、叫什么、在哪登记，归 `.specify/shared/guidelines/directory-governance.md`；本文件只回答「内容住哪一层」。因此本文件**不含**目录命名正则、注册义务句或运行期根清单，也 MUST NOT 新增环境变量、配置键或目录根——这些是本文件的边界，不是它的省略。
+**与目录治理的关系是引用，不是复制**：一个目录能否存在、叫什么、在哪登记，归 `shared/guidelines/directory-governance.md`；本文件只回答「内容住哪一层」。因此本文件**不含**目录命名正则、注册义务句或运行期根清单，也 MUST NOT 新增环境变量、配置键或目录根——这些是本文件的边界，不是它的省略。
 
-**边界情形：把状态写到 `.specify/state/`**——**动作的规则**属机制（产生状态的那一步与其格式），**落根**属策略，且该根由 `.specify/shared/guidelines/directory-governance.md` § 5 登记。本文件 MUST NOT 成为第二个根的声明处。
+**边界情形：把状态写到 `.specify/state/`**——**动作的规则**属机制（产生状态的那一步与其格式），**落根**属策略，且该根由 `shared/guidelines/directory-governance.md` § 5 登记。本文件 MUST NOT 成为第二个根的声明处。
 
 ## Consumption Contract
 
@@ -226,12 +226,12 @@
 
 | 相邻 owner | 它拥有的事实 | 本文的回答 |
 |-----------|-------------|-----------|
-| `.specify/shared/definitions/dogfooding-definitions.md` § 1 | 问题修复与机制修复的分野（修实例还是修载体） | 本文判「内容该住哪一侧」；「机制」一词在两处指向不同事实 |
-| `.specify/shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 5 运行期根） | 一个目录能否存在、叫什么、在哪登记；运行期根 | 本文只说内容归属，目录的存在与登记归它 |
-| `.specify/skills/create-skills/SKILL.md` § 2 | 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | 本文只说「资源侧 vs 运行环境侧」，占位符怎么取值归它 |
-| `.specify/shared/guidelines/one-source-of-truth.md` | 引用纪律本身（什么算一次合法重复） | 本文的「路径引用、不复制」遵守它，不重述它 |
-| `.specify/shared/guidelines/bilingual-expression.md` | 双语的方向、形态与覆盖面 | 本文的两个 canonical 词按它写，不重述其规则 |
-| `.specify/shared/guidelines/temp-directory-discipline.md` | 临时根与清理 | 本文只判临时物的内容属于哪一层，临时根归它 |
+| `shared/definitions/dogfooding-definitions.md` § 1 | 问题修复与机制修复的分野（修实例还是修载体） | 本文判「内容该住哪一侧」；「机制」一词在两处指向不同事实 |
+| `shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 5 运行期根） | 一个目录能否存在、叫什么、在哪登记；运行期根 | 本文只说内容归属，目录的存在与登记归它 |
+| `skills/external/create-skills/SKILL.md` § 2 | 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | 本文只说「资源侧 vs 运行环境侧」，占位符怎么取值归它 |
+| `shared/guidelines/one-source-of-truth.md` | 引用纪律本身（什么算一次合法重复） | 本文的「路径引用、不复制」遵守它，不重述它 |
+| `shared/guidelines/bilingual-expression.md` | 双语的方向、形态与覆盖面 | 本文的两个 canonical 词按它写，不重述其规则 |
+| `shared/guidelines/temp-directory-discipline.md` | 临时根与清理 | 本文只判临时物的内容属于哪一层，临时根归它 |
 
 本节的断言是「本文不含这些 owner 的规则字面」——具体枚举由 `tests/contract/test_mechanism_policy_ownership.py` 承担。
 

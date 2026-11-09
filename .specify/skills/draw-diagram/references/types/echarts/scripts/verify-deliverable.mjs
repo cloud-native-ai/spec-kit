@@ -12,8 +12,8 @@
 // These checks are deterministic (program-first), no browser needed.
 //
 // Usage:
-//   node .specify/scripts/verify-deliverable.mjs <file.html> [<file.html> ...]
-//   node .specify/scripts/verify-deliverable.mjs --config <foo.config.json> [...]
+//   node scripts/verify-deliverable.mjs <file.html> [<file.html> ...]
+//   node scripts/verify-deliverable.mjs --config <foo.config.json> [...]
 //
 // Checks per HTML file:
 //   1. VENDOR — if the file references vendor/echarts.min.js, the
@@ -22,9 +22,9 @@
 //      loader (blocking, deprecated, CSP-hostile)
 //   3. CONFIG_SYNC — for every *.config.js next to the HTML that has
 //      a *.config.json counterpart, both must be in sync
-//      (see .specify/scripts/sync-config.mjs --check)
+//      (see scripts/sync-config.mjs --check)
 //   4. LAYOUT — every graph config found is checked for
-//      out-of-bounds / overlapping nodes (see .specify/scripts/check-layout.mjs)
+//      out-of-bounds / overlapping nodes (see scripts/check-layout.mjs)
 //
 // Exit code: 0 = all checks pass, 1 = problems found, 2 = usage error.
 // ============================================================
@@ -82,7 +82,7 @@ function checkHtml(file) {
       const js = JSON.stringify(loadConfig(jsPath));
       const json = JSON.stringify(JSON.parse(fs.readFileSync(jsonPath, 'utf8')));
       if (js !== json) {
-        problems.push(`CONFIG_SYNC ${path.basename(jsPath)} differs from ${path.basename(jsonPath)} (run: node .specify/scripts/sync-config.mjs ${jsonPath})`);
+        problems.push(`CONFIG_SYNC ${path.basename(jsPath)} differs from ${path.basename(jsonPath)} (run: node scripts/sync-config.mjs ${jsonPath})`);
       }
     } catch (err) {
       problems.push(`CONFIG_SYNC ${path.basename(jsPath)}: ${err.message}`);
@@ -109,7 +109,7 @@ function checkHtml(file) {
 function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error('usage: node .specify/scripts/verify-deliverable.mjs <file.html> [...]');
+    console.error('usage: node scripts/verify-deliverable.mjs <file.html> [...]');
     process.exit(2);
   }
 

@@ -1,6 +1,6 @@
 # TODO-in-Context (上下文内嵌 TODO) — 待办与代码位置绑定的纪律
 
-本文件是 **TODO-in-Context 纪律**的唯一真源(single source of truth):SPECKIT TODO 标记的两种形态归属、上下文补全判读规则、其他工作流的提前感知(perception)处置义务、标记生命周期(insert → perceive → collect → execute → remove)、以及与 Park 寄存库的边界,都只在此定义。检测语义(哪种行算一个块、上下文字段如何提取)归扫描器 CLI 契约所有(框架仓库 spec 020 的 `search-todo-cli.md`,规则 D-1..D-12 与 C-1..C-6)——本文件引用它,MUST NOT 复述其规则。命令侧流程(`/speckit.todo` 四模式)归该命令的模板 `.specify/templates/commands/todo.md` 所有。导览面见 `docs/concepts/todo-in-context.md`。
+本文件是 **TODO-in-Context 纪律**的唯一真源(single source of truth):SPECKIT TODO 标记的两种形态归属、上下文补全判读规则、其他工作流的提前感知(perception)处置义务、标记生命周期(insert → perceive → collect → execute → remove)、以及与 Park 寄存库的边界,都只在此定义。检测语义(哪种行算一个块、上下文字段如何提取)归扫描器 CLI 契约所有(框架仓库 spec 020 的 `search-todo-cli.md`,规则 D-1..D-12 与 C-1..C-6)——本文件引用它,MUST NOT 复述其规则。命令侧流程(`/speckit.todo` 四模式)归该命令的模板 `templates/commands/todo.md` 所有。导览面见 `docs/concepts/todo-in-context.md`。
 
 **本纪律防的失效是「待办与它的位置分离」**:todo 记在别处(清单、issue、会话),代码里却无迹可查——读代码的流程不知道这里有计划中的改动,清单里的描述又缺乏代码上下文而读不准。TODO-in-Context 把待办以标记形式嵌在它所指的代码/文档元素处,同时闭合两个失效:
 
@@ -34,7 +34,7 @@ insert(就位插入) → perceive(其他流程感知) → collect(/speckit.todo 
 
 - **insert 就位原则**:块 MUST 插在它所指的确切代码/文档元素处(函数上方、语句旁、小节内),MUST NOT 堆放在文件头尾;内容写简短意图即可,上下文完成它。
 - **remove 与 retire 对称**:块的任务执行并验证后,同一步内把该块从源文件移除——落地的变更 + git 历史就是记录,留下过期标记等于让下轮 collect 重复规划已完成的工作。此规则与 Park Mode 的 retire-after-merge 对称(寄存记录合并落地后可删,合并点即真源)。
-- **执行与移除的边界**:只移除**本次执行并验证通过**的块;未执行、被否决(veto)的块留在原地,由报告与 memory 记录否决原因,下轮 collect 经 memory-recall 不再重复规划(该规则归 `.specify/templates/commands/todo.md` Collection Mode)。
+- **执行与移除的边界**:只移除**本次执行并验证通过**的块;未执行、被否决(veto)的块留在原地,由报告与 memory 记录否决原因,下轮 collect 经 memory-recall 不再重复规划(该规则归 `templates/commands/todo.md` Collection Mode)。
 
 ## 与 Park 寄存库的边界
 

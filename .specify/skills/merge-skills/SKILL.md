@@ -24,7 +24,7 @@ Goal anchor (Constitution Principle XIII — Better-Harness): consolidating two 
 
 Resolve two skills and one relationship before editing:
 
-- **`Source`** (merged *from*, then decommissioned): the source skill's reference. Its accepted forms, normalization order and failure semantics are owned by `.specify/shared/definitions/skill-reference-definitions.md` — reach them there and report the raw and the normalized identifier; this parameter declares only the name and its meaning. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
+- **`Source`** (merged *from*, then decommissioned): the source skill's reference. Its accepted forms, normalization order and failure semantics are owned by `shared/definitions/skill-reference-definitions.md` — reach them there and report the raw and the normalized identifier; this parameter declares only the name and its meaning. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
 - **`Target`** (merged *into*, survives and grows): the target skill's reference, resolved under the **same** owner reference named by `Source` — one reference covers both parameters, so the rule is not stated twice. It MUST already exist; if the user names a non-existent target, this is not a merge — redirect to `create-skills`.
 - **Merge intent**: full absorption (source disappears) is the default. If the user wants the source to keep existing, that is not this skill — route to `improve-skills` (borrow one capability) instead.
 
@@ -48,7 +48,7 @@ Convert the source's content into a neutral, readable intermediate (scratch, **n
 
 - Markdown source → usually already neutral; read directly.
 - HTML / rich formats → convert to Markdown with a deterministic tool (program-first — do not hand-transcribe). Example converter and the extraction recipes: [`./references/content-extraction.md`](./references/content-extraction.md).
-- Scripts / assets → inventory their behavior; scripts usually move into the target's `.specify/scripts/` largely intact (form is already code, not doc prose).
+- Scripts / assets → inventory their behavior; scripts usually move into the target's `scripts/` largely intact (form is already code, not doc prose).
 
 Land the intermediate under a scratch dir (e.g. `<project>/.specify/.tmp/merge-skills/merge-<source>/`); it is working material, cleaned up in Phase 8.
 
@@ -86,7 +86,7 @@ python3 ${SKILL_HOME}/scripts/coverage_probe.py <source-material-dir> <target-do
 
 Do not proceed to decommission while real content is still unaccounted for. Token classes and the lowercase-enum limitation, exit codes, the allow-file and both-direction recipes: [`./references/coverage-verification.md`](./references/coverage-verification.md).
 
-**Ask before decommissioning whether the merge changes the two layers' distribution.** Expected: the source's mechanism content moves into the target's skill assets. Not expected: a policy binding the source carried (a configuration value, an input or an output location) moving into the target body as if it were reusable logic — re-express it on the policy side instead. Judge each moved fact against `.specify/shared/definitions/mechanism-policy-definitions.md` § Misplacement Symptoms; a binding left with no value or two readings is a missing-policy stop that leaves every file in place.
+**Ask before decommissioning whether the merge changes the two layers' distribution.** Expected: the source's mechanism content moves into the target's skill assets. Not expected: a policy binding the source carried (a configuration value, an input or an output location) moving into the target body as if it were reusable logic — re-express it on the policy side instead. Judge each moved fact against `shared/definitions/mechanism-policy-definitions.md` § Misplacement Symptoms; a binding left with no value or two readings is a missing-policy stop that leaves every file in place.
 
 ### 6. Wire the target and record the inheritance
 
@@ -101,7 +101,7 @@ Make the target's metadata reflect its grown scope, and commit what the merge pr
 
 A merge that leaves the source wired still has two skills competing for the same triggers. Remove the source's **independent existence**, scoped by the Phase-1 classification:
 
-**Both layers before the decommission**: the actions below delete and rewrite wiring, so read the policy items this decommission depends on (which source, which landing point the retired name moves to), judge each one, and stop on any that is unstaked — the owner's read-judge-stop check, § Consumption Contract of `.specify/shared/definitions/mechanism-policy-definitions.md`. Run it **before** the first destructive action: a missing policy stops with every file still in place and no half-decommissioned source. **Policy missing** (the user never said which landing point the retired name takes) and **environment error** (named but unreadable) are different wordings with different follow-ups — never report one as the other.
+**Both layers before the decommission**: the actions below delete and rewrite wiring, so read the policy items this decommission depends on (which source, which landing point the retired name moves to), judge each one, and stop on any that is unstaked — the owner's read-judge-stop check, § Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`. Run it **before** the first destructive action: a missing policy stops with every file still in place and no half-decommissioned source. **Policy missing** (the user never said which landing point the retired name takes) and **environment error** (named but unreadable) are different wordings with different follow-ups — never report one as the other.
 
 - **Form carriers**: once Phase 5 passes, remove any raw source files that were staged into the target (prefer `git rm` — recoverable via history).
 - **Wiring & registration cleanup** (host-specific — **delegate, do not hardcode paths**): symlinks in agent load directories, registry rows, database records, and topology docs that made the source independently discoverable. In an environment with an agent-management skill/scripts (e.g. a `manage-agents`/`profiles-agents` front door), delegate this cleanup to it rather than reinventing per-agent paths.
@@ -120,7 +120,7 @@ Decommission playbook (classification → cleanup surfaces → boundary → topo
 - **Mirror sync** (when the host keeps a canonical↔mirror pair, e.g. spec-kit `skills/` ↔ `.specify/skills/`): sync with the host's own tool, never by hand — command and drift re-check in [`./references/decommission-and-wiring.md`](./references/decommission-and-wiring.md) `## Mirror sync`.
 - **Wiring health** (when decommission touched wiring): dangling-symlink scan returns zero, the target still resolves in every load directory, description-caching registries refreshed.
 - **Cleanup** the Phase-2 scratch — **only after** the record and baselines are committed and `provenance_check.py` exits `0`. A green probe is not enough: the allow file lives in scratch, so cleaning up on the probe alone destroys the only copy of the proof. Confirm both artifacts are tracked in the target, not left in a scratch or git-ignored workspace directory, then delete.
-- **Layer split after the merge**: `skill-shape.py` and `redline-check.py` do not judge how the two layers are distributed — the merged target MUST also pass `create-skills` § 6's `Mechanism / policy separation` item, reused by reference (`.specify/skills/create-skills/SKILL.md` § 6; criteria owner `.specify/shared/definitions/mechanism-policy-definitions.md`), never copied here.
+- **Layer split after the merge**: `skill-shape.py` and `redline-check.py` do not judge how the two layers are distributed — the merged target MUST also pass `create-skills` § 6's `Mechanism / policy separation` item, reused by reference (`skills/external/create-skills/SKILL.md` § 6; criteria owner `shared/definitions/mechanism-policy-definitions.md`), never copied here.
 - **Report**: what merged; coverage (tokens extracted / unresolved / allowed, with reasons); the committed record — path, rows verified vs. dropped-with-reason, baseline token counts per source; the standing re-verification command with its resolved host path; decommission scope — removed vs. deliberately left intact; declarations re-pointed; follow-up.
 
 ## Design Principles
@@ -158,7 +158,7 @@ Decommission playbook (classification → cleanup surfaces → boundary → topo
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -168,3 +168,4 @@ Decommission playbook (classification → cleanup surfaces → boundary → topo
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:merge-skills" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
+6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

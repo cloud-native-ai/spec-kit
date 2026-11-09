@@ -15,9 +15,9 @@ classification: external
 | 作用域 | 覆盖 | 细节入口 |
 |--------|------|----------|
 | **A — Spec Kit 框架下的 git workflow** | 框架级 git workflow 治理（不是开发者个人 git 习惯：SDD 驱动、周期维护、反馈消化、自动收口等无人值守机制同样受其约束），模型可选（见下方工作流模型菜单：单分支 / 双分支 / 临时分支 / MAIN/PRE/DEV 三层）、同步与合并纪律、选择性合并、`.gitexcludes`、强推纪律；状态面 `.specify/workflow/git.md` 托管块 | 本文件下方 Workflow + `references/` 的 `bootstrap-commands` / `health-check-commands` / `execute-commands` / `gitexcludes-subroutine` / `instructions-lookup` / `troubleshooting` |
-| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `.specify/scripts/git_fleet.py` |
-| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`.specify/scripts/record-bump.sh`；`assets/ledger-template.md` |
-| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`.specify/scripts/provision-git-server.sh` / `.specify/scripts/ssh_config_insert.py` |
+| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `scripts/git_fleet.py` |
+| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`scripts/record-bump.sh`；`assets/ledger-template.md` |
+| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`scripts/provision-git-server.sh` / `scripts/ssh_config_insert.py` |
 
 跨作用域硬约束：① 环境无关——主机名/绝对路径一律由调用方 inventory 或参数提供；② 高影响动作（写远端、强推等）的分级确认口径以本文件下方分级确认表与各作用域自身规则为准；③ 数据源唯一——分支信息只在 `.specify/workflow/git.md` 托管块，子模块台账只在 `${SKILL_WORKDIR}/submodule-edits.md`。
 
@@ -49,6 +49,9 @@ classification: external
 | `.specify/workflow/git.md` 缺失，或其托管块仍是 `None yet.` 占位行 | **Bootstrap** | 交互选择工作流模型与分支名、创建分支、初始化 `.gitexcludes`、写入 Git Workflow 块 |
 | 块已填写 且 无操作参数 | **全维度体检** | R1 观测 + R3 diff + 残差汇报，不自动收敛 |
 | 块已填写 且 有操作参数 | **定向收敛** | 用户指令并入期望态，执行具体 git 操作（自动尊重 `.gitexcludes`） |
+
+**具名操作 `closeout`（收口）** 是定向收敛里的一个具名操作，不是第二个引擎、也不是第四个作用域：块已填写 + 传入 `closeout` 参数即命中它，序列按托管块声明的模型推导，一次运行结束时执行（详见
+[`references/closeout-commands.md`](./references/closeout-commands.md)）。三条定位判据、三个（外加一个）具名拒绝结果、以及「谁的策略由谁声明」的边界都在该参考文件与其契约页里，本节不复述。
 
 **容忍带**：同步状态 `0 0`、`.gitexcludes` 内容语义等价、Git Workflow 块与实际分支名一致——均标记「已一致（容忍）」不触发收敛；仅 ahead/behind 分叉、分支缺失、排除路径仍被跟踪等实质偏离进入收敛建议。
 
@@ -247,11 +250,11 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ### 作用域 C — 子模块编辑（原 git-submodule-edit）
 
-两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `.specify/scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
+两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
 
 ### 作用域 D — 服务器置备（原 git-server-init）
 
-把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `.specify/scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `.specify/scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
+把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
 
 ---
 
@@ -295,6 +298,7 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 - `bootstrap-commands.md` — Bootstrap 调谐（Phase 0-1）命令序列：迁移、分支检测/创建、`.gitexcludes` 初始化。
 - `health-check-commands.md` — 全维度体检（Phase 2）命令序列：结构/同步/排除检查、维护报告模板。
 - `execute-commands.md` — 定向收敛（Phase 3）命令序列：前置校验、操作 A-G 命令。
+- `closeout-commands.md` — 具名操作 `closeout` 的命令面：声明读取、四种模型的序列推导、推送目标与只读角色复核、首次失败即停、报告字段（生命周期本身归 `.specify/shared/workflow/artifact-commit-step.md`）。
 - `troubleshooting.md` — 异常现象与应对策略（Known Issues）。
 
 - `fleet-workflow.md` / `fleet-inventory-schema.md` / `fleet-hazard-taxonomy.md` / `fleet-coordination-playbook.md` / `fleet-dependency-model.md` — 作用域 B（多环境协调）。
@@ -313,7 +317,7 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -323,3 +327,4 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:git-utils" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
+6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

@@ -1,6 +1,6 @@
 ---
 name: review-feature-quality
-description: Own the method of the two middle segments of `/speckit.review` — the artifact segment (Segment A) judges a slice's expected artifact set for completeness, internal consistency, traceability from requirement to task to success criterion to evidence, dependency and premise ownership, and acceptance honesty; the implementation segment (Segment B) judges the same slice's `base..head` delta against `requirements.md` and `tasks.md` for correctness, scope and regression and records the smoke command, exit code and evidence path. The expected-set denominator, the finding field set with its required `line`, the dimension lists and the `checked / expected` coverage-line shape live here, with the per-dimension detail in `references/artifact-and-implementation-review.md`. The skill owns no severity family: it emits the `P0`/`P1`/`P2` tokens owned by `review-sdd-process` and defines no level, and the composition that places it second and third is owned by `.specify/shared/workflow/acceptance-hardening.md` § Review Composition. Use this when the user mentions ["artifact review", "产物审查", "产物评审", "implementation review", "实现审查", "实现评审", "review artifacts", "review implementation", "expected artifact set", "期望产物集", "traceability review", "可追溯性审查", "/speckit.review"].
+description: Own the method of the two middle segments of `/speckit.review` — the artifact segment (Segment A) judges a slice's expected artifact set for completeness, internal consistency, traceability from requirement to task to success criterion to evidence, dependency and premise ownership, and acceptance honesty; the implementation segment (Segment B) judges the same slice's `base..head` delta against `requirements.md` and `tasks.md` for correctness, scope and regression and records the smoke command, exit code and evidence path. The expected-set denominator, the finding field set with its required `line`, the dimension lists and the `checked / expected` coverage-line shape live here, with the per-dimension detail in `references/artifact-and-implementation-review.md`. The skill owns no severity family: it emits the `P0`/`P1`/`P2` tokens owned by `review-sdd-process` and defines no level, and the composition that places it second and third is owned by `shared/workflow/acceptance-hardening.md` § Review Composition. Use this when the user mentions ["artifact review", "产物审查", "产物评审", "implementation review", "实现审查", "实现评审", "review artifacts", "review implementation", "expected artifact set", "期望产物集", "traceability review", "可追溯性审查", "/speckit.review"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/review-feature-quality/SKILL.md>"
 ---
@@ -13,7 +13,7 @@ Carry the **method** of `/speckit.review`'s two middle segments — the artifact
 implementation segment — and nothing else. The composition that places them second and third in one
 fixed order, the boundary sentences between the four segments, the expected-artifact derivation rule
 and the Acceptance Reality Check's clause are **not** stated here: they are owned by
-`.specify/shared/workflow/acceptance-hardening.md` § Review Composition, which this skill cites and never
+`shared/workflow/acceptance-hardening.md` § Review Composition, which this skill cites and never
 restates.
 
 This skill is the methodology carrier for those two segments, so the dimension sets below are the
@@ -30,7 +30,7 @@ line shape and the smoke record's fields — lives in
   diff is not an artifact.
 - **Arguments**: none of this skill's own. `$ARGUMENTS` guides review focus and is transported by the
   command; it selects, reorders and skips no segment.
-- **Composition**: `.specify/shared/workflow/acceptance-hardening.md` § Review Composition. This skill states no
+- **Composition**: `shared/workflow/acceptance-hardening.md` § Review Composition. This skill states no
   order of its own.
 
 ## Segment A — Artifact Review
@@ -48,7 +48,7 @@ what its stage requires? — and no other.
   different product, which is exactly why the set is derived per slice instead of being a constant
   list.
 - **Severity vocabulary**: `P0`/`P1`/`P2` — the family owned by
-  `.specify/skills/internal/review-sdd-process/SKILL.md` § Severity Vocabulary. This segment emits those three
+  `skills/internal/review-sdd-process/SKILL.md` § Severity Vocabulary. This segment emits those three
   tokens as a consumer and defines no level of its own; the meanings are written once, in the report
   template's severity table, and are not repeated here.
 - **Inputs**: the artifact set under `REQUIREMENTS_DIR`, the slice's `tasks.md` row set and its
@@ -56,14 +56,14 @@ what its stage requires? — and no other.
   plan/tasks tables name as evidence.
 - **Outputs**: the report slot `### 2.2 Artifact Review Segment` of `review.md` — the coverage line,
   one verdict row per expected member, and the findings — plus this segment's contribution to the
-  run's console conclusion. The slot's **shape** is owned by `.specify/templates/review-template.md`; this
+  run's console conclusion. The slot's **shape** is owned by `templates/review-template.md`; this
   section owns its content.
 
 ### The denominator is the expected set
 
 The denominator is the **expected set**, never the artifacts that happen to be on disk. The
 derivation rule — the union of what the slice's stage rules require and what its `plan.md`
-§ Project Structure lists — has exactly one statement: `.specify/shared/workflow/acceptance-hardening.md`
+§ Project Structure lists — has exactly one statement: `shared/workflow/acceptance-hardening.md`
 § Review Composition. A second statement of it, this file included, is a second definition and is a
 defect. What this section states is only the consequence a run has to enact:
 
@@ -120,11 +120,11 @@ The third segment of the fixed order. It answers one question — does this slic
   `references/artifact-and-implementation-review.md` § B.
 - **Judgment object**: this slice's implementation as the range `base..head` — the committed delta
   judged against `requirements.md` and `tasks.md` for correctness, scope and regression. `base` and
-  `head` resolution has exactly one route, `.specify/skills/internal/code-review/scripts/git-delta-review.sh`,
+  `head` resolution has exactly one route, `skills/internal/code-review/scripts/git-delta-review.sh`,
   whose `base` step owns the ordered resolution tiers, the closed trunk order and the run-start-fixed
   head. This segment implements no second base resolution and invents no branch-name default.
 - **Severity vocabulary**: `P0`/`P1`/`P2` — the same family, from the same owner
-  (`.specify/skills/internal/review-sdd-process/SKILL.md` § Severity Vocabulary). This segment defines no level
+  (`skills/internal/review-sdd-process/SKILL.md` § Severity Vocabulary). This segment defines no level
   either, and the two families present in a composed run never map onto each other.
 - **Inputs**: the resolved `base..head` range, `requirements.md`, `tasks.md`, the feature's smoke
   record, and the closure checker's `final_path` record when the run has one.
@@ -163,12 +163,12 @@ requirement still does not move that record, and the record does not move this s
   object is the committed code delta under its own six-level vocabulary, so a clean code record says
   nothing about whether the artifacts are complete or whether the requirement was delivered.
 - **The composition is not stated here.** What `/speckit.review` runs, in what order, and what each
-  part may answer belong to `.specify/shared/workflow/acceptance-hardening.md` § Review Composition. This skill
+  part may answer belong to `shared/workflow/acceptance-hardening.md` § Review Composition. This skill
   carries two segments' method and cites that section; it re-derives no order and no boundary
   sentence.
 - **No severity family is owned here.** `P0`/`P1`/`P2` belongs to
-  `.specify/skills/internal/review-sdd-process/SKILL.md`; the six-level code family belongs to
-  `.specify/skills/internal/code-review/SKILL.md`. This skill is a consumer of the first, a stranger to the
+  `skills/internal/review-sdd-process/SKILL.md`; the six-level code family belongs to
+  `skills/internal/code-review/SKILL.md`. This skill is a consumer of the first, a stranger to the
   second, and it maps, converts, weights and scores neither.
 - **The process skill stays single.** `review-sdd-process` keeps exactly one judgment object. This
   skill adds none to that body, does not live under its `references/`, and is not reached through it.
@@ -180,7 +180,7 @@ requirement still does not move that record, and the record does not move this s
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 8cb5a238739a — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
@@ -190,3 +190,4 @@ requirement still does not move that record, and the record does not move this s
 3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:review-feature-quality" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
+6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

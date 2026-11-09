@@ -1,6 +1,6 @@
 # SDD Routing Definitions — 授权路由与 SDD 调用分类
 
-**Owner（唯一所有者）**: 本文件 `.specify/shared/definitions/sdd-routing-definitions.md` 是「一次变更何时走 SDD、何时直接修改、何时必须裁定」这条路由规则的唯一所有者。它拥有**四项事实**，且只有本文件可以把它们写出来：
+**Owner（唯一所有者）**: 本文件 `shared/definitions/sdd-routing-definitions.md` 是「一次变更何时走 SDD、何时直接修改、何时必须裁定」这条路由规则的唯一所有者。它拥有**四项事实**，且只有本文件可以把它们写出来：
 
 | # | 事实 | 本文件落点 |
 |---|------|-----------|
@@ -11,7 +11,7 @@
 
 **引用纪律**: 其他任何位置——命令模板、技能、驱动入口、裁决记录形状、契约、测试——MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制上表任一项，MUST NOT 以表格 / YAML / JSON / 代码常量的形式再声明一份「输入 → 裁决」的映射；仓库中 MUST NOT 出现第二份路由数据文件或常量表。判据与两份合法重复的唯一真源是 `.specify/shared/guidelines/one-source-of-truth.md`。
 
-**机读面**: 唯一的读取者是只读 stdlib 引擎 `.specify/scripts/python/sdd-route.py`（动作 `route` / `authorize` / `golden`）。它在运行时解析本文件，MUST NOT 自带第二份取值域、裁决表、优先级或理由码；引擎的接口与退出码归 `contracts/routing-decision.md` C-28 所有。
+**机读面**: 唯一的读取者是只读 stdlib 引擎 `scripts/python/sdd-route.py`（动作 `route` / `authorize` / `golden`）。它在运行时解析本文件，MUST NOT 自带第二份取值域、裁决表、优先级或理由码；引擎的接口与退出码归 `contracts/routing-decision.md` C-28 所有。
 
 **字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是本特性切片的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。
 
@@ -21,24 +21,24 @@
 |------|--------|
 | 复杂度层级名、判定信号与思考深度处方 | `.specify/shared/guidelines/task-complexity-rubric.md` |
 | 质量门与确认门集合 | `.specify/shared/guidelines/confirmation-gates.md` 与宪法质量原则 |
-| Goal / Target 的身份、状态机与绑定 | `.specify/shared/definitions/goal-definitions.md` |
-| 驱动的阶段名册、状态脊、哨兵、U0–U6 | `.specify/skills/sdd-loop-driver/SKILL.md` |
-| 反嵌套义务与其派发前探针 | `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation；`.specify/skills/internal/run-agent/SKILL.md` |
+| Goal / Target 的身份、状态机与绑定 | `shared/definitions/goal-definitions.md` |
+| 驱动的阶段名册、状态脊、哨兵、U0–U6 | `skills/external/sdd-loop-driver/SKILL.md` |
+| 反嵌套义务与其派发前探针 | `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation；`skills/internal/run-agent/SKILL.md` |
 | 中立元数据键集（`[[STR-001]]` 的取值域与缺省） | `src/specify_cli/__init__.py` `NEUTRAL_AGENT_METADATA_KEYS` |
-| `team.md` frontmatter schema（`[[STR-010]]` 块映射） | `.specify/skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |
+| `team.md` frontmatter schema（`[[STR-010]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |
 
 ## Hierarchy
 
 控制层级只有一条，且有唯一一条边界：
 
-1. **Goal** 是最高层：它陈述一个目标与可验证的成功判据（身份与状态机归 `.specify/shared/definitions/goal-definitions.md`）。
+1. **Goal** 是最高层：它陈述一个目标与可验证的成功判据（身份与状态机归 `shared/definitions/goal-definitions.md`）。
 2. **Team** 绑定一个 Goal，编排 Agent 成员；Team 不重写 Goal，只把 Goal 拆成成员职责。
 3. **Agent** 执行一条职责（duty）；职责是路由与授权的计量单位——一次裁决对应一条职责，而不是一个文件或一次提交。
 4. **SDD 运行**（`sdd-loop-driver`）是从属执行路径：它由**已获有效授权的 Agent** 启动，为一条职责产出 SDD 工件链，并在 review 完成后交回 handoff。
 
 **边界**: 任何 SDD 运行 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team 或 roster。下层不得改写上层的定义；需要改变上层的动作 MUST 返回给上层执行者（Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
 
-**Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身 spec 内撰写与维护：Temporary Goal 在 requirements U4 后写入 `.specify/specs/<NNN-slug>/goal/`，Temporary Team 在 clarify+plan U4 后写入 `<spec-dir>/team/`。它是一条独立的、更低的作用域：MUST NOT 创建/重绑 Global Goal/Team，且 `.specify/goal/**` 与 `.specify/teams/**` 仍是运行与 child line 的 forbidden paths。Temporary 概念归 `.specify/shared/definitions/goal-definitions.md` 与 `.specify/skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。
+**Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身 spec 内撰写与维护：Temporary Goal 在 requirements U4 后写入 `.specify/specs/<NNN-slug>/goal/`，Temporary Team 在 clarify+plan U4 后写入 `<spec-dir>/team/`。它是一条独立的、更低的作用域：MUST NOT 创建/重绑 Global Goal/Team，且 `.specify/goal/**` 与 `.specify/teams/**` 仍是运行与 child line 的 forbidden paths。Temporary 概念归 `shared/definitions/goal-definitions.md` 与 `skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。
 
 ## Direct modification
 
@@ -66,9 +66,9 @@
 规则：
 
 - **引导与维护不同于开发流程**：`sdd-project-setup` 与 `sdd-house-keeping` 是框架的引导与维护路径，它们各自有既定职责，MUST NOT 被读作「轻量的 SDD 运行」，也 MUST NOT 取代开发流程。
-- **只有驱动构成 SDD 调用**：在嵌套入口契约下（`.specify/skills/sdd-loop-driver/references/nested-invocation.md`），只有 `sdd-loop-driver` 的调用算作一次 SDD 调用。
+- **只有驱动构成 SDD 调用**：在嵌套入口契约下（`skills/external/sdd-loop-driver/references/nested-invocation.md`），只有 `sdd-loop-driver` 的调用算作一次 SDD 调用。
 - **无 `.specify/` 结构的目标项目走引导路径**：当一次被分流为 SDD 的变更落到尚无 `.specify/` 结构的目标项目时，路由是**引导路径**（`sdd-project-setup`），MUST NOT 把 SDD 分流降级为直接修改——降级会让该变更永久失去工件链与 handoff，而这两件正是它被分流为 SDD 的原因。
-- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-010]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 .specify/scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。
+- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-010]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。
 
 ## Inputs
 
