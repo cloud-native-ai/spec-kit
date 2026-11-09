@@ -1,0 +1,107 @@
+# 093 — checklist-stage machine readings
+Captured: 2026-11-09T08:41Z (worktree /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-clarify)
+Subject: .specify/specs/093-concurrency-by-default/checklists/2026-11-09-requirements-quality.md
+Every number below is a command output from this run. Nothing here is estimated.
+
+## 1. Checklist structure (the properties the gates cannot judge — see checklist-gates § findings)
+
+1.1 item count and ids
+    cmd:  grep -c '^- \[ \] CHK' <checklist>
+    out:  44
+    cmd:  python3 (regex ^- \[ \] CHK(\d{3}) ; assert ids == CHK001..CHK044 in order)
+    out:  contiguous=True  (44 unique ids, no gap, no duplicate)
+
+1.2 traceability anchors
+    cmd:  python3 (count items whose tail carries a 'Req §…' or '[Gap]' marker)
+    out:  44 / 44 = 100 %  (methodology floor is 80 %)
+    cmd:  python3 (count items carrying a quality-dimension bracket)
+    out:  44 / 44
+    cmd:  python3 (items opening 'Verify|Test|Confirm|Check' + implementation behaviour)
+    out:  0   (methodology § Prohibited Patterns)
+
+1.3 duplicate ids and duplicate bodies (the property G-checklist-duplicate could not establish)
+    normalisation: strip the 'CHKnnn - ' list prefix, collapse whitespace, drop trailing punctuation, ASCII-fold
+                   (the rule the engine documents at doc-consistency-check.py :318-324)
+    out:  distinct ids = 44 ; duplicate id = 0 ; duplicate normalised body = 0
+
+1.4 verdict distribution (grepped, not counted by hand)
+    out:  pass 37 / fail 3 / 观察 2 / not_evaluated 1 / blocked-by F-093-004 1  (= 44)
+          fail ids: CHK002, CHK008, CHK009
+
+## 2. Requirements-side machine readings the checklist items rest on
+
+2.1 ids and counts
+    cmd:  grep -cE '^- \*\*FR-[0-9]{3}\*\*' requirements.md        out: 33  (FR-001..FR-033, contiguous)
+    cmd:  grep -cE '^- \*\*SC-[0-9]{3}\*\*' requirements.md        out: 12  (SC-001..SC-012)
+    cmd:  grep -c '^| `STR-[0-9]{3}`' requirements.md              out: 11  (STR-001..STR-011, each exactly once)
+    cmd:  python3 (SC **Path** markers)                            out: final = SC-001..SC-006 ; supporting = SC-007..SC-012
+    cmd:  python3 .specify/scripts/python/validate-requirements.py requirements.md
+    out:  status: ok — id-contiguous / doc-order / ref-resolvable / marker-count / dup-id / path-marker all pass (0);
+          319 lines, 45 definition rows, 11 shared strings, 0 error / 0 warning, exit 0
+
+2.2 Shared Strings — `Consumed by` citation, both directions (CHK039)
+    cmd:  python3 (for each STR row, check every named FR/SC definition row cites [[STR-NNN]] in its own body)
+    out:  11/11 rows satisfied
+          STR-001 -> FR-004 ✓ FR-031 ✓ SC-001 ✓      STR-002 -> FR-004 ✓
+          STR-003 -> FR-006 ✓ FR-007 ✓ FR-009 ✓ FR-031 ✓ SC-003 ✓
+          STR-004 -> FR-021 ✓ FR-022 ✓ SC-005 ✓      STR-005 -> FR-006 ✓ FR-008 ✓ SC-002 ✓ SC-006 ✓
+          STR-006 -> FR-031 ✓ FR-032 ✓ FR-033 ✓      STR-007 -> FR-029 ✓ SC-008 ✓
+          STR-008 -> FR-001 ✓ FR-031 ✓ SC-001 ✓      STR-009 -> FR-007 ✓
+          STR-010 -> FR-033 ✓ FR-007 ✓               STR-011 -> FR-021 ✓
+
+2.3 FR/SC outside requirements.md (no second definition surface)
+    cmd:  python3 (count '^\s*\*\*(FR|SC)-\d{3}\*\*' in the other spec *.md files)
+    out:  0 in every file
+
+## 3. Repository probes quoted by the items
+
+3.1 enumeration roots (CHK001, CHK002, CHK040)
+    ls -d skills/internal/*/   -> 38      ls -d skills/external/*/  -> 16
+    ls templates/commands/*.md -> 29      ls agents/*.md            -> 17
+    ls -d .specify/teams/*/    -> 12      ls -d .specify/goal/*/    -> 6
+    ls -d .specify/skills/*/   -> 16  (flat external projections; the trap form of CHK002: 38 + 16 counting different trees)
+    spec-local goal projection: .specify/specs/093-concurrency-by-default/goal/093-concurrency-by-default/goal.md -> 1 (CHK027)
+
+3.2 team territories (CHK028)
+    ls -d .specify/teams/*/ -> 12 ; of those, exactly two directories carry no 'territory' string in any of their .md
+    files (case-insensitive): demo-seat-dispatch, requirement-implement-monitor — the two the requirement names.
+
+3.3 agent capability list (CHK023)
+    cmd:  grep -l 'capability-tools' agents/*.md | wc -l     out: 17 of 17 definitions
+    cmd:  grep -h '^capability-tools:' agents/*.md | sort | uniq -c
+    out:      9 capability-tools: [Read, Grep, Glob, Bash]
+              7 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
+              1 capability-tools: [Read, Grep, Glob, Write]
+          → none declares a dispatch tool
+    cmd:  grep -l 'Never dispatch' agents/*.md | wc -l       out: 14
+          → the static field and the prohibition agree; only the 092 "6 packages parallel" claim disagrees (F-093-003)
+
+3.4 slot-cap sources cited by FR-014 (CHK015)
+    skills/external/sdd-loop-driver/templates/stage-team-preset.md:48  slot_cap_default: 6
+    skills/external/sdd-loop-driver/templates/stage-team-preset.md:49  slot_cap_ceiling: "min(6, the line's remaining concurrency allowance owned by Feature 064)"
+    skills/external/sdd-loop-driver/scripts/wp-gate.py:1865           parser.add_argument("--slot-cap-ceiling", type=int, default=4)
+    skills/external/sdd-loop-driver/references/decomposition-model.md:365  slot_cap_ceiling of min(effective_concurrency, 24) (temporary-team mode)
+    → four co-existing statements, as FR-014 says
+
+3.5 loop executors (CHK029) and member skills
+    sdd-house-keeping -> skills/external/sdd-house-keeping/ ; sdd-project-setup -> skills/external/sdd-project-setup/ ;
+    sdd-loop-driver -> skills/external/sdd-loop-driver/ ; run-team -> skills/internal/run-team/ ; run-agent -> skills/internal/run-agent/ ;
+    create-team -> skills/internal/create-team/ ; create-plan -> skills/internal/create-plan/ ; sanitize -> templates/commands/sanitize.md
+    (the two team slugs in §3.2 are team names, not skill directories — checked, absent from skills/, as expected)
+
+3.6 task-side readings used only to locate requirement gaps (CHK036, CHK037, CHK040, CHK041)
+    phase-body rows T001..T137: 137 unique, no gap, no duplicate (rows parsed before '## Dependencies & Execution Order')
+    package membership: 137/137 covered, 0 row in two packages (union of the five WP ranges parsed from the table)
+    validate-tasks.py and decomposition-check.py were NOT re-run in this stage (not in this stage's gate set); the
+    tasks-stage readings stand in test-evidence/validate-tasks.txt and test-evidence/decomposition-tasks.json.
+
+## 4. Framework observations raised by this stage (routed, not repaired)
+   O-1 doc-consistency-check.py's duplicate face is a constant pass for any subject under .specify/: is_excluded_path
+       (:279-290) tests the absolute path for a '.specify' component before the explicit --path is honoured, so
+       collect_records() emits 0 records and the comparison is empty. Measured directly on the mutant (0 records,
+       root = the worktree). 092 recorded the same face as "duplicate=pass".
+   O-2 doc-consistency-check.py's reader face evaluates only the two declaration markers (READER_MARKERS :44-47);
+       it neither resolves CHK anchors nor counts items, so an anchor-broken checklist passes it. 092 also recorded
+       "reader=pass" against a checklist; the pass means "the file declares its readers", not "the items are good".
+   O-3 the temp-root trap: an explicit --path under .specify/.tmp/ is swallowed by the same '.specify' exclusion
+       (O-1's root cause), so a scratch mutant placed in the sanction root cannot exercise the duplicate face at all.
