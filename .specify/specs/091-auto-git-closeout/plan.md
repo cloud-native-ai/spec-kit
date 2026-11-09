@@ -112,6 +112,7 @@ touches a constitution MUST). They are recorded below; `T-005` is the one that t
 - **discriminating_evidence**: 在夹具仓库里跑一次收口，对 `git log --name-only` 中被记录提交触达的路径取集合：结果二值——集合里出现任何 `exec-quant/records/*.json` 或 `memory/feedback/*.md` 原始记录文件（否）／只出现回执文件（是）。为“否”时回执读法成立。
 - **expected_sacrifice**: SC-001 Source ↓ “提交归属”只能断言到回执层，`git show <commit>` 不再直接展开记录正文，读者要多一跳才能看到被涵盖的记录。
 - **revision_trigger**: 若两个迭代内出现 ≥2 次“回执存在但无法据其定位被涵盖记录”的事故（路径或哈希失效）→ 重开，改为在回执中内联记录摘要并重建定位规则。
+- **refinement (2026-11-09, analyze-repair H-03)**: 本条记录没有重开——它的两个 pole 与判据都未被推翻，被推翻的是**字段形态**。「每条记录一个提交哈希」与「一次运行一个 `commit` 字段」不可能同时成立，除非固定提交的元数。裁定落点：`data-model.md` E-4 的 `commit` 改为 **per-row 字段**，`closeout-lifecycle.contract.md` C-2 固定「一次运行恰好一个记录提交」，不变量因此变为「同一回执内所有 `commit` 相等」（新增 V-15）。这不是两次读法之间的选择，而是把本条已裁定的读法补齐到可判形态，故记为 refinement 而非新的 T-006。
 
 ### T-002 — 标准授权落在托管块的一个值上，而不是扩一张破坏性白名单
 
@@ -165,9 +166,9 @@ touches a constitution MUST). They are recorded below; `T-005` is the one that t
 .specify/specs/091-auto-git-closeout/
 ├── plan.md              # This file
 ├── research.md          # Phase 0 — R1…R10 measurement record
-├── data-model.md        # Phase 1 — 6 entities (E-1…E-6), 14 validation rules (V-1…V-14)
+├── data-model.md        # Phase 1 — 6 entities (E-1…E-6), 17 validation rules (V-1…V-17)
 ├── quickstart.md        # Phase 1 — 8 scenarios (S-0…S-7)
-├── contracts/           # Phase 1 — 4 pages, 26 clauses
+├── contracts/           # Phase 1 — 4 pages, 32 clauses (26 at the plan baseline; +6 at analyze-repair)
 │   ├── closeout-declaration.contract.md
 │   ├── closeout-lifecycle.contract.md
 │   ├── closeout-executor.contract.md
@@ -305,8 +306,8 @@ Counts below were backfilled **after** the artifacts landed on disk (never pre-w
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Research | [`research.md`](research.md) | `R1`…`R10`, the measurement record behind § Phase 0 |
-| Data model | [`data-model.md`](data-model.md) | 6 entities (`E-1`…`E-6`), 14 validation rules (`V-1`…`V-14`) |
-| Contracts | [`contracts/`](contracts/) | 4 files, **26 clauses**: `closeout-declaration.contract.md` (C-1…C-7), `closeout-lifecycle.contract.md` (C-1…C-7), `closeout-executor.contract.md` (C-1…C-7), `closeout-verification.contract.md` (C-1…C-5) |
+| Data model | [`data-model.md`](data-model.md) | 6 entities (`E-1`…`E-6`), 17 validation rules (`V-1`…`V-17`) |
+| Contracts | [`contracts/`](contracts/) | 4 files, **32 clauses**: `closeout-declaration.contract.md` (C-1…C-7), `closeout-lifecycle.contract.md` (C-1…C-10), `closeout-executor.contract.md` (C-1…C-8), `closeout-verification.contract.md` (C-1…C-7) — 26 at the plan baseline, +6 at the analyze-repair round (lifecycle C-8/C-9/C-10, executor C-8, verification C-6/C-7) |
 | Quickstart | [`quickstart.md`](quickstart.md) | 8 scenarios (`S-0`…`S-7`) |
 | Feature ref | [`feature-ref.md`](feature-ref.md) | updated delivery surface (plan-refined), FR→contract map, SC→measurement map, disclosed rulings |
 

@@ -5,6 +5,8 @@
 **Status**: Draft
 **Flow Class**: execution
 **Flow Type**: -
+**Readers**: 框架维护者（修订 `.specify/workflow/git.md` 托管块、`git-utils` 技能与 `artifact-commit-step.md` 的作者）、无人值守机制的实现者、下游项目里决定「本项目的收口策略」的项目维护者——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
+**Reading scenario**: 在判定一次运行结束后的「提交 / 合并 / 推送」是否应按声明自动执行、以及在哪种声明取值下应当呈报而非执行时打开本规格，据 FR-001…FR-028 与 SC-001…SC-008 决定 `/speckit.plan` 与后续实现是否放行
 **Input**: User description: "我每次在作为修改执行都会要求执行:提交,合并,推送, 这应该是一套固定流程,不需要每次都手动触发,在框架中需要找到一个合适的切入点. 需要注意的是:不同的项目存在不同的git workflow, 这个动作需要和git workflow相结合"
 
 ## Related Feature *(mandatory)*
@@ -102,7 +104,7 @@
 - **托管块尚未填写**（`Workflow model` 仍是占位行）：收口 MUST NOT 猜测一个模型，报告「workflow 未声明」并把该步标为无法执行。
 - **`Closeout remotes` 为空或缺行**：视为「无可推送远端」，`commit+merge+push` 退化为只做本地提交与合并，并在报告里明说推送被省略及其原因。
 - **`Closeout remotes` 指向一个无法解析的远端名**：停下并报告该远端名，不猜测替代远端。
-- **只读上游是唯一列出的远端**：拒绝执行推送步骤（治理保留），报告「唯一可选远端为只读上游」。
+- **只读上游是唯一列出的远端**：拒绝执行推送步骤（治理保留），报告「唯一可选远端为只读上游」。**可达条件（analyze-repair L-01）**：本条只在**模型已声明**时可达——`Workflow model` 仍是占位行时，收口按「workflow 未声明」降级（见下方 Clarify 补记第一条），根本不会走到远端解析，故两条不会同时命中。二者产出不同的报告文本（「唯一可选远端为只读上游」vs「workflow 未声明」），不是同一情形的两种措辞。
 - **短命特性分支已存在于本地且属于其他线**：不得复用它，也不得删除它；停下报告命名冲突。
 - **推送被拒后用户手动解决并重跑**：第二次运行以正常的收口路径继续，不产生「重试循环」语义（重跑是使用者的显式动作）。
 - **无 git 仓库的目录**（standalone 技能部署）：收口步骤整体跳过并说明，不报错。
@@ -174,7 +176,7 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | `git` 命令行的本地分支/合并/推送能力（收口序列的实际执行面） | signed-contract | 宿主环境提供（本仓只消费，不打包） | 本特性实现期实测记录 `git --version` 输出，作为实现的运行时前提 | `pyproject.toml` | `/speckit.implement` 收口阶段在宿主 `git` 上跑通四个模型夹具仓库 | FR-010, FR-011, FR-012, FR-015 | EP-001 |
+| RS-001 | `git` 命令行的本地分支/合并/推送能力（收口序列的实际执行面） | signed-contract | 宿主环境提供（本仓只消费，不打包） | 本特性实现期实测记录 `git --version` 输出，作为实现的运行时前提；**可判定的最低能力集**由四条子命令形态给出：`push --force-with-lease`、`merge --no-ff`、`branch -d`、`ls-remote` 各跑通一次。任一形态不可用即 RS-001 判 `fail`，不以版本号字符串比较替代 | `pyproject.toml` | `/speckit.implement` 收口阶段在宿主 `git` 上跑通四个模型夹具仓库 | FR-010, FR-011, FR-012, FR-015 | EP-001 |
 | RS-002 | 托管块声明读取（本特性不改引擎；读取方是 `git-utils` 技能流程与契约测试） | in-scope | 本特性自身修订的 `git-utils` 技能与契约测试 | 不适用（无外部版本面） | `skills/external/git-utils/SKILL.md` | `tests/contract/` 下的收口契约测试在 `>=3.8` 解释器上通过 | FR-001, FR-002, FR-003, FR-009, FR-023 | EP-002 |
 | RS-003 | `pytest` 测试运行器（契约测试与夹具仓库断言） | signed-contract | CPython/pytest 上游（本仓只消费） | `pyproject.toml` 中既有的 `pytest` 依赖声明；本特性零新增第三方依赖 | `pyproject.toml` | `pytest -m contract` 通过，夹具仓库测试在 `>=3.8` 解释器上执行 | FR-024, FR-025 | EP-002 |
 
@@ -195,7 +197,7 @@
 - **SC-001**: 四个 workflow 模型各有一个夹具仓库收口后达到声明的终态（分支存在性、HEAD、提交归属逐项断言通过），四个全绿。 **Path**: final
 - **SC-002**: 托管块两行声明（[[STR-001]] 的四个取值 [[STR-003]] / [[STR-004]] / [[STR-005]] / [[STR-006]]，与 [[STR-002]]）的存在性、取值域与缺省 [[STR-006]] 由契约测试钉住；把策略值改成非法值或删掉该行时，测试转红。 **Path**: final
 - **SC-003**: 收口的失败路径可判定：在推送被拒与合并冲突两个夹具里，收口以非零退出、写出失败阶段与确切命令、且远端状态未被强推改写；两个夹具都转绿，且把「自动重试」注入实现时转红。 **Path**: final
-- **SC-004**: 破坏性边界未被扩大：以既有 `scan-confirmation-gates.py` 读数为对象，本特性落地后确认门条数不减少，且不存在任何面复制确认门清单纯文本（结构不变量断言）。本条是比较型封闭清单声明，基线取**本特性第一个实现提交之前**的扫描读数；2026-11-09 实测基线为 `blocking confirmation gates: 27`（`destructive: 20` / `governance_kept: 7`，`violations: 0`）。（澄清判据收紧见 C-11a。） **Path**: final
+- **SC-004**: 破坏性边界未被扩大：以既有 `scan-confirmation-gates.py` 读数为对象，本特性落地后确认门条数不减少，且不存在任何面复制确认门清单纯文本（结构不变量断言）。本条是比较型封闭清单声明，基线取**本特性第一个实现提交之前**的扫描读数；2026-11-09 实测基线为 `blocking confirmation gates: 27`（`destructive: 20` / `governance_kept: 7`，`violations: 0`）。本条 MUST NOT 重新断言该总数常量——既有 pin 的处置义务见 A20。（澄清判据收紧见 C-11a。） **Path**: final
 - **SC-005**: 无人值守入口收敛为单一机制：驱动者的收尾合并步、周期性维护与反馈消化都指向同一个收口 owner（指针存在性断言），且仓库中不存在第二个收口实现。 **Path**: final
 - **SC-006**: 本仓真实仓库上的一次干跑不推送、不改写远端，并产出与当前声明一致的序列证明（载于干跑记录，不另产核对产物；见 C-9a）。 **Path**: supporting
 - **SC-007**: 只读运行与「有工件无记录」两个分叉的行为各自被一个夹具断言到（跳过时有一行说明、不产生空提交；缺记录时仍合并推送并如实报告）。 **Path**: supporting
@@ -303,3 +305,15 @@
 - **A19（回执即消费终点，不与记录保留泳道争写）**: 记录文件由 `sanitize-materials` 的 `record-retention` 泳道在「存有回执 + 30 天宽限」后退役；收口因此只**新增**回执，不删除、不改写 `exec-quant/records/`、`memory/feedback/` 下的任何文件。回执本身按 Concurrent Development Safety 的「一文一件 + 时间戳命名」落盘。（C-10）
 - **A20（SC-004 的按名比较不得与既有 pin 互相拉扯）**: 已实测 `tests/contract/test_wrap_up_wording_gate_safe.py` 以 `== 27` 钉住确认门总数，注释亦把该数称为「owner fact = live scan total」。本特性的契约测试 MUST 断言「集合不缩小」而不重新断言总数常量；若实现期确需改动该计数，先由该 pin 的 owner 重裁，MUST NOT 顺手改数。这是 clarify 阶段发现的**既有 pin 张力**，移交 plan。（C-11a）
 - **A21（本特性的自指：C-1 的绿是「空的绿」这一发现本身）**: 本阶段一旦创建 `feature-ref.md`，`overlap-check.py` 的「无声明」分支就失效，该门从此检查本特性声明的交付面——这正是 C-1 所述缺口的**纠正性**修复。MUST 在证据中记录改前/改后两次判定，避免用改后的 `clear` 反推改前也成立。
+
+### Analyze-repair 补记（2026-11-09，无人值守）
+
+analyze 第一轮报 1 CRITICAL + 4 HIGH 阻断 implement。本轮为有界修复切片：**只改规格面，未触碰任何 owner 源码**。
+以下四项把 checklist 的 requirements-quality fail 项落到需求侧的可判形态；其余 CHK 项的处置见
+`test-evidence/analyze-repair-round1.md`。
+
+- **A22（CHK010 / FR-008 的判定形态）**: FR-008 的「不再自相矛盾」由**两半**判定，缺一半即不成立：(a) 被替换的旧句**可被定位**——判定对象是 owner 里「该步不推送」这一断言本身（按断言而非行号定位），故「改了但仍自相矛盾」会转红；(b) 旧断言在**本特性写入的每个面**上缺席。两半都是文件读取，不需要子进程。落点：`contracts/closeout-lifecycle.contract.md` C-7。
+- **A23（CHK012 / 「其他线未提交文件」的识别判据）**: 判据是**本运行自己的产出集**，不是工作树干净度、也不是 git 未跟踪状态：一条未提交路径若不在本次运行的工件/记录产出集内，即为「其他线」的路径，按上游偏差报告且绝不暂存。工作树干净仍可能夹带他人的文件，故干净度不能作为判据。落点：`contracts/closeout-lifecycle.contract.md` C-5 第三行 + `contracts/closeout-executor.contract.md` C-6。
+- **A24（CHK017 / `--force` 与 `--force-with-lease` 的两读法裁定）**: 采纳**读法 (b)**——`--force` 在任何情形下都禁止；`--force-with-lease` 在**该动作自身通过其确认门**后允许。需求句的「只允许 `--force-with-lease` 形态（禁止 `--force`）」本意即为 (b)：若连确认门通过后都禁止，FR-012 的「按确认门停下确认」就永远没有成功分支，成为一条空条款。落点：`contracts/closeout-executor.contract.md` C-5、`data-model.md` V-10。
+- **A25（CHK036 / RS-001 的最低能力集）**: RS-001 的 `Pin` 从「记录版本输出」升级为**能力集判据**（`push --force-with-lease` / `merge --no-ff` / `branch -d` / `ls-remote` 各跑通一次）。理由：版本号字符串与能力不可互推，而收口真正依赖的是这四条形态；用版本下限会把判据锚在一个与结论无因果关系的量上。落点：上方 RS-001 行的 `Pin` 列。
+- **A26（CHK009 / 「记录」成员集合的定义点）**: 「记录」的成员集合是**该运行写入记录型 wrap-up 的各类引擎的产出**，其封闭枚举与各自的读法指针由 `closeout-lifecycle.contract.md` C-3 的回执行承载，本文不再复述枚举——一处定义、其余指针。落点：C-2（一次运行恰好一个记录提交）+ C-3（回执逐条列出 `covered[]`）。

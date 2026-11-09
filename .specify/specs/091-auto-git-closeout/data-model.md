@@ -5,7 +5,14 @@
 This feature stores almost nothing: a declaration lives in a file the project already owns, a receipt is written once
 per run, and everything else is a derived sequence that exists only for the duration of one invocation. Six entities,
 each naming its **carrier** (the file that holds it) and the validation rules a guard or the executor asserts. Clause
-identifiers refer to the four pages under `contracts/`.
+identifiers refer to the four pages under `contracts/`; the value→authority mapping is owned by
+`closeout-executor.contract.md` C-8 and is not restated here.
+
+**The fixture roster lives in one place.** E-6 names the four fixture repositories; SC-001, SC-002 and SC-003 in the
+requirements file describe what each proves. Neither repeats the other's content: the roster (which fixtures exist) is
+E-6's, and the criterion text (what a green run means) is the requirements file's. M-09 flagged a duplication between
+them; the settlement is that this model names the roster and points at the criteria, and the requirements file's
+`Measurement Sources` points back here for the roster instead of listing it again.
 
 ## Entities
 
@@ -62,16 +69,32 @@ The one durable artifact a close-out writes, and the answer to FR-028. One file 
 |-------|---------|------------|
 | `kind` | the literal receipt kind, distinguishing it from the retention engine's `speckit.record-retention.receipt` | must not reuse the retention key |
 | `run_id` | the run the receipt belongs to | one receipt per run |
-| `commit` | the hash of the records commit this receipt covers | full 40-hex, as printed by `git rev-parse HEAD` |
-| `covered[]` | one row per record file the commit carried: `path`, `action` (`included` / `kept` / `handed-to-consumption`) | paths repository-relative; a path MUST NOT appear twice |
+| `covered[]` | one row per record file the commit covered: `path`, `action` (`included` / `kept` / `handed-to-consumption`), `commit` | paths repository-relative; a path MUST NOT appear twice |
+| `covered[].commit` | the hash of the records commit that carried **this row's** record file | full 40-hex, as printed by `git rev-parse HEAD`; within one receipt all values are equal (see below) |
 | `reader_pointer` | the consuming engine's read rule, **by path/anchor**, never copied text | e.g. the retention engine's own action names |
 | `created_at` | ISO-8601 UTC | sort order = creation order |
+
+**The commit field is per row and single-valued per run.** H-03 named a real inconsistency: a per-record hash obligation
+and a single `commit` field cannot both hold if a run could split its records across commits. The settlement is to make
+the field per-row and to fix the arity in the owning clause — `closeout-lifecycle.contract.md` C-2 states that one run
+produces exactly one records commit, so every row of one receipt names the same hash. Per-row placement is chosen over a
+head-level field because it keeps a future "a class settled in a later commit" expressible without a schema change and
+because it makes the receipt self-describing row by row. The invariant a guard asserts is **all `commit` values within
+one receipt are equal**, never the field's arity.
 
 Rules: V-11 (written once — a second close-out of the same run creates a new file, never an edit), V-12 (a record file
 appears in at most one receipt's `covered[]` for a given commit), V-13 (the receipt itself is committed in the same
 commit it names, so the commit is self-describing). Carrier: a timestamp-named file under the close-out receipt
 directory — the directory path is a `tasks` decision against the sanctioned record root, and the layout rule (one file
 per run) is the binding constraint, not the literal name.
+
+**The directory is decidable by its parent, not by a new store.** The receipt lands one level under
+`.specify/memory/retention/`, which `record-retention.py` already owns as its holding root; the sibling directories
+under it are the retention engine's own. This feature therefore adds **no new top-level store** — the test a reader
+applies is "does the parent already exist and already hold this kind of file?", and the receipt passes it because the
+retention family is exactly "one file per entry under a holding root". M-07 flagged that the parent currently holds only
+`plans/`; measured, that is a statement about today's *population*, not about the parent's *ownership*, and a store's
+identity is decided by its owner rather than by which subdirectories happen to exist yet.
 
 ### E-5 — Close-out report（收口报告）
 
@@ -121,22 +144,42 @@ share a path because each test gets its own root.
 | V-12 | A record path appears in at most one receipt for a commit | C-3 |
 | V-13 | The receipt is committed in the commit it names | C-3 |
 | V-14 | Every report field is present; an unrun step is stated, not omitted | `closeout-lifecycle.contract.md` C-4; SC-007 |
+| V-15 | Within one receipt, every `covered[].commit` is the same hash | C-2 (one records commit per run) + C-3 |
+| V-16 | The declared strategy value maps to exactly one authorized action set | `closeout-executor.contract.md` C-8 (the value→authority table; it is the only carrier) |
+| V-17 | The model axis and the remote axis are judged independently; a declared model with no pushable remote degrades the push step only | `closeout-declaration.contract.md` C-4, C-5 |
 
 ## State transitions
 
-One run, one close-out, four terminal states:
+One run, one close-out. The terminal states are a **closed set of five**, and every edge case the requirements file
+lists resolves into exactly one of them — M-04 flagged that four terminal states were named against five edge cases, so
+the two that had no home are now named here:
+
+| Terminal state | Reachable when | Receipt | Commit |
+|----------------|----------------|---------|--------|
+| `skipped-and-stated` | read-only run: no artifact and no record | none | none (no empty commit) |
+| `presented` | strategy is `ask` / absent | none | derived, not executed |
+| `done` | records produced, receipt written, commit → merge → push all reached | one | artifact commit + one records commit |
+| `degraded` | model declared but no pushable remote, or block unusable (row 2 / row 1 of the declaration table) | one when records exist | local commit and merge only; push `skipped (<why>)` |
+| `stopped-at-first-failure` | any stage fails: conflict, non-fast-forward, rejected push | one when records exist | as far as it got; NO retry, NO force |
 
 ```text
 run ends (artifacts committed)
    ├─ read-only, no artifacts, no records ──► skipped-and-stated        (no receipt, no empty commit)
    ├─ artifacts, no records ─────────────────► merge+push executed      (report says "no records commit")
    ├─ records produced ──────────────────────► receipt written ──► commit ──► merge ──► push ──► done
+   ├─ declared model, no pushable remote ────► degraded                  (push skipped with its reason)
    └─ any stage fails ───────────────────────► stopped-at-first-failure
                                                  (report: stage + exact command; NO retry, NO force)
 ```
 
-`ask` / absent strategy is not a fifth state: the sequence is derived and **presented**, and the run ends
-`presented-and-waited` without executing — a report, never a block (clarify C-3 / A7).
+`ask` / absent strategy is `presented`: the sequence is derived and **presented**, and the run ends without executing —
+a report, never a block (clarify C-3 / A7). It is not `degraded`, because nothing is missing — the project simply has not
+authorized the action.
+
+**Why `degraded` is a terminal state and not a fifth edge case.** The requirements file's edge cases "`Closeout remotes`
+empty or absent", "unresolvable remote name", "read-only upstream is the only listed remote" and "block unusable" all end
+a run without pushing, and all still merge what exists. Naming the state once — rather than leaving each edge case to
+invent its own outcome wording — is what keeps the outcome set closed and the report's `push[]` vocabulary finite.
 
 ## What this model deliberately does not contain
 

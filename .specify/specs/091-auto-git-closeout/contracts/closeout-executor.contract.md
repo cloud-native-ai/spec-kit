@@ -10,13 +10,31 @@ skill's existing entry modes is determined by the two axes the skill already use
 present?): close-out is the "filled + argument" case and joins the existing directed-convergence operations. The
 feature introduces no second skill, no second engine, and no new dispatch table.
 
-(FR-009; clarify C-6)
+**The non-goals are an owned negative assertion, not a preamble.** Each item the feature forbids is discharged here, by
+a statement whose subject is the absence of the thing:
+
+| Non-goal | What the guard asserts is absent |
+|----------|----------------------------------|
+| a new `/speckit.*` command | no command surface is added for close-out; the operation lives in the existing skill |
+| a daemon or scheduler | no process, timer or watcher is introduced; every invocation is caller-initiated |
+| a second branch registry | no store other than the managed block records branch facts (see `closeout-declaration.contract.md` C-2) |
+| an automatic force-push | the sequence contains no forced update that runs without its own gate (C-5) |
+| code-host PR/MR automation | no remote API is contacted, so no PR/MR state participates in any decision (A17) |
+
+The first three are file-and-search assertions over the repository; the last two are the behavioural arms C-5 already
+owns. This clause is where the *set* is owned, so a reviewer reads one place to know what the feature refuses to be.
+
+(FR-009, FR-027; clarify C-11c)
 
 **C-2** — Undeclared and unusable states are refused, not guessed.
 
 The operation refuses to derive a sequence when the model is undeclared, the block is missing, or the directory is not a
 git repository. Each refusal is a distinct, named outcome with its own reason in the report. Refusal is the correct
 behaviour: a guessed model is how a close-out pushes the wrong branch.
+
+These three are the whole set of refusals, and they are exactly the three states
+`closeout-declaration.contract.md` C-5 tabulates. A fourth "refuse because something looked odd" is not authorised: an
+unrecognised condition is reported with the state it was read as, not promoted into a new refusal kind.
 
 (FR-009, FR-016)
 
@@ -67,4 +85,33 @@ The command surface for close-out resolves `<remote>` from `Closeout remotes` af
 project whose upstream is the default-named remote cannot be pushed by accident. This rule applies to the new close-out
 reference; pre-existing examples elsewhere in the skill are reported, not silently rewritten.
 
+The substitution token is the literal `<remote>`, and the guard asserts on that token rather than on a description of
+it: a surface that says "the remote is substituted" but writes a concrete name still fails.
+
 (FR-002, FR-013; plan finding F-1)
+
+**C-8** — The strongest strategy value is settled by a runnable transition, not by the declaration's prose.
+
+`commit+merge+push` is the only value that authorizes a push without a per-run decision, and the sentence saying so
+already exists (`closeout-declaration.contract.md` C-7). What a reader can *check* is the transition it implies, so the
+carrier is behavioural and lives here:
+
+| Declared value | Authorized action set | Transition |
+|----------------|-----------------------|------------|
+| `commit+merge+push` | routine steps of the derived sequence, push included | `derived → executed` |
+| `commit+merge` | commit and merge, no push | `derived → executed`, push step `skipped (not authorized)` |
+| `commit-only` | commit, no merge, no push | `derived → executed`, merge and push `skipped (not authorized)` |
+| `ask` / absent | none | `derived → presented`, run ends, nothing executed |
+
+"Routine" is the boundary: an action outside the four models' declared sequences is never routine, whatever the value
+says. The table is the **only** place the value→authority mapping is written; C-7 of the declaration page says *what*
+the strongest value authorizes and this table says *what happens* under each value, by pointer and not by a second
+wording.
+
+**Why a transition rather than a sentence.** A placeholder row that merely restates "the strongest value authorizes the
+routine steps" is unverifiable — it can be true of any implementation. A transition can be exercised: the guard drives
+each of the four values through the derivation and asserts the terminal state above. That is also why the declaration
+page carries no runnable arm: the declaration is text a project edits, while the transition is behaviour this feature's
+guard owns.
+
+(FR-017, FR-019; clarify C-11c)

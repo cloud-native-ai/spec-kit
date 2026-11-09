@@ -89,49 +89,61 @@ not by a path token, so the checker sees no claim:
 Every functional requirement is discharged by a named clause; a clause column empty for an FR would mean an
 unplanned requirement.
 
+**Re-verified at the analyze-repair round (2026-11-09).** C-01 measured that FR-020 / FR-021 / FR-022 / FR-027 were
+cited by zero clause — the four map rows below pointed at clauses whose *subject* was something else (a lifecycle
+position, a delivery row). M-08 found six more rows of the same shape. The map is now checked mechanically rather than
+by reading: `account-clause-coverage.py --spec-dir` reports **FR claimed 28 / FR uncovered 0** by reading each clause's
+citation group, so a row that stops being true turns the account red. The check reads a clause's **last
+FR-containing parenthetical**, which is why each clause ends with its citation group rather than mentioning ids earlier
+in the body.
+
 | FR | Discharging clause(s) |
 |----|-----------------------|
 | FR-001 | `closeout-declaration.contract.md` C-1, C-3 |
-| FR-002 | C-1, C-4, C-7; `closeout-executor.contract.md` C-7 |
+| FR-002 | C-1, C-4; `closeout-executor.contract.md` C-7 |
 | FR-003 | `closeout-declaration.contract.md` C-2, C-6 |
 | FR-004 | C-1 (both surfaces: the shipped asset and this project's instance) |
 | FR-005 | `closeout-lifecycle.contract.md` C-1 |
-| FR-006 | C-2, C-3 |
+| FR-006 | C-2 (one records commit, per-class coverage) |
 | FR-007 | C-4, C-5 |
-| FR-008 | C-7 |
+| FR-008 | C-7 (the old sentence named, and absent from every surface) |
 | FR-009 | `closeout-executor.contract.md` C-1, C-2 |
 | FR-010 | C-3 |
 | FR-011 | C-5 |
-| FR-012 | C-4, C-5; `closeout-lifecycle.contract.md` C-6 |
+| FR-012 | C-5; `closeout-lifecycle.contract.md` C-6 |
 | FR-013 | `closeout-declaration.contract.md` C-4; `closeout-executor.contract.md` C-7 |
 | FR-014 | `closeout-lifecycle.contract.md` C-5; `closeout-executor.contract.md` C-6 |
 | FR-015 | `closeout-executor.contract.md` C-4 |
 | FR-016 | C-2; `closeout-declaration.contract.md` C-5 |
-| FR-017 | `closeout-declaration.contract.md` C-7; `closeout-lifecycle.contract.md` C-6 |
+| FR-017 | `closeout-declaration.contract.md` C-7; `closeout-executor.contract.md` C-8; `closeout-lifecycle.contract.md` C-6 |
 | FR-018 | `closeout-declaration.contract.md` C-7; `closeout-lifecycle.contract.md` C-6 (both reference the owner, neither restates it) |
-| FR-019 | `closeout-declaration.contract.md` C-3 |
-| FR-020 | `closeout-lifecycle.contract.md` C-1, C-6 (the shared step the unattended mechanisms call); delivery row 7 carries the contingent pointer fix |
-| FR-021 | `closeout-lifecycle.contract.md` C-1 + delivery row 6 (registry row) and row 11 (compiled faces, generated) |
-| FR-022 | delivery row 8 (contingent pointer, default no edit) |
-| FR-023 | `closeout-verification.contract.md` C-1, C-2 |
+| FR-019 | `closeout-declaration.contract.md` C-3; `closeout-executor.contract.md` C-8 |
+| FR-020 | `closeout-lifecycle.contract.md` C-8 (the one step, reached by pointer; no second implementation) |
+| FR-021 | `closeout-lifecycle.contract.md` C-9 (faces rendered by the registry, never authored) |
+| FR-022 | `closeout-lifecycle.contract.md` C-10; `closeout-verification.contract.md` C-7 (the measured pointer duty) |
+| FR-023 | `closeout-verification.contract.md` C-1 |
 | FR-024 | C-2, C-3 |
 | FR-025 | C-5 |
-| FR-026 | C-4 |
-| FR-027 | `closeout-executor.contract.md` C-1 (no second skill/engine) + the SC-004 negative structural assertion in C-4 |
-| FR-028 | `closeout-lifecycle.contract.md` C-3 |
+| FR-026 | C-4, C-6 (the closed-set claim with its three named elements) |
+| FR-027 | `closeout-executor.contract.md` C-1 (the five non-goals as an owned negative assertion) |
+| FR-028 | `closeout-lifecycle.contract.md` C-3 (receipt, never a rewrite) |
+
+**Clause count after the repair: 32** — declaration C-1…C-7 (7), lifecycle C-1…C-10 (10), executor C-1…C-8 (8),
+verification C-1…C-7 (7). The 26-clause reading in `plan.md` and `tasks.md` is the pre-repair state; the green partition
+is re-cut in `tasks.md` § Green Partition so each of the 32 clauses is claimed exactly once.
 
 ## Plan refinement — SC → measurement map
 
 | SC | Measurement | Carrier |
 |----|-------------|---------|
-| SC-001 | four fixture repositories, end-state assertions (branches, HEAD, remote contents) | `closeout-verification.contract.md` C-2 |
+| SC-001 | four fixture repositories, end-state assertions (branches, HEAD, remote contents); the roster itself is `data-model.md` E-6's, never repeated here | `closeout-verification.contract.md` C-2 |
 | SC-002 | declaration rows + value domain read from both surfaces; illegal value / deleted row mutations | `closeout-declaration.contract.md` C-1, C-3; verification C-1 |
 | SC-003 | two failure fixtures (push rejected, merge conflict) + an injected-retry mutation | verification C-3 |
-| SC-004 | confirmation-gate scan compared against a same-run baseline **by name**, plus "no surface copies the list" | verification C-4 |
-| SC-005 | pointer existence from each unattended mechanism, plus a negative search for a second close-out implementation | `closeout-lifecycle.contract.md` C-1; verification C-1 |
+| SC-004 | confirmation-gate scan compared against a same-run baseline **by name**, plus "no surface copies the list" | verification C-4, C-6 |
+| SC-005 | pointer existence from each unattended mechanism, plus a negative search for a second close-out implementation | `closeout-lifecycle.contract.md` C-8; verification C-7 |
 | SC-006 | the dry-run record on this repository (no push, no remote change) | verification C-5; `quickstart.md` S-7 |
-| SC-007 | the two wrap-up forks asserted separately (skip-with-one-line; records-free merge+push tells the truth) | `closeout-lifecycle.contract.md` C-5 |
-| SC-008 | the three named elements inside the SC-004 test, plus two mutation arms | verification C-4 |
+| SC-007 | the two wrap-up forks asserted separately (skip-with-one-line; records-free merge+push tells the truth) | `closeout-lifecycle.contract.md` C-4, C-5 |
+| SC-008 | the three named elements inside the SC-004 test, plus two mutation arms | verification C-4, C-6 |
 
 ## Plan refinement — disclosed rulings
 
@@ -184,5 +196,5 @@ Three rulings were made while planning and are recorded so a later stage does no
 |-------|-------|----------|
 | requirements | done | requirements file |
 | clarify | done — 16 adjudications (C-1…C-16), FR 28 / SC 8, 3 edge cases, 9 assumptions added; the overlap check run before **and** after this file | requirements Clarifications, this file |
-| plan | **this stage** — research (R1…R12), data model (6 entities / 14 rules), 4 contract pages (26 clauses), 8 quickstart scenarios, 5 decision-tension records, 7 execution premises; delivery surface refined (rows 4, 8, 9, 10) | plan.md, research.md, data-model.md, contracts/, quickstart.md, this file |
-| tasks / checklist / analyze / implement / review | not started | — |
+| plan | done — research (R1…R12), data model (6 entities / 17 rules), 4 contract pages (**32 clauses after the analyze-repair round; 26 at the plan baseline**), 8 quickstart scenarios, 5 decision-tension records, 7 execution premises; delivery surface refined (rows 4, 8, 9, 10) | plan.md, research.md, data-model.md, contracts/, quickstart.md, this file |
+| tasks / checklist / analyze / implement / review | analyze round 1 done (1C + 4H blocking) → **analyze-repair done 2026-11-09** (C/H resolved, 32 clauses, FR 28/28) → analyze round 2 pending | `test-evidence/analyze-round1-findings.md`, `test-evidence/analyze-repair-round1.md` |
