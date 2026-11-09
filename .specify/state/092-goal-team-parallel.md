@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch analyze-repair (main tree), then analyze round 2
+next_action: dispatch analyze round 2 (main tree) against the repaired artifacts
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
   non_goals: [新增 /speckit.* 命令, 第二个 goal/team 引擎, 破坏性迁移旧数据（archive-not-delete）, 改变 SDD 阶段链与哨兵]
@@ -52,6 +52,7 @@ gates: |
   tasks U4: pass — 80 rows / 7 packages; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors/1 warning; commit 00c36d9c
   checklist U4: pass — 40 items; both gates pass with red-first proof; 8 fail rows are requirements defects for analyze; commit d8ec0a1e
   analyze U4: conditional — report delivered; 1 CRITICAL + 5 HIGH block implement; repair brief written; next = analyze-repair
+  analyze-repair U4: pass — C-01/H-01…H-05/M-01…M-05/L-01 closed, L-02 = features record refreshed, L-03 residual; validate-requirements 0/0; account-clause-coverage FR 42/42; validate-tasks 0 error / 1 disclosed warning; pre-analyze 3 stages pass (fr=42); validate-decision-tensions ok (7 records); decomposition --mode tasks proceed (fr=42/tasks=80); next = analyze round 2
   tasks U4: pass — 80 rows / 7 packages / 111 clause attributions; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors / 1 disclosed warning
   checklist U4: pass — 40 items (100% traceable, soft cap 40 met); G-checklist-reader pass (mutation probe -> fail, exit 1); G-checklist-duplicate pass; validate-requirements ok 0/0; 8 fail rows are requirements findings for analyze
 wrapup: requirements records committed in af1fcae3; spec-local goal created; tasks stage records in test-evidence/ (+ coverage-baseline.txt); run-determination + exec-quant recorded; checklist stage: test-evidence/checklist-readings-2026-11-09.txt + checklist-gates-2026-11-09.txt + run-determination-checklist.txt; run-determination + exec-quant + feedback recorded for /speckit.checklist
