@@ -1,0 +1,75 @@
+# P3 fix-loop evidence — checkpoint protocol published-state check (F2 / REC-W1)
+
+Date: 2026-11-09 · Branch: 091-fix-p3 · Worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/091-fix-p3
+Scope: skills/external/sdd-loop-driver/references/checkpoint-protocol.md (source) + .specify/skills/sdd-loop-driver/references/checkpoint-protocol.md (generated mirror)
+
+## 1. The premise (F2) measured in this worktree
+
+$ for r in github gitlab gitee; do git ls-remote "$r" refs/heads/master; done
+  github  e06fcc52f5f4a3c4f025b49806451ed7c6cfbc33  refs/heads/master
+  gitlab  ec17c599cb04c8acd4525254e2cdbd9d6e84a980  refs/heads/master
+  gitee   e06fcc52f5f4a3c4f025b49806451ed7c6cfbc33  refs/heads/master
+  local    ec17c599cb04c8acd4525254e2cdbd9d6e84a980  refs/heads/master (local)
+
+Reading: gitlab master == local master == ec17c599 (the corrected trunk); github and gitee
+master == e06fcc52 (the moved-from commit). Two of three declared remotes diverge from the
+corrected trunk. The divergence is exactly the state F2 reports, reproduced at the time of
+this fix, so the premise is true and not stale.
+
+## 2. sync-mirrors verdict
+
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver/
+  DIFF .specify/skills/sdd-loop-driver/references/checkpoint-protocol.md
+  sync  skills/external/ -> .specify/skills/ (1 files)
+  EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver/
+scope --only: skills/external/sdd-loop-driver
+ok    skills/external/ == .specify/skills/ (34 files, byte-identical)
+  EXIT=0
+
+## 3. Related contract tests
+
+$ python3 -m pytest tests/contract/test_checkpoint_protocol.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_sdd_loop_driver_skill.py -q
+  35 passed in 17.27s  EXIT=0
+
+$ python3 -m pytest tests/contract -q -k "checkpoint or driver"
+  5 failed, 416 passed, 6042 deselected in 28.04s  EXIT=1
+
+The five failures are PRE-EXISTING and OUTSIDE this package's territory: four
+shared/declarations/facts/*.yaml mirror pairs and shared/workflow/feedback-step.md, plus the
+wrapup-accounting arm that compares the same shared/ pair. Measured against HEAD (before this
+package's change) all five pairs already differ:
+
+  DRIFT-AT-BASE  shared/declarations/facts/driver-completion-sentinels.yaml
+  DRIFT-AT-BASE  shared/declarations/facts/driver-gate-roster.yaml
+  DRIFT-AT-BASE  shared/declarations/facts/driver-stage-artifacts.yaml
+  DRIFT-AT-BASE  shared/declarations/facts/driver-stage-sequence.yaml
+  DRIFT-AT-BASE  shared/workflow/feedback-step.md
+
+This package's own subtree (skills/external/sdd-loop-driver/) is byte-identical (section 2),
+and every failure predates the change, so none is attributable to it. The drift belongs to the
+shared/ subtree, which this package is not permitted to write, and is reported as an anomaly
+rather than repaired here.
+
+## 4. What changed
+
+checkpoint-protocol.md gains one owned section, '## The published-state check (5b)', plus:
+  - a scope paragraph naming when part 5b fires (part 5 recorded correction-applied);
+  - a Rules entry making the check mandatory at the checkpoint and at closure.md;
+  - a '## 5b. Published-state check' block in the minimal shape;
+  - a dated review-disposition record naming which findings this file answers.
+
+The rule itself (declaration rows, the push sequence, stop-on-first-failure, no force) is
+reached by pointer to .specify/workflow/git.md and the close-out command surface; this file
+spells out no remote name and no branch name of its own.
+
+## 5. Residual risk
+
+- The check is protocol text: it obliges the driver and closure.md to act, but no program
+  enforces part 5b's presence. A checkpoint written without it is a defect a reader catches,
+  not a red test. A contract test pinning the section would close this; it is outside P3's
+  permitted file set (tests/), so it is left to the owning package.
+- The live divergence (github/gitee master at e06fcc52) is NOT repaired by this package: this
+  package publishes the rule that makes the repair mandatory, and its own close-out runs under
+  a no-push instruction. The residue remains open until a run authorized to push executes it.
