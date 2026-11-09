@@ -1,16 +1,16 @@
 # Line State — 091-auto-git-closeout
 
 <!-- loop-state:begin -->
-spine_state: blocked
+spine_state: running
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
-stage: review
+stage: closure
 stage_started_at: 1794202090
 stage_deadline_epoch: 1794212890
 stage_base_commit: 9d5acb7a
 attempt: 1
 retry_limit: 3
-last_verdict: "Review complete — segments: process fail / artifact fail / implementation fail / code blocked (3 blocking: C1 fixture discards the role-filtered target set, C2 SC-005 guard reds on the feature's own close-out heading, C3 no behavioural arm exercises the read-only/multi-remote branch); ARC refused (final_path pass 0 of 6, claim Implemented => F-ACCEPTANCE at P0, claim left unchanged); 13 items (3 P0 / 4 P1 / 6 P2); closure-acceptance-check verdict block (zero-final-path-pass, runtime-dependency-not-owned: RS-002, status-claims-implemented-but-blocked); review.md + code-review.md + test-evidence/review-2026-11-09/ committed; checkpoint 10; next = closure/U6"
+last_verdict: "Closure acceptance: accept (final_path pass=6/6); closeout contract 45 passed; review blocking findings closed by P1/P2/P3; registry -> Completed; full-suite closure + published refs pending"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: fix-loop decision — review is fail/blocked (5 blocking findings, closure-acceptance-check block, ARC refused); the efficiency diagnosis is delivered; user decides whether to run the fix loop or optimize the framework first
+next_action: await the closure full-suite reading; then merge 091-auto-git-closeout to master, push gitlab/github/gitee, verify the three published refs, remove worktrees/branches
 direction_contract: |
   goal_verbatim: "我每次在作为修改执行都会要求执行:提交,合并,推送, 这应该是一套固定流程,不需要每次都手动触发,在框架中需要找到一个合适的切入点. 需要注意的是:不同的项目存在不同的git workflow, 这个动作需要和git workflow相结合"
   non_goals: [新增 /speckit.* 命令, 守护进程/调度器, 第二套分支 registry, 自动强推, 托管平台 PR/MR 自动化]

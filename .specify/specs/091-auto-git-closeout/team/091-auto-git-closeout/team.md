@@ -4,7 +4,7 @@ slug: 091-auto-git-closeout
 description: Run-scoped SDD team for Feature 091 — Automatic git close-out; serial stage chain over tasks / implement / review with per-stage coordinator + executor seats, one independent verifier reserve per stage, and roster-only creation (execution belongs to the SDD driver).
 scope: spec
 spec_dir: .specify/specs/091-auto-git-closeout
-lifecycle_state: active
+lifecycle_state: archived
 goal: >-
   Every retained write ends with one git close-out (commit -> merge -> push) whose sequence is derived
   from the model declared in .specify/workflow/git.md, with no per-run manual trigger; the four workflow
