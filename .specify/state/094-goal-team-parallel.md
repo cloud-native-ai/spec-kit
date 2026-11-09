@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794231364
 stage_base_commit: e8d716e3
 attempt: 0
 retry_limit: 3
-last_verdict: "Implement waves 1-2: wp01 PASS (binding model; 12 tests via runner); wp02 integrated — merge 2ee5c37b, targeted tests 15 passed/6.53s via run-tests.sh, gates green (requirements 0/0; tasks 0 err/1 disclosed warn; tensions 0/0; decomposition proceed 43/83); worktree+branch cleaned. wp03 still running (branch 094-wp03 from eee176c6, disjoint domain)."
+last_verdict: "Implement wave 3: wp03 integrated (merge; facts+registration+feedback template+4 test modules landed; mirrors+copies re-synced). INTEGRATION FINDING F-094-R3-1: wp03 closed with 10 red tests on master — 8 depend on goal-utils actions `command-family`/`handoff-decision` that NO task row owns (package-map gap), 2 are wp05's vocabulary-scan greens (T064/T065). Named modules: test_command_family (5), test_declaration_facts (3), test_parallel_lines (1), test_criterion_vocabulary_scan (2). Containment: engine-fix fork dispatched (implements the two actions + adds T084/T085 to wp05 + greens the 8); the 2 vocabulary tests stay assigned to wp05. Process deviation recorded: the driver merged before running the package tests (U4 order violated) — corrected for wp04 onward: package tests run in the worktree pre-merge."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "on wp03 completion: integrate (merge → gates → runner tests → cleanup); then wave 3 wp04+wp05 in worktrees (serialize the skills/external/sdd-loop-driver overlap with 093 WP3 by merge order); then wp06; wp07 closure"
+next_action: "launch the engine-fix fork (worktree 094-enginefix from master); on merge, launch wp04+wp05 (worktrees); wp05 also closes the 2 vocabulary-scan tests; then wp06; wp07 closure"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
