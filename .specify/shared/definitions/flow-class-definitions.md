@@ -223,7 +223,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:run-team | execution | behavior-oracle |  | 交付团队运行报告；以运行结果判定 |
 | skill:sanitize-materials | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
 | skill:self-improvement | execution | behavior-oracle |  | 交付改进点与运行记录；由引擎记录判定 |
-| skill:study-project | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
+| skill:study-code | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
 | skill:summarize-project | expression | reader-oracle |  | 交付项目总结报告；呈现是否可用由读者判定 |
 
 台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `scripts/python/flow-class-check.py --action check` 执行）。

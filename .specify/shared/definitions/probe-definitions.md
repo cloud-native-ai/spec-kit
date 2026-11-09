@@ -130,7 +130,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
 | skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |
 | skill-sdd-house-keeping-wrapup | skill-wrapup | skill:sdd-house-keeping | wrap-up |
-| skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| skill-study-code-wrapup | skill-wrapup | skill:study-code | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |

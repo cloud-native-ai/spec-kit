@@ -247,11 +247,11 @@
   carrier: scripts/python/sanitize-utils.py
   anchor: skills/internal/sanitize-materials/SKILL.md#Goal
 #
-# skills/internal/study-project/SKILL.md — (d) the deliverable is `docs/overview.md`
+# skills/external/study-code/SKILL.md — (d) the deliverable is `docs/overview.md`
 # carrier: scripts/python/feedback-utils.py
-- unit: skills/internal/study-project/SKILL.md
+- unit: skills/external/study-code/SKILL.md
   carrier: scripts/python/feedback-utils.py
-  anchor: skills/internal/study-project/SKILL.md#Report Output Location
+  anchor: skills/external/study-code/SKILL.md#Report Output Location
 
 # `templates/commands/*.md` (9 rows)
 # The command face of nine of those deliverables, each delegating the product to its skill.
