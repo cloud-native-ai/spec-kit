@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794221142
 stage_base_commit: e55d8136
 attempt: 1
 retry_limit: 3
-last_verdict: "U4 pass — CLARIFY-DONE; Mode A on requirements.md; 15 ruled questions (each machine-read); 33 FR / 12 SC / 11 STR; validate ok 0/0; pre-analyze --stage requirements pass 0/0; overlap-check decision=clear but checked_specs=1 (VACUOUS — 093 declares no delivery surface yet); Feature 093 bound (Draft, index 86→87 + detail); F-093-001/002/003 registered; checkpoint 02; commit pending record; next = plan in its own worktree"
+last_verdict: "U4 pass — CLARIFY-DONE; Mode A on requirements.md; 15 ruled questions (each machine-read); 33 FR / 12 SC / 11 STR; validate ok 0/0; pre-analyze --stage requirements pass 0/0; overlap-check decision=clear but checked_specs=1 (VACUOUS — 093 declares no delivery surface yet); Feature 093 bound (Draft, index 86→87 + detail); F-093-001/002/003 registered; checkpoint 02; commit 11d49f18; next = plan in its own worktree"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
