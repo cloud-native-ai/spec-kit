@@ -1,0 +1,1595 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_class_table.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_concurrency_units.py tests/contract/test_concurrency_dispatch_capability.py tests/contract/test_concurrency_high_order.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_real_run_evidence.py tests/contract/test_test_entry_guard.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.............s....s..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.F...F     [100%]
+=================================== FAILURES ===================================
+__ test_owner_unavailable_and_inconsistency_are_distinguishable_by_exit_code ___
+[gw50] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw50/test_owner_unavailable_and_inc0')
+
+    def test_owner_unavailable_and_inconsistency_are_distinguishable_by_exit_code(tmp_path):
+        repo = _repo(tmp_path)
+        fact = repo / "shared" / "declarations" / "facts" / "coordinator-dispatch-verdict.yaml"
+        fact.unlink()
+        (repo / "agents").mkdir()
+        (repo / "agents" / "fixture.agent.md").write_text(
+            "---\nname: fixture\ncapability-tools: []\n---\n# Fixture\n", encoding="utf-8")
+        run_record = _record(repo, "run.yaml", ["units: []"])
+>       proc = _run_engine("capability", "--repo", repo, "--record", run_record,
+                           "--json-out", tmp_path / "cap.json")
+
+tests/contract/test_concurrency_disposal.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw50/test_owner_unavailable_and_inc0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw50/test_owner_unavailable_and_inc0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_disposal.py:52: AssertionError
+_____________________ test_pool_bound_is_a_runtime_reading _____________________
+[gw48] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_pool_bound_is_a_runtime_reading():
+        text = DRIVER_SKILL.read_text(encoding="utf-8") + DRIVER_RECIPES.read_text(encoding="utf-8")
+>       assert _judge_pool_bound(text) == []
+E       AssertionError: assert [('pool-bound...roc reading')] == []
+E         
+E         Left contains one more item: ('pool-bound', 'the pool bound must be the host nproc reading')
+E         Use -v to get more diff
+
+tests/contract/test_concurrency_high_order.py:269: AssertionError
+________ test_removed_root_from_the_enumeration_leaves_a_red_assertion _________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw2/test_removed_root_from_the_enu0')
+
+    def test_removed_root_from_the_enumeration_leaves_a_red_assertion(tmp_path):
+        """The assertion survives the mutation: the measured set must stay the five roots."""
+        repo = _copy_layer(tmp_path)
+        roots_fact = repo / "shared" / "declarations" / "facts" / "executor-enumeration-roots.yaml"
+        roots_fact.write_text(
+            _drop_block(roots_fact.read_text(encoding="utf-8"), "skills"), encoding="utf-8")
+>       proc, envelope = _classify(repo, tmp_path / "removed.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_class_table.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_class_table.py:51: in _classify
+    proc = _run_engine("classify", "--repo", repo, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None
+args = ('classify', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw2/test_removed_root_from_the_enu0'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw2/test_removed_root_from_the_enu0/removed.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+
+    def _run_engine(*args, cwd=None):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_class_table.py:41: AssertionError
+_____________ test_budget_code_requires_measured_remaining_budget ______________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw17/test_budget_code_requires_meas0')
+
+    def test_budget_code_requires_measured_remaining_budget(tmp_path):
+        repo = _repo(tmp_path)
+        partial = _record(repo, "budget-partial.yaml", [
+            "pattern: serial", "codes:", "  - budget-reserve", "evidence:",
+            "  budget-reserve:", "    before:", "      slots: 3", "      budget: 120",
+        ])
+>       proc, envelope = _judge(repo, partial, tmp_path / "partial.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw17/test_budget_code_requires_meas0'), ...('/tmp/pytest-of-agent/pytest-5031/popen-gw17/test_budget_code_requires_meas0/budget-partial.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+____________________ test_touching_intervals_do_not_overlap ____________________
+[gw24] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw24/test_touching_intervals_do_not0')
+
+    def test_touching_intervals_do_not_overlap(tmp_path):
+        """The declared tie-break: at equal epoch seconds settle precedes dispatch."""
+        repo = _repo(tmp_path)
+        record = _record(repo, "touching.yaml", [
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    dispatched_at: 0",
+            "    settled_at: 10",
+            "    executor_id: exec-a",
+            "    verifier_id: ver-a",
+            "  - unit_id: unit-b",
+            "    dispatched_at: 10",
+            "    settled_at: 20",
+            "    executor_id: exec-b",
+            "    verifier_id: ver-b",
+            "effective_reason: intervals touch, so the overlap is one",
+        ])
+>       proc, envelope = _reading(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_units.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_units.py:94: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw24/test_touching_intervals_do_not0'), '--rec...ixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw24/test_touching_intervals_do_not0/touching.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_units.py:84: AssertionError
+________ test_dot_evidence_is_rejected_for_every_code[dependency-edge] _________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw6/test_dot_evidence_is_rejected_0')
+code = 'dependency-edge'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw6/test_dot_evidence_is_rejected_0'), '...', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw6/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_____________ test_body_added_without_a_class_turns_the_check_red ______________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw1/test_body_added_without_a_clas0')
+
+    def test_body_added_without_a_class_turns_the_check_red(tmp_path):
+        repo = _copy_layer(tmp_path)
+        added = repo / "skills" / "new-skill" / "SKILL.md"
+        added.parent.mkdir(parents=True)
+        added.write_text(
+            "---\nname: new-skill\n---\n# New Skill\n\nPartition, dispatch, record.\n",
+            encoding="utf-8")
+        class_fact = repo / "shared" / "declarations" / "facts" / "concurrency-class.yaml"
+        text = class_fact.read_text(encoding="utf-8")
+        mutated = text.replace(
+            "    - name: concurrent-by-default\n", "    - name: concurrent-by-default-renamed\n", 1)
+        assert mutated != text, "fixture premise: the class member must be present"
+        class_fact.write_text(mutated, encoding="utf-8")
+>       proc, envelope = _classify(repo, tmp_path / "mutated.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_class_table.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_class_table.py:51: in _classify
+    proc = _run_engine("classify", "--repo", repo, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None
+args = ('classify', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw1/test_body_added_without_a_clas0'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw1/test_body_added_without_a_clas0/mutated.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+
+    def _run_engine(*args, cwd=None):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_class_table.py:41: AssertionError
+_____________ test_live_classify_is_green_and_counts_are_measured ______________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw0/test_live_classify_is_green_an0')
+
+    def test_live_classify_is_green_and_counts_are_measured(tmp_path):
+>       proc, envelope = _classify(REPO_ROOT, tmp_path / "classify.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_class_table.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_class_table.py:51: in _classify
+    proc = _run_engine("classify", "--repo", repo, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None
+args = ('classify', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw0/test_live_classify_is_green_an0/classify.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+
+    def _run_engine(*args, cwd=None):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_class_table.py:41: AssertionError
+_______________ test_live_tree_has_no_obligation_missing_finding _______________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw42/test_live_tree_has_no_obligati0')
+
+    def test_live_tree_has_no_obligation_missing_finding(tmp_path):
+>       proc = _run_engine("classify", "--repo", REPO_ROOT, "--json-out", tmp_path / "out.json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_high_order.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('classify', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw42/test_live_tree_has_no_obligati0/out.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_high_order.py:58: AssertionError
+________________ test_a_new_frontmatter_key_is_not_the_reading _________________
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw35/test_a_new_frontmatter_key_is_0')
+
+    def test_a_new_frontmatter_key_is_not_the_reading(tmp_path):
+        repo = _repo(tmp_path)
+        _agent(repo, "fixture-worker", tools="[]",
+               extra_keys=("dispatch-capable: true", "concurrency-class: concurrent-by-default"))
+        record = _single_unit_record(repo)
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw35/test_a_new_frontmatter_key_is_0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw35/test_a_new_frontmatter_key_is_0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+__________ test_capability_reads_the_existing_capability_tools_field ___________
+[gw34] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw34/test_capability_reads_the_exis0')
+
+    def test_capability_reads_the_existing_capability_tools_field(tmp_path):
+        repo = _repo(tmp_path)
+        _agent(repo, "fixture-worker-a", tools="[]")
+        _agent(repo, "fixture-worker-b", tools="[Read, Grep]")
+        record = _single_unit_record(repo)
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw34/test_capability_reads_the_exis0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw34/test_capability_reads_the_exis0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+__________ test_dot_evidence_is_rejected_for_every_code[single-unit] ___________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw10/test_dot_evidence_is_rejected_0')
+code = 'single-unit'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw10/test_dot_evidence_is_rejected_0'), ..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw10/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+___________ test_unadjudicated_verdict_fact_reads_owner_unavailable ____________
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw37/test_unadjudicated_verdict_fac0')
+
+    def test_unadjudicated_verdict_fact_reads_owner_unavailable(tmp_path):
+        """The live shape: decision_state without a value from allowed_values (C-039, SM-5)."""
+        repo = _repo(tmp_path, verdict=None)
+        _agent(repo, "fixture-worker")
+        record = _single_unit_record(repo)
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw37/test_unadjudicated_verdict_fac0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw37/test_unadjudicated_verdict_fac0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+______ test_same_executor_zero_overlap_is_declaration_execution_mismatch _______
+[gw39] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw39/test_same_executor_zero_overla0')
+
+    def test_same_executor_zero_overlap_is_declaration_execution_mismatch(tmp_path):
+        repo = _repo(tmp_path, verdict="forbid")
+        _agent(repo, "fixture-worker")
+        record = _record(repo, "mismatch.yaml", [
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    executor_id: exec-a",
+            "    dispatched_at: 0",
+            "    settled_at: 10",
+            "  - unit_id: unit-b",
+            "    executor_id: exec-a",
+            "    dispatched_at: 10",
+            "    settled_at: 20",
+        ])
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw39/test_same_executor_zero_overla0'), '--...ixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw39/test_same_executor_zero_overla0/mismatch.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+________________ test_form_reason_inconsistency_both_directions ________________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw12/test_form_reason_inconsistency0')
+
+    def test_form_reason_inconsistency_both_directions(tmp_path):
+        repo = _repo(tmp_path)
+        concurrent_with_codes = _record(repo, "concurrent-codes.yaml", [
+            "pattern: concurrent", "codes:", "  - single-unit", "evidence:",
+            "  single-unit:", "    units:", "      - only-unit",
+        ])
+>       proc, envelope = _judge(repo, concurrent_with_codes, tmp_path / "a.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw12/test_form_reason_inconsistency0'), .../tmp/pytest-of-agent/pytest-5031/popen-gw12/test_form_reason_inconsistency0/concurrent-codes.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_ test_condition_bound_evidence_form_is_accepted_when_complete[budget-reserve] _
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw16/test_condition_bound_evidence_0')
+code = 'budget-reserve'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND)
+    def test_condition_bound_evidence_form_is_accepted_when_complete(tmp_path, code):
+        repo = _repo(tmp_path)
+>       proc, envelope = _judge(repo, _valid_record(repo, code), tmp_path / "valid.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw16/test_condition_bound_evidence_0'), ...('/tmp/pytest-of-agent/pytest-5031/popen-gw16/test_condition_bound_evidence_0/budget-reserve.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+____ test_dot_evidence_is_rejected_for_every_code[mechanism-not-yet-landed] ____
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw11/test_dot_evidence_is_rejected_0')
+code = 'mechanism-not-yet-landed'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw11/test_dot_evidence_is_rejected_0'), ..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw11/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+________ test_simplicity_controllability_history_are_not_codes[simpler] ________
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw19/test_simplicity_controllabilit0')
+phrase = 'simpler'
+
+    @pytest.mark.parametrize("phrase", ("simpler", "more controllable", "historically serial"))
+    def test_simplicity_controllability_history_are_not_codes(tmp_path, phrase):
+        repo = _repo(tmp_path)
+        record = _record(repo, "not-a-code.yaml", [
+            "pattern: serial", "codes:", "  - %s" % phrase, "evidence:", "  %s: ." % phrase,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw19/test_simplicity_controllabilit0'), ...Path('/tmp/pytest-of-agent/pytest-5031/popen-gw19/test_simplicity_controllabilit0/not-a-code.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_____________ test_unresolvable_owner_anchor_is_obligation_missing _____________
+[gw41] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw41/test_unresolvable_owner_anchor0')
+
+    def test_unresolvable_owner_anchor_is_obligation_missing(tmp_path):
+        repo = _mini_repo(tmp_path, broken_anchor=True)
+>       proc = _run_engine("classify", "--repo", repo, "--json-out", tmp_path / "out.json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_high_order.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('classify', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw41/test_unresolvable_owner_anchor0/repo'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw41/test_unresolvable_owner_anchor0/out.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_high_order.py:58: AssertionError
+________________ test_adjudicated_verdict_is_reported_verbatim _________________
+[gw38] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw38/test_adjudicated_verdict_is_re0')
+
+    def test_adjudicated_verdict_is_reported_verbatim(tmp_path):
+        repo = _repo(tmp_path, verdict="forbid")
+        _agent(repo, "fixture-worker")
+        record = _single_unit_record(repo)
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw38/test_adjudicated_verdict_is_re0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw38/test_adjudicated_verdict_is_re0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+_____________ test_one_or_two_fields_alone_are_reading_incomplete ______________
+[gw25] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw25/test_one_or_two_fields_alone_a0')
+
+    def test_one_or_two_fields_alone_are_reading_incomplete(tmp_path):
+        repo = _repo(tmp_path)
+        missing_requested = _record(repo, "missing-requested.yaml", [
+            "units:",
+            "  - unit_id: unit-a",
+            "    dispatched_at: 0",
+            "    settled_at: 10",
+        ])
+>       proc, envelope = _reading(repo, missing_requested, tmp_path / "a.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_units.py:233: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_units.py:94: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw25/test_one_or_two_fields_alone_a0'), '--rec...tmp/pytest-of-agent/pytest-5031/popen-gw25/test_one_or_two_fields_alone_a0/missing-requested.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_units.py:84: AssertionError
+_ test_condition_bound_evidence_form_is_accepted_when_complete[dependency-edge] _
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw13/test_condition_bound_evidence_0')
+code = 'dependency-edge'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND)
+    def test_condition_bound_evidence_form_is_accepted_when_complete(tmp_path, code):
+        repo = _repo(tmp_path)
+>       proc, envelope = _judge(repo, _valid_record(repo, code), tmp_path / "valid.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw13/test_condition_bound_evidence_0'), ...'/tmp/pytest-of-agent/pytest-5031/popen-gw13/test_condition_bound_evidence_0/dependency-edge.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_________ test_dot_evidence_is_rejected_for_every_code[budget-reserve] _________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw9/test_dot_evidence_is_rejected_0')
+code = 'budget-reserve'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw9/test_dot_evidence_is_rejected_0'), '...', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw9/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+__ test_simplicity_controllability_history_are_not_codes[historically serial] __
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw21/test_simplicity_controllabilit0')
+phrase = 'historically serial'
+
+    @pytest.mark.parametrize("phrase", ("simpler", "more controllable", "historically serial"))
+    def test_simplicity_controllability_history_are_not_codes(tmp_path, phrase):
+        repo = _repo(tmp_path)
+        record = _record(repo, "not-a-code.yaml", [
+            "pattern: serial", "codes:", "  - %s" % phrase, "evidence:", "  %s: ." % phrase,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw21/test_simplicity_controllabilit0'), ...Path('/tmp/pytest-of-agent/pytest-5031/popen-gw21/test_simplicity_controllabilit0/not-a-code.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+________________ test_bound_recomputation_reports_its_operands _________________
+[gw27] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw27/test_bound_recomputation_repor0')
+
+    def test_bound_recomputation_reports_its_operands(tmp_path):
+        statement = _slot_statement()
+        slot_cap = statement["slot_cap_default"]
+        reserve = statement["verifier_reserve"]
+        ceiling = _ceiling_default()
+        repo = _repo(tmp_path)
+        record = _record(repo, "bound.yaml", [
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    dispatched_at: 0",
+            "    settled_at: 10",
+            "  - unit_id: unit-b",
+            "    dispatched_at: 5",
+            "    settled_at: 15",
+            "effective_reason: fixture overlaps exactly once",
+        ])
+>       proc, envelope = _reading(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_units.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_units.py:94: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw27/test_bound_recomputation_repor0'), '--rec...PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw27/test_bound_recomputation_repor0/bound.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_units.py:84: AssertionError
+___ test_simplicity_controllability_history_are_not_codes[more controllable] ___
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw20/test_simplicity_controllabilit0')
+phrase = 'more controllable'
+
+    @pytest.mark.parametrize("phrase", ("simpler", "more controllable", "historically serial"))
+    def test_simplicity_controllability_history_are_not_codes(tmp_path, phrase):
+        repo = _repo(tmp_path)
+        record = _record(repo, "not-a-code.yaml", [
+            "pattern: serial", "codes:", "  - %s" % phrase, "evidence:", "  %s: ." % phrase,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw20/test_simplicity_controllabilit0'), ...Path('/tmp/pytest-of-agent/pytest-5031/popen-gw20/test_simplicity_controllabilit0/not-a-code.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+______________ test_host_code_requires_a_resolving_landing_point _______________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw18/test_host_code_requires_a_reso0')
+
+    def test_host_code_requires_a_resolving_landing_point(tmp_path):
+        repo = _repo(tmp_path)
+        no_landing = _record(repo, "host-no-landing.yaml", [
+            "pattern: serial", "codes:", "  - host-no-parallel", "evidence:",
+            "  host-no-parallel:", "    probe: nproc=1",
+        ])
+>       proc, envelope = _judge(repo, no_landing, tmp_path / "a.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:327: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw18/test_host_code_requires_a_reso0'), ...'/tmp/pytest-of-agent/pytest-5031/popen-gw18/test_host_code_requires_a_reso0/host-no-landing.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+________________ test_effective_is_the_maximum_interval_overlap ________________
+[gw23] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw23/test_effective_is_the_maximum_0')
+
+    def test_effective_is_the_maximum_interval_overlap(tmp_path):
+        repo = _repo(tmp_path)
+        record = _three_unit_record(repo)
+>       proc, first = _reading(repo, record, tmp_path / "a.json")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_units.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_units.py:94: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw23/test_effective_is_the_maximum_0'), '--rec...sixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw23/test_effective_is_the_maximum_0/reading.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_units.py:84: AssertionError
+__________ test_engine_refuses_a_concurrency_claim_without_intervals ___________
+[gw61] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw61/test_engine_refuses_a_concurre0')
+
+    def test_engine_refuses_a_concurrency_claim_without_intervals(tmp_path):
+        repo = _repo(tmp_path)
+        record = _record(repo, "no-intervals.yaml", [
+            "run_kind: real",
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    executor_id: exec-a",
+            "    verifier_id: ver-a",
+            "  - unit_id: unit-b",
+            "    executor_id: exec-b",
+            "    verifier_id: ver-b",
+        ])
+>       proc, envelope = _reading(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_real_run_evidence.py:233: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_real_run_evidence.py:81: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw61/test_engine_refuses_a_concurre0'), '--rec...th('/tmp/pytest-of-agent/pytest-5031/popen-gw61/test_engine_refuses_a_concurre0/no-intervals.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_real_run_evidence.py:44: AssertionError
+_____________ test_default_concurrency_fixture_reads_effective_two _____________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw3/test_default_concurrency_fixtu0')
+
+    def test_default_concurrency_fixture_reads_effective_two(tmp_path):
+        """Two dependency-free, disjoint-write units overlap: effective >= 2, not an estimate."""
+        repo = _repo(tmp_path)
+        record = _record(repo, "concurrent.yaml", [
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    dispatched_at: 1000",
+            "    settled_at: 1010",
+            "    executor_id: exec-a",
+            "    verifier_id: ver-a",
+            "  - unit_id: unit-b",
+            "    dispatched_at: 1005",
+            "    settled_at: 1020",
+            "    executor_id: exec-b",
+            "    verifier_id: ver-b",
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw3/test_default_concurrency_fixtu0'), '...xPath('/tmp/pytest-of-agent/pytest-5031/popen-gw3/test_default_concurrency_fixtu0/concurrent.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_ test_condition_bound_evidence_form_is_accepted_when_complete[host-no-parallel] _
+[gw15] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw15/test_condition_bound_evidence_0')
+code = 'host-no-parallel'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND)
+    def test_condition_bound_evidence_form_is_accepted_when_complete(tmp_path, code):
+        repo = _repo(tmp_path)
+>       proc, envelope = _judge(repo, _valid_record(repo, code), tmp_path / "valid.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw15/test_condition_bound_evidence_0'), .../tmp/pytest-of-agent/pytest-5031/popen-gw15/test_condition_bound_evidence_0/host-no-parallel.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_ test_condition_bound_evidence_form_is_accepted_when_complete[write-conflict] _
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw14/test_condition_bound_evidence_0')
+code = 'write-conflict'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND)
+    def test_condition_bound_evidence_form_is_accepted_when_complete(tmp_path, code):
+        repo = _repo(tmp_path)
+>       proc, envelope = _judge(repo, _valid_record(repo, code), tmp_path / "valid.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw14/test_condition_bound_evidence_0'), ...('/tmp/pytest-of-agent/pytest-5031/popen-gw14/test_condition_bound_evidence_0/write-conflict.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_________________ test_analyze_wave_contract_on_the_live_tree __________________
+[gw45] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_analyze_wave_contract_on_the_live_tree():
+>       assert _judge_analyze(REPO_ROOT) == []
+E       AssertionError: assert [('analyze-wa...reason'), ...] == []
+E         
+E         Left contains 8 more items, first extra item: ('analyze-wave', 'the analyze Worker definition must be named')
+E         Use -v to get more diff
+
+tests/contract/test_concurrency_high_order.py:209: AssertionError
+_________ test_dot_evidence_is_rejected_for_every_code[write-conflict] _________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw7/test_dot_evidence_is_rejected_0')
+code = 'write-conflict'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw7/test_dot_evidence_is_rejected_0'), '...', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw7/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+________ test_missing_interval_yields_not_evaluated_and_names_the_unit _________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw26/test_missing_interval_yields_n0')
+
+    def test_missing_interval_yields_not_evaluated_and_names_the_unit(tmp_path):
+        repo = _repo(tmp_path)
+        record = _three_unit_record(repo, missing_settle=True)
+>       proc, envelope = _reading(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_units.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_units.py:94: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw26/test_missing_interval_yields_n0'), '--rec...sixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw26/test_missing_interval_yields_n0/reading.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_units.py:84: AssertionError
+________ test_dot_evidence_is_rejected_for_every_code[host-no-parallel] ________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw8/test_dot_evidence_is_rejected_0')
+code = 'host-no-parallel'
+
+    @pytest.mark.parametrize("code", CONDITION_BOUND + FACTUAL)
+    def test_dot_evidence_is_rejected_for_every_code(tmp_path, code):
+        repo = _repo(tmp_path)
+        record = _record(repo, "dot.yaml", [
+            "pattern: serial", "codes:", "  - %s" % code, "evidence:", "  %s: ." % code,
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "dot.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw8/test_dot_evidence_is_rejected_0'), '...', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw8/test_dot_evidence_is_rejected_0/dot.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+________ test_two_condition_serial_records_both_codes_in_declared_order ________
+[gw22] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw22/test_two_condition_serial_reco0')
+
+    def test_two_condition_serial_records_both_codes_in_declared_order(tmp_path):
+        repo = _repo(tmp_path)
+        record = _record(repo, "two-conditions.yaml", [
+            "pattern: serial",
+            "codes:",
+            "  - dependency-edge",
+            "  - budget-reserve",
+            "evidence:",
+            "  dependency-edge:",
+            "    predecessor_id: unit-a",
+            "    verdict_ptr: evidence/unit-a.verdict",
+            "  budget-reserve:",
+            "    before:",
+            "      slots: 3",
+            "      budget: 120",
+            "    after:",
+            "      slots: 2",
+            "      budget: 80",
+        ])
+>       proc, envelope = _judge(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:376: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw22/test_two_condition_serial_reco0'), ...('/tmp/pytest-of-agent/pytest-5031/popen-gw22/test_two_condition_serial_reco0/two-conditions.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+__________ test_absent_coordinator_verdict_fact_is_owner_unavailable ___________
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw36/test_absent_coordinator_verdic0')
+
+    def test_absent_coordinator_verdict_fact_is_owner_unavailable(tmp_path):
+        repo = _repo(tmp_path, verdict=None)
+        fact = repo / "shared" / "declarations" / "facts" / "coordinator-dispatch-verdict.yaml"
+        fact.unlink()
+        _agent(repo, "fixture-worker")
+        record = _single_unit_record(repo)
+>       proc, envelope = _capability(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_dispatch_capability.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_dispatch_capability.py:95: in _capability
+    proc = _run_engine("capability", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('capability', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw36/test_absent_coordinator_verdic0'), '--..., PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw36/test_absent_coordinator_verdic0/run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_dispatch_capability.py:41: AssertionError
+_______ test_engine_accepts_a_real_run_record_with_overlapping_intervals _______
+[gw60] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw60/test_engine_accepts_a_real_run0')
+
+    def test_engine_accepts_a_real_run_record_with_overlapping_intervals(tmp_path):
+        repo = _repo(tmp_path)
+        record = _record(repo, "real-run.yaml", [
+            "run_kind: real",
+            "requested: 2",
+            "units:",
+            "  - unit_id: unit-a",
+            "    dispatched_at: 0",
+            "    settled_at: 10",
+            "    executor_id: exec-a",
+            "    verifier_id: ver-a",
+            "    verdict: pass",
+            "    evidence_ptr: evidence/a.txt",
+            "  - unit_id: unit-b",
+            "    dispatched_at: 5",
+            "    settled_at: 20",
+            "    executor_id: exec-b",
+            "    verifier_id: ver-b",
+            "    verdict: pass",
+            "    evidence_ptr: evidence/b.txt",
+            "effective_reason: two independently dispatched units",
+        ])
+>       proc, envelope = _reading(repo, record, tmp_path / "out.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_real_run_evidence.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_real_run_evidence.py:81: in _reading
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('reading', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw60/test_engine_accepts_a_real_run0'), '--rec...ixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw60/test_engine_accepts_a_real_run0/real-run.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_real_run_evidence.py:44: AssertionError
+____ test_every_serial_record_uses_the_closed_vocabulary_without_duplicates ____
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw4/test_every_serial_record_uses_0')
+
+    def test_every_serial_record_uses_the_closed_vocabulary_without_duplicates(tmp_path):
+        statement = _vocabulary()
+        vocabulary = {entry["code"] for entry in statement["codes"]}
+        assert vocabulary == set(CONDITION_BOUND) | set(FACTUAL)
+        repo = _repo(tmp_path)
+        unknown = _record(repo, "unknown.yaml", [
+            "pattern: serial", "codes:", "  - depends-on-things", "evidence:",
+            "  depends-on-things: .",
+        ])
+>       proc, envelope = _judge(repo, unknown, tmp_path / "unknown.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw4/test_every_serial_record_uses_0'), '...osixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw4/test_every_serial_record_uses_0/unknown.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+_________ test_condition_code_bijection_is_zero_gap_in_both_directions _________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw5/test_condition_code_bijection_0')
+
+    def test_condition_code_bijection_is_zero_gap_in_both_directions(tmp_path):
+        statement = _vocabulary()
+        index = statement["condition_index"]
+        bound = [entry for entry in statement["codes"] if entry["group"] == "condition-bound"]
+        factual = [entry for entry in statement["codes"] if entry["group"] == "factual"]
+        # direction 1: every condition has exactly one code
+        for condition in index:
+            matching = [entry for entry in bound if entry.get("condition") == condition]
+            assert len(matching) == 1, "condition %s has %d codes" % (condition, len(matching))
+        # direction 2: every condition-bound code maps to exactly one indexed condition
+        for entry in bound:
+            assert entry.get("condition") in index, entry
+        for entry in factual:
+            assert "condition" not in entry, "factual %r must not carry a condition" % entry["code"]
+    
+        # the engine reports the gap when the fact is mutated (both directions of the fact)
+        repo = _repo(tmp_path)
+        fact = repo / "shared" / "declarations" / "facts" / "serial-reason.yaml"
+        text = fact.read_text(encoding="utf-8")
+        mutated = text.replace("    - FR-005(e)\n", "", 1)
+        assert mutated != text, "fixture premise: the condition index must list FR-005(e)"
+        fact.write_text(mutated, encoding="utf-8")
+        record = _valid_record(repo, "budget-reserve")
+>       proc, envelope = _judge(repo, record, tmp_path / "bijection.json")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_concurrency_serial_reason.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_concurrency_serial_reason.py:145: in _judge
+    proc = _run_engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('serial-reason', '--repo', PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw5/test_condition_code_bijection_0'), '...h('/tmp/pytest-of-agent/pytest-5031/popen-gw5/test_condition_code_bijection_0/budget-reserve.yaml'), '--json-out', ...)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+@py_assert3 = False
+@py_format5 = "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet\n>assert Fals...loud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file\n}()\n}"
+
+    def _run_engine(*args):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/contract/test_concurrency_serial_reason.py:135: AssertionError
+___________________ test_directory_level_write_domain_is_red ___________________
+[gw31] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5031/popen-gw31/test_directory_level_write_dom0')
+
+    def test_directory_level_write_domain_is_red(tmp_path):
+        write = wp_fixtures.make_write_package("plan-wp01")
+        read = wp_fixtures.make_package("plan-wp02")
+        plan = wp_fixtures.make_plan(packages=[write, read], pattern="serial")
+        proc, record = _gate_plan(tmp_path, plan)
+        assert record is not None, proc.stdout + proc.stderr
+>       assert proc.returncode == 1, "a directory-level write domain must be red (FR-012)"
+E       AssertionError: a directory-level write domain must be red (FR-012)
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor... null, "dispatch_layers": [["plan-wp01", "plan-wp02"]], "integration_order": ["plan-wp01", "plan-wp02"]}\n', stderr='').returncode
+
+tests/contract/test_concurrency_units.py:380: AssertionError
+_____________________ test_live_tree_has_no_raw_invocation _____________________
+[gw67] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_tree_has_no_raw_invocation():
+        findings = _scan(_tracked_files())
+        summary = "\n".join("%s:%d: %s" % finding for finding in findings)
+>       assert findings == [], (
+            "%d raw pytest invocation(s) remain in the scanned framework artifacts; the entry "
+            "is scripts/bash/run-tests.sh (FR-036):\n%s" % (len(findings), summary))
+E       AssertionError: 9 raw pytest invocation(s) remain in the scanned framework artifacts; the entry is scripts/bash/run-tests.sh (FR-036):
+E         .specify/instructions.md:256: ation`): `pytest`, `pytest -m contract`, `pytest -m integration`.
+E         docs/reference/history/00-cross-cutting-lessons.md:57: 因**。多个同族单元被并行编辑时,先 `pytest --tb=line` 读每条断言指向哪个单元,区分既有负债与本次回归,并把归因命
+E         docs/reference/history/00-cross-cutting-lessons.md:95: 按子串工作,却被当作按标识符工作**。`pytest -k` 的每个 token 按**子串**匹配测试 id,且**同时匹配 slu
+E         shared/definitions/non-disposable-definitions.md:704: 既有守卫（`pytest -m contract`）、三份历史面的**指针行**（只加一行，MUST NO
+E         skills/external/create-skills/SKILL.md:167: contract suite** (`pytest tests/contract/ -q -k "skill or runtime_
+E         skills/external/create-skills/SKILL.md:168: with `--tb=line` (`pytest tests/contract/ --tb=line -k "skill or r
+E         skills/external/merge-skills/references/decommission-and-wiring.md:73: ks pass (spec-kit: `pytest tests/contract/ -q -k
+E         skills/internal/implement-feature/SKILL.md:180: `python -m pytest | tail` pipelines whose exit codes mask
+E         skills/internal/implement-feature/SKILL.md:193: collection count (`pytest --collect-only -q <path>`) is non-zero
+E       assert [('.specify/i...l or r'), ...] == []
+E         
+E         Left contains 9 more items, first extra item: ('.specify/instructions.md', 256, 'ation`): `pytest`, `pytest -m contract`, `pytest -m integration`.')
+E         Use -v to get more diff
+
+tests/contract/test_test_entry_guard.py:147: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_concurrency_disposal.py::test_owner_unavailable_and_inconsistency_are_distinguishable_by_exit_code
+FAILED tests/contract/test_concurrency_high_order.py::test_pool_bound_is_a_runtime_reading
+FAILED tests/contract/test_concurrency_class_table.py::test_removed_root_from_the_enumeration_leaves_a_red_assertion
+FAILED tests/contract/test_concurrency_serial_reason.py::test_budget_code_requires_measured_remaining_budget
+FAILED tests/contract/test_concurrency_units.py::test_touching_intervals_do_not_overlap
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[dependency-edge]
+FAILED tests/contract/test_concurrency_class_table.py::test_body_added_without_a_class_turns_the_check_red
+FAILED tests/contract/test_concurrency_class_table.py::test_live_classify_is_green_and_counts_are_measured
+FAILED tests/contract/test_concurrency_high_order.py::test_live_tree_has_no_obligation_missing_finding
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_a_new_frontmatter_key_is_not_the_reading
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_capability_reads_the_existing_capability_tools_field
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[single-unit]
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_unadjudicated_verdict_fact_reads_owner_unavailable
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_same_executor_zero_overlap_is_declaration_execution_mismatch
+FAILED tests/contract/test_concurrency_serial_reason.py::test_form_reason_inconsistency_both_directions
+FAILED tests/contract/test_concurrency_serial_reason.py::test_condition_bound_evidence_form_is_accepted_when_complete[budget-reserve]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[mechanism-not-yet-landed]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_simplicity_controllability_history_are_not_codes[simpler]
+FAILED tests/contract/test_concurrency_high_order.py::test_unresolvable_owner_anchor_is_obligation_missing
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_adjudicated_verdict_is_reported_verbatim
+FAILED tests/contract/test_concurrency_units.py::test_one_or_two_fields_alone_are_reading_incomplete
+FAILED tests/contract/test_concurrency_serial_reason.py::test_condition_bound_evidence_form_is_accepted_when_complete[dependency-edge]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[budget-reserve]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_simplicity_controllability_history_are_not_codes[historically serial]
+FAILED tests/contract/test_concurrency_units.py::test_bound_recomputation_reports_its_operands
+FAILED tests/contract/test_concurrency_serial_reason.py::test_simplicity_controllability_history_are_not_codes[more controllable]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_host_code_requires_a_resolving_landing_point
+FAILED tests/contract/test_concurrency_units.py::test_effective_is_the_maximum_interval_overlap
+FAILED tests/contract/test_concurrency_real_run_evidence.py::test_engine_refuses_a_concurrency_claim_without_intervals
+FAILED tests/contract/test_concurrency_serial_reason.py::test_default_concurrency_fixture_reads_effective_two
+FAILED tests/contract/test_concurrency_serial_reason.py::test_condition_bound_evidence_form_is_accepted_when_complete[host-no-parallel]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_condition_bound_evidence_form_is_accepted_when_complete[write-conflict]
+FAILED tests/contract/test_concurrency_high_order.py::test_analyze_wave_contract_on_the_live_tree
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[write-conflict]
+FAILED tests/contract/test_concurrency_units.py::test_missing_interval_yields_not_evaluated_and_names_the_unit
+FAILED tests/contract/test_concurrency_serial_reason.py::test_dot_evidence_is_rejected_for_every_code[host-no-parallel]
+FAILED tests/contract/test_concurrency_serial_reason.py::test_two_condition_serial_records_both_codes_in_declared_order
+FAILED tests/contract/test_concurrency_dispatch_capability.py::test_absent_coordinator_verdict_fact_is_owner_unavailable
+FAILED tests/contract/test_concurrency_real_run_evidence.py::test_engine_accepts_a_real_run_record_with_overlapping_intervals
+FAILED tests/contract/test_concurrency_serial_reason.py::test_every_serial_record_uses_the_closed_vocabulary_without_duplicates
+FAILED tests/contract/test_concurrency_serial_reason.py::test_condition_code_bijection_is_zero_gap_in_both_directions
+FAILED tests/contract/test_concurrency_units.py::test_directory_level_write_domain_is_red
+FAILED tests/contract/test_test_entry_guard.py::test_live_tree_has_no_raw_invocation
+43 failed, 23 passed, 2 skipped in 6.64s
