@@ -1,0 +1,43 @@
+# WP2 red-first + green — T074–T077 (reading: C-031…C-034)
+- date: 2026-11-09T11:38:51Z
+- records under .specify/.tmp/wp2/records/
+
+## RED — the action was a stub
+decision = fail | findings = [('not-implemented','reading')] | exit status: 1
+
+## GREEN — the judgement matrix
+record                         exit   reading
+reading-overlap                0      decision=pass effective=3 codes=none
+reading-three                  1      decision=fail effective=3 codes=['effective-mismatch']
+reading-touching               0      decision=pass effective=1 codes=none
+reading-missing                1      decision=fail effective=not_evaluated codes=['reading-not-evaluated']
+reading-missing-serial         0      decision=pass effective=not_evaluated codes=none
+reading-incomplete             1      decision=fail effective=2 codes=['reading-incomplete']
+reading-below-bound            1      decision=fail effective=2 codes=['reading-incomplete']
+reading-below-bound-reasoned   0      decision=pass effective=2 codes=none
+reading-bound-violation        1      decision=fail effective=5 codes=['bound-violation']
+
+## GREEN — C-031: maximum interval overlap (half-open, settle-before-dispatch)
+- reading-overlap: intervals [100,140) [120,180) [130,150) -> 
+ measured.effective = 3 | intervals = [{'end': 140, 'start': 100}, {'end': 180, 'start': 120}, {'end': 150, 'start': 130}]
+- reading-touching: [100,140) [140,180) touch at 140 -> 
+ measured.effective = 1 (a dispatch at the settle moment does not overlap)
+
+## GREEN — C-032: a missing interval yields the literal not_evaluated and fails a concurrency claim
+ reading-missing: decision=fail effective='not_evaluated' findings=[('reading-not-evaluated', 'pkg-b')]
+ reading-missing-serial: decision=pass effective='not_evaluated' findings=[]
+
+## GREEN — C-033: the tri-field judgement and the below-bound reason
+- reading-incomplete: requested+effective present, effective_reason absent ->
+  [('reading-incomplete', "the reading triple is incomplete; missing: ['effective_reason']"), ('reading-incomplete', 'effective=2 is below min(slot_cap, ceiling, remaining)=4 and carries no named effective_reason')]
+- reading-below-bound: effective 2 < min 4 with an empty reason ->
+  [('reading-incomplete', 'effective=2 is below min(slot_cap, ceiling, remaining)=4 and carries no named effective_reason')]
+- reading-below-bound-reasoned: same values, named reason -> pass
+
+## GREEN — T077/C-034: bound recomputation (slot fact + wp-gate declared default)
+{"ceiling": 4, "ceiling_source": "skills/external/sdd-loop-driver/scripts/wp-gate.py declared default", "effective_available": 3, "min": 4, "min_formula": "min(slot_cap, ceiling, remaining_budget)", "remaining_budget": "not_evaluated", "slot_cap": 6, "verifier_reserve": 1}
+- command: `... reading --repo . --record reading-bound-violation.yml --ceiling 6`
+- exit status: 0
+ decision = pass | ceiling = 6 | source = --ceiling at call time
+- default ceiling without the flag: the 5-unit record violates the gate ceiling 4 ->
+  [('bound-violation', 'effective=5 exceeds min(slot_cap, ceiling, remaining)=4')]
