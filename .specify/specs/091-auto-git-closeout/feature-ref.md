@@ -108,6 +108,6 @@ not by a path token, so the checker sees no claim:
 
 | Stage | State | Artifact |
 |-------|-------|----------|
-| requirements | done (27 FR / 7 SC, 12 assumptions) | requirements file |
+| requirements | done | requirements file |
 | clarify | **this stage** — 16 adjudications (C-1…C-16), FR 28 / SC 8, 3 edge cases, 9 assumptions added; the overlap check run before **and** after this file | requirements Clarifications, this file |
 | plan / tasks / checklist / analyze / implement / review | not started | — |

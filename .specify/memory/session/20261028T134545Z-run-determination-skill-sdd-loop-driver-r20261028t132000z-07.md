@@ -21,7 +21,7 @@ skill:sdd-loop-driver run=r20261028T132000Z-074d token=not_evaluated elapsed=not
   "feature": "074-goal-team-sdd-unification",
   "feature_id": null,
   "determined_at": "2026-10-28T13:45:45Z",
-  "settled_at": null,
+  "settled_at": "2026-11-09T02:34:16Z",
   "complexity": "complex",
   "qualification": "partial",
   "axes": {

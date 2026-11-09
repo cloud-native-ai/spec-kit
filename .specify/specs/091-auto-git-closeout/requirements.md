@@ -174,9 +174,11 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | `git` 命令行的本地分支/合并/推送能力（收口序列的实际执行面） | signed-contract | 宿主环境提供（本仓只消费，不打包） | 本特性实现期实测记录 `git --version` 输出，作为实现的运行时前提 | `pyproject.toml`（本仓 Python 包的依赖面；`git` 按宿主提供，不列为 Python 依赖） | `/speckit.implement` 收口阶段在宿主 `git` 上跑通四个模型夹具仓库 | FR-010, FR-011, FR-012, FR-015 | EP-001 |
+| RS-001 | `git` 命令行的本地分支/合并/推送能力（收口序列的实际执行面） | signed-contract | 宿主环境提供（本仓只消费，不打包） | 本特性实现期实测记录 `git --version` 输出，作为实现的运行时前提 | `pyproject.toml` | `/speckit.implement` 收口阶段在宿主 `git` 上跑通四个模型夹具仓库 | FR-010, FR-011, FR-012, FR-015 | EP-001 |
 | RS-002 | 托管块声明读取（本特性不改引擎；读取方是 `git-utils` 技能流程与契约测试） | in-scope | 本特性自身修订的 `git-utils` 技能与契约测试 | 不适用（无外部版本面） | `skills/external/git-utils/SKILL.md` | `tests/contract/` 下的收口契约测试在 `>=3.8` 解释器上通过 | FR-001, FR-002, FR-003, FR-009, FR-023 | EP-002 |
 | RS-003 | `pytest` 测试运行器（契约测试与夹具仓库断言） | signed-contract | CPython/pytest 上游（本仓只消费） | `pyproject.toml` 中既有的 `pytest` 依赖声明；本特性零新增第三方依赖 | `pyproject.toml` | `pytest -m contract` 通过，夹具仓库测试在 `>=3.8` 解释器上执行 | FR-024, FR-025 | EP-002 |
+
+> RS-001 的 `Contract` 列只声明本仓 Python 依赖面；`git` 由宿主环境提供，不列为 Python 依赖。
 
 ### Key Entities *(include if requirement involves data)*
 

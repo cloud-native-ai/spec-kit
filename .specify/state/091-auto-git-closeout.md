@@ -4,7 +4,7 @@
 spine_state: running
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
-stage: clarify
+stage: plan
 stage_started_at: 1794191292
 stage_deadline_epoch: 1794202092
 stage_base_commit: 7cf87dad
@@ -43,10 +43,11 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages will be recomputed per stage
   verifier_reserve: 1
-  breakpoint_verdict: "requirements present; next stage = clarify"
+  breakpoint_verdict: "requirements + clarify complete; next stage = plan"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 27 FR / 7 SC; evidence .specify/specs/091-auto-git-closeout/test-evidence/requirements-gates.txt
+  clarify U4: pass with corrections — validate ok 0/0; pre-analyze pass 0/0 after RS-001 cell + feature-ref count fixes; overlap adjudicated (completed-only, 0 active); decomposition-check plan proceed (28 FR < 120); workspace-guard clean
   clarify U4 (pending verifier):
     overlap_check: decision=overlap — before the declaration artifact the gate was clear with
       checked=1 and note "no declaration artifact" (vacuous); after it: checked=82, overlaps=36
