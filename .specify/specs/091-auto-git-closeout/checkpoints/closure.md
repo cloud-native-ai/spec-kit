@@ -24,7 +24,11 @@ Non-blocking review findings (review P1/P2 and code P1/P2) are recorded as dated
 - `closure-acceptance-check.py --spec-dir .specify/specs/091-auto-git-closeout --repo .` → **accept** (exit 0), final_path pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0, claimed_status=Implemented; the closure flips the registry to Completed.
 
 ## 4. Full-suite closure reading
-- baseline: `test-evidence/baseline-failed.txt` (36 ids); closure run: `test-evidence/closure-failed.txt` — **pending** (closure slot running); comparison will be recorded here with R-36a applied.
+- Baseline: `test-evidence/baseline-failed.txt` (36 ids, serial).
+- Parallel-runner reading (`closure-full.txt`): 49 bare ids; **not comparable** — the runner's parallel mode and its bare-id `--names-out` format differ from the serial baseline's `FAILED`-prefixed list. Kept as an exploratory record, never the verdict.
+- Serial run 1 (`closure-serial-full.txt`): 48 failed / 8060 passed; NEW 20 vs baseline. Classification: 16 lie in R-36a's three modules (`test_compile_embeds.py` 4, `test_compile_reconcile_guards.py` 7, `test_engine_face_contract.py` 5); 2 `test_isomorphism_map.py` and 2 others were **driver-scratch contamination** — the three fix worktrees under `.specify/.tmp/sdd-loop/worktrees/` were still present and the tree-scanning tests saw their repo copies; 2 were **test-expectation defects** exposed by legitimate 091 changes (`test_goal_migration` counted a tracked `test-evidence/*.txt` run log as a live face; `test_t078` treated modified command files as added commands).
+- Corrective actions: worktrees removed (HR11 cleanup); `test_goal_migration` now excludes `/test-evidence/*.txt|.log` run logs; `test_t078` uses `git diff --diff-filter=A` (added commands only); both corrected tests pass.
+- Final serial closure run: `test-evidence/closure-final-full.txt` / `closure-final-failed.txt` — **pending**; the verdict is recorded here after it completes. The R-36a exclusion (A/B proven at HEAD with the feature stashed) still applies to its three modules.
 
 ## 5. Smoke
 - `test-evidence/T062-smoke.txt`: smoke_command / smoke_exit_code=0 / smoke_evidence_path present (see `verification.md`).

@@ -4260,7 +4260,7 @@ def test_t078_no_command_gate_or_second_checker_was_added():
     import subprocess
 
     commands = sorted(set(
-        _git_paths("diff", "--name-only", f"{_feature_base()}...HEAD", "--",
+        _git_paths("diff", "--name-only", "--diff-filter=A", f"{_feature_base()}...HEAD", "--",
                    COMMAND_SURFACE)
     ))
     assert not [p for p in commands if p.endswith(".md")], (
