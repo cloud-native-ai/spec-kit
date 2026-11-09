@@ -18,9 +18,9 @@ terminal `closure.md` repeats the same check (see `## The published-state check 
 
 ### 2. Goal progress
 
-- For each criterion of the spec's Goal (scope = spec), record `criterion / degree / evidence_ptr`.
+- For each criterion of the goal the run is bound to (resolved from `goal_slug`, never from a path position), record `criterion / degree / evidence_ptr`.
 - `degree` is a progress reading, not a binary checkbox; a missing measurement is `not_evaluated`, never zero.
-- Goal content changes only through the goal engine (`/speckit.goal modify --scope spec`); the checkpoint never writes `goal.md`.
+- Goal content changes only through the goal engine (`/speckit.goal modify`); the checkpoint never writes `goal.md`.
 
 ### 3. Team configuration review
 
@@ -29,7 +29,7 @@ terminal `closure.md` repeats the same check (see `## The published-state check 
   `concurrency`, `stage max_parallel`, `roster add/remove`, `pattern`, `verifier reserve`.
 - The proposal names its evidence, the exact before/after values, and the expected effect.
 - Ratify according to `checkpoint_policy.ratification` (`standing` for reversible config changes declared at U0, or `human`). Never apply silently.
-- Apply through `improve-team` / `/speckit.team modify --scope spec`; territory changes remain explicit modifications and are never optimizer output.
+- Apply through `improve-team` / `/speckit.team modify`; territory changes remain explicit modifications and are never optimizer output.
 
 ### 4. Concurrency and roster decision for the next stage
 
@@ -150,7 +150,7 @@ one thing an "everything closed" closure sentence is not allowed to hide.
 - At most one configuration/concurrency/roster change per checkpoint. An explicit human goal edit does not count toward this cap.
 - A checkpoint file is committed by the driver immediately after U4 as a driver record, not as a stage deliverable.
 - **Rollback**: at the next checkpoint, revert the prior change when U4 fails, new test failures appear versus the stage baseline, `retries_package` increases by at least two, or `parallelism_efficiency` drops by at least 30 percent. A rolled-back change is not re-proposed immediately.
-- `coordinate` remains territory-overlap only; with one temporary team it is a recorded no-op.
+- `coordinate` remains territory-overlap only; with a single team bound to the goal it is a recorded no-op.
 - The checkpoint carries paths and verdicts, never raw transcripts or fabricated metrics.
 - **Direction audit is mandatory**: every checkpoint carries part 5; a checkpoint without it is a defect. Its reload tier and verdict are recorded in the checkpoint, not only in the conversation.
 - **Published state is verified, never assumed**: a checkpoint whose part 5 records `correction-applied` for a branch correction MUST carry part 5b, and `closure.md` MUST carry the terminal check. A correction recorded without a published-state reading — converged SHAs or a residue row with its `unblock` — fails the checkpoint, and a residue left open at closure is named there.

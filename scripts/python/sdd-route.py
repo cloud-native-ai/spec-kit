@@ -280,8 +280,11 @@ def _resolve_agent_half(agent_path: Path):
 
 
 def _resolve_seat_half(root: Path, team_slug: str, seat_slug: str,
-                       scope: str = "global", spec_dir: str | None = None):
-    """`(value, supplying, team_md_path)`; an absent map / entry / key means deny."""
+                       scope: str = "auto", spec_dir: str | None = None):
+    """`(value, supplying, team_md_path, archive_layer)`; an absent map / entry / key
+    means deny. The team path and the archive-layer value both come from the goal
+    engine's `resolve_scope` — this engine carries no second path implementation
+    (C-29), and `archive_layer` is the C-9 value of the layer that answered."""
     try:
         resolved = _goal_utils().resolve_scope(root, scope, spec_dir, team_slug)
         team_path = resolved.team_definition(team_slug)
@@ -296,7 +299,7 @@ def _resolve_seat_half(root: Path, team_slug: str, seat_slug: str,
     seats = _parse_seat_map(lines, team_path, seat_slug)
     roster = _roster_ids(lines, team_path, seat_slug)
     if seats is None:
-        return DENY, {"source": "absent-map"}, team_path
+        return DENY, {"source": "absent-map"}, team_path, resolved.scope
     for key in seats:
         if key not in roster:
             raise InputError(
@@ -304,17 +307,17 @@ def _resolve_seat_half(root: Path, team_slug: str, seat_slug: str,
                 f"dangling rather than ignored (seat under resolution: {seat_slug!r})"
             )
     if seat_slug not in seats:
-        return DENY, {"source": "absent-entry"}, team_path
+        return DENY, {"source": "absent-entry"}, team_path, resolved.scope
     entry = seats[seat_slug]
     if ALLOW_KEY not in entry:
-        return DENY, {"source": "absent-key"}, team_path
+        return DENY, {"source": "absent-key"}, team_path, resolved.scope
     value = entry[ALLOW_KEY].strip().strip('"').strip("'")
     if value not in CLOSED_VALUES:
         raise InputError(
             f"{team_path}: seats[{seat_slug!r}].{ALLOW_KEY} = {value!r} is outside the closed "
             f"value set owned by NEUTRAL_AGENT_METADATA_KEYS (src/specify_cli/__init__.py)"
         )
-    return value, {"source": "declared"}, team_path
+    return value, {"source": "declared"}, team_path, resolved.scope
 
 
 # ---------------------------------------------------------------------------
@@ -346,9 +349,9 @@ def action_authorize(args) -> int:
 
     agent_path = Path(args.agent)
     agent_value, agent_supplying = _resolve_agent_half(agent_path)
-    seat_value, seat_supplying, team_path = _resolve_seat_half(
+    seat_value, seat_supplying, team_path, archive_layer = _resolve_seat_half(
         Path.cwd(), args.team, args.seat,
-        getattr(args, "scope", "global") or "global", getattr(args, "spec_dir", None)
+        getattr(args, "scope", "auto") or "auto", getattr(args, "spec_dir", None)
     )
 
     effective = ALLOW if (agent_value == ALLOW and seat_value == ALLOW) else DENY
@@ -371,8 +374,10 @@ def action_authorize(args) -> int:
         "failed_half": failed_half,
         "team_slug": args.team,
         "seat_slug": args.seat,
-        "scope": getattr(args, "scope", "global") or "global",
-        "spec_dir": getattr(args, "spec_dir", None),
+        # C-29: the archive layer that answered (the C-9 value set), replacing the
+        # retired scope names. The layer is resolved by the goal engine, never by a
+        # second path implementation here.
+        "archive_layer": archive_layer,
         "supplying": {
             "agent": agent_supplying["source"],
             "seat": seat_supplying["source"],
@@ -1026,10 +1031,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--agent", help="agent definition (.agent.md) carrying the capability")
     parser.add_argument("--team", help="team slug — the first authorization coordinate")
     parser.add_argument("--seat", help="seat slug — the second authorization coordinate")
-    parser.add_argument("--scope", choices=("global", "spec", "auto"), default="global",
-                        help="team scope: global (default), spec (requires --spec-dir), or auto")
+    parser.add_argument("--scope", choices=("goal", "teams", "auto"), default="auto",
+                        help="archive layer the team row resolves through: goal, teams, "
+                             "or auto (the single layer containing the team, the default)")
     parser.add_argument("--spec-dir", default=None,
-                        help="the spec directory for --scope spec/auto")
+                        help="spec directory used to resolve origin and validate auto "
+                             "inputs; it never decides where a definition lands")
     parser.add_argument("--nature", help="declared change_nature value")
     parser.add_argument("--traceability", help="declared traceability value")
     parser.add_argument("--blast-radius", help="declared blast_radius value")

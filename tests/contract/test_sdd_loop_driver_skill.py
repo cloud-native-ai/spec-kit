@@ -590,3 +590,48 @@ def test_c23_local_native_subagent_default():
     assert "当前项目" in docs and "原生子代理" in docs, (
         "docs page must carry the local default and native-subagent rule"
     )
+
+
+# ---------------------------------------------------------------------------
+# T071 / C-93 / C-95 / C-96 — the Goal/Team section is the binding model
+# ---------------------------------------------------------------------------
+
+GOAL_TEAM_HEADING = "**Goal/Team（binding model）**"
+THRESHOLD_FACT = "shared/declarations/facts/goal-team-handoff-threshold.yaml"
+BINDING_OWNER = "shared/definitions/goal-definitions.md"
+TEAM_OWNER = "skills/internal/create-team/references/conceptual-model.md"
+NEW_SPINE_KEYS = ("goal_slug", "team_slug", "origin_spec_dir")
+
+
+def test_the_goal_team_section_uses_the_binding_model():
+    text = _skill_text()
+
+    assert GOAL_TEAM_HEADING in text, (
+        "the Goal/Team section is retitled to the binding model")
+    assert "Goal/Team（085）" not in text, "the retired section title is gone"
+
+    section = text[text.index(GOAL_TEAM_HEADING):]
+    section = section[:section.index("\n\n")]
+    # Where the definitions land, under which binding, with both owners cited.
+    assert ".specify/anchoring/<slug>/goal.md" in section, (
+        "the goal archive layer is named")
+    assert ".specify/teams/<slug>/team.md" in section, (
+        "the team archive layer is named")
+    assert BINDING_OWNER in section and TEAM_OWNER in section, (
+        "both concept owners are cited by path rather than restated")
+    # The creation moment is read from its declaration, never restated as a value.
+    assert THRESHOLD_FACT in section, (
+        "the creation moment is read from the declared threshold fact")
+    for key in NEW_SPINE_KEYS:
+        assert key in section, f"the new state-spine key {key!r} is named"
+
+    # The retired scope syntax and the four-value write form are gone.
+    for retired in ("--scope spec", "--scope global", "scope = spec",
+                    "forbidden paths"):
+        assert retired not in text, (
+            f"the driver still carries the retired wording {retired!r}")
+
+    # The legacy keys are a read-only alias, not a write instruction.
+    assert "一次性迁移别名" in section and "legacy-key-dangling" in section, (
+        "the legacy keys remain readable only through the engine alias and fail "
+        "decidably when unresolvable")

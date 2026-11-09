@@ -36,9 +36,9 @@
 3. **Agent** 执行一条职责（duty）；职责是路由与授权的计量单位——一次裁决对应一条职责，而不是一个文件或一次提交。
 4. **SDD 运行**（`sdd-loop-driver`）是从属执行路径：它由**已获有效授权的 Agent** 启动，为一条职责产出 SDD 工件链，并在 review 完成后交回 handoff。
 
-**边界**: 任何 SDD 运行 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team 或 roster。下层不得改写上层的定义；需要改变上层的动作 MUST 返回给上层执行者（Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
+**边界**: 下层不得改写上层的定义。**一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义**——需要改变既有定义的动作 MUST 返回给上层执行者（Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
 
-**Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身 spec 内撰写与维护：Temporary Goal 在 requirements U4 后写入 `.specify/specs/<NNN-slug>/goal/`，Temporary Team 在 clarify+plan U4 后写入 `<spec-dir>/team/`。它是一条独立的、更低的作用域：MUST NOT 创建/重绑 Global Goal/Team，且 `.specify/goal/**` 与 `.specify/teams/**` 仍是运行与 child line 的 forbidden paths。Temporary 概念归 `shared/definitions/goal-definitions.md` 与 `skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。
+**平行线 carve-out（追加）**: 上句治理的是**共享档案中已有的定义**，不是禁止运行拥有定义。一次运行——SDD 运行与命令运行同规——MAY 创建归本次运行所有的定义并写入两条档案层：goal 档案 `.specify/anchoring/<slug>/goal.md`、team 档案 `.specify/teams/<slug>/team.md`；归属由绑定记录回答，其构成与取值域归 `shared/definitions/goal-definitions.md` § The Binding Record，team 侧归 `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model——本段只是路由层的 carve-out，不复述任何 value domain。哪些命令运行 MAY 创建定义由声明层与 goal 引擎的 `command-family` 动作判定，本段不设第二份清单。
 
 ## Direct modification
 

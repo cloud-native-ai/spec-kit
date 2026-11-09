@@ -40,9 +40,9 @@ classification: external
 | 断点 | U1 自动探测，禁止猜测 |
 | 特性切片 | 入口描述；未给则按权威文档推导，不自动选题 |
 | 并发度 | 缺省 **24**；U0 在状态脊写 `agent_concurrency_requested` / `agent_concurrency_effective` / `agent_concurrency_reason` / `verifier_reserve`；每阶段按 effective 与 ready packages 重算，降级必须具名 |
-| 写隔离 | 缺省 `write_isolation=shared-tree`；团队运行（team，scope = spec）可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
+| 写隔离 | 缺省 `write_isolation=shared-tree`；团队运行（一个绑定 goal 的 team）可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
 
-**Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `goal_slug`；clarify + plan U4 通过后，经 `/speckit.team create --scope spec --spec-dir <spec>` 创建并写入 `team_slug`（状态脊字段名 `goal_slug` / `team_slug`；历史状态脊里的 `temp_goal_slug` / `temp_team_slug` 作为历史记录原样保留，读方须两者都认）。两者都只写 spec-local `goal/` 与 `team/`，全局 `.specify/goal/**`、`.specify/teams/**` 是 forbidden paths。
+**Goal/Team（binding model）**：goal 与 team 都是**档案层**里的定义——goal 档案 `.specify/anchoring/<slug>/goal.md`、team 档案 `.specify/teams/<slug>/team.md`——归属由定义内的绑定记录回答（构成与取值域归 `shared/definitions/goal-definitions.md` § The Binding Record，team 侧归 `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model）；两者都不落任何 spec 子目录。**创建时机不在本手册复述**：读 `shared/declarations/facts/goal-team-handoff-threshold.yaml` 的声明值——直接执行的运行不创建，交接的运行在 `tasks` U4 后创建 goal 与 team；命令运行由命令模板声明其创建时刻。状态脊字段名为 `goal_slug` / `team_slug` / `origin_spec_dir`，写入 MUST 只落新键；历史状态脊里的 `temp_goal_slug` / `temp_team_slug` / `temp_scope_spec_dir` 只经 goal 引擎的一次性迁移别名读取（引擎读旧键、写新键；别名在 094 之后的首个 minor 版本移除），MUST NOT 被静默丢弃，无法解析时按 `legacy-key-dangling` 失败。
 
 **U0.5 自检（进入 U2 前必须通过）**：
 

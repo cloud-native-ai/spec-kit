@@ -1473,6 +1473,21 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
 
+    # C-18 / T046: the team lifecycle is its own closed two-value set; a definition
+    # outside it is refused instead of being run under a state nobody defined.
+    lifecycle_state = _lifecycle_for_kind(team_md, "teams")
+    if lifecycle_state not in ("", "active", "archived"):
+        raise GoalError(
+            f"team-lifecycle: team {team_slug!r} declares lifecycle_state "
+            f"{lifecycle_state!r}, outside the closed set active / archived")
+
+    # C-30 / T048: carry the loaded team's binding record additively. A team that
+    # predates the binding model keeps working — the key reports the absence (null)
+    # rather than turning the run preview into a new refusal.
+    binding = None
+    if _binding_block_lines(team_md.read_text(encoding="utf-8"))[0] is not None:
+        binding = read_binding(team_md)
+
     resolution = resolve_effective_target(team_md, explicit_target)
     reference = resolution["effective"]
 
@@ -1552,6 +1567,7 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
         "team_slug": team_slug,
         "goal_slug": goal_slug,
         "identity_kind": identity_kind,
+        "binding": binding,
         "resolution": {k: resolution.get(k) for k in ("effective", "source", "declared_focus")},
         "checks": checks,
         "verdict": verdict,

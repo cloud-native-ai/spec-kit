@@ -24,7 +24,7 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 **Delegation (mandatory)**: load `.specify/skills/internal/manage-goal/SKILL.md` and execute per its Workflow。六模式(`create` / `view` / `modify` / `targets` / `migrate` / `coordinate`)的模式表、读写分组与退出码裁决、唯一破坏性写(`criteria --clear` 需用户明示批准)、`create` 四要素访谈、执行顺序与 Boundaries 全部由该技能承载。
 
-**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. `global` is the project-level anchoring archive `.specify/anchoring/`; `spec` is `<spec-dir>/goal/`. Reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`); writes MUST use an explicit `global` or `spec` scope. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+**Scope**: pass `--scope` and `--spec-dir <path>` through to the goal engine. The closed scope value set, what each member names, and the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers — this template cites that owner and enumerates none of it. `--spec-dir` is accepted for `origin` resolution and `auto` validity only; it never decides where a definition lands. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
 
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 
@@ -33,7 +33,7 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 ### 技能产出
 
-- 定义文件本身—— `global` 写 `.specify/anchoring/<slug>/goal.md`(锚点档案),`spec` 写 `<spec-dir>/goal/<slug>/goal.md`(spec 级 goal;两者均仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)——与受影响 `team.md`(migrate / coordinate 经用户批准后)。
+- 定义文件本身—— 写 `.specify/anchoring/<slug>/goal.md`(goal 档案层;仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)——与受影响 `team.md`(migrate / coordinate 经用户批准后)。
 - `coordinate` 的领地重划分提案(批准前不写入);收尾执行报告。
 
 ## Wrap-up

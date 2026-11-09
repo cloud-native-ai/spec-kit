@@ -83,7 +83,7 @@ ACTIONS = [
 
 CHECK_KEYS = {"id", "name", "verdict", "message"}
 TOP_KEYS = {
-    "team_slug", "goal_slug", "identity_kind", "resolution",
+    "team_slug", "goal_slug", "identity_kind", "binding", "resolution",
     "checks", "verdict", "blocked",
 }
 RESOLUTION_KEYS = {"effective", "source", "declared_focus"}
