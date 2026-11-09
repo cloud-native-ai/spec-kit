@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261109T064500Z-092a
 slice: 092
-stage: analyze-repair
+stage: analyze
 stage_started_at: 1794211949
 stage_deadline_epoch: 1794222749
-stage_base_commit: ab8fa2de
-attempt: 0
+stage_base_commit: b75f1ebc
+attempt: 1
 retry_limit: 3
-last_verdict: "Analyze round 1: ANALYZE-DONE; NOT ready to implement — 1 CRITICAL (C-01 command-family predicate wrong; source ledger/default is the discriminator) + 5 HIGH (H-01 untestable GATE-6; H-02 three-way scope set; H-03 duplicated Assumptions; H-04 contradicting A1 + mis-cites; H-05 T043 forward dependency); checklist 7 STILL-VALID / 1 PARTIAL; repair brief at notes/analyze-round1-findings.md; next = analyze-repair"
+last_verdict: "Analyze-repair U4 pass (driver re-verified against artifacts and gate reruns): C-01/H-01…H-05/M-01…M-05/L-01/L-02 closed, L-03 residual (generation-name scope; C-107 does not scan .specify/specs/**); validate-requirements 0/0; account-clause-coverage status ok with explicit --corpus-root (fr 42/42; clause-uncovered pass, 0 beyond baseline); validate-tasks 0 err / 1 disclosed warn (T043→T054); pre-analyze x3 pass 0/0; decision-tensions 7 records 0/0; decomposition proceed 42/80; commits dae4a26c + b75f1ebc; next = analyze round 2"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch analyze round 2 (main tree) against the repaired artifacts
+next_action: "dispatch analyze round 2 (main tree): verify the 12 closure claims + adjudicate residual risks L-03 / H-01 grammar dependence / H-05 wp03 19-row ceiling / FR-025 scope-domain blast radius; verdict ready-to-implement iff CRITICAL=HIGH=0"
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
   non_goals: [新增 /speckit.* 命令, 第二个 goal/team 引擎, 破坏性迁移旧数据（archive-not-delete）, 改变 SDD 阶段链与哨兵]
@@ -56,4 +56,5 @@ gates: |
   tasks U4: pass — 80 rows / 7 packages / 111 clause attributions; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors / 1 disclosed warning
   checklist U4: pass — 40 items (100% traceable, soft cap 40 met); G-checklist-reader pass (mutation probe -> fail, exit 1); G-checklist-duplicate pass; validate-requirements ok 0/0; 8 fail rows are requirements findings for analyze
 wrapup: requirements records committed in af1fcae3; spec-local goal created; tasks stage records in test-evidence/ (+ coverage-baseline.txt); run-determination + exec-quant recorded; checklist stage: test-evidence/checklist-readings-2026-11-09.txt + checklist-gates-2026-11-09.txt + run-determination-checklist.txt; run-determination + exec-quant + feedback recorded for /speckit.checklist
-framework_observations: []
+framework_observations:
+  - "Concurrency-line gate leakage (driver-measured 2026-11-09): when two lines share one driver session whose cwd is line B's worktree, a gate that derives its corpus/repo root from cwd reads the sibling line's spec into line A's verdict. Measured: a 092 verification run of account-clause-coverage.py (no --corpus-root) reported 57 false `beyond the frozen baseline` clause names, all from 093's contracts; pre-analyze-check.py has the same shape via --repo. Framework location: .specify/scripts/python/account-clause-coverage.py default corpus root, .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py repo resolution. Impact: driver U4 must pass explicit --corpus-root/--repo whenever it stands outside the target tree."
