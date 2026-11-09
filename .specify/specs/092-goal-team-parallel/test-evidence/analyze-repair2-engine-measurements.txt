@@ -1,0 +1,31 @@
+# analyze-repair2 engine measurements — H-4 (unit-id grammar) re-measured (2026-11-09)
+# engine: .specify/scripts/python/flow-class-check.py  (read-only; --action lookup)
+
+## 1. grammar constants actually compiled into the two engines
+   .specify/scripts/python/flow-class-check.py:195:UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9-]*)$")
+   .specify/scripts/python/run-determination.py:198:_UNIT_ID_RE = re.compile(
+   run-determination.py:198-202 (verbatim):
+     r"^(?:/speckit\\.[a-z0-9][a-z0-9._-]*"
+     r"|skill:[a-z0-9][a-z0-9._-]*"
+     r"|custom:[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*)$"
+   flow-class-check.py:195 (verbatim):
+     ^(?:/speckit\\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9-]*)$
+   => the two engines differ: only run-determination accepts custom:<owner>/<name>.
+   => NEITHER accepts command:<name>. A command-family membership probe MUST therefore use
+      `--unit-id /speckit.<stem>`, the form both engines accept (C-71/C-72/C-74, tasks T020/T021).
+
+
+## 2. accepted vs rejected forms (flow-class-check.py --action lookup --format json)
+   /speckit.feedback -> exit=0  {  "action": "lookup",  "checked_at": "2026-11-09T08:54:32Z",  "unit_id": "/speckit.feedback",  "flow_class": "execution",  "source": "ledger",  "marker": null,  "basis": "behavior-oracle",  "neutral": false,  "error": n
+   /speckit.nonexistentcommand -> exit=0  {  "action": "lookup",  "checked_at": "2026-11-09T08:54:32Z",  "unit_id": "/speckit.nonexistentcommand",  "flow_class": "execution",  "flow_type": null,  "source": "default",  "marker": "未声明·按默认",  "basis": null,  "neutr
+   skill:create-tools -> exit=0  {  "action": "lookup",  "checked_at": "2026-11-09T08:54:32Z",  "unit_id": "skill:create-tools",  "flow_class": "execution",  "source": "ledger",  "marker": null,  "basis": "behavior-oracle",  "neutral": false,  "error": 
+   command:feedback -> exit=2  invalid unit id 'command:feedback': expected /speckit.<stem> or skill:<dir>{  "action": "lookup",  "checked_at": "2026-11-09T08:54:32Z",  "unit_id": "command:feedback",  "flow_class": "execution",  "flow_type": null,  "s
+   custom:x/y -> exit=2  invalid unit id 'custom:x/y': expected /speckit.<stem> or skill:<dir>{  "action": "lookup",  "checked_at": "2026-11-09T08:54:32Z",  "unit_id": "custom:x/y",  "flow_class": "execution",  "flow_type": null,  "source": "def
+
+## 3. the discriminator C-71 must name (measured, not inferred)
+   /speckit.feedback -> source=ledger flow_class=execution marker=None
+   /speckit.plan -> source=ledger flow_class=execution marker=None
+   /speckit.nonexistentcommand -> source=default flow_class=execution marker=未声明·按默认
+
+## 4. archival residents (SC-012 denominator) — see analyze-repair2-resident-measurement.txt
+   6 goal + 12 team definitions, 0 carrying a binding block (measured same run)

@@ -1,0 +1,36 @@
+# analyze-repair2 resident measurement — SC-012 baseline denominator (2026-11-09)
+# command: python3 - <<'PY' over glob('.specify/goal/*/goal.md') + glob('.specify/teams/*/team.md'),
+#          counting a definition as bound iff a line matching ^binding: exists in its text.
+# repo:      /storage/project/cloud-native-ai/spec-kit (MAIN tree, branch master)
+# purpose:   SC-012's comparison-type closed-set claim must name a measured baseline and denominator
+#            rather than restate a number; this file IS that baseline. Pre-backfill reading.
+
+goal_definitions            6
+team_definitions           12
+definitions_total          18
+with_binding_block          0
+without_binding_block      18
+
+## The 18 residents measured (all currently unbound)
+.specify/goal/command-logic-as-classified-skills/goal.md
+.specify/goal/draw-diagram-interactive/goal.md
+.specify/goal/draw-two-layer-structure/goal.md
+.specify/goal/post-refactor-mechanism-integrity/goal.md
+.specify/goal/session-driven-self-improvement/goal.md
+.specify/goal/skill-layer-install-separation/goal.md
+.specify/teams/command-logic-as-classified-skills/team.md
+.specify/teams/cws-workspace-cluster/team.md
+.specify/teams/demo-seat-dispatch/team.md
+.specify/teams/draw-diagram-interactive/team.md
+.specify/teams/draw-plantuml-optimizer/team.md
+.specify/teams/draw-two-layer-structure/team.md
+.specify/teams/post-refactor-mechanism-integrity/team.md
+.specify/teams/requirement-implement-monitor/team.md
+.specify/teams/session-driven-self-improvement/team.md
+.specify/teams/skill-layer-install-separation/team.md
+.specify/teams/summarize-project-optimizer/team.md
+.specify/teams/viz-skill-arena/team.md
+
+## Post-backfill reading (expected shape, to be produced by T083 at implement time)
+#    with_binding_block == definitions_total (18), second run writes 0, one `already-bound` line per definition.
+# This file is the BASELINE half of the pair; the apply-side reading is a separate file (one reading per file).

@@ -108,7 +108,7 @@ probe reading.
   `migrate-archive` as a side effect (A5); only the explicit `/speckit.goal migrate-archive` entry does.
 
 (FR-009, FR-030)
-## 5. Real-data dry run (FR-042)
+## 5. Resident backfill (FR-043) and the real-data dry run (FR-042)
 
 - **C-51**: The dry run MUST be executed against this repository's real tree once before the real migration, and
   both readings MUST be recorded as dated evidence under `<spec-dir>/test-evidence/`. The dry run MUST NOT delete
@@ -121,6 +121,23 @@ probe reading.
   never restated as a constant in a second document (SC-003).
 
 (FR-042)
+- **C-53**: The binding record requirement (C-1) MUST hold for **every** definition in the unified archive,
+  including the residents that predate this feature. Measured 2026-11-09: `.specify/goal/*/goal.md` carries 6
+  definitions and `.specify/teams/*/team.md` 12, and none carries a `binding` block. Those residents are NOT part
+  of the migration subject (C-35, FR-009 names spec-local trees only), so a second, separate action owns them:
+  `backfill-bindings`, a write action of the same engine with the same closed-subset reader (no second executable,
+  FR-012's rule applied to this action too), accepting `--dry-run`, which prints the per-definition plan and writes
+  nothing, and whose before/after readings MUST be recorded as dated evidence under `<spec-dir>/test-evidence/`,
+  one file per reading.
+
+(FR-043)
+- **C-54**: `backfill-bindings` MUST write the record `owner: human`, `owner_id: human`, `origin: null` on every
+  resident that has no binding block, MUST refuse (exit 2, naming the definition) a resident whose binding block is
+  present but incomplete rather than overwriting it, MUST leave every other byte of the definition identical
+  (C-6's comparison, applied to an insertion), and MUST be idempotent: a second run over a backfilled tree performs
+  zero writes and reports one `already-bound` line per definition. The action MUST NOT run implicitly (C-50's rule).
+
+(FR-043)
 ## Requirement coverage
 
-FR-007, FR-009, FR-010, FR-011, FR-012, FR-013, FR-029, FR-030, FR-037, FR-042; SC-002, SC-003, SC-004, SC-011.
+FR-007, FR-009, FR-010, FR-011, FR-012, FR-013, FR-029, FR-030, FR-037, FR-042, FR-043; SC-002, SC-003, SC-004, SC-011, SC-012.

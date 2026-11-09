@@ -6,7 +6,7 @@
 **Flow Class**: execution
 **Flow Type**: -
 **Readers**: 框架维护者（修订 085 引入的 goal/team 机制、`goal-utils.py`、`create-team` / `run-team`、驱动者 § Temporary Goal/Team 与 checkpoint 协议的作者）、下游项目里同时使用 `/speckit.*` 命令与 SDD 演进流程的项目维护者——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
-**Reading scenario**: 在判定「一次运行能否拥有 goal 与 team」「goal/team 的档案落在哪里」「spec 与 goal+team 谁附属谁、交接发生在哪」时打开本规格，据 FR-001…FR-042 与 SC-001…SC-010 决定 `/speckit.plan` 与后续实现是否放行
+**Reading scenario**: 在判定「一次运行能否拥有 goal 与 team」「goal/team 的档案落在哪里」「spec 与 goal+team 谁附属谁、交接发生在哪」时打开本规格，据 FR-001…FR-043 与 SC-001…SC-011 决定 `/speckit.plan` 与后续实现是否放行
 **Input**: User description: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. "临时"和"全局"也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 "设计师"和"施工队",  动手能力强的"设计师"可以自己动手完成一些简单的工作(在spec的sdd流程中直接执行), 有一定设计能力的"施工队"也可以自己完成一些简单的方案设计(goal直接进行设计然后执行), 但是比较复杂的工作就应该是"设计师将设计稿交给施工队去执行"(如前面的 implement阶段有 62 个任务)."
 
 ## Related Feature *(mandatory)*
@@ -165,8 +165,9 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 - **FR-040**: 命令运行的创建时机 MUST 同样可判定：命令运行 MAY 在其运行内创建 goal/team，创建时刻 MUST 由命令模板在其自身声明中给出（本特性 MUST 至少为 `/speckit.feedback` 给出该声明），MUST NOT 依赖引擎的隐式副作用，MUST NOT 要求命令运行拥有 spec 目录。
 - **FR-041**: 既有 085 的契约测试中钉住 spec-local 落点的用例 MUST 被显式处置（改写为统一落点断言，或标注为历史记录后移除）；本特性 MUST 列出处置清单，MUST NOT 让它们静默失效。处置面 MUST 至少覆盖 A7 已点名的文件清单（以 plan 阶段的检索读数为准，不得只按 A7 抄录），且处置后的全套契约测试必须在 `>=3.8` 上全绿——**移除**只能用于「该用例断言的事实已被本特性删除」的情形，断言仍成立而只是落点变化的用例 MUST 改写而非移除。〔判据见 Clarifications 的 Q11〕
 - **FR-042**: 本特性的迁移动作 MUST 在本仓真实数据上干跑一次（只读预演 + 一次实际迁移），并把读数记录为证据；干跑 MUST NOT 删除任何数据。
+- **FR-043**: [[STR-001]] 记录 MUST 对**每一个**已存在的 goal 与 team 定义成立，不只对本特性迁移或新建的那些：统一档案里在本特性之前就已存在的常驻定义（2026-11-09 实测 `.specify/goal/*/goal.md` 6 条、`.specify/teams/*/team.md` 12 条，实测时无一携带 `binding`）MUST 由本特性的一次**补录（backfill）**动作补齐，MUST NOT 留下「引擎读不了、也不归任何条目」的常驻定义。补录 MUST 经 FR-003 的引擎写路径完成、MUST 幂等（已有完整 binding 的定义零写入）、MUST 只增写缺失的绑定行而不改动定义其余字节（沿用 C-6 的字节规则），并在 `test-evidence/` 留下逐条读数。补录行的取值是一枚**已登记的裁定**而非推断：`owner: human` / `owner_id: human` / `origin: null`，理由见 Clarifications 的 Q14。〔与 FR-002 的关系：FR-002 给取值域，本条给存量上的穷尽义务〕
 
-本节的 `A`–`F` 六个分组是标题，不承载要求条目：分组标题在 clarify 阶段随条目增删保留下来，而**全部 42 条 FR 按执行顺序连续登记在 `A` 之下**，编号 `FR-001`…`FR-042` 未按分组重新切分。重切分组会让编号在不同位置改变含义，代价大于收益，因此本阶段把这一事实写明，而不是留下六个空标题让读者以为分组与编号对应。分组的语义对应（供检索用，不构成第二份清单）：`A` 作用域扩展（FR-001…FR-006、FR-040）、`B` 档案统一与迁移（FR-007、FR-009…FR-013、FR-042）、`C` 平行关系与交接契约（FR-014、FR-016…FR-021、FR-034…FR-036、FR-039）、`D` 概念重定义（FR-002、FR-003、FR-015、FR-022…FR-027、FR-038）、`E` 判定面与取证（FR-005、FR-031…FR-033、FR-041）、`F` 档案层级与运行时豁免（FR-037）。
+本节的 `A`–`F` 六个分组是标题，不承载要求条目：分组标题在 clarify 阶段随条目增删保留下来，而**全部 43 条 FR 按执行顺序连续登记在 `A` 之下**，编号 `FR-001`…`FR-043` 未按分组重新切分。重切分组会让编号在不同位置改变含义，代价大于收益，因此本阶段把这一事实写明，而不是留下六个空标题让读者以为分组与编号对应。分组的语义对应（供检索用，不构成第二份清单）：`A` 作用域扩展（FR-001…FR-006、FR-040）、`B` 档案统一与迁移（FR-007、FR-009…FR-013、FR-042、FR-043）、`C` 平行关系与交接契约（FR-014、FR-016…FR-021、FR-034…FR-036、FR-039）、`D` 概念重定义（FR-002、FR-003、FR-015、FR-022…FR-027、FR-038）、`E` 判定面与取证（FR-005、FR-031…FR-033、FR-041）、`F` 档案层级与运行时豁免（FR-037）。
 
 ### Runtime Stack & Dependency Ownership
 
@@ -205,6 +206,7 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 - **SC-009**: 绑定模型自足：同一 goal 定义在改变绑定（owner 由命令运行改为被某个 SDD 运行的 team 引用）前后，定义文件字节与路径不变，归属只由绑定记录回答；把归属推断改成「按目录位置」时测试转红。 **Path**: supporting
 - **SC-010**: 085 契约测试处置完整：钉住 spec-local 落点的既有用例逐条有处置记录（改写 / 移除 / 标为历史，移除仅限「所断言的事实已被删除」的用例，见 FR-041），且处置后全套契约测试在 `>=3.8` 上全绿；存在未处置条目时该测试转红。 **Path**: supporting
 - **SC-011**: 中断迁移可续做：在「源已移入归档位置、目标尚未落盘」处中断一次迁移，第二次调用 MUST 报告该阶段并完成收尾，且源数据与回执均可枚举——不得二次搬移。把第二次调用改成重新搬移或静默成功时测试转红。 **Path**: supporting
+- **SC-012**: 绑定记录在统一档案里穷尽：补录动作运行后，`.specify/goal/*/goal.md` 与 `.specify/teams/*/team.md` 的**每一条**定义都携带完整 `binding` 记录（`owner` / `owner_id` / `origin`），第二次运行零写入；把补录改成只处置本特性新建的定义、或把某条常驻定义的绑定行删掉时，该测试转红。本条是比较型封闭清单声明：基线与分母取自 `test-evidence/analyze-repair2-resident-measurement.txt` 的实测读数，本条 MUST NOT 重述该数。 **Path**: final
 
 ### Measurement Sources & Collection Methods
 
@@ -219,6 +221,7 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 - **SC-009 Source**: 绑定变更前后同一定义的哈希对照与归属查询输出，记录在 `test-evidence/`。
 - **SC-010 Source**: 085 契约测试文件清单与逐条处置表（写入 `feature-ref.md` 或本规格的处置节），加上处置后的 `pytest -m contract` 读数。
 - **SC-011 Source**: `test-evidence/` 下的中断迁移夹具复现记录（中断点、第二次调用的退出码、回执路径与源数据存在性断言）。
+- **SC-012 Source**: `test-evidence/` 下的补录前后逐条读数（分母、写入计数、第二次运行零写入、逐条 `binding` 存在性断言），乘以合成变异实测（从一条常驻定义中删掉绑定行，同一模块转红）。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
@@ -256,8 +259,14 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 
 ### Session 2026-11-09（analyze-repair，自行裁决并记录）
 
-- Q（H-02）：同一份取值集在三处出现三种写法——FR-008 + plan T-004 写 `{global, auto}`，契约 C-9 + `.specify/memory/features/092.md` 写 `{goal, teams, auto}`，live 引擎 `goal-utils.py:1312` 写 `("global", "spec", "auto")`。哪一个是对的，其余怎么处置？ → A: 以 **`goal` / `teams` / `auto`** 为唯一答案，唯一 owner 是 FR-025（本条新增为封闭三成员并以 `choices=` 为实现投影）；`global` 与 `spec` 一并出域。判据不是投票而是**语义**：`global` 是 085 的「全局档案」单数概念，本特性把它拆成两条并列档案行（[[STR-002]]），一个叫 `global` 的成员会同时指向两行、每回调用都要再猜一层；而 `{global, auto}` 两成员集根本表达不出「写 goal 档案」与「写 team 档案」两条写目标（C-13 要求写入必须点名档案行）。因此 Q2 里「保留 `global` / `auto`」的措辞应读作「保留两**行档案**语义」，改名后即 `goal` / `teams`；契约 C-9、`features/092.md`、plan T-004 与 quickstart 的 `--scope goal` 均已一致，本阶段只改 FR-008 / FR-025 / 假设 A1 三处正文。（FR-008、FR-025、A1）
+- Q（H-02）：同一份取值集在三处出现三种写法——FR-008 + plan T-004 写 `{global, auto}`，契约 C-9 + `.specify/memory/features/092.md` 写 `{goal, teams, auto}`，live 引擎 `goal-utils.py:1312` 写 `("global", "spec", "auto")`。哪一个是对的，其余怎么处置？ → A: 以 **`goal` / `teams` / `auto`** 为唯一答案，唯一 owner 是 FR-025（本条新增为封闭三成员并以 `choices=` 为实现投影）；`global` 与 `spec` 一并出域。判据不是投票而是**语义**：`global` 是 085 的「全局档案」单数概念，本特性把它拆成两条并列档案行（[[STR-002]]），一个叫 `global` 的成员会同时指向两行、每回调用都要再猜一层；而 `{global, auto}` 两成员集根本表达不出「写 goal 档案」与「写 team 档案」两条写目标（C-13 要求写入必须点名档案行）。因此 Q2 里「保留 `global` / `auto`」的措辞应读作「保留两**行档案**语义」，改名后即 `goal` / `teams`；契约 C-9 与 `features/092.md` 已是 `{goal, teams, auto}`，plan T-004 的决策正文在本轮（analyze-repair round 2）改到同一取值集，quickstart 的 `--scope goal` 与本条一致；本阶段改 FR-008 / FR-025 / 假设 A1 三处正文、plan T-004 一处决策记录。（FR-008、FR-025、A1）
 - Q（H-01）：GATE-6 的命令写作 `account-clause-coverage.py --spec-dir …`，而该命令实测 `fr-uncovered` fail 26/42 且退出 1；是把 111 条条款的引注组改写，还是让 GATE-6 只声明它真正判定的车道？ → A: **改写引注组**，不改判据语义。判据 owner（`shared/definitions/contract-clause-definitions.md` § 引用组）把「条款引用了哪条 FR」定义为条款块内**最后一个**含编号的括号组，而本特性把 FR 写在块首括注里、块尾不再有引用组，于是每条条款都被记为「未引用」——这是引注形式缺陷，不是覆盖缺失（`pre-analyze-check --stage tasks` 的 FR 车道 42/42、`feature-ref.md` § FR → clause map 42/42 均可证）。取真判据的代价是 111 条各加/移一个括号组；降判据的代价是让一条真检查从此只看它想看的部分。同族 spec 090（10/10）与 091（28/28）在该判据下都满覆盖，证明判据可实现。（FR-033、SC-006、SC-010）
+
+### Session 2026-11-09（analyze-repair round 2，自行裁决并记录）
+
+- Q（H-3）：C-1 要求每个定义都带 [[STR-001]] 记录，而统一档案里在本特性之前就存在的 6 个 goal / 12 个 team 定义无一携带它，迁移只处置 8 + 8 条 spec-local 定义——这 18 条常驻定义由谁负责？ → A: **给补录一个具名 owner（FR-043）**，不采用「把 C-1 的拒绝收窄到本特性创建/迁移的定义」这一读法。判据是失效模式而非成本：收窄读法在实现完成后留下 18 条引擎读不了的定义，而引擎读不了正好等于 `/speckit.goal`、`/speckit.team`、`run-team` 与驱动者在这棵树上失效——这正是本特性要交付的能力本身。补录取值裁定为 `owner: human` / `owner_id: human` / `origin: null`（C-3 已允许 `human` 形态），依据有三：(a) 这 18 条定义是先于绑定模型存在的人工产物，没有可解析的运行标识可填；(b) `human` 是唯一对任何 goal 恒可写的 owner（C-14），补录后不会制造一批「谁都不能改」的档案；(c) `origin: null` 是既有事实——它们不在任何 spec 目录下。`origin: null` 与 EP-002 的 slug 不相交两项实测共同保证补录不改变迁移判定（C-36 只给被迁移定义写 `origin`）。本条与 FR-009 的迁移是**两个动作**：迁移处置 spec-local 定义，补录处置常驻定义，任何一条定义只走其中一条路径。（FR-002、FR-043、C-1、C-3）
+
+- Q（H-5 / M-04）：`plan.md` T-004 的决策记录仍写 `{global, auto}` 而 FR-025 与契约 C-9 已裁为 `{goal, teams, auto}`；FR-009 是否要新写一句「MUST NOT 重建谱系」？ → A: **改 T-004 的决策正文到 `{goal, teams, auto}` 一枚读法**，并在同一记录里写明它取代了先前那版写 `{global, auto}` 的反题；A11 与 § Notes 的指针**改指 C-36**，不在 FR-009 里再写一句。依据：T-004 原先的标题与决策句写的都是「收窄为 `global` / `auto`」，而 `global` 已由 Q13 出域，一条自称「本轮裁决」的记录却载着已被判为出域的成员，读者无从分辨哪句是现行；T-004 是 `validate-decision-tensions.py` 校验的那份记录，也是 DoD 指名的设计 owner，它的正文必须与它指向的 FR 一致。**第二轮 analyze-repair 已按本裁决改写 T-004**（标题与 decision 为 `goal` / `teams` / `auto`，`discriminating_evidence` 改为 `--scope global|spec|<未登记值>` 三者同形退出 2、`--scope goal|teams` 退出 0 的正反两读），故此处不再是待办而是对既成事实的记载。反题一侧不需重写——原反题「保留 `spec` 作别名、零调用方修改」仍是那条被拒方案，只是它的「更优条件」收窄为「允许改 8 个 scope 测试时」。M-04 走**改指针**而非补 FR 句，因为禁令的规范面已经在 C-36 上（迁移 MUST NOT 重建跨定义谱系），再在 FR-009 写一遍就是同一事实的第二定义点，违反宪法 XIV；A11 是「假设」，指向契约条款与指向 FR 同样成立。§ Notes 第 277 行与 requirements 第 259 行两处「已由 FR-009 承载 / 已一致」的措辞随之改为事实陈述。（FR-008、FR-009、FR-025、A11）
 
 ## Notes
 
@@ -274,14 +283,14 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 处置同时修掉三处误引与一处矛盾：A2 误引 `FR-007、FR-032` → `FR-006、FR-031`；A3 误引 `FR-019 / FR-032` → `FR-018 / FR-031`；A4 误引 `FR-025` → `FR-024`、`RS-004` → `RS-003、RS-004`；A5 误引 `FR-010` / `FR-031` / `FR-013` → `FR-009` / `FR-030` / `FR-012`。
 矛盾项（段 2 的 A1 写「本阶段不裁 scope 取值名，只钉死必须显式处置」，与已裁决的 FR-008 及段 1 的 A1 直接冲突）以 clarify 裁决为准保留一份，段 2 的 A1 文本作为**已被取代读法**记录在本节而不保留在正文——这是唯一一处内容不并入合并段落的位置，理由是它断言的事实已被判决删除，保留会让读者看到两条互斥的现行规则。
 
-本阶段同时补齐两处 analyze 指出的口径缺口：A11 的「迁移 MUST NOT 重建谱系」原先只在假设里出现、无 FR 承载，现由 FR-009 正文承载（A11 只留理由）；A6 的枚举范围统一为「085–091」。
+本阶段同时补齐两处 analyze 指出的口径缺口：A11 的「迁移 MUST NOT 重建谱系」原先只在假设里出现、无 FR 承载，现由[[契约条款 `contracts/unified-archive-and-migration.md` C-36]] 承载（A11 只留理由）；A6 的枚举范围统一为「085–091」。第二轮 analyze 指出此处原先误指 FR-009（FR-009 正文并无该句，禁令规范面在 C-36），指针已改为契约条款；同一事实在 FR 与契约各写一遍是第二定义点，故不从 FR 侧补句。
 
 ### 同批处置的其余发现（2026-11-09 analyze-repair）
 
 - **M-01 / H-04（A6 范围与误引）**: 见上节，合并段取 `085–091`（7 + 7，实测）。
 - **M-02（FR-005 的过期指针）**: `见 FR-032` → `见 FR-031`（声明层条目的 owner 是 FR-031）。
 - **M-03 / C-01（命令族判别子）**: FR-006 与 A9 一并改为 `source: ledger` vs `source: default`；FR-006 载实测对照（`/speckit.feedback`、`/speckit.plan` = `ledger`；`/speckit.nonexistentcommand` = `default`），A9 只留理由与「未声明 = 不入族」的裁定。
-- **M-04（A11 无 FR 承载）**: 已由 FR-009 承载，见上节。
+- **M-04（A11 无 FR 承载）**: 禁令的规范面在契约 `unified-archive-and-migration.md` C-36（迁移 MUST NOT 重建跨定义谱系），A11 的指针已改指该条款（第二轮 analyze 更正了「已由 FR-009 承载」这一误指）。
 - **M-05（FR-041 双引 A7）**: 原 FR-041 在正文里两次点名 A7（「至少覆盖 A7 已点名的文件清单…不得只按 A7 抄录」），是 H-03 中**爆炸半径最大**的一处——一旦按重复块整段处置掉其一，这条不可逆的 085 测试移除就失去它唯一的清单锚点。合并后 A7 只剩一条，FR-041 的两次点名指向同一目标，语义不变；本阶段不改写 FR-041 正文，只把这件事记录在此。
 - **L-01（B–F 空分组）**: 六个分组标题保留，`A` 段末补一句「全部 42 条 FR 连续登记在 A 之下、分组只是标题」的事实，避免读者以为编号与分组对应。
 
@@ -303,4 +312,4 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 - **A8（本特性自身的收口受同样约束）**: 本阶段提交只含本特性产物、按显式路径、不 push——迁移机制尚未落地，本特性自己的运行仍按手工步骤完成，并把这件事实记录在此以免被误读为「机制已生效」。
 - **A9（未声明类别的命令按「不入族」处理）**: FR-006 用「载体文件是否在 `flow-class-classes.yaml` 中登记了类别」判定命令族，判别子是类别读取入口输出里的 `source` 字段——`source: ledger`（登记表里有自己的条目）入族，`source: default`（有序清单第 0 个成员的兜底）不入族；`flow_class` 取值与退出 0 都不是判别子（`/speckit.nonexistentcommand` 同样退出 0 并返回 `flow_class: execution`，见 FR-006 的实测）。本阶段裁为「未声明 = 不入族」，理由是判定必须可由既有读入口回答，猜一个白名单会重新引入逐命令硬编码。若后续确需让某个入口层命令入族，正确做法是给它登记类别，而不是改本判据。
 - **A10（绑定改成可写性的确定性函数，不靠禁令）**: 旧规则用「forbidden paths」表达「运行不得写共享档案」。本阶段裁为可判定函数（FR-038）：被任意 team 绑定的 goal 只能由 `human` 改写。边界情形——同一个 goal 被另一条线的 team 绑定时，原 `owner` 失去写权——是**有意接受**的代价：它把「谁的档案」变成可枚举的事实，而不是依赖禁令文本。
-- **A11（`origin` 只记直接来源，不建谱系）**: 迁移后的定义 `origin` 记录**直接来源 spec**；一条被迁移的 team 若其 `goal_slug` 指向也被迁移的 goal，迁移 MUST NOT 试图重建跨定义的历史谱系。理由：谱系不是本特性的诉求，且它会让「重跑迁移是否等价」变得不可判定。该禁令的规范面由 FR-009 承载（迁移 MUST NOT 重建谱系），本条只记理由。
+- **A11（`origin` 只记直接来源，不建谱系）**: 迁移后的定义 `origin` 记录**直接来源 spec**；一条被迁移的 team 若其 `goal_slug` 指向也被迁移的 goal，迁移 MUST NOT 试图重建跨定义的历史谱系。理由：谱系不是本特性的诉求，且它会让「重跑迁移是否等价」变得不可判定。该禁令的规范面由契约 `unified-archive-and-migration.md` 的 C-36 承载（迁移 MUST NOT 重建跨定义谱系），本条只记理由。
