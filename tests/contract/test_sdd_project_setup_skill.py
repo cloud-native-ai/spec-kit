@@ -226,12 +226,24 @@ def test_instruction_budget_and_hook_health_are_pointers():
 
 
 def test_local_default_and_native_subagent():
+    """FR-035 / C-094 re-pin (093 T152): fork + subprocess carriers, in-process ban."""
     text = _skill()
     assert "S0 入口缺省解析" in text
     assert "当前项目" in text
-    assert "原生子代理" in text
-    assert "MUST NOT 启动 `qodercli`" in text
+    combined = text + _recipes()
+    assert "qodercli" in combined and "stage-runner.sh" in combined, (
+        "the fork carrier is same-family qodercli children through stage-runner.sh")
+    assert re.search(r"子进程|child process|child-process", combined)
+    assert re.search(r"SUBPROCESS|subprocess|独立子进程", combined), (
+        "heterogeneous agents use the subprocess carrier")
+    assert re.search(r"heterogeneous|异构", combined)
+    assert "in-process" in combined and re.search(
+        r"in-process[\s\S]{0,240}(BANNED|禁止|MUST NOT)"
+        r"|(BANNED|禁止|MUST NOT)[\s\S]{0,240}in-process", combined), (
+        "the host-internal in-process subagent path is BANNED as a carrier")
+    for phrase in ("MUST NOT 启动 `qodercli`", "MUST NOT 启动 qodercli",
+                   "MUST NOT launch `qodercli` locally"):
+        assert phrase not in combined, (
+            "the disposed old rule returned: %r" % phrase)
     recipes = _recipes()
     assert "本地拓扑" in recipes and "n/a" in recipes
-    docs = DOCS.read_text(encoding="utf-8")
-    assert "当前项目" in docs and "原生子代理" in docs

@@ -1,0 +1,178 @@
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_concurrency_check_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.F.FF.FF.                                                                [100%]
+=================================== FAILURES ===================================
+_________________ test_five_actions_each_produce_one_envelope __________________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw7/test_five_actions_each_produce0')
+
+    def test_five_actions_each_produce_one_envelope(tmp_path):
+        cases = {
+            "classify": ["classify", "--repo", REPO_ROOT],
+            "coverage": ["coverage", "--repo", REPO_ROOT, "--stage", "requirements"],
+            "serial-reason": [
+                "serial-reason", "--repo", REPO_ROOT,
+                "--record", _write_subset(tmp_path / "serial.yaml", [
+                    "pattern: serial",
+                    "codes:",
+                    "  - single-unit",
+                    "evidence:",
+                    "  single-unit:",
+                    "    units:",
+                    "      - only-unit",
+                ]),
+            ],
+            "reading": [
+                "reading", "--repo", REPO_ROOT,
+                "--record", _write_subset(tmp_path / "reading.yaml", [
+                    "requested: 1",
+                    "units:",
+                    "  - unit_id: unit-a",
+                    "    dispatched_at: 100",
+                    "    settled_at: 200",
+                    "effective_reason: one representable unit",
+                ]),
+            ],
+            "capability": [
+                "capability", "--repo", REPO_ROOT,
+                "--record", _write_subset(tmp_path / "capability.yaml", ["{}"]),
+            ],
+        }
+        for action, args in cases.items():
+            out = tmp_path / ("%s.json" % action)
+>           proc = _run_engine(*args, "--json-out", out)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_concurrency_check_engine.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None, timeout = 120
+args = ('classify', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw7/test_five_actions_each_produce0/classify.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+
+    def _run_engine(*args, cwd=None, timeout=120):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/unit/test_concurrency_check_engine.py:65: AssertionError
+________________ test_undeclared_option_is_rejected_with_exit_2 ________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw4/test_undeclared_option_is_reje0')
+
+    def test_undeclared_option_is_rejected_with_exit_2(tmp_path):
+>       proc = _run_engine("classify", "--repo", REPO_ROOT, "--bogus-option", cwd=tmp_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_concurrency_check_engine.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw4/test_undeclared_option_is_reje0')
+timeout = 120
+args = ('classify', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'), '--bogus-option')
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+
+    def _run_engine(*args, cwd=None, timeout=120):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/unit/test_concurrency_check_engine.py:65: AssertionError
+_________________ test_help_and_version_answer_without_acting __________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw3/test_help_and_version_answer_w0')
+
+    def test_help_and_version_answer_without_acting(tmp_path):
+        for flag in ("-h", "--help", "--version"):
+>           proc = _run_engine(flag, cwd=tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_concurrency_check_engine.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw3/test_help_and_version_answer_w0')
+timeout = 120, args = ('-h',)
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+
+    def _run_engine(*args, cwd=None, timeout=120):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/unit/test_concurrency_check_engine.py:65: AssertionError
+______________________ test_action_set_is_closed_to_five _______________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_action_set_is_closed_to_five():
+>       proc = _run_engine("sixth-action", "--repo", REPO_ROOT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_concurrency_check_engine.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None, timeout = 120
+args = ('sixth-action', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+
+    def _run_engine(*args, cwd=None, timeout=120):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/unit/test_concurrency_check_engine.py:65: AssertionError
+________________ test_record_actions_require_their_record_flag _________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw6/test_record_actions_require_th0')
+
+    def test_record_actions_require_their_record_flag(tmp_path):
+        for action in ("serial-reason", "reading", "capability"):
+>           proc = _run_engine(action, "--repo", REPO_ROOT, "--json-out", tmp_path / "out.json")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_concurrency_check_engine.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = None, timeout = 120
+args = ('serial-reason', '--repo', PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4'), '--json-out', PosixPath('/tmp/pytest-of-agent/pytest-5030/popen-gw6/test_record_actions_require_th0/out.json'))
+@py_assert1 = <bound method Path.is_file of PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py')>
+
+    def _run_engine(*args, cwd=None, timeout=120):
+>       assert ENGINE.is_file(), (
+            "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
+            "not in this worktree yet")
+E       AssertionError: red-first: scripts/python/concurrency-check.py is the WP2 engine target and is not in this worktree yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp4/scripts/python/concurrency-check.py').is_file
+
+tests/unit/test_concurrency_check_engine.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_concurrency_check_engine.py::test_five_actions_each_produce_one_envelope
+FAILED tests/unit/test_concurrency_check_engine.py::test_undeclared_option_is_rejected_with_exit_2
+FAILED tests/unit/test_concurrency_check_engine.py::test_help_and_version_answer_without_acting
+FAILED tests/unit/test_concurrency_check_engine.py::test_action_set_is_closed_to_five
+FAILED tests/unit/test_concurrency_check_engine.py::test_record_actions_require_their_record_flag
+5 failed, 4 passed in 6.81s
