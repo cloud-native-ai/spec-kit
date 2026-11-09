@@ -22,6 +22,7 @@ Read group (zero writes):
   targets         <slug> --list | --check STATEMENT
   run-checks      <team-slug> [--target T-nnn | <goal-slug>.T-nnn]
   binding         <goal|teams> <slug>
+  probe-residual  (094: enumerate the spec-local goal/team residuals)
 
 Write group (mutates one definition file):
   create    <slug> --objective TEXT [--title TEXT] [--criterion TEXT ...] [--boundary TEXT ...]
@@ -32,13 +33,18 @@ Write group (mutates one definition file):
   migrate   <team-slug> [--keep-inline/--drop-inline]
   bind      <goal|teams> <slug> --owner V --owner-id V [--origin V]
 
-Exit codes: 0 ok | 2 input error | 3 not found | 4 validation failed | 5 blocked
+Write group (094 unified archive; explicit actions, never implicit):
+  migrate-archive   --dry-run | --apply   (move spec-local trees, archive-not-delete)
+  backfill-bindings --dry-run | --apply   (insert the recorded binding on residents)
+
+Exit codes: 0 ok | 2 input error | 3 not found or migration interrupted | 4 validation failed or migration conflict | 5 blocked
 """
 
 from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import hashlib
 import json
 import os
 import re
@@ -1619,6 +1625,546 @@ def list_goals(repo_root: Path) -> list[dict]:
 
 
 # --------------------------------------------------------------------------
+# unified archive: migration, residual probe, resident backfill
+# (094, contracts/unified-archive-and-migration.md C-31…C-52, C-112…C-113)
+# --------------------------------------------------------------------------
+
+#: The migration destination history (STR-003): receipts and moved source trees.
+ARCHIVE_HISTORY_DIRNAME = ".specify/archive/goal-team"
+RECEIPTS_DIRNAME = "receipts"
+TREES_DIRNAME = "trees"
+DELETE_POLICY = "archive-not-delete"
+
+#: C-33 / C-34 — the two receipt shapes. A migration receipt carries one of the four
+#: migration outcomes; an archive receipt carries `archived` and is never a read surface.
+MIGRATION_RESULTS = ("migrated", "noop", "conflict", "interrupted")
+ARCHIVE_RESULT = "archived"
+
+#: C-43 — the spec-local forms the residual probe enumerates. These are migration
+#: SOURCES, never write targets; `.specify/.tmp/` is outside `.specify/specs/` entirely.
+RESIDUAL_FORMS = {
+    "goal": ("goal", DEFINITION_FILENAME),
+    "teams": ("team", "team.md"),
+}
+
+#: C-112 — the backfill values are a recorded ruling (Clarifications Q14), not inference.
+RESIDENT_BINDING = {"owner": "human", "owner_id": "human", "origin": None}
+
+#: C-39 test seam: the two step boundaries an interruption can be injected after.
+#: Declared, closed and side-effect-free; unset in production.
+FAULT_ENV = "GOAL_UTILS_FAULT_AFTER"
+FAULT_STEPS = ("target-write", "source-move")
+
+
+class _Interrupted(Exception):
+    """C-39 — a migration stopped between steps; carries the reached step."""
+
+    def __init__(self, step: str, row: dict, state: dict):
+        super().__init__(step)
+        self.step = step
+        self.row = row
+        self.state = state
+
+
+def _specs_root(repo_root: Path) -> Path:
+    return Path(repo_root) / ".specify" / "specs"
+
+
+def _history_root(repo_root: Path) -> Path:
+    return Path(repo_root) / ARCHIVE_HISTORY_DIRNAME
+
+
+def _receipt_path(repo_root: Path, kind: str, slug: str) -> Path:
+    return _history_root(repo_root) / RECEIPTS_DIRNAME / f"{kind}-{slug}.yaml"
+
+
+def _archived_tree_path(repo_root: Path, spec: str, kind: str, slug: str) -> Path:
+    return _history_root(repo_root) / TREES_DIRNAME / spec / kind / slug
+
+
+def _target_definition_path(repo_root: Path, kind: str, slug: str) -> Path:
+    """C-31 — the two unified-archive landing points, and nothing else."""
+    if kind == "goal":
+        return Path(repo_root) / ARCHIVE_DIRNAME / slug / DEFINITION_FILENAME
+    return Path(repo_root) / TEAM_DIRNAME / slug / "team.md"
+
+
+def _relative(root: Path, path: Path) -> str:
+    try:
+        return Path(path).relative_to(root).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def probe_residual(repo_root: Path) -> dict:
+    """C-43 — read-only enumeration of the spec-local residual trees (zero writes)."""
+    repo_root = Path(repo_root)
+    residuals: dict[str, list[str]] = {"goal": [], "teams": []}
+    specs = _specs_root(repo_root)
+    if specs.is_dir():
+        for kind, (layer_dir, filename) in RESIDUAL_FORMS.items():
+            for definition in sorted(specs.glob(f"*/{layer_dir}/*/{filename}")):
+                residuals[kind].append(_relative(repo_root, definition))
+    return {"residuals": residuals,
+            "counts": {kind: len(rows) for kind, rows in residuals.items()}}
+
+
+def _raw_frontmatter_value(text: str, key: str) -> str:
+    """The raw value of one frontmatter key, folded continuation lines included.
+
+    The closed-subset reader (R-06) parses four scalar kinds; a folded block scalar
+    (`key: >-`) is outside them, yet a team's concept statement lives there. This slice
+    reads that one key's text and does not grow into a second YAML parser.
+    """
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return ""
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        return ""
+    for i in range(1, end):
+        if lines[i].startswith(key + ":"):
+            raw = lines[i].partition(":")[2].strip()
+            parts = [] if raw in (">", ">-", "|", "|-", "") else [raw]
+            j = i + 1
+            while j < end and lines[j][:1] in (" ", "\t"):
+                parts.append(lines[j].strip())
+                j += 1
+            return " ".join(part for part in parts if part).strip()
+    return ""
+
+
+def _goal_concept_payload(path: Path) -> dict:
+    data = parse_goal(path)
+    return {
+        "objective": " ".join(data["objective"].split()),
+        "criteria": [" ".join(criterion.split()) for criterion in data["criteria"]],
+        "status": data["status"].strip(),
+        "targets": [[t["id"], " ".join(t["statement"].split()), t["status"]]
+                    for t in data["targets"]],
+    }
+
+
+def _team_concept_payload(path: Path) -> dict:
+    text = Path(path).read_text(encoding="utf-8")
+    meta, _start, _end = read_frontmatter_subset(text)
+    return {
+        "description": str(meta.get("description") or "").strip(),
+        "goal": _raw_frontmatter_value(text, "goal"),
+        "goal_slug": str(meta.get("goal_slug") or "").strip(),
+        "lifecycle_state": str(meta.get("lifecycle_state") or "").strip(),
+    }
+
+
+def concept_payload(kind: str, path: Path) -> dict:
+    """C-40/C-41 — what "did this definition change" compares.
+
+    Goal: Objective, Success Criteria, Lifecycle status, Targets text. Team: the nearest
+    concept fields (description, the inline goal statement, goal_slug, lifecycle_state);
+    territory is operational data and the binding block is excluded for both kinds.
+    """
+    return _goal_concept_payload(path) if kind == "goal" else _team_concept_payload(path)
+
+
+def concept_digest(kind: str, path: Path) -> str:
+    canonical = json.dumps(concept_payload(kind, path), sort_keys=True,
+                           ensure_ascii=False, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _read_binding_keys(text: str, path: Path) -> dict:
+    """The binding block's three values, refusing any non-canonical or incomplete block."""
+    start, block, occurrences = _binding_block_lines(text)
+    if start is None:
+        return {}
+    parsed: dict = {}
+    for line in block[1:]:
+        key, sep, raw = line.strip().partition(":")
+        if sep:
+            parsed[key.strip()] = raw.strip()
+    missing = [key for key in BINDING_KEYS if key not in parsed]
+    if missing:
+        raise GoalError(
+            f"binding-incomplete: {path} carries a binding block missing "
+            f"{', '.join(missing)}; the engine refuses to overwrite an incomplete record")
+    binding = {"owner": parsed["owner"], "owner_id": parsed["owner_id"],
+               "origin": None if parsed["origin"] in ("null", "~") else parsed["origin"]}
+    if occurrences != 1 or block != _render_binding_block(binding).splitlines():
+        raise GoalError(
+            f"binding-hand-edited: the binding block in {path} is not in the "
+            "engine-written canonical form; the binding is written only by this engine, "
+            "never by a template, skill or driver")
+    return binding
+
+
+def _insert_binding_block(text: str, binding: dict) -> str:
+    """Insert the binding block as the last frontmatter key; every other byte is kept."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise GoalInvalid("the definition carries no frontmatter; the binding record "
+                          "cannot be inserted (owner / owner_id / origin)")
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        raise GoalInvalid("the definition's frontmatter is unterminated; the binding "
+                          "record cannot be inserted") from None
+    rewritten = lines[:end] + _render_binding_block(binding).splitlines() + lines[end:]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    return new_text
+
+
+def _definition_with_origin(text: str, path: Path, origin: str) -> str:
+    """C-36 — set origin on the definition; the rest of the binding, when present, stays."""
+    existing = _read_binding_keys(text, path)
+    binding = {"owner": existing.get("owner", RESIDENT_BINDING["owner"]),
+               "owner_id": existing.get("owner_id", RESIDENT_BINDING["owner_id"]),
+               "origin": origin}
+    if not existing:
+        return _insert_binding_block(text, binding)
+    start, block, _occurrences = _binding_block_lines(text)
+    lines = text.splitlines()
+    rewritten = lines[:start] + _render_binding_block(binding).splitlines() \
+        + lines[start + len(block):]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    return new_text
+
+
+def _utc_now() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).replace(
+        microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _receipt_body(*, kind: str, source_spec: str, source_slug: str, target_slug: str,
+                  target_path: str, archived_path: str, digest: str, result: str,
+                  at: str, reached_step: str | None = None) -> dict:
+    body = {
+        "kind": kind,
+        "source_spec": source_spec,
+        "source_slug": source_slug,
+        "target_slug": target_slug,
+        "target_path": target_path,
+        "archived_path": archived_path,
+        "concept_digest": digest,
+        "result": result,
+        "at": at,
+        "delete_policy": DELETE_POLICY,
+    }
+    if reached_step:
+        body["reached_step"] = reached_step
+    return body
+
+
+def _write_receipt(repo_root: Path, body: dict) -> Path:
+    """One file per definition (`<kind>-<slug>.yaml`); never a shared stream (C-32)."""
+    path = _receipt_path(repo_root, body["kind"], body["target_slug"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(f"{key}: {value}" for key, value in body.items()) + "\n",
+                    encoding="utf-8")
+    return path
+
+
+def _read_receipt(path: Path) -> dict:
+    fields: dict = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        key, sep, value = line.partition(":")
+        if sep and key and not key.startswith((" ", "\t")):
+            fields[key.strip()] = value.strip()
+    return fields
+
+
+def _residual_sources(repo_root: Path) -> list[dict]:
+    rows = []
+    for kind, paths in probe_residual(repo_root)["residuals"].items():
+        for rel in paths:
+            definition = repo_root / rel
+            rows.append({"kind": kind, "slug": definition.parent.name,
+                         "source_spec": definition.parents[2].name,
+                         "definition": definition, "source_tree": definition.parent})
+    return rows
+
+
+def _planned_receipt(row: dict) -> dict:
+    return _receipt_body(
+        kind=row["kind"], source_spec=row["source_spec"], source_slug=row["slug"],
+        target_slug=row["slug"], target_path=row["target_path"],
+        archived_path=row["archived_path"], digest=row["concept_digest"],
+        result="migrated", at=_utc_now())
+
+
+def _plan_row(repo_root: Path, kind: str, spec: str, slug: str, definition: Path,
+              source_tree: Path | None) -> dict:
+    target = _target_definition_path(repo_root, kind, slug)
+    archived_tree = _archived_tree_path(repo_root, spec, kind, slug)
+    if kind == "goal":
+        ok, problems = validate_goal(definition, repo_root)
+        if not ok:
+            raise GoalInvalid(
+                f"migration-invalid: {_relative(repo_root, definition)} fails validation "
+                f"and is not migrated: {'; '.join(problems)}")
+    digest = concept_digest(kind, definition)
+    existing = _read_binding_keys(definition.read_text(encoding="utf-8"), definition)
+    row = {
+        "kind": kind, "slug": slug, "source_spec": spec,
+        "source_path": _relative(repo_root, definition),
+        "target_path": _relative(repo_root, target),
+        "archived_path": _relative(repo_root, archived_tree),
+        "concept_digest": digest,
+        "definition": definition, "source_tree": source_tree,
+        "binding": {"owner": existing.get("owner", RESIDENT_BINDING["owner"]),
+                    "owner_id": existing.get("owner_id", RESIDENT_BINDING["owner_id"]),
+                    "origin": spec},
+    }
+    if target.is_file():
+        if concept_digest(kind, target) != digest:
+            row["action"] = "conflict"
+            row["result"] = "conflict"
+            row["receipt"] = None
+            return row
+        row["action"] = "resume-move" if source_tree is not None else "resume-receipt"
+    elif archived_tree.exists() and source_tree is None:
+        row["action"] = "finish-write"
+    else:
+        row["action"] = "migrate"
+    row["result"] = "migrated"
+    row["receipt"] = _planned_receipt(row)
+    return row
+
+
+def _orphan_decisions(repo_root: Path, covered: set) -> list[dict]:
+    """Definitions whose source tree moved but whose receipt is absent or interrupted."""
+    trees_root = _history_root(repo_root) / TREES_DIRNAME
+    rows: list[dict] = []
+    if not trees_root.is_dir():
+        return rows
+    for spec_dir in sorted(path for path in trees_root.iterdir() if path.is_dir()):
+        for kind in ("goal", "teams"):
+            kind_dir = spec_dir / kind
+            if not kind_dir.is_dir():
+                continue
+            for tree in sorted(path for path in kind_dir.iterdir() if path.is_dir()):
+                definition = tree / (DEFINITION_FILENAME if kind == "goal" else "team.md")
+                if not definition.is_file() or (kind, tree.name) in covered:
+                    continue
+                receipt = _receipt_path(repo_root, kind, tree.name)
+                if receipt.is_file() and _read_receipt(receipt).get("result") != "interrupted":
+                    continue
+                rows.append(_plan_row(repo_root, kind, spec_dir.name, tree.name,
+                                      definition, None))
+    return rows
+
+
+def _noop_decisions(repo_root: Path, covered: set) -> list[dict]:
+    """C-38 — one noop entry per already-migrated definition, from its receipt."""
+    receipts = _history_root(repo_root) / RECEIPTS_DIRNAME
+    rows: list[dict] = []
+    if not receipts.is_dir():
+        return rows
+    for path in sorted(receipts.glob("*.yaml")):
+        fields = _read_receipt(path)
+        if fields.get("result") != "migrated":
+            continue
+        kind, slug = fields.get("kind"), fields.get("target_slug")
+        if kind not in ("goal", "teams") or not slug or (kind, slug) in covered:
+            continue
+        rows.append({
+            "kind": kind, "slug": slug, "source_spec": fields.get("source_spec", ""),
+            "source_path": "", "target_path": fields.get("target_path", ""),
+            "archived_path": fields.get("archived_path", ""),
+            "concept_digest": fields.get("concept_digest", ""),
+            "action": "noop", "result": "noop", "receipt": None,
+        })
+    return rows
+
+
+def _fault_after() -> str | None:
+    value = os.environ.get(FAULT_ENV)
+    return value if value in FAULT_STEPS else None
+
+
+def _write_target(repo_root: Path, row: dict, target: Path, source_text: str) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        _definition_with_origin(source_text, target, row["source_spec"]),
+        encoding="utf-8")
+    read_binding(target)
+
+
+def _execute_decision(repo_root: Path, row: dict) -> None:
+    """C-35's three ordered steps, with the interruption seam at each boundary."""
+    action = row["action"]
+    if action in ("noop", "conflict"):
+        return
+    target = _target_definition_path(repo_root, row["kind"], row["slug"])
+    archived = _archived_tree_path(repo_root, row["source_spec"], row["kind"], row["slug"])
+    fault = _fault_after()
+
+    def step(work, name: str) -> None:
+        try:
+            work()
+        except OSError as exc:
+            raise _Interrupted(name, row, {"target_exists": target.is_file()}) from exc
+        if fault == name:
+            raise _Interrupted(name, row, {"target_exists": target.is_file()})
+
+    if action in ("migrate", "finish-write"):
+        step(lambda: _write_target(repo_root, row, target,
+                                   row["definition"].read_text(encoding="utf-8")),
+             "target-write")
+    if action in ("migrate", "resume-move"):
+        def move() -> None:
+            archived.parent.mkdir(parents=True, exist_ok=True)
+            row["source_tree"].rename(archived)
+        step(move, "source-move")
+    step(lambda: _write_receipt(repo_root, _planned_receipt(row)), "source-move")
+
+
+def _public_decision(row: dict) -> dict:
+    return {key: value for key, value in row.items()
+            if key not in ("definition", "source_tree")}
+
+
+def migrate_archive(repo_root: Path, *, apply: bool) -> dict:
+    """FR-009/FR-010 — move spec-local definitions into the unified archive.
+
+    Planning is shared by `--dry-run` and `--apply`, which is what makes C-42's "same
+    decisions" structural rather than a claim, and every write is one of the three
+    ordered steps: target written and validated, source tree moved, receipt written.
+    """
+    repo_root = Path(repo_root)
+    sources = _residual_sources(repo_root)
+    for row in sources:
+        archived = _archived_tree_path(repo_root, row["source_spec"], row["kind"],
+                                       row["slug"])
+        if archived.exists() and row["source_tree"].exists():
+            raise GoalError(
+                f"archive-conflict: {_relative(repo_root, archived)} already holds a "
+                f"tree and {_relative(repo_root, row['source_tree'])} still exists; the "
+                "move would overwrite the archived copy, so the migration refuses "
+                "before writing anything (C-37)")
+
+    decisions = [_plan_row(repo_root, row["kind"], row["source_spec"], row["slug"],
+                           row["definition"], row["source_tree"]) for row in sources]
+    covered = {(row["kind"], row["slug"]) for row in decisions}
+    for row in _orphan_decisions(repo_root, covered):
+        decisions.append(row)
+    covered = {(row["kind"], row["slug"]) for row in decisions}
+    for row in _noop_decisions(repo_root, covered):
+        decisions.append(row)
+    decisions.sort(key=lambda row: (row["kind"], row["slug"]))
+
+    interrupted: dict | None = None
+    if apply:
+        executed: list[dict] = []
+        for row in decisions:
+            try:
+                _execute_decision(repo_root, row)
+            except _Interrupted as exc:
+                receipt = _receipt_body(
+                    kind=exc.row["kind"], source_spec=exc.row["source_spec"],
+                    source_slug=exc.row["slug"], target_slug=exc.row["slug"],
+                    target_path=exc.row["target_path"],
+                    archived_path=exc.row["archived_path"],
+                    digest=exc.row["concept_digest"], result="interrupted",
+                    at=_utc_now(), reached_step=exc.step)
+                _write_receipt(repo_root, receipt)
+                interrupted = {
+                    "result": "interrupted",
+                    "error": (f"interrupted: the migration of {exc.row['kind']} "
+                              f"{exc.row['slug']!r} stopped after the {exc.step} step; a "
+                              "second call resumes from that step (C-39)"),
+                    "reached_step": exc.step,
+                    "target_exists": exc.state["target_exists"],
+                    "target_path": exc.row["target_path"],
+                    "archived_path": exc.row["archived_path"],
+                }
+                row_copy = dict(_public_decision(row))
+                row_copy["result"] = "interrupted"
+                row_copy["reached_step"] = exc.step
+                decisions = executed + [row_copy]
+                break
+            executed.append(row)
+
+    conflicts = [row for row in decisions if row["result"] == "conflict"]
+    payload: dict = {
+        "action": "migrate-archive",
+        "mode": "apply" if apply else "dry-run",
+        "decisions": [(_public_decision(row) if isinstance(row, dict) else row)
+                      for row in decisions],
+        "counts": {name: sum(1 for row in decisions if row["result"] == name)
+                   for name in MIGRATION_RESULTS},
+    }
+    if interrupted:
+        payload.update({key: interrupted[key] for key in
+                        ("result", "error", "reached_step", "target_exists",
+                         "target_path", "archived_path")})
+    elif conflicts:
+        payload["error"] = "conflict: " + "; ".join(
+            f"target {row['target_path']} already exists with a different concept "
+            f"payload than the source {row['source_path']} — the migration refuses to "
+            "overwrite and names both candidates (C-40)" for row in conflicts)
+    return payload
+
+
+def _resident_definitions(repo_root: Path) -> list[dict]:
+    """C-112 — every definition already living in the unified archive."""
+    rows = []
+    for path in sorted((Path(repo_root) / ARCHIVE_DIRNAME).glob("*/goal.md")):
+        rows.append({"kind": "goal", "slug": path.parent.name, "path": path})
+    for path in sorted((Path(repo_root) / TEAM_DIRNAME).glob("*/team.md")):
+        rows.append({"kind": "teams", "slug": path.parent.name, "path": path})
+    return rows
+
+
+def backfill_bindings(repo_root: Path, *, apply: bool) -> dict:
+    """C-112/C-113 — insert the recorded binding on every unbound archive resident.
+
+    Every refusal is computed before the first write, so an incomplete or hand-edited
+    block leaves the whole tree untouched rather than half-backfilled.
+    """
+    repo_root = Path(repo_root)
+    planned: list[dict] = []
+    refusals: list[str] = []
+    for resident in _resident_definitions(repo_root):
+        text = resident["path"].read_text(encoding="utf-8")
+        if _binding_block_lines(text)[0] is None:
+            result = "backfilled"
+        else:
+            try:
+                _read_binding_keys(text, resident["path"])
+            except GoalError as exc:
+                refusals.append(str(exc))
+                continue
+            result = "already-bound"
+        shown = _relative(repo_root, resident["path"])
+        planned.append({"kind": resident["kind"], "slug": resident["slug"],
+                        "path": shown, "result": result,
+                        "_path": resident["path"]})
+    if refusals:
+        raise GoalError("; ".join(refusals))
+    if apply:
+        for row in planned:
+            if row["result"] != "backfilled":
+                continue
+            text = row["_path"].read_text(encoding="utf-8")
+            row["_path"].write_text(_insert_binding_block(text, RESIDENT_BINDING),
+                                    encoding="utf-8")
+    rows = [{key: value for key, value in row.items() if key != "_path"}
+            for row in planned]
+    return {"action": "backfill-bindings",
+            "mode": "apply" if apply else "dry-run",
+            "definitions": rows,
+            "counts": {"backfilled": sum(1 for row in rows
+                                         if row["result"] == "backfilled"),
+                       "already-bound": sum(1 for row in rows
+                                            if row["result"] == "already-bound")}}
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -1652,8 +2198,36 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
     def _sig_guard(_argv=None, declared=None, **_kwargs):
         return None
 
+def _run_archive_action(args, repo_root: Path) -> int:
+    """Dispatch the 094 archive actions; they span both archive layers and therefore
+    bypass the single-layer `--scope` resolution (C-31 applies to them directly)."""
+    try:
+        if args.action == "probe-residual":
+            payload = probe_residual(repo_root)
+        elif args.action == "migrate-archive":
+            payload = migrate_archive(repo_root, apply=bool(args.apply))
+        else:
+            payload = backfill_bindings(repo_root, apply=bool(args.apply))
+    except GoalNotFound as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_NOT_FOUND
+    except GoalInvalid as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INVALID
+    except GoalError as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INPUT_ERROR
+    _emit(payload, args.json)
+    if payload.get("result") == "interrupted":
+        # C-39: exit 3, distinguishable from 0 (complete) and 2 (input error).
+        return EXIT_NOT_FOUND
+    if "error" in payload:
+        return EXIT_INVALID
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -1784,8 +2358,36 @@ def main(argv: list[str] | None = None) -> int:
                               help="T-<nnn> or <goal-slug>.T-<nnn>; omit to resolve via "
                                    "team.md focus_target")
 
+    sub.add_parser(
+        "probe-residual", parents=[common],
+        help="read: enumerate the spec-local goal/team residuals (zero writes; 094)")
+
+    p_migrate_archive = sub.add_parser(
+        "migrate-archive", parents=[common],
+        help="write: move spec-local definitions into the unified archive "
+             "(archive-not-delete; explicit action, never implicit; 094)")
+    archive_mode = p_migrate_archive.add_mutually_exclusive_group(required=True)
+    archive_mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                              help="perform every read and decision, print the plan and "
+                                   "the receipt bodies, and write nothing")
+    archive_mode.add_argument("--apply", dest="apply", action="store_true",
+                              help="write the target, move the source tree, write the receipt")
+
+    p_backfill = sub.add_parser(
+        "backfill-bindings", parents=[common],
+        help="write: insert the recorded binding (human / human / null) on archive "
+             "residents that carry none (explicit action, never implicit; 094)")
+    backfill_mode = p_backfill.add_mutually_exclusive_group(required=True)
+    backfill_mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                               help="print the per-definition plan and write nothing")
+    backfill_mode.add_argument("--apply", dest="apply", action="store_true",
+                               help="insert the binding record on every unbound resident")
+
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
+
+    if args.action in ("probe-residual", "migrate-archive", "backfill-bindings"):
+        return _run_archive_action(args, repo_root)
 
     global _ACTIVE_SCOPE
     _ACTIVE_SCOPE = None
@@ -2023,6 +2625,26 @@ def _emit(payload: dict, as_json: bool) -> None:
             print(f"  {row['id']}. {row['name']:<16} {row['verdict']}{tail}")
         print(f"verdict: {payload['verdict']}   blocked: "
               f"{str(payload['blocked']).lower()}")
+        return
+    if "residuals" in payload:
+        for heading, kind in (("goal", "goal"), ("team", "teams")):
+            print(f"## {heading}")
+            for path in payload["residuals"][kind]:
+                print(path)
+            print(f"count={payload['counts'][kind]}")
+        return
+    if "decisions" in payload:
+        for row in payload["decisions"]:
+            print(f"{row['kind']}\t{row['slug']}\t{row['result']}\t"
+                  f"{row.get('source_path', '')} -> {row.get('target_path', '')}")
+        counts = payload.get("counts") or {}
+        if counts:
+            print("counts: " + " ".join(f"{name}={value}"
+                                        for name, value in counts.items()))
+        return
+    if "definitions" in payload:
+        for row in payload["definitions"]:
+            print(f"{row['result']}\t{row['path']}")
         return
     for key, value in payload.items():
         print(f"{key}: {value}")

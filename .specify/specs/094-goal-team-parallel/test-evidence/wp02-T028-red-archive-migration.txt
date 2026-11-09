@@ -1,0 +1,217 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFF.                                                              [100%]
+=================================== FAILURES ===================================
+__________ test_a_conflict_names_both_candidates_and_never_overwrites __________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw2/test_a_conflict_names_both_can0')
+
+    def test_a_conflict_names_both_candidates_and_never_overwrites(tmp_path):
+        spec = "093-fixture"
+        source = _seed_spec_goal(tmp_path, spec, slug="gamma",
+                                 objective="Move the fixture without losing a byte.")
+        target = tmp_path / ".specify/anchoring/gamma/goal.md"
+        target.parent.mkdir(parents=True)
+        target.write_text(
+            GOAL_SOURCE.format(status="active", slug="gamma",
+                               objective="A different outcome entirely.",
+                               criterion="The definition survives the move."),
+            encoding="utf-8")
+        before = target.read_text(encoding="utf-8")
+    
+        proc = _run(tmp_path, "migrate-archive", "--apply")
+>       assert proc.returncode == 4, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+E       AssertionError: stdout='' stderr='error: unrecognized option: --apply\n'
+E       assert 2 == 4
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...2/test_a_conflict_names_both_can0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+
+tests/contract/test_archive_migration.py:233: AssertionError
+________ test_every_source_file_is_readable_under_trees_after_migration ________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw7/test_every_source_file_is_read0')
+
+    def test_every_source_file_is_readable_under_trees_after_migration(tmp_path):
+        spec = "097-fixture"
+        goal_tree = _seed_spec_goal(tmp_path, spec, slug="theta")
+        (goal_tree / "summary").mkdir()
+        (goal_tree / "summary" / "summary.md").write_text("derived summary\n", encoding="utf-8")
+        (goal_tree / "notes.txt").write_text("an owned file\n", encoding="utf-8")
+        team_tree = _seed_spec_team(tmp_path, spec, slug="theta-crew", goal_slug="theta")
+        (team_tree / "runs").mkdir()
+        (team_tree / "runs" / "20261109T000000Z-report.md").write_text(
+            "run report\n", encoding="utf-8")
+    
+        original: dict[str, str] = {}
+        for tree in (goal_tree, team_tree):
+            for path in tree.rglob("*"):
+                if path.is_file():
+                    original[str(path.relative_to(tmp_path))] = path.read_text(encoding="utf-8")
+    
+>       assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...7/test_every_source_file_is_read0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+E        +    where CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...7/test_every_source_file_is_read0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n') = _run(PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw7/test_every_source_file_is_read0'), 'migrate-archive', '--apply')
+
+tests/contract/test_archive_migration.py:353: AssertionError
+________________ test_the_receipt_carries_every_mandatory_field ________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw4/test_the_receipt_carries_every0')
+
+    def test_the_receipt_carries_every_mandatory_field(tmp_path):
+        spec = "094-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="epsilon")
+>       assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...4/test_the_receipt_carries_every0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+E        +    where CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...4/test_the_receipt_carries_every0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n') = _run(PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw4/test_the_receipt_carries_every0'), 'migrate-archive', '--apply')
+
+tests/contract/test_archive_migration.py:272: AssertionError
+_______________ test_a_binding_only_difference_is_not_a_conflict _______________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw3/test_a_binding_only_difference0')
+
+    def test_a_binding_only_difference_is_not_a_conflict(tmp_path):
+        """C-40's last sentence: the binding block is excluded from the comparison."""
+        spec = "093b-fixture"
+        source = _seed_spec_goal(tmp_path, spec, slug="delta")
+        target = tmp_path / ".specify/anchoring/delta/goal.md"
+        target.parent.mkdir(parents=True)
+        target.write_text(
+            source.joinpath("goal.md").read_text(encoding="utf-8")
+            .replace("updated: 2026-11-09\n",
+                     "updated: 2026-11-09\nbinding:\n  owner: command-run\n"
+                     "  owner_id: r20261109T064500Z-094a\n  origin: null\n"),
+            encoding="utf-8")
+        before = target.read_text(encoding="utf-8")
+    
+        proc = _run(tmp_path, "migrate-archive", "--apply")
+>       assert proc.returncode == 0, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+E       AssertionError: stdout='' stderr='error: unrecognized option: --apply\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...3/test_a_binding_only_difference0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+
+tests/contract/test_archive_migration.py:258: AssertionError
+____ test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt ____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw0/test_migration_moves_the_tree_0')
+
+    def test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt(tmp_path):
+        spec = "091-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="alpha")
+        _seed_spec_team(tmp_path, spec, slug="crew", goal_slug="alpha")
+    
+        proc = _run(tmp_path, "migrate-archive", "--apply")
+>       assert proc.returncode == 0, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+E       AssertionError: stdout='' stderr='error: unrecognized option: --apply\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...0/test_migration_moves_the_tree_0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+
+tests/contract/test_archive_migration.py:148: AssertionError
+_ test_archive_and_migration_receipts_are_distinguishable_and_not_a_read_surface _
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw5/test_archive_and_migration_rec0')
+
+    def test_archive_and_migration_receipts_are_distinguishable_and_not_a_read_surface(tmp_path):
+        spec = "095-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="zeta")
+>       assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...5/test_archive_and_migration_rec0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+E        +    where CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...5/test_archive_and_migration_rec0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n') = _run(PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw5/test_archive_and_migration_rec0'), 'migrate-archive', '--apply')
+
+tests/contract/test_archive_migration.py:287: AssertionError
+_________________ test_origin_is_set_and_no_lineage_is_rebuilt _________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw6/test_origin_is_set_and_no_line0')
+
+    def test_origin_is_set_and_no_lineage_is_rebuilt(tmp_path):
+        spec = "096-fixture"
+        goal_tree = _seed_spec_goal(tmp_path, spec, slug="eta")
+        team_tree = _seed_spec_team(tmp_path, spec, slug="eta-crew", goal_slug="eta")
+        goal_body = _body(goal_tree.joinpath("goal.md").read_text(encoding="utf-8"))
+        team_body = _body(team_tree.joinpath("team.md").read_text(encoding="utf-8"))
+    
+>       assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...6/test_origin_is_set_and_no_line0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+E        +    where CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...6/test_origin_is_set_and_no_line0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n') = _run(PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw6/test_origin_is_set_and_no_line0'), 'migrate-archive', '--apply')
+
+tests/contract/test_archive_migration.py:320: AssertionError
+_________ test_the_dry_run_writes_nothing_and_agrees_with_the_real_run _________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw8/test_the_dry_run_writes_nothin0')
+
+    def test_the_dry_run_writes_nothing_and_agrees_with_the_real_run(tmp_path):
+        spec = "098-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="iota")
+        _seed_spec_team(tmp_path, spec, slug="iota-crew", goal_slug="iota")
+    
+        dry = _run(tmp_path, "migrate-archive", "--dry-run")
+>       assert dry.returncode == 0, dry.stderr
+E       AssertionError: error: unrecognized option: --dry-run
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...test_the_dry_run_writes_nothin0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --dry-run\n').returncode
+
+tests/contract/test_archive_migration.py:376: AssertionError
+____ test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area _____
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw9/test_the_residual_probe_is_rea0')
+
+    def test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area(tmp_path):
+        goal_tree = _seed_spec_goal(tmp_path, "099-fixture", slug="kappa")
+        team_tree = _seed_spec_team(tmp_path, "099-fixture", slug="kappa-crew",
+                                    goal_slug="kappa")
+        decoy = tmp_path / ".specify/.tmp/s094/repo/.specify/specs/900-x/goal/decoy"
+        decoy.mkdir(parents=True)
+        (decoy / "goal.md").write_text("decoy definition\n", encoding="utf-8")
+    
+        before = _snapshot(tmp_path)
+        proc = _run(tmp_path, "probe-residual")
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks')\n").returncode
+
+tests/contract/test_archive_migration.py:413: AssertionError
+________________ test_a_second_run_writes_nothing_and_is_a_noop ________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4806/popen-gw1/test_a_second_run_writes_nothi0')
+
+    def test_a_second_run_writes_nothing_and_is_a_noop(tmp_path):
+        spec = "092-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="beta")
+        _seed_spec_team(tmp_path, spec, slug="beta-crew", goal_slug="beta")
+        first = _run(tmp_path, "migrate-archive", "--apply")
+>       assert first.returncode == 0, first.stderr
+E       AssertionError: error: unrecognized option: --apply
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...1/test_a_second_run_writes_nothi0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+
+tests/contract/test_archive_migration.py:204: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_archive_migration.py::test_a_conflict_names_both_candidates_and_never_overwrites
+FAILED tests/contract/test_archive_migration.py::test_every_source_file_is_readable_under_trees_after_migration
+FAILED tests/contract/test_archive_migration.py::test_the_receipt_carries_every_mandatory_field
+FAILED tests/contract/test_archive_migration.py::test_a_binding_only_difference_is_not_a_conflict
+FAILED tests/contract/test_archive_migration.py::test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt
+FAILED tests/contract/test_archive_migration.py::test_archive_and_migration_receipts_are_distinguishable_and_not_a_read_surface
+FAILED tests/contract/test_archive_migration.py::test_origin_is_set_and_no_lineage_is_rebuilt
+FAILED tests/contract/test_archive_migration.py::test_the_dry_run_writes_nothing_and_agrees_with_the_real_run
+FAILED tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area
+FAILED tests/contract/test_archive_migration.py::test_a_second_run_writes_nothing_and_is_a_noop
+10 failed, 1 passed in 6.30s
+EXIT=1

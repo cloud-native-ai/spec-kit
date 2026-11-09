@@ -1,0 +1,10 @@
+# modules: test_archive_migration.py + test_migration_interruption.py
+# command: bash scripts/bash/run-tests.sh tests/contract/test_archive_migration.py tests/contract/test_migration_interruption.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py tests/contract/test_migration_interruption.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+............                                                             [100%]
+12 passed in 6.42s
+EXIT=0

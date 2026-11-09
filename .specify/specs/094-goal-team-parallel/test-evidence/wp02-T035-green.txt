@@ -1,0 +1,10 @@
+# row: T035
+# command: bash scripts/bash/run-tests.sh tests/contract/test_archive_migration.py::test_the_receipt_carries_every_mandatory_field -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py::test_the_receipt_carries_every_mandatory_field -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.23s
+EXIT=0

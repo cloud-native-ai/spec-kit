@@ -1,0 +1,10 @@
+# row: T032
+# command: bash scripts/bash/run-tests.sh tests/integration/test_archive_migration_real_data.py::test_every_source_tree_stays_readable_after_migration -q
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_archive_migration_real_data.py::test_every_source_tree_stays_readable_after_migration -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.22s
+EXIT=0
