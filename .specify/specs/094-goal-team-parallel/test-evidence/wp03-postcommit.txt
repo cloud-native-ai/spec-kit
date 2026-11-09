@@ -1,0 +1,225 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_command_family.py tests/contract/test_declaration_facts.py tests/contract/test_criterion_vocabulary_scan.py tests/integration/test_parallel_lines.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....FFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+_____ test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim ______
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim():
+        section = _section(ROUTING, "## Hierarchy")
+>       assert HIERARCHY_PROHIBITION in section, (
+            "C-91 keeps this prohibition verbatim when the Temporary carve-out is "
+            f"replaced: {HIERARCHY_PROHIBITION!r}")
+E       AssertionError: C-91 keeps this prohibition verbatim when the Temporary carve-out is replaced: '一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义'
+E       assert '一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义' in '\n\n控制层级只有一条，且有唯一一条边界：\n\n1. **Goal** 是最高层：它陈述一个目标与可验证的成功判据（身份与状态机归 `shared/definitions/goal-definitions.md`）。\n2. **...ons/goal-definitions.md` 与 `skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。\n\n'
+
+tests/contract/test_criterion_vocabulary_scan.py:112: AssertionError
+_____ test_flow_class_check_is_not_modified_and_no_second_whitelist_exists _____
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_flow_class_check_is_not_modified_and_no_second_whitelist_exists():
+        digest = hashlib.sha256(FLOW_CLASS.read_bytes()).hexdigest()
+        assert digest == FLOW_CLASS_SHA256, (
+            "flow-class-check.py MUST NOT be modified by this feature (C-74); "
+            f"measured sha256 {digest}")
+    
+        engine_text = ENGINE.read_text(encoding="utf-8")
+>       assert "flow-class-check" in engine_text, (
+            "the engine action must delegate to the class lookup (C-74)")
+E       AssertionError: the engine action must delegate to the class lookup (C-74)
+E       assert 'flow-class-check' in '#!/usr/bin/env python3\n"""Goal definition engine for `/speckit.goal` (requirement 037, Feature 041).\n\nThe command ... in payload.items():\n        print(f"{key}: {value}")\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'
+
+tests/contract/test_command_family.py:184: AssertionError
+___________ test_a_non_family_command_may_still_read_but_not_create ____________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/family-jept1pry')
+
+    def test_a_non_family_command_may_still_read_but_not_create(sandbox):
+        _seed_bound_goal(sandbox)
+        before = _tree_digest(sandbox)
+    
+        side = _family("nonexistentcommand")
+>       assert side.returncode == 0, (
+            f"the family verdict must resolve: {side.stdout!r} {side.stderr!r}")
+E       AssertionError: the family verdict must resolve: '' 'error: unrecognized option: --command\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:227: AssertionError
+________________ test_both_peer_fixtures_deliver_independently _________________
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/parallel-qqegzc1i')
+
+    def test_both_peer_fixtures_deliver_independently(sandbox):
+        threshold = _threshold()
+    
+        # -- Peer A: SDD-only, no goal/team -------------------------------------
+        sdd = sandbox / "sdd-only"
+        sdd.mkdir()
+        tasks = _tasks_file(sdd, threshold)  # equality stays on the simple side
+    
+        proc = _run(REPO_ROOT, "handoff-decision", "--tasks", str(tasks))
+>       assert proc.returncode == 0, (
+            f"the SDD line's threshold decision failed: {proc.stdout!r} {proc.stderr!r}")
+E       AssertionError: the SDD line's threshold decision failed: '' 'error: unrecognized option: --tasks\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor.../.tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --tasks\n').returncode
+
+tests/integration/test_parallel_lines.py:135: AssertionError
+_____ test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list _____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list():
+        stems = sorted(path.stem for path in COMMANDS_DIR.glob("*.md"))
+        assert stems, "no command carriers found — the class predicate has no subject"
+    
+        disagreements = []
+        for name in stems:
+            proc = _family(name)
+>           assert proc.returncode == 0, (
+                f"command-family {name!r} must answer from the class lookup: "
+                f"{proc.stdout!r} {proc.stderr!r}")
+E           AssertionError: command-family 'agents' must answer from the class lookup: '' 'error: unrecognized option: --command\n'
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:120: AssertionError
+________ test_the_threshold_decides_both_complexity_and_creation_timing ________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/decl-p5np4xud')
+
+    def test_the_threshold_decides_both_complexity_and_creation_timing(sandbox):
+        threshold = _threshold()
+    
+        at_boundary = _tasks_file(sandbox, threshold)
+        proc = _run(REPO_ROOT, "handoff-decision", "--tasks", str(at_boundary))
+>       assert proc.returncode == 0, (
+            f"handoff-decision failed: {proc.stdout!r} {proc.stderr!r}")
+E       AssertionError: handoff-decision failed: '' 'error: unrecognized option: --tasks\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor.../.tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --tasks\n').returncode
+
+tests/contract/test_declaration_facts.py:214: AssertionError
+_ test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected _
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/family-cqal9xra')
+
+    def test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected(
+            sandbox):
+        assert not (COMMANDS_DIR / "nonexistentcommand.md").exists()
+        proc = _family("nonexistentcommand")
+>       assert proc.returncode == 0, (
+            "an unregistered unit is a decided verdict (source: default, exit 0), "
+            f"not an action failure: {proc.stdout!r} {proc.stderr!r}")
+E       AssertionError: an unregistered unit is a decided verdict (source: default, exit 0), not an action failure: '' 'error: unrecognized option: --command\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:145: AssertionError
+_________ test_a_declared_addition_without_a_carrier_is_an_input_error _________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/decl-g9lfawgy')
+
+    def test_a_declared_addition_without_a_carrier_is_an_input_error(sandbox):
+        root = _declaration_fixture(sandbox)
+        fact = root / "shared/declarations/facts" / FAMILY_FACT.name
+        text = fact.read_text(encoding="utf-8")
+        assert "statement: []" in text, "the fact's empty addition list moved; update this fixture"
+        fact.write_text(
+            text.replace("statement: []", "statement:\n  - ghostcommand"), encoding="utf-8")
+        assert not (root / "templates/commands/ghostcommand.md").exists()
+    
+        proc = _run(root, "command-family", "--command", "feedback")
+        assert proc.returncode == 2, (
+            "a declared addition whose carrier does not exist is an input error at read "
+            f"time (C-77); got exit {proc.returncode}: {proc.stdout!r} {proc.stderr!r}")
+>       assert "ghostcommand" in (proc.stdout + proc.stderr), (
+            "the refusal must name the addition without a carrier")
+E       AssertionError: the refusal must name the addition without a carrier
+E       assert 'ghostcommand' in ('' + 'error: unrecognized option: --command\n')
+E        +  where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...specify/.tmp/s094/decl-g9lfawgy', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').stdout
+E        +  and   'error: unrecognized option: --command\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...specify/.tmp/s094/decl-g9lfawgy', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').stderr
+
+tests/contract/test_declaration_facts.py:202: AssertionError
+__________ test_handoff_decision_refuses_when_the_fact_is_unavailable __________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/decl-eqllfcci')
+
+    def test_handoff_decision_refuses_when_the_fact_is_unavailable(sandbox):
+        root = _declaration_fixture(sandbox, drop_threshold=True)
+        tasks = _tasks_file(root, 3)
+    
+        proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+        assert proc.returncode == 2, (
+            "an unavailable fact exits 2 (owner-unavailable), never a default: "
+            f"got {proc.returncode}: {proc.stdout!r} {proc.stderr!r}")
+        combined = proc.stdout + proc.stderr
+>       assert "owner-unavailable" in combined, (
+            f"the refusal names the degradation label; got {combined!r}")
+E       AssertionError: the refusal names the degradation label; got 'error: unrecognized option: --tasks\n'
+E       assert 'owner-unavailable' in 'error: unrecognized option: --tasks\n'
+
+tests/contract/test_declaration_facts.py:250: AssertionError
+_______ test_no_runtime_surface_uses_temporary_or_global_as_a_criterion ________
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_no_runtime_surface_uses_temporary_or_global_as_a_criterion():
+        hits = _criterion_hits()
+>       assert not hits, (
+            "the retired classification vocabulary survives on a runtime surface "
+            "(FR-022 allows it only in the owner's historical record and the temp-directory "
+            f"exemption); hits: {len(hits)}\n" + "\n".join(hits))
+E       AssertionError: the retired classification vocabulary survives on a runtime surface (FR-022 allows it only in the owner's historical record and the temp-directory exemption); hits: 29
+E         shared/definitions/sdd-routing-definitions.md:41 [temporary-goal-team] **Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身
+E         shared/definitions/sdd-routing-definitions.md:41 [global-goal-team] **Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身
+E         skills/internal/create-team/references/create-mode.md:53 [temporary-goal-team] Each persistent team owns a **directory**: global teams use `.specify/teams/<slug>/`; spec-scoped temporary teams use `.specify/specs/<NNN-s
+E         skills/internal/create-team/references/create-mode.md:53 [global-goal-team] Each persistent team owns a **directory**: global teams use `.specify/teams/<slug>/`; spec-scoped temporary teams use `.specify/specs/<NNN-s
+E         skills/internal/create-team/references/create-mode.md:60 [retired-scope-value] scope: global | spec           # optional (085); absent = global (legacy byte-identical)
+E         skills/internal/create-team/references/create-mode.md:61 [retired-scope-value] spec_dir: .specify/specs/<NNN-slug>  # required when scope=spec
+E         skills/internal/create-team/references/create-mode.md:153 [retired-scope-value] - `scope`, `spec_dir`, and `lifecycle_state` are additive (084). Absent `scope` means `global` and preserves the legacy path; `scope: spec` 
+E         skills/internal/create-team/references/create-mode.md:154 [global-goal-team] - `stage_seats` is an optional (085) block map keyed only by the eight canonical SDD stages. Each entry carries `seats[]` (each resolving to
+E         skills/internal/create-team/references/conceptual-model.md:92 [temporary-goal-team] ## Temporary (Run-Scoped) Team
+E         skills/internal/create-team/references/conceptual-model.md:94 [temporary-goal-team] A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the sa
+E         skills/internal/create-team/references/conceptual-model.md:94 [global-goal-team] A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the sa
+E         skills/internal/create-team/references/conceptual-model.md:102 [temporary-goal-team] - **Creation timing**: created only after both `clarify` and `plan` pass U4 — the design is what makes the roster and concurrency decidable.
+E         skills/internal/create-team/references/conceptual-model.md:103 [retired-scope-value] - **Frontmatter extension**: `scope: spec`, `spec_dir`, `goal_slug`, optional `lifecycle_state`, and a `stage_seats` block map. These are ad
+E         skills/external/sdd-loop-driver/SKILL.md:43 [retired-scope-value] | 写隔离 | 缺省 `write_isolation=shared-tree`；团队运行（team，scope = spec）可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
+E         skills/external/sdd-loop-driver/SKILL.md:45 [retired-scope-value] **Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `goal_slug`；clarify + plan U4 通过后，经 `/s
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:358 [retired-scope-value] ## 22. Team mode (scope = spec)
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:365 [temporary-goal-team] - **Slot cap**: temporary-team mode MAY pass a `slot_cap_ceiling` of `min(effective_concurrency, 24)`; the legacy ceiling `min(4, line remai
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:21 [retired-scope-value] - For each criterion of the spec's Goal (scope = spec), record `criterion / degree / evidence_ptr`.
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:23 [retired-scope-value] - Goal content changes only through the goal engine (`/speckit.goal modify --scope spec`); the checkpoint never writes `goal.md`.
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:32 [retired-scope-value] - Apply through `improve-team` / `/speckit.team modify --scope spec`; territory changes remain explicit modifications and are never optimize
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:153 [temporary-goal-team] - `coordinate` remains territory-overlap only; with one temporary team it is a recorded no-op.
+E         scripts/python/sdd-route.py:1030 [retired-scope-value] help="team scope: global (default), spec (requires --spec-dir), or auto")
+E         scripts/python/sdd-route.py:1032 [retired-scope-value] help="the spec directory for --scope spec/auto")
+E         templates/commands/team.md:35 [temporary-goal-team] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. `global` is `.specify/teams/`; `spec` is 
+E         templates/commands/team.md:35 [retired-scope-value] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. `global` is `.specify/teams/`; `spec` is 
+E         templates/commands/team.md:71 [retired-scope-value] When a token in `$ARGUMENTS` exactly matches an archived `<slug>` in the project-level anchoring archive `.specify/anchoring/`, the create p
+E         templates/commands/team.md:75 [retired-scope-value] Inside a `team.md`, `goal` is the **`goal_slug` of the goal this team serves** — for `scope: spec`, the slug of the spec-scoped goal at `<sp
+E         templates/commands/goal.md:4 [retired-scope-value] argument-hint: "[create|view|modify|targets|migrate|coordinate] [goal-slug|team-slug] [--scope global|spec|auto] [--spec-dir <path>]"
+E         templates/commands/goal.md:29 [retired-scope-value] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. `global` is the project-level anchoring archi
+E       assert not ['shared/definitions/sdd-routing-definitions.md:41 [temporary-goal-team] **Temporary run-scoped scopes（追加 carve-out）**...ferences/create-mode.md:61 [retired-scope-value] spec_dir: .specify/specs/<NNN-slug>  # required when scope=spec', ...]
+
+tests/contract/test_criterion_vocabulary_scan.py:98: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_criterion_vocabulary_scan.py::test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim
+FAILED tests/contract/test_command_family.py::test_flow_class_check_is_not_modified_and_no_second_whitelist_exists
+FAILED tests/contract/test_command_family.py::test_a_non_family_command_may_still_read_but_not_create
+FAILED tests/integration/test_parallel_lines.py::test_both_peer_fixtures_deliver_independently
+FAILED tests/contract/test_command_family.py::test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list
+FAILED tests/contract/test_declaration_facts.py::test_the_threshold_decides_both_complexity_and_creation_timing
+FAILED tests/contract/test_command_family.py::test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected
+FAILED tests/contract/test_declaration_facts.py::test_a_declared_addition_without_a_carrier_is_an_input_error
+FAILED tests/contract/test_declaration_facts.py::test_handoff_decision_refuses_when_the_fact_is_unavailable
+FAILED tests/contract/test_criterion_vocabulary_scan.py::test_no_runtime_surface_uses_temporary_or_global_as_a_criterion
+10 failed, 5 passed in 6.74s

@@ -1,0 +1,26 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_command_family.py::test_flow_class_check_is_not_modified_and_no_second_whitelist_exists -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_flow_class_check_is_not_modified_and_no_second_whitelist_exists _____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_flow_class_check_is_not_modified_and_no_second_whitelist_exists():
+        digest = hashlib.sha256(FLOW_CLASS.read_bytes()).hexdigest()
+        assert digest == FLOW_CLASS_SHA256, (
+            "flow-class-check.py MUST NOT be modified by this feature (C-74); "
+            f"measured sha256 {digest}")
+    
+        engine_text = ENGINE.read_text(encoding="utf-8")
+>       assert "flow-class-check" in engine_text, (
+            "the engine action must delegate to the class lookup (C-74)")
+E       AssertionError: the engine action must delegate to the class lookup (C-74)
+E       assert 'flow-class-check' in '#!/usr/bin/env python3\n"""Goal definition engine for `/speckit.goal` (requirement 037, Feature 041).\n\nThe command ... in payload.items():\n        print(f"{key}: {value}")\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'
+
+tests/contract/test_command_family.py:184: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_command_family.py::test_flow_class_check_is_not_modified_and_no_second_whitelist_exists
+1 failed in 6.21s

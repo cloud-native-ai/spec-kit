@@ -1,0 +1,27 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_command_family.py::test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected _
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/family-kf7q0mv_')
+
+    def test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected(
+            sandbox):
+        assert not (COMMANDS_DIR / "nonexistentcommand.md").exists()
+        proc = _family("nonexistentcommand")
+>       assert proc.returncode == 0, (
+            "an unregistered unit is a decided verdict (source: default, exit 0), "
+            f"not an action failure: {proc.stdout!r} {proc.stderr!r}")
+E       AssertionError: an unregistered unit is a decided verdict (source: default, exit 0), not an action failure: '' 'error: unrecognized option: --command\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:145: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_command_family.py::test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected
+1 failed in 6.20s
