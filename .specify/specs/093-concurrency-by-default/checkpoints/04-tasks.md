@@ -38,6 +38,10 @@
 - Q5 territory/workspace: pass — no write outside the worktree; the main worktree untouched; no push
 - verdict: **correction-applied** — every item above had exactly one reading consistent with the recorded intent and was repaired locally; the one item that does **not** have a single reading is the `[green:]` semantics disagreement, and it is escalated below rather than settled here
 
+## 5b. Published-state check
+- scope: n/a — no history correction (part 5's `correction-applied` covers in-stage artifact corrections, not a branch correction)
+- disposition: n/a — nothing to converge
+
 ## 6. Disclosed rulings (in-stage, recorded where they bind)
 1. **[green: …] is a red-first marker, not a clause-registration table.** Adopted because `create-tasks` defines it that way and because the alternative (one row per clause) forced untagging rows whose tests are genuinely red-first. Consequence: DoD-1 was rewritten from "every clause claimed by exactly one row" to "every FR row resolves to an implementation row; the tag appears at most once per (module path, clause)". **This needs ratification**: `validate-tasks.py`'s rule text says otherwise, and the two cannot both be true. Recorded as the stage's headline anomaly.
 2. **Package boundary = write domain, not row count.** 137 rows over 5 packages is far above the ~10-row guidance; splitting further would put two packages on one file, which FR-012 forbids. Recorded as a deliberate deviation.
