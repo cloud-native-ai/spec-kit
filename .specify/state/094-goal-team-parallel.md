@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794231364
 stage_base_commit: e8d716e3
 attempt: 0
 retry_limit: 3
-last_verdict: "Wave 3 complete: wp05 integrated (merge 7201d1fdc; 29-file feat + mirrors/copies + close-out note). The two criterion-vocabulary tests are GREEN (strict improvement: family name-set diff shows 0 new failures, 2 fixed; 13 pre-existing 085-disposal-family failures remain as a recorded baseline debt tied to the anchor rename). Gates: requirements 0/0; tasks 85 rows 0 err/1 disclosed warn; decomposition proceed 43/85. Remaining: wp04-blocked T055/T057/T058 (dedicated follow-up with an explicitly expanded domain) + wp06 (6 rows) + wp07 closure."
+last_verdict: "Wave 3 complete + wp04b: wp06 and wp04b integrated (merge; 6+6 handoff tests green — the last named red is cleared). Consolidation side-effects fixed: archived-path re-points in the seam/migration tests (45+18 passed) and the 069a wiring roster widened with a dated justification (16 passed; 094 T022/T025 own the new references). Master known debt now = the pre-existing 085-disposal family (13 ids) + the wp01/wp02-era test_run_checks roster pin (1), both named baselines. wp07 closure dispatched."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch wp04b (blocked handoff rows, expanded domain) + wp06 (owners+guards) in worktrees; then wp07 closure and the final push"
+next_action: "on wp07: pre-merge check in its worktree, merge to master, gates + full-suite reading, then the 094 review stage; final push"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
