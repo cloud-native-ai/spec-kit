@@ -44,7 +44,7 @@
 
 ### User Story 2 - 档案统一落 `.specify/anchoring/` 与 `.specify/teams/`，旧数据归档不删除 (Priority: P1)
 
-goal 与 team 只有一处落点：`.specify/anchoring/<slug>/goal.md` 与 `.specify/teams/<slug>/team.md`。SaaS 化的旧落点 `.specify/specs/<spec>/goal|team/` 不再产生新写入；仓库里已经存在的 spec-local 定义（plan-entry 读数 goal 7 / team 7 见 A6，2026-11-09 round-3 复测 goal 9 / team 9 见 plan EP-002）经迁移命令搬入统一档案，原位置留下归档回执而非被删除。
+goal 与 team 只有一处落点：`.specify/anchoring/<slug>/goal.md` 与 `.specify/teams/<slug>/team.md`。SaaS 化的旧落点 `.specify/specs/<spec>/goal|team/` 不再产生新写入；仓库里已经存在的 spec-local 定义（plan-entry 读数 goal 7 / team 7 见 A6，2026-11-09 最新复测（probe 形 goal 9 / team 8 = 17；全量普查 goal 9 / team 10 = 19）见 plan EP-002）经迁移命令搬入统一档案，原位置留下归档回执而非被删除。
 
 **Why this priority**: 与 User Story 1 同一级——两者缺一，档案仍然分裂。这条也是唯一带**破坏性风险**的诉求，必须由可判定规则钉死「archive-not-delete」。
 

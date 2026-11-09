@@ -99,9 +99,9 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 - **antithesis**: 保留两层档案，只把 spec-local 路径改名并继续用目录位置回答归属；当仓库只需要「一眼看出哪些 goal 属于活跃 spec」、且没有任何命令运行需要 goal/team 时它更优——无需迁移、无需绑定重写、无需改动既有 spec-local 定义（plan-entry 14 条）。
 - **binding_constraints**:
   - pole_a: 归属必须可判定且只有一处回答；目录位置一旦参与回答，两条线就再次变成从属。
-  - pole_b: 既有 spec-local 定义（plan-entry 14 条，2026-11-09 复测 18 条）与全部 scope 测试必须可迁移、可解释，不能一次改动就丢失历史。
+  - pole_b: 既有 spec-local 定义（plan-entry 14 条；2026-11-09 最新读数见 EP-002：probe 形 17、全量普查 19）与全部 scope 测试必须可迁移、可解释，不能一次改动就丢失历史。
 - **discriminating_evidence**: 在同一棵树上创建 `owner=command-run` 与 `owner=sdd-run` 两条定义后断言：`goal-utils.py resolve-scope --json` 的两个根是否恒为 `.specify/anchoring` 与 `.specify/teams`；结果二值：恒等 / 出现 spec 根。
-- **expected_sacrifice**: SC-003 Source ↓ 一次性迁移全部 spec-local 定义（plan-entry 14 条；2026-11-09 复测 18 条）必须产出逐条回执，迁移证据面从零变为逐条。
+- **expected_sacrifice**: SC-003 Source ↓ 一次性迁移全部 spec-local 定义（plan-entry 14 条；2026-11-09 最新读数见 EP-002：probe 形 17、全量普查 19）必须产出逐条回执，迁移证据面从零变为逐条。
 - **revision_trigger**: 迁移后出现「同一 slug 两条候选」或任一调用方仍能从路径推断归属（契约测试转红）≥2 次 → 重开，恢复分层档案并把它声明为 `origin` 的唯一来源。
 - **tension_id**: T-001
 
