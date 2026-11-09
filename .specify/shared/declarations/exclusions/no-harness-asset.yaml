@@ -267,3 +267,39 @@
 - unit: templates/commands/todo.md
   carrier: scripts/python/search-todo.py
   anchor: templates/commands/todo.md#Delegation
+
+# --- 092 A2 rows, appended 2026-11-09 (092 non-disposable, u04): three carriers that entered the
+# candidate screen after 084 closed — `templates/commands/measure.md` and
+# `templates/commands/status.md` (087) and `skills/external/ssh-utils/SKILL.md` (ssh-utils refactor).
+# Existing rows above are untouched (E-2: a new unit appends, never reorders), and each unit appears
+# exactly once (E-2 R-4).
+# Why `no-harness-asset` on these three: D1 fails — the acceptance deliverable each row's anchor
+# names is a report, a digest or a remote execution result produced by its own engine, not one of
+# the four harness-asset kinds. A fact declaration is not the minimal repair either: no engine of
+# these units reads a value from the declaration layer today, so a declaration would name a consumer
+# engine with no locatable read point and stay permanently `pending` (STR-009) — repairing that would
+# mean editing the engines, outside a 084 spec-file change. The reason is `no-harness-asset`, not
+# `no-machine-fact`: none of the three ever held a roster fact, and the latter reason is reserved for
+# a unit whose migrated fact left the roster.
+# Count after this append: 35 rows (32 + 3). The readings above stay as the readings they were.
+
+# templates/commands/measure.md — product: a measurement report printed from the existing exec-quant
+# store; measure.py writes nothing
+# carrier: scripts/python/measure.py
+- unit: templates/commands/measure.md
+  carrier: scripts/python/measure.py
+  anchor: templates/commands/measure.md#Delegation
+
+# templates/commands/status.md — product: a bounded current-state digest, the reporting guard's
+# verdicts on this run's own obligation, or one status line; status-digest.py owns every read
+# carrier: scripts/python/status-digest.py
+- unit: templates/commands/status.md
+  carrier: scripts/python/status-digest.py
+  anchor: templates/commands/status.md#Delegation
+
+# skills/external/ssh-utils/SKILL.md — product: remote command execution (stdout and remote exit
+# code) over ssh; the skill is transport only and writes no record
+# carrier: skills/external/ssh-utils/scripts/ssh-exec.py
+- unit: skills/external/ssh-utils/SKILL.md
+  carrier: skills/external/ssh-utils/scripts/ssh-exec.py
+  anchor: skills/external/ssh-utils/SKILL.md#Boundary

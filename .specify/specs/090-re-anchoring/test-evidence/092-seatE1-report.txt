@@ -1,0 +1,8 @@
+seat E1 — 084 (D3 + E5)
+D3: shared/definitions/harness-triple-definitions.md:53 now names ONE criterion (i∧ii); 084 requirements.md FR-006 (L143-145) keeps the original text verbatim as 历史引用 + <!-- 092 handoff: D3 -->.
+E5: 084 requirements.md L206 records measured 38 rows (no-machine-fact.yaml 38 unit keys; coverage: 86 = 13 in-scope + 38 + 35); the 8 stays as history + <!-- 092 handoff: E5 -->.
+Not written: contracts/migration-batches.contract.md — no 8→38 error there (L132 already says 8 facts / 8 units from the table; the 38 reading is L143 delegated to the yaml), and its file says the clause count stays 59, so adding a correction there would contradict a closed-set claim. Its stale § Facts outside the roster reading remains and is disclosed in the 084 correction note.
+Check: harness-triple-check.py --action verify -> findings [], candidates 86. Mirror .specify/shared/definitions/harness-triple-definitions.md NOT synced (outside write domain; stale until regeneration).
+Error made in passing: I first cited a nonexistent "C-127" in the E5 note; removed it in the same change before completion.
+ANOMALY: migration contract L132 "8 rows" was not corrected — needs a ruling on where the 084 exclusion count is owned (tree reading vs that contract's own count rule).
+SEAT-E1-DONE

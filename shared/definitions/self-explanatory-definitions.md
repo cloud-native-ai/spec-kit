@@ -31,6 +31,8 @@
 - 与 Constitution X（Documentation Naming & Location Conventions）最接近，是对其“path is semantic / names carry meaning”的**具现化**。
 - 依赖 Constitution XVIII（Grounded Naming）：名称首先由既有权威来源决定，不能为了“不言自明”绕过命名来源规则。
 - **核心判断条件**：面对一个具体结构，如果本概念能触发“把用户需要的信息维度提升为名称、路径或结构层级”的改造判断，说明它已进入框架并产生效力；不能触发则说明 Constitution X 的效力不足。goal 的 `<status>/<slug>` 布局只是本概念的一个示例，不是对所有项目强制实施的普适布局。
+- <!-- 092 handoff: D6 → 082 / 083 -->
+  与 `shared/definitions/mechanism-policy-definitions.md` 的相邻边界与**判据优先级**：一段内容先按那份文件的判据定侧（机制侧 / 运行环境侧），再在本概念下决定**这一侧内部**的名称、路径是否承载信息维度。定侧在前、命名在后；同时可读时先定侧，命名只在已定的侧内生效。
 
 ## 5. 权威归属与强制力
 

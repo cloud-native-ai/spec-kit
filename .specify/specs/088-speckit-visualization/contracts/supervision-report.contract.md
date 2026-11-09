@@ -1,6 +1,6 @@
 # Contract: Supervision Report and the Coaching Payload Amendment
 
-**Feature**: 087 | **Covers**: FR-008, FR-009, FR-010, FR-013, FR-019
+**Feature**: 088 | **Covers**: FR-008, FR-009, FR-010, FR-013, FR-019
 **Contract object**: (a) the master-reporting duty's content over `skills/external/coaching-skills/SKILL.md`
 § Dispatch Payload and over any supervising master; (b) the closed-set amendment to that payload.
 

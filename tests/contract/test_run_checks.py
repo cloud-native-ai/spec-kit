@@ -17,7 +17,7 @@ about what must appear:
   NOT disjointness — four of the five names are also verdict literals in the source, so a
   test asserting an empty intersection would be red the moment it landed.
 
-Fixtures are built in ``tmp_path`` as throwaway repositories; the real ``.specify/goal/``
+Fixtures are built in ``tmp_path`` as throwaway repositories; the real ``.specify/anchoring/``
 and ``.specify/teams/`` trees are only ever read (C-3, C-28).
 """
 from __future__ import annotations
@@ -210,7 +210,7 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
           targets=(("T-001", "open"), ("T-002", "done")), team: bool = True,
           team_slug: str = "t1", goal_slug: str = "g1", goal_dir: str | None = None,
           focus=None, goal_body: str | None = None) -> Path:
-    """A throwaway repository: `.specify/goal/<dir>/goal.md` + `.specify/teams/<slug>/team.md`.
+    """A throwaway repository: `.specify/anchoring/<dir>/goal.md` + `.specify/teams/<slug>/team.md`.
 
     `goal_slug` is the team's DECLARED binding (None = no `goal_slug` line, so identity
     resolution falls through to the team-slug inference and then to none); `goal_dir` is
@@ -219,7 +219,7 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
     """
     directory = goal_dir if goal_dir is not None else (goal_slug or "g1")
     root = tmp_path / "repo"
-    (root / ".specify" / "goal").mkdir(parents=True, exist_ok=True)
+    (root / ".specify" / "anchoring").mkdir(parents=True, exist_ok=True)
     (root / ".specify" / "teams" / team_slug).mkdir(parents=True, exist_ok=True)
     if team:
         binding = f"goal_slug: {goal_slug}\n" if goal_slug else ""
@@ -229,19 +229,19 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
             TEAM_TMPL.format(slug=team_slug, binding=binding), encoding="utf-8"
         )
     if goal:
-        (root / ".specify" / "goal" / directory).mkdir(parents=True, exist_ok=True)
+        (root / ".specify" / "anchoring" / directory).mkdir(parents=True, exist_ok=True)
         rows = "".join(f"| {tid} | slice for {tid} | {state} |\n" for tid, state in targets)
         text = goal_body if goal_body is not None else GOAL_TMPL.format(
             status=goal_status, slug=directory, rows=rows.rstrip("\n")
         )
-        (root / ".specify" / "goal" / directory / "goal.md").write_text(text, encoding="utf-8")
+        (root / ".specify" / "anchoring" / directory / "goal.md").write_text(text, encoding="utf-8")
     return root
 
 
 def _checksum(root: Path) -> str:
     """Byte checksum of the two trees C-3/C-28 protect, in a stable order."""
     digest = hashlib.md5()
-    for sub in (".specify/goal", ".specify/teams"):
+    for sub in (".specify/anchoring", ".specify/teams"):
         for path in sorted((root / sub).rglob("*")):
             if path.is_file():
                 digest.update(path.relative_to(root).as_posix().encode("utf-8"))
@@ -291,7 +291,7 @@ def test_c3_a_call_writes_no_byte_of_the_goal_or_team_trees(tmp_path):
                  ("run-checks", "t1", "--target", "bogus"),
                  ("run-checks", "nope")):
         _run(root, *args)
-    assert _checksum(root) == before, "run-checks modified .specify/goal/ or .specify/teams/"
+    assert _checksum(root) == before, "run-checks modified .specify/anchoring/ or .specify/teams/"
     # and on the REAL tree, read-only paths only (C-28's fallback evidence form). No exit
     # expectation here: the real goal draw-two-layer-structure was deliberately closed
     # (`achieved`), so the run now legitimately blocks (5) — the measured state is pinned

@@ -98,7 +98,7 @@ verdict=pass
 # test-evidence/success-criteria.txt (T042, contract C-52).
 
 SC-001_status=pass
-SC-001_value=20 attributed status lines captured from a real >90 s team run (team 087-reporting-dogfood, run r20261106T100000Z-dogfood-r3; the concurrent closure suite ran 441 s), each carrying the team slug, run stamp, position/delta/remainder/blocker, cadence=30s, the efficiency element and carrier=console
+SC-001_value=20 attributed status lines captured from a real >90 s team run (team 088-reporting-dogfood — captured under its then-current name 087-reporting-dogfood, renamed by 092 C4b; run r20261106T100000Z-dogfood-r3; the concurrent closure suite ran 441 s), each carrying the team slug, run stamp, position/delta/remainder/blocker, cadence=30s, the efficiency element and carrier=console
 SC-001_evidence=.specify/specs/088-speckit-visualization/test-evidence/dogfood-reporter-lines-r3.txt; test-evidence/dogfood-reporter-run-record-r3.md; test-evidence/dogfood-worker-result-r3.md
 SC-001_history=2026-11-06 partial (4 s fixture); unblocked 2026-11-07 by the real dogfood run
 SC-001_value=5 captured lines (3 tick + 2 boundary) from a fixture run over the compliant roster; every line carries structure=us1-compliant-fixture, run=r<stamp>-us1f, position=, delta=, remainder=, blocker=, carrier=console
@@ -110,8 +110,8 @@ SC-001_why_reduced_insufficient=Compressing the interval proves the renderer, th
 SC-001_unblock=Run one real team run lasting more than 90 s with a reporter seat on the long-run profile and capture at least three of its emitted lines verbatim.
 
 SC-002_status=pass
-SC-002_value=team 087-reporting-dogfood created through the team-creation entry carries exactly one reporter seat resolvable to the shipped template; validate-roster.py exit 0 (conforming); guard RO-04 pass (1 roster path in population, no named defect)
-SC-002_evidence=.specify/specs/088-speckit-visualization/team/087-reporting-dogfood/team.md; test-evidence/sc002-roster-validate.txt; test-evidence/sc002-ro-04.txt
+SC-002_value=team 088-reporting-dogfood created through the team-creation entry carries exactly one reporter seat resolvable to the shipped template; validate-roster.py exit 0 (conforming); guard RO-04 pass (1 roster path in population, no named defect)
+SC-002_evidence=.specify/specs/088-speckit-visualization/team/088-reporting-dogfood/team.md; test-evidence/sc002-roster-validate.txt; test-evidence/sc002-ro-04.txt
 SC-002_history=2026-11-06 partial (population empty in the pre-dogfood tree); unblocked 2026-11-07 by the entry-created dogfood roster
 SC-002_value=defect side: absent-seat named with seat literal and slug, rc=1; pass side: conforming: team us1-compliant-fixture carries exactly one reporter seat (agent: reporter), rc=0; sweep: 13/13 pre-existing rosters return absent-seat, matching the 0-seat baseline
 SC-002_note=Final-path. The guard's two readings, its named-defect vocabulary and its population discipline are captured on fixtures plus a 13-path sweep (test-evidence/us1-team-cadence.txt § Part 1). Partial because the obligation's population holds ZERO in-population rosters (T003 name list: 13 listed, 13 outside), so the population half of the criterion is measured on the fixture and the guard's RO-04 is correctly `not-evaluated`, never `pass`.

@@ -483,6 +483,13 @@ def test_c1_skill_inventory_is_frozen():
 # `tests/contract/test_review_code_composition.py`, `test_code_review_skill_contract.py`
 # and `test_coverage_receipt.py`; this entry records the drift, it does not
 # authorize any other.
+# 2026-11-09 (Feature 092): two frozen sources gain the four-stage `/speckit.history`
+# seam — `skills/internal/manage-history/SKILL.md` (Steps 0 / A / B plus the execute
+# segment) and `templates/commands/history.md` (the delegation list and seam pointer).
+# Both are declared edit surfaces of Feature 092 (`contracts/four-stage-command.contract.md`
+# C-401…C-410) and are pinned by that feature's guard legs (four-stage ordering, zero write,
+# temporary plan, confirmation granularity, evidence shape); the markers below are added by
+# this change, so the allowance cannot be satisfied by text that was already there.
 ALLOWED_POST_BASELINE_CHANGES = {
     "skills/external/improve-docs/SKILL.md": {
         "reason": (
@@ -776,6 +783,46 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "markers": ("changes the two layers' distribution", "Layer split after the merge",
                     "shared/definitions/skill-reference-definitions.md"),
     },
+    # 2026-11-09 (Feature 092, the four-stage history seam): the two faces the seam edits.
+    # Their drift is authored, so they left `_FEATURE_087_BANNER_ONLY` below (that tuple is
+    # derived from banner-only drift and would otherwise overwrite these entries). Every
+    # marker here is content this feature added and is absent from the 069a frozen bytes.
+    "skills/internal/manage-history/SKILL.md": {
+        "reason": (
+            "2026-11-09 Feature 092 (contracts/four-stage-command.contract.md C-401…C-410): "
+            "/speckit.history becomes the four-stage form 回顾 → 设计 → 用户确认 → 执行, so "
+            "this skill gains Step 0 (zero-write review over the declared roots), Step A "
+            "(zero-write design bracketed by the same snapshot), Step B (the closed "
+            "three-value confirmation and the visible `unconfirmed` state) and the execute "
+            "segment bound to Step 6's position (group-boundary writes, four-segment "
+            "evidence under `<spec-dir>/test-evidence/`). Steps 1–6 keep their numbering and "
+            "the distillation plus incremental manifest stay. The 069a hash manifest stays "
+            "the dated record it is; this entry records the drift and authorizes nothing else."
+        ),
+        "markers": (
+            "回顾 (review) → 设计（方案） (design) → 用户确认 (user confirm) → 执行 (execute)",
+            "Step 0",
+            "unconfirmed",
+            "test-evidence/",
+        ),
+        "added_markers": True,
+    },
+    "templates/commands/history.md": {
+        "reason": (
+            "2026-11-09 Feature 092 (contracts/four-stage-command.contract.md C-401…C-410 / "
+            "C-409): the delegation list gains the four stage names in order, the "
+            "confirmation-granularity and evidence bullets, and the seam pointer at the "
+            "skill, which owns the seam. The distillation capability and the incremental "
+            "manifest bullets are retained; the 069a hash manifest stays the dated record it "
+            "is, and this entry authorizes nothing else."
+        ),
+        "markers": (
+            "回顾 (review) → 设计（方案） (design) → 用户确认 (user confirm) → 执行 (execute)",
+            "Step B",
+            "dispositions",
+        ),
+        "added_markers": True,
+    },
 }
 
 # 2026-10-30 Feature 077 stage-wiring amendment. 069a's manifest is that slice's
@@ -803,7 +850,7 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
 # equals its 069a bytes with the compiled banner replaced by the registry's current
 # projection (see `_banner_only_drift` below). All-but-the-banner-lines equality is
 # the marker — stronger than a needle list, and the reason a hand edit inside any of
-# these skills cannot ride in on the allowance. 36 rows: the three remaining drifted
+# these skills cannot ride in on the allowance. 33 rows: the three remaining drifted
 # sources, `skills/internal/analyze-artifacts/SKILL.md`,
 # `templates/commands/analyze.md` and — as of 2026-11-07 — 
 # `skills/external/improve-docs/SKILL.md`, already carry their own authorial
@@ -813,7 +860,10 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
 # below writes its entry into `ALLOWED_POST_BASELINE_CHANGES` unconditionally, so it
 # silently OVERWROTE the authored entry above and installed the vacuous banner-only
 # shape as the live one. Its own entry now wins, and `_banner_only_drift` is applied
-# to 35 rows instead of 36.
+# to 35 rows instead of 36. On 2026-11-09 (Feature 092) `skills/internal/manage-history/
+# SKILL.md` and `templates/commands/history.md` left the tuple the same way: the
+# four-stage seam is authored drift, each carries its own entry above, and
+# `_banner_only_drift` now covers 33 rows.
 _FEATURE_087_BANNER_ONLY = (
     "skills/external/create-pages/SKILL.md",
     "skills/external/database-utils/SKILL.md",
@@ -832,7 +882,6 @@ _FEATURE_087_BANNER_ONLY = (
     "skills/internal/improve-tools/SKILL.md",
     "skills/internal/manage-agents/SKILL.md",
     "skills/internal/manage-goal/SKILL.md",
-    "skills/internal/manage-history/SKILL.md",
     "skills/internal/manage-instructions/SKILL.md",
     "skills/internal/manage-todo/SKILL.md",
     "skills/internal/memory-recall/SKILL.md",
@@ -843,7 +892,6 @@ _FEATURE_087_BANNER_ONLY = (
     "skills/internal/study-project/SKILL.md",
     "skills/internal/summarize-project/SKILL.md",
     "templates/commands/derive.md",
-    "templates/commands/history.md",
     "templates/commands/instructions.md",
     "templates/commands/interview.md",
     "templates/commands/research.md",

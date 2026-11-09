@@ -66,7 +66,7 @@ def _run(*argv):
 
 
 def _goal_path(repo):
-    return repo / ".specify/goal/sliced-goal/goal.md"
+    return repo / ".specify/anchoring/sliced-goal/goal.md"
 
 
 # --------------------------------------------------------------------------

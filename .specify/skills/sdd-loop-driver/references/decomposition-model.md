@@ -355,7 +355,7 @@ This layer **adds pre-U4 steps only**. The preserved-behavior obligations are ow
 - **FN-15 (red-first evidence)** — new behavior is red before implementation; each verification record carries the command, exit code, pass/fail counts, changed paths, and an evidence pointer. A green check that would not turn red when its subject breaks is not cited.
 - **FN-16 (delivery surface)** — Delivery is confined to the driver skill source (`SKILL.md`, this reference, the template, `wp-gate.py`, `wp-report.py`), the driver documentation page, the canonical test suites, the generated mirror, and this feature's specification and evidence. No runtime service, daemon, external dependency, model API, second registry, second ownership model, second integration queue, second brief format, second ledger, or persisted team directory is added. The stage-team preset stays a driver template and is never written into `.specify/teams/`.
 
-## 22. Temporary-team mode
+## 22. Team mode (scope = spec)
 
 This section is additive; the shared-tree behavior above remains the default and every pinned literal is unchanged.
 

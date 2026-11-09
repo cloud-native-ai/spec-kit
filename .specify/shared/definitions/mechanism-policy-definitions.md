@@ -232,6 +232,7 @@
 | `shared/guidelines/one-source-of-truth.md` | 引用纪律本身（什么算一次合法重复） | 本文的「路径引用、不复制」遵守它，不重述它 |
 | `shared/guidelines/bilingual-expression.md` | 双语的方向、形态与覆盖面 | 本文的两个 canonical 词按它写，不重述其规则 |
 | `shared/guidelines/temp-directory-discipline.md` | 临时根与清理 | 本文只判临时物的内容属于哪一层，临时根归它 |
+| `shared/definitions/self-explanatory-definitions.md`（不言自明） | 一侧内部：名称、路径或结构该不该承载一个信息维度，承载了怎么办 | 本文只判内容**住哪一侧**（§ Terminology 的二值判据）；该侧内部的命名与结构归它。优先级：定侧在前、命名在后；同时可读时先定侧，命名只在已定的侧内生效 |
 
 本节的断言是「本文不含这些 owner 的规则字面」——具体枚举由 `tests/contract/test_mechanism_policy_ownership.py` 承担。
 

@@ -3,6 +3,8 @@
 **Status**: designed (this stage); implemented by `/speckit.implement`
 **Owner of every literal below**: `shared/workflow/acceptance-hardening.md` (§ Feature Status / § Verification Vocabulary / § Gates). This contract states **which carrier must contain which value** and **which guard must change**; it does not create a second definition point.
 
+<!-- 092 handoff: D2 — the owner line above is already the pointer form and stays as written. The literals this contract names are defined by that owner document (its header declares `本文件为 owner，其余为指针`; the values live in § Feature Status / § Verification Vocabulary / § Gates / § Closure Verdict). What this contract still owes is its carrier-and-guard statement, not a definition of those values. -->
+
 ## The four `blocked` literals are four unrelated facts (Assumptions A5)
 
 - **SV-01**: The character sequence `blocked` appears in four independent closed sets with four owners, and this feature MUST treat them as unrelated: feature status `Blocked` (owner `templates/feature-details-template.md` § Canonical Status State Machine), verification status `blocked` (owner `templates/verification-log-template.md`), line state `blocked` (owner `skills/external/sdd-loop-driver/scripts/line-registry.py`), and the task dependency tag `[blockedBy: …]` (owner `templates/tasks-template.md` — a **tag**, not a state). No third meaning may be introduced.

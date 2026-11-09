@@ -1,6 +1,6 @@
 # Contract: The efficiency element on the two visibility surfaces
 
-**Feature**: 087 | **Covers**: FR-023, FR-024, FR-025, SC-011, SC-012
+**Feature**: 088 | **Covers**: FR-023, FR-024, FR-025, SC-011, SC-012
 **Contract object**: the one bounded efficiency element a status line and a digest entry each carry per step, the
 read-only store access behind it, and the source of its elapsed quantity.
 

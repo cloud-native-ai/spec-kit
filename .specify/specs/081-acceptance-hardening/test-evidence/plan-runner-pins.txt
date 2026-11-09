@@ -1,15 +1,9 @@
-# RS-002 / RS-003 pins — measured 2026-11-03 (never invented)
-pytest --version  => pytest 9.2.0
-python --version  => Python 3.14.6
-git --version     => git version 2.54.0 (Apple Git-157)
-collect-only      => 7016 tests collected in 1.03s
-# pip index used to repair .venv: http://yum.tbsite.net/pypi/simple/
-httpx             0.28.1
-platformdirs      4.14.3
-Pygments          2.21.0
-pytest            9.2.0
-PyYAML            6.0.3
-readchar          4.2.2
-rich              15.0.0
-truststore        0.10.5
-typer             0.27.3
+# RS-002 / RS-003 pins — re-captured 2026-11-09 on this host (never invented)
+# superseded reading, kept for the record: pytest 9.2.0 / Python 3.14.6 / git version 2.54.0 (Apple Git-157), measured 2026-11-03
+pytest --version  => pytest 9.0.3
+python --version  => Python 3.11.0rc1
+git --version     => git version 2.34.1
+collect-only      => 8224 tests collected in 2.15s
+# 092 seat D: the pin is a verifiable transcript of one run (FR-023). A different host/venv makes a
+# comparison INVALID, never a new failure — this file was refreshed here because the live reading no longer
+# reproduced the 2026-11-03 one (see test-evidence/seatD-report.txt).

@@ -1,0 +1,8 @@
+A3 W2 anchored 085 contracts (scope-not-temporary): edited 4 of 5 .specify/specs/085-sdd-temporary-goal-team/contracts/ (stage-agents.md had 0 attributes); 15+14+18+14+5 clause IDs kept, no renumber, no duplicate
+Live text now Goal/Team (scope: spec) / spec-scoped goal|team / spec-scope; 0 live "temporary", 0 live `.specify/goal/`; 13 `<!-- superseded (092: scope-not-temporary) -->` markers, prior text retained
+Paths: goal/<goal-slug>/goal.md (C-001, owner goal-definitions.md); team/team.md default as C-007 stood after a1549dc7 — A3 folded a stale 2026-11-09 retention line left by that commit into one C-007 retention
+`.specify/goal/**` -> `.specify/anchoring/**` in C-014/C-009 mirrors the same 092 ruling (ARCHIVE_DIRNAME in both goal-utils.py copies; owner "does not write .specify/anchoring/**")
+checkpoint-and-agents.md: only C-003 carried "temporary"; the four-part retention line names no attribute, so 092 reviewed it and added no marker (inline note)
+Records with known wrong pointers are kept as history, not inherited: 085 C-007 still points at skills/internal/create-team/references/create-mode.md while the owner is shared/definitions/goal-definitions.md
+Not written / out of domain: tests/contract/{test_temp_goal_contract,test_temp_team_schema,test_checkpoint_protocol}.py (assert "### 2. Temporary Goal progress"), create-team/conceptual-model.md, goal-definitions.md mirror, 085 requirements/plan/team/goal.md, 092 & 090 requirements (say Temporary Goal/Team), 092/085 team.md forbidden `.specify/goal/**`
+A3-DONE

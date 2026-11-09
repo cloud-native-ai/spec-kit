@@ -26,7 +26,7 @@ goal_utils = _load_engine()
 def _seed(root: Path, *, global_goal: bool = False, global_team: bool = False,
           spec_goal: bool = False, spec_team: bool = False) -> Path:
     if global_goal:
-        p = root / ".specify/goal/global-goal/goal.md"
+        p = root / ".specify/anchoring/global-goal/goal.md"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text("# Global Goal\n", encoding="utf-8")
     if global_team:
@@ -47,7 +47,7 @@ def _seed(root: Path, *, global_goal: bool = False, global_team: bool = False,
 
 def test_global_scope_paths(tmp_path: Path):
     scope = goal_utils.resolve_scope(tmp_path, "global")
-    assert scope.goal_root == tmp_path / ".specify/goal"
+    assert scope.goal_root == tmp_path / ".specify/anchoring"
     assert scope.team_root == tmp_path / ".specify/teams"
     assert scope.spec_dir is None
 
@@ -85,7 +85,7 @@ def test_auto_prefers_global_when_only_global_exists(tmp_path: Path):
     _seed(tmp_path, global_goal=True)
     scope = goal_utils.resolve_scope(tmp_path, "auto", tmp_path / ".specify/specs/absent")
     assert scope.scope == "global"
-    assert scope.goal_root == tmp_path / ".specify/goal"
+    assert scope.goal_root == tmp_path / ".specify/anchoring"
 
 
 def test_auto_is_ambiguous_when_both_exist(tmp_path: Path):

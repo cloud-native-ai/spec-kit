@@ -1,0 +1,14 @@
+u01 — 089 renumber + task-structure repair (092 P6 档 I)
+cmd: python3 .specify/scripts/python/validate-tasks.py .specify/specs/089-script-interface-contract/tasks.md
+before: exit 1 — 7 error(s) / 68 warning(s); all 7 = story-labels on Phase 10 rows T088–T094
+after:  exit 0 — 0 error(s) / 68 warning(s)
+unchecked rows: 5 (T019,T081,T085,T086,T087) before -> 0 after (`grep -c '^- \[ \]'` = 5 -> 0)
+1. requirements.md:12 `Feature ID` 086 -> 089
+2. tasks.md:3,5 `Requirement ID` / `Related Feature` 086 -> 089
+3. tasks.md:278 T081: `features.md` (086 row) / `features/086.md` -> 089 row / `features/089.md` (+ evidence pointer)
+4. feature-ref.md §1/§5 (:7,:12,:78) 086 / features/086.md / Planned -> 089 / features/089.md / Implemented; :13 `(Planned)` -> `(Implemented)` corrected in passing (registry row 089 already reads Implemented)
+5. tasks.md Phase 10 (T088–T094): `[US5]`x5 + `[US1]` + `[US3]` removed, every `[green:]` kept
+6. T019 evidence = tests/contract/test_script_interface_contract.py::test_c30_owner_table_and_checker_payload_agree_row_for_row; T085/T086/T087 carry `evidence: .specify/specs/089-script-interface-contract/verification.md`
+dependency: verification.md still lacks the `SC-NNN_status=` machine block — u03 writes it this same wave; T085/T086/T087 rest on it
+not mine: git diff also shows .specify/specs/089-script-interface-contract/team/089-script-interface-contract/team.md (another writer)
+U01-DONE

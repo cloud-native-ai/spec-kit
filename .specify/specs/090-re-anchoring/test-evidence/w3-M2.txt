@@ -1,0 +1,11 @@
+W3-M2 092->090 merge: contracts copied as contracts/nd-<name>.contract.md (8), clause ids C-NNN -> ND-C-NNN, 62 definitions 1:1, 0 unprefixed left (grep -P '(?<!ND-)\bC-\d{3}\b' = none), intra-slice refs repointed
+plan.md += '## Non-Disposable slice (092)' (appended at end, so the Constitution Check -> Decision Tensions -> Project Structure anchor is untouched): artefact map, slice summary, T-001..T-007 index, merge tension T-ND-001, corpus/shift/baseline carry, boundaries
+data-model.md += ND-E-1..ND-E-9 (9 entities) + ND Entry State Machine + ND Human-Facing Output Shape + ND Fact Owners + ND-V-1..ND-V-11 + ND<->E relationships; existing E-1..E-6, V-1..V-12 unchanged
+plan.md Phase 1 table updated from 4 contract files/6 entities to 12 files in two clause namespaces + 9 ND entities
+check: /usr/bin/python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/090-re-anchoring --json -> status ok, errors 0, records 2, all six labels pass
+check: 092 sources untouched (8 contracts + plan + data-model md5 identical to pre-merge); 092 not deleted; nothing staged, not committed, not pushed
+ANOMALY: a concurrent seat already appended requirements.md (+219) and tasks.md (+220) and copied test-evidence/092-* into 090; not mine, not modified by me
+ANOMALY: 090 baseline declares contracts/guard-tests.contract.md as C-1..C-8 while the file carries C-1..C-10 and test-evidence/guard-red-controls.txt cites C-10; pre-existing drift, left as recorded
+ANOMALY: merge tension T-ND-001 lives in the appended section, so validate-decision-tensions.py does not scan it (it reads only '## Decision Tensions'; ids there stay T-001/T-002). Registered rather than renumbered, per the dispatch's no-renumber instruction
+ANOMALY: the validator's SC regex (SACRIFICE_ID_RE) cannot express a second SC id domain; the ND record cites 'SC-002 Source ↓' with the reading stated inline instead of inventing a prefixed token
+M2-DONE

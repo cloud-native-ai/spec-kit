@@ -1,0 +1,49 @@
+# checklist stage gates — 092-non-disposable
+# run at: 2026-11-09T03:30Z (UTC)  runner: checklist stage worker
+# artifacts under test: .specify/specs/092-non-disposable/checklists/2026-11-09-requirements-quality.md
+
+## G1 artifact self-measure (stdlib python3, read-only)
+file_bytes: 13857 lines: 101
+items: 40 | sequential_from_CHK001: True | soft_cap_40_respected: True
+with_Req_anchor: 40 | ratio: 1.0 | target>=0.80: True
+question_form: 40 | prohibited_openers_Verify_Test_Confirm_Check: []
+sections: ['1. "Non-Disposable" as a decidable mechanism, not a slogan', '2. Exemption (`exempt`) — the anti-permanent escape hatch', '3. The four-stage `/speckit.history` contract', '4. The review surface and its closed-set carrier', '5. Supersede and renumber protocols — mechanical detectability', '6. Status and verification — machine-readable, never "implemented but blocked"', '7. A–H corpus, tier split and the zero-reduction accounting', '8. Team, concurrency and reuse boundaries', 'Notes']
+
+## G2 doc-consistency-check --faces reader (checklist alone)  [read-only; expected pass]
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:31:09Z
+faces: reader=pass
+files_scanned: 1
+findings: 0
+exit=0
+
+## G3 doc-consistency-check --faces duplicate (checklist vs requirements; 0 findings = no copied requirement text)
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:31:09Z
+faces: duplicate=pass
+files_scanned: 2
+findings: 0
+exit=0
+
+## G4 doc-consistency-check --faces duplicate narrowed to the two owner pages (checklist as subject)
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:31:09Z
+faces: duplicate=pass
+files_scanned: 1
+findings: 0
+exit=0
+
+## G5 spec-dir baseline, duplicate face (22 files after this stage; 21 before)
+checked_at: 2026-11-09T03:31:09Z
+faces: duplicate=pass
+files_scanned: 22
+findings: 0
+exit=0
+
+## G6 spec-dir reader face — pre-existing baseline, NOT introduced by this stage
+# 21 findings, all 'reader-declaration-missing'; the checklist itself is NOT among them.
+# comparison: .specify/specs/085-sdd-temporary-goal-team has 23 of the same finding (per-spec-dir rollup predicate)
+findings: 21
+checklist_in_findings: False
+codes: [reader-declaration-missing]   # finding payload keys: counterpart / face / fix_direction / line / path / rule / snippet (no "code" key)
+085 findings: 23

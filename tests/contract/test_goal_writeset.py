@@ -21,7 +21,7 @@ CANONICAL_MAPPING = REPO_ROOT / "skills/internal/create-team/references/summary-
 MIRROR_MAPPING = REPO_ROOT / ".specify/skills/internal/create-team/references/summary-mapping.md"
 GENERATOR = REPO_ROOT / "skills/internal/create-team/scripts/build-summary-input.py"
 
-NEW_DELIVERY_ROOT = ".specify/goal"
+NEW_DELIVERY_ROOT = ".specify/anchoring"
 OLD_DELIVERY_ROOT = ".specify/project/goal"
 
 pytestmark = pytest.mark.contract

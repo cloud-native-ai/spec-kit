@@ -1,0 +1,30 @@
+seat D — owner-claim reads (092 D1/D2), measured 2026-11-09, host /cws_data/cloud-native-ai/spec-kit
+
+1) Owner doc identity: `shared/workflow/acceptance-hardening.md` and `.specify/shared/workflow/acceptance-hardening.md`
+   were byte-identical before the edit (`diff` empty). Its header already declared `**Owner (single definition point)**`.
+
+2) Self-claims cut in 081 requirements.md (each retains its original text under `<!-- 092 handoff: D1 -->`):
+   - A7: `owner 只有一个文件` -> `owner 见` (line 44 note; A7 body line 43)
+   - FR-006: `唯一规范形态` -> `规范形态` (line 145 note)
+   - FR-011: `在落地之前，语法条文由本条拥有` -> pointer to owner § Inherited Blockers, T003 already landed (line 151)
+   - FR-013 / A3: `唯一内容定义点` -> `内容定义点` + owner-declared uniqueness (lines 29, 155)
+
+3) Declaration-layer boundary NOT touched: FR-013's layering (content owner = owner doc § Review Composition,
+   declaration owner = `templates/commands/review.md` § Composition) keeps its MUST NOT sentence verbatim; a
+   command template is a declaration carrier by that clause's own text, not a schema restatement.
+
+4) Consumers checked before touching the templates/spec rows (none re-implements the schema):
+   `tests/contract/test_acceptance_state_machine.py:22` cites the owner doc; `templates/feature-details-template.md`
+   points at it (`schema owner`); `tests/contract/test_acceptance_schema_ownership.py` excludes the owner by identity
+   and reads its `| Column | Content |` tables. No test asserts the owner doc's header wording, so the added sentence
+   is additive and guarded by nothing that would go red on its removal (recorded, not overstated).
+
+5) `## Shared Strings` in requirements.md: at requirements stage it was the grammar owner by FR-006/FR-011; today the
+   owner doc § Closure Verdict holds it and declares "A declaring specification records the same seven templates in its
+   own `## Shared Strings` so its tests can pin them verbatim … this file is authoritative for what a consumer emits."
+   Machine consumers that read it as a transcription: `tests/contract/test_closure_acceptance_check.py` (`_templates`),
+   `scripts/python/validate-requirements.py` (ref-resolvable, `STR_ROW_RE` anchored at `^|`).
+   NOT claimed: any flow-class rule about which sections an `expression` spec must carry (unverified).
+
+6) Verdict: the owner stays one file; requirements.md, state-vocabulary.contract.md and tasks-081b.md now carry
+   pointers with the original text preserved; the owner doc carries one added sentence declaring itself the owner.

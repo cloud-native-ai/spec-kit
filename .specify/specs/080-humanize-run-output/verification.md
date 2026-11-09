@@ -9,6 +9,17 @@ baseline_branch=080-humanize-run-output
 implementation_date=2026-10-31
 post_change_commit=46394dd4
 
+# -- Smoke test record (exactly one per feature) --
+# `smoke_command` is the feature's contractual surface suite, run end to end over the delivered
+# command face: the report shape, evidence pointers and verdict/failure wording are asserted there.
+# A live `/speckit.humanize` invocation needs a native dispatch channel this host does not expose
+# (see § 未跑与限制), so the deterministic substitute below is the smoke. Recorded 2026-11-09 by the
+# 092 A6 schema-completion pass, verbatim command and exit code; the evidence file is that pass's
+# own reading record, the only file this pass was authorised to write.
+smoke_command=/usr/bin/python3 -m pytest -q tests/contract/test_humanize_command_surface.py
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/092-non-disposable/test-evidence/u08-report.txt
+
 # -- Evidence records (owner: templates/verification-log-template.md) --
 # One record per `pass` SC sample (SC-002/003/005/006/007/008/009/010).
 # `evidence_path` is repo-relative; `evidence_sha256` is SHA-256 over the archived

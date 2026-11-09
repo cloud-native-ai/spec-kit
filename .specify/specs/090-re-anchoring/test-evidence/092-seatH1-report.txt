@@ -1,0 +1,8 @@
+086/092 implement-executor seat H1 — 档 II E4 (tasks.md DoD-3 + GATE-5, verification.md SC-003 row + note)
+Measured on test-evidence/closure-check.json: candidates=751 applicable=367 exempt=737 violations=0; 353 exempted paths are ALSO applicable, so applicable+exempt (1104) double-counts — identity is void by construction, not just unreached.
+Replacement form: counts recompute against their arrays + exemptions subset of candidates + no candidate outside applicable ∪ exemptions ∪ violations; new GATE-5 one-liner verified exit=0 against the recorded payload.
+DoD-3 / GATE-5 / SC-003 row / new verification note each carry <!-- 092 handoff: E4 -->; no other body text touched.
+validate-tasks.py: 0 errors, 68 warnings (unchanged from pre-edit baseline); diff = 2 files, +7/-3.
+Engine (script-interface-check.py) count semantics untouched; quickstart.md:79 and non-disposable-definitions.md:122 still carry the old identity (outside this seat's write domain).
+ANOMALY: the old check `applicable+exempt==candidates` was never satisfiable under the engine's definitions — it is a spec defect, not a tree defect; closing it fully needs a ruling on whether `exempt` should mean "not applicable" (excluding the 353 overlap) or stay `len(exemptions[])`.
+SEAT-H1-DONE

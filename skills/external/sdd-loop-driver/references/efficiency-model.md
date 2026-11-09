@@ -93,6 +93,10 @@ FL-01…FL-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义务由收口槽位承担。槽内重跑记 `in-slot-rerun`，不另开槽。
 
+**证据路径拼写（本节唯一 owner）**：两个槽位名单文件的唯一拼写是 `<spec-dir>/baseline-failed.txt` 与 `<spec-dir>/final-failed.txt`（即上表的 `--names-out` 落点）。085 的 `test-evidence/full-suite-final-failed.txt` 与 086 的 `test-evidence/{baseline,final}-failed.txt` 是**历史指针**——它们是各自带日期的记录，不是本条 owner 拼写的第二种合法形态；引用时按该路径读旧记录，新运行 MUST NOT 沿用这两种形态。
+
+**closure 名单的命名规则**：同一 spec 目录出现多个 closure 名单时，收口读数 MUST 取文件名带轮次、且轮次最新的那一个（如 `final-failed-r2.txt` … `final-failed-r6.txt`）；无轮次的 `final-failed.txt` MUST NOT 作为缺省收口读数——它若滞留更早轮次的读数，MUST 在台账或证据中标注为**旧读数**并指向轮次文件。实例（088）：closure 读数是 `.specify/specs/088-speckit-visualization/final-failed-r6.txt`（27 个失败名称；台账行 `.specify/state/088-speckit-visualization.md` 的 `slot=closure` seq=2），同目录 `final-failed.txt` 是 r1 旧读数（58 个名称），不得当作收口读数。
+
 ### 2.2 台账与证据分工
 
 - **E2 台账唯一来源** = 线状态脊的 `<!-- test-budget:begin -->` … `<!-- test-budget:end -->` JSONL 围栏；`<spec-dir>/test-evidence/implement.jsonl` 仅是 E3 传输/证据副本，MUST NOT 作为台账或审计来源。

@@ -16,7 +16,7 @@ ENGINE = REPO_ROOT / "scripts/python/goal-utils.py"
 
 
 def _seed(root: Path) -> Path:
-    global_goal = root / ".specify/goal/global-goal/goal.md"
+    global_goal = root / ".specify/anchoring/global-goal/goal.md"
     global_goal.parent.mkdir(parents=True, exist_ok=True)
     global_goal.write_text("# Global Goal\n", encoding="utf-8")
     global_team = root / ".specify/teams/global-team/team.md"
@@ -44,7 +44,7 @@ def test_global_scope(tmp_path: Path):
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["scope"] == "global"
-    assert payload["goal_root"].endswith("/.specify/goal")
+    assert payload["goal_root"].endswith("/.specify/anchoring")
     assert payload["team_root"].endswith("/.specify/teams")
 
 
@@ -99,7 +99,7 @@ def test_write_with_auto_scope_is_rejected(tmp_path: Path):
 def test_spec_write_leaves_global_stores_byte_identical(tmp_path: Path):
     spec = _seed(tmp_path)
     globals_ = [
-        tmp_path / ".specify/goal/global-goal/goal.md",
+        tmp_path / ".specify/anchoring/global-goal/goal.md",
         tmp_path / ".specify/teams/global-team/team.md",
     ]
     before = {path: path.read_bytes() for path in globals_}
@@ -107,5 +107,5 @@ def test_spec_write_leaves_global_stores_byte_identical(tmp_path: Path):
                 "--spec-dir", str(spec), "--objective", "a run-scoped outcome")
     assert proc.returncode == 0, proc.stdout + proc.stderr
     after = {path: path.read_bytes() for path in globals_}
-    assert after == before, "a temporary-scope write must not touch the global stores"
+    assert after == before, "a spec-scoped write must not touch the global stores"
     assert (spec / "goal/new-temp-goal/goal.md").is_file()

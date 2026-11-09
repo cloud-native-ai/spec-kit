@@ -1,0 +1,9 @@
+M3: appended 092 tasks -> 090 tasks.md as `## Non-Disposable slice (092)`, before `## Dependencies & Execution Order`; 158/158 rows, states kept (42 X / 116 open), `git diff` = pure insertion, 090's own 39 rows untouched, 092 tasks.md unmodified.
+Edits: ids/cross-refs `T<NNN>A` (brief's `ND-T<NNN>` is a `row-format` error: `VALID_ID = ^T\d{3}[A-Za-z]?$`); `[green:]` -> `contracts/nd-<page>.contract.md#<clause>`; `[blockedBy:]` -> `T<NNN>A`. Reversing both edits reproduces 092 byte-for-byte (0 mismatches).
+validate-tasks.py .specify/specs/090-re-anchoring/tasks.md -> FAIL, exit 1, 62 error(s), 0 warning(s); all 62 = `green-dangling` on the 8 `contracts/nd-*` pages, which do not exist yet (no other class fires).
+File is 532 lines (>160), reported as measured: 337 head + 220 appended; no line compressed and no row dropped — 40 rows + 220 frame lines = 39 head + 158 appended + 23 frame. The 160 ceiling belongs to decomposition-check.py (per 092 § Adjudications 3), not to validate-tasks.py.
+ANOMALY: `contracts/nd-*` absent, so the 62 green claims are unreadable until the W3 contract lane lands the merged pages; the slice keeps the merged namespace rather than retargeting at 092's pages (that choice needs an adjudication, not a repair).
+ANOMALY: brief's `ND-T<N>` id form and brief's "task numbers (T001…T158) with ND-T prefix" are rejected by validate-tasks.py; `T<NNN>A` is the only conforming spelling.
+ANOMALY: 090 tasks.md is the only file in my write domain; `verification.md`, `coverage-baseline.txt` and the `## Dependencies` block still describe T001…T039 only — the ND/D lane must reconcile them.
+ANOMALY: report written at the path the brief named (090 `test-evidence/`), not into 092's `test-evidence/` that C-408 names for 092 evidence.
+M3-DONE

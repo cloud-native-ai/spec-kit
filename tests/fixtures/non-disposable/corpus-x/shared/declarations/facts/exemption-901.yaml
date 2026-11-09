@@ -1,0 +1,7 @@
+fact: exemption-901
+kind: record
+feature: "901"
+reason: "the block lands with the next record completion"
+expiry_kind: on-date
+expiry_value: "2099-01-01"
+expiry_recheck: "2099-01-01"

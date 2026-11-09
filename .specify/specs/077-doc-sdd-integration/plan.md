@@ -41,6 +41,8 @@
 
 **Core Principles Compliance**（动态枚举自 `.specify/memory/constitution.md`，共 18 项；同作者降级说明见本节末）:
 
+<!-- 092 handoff: F3 — 「共 18 项」是 plan-time 快照，保留不改。名册的唯一值 owner 是 `.specify/memory/constitution.md`（2026-11-09 现值 22 条，版本 1.19.0）；引用时 MUST 重新枚举，MUST NOT 采信本行数字。参见 092 F3。 -->
+
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | Pass | `feature-ref.md` 把 25 条 FR 逐条映射到设计落点与契约；每个形制取舍在 `research.md` R-1…R-13 有理由；执行类零变化的判据是「与基线提交逐字相同」，不是印象 |

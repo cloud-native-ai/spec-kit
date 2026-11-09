@@ -11,7 +11,7 @@ During the summary step, writes are permitted ONLY to:
 
 | # | Path | Contents |
 |---|------|----------|
-| W-1 | `<delivery_dir>/` — `.specify/goal/<goal-slug>/` ([[STR-001]]) | `summary.md`, `assets/`, `data/` |
+| W-1 | `<delivery_dir>/` — `.specify/anchoring/<goal-slug>/` ([[STR-001]]) | `summary.md`, `assets/`, `data/` |
 | W-2 | `.specify/memory/feedback/` | Feedback entries recorded by the invoked skill |
 
 Any write outside W-1 and W-2 during the summary step is a violation.
@@ -56,7 +56,7 @@ The following MUST remain byte-identical across the summary step:
 
 ```bash
 # Byte-invariance across a refresh: capture, refresh, compare
-G=.specify/goal/<goal-slug>
+G=.specify/anchoring/<goal-slug>
 before=$(git status --porcelain=v1 .specify/teams skills/internal/summarize-project .specify/agents .specify/project | sort)
 # ... run the summary step ...
 after=$(git status --porcelain=v1 .specify/teams skills/internal/summarize-project .specify/agents .specify/project | sort)

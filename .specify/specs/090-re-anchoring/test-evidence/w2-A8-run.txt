@@ -1,0 +1,22 @@
+=== command ===
+.venv/bin/python -m pytest -q -p no:randomly <13 in-scope files>
+=== date ===
+2026-11-09T16:16:15+08:00
+=== before-my-edit (baseline) ===
+10 failed, 174 passed, 1 warning in 9.06s  (recorded at start of seat run)
+=== after-my-edit ===
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_goal_definition_sourcing.py::test_narrative_and_milestones_come_from_the_definition
+FAILED tests/integration/test_goal_definition_sourcing.py::test_disagreeing_team_bodies_no_longer_raise_arbitration_when_a_definition_exists
+FAILED tests/integration/test_goal_definition_sourcing.py::test_refresh_never_writes_the_definition_file
+FAILED tests/integration/test_goal_definition_sourcing.py::test_empty_criteria_definition_declares_absence_not_invented_milestones
+FAILED tests/integration/test_goal_migration_path.py::test_migration_preserves_the_resolved_objective
+FAILED tests/integration/test_goal_reference.py::test_two_teams_sharing_a_goal_resolve_to_one_definition
+FAILED tests/integration/test_goal_reference.py::test_broken_reference_is_reported_not_degraded
+FAILED tests/integration/test_goal_reference.py::test_reference_inline_divergence_prefers_the_definition_and_surfaces_it
+FAILED tests/integration/test_goal_reference.py::test_editing_the_definition_changes_all_referencing_teams
+FAILED tests/integration/test_goal_roster.py::test_roster_written_to_summary_never_to_goal_md
+10 failed, 174 passed, 1 warning in 9.00s
+=== exit ===

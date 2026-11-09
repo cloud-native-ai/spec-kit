@@ -1,0 +1,6 @@
+seat F — 档 II D4, reporter cadence single owner (092)
+4 bodies touched (7 files, source+mirror): create-mode.md x2, reporter.agent.md (agents/ + .specify/), progress-reporting.md x2, reporting-obligations.md x2 — 8 markers, +8 lines, 0 deletions; original text byte-preserved (marker-strip round-trip == HEAD for all 7).
+Owner is reporting-obligations.md § 二 (long-run 30 s); create-mode x2 + reporter template now point there; progress-reporting keeps its own 15-min interactive default with a boundary marker, no value moved.
+guards: 76 passed (reporting_obligations + progress_reporting + roster_reporter_seat + status_digest RO-07); scans proven live — seeding "30 seconds" into agents/reporter.agent.md turned RO-03 red and naming that file.
+C-11(b) test_user_facing_comprehension_section FAILS, not mine: pre-existing, also names self-explanatory.md; its scan reads shipped shared/guidelines/*.md, which I only appended to; seeding the pointer proves the assertion live.
+SEAT-F-DONE

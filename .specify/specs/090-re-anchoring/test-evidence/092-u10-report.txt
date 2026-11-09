@@ -1,0 +1,8 @@
+U10 / 092 P6-B3 (tasks.md T128) — 067 runner contract superseded marker
+Target (glob-confirmed, only file touched): .specify/specs/067-loop-efficiency-hardening/contracts/runner-contract.md
+Change: blockquote "SUPERSEDED (2026-11-09)" added under RC-03; old RC-03 text kept verbatim; pointer -> .specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md C-001 (parallel default) + C-004 (--serial escape hatch).
+Scope stated in marker: only the "Serial is the default" proposition is superseded; the serial-runnability guarantee and "degradation serial run is never budget evidence" stay in force (086 § inheritance cites RC-03 verbatim).
+Tests: none changed (git status shows no test-file edit by this writer; other dirty paths belong to parallel writers).
+Note: work-queue.json u10 territory says `.specify/specs/067-bilingual-expression/contracts/runner-contract.md`; no such directory exists — read as the 067-* glob (tasks.md T128 wording) and resolved to 067-loop-efficiency-hardening.
+Not committed, not pushed.
+U10-DONE
