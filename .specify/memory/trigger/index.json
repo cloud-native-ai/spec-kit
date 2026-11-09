@@ -1,11 +1,11 @@
 {
   "store": ".specify/memory/trigger/",
   "schemaVersion": 1,
-  "updated": "2026-09-20T08:34:16Z",
+  "updated": "2026-11-09T12:30:05Z",
   "config": {
     "enabled": true,
-    "threshold": 3,
-    "telemetryWindow": 200,
+    "threshold": 5,
+    "telemetryWindow": 3,
     "probeBudgetPct": 20,
     "minSample": 5
   },
@@ -220,19 +220,19 @@
       "priority": 30,
       "state": "active",
       "promotion": {
-        "consecutive": 0,
-        "threshold": 3,
+        "consecutive": 1,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
         "userResetAt": null
       },
       "stats": {
-        "hits": 0,
-        "accepted": 0,
+        "hits": 6,
+        "accepted": 1,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": null
+        "lastSeen": "2026-11-09T12:30:04Z"
       },
       "provenance": {
         "file": "templates/commands/requirements.md",
@@ -253,7 +253,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -285,7 +285,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -317,7 +317,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -349,7 +349,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -381,18 +381,18 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
         "userResetAt": null
       },
       "stats": {
-        "hits": 0,
+        "hits": 3,
         "accepted": 0,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": null
+        "lastSeen": "2026-11-09T12:30:05Z"
       },
       "provenance": {
         "file": "templates/commands/checklist.md",
@@ -414,18 +414,18 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
         "userResetAt": null
       },
       "stats": {
-        "hits": 1,
+        "hits": 0,
         "accepted": 0,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": "2026-09-08T15:01:30Z"
+        "lastSeen": null
       },
       "provenance": {
         "file": "templates/commands/implement.md",
@@ -446,7 +446,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -478,7 +478,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -510,7 +510,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -524,10 +524,10 @@
         "lastSeen": null
       },
       "provenance": {
-        "file": "templates/commands/feedback.md",
+        "file": "skills/internal/manage-feedback/SKILL.md",
         "anchorKind": "owning-section",
-        "anchor": "Outline",
-        "quote": "Run § Introspection over the open `internal` entries"
+        "anchor": "Workflow",
+        "quote": "Run § Introspection (A3 in [`./references/path-a-digest.md`](./references/path-a-digest.md)) over the open `internal` entries"
       }
     },
     {
@@ -542,7 +542,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
@@ -575,7 +575,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
@@ -607,7 +607,7 @@
       "state": "active",
       "promotion": {
         "consecutive": 0,
-        "threshold": 3,
+        "threshold": 5,
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
@@ -629,17 +629,107 @@
       "notes": "confirmationClass per shared/guidelines/confirmation-gates.md (criteria cited by path, not restated here); doubtful cases are treated as destructive, so this flow never becomes auto-executing."
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "eventId": "20261109T122951Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T12:29:51Z"
+    }
+  ],
   "lastSuggestion": {
-    "simp050": {
-      "sessionId": "simp050",
-      "turnId": "simp050-01",
-      "situationId": "s07",
-      "ruleId": "r-007",
-      "snapshot": "implementing|open-tasks",
+    "sc16p-1": {
+      "sessionId": "sc16p-1",
+      "turnId": "sc16p-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
       "escalated": false,
       "suggested": true,
-      "ts": "2026-09-08T15:01:30Z"
+      "ts": "2026-11-09T12:29:50Z"
+    },
+    "sord2": {
+      "sessionId": "sord2",
+      "turnId": "sord2-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:29:50Z"
+    },
+    "sst": {
+      "sessionId": "sst",
+      "turnId": "sst-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:29:50Z"
+    },
+    "sb": {
+      "sessionId": "sb",
+      "turnId": "sb-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:29:50Z"
+    },
+    "sc16p-3": {
+      "sessionId": "sc16p-3",
+      "turnId": "sc16p-3-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:29:50Z"
+    },
+    "sc16-1": {
+      "sessionId": "sc16-1",
+      "turnId": "sc16-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:30:04Z"
+    },
+    "srep-0": {
+      "sessionId": "srep-0",
+      "turnId": "srep-0-01",
+      "situationId": "s06",
+      "ruleId": "r-006",
+      "snapshot": "tasks-ready|open-tasks",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:30:04Z"
+    },
+    "srep-3": {
+      "sessionId": "srep-3",
+      "turnId": "srep-3-01",
+      "situationId": "s06",
+      "ruleId": "r-006",
+      "snapshot": "tasks-ready|open-tasks",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:30:04Z"
+    },
+    "srep-4": {
+      "sessionId": "srep-4",
+      "turnId": "srep-4-01",
+      "situationId": "s06",
+      "ruleId": "r-006",
+      "snapshot": "tasks-ready|open-tasks",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-09T12:30:05Z"
     }
   },
   "proposals": [],

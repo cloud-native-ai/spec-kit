@@ -5,10 +5,10 @@ source: "skill:sdd-loop-driver"
 tags: ["run-determination", "091-closeout-20261109t062926z"]
 title: "run-determination skill:sdd-loop-driver 091-closeout-20261109T062926Z"
 created: "2026-11-09T06:29:26Z"
-summary: "skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elapsed=not_evaluated artifact=regressed satisfaction=not_evaluated"
+summary: "skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elapsed=not_evaluated artifact=regressed satisfaction=accepted"
 ---
 
-skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elapsed=not_evaluated artifact=regressed satisfaction=not_evaluated
+skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elapsed=not_evaluated artifact=regressed satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elap
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-11-09T06:29:26Z",
-  "settled_at": null,
+  "settled_at": "2026-11-09T08:23:26Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -105,9 +105,9 @@ skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elap
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "true",
         "source": "engine_nonzero_exit"
@@ -186,18 +186,6 @@ skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elap
           ".specify/specs/091-auto-git-closeout/test-evidence/baseline-failed.txt"
         ],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -212,11 +200,6 @@ skill:sdd-loop-driver run=091-closeout-20261109T062926Z token=not_evaluated elap
       },
       {
         "observation": "elapsed not_evaluated via source=unavailable: current=None baseline=None reason=source_unavailable",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

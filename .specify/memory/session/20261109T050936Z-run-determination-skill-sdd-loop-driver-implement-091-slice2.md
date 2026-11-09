@@ -6,10 +6,10 @@ feature: "091-auto-git-closeout"
 tags: ["run-determination", "implement-091-slice2"]
 title: "run-determination skill:sdd-loop-driver implement-091-slice2"
 created: "2026-11-09T05:09:36Z"
-summary: "skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_e
   "feature": "091-auto-git-closeout",
   "feature_id": "091",
   "determined_at": "2026-11-09T05:09:36Z",
-  "settled_at": null,
+  "settled_at": "2026-11-09T08:23:29Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -89,9 +89,9 @@ skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_e
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -170,18 +170,6 @@ skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_e
           ".specify/specs/091-auto-git-closeout/test-evidence/mutations.txt"
         ],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -201,11 +189,6 @@ skill:sdd-loop-driver run=implement-091-slice2 token=not_evaluated elapsed=not_e
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=1 collected=2 reason=no_baseline",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
