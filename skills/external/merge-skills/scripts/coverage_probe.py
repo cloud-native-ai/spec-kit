@@ -71,7 +71,7 @@ Baseline files (--emit-baseline / --baseline):
     idempotent. Feeding a bare token list back through extract_tokens() loses the
     tokens that only existed because the source backtick-quoted them (`pass`, `fail` —
     the class the limitation above already flags as probe-invisible) and truncates
-    relative paths to their leading-slash fragment (`docs/git-workflow.md` ->
+    relative paths to their leading-slash fragment (`.specify/workflow/git.md` ->
     `/git-workflow.md`). A baseline regenerated from a baseline is therefore a
     strictly weaker gate that still prints "coverage clean". Treat the frozen file as
     the authority; if the source material still exists and the baseline looks wrong,

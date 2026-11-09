@@ -1,12 +1,20 @@
-# Git Workflow
+# Git Workflow (Spec Kit framework)
 
 Machine-maintained by the `git-utils` skill (scope A) — the managed block below is the
-**single source of truth** for this project's declared git workflow model and branch
-conventions; do not edit it by hand.
+**single source of truth** for the git workflow **under the Spec Kit framework**: the
+declared model, branch structure, and the close-out discipline followed by both human
+developers and the framework's unattended mechanisms. Do not edit it by hand.
 `.specify/instructions.md` carries only a pointer to this file.
 
+> **Why this is not a developer's personal git flow:** Spec Kit runs unattended
+> mechanisms (SDD loop driver, periodic house-keeping, feedback digest, automatic
+> close-out) that commit, merge, and push on a programmatic cadence. The declared
+> workflow therefore constrains both human and automated executors, and the state
+> file lives on the framework runtime surface (`.specify/workflow/`) rather than in
+> the documentation space.
+
 <!-- GIT_WORKFLOW_START -->
-<!-- Workflow model is a per-project choice (menu: single-branch / dual-branch / temp-branch / MAIN-PRE-DEV three-tier; single-branch never even creates temp branches); the declaration below records THIS project's choice, followed by its operating rules. While no workflow is established yet, keep the `None yet.` line as the model declaration so Bootstrap can detect the unfilled state. -->
+<!-- Workflow model is a framework-level declaration under Spec Kit (menu: single-branch / dual-branch / temp-branch / MAIN-PRE-DEV three-tier; single-branch never even creates temp branches); the declaration below records THIS project's choice, followed by its operating rules. While no workflow is established yet, keep the `None yet.` line as the model declaration so Bootstrap can detect the unfilled state. -->
 - **Workflow model**: 临时分支（trunk-based）—— 单主干 + 短命特性分支；开发在临时分支上进行，完成即合入主干并删除
 - **Trunk**: `master`（tracks `gitlab/master`；推送时 `github/master` 与 `gitee/master` —— 同一 fork 的镜像 —— 一并更新）
 - **Feature branch convention**: `NNN-<slug>`（`NNN` = 需求编号，如 `050-proactive-flow-trigger`）；自 `master` 切出，完成后合回 `master`，随即删除本地分支（`git branch -d`，已合并才允许）
