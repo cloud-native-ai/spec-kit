@@ -102,9 +102,9 @@ declares `metric: task-count` against that measured shape, and `implement`'s pac
 
 ## Concurrency and execution model
 
-**R-23 — Single-agent implement is a measured bottleneck.** The 092 execution-lessons record § 1: 62 tasks in one
+**R-23 — Single-agent implement is a measured bottleneck.** The 092 execution-lessons record § 1: one package of 60+ rows in one
 500-turn agent took 116 min and hit the turn limit; 091's 3-package fix loop finished with zero integration
-conflicts. Consequence: the plan declares ~10 tasks per package and up to 6 concurrent executors (§ Execution Model).
+conflicts. Consequence: the plan declares a per-package ceiling of 16 rows and up to 6 concurrent executors (§ Execution Model).
 
 **R-24 — Worktrees contaminate tree-scanning tests.** The same record § 2: fix worktrees under `.specify/.tmp` were
 read as duplicate repo copies by migration/isomorphism/script-interface tests. Consequence: rule 1 of the package

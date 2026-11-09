@@ -7,10 +7,10 @@ slice: 092
 stage: tasks
 stage_started_at: 1794208982
 stage_deadline_epoch: 1794219782
-stage_base_commit: 4420076c
+stage_base_commit: ab8fa2de
 attempt: 0
 retry_limit: 3
-last_verdict: "U4 pass — PLAN-DONE; 111 clauses; 7 decision tensions; 22-row Constitution; pre-analyze pass (0 errors / 37 advisories); decomposition proceed; overlap adjudicated; commits 58516812 + 679a3f51; checkpoint 03; temporary team created; ANOMALY: the plan 6-package partition ran serially (coordinator lacks dispatch) — the user 093 requirement addresses this; next = tasks"
+last_verdict: "TASKS-DONE — 80 task rows (T001–T080) in 8 phases / 5 P1 stories / 7 dispatchable packages (15·14·18·8·17·6·2); 111 clauses attributed, 0 dangling/collision/cross-phase/divergence; decomposition proceed (42 FR / 80 tasks, ceilings 120/160); pre-analyze pass (0 errors / 86 advisories, all missing-path of implement-time files); validate-tasks 0 errors / 1 warning (disclosed forward edge T043→T054); accounting clause lanes pass, fr-uncovered 26 of 42 recorded as a citation-form artefact; next = checklist"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch tasks (092 line); the user 093 line (framework-wide subagent concurrency default) starts with its requirements stage
+next_action: dispatch checklist (092 line); the user 093 line (framework-wide subagent concurrency default) starts with its requirements stage
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
   non_goals: [新增 /speckit.* 命令, 第二个 goal/team 引擎, 破坏性迁移旧数据（archive-not-delete）, 改变 SDD 阶段链与哨兵]
@@ -43,11 +43,12 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages recomputed per stage; implement packages ~10 tasks, up to 6 concurrent
   verifier_reserve: 1
-  breakpoint_verdict: "requirements + clarify + plan complete; next stage = tasks"
+  breakpoint_verdict: "requirements + clarify + plan + tasks complete; next stage = checklist"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 35 FR / 10 SC; commit af1fcae3
   clarify U4: pass — 42 FR / 11 SC; overlap clear; validate ok 0/0; pre-analyze pass 0/0; commit 8badbd03
   plan U4: pass — 111 clauses; 7 tensions; pre-analyze pass 0/37; decomposition proceed; overlap adjudicated; commits 58516812 + 679a3f51; team created
-wrapup: requirements records committed in af1fcae3; spec-local goal created
+  tasks U4: pass — 80 rows / 7 packages / 111 clause attributions; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors / 1 disclosed warning
+wrapup: requirements records committed in af1fcae3; spec-local goal created; tasks stage records in test-evidence/ (+ coverage-baseline.txt); run-determination + exec-quant recorded
 framework_observations: []

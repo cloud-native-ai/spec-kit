@@ -35,9 +35,10 @@ migration, residual-probe and archive-writability actions; `skills/internal/crea
 territory expansion; `shared/declarations/facts/` grows exactly two facts; the two concept owners are rewritten
 rather than duplicated (FR-024, FR-031, RS-003, RS-004).
 
-Delivery uses **6 concurrent plan packages** for this stage and, after `tasks`, **~10 tasks per package with up to 6
-concurrent implement executors** in isolated git worktrees folded through the existing integration queue — the shape
-091 measured as the fix for the single-agent bottleneck (§ Execution Model).
+Delivery uses **6 concurrent plan packages** for this stage and, after `tasks`, dispatches **up to 6 implement executors
+concurrently** in isolated git worktrees folded through the existing integration queue; the package partition and each
+package's row count are declared in `tasks.md` § Package Map, not here — the shape 091 measured as the fix for the
+single-agent bottleneck (§ Execution Model).
 
 ## Technical Context
 
@@ -220,7 +221,7 @@ templates/commands/team.md                         # EDIT: scope values by point
 templates/commands/feedback.md                     # EDIT: declare its goal/team creation timing (FR-040)
 skills/external/sdd-loop-driver/SKILL.md           # EDIT: § Temporary Goal/Team → binding model; creation timing by declaration
 skills/external/sdd-loop-driver/references/checkpoint-protocol.md # EDIT: goal/team paragraphs to the new model
-skills/external/sdd-loop-driver/references/decomposition-model.md  # EDIT: implement packages ~10 tasks / <=6 concurrent / worktree
+skills/external/sdd-loop-driver/references/decomposition-model.md  # EDIT: implement packages <=6 concurrent, per-package ceiling 16, worktree writes
 tests/contract/, tests/unit/, tests/integration/   # NEW + EDIT: contract suites, 085 disposal, structural invariants
 docs/reference/                                    # EDIT: command/engine/skill references for the new surfaces
 ```
@@ -257,7 +258,7 @@ Owner of this table's shape, its `Status` / `Decision` domains and the invalid-r
 | EP-002 | The 14 spec-local definitions in this repository are the migration subject, and their slugs collide with none of the 6 goal / 12 team archive entries. | `test-evidence/requirements-baseline-probe.txt` (goal 7 / team 7); programmatic overlay of the two archive trees against the spec-local trees in this session returned two empty intersections | verified | — |
 | EP-003 | `create_goal` and `definition_path` already refuse duplicate definitions, so the single-archive collision refusal (FR-021 and the Edge Case) needs no second detector. | `scripts/python/goal-utils.py` `create_goal` raises `GoalError` when `definition_path(...).exists()`; `definition_path` resolves `archive_root(repo_root)/slug/goal.md` | verified | — |
 | EP-004 | The declaration layer is readable through one entry point and an unregistered fact surfaces as `owner-unavailable`, so two new facts can be consumed without touching `flow-class-check.py`. | `declaration_reader.py --action get --fact flow-class-classes` returns the entry; `load_fact` raises the absent finding for an unknown slug; `flow-class-check.py --action lookup --unit-id spec:092-goal-team-parallel` exits 0 | verified | — |
-| EP-005 | Implement-stage concurrency (up to 6 executors, ~10 tasks per package, worktree writes) has an existing integration queue in 064 and is safe to reuse. | the 092 execution-lessons record in `notes/` § 1 (3-package fix loop, zero integration conflicts); `skills/external/sdd-loop-driver/references/decomposition-model.md` § 13 and § 16 | verified | — |
+| EP-005 | Implement-stage concurrency (up to 6 executors, per-package ceiling 16, worktree writes) has an existing integration queue in 064 and is safe to reuse. | the 092 execution-lessons record in `notes/` § 1 (3-package fix loop, zero integration conflicts); `skills/external/sdd-loop-driver/references/decomposition-model.md` § 13 and § 16 | verified | — |
 | EP-006 | The serial `FAILED` id set is a stable comparison surface and the 44 baseline failures are unrelated to goal/team behaviour. | `test-evidence/plan-baseline-names.txt` (46 fully qualified ids) and `plan-baseline-stability.txt` (empty diff between consecutive runs); goal/team suites are green on this tree — `test_scope_resolution.py` 8 passed, the 7-module goal/team set 171 passed | verified | — |
 
 ## Inherited Blockers
@@ -308,7 +309,7 @@ The plan is executed under the user's large-concurrency instruction, and the sam
 | Stage | Packages | Concurrency | Write isolation | Evidence rule |
 |-------|----------|-------------|-----------------|---------------|
 | plan | 6 (`plan-wp01`…`plan-wp06`) | 6 | shared tree with disjoint file sets (table below) | each package records its own gate reading |
-| tasks | 1 | 1 | shared tree | one `tasks.md`, ~10 tasks per implement package declared in the list itself |
+| tasks | 1 | 1 | shared tree | one `tasks.md`; the implement packages and their row counts are declared in its own § Package Map |
 | implement | ceil(tasks/10), cap 6 concurrent | 6 | `write_isolation=worktree` (child line plus its own worktree), integrated through the 064 queue in declared order | targeted package suite per package; two full-suite slots only (implement start and after review) |
 | review | 4 segments | 4 | read-only | one fresh-context verifier per package; a package verdict never substitutes for stage U4 |
 
@@ -327,7 +328,7 @@ Rules carried into every package brief, from `notes/execution-lessons-2026-11-09
    `--collected` / `--names-*` / `--green-check` shapes (lesson 6).
 6. **Record writeback after renumber or acceptance**: any id renumber or second acceptance updates verification,
    notes and evidence pointers in the same commit (lesson 7).
-7. **Cost discipline**: ~10 tasks per implement package (<=16), never 60+ in one executor; every package brief names
+7. **Cost discipline**: per-package ceiling 16 rows, never 60+ in one executor; every package brief names
    its `owned_paths` so two worktrees never write the same path (lesson 1).
 
 ### Plan packages (this stage, 6 concurrent, disjoint write sets)

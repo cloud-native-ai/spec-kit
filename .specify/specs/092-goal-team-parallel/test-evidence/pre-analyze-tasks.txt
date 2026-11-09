@@ -1,0 +1,1 @@
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=86 waived=0 fr=42 sc=11 tasks=80 clauses=0 files=12 checked_at=2026-11-09T07:42:31Z
