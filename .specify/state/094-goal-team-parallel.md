@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794228656
 stage_base_commit: a72138e1
 attempt: 3
 retry_limit: 3
-last_verdict: "Round 4 verification = VA PASS (H-1/H-2 closures file-level + gates re-measured) / VB FAIL (4 LOW: registry status stale; tasks.md:483 pointer; research.md:115 44 vs 46; 092 identity residues) / VC FAIL (D4 anchoring split: contracts 9 normative lines / 8 clauses HIGH — C-10/13/15/31/58/59/63/100; tasks 5 rows; quickstart 4 lines; feature-ref 1 row; data-model 2 rules; M-1..M-8, L-1..L-3). Fix wave dispatched: W1 contracts+tasks+baseline; W2 remaining surfaces."
+last_verdict: "Fix wave (W1/W2) = D4 anchoring aligned: 9 normative contract lines (8 clauses) + 5 tasks rows + quickstart 4 + feature-ref SC-012 + data-model 2 + all M/L items; live normative .specify/goal remaining: 0 in contracts and 0 in tasks (spec-local <spec>/goal/ unchanged, filename goal.md kept); ALL GATES GREEN (requirements 0/0; account status ok fr 43/43, 0 beyond; tasks 0 err/1 disclosed warn; tensions 0/0; pre-analyze x3 pass; decomposition proceed 43/83). Final verification wave dispatched."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "fix wave W1/W2 (fork, disjoint files, no commits) → driver integrates + gates → final verification (2 fork verifiers) → implement gate"
+next_action: "final verification (FV1 anchoring closures; FV2 consistency/registry/residuals) → analyze READY gate → implement with fork-carried packages"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."

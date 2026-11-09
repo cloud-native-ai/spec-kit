@@ -33,13 +33,13 @@ Owner of the task table: `<spec-dir>/tasks.md` (this contract references task id
 (FR-016, FR-035)
 ## 2. The three-way key pair (FR-034)
 
-- **C-58**: `handoff.md` frontmatter `goal_slug` MUST resolve to `.specify/goal/<goal_slug>/goal.md`, and
+- **C-58**: `handoff.md` frontmatter `goal_slug` MUST resolve to `.specify/anchoring/<goal_slug>/goal.md`, and
   `team_slug` ([[STR-005]]) MUST resolve to `.specify/teams/<team_slug>/team.md`. Both MUST be refused at
   creation when they do not resolve (`handoff-dangling-key`, exit 2): a contract never names a team that does not
   exist.
 
 (FR-016, FR-034)
-- **C-59**: The reverse keys MUST exist on the two other sides: `.specify/goal/<goal_slug>/goal.md` and
+- **C-59**: The reverse keys MUST exist on the two other sides: `.specify/anchoring/<goal_slug>/goal.md` and
   `.specify/teams/<team_slug>/team.md` each MUST carry `handoff_ref: <spec-dir-relative path>` pointing back at
   the same `handoff.md`, written by the engine's binding action (C-5/C-6's discipline), never by the contract
   file alone.
@@ -63,7 +63,7 @@ Owner of the task table: `<spec-dir>/tasks.md` (this contract references task id
 
 (FR-019, FR-036)
 - **C-63**: `territory.write` entries granted by C-61 MUST stay inside the spec directory of the contract and
-  MUST NOT include `.specify/goal/**` or `.specify/teams/**` (C-15 of `binding-and-lifecycle.md`).
+  MUST NOT include `.specify/anchoring/**` or `.specify/teams/**` (C-15 of `binding-and-lifecycle.md`).
 
 (FR-036)
 - **C-64**: The design face of `handoff.md` is owned by the spec side: a crew seat MUST NOT hold `write` on it.

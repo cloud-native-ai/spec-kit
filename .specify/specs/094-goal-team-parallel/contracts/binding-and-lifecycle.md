@@ -58,7 +58,7 @@ files in `contracts/` (C-1…C-113).
   exit 2, and the engine MUST NOT offer any alias for it (T-004).
 
 (FR-008, FR-025)
-- **C-10**: `--scope goal` MUST resolve the goal root to `.specify/goal`; `--scope teams` MUST resolve the team
+- **C-10**: `--scope goal` MUST resolve the goal root to `.specify/anchoring`; `--scope teams` MUST resolve the team
   root to `.specify/teams`; both MUST resolve both roots in one `Scope` object so a caller never needs two calls.
 
 (FR-008, FR-025)
@@ -72,7 +72,7 @@ files in `contracts/` (C-1…C-113).
   MUST be refused (`spec-dir-unresolvable`, exit 2).
 
 (FR-008)
-- **C-13**: The engine MUST NOT expose a write target outside `.specify/goal/<slug>/` and
+- **C-13**: The engine MUST NOT expose a write target outside `.specify/anchoring/<slug>/` and
   `.specify/teams/<slug>/` . A caller that asks for a write with `--scope auto` MUST be refused
   (`scope-read-only`, exit 2) — the existing 085 rule survives with the new value names.
 
@@ -85,7 +85,7 @@ files in `contracts/` (C-1…C-113).
   name that `goal_slug`. A refusal MUST be an exit-2 error whose text names the binding team slug(s).
 
 (FR-038)
-- **C-15**: `territory` on a team MUST NOT be able to authorize a write into `.specify/goal/**` or
+- **C-15**: `territory` on a team MUST NOT be able to authorize a write into `.specify/anchoring/**` or
   `.specify/teams/**`; such an entry MUST be refused when the team definition is validated (`territory-reserved`,
   exit 2), because those trees obey the function above rather than a territory grant.
 

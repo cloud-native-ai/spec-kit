@@ -1,4 +1,4 @@
-# Research — Feature 092 (Phase 0)
+# Research — Feature 094 (Phase 0)
 
 Every ruling below was taken from live files or live commands in this session; the file or command that bears on it
 is named. Rulings that changed the design carry their consequence.
@@ -112,7 +112,8 @@ brief set (clean before closure).
 
 **R-25 — The serial failure list is the comparison face.** The record § 3: parallel mode writes bare ids while the
 frozen baseline is the `FAILED`-prefixed list. Consequence: GATE-1 uses `test-evidence/plan-baseline-names.txt`
-(44 ids, measured this session), and the runner records `passes=2`.
+(46 ids, measured this session 2026-11-09; corrected at analyze round 4, 2026-11-09, from an earlier 44 reading —
+the file holds 46 unique ids), and the runner records `passes=2`.
 
 **R-26 — The existing integration queue is the only queue.** `skills/external/sdd-loop-driver/references/decomposition-model.md`
 § 13/§ 16 owns scheduling, independent verification and deterministic integration. Consequence: this feature adds no

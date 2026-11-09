@@ -89,7 +89,7 @@ clause's citation group changes — which is exactly when a reader needs to see 
 | SC-009 | a rebind changes ownership only; the file-minus-binding hash is unchanged | `tests/contract/test_binding_model.py` |
 | SC-010 | the 085 temporary hierarchy and vocabulary are gone; the disposal table is measured | `tests/contract/test_085_disposal_table.py` |
 | SC-011 | an interrupted migration resumes; no new failing id appears against the serial baseline | `tests/contract/test_migration_interruption.py` |
-| SC-012 | every `.specify/goal/*/goal.md` and `.specify/teams/*/team.md` resident carries a complete `binding` record after `backfill-bindings`, and a second run writes nothing | `tests/contract/test_resident_backfill.py` |
+| SC-012 | every `.specify/anchoring/*/goal.md` and `.specify/teams/*/team.md` resident carries a complete `binding` record after `backfill-bindings`, and a second run writes nothing | `tests/contract/test_resident_backfill.py` |
 
 Count: 12 map rows, 12 distinct SC ids. Each module is added by `/speckit.implement` in red-first order; the module names
 above are the plan's allocation and are pinned by `contracts/owner-rewrites-and-tests.md` C-109; the plan does not

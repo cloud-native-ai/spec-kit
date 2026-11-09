@@ -1,4 +1,4 @@
-# Data Model — Feature 092
+# Data Model — Feature 094
 
 Entities the feature designs. Field names are the ones the contracts use verbatim; a field that the contracts do
 not name is marked `annotation` and is not required. Validation rules point at the contract clause that owns them.
@@ -18,7 +18,7 @@ Validation: exactly these three keys; a missing key is `binding-missing`; a hand
 
 ## E-2 Goal definition
 
-Path `.specify/goal/<slug>/goal.md` (C-31). Existing shape (objective, criteria, lifecycle status, created/updated
+Path `.specify/anchoring/<slug>/goal.md` (C-31). Existing shape (objective, criteria, lifecycle status, created/updated
 dates, change history, optional targets, boundaries) is preserved; the following are added or constrained:
 
 | Field | Type | Rule |
@@ -39,7 +39,7 @@ Path `.specify/teams/<slug>/team.md` (C-31).
 | `goal_slug` | identity | one-way, N teams : 1 goal, no goal content copy (C-28) |
 | `handoff_ref` | nullable path | same contract as E-2 (C-59) |
 | `lifecycle_state` | closed set | `active` / `archived` (C-18) |
-| `territory.write[]` | path list | must not include `.specify/goal/**` or `.specify/teams/**` (C-15) |
+| `territory.write[]` | path list | must not include `.specify/anchoring/**` or `.specify/teams/**` (C-15) |
 | `territory.forbidden[]` | path list | the three spec artifacts plus `handoff.md` when a contract is active (C-62) |
 
 ## E-4 Archive layer ([[STR-002]] `archive-scope`)

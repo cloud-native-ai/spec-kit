@@ -11,7 +11,7 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: 092
+**Feature ID**: 094
 **Feature Name**: goal/team 与 spec 的平行关系（Goal/Team × Spec Parallelism）
 
 ## Overview
@@ -317,7 +317,7 @@ goal 与 team 只有一处落点：`.specify/anchoring/<slug>/goal.md` 与 `.spe
 - **A3（「62 个任务」是用户举的例子，不是门槛常量）**: 用户原文以「前面的 implement 阶段有 62 个任务」为例说明复杂度。本规格把它当**例子**而非门槛：门槛取值由 FR-018 / FR-031 的声明层条目给出，本阶段不发明具体数字。
 - **A4（不新建引擎、不新建文档 owner）**: 概念 owner 是既有的 `goal-definitions.md` 与 `conceptual-model.md`（FR-024），迁移与探测以扩展既有 `goal-utils.py` 的方式落地（RS-003、RS-004、宪法 XII / IX）。若实现期证明需要独立可执行体，它必须同时满足宪法 XXI 的 `--help` / `--version` 与未知选项拒绝——这一点与 091 的做法一致。
 - **A5（迁移不强制，先探测）**: 迁移是显式动作而非启动时副作用：无人值守运行在未迁移仓库里 MUST NOT 自动搬动档案（那是无人值守的破坏性动作）。因此 FR-009 的迁移动作是**被调用的**（入口见 FR-030），FR-012 的探测是**只读的**；本特性的干跑（FR-042）由本特性的运行自行发起。
-- **A6（实测基线读数，取自 requirements 阶段）**: 2026-11-09 只读探测（`.specify/specs/094-goal-team-parallel/test-evidence/requirements-baseline-probe.txt`）：`.specify/specs/*/goal/*/goal.md` 共 7 条、`.specify/specs/*/team/*/team.md` 共 7 条（085–091 各一对；089 的 goal slug 为 `script-interface-contract` 而非目录名，088 / 089 的 team slug 亦偏离目录名；092 自身的 spec-local goal 在本特性落地后计入残余）。SC-003 引用该读数作为**比较基线**；按 091 的教训，本规格 MUST NOT 把该数字复制为第二处固定值——计数与枚举只在本条与 SC-003 的基线引用处出现。2026-11-09 analyze-repair round 3 复测（本阶段）：`<kind>/<slug>/` 形态 goal 9 / team 8，另加 `092-non-disposable/team/team.md` 一条一级非规范层级，合计 goal 9 / team 9；逐条与碰撞读数见 plan EP-002。该复测不替换本条的比较基线——SC-003 的基线仍取本特性第一个实现提交之前的探测读数。
+- **A6（实测基线读数，取自 requirements 阶段）**: 2026-11-09 只读探测（`.specify/specs/094-goal-team-parallel/test-evidence/requirements-baseline-probe.txt`）：`.specify/specs/*/goal/*/goal.md` 共 7 条、`.specify/specs/*/team/*/team.md` 共 7 条（085–091 各一对；089 的 goal slug 为 `script-interface-contract` 而非目录名，088 / 089 的 team slug 亦偏离目录名；092 自身的 spec-local goal 在本特性落地后计入残余）。SC-003 引用该读数作为**比较基线**；按 091 的教训，本规格 MUST NOT 把该数字复制为第二处固定值——计数与枚举只在本条与 SC-003 的基线引用处出现。2026-11-09 analyze-repair round 4 复测（本阶段）：`<kind>/<slug>/` 形态（探针口径，C-43）goal 9 / team 8 = 17，另有一级非规范层级两条（`088-speckit-visualization/team/team.md`、`092-non-disposable/team/team.md`），全量定义文件计 goal 9 / team 10 = 19；历史读数按日期保留：plan 入口 goal 7 / team 7 = 14（`test-evidence/requirements-baseline-probe.txt`，2026-11-09），tasks 阶段 goal 8 / team 8 = 16（tasks.md N-4，2026-11-09）；逐条与碰撞读数见 plan EP-002。该复测不替换本条的比较基线——SC-003 的基线仍取本特性第一个实现提交之前的探测读数。
 - **A7（既有测试的处置是义务，不是可选项）**: FR-041 要求的处置清单必须先列全再动手；`tests/contract/test_scope_resolution.py`、`test_temp_goal_contract.py`、`test_temp_team_schema.py`、`test_team_command_routing.py`、`test_goal_writeset.py`、`test_goal_migration.py`、`test_goal_targets_engine.py`、`test_goal_definition.py` 与 `tests/unit/test_goal_scope_engine.py`、`test_goal_utils.py` 都含 spec-local 断言或 scope 断言，实际处置面以 plan 阶段的检索读数为准（A7 是起点，不是清单；plan-phase R-28 实测为 11 个模块，其中 `test_goal_writeset.py` 只有一处非断言命中）。
 - **A8（本特性自身的收口受同样约束）**: 本阶段提交只含本特性产物、按显式路径、不 push——迁移机制尚未落地，本特性自己的运行仍按手工步骤完成，并把这件事实记录在此以免被误读为「机制已生效」。
 - **A9（未声明类别的命令按「不入族」处理）**: FR-006 用「载体文件是否在 `flow-class-classes.yaml` 中登记了类别」判定命令族，判别子是类别读取入口输出里的 `source` 字段——`source: ledger`（登记表里有自己的条目）入族，`source: default`（有序清单第 0 个成员的兜底）不入族；`flow_class` 取值与退出 0 都不是判别子（`/speckit.nonexistentcommand` 同样退出 0 并返回 `flow_class: execution`，见 FR-006 的实测）。本阶段裁为「未声明 = 不入族」，理由是判定必须可由既有读入口回答，猜一个白名单会重新引入逐命令硬编码。若后续确需让某个入口层命令入族，正确做法是给它登记类别，而不是改本判据。

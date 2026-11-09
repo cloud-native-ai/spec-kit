@@ -1,7 +1,7 @@
 ---
-name: SDD Temporary Team 092
+name: SDD Temporary Team 094
 slug: 094-goal-team-parallel
-description: Run-scoped SDD team for Feature 092 — goal/team × spec parallelism; default-concurrent stages (plan packages, implement packages up to 6, review 4 segments), worktree write isolation, deterministic integration.
+description: Run-scoped SDD team for Feature 094 — goal/team × spec parallelism; default-concurrent stages (plan packages, implement packages up to 6, review 4 segments), worktree write isolation, deterministic integration.
 scope: spec
 spec_dir: .specify/specs/094-goal-team-parallel
 lifecycle_state: active
@@ -14,7 +14,7 @@ territory:
   write:
     - .specify/specs/094-goal-team-parallel/**
     - .specify/state/094-goal-team-parallel.md
-    - .specify/goal/**
+    - .specify/anchoring/**
     - .specify/teams/**
     - scripts/python/goal-utils.py
     - .specify/scripts/python/goal-utils.py
@@ -34,7 +34,7 @@ territory:
     - .specify/shared/definitions/goal-definitions.md
     - tests/contract/**
     - .specify/memory/features.md
-    - .specify/memory/features/092.md
+    - .specify/memory/features/094.md
   read:
     - "**"
   forbidden:

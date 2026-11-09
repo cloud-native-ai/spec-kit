@@ -7,8 +7,8 @@ probe reading.
 
 ## 1. Archive layout
 
-- **C-31**: The unified archive MUST be exactly `.specify/goal/<slug>/` and `.specify/teams/<slug>/` (FR-007).
-  A goal definition lives at `.specify/goal/<slug>/goal.md`, a team definition at `.specify/teams/<slug>/team.md`;
+- **C-31**: The unified archive MUST be exactly `.specify/anchoring/<slug>/` and `.specify/teams/<slug>/` (FR-007).
+  A goal definition lives at `.specify/anchoring/<slug>/goal.md`, a team definition at `.specify/teams/<slug>/team.md`;
   every other file a definition owns (goal `summary/`, team `runs/`, `.work/`) stays inside its own `<slug>/`.
 
 (FR-007)
@@ -122,7 +122,7 @@ probe reading.
 
 (FR-042)
 - **C-112**: The binding record requirement (C-1) MUST hold for **every** definition in the unified archive,
-  including the residents that predate this feature. Measured 2026-11-09: `.specify/goal/*/goal.md` carries 6
+  including the residents that predate this feature. Measured 2026-11-09: `.specify/anchoring/*/goal.md` carries 6
   definitions and `.specify/teams/*/team.md` 12, and none carries a `binding` block. Those residents are NOT part
   of the migration subject (C-35, FR-009 names spec-local trees only), so a second, separate action owns them:
   `backfill-bindings`, a write action of the same engine with the same closed-subset reader (no second executable,

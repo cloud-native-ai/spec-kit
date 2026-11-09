@@ -39,7 +39,7 @@ python3 ../../../../scripts/python/goal-utils.py create demo-command-goal \
 python3 ../../../../scripts/python/goal-utils.py binding goal demo-command-goal --json
 ```
 
-Expected: the definition lands at `.specify/goal/demo-command-goal/goal.md`; `binding` reports `owner`,
+Expected: the definition lands at `.specify/anchoring/demo-command-goal/goal.md`; `binding` reports `owner`,
 `owner_id`, `origin`; `.specify/specs/` gains **no** goal/team path (SC-001). Writing with `--scope spec` exits 2 with
 `invalid choice` (C-9).
 
@@ -61,7 +61,7 @@ python3 scripts/python/goal-utils.py probe-residual --json
 ls .specify/archive/goal-team/receipts/
 ```
 
-Expected: each definition exists at `.specify/goal/<slug>/goal.md` / `.specify/teams/<slug>/team.md`; residual count is
+Expected: each definition exists at `.specify/anchoring/<slug>/goal.md` / `.specify/teams/<slug>/team.md`; residual count is
 zero; one receipt per definition carries `delete_policy: archive-not-delete`; every source tree is still readable under
 `trees/` (SC-003, C-37).
 
@@ -77,9 +77,9 @@ different Objective exits 4 and names both candidate paths (C-40).
 ## S-5 — Rebind without touching the rest of the file
 
 ```bash
-sha256sum .specify/goal/demo-command-goal/goal.md
+sha256sum .specify/anchoring/demo-command-goal/goal.md
 python3 scripts/python/goal-utils.py bind goal demo-command-goal --owner sdd-run --owner-id r20261110T010000Z-900a
-sha256sum .specify/goal/demo-command-goal/goal.md
+sha256sum .specify/anchoring/demo-command-goal/goal.md
 python3 scripts/python/goal-utils.py binding goal demo-command-goal --json
 ```
 

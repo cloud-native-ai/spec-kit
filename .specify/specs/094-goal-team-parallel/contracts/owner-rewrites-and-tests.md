@@ -19,7 +19,7 @@ obligations that make the other four contracts decidable. Every clause here name
 (FR-024, FR-027)
 ## 2. Driver protocol and state spine (FR-028)
 
-- **C-93**: `skills/external/sdd-loop-driver/SKILL.md` § Temporary Goal/Team MUST be retitled and rewritten to the
+- **C-93**: `skills/external/sdd-loop-driver/SKILL.md` § Goal/Team（085） MUST be retitled and rewritten to the
   binding model: when a goal/team is created, where it lands, under which binding, and that the creation moment is
   read from `goal-team-handoff-threshold.yaml` rather than restated.
 
@@ -54,7 +54,7 @@ obligations that make the other four contracts decidable. Every clause here name
 
 (FR-040)
 - **C-100**: `shared/definitions/framework-map.md` MUST update the Goals, Teams and spec-archive rows so that
-  goal/team land only in `.specify/goal/` and `.specify/teams/`, the archive row names
+  goal/team land only in `.specify/anchoring/` and `.specify/teams/`, the archive row names
   `.specify/archive/goal-team/`, and the `.specify/specs/` row no longer implies goal/team subdirectories.
 
 (FR-029)
