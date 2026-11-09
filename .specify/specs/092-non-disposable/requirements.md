@@ -225,7 +225,7 @@
 - **FR-020**: 一份声称含闭集恒等式（如 `applicable + exempt == candidates`）的验证记录，当恒等式两侧读数不成立时 MUST 被检出并给出两侧读数；MUST NOT 存在「声明了闭集却无人复算」的验证条目。
 - **FR-021**: 状态一致性检查 MUST 复用既有闭环引擎的裁决与 reason code 词表，MUST NOT 在检出引擎中重建第二套裁决逻辑或第二套 reason 词表。
 
-#### `/speckit.history` 的新执行形态（US1/US3）
+#### 命令执行形态：回顾 → 设计 → 确认 → 执行（US1/US3）
 
 - **FR-022**: `/speckit.history` 的执行形态 MUST 是四段：**回顾 → 设计（方案）→ 用户确认 → 执行**。回顾与方案段 MUST 零写盘；执行段 MUST 只在用户确认之后发生。
 - **FR-023**: 回顾面 MUST 恰为当前 HEAD 工作树中 `.specify/{archive,derive,goal,history,memory,project,review,specs,state,teams}` 十个目录下的文件；MUST NOT 读取 git 历史（commit / blame / 旧版本 diff）作为回顾输入；MUST NOT 以「git 历史里也有」作为条目来源。
@@ -275,8 +275,8 @@
 |----|------------|------|-------|-----|----------|------------------|----|----------|
 | RS-001 | Python 3 解释器（运行检出引擎、状态一致性与既有镜像/闭环引擎） | signed-contract | CPython 上游（本仓只消费） | `requires-python = ">=3.8"`（`pyproject.toml` 既有声明；本特性零新增第三方依赖） | `pyproject.toml` | 新增检出引擎与契约测试在 `>=3.8` 解释器上通过；本特性零新增 import | FR-006, FR-039 | EP-001 |
 | RS-002 | pytest 契约测试运行器（承载 FR-040 的守卫） | signed-contract | pytest 上游（本仓只消费） | 以 closure 比较时刻实测 `python3 -m pytest --version` 为准（`090` 记录 2026-11-09 为 `pytest 9.0.3`） | `scripts/bash/run-tests.sh` | `pytest -m contract` 在冻结基线上零新增失败（基线 = 失败 node-id 集合） | FR-040 | EP-001 |
-| RS-003 | 既有闭环裁决引擎（`closure-acceptance-check.py` 的 verdict 与 reason code 词表） | signed-contract | 既有 owner `shared/workflow/acceptance-hardening.md` § Closure Verdict | 以该引擎的退出码与 `--json` 输出为读数 | `.specify/specs/089-script-interface-contract/contracts/` 与 `shared/workflow/acceptance-hardening.md` | 状态一致性检查在 `Implemented` 但对 `block` 的副本树上判红，在两者一致时判绿 | FR-019, FR-021 | EP-002 |
-| RS-004 | 既有材料卫生引擎（`sanitize-utils.py` 的类别/处置/台账词汇） | signed-contract | 既有 owner（Feature 047 契约 `045-sanitize-command`） | 其 `CATEGORIES` / `DISPOSITIONS` / `STATES` 字面为其自身 owner，本特性按指针引用 | `.specify/specs/045-sanitize-command/contracts/sanitize-*.md` | 本特性处置词汇与 sanitize 台账的一致性由一次联合比对取证（相同写作不同写作 MUST 被阐明） | FR-038 | EP-003 |
+| RS-003 | 既有闭环裁决引擎（`closure-acceptance-check.py` 的 verdict 与 reason code 词表） | signed-contract | 既有 owner `shared/workflow/acceptance-hardening.md` § Closure Verdict | 以该引擎的退出码与 `--json` 输出为读数 | `shared/workflow/acceptance-hardening.md` | 状态一致性检查在 `Implemented` 但对 `block` 的副本树上判红，在两者一致时判绿 | FR-019, FR-021 | EP-002 |
+| RS-004 | 既有材料卫生引擎（`sanitize-utils.py` 的类别/处置/台账词汇） | signed-contract | 既有 owner（Feature 047 契约 `045-sanitize-command`） | 其 `CATEGORIES` / `DISPOSITIONS` / `STATES` 字面为其自身 owner，本特性按指针引用 | `.specify/specs/045-sanitize-command/contracts/sanitize-findings.md` | 本特性处置词汇与 sanitize 台账的一致性由一次联合比对取证（相同写作不同写作 MUST 被阐明） | FR-038 | EP-003 |
 | RS-005 | 既有 spec-local Temporary Goal/Team 与多 agent 并发机制 | signed-contract | 既有 owner（Feature 085 契约） | 以 `085` 契约的 roster/并发上限声明为读数 | `.specify/specs/085-sdd-temporary-goal-team/contracts/concurrency-and-worktrees.md` | 一次分片回顾的派发数 ≤ 声明的并发上限，分区并集覆盖候选集合 | FR-029, FR-030 | EP-004 |
 | RS-006 | 检出引擎（本特性交付的只读确定性能力） | in-scope | 本特性 | — | 本特性 `contracts/`（plan 阶段定义） | 检出引擎在 A–H 语料树上复现各检测类别的发现 | FR-006, FR-007 | EP-001 |
 | RS-007 | 回顾→方案→确认→执行 的命令形态（`/speckit.history` 新执行段） | in-scope | 本特性 | — | 本特性 `contracts/`（plan 阶段定义） | 回顾段与方案段零写盘、未确认不执行，由契约测试取证 | FR-022, FR-025 | EP-001 |
