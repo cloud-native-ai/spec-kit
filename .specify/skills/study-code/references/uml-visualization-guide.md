@@ -36,10 +36,11 @@ For each planned figure: write the `.puml` source following the mapped draw-diag
 
 ## 5. Degradation rule
 
-If draw-diagram rendering is unavailable during the run (server unreachable and no local jar, or Graphviz missing for the needed type):
+If draw-diagram rendering is unavailable during the run (render server unreachable with no local jar, or Graphviz missing for the needed type), the affected primary view **degrades** — the study step still completes: never fail it, and never silently drop the figure.
 
-1. Fall back to a Mermaid inline sketch for each affected primary view.
-2. Add a visible **degradation note** next to each affected view, e.g. `> Note: UML rendering unavailable during this run; view shown as a Mermaid sketch.`
-3. Keep the planned `.puml` sources (or the figure plan) in the drafts so figures can be rendered and swapped in later.
+For each affected primary view, produce all three fallback outputs:
 
-Never silently drop a primary view's figure.
+1. **Mermaid sketch** — an inline Mermaid sketch in the report standing in for the affected primary view.
+2. **Retained source** — the planned `.puml` source kept at `$WORK_DIR/docs/figures/<name>.puml` (or the figure plan when no source was drafted yet), so the figure can be rendered and swapped in later without redoing the analysis.
+3. **Degradation note** — a visible blockquote directly next to the sketch, in this format:
+   `> Note: UML rendering unavailable during this run (<reason: render server unreachable | no local jar | Graphviz missing>); view shown as a Mermaid sketch; PlantUML source retained at figures/<name>.puml.`

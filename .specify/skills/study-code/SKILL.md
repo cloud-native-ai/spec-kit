@@ -13,17 +13,22 @@ classification: external
 
 - **目标**：`owner/repo`、GitHub/GitLab/Gitee URL 或本地路径；缺省 = 当前工作区仓库。
 - **`$WORK_DIR`**：原始仓库根（本地路径时即它本身）；**绝不修改原仓库**。
-- **`$STUDY_DIR`**：研读工作区，默认 `$WORK_DIR/../study-code/<repo>-study/`（落盘前确认它在目标项目治理允许的临时根下；目标项目有临时目录纪律时以它为准）。所有剥离与清单都在这里，不碰原仓库。
+- **`$STUDY_DIR`**：研读工作区，按回退阶梯选定（逐级先探写权限；目标项目有临时目录纪律时以其受治理临时根为准）：
+    1. 缺省 `$WORK_DIR/../study-code/<repo>-study/`；
+    2. 不可写 → 宿主仓库的受治理临时根 `.specify/.tmp/study-code/<repo>-study/`；
+    3. 仍不可写 → `~/tmp/study-code/<repo>-study/`。
+  选定后在 `strip-manifest.md` 记录所选根与理由。所有剥离与清单都在这里，不碰原仓库。
 
 ## Step 1 — strip-repo（减法）
 
-1. 浅拷贝：远端用 `git clone --depth 1 <url> "$STUDY_DIR/stripped"`；本地用 `git clone --depth 1 "file://$WORK_DIR" "$STUDY_DIR/stripped"`（保留一份 `.git` 供追溯）。
-2. 在拷贝内删除三类干扰项（**只删拷贝，不删原件**）：
+1. **源完整性预检**（本地目标）：克隆前在 `$WORK_DIR` 运行 `git fsck --no-dangling`，确认 `refs` 与 index 可读。失败时不修原仓库——校验对象库一致后用 `cp -a "$WORK_DIR/." "$STUDY_DIR/stripped/"` 物化工作树，并把目标提交哈希（`git rev-parse HEAD`；读不到则记不可得）写入 `$STUDY_DIR/target-commit.txt`；此后溯源以该哈希为准，不以拷贝内 `.git` 为准。
+2. 浅拷贝：远端用 `git clone --depth 1 <url> "$STUDY_DIR/stripped"`；本地用 `git clone --depth 1 "file://$WORK_DIR" "$STUDY_DIR/stripped"`（保留一份 `.git` 供追溯）。
+3. 在拷贝内删除三类干扰项（**只删拷贝，不删原件**）：
    - **工程类配置**：`package.json` 及 lockfile、`pyproject.toml`/`setup.*`、`tsconfig*.json`、`*.config.{js,ts,mjs,cjs}`、`Makefile`、`Dockerfile`、`docker-compose*`、CI 目录（`.github/`、`.gitlab-ci.yml` 等）、`.gitignore`/`.editorconfig`。
    - **脚手架/生成物**：`dist/`、`build/`、`out/`、`generated/`、`vendor/`（纯第三方 vendor）、`node_modules/`、`__pycache__/`。
    - **测试用例**：`tests/`、`test/`、`spec/`、`__tests__/`、`*.spec.*`、`*_test.*`、`test_*.py`、`fixtures/`。
-3. 产出 `$STUDY_DIR/strip-manifest.md`：按类别的删除文件数，**并为每个被删的配置文件写一行用途**（如 `package.json — 声明运行时依赖与脚本入口`）。这份清单是 Step 4 技术栈判断的证据来源——删除的是噪音，不是事实。
-4. 报告删除总量与保留文件数；若某删除命中"疑似核心目录"（如名为 `build/` 但内容是源码），保留并记录例外。
+4. 产出 `$STUDY_DIR/strip-manifest.md`：按类别的删除文件数，**并为每个被删的配置文件写一行用途**（如 `package.json — 声明运行时依赖与脚本入口`）。这份清单是 Step 4 技术栈判断的证据来源——删除的是噪音，不是事实。
+5. 报告删除总量与保留文件数；若某删除命中"疑似核心目录"（如名为 `build/` 但内容是源码），保留并记录例外。
 
 ## Step 2 — outline-code（代码清单）
 
@@ -44,7 +49,7 @@ classification: external
 - **组件构成**：核心 vs 次要组件（按业务功能划分），每个组件的职责、对外接口、依赖与被依赖。
 - **核心实现**：关键路径的机制拆解（为什么这样设计、替代方案的代价），以 `文件:行` 为证据。
 
-方法论与深度标准见 references：`architect-analysis-guide` / `tech-stack-analysis-guide`（读 Step 1 的删除清单）/ `module-analysis-guide` / `git-analysis-guide` / `deployment-analysis-guide` / `uml-visualization-guide`。核心原则保留：**Why > What**、设计级叙述而非贴代码、结论必须有 `路径[:行]` 证据、每个局部结论要连回整体设计。
+方法论与深度标准见 references：`architect-analysis-guide` / `tech-stack-analysis-guide`（读 Step 1 的删除清单）/ `module-analysis-guide` / `git-analysis-guide` / `deployment-analysis-guide` / `uml-visualization-guide`。核心原则保留：**Why > What**、设计级叙述而非贴代码、结论必须有 `路径[:行]` 证据、每个局部结论要连回整体设计。draw-diagram 渲染后端不可达时按 `uml-visualization-guide` 的降级分支处理（Mermaid 草图 + 保留 `.puml` + 可见降级注记），该步不因渲染失败而失败。
 
 产出 `$STUDY_DIR/deep-study.md`（四节 + 证据指针）。规模大时可按组件并行子代理，但主代理不得重复读子代理的领地，且必须等全部返回后统一校验。
 
