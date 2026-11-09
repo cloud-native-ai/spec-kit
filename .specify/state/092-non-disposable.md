@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261109T024154Z-3301
 slice: 092
-stage: clarify
-stage_started_at: 1794192467
-stage_deadline_epoch: 1794203267
+stage: plan
+stage_started_at: 1794193024
+stage_deadline_epoch: 1794203824
 stage_base_commit: 1a7fed0e
 attempt: 1
 retry_limit: 3
-last_verdict: clarify done (Mode A unattended; 65 FR / 20 SC; validate-requirements 0 error; OI-1 -> no-constitution-principle, OI-2/OI-3 closed, OI-4/OI-5 surfaced); next = plan
+last_verdict: clarify U4 pass (cbf8c05c; 65 FR / 20 SC; overlap clear); checkpoint 02 on-track
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch clarify, then plan; the temporary team is created after clarify + plan U4 at high concurrency
+next_action: dispatch plan; after plan U4 create the spec-local team at high concurrency, then tasks
 direction_contract: |
   goal_verbatim: "在 speckit 框架中引入『Non-Disposable』理念：任何过程和文档都不应该是『用过即丢』(Use and throw)，需要时常回顾和修正，同时过去的历史也是重要的参考和借鉴。这就要求设计一系列机制，杜绝『这个没用了但是留在这里』或『这个过时了但是我现在不想删除』等一系列将问题推到将来的行为。以上面分析 A~H 的结论作为这个新特性的输入和验证用例。新特性的落点可以放到 /speckit.history 命令中：speckit.history 命令执行时先回顾历史，然后进行设计给出方案，向用户确定是否执行。回顾历史需要回顾当前 git head 指向的 workdir 中的 .specify 目录中记录的历史文件，而不是 git history。需要将所有的 .specify/{archive,derive,goal,history,memory,project,review,specs,state,teams}/* 这些带『历史』属性的目录和文件都纳入其中。这是一个浩大的工程，因此需要使用一个 team 通过大并发的 subagent 来完成。"
   non_goals:
