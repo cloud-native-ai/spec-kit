@@ -1,7 +1,7 @@
 # Line State — 091-auto-git-closeout
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: blocked
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
 stage: review
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch closure / U6 (main agent) — review verdict is fail/blocked, ARC refused; no fix was applied inside the review stage
+next_action: fix-loop decision — review is fail/blocked (5 blocking findings, closure-acceptance-check block, ARC refused); the efficiency diagnosis is delivered; user decides whether to run the fix loop or optimize the framework first
 direction_contract: |
   goal_verbatim: "我每次在作为修改执行都会要求执行:提交,合并,推送, 这应该是一套固定流程,不需要每次都手动触发,在框架中需要找到一个合适的切入点. 需要注意的是:不同的项目存在不同的git workflow, 这个动作需要和git workflow相结合"
   non_goals: [新增 /speckit.* 命令, 守护进程/调度器, 第二套分支 registry, 自动强推, 托管平台 PR/MR 自动化]
