@@ -60,7 +60,7 @@ python3 ${SKILL_HOME}/scripts/logical-framework.py --project <project-dir> --jso
 
 固定次序，执行 **H1 缺口 OR owner 自检报告的漂移**；每项登记 `executed / existing / skipped + reason`。未处理项进入 H5 的未处理清单，静默省略视为违规。H1 只回答“目录/资产在不在”，不替代 owner 的漂移检查（sanitize 残留、feature 注册表漂移、instructions 预算/过期、docs 漂移都由各自 owner 判定）。
 
-**远端 H2/H3 执行形态**：所有 `/speckit.*` 命令在 `<project-dir>` 下、经 run-agent 驱动 subagent CLI 执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli。本地则由编排者/原生子代理在当前项目执行。
+**远端 H2/H3 执行形态**：所有 `/speckit.*` 命令在 `<project-dir>` 下、经 run-agent 驱动 subagent CLI 执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli。本地派发缺省用 fork 承载（同族 `qodercli` 子进程经 `stage-runner.sh`），异构 agent 用 subprocess 承载；in-process 路径 BANNED。
 
 1. `/speckit.sanitize` — `check` 模式同时跑 materials check（`/speckit.sanitize check`）与 retention check（`/speckit.sanitize --lane retention check`），两份摘要一起报告；`cleanup` 模式跑 `/speckit.sanitize --lane all`，一个调用内呈现 materials 与 retention 两个计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。**本 skill 不直接调用 `sanitize-utils.py apply` 或 `record-retention.py apply`。**
    - 目标项目缺 `record-retention.py`（旧框架）：只跑 materials lane，报告 `retention=not_evaluated — 需升级 spec-kit`，不删除；缺 `sanitize-utils.py`：回交 setup 做刷新。
@@ -106,7 +106,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 4. **幂等收敛**：稳定态上重复执行零结构写、零内容重建；每项动作前以本次 H1 为凭据，禁止凭上次运行的记忆跳过或重做。
 5. **sanitize 是唯一的破坏性门**：`check` 默认只扫描；`cleanup` 必须显式请求。破坏性回收/删除由 sanitize 既有确认门保护；本 skill MUST NOT 新增第二道确认门，也 MUST NOT 绕过 sanitize 直接执行 apply。
 6. **记录回收红线**：没有 retention receipt 不删除；open feedback、unsettled run-determination、不可解析 exec-quant、无 promotion/ephemeral 决策的 session 笔记永不回收；默认宽限 30 天；目标路径 git 脏时拒绝 apply（非 git 项目需显式 `--allow-unversioned`）。
-7. **本地原生承载**：本地拓扑由编排者或宿主原生子代理执行；MUST NOT 在本地启动 `qodercli` / `claude -p` 等外部 agent CLI。远端拓扑经 `run-agent` 外部 CLI 派发。
+7. **本地 fork 承载**：本地拓扑的派发 MUST 缺省使用 **fork 承载**——同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh` 启动（prompt 经 stdin、stream-json 输出、哨兵判定）；异构 agent MUST 使用 **subprocess 承载**——该 agent 自身 CLI 的独立子进程。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。远端拓扑经 `run-agent` 外部 CLI 派发。
 8. **不推进 SDD 阶段**：requirements → … → review 归 `sdd-loop-driver`；本 skill 只做治理、维护、强化与报告。
 9. **进度可见**：长任务按 `.specify/shared/guidelines/progress-reporting.md` 的 15 分钟四要素节奏汇报；派发子代理时把该义务注入载荷。
 10. **参数化、零机器路径**：目标路径、别名、运行用户全部入口参数；MUST NOT 嵌入用户名、主机名、家目录或项目族路径。
@@ -137,11 +137,11 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 ## Subagent Delegation
 
 - **Carrier decision**（owner：`.specify/shared/workflow/execution-topology.md` § Carrier decision）：
-  - **未给远程三元组 → 本地**：目标=当前项目；H1–H5 由编排者或宿主**原生子代理**执行；MUST NOT 启动 `qodercli` / `claude -p`。
+  - **本地（缺省）**：目标=当前项目；H1 盘点由编排者直接运行只读脚本，H2–H5 的派发 MUST 用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
   - **远程三元组给全 → 远端**：`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；H1 盘点在目标侧执行，H2/H3 的 `/speckit.*` 经 run-agent 驱动，H4 hook-health 在目标侧执行；CLI 缺省取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。
   - **部分远程信息 → 问一个澄清问题**，不猜、不静默回退本地。
 - **盘点与验证**：本地由编排者直接运行只读脚本；远端经 `ssh + su` 在 `<project-dir>` 下执行。
-- **本地拓扑**：`/speckit.*` 由编排者亲自执行，或交给当前宿主 agent 的**原生子代理**。
+- **本地拓扑**：`/speckit.*` 的派发按 fork / subprocess 两类进程承载执行（in-process 路径 BANNED）。
 - **远端拓扑**：治理命令经 `run-agent` 以拓扑声明派发外部子代理；前置检查与失败处置随其 `dispatch-preflight.md`。
 - 职责切分：本 skill = 周期性维护（assess/reconcile/strengthen/verify/report）；setup = bootstrap；loop-driver = SDD 阶段循环；create-agent/run-agent/improve-agent = 代理的创建/派发/修正。
 
