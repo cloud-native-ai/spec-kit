@@ -1,0 +1,9 @@
+unit: /speckit.clarify   run: 093-clarify-a1
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (source_unavailable)
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-093-clarify-a1 clean=false findings=4
+persisted: .specify/memory/session/20261109T075428Z-run-determination-speckit-clarify-093-clarify-a1.md
+settled previous run r20261106T090000Z-086a: not_evaluated
