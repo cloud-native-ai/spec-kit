@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794221847
 stage_base_commit: e55d8136
 attempt: 1
 retry_limit: 3
-last_verdict: "U4 pass — CLARIFY-DONE; 15 ruled questions; 33 FR / 12 SC / 11 STR; validate ok 0/0; pre-analyze pass 0/0; overlap clear (vacuous: no feature-ref; nested-path collision risk with 064/070/086); commits 11d49f18 + 6b291bb7; checkpoint 02; F-093-001/002/003 registered; next = plan"
+last_verdict: "plan stage complete (executor claim, independent verifier not yet run) — plan.md + research.md + data-model.md + contracts/ (6 files, 92 clauses C-001…C-092) + quickstart.md + feature-ref.md; pre-analyze --stage plan pass (0 error / 44 missing-path advisory, all paths this feature creates); validate-decision-tensions pass (5 records); decomposition-check --mode plan proceed (33 FR); overlap-check reading retained (84 specs / 195 hits, 113 nested-path) with a file-level adjudication in feature-ref.md (F-093-001 resolved); execution shape = serial single agent, mechanism-not-yet-landed, SC-006 not_evaluated"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch plan in the 093 worktree (main tree stays on the 092 line)
+next_action: checkpoint 03 + commit the plan artifacts, then dispatch tasks in the 093 worktree (main tree stays on the 092 line)
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
@@ -52,10 +52,15 @@ gates: |
   validate-requirements: pass — .specify/specs/093-concurrency-by-default/test-evidence/validate-requirements.txt ; clarify: test-evidence/validate-requirements-clarify.txt
   pre-analyze-check (stage=requirements): pass — .specify/specs/093-concurrency-by-default/test-evidence/pre-analyze-check.txt ; clarify: test-evidence/pre-analyze-check-clarify.txt
   overlap-check (clarify U4): clear-vacuous — test-evidence/overlap-check-clarify.{txt,json}
+  plan stage: pre-analyze-check (stage=plan) pass — test-evidence/pre-analyze-plan.json (0 error / 44 advisory: every advisory is a path this feature creates, plus two dated citations)
+  plan stage: validate-decision-tensions pass — test-evidence/decision-tensions-plan.json (5 records T-001…T-005; 2 findings fixed in-stage: two `expected_sacrifice` rows bound two SC ids)
+  plan stage: decomposition-check --mode plan proceed — test-evidence/decomposition-plan.json (33 FR, no reason)
+  plan stage: overlap-check reading=overlap (84 specs / 195 hits / 113 nested-path) — test-evidence/overlap-plan.json; verdict NOT taken from the engine, file-level adjudication in feature-ref.md § Overlap adjudication (F-093-001 resolved, F-093-002 workaround recorded)
 wrapup: done (requirements stage) — run-determination 093-requirements-a1 recorded; exec-quant recorded; feedback recorded
+wrapup_plan: pending — run-determination + exec-quant + feedback to be recorded after checkpoint 03
 wrapup_clarify: done — run-determination 093-clarify-a1 recorded for /speckit.clarify + skill:clarify-artifact; exec-quant + feedback recorded (both)
 feature_binding: "Feature 093 Concurrency by Default (Draft) — index header 86→87 + row + memory/features/093.md"
-findings: "F-093-001 delivery-surface overlap vs 064/070/086 (open, plan-owned); F-093-002 overlap-check vacuous clear under a nested worktree repo (open, framework); F-093-003 coordinator dispatch verdict owner missing (open, STR-011)"
+findings: "F-093-001 delivery-surface overlap vs 064/070/086 — RESOLVED at plan: file-level adjudication table in feature-ref.md § Overlap adjudication (5 real same-file overlaps, each split by section); F-093-002 overlap-check nested-worktree relativization (open, framework) — plan uses the main-repo-root run + file-level reading as the recorded workaround, not a fix; F-093-003 coordinator dispatch verdict (open, STR-011) — registered as coordinator-dispatch-verdict.yaml and carried as plan T-004, deliberately NOT self-adjudicated"
 framework_observations:
   - "Blockquote-wrapped text is invisible to validate-requirements.py and pre-analyze-check.py: a spec whose FR/SC definition rows were altered so they no longer matched '^***' still returned status=ok with definition_rows derived only from what remained — the check is a filter, not a totality assertion."
   - "The two validators disagree on definition-row syntax: validate-requirements.py treats 'FR-007' with a trailing fullwidth colon as a non-definition (silently), while pre-analyze-check.py still resolves the reference through '\\bFR-(\\d{3})\\b' and reports the row as a dangling id — the pair detects the drift only by accident."
@@ -65,3 +70,5 @@ framework_observations:
   - "overlap-check.py --repo <repo> where <repo> is the worktree itself puts '..' at the head of current_rel, so every declared path is filtered by startswith(spec_rel) and the engine answers 'no declaration artifact' (vacuous clear). Worktree-per-write-line is the house default, so this is the common case, not an edge (F-093-002)."
   - "pre-analyze-check.py's missing-path advisory reads Clarifications history rows as live paths: an old path quoted inside a dated Q/A bullet raises an advisory that can only be cleared by editing history (forbidden) — the gate should skip dated sections."
   - "declaration_reader.py --action list returns contract.yaml's own keys alongside facts/ slugs (one namespace, two kinds of member); --action get for an absent fact exits 1 with 'no declaration for fact …', not 2. Any 'owner-unavailable ⇒ exit 2' clause written against the reader must be reconciled with that observed exit code."
+  - "validate-decision-tensions.py's `expected_sacrifice` closed form is `<SC-NNN> Source <↓|↑>` and it counts *every* SC-NNN occurrence on the line: a parenthetical that re-names the same SC (e.g. 'SC-005 因此分成两半') silently makes one source look like two, and the reported reason ('binds 2 identifiers') names the count, not the duplicate. Two of five records hit it in one pass; `grep -o 'SC-[0-9]\\{3\\}'` before trusting the verdict is the cheap workaround."
+  - "declaration_reader.py and the `owner-unavailable ⇒ exit 2` convention disagree at the boundary: the reader exits 1 for an absent fact while the framework's script-interface contract reserves 1 for 'a documented check failed' and 2 for 'input or environment error'. A judgement engine that must report `owner-unavailable` therefore has to translate, not propagate — recorded as C-011 rather than repaired here."

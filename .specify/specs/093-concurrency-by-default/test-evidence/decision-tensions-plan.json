@@ -1,0 +1,53 @@
+{
+  "spec": ".specify/specs/093-concurrency-by-default",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 384,
+    "records": 5
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 0
+  },
+  "findings": []
+}

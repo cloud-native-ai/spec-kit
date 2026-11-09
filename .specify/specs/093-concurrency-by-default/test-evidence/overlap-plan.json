@@ -1,0 +1,1291 @@
+{
+  "decision": "overlap",
+  "current_spec": "093-concurrency-by-default",
+  "checked_specs": [
+    "093-concurrency-by-default",
+    "001-unify-command-handoffs",
+    "003-speckit-agents-command",
+    "006-add-qoder-support",
+    "007-skill-install-layout",
+    "008-create-skills-skill",
+    "009-claude-code-support",
+    "012-skill-home-workdir",
+    "013-portable-skill-creation",
+    "016-refactor-tools-command",
+    "017-consolidate-draft-skills",
+    "018-cli-priority-support",
+    "020-speckit-todo-command",
+    "021-agent-specific-config",
+    "022-eei-agent-triad",
+    "023-agent-framework-redesign",
+    "024-agent-env-config",
+    "025-agent-skill-enablement",
+    "027-feedback-mechanism",
+    "028-sdd-workflow-refactor",
+    "029-glossary-mechanism",
+    "030-summarize-project",
+    "031-task-complexity-rubric",
+    "032-dogfooding-practice",
+    "033-docs-command",
+    "034-evidence-infra",
+    "035-token-efficiency",
+    "036-team-summary",
+    "037-goal-registry",
+    "038-goal-target",
+    "039-session-export",
+    "040-agent-metadata-portability",
+    "041-refactor-feedback-probe",
+    "042-goal-team-creation",
+    "043-init-commit-stamp",
+    "044-reduce-confirmation-flows",
+    "045-sanitize-command",
+    "046-browser-site-memory",
+    "047-feedback-introspection",
+    "048-derive-command",
+    "049-docs-reconcile",
+    "050-proactive-flow-trigger",
+    "051-user-facing-comprehension",
+    "052-fast-fail-principle",
+    "053-machine-decidable-artifacts",
+    "054-agent-registration-wiring",
+    "055-conflict-free-stores",
+    "056-probe-handler-system",
+    "057-decompose-command-skills",
+    "058-sdd-loop-driver",
+    "059-exec-quant-recording",
+    "060-decompose-subagent-dispatch",
+    "061-subagent-cli-config",
+    "062-humanize-command",
+    "063-review-p1-governance",
+    "064-subagent-concurrency",
+    "065-loop-interruption-recovery",
+    "066-loop-state-awareness-a",
+    "067-loop-efficiency-hardening",
+    "068-exec-quant-feedback-channel",
+    "069-execution-expression-sdd",
+    "070-subagent-task-teams",
+    "071-review-code-integration",
+    "072-client-self-improvement",
+    "073-record-retention-and-housekeeping",
+    "074-goal-team-sdd-unification",
+    "075-sdd-loop-efficiency",
+    "076-decision-tension-contract",
+    "077-doc-sdd-integration",
+    "078-coaching-skills",
+    "079-bilingual-expression",
+    "080-humanize-run-output",
+    "081-acceptance-hardening",
+    "082-self-explanatory-integration",
+    "083-mechanism-policy-separation",
+    "084-harness-triple-structure",
+    "085-sdd-temporary-goal-team",
+    "086-efficient-test-execution",
+    "087-arch-diagram-docs",
+    "088-speckit-visualization",
+    "089-script-interface-contract",
+    "090-re-anchoring",
+    "091-auto-git-closeout",
+    "092-goal-team-parallel"
+  ],
+  "current_paths": [
+    "scripts/python",
+    "scripts/python/concurrency-check.py",
+    "scripts/python/sync-mirrors.py",
+    "shared/declarations/contract.yaml",
+    "shared/declarations/facts",
+    "shared/declarations/facts/concurrency-class.yaml",
+    "shared/declarations/facts/concurrency-contract.yaml",
+    "shared/declarations/facts/concurrency-slot-and-reserve.yaml",
+    "shared/declarations/facts/coordinator-dispatch-verdict.yaml",
+    "shared/declarations/facts/decomposition-coverage.yaml",
+    "shared/declarations/facts/effective-concurrency.yaml",
+    "shared/declarations/facts/executor-enumeration-roots.yaml",
+    "shared/declarations/facts/serial-reason.yaml",
+    "shared/definitions/goal-definitions.md",
+    "shared/definitions/subagent-definitions.md",
+    "skills/external/sdd-loop-driver/SKILL.md",
+    "skills/external/sdd-loop-driver/references/decomposition-model.md",
+    "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+    "skills/external/sdd-loop-driver/templates/stage-team-preset.md",
+    "skills/internal/create-plan/SKILL.md",
+    "skills/internal/create-team/SKILL.md",
+    "skills/internal/create-team/references/conceptual-model.md",
+    "skills/internal/run-agent/SKILL.md",
+    "skills/internal/run-team/SKILL.md",
+    "templates/instructions-template.md",
+    "templates/plan-template.md"
+  ],
+  "overlaps": [
+    {
+      "other_spec": "006-add-qoder-support",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "006-add-qoder-support",
+      "relation": "same-path",
+      "current_path": "templates/plan-template.md",
+      "other_path": "templates/plan-template.md"
+    },
+    {
+      "other_spec": "007-skill-install-layout",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/skills-utils.py"
+    },
+    {
+      "other_spec": "009-claude-code-support",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "016-refactor-tools-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/tools-utils.py"
+    },
+    {
+      "other_spec": "027-feedback-mechanism",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "027-feedback-mechanism",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "027-feedback-mechanism",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "029-glossary-mechanism",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/glossary-utils.py"
+    },
+    {
+      "other_spec": "029-glossary-mechanism",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "031-task-complexity-rubric",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "032-dogfooding-practice",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/history-utils.py"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/regen-command-copies.py"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "035-token-efficiency",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "037-goal-registry",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/goal-utils.py"
+    },
+    {
+      "other_spec": "038-goal-target",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "038-goal-target",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/references/conceptual-model.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "039-session-export",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "039-session-export",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "039-session-export",
+      "relation": "same-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions/subagent-definitions.md"
+    },
+    {
+      "other_spec": "042-goal-team-creation",
+      "relation": "same-path",
+      "current_path": "shared/definitions/goal-definitions.md",
+      "other_path": "shared/definitions/goal-definitions.md"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/regen-command-copies.py"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/scan-confirmation-gates.py"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "044-reduce-confirmation-flows",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "045-sanitize-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sanitize-utils.py"
+    },
+    {
+      "other_spec": "047-feedback-introspection",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "048-derive-command",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/derive-utils.py"
+    },
+    {
+      "other_spec": "049-docs-reconcile",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/regen-command-copies.py"
+    },
+    {
+      "other_spec": "049-docs-reconcile",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "049-docs-reconcile",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "050-proactive-flow-trigger",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/trigger-utils.py"
+    },
+    {
+      "other_spec": "050-proactive-flow-trigger",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "051-user-facing-comprehension",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "052-fast-fail-principle",
+      "relation": "same-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions/subagent-definitions.md"
+    },
+    {
+      "other_spec": "052-fast-fail-principle",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/account-clause-coverage.py"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/clause_extract.py"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/goal-utils.py"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/validate-requirements.py"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/validate-tasks.py"
+    },
+    {
+      "other_spec": "053-machine-decidable-artifacts",
+      "relation": "same-path",
+      "current_path": "shared/definitions/goal-definitions.md",
+      "other_path": "shared/definitions/goal-definitions.md"
+    },
+    {
+      "other_spec": "054-agent-registration-wiring",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "055-conflict-free-stores",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/evidence-utils.py"
+    },
+    {
+      "other_spec": "055-conflict-free-stores",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "055-conflict-free-stores",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/memory-utils.py"
+    },
+    {
+      "other_spec": "055-conflict-free-stores",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sanitize-utils.py"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/probe-utils.py"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "057-decompose-command-skills",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "other_spec": "058-sdd-loop-driver",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/exec-quant.py"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/probe-utils.py"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-plan/SKILL.md",
+      "other_path": "skills/internal/create-plan/SKILL.md"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "059-exec-quant-recording",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "other_spec": "060-decompose-subagent-dispatch",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "060-decompose-subagent-dispatch",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "061-subagent-cli-config",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/exec-quant.py"
+    },
+    {
+      "other_spec": "061-subagent-cli-config",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/execution-config.py"
+    },
+    {
+      "other_spec": "061-subagent-cli-config",
+      "relation": "same-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions/subagent-definitions.md"
+    },
+    {
+      "other_spec": "061-subagent-cli-config",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "062-humanize-command",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "062-humanize-command",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-plan/SKILL.md",
+      "other_path": "skills/internal/create-plan/SKILL.md"
+    },
+    {
+      "other_spec": "062-humanize-command",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "062-humanize-command",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "062-humanize-command",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/clause_extract.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/exec-quant.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/probe-utils.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/renumber-utils.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/run-determination.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sanitize-utils.py"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-plan/SKILL.md",
+      "other_path": "skills/internal/create-plan/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "other_spec": "063-review-p1-governance",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "064-subagent-concurrency",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "065-loop-interruption-recovery",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "066-loop-state-awareness-a",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/trigger-utils.py"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "skills/external/sdd-loop-driver/references/decomposition-model.md",
+      "other_path": "skills/external/sdd-loop-driver"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+      "other_path": "skills/external/sdd-loop-driver"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "skills/external/sdd-loop-driver/templates/stage-team-preset.md",
+      "other_path": "skills/external/sdd-loop-driver"
+    },
+    {
+      "other_spec": "068-exec-quant-feedback-channel",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/exec-quant.py"
+    },
+    {
+      "other_spec": "068-exec-quant-feedback-channel",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "070-subagent-task-teams",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "070-subagent-task-teams",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/references/decomposition-model.md",
+      "other_path": "skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "other_spec": "070-subagent-task-teams",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+      "other_path": "skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "other_spec": "070-subagent-task-teams",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/templates/stage-team-preset.md",
+      "other_path": "skills/external/sdd-loop-driver/templates/stage-team-preset.md"
+    },
+    {
+      "other_spec": "072-client-self-improvement",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/feedback-utils.py"
+    },
+    {
+      "other_spec": "072-client-self-improvement",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/probe-utils.py"
+    },
+    {
+      "other_spec": "075-sdd-loop-efficiency",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "076-decision-tension-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/validate-decision-tensions.py"
+    },
+    {
+      "other_spec": "076-decision-tension-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/validate-falsification-quartet.py"
+    },
+    {
+      "other_spec": "076-decision-tension-contract",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "076-decision-tension-contract",
+      "relation": "same-path",
+      "current_path": "templates/plan-template.md",
+      "other_path": "templates/plan-template.md"
+    },
+    {
+      "other_spec": "077-doc-sdd-integration",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/doc-consistency-check.py"
+    },
+    {
+      "other_spec": "077-doc-sdd-integration",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/flow-class-check.py"
+    },
+    {
+      "other_spec": "077-doc-sdd-integration",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "077-doc-sdd-integration",
+      "relation": "same-path",
+      "current_path": "templates/plan-template.md",
+      "other_path": "templates/plan-template.md"
+    },
+    {
+      "other_spec": "078-coaching-skills",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/bilingual-expression-check.py"
+    },
+    {
+      "other_spec": "078-coaching-skills",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sanitize-utils.py"
+    },
+    {
+      "other_spec": "079-bilingual-expression",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/bilingual-expression-check.py"
+    },
+    {
+      "other_spec": "079-bilingual-expression",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "080-humanize-run-output",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/regen-command-copies.py"
+    },
+    {
+      "other_spec": "080-humanize-run-output",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "080-humanize-run-output",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "081-acceptance-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/closure-acceptance-check.py"
+    },
+    {
+      "other_spec": "081-acceptance-hardening",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/validate-requirements.py"
+    },
+    {
+      "other_spec": "082-self-explanatory-integration",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/declaration_reader.py"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/harness-triple-check.py"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/contract.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-class.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-contract.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-slot-and-reserve.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/coordinator-dispatch-verdict.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/decomposition-coverage.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/effective-concurrency.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/executor-enumeration-roots.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "084-harness-triple-structure",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/serial-reason.yaml",
+      "other_path": "shared/declarations"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/goal-utils.py"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sdd-route.py"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "same-path",
+      "current_path": "shared/definitions/goal-definitions.md",
+      "other_path": "shared/definitions/goal-definitions.md"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "same-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions/subagent-definitions.md"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/references/decomposition-model.md",
+      "other_path": "skills/external/sdd-loop-driver/references/decomposition-model.md"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+      "other_path": "skills/external/sdd-loop-driver/scripts/wp-gate.py"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/references/conceptual-model.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team"
+    },
+    {
+      "other_spec": "086-efficient-test-execution",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/exec-quant.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/measure.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/regen-command-copies.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/status-digest.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "same-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python/sync-mirrors.py"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "same-path",
+      "current_path": "shared/declarations/facts",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts",
+      "other_path": "shared/declarations/facts/quant-record-schema.yaml"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-class.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-contract.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/concurrency-slot-and-reserve.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/coordinator-dispatch-verdict.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/decomposition-coverage.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/effective-concurrency.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/executor-enumeration-roots.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "shared/declarations/facts/serial-reason.yaml",
+      "other_path": "shared/declarations/facts"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "same-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions/subagent-definitions.md"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": "skills/internal/create-team/references/conceptual-model.md",
+      "other_path": "skills/internal/create-team"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "same-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/script-interface-check.py"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/script_interface_cli.py"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python/concurrency-check.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "scripts/python/sync-mirrors.py",
+      "other_path": "scripts/python"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "shared/definitions/goal-definitions.md",
+      "other_path": "shared/definitions"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "090-re-anchoring",
+      "relation": "nested-path",
+      "current_path": "shared/definitions/goal-definitions.md",
+      "other_path": "shared/definitions"
+    },
+    {
+      "other_spec": "090-re-anchoring",
+      "relation": "nested-path",
+      "current_path": "shared/definitions/subagent-definitions.md",
+      "other_path": "shared/definitions"
+    },
+    {
+      "other_spec": "090-re-anchoring",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "090-re-anchoring",
+      "relation": "same-path",
+      "current_path": "templates/instructions-template.md",
+      "other_path": "templates/instructions-template.md"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": "skills/external/sdd-loop-driver/SKILL.md",
+      "other_path": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-plan/SKILL.md",
+      "other_path": "skills/internal/create-plan/SKILL.md"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": "skills/internal/create-team/SKILL.md",
+      "other_path": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-agent/SKILL.md",
+      "other_path": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": "skills/internal/run-team/SKILL.md",
+      "other_path": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "other_spec": "092-goal-team-parallel",
+      "relation": "nested-path",
+      "current_path": "scripts/python",
+      "other_path": "scripts/python/goal-utils.py"
+    }
+  ],
+  "checked_at": "2026-11-09T08:08:50Z"
+}
