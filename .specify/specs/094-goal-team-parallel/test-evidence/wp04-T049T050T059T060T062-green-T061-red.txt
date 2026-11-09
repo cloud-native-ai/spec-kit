@@ -1,0 +1,41 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+....F.                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_a_dangling_handoff_key_is_refused_at_creation ______________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/.specify/.tmp/s094/handoff-fqkqycaa')
+
+    def test_a_dangling_handoff_key_is_refused_at_creation(sandbox):
+        """Red-first by design while the engine action is unowned (see module docstring).
+    
+        The contracts fix the behaviour, not the entry name; this module pins
+        `handoff-ref --handoff <path>` as the engine entry that validates both keys and
+        writes the reverse `handoff_ref` through the binding discipline (C-5/C-6/C-59).
+        """
+        shape = _shape_from_template()
+        spec_dir = _seed_spec(sandbox)
+        handoff = spec_dir / "handoff.md"
+        handoff.write_text(_instantiate(shape, GOAL_SLUG, TEAM_SLUG), encoding="utf-8")
+        _seed_goal(sandbox, GOAL_SLUG)
+    
+        # The team named by team_slug exists nowhere: the contract names a team that does
+        # not exist and MUST be refused at creation (C-58).
+        proc = _run(sandbox, "handoff-ref", "--handoff", str(handoff))
+        assert proc.returncode == 2, (
+            "a dangling handoff key exits 2 (handoff-dangling-key): "
+            f"got {proc.returncode}: {proc.stdout!r} {proc.stderr!r}")
+        combined = proc.stdout + proc.stderr
+>       assert "handoff-dangling-key" in combined, (
+            f"the refusal names the dangling-key label; got {combined!r}")
+E       AssertionError: the refusal names the dangling-key label; got 'error: unrecognized option: --handoff\n'
+E       assert 'handoff-dangling-key' in 'error: unrecognized option: --handoff\n'
+
+tests/contract/test_handoff_contract.py:317: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_handoff_contract.py::test_a_dangling_handoff_key_is_refused_at_creation
+1 failed, 5 passed in 6.47s

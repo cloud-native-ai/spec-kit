@@ -1,0 +1,155 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_the_contract_cites_and_never_copies_task_rows ______________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/.specify/.tmp/s094/handoff-jmsmx7z7')
+
+    def test_the_contract_cites_and_never_copies_task_rows(sandbox):
+>       shape = _shape_from_template()
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_handoff_contract.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_handoff_contract.py:91: in _shape_from_template
+    text = _template_text()
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _template_text() -> str:
+>       assert TEMPLATE.is_file(), (
+            "the handoff contract template is missing: "
+            f"{TEMPLATE.relative_to(REPO_ROOT)} (tasks row T059, ruling N-3)")
+E       AssertionError: the handoff contract template is missing: skills/internal/create-team/references/handoff-contract-template.md (tasks row T059, ruling N-3)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/skills/internal/create-team/references/handoff-contract-template.md').is_file
+
+tests/contract/test_handoff_contract.py:83: AssertionError
+______________ test_a_dangling_handoff_key_is_refused_at_creation ______________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/.specify/.tmp/s094/handoff-m6apahl0')
+
+    def test_a_dangling_handoff_key_is_refused_at_creation(sandbox):
+        """Red-first by design while the engine action is unowned (see module docstring).
+    
+        The contracts fix the behaviour, not the entry name; this module pins
+        `handoff-ref --handoff <path>` as the engine entry that validates both keys and
+        writes the reverse `handoff_ref` through the binding discipline (C-5/C-6/C-59).
+        """
+>       shape = _shape_from_template()
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_handoff_contract.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_handoff_contract.py:91: in _shape_from_template
+    text = _template_text()
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _template_text() -> str:
+>       assert TEMPLATE.is_file(), (
+            "the handoff contract template is missing: "
+            f"{TEMPLATE.relative_to(REPO_ROOT)} (tasks row T059, ruling N-3)")
+E       AssertionError: the handoff contract template is missing: skills/internal/create-team/references/handoff-contract-template.md (tasks row T059, ruling N-3)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/skills/internal/create-team/references/handoff-contract-template.md').is_file
+
+tests/contract/test_handoff_contract.py:83: AssertionError
+___ test_a_crew_write_onto_a_spec_artifact_is_refused_by_the_territory_check ___
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/.specify/.tmp/s094/territory-vhjckexo')
+
+    def test_a_crew_write_onto_a_spec_artifact_is_refused_by_the_territory_check(sandbox):
+>       assert TERRITORY_CHECK.is_file(), (
+            "the create-team territory check is missing: "
+            f"{TERRITORY_CHECK.relative_to(REPO_ROOT)} (quickstart S-7)")
+E       AssertionError: the create-team territory check is missing: skills/internal/create-team/scripts/territory-check.py (quickstart S-7)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/skills/internal/create-team/scripts/territory-check.py').is_file
+
+tests/contract/test_handoff_territory.py:101: AssertionError
+_ test_the_territory_expansion_is_recorded_and_forbids_the_four_spec_artifacts _
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_territory_expansion_is_recorded_and_forbids_the_four_spec_artifacts():
+        assert IMPROVE_TEAM.is_file(), f"improve-team SKILL.md is missing: {IMPROVE_TEAM}"
+        text = IMPROVE_TEAM.read_text(encoding="utf-8")
+    
+        match = re.search(
+            r"^## Handoff Territory Expansion\n(.*?)(?=^## |\Z)",
+            text, re.MULTILINE | re.DOTALL)
+>       assert match, (
+            "improve-team MUST record the handoff territory expansion procedure "
+            "(tasks row T062)")
+E       AssertionError: improve-team MUST record the handoff territory expansion procedure (tasks row T062)
+E       assert None
+
+tests/contract/test_handoff_territory.py:142: AssertionError
+______________ test_the_three_way_keys_resolve_in_both_directions ______________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/.specify/.tmp/s094/handoff-fr0ljtp0')
+
+    def test_the_three_way_keys_resolve_in_both_directions(sandbox):
+>       shape = _shape_from_template()
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_handoff_contract.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_handoff_contract.py:91: in _shape_from_template
+    text = _template_text()
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _template_text() -> str:
+>       assert TEMPLATE.is_file(), (
+            "the handoff contract template is missing: "
+            f"{TEMPLATE.relative_to(REPO_ROOT)} (tasks row T059, ruling N-3)")
+E       AssertionError: the handoff contract template is missing: skills/internal/create-team/references/handoff-contract-template.md (tasks row T059, ruling N-3)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/skills/internal/create-team/references/handoff-contract-template.md').is_file
+
+tests/contract/test_handoff_contract.py:83: AssertionError
+____________ test_the_contract_carries_its_eight_sections_in_order _____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_contract_carries_its_eight_sections_in_order():
+>       shape = _shape_from_template()
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_handoff_contract.py:233: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_handoff_contract.py:91: in _shape_from_template
+    text = _template_text()
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _template_text() -> str:
+>       assert TEMPLATE.is_file(), (
+            "the handoff contract template is missing: "
+            f"{TEMPLATE.relative_to(REPO_ROOT)} (tasks row T059, ruling N-3)")
+E       AssertionError: the handoff contract template is missing: skills/internal/create-team/references/handoff-contract-template.md (tasks row T059, ruling N-3)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp04/skills/internal/create-team/references/handoff-contract-template.md').is_file
+
+tests/contract/test_handoff_contract.py:83: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_handoff_contract.py::test_the_contract_cites_and_never_copies_task_rows
+FAILED tests/contract/test_handoff_contract.py::test_a_dangling_handoff_key_is_refused_at_creation
+FAILED tests/contract/test_handoff_territory.py::test_a_crew_write_onto_a_spec_artifact_is_refused_by_the_territory_check
+FAILED tests/contract/test_handoff_territory.py::test_the_territory_expansion_is_recorded_and_forbids_the_four_spec_artifacts
+FAILED tests/contract/test_handoff_contract.py::test_the_three_way_keys_resolve_in_both_directions
+FAILED tests/contract/test_handoff_contract.py::test_the_contract_carries_its_eight_sections_in_order
+6 failed in 6.24s

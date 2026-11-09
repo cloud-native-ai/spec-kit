@@ -1,0 +1,17 @@
+command: goal-utils.py handoff-decision --tasks <fixture>/tasks.md --repo-root <fixture> --json
+fixture: goal-team-handoff-threshold registration subset_id rewritten to yaml/v0
+exit: 2
+stdout: {
+  "decision": null,
+  "task_count": 2,
+  "threshold": null,
+  "creation": {
+    "on_direct": null,
+    "on_handoff": null
+  },
+  "error": {
+    "label": "declaration-invalid",
+    "detail": "fact registers grammar 'yaml/v0', but the shared reader implements 'declaration-subset/v1'"
+  }
+}
+stderr: 

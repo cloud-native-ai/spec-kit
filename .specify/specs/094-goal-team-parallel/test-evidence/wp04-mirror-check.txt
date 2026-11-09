@@ -1,0 +1,19 @@
+command: python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (419 files, byte-identical)
+MISS  .specify/skills/internal/create-team/references/handoff-contract-template.md
+MISS  .specify/skills/internal/create-team/scripts/territory-check.py
+DIFF .specify/skills/internal/create-team/SKILL.md
+DIFF .specify/skills/internal/improve-team/SKILL.md
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+DIFF .specify/scripts/python/goal-utils.py
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (102 files, byte-identical)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit=2
