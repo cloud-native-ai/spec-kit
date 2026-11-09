@@ -20,13 +20,13 @@
 
 **并发承载（FR-035 / C-094）**：并发的承载 MUST 是**独立子进程**，且仅有两类合法形态；宿主内建 Agent 扇出（in-process subagent）路径 **BANNED**（既不是缺省、也不是降级选项）：
 
-- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `scripts/stage-runner.sh` 启动——prompt 经 stdin 传入、输出以 `--output-format stream-json` 流式落盘、完成以阶段哨兵判定。进程池上限取宿主 `nproc` 的**运行期读数**（MUST NOT 固化为常量）；请求并发度取阶段/运行声明；实际进程数 = min(请求值, nproc 读数, 槽位上限)。命令形态见本文件 Recipe 2（本地与远端同构）。
+- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `scripts/stage-runner.sh` 启动——prompt 经 stdin 传入、输出以 `--output-format stream-json` 流式落盘、完成以阶段哨兵判定。进程池上限取宿主 `nproc` 的**运行期读数**（MUST NOT 写成常量）；请求并发度取阶段/运行声明；实际进程数 = min(请求值, nproc 读数, 槽位上限)。命令形态见本文件 Recipe 2（本地与远端同构）。
 - **SUBPROCESS 承载（异构 agent）**：当并发单元由与 `qodercli` 不同族的 agent CLI 执行时，由**该 agent 自身 CLI 的独立子进程**承载，并与 FORK 承载满足同一判据：独立进程、逐单元派发/返回区间（最大重叠数即 effective）、完成以哨兵或退出记录判定；MUST NOT 因族差异回落到宿主内建扇出。
 - **in-process 路径不是承载**：同一进程内的 subagent 共享一个进程与一个 CPU 核，扇出只会把单核跑满；该路径 MUST NOT 被计为满足「并行派发」条件，也 MUST NOT 在派发记录中被写成并发机制。无进程承载能力时，登记串行并给出具名理由码（`host-no-parallel`，证据为该次运行的能力探针读数），MUST NOT 声称并行。
 
 **analyze 波（FR-034）**：`analyze` 阶段默认 **N 个并发 SDD Analysis Worker**（`agents/sdd-analysis-worker.agent.md`），N 取自阶段团队配置 / 状态脊 `agent_concurrency_requested`。三件事与并发同时成立，缺任一项判红：
 
-- **(a) 读域互斥（文件级）**：每个 Worker 的读域在派发前逐条声明为**文件级**路径集；同一路径出现在两个并发 Worker 的读域里，即**派发前判红**，不得靠运行时避让。
+- **(a) 读域互斥（文件级）**：每个 Worker 的读域在派发前逐条声明为**文件级**路径集；同一路径出现在两个并发 Worker 的读域里（读域相交），即**派发前判红**，不得靠运行时避让。
 - **(b) 确定性归并**：N 份 findings 由一条确定性规则归并为单一报告——先按声明的读域次序分节，节内按 finding id 的字典序；跨 Worker 的重复 id 按「先声明先得」破平，并保留一条指向被抑制副本的指针；MUST NOT 依赖返回时刻。
 - **(c) 记录面**：记录 `requested` / `effective` / `effective_reason` 三元组（`effective` 取逐 Worker 派发/返回区间的最大重叠数，缺失区间记 `not_evaluated`），并记录每个 Worker 的 `executor_id` 与其 verdict 的 `verifier_id`。
 

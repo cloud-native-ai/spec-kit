@@ -449,6 +449,51 @@ def action_classify(repo, args):
     roots = roots_statement.get("roots") or []
 
     findings = []
+    root_id_set = {str(root.get("root_id", "")).strip()
+                   for root in roots if isinstance(root, dict)}
+    root_id_set.discard("")
+    class_root_set = set()
+    for entry in classes:
+        if not isinstance(entry, dict):
+            continue
+        for root_id in entry.get("applies_to") or []:
+            class_root_set.add(str(root_id).strip())
+    # C-015's drift guard must survive a silent enumeration change: the class table's
+    # applies_to surface and the decision rule are independent readers of the root set,
+    # so a dropped root — or a rule naming a class outside the member set — is red even
+    # when the enumeration yields no body to exercise it.
+    for root_id in sorted(root_id_set - class_root_set):
+        findings.append(finding(
+            "uncovered", "roots",
+            "root %r carries no class applies_to entry: the class table and the roots "
+            "fact disagree" % root_id,
+            "shared/declarations/facts/executor-enumeration-roots.yaml",
+            compared=[sorted(root_id_set), sorted(class_root_set)]))
+    for root_id in sorted(class_root_set - root_id_set):
+        findings.append(finding(
+            "uncovered", "roots",
+            "the class table applies to root %r which the roots fact does not declare"
+            % root_id, "shared/declarations/facts/executor-enumeration-roots.yaml",
+            compared=[sorted(class_root_set), sorted(root_id_set)]))
+    for row in rule_rows:
+        if not isinstance(row, dict):
+            continue
+        row_class = str(row.get("class", "")).strip()
+        row_root = str(row.get("root_id", "")).strip()
+        if row_class and row_class not in class_names:
+            findings.append(finding(
+                "class-unknown", "decision-rule",
+                "the decision rule names class %r, absent from the closed class table %s"
+                % (row_class, sorted(class_names)),
+                "shared/declarations/facts/concurrency-class.yaml",
+                compared=[row_class, sorted(class_names)]))
+        if row_root and row_root not in root_id_set:
+            findings.append(finding(
+                "uncovered", "decision-rule",
+                "the decision rule names root %r, absent from the enumeration roots %s"
+                % (row_root, sorted(root_id_set)),
+                "shared/declarations/facts/executor-enumeration-roots.yaml",
+                compared=[row_root, sorted(root_id_set)]))
     measured_roots = {}
     measured_bodies = []
     for root in roots:
@@ -519,6 +564,8 @@ def action_classify(repo, args):
     decision = "fail" if findings else "pass"
     measured = {
         "roots": measured_roots,
+        "root_counts": {root_id: values["member_count"]
+                        for root_id, values in measured_roots.items()},
         "total_bodies": sum(r["member_count"] for r in measured_roots.values()),
         "bodies": measured_bodies,
     }
@@ -572,7 +619,8 @@ def judge_evidence(repo, code_entry, evidence):
             "evidence for %r must be a structured reading of form %r, not a bare value"
             % (code_entry.get("code"), form))
     if form == "dependency-edge":
-        predecessor = str(evidence.get("predecessor", "")).strip()
+        predecessor = str(evidence.get("predecessor_id")
+                          or evidence.get("predecessor") or "").strip()
         verdict_ptr = evidence.get("verdict_ptr")
         if not predecessor:
             return "evidence-form-mismatch", (
@@ -589,10 +637,11 @@ def judge_evidence(repo, code_entry, evidence):
                 "write-conflict needs the intersecting file-level path set")
         for entry in paths:
             text = str(entry).strip()
-            last = text.rsplit("/", 1)[-1]
-            if "/" not in text or "." not in last:
+            last = text.rstrip("/").rsplit("/", 1)[-1]
+            if text.endswith("/") or "." not in last or not resolves_in(repo, text):
                 return "evidence-form-mismatch", (
-                    "write-conflict paths are file-level paths (got %r)" % entry)
+                    "write-conflict paths are resolving file-level paths (got %r)"
+                    % entry)
         return None
     if form == "host-probe":
         probe = str(evidence.get("probe", "")).strip()
@@ -667,18 +716,13 @@ def action_serial_reason(repo, args):
                 kind="inconsistency", record_code=code, record=record_ref))
             continue
         seen.add(code)
-        if SIMPLICITY_FAMILY.search(code):
-            findings.append(finding(
-                "prose-reason-not-a-code", record_ref,
-                "%r is not a reason code: the closed vocabulary is %s; simplicity, "
-                "controllability and history are never codes" % (code, declared_order),
-                ptr, kind="inconsistency", record_code=code, record=record_ref,
-                compared=[code, declared_order]))
-            continue
         if code not in by_code:
+            family = ("; simplicity, controllability and history are never codes "
+                      "(FR-009)" if SIMPLICITY_FAMILY.search(code) else "")
             findings.append(finding(
                 "code-unknown", record_ref,
-                "code %r is outside the closed vocabulary %s" % (code, declared_order),
+                "code %r is outside the closed vocabulary %s%s"
+                % (code, declared_order, family),
                 ptr, kind="inconsistency", record_code=code, record=record_ref,
                 compared=[code, declared_order]))
 
@@ -818,21 +862,31 @@ def maximum_overlap(intervals):
 def read_gate_ceiling(repo, override):
     """C-034: the ceiling from ``wp-gate.py``'s declared default, or the explicit flag.
 
-    The engine carries no numeric ceiling of its own; when neither the call-time
-    override nor the gate script's declaration is readable, that is an input error.
+    The ceiling's owner is the gate script, not the repository under judgement: the
+    declaration is read from ``--repo`` first (a client project may carry its own
+    ``.specify`` projection) and then from this engine's own tree, so a fixture that
+    copies only ``shared/declarations/`` still reads the owner's default. The engine
+    carries no numeric ceiling of its own; when neither the call-time override nor
+    the gate script's declaration is readable, that is an input error.
     """
     if override is not None:
         return int(override), "--ceiling at call time"
-    for rel in ("skills/external/sdd-loop-driver/scripts/wp-gate.py",
-                ".specify/skills/sdd-loop-driver/scripts/wp-gate.py"):
-        path = repo / rel
-        if not path.is_file():
-            continue
-        text = path.read_text(encoding="utf-8")
-        match = re.search(
-            r'"--slot-cap-ceiling"[^)]*?default\s*=\s*(\d+)', text)
-        if match:
-            return int(match.group(1)), "%s declared default" % rel
+    roots = [repo]
+    own = default_repo()
+    if own != repo:
+        roots.append(own)
+    for base in roots:
+        for rel in ("skills/external/sdd-loop-driver/scripts/wp-gate.py",
+                    ".specify/skills/sdd-loop-driver/scripts/wp-gate.py"):
+            path = base / rel
+            if not path.is_file():
+                continue
+            text = path.read_text(encoding="utf-8")
+            match = re.search(
+                r'"--slot-cap-ceiling"[^)]*?default\s*=\s*(\d+)', text)
+            if match:
+                where = rel if base == repo else "%s (engine tree)" % rel
+                return int(match.group(1)), "%s declared default" % where
     raise EngineInputError(
         "ceiling-unavailable",
         "no --ceiling given and wp-gate.py's --slot-cap-ceiling default is not readable")
@@ -878,14 +932,16 @@ def action_reading(repo, args):
     declared_effective = record.get("effective")
     declared_numeric = numeric_reading(declared_effective)
     effective_reason = record.get("effective_reason")
-    missing_fields = [name for name, value in (
-        ("requested", requested), ("effective", declared_effective),
-        ("effective_reason", effective_reason)) if value is None]
+    # C-033's triple is judged as (requested, effective, effective_reason), but the
+    # effective member is the computed interval overlap, not a record field: the
+    # record supplies requested and effective_reason, and the reason is required
+    # exactly when the computed effective falls short of min(requested, bound).
+    missing_fields = [] if requested is not None else ["requested"]
     if missing_fields:
         findings.append(finding(
             "reading-incomplete", record_ref,
             "the reading triple is incomplete; missing: %s" % missing_fields,
-            record_ref + "#reading", compared=[[requested, declared_effective, effective_reason]]))
+            record_ref + "#reading", compared=[[requested, effective, effective_reason]]))
 
     claim = (requested_numeric is not None and requested_numeric >= 2) \
         or str(record.get("pattern", "")).strip() == "concurrent"
@@ -931,12 +987,16 @@ def action_reading(repo, args):
     }
     if isinstance(effective, int) and bound is not None:
         reason_text = str(effective_reason or "").strip()
-        if effective < bound and not reason_text:
+        # The shortfall threshold is what the run could actually have used: a run
+        # that requests less than the bound and achieves its request has no
+        # shortfall, so the comparison is against min(requested, bound).
+        threshold = bound if requested_numeric is None else min(requested_numeric, bound)
+        if effective < threshold and not reason_text:
             findings.append(finding(
                 "reading-incomplete", record_ref,
-                "effective=%d is below min(slot_cap, ceiling, remaining)=%d and carries "
-                "no named effective_reason" % (effective, bound), record_ref + "#effective_reason",
-                compared=[effective, bound]))
+                "effective=%d is below min(requested, slot_cap, ceiling, remaining)=%d "
+                "and carries no named effective_reason" % (effective, threshold),
+                record_ref + "#effective_reason", compared=[effective, threshold]))
         if effective > bound:
             findings.append(finding(
                 "bound-violation", record_ref,
@@ -1288,8 +1348,6 @@ def action_capability(repo, args):
     verdict_statement = fact_statement(verdict_body, "coordinator-dispatch-verdict")
     allowed = [str(value).strip() for value in (verdict_statement.get("allowed_values") or [])]
     verdict = str(verdict_statement.get("verdict", "")).strip()
-    record = load_record(args.record)
-    record_ref = str(args.record)
 
     findings = []
     measured = {
@@ -1297,6 +1355,8 @@ def action_capability(repo, args):
         "verdict_allowed_values": allowed,
         "agents": [],
     }
+    # The owner's ruling gates the whole action: an unadjudicated (or absent) verdict
+    # is owner-unavailable before the record is even parsed, never a default.
     if not verdict or verdict not in allowed:
         return envelope(
             "capability", "owner-unavailable",
@@ -1308,6 +1368,10 @@ def action_capability(repo, args):
                 measured["verdict_fact"])],
             measured, verdict=None)
 
+    record = load_record(args.record)
+    record_ref = str(args.record)
+    measured["record"] = record_ref
+
     measured["verdict"] = verdict
     agents_dir = repo / "agents"
     for path in sorted(agents_dir.glob("*.agent.md")) if agents_dir.is_dir() else []:
@@ -1317,6 +1381,7 @@ def action_capability(repo, args):
         rel = path.relative_to(repo).as_posix()
         measured["agents"].append({
             "body": rel,
+            "reading": "capability-tools",
             "capability_tools": tools,
             "verdict": name,
             "detail": detail,
