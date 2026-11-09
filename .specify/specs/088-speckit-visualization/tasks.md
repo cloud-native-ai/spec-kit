@@ -1,8 +1,8 @@
 # Tasks: Speckit 框架可视化（Speckit Framework Visualization）
 
-**Requirement ID**: 087
+**Requirement ID**: 088
 **Requirement Key**: 088-speckit-visualization
-**Related Feature**: 087 Speckit 框架可视化（Speckit Framework Visualization）
+**Related Feature**: 088 Speckit 框架可视化（Speckit Framework Visualization）
 **Input**: Design documents from `.specify/specs/088-speckit-visualization/`
 **Prerequisites**: plan.md (required), requirements.md (required for user stories), research.md, data-model.md, contracts/, quickstart.md, feature-ref.md
 

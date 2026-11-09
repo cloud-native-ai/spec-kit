@@ -1,6 +1,6 @@
 # Contract: 全量测试预算与定向测试（test-budget）
 
-**Feature**: 063 → Feature 058（演化）
+**Feature**: 075 → Feature 058（演化）
 **FR 覆盖**: FR-011…FR-019
 **载体**: `references/efficiency-model.md`、`references/stage-prompts.md`、`skills/external/sdd-loop-driver/scripts/audit-test-budget.py`、`docs/reference/skills/sdd-loop-driver.md`
 

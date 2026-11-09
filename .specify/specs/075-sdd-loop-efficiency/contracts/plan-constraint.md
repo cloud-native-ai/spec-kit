@@ -1,6 +1,6 @@
 # Contract: Plan 阶段「只小修、不重审」约束（plan-constraint）
 
-**Feature**: 063 → Feature 058（演化）
+**Feature**: 075 → Feature 058（演化）
 **FR 覆盖**: FR-020…FR-025
 **载体**: `references/efficiency-model.md`、`references/stage-prompts.md`、`skills/external/sdd-loop-driver/scripts/audit-plan-changes.py`、`docs/reference/skills/sdd-loop-driver.md`
 

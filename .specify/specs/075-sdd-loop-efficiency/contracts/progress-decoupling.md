@@ -1,6 +1,6 @@
 # Contract: 进度可见与驱动会话解耦（progress-decoupling）
 
-**Feature**: 063 → Feature 058（演化）
+**Feature**: 075 → Feature 058（演化）
 **FR 覆盖**: FR-026…FR-035
 **载体**: `references/efficiency-model.md`、`references/dispatch-recipes.md`、`references/watch-model.md`、`skills/external/sdd-loop-driver/scripts/stage-runner.sh`、`skills/external/sdd-loop-driver/scripts/derive-live-log.py`、`skills/external/sdd-loop-driver/scripts/watch-target.sh`、`docs/reference/skills/sdd-loop-driver.md`
 

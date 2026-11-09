@@ -1,6 +1,6 @@
 # Contract: 安全不变量、自应用与分发（delivery-and-invariants）
 
-**Feature**: 063 → Feature 058（演化）
+**Feature**: 075 → Feature 058（演化）
 **FR 覆盖**: FR-036…FR-043
 **载体**: `SKILL.md`、`references/efficiency-model.md`、`docs/reference/skills/sdd-loop-driver.md`、`tests/contract/*`、`tests/integration/*`、`.specify/memory/features/058.md`
 

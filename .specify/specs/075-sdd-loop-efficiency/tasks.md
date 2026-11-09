@@ -1,6 +1,6 @@
 # Tasks: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
-**Requirement ID**: 063 (from branch `075-sdd-loop-efficiency`)
+**Requirement ID**: 075 (from branch `075-sdd-loop-efficiency`)
 **Requirement Key**: `075-sdd-loop-efficiency`
 **Related Feature**: Feature 058 无人值守 SDD 循环驱动机制（演化特性；状态保持 `Implemented`，不回退）
 **Input**: Design documents from `.specify/specs/075-sdd-loop-efficiency/` — plan.md, requirements.md, research.md, data-model.md, contracts/ ×5, quickstart.md, feature-ref.md, checklists/requirements.md, notes/source-requirement.md

@@ -1,6 +1,6 @@
 # Contract: 中型特性快车道（fast-lane）
 
-**Feature**: 063 → Feature 058（演化）
+**Feature**: 075 → Feature 058（演化）
 **FR 覆盖**: FR-001…FR-010
 **载体**: `skills/external/sdd-loop-driver/SKILL.md`、`references/efficiency-model.md`、`references/dispatch-recipes.md`、`references/stage-prompts.md`、`skills/external/sdd-loop-driver/scripts/admission-check.py`、`docs/reference/skills/sdd-loop-driver.md`
 

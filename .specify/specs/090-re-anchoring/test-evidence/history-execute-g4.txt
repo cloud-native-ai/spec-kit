@@ -1,0 +1,290 @@
+# History execute — Wave 3, G4 (renumber-live-binding → correct) — 2026-11-10
+
+Run: /speckit.history four-stage seam, execute segment (Step 6), wave 3 group G4.
+Executor: bounded repair executor, main tree; no commit, no push, no subagents.
+Inputs: `.specify/.tmp/history-review.json` (read-only; the confirmed 105 `renumber-live-binding` entries),
+`.specify/.tmp/history-execute-plan.md` (group `correct`, wave 3), owner page § Renumber-Face / § Disposal
+Pathways / § Capture Rule, archived `092-non-disposable/data-model.md` E-1/E-4/E-7, the engine's
+`class_renumber_live_binding`, and `scripts/python/renumber-utils.py` (`EXCLUDED_PREFIXES` /
+`MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE` — the path-addressed dated-record judgement, consumed by
+the engine via `_is_dated_record`, no second literal copy).
+
+RESULT: G4 is **partially closed** — 9 live bindings corrected in place; `renumber-live-binding` 105 → **96**;
+`not_closed.open` 908 → **899** (−9, exactly the number of live bindings closed). Zero entries added; every
+other class count unchanged (measured by `entry_id` set difference across the before/after readings). The
+remaining 96 entries are **not renumbered-id claims** and stay `open` with the evidence below — never rewritten.
+
+## The live-vs-dated split
+
+The owner page § Renumber-Face splits the class into two legs. Leg 1 is path-addressed and is already applied
+by the engine when it builds candidates: no entry below lives in `.specify/history/`, `.specify/archive/`,
+`.specify/specs/.archive/`, a machine store, a `test-evidence/` segment or a date-named file. Leg 2 is
+content-addressed: a live binding is correctable **iff the number it carries is this document's own identifier,
+stale after a directory renumber** — "the reference is claimed as current and must point at the renumbered id".
+A number that names a *different registry object* is not a renumbered id: the directory prefix was never its
+value, so there is nothing for it to "follow".
+
+| Bucket | Entries | Test applied | Outcome |
+|---|---:|---|---|
+| Live binding (renumbered-directory residue) | 9 | the header carries the spec's own id; git shows the directory was renamed and the reference kept the old number; the correct value is the current directory prefix | corrected in place |
+| Owning-feature binding (registry-verified) | 94 | the number resolves to a `.specify/memory/features.md` row whose own name matches the name the file itself states; the rename leg does not apply | left `open` |
+| Cross-reference to another feature | 2 | the pointer cites `features/040.md` as a precedent for specs 051 / 053, not as their own binding | left `open` |
+
+**Why the 96 must not be "corrected" to the directory number.** This repository carries two number namespaces:
+requirement iterations (spec directory prefixes) and the feature registry (`features.md`). Old specs
+(006…053 era) state the *owning feature* number in `**Feature ID**` / `**Related Feature**`; modern specs
+(088 / 090 / 093) agree with their directory only because the two numbers happen to coincide. Rewriting, e.g.,
+`specs/030-summarize-project/requirements.md:18` `Feature ID: 013` → `030` would make the file claim Feature 030
+"History Command", contradicting its own `Feature Name: Skills Command` line and `features.md:22`, whose
+Related-Specifications cell names spec 030 for Feature 013. That is falsification of a current,
+registry-backed statement — the same refusal G5 recorded for dated specs. The 9 live entries are the opposite
+case: the number is the spec's own former id, and the corpus itself (`092` plan rows C1 / C4) fixes exactly this
+shape by moving it to the new directory number.
+
+**Three live clusters (git evidence).**
+
+| Spec | Rename evidence | Residual entries |
+|---|---|---|
+| `075-sdd-loop-efficiency` | commits `e24a1741a` (063→074), `26731b670` (074→075); ledgers `.specify/memory/renumber/ledger/20261029T044157807079Z-renumber.json` and `…072711164509Z-renumber.json` | `tasks.md:3`; `contracts/*.md:3` ×5 |
+| `080-humanize-run-output` | commits `4526cadfc` (079→080), `c5367a4a0` (reference sweep) | `tasks.md:3` |
+| `088-speckit-visualization` | commit `111d03e07` (087→088; the trunk's 087 is arch-diagram-docs) | `tasks.md:3`, `tasks.md:5` |
+
+In all three, the renumber ledger rewrote the full directory token (`063-sdd-loop-efficiency`) but not the
+bare number in a header, which is exactly the residue this class names. No other spec in the 105 resolves to a
+renamed directory whose current prefix differs from the bound number.
+
+## readings
+
+### Capture Rule (four readings, before → after)
+
+| # | Reading | Command | Before | After |
+|---|---|---|---|---|
+| 1 | Mirror baseline | `python3 scripts/python/sync-mirrors.py --check` | exit 0, all pairs ok | exit 0, all pairs ok (specs are not mirrored; this group touches no mirrored path) |
+| 2 | Instructions bytes | `wc -c .specify/instructions.md` | 36804 | 36804 |
+| 3 | Constitution pins | `grep -c '^### ' .specify/memory/constitution.md` and `…/constitution-template.md` | 27 / 21 | 27 / 21 |
+| 4 | Worktree shape | `git status --porcelain` | clean except this group's probe artifact `?? history-w3-before.json` | 8 `M` (this group) + 2 `??` (this group's JSON readings) |
+
+### Engine readings (command + exit + raw artifact)
+
+- before: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w3-before.json`
+  — exit 1; `renumber-live-binding` **105**; `not_closed.open` **908** (909 total entries = 908 open + 1 unevaluated);
+  candidates 1989; surface digest `e4e9acc82b79b92e…`.
+- after: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w3-after.json`
+  — exit 1; `renumber-live-binding` **96**; `not_closed.open` **899** (900 total entries); same candidates and
+  surface digest `e4e9acc82b79b92e…`.
+- Set difference of `entry_id`: **removed 9 / added 0**. Class delta is exactly
+  `{renumber-live-binding: 105 → 96}`; every other count is unchanged (deferral-marker 15, false-closed-set 0,
+  multi-owner 1, orphan-path 736, stale-constant 0, status-unreadable 52, superseded-live 0).
+
+Brief-base note: the brief expected "105, `not_closed.open` 909"; the measured before-reading is 105 and
+908 open — 909 is the *total-entry* count (the engine's `not_closed.unevaluated` is 1). The class count matched
+exactly; the delta arithmetic uses the measured base.
+
+Determinism note: a re-run taken after this evidence file was written differs from `history-w3-after.json` only
+by that file's own exclusion (`.specify/specs/090-re-anchoring/test-evidence/history-execute-g4.txt`, reason
+`dated-record`; excluded count 3413 → 3414). The `entries` set, every class count and `not_closed` are
+byte-values identical (900 entries, open 899). The engine's path predicate classifying this evidence artifact as
+a dated record is what keeps the reading reproducible.
+
+### Per-entry before / after (the 9 live bindings)
+
+| # | entry_id (before) | before (line) | after (line) |
+|---:|---|---|---|
+| 1 | `renumber-live-binding/specs/075-sdd-loop-efficiency/tasks.md:3` | `**Requirement ID**: 063 (from branch `075-sdd-loop-efficiency`)` | `**Requirement ID**: 075 (from branch `075-sdd-loop-efficiency`)` |
+| 2 | `…/075-sdd-loop-efficiency/contracts/delivery-and-invariants.md:3` | `**Feature**: 063 → Feature 058（演化）` | `**Feature**: 075 → Feature 058（演化）` |
+| 3 | `…/075-sdd-loop-efficiency/contracts/fast-lane.md:3` | `**Feature**: 063 → Feature 058（演化）` | `**Feature**: 075 → Feature 058（演化）` |
+| 4 | `…/075-sdd-loop-efficiency/contracts/plan-constraint.md:3` | `**Feature**: 063 → Feature 058（演化）` | `**Feature**: 075 → Feature 058（演化）` |
+| 5 | `…/075-sdd-loop-efficiency/contracts/progress-decoupling.md:3` | `**Feature**: 063 → Feature 058（演化）` | `**Feature**: 075 → Feature 058（演化）` |
+| 6 | `…/075-sdd-loop-efficiency/contracts/test-budget.md:3` | `**Feature**: 063 → Feature 058（演化）` | `**Feature**: 075 → Feature 058（演化）` |
+| 7 | `…/080-humanize-run-output/tasks.md:3` | `**Requirement ID**: 079` | `**Requirement ID**: 080` |
+| 8 | `…/088-speckit-visualization/tasks.md:3` | `**Requirement ID**: 087` | `**Requirement ID**: 088` |
+| 9 | `…/088-speckit-visualization/tasks.md:5` | `**Related Feature**: 087 Speckit 框架可视化（Speckit Framework Visualization）` | `**Related Feature**: 088 Speckit 框架可视化（Speckit Framework Visualization）` |
+
+Post-edit structural validation: `validate-tasks.py` passes the three edited tasks files — 075 = 0 error /
+0 warning; 080 = 0 error / 0 warning; 088 = 0 error / 20 warning (all 20 are pre-existing `green-cross-phase`
+clause-order warnings from the Phase 8 scope revision, unrelated to lines 3/5). The five contract files have no
+machine validator; their headers were the only edited line.
+
+## paths
+
+Tracked paths changed (8; the whole `correct` surface — `git diff --name-only` scope; `git diff --stat` =
+8 files, +9 −9):
+
+1. `.specify/specs/075-sdd-loop-efficiency/contracts/delivery-and-invariants.md`
+2. `.specify/specs/075-sdd-loop-efficiency/contracts/fast-lane.md`
+3. `.specify/specs/075-sdd-loop-efficiency/contracts/plan-constraint.md`
+4. `.specify/specs/075-sdd-loop-efficiency/contracts/progress-decoupling.md`
+5. `.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md`
+6. `.specify/specs/075-sdd-loop-efficiency/tasks.md`
+7. `.specify/specs/080-humanize-run-output/tasks.md`
+8. `.specify/specs/088-speckit-visualization/tasks.md`
+
+Reversal per path: `git checkout -- <path>`. No file was moved or renamed (`moved` = null for every entry;
+`git status` shows no rename pair). The two reading artifacts `history-w3-before.json` / `history-w3-after.json`
+are new untracked files under this directory.
+
+## corpus
+
+Empty: none of the 105 entries carries a `source_entry`. Shape correspondence (recorded, not claimed as an id):
+the 9 live entries reproduce the corpus's renumber shapes — C1 (`089` tasks/requirements headers still saying
+086 after the 086→089 rename) and C4 (`088`'s contract headers `**Feature**: 087` → 088). The corpus never
+exercises a feature-registry binding (all four C rows are renumbered-directory cases), which is why the 96
+non-live hits have no corpus counterpart; the class predicate over-approximates relative to the corpus.
+
+## dispositions
+
+### Disposed (9) — E-4 records
+
+`group` = the user-confirmed group granularity value (`renumber-live-binding`); `moved` and `superseded_by` are
+mutually exclusive and both null here because `correct` sets neither.
+
+| entry_id | disposition | group | moved | superseded_by | reverted_by | irreversible |
+|---|---|---|---|---|---|---|
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/tasks.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/tasks.md` | false |
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/contracts/delivery-and-invariants.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/contracts/delivery-and-invariants.md` | false |
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/contracts/fast-lane.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/contracts/fast-lane.md` | false |
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/contracts/plan-constraint.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/contracts/plan-constraint.md` | false |
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/contracts/progress-decoupling.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/contracts/progress-decoupling.md` | false |
+| `renumber-live-binding/specs/075-sdd-loop-efficiency/contracts/test-budget.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` | false |
+| `renumber-live-binding/specs/080-humanize-run-output/tasks.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `renumber-live-binding/specs/088-speckit-visualization/tasks.md:3` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/088-speckit-visualization/tasks.md` | false |
+| `renumber-live-binding/specs/088-speckit-visualization/tasks.md:5` | `correct` | renumber-live-binding | null | null | `git checkout -- .specify/specs/088-speckit-visualization/tasks.md` | false |
+
+### Left open (96) — no disposition, `state: open`
+
+One row per entry. `owning-feature` = the bound number resolves to a live `features.md` row whose own name
+matches the name the file states (the owning-feature binding of this requirement iteration); `cross-ref` = the
+pointer cites another feature as a precedent. A `†`-style suffix (`feature-ref.md:N` / `requirements.md:N` /
+`contract:N`) marks a carrier that additionally records the binding decision with an explicit date/session —
+those are dated records on Leg 1/2 and MUST NOT be rewritten. (20 carriers carry such a dated line.)
+
+| # | entry_id | verdict | evidence |
+|---:|---|---|---|
+| 1 | `specs/006-add-qoder-support/tasks.md:5` | owning-feature | `features.md:29` row 020 "Qoder Support"; related-spec names this spec |
+| 2 | `specs/009-claude-code-support/requirements.md:16` | owning-feature | `features.md:30` row 021 "Claude Code Support"; related-spec names this spec |
+| 3 | `specs/009-claude-code-support/tasks.md:5` | owning-feature | `features.md:30` row 021 "Claude Code Support"; related-spec names this spec |
+| 4 | `specs/012-skill-home-workdir/feature-ref.md:13` | owning-feature | `features.md:22` row 013 "Skills Command"; feature-ref.md:3 `**Date**: 2026-05-30` |
+| 5 | `specs/012-skill-home-workdir/feature-ref.md:35` | owning-feature | `features.md:22` row 013 "Skills Command"; feature-ref.md:3 `**Date**: 2026-05-30` |
+| 6 | `specs/012-skill-home-workdir/requirements.md:10` | owning-feature | `features.md:22` row 013 "Skills Command" |
+| 7 | `specs/012-skill-home-workdir/tasks.md:10` | owning-feature | `features.md:22` row 013 "Skills Command" |
+| 8 | `specs/018-cli-priority-support/requirements.md:15` | owning-feature | `features.md:31` row 022 "AI Tools Support" |
+| 9 | `specs/018-cli-priority-support/tasks.md:10` | owning-feature | `features.md:31` row 022 "AI Tools Support" |
+| 10 | `specs/020-speckit-todo-command/requirements.md:15` | owning-feature | `features.md:34` row 025 "Todo Command"; related-spec names this spec |
+| 11 | `specs/020-speckit-todo-command/tasks.md:5` | owning-feature | `features.md:34` row 025 "Todo Command"; related-spec names this spec |
+| 12 | `specs/021-agent-specific-config/requirements.md:10` | owning-feature | `features.md:31` row 022 "AI Tools Support"; related-spec names this spec |
+| 13 | `specs/021-agent-specific-config/tasks.md:5` | owning-feature | `features.md:31` row 022 "AI Tools Support"; related-spec names this spec |
+| 14 | `specs/023-agent-framework-redesign/feature-ref.md:9` | owning-feature | `features.md:28` row 019 "Agents Command"; related-spec names this spec |
+| 15 | `specs/023-agent-framework-redesign/feature-ref.md:11` | owning-feature | `features.md:28` row 019 "Agents Command"; related-spec names this spec |
+| 16 | `specs/023-agent-framework-redesign/feature-ref.md:22` | owning-feature | `features.md:28` row 019 "Agents Command"; related-spec names this spec |
+| 17 | `specs/023-agent-framework-redesign/requirements.md:10` | owning-feature | `features.md:28` row 019 "Agents Command"; related-spec names this spec |
+| 18 | `specs/023-agent-framework-redesign/tasks.md:9` | owning-feature | `features.md:28` row 019 "Agents Command"; related-spec names this spec |
+| 19 | `specs/024-agent-env-config/requirements.md:10` | owning-feature | `features.md:31` row 022 "AI Tools Support" |
+| 20 | `specs/024-agent-env-config/tasks.md:10` | owning-feature | `features.md:31` row 022 "AI Tools Support" |
+| 21 | `specs/025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md:3` | owning-feature | `features.md:35` row 026 "Agent Skill Enablement"; related-spec names this spec; contract:5 `**Date**: 2026-07-13` |
+| 22 | `specs/025-agent-skill-enablement/requirements.md:10` | owning-feature | `features.md:35` row 026 "Agent Skill Enablement"; related-spec names this spec |
+| 23 | `specs/025-agent-skill-enablement/tasks.md:9` | owning-feature | `features.md:35` row 026 "Agent Skill Enablement"; related-spec names this spec |
+| 24 | `specs/027-feedback-mechanism/contracts/command-classification.md:3` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 25 | `specs/027-feedback-mechanism/contracts/feedback-entry-schema.md:3` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 26 | `specs/027-feedback-mechanism/contracts/feedback-step-convention.md:3` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 27 | `specs/027-feedback-mechanism/contracts/feedback-utils-cli.md:3` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 28 | `specs/027-feedback-mechanism/requirements.md:10` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 29 | `specs/027-feedback-mechanism/tasks.md:10` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; related-spec names this spec |
+| 30 | `specs/028-sdd-workflow-refactor/requirements.md:10` | owning-feature | `features.md:38` row 029 "Shared Reference Directory"; related-spec names this spec |
+| 31 | `specs/028-sdd-workflow-refactor/tasks.md:10` | owning-feature | `features.md:38` row 029 "Shared Reference Directory"; related-spec names this spec |
+| 32 | `specs/029-glossary-mechanism/requirements.md:10` | owning-feature | `features.md:40` row 031 "Glossary Mechanism"; related-spec names this spec |
+| 33 | `specs/029-glossary-mechanism/tasks.md:9` | owning-feature | `features.md:40` row 031 "Glossary Mechanism"; related-spec names this spec |
+| 34 | `specs/030-summarize-project/feature-ref.md:46` | owning-feature | `features.md:22` row 013 "Skills Command"; related-spec names this spec |
+| 35 | `specs/030-summarize-project/requirements.md:18` | owning-feature | `features.md:22` row 013 "Skills Command"; related-spec names this spec |
+| 36 | `specs/030-summarize-project/tasks.md:5` | owning-feature | `features.md:22` row 013 "Skills Command"; related-spec names this spec |
+| 37 | `specs/031-task-complexity-rubric/contracts/rubric-section.md:3` | owning-feature | `features.md:41` row 032 "Task Complexity Rubric"; related-spec names this spec; contract:3 `**Date**: 2026-07-20` |
+| 38 | `specs/031-task-complexity-rubric/feature-ref.md:6` | owning-feature | `features.md:41` row 032 "Task Complexity Rubric"; related-spec names this spec |
+| 39 | `specs/031-task-complexity-rubric/requirements.md:12` | owning-feature | `features.md:41` row 032 "Task Complexity Rubric"; related-spec names this spec |
+| 40 | `specs/031-task-complexity-rubric/tasks.md:9` | owning-feature | `features.md:41` row 032 "Task Complexity Rubric"; related-spec names this spec |
+| 41 | `specs/032-dogfooding-practice/feature-ref.md:4` | owning-feature | `features.md:45` row 036 "Dogfooding Practice"; related-spec names this spec; feature-ref.md:5 `Binding Decision: clarify Session 2026-07-25 Q1` |
+| 42 | `specs/032-dogfooding-practice/requirements.md:10` | owning-feature | `features.md:45` row 036 "Dogfooding Practice"; related-spec names this spec |
+| 43 | `specs/032-dogfooding-practice/tasks.md:5` | owning-feature | `features.md:45` row 036 "Dogfooding Practice"; related-spec names this spec |
+| 44 | `specs/033-docs-command/feature-ref.md:4` | owning-feature | `features.md:46` row 037 "Docs Command"; related-spec names this spec; feature-ref.md:5 `Binding decided: 2026-07-28` |
+| 45 | `specs/033-docs-command/requirements.md:10` | owning-feature | `features.md:46` row 037 "Docs Command"; related-spec names this spec |
+| 46 | `specs/033-docs-command/tasks.md:5` | owning-feature | `features.md:46` row 037 "Docs Command"; related-spec names this spec |
+| 47 | `specs/034-evidence-infra/feature-ref.md:4` | owning-feature | `features.md:47` row 038 "Evidence Infrastructure"; related-spec names this spec |
+| 48 | `specs/034-evidence-infra/requirements.md:10` | owning-feature | `features.md:47` row 038 "Evidence Infrastructure"; related-spec names this spec |
+| 49 | `specs/034-evidence-infra/tasks.md:5` | owning-feature | `features.md:47` row 038 "Evidence Infrastructure"; related-spec names this spec |
+| 50 | `specs/035-token-efficiency/feature-ref.md:4` | owning-feature | `features.md:49` row 040 "Token Efficiency Discipline"; related-spec names this spec |
+| 51 | `specs/035-token-efficiency/requirements.md:10` | owning-feature | `features.md:49` row 040 "Token Efficiency Discipline"; related-spec names this spec |
+| 52 | `specs/035-token-efficiency/tasks.md:5` | owning-feature | `features.md:49` row 040 "Token Efficiency Discipline"; related-spec names this spec |
+| 53 | `specs/036-team-summary/feature-ref.md:4` | owning-feature | `features.md:36` row 027 "Team Management"; related-spec names this spec; feature-ref.md:14 `Binding decided at /speckit.clarify session 2026-08-04` |
+| 54 | `specs/036-team-summary/feature-ref.md:12` | owning-feature | `features.md:36` row 027 "Team Management"; related-spec names this spec; feature-ref.md:14 `Binding decided at /speckit.clarify session 2026-08-04` |
+| 55 | `specs/036-team-summary/requirements.md:10` | owning-feature | `features.md:36` row 027 "Team Management"; related-spec names this spec |
+| 56 | `specs/036-team-summary/tasks.md:5` | owning-feature | `features.md:36` row 027 "Team Management"; related-spec names this spec |
+| 57 | `specs/037-goal-registry/feature-ref.md:5` | owning-feature | `features.md:50` row 041 "Goal Registry"; related-spec names this spec |
+| 58 | `specs/037-goal-registry/requirements.md:10` | owning-feature | `features.md:50` row 041 "Goal Registry"; related-spec names this spec |
+| 59 | `specs/038-goal-target/feature-ref.md:3` | owning-feature | `features.md:50` row 041 "Goal Registry" |
+| 60 | `specs/038-goal-target/requirements.md:10` | owning-feature | `features.md:50` row 041 "Goal Registry" |
+| 61 | `specs/039-session-export/requirements.md:11` | owning-feature | `features.md:52` row 043 "Session Export"; related-spec names this spec |
+| 62 | `specs/040-agent-metadata-portability/feature-ref.md:6` | owning-feature | `features.md:53` row 044 "Agent Metadata Portability"; related-spec names this spec; feature-ref.md:7 `绑定来源: 2026-08-13 /speckit.clarify` |
+| 63 | `specs/040-agent-metadata-portability/requirements.md:10` | owning-feature | `features.md:53` row 044 "Agent Metadata Portability"; related-spec names this spec |
+| 64 | `specs/041-refactor-feedback-probe/requirements.md:17` | owning-feature | `features.md:37` row 028 "Feedback Mechanism" |
+| 65 | `specs/041-refactor-feedback-probe/tasks.md:5` | owning-feature | `features.md:37` row 028 "Feedback Mechanism" |
+| 66 | `specs/042-goal-team-creation/feature-ref.md:3` | owning-feature | `features.md:36` row 027 "Team Management"; feature-ref.md:4 `Binding rationale (2026-08-17 /speckit.clarify)` |
+| 67 | `specs/042-goal-team-creation/requirements.md:10` | owning-feature | `features.md:36` row 027 "Team Management" |
+| 68 | `specs/042-goal-team-creation/tasks.md:5` | owning-feature | `features.md:36` row 027 "Team Management" |
+| 69 | `specs/043-init-commit-stamp/feature-ref.md:3` | owning-feature | `features.md:54` row 045 "Framework Source Provenance"; related-spec names this spec; feature-ref.md:4 `Binding rationale (2026-08-17 /speckit.clarify)` |
+| 70 | `specs/043-init-commit-stamp/requirements.md:12` | owning-feature | `features.md:54` row 045 "Framework Source Provenance"; related-spec names this spec |
+| 71 | `specs/043-init-commit-stamp/tasks.md:5` | owning-feature | `features.md:54` row 045 "Framework Source Provenance"; related-spec names this spec |
+| 72 | `specs/044-reduce-confirmation-flows/feature-ref.md:4` | owning-feature | `features.md:55` row 046 "Confirmation Gate Governance"; related-spec names this spec; feature-ref.md:9 `2026-08-18 经 /speckit.clarify 裁定新建` |
+| 73 | `specs/044-reduce-confirmation-flows/requirements.md:10` | owning-feature | `features.md:55` row 046 "Confirmation Gate Governance"; related-spec names this spec |
+| 74 | `specs/044-reduce-confirmation-flows/tasks.md:5` | owning-feature | `features.md:55` row 046 "Confirmation Gate Governance"; related-spec names this spec |
+| 75 | `specs/045-sanitize-command/requirements.md:10` | owning-feature | `features.md:56` row 047 "Framework Material Hygiene"; related-spec names this spec |
+| 76 | `specs/045-sanitize-command/tasks.md:5` | owning-feature | `features.md:56` row 047 "Framework Material Hygiene"; related-spec names this spec |
+| 77 | `specs/047-feedback-introspection/feature-ref.md:8` | owning-feature | `features.md:37` row 028 "Feedback Mechanism"; feature-ref.md:7 `绑定裁定: /speckit.clarify Session 2026-08-27` |
+| 78 | `specs/047-feedback-introspection/requirements.md:15` | owning-feature | `features.md:37` row 028 "Feedback Mechanism" |
+| 79 | `specs/047-feedback-introspection/tasks.md:9` | owning-feature | `features.md:37` row 028 "Feedback Mechanism" |
+| 80 | `specs/048-derive-command/feature-ref.md:36` | owning-feature | `features.md:58` row 049 "Derivation Command"; related-spec names this spec; feature-ref.md:7 `绑定裁定(2026-09-05, /speckit.clarify + 用户裁定)` |
+| 81 | `specs/048-derive-command/requirements.md:10` | owning-feature | `features.md:58` row 049 "Derivation Command"; related-spec names this spec |
+| 82 | `specs/048-derive-command/tasks.md:5` | owning-feature | `features.md:58` row 049 "Derivation Command"; related-spec names this spec |
+| 83 | `specs/049-docs-reconcile/requirements.md:10` | owning-feature | `features.md:46` row 037 "Docs Command"; requirements.md:15 `Merge-time renumbering (2026-09-06)` — 048→049 renumber recorded in place |
+| 84 | `specs/051-user-facing-comprehension/feature-ref.md:15` | cross-ref | cites `features/040.md` (Feature 040 Token Efficiency Discipline) as a precedent — not this spec's binding; `features.md:49` |
+| 85 | `specs/053-machine-decidable-artifacts/feature-ref.md:13` | cross-ref | cites `features/040.md` (Feature 040 Token Efficiency Discipline) as a precedent — not this spec's binding; `features.md:49` |
+| 86 | `specs/067-loop-efficiency-hardening/requirements.md:10` | owning-feature | `features.md:66` row 058 "无人值守 SDD 循环驱动机制"; requirements.md:14 binding rationale; :16 `现状锚点（2026-10-22，dated record）` |
+| 92 | `specs/075-sdd-loop-efficiency/feature-ref.md:112` | owning-feature | `features.md:66` row 058 "无人值守 SDD 循环驱动机制"; feature-ref.md:4 `演化特性，2026-10-20 绑定` |
+| 93 | `specs/075-sdd-loop-efficiency/requirements.md:10` | owning-feature | `features.md:66` row 058 "无人值守 SDD 循环驱动机制"; requirements.md:14 `现状锚点（2026-10-20…dated record）` |
+| 95 | `specs/080-humanize-run-output/contracts/content-mode.contract.md:3` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+| 96 | `specs/080-humanize-run-output/contracts/execution-dispatch.contract.md:3` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+| 97 | `specs/080-humanize-run-output/contracts/invocation-parse.contract.md:3` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+| 98 | `specs/080-humanize-run-output/contracts/report-assembly.contract.md:3` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+| 99 | `specs/080-humanize-run-output/contracts/wiring-compat.contract.md:3` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+| 100 | `specs/080-humanize-run-output/feature-ref.md:14` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec; feature-ref.md:19 `绑定裁决: clarify 2026-10-30` |
+| 101 | `specs/080-humanize-run-output/feature-ref.md:15` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec; feature-ref.md:19 `绑定裁决: clarify 2026-10-30` |
+| 102 | `specs/080-humanize-run-output/requirements.md:12` | owning-feature | `features.md:70` row 062 "Humanize Command（动作输出人类友好化）"; related-spec names this spec |
+
+Rows are numbered by the before-reading's `(path, line)` order; numbers 87–91, 94, 103–105 are the 9 disposed
+entries above. Total: 96 open + 9 disposed = 105.
+
+## Adjacent findings (named, not repaired — outside the confirmed entry set)
+
+The class predicate scans `requirements.md`, `tasks.md`, `contracts/*.md`, `feature-ref.md` and `team/` only,
+so the same-shape residual references below are invisible to it. They were left untouched in this wave (the
+confirmed unit is the entry) and are recorded here so the next reader does not have to rediscover them:
+
+- `.specify/specs/075-sdd-loop-efficiency/quickstart.md:3` — `**Feature**: 063 → Feature 058（演化）` (same
+  live-header shape as the five corrected contracts; `quickstart.md` is not scanned).
+- `.specify/specs/080-humanize-run-output/tasks.md:1` — title `— 079` (not a machine-readable header).
+- `.specify/specs/088-speckit-visualization/quickstart.md:3`, `research.md:3`, `data-model.md:3` —
+  `**Feature**: 087` (same live-header shape; these files are not scanned); `feature-ref.md:11` —
+  `(ID 087)` inside the binding table (not matched by `FEATURE_REF_ID_RE`).
+- Dated records that legitimately keep 087 / 079 / 063 and MUST NOT be rewritten: `088/requirements.md:8`
+  (quoted user input), `:919` (clarify narrative), `checkpoints/02-clarify.md`, `checklists/requirements.md`,
+  `review.md`, `review-second-slice.md`, `verification.md`, `notes/red-first-evidence.md`; `080/requirements.md:3,17`
+  (the 079→080 renumber record), `verification.md`, `review.md`, `notes/*`; `075/quickstart.md` `/tmp/063-*`
+  fixture names.
+
+## Engine observation (named, not this wave's repair)
+
+The class predicate treats every `**Feature ID**` / `**Related Feature**` / feature-detail pointer whose number
+differs from the directory prefix as a live-binding defect. Under this repository's two-level model that
+difference is legitimate for every pre-088 spec (the number is the owning feature's registry id), so the class
+over-approximates: 96 of the 105 hits are registry-backed feature bindings, not renumbered ids. The 9 genuine
+instances all come from the three git-verified directory renames. A future engine revision should distinguish
+"same identifier, stale after a rename" from "foreign registry identifier" (e.g., resolve the number against
+`features.md` before emitting). Until then, this wave's 9 corrections are the complete live-binding residue the
+class can name, and no rewrite was performed on the 96.

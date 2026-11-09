@@ -1,6 +1,6 @@
 # Tasks: Humanize Run Output（动作输出的人类友好化） — 079
 
-**Requirement ID**: 079
+**Requirement ID**: 080
 **Requirement Key**: `080-humanize-run-output`
 **Branch**: `080-humanize-run-output`（本阶段禁止切换或新建分支；不 push）
 **Related Feature**: Feature 062 — Humanize Command（动作输出人类友好化）, status `Implemented`（扩展不回退；本文件任何行不得改状态，只在登记面追加扩展记录）
