@@ -772,8 +772,187 @@ def action_serial_reason(repo, args):
                     "fail" if findings else "pass", findings, measured)
 
 
+# --------------------------------------------------------------------------- #
+# concurrency reading (C-031…C-034, T074–T077)
+# --------------------------------------------------------------------------- #
+NOT_EVALUATED = "not_evaluated"
+
+
+def epoch_seconds(value):
+    """An interval endpoint as epoch seconds, or ``None`` when it is not one."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    text = str(value or "").strip()
+    if re.fullmatch(r"-?\d+", text):
+        return int(text)
+    try:
+        stamp = datetime.strptime(text, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return None
+    return int(stamp.replace(tzinfo=timezone.utc).timestamp())
+
+
+def maximum_overlap(intervals):
+    """C-031: the maximum count of simultaneously open half-open intervals.
+
+    ``[dispatched_at, settled_at)``; at equal epoch seconds a settle is applied
+    before a dispatch, so touching intervals do not overlap (the fact's tie-break).
+    """
+    events = []
+    for start, end in intervals:
+        events.append((start, 1, "dispatch"))
+        events.append((end, 0, "settle"))
+    events.sort()
+    current = 0
+    peak = 0
+    for _moment, _order, kind in events:
+        current += 1 if kind == "dispatch" else -1
+        peak = max(peak, current)
+    return peak
+
+
+def read_gate_ceiling(repo, override):
+    """C-034: the ceiling from ``wp-gate.py``'s declared default, or the explicit flag.
+
+    The engine carries no numeric ceiling of its own; when neither the call-time
+    override nor the gate script's declaration is readable, that is an input error.
+    """
+    if override is not None:
+        return int(override), "--ceiling at call time"
+    for rel in ("skills/external/sdd-loop-driver/scripts/wp-gate.py",
+                ".specify/skills/sdd-loop-driver/scripts/wp-gate.py"):
+        path = repo / rel
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        match = re.search(
+            r'"--slot-cap-ceiling"[^)]*?default\s*=\s*(\d+)', text)
+        if match:
+            return int(match.group(1)), "%s declared default" % rel
+    raise EngineInputError(
+        "ceiling-unavailable",
+        "no --ceiling given and wp-gate.py's --slot-cap-ceiling default is not readable")
+
+
 def action_reading(repo, args):
-    return _not_implemented("reading")
+    """C-031…C-034: judge one run record's concurrency reading."""
+    slot_statement = fact_statement(
+        load_fact(repo, "concurrency-slot-and-reserve"), "concurrency-slot-and-reserve")
+    record = load_record(args.record)
+    record_ref = str(args.record)
+    findings = []
+
+    units = record.get("units")
+    unit_list = units if isinstance(units, list) else []
+    intervals = []
+    missing = []
+    for position, unit in enumerate(unit_list):
+        if not isinstance(unit, dict):
+            findings.append(finding(
+                "record-malformed", record_ref,
+                "units[%d] is not a mapping" % position, "%s#units[%d]" % (record_ref, position)))
+            continue
+        unit_id = str(unit.get("unit_id", "")).strip() or "units[%d]" % position
+        start = epoch_seconds(unit.get("dispatched_at"))
+        end = epoch_seconds(unit.get("settled_at"))
+        dispatched = (unit.get("dispatched_at") is not None
+                      or unit.get("settled_at") is not None
+                      or bool(str(unit.get("executor_id", "")).strip()))
+        if dispatched and (start is None or end is None):
+            missing.append(unit_id)
+            continue
+        if start is not None and end is not None:
+            intervals.append((start, end))
+
+    if missing:
+        effective = NOT_EVALUATED
+    else:
+        effective = maximum_overlap(intervals) if intervals else 0
+
+    requested = record.get("requested")
+    requested_numeric = numeric_reading(requested)
+    declared_effective = record.get("effective")
+    declared_numeric = numeric_reading(declared_effective)
+    effective_reason = record.get("effective_reason")
+    missing_fields = [name for name, value in (
+        ("requested", requested), ("effective", declared_effective),
+        ("effective_reason", effective_reason)) if value is None]
+    if missing_fields:
+        findings.append(finding(
+            "reading-incomplete", record_ref,
+            "the reading triple is incomplete; missing: %s" % missing_fields,
+            record_ref + "#reading", compared=[[requested, declared_effective, effective_reason]]))
+
+    claim = (requested_numeric is not None and requested_numeric >= 2) \
+        or str(record.get("pattern", "")).strip() == "concurrent"
+    if missing and claim:
+        for unit_id in missing:
+            findings.append(finding(
+                "reading-not-evaluated", unit_id,
+                "a dispatched unit has no complete dispatch/settle interval, so "
+                "effective is the literal %r" % NOT_EVALUATED, record_ref))
+
+    if declared_numeric is not None:
+        if effective != NOT_EVALUATED and declared_numeric != effective:
+            findings.append(finding(
+                "effective-mismatch", record_ref,
+                "the record declares effective=%d but the interval overlap computes %d"
+                % (declared_numeric, effective), record_ref + "#effective",
+                kind="inconsistency", compared=[declared_numeric, effective],
+                record=record_ref))
+    elif str(declared_effective).strip() == NOT_EVALUATED and isinstance(effective, int):
+        findings.append(finding(
+            "effective-mismatch", record_ref,
+            "the record declares effective=not_evaluated but the intervals compute %d"
+            % effective, record_ref + "#effective",
+            kind="inconsistency", compared=[declared_effective, effective],
+            record=record_ref))
+
+    slot_cap = numeric_reading(slot_statement.get("slot_cap_default"))
+    reserve = numeric_reading(slot_statement.get("verifier_reserve"))
+    ceiling, ceiling_source = read_gate_ceiling(repo, args.ceiling)
+    remaining = numeric_reading(record.get("remaining_budget"))
+    operands = [value for value in (slot_cap, ceiling, remaining) if value is not None]
+    bound = min(operands) if operands else None
+    available = (bound - reserve) if (bound is not None and reserve is not None) else None
+    measured_bound = {
+        "slot_cap": slot_cap,
+        "ceiling": ceiling,
+        "ceiling_source": ceiling_source,
+        "remaining_budget": remaining if remaining is not None else NOT_EVALUATED,
+        "min_formula": "min(slot_cap, ceiling, remaining_budget)",
+        "min": bound,
+        "verifier_reserve": reserve,
+        "effective_available": available,
+    }
+    if isinstance(effective, int) and bound is not None:
+        reason_text = str(effective_reason or "").strip()
+        if effective < bound and not reason_text:
+            findings.append(finding(
+                "reading-incomplete", record_ref,
+                "effective=%d is below min(slot_cap, ceiling, remaining)=%d and carries "
+                "no named effective_reason" % (effective, bound), record_ref + "#effective_reason",
+                compared=[effective, bound]))
+        if effective > bound:
+            findings.append(finding(
+                "bound-violation", record_ref,
+                "effective=%d exceeds min(slot_cap, ceiling, remaining)=%d"
+                % (effective, bound), record_ref + "#effective",
+                kind="inconsistency", compared=[effective, bound], record=record_ref))
+
+    measured = {
+        "effective": effective,
+        "requested": requested,
+        "units_counted": len(intervals),
+        "units_missing_interval": missing,
+        "intervals": [{"start": start, "end": end} for start, end in intervals],
+        "bound": measured_bound,
+    }
+    return envelope("reading", "fail" if findings else "pass", findings, measured)
 
 
 def action_coverage(repo, args):
