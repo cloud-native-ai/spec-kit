@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794228656
 stage_base_commit: a72138e1
 attempt: 3
 retry_limit: 3
-last_verdict: "Repair round 3 = H-1/H-2 closed + D4 anchoring re-scope; ALL GATES GREEN: validate-requirements 0/0; account status ok (fr 43/43, clause 0 beyond, post-freeze baseline 599); validate-tasks 0 err/1 disclosed warn; tensions 0/0; pre-analyze x3 pass; decomposition proceed 43/83. Residuals for round 4: contracts still carry .specify/goal in live normative text while requirements/plan/feature-ref now say .specify/anchoring (split introduced by D4); features.md header count 87 vs 88 rows; L-03 team name SDD Temporary Team 092; L-2 denominator 16 vs 18; features/094.md refresh done by R2."
+last_verdict: "Round 4 verification = VA PASS (H-1/H-2 closures file-level + gates re-measured) / VB FAIL (4 LOW: registry status stale; tasks.md:483 pointer; research.md:115 44 vs 46; 092 identity residues) / VC FAIL (D4 anchoring split: contracts 9 normative lines / 8 clauses HIGH — C-10/13/15/31/58/59/63/100; tasks 5 rows; quickstart 4 lines; feature-ref 1 row; data-model 2 rules; M-1..M-8, L-1..L-3). Fix wave dispatched: W1 contracts+tasks+baseline; W2 remaining surfaces."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze round 4 as 3 fork verifiers (VA closures/file-level; VB consistency/counts/gates; VC anchoring split/residuals); if only M/L remain, one in-passing repair fork, then the implement gate"
+next_action: "fix wave W1/W2 (fork, disjoint files, no commits) → driver integrates + gates → final verification (2 fork verifiers) → implement gate"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
