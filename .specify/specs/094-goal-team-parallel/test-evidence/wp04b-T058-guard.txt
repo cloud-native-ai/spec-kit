@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh tests/contract/test_declaration_facts.py::test_registration_is_additive_and_both_consumers_are_in_scope -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py::test_registration_is_additive_and_both_consumers_are_in_scope -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.19s
+exit=0

@@ -1,0 +1,4 @@
+command: python3 scripts/python/validate-tasks.py .specify/specs/094-goal-team-parallel/tasks.md
+WARN  240: blockedBy: T043 references later task T054 (forward dependency — verify this is intentional)
+PASS (with warnings): .specify/specs/094-goal-team-parallel/tasks.md — 0 error(s), 1 warning(s)
+exit=0

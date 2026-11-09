@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py tests/contract/test_declaration_facts.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py tests/contract/test_declaration_facts.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+................                                                         [100%]
+16 passed in 6.82s
+exit=0

@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh tests/contract/test_declaration_facts.py::test_a_fact_in_another_grammar_is_refused_at_load -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py::test_a_fact_in_another_grammar_is_refused_at_load -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 7.15s
+exit=0

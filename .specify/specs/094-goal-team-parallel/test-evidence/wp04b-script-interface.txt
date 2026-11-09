@@ -1,0 +1,22 @@
+command: python3 scripts/python/goal-utils.py --version
+goal-utils.py 0.0.22
+exit=0
+
+command: python3 scripts/python/goal-utils.py handoff-ref --help (usage)
+usage: goal-utils.py handoff-ref [-h] [--repo-root REPO_ROOT] [--json]
+                                 [--scope {goal,teams,auto}]
+                                 [--spec-dir SPEC_DIR] --handoff PATH
+
+options:
+  -h, --help            show this help message and exit
+  --repo-root REPO_ROOT
+                        repository root (default: cwd)
+  --json                machine-readable output
+  --scope {goal,teams,auto}
+                        archive layer: goal (.specify/anchoring/), teams
+                        (.specify/teams/), or auto (read-only single-layer
+exit=0
+
+command: python3 scripts/python/goal-utils.py handoff-ref --bogus
+error: unrecognized option: --bogus
+exit=2

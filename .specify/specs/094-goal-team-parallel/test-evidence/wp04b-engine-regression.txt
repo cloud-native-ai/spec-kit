@@ -1,0 +1,43 @@
+command: bash scripts/bash/run-tests.sh <17 goal-utils-referencing modules> -q
+E         stderr:
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...ema": "script-interface-check/1",\n  "source": "tracked",\n  "violation_rows": [],\n  "violations": 0\n}\n', stderr='').returncode
+
+tests/contract/test_script_interface_contract.py:2258: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged
+FAILED tests/contract/test_scope_resolution.py::test_global_scope - Assertion...
+FAILED tests/contract/test_scope_resolution.py::test_spec_scope - AssertionEr...
+FAILED tests/contract/test_scope_resolution.py::test_list_spec_is_scoped - As...
+FAILED tests/contract/test_scope_resolution.py::test_spec_write_leaves_global_stores_byte_identical
+FAILED tests/contract/test_scope_resolution.py::test_spec_scope_requires_spec_dir
+FAILED tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+FAILED tests/contract/test_temp_goal_contract.py::test_resolve_scope_returns_the_spec_roots
+FAILED tests/contract/test_criterion_subject.py::test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten
+FAILED tests/contract/test_temp_goal_contract.py::test_spec_scope_lists_the_spec_scoped_goal
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+FAILED tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root
+12 failed, 562 passed, 1 skipped in 9.67s
+exit=1 (only the pre-existing set below)
+
+== name-level diff against a git-archive HEAD copy (baseline copy lacks .git) ==
+-- worktree-only failures:
+tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root
+-- baseline-only failures (all four are .git-absent artifacts of the copy; they pass in the worktree):
+tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+tests/contract/test_script_interface_contract.py::test_t073_the_guard_block_is_the_first_executable_block_of_every_consumer
+tests/contract/test_script_interface_contract.py::test_t078_a_projection_never_answers_the_version_it_so_loudly_does_not_print
+tests/contract/test_script_interface_contract.py::test_t078_the_new_executable_artifacts_are_exactly_what_c32_names
+-- common pre-existing failures:
+tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+tests/contract/test_criterion_subject.py::test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten
+tests/contract/test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged
+tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+tests/contract/test_scope_resolution.py::test_global_scope
+tests/contract/test_scope_resolution.py::test_list_spec_is_scoped
+tests/contract/test_scope_resolution.py::test_spec_scope
+tests/contract/test_scope_resolution.py::test_spec_scope_requires_spec_dir
+tests/contract/test_scope_resolution.py::test_spec_write_leaves_global_stores_byte_identical
+tests/contract/test_temp_goal_contract.py::test_resolve_scope_returns_the_spec_roots
+tests/contract/test_temp_goal_contract.py::test_spec_scope_lists_the_spec_scoped_goal
