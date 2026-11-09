@@ -1,0 +1,14 @@
+CMD: python3 .specify/scripts/python/validate-requirements.py .specify/specs/093-concurrency-by-default/requirements.md
+DATE: 2026-11-09T17:58:07+08:00
+---
+file: .specify/specs/093-concurrency-by-default/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 337 lines, 47 definition rows, 11 shared strings
+0 error(s), 0 warning(s)
+EXIT=0

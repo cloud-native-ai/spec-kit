@@ -73,11 +73,18 @@ parallel hierarchy.
   requested / effective / effective-reason triple plus each Worker's `executor_id` and its verdict's `verifier_id`.
   The stage's default value is owned by `decomposition-coverage.yaml` ([[STR-007]]) and MUST NOT be restated here.
   (FR-034, FR-028, FR-016)
-- **C-094** — The concurrency mechanism MUST be the fork model: each concurrent unit is a separate `qodercli` child
-  process launched through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` (prompt through stdin,
-  `--output-format stream-json`, completion judged by the stage sentinel), and the process pool's upper bound MUST be
-  the host's `nproc` reading taken at dispatch — never a frozen constant. Host-internal agent fan-out (in-process
-  subagents sharing one process and one CPU core) MUST NOT be recorded as the concurrency mechanism and MUST NOT be
-  counted as satisfying FR-005(d); the external-process branch of FR-005(d) is what this clause fixes. The runner's
-  own `--help` contract and `references/dispatch-recipes.md` are the mechanism's owners; no second runner rule is
-  introduced. (FR-035, FR-021, FR-008)
+- **C-094** — The concurrency mechanism MUST be an independent-child-process form, with exactly two legal
+  carriers. Fork form (same-family default): each concurrent unit is a separate `qodercli` child process launched
+  through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` (prompt through stdin,
+  `--output-format stream-json`, completion judged by the stage sentinel), with the process pool's upper bound taken
+  as the host's `nproc` reading at dispatch — never a frozen constant. Subprocess form (heterogeneous agents): when
+  a concurrent unit is executed by an agent CLI of a different family than `qodercli`, it MUST be carried by an
+  independent child process of that agent's own CLI, under the same judgement (separate process, per-unit
+  dispatch/settle intervals, completion by sentinel or exit record), and MUST NOT fall back to host-internal
+  fan-out because of the family difference. The host-internal in-process subagent path is BANNED as a concurrency
+  mechanism (neither a default nor a degradation option): in-process subagents sharing one process and one CPU core
+  MUST NOT be recorded as the concurrency mechanism and MUST NOT be counted as satisfying FR-005(d); the
+  external-process branch of FR-005(d) is what this clause fixes (both carriers belong to it). The runner's own
+  `--help` contract and `references/dispatch-recipes.md` are the fork carrier's owners;
+  `shared/workflow/external-dispatch-recipes.md` § Recipe 7 is the heterogeneous process-form owner; no second
+  runner rule is introduced. (FR-035, FR-021, FR-008)

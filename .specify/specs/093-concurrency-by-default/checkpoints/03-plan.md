@@ -13,6 +13,8 @@
 - anomaly disclosed above rather than hidden: the overlap engine's green-or-red is not usable as-is here; the recorded reading plus the by-hand file-level table is the evidence, and F-093-002 stays open as a framework finding.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | partial (design complete) | `contracts/executor-obligations.contract.md` C-041…C-062 (three-part obligation, class text, closed reason set); `contracts/declaration-facts.contract.md` C-004/C-005; implementation pending |

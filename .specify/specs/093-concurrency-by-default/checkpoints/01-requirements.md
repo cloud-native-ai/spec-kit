@@ -7,6 +7,8 @@
 - anomaly: three framework frictions recorded by the stage: (a) `validate-requirements.py` silently accepted a full-width-colon rewrite as **zero definition rows** while reporting `status: ok` (a green-not-red — exactly SC-001's subject); (b) both checkers are blind to blockquote (`>`) content; (c) the Runtime Stack `Contract` cell rejects a backticked path + `§` anchor combination. Additionally, the parallel dispatch of 092 tasks and 093 requirements in one working tree mixed the branches (092's commits landed on the 093 branch); the driver corrected it by cherry-picking 092 back to `master` and rebuilding the clean 093 branch, and the lesson is recorded for the 092/093 isolation design.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | not_evaluated | requirements FR groups A/E; implementation pending |

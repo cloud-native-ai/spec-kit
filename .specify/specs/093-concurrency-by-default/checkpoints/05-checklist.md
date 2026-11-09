@@ -17,6 +17,8 @@
   Consequently the duplicate property is established by the item-level machine check (44 distinct ids, 0 duplicate bodies under the engine's own normalisation rule :318-324), and a recurrence note is added below. Both defects are routed as framework observations (readings §4 O-1 / O-2 / O-3), not repaired in-stage: repairing them means editing a framework script outside this stage's territory.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | **partial — requirement text is judgeable, implementations absent** | CHK006/CHK007/CHK010/CHK012 pass on FR-005…FR-007; CHK008 fail (FR-006's bijection contradicts its own `factual` members); CHK009 fail (the "6 reason codes" count has no owner in the requirements body) |

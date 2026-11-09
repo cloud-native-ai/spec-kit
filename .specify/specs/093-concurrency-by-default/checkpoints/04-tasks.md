@@ -12,6 +12,8 @@
 - **Anomaly disclosed, not hidden**: `validate-tasks.py` and the `create-tasks` skill disagree on the semantics of `[green: …]`. The validator enforces a one-row-per-clause partition; the skill describes the tag as a red-first marker. The two contracts cannot both be satisfied by one artefact — satisfying the validator forces untagging rows whose red-first work is real. This stage adopted the marker reading, restored the red-first rows, kept the partition discipline that the validator can still check, and recorded the divergence below as a decision that must be ratified.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | partial (rows allocated) | US1 rows T027–T041 and US2 rows T042–T065; owner surfaces T037/T056/T060; verification T065 |

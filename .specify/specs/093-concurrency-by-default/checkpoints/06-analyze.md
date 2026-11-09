@@ -13,6 +13,8 @@
 - **Anomaly disclosed, not hidden**: two gate readings are red and neither was repaired in-stage — the FR lane (F-093-005, structural: the delivery map's clauses carry no resolvable citation group) and, upstream of it, a CRITICAL requirement-text corruption the validator cannot see because it sits inside a backtick pair (F-093-009). Both are requirement/contract-layer defects with one recorded reading each and are routed to `analyze-repair` with a table, not to the user.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | partial — requirement text judgeable, implementations absent; the one text defect blocking it (FR-006 bijection vs STR-009/STR-010) is F-093-007 | findings § 4 HIGH F-093-007; checklist CHK008 |

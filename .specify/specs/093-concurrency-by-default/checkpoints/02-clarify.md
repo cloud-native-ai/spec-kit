@@ -9,6 +9,8 @@
 - anomaly: the overlap verdict is a **vacuous clear** — 093 declares no delivery surface yet (`feature-ref.md` is plan-owned), so no comparison ran; under 093's FR-031 surface it will collide at area level with 064/070/086 unless plan names file-level paths. Recorded, not relied on as green.
 
 ## 2. Temporary Goal progress
+
+> 注（2026-11-09，analyze-repair round 2 · V3-F6）：本节标题沿用已退役的「Temporary Goal」称谓；随框架分发的协议现名「Goal progress」（owner：`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 2）。标题保留为 dated record，正文不改写。
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | 各执行体声明 default-concurrent 与具名串行例外 | partial (spec-side) | requirements FR-001/FR-006/FR-007 now carry the five enumeration roots + one-to-one reason↔condition mapping; implementation pending |

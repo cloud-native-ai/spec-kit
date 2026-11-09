@@ -112,8 +112,7 @@ integration order and the duration, compared against the serial baseline recorde
 Any quantity the run did not produce is written `not_evaluated`; writing `0` or an estimate is a failure
 (SC-006, FR-030).
 
-**This feature's own run does not satisfy S-6** — see `plan.md` § Concurrency plan for this run: the executing
-agent has no dispatch tool, so it declares serial with `mechanism-not-yet-landed` and SC-006 as `not_evaluated`.
+**This feature's own run does not satisfy S-6** — see `plan.md` § Concurrency plan for this run: the feature's own concurrency mechanism has not landed yet (the declaration facts, the engine, and the FR-035 runner path), so the run declares serial with `mechanism-not-yet-landed` and records SC-006 as `not_evaluated`. A tool set is a per-run probe (RS-005), never a constant; the earlier "no dispatch tool" reason was measured false at analyze 2026-11-09 (F-093-012).
 
 ---
 

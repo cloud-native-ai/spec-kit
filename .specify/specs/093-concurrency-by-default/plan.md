@@ -49,7 +49,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 **Project Type**: SDD framework — declaration facts, one Python engine, concept-owner documents, agent definitions, command templates, skills, contract tests. No runtime platform, no scheduler, no daemon.
 **Performance Goals**: no wall-clock promise is the release criterion. The measurable target is **execution shape**: every enumeration-root member mapped to exactly one declaration class, every serial record carrying a resolvable reason code, and at least one real run (not a fixture) reporting an effective concurrency `>= 2` measured as maximum interval overlap (SC-006).
 **Constraints**: no new `/speckit.*` command; no second dispatch engine or registry; no unconditional parallelism; the SDD stage chain and its sentinels byte-unchanged; no push; `templates/` stays project-neutral (no repo-specific path facts); the new engine satisfies the script interface contract (Constitution XXI).
-**Scale/Scope**: 35 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept/owner documents rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 10 new contract test modules; 8 existing test modules dispositioned; 6 contract files carrying 94 clauses.
+**Scale/Scope**: 35 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept owners plus every dispatch-declaring surface in the complete-correction manifest (§ The analyze wave) rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 10 new contract test modules; 4 existing framework contract modules re-pinned; 8 existing test modules dispositioned; 6 contract files carrying 94 clauses.
 
 ## Constitution Check
 
@@ -196,16 +196,27 @@ shared/declarations/facts/                   # new fact entries (the only new ma
 └── coordinator-dispatch-verdict.yaml        # [[STR-011]] the single coordinator-dispatch adjudication (T-004)
 scripts/python/concurrency-check.py           # new: the only program that turns the facts into verdicts
 shared/definitions/subagent-definitions.md    # [[STR-004]] dispatch capability (new section)
+shared/definitions/agent-definitions.md       # execution layer names the carrier; in-process ban pinned
+shared/workflow/execution-topology.md         # local carrier decision -> fork / subprocess + ban
+shared/workflow/external-dispatch-recipes.md  # SDD boundary + Recipe 7 -> the two carriers + ban
 shared/definitions/goal-definitions.md        # FR-026 goal/target concurrency (rewritten)
 skills/external/sdd-loop-driver/references/decomposition-model.md   # slot owner projection, coverage, integration order
 skills/external/sdd-loop-driver/templates/stage-team-preset.md      # slot cap projection, seat territory judgement
 skills/external/sdd-loop-driver/SKILL.md                            # the driver loop's concurrency obligation
+skills/external/sdd-loop-driver/references/watch-model.md           # watch model extended to the local fork carrier
+skills/external/sdd-loop-driver/references/stage-prompts.md         # the two-topology dispatch rule -> fork / subprocess
 skills/external/sdd-loop-driver/scripts/wp-gate.py                  # ceiling owner (WG-16) + file-level write domain
 skills/internal/create-team/SKILL.md                                # team seat binding-time judgement
 skills/internal/create-team/references/conceptual-model.md          # team/seat territory owner
 skills/internal/run-agent/SKILL.md                                  # dispatch-capability preflight + routing (FR-024)
 skills/internal/run-team/SKILL.md                                   # team executor default-concurrent
 skills/internal/create-plan/SKILL.md                                # plan-stage default-concurrent (this pipeline)
+skills/external/sdd-house-keeping/SKILL.md                          # in-process ban inverted; fork/subprocess carriers
+skills/external/sdd-house-keeping/references/maintenance-recipes.md # H2 carrier line -> fork / subprocess
+skills/external/sdd-project-setup/SKILL.md                          # in-process ban inverted; fork/subprocess carriers
+skills/external/sdd-project-setup/references/setup-recipes.md       # carrier line -> fork / subprocess
+skills/external/coaching-skills/SKILL.md                            # dispatch mechanism: fork / subprocess, ban pinned
+skills/internal/analyze-artifacts/references/validation-and-report.md # dispatch carrier -> the two carriers + ban
 agents/*.agent.md (17 files)                                        # dispatch capability judged; verdict applied
 templates/commands/*.md (the command surfaces this feature judges)  # each command's concurrency obligation
 templates/plan-template.md                                          # records a stage's concurrency plan
@@ -219,6 +230,10 @@ tests/contract/test_concurrency_disposal.py                         # FR-033, SC
 tests/contract/test_concurrency_reproduction_092.py                 # SC-005 red-first reproduction fixture
 tests/contract/test_concurrency_real_run_evidence.py                # FR-030, SC-006, SC-012
 tests/unit/test_concurrency_check_engine.py                         # the engine's own actions
+tests/contract/test_sdd_loop_driver_skill.py                        # pins fork/subprocess carriers + the in-process ban
+tests/contract/test_sdd_project_setup_skill.py                      # same
+tests/contract/test_coaching_run_contract.py                        # same
+tests/contract/test_sdd_carrier_contract.py                         # same
 ```
 
 **Structure Decision**: this feature extends the existing declaration-layer + engine + contract-test shape the
@@ -370,6 +385,42 @@ conflicts they create are named here instead of being absorbed silently.
   subagents; FR-035 reverses that default for the concurrency mechanism — the same explicit revision (FR-033
   disposal list) converges them. Editing either rule in this stage would have decided the user's ruling by
   paraphrase; the ledger in `notes/analyze-repair.md` records both conflicts and the refused in-place edits.
+
+### Complete-correction manifest (analyze round 2, V2; user ruling recorded 2026-11-09)
+
+The ruling fixes the dispatch policy this feature enforces: **the host-internal in-process subagent path is
+BANNED as a concurrency carrier; the only two legal carriers are the fork form (same-family `qodercli` child
+processes through `scripts/stage-runner.sh`) and the subprocess form (heterogeneous agents, each carried by an
+independent child process of its own CLI).** Every surface below *declares dispatch* somewhere in its text; the
+correction rewrites that declaration to state the ban and the two carriers (by pointer to FR-035 / C-094), and its
+implement row is named here. The row set is closed: a surface not listed was measured as already covered by
+T139/T140/T142/T116/T133/T037/T060/T099/T132.
+
+| # | Dispatch-declaring surface | Severity | Row | Correction content |
+|---|---|---|---|---|
+| 1 | `skills/external/sdd-loop-driver/SKILL.md` | — | T139, T142 | already scheduled (N-Worker analyze; fork mechanism) |
+| 2 | `skills/external/sdd-loop-driver/references/dispatch-recipes.md` | — | T139, T142 | already scheduled (本地原生拓扑 + Recipe 2) |
+| 3 | `skills/external/sdd-loop-driver/references/watch-model.md` | MEDIUM | T146 | watch model extended to the local fork carrier; in-process path is not a carrier |
+| 4 | `skills/external/sdd-loop-driver/references/decomposition-model.md` | — | T140 | already scheduled (§ 20.1 analyze default) |
+| 5 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | MEDIUM | T146 | the two-topology rule becomes fork / subprocess; ban stated |
+| 6 | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | — | T116, T133 | already scheduled (team obligation + slot pointer) |
+| 7 | `skills/external/sdd-house-keeping/SKILL.md` | HIGH | T144 | invert "MUST NOT 启动 qodercli" (~L109/L140/L144); ban + two carriers |
+| 8 | `skills/external/sdd-house-keeping/references/maintenance-recipes.md` | HIGH | T144 | H2 Carrier line (~L35): fork / subprocess; ban stated |
+| 9 | `skills/external/sdd-project-setup/SKILL.md` | HIGH | T145 | invert "MUST NOT 启动 qodercli" (~L57/L59/L73/L104); ban + two carriers |
+| 10 | `skills/external/sdd-project-setup/references/setup-recipes.md` | HIGH | T145 | Carrier paragraph (~L109): fork / subprocess; ban stated |
+| 11 | `skills/external/coaching-skills/SKILL.md` | MEDIUM | T147 | "host-native first" (~L276) replaced by fork / subprocess; ban stated |
+| 12 | `skills/internal/analyze-artifacts/references/validation-and-report.md` | MEDIUM | T148 | Dispatch carrier paragraph (~L36): the two carriers + ban |
+| 13 | `shared/workflow/execution-topology.md` | MEDIUM | T149 | local carrier bullet (~L33): fork / subprocess; ban stated |
+| 14 | `shared/workflow/external-dispatch-recipes.md` | MEDIUM | T150 | SDD boundary (~L18) + Recipe 7 (~L91): the two carriers + ban |
+| 15 | `shared/definitions/agent-definitions.md` | MEDIUM | T151 | execution layer names the carrier; in-process ban pinned |
+| 16 | `shared/definitions/subagent-definitions.md` | — | T037, T060, T099, T132 | already scheduled (dispatch capability + three modes) |
+| 17 | `tests/contract/test_sdd_loop_driver_skill.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
+| 18 | `tests/contract/test_sdd_project_setup_skill.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
+| 19 | `tests/contract/test_coaching_run_contract.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
+| 20 | `tests/contract/test_sdd_carrier_contract.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
+
+Task rows T144–T152 are appended in Phase 8 of `tasks.md`; each row carries the ban sentence and both carriers in
+its own text, so a reader of the row can judge it without this table.
 
 ## Complexity Tracking
 

@@ -145,6 +145,12 @@ Measured: this planning stage ran in one agent with `Read, Grep, Glob, Bash, Wri
 Spec Assumption A4 anticipates exactly this and FR-033 requires the record `mechanism-not-yet-landed`
 ([[STR-010]]).
 
+> **Correction (2026-11-09, analyze-repair round 2 · V3-F4)**: the measured premise above — "no dispatch tool" —
+> was itself measured false at analyze (F-093-012): the same host body held a dispatch tool, and a tool set is a
+> per-run probe (RS-005), never a constant. The paragraph is retained as the dated reading; the live reason for
+> `not_evaluated` is `mechanism-not-yet-landed` — the feature's own mechanism (the declaration facts, the engine,
+> and the FR-035 runner path) is what is absent.
+
 **Ruling**: SC-006 stays `not_evaluated` with the carrier named (a later real run), and the plan states it in
 § Concurrency plan for this run. The 092 run record remains the *reproduction* case, never the proof.
 

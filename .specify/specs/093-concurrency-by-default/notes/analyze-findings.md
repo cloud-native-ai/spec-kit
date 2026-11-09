@@ -94,6 +94,8 @@ Owner declaration (the ruling's home, so it is not re-derived next time): `templ
   - **SC-006 stays `not_evaluated`, unchanged.** Whether *this* stage could dispatch is a different unit from whether the feature's own mechanism landed; the mechanism (`effective >= 2` recorded on a real run with per-unit intervals) is still this feature's deliverable and is absent. The feature's own discipline says the honest value is `not_evaluated` — never `0`, never "concurrency proven by a fixture" — and this stage honours it. Do **not** read this disclosure as an attempt to close SC-006.
   - **The premise dispute is a requirements-quality defect**, filed as F-093-012: the stage statement records a tool *set* rather than a runtime *capability*, and its own affected-task pointer is wrong.
 
+> **Correction (2026-11-09, analyze-repair round 2 · V3-F9)**: the count in the disclosure above is imprecise and is retained as a dated record: measured, only checkpoints **03 / 04 / 05** assert "no dispatch tool"; checkpoints **01 / 02** record serial execution from a different, still-valid reason ("single read/write package/slice"). The same correction applies to § 5 item 6 below.
+
 ---
 
 ## 4. Findings
@@ -191,6 +193,8 @@ Carried into the spine's `framework_observations`; each is a stage-external scri
 4. **`doc-consistency-check.py` reader face judges only `READER_MARKERS`** — it never resolves CHK anchors; `reader=pass` means "the file declared its readers", never "the items are good".
 5. **A framework source template can name an owner that does not exist and nothing notices** (F-093-015). A pointer-resolution check over `templates/` would catch it; three prior features copied the dead path.
 6. **The stage record's "executor tool set" is not a property of the host** (F-093-012): five consecutive stages asserted "no dispatch tool" from one probe, while the executor running them held one. A capability recorded as a constant is exactly what `requirements.md` RS-005 forbids — the framework's own stage protocol commits the defect the feature exists to fix.
+
+> **Correction (2026-11-09, analyze-repair round 2 · V3-F9)**: "five consecutive stages" overstates the set — measured, checkpoints 03 / 04 / 05 carried the claim; 01 / 02 recorded serial from a different reason. The item is retained as a dated record.
 
 ---
 
