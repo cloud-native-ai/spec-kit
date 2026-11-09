@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
+disposition: "processed"
 partial: false
 created: "2026-11-06T04:50:13Z"
 summary: "analyze round 1 produced 22 findings (1 critical / 3 high / 13 medium / 5 low); the four checklist-named items were adjudicated (CHK027 high, CHK052 medium with a corrected premise, CHK056 low, CHK012"
+introspection_ref: "introspection-20261108T192504Z#F-11"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-11"
 ---
 
 ## Review

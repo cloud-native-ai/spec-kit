@@ -1,0 +1,164 @@
+..................F..................................................... [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+..............F......................................................... [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+.......................................................F................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+....................................................................F... [ 15%]
+........................................................................ [ 16%]
+.......s................................................................ [ 16%]
+........................................................................ [ 17%]
+.....................................F.................................. [ 18%]
+F.F..................................................................... [ 19%]
+........................................................................ [ 20%]
+............F.....................F..................................... [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+.......F................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 33%]
+......................................F..F.............................. [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+...................................F.................................... [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+..........................F............................................. [ 49%]
+........................................................................ [ 50%]
+............................................F........................... [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+................................................F..............F..F..... [ 60%]
+................s..........F............................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+..F.........F........................................................... [ 68%]
+....................F................................................... [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................F............................... [ 73%]
+.....................................................................F.. [ 74%]
+................................................F....................... [ 75%]
+........................................................................ [ 75%]
+......F................................................................. [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+.F...................................................................... [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+.................FFF..........F....................FFFF...........F..... [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [100%]
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_execution_config_engine.py::TestErrorsAndWarnings::test_warning_surface_is_json_and_stderr
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+FAILED tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/git-utils/assets/git-workflow-block.md->.specify/skills/git-utils/assets/git-workflow-block.md]
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root
+FAILED tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+FAILED tests/contract/test_script_interface_contract.py::test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker
+FAILED tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+FAILED tests/contract/test_spec_feature_binding_integrity.py::test_c2_active_spec_feature_bindings_resolve
+FAILED tests/contract/test_summary_writeset.py::test_write_whitelist_is_the_goal_directory_not_the_team_directory
+FAILED tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+FAILED tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+FAILED tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+FAILED tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+FAILED tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+FAILED tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+FAILED tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+FAILED tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+FAILED tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+36 failed, 8026 passed, 2 skipped, 3 warnings in 569.90s (0:09:29)

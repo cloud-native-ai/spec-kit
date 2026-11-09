@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T09:38:56Z"
 summary: "Part 5 (T065-T076) closes the implement stage without adding a product byte: the twelve rows are verification, parity and registration. All readings land where the recorded baselines are — the exact n"
+introspection_ref: "introspection-20261108T192504Z#F-03"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-03"
 ---
 
 ## Review

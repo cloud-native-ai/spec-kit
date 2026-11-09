@@ -1,8 +1,8 @@
 """Contract test: git-workflow branch data lives in a dedicated state file.
 
 The skill records branch roles into the managed block of
-``docs/git-workflow.md`` — the single source of truth for every git
-operation. The instructions template carries only a pointer section; an inline
+``.specify/workflow/git.md`` — the single source of truth for every git
+operation under the Spec Kit framework. The instructions template carries only a pointer section; an inline
 ``## Git Workflow`` block inside the instructions file is legacy content that
 ``/speckit.instructions`` migrates into the state file.
 """
@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "templates" / "instructions-template.md"
 INSTRUCTIONS_CMD = REPO_ROOT / "templates" / "commands" / "instructions.md"
 LIVE_INSTRUCTIONS = REPO_ROOT / ".specify" / "instructions.md"
-STATE_FILE = REPO_ROOT / "docs" / "git-workflow.md"
+STATE_FILE = REPO_ROOT / ".specify" / "workflow" / "git.md"
 SKILL_DIR = REPO_ROOT / "skills" / "external" / "git-utils"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 BLOCK_ASSET = SKILL_DIR / "assets" / "git-workflow-block.md"
@@ -35,7 +35,9 @@ def test_template_git_workflow_section_is_a_pointer():
     assert HEADING in text, "instructions template must keep the Git Workflow section heading"
     assert START not in text and END not in text, \
         "the managed block must not live in the instructions template anymore"
-    assert "docs/git-workflow.md" in text, "pointer must name the dedicated state file"
+    assert ".specify/workflow/git.md" in text, "pointer must name the dedicated state file"
+    assert "framework-level declaration" in text, \
+        "the pointer must state the framework-level concept, not a per-project choice"
     assert "Resource Registry" not in text, "registry section must be gone from the template"
 
 
@@ -45,7 +47,7 @@ def test_instructions_command_owns_the_migration_path():
     # actions, migration steps) into the manage-instructions skill; the migration-path
     # ownership guard follows the content.
     text = (REPO_ROOT / "skills" / "internal" / "manage-instructions" / "SKILL.md").read_text(encoding="utf-8")
-    assert "docs/git-workflow.md" in text, "scope zones must name the state file"
+    assert ".specify/workflow/git.md" in text, "scope zones must name the state file"
     assert "git-utils` skill" in text, "the state file's owner must be named"
     assert "MUST NOT be lost" in text, \
         "legacy branch-role migration into the state file must be data-preserving"
@@ -58,7 +60,9 @@ def test_state_file_carries_the_managed_block():
     assert text.index(START) < text.index(END), "markers out of order"
     block = text[text.index(START):text.index(END)]
     assert "**Workflow model**:" in block, \
-        "block must declare the project's chosen workflow model (per-project choice)"
+        "block must declare the chosen workflow model (framework-level declaration)"
+    assert "framework-level declaration under Spec Kit" in block, \
+        "block must state the framework-level (not per-project) concept"
     assert "None yet." in block, "unestablished workflow must keep the placeholder row"
     assert "**Last updated**:" in block, "block must be dated"
 
@@ -69,14 +73,15 @@ def test_live_instructions_carry_only_the_pointer():
     assert HEADING in text, "live instructions must keep the pointer section"
     assert START not in text and END not in text, \
         "live instructions must not carry the managed block (legacy content migrated out)"
-    assert "docs/git-workflow.md" in text, "pointer must name the state file"
+    assert ".specify/workflow/git.md" in text, "pointer must name the state file"
 
 
 @pytest.mark.contract
 def test_skill_reads_and_writes_the_state_file_not_a_document():
     text = SKILL_MD.read_text(encoding="utf-8")
     assert "## Git Workflow 块维护" in text, "skill must document block maintenance"
-    assert "docs/git-workflow.md" in text, "skill must target the dedicated state file"
+    assert ".specify/workflow/git.md" in text, "skill must target the dedicated state file"
+    assert "Spec Kit 框架下" in text, "skill must state the framework-level concept"
     assert "归口 instructions 文件的 `## Git Workflow` 块" not in text, \
         "the instructions file must no longer be named as the block's home"
     # the previous data-source contract (frontmatter of a memory document) must be gone
@@ -91,8 +96,10 @@ def test_block_asset_is_a_full_file_template():
     assert START in asset and END in asset, "block asset must ship the markers"
     assert "# Git Workflow" in asset, \
         "asset must render the whole state file, header included"
+    assert "FRAMEWORK-LEVEL DECLARATION" in asset, \
+        "asset must state the framework-level (not per-project) concept"
     assert "<MODEL>" in asset and "<MODEL_SPECIFIC_LINES>" in asset, \
-        "asset must carry the model-declaration placeholders (per-project model choice)"
+        "asset must carry the model-declaration placeholders"
     for placeholder in ("<MAIN>", "<PRE>", "<DEV>", "<MAIN_TRACKING>", "<DATE>"):
         assert placeholder in asset, f"block asset missing placeholder {placeholder}"
 
@@ -102,7 +109,8 @@ def test_lookup_reference_pins_marker_only_replacement_and_single_source():
     text = LOOKUP_REF.read_text(encoding="utf-8")
     assert "只替换" in text and START in text, \
         "write rule must confine edits to the marker range"
-    assert "docs/git-workflow.md" in text, "lookup must resolve to the fixed state file"
+    assert ".specify/workflow/git.md" in text, "lookup must resolve to the fixed state file"
+    assert "Spec Kit 框架下" in text, "lookup must state the framework-level concept"
     assert "单一数据源" in text, "reference must forbid a second branch-data source"
     assert "归口 instructions 文件" not in text, \
         "lookup must not route branch reads/writes through the instructions file anymore"
@@ -116,6 +124,8 @@ def test_legacy_stores_are_only_referenced_as_migration_sources():
     text = SKILL_MD.read_text(encoding="utf-8")
     assert ".specify/git-workflow.md" in text and ".specify/memory/git-workflow.md" in text, \
         "Phase 0 must detect both legacy config locations"
+    assert "docs/git-workflow.md" in text, \
+        "Phase 0 must detect the previous docs/ location as a legacy source"
     assert "不自动删除" in text, "legacy files must never be deleted automatically"
     boot = BOOTSTRAP_REF.read_text(encoding="utf-8")
     assert "不再生成独立工作流文档" in boot, "bootstrap must keep the no-second-document rule"

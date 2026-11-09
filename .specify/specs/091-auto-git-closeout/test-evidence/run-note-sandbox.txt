@@ -1,0 +1,16 @@
+# Why the two full-suite runs differ (implement completion slice 2, 2026-11-09)
+
+Three concurrent full-suite runs were started while the tree was being edited. Their readings are kept
+here so no later reader mistakes one for the other.
+
+| # | selection | reading | what it proves |
+|---|---|---|---|
+| 1 | `tests/` minus R-36a's three modules, serial | `34 failed, 7854 passed, 2 skipped` | a mid-repair reading only: the C-5 containment guard was still red at that moment, and the run carried no R-36a ids |
+| 2 | same selection, started while `sync-mirrors.py` and the humanize edit were still in flight | `42 failed, 8037 passed, 2 skipped` | NOT an acceptance reading: it caught the tree mid-edit (twelve mirror/byte-state ids red, exactly the ones the final run has green). Kept as evidence, not as the verdict |
+| 3 | **`tests/` entire — the acceptance reading** | **`34 failed, 8045 passed, 2 skipped`, 566.07s** | GATE-1's reading: `final-failed.txt` holds 34 ids — 30 entry-baseline ids plus R-36a's 4 `test_compile_embeds.py` ids, which were re-proven red at `HEAD` with this feature stashed. NEW with R-36a applied: **0**. Cleared: **6** |
+
+Runs 1 and 2 are kept because they were started while the tree was being edited, and a later reader must not
+mistake one of them for the verdict. Only run 3 is cited by `verification.md`.
+
+The comparison unit is the **failed node-id set** against `baseline-failed.txt`; the passed total is
+selection-dependent and is never used as a criterion.

@@ -167,8 +167,10 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
 # 预期：verdict = missing / reason = orphan-rendered（源在、渲染面缺）; summary.converged = false ; summary.clean = false ; exit 0
 
 # 3) 面序对照：两面都在、只是源更新 ⇒ stale（不是 missing）。`stale-source/` 的 mtime 不等式是**复制到
-#    tmp_path 时**由 helpers.apply_mtime_step 造出来的夹具事实（git 不存 mtime），所以本条要在副本上跑：
-#    SPACE="$(mktemp -d)/space-stale-source" && cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"
+#    受制裁临时目录时**由 helpers.apply_mtime_step 造出来的夹具事实（git 不存 mtime），所以本条要在副本上跑：
+#    mkdir -p .specify/.tmp && SPACE="$(mktemp -d .specify/.tmp/space-stale-source.XXXXXX)/space-stale-source"
+#    cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"
+#    python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, "tests/fixtures/docs-obligation"); import helpers; helpers.apply_mtime_step(Path(sys.argv[1]))' "$SPACE"
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root "${SPACE}" \
   --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json

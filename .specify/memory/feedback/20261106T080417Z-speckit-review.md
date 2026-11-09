@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:04:17Z"
 summary: "- 四段评审可执行性：本仓 `/speckit.review` 一次跑完过程/产物/实现/代码四段 + ARC，四段的结论载体（`review.md` § 2.1–2.4 与 `features/087.md` § Latest Review）都可落盘、可复核，代码段的 base 解析（`feature-first-commit` → `24cb4edc`）与覆盖收据（`166/166/0/0`）"
+introspection_ref: "introspection-20261108T192504Z#F-01"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-01"
 ---
 
 ## Review

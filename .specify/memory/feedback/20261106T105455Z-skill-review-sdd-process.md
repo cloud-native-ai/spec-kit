@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:54:55Z"
 summary: "Process segment round 3: pass. The round-3 repair commit 4fb0f1aa is a documentation-and-guard repair with a declared plan-edit set; plan audit undeclared=false; no new process finding. F10/F11 remain"
+introspection_ref: "introspection-20261108T192504Z#F-04"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-04"
 ---
 
 ## Review

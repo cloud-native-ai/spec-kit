@@ -317,6 +317,16 @@ Feature 085 legitimately edits the comparison unit to add the temporary Goal/Tea
 | 41 | `templates/commands/goal.md` | 改写（085 --scope/--spec-dir） | 是 |
 | 42 | `templates/commands/team.md` | 改写（085 --scope/--spec-dir） | 是 |
 
+### 091 追加登记（2026-11-09）
+
+Feature 091 adds one reference file inside the comparison unit (`skills/external/git-utils/` is a
+shipped skill). The row is registered so the SC-003 containment guard stays decidable; the 083 and
+085 rows above keep their own meaning and count.
+
+| # | 路径 | 类别 | 属比较单元 |
+|---|---|---|---|
+| 43 | `skills/external/git-utils/references/closeout-commands.md` | 新增（091 具名操作 `closeout` 的命令面） | 是 |
+
 **结构不变量**：第 21–42 行是 085 的追加登记，不改变 083 第 1–20 行的计数与含义；比较单元的分母仍是“baseline 路径 + 本表 in-unit 新增路径”，由 `test_mechanism_policy_guard.py` 的同一解析器读取。
 
 ## 实体关系

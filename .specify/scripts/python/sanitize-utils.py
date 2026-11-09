@@ -694,7 +694,7 @@ def check_legacy_install_residue(root: Path) -> list:
             if (root / rel).is_file():
                 findings.append(_finding(
                     "stale-residue", rel,
-                    "旧代 git-workflow 状态文件:新模型状态面在 docs/git-workflow.md——"
+                    "旧代 git-workflow 状态文件:新模型状态面在 .specify/workflow/git.md——"
                     "归档本文件,并经 git-utils 技能 bootstrap 核对分支状态已迁移",
                     disposition="archive"))
     legacy_tools = root / ".specify" / "tools"

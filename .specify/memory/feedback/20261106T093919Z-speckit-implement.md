@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T09:39:19Z"
 summary: "Token-efficiency self-assessment for the wrap-up (TOKEN-REFLECTION supplement): the eleven rows of this part's machine-managed readings (pytest summaries, JSON payloads from the obligation engine, mir"
+introspection_ref: "introspection-20261108T192504Z#F-14"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-14"
 ---
 
 ## Review

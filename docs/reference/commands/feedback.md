@@ -26,13 +26,13 @@ The hat test is mechanical: the repository root owns the canonical framework **s
 The **inventory** step is where the old probe overview lives — a step the judgment needs, not a destination of its own. It prints every probe placed in the current project as a vertical tree: kind (internal/external) → class (target slice, collection, processing) → objects (unit @ lifecycle point), rendered from the merged truth source and never a hand-maintained list.
 
 ```bash
-python3 .specify/scripts/python/feedback-utils.py --action probes           # tree (text)
-python3 .specify/scripts/python/feedback-utils.py --action probes --format json
-python3 .specify/scripts/python/feedback-utils.py --action probes --validate    # schema
-python3 .specify/scripts/python/feedback-utils.py --action probes --reconcile   # objects↔embeds audit
-python3 .specify/scripts/python/feedback-utils.py --action map              # rebuild probe-map.md
+python3 .specify/scripts/python/probe-utils.py --action probes           # tree (text)
+python3 .specify/scripts/python/probe-utils.py --action probes --format json
+python3 .specify/scripts/python/probe-utils.py --action probes --validate    # schema
+python3 .specify/scripts/python/probe-utils.py --action probes --reconcile   # objects↔embeds audit
+python3 .specify/scripts/python/probe-utils.py --action map              # rebuild probe-map.md
 python3 .specify/scripts/python/feedback-utils.py --action status
-python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --format json
+python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --limit 0 --format json
 ```
 
 ## Path A — Digest In This Project

@@ -248,7 +248,7 @@ def normalize_entry_declaration(entry: dict | None = None) -> dict:
                 "decomposition_stages[%s] must be auto|on|off" % stage
             )
         stages[stage] = mode
-    slot_cap = entry.get("decomposition_slot_cap", 2)
+    slot_cap = entry.get("decomposition_slot_cap", 6)
     if isinstance(slot_cap, bool) or not isinstance(slot_cap, int) or slot_cap < 1:
         raise ValueError("decomposition_slot_cap must be a positive integer")
     return {

@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
+disposition: "processed"
 partial: false
 created: "2026-11-06T04:14:09Z"
 summary: "down"
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review

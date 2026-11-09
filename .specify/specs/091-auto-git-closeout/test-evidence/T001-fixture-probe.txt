@@ -1,0 +1,37 @@
+# T001 — fixture mechanism probe (2026-11-09)
+
+Purpose: prove on this host that a throwaway repository plus a local bare remote can be
+created under `tempfile.TemporaryDirectory()` and torn down afterwards, so every later
+fixture row (T030/T034/T035/T039/T040/T044) rests on a measured mechanism rather than an
+assumption. No network is contacted.
+
+Command (verbatim, run in /storage/project/cloud-native-ai/spec-kit): a heredoc feeding
+/usr/bin/python3 that runs git init -b master, git init --bare, add + commit, remote add
+mirror, push, then git --git-dir <bare> for-each-ref, then shutil.rmtree.
+
+Reading:
+
+    temp root: /tmp/091-fixture-probe-22i1pges
+    init repo: 0
+    init bare: 0
+    add: 0
+    commit: 0
+    remote add: 0
+    push: 0
+    bare refs: ['refs/heads/master']
+    torn down: True
+
+Exit status: 0.
+
+Conclusions carried into the fixture helper (tests/fixtures/git-closeout/):
+- `git init -q -b <name>` works on this host (git 2.43.5), so a fixture can name its trunk
+  branch instead of renaming after the fact.
+- A local bare repository accepts a push with no network and no credentials.
+- `git --git-dir <bare> for-each-ref --format=%(refname)` is the reading form for
+  "what does the remote actually hold", which is the end-state assertion C-2 demands.
+- Committer identity is injected through the environment (GIT_* variables) because the host
+  has no guaranteed global identity; the helper sets them per fixture.
+- shutil.rmtree on the temp root succeeded, so teardown is verifiable per test.
+
+Evidence landing points created in this row: .specify/specs/091-auto-git-closeout/notes/
+and .specify/specs/091-auto-git-closeout/test-evidence/ (both exist and are non-empty).

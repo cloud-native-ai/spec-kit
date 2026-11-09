@@ -8,9 +8,12 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
+disposition: "processed"
 partial: false
 created: "2026-11-06T12:25:49Z"
 summary: "pass"
+introspection_ref: "introspection-20261108T191359Z#F-01"
+disposition_reason: "introspection:introspection-20261108T191359Z#F-01"
 ---
 
 ## Review

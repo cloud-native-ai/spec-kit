@@ -615,6 +615,59 @@ def channel_section_lines() -> list[str]:
     return lines[start:end]
 
 
+def _wrap_up_section(text: str) -> list[str]:
+    """The `## Wrap-up` section's lines — the compiled region, and only that region."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip() == "## Wrap-up":
+            start = index
+            break
+    assert start is not None, "the compiled `## Wrap-up` section is missing"
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return lines[start:end]
+
+
+def closeout_step_delta(rel_path: Path, revision: "str | None" = None) -> tuple[str, str]:
+    """``(old_step_line, new_step_line)`` — the compiled close-out step line, if it moved.
+
+    The third sanctioned delta, and the same kind of object as the banner above: Feature 091
+    (the singular close-out) appended one wrap-up handler row to the registry that
+    ``probe-utils.py --action compile-embeds`` compiles from, so every compiled face gained
+    the step. It is *read out of git* rather than pinned as a literal for the same reason:
+    the criterion stays "the compiled close-out line is the only other line this compiled
+    region gained, and it is exactly one line", which is decidable at any future recompile.
+
+    Scope is deliberately the `## Wrap-up` section: a close-out line moved into prose, a
+    second compiled close-out line, or the line appearing anywhere else in the file still
+    turns the containment check red. Returns ``("", "")`` when the baseline already carried
+    the line, so the check degrades to "no delta" rather than to a vacuous allow-list.
+    """
+    revision = revision or BASELINE_COMMIT
+    old_lines = _wrap_up_section(git_show(rel_path, revision))
+    new_lines = _wrap_up_section(read(rel_path))
+    pattern = re.compile(r"^\d+\. Closeout \u2014 ")
+    old_steps = [line for line in old_lines if pattern.match(line)]
+    new_steps = [line for line in new_lines if pattern.match(line)]
+    if not old_steps and not new_steps:
+        return "", ""
+    assert not old_steps, (
+        f"{rel_path.relative_to(ROOT)}: the baseline {revision} already carries a compiled "
+        f"close-out step, so this projection's delta is not the one it declares: {old_steps!r}"
+    )
+    assert len(new_steps) == 1, (
+        f"{rel_path.relative_to(ROOT)}: the compiled wrap-up face must carry exactly one "
+        f"close-out step, found {len(new_steps)}"
+    )
+    extra = [line for line in new_lines if pattern.match(line) and line not in new_steps]
+    assert not extra, f"{rel_path.relative_to(ROOT)}: duplicate close-out step lines {extra!r}"
+    return "", new_steps[0]
+
+
 def rounds_section_lines() -> list[str]:
     """SKILL.md's `## Rounds` section, line-for-line (trailing blank line included).
 
@@ -1077,15 +1130,19 @@ class TestScenarioBAnalyzeStructuralChannel:
         )
 
         # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only
-        # deltas are the pass-enumeration paragraph, the `## Rounds` section (the
-        # latter added by Feature 081c, f892c8a8, 2026-11-03 — the two-round
-        # adjudication; see rounds_section_lines), and the compiled Wrap-up banner
-        # (see compiled_banner_delta below). The added-line multiset must equal
-        # paragraph-delta ∪ Rounds-section ∪ banner-line exactly (hunk order is file
-        # order, so the comparison is order-free); any fourth delta stays red.
+        # deltas are the pass-enumeration paragraph, the `## Rounds` section (added by
+        # Feature 081c, f892c8a8, 2026-11-03 — the two-round adjudication; see
+        # rounds_section_lines), the compiled Wrap-up banner (see compiled_banner_delta
+        # below) and the compiled close-out step line (added by Feature 091, the
+        # singular close-out that appended one wrap-up handler row to the registry this
+        # face is compiled from; see closeout_step_delta below — both machine-owned).
+        # The added-line multiset must equal paragraph-delta ∪ Rounds-section ∪
+        # banner-line ∪ close-out-line exactly (hunk order is file order, so the
+        # comparison is order-free); any fifth delta stays red.
         old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
         new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
         old_banner, new_banner = compiled_banner_delta(ANALYZE_SKILL)
+        _, closeout_step = closeout_step_delta(ANALYZE_SKILL)
         removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
         assert removed_skill == (
             [line for line in old_paragraph if line not in new_paragraph]
@@ -1098,6 +1155,7 @@ class TestScenarioBAnalyzeStructuralChannel:
             [line for line in new_paragraph if line not in old_paragraph]
             + rounds_section_lines()
             + [new_banner]
+            + ([closeout_step] if closeout_step else [])
         )
         assert Counter(added_skill) == allowed_added, (
             "C-5: SKILL.md gained a change outside the enumeration paragraph, the Rounds "

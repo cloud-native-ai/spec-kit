@@ -275,7 +275,7 @@ Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. A
 Full model (Qoder CLI vs IDE, detection, regeneration): `.specify/shared/workflow/symlink-model.md`.
 
 ## Git Workflow
-This project's git workflow is a **per-project choice** (a suggestion for managing the repo well, not a framework mandate) — common models include single-branch, dual-branch, temp-branch and the MAIN/PRE/DEV three-tier. The `git-utils` skill (scope A) maintains whichever model this project declared in **`docs/git-workflow.md`**: that managed block is the **single source of truth** for every git operation here — do not edit it by hand and do not record branch information anywhere else. The operational procedure lives in the skill and its references.
+Under the **Spec Kit framework**, the git workflow is a **framework-level declaration**, not a personal habit: unattended mechanisms (SDD driver, house-keeping, feedback digest, close-out) commit, merge and push on a cadence, so the model constrains both human and automated executors. Models: single-branch, dual-branch, temp-branch, MAIN/PRE/DEV. The `git-utils` skill (scope A) maintains whichever model this project declared in **`.specify/workflow/git.md`**: that managed block is the **single source of truth** for every git operation here — do not edit it by hand and do not record branch information anywhere else. Procedure: the skill and its references.
 
 ## Skills & Tools
 No registration tables — agents discover resources from the filesystem:

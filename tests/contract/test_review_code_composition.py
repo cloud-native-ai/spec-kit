@@ -535,9 +535,17 @@ def test_c16_the_compiled_wrap_up_face_is_untouched():
         "the compiled face keeps its compilation marker"
     )
     steps = re.findall(r"(?m)^\d+\. ", wrap)
-    assert len(steps) == 6, (
-        "the compiled `## Wrap-up` face keeps its six steps; found "
-        f"{len(steps)}: {steps!r}"
+    # Re-pinned by Feature 091: the wrap-up handler registry gained one row (`h-closeout`,
+    # order 60), and this face is COMPILED from that registry — so the whole face is still the
+    # registry's output, which is what C-16 protects ("the compiled face is not edited"). The
+    # former `== 6` froze a count the registry owns; the pin now asserts the face is one step
+    # per registry row, with the close-out step's presence and owner path checked explicitly.
+    assert len(steps) == 7, (
+        "the compiled `## Wrap-up` face renders one step per registry row (7 after 091's "
+        f"`h-closeout`); found {len(steps)}: {steps!r}"
+    )
+    assert "Closeout" in wrap and "shared/workflow/artifact-commit-step.md" in wrap, (
+        "the added closing step is the close-out step and it reaches its one owner by path"
     )
 
 

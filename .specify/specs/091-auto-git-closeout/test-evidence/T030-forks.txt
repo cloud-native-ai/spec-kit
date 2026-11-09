@@ -1,0 +1,41 @@
+# T030 — the two wrap-up forks, measured on fixture repositories (2026-11-09)
+
+Row: T030 (US2, blockedBy T032) — green tag on `contracts/closeout-verification.contract.md#C-2`
+Clause owner of the behaviour: `contracts/closeout-lifecycle.contract.md#C-6` (the three forks)
+
+## Why this file exists
+
+T030's row text names a capture path (`.specify/specs/091-auto-git-closeout/test-evidence/T030-forks.txt`)
+and slice 1 landed the guard without the capture. This file supplies it, so the row is closed on a
+reading that was produced in this run rather than on the guard's existence alone.
+
+## The two arms the row names, and the code that carries them
+
+| Fork | Where it is asserted | What it asserts |
+|------|----------------------|-----------------|
+| read-only run — skip with one line, no empty commit | `test_closeout_section_exists_after_the_commit_and_after_the_record_steps` + the lifecycle section's fork 1 sentence; the behavioural arm is `test_the_three_forks_are_three_distinct_behaviours` | the section names fork 1 as "skip, one line, no empty commit", and the derived plan for a read-only run carries no `commit` step |
+| artifacts without records — merge and push still happen, and say so | same module, `test_three_forks_are_three_distinct_behaviours` + `test_report_field_set_is_enumerated_and_omission_is_a_defect` | the plan keeps `merge` and `push`, and the report's field set has a slot for "records commit absent, with the reason" |
+| other line's uncommitted files — reported, never staged | `test_another_lines_dirty_file_is_a_deviation_and_never_staged` | the commit holds only the explicit paths; the dirty file appears in `outcome.deviations` |
+
+## Command (verbatim) and its reading
+
+    $ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest \
+        tests/contract/test_git_closeout_contract.py -q -rA \
+        -k "fork or merge_conflict or rejected_push or dirty_file or single_and_dual or three_tier"
+    ......                                                                   [100%]
+    PASSED tests/contract/test_git_closeout_contract.py::test_three_forks_are_three_distinct_behaviours
+    PASSED tests/contract/test_git_closeout_contract.py::test_single_and_dual_branch_models_reach_the_expected_end_state
+    PASSED tests/contract/test_git_closeout_contract.py::test_three_tier_model_advances_through_the_intermediate_branch
+    PASSED tests/contract/test_git_closeout_contract.py::test_a_rejected_push_stops_before_the_remote_changes
+    PASSED tests/contract/test_git_closeout_contract.py::test_a_merge_conflict_stops_before_any_push
+    PASSED tests/contract/test_git_closeout_contract.py::test_another_lines_dirty_file_is_a_deviation_and_never_staged
+    6 passed, 35 deselected in 0.42s
+    exit status: 0
+
+## Recorded limit (not papered over)
+
+The read-only fork's "no empty commit" half is asserted **structurally** (the plan for a read-only
+run contains no `commit` step) plus by the section's own sentence; there is no fixture that runs a
+read-only close-out through `run_closeout`, because a read-only run never reaches the close-out at
+all (fork 1 is the *absence* of a run). The behavioural proof of "no empty commit" therefore stays a
+structural read of the derivation, and that is stated here rather than implied.

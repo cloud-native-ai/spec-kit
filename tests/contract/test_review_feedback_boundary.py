@@ -121,8 +121,20 @@ COMMAND_CLOSING_STEPS = (
     "Threshold Notice",
     "Token Reflection",
     "Docs Sync Eval",
+    "Closeout",
+    # Feature 091 appended one wrap-up handler row (`h-closeout`, order 60) to the registry the
+    # compiled faces are generated from, so every command face now renders this step. C-55's
+    # subject is that the compiled face is NOT hand-edited and that no side channel is added; the
+    # set itself is the registry's, so the pin follows the compiled output rather than freezing a
+    # count the registry owns. Deliberate, same shape as the RC-19 re-pin the sibling module
+    # documents; disclosed in the feature's verification record.
 )
-SKILL_CLOSING_STEPS = COMMAND_CLOSING_STEPS[:5]
+#: A delegated skill's face is the same registry compiled for a skill unit: the wrap-up handlers
+#: bind `all` units (unlike the `gate`-class handlers), and the feature-072 five-step subset is
+#: what a *skill* face rendered before 091. 091's `h-closeout` binds every wrap-up unit, so a skill
+#: face carries six: the same five plus the close-out step. The subset relation is preserved —
+#: this is still `COMMAND_CLOSING_STEPS` minus the gate-class step — never a hand-written list.
+SKILL_CLOSING_STEPS = tuple(s for s in COMMAND_CLOSING_STEPS if s != "Docs Sync Eval")
 
 #: The six-level code vocabulary, owned by the code-review skill's own contract.
 CODE_SEVERITIES = ("blocking", "important", "suggestion", "nitpick", "question", "praise")
@@ -378,8 +390,8 @@ def _frontmatter_field(entry: str, field: str) -> str:
 def test_c55_the_command_closing_step_set_is_the_published_six():
     face = _section(_cmd(), "## Wrap-up", "## Handoffs")
     assert _steps(face) == COMMAND_CLOSING_STEPS, (
-        "the command's closing step set MUST stay exactly as published — six steps "
-        f"in this order; found {_steps(face)!r}"
+        "the command's closing step set MUST stay exactly as published, one step per "
+        f"registry row, in this order; found {_steps(face)!r}"
     )
 
 
@@ -390,7 +402,8 @@ def test_c55_both_delegated_skill_faces_keep_their_five_step_set():
     ):
         face = _section(text, "## Wrap-up", None)
         assert _steps(face) == SKILL_CLOSING_STEPS, (
-            f"{path} MUST keep its five-step closing face; found {_steps(face)!r}"
+            f"{path} MUST keep its published closing face (the registry's non-gate steps, "
+            f"six after 091); found {_steps(face)!r}"
         )
 
 

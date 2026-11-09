@@ -1,0 +1,109 @@
+# SC-006 dry run — derive this repository's close-out sequence, print it, write nothing
+
+Date: 2026-11-09
+Row: T055 (blockedBy T049, T031) — SC-006: the sequence is derivable and printable, and
+the dry run performs no remote write.
+
+## The derivation input (read from this project's own declaration)
+
+$ python -c "...parse_block(Path(\".specify/workflow/git.md\").read_text())"
+BlockState(state='declared', model='临时分支（trunk-based）—— ...', strategy='commit+merge+push', remotes=('github','gitlab','gitee'), remotes_absent=False, readonly=('origin',))
+
+## The command
+
+$ python .specify/specs/091-auto-git-closeout/test-evidence/dry-run-closeout.py
+  # driver: tests/fixtures/git_closeout (derive_closeout) — pure planning, read-only;
+  # it shells no git command, so the run cannot write a ref even by accident.
+
+## Its output
+
+==============================================================================
+declared model   : 临时分支（trunk-based）—— 单主干 + 短命特性分支；开发在临时分支上进行，完成即合入主干并删除
+strategy value   : commit+merge+push
+push targets     : ('master',)   read-only: ('origin',)
+terminal state   : executed
+   1. branch  091-fixture :: cut from master
+   2. commit  091-fixture :: artifact + records commit
+   3. merge   master :: 091-fixture -> master
+   4. delete-branch 091-fixture :: local only, after the merge landed
+   5. push    <remote> :: push the trunk
+  receipt steps  : ()
+==============================================================================
+declared model   : 临时分支（trunk-based）—— 单主干 + 短命特性分支；开发在临时分支上进行，完成即合入主干并删除
+strategy value   : ask  (dry-run override)
+push targets     : ('master',)   read-only: ('origin',)
+terminal state   : presented
+   1. branch  091-fixture :: cut from master
+   2. commit  091-fixture :: artifact + records commit
+   3. merge   master :: 091-fixture -> master
+   4. delete-branch 091-fixture :: local only, after the merge landed
+   5. push    <remote> :: push the trunk
+  receipt steps  : ('commit', 'merge', 'push')
+## Remote references BEFORE
+
+$ git for-each-ref --format="%(refname:short) %(objectname:short)" refs/remotes
+gitee/main 2dd1ca4f
+gitee/master e06fcc52
+gitee/xuanji 68c89c8d
+github 2dd1ca4f
+github/add-apm-init f6cae496
+github/cli-fix 6f3e450c
+github/consolidate-scripts b03bba37
+github/force-arg 9319f042
+github/localden/bugfix 26645103
+github/main 2dd1ca4f
+github/master e06fcc52
+github/quizme a4b86f75
+github/xuanji 68c89c8d
+gitlab/065-loop-interruption-recovery d1149063
+gitlab/069-execution-expression-sdd 5b13564b
+gitlab/089-script-interface 25d5fe13
+gitlab/090-re-anchoring f4ceebff
+gitlab/main 7370e592
+gitlab/master ec17c599
+gitlab/xuanji 68c89c8d
+origin/add-assure-extension-538dd1981a621ffc 9cd962ed
+origin/add-assure-extension-fe6e169abcaf71ae 574ee23a
+origin/add-deja-vu-extension-777412cd7b6b991f 0cc261b6
+origin/add-illustrate-extension-19a1cb23335bd23b 0778e6be
+origin/add-illustrate-extension-4b143d0466af6c91 aa7f6663
+origin/add-lifecycle-extension-032ac635306aef1b d10a3e12
+origin/add-progress-extension-0fdf99f646fe493f 0778e6be
+origin/add-workflow-extension-cda4b08767b31d50 dc392ce0
+origin/backup-contribution-ids-20260824-171032 d1dac369
+origin/backup-shiny-garbanzo-20260824-171032 6d9f7b23
+origin/chore/release-v1.3.2 4171e436
+origin/copilot/fix-review-comment-3769505368 898870bb
+origin/copilot/fix-review-comments-again f20678df
+origin/dependabot/github_actions/actions/upload-artifact-7.0.2 53300ae1
+origin/fix/4273-converge-missing-manifest-9a82b7fb4f73186e de2981ed
+origin/fix/4914-persisted-run-symlinks-2a3452971b7ee167 a7fdbd81
+origin/main c4384940
+origin/update-adrkit-extension-10cc1b5f7606e0da 1cf7c8d1
+origin/update-gates-extension-b30806f376b7f4fc 86544e87
+origin/update-jira-sync-extension-2665c7324dcb3525 765bf744
+origin/update-keel-extension-8a8a7b4dc1e878bf f74e0935
+origin/update-model-routing-governance-preset-0875ade8c838af50 2c0bd0b5
+origin/update-model-routing-governance-preset-c14e09bca5ce34fe 0778e6be
+
+## Remote references AFTER
+
+(byte-identical to BEFORE — 43 refs, no change)
+
+Local branches AFTER (the run created none):
+main 2dd1ca4f
+master 22d33748
+
+## Reading
+
+- The declared model is the short-lived-branch shape: cut → commit → merge back to the
+  trunk → delete the local branch → push the trunk. Five steps, in that order.
+- 'push targets' is the declared remote list minus the read-only role: the trunk is the
+  only pushable *branch*, and `origin` never appears as a target (it is marked read-only
+  upstream in the block, excluded by role rather than by name).
+- Under the declared value (commit+merge+push) the terminal state is `executed`; under
+  the `ask` override the same sequence is derived and the run ends `presented`, with
+  commit/merge/push skipped — the derivation happens, the execution does not. That is the
+  SC-006 property: what would run is knowable before anything runs.
+- No remote write: the remote reference listing is byte-identical before and after, and no
+  branch was created locally (HEAD is unchanged; the dry run only derives).

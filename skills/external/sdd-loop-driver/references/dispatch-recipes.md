@@ -27,7 +27,7 @@
 ## 阶段子代理预算与分段（Stage Subagent Budget & Bounded Dispatch）
 
 - **默认预算**：阶段执行子代理的 `run-turn-budget` 统一为 **500**（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-10-22 由 40 上调至 120，2026-11-05 在 1M-context 运行档下由 120 上调至 400，2026-11-06 统一为 500）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
-- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **≤16 任务 / 一个 phase** 的子派发；每段在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；驱动者 U4 通过后才派下一段。禁止把整个大阶段压在一次派发里。
+- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并由 **最多 6 个执行子代理并发**推进；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
 - **状态字段**：状态脊记录 `turn_budget`、`sub_dispatch`、`part_scope`、`checkpoint`；预算耗尽/输出上限属 U5 预算触顶，按卡死处置上报，不得伪完成。
 
@@ -166,7 +166,7 @@ ssh -o BatchMode=yes <alias> \
   - **checklist 门**：产物 = `REQUIREMENTS_DIR/checklists/` 新增清单文件；清单项的满足判定不在本门裁决——由 implement 阶段的 checklist 豁免门接管（子代理按 G5 默认纪律自行裁决，waiver 记录进 waivers.md）。
   - **analyze 门**：产物 = findings 报告正文（只读命令，不产新提交）；门判据 = 报告中 CRITICAL/HIGH 发现为零或已处置。
   - **回环规则（两门同构，一轮有界）**：门发现的问题回上游阶段修复（checklist 项失败 → 重派 plan 或 tasks；analyze CRITICAL/HIGH → 重派 requirements/plan/tasks 对应修复）后重过该门，同一门最多回环一轮；第二轮 checklist 仍未过 → 豁免放行并记录进状态脊；第二轮 analyze 仍有 CRITICAL/HIGH → 停线上送（跨产物矛盾带病进 implement 会放大，不可豁免）。
-- **合并收尾（git 状态判定，不设哨兵）**：review 后合并回 main——判定条件为特性分支的提交已包含于集成分支、且工作树无该分支的未合并/冲突残留；两项齐备即该线合并完成。push 与远程分支操作缺省不执行（确认门控破坏性动作；仅入口显式授权时先推后合）。
+- **合并收尾（git 状态判定，不设哨兵）**：本步即收口的执行侧——提交 / 合并 / 推送的**步骤与报告字段**由 `.specify/shared/workflow/artifact-commit-step.md` § Close-out 拥有（按指针抵达，本节不复述）。指针只给出序列，**不授予新权限**：声明的策略未授权推送时，本次收尾仍止于本地合并。review 后合并回 main——判定条件为特性分支的提交已包含于集成分支、且工作树无该分支的未合并/冲突残留；两项齐备即该线合并完成。push 与远程分支操作缺省不执行（确认门控破坏性动作；仅入口显式授权时先推后合）。
 - **脏树合并变体（实测配方）**：工作树存在与集成分支冲突的既有脏文件、`git checkout main` 被终止时，不动工作树——`git push . HEAD:main` 快进本地 main 引用，再 `git push origin HEAD:main` 推远端；工作树留在特性分支无害，重入只认状态脊。**仓含 submodule 时**必须加 `--no-recurse-submodules`（默认 `push.recurseSubmodules` 会尝试推送子模块，在 detached/no-remote 子模块上以「远端意外挂断」失败，main 引用不变）：`git push --no-recurse-submodules . HEAD:main`。
 - **分支清理（branch hygiene，合并后的收尾步）**：合并并推送后，删除本特性的特性分支——本地用 `git branch -d`（安全删除，未合并自动拒删），远端先 `git merge-base --is-ancestor origin/<branch> main` 验证祖先关系再 `git push origin --delete`；判定 NOT-MERGED 的分支保留并登记进收尾汇总，不强删。该线历史上的遗留分支同规则一并巡检（实测定级示例见 2026-10-15 xuanji-doc：6 条规格/验证分支 + 1 条已并入的 kb-v41-phase-t 时代分支，全部验证祖先后删除，终态仅存 main）。
 - **P0 前置门**：同线上一特性 review 的 P0 发现未修复或未显式豁免前，禁止派发该线下一特性规格的 requirements（P0 语义 = fix before next spec；豁免记录进状态脊）。

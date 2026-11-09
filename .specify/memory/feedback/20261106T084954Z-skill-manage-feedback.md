@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-manage-feedback-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:49:54Z"
 summary: "Digest execution: framework hat, Path A; two introspection reports (5 + 33 entries), 22 processed, 11 ignored, 16 backlog rows; the engine actions the skill names (probes/map) were absent and the defa"
+introspection_ref: "introspection-20261108T192504Z#F-15"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-15"
 ---
 
 ## Review

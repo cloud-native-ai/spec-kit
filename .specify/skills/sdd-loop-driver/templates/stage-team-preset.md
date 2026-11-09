@@ -44,10 +44,11 @@ members:
     responsibility: Aggregate verified outputs in the declared order, make the single stage-closing commit, and emit the stage sentinel.
 config:
   default_pattern: parallel
-  pattern_selection: parallel only when every package is read-only and two or more packages are independent; serial when any write package or any dependency edge orders the work; iteration only for a bounded repair_loop with an explicit maximum; continuous is never selected.
-  slot_cap_default: 2
-  slot_cap_ceiling: "min(4, the line's remaining concurrency allowance owned by Feature 064)"
-  write_packages: dispatched alone (effective concurrency 1)
+  pattern_selection: parallel when two or more independent packages exist and either every package is read-only or write_isolation=worktree (the integration queue serializes the write merges); serial when a shared-tree write package or any dependency edge orders the work; iteration only for a bounded repair_loop with an explicit maximum; continuous is never selected.
+  slot_cap_default: 6
+  slot_cap_ceiling: "min(6, the line's remaining concurrency allowance owned by Feature 064)"
+  package_size_target: "~10 tasks per package (<=16), up to 6 concurrent implement executors"
+  write_packages: dispatched alone under shared-tree (effective concurrency 1); under worktree each write package owns a child line + worktree and the integration queue serializes the merges
   verification: one fresh-context verifier execution per Work Package
   retry: at most one automatic retry per Work Package; the retry must change scope, budget, or topology
   persistence: run-scoped only; never .specify/teams/<slug>/team.md

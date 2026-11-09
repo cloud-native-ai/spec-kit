@@ -142,6 +142,16 @@ def _is_ignored_log(path: str) -> bool:
     return proc.returncode == 0
 
 
+def _is_test_evidence_log(path: str) -> bool:
+    """A dated test-evidence run log under a spec is evidence, not a live face.
+
+    Full-suite logs quote pre-existing failure text (including this test's own
+    output), which can name the old path; they are run evidence and must not be
+    rewritten. Bounded to ``/test-evidence/`` + ``.txt``/``.log``.
+    """
+    return "/test-evidence/" in path and path.endswith((".txt", ".log"))
+
+
 def _is_guard(path: str) -> bool:
     return path in GUARD_FILES
 
@@ -163,11 +173,12 @@ class TestLiveSurfacesAreMigrated:
         offenders = [
             p for p in _tracked_files_containing(OLD_PATH_NEEDLE)
             if not _is_historical(p) and not _is_guard(p) and not _is_ignored_log(p)
+            and not _is_test_evidence_log(p)
         ]
         assert offenders == [], (
             "live-face files still reference the pre-migration path "
             f"(historical faces, the {len(GUARD_FILES)} migration guards and "
-            "git-ignored *.log run scratch are excluded by design):\n  "
+            "git-ignored *.log run scratch and test-evidence run logs are excluded by design):\n  "
             + "\n  ".join(offenders)
         )
 

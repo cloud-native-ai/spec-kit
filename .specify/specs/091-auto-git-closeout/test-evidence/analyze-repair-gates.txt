@@ -1,0 +1,85 @@
+# Analyze-repair round 1 — gate readings — 091-auto-git-closeout
+# captured: 2026-11-09T03:23:58Z (final pass, after all repair edits)
+
+$ git --version
+git version 2.43.5
+$ python3 -V
+Python 3.11.11
+$ git rev-parse HEAD
+e4ad2865640b6498bce30dc7356bdefff0e95ca1
+
+## 1. validate-requirements.py — required by the slice
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/091-auto-git-closeout/requirements.md
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 320 lines, 36 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+## 2. pre-analyze-check.py --stage requirements — required by the slice
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements --spec-dir .specify/specs/091-auto-git-closeout --repo .
+exit=0
+decision=pass summary={'errors': 0, 'advisories': 47, 'waived': 0, 'fr': 28, 'sc': 8, 'tasks': 62, 'clauses': 0, 'files': 12}
+  25 x path does not exist under the repo: tests/contract/test_git_closeout_contract.py
+  15 x path does not exist under the repo: skills/external/git-utils/references/closeout-commands.md
+   3 x path does not exist under the repo: .specify/memory/retention/closeout/
+   3 x path does not exist under the repo: tests/fixtures/git-closeout/
+   1 x non-concrete blockedBy token 'Txxx'
+
+## 3. pre-analyze-check.py --stage plan — required by the slice
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/091-auto-git-closeout --repo .
+exit=0
+decision=pass summary={'errors': 0, 'advisories': 47, 'waived': 0, 'fr': 28, 'sc': 8, 'tasks': 62, 'clauses': 0, 'files': 12}
+
+## 4. validate-decision-tensions.py — required by the slice
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/091-auto-git-closeout
+spec: .specify/specs/091-auto-git-closeout
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 322 lines, 5 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+exit=0
+
+## 5. decomposition-check.py --mode plan — required by the slice
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/091-auto-git-closeout/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T03:23:58Z"}
+exit=0
+
+## 6. SUPPORTING (not one of the five): FR + clause coverage accountant (C-01 evidence)
+$ python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/091-auto-git-closeout | grep ...
+claimed clauses (this feature): 32
+baseline: .specify/specs/091-auto-git-closeout/coverage-baseline.txt (0 names, MISSING)
+FR universe: 28
+FR claimed: 28
+FR uncovered: 0
+ERROR frozen baseline not found: .specify/specs/091-auto-git-closeout/coverage-baseline.txt — an absent baseline is NOT an empty exemption list, so this run cannot judge the delta; freeze it with `account-clause-coverage.py .specify/specs/091-auto-git-closeout --freeze > .specify/specs/091-auto-git-closeout/coverage-baseline.txt`
+companion (must be non-empty on a green run): claimed clauses 32, scanned files 292, clause universe 1940, FR universe 28
+  [coverage-baseline-delta] fail (598) — baseline holds 0 names; 0 uncovered items are baseline-internal and do not block
+status: baseline-missing
+
+## 7. SUPPORTING: validate-tasks.py clause lane (32-clause partition)
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/091-auto-git-closeout/tasks.md | tail -1
+PASS (with warnings): .specify/specs/091-auto-git-closeout/tasks.md — 0 error(s), 69 warning(s)
+green-dangling + green-clause-collision: 0
+green-cross-phase: 2 (both disclosed in tasks.md § Green Partition)
+
+## 8. SUPPORTING: reader-declaration gate (R-13 / CHK046)
+$ python3 .specify/scripts/python/doc-consistency-check.py --faces reader --path .specify/specs/091-auto-git-closeout/requirements.md
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:24:03Z
+faces: reader=pass
+files_scanned: 1
+findings: 0
+exit=0

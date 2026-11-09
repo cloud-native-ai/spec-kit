@@ -163,11 +163,13 @@ The scheduler is **driver prompt logic**, not a runtime engine. The driver is th
 
 A package is **ready** when every `depends_on` entry has a ledger `verdict=pass` with an evidence pointer in the current stage attempt. A failed, missing, or malformed verdict keeps the dependent `blocked`; the driver records it instead of dropping it. The dependency status is re-read from the ledger after every settlement, never from session memory.
 
-Every write package is dispatched **write-alone**: if a write is ready, the driver stops launching new read-only packages, waits for every running package to settle, dispatches exactly one write package, and only after it settles resumes the read-only queue. A ready write is never deferred behind newly launched reads. Its effective concurrency is 1.
+Every write package is dispatched **write-alone under `shared-tree` isolation**: if a write is ready, the driver stops launching new read-only packages, waits for every running package to settle, dispatches exactly one write package, and only after it settles resumes the read-only queue. A ready write is never deferred behind newly launched reads. Its effective concurrency is 1.
+
+Under `write_isolation=worktree`, readiness and verification are unchanged, but up to `slot_cap` ready write packages run **concurrently**, each on a child line with its own worktree and branch; commits are serialized by the existing integration queue in `integration_order` (064/084). The write-alone rule above applies only to `shared-tree`.
 
 ### 13.2 Read-only concurrency and the slot cap (SD-04, SD-05)
 
-Up to `slot_cap` read-only packages run concurrently; the default and the ceiling are owned by SD-04 and enforced by WG-16. When the local host cannot issue parallel native calls, the driver records `parallel_requested=yes`, `effective=serial`, `reason=host-no-parallel-native` and dispatches serially (SD-07); the effective concurrency is recorded on every dispatch event (V-LED.10).
+Up to `slot_cap` read-only packages run concurrently; under `write_isolation=worktree`, up to `slot_cap` write packages also run concurrently (each on a child line); the default is 6 and the ceiling is owned by SD-04 and enforced by WG-16. When the local host cannot issue parallel native calls, the driver records `parallel_requested=yes`, `effective=serial`, `reason=host-no-parallel-native` and dispatches serially (SD-07); the effective concurrency is recorded on every dispatch event (V-LED.10).
 
 The ready set is ordered by topological layer and then `wp_id` lexicographic, the declared tie-break (WP-04). The ledger records the actual `dispatch_order` counter separately; integration uses the declared order, never the dispatch timing order (SD-05).
 
@@ -264,7 +266,7 @@ Each package's `seat` field carries its derived Role × Stage × Type tuple (E10
 
 ### 17.2 Pattern selection (ST-06, ST-07, ST-12)
 
-The selected pattern is graph-derived and always takes precedence over the preset's declared default. `iteration` requires a complete `repair_loop` (a positive maximum, a stop condition, and a findings source). Otherwise `parallel` applies only when every package is read-only and two or more packages are independent. Otherwise `serial` applies when any write package or any dependency edge exists. A serial stage may still run independent ready read-only packages concurrently under SD-04. `continuous` is excluded: it is never selected and never appears as an adapter flow.
+The selected pattern is graph-derived and always takes precedence over the preset's declared default. `iteration` requires a complete `repair_loop` (a positive maximum, a stop condition, and a findings source). Otherwise `parallel` applies when two or more packages are independent and either every package is read-only, or `write_isolation=worktree` (the integration queue serializes the write merges). Otherwise `serial` applies when a `shared-tree` write package or any dependency edge exists. A serial stage may still run independent ready read-only packages concurrently under SD-04. `continuous` is excluded: it is never selected and never appears as an adapter flow.
 
 The preset's declared pattern and slot cap are starting values only. The graph-derived pattern, the resolved slot cap, and the per-package seat mapping are recorded in the plan and take precedence (ST-12).
 
@@ -316,7 +318,7 @@ The opt-out and fallback semantics are owned by `contracts/fallback-and-nonregre
 
 ### 20.1 U0 declaration and precedence (FN-01…FN-03)
 
-The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages` (one `auto|on|off` per stage, with the built-in defaults recorded), and `decomposition_slot_cap` (default 2). A stage attempt may carry `decomposition_override: auto|on|off`. All of these are spine fields, not new command arguments.
+The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages` (one `auto|on|off` per stage, with the built-in defaults recorded), and `decomposition_slot_cap` (default 6). A stage attempt may carry `decomposition_override: auto|on|off`. All of these are spine fields, not new command arguments.
 
 Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable it in the same run; otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults. Built-in defaults: `plan`, `implement`, and `review` are `auto`; `analyze` and `clarify` are `off`; `requirements`, `tasks`, and `checklist` are `off`.
 

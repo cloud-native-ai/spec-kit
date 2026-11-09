@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:44:39Z"
 summary: "checklist stage: 67 CHK items in requirements-quality.md; OI-087-01 resolved (derived-count copy deleted); E3 not-run-docs-only; no plan/docs/draw-diagram changes. Driver re-record with feature key be"
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review

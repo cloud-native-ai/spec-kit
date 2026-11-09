@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:12:20Z"
 summary: "Code segment verdict blocked: 2 blocking (recognisable-suffix list, source-reference false green), 6 important (line shift after fenced blocks, global root check, Python 3.9 APIs against a 3.8 floor, "
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review

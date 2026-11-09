@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
+disposition: "processed"
 partial: false
 created: "2026-11-06T04:08:36Z"
 summary: "requirements stage ran clean end to end; validator ok on first pass after the spec write, flow-class declaration resolved as execution/- with source=declaration. Two stage-level observations worth car"
+introspection_ref: "introspection-20261108T192504Z#F-06"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-06"
 ---
 
 ## Review

@@ -1,0 +1,34 @@
+# 091 requirements — gate readings (2026-11-09T02:26:40Z)
+
+## validate-requirements.py
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 237 lines, 34 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+## pre-analyze-check.py --stage requirements
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 27, "sc": 7, "tasks": 0, "clauses": 0, "files": 1}, "checked_at": "2026-11-09T02:26:40Z"}
+EXIT=0
+
+## pre-analyze-check.py --stage requirements --json-out <file>
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 27, "sc": 7, "tasks": 0, "clauses": 0, "files": 1}, "checked_at": "2026-11-09T02:26:40Z"}
+EXIT=0
+
+## flow-class-check.py --action lookup
+unit_id: spec:091-auto-git-closeout
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0

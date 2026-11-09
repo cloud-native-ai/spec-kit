@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:12:20Z"
 summary: "Process segment verdict blocked: the implement stage closed U4 pass while GATE-4/DoD-3 required verification.md, the analyze round-2 pointer names a report not on disk, the plan-constraint audit was l"
+introspection_ref: "introspection-20261108T192504Z#F-02"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-02"
 ---
 
 ## Review

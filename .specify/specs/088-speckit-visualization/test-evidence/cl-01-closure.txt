@@ -1,5 +1,7 @@
 # T041 — the closure baseline diff (by name) and the zero-new-machinery audit
 
+> **Dated record (pre-renumber 087, first-round closure)**: this file quotes the 2026-11-06 `block` verdict. The current final closure is `checkpoints/12-final-closure.md` (2026-11-07, `accept`, final_path 10/10).
+
 **Capture date**: 2026-11-06T07:44Z (UTC)
 **Base commit**: `56f3f881` ("chore(087): record the clarify checkpoint") — the row's own range start.
 **Head**: `d82063f5` (Part 5 landed) **plus this Part's working-tree writes**, which is the delivered change set the

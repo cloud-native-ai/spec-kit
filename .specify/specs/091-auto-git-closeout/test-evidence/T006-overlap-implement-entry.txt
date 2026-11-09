@@ -1,0 +1,19 @@
+# T006 — cross-feature overlap re-run at implement entry (2026-11-09)
+
+`feature-ref.md` § Adjacency makes the overlap check an implement-entry obligation, not a
+plan-stage inheritance. Both commands below were run in this implement run.
+
+    python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py \
+        --spec-dir .specify/specs/091-auto-git-closeout --repo .
+    -> decision=overlap current=091-auto-git-closeout checked=82 overlaps=36   (exit 1)
+
+    python3 .specify/skills/sdd-loop-driver/scripts/line-registry.py --action list --active --format json
+    -> []
+
+Assertion carried: the active-line set is **still empty**, so no overlap row names a live
+concurrent line. The 36 rows are all `same-path` / `nested-path` matches against **completed**
+spec lines, which is the same reading recorded at clarify (C-16) and at plan. `checked=82` and
+`overlaps=36` are unchanged across all three stages, i.e. nothing moved underneath this
+feature during plan → tasks → checklist → analyze → analyze-repair → analyze-round2.
+
+Full JSON: `test-evidence/overlap-check-tasks.json`.

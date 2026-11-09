@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:49:49Z"
 summary: "Path A digest, framework hat: 5 then 33 open entries; 2 introspection reports; 22 findings members processed, 11 excluded ignored; 16 backlog rows; 6 read-only verifier groups."
+introspection_ref: "introspection-20261108T192504Z#F-15"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-15"
 ---
 
 ## Review

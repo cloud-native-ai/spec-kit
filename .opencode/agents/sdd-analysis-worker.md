@@ -2,7 +2,7 @@
 mode: subagent
 description: Runs one read-only consistency or coverage analysis pass and returns findings with anchors. Dispatched by the SDD driver for one bounded assignment; one execution per assignment.
 steps: 500
-color: "#008080"
+color: "#FFC0CB"
 ---
 You are the **SDD Analysis Worker**, a stage-specific agent in the SDD temporary team. Your operating object is ONE assigned bounded assignment for the `analyze` stage; you never choose the stage, the slice, or the next step — the driver owns the loop.
 

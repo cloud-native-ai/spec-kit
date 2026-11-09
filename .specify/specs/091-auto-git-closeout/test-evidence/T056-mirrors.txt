@@ -1,0 +1,55 @@
+# T056 — the mirror projections and the compiled faces
+
+Date: 2026-11-09
+Row: T056 (blockedBy T051, T054) — DoD-5
+
+## 1. The mirror pairs
+
+$ python scripts/python/sync-mirrors.py --write
+    ok    templates/ == .specify/templates/ (22 files, byte-identical)
+    ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+    ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+    ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+    ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+    ok    shared/ == .specify/shared/ (98 files, byte-identical)
+    (plus one "projected[...]" line per generated file; the write pass reported no conflict)
+
+$ python scripts/python/sync-mirrors.py --check    → exit 0
+    ok    templates/ == .specify/templates/ (22 files, byte-identical)
+    ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+    ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+    ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+    ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+    ok    shared/ == .specify/shared/ (98 files, byte-identical)
+
+## 2. The compiled faces
+
+$ python scripts/python/probe-utils.py --action compile-embeds
+    compiled 79 units: 0 written, 79 unchanged
+
+$ python scripts/python/probe-utils.py --action compile-embeds --check    → exit 0
+    compile-embeds --check: 79 units, zero drift
+
+## 3. The registry the faces were compiled from
+
+$ python scripts/python/probe-utils.py --action probes --format json
+    classes=11  objects=122  (all internal; 0 external)
+
+$ python scripts/python/probe-utils.py --action handlers --format json
+    handlers=10   (T051's h-closeout is the one added by this feature; order 60)
+
+## 4. No compiled face was hand-edited
+
+Every compiled face carries the same machine-owned banner, and the banner's fingerprint is the
+one the registry produces after T051's row:
+
+$ grep -c "fingerprint: 4682b9e38032" templates/commands/requirements.md
+1
+$ grep -c "fingerprint: 4682b9e38032" skills/external/sdd-loop-driver/SKILL.md
+1
+$ grep -rc "fingerprint: 8cb5a238739a" --include=*.md skills/ templates/ shared/ agents/
+(no hits — the pre-change fingerprint is gone from every live face family; the only remaining
+occurrences are recorded evidence copies under .specify/specs/090-re-anchoring/test-evidence/tmp/)
+
+The --check above is what makes that mechanical: it recompiles in memory and compares, so a
+hand-edited face or a stale banner would make it exit non-zero.

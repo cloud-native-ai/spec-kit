@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:12:05Z"
 summary: "Four-segment review completed: process blocked (stage closed without verification.md), artifact blocked (1 P0: verification.md absent), implementation blocked (checker semantics and a shipped-skill po"
+introspection_ref: "introspection-20261108T192504Z#F-02"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-02"
 ---
 
 ## Review

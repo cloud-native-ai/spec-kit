@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:54:55Z"
 summary: "Artifact + implementation segments round 3: pass-with-residuals. F2 closed (requirements.md:289 / plan.md:32,81 / feature-ref.md:72 one FR-001 exception), F13 closed (feature-ref.md:30 real surfaces),"
+introspection_ref: "introspection-20261108T191359Z#F-02"
+disposition_reason: "introspection:introspection-20261108T191359Z#F-02"
 ---
 
 ## Review

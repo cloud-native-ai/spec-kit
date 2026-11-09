@@ -8,9 +8,11 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:39:03Z"
 summary: "Review round 2: P0/P1 closure rechecked after b06c93a7; closure verdict accept (final_path 6/6), code gate allow (0 blocking, 0 important, 2 suggestions). Open: F2 feature-ref.md:72 P1 partial; F10/F1"
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review

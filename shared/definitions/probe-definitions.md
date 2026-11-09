@@ -54,13 +54,14 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | run-determination | internal | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | scripts | determine→session-record→route-into-feedback | wrap-up | `scripts/python/run-determination.py`:`AXES`,`probe_session_store`,`probe_evidence_lane` |
 | evidence-lane | internal | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | scripts | collect→findings.json | collect | `scripts/python/evidence-utils.py`:`LANE_NAMES`,`probe_node`,`probe_session_store`,`probe_platforms` |
 | exec-quant | internal | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | scripts | collect→durable-record | wrap-up | `scripts/python/exec-quant.py`:`ACTIONS`,`build_record`,`resolve_run_identity` |
+| closeout-step | internal | 收口步骤的可观察结局(签名面一次编译即得:Close-out 节的存在性与顺序;规则真源 owner 为 artifact-commit-step.md) | skills | compile→embed | wrap-up | `skills/external/git-utils/references/closeout-commands.md`:`## Deriving the sequence` |
 
 ## Objects
 
 > SC-001 对账基准(历史快照,仅作当时留痕,不代表当前数量):彼时的隐式埋点
 > 与嵌入点清单一一对应,`/speckit.feedback` 命令自身的 Object 随命令模板落地
 > 同变更登记(见 contracts/probe-registry.md C-3.4)。当前生效的埋点集合以本
-> 注册表为准,用 `feedback-utils.py --action probes --validate` 读取与对账,
+> 注册表为准,用 `probe-utils.py --action probes --validate` 读取与对账,
 > MUST NOT 在他处复写计数。
 >
 > 51–70 行为 044 Phase 7 的门控必要性 probe(insertion_type=confirm-gate):
@@ -174,6 +175,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | eq-probe-host-process | exec-quant | scripts/python/exec-quant.py | wrap-up |
 | eq-probe-host-config | exec-quant | scripts/python/exec-quant.py | wrap-up |
 | eq-probe-determination-link | exec-quant | scripts/python/exec-quant.py | wrap-up |
+| closeout-step-observe | closeout-step | skill:git-utils | wrap-up |
 | skill-analyze-artifacts-wrapup | skill-wrapup | skill:analyze-artifacts | wrap-up |
 | skill-clarify-artifact-wrapup | skill-wrapup | skill:clarify-artifact | wrap-up |
 | skill-create-checklist-wrapup | skill-wrapup | skill:create-checklist | wrap-up |
@@ -224,6 +226,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-threshold-notice | agent | Threshold prompt protocol (canonical semantics for step 6) | non-blocking | 30 | shared/workflow/feedback-step.md |
 | h-token-reflection | agent | Reflection procedure (the embedded step points here) | non-blocking | 40 | shared/workflow/feedback-step.md |
 | h-docs-sync-eval | agent | Evaluation procedure (the embedded step points here) | non-blocking | 50 | shared/workflow/docs-step.md |
+| h-closeout | agent | The `## Close-out` step | non-blocking | 60 | shared/workflow/artifact-commit-step.md |
 | h-situation-assess | engine | assess | non-blocking | 10 | scripts/python/trigger-utils.py |
 | h-team-phase-summary | agent | Summary Refresh (all patterns) | non-blocking | 20 | skills/internal/create-team/SKILL.md |
 | h-gate-evidence | gate | 门控观察协议 (Gate Observation Protocol) | non-blocking | 30 | shared/guidelines/confirmation-gates.md |
@@ -267,6 +270,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-feedback-record | @point:wrap-up | all | 69 单元现均有反馈记录面 |
 | h-threshold-notice | @point:wrap-up | all | 消费 h-run-determination 判定结果(order 10 → 30 次序约束 FR-008/FR-014) |
 | h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
+| h-closeout | @point:wrap-up | all | 091 收口步骤:每单元 wrap-up 在 Run Determination / exec-quant / Feedback 与 Documentation 步骤之后执行提交-合并-推送序列,行为归 artifact-commit-step.md § Close-out |
 | h-docs-sync-eval | @point:wrap-up | skill-humanize-wrapup | humanize 技能的 Documentation 面(062;技能侧首个 docs 绑定) |
 | h-docs-sync-eval | @point:wrap-up | speckit-analyze-wrapup | /speckit.analyze 的 Documentation 面(T019 矩阵;正枚举,免扣减语义) |
 | h-docs-sync-eval | @point:wrap-up | speckit-checklist-wrapup | /speckit.checklist 的 Documentation 面 |

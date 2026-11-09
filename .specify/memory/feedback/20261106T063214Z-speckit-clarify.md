@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T06:32:14Z"
 summary: "useful"
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review

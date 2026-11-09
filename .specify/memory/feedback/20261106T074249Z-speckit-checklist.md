@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:42:49Z"
 summary: "useful"
+disposition_reason: "introspection-20261108T192504Z: excluded"
 ---
 
 ## Review
