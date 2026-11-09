@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794203267
 stage_base_commit: 1a7fed0e
 attempt: 1
 retry_limit: 3
-last_verdict: requirements U4 pass (e421884f + 9c9122df; 41 FR / 14 SC; gates pass; OI-1/OI-2 surfaced); checkpoint 01 on-track
+last_verdict: clarify done (Mode A unattended; 65 FR / 20 SC; validate-requirements 0 error; OI-1 -> no-constitution-principle, OI-2/OI-3 closed, OI-4/OI-5 surfaced); next = plan
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -53,7 +53,10 @@ project_config:
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
   validation_corpus: "the 080–090 cross-spec review A–H, persisted at .specify/specs/092-non-disposable/notes/input-review-080-090.md"
 gates: |
-  (none run yet)
+  clarify — validate-requirements.py 0 error / 0 warning (65 FR / 20 SC, contiguous + document order);
+  flow-class-check execution (source=declaration); validate-decision-tensions unreadable (no plan.md yet,
+  0 findings); decomposition-check --mode plan proceed (fr=65 <= 120).
+  readings: .specify/specs/092-non-disposable/test-evidence/clarify-gates.txt
 wrapup: pending
 framework_observations:
   - "The A–H review is itself evidence that history review must be semantic (claims/owners/constants), not a file-by-file listing."
