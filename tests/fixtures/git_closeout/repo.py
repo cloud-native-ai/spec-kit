@@ -231,6 +231,10 @@ class CloseoutOutcome:
     dry_run: bool = False
     records_commit: str | None = None
     commits: tuple[str, ...] = ()
+    #: How many times the driver re-issued a failing step. The landed driver always reports 0;
+    #: a non-zero value is the mutation hook of FR-011 firing, so an arm can prove the guard
+    #: would notice it (`closeout-verification.contract.md` C-6).
+    retries: int = 0
 
 
 def _fmt(args: Sequence[str]) -> str:
@@ -273,6 +277,7 @@ def run_closeout(
     commits: list[str] = []
     pushed: list[str] = []
     merged = False
+    retries = 0
     target_remote = plan.targets[0] if plan.targets else None
     current = repo.trunk
 
@@ -354,6 +359,7 @@ def run_closeout(
                     proc = _git(*argv, cwd=repo.repo, check=False)
                     if proc.returncode != 0 and attempt_retry > 0:
                         for _ in range(attempt_retry):
+                            retries += 1
                             if _git(*argv, cwd=repo.repo, check=False).returncode == 0:
                                 proc = None
                                 break
@@ -363,7 +369,7 @@ def run_closeout(
                     if proc.returncode != 0:
                         return CloseoutOutcome(proc.returncode, "push", _fmt(argv),
                                                (proc.stdout or "") + (proc.stderr or ""), deviations,
-                                               tuple(pushed), merged)
+                                               tuple(pushed), merged, retries=retries)
                     pushed.append(name)
     return CloseoutOutcome(0, "done", "git closeout", plan.render(), deviations, tuple(pushed),
-                           merged, False, records_commit, tuple(commits))
+                           merged, False, records_commit, tuple(commits), retries)

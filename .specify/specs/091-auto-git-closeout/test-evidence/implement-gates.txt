@@ -1,0 +1,48 @@
+# 091-auto-git-closeout — implement-slice gate readings (completion slice 2)
+# Captured 2026-11-09 from the working tree at implement completion.
+
+## 1. Generated-face drift (probe embeds)
+$ /usr/bin/python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 79 units, zero drift
+EXIT=0
+
+## 2. Mirror projection
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+ok    shared/ == .specify/shared/ (98 files, byte-identical)
+EXIT=0
+
+## 3. This feature's contract suite (the smoke command verification.md names)
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q
+42 passed in 1.46s
+EXIT=0
+
+## 4. The four models' derived sequences (US3 fixture arms)
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q \
+    -k "four or model or derive or sequence or three_tier or single_and_dual or branch"
+6 passed, 36 deselected in 0.31s
+EXIT=0
+
+## 5. Close-out dry run (declared model = 临时分支 / temp-branch)
+$ /usr/bin/python3 .specify/specs/091-auto-git-closeout/test-evidence/dry-run-closeout.py
+declared model   : 临时分支（trunk-based）
+strategy value   : ask  (dry-run override)
+push targets     : ('master',)   read-only: ('origin',)
+terminal state   : presented
+   1. branch  091-fixture :: cut from master
+   2. commit  091-fixture :: artifact + records commit
+   3. merge   master :: 091-fixture -> master
+   4. delete-branch 091-fixture :: local only, after the merge landed
+   5. push    <remote> :: push the trunk
+EXIT=0   (full capture: test-evidence/dry-run-closeout-rerun.txt)
+
+## 6. Full suite (tests/ entire; acceptance reading)
+34 failed, 8045 passed, 2 skipped in 566.07s
+Full capture: test-evidence/final-full.txt; failure list: test-evidence/final-failed.txt.
+vs test-evidence/baseline-failed.txt (36 ids): NEW 4 — all four R-36a (`test_compile_embeds.py`), re-proven red at
+HEAD with this feature stashed — so NEW = 0 with R-36a applied; CLEARED 6.
+The two earlier readings (both started mid-edit) are disclosed in test-evidence/run-note-sandbox.txt and are not
+cited as the verdict. See verification.md § Full-suite baseline comparison.
+
+## 7. Task-graph integrity (GATE-6)
+$ /usr/bin/python3 .specify/scripts/python/validate-tasks.py --help   # (form recorded in tasks.md § Notes)
+0 error(s); 381 warnings (378 green-path-divergence, 2 green-cross-phase, 1 blockedBy forward edge).

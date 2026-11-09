@@ -125,7 +125,33 @@ wrapup: done (plan, units skill:create-plan + skill:sdd-loop-driver)
   token_reflection: no instrumented token source for a subagent stage; the largest avoidable spend was the
     three pre-analyze iterations, each caused by a gate parser reading free text (a pipe-delimited cell and an
     em-dash cell) — reading the premise/blocker parser first would have cost one iteration instead of three.
+wrapup: done (implement completion slice 2, unit skill:sdd-loop-driver, run implement-091-slice2)
+  run_determination: .specify/memory/session/20261109T050936Z-run-determination-skill-sdd-loop-driver-implement-091-slice2.md
+    (four quantities not_evaluated: token source_unavailable, elapsed not_comparable, correctness no_baseline,
+     satisfaction pending_next_turn; 1 declared check / 2 collected)
+  exec_quant: .specify/memory/exec-quant/records/20261109T050941886215Z-44baddaa.json
+  feedback_record: .specify/memory/feedback/20261109T050944Z-skill-sdd-loop-driver.md
+  threshold_notice: should_prompt=true (358/10) => NOT surfaced (no user turn in an unattended subagent slice)
+  token_reflection: no instrumented token source; the largest avoidable spend was three full-suite runs where one
+    would have done — the first two started while the tree was still being edited (mirror sync + humanize slimming),
+    so both caught a mid-edit state and had to be discarded. Starting a full run only after `git status` is clean of
+    in-flight edits would have saved ~19 minutes of wall clock.
+implement_slice_2: done
+  tasks: 62/62 rows checked, each with an evidence pointer; DoD Status: met
+  artifacts: .specify/specs/091-auto-git-closeout/verification.md (SC/GATE/DoD tables, rulings R-14..R-23 + R-21b + R-37/R-38, residuals R-36a/R-36b)
+  suite: final-full.txt 34 failed / 8045 passed / 2 skipped (566.07s); final-failed.txt vs baseline-failed.txt =>
+    NEW 0 once R-36a (test_compile_embeds.py, red at HEAD too) is applied, cleared 6
+  repaired-at-root: three compiled-face closing-step pins + analyze's C-5 containment allowance (read out of git)
+    + humanize body budget 5023 -> 4998 tokens
+  gates: sync-mirrors 0 | compile-embeds 0 (79 units, zero drift) | closeout contract 42 passed | four-model arms 6 passed
+    | dry-run exit 0 | validate-tasks 0 errors | account-clause-coverage status ok (FR 28/28, 32 clauses)
+    | scan-confirmation-gates 27/20/7/violations 0
 framework_observations:
+  - "The tests/ tree is collected TWICE in a plain `pytest tests/` run: the repo-root `scripts/` mirror and `.specify/scripts/` project the same modules, so a full run reports ~8000 passed for a suite whose distinct assertions are far fewer. The count is therefore not a comparable quantity across selections, and this feature's GATE-1 had to be judged on the failed node-id set alone; the passed total moved by 219 between two runs of the same selection purely because one run also included three extra modules."
+  - "tests/contract/test_compile_embeds.py, test_engine_face_contract.py and test_compile_reconcile_guards.py build a throwaway workspace by copying the LIVE probe registry plus a hand-maintained `_OWNER_COPIES` list (feedback-step.md, docs-step.md, create-team SKILL, confirmation-gates.md). Any registry row whose behaviour owner is not on that list makes the sandboxed compile exit 2, so the module reds for a reason that has nothing to do with the change under test — 091's `h-closeout` (owner: shared/workflow/artifact-commit-step.md) is the current instance, but the defect is structural: the copy list should be derived from the registry it copies."
+  - "Compiled `## Wrap-up` faces are pinned verbatim by at least five independent contract modules (client-guard sweep C-53, review composition C-16, review feedback boundary C-55, decision-tension C-5, humanize WC-07 body budget) with no shared owner for the expected set. One registry row therefore forces five separate re-pins in five files, each with its own containment argument, and a sixth pin (a skill body token budget) can break without any step-set assertion being involved. A single 'expected compiled step set' owner — derived from the registry — would make all five read from one place."
+  - "A skill body token budget (humanize WC-07, 5000) has ~1 token of headroom at HEAD (4999), so ANY registry addition that compiles a step into every skill face pushes it over: the 091 row cost 24 tokens because of re-wrapping, and the repair had to delete body text that the skill's own contract already owned elsewhere. A budget whose only growth direction is deletion needs either headroom or a documented way to re-derive it."
+  - "validate-tasks.py's green-path-divergence warning count is quadratic in the number of rows that mention the same test path, so appending an `— evidence: tests/...` pointer to every row inflates the count from 69 to 381 without any claim changing. A warning count that moves on a documentation-only edit cannot be used as a gate signal, and its message ('two rows cannot each be the one that turns this file green') describes a detector premise the plan explicitly rejected."
   - "pre-analyze-check.py Runtime Stack Contract check: clean_cell() uses str.strip(chr(96)), so a PAIRED inline code span followed by prose is parsed as a path and the check exits 2 (input error). Any spec annotating its Contract cell this way is falsely blocked. Owner = driver skill, out of scope for a spec stage."
   - "overlap-check.py current-surface declaration is collected from every backticked shared-root path anywhere in feature-ref.md, including lines that say a document is NOT delivered. There is no way to mark a path as read-only input except by omitting its backticks, which conflicts with the file's own citation habit."
   - "overlap-check.py has no exit-code distinction between 'compared nothing because there is no declaration artifact' (clear, checked=1) and 'compared and found nothing'. A feature with no declaration passes the clarify U4 gate vacuously."

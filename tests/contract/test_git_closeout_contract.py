@@ -1249,6 +1249,85 @@ def test_mutation_an_injected_retry_reds_the_no_retry_guard():
     )
 
 
+def test_mutation_a_behavioural_retry_loop_reds_the_no_retry_assertions():
+    """T041 — FR-011 / SC-003, the *behavioural* retry arm, on a real fixture repository.
+
+    The structural mutation above reads the reference's wording. This arm mutates the driver's
+    behaviour instead: the fixture exposes ``attempt_retry``, so retry = 0 is the landed driver
+    and retry = 2 is a driver that re-issues the failing step. The SAME predicate the two
+    failure tests assert must hold under retry = 0 and break under retry = 2 — otherwise the
+    two behavioural arms prove "the run failed" but not "the run did not retry".
+
+    Measured 2026-11-09: the driver's retry loop sits on the **push** step only, so the
+    rejected-push arm reds (a bare remote refuses every attempt, and the retry count comes back
+    on the outcome) while the merge-conflict arm stays green (a conflicted merge is never
+    retried by any variant). Both readings are asserted here so the limit is recorded by a
+    test rather than by prose.
+    """
+    from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
+
+    # --- arm A: rejected push — the retry loop is observable and the arm reds --------------
+    def rejected_push(attempt_retry: int):
+        with build_repo("single-branch") as repo:
+            _advance_remote(repo)
+            before = repo.remote_branch_sha("mirror", "master")
+            plan = derive_closeout(
+                model="single-branch", strategy="commit+merge+push",
+                remotes=["mirror"], readonly=[],
+            )
+            outcome = run_closeout(
+                repo, plan, paths=_seed_record(repo), attempt_retry=attempt_retry
+            )
+            return outcome, before, repo.remote_branch_sha("mirror", "master")
+
+    landed, before, after = rejected_push(0)
+    assert landed.exit_code != 0 and landed.stage == "push", "the landed driver fails at the push"
+    assert after == before, "and the remote is not force-overwritten"
+    assert landed.retries == 0, f"the landed driver performs no retry, read {landed.retries}"
+
+    mutated, before_m, after_m = rejected_push(2)
+    assert mutated.exit_code != 0 and mutated.stage == "push", (
+        "the mutated driver still fails — a bare remote refuses every attempt"
+    )
+    assert after_m == before_m, "and still never forces over the remote"
+    assert mutated.retries > 0, (
+        "the injected retry did not fire, so this arm proves nothing about FR-011"
+    )
+
+    # --- arm B: merge conflict — recorded limit, not papered over --------------------------
+    def merge_conflict(attempt_retry: int):
+        with build_repo("dual-branch") as repo:
+            repo.git("commit", "-q", "--allow-empty", "-m", "seed: archive line base")
+            repo.git("update-ref", "refs/heads/archive", "HEAD")
+            repo.git("checkout", "-q", "archive")
+            target = repo.repo / "conflict.txt"
+            target.write_text("archive line\n", encoding="utf-8")
+            repo.git("add", "--", "conflict.txt")
+            repo.git("commit", "-q", "-m", "archive: divergent edit")
+            repo.git("checkout", "-q", "develop")
+            target.write_text("daily line\n", encoding="utf-8")
+            repo.git("add", "--", "conflict.txt")
+            repo.git("commit", "-q", "-m", "daily: divergent edit")
+            plan = derive_closeout(
+                model="dual-branch", strategy="commit+merge+push", remotes=["mirror"], readonly=[]
+            )
+            return run_closeout(
+                repo, plan, paths=_seed_record(repo), conflict=True, attempt_retry=attempt_retry
+            )
+
+    landed_m = merge_conflict(0)
+    mutated_m = merge_conflict(2)
+    assert landed_m.stage == "merge" and landed_m.pushed == (), "the landed run stops at the merge"
+    assert mutated_m.stage == "merge" and mutated_m.pushed == (), (
+        "the merge arm is unchanged by the retry hook — its guarantee is 'no push after a "
+        "failed merge', which the hook does not touch"
+    )
+    assert mutated_m.retries == 0, (
+        "recorded limit (mutations.txt § R-21b): the retry hook is a push-step hook, so the "
+        "merge arm proves 'stops at the merge' but not 'the retry would have been caught here'"
+    )
+
+
 def test_mutation_a_bare_force_form_reds_the_no_retry_guard():
     """T041 — the second half: a bare force push is not a recovery path."""
     text = read(CLOSEOUT_REF)

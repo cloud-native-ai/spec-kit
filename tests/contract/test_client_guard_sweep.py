@@ -349,11 +349,26 @@ def test_c53_closing_step_set_and_four_unit_census_verbatim():
     wrapup = re.split(r"(?m)^## Wrap-up\s*$", template)[1]
     wrapup = re.split(r"(?m)^## ", wrapup)[0]
     steps = re.findall(r"(?m)^\d+\.\s+(\w[^—`]*?)\s+—", wrapup)
+    # Re-pinned by Feature 091 (deliberate update, same shape as the RC-19 note in this module's
+    # docstring). Why it moved: 091 registered a wrap-up handler row `h-closeout` (order 60,
+    # behaviour owner `shared/workflow/artifact-commit-step.md` § The `## Close-out` step) and the
+    # faces are COMPILED from that registry, so every artifact-producing command — this one
+    # included — renders one more closing step. The clause's subject is "the set is closed and
+    # preserved verbatim"; it is not a count assertion, so the pin moves to the compiled set
+    # rather than being deleted or widened into a subset check. Leaving the six-row pin in place
+    # would make a correct implementation red in a module 091 never named, which is exactly the
+    # failure the RC-19 note above describes; rewording the command while dropping the pin would
+    # be the other failure the clause names.
     expected = ["Run Determination", "Exec Quant", "Feedback Record",
-                "Threshold Notice", "Token Reflection", "Docs Sync Eval"]
+                "Threshold Notice", "Token Reflection", "Docs Sync Eval", "Closeout"]
     assert steps == expected, (
-        f"the review command's closing-step set MUST stay the published six, verbatim; "
+        f"the review command's closing-step set MUST stay the published set, verbatim; "
         f"drift: {steps!r} (C-53)"
+    )
+    # The close-out step is reached by pointer to its one behaviour owner, never by restating
+    # the procedure here (`shared/guidelines/one-source-of-truth.md`).
+    assert "shared/workflow/artifact-commit-step.md" in wrapup, (
+        "the close-out closing step MUST name its behaviour owner by path (C-53 / FR-020)"
     )
     skill = SKILL_MD.read_text(encoding="utf-8")
     # Re-pinned by slice 081c / T009 (RC-19). This assertion used to read the sentence

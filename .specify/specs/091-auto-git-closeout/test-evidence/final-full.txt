@@ -1,0 +1,1135 @@
+..................F..................................................... [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+..............F......................................................... [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................FFFF...F........................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+..........................................F............................. [ 15%]
+.....................................................s.................. [ 16%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+...........F..................................F.F....................... [ 18%]
+........................................................................ [ 19%]
+..........................................................F............. [ 20%]
+........F............................................................... [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+.......................F................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+......................................................F..F.............. [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+...........................................F............................ [ 49%]
+........................................................................ [ 49%]
+.............................................................F.......... [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+.................................................................F...... [ 60%]
+.................................s...................................... [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+...................F.................................................... [ 68%]
+.....................................F.................................. [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+.........................................................F.............. [ 73%]
+........................................................................ [ 73%]
+..............F..................................................F...... [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+..................F..................................................... [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+..................................FFF..........F....................FFFF [ 94%]
+...........F............................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it ______
+
+    def test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it():
+        """The pin is valid only while re-reading it reproduces it — and a mismatch is exit-2 class."""
+        for tool, reading in _live_readings().items():
+            assert reading, "%s produced no reading; a pin comparison on nothing proves nothing" % tool
+>           assert _assert_pin(tool, reading)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_acceptance_premises.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'pytest', reading = 'pytest 8.4.2'
+
+    def _assert_pin(tool, reading):
+        """Compare one reading against its recorded pin; a difference is an input error."""
+        pins = _pins()
+        if tool not in pins:
+            raise PinMismatch("no recorded pin for %r in %s" % (tool, PINS))
+        if reading.strip() != pins[tool].strip():
+>           raise PinMismatch(
+                "%s reads %r but %s records %r — the comparison is invalid (input error, exit 2), "
+                "which is not a new failure" % (tool, reading.strip(), PINS.name, pins[tool].strip())
+            )
+E           contract.test_acceptance_premises.PinMismatch: pytest reads 'pytest 8.4.2' but plan-runner-pins.txt records 'pytest 9.2.0' — the comparison is invalid (input error, exit 2), which is not a new failure
+
+tests/contract/test_acceptance_premises.py:627: PinMismatch
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+_______________________ test_compile_embeds_determinism ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_compile_embeds_determinis0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb5f138f250>
+
+    @pytest.mark.contract
+    def test_compile_embeds_determinism(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc1, p1 = _run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fb5f6db65d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________ test_compile_embeds_zero_handler_no_section __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_compile_embeds_zero_handl0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb5f1478fd0>
+
+    @pytest.mark.contract
+    def test_compile_embeds_zero_handler_no_section(tmp_path, capsys):
+        # Re-scope the four all-rows to an object no sandbox unit owns: sandbox
+        # units get zero effective handlers at the wrap-up point.
+        registry = _REGISTRY.read_text(encoding="utf-8").replace(
+            "| @point:wrap-up | all |", "| @point:wrap-up | speckit-analyze-wrapup |")
+        ws = _build_workspace(tmp_path, registry)
+>       rc, payload = _run(ws, capsys)
+                      ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fb5f6db65d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________________ test_compile_embeds_check_clean_and_drift ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_compile_embeds_check_clea0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb5f14750d0>
+
+    @pytest.mark.contract
+    def test_compile_embeds_check_clean_and_drift(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fb5f6db65d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________________ test_compiled_form_contract __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_compiled_form_contract0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb5f13dd550>
+
+    @pytest.mark.contract
+    def test_compiled_form_contract(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fb5f6db65d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+_ TestCF13FeedbackPackageExclusion.test_package_zip_contains_no_evidence_paths _
+
+self = <contract.test_evidence_findings_schema.TestCF13FeedbackPackageExclusion object at 0x7fb5f3f19650>
+artifacts = {'findings': {'evidence': [{'evidenceRefs': ['.specify/teams/demo-team/runs/20260101T000000Z-report.md'], 'evidenceSta...': PosixPath('/tmp/pytest-of-agent/pytest-4249/evidence0/ws/.specify/memory/evidence/ev-20261109-051045-project'), ...}
+
+    def test_package_zip_contains_no_evidence_paths(self, artifacts):
+        workspace = artifacts["workspace"]
+        feedback_utils = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+        subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "reindex",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        result = subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "package", "--all",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        assert result.returncode == 0, result.stderr
+        packages_dir = workspace / ".specify" / "memory" / "feedback" / "packages"
+        zips = sorted(packages_dir.glob("feedback-*.zip"))
+>       assert zips, "package produced no zip in the isolated workspace"
+E       AssertionError: package produced no zip in the isolated workspace
+E       assert []
+
+tests/contract/test_evidence_findings_schema.py:223: AssertionError
+________ TestErrorsAndWarnings.test_warning_surface_is_json_and_stderr _________
+
+self = <contract.test_execution_config_engine.TestErrorsAndWarnings object at 0x7fb5f3cd54d0>
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_warning_surface_is_json_a0')
+
+    def test_warning_surface_is_json_and_stderr(self, tmp_path):
+        ws = make_ws(tmp_path, defaults_extra="mode: external\n",
+                     agent_yaml="cli: claude\n")
+        result = run_engine(ws)
+>       data = payload(result)
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_execution_config_engine.py:680: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/execution-config....guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n")
+
+    def payload(result: subprocess.CompletedProcess) -> dict:
+>       assert result.returncode == 0, f"engine failed: {result.stderr}\n{result.stdout}"
+E       AssertionError: engine failed: usage: execution-config.py --action {resolve,validate,list-configs} --agent SLUG [--mode MODE] [--cli CLI] [--model MODEL] [--reasoning-effort EFFORT] [--context-window N] [--extra-flags FLAGS] [--log-dir DIR] [--quantification-method METHOD] [--host-cli CLI] [--workspace-root PATH] [--format text|json]
+E         execution-config: configuration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)
+E         
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/execution-config....guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n").returncode
+
+tests/contract/test_execution_config_engine.py:76: AssertionError
+______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
+
+    def test_c5_non_wiring_files_keep_their_frozen_hashes():
+        manifest = _hash_manifest()
+        templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+        skills = [rel for rel in manifest if rel.startswith("skills/")]
+        assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+        assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+        assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+        assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+            "the manifest is the NON-wiring complement; it still lists a wiring template"
+        )
+        assert not any(rel in WIRING_SKILLS for rel in skills), (
+            "the manifest is the NON-wiring complement; it still lists a wiring skill"
+        )
+    
+        # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+        # the register above, then re-asserted on content at its new path — the
+        # manifest entry itself stays untouched as 069a's dated record.
+        retired = _retired_skill_register(manifest)
+    
+        drifted: list[str] = []
+        missing: list[str] = []
+        for rel, expected in sorted(manifest.items()):
+            if rel in retired:
+                continue
+            path = REPO_ROOT / rel
+            if not path.is_file():
+                missing.append(rel)
+                continue
+            if _sha256(path) != expected:
+                if rel in ALLOWED_POST_BASELINE_CHANGES:
+                    continue
+                drifted.append(rel)
+        assert not missing, (
+            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+        )
+        assert not drifted, (
+            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "feedback-step pointer). drifted: %r" % drifted
+        )
+        for retired_rel, replacement_rel in retired.items():
+            assert not (REPO_ROOT / retired_rel).exists(), (
+                "the retired source came back at its manifest path: %s" % retired_rel
+            )
+            replacement = _read(REPO_ROOT / replacement_rel)
+            # 2026-11-05 (Feature 083): the replacement is also a rewritten consumer — FR-026 /
+            # SR-06 lands the reference wiring only, so the register re-asserts that one added
+            # literal here. This IS coaching-skills' registration point: the path is not in the
+            # 069a manifest, so an ALLOWED_POST_BASELINE_CHANGES key for it would be vacuous.
+            for marker in ("name: coaching-skills", "classification: external",
+                           "shared/definitions/skill-reference-definitions.md"):
+                assert marker in replacement, (
+                    "the replacement of %s must carry its own content: %r "
+                    "missing from %s (2026-10-30 Feature 078 rename; 2026-11-05 Feature 083 "
+                    "FR-026 wiring)"
+                    % (retired_rel, marker, replacement_rel)
+                )
+    
+        for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
+            text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+            banner_only = allowance["markers"] == ("COMPILED_BANNER_ONLY",)
+            added = allowance.get("added_markers", False)
+            for marker in allowance["markers"]:
+                if banner_only:
+                    # The machine-owned banner sentinel is not a needle in the file: it states
+                    # that the file equals its 069a bytes once the compiled banner is swapped for
+                    # the registry's current projection. That is the assertion, so it is made.
+>                   assert _banner_only_drift(rel, manifest[rel]), (
+                        "declared compiled-banner-only drift does not hold for %s: the file "
+                        "differs from its 069a bytes by something other than the compiled "
+                        "Wrap-up banner (%s)" % (rel, allowance["reason"])
+                    )
+E                   AssertionError: declared compiled-banner-only drift does not hold for skills/external/create-pages/SKILL.md: the file differs from its 069a bytes by something other than the compiled Wrap-up banner (2026-11-06 Feature 087 (d41d0ced) recompiled the Wrap-up banner after the speckit-status-wrapup Object and the status/measure h-docs-sync-eval bindings moved the registry fingerprint 7877db82c58c -> 8cb5a238739a; the compiled line is machine-owned and no authored text changed)
+E                   assert False
+E                    +  where False = _banner_only_drift('skills/external/create-pages/SKILL.md', '4d0d54da94a87b69b78cd0705c4edb99392151d716d05560b957010d873476ce')
+
+tests/contract/test_expression_compatibility.py:945: AssertionError
+_________________ test_c2_no_project_side_classification_store _________________
+
+    def test_c2_no_project_side_classification_store():
+        offenders: list[str] = []
+        for path in sorted(MEMORY_DIR.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            if CLASS_FILE_NAME_RE.search(path.name):
+                offenders.append("%s — classification-named file" % rel)
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            for number, line in enumerate(text.splitlines(), 1):
+                if LEDGER_ROW_RE.match(line):
+                    offenders.append("%s:%d — ledger-style unit/class row" % (rel, number))
+                elif CLASS_ASSIGN_RE.search(line):
+                    offenders.append("%s:%d — flow_class assignment" % (rel, number))
+>       assert not offenders, (
+            "C-2: no classification data may be stored project-side (the ledger is "
+            "the owner document, delivered with shared/). found:\n- "
+            + "\n- ".join(offenders)
+        )
+E       AssertionError: C-2: no classification data may be stored project-side (the ledger is the owner document, delivered with shared/). found:
+E         - .specify/memory/features/088.md:62 — flow_class assignment
+E         - .specify/memory/features.md:96 — flow_class assignment
+E       assert not ['.specify/memory/features/088.md:62 — flow_class assignment', '.specify/memory/features.md:96 — flow_class assignment']
+
+tests/contract/test_expression_compatibility.py:1023: AssertionError
+_______________ test_i11_channel_two_mirrors_and_per_tool_copies _______________
+
+    def test_i11_channel_two_mirrors_and_per_tool_copies():
+        """C-11: the mirror and all four per-tool trees carry the identical clause."""
+        # Stale-pin update (067 T025, 2026-10-22): per-tool trees are RENDERED copies —
+        # the render engine (specify_cli.rewrite_paths, the recorded owner of the rule)
+        # rewrites root-relative `shared/` to the runtime `.specify/shared/` prefix. The
+        # raw owner literal is the wrong expected value for that channel; the pin now
+        # compares each per-tool interval against the engine-rendered owner literal.
+        # Byte-identity strength unchanged (still exact interval equality).
+        from specify_cli import rewrite_paths
+        owner = _clause_interval(_text(DOC))
+        for preset in FACTORY_PRESETS:
+            mirror = ROOT / ".specify" / "agents" / "templates" / preset.name
+            assert mirror.is_file(), f"C-11: missing mirror {mirror.relative_to(ROOT)}"
+            assert mirror.read_bytes() == preset.read_bytes(), (
+                f"C-11: {mirror.relative_to(ROOT)} differs from its source"
+            )
+        for tree, naming in AGENT_TREES:
+            d = ROOT / tree
+            assert d.is_dir(), f"C-11: per-tool agent tree {tree} is missing"
+            for slug in PRESET_SLUGS:
+                copy = d / naming.format(slug=slug)
+                assert copy.is_file(), f"C-11: {copy.relative_to(ROOT)} was not rendered"
+>               assert _clause_interval(_text(copy)) == rewrite_paths(owner), (
+                    f"C-11: {copy.relative_to(ROOT)}'s clause interval is not byte-identical "
+                    f"to the engine-rendered owner literal (rewrite_paths)"
+                )
+E               AssertionError: C-11: .qoder/agents/sdd-analysis-worker.agent.md's clause interval is not byte-identical to the engine-rendered owner literal (rewrite_paths)
+E               assert '\nfast-fail-...t-fail.md`。\n' == '\nfast-fail-...t-fail.md`。\n'
+E                 
+E                 Skipping 316 identical leading characters in diff, use -v to show
+E                 - 件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
+E                 ?           ---------
+E                 + 件形态的唯一真源:`shared/guidelines/fast-fail.md`。
+
+tests/contract/test_fast_fail_discipline.py:1602: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1990: AssertionError
+_ TestHistoricalFacesArePreserved.test_the_user_directive_quoting_the_old_path_survives_verbatim _
+
+self = <contract.test_goal_migration.TestHistoricalFacesArePreserved object at 0x7fb5f37af950>
+
+    def test_the_user_directive_quoting_the_old_path_survives_verbatim(self):
+        spec = REPO_ROOT / ".specify/specs/037-goal-registry/requirements.md"
+        text = spec.read_text(encoding="utf-8")
+>       assert "使用.specify/goal/收编.specify/project/goal/" in text, (
+            "the 2026-08-04 user directive quoting the old path must remain verbatim "
+            "in the Clarifications record; rewriting it falsifies history"
+        )
+E       AssertionError: the 2026-08-04 user directive quoting the old path must remain verbatim in the Clarifications record; rewriting it falsifies history
+E       assert '使用.specify/goal/收编.specify/project/goal/' in '# Requirements Specification: Goal 作为项目级一等概念(goal 定义归档 + 团队引用 + 单一撰写入口 + 多团队协调)\n\n**Requirement Branch**: `037-goal-... `tasks.md` 后将自动恢复通过。该测试同时验证了 `Related Feature` 绑定可被机器读取(输出含 `"FEATURE_ID":"041"`、`"FEATURE_NAME":"Goal Registry"`)。\n'
+
+tests/contract/test_goal_migration.py:181: AssertionError
+_____________________ test_lc_07_identity_ok_mismatch_dead _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_lc_07_identity_ok_mismatc0')
+
+    def test_lc_07_identity_ok_mismatch_dead(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        entry = _register(reg, project)
+        four = four_piece(tmp_path / "rt", entry["line_id"], entry["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", entry["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        ok = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
+>       assert ok["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:241: AssertionError
+______________________ test_lc_10_11_12_snapshot_branches ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_lc_10_11_12_snapshot_bran0')
+
+    def test_lc_10_11_12_snapshot_branches(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        line = _register(reg, project)
+        four = four_piece(tmp_path / "rt", line["line_id"], line["run_id"], stage="plan", sentinel=True)
+        engine_json(
+            "update", "--line-id", line["line_id"], "--stage", "plan",
+            "--runner-pid", "999999", "--runner-start-token", "0",
+            "--cli-pid", "999999", "--cli-start-token", "0",
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        done = engine_json("verify-identity", "--line-id", line["line_id"], reg=reg)
+        assert done["branch_hint"] == "done"
+    
+        running_line = _register(reg, project)
+        four2 = four_piece(tmp_path / "rt2", running_line["line_id"], running_line["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", running_line["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four2["prompt_meta"]), "--status-path", str(four2["status"]),
+            "--log-path", str(four2["log"]), "--heartbeat-path", str(four2["heartbeat"]), reg=reg,
+        )
+        running = engine_json("verify-identity", "--line-id", running_line["line_id"], reg=reg)
+>       assert running["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:315: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+______________ test_c20_the_mirror_copy_resolves_to_its_own_root _______________
+
+    def test_c20_the_mirror_copy_resolves_to_its_own_root():
+        """C-15: run through `.specify/scripts/python/`, the engine's root is the repository."""
+        import json
+        import subprocess
+        import sys
+    
+        mirror = ROOT / ".specify" / "scripts" / "python" / "script-interface-check.py"
+        assert mirror.is_file(), (
+            f"C-15: the engine's mirror is missing: {mirror.relative_to(ROOT)} — T042's mirror "
+            "obligation is projected by sync-mirrors.py"
+        )
+        source = subprocess.run(
+            [sys.executable, str(CHECKER), "--json", "--skip-probe", "--root", str(ROOT)],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=300,
+        )
+        # The mirror is run with NO `--root`: resolving its own root IS the clause.
+        through_mirror = subprocess.run(
+            [sys.executable, str(mirror), "--json", "--skip-probe"],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=300,
+        )
+>       assert source.returncode == 0 and through_mirror.returncode == 0, (
+            "C-15: both the source and its mirror answer `--skip-probe` at exit 0; got "
+            f"{source.returncode} / {through_mirror.returncode}\n"
+            f"stderr:\n{through_mirror.stderr[-2000:]}"
+        )
+E       AssertionError: C-15: both the source and its mirror answer `--skip-probe` at exit 0; got 1 / 1
+E         stderr:
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/script-interface-...ema": "script-interface-check/1",\n  "source": "tracked",\n  "violation_rows": [],\n  "violations": 0\n}\n', stderr='').returncode
+
+tests/contract/test_script_interface_contract.py:2258: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/SKILL.md', 'skills/internal/review-feature-quality/references/artifact-and-implementation-review.md', 'skills/internal/run-skills/SKILL.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/create-team/references/create-mode.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/manage-feedback/references/path-a-digest.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/implement-feature/SKILL.md', 'skills/external/create-docs/SKILL.md', 'skills/external/create-docs/references/diagram-obligation.md', 'skills/external/merge-skills/SKILL.md', 'skills/external/merge-skills/references/provenance-record.md', 'skills/external/sdd-loop-driver/references/dispatch-recipes.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/external/humanize/SKILL.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md', 'skills/external/git-utils/references/closeout-commands.md', 'skills/external/create-skills/SKILL.md', 'skills/external/create-skills/references/mechanism-policy-check.md', 'skills/external/sdd-house-keeping/references/maintenance-recipes.md', 'skills/external/coaching-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md']
+E       assert not ['skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/SKI...s/internal/run-skills/SKILL.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:105: AssertionError
+_________________ test_c2_active_spec_feature_bindings_resolve _________________
+
+    @pytest.mark.contract
+    def test_c2_active_spec_feature_bindings_resolve():
+        feature_ids = {row["id"] for row in _feature_rows()}
+        bad = []
+        for spec_dir in sorted(SPECS_DIR.iterdir()):
+            if spec_dir.name.startswith(".") or not spec_dir.is_dir():
+                continue
+            req = spec_dir / "requirements.md"
+            if not req.exists():
+                continue
+            m = re.search(r"\*\*Feature ID\*\*:\s*(\d{3})",
+                          req.read_text(encoding="utf-8"))
+            if m and m.group(1) not in feature_ids:
+                bad.append(f"{spec_dir.name}: Feature {m.group(1)} has no row")
+>       assert not bad, f"active specs bind unregistered Features: {bad}"
+E       AssertionError: active specs bind unregistered Features: ['086-efficient-test-execution: Feature 086 has no row', '088-speckit-visualization: Feature 088 has no row', '089-script-interface-contract: Feature 086 has no row', '090-re-anchoring: Feature 090 has no row', '091-auto-git-closeout: Feature 091 has no row']
+E       assert not ['086-efficient-test-execution: Feature 086 has no row', '088-speckit-visualization: Feature 088 has no row', '089-scr...: Feature 086 has no row', '090-re-anchoring: Feature 090 has no row', '091-auto-git-closeout: Feature 091 has no row']
+
+tests/contract/test_spec_feature_binding_integrity.py:69: AssertionError
+______ test_write_whitelist_is_the_goal_directory_not_the_team_directory _______
+
+    def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
+        """FR-017 / FR-020: the goal side owns the summary; the team side is read-only.
+    
+        This reads requirement 036's frozen contract, which states the pre-migration
+        path. That document is history and MUST NOT be rewritten (037 FR-022), so the
+        assertion keeps 036's wording — its subject is goal-indexed vs team-indexed,
+        which the historical path satisfies just as well. The *live* write-set truth is
+        pinned separately by tests/contract/test_goal_writeset.py against
+        skills/internal/create-team/references/summary-mapping.md.
+        """
+        text = WRITESET_CONTRACT.read_text(encoding="utf-8")
+        whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]
+>       assert "project/goal/" in whitelist
+E       AssertionError: assert 'project/goal/' in '\n\nDuring the summary step, writes are permitted ONLY to:\n\n| # | Path | Contents |\n|---|------|----------|\n| W-1...k entries recorded by the invoked skill |\n\nAny write outside W-1 and W-2 during the summary step is a violation.\n\n'
+
+tests/contract/test_summary_writeset.py:163: AssertionError
+_______________________ test_scanner_real_tree_is_clean ________________________
+
+    def test_scanner_real_tree_is_clean():
+        result = subprocess.run(
+            [sys.executable, str(SCANNER), "--summary"],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+>       assert result.returncode == 0, result.stdout + result.stderr
+E       AssertionError: temp-directory violations: 2
+E         scanned files: 458
+E         allowlisted: 74
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/scan-temp-usage.py', '--summary'], returncode=2, stdout='temp-directory violations: 2\nscanned files: 458\nallowlisted: 74\n', stderr='').returncode
+
+tests/contract/test_temp_directory_discipline.py:154: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/reporting-obligations.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/reporting-obligations.md:## 判定边界', '/storage/project/clo...ss-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+_____ test_c11_no_dangling_guideline_pointer_on_either_instruction_surface _____
+
+    def test_c11_no_dangling_guideline_pointer_on_either_instruction_surface():
+        surfaces = (("template", TEMPLATE), ("live", LIVE))
+        pointed: set[str] = set()
+        for label, path in surfaces:
+            names = set(GUIDELINE_POINTER_RE.findall(_text(path)))
+            assert names, f"the {label} instruction surface carries no guideline pointer at all"
+            pointed |= names
+    
+        # A pointer's whole job is to let a reader open the file, so the target that must exist
+        # is the one the reader actually resolves: `.specify/shared/guidelines/<name>.md`.
+        # Checking only the framework source leaves the downstream failure mode invisible —
+        # proven by drill: with the runtime copy moved aside and the source intact, a
+        # source-only version of this clause still passed. Both halves are asserted, because
+        # the source is what regenerates the runtime copy.
+        runtime_dir = ROOT / ".specify" / "shared" / "guidelines"
+        dangling_runtime = sorted(n for n in pointed if not (runtime_dir / n).is_file())
+        assert not dangling_runtime, (
+            "instruction surfaces point at guidelines with no runtime copy under "
+            ".specify/shared/guidelines/ — a reader following the pointer finds nothing, which "
+            "is the delivery window FR-038 / SC-017 exists to close "
+            f"(run scripts/python/sync-mirrors.py --write shared): {dangling_runtime}"
+        )
+        dangling_source = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
+        assert not dangling_source, (
+            "instruction surfaces point at guidelines with no framework source under "
+            f"shared/guidelines/ — the runtime copy cannot be regenerated: {dangling_source}"
+        )
+    
+        # C-11(b): the remainder must not grow past the three structurally unpointed files.
+        # Anti-vacuity: name the three and require them to exist, so an empty guidelines
+        # directory cannot make the subset assertion pass on nothing.
+        for name in UNPOINTED_BY_STRUCTURE:
+            assert (GUIDELINES / name).is_file(), (
+                f"C-11(b) names {name} as unpointed-by-structure but it is not in shared/guidelines/"
+            )
+        full = {p.name for p in GUIDELINES.glob("*.md")}
+        remainder = full - pointed
+        unexpected = sorted(remainder - set(UNPOINTED_BY_STRUCTURE))
+>       assert not unexpected, (
+            "a guideline lost its instruction-surface pointer, so it can no longer dangle "
+            "loudly — coverage shrank silently. Either restore the pointer or amend "
+            f"ambient-section.md C-11(b) with a recorded reason: {unexpected}"
+        )
+E       AssertionError: a guideline lost its instruction-surface pointer, so it can no longer dangle loudly — coverage shrank silently. Either restore the pointer or amend ambient-section.md C-11(b) with a recorded reason: ['reporting-obligations.md', 'self-explanatory.md']
+E       assert not ['reporting-obligations.md', 'self-explanatory.md']
+
+tests/contract/test_user_facing_comprehension_section.py:283: AssertionError
+_________________ test_state_dir_falls_back_to_runtime_dir_env _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_state_dir_falls_back_to_r0')
+
+    def test_state_dir_falls_back_to_runtime_dir_env(tmp_path):
+        """R-02 level 3: with no --state-dir and no Registry `status_path`, the
+        `SPECIFY_LINE_RUNTIME_DIR` convention the runner writes to is used, so the
+        four-piece evidence is still found instead of leaving `state_dir` null."""
+        ws = Workspace(tmp_path)  # no registry entry -> level 2 cannot fire
+        ws.write_spine(state="running")
+        pid = ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws, state_dir=False)  # --spine stays explicit
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["paths"]["state_dir"] == str(ws.state_dir)
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:408: AssertionError
+_________ test_state_dir_falls_back_to_home_when_runtime_env_is_absent _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_state_dir_falls_back_to_h0')
+
+    def test_state_dir_falls_back_to_home_when_runtime_env_is_absent(tmp_path):
+        """R-02 level 4: with no --state-dir, no Registry and no
+        `SPECIFY_LINE_RUNTIME_DIR`, `$HOME` is the last resort. The fixture points
+        HOME at a temp dir, so the real home is neither read nor written."""
+        ws = Workspace(tmp_path)  # no registry entry
+        ws.write_spine(state="running")
+        home_pid = ws.home / ("pid-%s-%s" % (ws.line, ws.stage))
+        home_pid.write_text(
+            "pid=%d start=424242 at=%d line=%s stage=%s event=pid\n"
+            % (os.getpid(), NOW, ws.line, ws.stage), encoding="utf-8")
+        (ws.home / ("heartbeat-%s-%s.log" % (ws.line, ws.stage))).write_text(
+            "at=%d line=%s stage=%s event=heartbeat\n" % (NOW, ws.line, ws.stage),
+            encoding="utf-8")
+    
+        env = _snap_json(ws, state_dir=False, unset=["SPECIFY_LINE_RUNTIME_DIR"])
+    
+        assert env["paths"]["state_dir"] == str(ws.home)
+        assert env["paths"]["state_dir"] != str(Path.home()), "real home must stay out"
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(home_pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:431: AssertionError
+__________________ test_missing_registry_continues_evaluation __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_missing_registry_continue0')
+
+    def test_missing_registry_continues_evaluation(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine(state="running")
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["registry"]["stage"] is None
+        assert env["spine"]["status"] == "present"
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:445: AssertionError
+_________________ test_sentinel_must_be_the_last_nonempty_line _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_sentinel_must_be_the_last0')
+
+    def test_sentinel_must_be_the_last_nonempty_line(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine()
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "", "still working"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:632: AssertionError
+___________________ test_derived_dead_no_signal_and_running ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_derived_dead_no_signal_an0')
+
+    def test_derived_dead_no_signal_and_running(tmp_path):
+        """FR-004 rules (4), (6), (7)."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert env["loop_state_reason"] == "dead-no-exit-record"
+        assert env["recovery_action"] == "retry"
+    
+        (ws.state_dir / ("pid-%s-%s" % (ws.line, ws.stage))).unlink()
+        env = _snap_json(ws)
+        assert env["loop_state"] == "NO_SIGNAL"
+        assert env["loop_state_reason"] == "no-signal"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1073: AssertionError
+_______ test_derived_deadline_overrun_with_live_process_is_timeout_watch _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_derived_deadline_overrun_0')
+
+    def test_derived_deadline_overrun_with_live_process_is_timeout_watch(tmp_path):
+        """FR-004 rule (5) + IA-17: a live TIMEOUT is watched, never killed."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 900, deadline=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+>       assert env["loop_state"] == "TIMEOUT"
+E       AssertionError: assert 'DEAD' == 'TIMEOUT'
+E         
+E         - TIMEOUT
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1086: AssertionError
+____________ test_unwatched_detector_positive_expired_and_negative _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_unwatched_detector_positi0')
+
+    def test_unwatched_detector_positive_expired_and_negative(tmp_path):
+        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
+        # cases anchor to call time instead of module-import NOW. NOW binds at
+        # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
+        # marker already sits past its own 300 s window and the "fresh" branch becomes
+        # unreachable. Assertions and branch coverage are unchanged.
+        now = int(time.time())
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=now - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1114: AssertionError
+____________________ test_dead_no_exit_record_is_never_done ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_dead_no_exit_record_is_ne0')
+
+    def test_dead_no_exit_record_is_never_done(tmp_path):
+        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert _find(env, "dead-no-exit-record")
+        assert env["recovery_action"] != "verify"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert _find(env, "dead-no-exit-record") == [], (
+            "a live process must not be reported as dead-no-exit-record"
+        )
+E       AssertionError: a live process must not be reported as dead-no-exit-record
+E       assert [{'detail': '...exit-record'}] == []
+E         
+E         Left contains one more item: {'detail': 'pid record exists, the process is gone and no exit record was written', 'detector': '065a', 'evidence': [{...ead_no_exit_record_is_ne0/state/demo-line/status-demo-line-tasks', 'signal': 'status'}], 'form': 'dead-no-exit-record'}
+E         Use -v to get more diff
+
+tests/unit/test_loop_state_engine.py:1146: AssertionError
+________ test_trailing_anomaly_line_with_live_process_is_watch_not_done ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4249/test_trailing_anomaly_line_wit0')
+
+    def test_trailing_anomaly_line_with_live_process_is_watch_not_done(tmp_path):
+        """FR-004 sentinel rule: an earlier sentinel followed by ANOMALY: is not DONE."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "ANOMALY: subagent returned malformed tasks"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+        assert env["evidence"]["log"]["anomaly"] is True
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'ANOMALY' == 'RUNNING'
+E         
+E         - RUNNING
+E         + ANOMALY
+
+tests/unit/test_loop_state_engine.py:1445: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_determinism
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_zero_handler_no_section
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_check_clean_and_drift
+FAILED tests/contract/test_compile_embeds.py::test_compiled_form_contract - j...
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_execution_config_engine.py::TestErrorsAndWarnings::test_warning_surface_is_json_and_stderr
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+FAILED tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_spec_feature_binding_integrity.py::test_c2_active_spec_feature_bindings_resolve
+FAILED tests/contract/test_summary_writeset.py::test_write_whitelist_is_the_goal_directory_not_the_team_directory
+FAILED tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+FAILED tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+FAILED tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+FAILED tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+FAILED tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+FAILED tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+FAILED tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+FAILED tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+34 failed, 8045 passed, 2 skipped, 3 warnings in 566.07s (0:09:26)
+EXIT=1

@@ -1,0 +1,22 @@
+==============================================================================
+declared model   : 临时分支（trunk-based）—— 单主干 + 短命特性分支；开发在临时分支上进行，完成即合入主干并删除
+strategy value   : commit+merge+push
+push targets     : ('master',)   read-only: ('origin',)
+terminal state   : executed
+   1. branch  091-fixture :: cut from master
+   2. commit  091-fixture :: artifact + records commit
+   3. merge   master :: 091-fixture -> master
+   4. delete-branch 091-fixture :: local only, after the merge landed
+   5. push    <remote> :: push the trunk
+  receipt steps  : ()
+==============================================================================
+declared model   : 临时分支（trunk-based）—— 单主干 + 短命特性分支；开发在临时分支上进行，完成即合入主干并删除
+strategy value   : ask  (dry-run override)
+push targets     : ('master',)   read-only: ('origin',)
+terminal state   : presented
+   1. branch  091-fixture :: cut from master
+   2. commit  091-fixture :: artifact + records commit
+   3. merge   master :: 091-fixture -> master
+   4. delete-branch 091-fixture :: local only, after the merge landed
+   5. push    <remote> :: push the trunk
+  receipt steps  : ('commit', 'merge', 'push')

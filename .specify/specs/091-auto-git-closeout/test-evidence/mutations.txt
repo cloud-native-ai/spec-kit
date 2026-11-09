@@ -40,3 +40,55 @@ change. The structural arm is the fast check, not the proof.
 header restates it: a structural predicate reads files, a behavioural predicate runs git against
 a throwaway repository. Neither writes a tracked file, so a mutation cannot leave the tree in a
 half-mutated state — the substitution is applied to a local string and discarded.
+
+## R-21b — measured 2026-11-09 in the completion slice: the behavioural retry arm
+
+The retry arm above mutates **wording**. T041's row text asks specifically that the T039 / T040
+assertions (the two failure fixtures) go red when an automatic retry is injected. That is a
+behavioural question, and slice 1 had no reading for it. Measured now with the driver's own
+mutation hook (`run_closeout(..., attempt_retry=N)`), which retries the failing step N times:
+
+$ /usr/bin/python3 .specify/specs/091-auto-git-closeout/test-evidence/T041-mutation-probe.py
+    (first reading, before the axis existed)
+arm | retry | exit | stage | command | predicate
+----|-------|------|-------|---------|----------
+A rejected-push | 0 | 1 | push | 'git push -q mirror master:master' | GREEN
+A rejected-push | 2 | 1 | push | 'git push -q mirror master:master' | GREEN
+B merge-conflict | 0 | 1 | merge | - | GREEN
+B merge-conflict | 2 | 1 | merge | - | GREEN
+MUTATION-PROBE-FAIL: arm A: an injected retry left the predicate GREEN — the arm proves nothing
+MUTATION-PROBE-FAIL: arm B: an injected retry left the predicate GREEN — the arm proves nothing
+exit status: 1
+
+    (second reading, after the guard gained the axis it lacked)
+$ /usr/bin/python3 .specify/specs/091-auto-git-closeout/test-evidence/T041-mutation-probe.py
+arm | retry | exit | stage | retries | remote unchanged
+----|-------|------|-------|---------|-----------------
+A rejected-push | 0 | 1 | push | 0 | True | GREEN
+A rejected-push | 2 | 1 | push | 2 | True | GREEN
+B merge-conflict | 0 | 1 | merge | 0 | n/a | GREEN
+B merge-conflict | 2 | 1 | merge | 0 | n/a | GREEN
+MUTATION-PROBE: pass
+exit status: 0
+
+Reading of the first run (kept, not deleted): the two behavioural guards asserted the *remote's*
+end state and the failing stage, and a retry changes neither — the assertion had no axis on which
+the mutation could show. `retries` is now that axis (a reported field on the outcome, never a
+rule), and the landed guard `test_mutation_a_behavioural_retry_loop_reds_the_no_retry_assertions`
+asserts `retries == 0` on the landed driver and the mutated driver's non-zero reading.
+
+| Arm | Row | Clause | Mutation | Landed | Mutated |
+|-----|-----|--------|----------|--------|---------|
+| `test_mutation_a_behavioural_retry_loop_reds_the_no_retry_assertions` | T041 | executor C-5 / FR-011 / SC-003 | `run_closeout(..., attempt_retry=2)` — the driver re-issues the failing push twice | `attempt_retry=0`: exit 1, stage `push`, remote sha unchanged, `retries == 0` — GREEN | `attempt_retry=2`: `retries == 2` — the arm REDS on the "no retry happened" assertion it now carries; the remote is still never overwritten |
+
+Second measured limit, recorded rather than smoothed (this is the R-21b entry):
+
+- the retry hook lives on the **push** step, so the **merge-conflict** arm is unchanged by it
+  (`retries == 0` under both runs) and its guarantee stays "stops at the merge, no push after it".
+  The test asserts that reading explicitly, so a later change that makes the merge retryable
+  turns this arm red instead of silently passing.
+- what changed in the module for this arm: `CloseoutOutcome.retries` (a reported field, never a
+  constant) — a report field, not a second rule.
+
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q -k mutation
+6 passed, 36 deselected in 0.59s
