@@ -21,7 +21,7 @@ skill:sdd-loop-driver run=r20261109T023000Z-auto-closeout-repair1 token=not_eval
   "feature": "091-auto-git-closeout",
   "feature_id": "091",
   "determined_at": "2026-11-09T03:24:35Z",
-  "settled_at": null,
+  "settled_at": "2026-11-09T03:30:17Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ skill:sdd-loop-driver run=r20261109T023000Z-auto-closeout-repair1 token=not_eval
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -163,8 +163,8 @@ skill:sdd-loop-driver run=r20261109T023000Z-auto-closeout-repair1 token=not_eval
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -194,7 +194,7 @@ skill:sdd-loop-driver run=r20261109T023000Z-auto-closeout-repair1 token=not_eval
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
