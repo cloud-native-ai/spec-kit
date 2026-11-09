@@ -1,4 +1,4 @@
-run1(2026-11-09) vs run2(2026-11-09), serial, 23 test files: diff lines=0 entries=46 each
+run1 vs run2 vs run3 (2026-11-09), serial, 23 test files: diff empty, 46 entries each; three consecutive runs identical
 
 parallel-mode reading (run-tests.sh default, -n auto) vs serial reading: 46 ids each; the symmetric difference is ONE
 pair (see baseline-parallel-vs-serial.txt): test_clause_coverage.py::test_c20_... appears in the parallel reading only,
