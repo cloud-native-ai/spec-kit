@@ -17,7 +17,7 @@
 | SC-007 | supporting | **partial** | `test-evidence/wp5-t110-t112-coordination-coverage.txt`, `test-evidence/wp2-t109-t113-t119.txt` | goal: partition fixture measured (5 targets → [3,2]; <2 available → serial with `budget-reserve`); team/loop: obligations stated in their owner documents and the territory machinery is retained, but no executable team/loop concurrency fixture exists this run |
 | SC-008 | supporting | **pass** | `test-evidence/wp5-t110-t112-coordination-coverage.txt`, `tests/contract/test_concurrency_check_engine.py` | every stage resolves through `decomposition-coverage.yaml` (requirements/tasks covered-by-default, analyze `on`); an `off` stage without a named decision is `coverage-undeclared` |
 | SC-009 | supporting | **pass** | `test-evidence/wp5-t017-t019-owner-unavailable.txt` | unregistered / broken / unparsable facts all read `owner-unavailable` at exit 2 with a named message; no default is produced |
-| SC-010 | supporting | **partial** | `notes/disposal-ledger.md`, `test-evidence/wp5-gate1-comparison.txt`, `test-evidence/wp5-suite-final.txt` | the 064/070/077/086/092 dispositions are recorded and the re-pin set is green; the literal "whole suite green" is not met because 161 frozen-baseline + 44 master-inherited reds sit outside this feature's write domain — zero NEW 093-caused names remain |
+| SC-010 | supporting | **partial** | `notes/disposal-ledger.md`, `test-evidence/wp5-gate1-comparison.txt`, `test-evidence/wp5-suite-final.txt` | the 064/070/077/086/092 dispositions are recorded and the re-pin set is green; the literal "whole suite green" is not met because 161 frozen-baseline + 44 master-inherited + 2 trigger-order reds sit outside this feature's write domain — zero NEW 093-caused names remain |
 | SC-011 | supporting | **pass** | `tests/contract/test_concurrency_high_order.py::test_anti_nesting_chain_is_depth_two_with_its_three_prohibitions` | dispatch depth stays 2 with the three prohibitions; the tamper mutation reds |
 | SC-012 | supporting | **pass** | `tests/unit/test_concurrency_check_engine.py::test_cost_benefit_fixture_identical_result_set_lower_wall_clock` | the fixture's concurrent form yields an identical result set with a lower wall clock |
 
@@ -92,7 +92,7 @@ SC-009_value=absent / broken / unparsable facts -> owner-unavailable exit 2, nam
 SC-009_note=supporting path — see § Success criteria row SC-009
 
 SC-010_status=partial
-SC-010_value=dispositions recorded (12 ledger rows); zero NEW 093-caused failures vs the frozen baseline; 161 baseline + 44 master-inherited names remain
+SC-010_value=dispositions recorded (12 ledger rows); zero NEW 093-caused failures vs the frozen baseline; 161 baseline + 44 master-inherited + 2 trigger-order names remain
 SC-010_note=supporting path — see § Success criteria row SC-010
 SC-010_blocked_at=the literal whole-suite-green is not measured on this tree; inherited reds sit outside this feature's write domain
 SC-010_reduced_measurement=GATE-1 name-set comparison vs the frozen baseline, classified per name (wp5-gate1-comparison.txt)
@@ -125,9 +125,9 @@ notes=the two WP4 modules that skipped on not_evaluated (T110 report, T134 ledge
 
 ## Gate readings carried by this record
 
-- **GATE-1**: `test-evidence/wp5-suite-final.txt` (211 failed / 8252 passed / 2 skipped) compared
-  name-by-name against the frozen baseline — **0 NEW 093-caused failures**; the 51 NEW names are 44
-  master-inherited, 5 trigger-order, and 2 order-sensitive (evidence: `wp5-gate1-comparison.txt`).
+- **GATE-1**: `test-evidence/wp5-suite-final.txt` (207 failed / 8256 passed / 2 skipped) compared
+  name-by-name against the frozen baseline — **0 NEW 093-caused failures**; the 46 NEW names are 44
+  master-inherited and 2 trigger-order (evidence: `wp5-gate1-comparison.txt`).
 - **GATE-2**: `test-evidence/wp5-t130-t131-release-parity.txt` — `sync-mirrors.py --check` exit 0,
   `regen-command-copies.py --check` exit 0.
 - **GATE-5**: `script-interface-check` reading in `test-evidence/wp2-t021-t025.txt` (WP2) plus the
