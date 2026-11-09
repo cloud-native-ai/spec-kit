@@ -1,0 +1,19 @@
+# 2026-11-09 baseline: spec-local goal/team residual (read-only probe)
+## goal
+.specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md
+.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md
+.specify/specs/087-arch-diagram-docs/goal/087-arch-diagram-docs/goal.md
+.specify/specs/088-speckit-visualization/goal/088-speckit-visualization/goal.md
+.specify/specs/089-script-interface-contract/goal/script-interface-contract/goal.md
+.specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md
+.specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md
+count=7
+## team
+.specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md
+.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md
+.specify/specs/087-arch-diagram-docs/team/087-arch-diagram-docs/team.md
+.specify/specs/088-speckit-visualization/team/087-reporting-dogfood/team.md
+.specify/specs/089-script-interface-contract/team/086-script-interface-contract/team.md
+.specify/specs/090-re-anchoring/team/090-re-anchoring/team.md
+.specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md
+count=7
