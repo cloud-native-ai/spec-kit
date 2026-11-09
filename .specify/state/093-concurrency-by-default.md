@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794224585
 stage_base_commit: 215c3dcb
 attempt: 1
 retry_limit: 3
-last_verdict: "Integration wave: WP2+WP3+WP4 merged into the 093 branch (pre-merge per-package greens verified where applicable: WP2 9 passed; WP4 alone 56 red by cross-package design); branch synced onto master (merge ed8168a0d; 4 conflicts resolved as unions — contract.yaml facts (093 flat keys + 094 registered_facts), features.md (093 row + master 094 row), register rows; mirrors re-synced). Combined 12-module run on the merged branch: 22 failed / 122 passed / 2 skipped — the WP2 engine does not yet satisfy the WP4 contract tests (interval semantics, negative-path detection, evidence forms, verdict named-reading, wp-gate ceiling default, and the #class-concurrent-by-default anchor). 093-enginefix fork dispatched to turn all 22 green."
+last_verdict: "Enginefix integrated into the 093 branch (merge 7d4fd7164): the 12 WP4 modules now read 83 passed / 2 skipped / 0 failed on the committed branch; mirror conflicts resolved by projecting the source over the regenerated mirrors; sync-mirrors --check ok (110 files). The line now holds WP1+WP2+WP3+WP4+enginefix on top of the master sync."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "on enginefix completion: pre-merge check in its worktree (12 modules → 0 failed), merge into the 093 branch, gates + mirror sync, push branch; then WP5 release (49 rows) and line closure"
+next_action: "run WP5 release (49 rows) in a per-package worktree; then line closure (review + closure-acceptance) and the branch→master merge"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
