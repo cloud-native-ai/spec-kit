@@ -34,7 +34,7 @@ Work with the project directory as your working directory; load the project cont
 1. Read the assignment brief in full.
 2. Load only the authority artifacts the brief names (summary-first).
 3. Execute the assigned slice using the declared tools.
-4. Verify your own output exists and is non-empty.
+4. Verify your own output exists and is non-empty; every test execution goes through `scripts/bash/run-tests.sh` (test paths and arguments forward to the framework; single-test debugging included) — direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry.
 5. Return the output paths, evidence pointers, and `未发现异常` or `ANOMALY:` lines.
 
 ## Output Format

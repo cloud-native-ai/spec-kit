@@ -253,7 +253,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - **Languages**: Python `>=3.8` (`pyproject.toml`)
 - **Build / Packaging**: `hatchling` (PEP 517); entrypoint `specify = "specify_cli:main"`; install via `uv tool install` or `pipx`.
 - **Runtime Dependencies**: `typer` (CLI), `rich` (TTY), `httpx[socks]`, `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
-- **Test Framework**: `pytest` (markers `contract`, `integration`): `pytest`, `pytest -m contract`, `pytest -m integration`.
+- **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded (single-test debugging included, e.g. `bash scripts/bash/run-tests.sh tests/contract/test_x.py -q`); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry. The suite carries the `contract` and `integration` markers — select them by passing `-m <marker>` through the runner.
 - **Key Directories**:
   - `src/specify_cli/`: single-module Typer CLI.
   - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, tools/skills).
