@@ -1,0 +1,159 @@
+# team-create evidence — 092-non-disposable
+
+date: 2026-11-09
+stage: tasks (pre-dispatch) — 085 cadence: team created after clarify U4 and plan U4 (FR-051)
+actor: SDD Stage Integrator (spec-local temporary-team creation)
+spec dir: .specify/specs/092-non-disposable
+
+Every reading below is pasted as produced. Nothing here is an attestation: each block names the exact
+command, so a later reader can re-run it.
+
+------------------------------------------------------------------------------
+## G1 — creation timing (SC-020: the team directory must not exist before clarify+plan U4)
+
+    ls .specify/specs/092-non-disposable/team
+    → No such file or directory            (read BEFORE landing, exit 2)
+
+    clarify U4: .specify/specs/092-non-disposable/checkpoints/02-clarify.md   (present, gate readings in
+                test-evidence/clarify-gates.txt)
+    plan U4:    .specify/specs/092-non-disposable/checkpoints/03-plan.md      (present, U4: pass — 7
+                contracts / 54 clauses, 3 gates pass)
+
+    Both U4s are on disk before this creation, so the timing condition holds.
+
+------------------------------------------------------------------------------
+## G2 — territory disjointness (042 verifier, proposals ∪ existing same-goal_slug teams)
+
+    python3 .specify/skills/internal/create-team/scripts/verify-territory-disjoint.py \
+        --input .specify/.tmp/092-team-proposal.json --repo-root . --json
+
+    {"verdicts": [],
+     "summary": {"pairs": 0, "no-overlap": 0, "overlap": 0, "undecidable": 0}}
+
+    exit code: 0
+
+### Why 0 pairs
+
+Checked set = the proposal ∪ existing teams declaring `goal_slug: 092-non-disposable`. The scan root is
+`.specify/teams/*/team.md` (the owner's rule: `goal-utils.py` `ARCHIVE_DIRNAME`/`TEAM_DIRNAME` +
+`verify-territory-disjoint.py` `_existing_territories`); no global team declares this goal_slug, so the
+proposal is the only party and no pair exists. This is "no contest", not "a contest that was waived".
+
+------------------------------------------------------------------------------
+## G3 — preset match (create-mode step 2)
+
+    python3 .specify/skills/internal/create-team/scripts/match-team-preset.py --goal "<goal text>"
+
+    {"goalChars": 239, "presetsScanned": 2, "confidence": "none", "matches": []}
+
+    exit code: 0
+
+    Verdict: no preset matched → from-scratch derivation (step 3 pattern tree + step 4 roster). No
+    `preset:` key is written into the frontmatter, because none was instantiated.
+
+------------------------------------------------------------------------------
+## G4 — reporter-seat seat guard (mandatory create step, 087)
+
+    python3 .specify/skills/internal/create-team/scripts/validate-roster.py \
+        .specify/specs/092-non-disposable/team/092-non-disposable/team.md
+
+    conforming: team 092-non-disposable carries exactly one reporter seat (agent: reporter)
+
+    exit code: 0
+
+    The canonical source copy (`skills/internal/create-team/scripts/validate-roster.py`) is byte-identical
+    (`diff` → IDENTICAL) and returns the same line and exit 0.
+    The `config.reporting-reason` omission path was NOT used: the RS-05 condition does not hold (this run is
+    multi-lane and long), so the seat is a real roster row.
+
+------------------------------------------------------------------------------
+## G5 — seat-policy resolution (074a, the roster's `seats` block must resolve by (team, seat))
+
+    python3 scripts/python/sdd-route.py --action authorize --team 092-non-disposable --seat reporter \
+        --agent .specify/agents/templates/reporter.agent.md \
+        --scope spec --spec-dir .specify/specs/092-non-disposable --format text
+
+    agent_capability: forbidden (absent-key)
+    seat_policy:      forbidden (declared)
+    effective:        forbidden
+    verdict:          forbidden
+    failed_half:      both
+    reason:           neither half allows SDD invocation: the agent definition and the seat policy both deny
+    team / seat:      092-non-disposable / reporter
+    agent source:     /cws_data/cloud-native-ai/spec-kit/.specify/agents/templates/reporter.agent.md
+    team source:      /cws_data/cloud-native-ai/spec-kit/.specify/specs/092-non-disposable/team/092-non-disposable/team.md
+
+    exit code: 0
+
+    The reading matters for two reasons: (a) the roster parses as frontmatter — the engine located the team
+    file and read the `seats` map out of it; (b) `forbidden` matches the sibling spec-local teams
+    (085 / 086 / 090), which deny SDD invocation to their stage seats so a seat never re-enters the driver
+    loop. It is a resolution proof, not an authorization grant.
+
+------------------------------------------------------------------------------
+## Roster summary
+
+    team slug:   092-non-disposable
+    scope:       spec      spec_dir: .specify/specs/092-non-disposable
+    goal_slug:   092-non-disposable
+    focus_target: (absent) — the spec-local goal carries no `## Targets` section
+    pattern:     serial (质量优先) with in-stage parallelism
+    stage chain: tasks → implement → review
+
+    Stage     Seats                                                              max_parallel
+    --------  -----------------------------------------------------------------  ------------
+    tasks     task-coordinator, task-executor, stage-verifier, integrator, reporter        4
+    implement implement-coordinator, implement-executor, stage-verifier, integrator, reporter  8
+    review    review-coordinator, review-executor, stage-verifier, integrator, reporter        4
+
+    Members (9 rows, 9 distinct agent definitions, zero newly instantiated seats):
+      sdd-task-coordinator        task-coordinator        Worker   temporary
+      sdd-task-executor           task-executor           Worker   temporary
+      sdd-implement-coordinator   implement-coordinator   Worker   temporary
+      sdd-implement-executor      implement-executor      Worker   temporary
+      sdd-review-coordinator      review-coordinator      Worker   temporary
+      sdd-review-executor         review-executor         Worker   temporary
+      sdd-stage-verifier          stage-verifier          Worker   temporary
+      sdd-stage-integrator        stage-integrator        Worker   temporary
+      reporter                    reporter                Meta     temporary  (the one seat row)
+
+    All nine resolve to shipped templates under .specify/agents/templates/ (mirror of agents/) — reuse-first
+    held, so no create-agent instantiation ran and no `team-scope` seat instance was produced.
+
+    Concurrency (the checkpoint-03 decision, expressed only inside the existing 085 mechanism):
+      agent_concurrency: { requested: 24, effective: 24,
+                           reason: local native subagents, shared-tree; user requires large concurrency }
+      stage_max_parallel: { tasks: 4, implement: 8, review: 4 }
+      verifier_reserve: 1
+      decomposition_slot_cap: 8   (= the implement ceiling)
+      isolation: shared-tree      → concurrent executors MUST hold disjoint write paths
+      reconciliation: the plan's package chain (P1→P2→P3→P4→P5→P6, P7∥P6, →P8) authorizes exactly one
+      parallel pair, so 8 is a bound and the measured concurrency will be lower; that is a legitimate
+      outcome under FR-050 (a named downgrade), not a defect of the roster.
+
+    Reporter seat:
+      reporting-territory.read:  state spine, test-evidence/**, checkpoints/**, team runs/**
+      reporting-territory.write: .specify/specs/092-non-disposable/test-evidence/reporter-092-non-disposable.live.log
+      reporting-cadence: default (the cadence owned by shared/guidelines/progress-reporting.md)
+
+    Territory: write = the spec's own artifacts + the eleven framework/registry paths the plan's package
+    table names (P1/P2/P3/P4/P5); read = "**"; forbidden = .specify/teams/**, .specify/goal/**, and the six
+    neighbour feature bodies (085–090) whose 档 II handoffs are recorded, never rewritten (FR-056 / D-8).
+
+------------------------------------------------------------------------------
+## Writes performed by this creation
+
+    .specify/specs/092-non-disposable/team/092-non-disposable/team.md   (created)
+    .specify/specs/092-non-disposable/test-evidence/team-create.txt     (this file, created)
+
+    Zero writes to .specify/teams/**, zero writes to .specify/goal/**, zero writes to framework sources,
+    zero agent instances created, no git commit, no push.
+
+------------------------------------------------------------------------------
+## Not done, and why (scope boundaries of this assignment)
+
+- `specify render-agents --ai <host tool>` (create-mode step 7) was NOT run: it writes the rendered agent
+  registration surfaces, which lie outside this assignment's declared write boundary. The creation brief
+  scoped this step to `team/<slug>/team.md` + `test-evidence/team-create.txt` and forbade changes outside it.
+- No run report under `runs/` was written: creating a team is not a team run.
+- The team was not executed; implementation was not touched; nothing was committed or pushed.
