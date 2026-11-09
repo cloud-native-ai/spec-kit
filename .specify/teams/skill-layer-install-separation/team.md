@@ -113,6 +113,10 @@ summary:
     every: 1
     delivery_dir: .specify/goal/skill-layer-install-separation/summary/
     interactive: false
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

@@ -1,0 +1,18 @@
+== row/ID counts ==
+feature-ref physical table rows: 22 (2 FR cells per row)
+feature-ref FR entries: 43 ; distinct FR ids: 43
+recomputed FR ids: 43 ; requirements FR definitions: 43
+FR ids in requirements but not in feature-ref: []
+FR ids in feature-ref but not in requirements: []
+FR ids in recompute but not in feature-ref: []
+FR ids in feature-ref but not recomputed: []
+
+== row-by-row comparison (membership set / order) ==
+FR-013  membership-equal/order-differs  ref=['C-46', 'C-47', 'C-106', 'C-108'] recomputed=['C-106', 'C-108', 'C-46', 'C-47']
+FR-029  membership-equal/order-differs  ref=['C-48', 'C-100', 'C-101'] recomputed=['C-100', 'C-101', 'C-48']
+FR-030  membership-equal/order-differs  ref=['C-45', 'C-50', 'C-97', 'C-98', 'C-101'] recomputed=['C-97', 'C-98', 'C-101', 'C-45', 'C-50']
+FR-037  membership-equal/order-differs  ref=['C-49', 'C-107'] recomputed=['C-107', 'C-49']
+FR-039  membership-equal/order-differs  ref=['C-68', 'C-69', 'C-70', 'C-80', 'C-81'] recomputed=['C-80', 'C-81', 'C-68', 'C-69', 'C-70']
+
+membership drift rows: 0 ; order-only rows: 5
+RESULT: NO MEMBERSHIP DRIFT — every FR->clause mapping agrees

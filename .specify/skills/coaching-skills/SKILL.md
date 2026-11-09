@@ -1,7 +1,7 @@
 ---
 name: coaching-skills
 description: |
-  Coach another Skill (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md, observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee-name|trainee-path> <work>`.
+  Coach a Skill or a slash-command (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md (or the resolved command template), observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee> [<work>]`.
 skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"
 classification: external
 ---
@@ -10,37 +10,62 @@ classification: external
 
 ## Goal
 
-Coach one Trainee skill through one real work item: state the execution expectation
-first (outcome correctness and process efficiency), dispatch exactly one subagent to
-execute the Trainee's own `SKILL.md`, observe what actually happens, compare the two,
-and hand a micro-adjustment plan to the existing `improve-skills` entry. The Trainee's
-real work is the primary result; optimizing the Trainee is secondary.
+Coach one Trainee — a Skill or a slash-command — through one real work item: state the
+execution expectation first (outcome correctness and process efficiency), dispatch
+exactly one subagent to execute the Trainee's own `SKILL.md` (or its resolved command
+template), observe what actually happens, compare the two, and hand a micro-adjustment
+plan to the existing `improve-skills` entry. The Trainee's real work is the primary
+result; optimizing the Trainee is secondary.
 
 ## Inputs
 
-Invocation: `coaching-skills <trainee-name|trainee-path> <work>`.
+Invocation: `coaching-skills <trainee> [<work>]`.
 
-- Exactly two positional parameters: the Trainee reference and `<work>`.
-- **`Trainee`**: the Trainee reference. Its accepted forms, normalization order,
-  disambiguation rules and failure semantics are owned by
-  `shared/definitions/skill-reference-definitions.md` — reach them there, and
-  report the raw and the normalized identifier plus the decision class. A leading `/`
-  names the Trainee's slash-command surface; it is **never** an instruction to invoke
-  that skill directly instead of running this loop.
+- **One required positional parameter**: the Trainee reference. **`<work>` is
+  OPTIONAL** — many skills and commands run without arguments (e.g. `/speckit.status`);
+  an empty value dispatches the no-argument form and is never a missing parameter.
+- **`Trainee`**: the Trainee reference — a Skill or a command surface. Skill-reference
+  forms, normalization order, disambiguation rules and failure semantics are owned by
+  `shared/definitions/skill-reference-definitions.md` — reach them there, and report
+  the raw and the normalized identifier plus the decision class. A leading `/` is only
+  the surface form (both kinds carry it) and is **never** an instruction to invoke the
+  Trainee directly instead of running this loop; the kind is decided by scanning both
+  lists in § Trainee Resolution.
 - **Meta-skill Trainees are in scope.** When the Trainee itself operates on other
   skills (`improve-skills`, `merge-skills`, `create-skills`, `run-skills`), `<work>` is
   normally a skill-engineering request ("optimize skill X", "merge A into B"); its
   primary artifact is the changed target-skill file set or the Trainee's run report.
   Such a request MUST NOT be reclassified as "not a real work item", and the coach
   MUST NOT execute the Trainee's steps itself in its place.
-- `<work>` MUST be non-empty and enters the run and the dispatch payload verbatim;
-  never rewrite, summarize, or re-scope it.
-- A missing or empty parameter fails closed and names the missing parameter; never
-  substitute one parameter for the other and never pick a topic on the user's behalf.
-- Missing-argument handling is a plain one-sentence clarification, then stop. It is
-  not a confirmation step.
+- `<work>` enters the run and the dispatch payload **verbatim** (an empty value stays
+  empty and is recorded as no-argument execution); never rewrite, summarize,
+  re-scope it, or fill it on the user's behalf.
+- A missing **Trainee** parameter fails closed and names it; an empty `<work>` is
+  legal. Missing-argument handling is a plain one-sentence clarification, then stop.
+  It is not a confirmation step.
 
 ## Trainee Resolution
+
+**First decide what kind of executor the Trainee names — resolve it by scanning both
+lists, never by syntax.** A leading `/` is NOT a discriminator: skills
+(`/improve-skills`, `/coaching-skills`) and command surfaces (`/speckit.status`) both
+carry it.
+
+- **Scan both lists** with the leading `/` stripped: (a) the **Skill** set through the
+  position ladder below (directory name or frontmatter `name`); (b) the **Command** set
+  through the canonical templates `templates/commands/<name>.md` (a `speckit.` prefix
+  also maps to `<name>.md`), then their generated per-tool copies as aliases.
+- Exactly one hit decides the executor kind: a **Skill** (decision class `skill`
+  internal/external/installed) or a **Command** (decision class `command`; the template
+  body is its execution contract).
+- **Two hits of different kinds fail closed naming both candidates** — a skill and a
+  command sharing the normalized name are ambiguous and the user disambiguates; two hits
+  inside the skill ladder fail closed the same way; zero hits name the raw form and the
+  searched coordinates of both lists. Never pick the nearest.
+- The recursion guard (§ below) applies to whichever branch resolved.
+
+Scan coordinates, aliases and the full failure table:
+[`references/trainee-resolution.md`](./references/trainee-resolution.md).
 
 Reuse the `run-skills` position ladder, with no second resolution rule: canonical
 internal → canonical external → installed internal → installed external.
@@ -52,8 +77,9 @@ internal → canonical external → installed internal → installed external.
   distinct layers carrying the same name are two hits.
 - Two hits: fail closed naming both candidate paths; never pick the nearest.
 - Zero hits: fail closed naming the raw and normalized identifier and the searched coordinates.
-- Reject before the expectation phase when the directory has no readable `SKILL.md`
-  or its frontmatter is invalid.
+- Reject before the expectation phase when the resolved executor is unreadable: a skill
+  directory without a readable `SKILL.md`, or a command without a readable template,
+  or either with invalid frontmatter.
 - Reject a target that resolves to `coaching-skills` itself: recursion depth is 1 and
   no dispatch happens.
 - When the host can only load by explicit path, use the `run-skills` explicit-path
@@ -63,41 +89,23 @@ internal → canonical external → installed internal → installed external.
 
 ## Nested (chain) runs
 
-A Trainee may itself be a meta-skill whose own target is the skill actually changed —
-`coaching-skills improve-skills 优化 X` is caller → Trainee → **subject**. Supported per the
-skill-reference owner's § Nested (owner cited under § Inputs), with four duties here:
-
-- **The Trainee resolves the subject, not the coach.** The subject reference stays inside
-  `<work>` byte-for-byte; resolving, normalizing or rewriting it in this run is a contract
-  violation — it would pre-digest the work.
-- **Expectation and verdict target the subject.** `OC-1` names the changed **subject** file
-  set (or the Trainee's own run report), not the Trainee's files; record
-  `chain: <caller> → <trainee> → <subject>` and each hop's resolved absolute path in
-  `expectation.md` and `observation.md`.
-- **The write lock follows the subject**, per `data-model.md` § Optimization claim: two
-  runs coaching different meta-trainees at the same subject still serialize.
-- **Depth is counted per perspective, in dispatch edges**: this run owns exactly one edge
-  (coach → Trainee); the Trainee owns its own single edge (Trainee → subject) and MUST NOT
-  open a second one. A Trainee whose flow would itself dispatch a further coaching/agent
-  run stops and reports `depth-exceeded`; the coach never opens a second dispatch to
-  compensate.
-- **Claim before dispatch when the write rides inside it**: a nested run's subject is
-  written during the dispatch, so the claim is taken before dispatching (see
-  `data-model.md` § Optimization claim) — taking it after the plan would guard a write
-  that already happened.
-- **Guards**: subject == this skill → fail closed before the expectation (never write the
-  running skill from inside its own run); Trainee cannot resolve the subject → record an
-  `observation-gap` plus a deviation, never substitute the coach's own resolution.
+A meta-skill Trainee may itself target the skill actually changed (`caller → Trainee →
+subject`). The four duties — the Trainee resolves the subject, expectation and verdict
+target the subject, the write lock follows the subject, and depth is one dispatch edge per
+perspective with claim-before-dispatch plus the subject guards — are owned in full by
+[`references/nested-runs.md`](./references/nested-runs.md); this body states the branch
+only and never a second copy.
 
 ## Preflight
 
 Run these checks in order before writing any artifact:
 
-1. both positional parameters are present and `<work>` is non-empty;
-2. exactly one Trainee hit resolves from the ladder, with valid frontmatter and a
-   target other than this skill;
-3. when the Trainee is a meta-skill, `<work>` names an identifiable subject to operate on;
-   if it does not, ask one targeted clarification and stop (never pick the subject);
+1. the Trainee parameter is present and resolves to exactly one executor — a command
+   template or a skill hit — with valid frontmatter and a target other than this skill;
+2. `<work>` is optional: an empty value is legal (no-argument execution) and is never
+   treated as a missing parameter;
+3. when the Trainee is a meta-skill, `<work>` names an identifiable subject to operate
+   on; if it is empty, ask one targeted clarification and stop (never pick the subject);
 4. the run directory does not already exist (see § Run Identity).
 
 Any failure stops the run before the expectation phase and names what failed and
@@ -107,7 +115,8 @@ nothing else is a precondition.
 ## Run Identity
 
 - `run-id`: `YYYYMMDDTHHMMSSZ-<trainee-slug>` — a UTC timestamp plus the lowercase
-  kebab slug of the resolved Trainee name.
+  kebab slug of the resolved Trainee name. For a command Trainee the slug is the
+  command name's kebab form (`/speckit.status` → `speckit-status`).
 - Run directory: `.specify/memory/coaching/<run-id>/`, created before the expectation
   is written.
 - If the directory already exists the run fails closed naming the existing path;
@@ -133,7 +142,8 @@ Exactly four files, in this order:
 ## Execution First
 
 - The primary success condition is: the Trainee's real work completed and its primary
-  artifact exists.
+  artifact exists — an artifact path or checkable conclusion for a skill; the command's
+  output or invocation record for a command.
 - Optimization MUST NOT be a precondition of execution and MUST NOT shorten, redirect,
   or simplify the execution to collect optimization material.
 - The coach MUST NOT run any Trainee step in parallel with the subagent.
@@ -153,10 +163,10 @@ The payload is a closed field set; anything not listed below is forbidden.
 
 | Field | Content | Rule |
 |-------|---------|------|
-| `trainee` | resolved identifier, resolved path, layer | the exact path this run resolved; no alternatives offered |
+| `trainee` | resolved identifier, resolved path, executor kind (`skill` or `command`), and the layer for a skill | the exact path this run resolved; no alternatives offered |
 | `workdir` | the project root the Trainee must treat as `${SKILL_WORKDIR}` | a subagent does not inherit this conversation's cwd; omitting it leaves every `.specify/...` reference ambiguous |
-| `work` | `<work>` verbatim | byte-for-byte the second positional parameter |
-| `instruction` | "Follow the Trainee's own `SKILL.md` as the highest execution guidance" | never replaced by a coach-authored procedure |
+| `work` | `<work>` verbatim | byte-for-byte the second positional parameter; an empty value IS the no-argument form, never a missing parameter |
+| `instruction` | for a skill: "Follow the Trainee's own `SKILL.md` as the highest execution guidance"; for a command: "Execute the resolved command template exactly; `<work>` (possibly empty) is its argument set — an empty `<work>` is the no-argument form" | never replaced by a coach-authored procedure |
 | `return-contract` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state — plus, when the Trainee is a meta-skill: `subject {ref, path}`, the subject's changed files, and the claim taken or skipped | powers `self-report` when host events are unavailable |
 | `anomaly-line` | "State one explicit anomaly line on return; state `none` when there is none" | silence is not read as clean |
 | `fast-fail-clause` | the dispatcher's anomaly discipline | injected at dispatch time; a subagent does not inherit this conversation |

@@ -1,0 +1,7 @@
+row: T010
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_a_hand_edited_binding_block_is_reported_not_trusted' -q
+date: 2026-11-09T10:46:34Z
+---
+.                                                                        [100%]
+1 passed in 0.16s
+exit=0

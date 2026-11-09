@@ -1,0 +1,52 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_criterion_vocabulary_scan.py::test_no_runtime_surface_uses_temporary_or_global_as_a_criterion -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_no_runtime_surface_uses_temporary_or_global_as_a_criterion ________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_no_runtime_surface_uses_temporary_or_global_as_a_criterion():
+        hits = _criterion_hits()
+>       assert not hits, (
+            "the retired classification vocabulary survives on a runtime surface "
+            "(FR-022 allows it only in the owner's historical record and the temp-directory "
+            f"exemption); hits: {len(hits)}\n" + "\n".join(hits))
+E       AssertionError: the retired classification vocabulary survives on a runtime surface (FR-022 allows it only in the owner's historical record and the temp-directory exemption); hits: 29
+E         shared/definitions/sdd-routing-definitions.md:41 [temporary-goal-team] **Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身
+E         shared/definitions/sdd-routing-definitions.md:41 [global-goal-team] **Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身
+E         skills/internal/create-team/references/create-mode.md:53 [temporary-goal-team] Each persistent team owns a **directory**: global teams use `.specify/teams/<slug>/`; spec-scoped temporary teams use `.specify/specs/<NNN-s
+E         skills/internal/create-team/references/create-mode.md:53 [global-goal-team] Each persistent team owns a **directory**: global teams use `.specify/teams/<slug>/`; spec-scoped temporary teams use `.specify/specs/<NNN-s
+E         skills/internal/create-team/references/create-mode.md:60 [retired-scope-value] scope: global | spec           # optional (085); absent = global (legacy byte-identical)
+E         skills/internal/create-team/references/create-mode.md:61 [retired-scope-value] spec_dir: .specify/specs/<NNN-slug>  # required when scope=spec
+E         skills/internal/create-team/references/create-mode.md:153 [retired-scope-value] - `scope`, `spec_dir`, and `lifecycle_state` are additive (084). Absent `scope` means `global` and preserves the legacy path; `scope: spec` 
+E         skills/internal/create-team/references/create-mode.md:154 [global-goal-team] - `stage_seats` is an optional (085) block map keyed only by the eight canonical SDD stages. Each entry carries `seats[]` (each resolving to
+E         skills/internal/create-team/references/conceptual-model.md:92 [temporary-goal-team] ## Temporary (Run-Scoped) Team
+E         skills/internal/create-team/references/conceptual-model.md:94 [temporary-goal-team] A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the sa
+E         skills/internal/create-team/references/conceptual-model.md:94 [global-goal-team] A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the sa
+E         skills/internal/create-team/references/conceptual-model.md:102 [temporary-goal-team] - **Creation timing**: created only after both `clarify` and `plan` pass U4 — the design is what makes the roster and concurrency decidable.
+E         skills/internal/create-team/references/conceptual-model.md:103 [retired-scope-value] - **Frontmatter extension**: `scope: spec`, `spec_dir`, `goal_slug`, optional `lifecycle_state`, and a `stage_seats` block map. These are ad
+E         skills/external/sdd-loop-driver/SKILL.md:43 [retired-scope-value] | 写隔离 | 缺省 `write_isolation=shared-tree`；团队运行（team，scope = spec）可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
+E         skills/external/sdd-loop-driver/SKILL.md:45 [retired-scope-value] **Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `goal_slug`；clarify + plan U4 通过后，经 `/s
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:358 [retired-scope-value] ## 22. Team mode (scope = spec)
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:365 [temporary-goal-team] - **Slot cap**: temporary-team mode MAY pass a `slot_cap_ceiling` of `min(effective_concurrency, 24)`; the legacy ceiling `min(4, line remai
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:21 [retired-scope-value] - For each criterion of the spec's Goal (scope = spec), record `criterion / degree / evidence_ptr`.
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:23 [retired-scope-value] - Goal content changes only through the goal engine (`/speckit.goal modify --scope spec`); the checkpoint never writes `goal.md`.
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:32 [retired-scope-value] - Apply through `improve-team` / `/speckit.team modify --scope spec`; territory changes remain explicit modifications and are never optimize
+E         skills/external/sdd-loop-driver/references/checkpoint-protocol.md:153 [temporary-goal-team] - `coordinate` remains territory-overlap only; with one temporary team it is a recorded no-op.
+E         scripts/python/sdd-route.py:1030 [retired-scope-value] help="team scope: global (default), spec (requires --spec-dir), or auto")
+E         scripts/python/sdd-route.py:1032 [retired-scope-value] help="the spec directory for --scope spec/auto")
+E         templates/commands/team.md:35 [temporary-goal-team] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. `global` is `.specify/teams/`; `spec` is 
+E         templates/commands/team.md:35 [retired-scope-value] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. `global` is `.specify/teams/`; `spec` is 
+E         templates/commands/team.md:71 [retired-scope-value] When a token in `$ARGUMENTS` exactly matches an archived `<slug>` in the project-level anchoring archive `.specify/anchoring/`, the create p
+E         templates/commands/team.md:75 [retired-scope-value] Inside a `team.md`, `goal` is the **`goal_slug` of the goal this team serves** — for `scope: spec`, the slug of the spec-scoped goal at `<sp
+E         templates/commands/goal.md:4 [retired-scope-value] argument-hint: "[create|view|modify|targets|migrate|coordinate] [goal-slug|team-slug] [--scope global|spec|auto] [--spec-dir <path>]"
+E         templates/commands/goal.md:29 [retired-scope-value] **Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. `global` is the project-level anchoring archi
+E       assert not ['shared/definitions/sdd-routing-definitions.md:41 [temporary-goal-team] **Temporary run-scoped scopes（追加 carve-out）**...ferences/create-mode.md:61 [retired-scope-value] spec_dir: .specify/specs/<NNN-slug>  # required when scope=spec', ...]
+
+tests/contract/test_criterion_vocabulary_scan.py:98: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_criterion_vocabulary_scan.py::test_no_runtime_surface_uses_temporary_or_global_as_a_criterion
+1 failed in 6.70s

@@ -1,0 +1,50 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_resident_backfill.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_every_archive_resident_carries_a_binding_after_backfill _________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4809/popen-gw1/test_every_archive_resident_ca0')
+
+    def test_every_archive_resident_carries_a_binding_after_backfill(tmp_path):
+        _seed_goal(tmp_path, "resident")
+        _seed_goal(tmp_path, "terminal-resident", status="achieved")
+        _seed_team(tmp_path, "resident-crew", goal_slug="resident")
+        _seed_team(tmp_path, "archived-crew", goal_slug="resident", lifecycle="archived")
+    
+        applied = _run(tmp_path, "backfill-bindings", "--apply")
+>       assert applied.returncode == 0, applied.stdout + applied.stderr
+E       AssertionError: error: unrecognized option: --apply
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...1/test_every_archive_resident_ca0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --apply\n').returncode
+
+tests/contract/test_resident_backfill.py:200: AssertionError
+___ test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding ____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4809/popen-gw0/test_a_second_backfill_writes_0')
+
+    def test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding(tmp_path):
+        goal = _seed_goal(tmp_path, "resident")
+        team = _seed_team(tmp_path, "resident-crew")
+        original_goal = _hash_minus_binding(goal)
+        original_team = _hash_minus_binding(team)
+    
+        dry = _run(tmp_path, "backfill-bindings", "--dry-run")
+>       assert dry.returncode == 0, dry.stdout + dry.stderr
+E       AssertionError: error: unrecognized option: --dry-run
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...test_a_second_backfill_writes_0', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --dry-run\n').returncode
+
+tests/contract/test_resident_backfill.py:146: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill
+FAILED tests/contract/test_resident_backfill.py::test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding
+2 failed in 6.23s
+EXIT=1

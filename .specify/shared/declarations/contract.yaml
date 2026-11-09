@@ -71,3 +71,27 @@ decomposition-coverage: shared/declarations/facts/decomposition-coverage.yaml
 executor-enumeration-roots: shared/declarations/facts/executor-enumeration-roots.yaml
 concurrency-contract: shared/declarations/facts/concurrency-contract.yaml
 coordinator-dispatch-verdict: shared/declarations/facts/coordinator-dispatch-verdict.yaml
+
+# Feature 094, contract `contracts/command-family-and-declarations.md` C-83 / C-84 / C-85
+# — the two facts registered before any consumer reads them. One entry per fact:
+# `subset_id` names the grammar the fact file is written in, `value_domain` the closed
+# domain the consumer validates against, and `statement_keys` the keys the statement must
+# carry. An unregistered fact reads as `owner-unavailable` at the consumer, never as a
+# default. Adopted under ruling N-5: the section uses the file's existing
+# sequence-of-mappings form, and `tests/contract/test_declaration_facts.py` asserts the
+# reader sees both facts — a registration no reader consumes would be inert.
+registered_facts:
+  - fact: goal-team-command-family
+    subset_id: declaration-subset/v1
+    value_domain: closed-set
+    statement_keys:
+      - statement
+  - fact: goal-team-handoff-threshold
+    subset_id: declaration-subset/v1
+    value_domain: threshold+timing-map
+    statement_keys:
+      - metric
+      - threshold
+      - boundary
+      - on_direct
+      - on_handoff

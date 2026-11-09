@@ -1,0 +1,2 @@
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 43, "task_count": 83, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T09:52:26Z"}
+decomposition-check EXIT=0

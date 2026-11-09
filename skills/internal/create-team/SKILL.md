@@ -19,6 +19,10 @@ The capacity vs. responsibility boundary — which template set defines an agent
 
 The **goal** concept is defined authoritatively in `references/goal.md`. When a goal's theme is **optimization**, classify it per `references/optimization-goals.md`.
 
+## Command Family Gate (which commands may create a goal/team)
+
+Whether the invoking command run may own a goal/team is decided by the declared class axis, never by a per-command list kept here (contract C-74): ask the engine with `python3 scripts/python/goal-utils.py command-family --command <stem> --json` and read `in_family` from its answer. The action resolves the class through `flow-class-check.py --action lookup --unit-id /speckit.<stem>` and reports `source: ledger` = in family, `source: default` = not in family; a degraded lookup exits 2 and is never read as a family membership. This skill carries no second whitelist.
+
 ## Team Definition & Persistence (create mode)
 
 Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/team.md`. Establish the goal first, then derive both structures from it. Full procedure, schema, and persistence rules: [`references/create-mode.md`](references/create-mode.md).

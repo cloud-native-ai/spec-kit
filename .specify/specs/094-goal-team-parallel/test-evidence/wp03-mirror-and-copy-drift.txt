@@ -1,0 +1,30 @@
+$ python3 scripts/python/sync-mirrors.py --check
+DRIFT detected:
+  .github/prompts/speckit.feedback.prompt.md
+  .claude/commands/speckit.feedback.md
+  .opencode/command/speckit.feedback.md
+  .qoder/commands/speckit.feedback.md
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+DIFF .specify/scripts/python/goal-utils.py
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+MISS  .specify/shared/declarations/facts/goal-team-command-family.yaml
+MISS  .specify/shared/declarations/facts/goal-team-handoff-threshold.yaml
+DIFF .specify/shared/declarations/contract.yaml
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit=2
+
+$ python3 scripts/python/regen-command-copies.py --check
+DRIFT detected:
+  .github/prompts/speckit.feedback.prompt.md
+  .claude/commands/speckit.feedback.md
+  .opencode/command/speckit.feedback.md
+  .qoder/commands/speckit.feedback.md
+exit=1

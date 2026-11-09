@@ -1,0 +1,11 @@
+row: T001
+command: ls -l .specify/specs/094-goal-team-parallel/notes/red-first-evidence.md && grep '^###\|^## ' <file>
+date: 2026-11-09T10:47:39Z
+---
+-rw------- 1 agent agent 2265 Nov  9 18:42 .specify/specs/094-goal-team-parallel/notes/red-first-evidence.md
+--- headings ---
+1:# Red-first evidence — Feature 094 goal/team parallel
+8:## Entry format (copy this block; never invent a second shape)
+11:### <row id> — <subject>
+23:### T005 — binding-record reader and the module's first red reading
+exit=0

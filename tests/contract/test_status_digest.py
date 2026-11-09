@@ -1482,3 +1482,65 @@ def test_c45_the_digest_exit_status_table_is_unchanged_by_the_dimension(tmp_path
         env_overrides=env,
     )
     assert bad_cap.returncode == 2, "an input error is still ``2``; got %r" % (bad_cap,)
+
+
+# --------------------------------------------------------------------------- #
+# Presentation — ``--format auto|table`` renders the SAME reading readably
+# --------------------------------------------------------------------------- #
+def test_the_table_format_groups_the_same_entries_readably(tmp_path):
+    """C-41: the table is a presentation of the one reading, not a second one — every field retained."""
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, "the table render must succeed; rc=%s stderr=%r" % (
+        proc.returncode,
+        proc.stderr,
+    )
+    out = proc.stdout
+    assert out.splitlines()[0].startswith("status digest  generated_at="), out
+    assert "-- ACTIVE (1) --" in out, "the fixture entry is an active line; got %r" % out
+    assert entry["line_id"] in out and "run=" in out and "age=" in out, out
+    assert "state=%s" % entry["state"] in out, out
+
+
+def test_the_default_format_under_non_tty_is_the_text_render(tmp_path):
+    """``auto`` resolves to ``text`` when stdout is not a TTY — machine consumers see unchanged bytes."""
+    workspace, registry, _entry, _paths = _fixture_tree(tmp_path)
+    env = {"SPECIFY_LINE_REGISTRY_DIR": str(registry)}
+    default = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides=env,
+    )
+    text = _run_digest(
+        ["--action", "digest", "--format", "text", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides=env,
+    )
+    assert default.returncode == text.returncode == 0
+
+    def without_clock(text_out: str) -> str:
+        import re
+
+        return re.sub(r"generated_at=[^ ]+", "generated_at=<clock>", text_out)
+
+    assert without_clock(default.stdout) == without_clock(text.stdout), (
+        "auto must not change the non-TTY digest content (the reading clock aside)"
+    )
+
+
+def test_the_table_format_keeps_the_nothing_running_literal(tmp_path):
+    """C-45 holds for the table render too: the empty set renders the literal, exit 3."""
+    workspace, _registry, _entry, _paths = _fixture_tree(tmp_path)
+    empty = tmp_path / "empty-registry"
+    empty.mkdir()
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(empty)},
+    )
+    assert proc.returncode == 3, "nothing-running is still ``3``; got %r" % (proc,)
+    assert proc.stdout.strip() == "nothing-running", proc.stdout

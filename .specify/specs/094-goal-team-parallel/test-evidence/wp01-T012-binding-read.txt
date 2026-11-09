@@ -1,0 +1,7 @@
+row: T012
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_ownership_is_answered_by_the_read_action_not_by_the_path' -q
+date: 2026-11-09T10:46:36Z
+---
+.                                                                        [100%]
+1 passed in 0.12s
+exit=0

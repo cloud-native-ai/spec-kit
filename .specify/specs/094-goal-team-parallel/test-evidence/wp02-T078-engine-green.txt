@@ -1,0 +1,10 @@
+# row: T078-engine
+# command: bash scripts/bash/run-tests.sh tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.24s
+EXIT=0

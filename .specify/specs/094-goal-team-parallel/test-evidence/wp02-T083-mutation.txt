@@ -1,0 +1,8 @@
+# T083 mutation reading — the T081 exhaustiveness sensor over a fixture COPY
+# command: for each resident under the copy: goal-utils.py binding <kind> <slug> --json
+# mutation: binding block removed from the COPY of
+#   .specify/anchoring/session-driven-self-improvement/goal.md (no tree edit)
+residents checked=18  failing=1
+RED goal session-driven-self-improvement exit=2 :: binding-missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp02/.specify/.tmp/s094-wp02/mutation-root/.specify/anchoring/session-driven-self-improvement/goal.md carries no binding block; a definition without a complete binding record is uninterpretable (owner / owner_id / origin)
+SENSOR TURNED-RED
+EXIT=0

@@ -1,0 +1,19 @@
+row: wp01 mirror obligation (DoD-6 / GATE-2 context; driver integration step owns --write)
+command: python3 scripts/python/sync-mirrors.py --check
+date: 2026-11-09T10:47:47Z
+---
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+DIFF .specify/scripts/python/goal-utils.py
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (100 files, byte-identical)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit=2 (one expected drift: .specify/scripts/python/goal-utils.py, the projection of this package's edit; the driver's integration step runs sync-mirrors.py --write)

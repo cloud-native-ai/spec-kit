@@ -5,6 +5,10 @@ pattern: serial
 created: 2026-10-08
 updated: 2026-10-08
 description: "SC-002 demonstration team for spec 054 — proves a stage-frame seat is instantiated, rendered onto the host registration surface, and dispatched by its registered type."
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

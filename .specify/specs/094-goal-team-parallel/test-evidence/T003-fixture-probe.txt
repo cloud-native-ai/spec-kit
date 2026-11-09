@@ -1,0 +1,25 @@
+== T003 fixture-mechanism probe ==
+date: 2026-11-09T10:38:40Z
+probe_root: .specify/.tmp/s094/probe
+probe_abs: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/s094/probe
+fixture_spec_dir: .specify/.tmp/s094/probe/.specify/specs/900-fixture
+
+== command: python3 scripts/python/goal-utils.py resolve-scope --repo-root .specify/.tmp/s094/probe --scope auto --json ==
+exit_status: 0
+stdout:
+{
+  "scope": "global",
+  "spec_dir": null,
+  "goal_root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/s094/probe/.specify/anchoring",
+  "team_root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/s094/probe/.specify/teams"
+}
+stderr:
+
+goal_root_under_probe: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/s094/probe/.specify/anchoring
+team_root_under_probe: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/s094/probe/.specify/teams
+resolved_inside_probe: True
+resolution_check_exit: 0
+
+== teardown: rm -rf .specify/.tmp/s094/probe ==
+teardown: ok — .specify/.tmp/s094/probe removed
+wrapper_exit=0

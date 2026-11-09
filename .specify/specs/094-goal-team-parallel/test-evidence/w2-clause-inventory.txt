@@ -1,0 +1,140 @@
+Clause marker inventory (form + marker line per file)
+owner grammar: shared/definitions/contract-clause-definitions.md § 2/§ 4
+
+binding-and-lifecycle.md	form=md-bold-closed	markers=30	distinct-in-file=30
+  binding-and-lifecycle.md:14	C-1	cites=FR-001,FR-002,FR-003,FR-004
+  binding-and-lifecycle.md:19	C-2	cites=FR-001,FR-002,FR-003,FR-004
+  binding-and-lifecycle.md:23	C-3	cites=FR-001,FR-002,FR-003,FR-004
+  binding-and-lifecycle.md:29	C-4	cites=FR-001,FR-002,FR-003,FR-004
+  binding-and-lifecycle.md:34	C-5	cites=FR-003
+  binding-and-lifecycle.md:39	C-6	cites=FR-003
+  binding-and-lifecycle.md:45	C-7	cites=FR-026
+  binding-and-lifecycle.md:50	C-8	cites=FR-015
+  binding-and-lifecycle.md:56	C-9	cites=FR-008,FR-025
+  binding-and-lifecycle.md:61	C-10	cites=FR-008,FR-025
+  binding-and-lifecycle.md:65	C-11	cites=FR-008,FR-025
+  binding-and-lifecycle.md:70	C-12	cites=FR-008
+  binding-and-lifecycle.md:75	C-13	cites=FR-007,FR-008,FR-025
+  binding-and-lifecycle.md:82	C-14	cites=FR-038
+  binding-and-lifecycle.md:88	C-15	cites=FR-036,FR-038
+  binding-and-lifecycle.md:93	C-16	cites=FR-027,FR-038
+  binding-and-lifecycle.md:100	C-17	cites=FR-026
+  binding-and-lifecycle.md:104	C-18	cites=FR-023,FR-026
+  binding-and-lifecycle.md:108	C-19	cites=FR-026
+  binding-and-lifecycle.md:112	C-20	cites=FR-026
+  binding-and-lifecycle.md:118	C-21	cites=FR-028
+  binding-and-lifecycle.md:123	C-22	cites=FR-028
+  binding-and-lifecycle.md:128	C-23	cites=FR-028
+  binding-and-lifecycle.md:133	C-24	cites=FR-028
+  binding-and-lifecycle.md:139	C-25	cites=FR-014
+  binding-and-lifecycle.md:144	C-26	cites=FR-015,FR-038
+  binding-and-lifecycle.md:148	C-27	cites=FR-021
+  binding-and-lifecycle.md:151	C-28	cites=FR-026
+  binding-and-lifecycle.md:156	C-29	cites=FR-008,FR-025
+  binding-and-lifecycle.md:160	C-30	cites=FR-002
+
+command-family-and-declarations.md	form=md-bold-closed	markers=20	distinct-in-file=20
+  command-family-and-declarations.md:9	C-71	cites=FR-005,FR-006
+  command-family-and-declarations.md:27	C-72	cites=FR-005,FR-006
+  command-family-and-declarations.md:34	C-73	cites=FR-040
+  command-family-and-declarations.md:36	C-74	cites=FR-006,FR-031
+  command-family-and-declarations.md:44	C-75	cites=FR-005
+  command-family-and-declarations.md:50	C-76	cites=FR-031
+  command-family-and-declarations.md:56	C-77	cites=FR-031
+  command-family-and-declarations.md:61	C-78	cites=FR-031
+  command-family-and-declarations.md:68	C-79	cites=FR-018,FR-031
+  command-family-and-declarations.md:74	C-80	cites=FR-018,FR-031,FR-039
+  command-family-and-declarations.md:78	C-81	cites=FR-018,FR-031,FR-039
+  command-family-and-declarations.md:83	C-82	cites=FR-031
+  command-family-and-declarations.md:87	C-83	cites=FR-031
+  command-family-and-declarations.md:92	C-84	cites=FR-031
+  command-family-and-declarations.md:96	C-85	cites=FR-031
+  command-family-and-declarations.md:101	C-86	cites=FR-031
+  command-family-and-declarations.md:105	C-87	cites=FR-031
+  command-family-and-declarations.md:112	C-88	cites=FR-024
+  command-family-and-declarations.md:117	C-89	cites=FR-024
+  command-family-and-declarations.md:121	C-90	cites=FR-024
+
+handoff-contract.md	form=md-bold-closed	markers=18	distinct-in-file=18
+  handoff-contract.md:9	C-53	cites=FR-016,FR-035
+  handoff-contract.md:13	C-54	cites=FR-016,FR-035
+  handoff-contract.md:18	C-55	cites=FR-016,FR-035
+  handoff-contract.md:24	C-56	cites=FR-016,FR-035
+  handoff-contract.md:29	C-57	cites=FR-016,FR-035
+  handoff-contract.md:36	C-58	cites=FR-016,FR-034
+  handoff-contract.md:42	C-59	cites=FR-003,FR-016,FR-034
+  handoff-contract.md:48	C-60	cites=FR-016,FR-034
+  handoff-contract.md:54	C-61	cites=FR-016,FR-036
+  handoff-contract.md:59	C-62	cites=FR-019,FR-036
+  handoff-contract.md:65	C-63	cites=FR-036
+  handoff-contract.md:69	C-64	cites=FR-017,FR-036
+  handoff-contract.md:76	C-65	cites=FR-020
+  handoff-contract.md:81	C-66	cites=FR-020
+  handoff-contract.md:85	C-67	cites=FR-019,FR-020
+  handoff-contract.md:91	C-68	cites=FR-035,FR-039
+  handoff-contract.md:96	C-69	cites=FR-035,FR-039
+  handoff-contract.md:100	C-70	cites=FR-035,FR-039
+
+owner-rewrites-and-tests.md	form=md-bold-closed	markers=21	distinct-in-file=21
+  owner-rewrites-and-tests.md:8	C-91	cites=FR-027
+  owner-rewrites-and-tests.md:15	C-92	cites=FR-024,FR-027
+  owner-rewrites-and-tests.md:22	C-93	cites=FR-028
+  owner-rewrites-and-tests.md:27	C-94	cites=FR-028
+  owner-rewrites-and-tests.md:32	C-95	cites=FR-028
+  owner-rewrites-and-tests.md:38	C-96	cites=FR-028
+  owner-rewrites-and-tests.md:44	C-97	cites=FR-030
+  owner-rewrites-and-tests.md:48	C-98	cites=FR-030
+  owner-rewrites-and-tests.md:52	C-99	cites=FR-040
+  owner-rewrites-and-tests.md:56	C-100	cites=FR-029
+  owner-rewrites-and-tests.md:61	C-101	cites=FR-029,FR-030
+  owner-rewrites-and-tests.md:67	C-102	cites=FR-041
+  owner-rewrites-and-tests.md:76	C-103	cites=FR-041
+  owner-rewrites-and-tests.md:82	C-104	cites=FR-033,FR-041
+  owner-rewrites-and-tests.md:87	C-105	cites=FR-041
+  owner-rewrites-and-tests.md:93	C-106	cites=FR-013
+  owner-rewrites-and-tests.md:98	C-107	cites=FR-022,FR-037
+  owner-rewrites-and-tests.md:104	C-108	cites=FR-013,FR-022,FR-032,FR-033
+  owner-rewrites-and-tests.md:111	C-109	cites=FR-033
+  owner-rewrites-and-tests.md:115	C-110	cites=FR-033
+  owner-rewrites-and-tests.md:119	C-111	cites=FR-033
+
+unified-archive-and-migration.md	form=md-bold-closed	markers=24	distinct-in-file=24
+  unified-archive-and-migration.md:10	C-31	cites=FR-007
+  unified-archive-and-migration.md:15	C-32	cites=FR-009,FR-010
+  unified-archive-and-migration.md:21	C-33	cites=FR-009,FR-010
+  unified-archive-and-migration.md:27	C-34	cites=FR-010
+  unified-archive-and-migration.md:34	C-35	cites=FR-009,FR-010
+  unified-archive-and-migration.md:40	C-36	cites=FR-009
+  unified-archive-and-migration.md:45	C-37	cites=FR-010
+  unified-archive-and-migration.md:49	C-38	cites=FR-009
+  unified-archive-and-migration.md:54	C-39	cites=FR-009,FR-010
+  unified-archive-and-migration.md:60	C-40	cites=FR-009,FR-011
+  unified-archive-and-migration.md:66	C-41	cites=FR-011
+  unified-archive-and-migration.md:71	C-42	cites=FR-042
+  unified-archive-and-migration.md:76	C-43	cites=FR-012
+  unified-archive-and-migration.md:80	C-44	cites=FR-007,FR-012
+  unified-archive-and-migration.md:84	C-45	cites=FR-012,FR-030
+  unified-archive-and-migration.md:90	C-46	cites=FR-007,FR-013
+  unified-archive-and-migration.md:95	C-47	cites=FR-007,FR-013
+  unified-archive-and-migration.md:99	C-48	cites=FR-029
+  unified-archive-and-migration.md:103	C-49	cites=FR-037
+  unified-archive-and-migration.md:107	C-50	cites=FR-009,FR-030
+  unified-archive-and-migration.md:113	C-51	cites=FR-042
+  unified-archive-and-migration.md:118	C-52	cites=FR-042
+  unified-archive-and-migration.md:124	C-53	cites=FR-043
+  unified-archive-and-migration.md:134	C-54	cites=FR-043
+
+== global marker accounting ==
+total marker lines: 113
+distinct clause ids: 111
+ids appearing more than once: 2
+  C-53:
+    handoff-contract.md:9
+    unified-archive-and-migration.md:124
+  C-54:
+    handoff-contract.md:13
+    unified-archive-and-migration.md:134
+
+per-file marker counts: binding-and-lifecycle.md 30 + command-family-and-declarations.md 20 + handoff-contract.md 18 + owner-rewrites-and-tests.md 21 + unified-archive-and-migration.md 24
+sum = 113
+clauses with an EMPTY FR citation group (count 0): []

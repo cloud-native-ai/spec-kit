@@ -72,6 +72,10 @@ config:
   sync_constraint: >
     优化命中 skills/draw-plantuml/ 后必须与 .specify/skills/draw-plantuml/ 双写同步
     （diff -rq 校验字节一致），二者均为独立 git 副本、非符号链接。
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

@@ -2,6 +2,10 @@
 status: achieved
 created: 2026-10-11
 updated: 2026-10-12
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 # Goal: post-refactor-mechanism-integrity

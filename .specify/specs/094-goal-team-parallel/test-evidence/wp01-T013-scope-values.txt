@@ -1,0 +1,7 @@
+row: T013
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_scope_spec_is_removed_and_no_alias_exists' -q
+date: 2026-11-09T10:46:36Z
+---
+.                                                                        [100%]
+1 passed in 0.24s
+exit=0

@@ -1,0 +1,21 @@
+purpose: post-commit readings for wp01 (T001–T015)
+commit: a8965b03 feat(094-wp01): binding model + scope engine + contract tests (T001–T015)
+date: 2026-11-09T11:04:45Z
+
+== 1) python3 -m pytest tests/contract/test_binding_model.py -q ==
+............                                                             [100%]
+12 passed in 1.46s
+exit=0
+
+== 2) python3 -m pytest tests/contract/test_script_interface_contract.py -q --tb=no -rf ==
+=========================== short test summary info ============================
+FAILED tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+FAILED tests/contract/test_script_interface_contract.py::test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker
+2 failed, 90 passed, 1 skipped in 20.17s
+note: C-20 resolved once the test module became tracked; C-33/C-35 remain red only because
+      .specify/scripts/python/goal-utils.py is the pending sync-mirrors projection (driver step).
+
+== 3) python3 -m pytest tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one -q ==
+FAILED tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+1 failed in 0.05s
+note: the roster pin is 11; bind + binding make 13. Unassigned; disclosed in notes/implement-wp01.md.

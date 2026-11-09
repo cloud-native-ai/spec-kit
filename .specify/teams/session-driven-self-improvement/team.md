@@ -168,6 +168,10 @@ config:
     every: 1
     delivery_dir: .specify/goal/session-driven-self-improvement/summary/
     interactive: false
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

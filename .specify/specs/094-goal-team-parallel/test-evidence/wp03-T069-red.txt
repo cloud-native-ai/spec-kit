@@ -1,0 +1,22 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_criterion_vocabulary_scan.py::test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim ______
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim():
+        section = _section(ROUTING, "## Hierarchy")
+>       assert HIERARCHY_PROHIBITION in section, (
+            "C-91 keeps this prohibition verbatim when the Temporary carve-out is "
+            f"replaced: {HIERARCHY_PROHIBITION!r}")
+E       AssertionError: C-91 keeps this prohibition verbatim when the Temporary carve-out is replaced: '一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义'
+E       assert '一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义' in '\n\n控制层级只有一条，且有唯一一条边界：\n\n1. **Goal** 是最高层：它陈述一个目标与可验证的成功判据（身份与状态机归 `shared/definitions/goal-definitions.md`）。\n2. **...ons/goal-definitions.md` 与 `skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。\n\n'
+
+tests/contract/test_criterion_vocabulary_scan.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_criterion_vocabulary_scan.py::test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim
+1 failed in 6.17s

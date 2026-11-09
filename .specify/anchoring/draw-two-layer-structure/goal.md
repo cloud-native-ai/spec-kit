@@ -2,6 +2,10 @@
 status: achieved
 created: 2026-09-16
 updated: 2026-10-12
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 # Goal: draw-two-layer-structure

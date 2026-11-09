@@ -21,6 +21,8 @@ Read group (zero writes):
   check-statement <statement>
   targets         <slug> --list | --check STATEMENT
   run-checks      <team-slug> [--target T-nnn | <goal-slug>.T-nnn]
+  binding         <goal|teams> <slug>
+  probe-residual  (094: enumerate the spec-local goal/team residuals)
 
 Write group (mutates one definition file):
   create    <slug> --objective TEXT [--title TEXT] [--criterion TEXT ...] [--boundary TEXT ...]
@@ -29,14 +31,20 @@ Write group (mutates one definition file):
   criteria  <slug> --criterion TEXT ... | --clear
   targets   <slug> --add TEXT | --set STATE --id T-nnn
   migrate   <team-slug> [--keep-inline/--drop-inline]
+  bind      <goal|teams> <slug> --owner V --owner-id V [--origin V]
 
-Exit codes: 0 ok | 2 input error | 3 not found | 4 validation failed | 5 blocked
+Write group (094 unified archive; explicit actions, never implicit):
+  migrate-archive   --dry-run | --apply   (move spec-local trees, archive-not-delete)
+  backfill-bindings --dry-run | --apply   (insert the recorded binding on residents)
+
+Exit codes: 0 ok | 2 input error | 3 not found or migration interrupted | 4 validation failed or migration conflict | 5 blocked
 """
 
 from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import hashlib
 import json
 import os
 import re
@@ -53,18 +61,22 @@ EXIT_INVALID = 4
 #: keep working unchanged.
 EXIT_BLOCKED = 5
 
-#: Global archive of definitions: the "anchoring" concept (renamed from goal, 092).
-#: SPEC_GOAL_DIRNAME is deliberately still `goal`, and DEFINITION_FILENAME is still
-#: `goal.md` — the per-spec location and the file name are unchanged this round.
+#: The two archive rows a definition can live in (STR-002). `goal` names the goal row
+#: (directory `.specify/anchoring/`, file `goal.md`); `teams` names the team row.
 ARCHIVE_DIRNAME = ".specify/anchoring"
 TEAM_DIRNAME = ".specify/teams"
+#: The retired spec-local layout: a migration SOURCE only, never a write target.
 SPEC_GOAL_DIRNAME = "goal"
 SPEC_TEAM_DIRNAME = "team"
 DEFINITION_FILENAME = "goal.md"
 SUMMARY_DIRNAME = "summary"
 
+#: The closed archive-layer value set (C-9). `auto` is a read-only resolver, never a
+#: write target; the retired position-named member does not exist and has no alias.
+ARCHIVE_SCOPES = ("goal", "teams", "auto")
+
 #: Resolved once per CLI invocation by `resolve_scope`; direct API callers leave it None,
-#: which preserves the legacy global behavior byte for byte.
+#: which keeps the default archive roots for the two-archive model.
 _ACTIVE_SCOPE = None
 
 
@@ -73,10 +85,10 @@ class ScopeError(Exception):
 
 
 class Scope:
-    """The resolved anchoring/team roots for one CLI invocation.
+    """The two archive-layer roots resolved for one CLI invocation.
 
-    `goal_root` keeps its attribute name (the stored definition is still a `goal.md`);
-    only the wording and the global directory (`ARCHIVE_DIRNAME`) say "anchoring".
+    `goal_root` keeps its attribute name because the stored definition is still `goal.md`;
+    its directory is the anchoring archive (`ARCHIVE_DIRNAME`).
     """
 
     __slots__ = ("scope", "repo_root", "spec_dir", "goal_root", "team_root")
@@ -132,21 +144,58 @@ def _has_team(root: Path, slug: str | None) -> bool:
                for child in root.iterdir())
 
 
-def resolve_scope(repo_root: Path, scope: str = "global",
+def resolve_scope(repo_root: Path, scope: str = "goal",
                   spec_dir: str | os.PathLike | None = None,
                   team_slug: str | None = None) -> Scope:
-    """Resolve the anchoring/team roots. The path rule has exactly one owner: this function.
+    """Resolve the two archive-layer roots. The path rule has exactly one owner: this function.
 
-    Global scope stores definitions under the anchoring archive (`.specify/anchoring/`);
-    spec scope keeps them inside the spec (`<spec>/goal/<slug>/goal.md`, 092 ruling).
+    `scope` is the closed archive-layer set `goal` / `teams` / `auto` (C-9). `goal` and
+    `teams` always return BOTH roots in one `Scope` object, so a caller never needs two
+    calls; `auto` is a read-only resolver that picks the single layer containing the
+    requested slug (or the single non-empty layer when no slug is requested).
     """
     repo_root = Path(repo_root)
-    global_goal = repo_root / ARCHIVE_DIRNAME
-    global_team = repo_root / TEAM_DIRNAME
-    if scope not in ("global", "spec", "auto"):
-        raise ScopeError(f"scope {scope!r} is outside the closed set global / spec / auto")
+    goal_root = repo_root / ARCHIVE_DIRNAME
+    team_root_path = repo_root / TEAM_DIRNAME
+    if scope not in ARCHIVE_SCOPES:
+        raise ScopeError(
+            f"scope {scope!r} is outside the closed set {' / '.join(ARCHIVE_SCOPES)}")
 
-    resolved_spec = None
+    resolved_spec = _resolve_spec_dir(repo_root, spec_dir)
+    if scope == "goal":
+        return Scope("goal", repo_root, resolved_spec, goal_root, team_root_path)
+    if scope == "teams":
+        return Scope("teams", repo_root, resolved_spec, goal_root, team_root_path)
+
+    # `auto` (C-11): ONE candidate layer or a named refusal. Never writes.
+    candidates: list[str] = []
+    if team_slug:
+        if (goal_root / team_slug / DEFINITION_FILENAME).is_file():
+            candidates.append("goal")
+        if _team_layer_contains(team_root_path, team_slug):
+            candidates.append("teams")
+    else:
+        if _has_any_definition(goal_root):
+            candidates.append("goal")
+        if _has_team(team_root_path, None):
+            candidates.append("teams")
+    if not candidates:
+        subject = f"slug {team_slug!r}" if team_slug else "any definition"
+        raise ScopeError(
+            f"not-found: no archive layer contains {subject} "
+            f"(checked {ARCHIVE_DIRNAME} and {TEAM_DIRNAME})")
+    if len(candidates) > 1:
+        raise ScopeError(
+            f"scope-ambiguous: both archive layers contain the requested slug "
+            f"({', '.join(candidates)}); pass --scope goal or --scope teams")
+    return Scope(candidates[0], repo_root, resolved_spec, goal_root, team_root_path)
+
+
+def _resolve_spec_dir(repo_root: Path,
+                      spec_dir: str | os.PathLike | None) -> Path | None:
+    """`--spec-dir` is accepted for `origin` resolution and `auto` input validity only
+    (C-12); it never decides where a definition lands. Outside `.specify/specs/` is a
+    named refusal."""
     if spec_dir:
         candidate = Path(spec_dir)
         if not candidate.is_absolute():
@@ -156,36 +205,27 @@ def resolve_scope(repo_root: Path, scope: str = "global",
             candidate.relative_to((repo_root / ".specify" / "specs").resolve())
         except ValueError as exc:
             raise ScopeError(
-                f"spec scope requires a directory under .specify/specs/: {candidate}") from exc
-        resolved_spec = candidate
-    elif os.environ.get("SPECIFY_FEATURE"):
+                f"spec-dir-unresolvable: --spec-dir must name a directory under "
+                f".specify/specs/: {candidate}") from exc
+        return candidate
+    if os.environ.get("SPECIFY_FEATURE"):
         candidate = repo_root / ".specify" / "specs" / os.environ["SPECIFY_FEATURE"]
         if candidate.is_dir():
-            resolved_spec = candidate.resolve()
+            return candidate.resolve()
+    return None
 
-    def spec_scope() -> Scope:
-        if resolved_spec is None:
-            raise ScopeError(
-                "spec-scope-requires-spec-dir: spec scope requires --spec-dir (or SPECIFY_FEATURE resolving to an existing spec directory)")
-        return Scope("spec", repo_root, resolved_spec,
-                     resolved_spec / SPEC_GOAL_DIRNAME, resolved_spec / SPEC_TEAM_DIRNAME)
 
-    if scope == "global":
-        return Scope("global", repo_root, None, global_goal, global_team)
-    if scope == "spec":
-        return spec_scope()
-
-    global_present = _has_any_definition(global_goal) or _has_team(global_team, team_slug)
-    spec_present = (resolved_spec is not None and
-                    (_has_any_definition(resolved_spec / SPEC_GOAL_DIRNAME) or
-                     _has_team(resolved_spec / SPEC_TEAM_DIRNAME, team_slug)))
-    if global_present and spec_present:
-        raise ScopeError(
-            "scope-ambiguous: both the global and spec candidates exist "
-            f"({global_goal} and {resolved_spec}); pass --scope global or --scope spec")
-    if spec_present:
-        return spec_scope()
-    return Scope("global", repo_root, None, global_goal, global_team)
+def _team_layer_contains(team_root_path: Path, slug: str) -> bool:
+    """Does the team archive row contain a definition with this slug?"""
+    if (team_root_path / slug / "team.md").is_file():
+        return True
+    default = team_root_path / "team.md"
+    if not default.is_file():
+        return False
+    meta, _start, _end = read_frontmatter_subset(
+        default.read_text(encoding="utf-8"))
+    declared = str(meta.get("team_slug") or meta.get("slug") or "").strip()
+    return not declared or declared == slug
 
 #: Exactly three, per the concept authority. `superseded` is deliberately absent.
 LIFECYCLE_STATES = ("active", "achieved", "abandoned")
@@ -323,6 +363,288 @@ def summary_dir(repo_root: Path, slug: str) -> Path:
 
 
 # --------------------------------------------------------------------------
+# binding record (094, contracts/binding-and-lifecycle.md C-1…C-8)
+# --------------------------------------------------------------------------
+
+#: C-2 — the closed owner domain: exactly these three values.
+OWNER_VALUES = ("sdd-run", "command-run", "human")
+
+#: C-1 — exactly these three keys under `binding`, no fourth.
+BINDING_KEYS = ("owner", "owner_id", "origin")
+BINDING_MARKER = "binding:"
+
+#: C-3 — shape only. The grammar is owned by the state spine; this file cites that
+#: owner and never re-declares it as a second schema.
+RUN_ID_SHAPE = re.compile(r"^r\d{8}T\d{6}Z-[A-Za-z0-9][A-Za-z0-9_.\-]*$")
+STATE_SPINE_GRAMMAR_OWNER = "skills/external/sdd-loop-driver/references/state-awareness.md"
+
+#: R-06 — the closed frontmatter subset: `key: value` scalars (null / bool / int /
+#: string), inline lists, and one nested mapping level. Nothing else is guessed.
+_SUBSET_INT = re.compile(r"^-?\d+$")
+
+
+def _parse_subset_scalar(raw: str):
+    text = raw.strip()
+    if text == "" or text in ("null", "~", "Null", "NULL"):
+        return None
+    if text in ("true", "false"):
+        return text == "true"
+    if _SUBSET_INT.match(text):
+        return int(text)
+    if text.startswith("[") and text.endswith("]"):
+        inner = text[1:-1].strip()
+        return [] if not inner else [_parse_subset_scalar(part) for part in inner.split(",")]
+    if len(text) >= 2 and text[0] == text[-1] and text[0] in "\"'":
+        return text[1:-1]
+    return text
+
+
+def read_frontmatter_subset(text: str) -> tuple[dict, int, int]:
+    """Read a definition's frontmatter under the closed subset (R-06).
+
+    Returns `(meta, start, end)`; `start`/`end` are the line indexes of the frontmatter
+    content (`---` lines excluded). An absent frontmatter returns `({}, 0, 0)`.
+    """
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}, 0, 0
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        return {}, 0, 0
+    meta: dict = {}
+    i = 1
+    while i < end:
+        line = lines[i]
+        if not line.strip() or line[:1] in (" ", "\t"):
+            i += 1
+            continue
+        key, sep, raw = line.partition(":")
+        if not sep:
+            i += 1
+            continue
+        key = key.strip()
+        if not raw.strip() and i + 1 < end and lines[i + 1][:1] in (" ", "\t"):
+            nested = {}
+            j = i + 1
+            while j < end and lines[j][:1] in (" ", "\t"):
+                nkey, nsep, nraw = lines[j].strip().partition(":")
+                if nsep:
+                    nested[nkey.strip()] = _parse_subset_scalar(nraw)
+                j += 1
+            meta[key] = nested
+            i = j
+            continue
+        meta[key] = _parse_subset_scalar(raw)
+        i += 1
+    return meta, 1, end
+
+
+def _binding_block_lines(text: str) -> tuple[int | None, list[str], int]:
+    """The raw `binding:` block: (start line index, block lines, occurrence count)."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None, [], 0
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        return None, [], 0
+    starts = [i for i in range(1, end) if lines[i].startswith(BINDING_MARKER)]
+    if not starts:
+        return None, [], 0
+    start = starts[0]
+    block = [lines[start]]
+    j = start + 1
+    while j < end and lines[j][:1] in (" ", "\t"):
+        block.append(lines[j])
+        j += 1
+    return start, block, len(starts)
+
+
+def _render_binding_block(binding: dict) -> str:
+    origin = "null" if binding["origin"] is None else binding["origin"]
+    return (f"{BINDING_MARKER}\n"
+            f"  owner: {binding['owner']}\n"
+            f"  owner_id: {binding['owner_id']}\n"
+            f"  origin: {origin}\n")
+
+
+def read_binding(path: Path) -> dict:
+    """Read and validate one definition's complete binding record (C-1…C-5).
+
+    A definition without a complete block is uninterpretable (`binding-missing`); a block
+    that is not byte-identical to the engine's canonical rendering is reported as
+    `binding-hand-edited` rather than trusted — the engine is the only writer (FR-003).
+    """
+    path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    start, block, occurrences = _binding_block_lines(text)
+    if start is None:
+        raise GoalError(
+            f"binding-missing: {path} carries no binding block; a definition without a "
+            "complete binding record is uninterpretable (owner / owner_id / origin)")
+    parsed: dict = {}
+    for line in block[1:]:
+        key, sep, raw = line.strip().partition(":")
+        if sep:
+            parsed[key.strip()] = raw.strip()
+    missing = [key for key in BINDING_KEYS if key not in parsed]
+    if missing:
+        raise GoalError(
+            f"binding-missing: {path} is missing the binding key(s) "
+            f"{', '.join(missing)}; exactly owner / owner_id / origin are required")
+    origin_raw = parsed["origin"]
+    binding = {
+        "owner": parsed["owner"],
+        "owner_id": parsed["owner_id"],
+        "origin": None if origin_raw in ("null", "~") else origin_raw,
+    }
+    canonical = _render_binding_block(binding).splitlines()
+    if occurrences != 1 or block != canonical:
+        raise GoalError(
+            f"binding-hand-edited: the binding block in {path} is not in the "
+            "engine-written canonical form; the binding is written only by this engine, "
+            "never by a template, skill or driver")
+    return binding
+
+
+def _validate_binding_values(repo_root: Path, owner: str, owner_id: str,
+                             origin: str | None) -> None:
+    """C-2 / C-3 / C-4 — validate candidate values before anything is written."""
+    if owner not in OWNER_VALUES:
+        raise GoalError(
+            f"owner {owner!r} is outside the closed set {' / '.join(OWNER_VALUES)}")
+    if owner_id == "human":
+        if owner != "human":
+            raise GoalError(
+                f"owner_id 'human' is reserved for owner: human; {owner!r} requires a "
+                "state-spine run_id")
+    elif not RUN_ID_SHAPE.match(owner_id or ""):
+        raise GoalError(
+            f"owner_id {owner_id!r} does not match the state-spine run_id shape "
+            "r<YYYYMMDD>T<HHMMSS>Z-<slice-token>; the grammar is owned by "
+            f"{STATE_SPINE_GRAMMAR_OWNER} and is not re-declared here")
+    if origin is not None:
+        if (not origin or origin in (".", "..") or "/" in origin or "\\" in origin):
+            raise GoalError(
+                f"origin-unresolvable: origin {origin!r} is not a spec directory basename")
+        if not (Path(repo_root) / ".specify" / "specs" / origin).is_dir():
+            raise GoalError(
+                f"origin-unresolvable: origin {origin!r} names no directory under "
+                ".specify/specs/; an unresolvable origin is never auto-created")
+
+
+def bound_team_slugs(repo_root: Path, goal_slug: str) -> list[str]:
+    """Every team in the team archive row whose `goal_slug` names this goal (C-14)."""
+    root = Path(repo_root) / TEAM_DIRNAME
+    if not root.is_dir():
+        return []
+    candidates: list[tuple[str, Path]] = []
+    default = root / "team.md"
+    if default.is_file():
+        candidates.append(("team", default))
+    for child in sorted(root.iterdir()):
+        if child.is_dir() and (child / "team.md").is_file():
+            candidates.append((child.name, child / "team.md"))
+    rows: list[str] = []
+    for slug, path in candidates:
+        meta, _start, _end = read_frontmatter_subset(path.read_text(encoding="utf-8"))
+        if str(meta.get("goal_slug") or "").strip() == goal_slug:
+            rows.append(slug)
+    return rows
+
+
+def writable(kind: str, binding: dict, bound_teams: list[str]) -> tuple[bool, str | None]:
+    """C-14 — writability is computed, never declared (FR-038)."""
+    if kind == "teams":
+        return True, None
+    if binding.get("owner") == "human":
+        return True, None
+    if bound_teams:
+        return False, "bound-by:" + ",".join(bound_teams)
+    return True, None
+
+
+def _path_for_kind(repo_root: Path, kind: str, slug: str) -> Path:
+    if kind == "goal":
+        return definition_path(repo_root, slug)
+    if kind == "teams":
+        root = team_root(repo_root)
+        default = root / "team.md"
+        if default.is_file():
+            return default
+        return root / slug / "team.md"
+    raise GoalError(f"kind {kind!r} is outside the closed set goal / teams")
+
+
+def _lifecycle_for_kind(path: Path, kind: str) -> str:
+    meta, _start, _end = read_frontmatter_subset(path.read_text(encoding="utf-8"))
+    key = "status" if kind == "goal" else "lifecycle_state"
+    return str(meta.get(key) or "")
+
+
+def bind_definition(repo_root: Path, kind: str, slug: str, owner: str,
+                    owner_id: str, origin: str | None,
+                    origin_given: bool) -> tuple[Path, dict]:
+    """C-6 — rewrite the binding record; every other byte stays identical."""
+    path = _path_for_kind(repo_root, kind, slug)
+    if not path.is_file():
+        raise GoalNotFound(f"{kind} definition not found: {slug} ({path})")
+    current = read_binding(path)
+    lifecycle = _lifecycle_for_kind(path, kind)
+    if kind == "goal" and lifecycle in TERMINAL_STATES:
+        raise GoalError(
+            f"terminal-goal-rebind: goal {slug!r} is in terminal state {lifecycle!r} "
+            "and refuses a new binding; reopening is an explicit lifecycle action")
+    if kind == "teams" and lifecycle == "archived":
+        raise GoalError(
+            f"terminal-team-rebind: team {slug!r} is archived ({lifecycle!r}); an "
+            "archived team refuses any binding rewrite")
+    if not origin_given:
+        origin = current["origin"]
+    _validate_binding_values(repo_root, owner, owner_id, origin)
+    new_binding = {"owner": owner, "owner_id": owner_id, "origin": origin}
+    if kind == "goal":
+        allowed, reason = writable(kind, new_binding, bound_team_slugs(repo_root, slug))
+        if not allowed:
+            teams = (reason or "").split(":", 1)[-1]
+            raise GoalError(
+                f"{reason}: goal {slug!r} is bound by team(s) {teams} in the team "
+                "archive row; only owner: human may rewrite a bound goal (FR-038)")
+    text = path.read_text(encoding="utf-8")
+    start, block, _occurrences = _binding_block_lines(text)
+    new_block = _render_binding_block(new_binding).splitlines()
+    rewritten = text.splitlines()[:start] + new_block + text.splitlines()[start + len(block):]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    path.write_text(new_text, encoding="utf-8")
+    return path, new_binding
+
+
+def binding_payload(repo_root: Path, kind: str, slug: str) -> dict:
+    """C-8 — answer ownership from the record, never from the filesystem layout."""
+    path = _path_for_kind(repo_root, kind, slug)
+    if not path.is_file():
+        raise GoalNotFound(f"{kind} definition not found: {slug} ({path})")
+    binding = read_binding(path)
+    try:
+        shown = path.relative_to(repo_root).as_posix()
+    except ValueError:
+        shown = str(path)
+    return {
+        "kind": kind,
+        "slug": slug,
+        "owner": binding["owner"],
+        "owner_id": binding["owner_id"],
+        "origin": binding["origin"],
+        "path": shown,
+        "archive_layer": kind,
+        "lifecycle": _lifecycle_for_kind(path, kind),
+    }
+
+
+# --------------------------------------------------------------------------
 # lifecycle
 # --------------------------------------------------------------------------
 
@@ -439,7 +761,8 @@ def _today() -> str:
 def _render(objective: str, criteria: list[str], status: str, created: str,
             updated: str, history: list[str], title: str,
             targets: list[dict] | None = None,
-            boundaries: list[str] | None = None) -> str:
+            boundaries: list[str] | None = None,
+            binding_lines: list[str] | None = None) -> str:
     if criteria:
         body = "\n".join(f"{i}. {c}" for i, c in enumerate(criteria, 1))
     else:
@@ -452,8 +775,13 @@ def _render(objective: str, criteria: list[str], status: str, created: str,
                         if boundaries else "")
     targets_block = (f"{_SECTION_TARGETS}\n\n{_render_targets_table(targets)}\n\n"
                      if targets else "")
+    # C-20 — a lifecycle/objective/criteria/targets write never touches the binding
+    # block: it is carried through byte for byte (C-6's byte rule).
+    frontmatter = f"status: {status}\ncreated: {created}\nupdated: {updated}\n"
+    if binding_lines:
+        frontmatter += "\n".join(binding_lines) + "\n"
     return (
-        f"---\nstatus: {status}\ncreated: {created}\nupdated: {updated}\n---\n\n"
+        f"---\n{frontmatter}---\n\n"
         f"# Goal: {title}\n\n"
         f"{_SECTION_OBJECTIVE}\n\n{objective.strip()}\n\n"
         f"{_SECTION_CRITERIA}\n\n{body}\n\n"
@@ -626,6 +954,9 @@ def parse_goal(path: Path) -> dict:
         "criteria_count": len(criteria),
         "boundaries": _parse_bullets(_section(body, _SECTION_BOUNDARIES)),
         "targets": _parse_targets_text(_section(body, _SECTION_TARGETS)),
+        # C-20: the raw binding block travels with the parsed data so any write that
+        # re-renders the definition preserves it byte for byte.
+        "binding_block": _binding_block_lines(text)[1],
         # 053 FR-035: subject sets derived at parse time, one entry per criterion that
         # carries a reference form. A pure-enumeration criterion derives nothing, so this
         # list is empty for every definition that predates the form.
@@ -778,7 +1109,8 @@ def set_status(path: Path, target: str) -> Path:
     history.append(f"- {today} — status {current} -> {target}.")
     path.write_text(
         _render(data["objective"], data["criteria"], target, data["created"],
-                today, history, data["title"], data["targets"], data["boundaries"]),
+                today, history, data["title"], data["targets"], data["boundaries"],
+                data["binding_block"]),
         encoding="utf-8",
     )
     return path
@@ -797,7 +1129,8 @@ def set_objective(path: Path, objective: str) -> Path:
     history.append(f"- {today} — objective changed; prior value: {previous}")
     path.write_text(
         _render(objective, data["criteria"], data["status"], data["created"],
-                today, history, data["title"], data["targets"], data["boundaries"]),
+                today, history, data["title"], data["targets"], data["boundaries"],
+                data["binding_block"]),
         encoding="utf-8",
     )
     return path
@@ -815,7 +1148,8 @@ def set_criteria(path: Path, criteria: list[str]) -> Path:
     )
     path.write_text(
         _render(data["objective"], list(criteria), data["status"], data["created"],
-                today, history, data["title"], data["targets"], data["boundaries"]),
+                today, history, data["title"], data["targets"], data["boundaries"],
+                data["binding_block"]),
         encoding="utf-8",
     )
     return path
@@ -860,7 +1194,8 @@ def add_target(path: Path, statement: str) -> str:
     history.append(f"- {today} target {tid} added: {statement}")
     path.write_text(
         _render(data["objective"], data["criteria"], data["status"], data["created"],
-                today, history, data["title"], targets, data["boundaries"]),
+                today, history, data["title"], targets, data["boundaries"],
+                data["binding_block"]),
         encoding="utf-8",
     )
     return tid
@@ -890,7 +1225,8 @@ def set_target_status(path: Path, tid: str, new_status: str) -> Path:
     history.append(f"- {today} target {tid} {current}→{new_status}")
     path.write_text(
         _render(data["objective"], data["criteria"], data["status"], data["created"],
-                today, history, data["title"], targets, data["boundaries"]),
+                today, history, data["title"], targets, data["boundaries"],
+                data["binding_block"]),
         encoding="utf-8",
     )
     return path
@@ -1289,6 +1625,546 @@ def list_goals(repo_root: Path) -> list[dict]:
 
 
 # --------------------------------------------------------------------------
+# unified archive: migration, residual probe, resident backfill
+# (094, contracts/unified-archive-and-migration.md C-31…C-52, C-112…C-113)
+# --------------------------------------------------------------------------
+
+#: The migration destination history (STR-003): receipts and moved source trees.
+ARCHIVE_HISTORY_DIRNAME = ".specify/archive/goal-team"
+RECEIPTS_DIRNAME = "receipts"
+TREES_DIRNAME = "trees"
+DELETE_POLICY = "archive-not-delete"
+
+#: C-33 / C-34 — the two receipt shapes. A migration receipt carries one of the four
+#: migration outcomes below; an archive receipt (`result: archived`, written when a
+#: definition retires in place) shares the directory family and is never a read surface.
+MIGRATION_RESULTS = ("migrated", "noop", "conflict", "interrupted")
+
+#: C-43 — the spec-local forms the residual probe enumerates. These are migration
+#: SOURCES, never write targets; `.specify/.tmp/` is outside `.specify/specs/` entirely.
+RESIDUAL_FORMS = {
+    "goal": ("goal", DEFINITION_FILENAME),
+    "teams": ("team", "team.md"),
+}
+
+#: C-112 — the backfill values are a recorded ruling (Clarifications Q14), not inference.
+RESIDENT_BINDING = {"owner": "human", "owner_id": "human", "origin": None}
+
+#: C-39 test seam: the two step boundaries an interruption can be injected after.
+#: Declared, closed and side-effect-free; unset in production.
+FAULT_ENV = "GOAL_UTILS_FAULT_AFTER"
+FAULT_STEPS = ("target-write", "source-move")
+
+
+class _Interrupted(Exception):
+    """C-39 — a migration stopped between steps; carries the reached step."""
+
+    def __init__(self, step: str, row: dict, state: dict):
+        super().__init__(step)
+        self.step = step
+        self.row = row
+        self.state = state
+
+
+def _specs_root(repo_root: Path) -> Path:
+    return Path(repo_root) / ".specify" / "specs"
+
+
+def _history_root(repo_root: Path) -> Path:
+    return Path(repo_root) / ARCHIVE_HISTORY_DIRNAME
+
+
+def _receipt_path(repo_root: Path, kind: str, slug: str) -> Path:
+    return _history_root(repo_root) / RECEIPTS_DIRNAME / f"{kind}-{slug}.yaml"
+
+
+def _archived_tree_path(repo_root: Path, spec: str, kind: str, slug: str) -> Path:
+    return _history_root(repo_root) / TREES_DIRNAME / spec / kind / slug
+
+
+def _target_definition_path(repo_root: Path, kind: str, slug: str) -> Path:
+    """C-31 — the two unified-archive landing points, and nothing else."""
+    if kind == "goal":
+        return Path(repo_root) / ARCHIVE_DIRNAME / slug / DEFINITION_FILENAME
+    return Path(repo_root) / TEAM_DIRNAME / slug / "team.md"
+
+
+def _relative(root: Path, path: Path) -> str:
+    try:
+        return Path(path).relative_to(root).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def probe_residual(repo_root: Path) -> dict:
+    """C-43 — read-only enumeration of the spec-local residual trees (zero writes)."""
+    repo_root = Path(repo_root)
+    residuals: dict[str, list[str]] = {"goal": [], "teams": []}
+    specs = _specs_root(repo_root)
+    if specs.is_dir():
+        for kind, (layer_dir, filename) in RESIDUAL_FORMS.items():
+            for definition in sorted(specs.glob(f"*/{layer_dir}/*/{filename}")):
+                residuals[kind].append(_relative(repo_root, definition))
+    return {"residuals": residuals,
+            "counts": {kind: len(rows) for kind, rows in residuals.items()}}
+
+
+def _raw_frontmatter_value(text: str, key: str) -> str:
+    """The raw value of one frontmatter key, folded continuation lines included.
+
+    The closed-subset reader (R-06) parses four scalar kinds; a folded block scalar
+    (`key: >-`) is outside them, yet a team's concept statement lives there. This slice
+    reads that one key's text and does not grow into a second YAML parser.
+    """
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return ""
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        return ""
+    for i in range(1, end):
+        if lines[i].startswith(key + ":"):
+            raw = lines[i].partition(":")[2].strip()
+            parts = [] if raw in (">", ">-", "|", "|-", "") else [raw]
+            j = i + 1
+            while j < end and lines[j][:1] in (" ", "\t"):
+                parts.append(lines[j].strip())
+                j += 1
+            return " ".join(part for part in parts if part).strip()
+    return ""
+
+
+def _goal_concept_payload(path: Path) -> dict:
+    data = parse_goal(path)
+    return {
+        "objective": " ".join(data["objective"].split()),
+        "criteria": [" ".join(criterion.split()) for criterion in data["criteria"]],
+        "status": data["status"].strip(),
+        "targets": [[t["id"], " ".join(t["statement"].split()), t["status"]]
+                    for t in data["targets"]],
+    }
+
+
+def _team_concept_payload(path: Path) -> dict:
+    text = Path(path).read_text(encoding="utf-8")
+    meta, _start, _end = read_frontmatter_subset(text)
+    return {
+        "description": str(meta.get("description") or "").strip(),
+        "goal": _raw_frontmatter_value(text, "goal"),
+        "goal_slug": str(meta.get("goal_slug") or "").strip(),
+        "lifecycle_state": str(meta.get("lifecycle_state") or "").strip(),
+    }
+
+
+def concept_payload(kind: str, path: Path) -> dict:
+    """C-40/C-41 — what "did this definition change" compares.
+
+    Goal: Objective, Success Criteria, Lifecycle status, Targets text. Team: the nearest
+    concept fields (description, the inline goal statement, goal_slug, lifecycle_state);
+    territory is operational data and the binding block is excluded for both kinds.
+    """
+    return _goal_concept_payload(path) if kind == "goal" else _team_concept_payload(path)
+
+
+def concept_digest(kind: str, path: Path) -> str:
+    canonical = json.dumps(concept_payload(kind, path), sort_keys=True,
+                           ensure_ascii=False, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _read_binding_keys(text: str, path: Path) -> dict:
+    """The binding block's three values, refusing any non-canonical or incomplete block."""
+    start, block, occurrences = _binding_block_lines(text)
+    if start is None:
+        return {}
+    parsed: dict = {}
+    for line in block[1:]:
+        key, sep, raw = line.strip().partition(":")
+        if sep:
+            parsed[key.strip()] = raw.strip()
+    missing = [key for key in BINDING_KEYS if key not in parsed]
+    if missing:
+        raise GoalError(
+            f"binding-incomplete: {path} carries a binding block missing "
+            f"{', '.join(missing)}; the engine refuses to overwrite an incomplete record")
+    binding = {"owner": parsed["owner"], "owner_id": parsed["owner_id"],
+               "origin": None if parsed["origin"] in ("null", "~") else parsed["origin"]}
+    if occurrences != 1 or block != _render_binding_block(binding).splitlines():
+        raise GoalError(
+            f"binding-hand-edited: the binding block in {path} is not in the "
+            "engine-written canonical form; the binding is written only by this engine, "
+            "never by a template, skill or driver")
+    return binding
+
+
+def _insert_binding_block(text: str, binding: dict) -> str:
+    """Insert the binding block as the last frontmatter key; every other byte is kept."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise GoalInvalid("the definition carries no frontmatter; the binding record "
+                          "cannot be inserted (owner / owner_id / origin)")
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        raise GoalInvalid("the definition's frontmatter is unterminated; the binding "
+                          "record cannot be inserted") from None
+    rewritten = lines[:end] + _render_binding_block(binding).splitlines() + lines[end:]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    return new_text
+
+
+def _definition_with_origin(text: str, path: Path, origin: str) -> str:
+    """C-36 — set origin on the definition; the rest of the binding, when present, stays."""
+    existing = _read_binding_keys(text, path)
+    binding = {"owner": existing.get("owner", RESIDENT_BINDING["owner"]),
+               "owner_id": existing.get("owner_id", RESIDENT_BINDING["owner_id"]),
+               "origin": origin}
+    if not existing:
+        return _insert_binding_block(text, binding)
+    start, block, _occurrences = _binding_block_lines(text)
+    lines = text.splitlines()
+    rewritten = lines[:start] + _render_binding_block(binding).splitlines() \
+        + lines[start + len(block):]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    return new_text
+
+
+def _utc_now() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).replace(
+        microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _receipt_body(*, kind: str, source_spec: str, source_slug: str, target_slug: str,
+                  target_path: str, archived_path: str, digest: str, result: str,
+                  at: str, reached_step: str | None = None) -> dict:
+    body = {
+        "kind": kind,
+        "source_spec": source_spec,
+        "source_slug": source_slug,
+        "target_slug": target_slug,
+        "target_path": target_path,
+        "archived_path": archived_path,
+        "concept_digest": digest,
+        "result": result,
+        "at": at,
+        "delete_policy": DELETE_POLICY,
+    }
+    if reached_step:
+        body["reached_step"] = reached_step
+    return body
+
+
+def _write_receipt(repo_root: Path, body: dict) -> Path:
+    """One file per definition (`<kind>-<slug>.yaml`); never a shared stream (C-32)."""
+    path = _receipt_path(repo_root, body["kind"], body["target_slug"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(f"{key}: {value}" for key, value in body.items()) + "\n",
+                    encoding="utf-8")
+    return path
+
+
+def _read_receipt(path: Path) -> dict:
+    fields: dict = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        key, sep, value = line.partition(":")
+        if sep and key and not key.startswith((" ", "\t")):
+            fields[key.strip()] = value.strip()
+    return fields
+
+
+def _residual_sources(repo_root: Path) -> list[dict]:
+    rows = []
+    for kind, paths in probe_residual(repo_root)["residuals"].items():
+        for rel in paths:
+            definition = repo_root / rel
+            rows.append({"kind": kind, "slug": definition.parent.name,
+                         "source_spec": definition.parents[2].name,
+                         "definition": definition, "source_tree": definition.parent})
+    return rows
+
+
+def _planned_receipt(row: dict) -> dict:
+    return _receipt_body(
+        kind=row["kind"], source_spec=row["source_spec"], source_slug=row["slug"],
+        target_slug=row["slug"], target_path=row["target_path"],
+        archived_path=row["archived_path"], digest=row["concept_digest"],
+        result="migrated", at=_utc_now())
+
+
+def _plan_row(repo_root: Path, kind: str, spec: str, slug: str, definition: Path,
+              source_tree: Path | None) -> dict:
+    target = _target_definition_path(repo_root, kind, slug)
+    archived_tree = _archived_tree_path(repo_root, spec, kind, slug)
+    if kind == "goal":
+        ok, problems = validate_goal(definition, repo_root)
+        if not ok:
+            raise GoalInvalid(
+                f"migration-invalid: {_relative(repo_root, definition)} fails validation "
+                f"and is not migrated: {'; '.join(problems)}")
+    digest = concept_digest(kind, definition)
+    existing = _read_binding_keys(definition.read_text(encoding="utf-8"), definition)
+    row = {
+        "kind": kind, "slug": slug, "source_spec": spec,
+        "source_path": _relative(repo_root, definition),
+        "target_path": _relative(repo_root, target),
+        "archived_path": _relative(repo_root, archived_tree),
+        "concept_digest": digest,
+        "definition": definition, "source_tree": source_tree,
+        "binding": {"owner": existing.get("owner", RESIDENT_BINDING["owner"]),
+                    "owner_id": existing.get("owner_id", RESIDENT_BINDING["owner_id"]),
+                    "origin": spec},
+    }
+    if target.is_file():
+        if concept_digest(kind, target) != digest:
+            row["action"] = "conflict"
+            row["result"] = "conflict"
+            row["receipt"] = None
+            return row
+        row["action"] = "resume-move" if source_tree is not None else "resume-receipt"
+    elif archived_tree.exists() and source_tree is None:
+        row["action"] = "finish-write"
+    else:
+        row["action"] = "migrate"
+    row["result"] = "migrated"
+    row["receipt"] = _planned_receipt(row)
+    return row
+
+
+def _orphan_decisions(repo_root: Path, covered: set) -> list[dict]:
+    """Definitions whose source tree moved but whose receipt is absent or interrupted."""
+    trees_root = _history_root(repo_root) / TREES_DIRNAME
+    rows: list[dict] = []
+    if not trees_root.is_dir():
+        return rows
+    for spec_dir in sorted(path for path in trees_root.iterdir() if path.is_dir()):
+        for kind in ("goal", "teams"):
+            kind_dir = spec_dir / kind
+            if not kind_dir.is_dir():
+                continue
+            for tree in sorted(path for path in kind_dir.iterdir() if path.is_dir()):
+                definition = tree / (DEFINITION_FILENAME if kind == "goal" else "team.md")
+                if not definition.is_file() or (kind, tree.name) in covered:
+                    continue
+                receipt = _receipt_path(repo_root, kind, tree.name)
+                if receipt.is_file() and _read_receipt(receipt).get("result") != "interrupted":
+                    continue
+                rows.append(_plan_row(repo_root, kind, spec_dir.name, tree.name,
+                                      definition, None))
+    return rows
+
+
+def _noop_decisions(repo_root: Path, covered: set) -> list[dict]:
+    """C-38 — one noop entry per already-migrated definition, from its receipt."""
+    receipts = _history_root(repo_root) / RECEIPTS_DIRNAME
+    rows: list[dict] = []
+    if not receipts.is_dir():
+        return rows
+    for path in sorted(receipts.glob("*.yaml")):
+        fields = _read_receipt(path)
+        if fields.get("result") != "migrated":
+            continue
+        kind, slug = fields.get("kind"), fields.get("target_slug")
+        if kind not in ("goal", "teams") or not slug or (kind, slug) in covered:
+            continue
+        rows.append({
+            "kind": kind, "slug": slug, "source_spec": fields.get("source_spec", ""),
+            "source_path": "", "target_path": fields.get("target_path", ""),
+            "archived_path": fields.get("archived_path", ""),
+            "concept_digest": fields.get("concept_digest", ""),
+            "action": "noop", "result": "noop", "receipt": None,
+        })
+    return rows
+
+
+def _fault_after() -> str | None:
+    value = os.environ.get(FAULT_ENV)
+    return value if value in FAULT_STEPS else None
+
+
+def _write_target(repo_root: Path, row: dict, target: Path, source_text: str) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        _definition_with_origin(source_text, target, row["source_spec"]),
+        encoding="utf-8")
+    read_binding(target)
+
+
+def _execute_decision(repo_root: Path, row: dict) -> None:
+    """C-35's three ordered steps, with the interruption seam at each boundary."""
+    action = row["action"]
+    if action in ("noop", "conflict"):
+        return
+    target = _target_definition_path(repo_root, row["kind"], row["slug"])
+    archived = _archived_tree_path(repo_root, row["source_spec"], row["kind"], row["slug"])
+    fault = _fault_after()
+
+    def step(work, name: str) -> None:
+        try:
+            work()
+        except OSError as exc:
+            raise _Interrupted(name, row, {"target_exists": target.is_file()}) from exc
+        if fault == name:
+            raise _Interrupted(name, row, {"target_exists": target.is_file()})
+
+    if action in ("migrate", "finish-write"):
+        step(lambda: _write_target(repo_root, row, target,
+                                   row["definition"].read_text(encoding="utf-8")),
+             "target-write")
+    if action in ("migrate", "resume-move"):
+        def move() -> None:
+            archived.parent.mkdir(parents=True, exist_ok=True)
+            row["source_tree"].rename(archived)
+        step(move, "source-move")
+    step(lambda: _write_receipt(repo_root, _planned_receipt(row)), "source-move")
+
+
+def _public_decision(row: dict) -> dict:
+    return {key: value for key, value in row.items()
+            if key not in ("definition", "source_tree")}
+
+
+def migrate_archive(repo_root: Path, *, apply: bool) -> dict:
+    """FR-009/FR-010 — move spec-local definitions into the unified archive.
+
+    Planning is shared by `--dry-run` and `--apply`, which is what makes C-42's "same
+    decisions" structural rather than a claim, and every write is one of the three
+    ordered steps: target written and validated, source tree moved, receipt written.
+    """
+    repo_root = Path(repo_root)
+    sources = _residual_sources(repo_root)
+    for row in sources:
+        archived = _archived_tree_path(repo_root, row["source_spec"], row["kind"],
+                                       row["slug"])
+        if archived.exists() and row["source_tree"].exists():
+            raise GoalError(
+                f"archive-conflict: {_relative(repo_root, archived)} already holds a "
+                f"tree and {_relative(repo_root, row['source_tree'])} still exists; the "
+                "move would overwrite the archived copy, so the migration refuses "
+                "before writing anything (C-37)")
+
+    decisions = [_plan_row(repo_root, row["kind"], row["source_spec"], row["slug"],
+                           row["definition"], row["source_tree"]) for row in sources]
+    covered = {(row["kind"], row["slug"]) for row in decisions}
+    for row in _orphan_decisions(repo_root, covered):
+        decisions.append(row)
+    covered = {(row["kind"], row["slug"]) for row in decisions}
+    for row in _noop_decisions(repo_root, covered):
+        decisions.append(row)
+    decisions.sort(key=lambda row: (row["kind"], row["slug"]))
+
+    interrupted: dict | None = None
+    if apply:
+        executed: list[dict] = []
+        for row in decisions:
+            try:
+                _execute_decision(repo_root, row)
+            except _Interrupted as exc:
+                receipt = _receipt_body(
+                    kind=exc.row["kind"], source_spec=exc.row["source_spec"],
+                    source_slug=exc.row["slug"], target_slug=exc.row["slug"],
+                    target_path=exc.row["target_path"],
+                    archived_path=exc.row["archived_path"],
+                    digest=exc.row["concept_digest"], result="interrupted",
+                    at=_utc_now(), reached_step=exc.step)
+                _write_receipt(repo_root, receipt)
+                interrupted = {
+                    "result": "interrupted",
+                    "error": (f"interrupted: the migration of {exc.row['kind']} "
+                              f"{exc.row['slug']!r} stopped after the {exc.step} step; a "
+                              "second call resumes from that step (C-39)"),
+                    "reached_step": exc.step,
+                    "target_exists": exc.state["target_exists"],
+                    "target_path": exc.row["target_path"],
+                    "archived_path": exc.row["archived_path"],
+                }
+                row_copy = dict(_public_decision(row))
+                row_copy["result"] = "interrupted"
+                row_copy["reached_step"] = exc.step
+                decisions = executed + [row_copy]
+                break
+            executed.append(row)
+
+    conflicts = [row for row in decisions if row["result"] == "conflict"]
+    payload: dict = {
+        "action": "migrate-archive",
+        "mode": "apply" if apply else "dry-run",
+        "decisions": [(_public_decision(row) if isinstance(row, dict) else row)
+                      for row in decisions],
+        "counts": {name: sum(1 for row in decisions if row["result"] == name)
+                   for name in MIGRATION_RESULTS},
+    }
+    if interrupted:
+        payload.update({key: interrupted[key] for key in
+                        ("result", "error", "reached_step", "target_exists",
+                         "target_path", "archived_path")})
+    elif conflicts:
+        payload["error"] = "conflict: " + "; ".join(
+            f"target {row['target_path']} already exists with a different concept "
+            f"payload than the source {row['source_path']} — the migration refuses to "
+            "overwrite and names both candidates (C-40)" for row in conflicts)
+    return payload
+
+
+def _resident_definitions(repo_root: Path) -> list[dict]:
+    """C-112 — every definition already living in the unified archive."""
+    rows = []
+    for path in sorted((Path(repo_root) / ARCHIVE_DIRNAME).glob("*/goal.md")):
+        rows.append({"kind": "goal", "slug": path.parent.name, "path": path})
+    for path in sorted((Path(repo_root) / TEAM_DIRNAME).glob("*/team.md")):
+        rows.append({"kind": "teams", "slug": path.parent.name, "path": path})
+    return rows
+
+
+def backfill_bindings(repo_root: Path, *, apply: bool) -> dict:
+    """C-112/C-113 — insert the recorded binding on every unbound archive resident.
+
+    Every refusal is computed before the first write, so an incomplete or hand-edited
+    block leaves the whole tree untouched rather than half-backfilled.
+    """
+    repo_root = Path(repo_root)
+    planned: list[dict] = []
+    refusals: list[str] = []
+    for resident in _resident_definitions(repo_root):
+        text = resident["path"].read_text(encoding="utf-8")
+        if _binding_block_lines(text)[0] is None:
+            result = "backfilled"
+        else:
+            try:
+                _read_binding_keys(text, resident["path"])
+            except GoalError as exc:
+                refusals.append(str(exc))
+                continue
+            result = "already-bound"
+        shown = _relative(repo_root, resident["path"])
+        planned.append({"kind": resident["kind"], "slug": resident["slug"],
+                        "path": shown, "result": result,
+                        "_path": resident["path"]})
+    if refusals:
+        raise GoalError("; ".join(refusals))
+    if apply:
+        for row in planned:
+            if row["result"] != "backfilled":
+                continue
+            text = row["_path"].read_text(encoding="utf-8")
+            row["_path"].write_text(_insert_binding_block(text, RESIDENT_BINDING),
+                                    encoding="utf-8")
+    rows = [{key: value for key, value in row.items() if key != "_path"}
+            for row in planned]
+    return {"action": "backfill-bindings",
+            "mode": "apply" if apply else "dry-run",
+            "definitions": rows,
+            "counts": {"backfilled": sum(1 for row in rows
+                                         if row["result"] == "backfilled"),
+                       "already-bound": sum(1 for row in rows
+                                            if row["result"] == "already-bound")}}
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -1322,8 +2198,36 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
     def _sig_guard(_argv=None, declared=None, **_kwargs):
         return None
 
+def _run_archive_action(args, repo_root: Path) -> int:
+    """Dispatch the 094 archive actions; they span both archive layers and therefore
+    bypass the single-layer `--scope` resolution (C-31 applies to them directly)."""
+    try:
+        if args.action == "probe-residual":
+            payload = probe_residual(repo_root)
+        elif args.action == "migrate-archive":
+            payload = migrate_archive(repo_root, apply=bool(args.apply))
+        else:
+            payload = backfill_bindings(repo_root, apply=bool(args.apply))
+    except GoalNotFound as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_NOT_FOUND
+    except GoalInvalid as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INVALID
+    except GoalError as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INPUT_ERROR
+    _emit(payload, args.json)
+    if payload.get("result") == "interrupted":
+        # C-39: exit 3, distinguishable from 0 (complete) and 2 (input error).
+        return EXIT_NOT_FOUND
+    if "error" in payload:
+        return EXIT_INVALID
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -1336,27 +2240,27 @@ def main(argv: list[str] | None = None) -> int:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--repo-root", default=None, help="repository root (default: cwd)")
     common.add_argument("--json", action="store_true", help="machine-readable output")
-    common.add_argument("--scope", choices=("global", "spec", "auto"), default=None,
-                        help="anchoring/team scope: global (the .specify/anchoring archive), "
-                             "spec (requires --spec-dir; <spec>/goal/), or auto")
+    common.add_argument("--scope", choices=ARCHIVE_SCOPES, default=None,
+                        help="archive layer: goal (.specify/anchoring/), teams "
+                             "(.specify/teams/), or auto (read-only single-layer resolution)")
     common.add_argument("--spec-dir", default=None,
-                        help="the spec directory for --scope spec/auto (repo-relative or absolute)")
+                        help="the spec directory used to resolve origin and validate auto "
+                             "inputs (repo-relative or absolute); never decides a landing point")
 
     parser = argparse.ArgumentParser(
         description="Anchoring (goal) definition engine — stores goal.md definitions "
-                    "in the .specify/anchoring archive or a spec's goal/ subtree.",
+                    "in the .specify/anchoring archive and team.md in .specify/teams/.",
         parents=[common],
     )
     _sig_configure(parser)
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_scope = sub.add_parser("resolve-scope", parents=[common],
-                             help="read: resolve the global/spec/auto anchoring and team roots")
+                             help="read: resolve the goal/teams/auto archive-layer roots")
     p_scope.add_argument("--team", default=None, help="optional team slug for identity-aware auto")
 
     p_create = sub.add_parser("create", parents=[common],
-                              help="write: add a new definition to the anchoring archive "
-                                   "(or the spec's goal/ subtree)")
+                              help="write: add a new definition to the anchoring archive")
     p_create.add_argument("slug")
     p_create.add_argument("--objective", required=True)
     p_create.add_argument("--title", default=None, metavar="TEXT",
@@ -1407,6 +2311,26 @@ def main(argv: list[str] | None = None) -> int:
     p_migrate.add_argument("--drop-inline", action="store_true",
                            help="remove the team's inline goal after migrating (default: keep)")
 
+    p_bind = sub.add_parser("bind", parents=[common],
+                            help="write: rewrite one definition's binding record "
+                                 "(owner / owner_id / origin); every other byte is preserved")
+    p_bind.add_argument("kind", choices=("goal", "teams"),
+                        help="the archive layer the definition lives in")
+    p_bind.add_argument("slug")
+    p_bind.add_argument("--owner", required=True,
+                        help="sdd-run / command-run / human (validated by the engine)")
+    p_bind.add_argument("--owner-id", dest="owner_id", required=True,
+                        help="the state-spine run_id, or the literal 'human' for owner: human")
+    p_bind.add_argument("--origin", default=None,
+                        help="null or an existing .specify/specs/<dir> basename; omit to keep")
+
+    p_binding = sub.add_parser("binding", parents=[common],
+                               help="read: answer who owns one definition, from its "
+                                    "binding record (zero writes)")
+    p_binding.add_argument("kind", choices=("goal", "teams"),
+                           help="the archive layer the definition lives in")
+    p_binding.add_argument("slug")
+
     p_targets = sub.add_parser("targets", parents=[common],
                                help="read (--list/--check) | write (--add/--set): the "
                                     "Targets of one goal (038)")
@@ -1434,19 +2358,57 @@ def main(argv: list[str] | None = None) -> int:
                               help="T-<nnn> or <goal-slug>.T-<nnn>; omit to resolve via "
                                    "team.md focus_target")
 
+    sub.add_parser(
+        "probe-residual", parents=[common],
+        help="read: enumerate the spec-local goal/team residuals (zero writes; 094)")
+
+    p_migrate_archive = sub.add_parser(
+        "migrate-archive", parents=[common],
+        help="write: move spec-local definitions into the unified archive "
+             "(archive-not-delete; explicit action, never implicit; 094)")
+    archive_mode = p_migrate_archive.add_mutually_exclusive_group(required=True)
+    archive_mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                              help="perform every read and decision, print the plan and "
+                                   "the receipt bodies, and write nothing")
+    archive_mode.add_argument("--apply", dest="apply", action="store_true",
+                              help="write the target, move the source tree, write the receipt")
+
+    p_backfill = sub.add_parser(
+        "backfill-bindings", parents=[common],
+        help="write: insert the recorded binding (human / human / null) on archive "
+             "residents that carry none (explicit action, never implicit; 094)")
+    backfill_mode = p_backfill.add_mutually_exclusive_group(required=True)
+    backfill_mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                               help="print the per-definition plan and write nothing")
+    backfill_mode.add_argument("--apply", dest="apply", action="store_true",
+                               help="insert the binding record on every unbound resident")
+
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
 
+    if args.action in ("probe-residual", "migrate-archive", "backfill-bindings"):
+        return _run_archive_action(args, repo_root)
+
     global _ACTIVE_SCOPE
     _ACTIVE_SCOPE = None
-    write_action = args.action in ("create", "status", "objective", "criteria", "migrate")
+    write_action = args.action in ("create", "status", "objective", "criteria",
+                                   "migrate", "bind")
     if args.action == "targets":
         write_action = bool(args.add_statement or args.set_state)
     requested_scope = args.scope
     if requested_scope is None:
-        requested_scope = "auto" if args.action == "resolve-scope" else "global"
+        if args.action == "resolve-scope":
+            requested_scope = "auto"
+        elif args.action == "run-checks":
+            requested_scope = "teams"
+        elif args.action in ("bind", "binding"):
+            requested_scope = args.kind
+        else:
+            requested_scope = "goal"
     if requested_scope == "auto" and write_action:
-        _emit({"error": "scope auto is read-only; pass --scope global or --scope spec for a write"},
+        _emit({"error": "scope-read-only: --scope auto resolves a single archive layer "
+                        "for reads only; name the layer with --scope goal or --scope teams "
+                        "for a write"},
               args.json)
         return EXIT_INPUT_ERROR
     team_slug = getattr(args, "team_slug", None) or getattr(args, "team", None)
@@ -1458,6 +2420,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.action == "resolve-scope":
         _emit(scope_obj.as_dict(team_slug), args.json)
         return EXIT_OK
+    # C-16 — a write may not target a layer other than the one its definition resolves
+    # to; the two layers are named so the caller can correct the address.
+    action_layer = None
+    if args.action in ("bind", "binding"):
+        action_layer = args.kind
+    elif args.action == "run-checks":
+        action_layer = "teams"
+    elif write_action:
+        action_layer = "goal"
+    if write_action and action_layer and scope_obj.scope != action_layer:
+        _emit({"error": f"cross-layer-write: this write targets the {scope_obj.scope} "
+                        f"archive layer but the definition resolves to the {action_layer} "
+                        "archive layer; both layers are named so the caller can address "
+                        "the right one"},
+              args.json)
+        return EXIT_INPUT_ERROR
     _ACTIVE_SCOPE = scope_obj
 
     try:
@@ -1512,6 +2490,16 @@ def main(argv: list[str] | None = None) -> int:
             result = {"migrated_team": args.team_slug, "goal_slug": identity,
                       "created": str(created.relative_to(repo_root)),
                       "inline_kept": not args.drop_inline}
+        elif args.action == "bind":
+            origin_given = args.origin is not None
+            origin = None if args.origin in (None, "null") else args.origin
+            path, binding = bind_definition(
+                repo_root, args.kind, args.slug, args.owner, args.owner_id,
+                origin, origin_given)
+            result = {"kind": args.kind, "slug": args.slug, "binding": binding,
+                      "path": str(path.relative_to(repo_root))}
+        elif args.action == "binding":
+            result = binding_payload(repo_root, args.kind, args.slug)
         elif args.action == "check-statement":
             # Standalone pre-creation path (F-E12): `targets <slug> --check`
             # needs an existing goal (exit 3 without one), which made the
@@ -1637,6 +2625,26 @@ def _emit(payload: dict, as_json: bool) -> None:
             print(f"  {row['id']}. {row['name']:<16} {row['verdict']}{tail}")
         print(f"verdict: {payload['verdict']}   blocked: "
               f"{str(payload['blocked']).lower()}")
+        return
+    if "residuals" in payload:
+        for heading, kind in (("goal", "goal"), ("team", "teams")):
+            print(f"## {heading}")
+            for path in payload["residuals"][kind]:
+                print(path)
+            print(f"count={payload['counts'][kind]}")
+        return
+    if "decisions" in payload:
+        for row in payload["decisions"]:
+            print(f"{row['kind']}\t{row['slug']}\t{row['result']}\t"
+                  f"{row.get('source_path', '')} -> {row.get('target_path', '')}")
+        counts = payload.get("counts") or {}
+        if counts:
+            print("counts: " + " ".join(f"{name}={value}"
+                                        for name, value in counts.items()))
+        return
+    if "definitions" in payload:
+        for row in payload["definitions"]:
+            print(f"{row['result']}\t{row['path']}")
         return
     for key, value in payload.items():
         print(f"{key}: {value}")

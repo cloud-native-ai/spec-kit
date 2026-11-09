@@ -1,0 +1,7 @@
+CMD: python3 .specify/scripts/python/validate-tasks.py .specify/specs/092-goal-team-parallel/tasks.md
+CWD: /storage/project/cloud-native-ai/spec-kit
+DATE: 2026-11-09T09:30:59Z
+---
+WARN  239: blockedBy: T043 references later task T054 (forward dependency — verify this is intentional)
+PASS (with warnings): .specify/specs/092-goal-team-parallel/tasks.md — 0 error(s), 1 warning(s)
+EXIT=0

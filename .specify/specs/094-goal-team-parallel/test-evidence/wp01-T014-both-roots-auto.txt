@@ -1,0 +1,7 @@
+row: T014
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only' -q
+date: 2026-11-09T10:46:37Z
+---
+.                                                                        [100%]
+1 passed in 0.32s
+exit=0

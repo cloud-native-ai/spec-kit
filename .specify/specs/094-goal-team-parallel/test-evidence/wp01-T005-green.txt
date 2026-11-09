@@ -1,0 +1,6 @@
+command: python3 -m pytest tests/contract/test_binding_model.py -q
+date: 2026-11-09T11:01:18Z
+---
+............                                                             [100%]
+12 passed in 1.49s
+exit=0

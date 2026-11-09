@@ -1,0 +1,43 @@
+row: T002
+command: python3 -m pytest -q --tb=no -rf   (serial, full suite, implement entry)
+date: 2026-11-09T11:01:04Z
+tree: scripts/python/goal-utils.py byte-identical to HEAD (27adac3f3dee592ce2f58d6c8cb71d341a399a68); tests/contract/test_binding_model.py absent
+restore: .specify/.../test-evidence/implementation-baseline-restore.txt
+exit: 1
+pytest tail: 113 failed, 8187 passed, 2 skipped, 3 warnings in 679.29s (0:11:19)
+raw names: implementation-baseline-names.txt (113 lines; one unittest-style line carries a ' - reason' suffix)
+normalized ids: implementation-baseline-ids.txt (113 ids; reason suffix stripped, LC_ALL=C sorted)
+
+comparison against plan-baseline-names.txt (46 ids):
+  plan file is NOT in LC_ALL=C sort order (sort -c fails at line 4); re-sorted before comm
+  new-not-in-plan: 69
+  in-plan-not-now: 2   (test_registry_completeness::test_c3_features_header_count_matches_rows, test_summary_writeset::test_write_whitelist_is_the_goal_directory_not_the_team_directory)
+
+reading: the implement-entry tree has 113 failing ids, NOT the plan-recorded 46. The clean run
+used the HEAD engine with this package's test module absent, so none of the 113 is caused by wp01.
+69 of the 113 are not in the plan baseline; they cluster in the goal/summary/target integration
+suites (68) plus 15 tree-scanning contract tests, i.e. the upstream rename drift and the
+pre-existing .specify/.tmp/sdd-loop worktrees/run scratch named by execution lesson 2.
+This is a stale comparison surface for GATE-1, disclosed as an anomaly (not repaired here).
+
+new-not-in-plan grouped by module:
+     10 tests/integration/test_summary_legacy_backfill.py
+     10 tests/integration/test_summary_accumulation.py
+     10 tests/integration/test_goal_aggregation.py
+      7 tests/integration/test_target_fold.py
+      5 tests/integration/test_goal_reference.py
+      5 tests/integration/test_goal_concurrent_refresh.py
+      4 tests/integration/test_target_milestones.py
+      4 tests/integration/test_goal_definition_sourcing.py
+      2 tests/contract/test_isomorphism_map.py
+      2 tests/contract/test_criterion_subject.py
+      1 tests/integration/test_goal_roster.py
+      1 tests/integration/test_goal_migration_path.py
+      1 tests/contract/test_wrap_up_wording_gate_safe.py
+      1 tests/contract/test_user_facing_comprehension_doc.py
+      1 tests/contract/test_shipped_surface_client_neutrality.py
+      1 tests/contract/test_sdd_diffusion.py
+      1 tests/contract/test_neutrality_budget.py
+      1 tests/contract/test_client_guard_sweep.py
+      1 tests/contract/test_clause_coverage.py
+      1 tests/contract/test_checkpoint_protocol.py

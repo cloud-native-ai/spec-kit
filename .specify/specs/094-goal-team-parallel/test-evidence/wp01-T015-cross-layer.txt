@@ -1,0 +1,7 @@
+row: T015
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_a_cross_layer_write_is_refused_and_names_both_layers' -q
+date: 2026-11-09T10:46:38Z
+---
+.                                                                        [100%]
+1 passed in 0.12s
+exit=0
