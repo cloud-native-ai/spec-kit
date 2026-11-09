@@ -40,6 +40,7 @@
 
 ## 二 · 长跑档缺省周期与覆盖(Long-run cadence default)
 
+<!-- 092 handoff: D4 — 本节是汇报周期数值的**唯一 owner**（长跑档缺省值见本节第一段）；`shared/guidelines/progress-reporting.md` § 默认间隔与覆盖 只拥有交互档缺省，`skills/internal/create-team/references/create-mode.md` 与 `agents/reporter.agent.md` 只以指针抵达本节。本节文本保留不改。参见 092 D4，2026-11-09。 -->
 框架从**同一个 owner** 读出两档周期,并用**一个已声明的条件**在两者之间选择:
 
 - **长跑档(long-run profile)**:缺省 **30 seconds**。当该结构存在**至少一个活的汇报接收方**时使用——即它拥有一个运行期未被省略的 reporter 席位,或它是一个持有至少一个已派发子流程的监督者。

@@ -5,8 +5,8 @@
 - **closure verdict**: `closure-acceptance-check.py` → **`accept`**；`final_path pass=10 / partial=0 / fail=0 / unknown=0 / total=10`；`tasks 73/73 closed`；reasons `[]`
 - **test budget**: `audit-test-budget.py --stage-check closure` → `status=ok`，`slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=0`，`stages=6 complete=6`；closure 全量 `27 failed（全部为 baseline）/ 7698 passed / 1 skipped`，`comm -13` = **0 new**
 - **SC unblock evidence**:
-  - SC-001 → pass：真实 >90 s team run（087-reporting-dogfood，worker closure 全量 437.97 s）+ reporter 20 条 30 秒节奏归属状态行（`test-evidence/dogfood-reporter-lines-r3.txt`、`dogfood-reporter-run-record-r3.md`、`dogfood-worker-result-r3.md`）
-  - SC-002 → pass：经 team-creation entry 创建的 roster（`team/087-reporting-dogfood/team.md`，恰一个 reporter 席位）+ `validate-roster.py` exit 0（`test-evidence/sc002-roster-validate.txt`）+ guard RO-04 pass（`test-evidence/sc002-ro-04.txt`）
+  - SC-001 → pass：真实 >90 s team run（088-reporting-dogfood，worker closure 全量 437.97 s）+ reporter 20 条 30 秒节奏归属状态行（`test-evidence/dogfood-reporter-lines-r3.txt`、`dogfood-reporter-run-record-r3.md`、`dogfood-worker-result-r3.md`）
+  - SC-002 → pass：经 team-creation entry 创建的 roster（`team/088-reporting-dogfood/team.md`，恰一个 reporter 席位）+ `validate-roster.py` exit 0（`test-evidence/sc002-roster-validate.txt`）+ guard RO-04 pass（`test-evidence/sc002-ro-04.txt`）
 - **第二切片**：SC-011…SC-013 final pass、SC-014 supporting pass（`verification.md`）
 - anomaly: 无阻断；r1–r6 的全量 in-slot rerun 均由镜像漂移、probe 重编译与冻结 pin 对齐触发，逐次留证；`baseline` 27 条为存量失败（0 新增、0 修复）。
 
@@ -20,7 +20,8 @@
 
 ## 3. Team configuration review
 
-- evidence: `team/087-reporting-dogfood/runs/20261106T100000Z-report.md`
+- evidence: `team/088-reporting-dogfood/runs/20261106T100000Z-report.md`
+- history: 该 dogfood 团队原编号为 `087-reporting-dogfood`（2026-11-06 建），092 C4b 将目录与 slug 归一为 `088-reporting-dogfood`；改名前的 run 报告与 test-evidence 捕获件按当时名称逐字保留，不复写。
 - symptom: none
 - proposal: none
 - ratification: n/a

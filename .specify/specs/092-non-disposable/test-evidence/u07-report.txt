@@ -1,0 +1,11 @@
+U07 — P6-B2 (085 superseded bodies). Not committed, not pushed; only the two contract files touched.
+1. temporary-goal-team.md C-007: path is now `.specify/specs/<NNN-slug>/team/<slug>/team.md` (the `<slug>` segment collapses to team/team.md only when the slug equals the spec basename); superseded marker points at skills/internal/create-team/references/create-mode.md (team root layout) and the prior text is retained verbatim as a dated historical reference.
+2. checkpoint-and-agents.md C-001: now a five-part checkpoint defined by skills/external/sdd-loop-driver/references/checkpoint-protocol.md — parts 1–4 carried by C-002…C-006 plus part 5, the Direction audit (C-014); superseded marker plus the retained prior C-001/C-008 wording sit under the clause.
+3. checkpoint-and-agents.md C-008: "All four parts MUST be present" -> "All five parts MUST be present".
+4. checkpoint-and-agents.md Owners line now also names checkpoint-protocol.md as the owner of the checkpoint's five parts.
+5. checkpoint-and-agents.md new C-014: part 5 Direction audit is mandatory (reload tier, five binary questions, exactly one verdict on-track/correction-applied/decision-needed, rules judged before the goal, never ending in a question to the user). No C-ID renumbering, so existing anchors (tasks.md T060 C-001..C-008) stay valid.
+6. Wording confirmed once each from skills/external/sdd-loop-driver/references/checkpoint-protocol.md §"The five parts"/§"5. Direction audit" and skills/internal/create-team/references/create-mode.md §"Persisted team.md schema" (`<team-root>/<slug>/team.md`).
+7. Tests and guards untouched; no test reads these two contract files (grep over tests/ found no reference), so no guard red is expected from this change.
+8. NOTE, not repaired because it is outside this territory — 085 still says "four-part" at requirements.md:98 and :216 (FR-037), tasks.md:90 and :92 (T060), team/085-sdd-temporary-goal-team/team.md:163 and feature-ref.md:28; the driver needs to route one of these (u06 owns plan.md only).
+9. Anomalies found in my own two files beyond the assigned scope: none; no in-passing repair was needed.
+U07-DONE

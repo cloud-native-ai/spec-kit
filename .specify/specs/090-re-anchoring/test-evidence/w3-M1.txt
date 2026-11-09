@@ -1,0 +1,9 @@
+W3-M1: 092 → 090 requirements merge (append-only)
+CMD  git diff --stat -- .specify/specs/090-re-anchoring/requirements.md -> 219 insertions(+), 0 deletions; file 315 lines
+GATE ND-FR defs=65 unique=65 range 001..065 | ND-SC defs=20 unique=20 range 001..020 (expr: grep -c '^- \*\*ND-FR-NNN\*\*:' etc.)
+GATE merged section (line 102+) has 0 unprefixed FR-NNN/SC-NNN refs; RS table 7 rows, A-H table 8 rows, 20 SC + 20 Measurement Source lines
+GATE 090 original FR-001..FR-010 / SC-001..SC-004 intact; no line of the pre-existing body was deleted (diff deletions = 0)
+GATE 092 source: git diff --quiet .specify/specs/092-non-disposable/requirements.md -> UNCHANGED (file not deleted, not edited)
+DECISION heading levels: 092 headings demoted so no `##`/`###` anchor collides with 090 (FR/OK group -> h5, SC -> h3, sub -> h4); merge note records it
+SCOPE wrote only 090 requirements.md (append + 1 header note line) and this file; no commit, no push
+M1-DONE

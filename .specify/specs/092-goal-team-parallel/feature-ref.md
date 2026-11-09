@@ -6,36 +6,60 @@
 **Delivery surface**: engine `scripts/python/goal-utils.py` (extended), declaration facts under
 `.specify/shared/declarations/facts/`, the sdd-loop driver skill, the `/speckit.goal` `/speckit.team` `/speckit.feedback`
 command templates, the framework map, and the 085 test set.
-**Authority**: `requirements.md` (42 FR, 11 SC, Clarifications Q1–Q12, Assumptions A1–A11) is the intent owner; the
+**Authority**: `requirements.md` (43 FR, 12 SC, Clarifications Q1–Q14, Assumptions A1–A11) is the intent owner; the
 contracts below are the conformance owner; `plan.md` is the design owner. This page restates no rule — it maps.
 
 ## Delivery map — FR → contract clause
 
 | FR | Clause | FR | Clause |
 |---|---|---|---|
-| FR-001 | binding-and-lifecycle C-1, C-2 | FR-022 | command-family-and-declarations C-77…C-80 |
-| FR-002 | binding-and-lifecycle C-3 | FR-023 | binding-and-lifecycle C-26 |
-| FR-003 | binding-and-lifecycle C-4 | FR-024 | handoff-contract C-53, C-58 |
-| FR-004 | binding-and-lifecycle C-5 | FR-025 | binding-and-lifecycle C-25 |
-| FR-005 | binding-and-lifecycle C-18, C-19 | FR-026 | binding-and-lifecycle C-27 |
-| FR-006 | owner-rewrites-and-tests C-91 | FR-027 | binding-and-lifecycle C-28 |
-| FR-007 | unified-archive-and-migration C-32, C-33 | FR-028 | binding-and-lifecycle C-29 |
-| FR-008 | binding-and-lifecycle C-11 | FR-029 | handoff-contract C-56, C-57 |
-| FR-009 | unified-archive-and-migration C-34 | FR-030 | handoff-contract C-59 |
-| FR-010 | unified-archive-and-migration C-35 | FR-031 | command-family-and-declarations C-81, C-88 |
-| FR-011 | unified-archive-and-migration C-36 | FR-032 | command-family-and-declarations C-71 |
-| FR-012 | unified-archive-and-migration C-37, C-38 | FR-033 | command-family-and-declarations C-71, C-72 |
-| FR-013 | unified-archive-and-migration C-39, C-40 | FR-034 | command-family-and-declarations C-84 |
-| FR-014 | binding-and-lifecycle C-11, C-12 | FR-035 | command-family-and-declarations C-86, C-87 |
-| FR-015 | binding-and-lifecycle C-13, C-16 | FR-036 | command-family-and-declarations C-73, C-74 |
-| FR-016 | unified-archive-and-migration C-41, C-42 | FR-037 | command-family-and-declarations C-75, C-76 |
-| FR-017 | unified-archive-and-migration C-43, C-44 | FR-038 | binding-and-lifecycle C-30 |
-| FR-018 | unified-archive-and-migration C-45, C-46 | FR-039 | owner-rewrites-and-tests C-92, C-93 |
-| FR-019 | unified-archive-and-migration C-47, C-48 | FR-040 | owner-rewrites-and-tests C-94, C-95 |
-| FR-020 | command-family-and-declarations C-89 | FR-041 | owner-rewrites-and-tests C-96 |
-| FR-021 | binding-and-lifecycle C-17 | FR-042 | owner-rewrites-and-tests C-97 |
+| FR-001 | C-1, C-2, C-3, C-4 | FR-023 | C-18 |
+| FR-002 | C-1, C-2, C-3, C-4, C-30 | FR-024 | C-88, C-89, C-90, C-92 |
+| FR-003 | C-1, C-2, C-3, C-4, C-5, C-6, C-59 | FR-025 | C-9, C-10, C-11, C-13, C-29 |
+| FR-004 | C-1, C-2, C-3, C-4 | FR-026 | C-7, C-17, C-18, C-19, C-20, C-28 |
+| FR-005 | C-71, C-72, C-75 | FR-027 | C-16, C-91, C-92 |
+| FR-006 | C-71, C-72, C-74 | FR-028 | C-21, C-22, C-23, C-24, C-93, C-94, C-95, C-96 |
+| FR-007 | C-13, C-31, C-44, C-46, C-47 | FR-029 | C-48, C-100, C-101 |
+| FR-008 | C-9, C-10, C-11, C-12, C-13, C-29 | FR-030 | C-45, C-50, C-97, C-98, C-101 |
+| FR-009 | C-32, C-33, C-35, C-36, C-38, C-39, C-40, C-50 | FR-031 | C-74, C-76, C-77, C-78, C-79, C-80, C-81, C-82, C-83, C-84, C-85, C-86, C-87 |
+| FR-010 | C-32, C-33, C-34, C-35, C-37, C-39 | FR-032 | C-108 |
+| FR-011 | C-40, C-41 | FR-033 | C-104, C-108, C-109, C-110, C-111 |
+| FR-012 | C-43, C-44, C-45 | FR-034 | C-58, C-59, C-60 |
+| FR-013 | C-46, C-47, C-106, C-108 | FR-035 | C-53, C-54, C-55, C-56, C-57, C-68, C-69, C-70 |
+| FR-014 | C-25 | FR-036 | C-15, C-61, C-62, C-63, C-64 |
+| FR-015 | C-8, C-26 | FR-037 | C-49, C-107 |
+| FR-016 | C-53, C-54, C-55, C-56, C-57, C-58, C-59, C-60, C-61 | FR-038 | C-14, C-15, C-16, C-26 |
+| FR-017 | C-64 | FR-039 | C-68, C-69, C-70, C-80, C-81 |
+| FR-018 | C-79, C-80, C-81 | FR-040 | C-73, C-99 |
+| FR-019 | C-62, C-67 | FR-041 | C-102, C-103, C-104, C-105 |
+| FR-020 | C-65, C-66, C-67 | FR-042 | C-42, C-51, C-52 |
+| FR-021 | C-27 | FR-043 | C-53, C-54 |
+| FR-022 | C-107, C-108 | | | |
 
-Count: 42 map rows, 42 distinct FR ids — every requirement reaches at least one clause.
+Count: 43 map rows, 43 distinct FR ids — every requirement reaches at least one clause.
+
+**This table is generated, not authored.** It is the deterministic export of the contracts' own citation
+groups; regenerate it (never hand-edit a cell) with:
+
+```
+python3 - <<'EOF'   # run from the repo root; same 22-row/two-column layout
+import sys; sys.path.insert(0, '.specify/scripts/python')
+import clause_extract as ce, glob
+files = sorted(glob.glob('.specify/specs/092-goal-team-parallel/contracts/*.md'))
+fr = {}
+for f in files:
+    for cid, frs in ce.clause_citations(f).items():
+        for x in frs:
+            fr.setdefault(x, []).append((f.rsplit('/', 1)[-1][:-3], cid))
+for x in sorted(fr):
+    print(x, [c for _, c in fr[x]])
+EOF
+```
+
+`clause_extract.py` is the executable counterpart of
+`.specify/shared/definitions/contract-clause-definitions.md` § 4: a clause cites FRs through the **last
+FR/SC-bearing parenthetical in its block**, inline code spans stripped. The map therefore changes only when a
+clause's citation group changes — which is exactly when a reader needs to see it change.
 
 ## Measurement map — SC → red-first module
 
@@ -52,8 +76,9 @@ Count: 42 map rows, 42 distinct FR ids — every requirement reaches at least on
 | SC-009 | a rebind changes ownership only; the file-minus-binding hash is unchanged | `tests/contract/test_binding_model.py` |
 | SC-010 | the 085 temporary hierarchy and vocabulary are gone; the disposal table is measured | `tests/contract/test_085_disposal_table.py` |
 | SC-011 | an interrupted migration resumes; no new failing id appears against the serial baseline | `tests/contract/test_migration_interruption.py` |
+| SC-012 | every `.specify/goal/*/goal.md` and `.specify/teams/*/team.md` resident carries a complete `binding` record after `backfill-bindings`, and a second run writes nothing | `tests/contract/test_resident_backfill.py` |
 
-Count: 11 map rows, 11 distinct SC ids. Each module is added by `/speckit.implement` in red-first order; the module names
+Count: 12 map rows, 12 distinct SC ids. Each module is added by `/speckit.implement` in red-first order; the module names
 above are the plan's allocation and are pinned by `contracts/owner-rewrites-and-tests.md` C-109; the plan does not
 restate them a second time.
 

@@ -1,6 +1,6 @@
 ---
-description: Author and manage project-level goal definitions — create, view, modify, manage Targets (scope slices), migrate a team's inline goal, and coordinate teams that share one goal.
-short-description: 创建、查看、修改项目目标，并协调共享该目标的团队
+description: Author and manage goal definitions in both scopes — the project-level anchoring (锚点) and a spec-scoped goal: create, view, modify, manage Targets (scope slices), migrate a team's inline goal, and coordinate teams that share one goal.
+short-description: 创建、查看、修改锚点(全局)与 spec 级目标，并协调共享该目标的团队
 argument-hint: "[create|view|modify|targets|migrate|coordinate] [goal-slug|team-slug] [--scope global|spec|auto] [--spec-dir <path>]"
 ---
 
@@ -14,7 +14,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Positioning
 
-`/speckit.goal` is the **sole authoring entry** for project-level goal definitions. No skill, script, or other command may write into the goal archive **directly** — the goal engine (`goal-utils.py`) is its sole writing path, whether driven by this entry or carried as delegated logic behind it.
+`/speckit.goal` is the **sole authoring entry** for goal definitions in both scopes — the project-level **anchoring (锚点)** and a **spec-scoped goal**. No skill, script, or other command may write into either store **directly** — the goal engine (`goal-utils.py`) is its sole writing path, whether driven by this entry or carried as delegated logic behind it.
 
 ## Glossary
 
@@ -22,11 +22,11 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 ## Outline
 
-一次调用 = 委派 **`manage-goal`** 技能执行全部目标操作。Goal 的概念(构成、生命周期、与 Requirement 的边界、判据权威性、单一定位、团队绑定)定义于 `.specify/shared/definitions/goal-definitions.md`,确定性规则(身份文法、三段结构、生命周期表、变更历史、档案枚举)在引擎 `scripts/python/goal-utils.py` —— 均以技能与该两处为单一事实源,本模板引用而不复述。
+一次调用 = 委派 **`manage-goal`** 技能执行全部目标操作。Goal 的概念(构成、生命周期、两种作用域即 **anchoring(锚点)** 与 **spec 级 goal**、与 Requirement 的边界、判据权威性、单一定位、团队绑定)定义于 `.specify/shared/definitions/goal-definitions.md`,确定性规则(身份文法、三段结构、生命周期表、变更历史、档案枚举)在引擎 `scripts/python/goal-utils.py` —— 均以技能与该两处为单一事实源,本模板引用而不复述。
 
 **Delegation (mandatory)**: load `.specify/skills/internal/manage-goal/SKILL.md` and execute per its Workflow。六模式(`create` / `view` / `modify` / `targets` / `migrate` / `coordinate`)的模式表、读写分组与退出码裁决、唯一破坏性写(`criteria --clear` 需用户明示批准)、`create` 四要素访谈、执行顺序与 Boundaries 全部由该技能承载。
 
-**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. Global is `.specify/goal/`; spec is `<spec-dir>/goal/`. Reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`); writes MUST use an explicit `global` or `spec` scope. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. `global` is the project-level anchoring archive `.specify/anchoring/`; `spec` is `<spec-dir>/goal/`. Reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`); writes MUST use an explicit `global` or `spec` scope. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
 
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 
@@ -35,7 +35,7 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 ### 技能产出
 
-- `.specify/goal/<goal-slug>/goal.md`(仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)与受影响 `team.md`(migrate / coordinate 经用户批准后)。
+- 定义文件本身—— `global` 写 `.specify/anchoring/<slug>/goal.md`(锚点档案),`spec` 写 `<spec-dir>/goal/<slug>/goal.md`(spec 级 goal;两者均仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)——与受影响 `team.md`(migrate / coordinate 经用户批准后)。
 - `coordinate` 的领地重划分提案(批准前不写入);收尾执行报告。
 
 ## Wrap-up

@@ -1,0 +1,7 @@
+W3-M4 092->090 合并（证据复制 + feature detail + registry）  2026-11-09
+1 复制: 092 checklists/checkpoints/test-evidence(46 文件) -> 090 test-evidence/{checklists/checkpoints/}，全部加 092- 前缀，无覆盖（aim: 1+7+46=54 文件）；逐字节 cmp 全等，源文件未改未删。
+2 feature detail: .specify/memory/features/090.md 新增 § Non-Disposable（不可一次性处置，absorbed from 092），七面交付 + 两能力关系 + 合并期证据指针。
+3 registry: features.md 090 行描述改写为两能力并集（状态仍 Implemented）；092 行保留、尾部加 `merged into 090` 标注（状态仍 Planned，7 列结构不变）；Total Features 仍 86（未增删行）。
+4 未做（越界）: 092 目录未删除、specs 正文未合并、未提交、未 push。
+ANOMALY: 090 行 Description 与 Detail 两列合并叙述，两列对应同一 feature，无独立 owner；092 行保留 Planned 状态与「merged into 090」标注并存，状态值域内无 merged 值。
+M4-DONE

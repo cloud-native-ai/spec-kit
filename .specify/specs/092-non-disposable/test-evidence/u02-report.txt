@@ -1,0 +1,10 @@
+u02 — 089 renumbering residue repair (092 P6 C3)
+1. git mv team/086-script-interface-contract -> team/089-script-interface-contract: done (git status shows R rename, not committed)
+2. team.md frontmatter — name: "SDD Temporary Team 089"; slug: 089-script-interface-contract (unchanged); spec_dir: .specify/specs/089-script-interface-contract (correct)
+3. grep "086" under team/: zero matches after edit
+4. engine readout: goal-utils.py run-checks 089-script-interface-contract --scope spec --spec-dir .specify/specs/089-script-interface-contract
+   -> team resolved: goal script-interface-contract, identity explicit, checks goal-binding ok / goal-terminal ok,
+      dangling+target-terminal+cross-goal not-evaluated (no Target reference), verdict ok blocked false, exit 0
+5. observation: team.md has no focus_target, so target: None source: none (engine still resolves the team)
+6. no other file touched; no leftover references to the old team path found under .specify/specs/089-script-interface-contract
+U02-DONE

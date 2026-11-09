@@ -1,0 +1,22 @@
+# analyze round 2 — post-correction gate re-run (after M-2 in-passing correction, 2026-11-09)
+=== validate-requirements.py ===
+file: /storage/project/cloud-native-ai/spec-kit/.specify/specs/092-goal-team-parallel/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 307 lines, 53 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+=== account-clause-coverage.py --corpus-root ===
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 42 of 42 FRs cited from citation groups
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+status: ok
+pipeline-exit=0
+=== validate-tasks.py ===
+WARN  239: blockedBy: T043 references later task T054 (forward dependency — verify this is intentional)
+PASS (with warnings): /storage/project/cloud-native-ai/spec-kit/.specify/specs/092-goal-team-parallel/tasks.md — 0 error(s), 1 warning(s)

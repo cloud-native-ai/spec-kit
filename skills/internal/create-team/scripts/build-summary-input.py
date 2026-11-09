@@ -333,7 +333,7 @@ CRITERIA_SPLIT = re.compile(r"[;；]|(?<=[。.])\s*")
 
 
 #: The goal archive. Read-only from this script — `goal-utils.py` is its only writer.
-ARCHIVE_DIRNAME = ".specify/goal"
+ARCHIVE_DIRNAME = ".specify/anchoring"
 
 #: 038 — the ## Targets row grammar; identical to goal-utils' render grammar (D3).
 _TARGET_ROW = re.compile(r"^\| (T-\d{3}) \| (.+) \| (open|done|dropped) \|$")
@@ -1051,7 +1051,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return EXIT_NO_MATERIAL
 
-    delivery_dir = repo_root / ".specify/goal" / goal_slug / "summary"
+    delivery_dir = repo_root / ".specify/anchoring" / goal_slug / "summary"
     out_path = Path(args.out) if args.out else delivery_dir / "data/project-input.yaml"
     if not out_path.is_absolute():
         out_path = repo_root / out_path

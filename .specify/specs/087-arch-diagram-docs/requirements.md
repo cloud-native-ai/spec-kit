@@ -36,6 +36,10 @@
 
 The user's request, read as one coherent change: **the `docs/` documentation space stops being organised around prose document types and starts being organised around the architecture diagram.** Every document the framework produces for a project gains a diagram that goes with it, and the diagram is what the reader actually looks at.
 
+<!-- 092 handoff: E6 → 087 -->
+
+**Correction (the clarify ruling governs, not the sentence above).** The paragraph above reads as a replacement of the taxonomy, which contradicts this spec's own `## Clarifications` § Session 2026-11-06 (A2): option (ii) was **ratified** — the six formal document-type directories stand, and the accompanying architecture diagram is added as a **compliance obligation within** that baseline. The change is **additive**, not a reorganisation: no new document-type directory, no relocation of existing documents (FR-002, FR-003, § Out of Scope). Only the reading "organised around the diagram *instead of* prose types" is wrong; "every document carries a diagram and the diagram is what the reader looks at" stands.
+
 Two inputs constrain the shape of the change and MUST NOT be re-invented here:
 
 - **Existing surface.** `/speckit.docs` (`templates/commands/docs.md`) is already a thin orchestration layer over three owning skills — `create-docs` (structure and authoring), `improve-docs` (content of an existing document), `create-pages` (optional presentation). The documentation taxonomy, the reserved root filenames, and the reconcile engine all live in `skills/external/create-docs/SKILL.md` § Desired-State Baseline; the reader-facing explanation lives in `docs/concepts/documentation-model.md`.

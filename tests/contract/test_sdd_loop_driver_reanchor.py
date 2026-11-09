@@ -34,15 +34,24 @@ MINIMAL_Q1_PREFIX = "- Q1 rules:"
 # that way in a requirement, the protocol itself asks it as "Is the state spine fresher…" and
 # also carries it as `spine written before acting` in the fifth-part bullet. Both forms are the
 # same rule; pinning the wording rather than the rule would make the guard a copy-editor.
+#
+# <!-- 092 handoff: D5 → 090-re-anchoring -->
+# One entry per member of the owner's rule anchor (`shared/definitions/re-anchoring-definitions.md`
+# §1.1, the only place that enumerates them), numbered ①-⑧ in the owner's order, so the set and
+# the owner's list are a one-to-one correspondence and a deleted member reds (092 G3). The
+# confirmation gate was missing entirely before this repair; the report discipline was missing
+# too and `unattended` / `no approval request` stood for one member between them - both ① forms
+# are kept here because the protocol names the rule twice, but they map to the single member ①.
 RULE_SET = (
-    ("unattended", r"unattended"),
-    ("no approval request", r"no approval request"),
-    ("U4 -> next stage", r"U4 -> next"),
-    ("spine written before acting", r"spine written before acting|spine fresher"),
-    ("workspace-guard --check", r"workspace-guard --check"),
-    ("fast-fail", r"fast-fail"),
-    ("the gate discipline", r"gate discipline"),
-    ("budget", r"budget"),
+    ("① unattended (no approval request)", r"unattended"),
+    ("① unattended (no approval request), verbatim form", r"no approval request"),
+    ("② U4 -> next stage", r"U4 -> next"),
+    ("③ spine written before acting", r"spine written before acting|spine fresher"),
+    ("④ workspace guard", r"workspace-guard --check"),
+    ("⑤ fast-fail correction/decision split", r"fast-fail"),
+    ("⑥ the gate discipline", r"gate discipline"),
+    ("⑦ budget discipline", r"budget"),
+    ("⑧ report discipline", r"\breport discipline\b"),
 )
 # The primary-object sentence carries the goal as a *contracted* half ("the RULES, not the
 # goal"), so the order is matched rather than a frozen spelling: a rewrite that names the goal
@@ -50,6 +59,14 @@ RULE_SET = (
 RULE_FIRST_RE = re.compile(
     r"primary object is the RULES\b.*?\bnot the goal\b|primary object is the rules\b.*?\bnot the goal\b"
 )
+# The ordering sentence itself: the rule verdict and the action it licenses precede any goal
+# statement. Matching it yields the position the additive mutation leg measures against.
+RULES_FIRST_STMT_RE = re.compile(
+    r"the rule verdict and the action it licenses are stated\s+\**before\**\s+any goal statement"
+)
+# A goal verdict spelled out *before* that sentence is the goal-first drift this guard exists
+# for. Nothing else in part 5 legitimately precedes the sentence with either marker.
+GOAL_FIRST_MARKER_RE = re.compile(r"\bgoal\s+verdict\b|\bgoal[- ]first\b", re.I)
 
 
 def test_five_parts_and_direction_audit():
@@ -98,7 +115,7 @@ def _audit_block(proto: str) -> str:
 
 
 def _assert_rule_first(proto: str) -> None:
-    """The three legs of the ordering proposition, each with its own failure statement."""
+    """The four legs of the ordering proposition, each with its own failure statement."""
     audit = _audit_block(proto)
 
     # Leg 1 - the rules-first statement is present, so "rules first" is not merely implied.
@@ -109,14 +126,18 @@ def _assert_rule_first(proto: str) -> None:
     # Leg 2 - the first of the five questions asks the RULES and names the rule set inline.
     # Question 1 wraps over two source lines, so it is read as "the first numbered item plus
     # its indented continuation", not as one physical line.
-    first = re.search(r"^\s*1\. .*?(?=^\s*2\. )", audit, flags=re.M | re.S)
+    first = re.search(r"^\s*(?P<no>\d+)\. .*?(?=^\s*(?P<next>\d+)\. )", audit, flags=re.M | re.S)
     assert first, "leg 2: the direction audit carries no question 1"
     first_text = first.group(0)
-    assert not re.search(r"^\s*\d+\. ", audit[:first.start()], flags=re.M), (
-        "leg 2: a numbered item precedes question 1, so question 1 is not the first question"
-    )
-    first_no = "1"
+    # Read the actual first item instead of asserting a constant against itself (092 G2):
+    # the first numbered item must be numbered 1, and the item after it must be numbered 2.
+    # Both readings come from the text, so inserting or renumbering a question reds here.
+    first_no = first.group("no")
     assert first_no == "1", f"leg 2: the first numbered item is {first_no}, not question 1"
+    following_no = first.group("next")
+    assert following_no == "2", (
+        f"leg 2: the item after the first is numbered {following_no}, so the question list is not consecutive"
+    )
     assert "Which rules govern this step" in first_text, (
         "leg 2: the first question no longer asks which RULES govern the step"
     )
@@ -140,17 +161,47 @@ def _assert_rule_first(proto: str) -> None:
     # than asked separately. These are the propositions SC-002 pins; a rewrite that drops the
     # sentence, flips Q1 to the goal, or asks the goal as a question reds.
     flat = _flatten(audit)
-    assert re.search(
-        r"the rule verdict and the action it licenses are stated\s+\**before\**\s+any goal statement",
-        flat), (
+    statement = RULES_FIRST_STMT_RE.search(flat)
+    assert statement, (
         "ordering: the rules-before-goal verdict sentence is gone from part 5"
+    )
+    # Leg 4 - the additive mutation leg (092 G1). The sentence claims the rule verdict comes
+    # before "any goal statement", so a goal verdict spelled out ahead of it contradicts the
+    # rule it is supposed to state. Nothing in the unmutated block uses either marker before
+    # the sentence, so this reds exactly when the ordering is inserted around additively.
+    before_statement = flat[:statement.start()]
+    goal_marker = GOAL_FIRST_MARKER_RE.search(before_statement)
+    assert not goal_marker, (
+        "ordering: a goal verdict is stated before the rule verdict "
+        f"({goal_marker.group(0)!r} appears ahead of the rules-first sentence)"
     )
     assert "implicit in it" in flat, (
         "ordering: Q3 no longer states that the goal is implicit in the named next action"
     )
-    assert "do not ask the goal as a separate question" in _flatten(audit), (
+    assert "do not ask the goal as a separate question" in flat, (
         "ordering: the protocol no longer forbids asking the goal as a separate question"
     )
+
+
+def _rule_first_verdict(text: str) -> tuple[bool, str]:
+    """The guard's verdict on a protocol text: ``(green, reason)``.
+
+    Everything `_assert_rule_first` establishes is folded into one boolean so a mutant can be
+    shown to red without its assertion escaping as a test error, and so the reason names the
+    leg that broke.
+    """
+    try:
+        _assert_rule_first(text)
+    except AssertionError as exc:
+        return False, str(exc) or "an ordering assertion failed without a message"
+    except (IndexError, ValueError) as exc:
+        return False, f"an ordering surface could not be read: {exc}"
+    return True, "the rule verdict is stated before any goal statement"
+
+
+# The exact additive line the G1 mutant inserts, and the sentence line it is inserted before.
+GOAL_FIRST_LINE = "Goal verdict: on-track — goal first"
+RULES_FIRST_SENTENCE_LINE = "  So the rule verdict and the action it licenses are stated"
 
 
 def test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal():
@@ -166,4 +217,37 @@ def test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_
     three mutant fail arms).
     """
     assert PROTOCOL.is_file(), f"protocol not found: {PROTOCOL}"
-    _assert_rule_first(PROTOCOL.read_text(encoding="utf-8"))
+    green, reason = _rule_first_verdict(PROTOCOL.read_text(encoding="utf-8"))
+    assert green, reason
+
+
+def test_additive_goal_verdict_before_the_rules_verdict_reds(tmp_path):
+    """092 G1: the fix round deleted the guard's only positional comparison, so a purely
+    additive goal-first insertion stayed green. The clone below differs from the tracked
+    protocol by exactly one inserted line, placed immediately before the sentence that
+    claims the rule verdict precedes any goal statement.
+    """
+    source = PROTOCOL.read_text(encoding="utf-8")
+    assert RULES_FIRST_SENTENCE_LINE in source, (
+        "the rules-first sentence line moved; update the mutant builder before trusting it"
+    )
+
+    green, reason = _rule_first_verdict(source)
+    assert green, f"the unmutated copy read red: {reason}"
+
+    mutant_text = source.replace(
+        RULES_FIRST_SENTENCE_LINE,
+        f"  {GOAL_FIRST_LINE}\n{RULES_FIRST_SENTENCE_LINE}",
+        1,
+    )
+    assert mutant_text != source, "the additive insertion did not change the text"
+
+    clone = tmp_path / PROTOCOL.name
+    clone.write_text(mutant_text, encoding="utf-8")
+
+    green, reason = _rule_first_verdict(clone.read_text(encoding="utf-8"))
+    assert green is False, (
+        "the additive mutant stayed green: a goal verdict inserted before the rules-first "
+        "sentence must red the guard"
+    )
+    assert "goal verdict" in reason.lower(), f"red for the wrong reason: {reason}"

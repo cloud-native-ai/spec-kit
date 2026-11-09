@@ -1,0 +1,12 @@
+A7 — contract tests: .specify/goal -> .specify/anchoring; "temporary" -> scope wording
+Edited (8): test_goal_definition, test_goal_targets_check, test_goal_targets_engine, test_run_checks, test_criterion_subject, test_scope_resolution, test_temp_goal_contract, test_temp_team_schema (49+/39-). Naming rule: only the global archive renamed; definition filename stays goal.md; 085 slug kept (Grounded Naming).
+Run: pytest 10 assigned files (test_goal_*, test_team_*, test_temp_*) -> 178 passed, 2 failed (baseline before edit: 160 passed, 20 failed).
+Green: 18 of 20 baseline reds cleared; test_scope_resolution 8/8, test_run_checks 33/33, test_criterion_subject 9 reds -> 3.
+RED-1 test_goal_migration::test_the_user_directive...verbatim — pre-existing, NOT mine: commit c4605da6 rewrote the 037 Clarifications record that FR-022 forbids rewriting.
+RED-2 test_goal_targets_engine::test_engine_exists_with_its_mirror — pre-existing, NOT mine: scripts/python vs .specify/scripts/python goal-utils.py diverge (39+- vs 1+-; both already say .specify/anchoring).
+Deliberately NOT renamed (green, out of this rename's intent): test_summary_form_generator, test_summary_writeset, test_summary_trigger, test_directory_governance, test_goal_writeset — build-summary-input.py still declares ARCHIVE_DIRNAME=".specify/goal" and writes there; framework-map still registers the old root.
+Not run/fixed (not my domain): test_criterion_subject c3/c19 (owner doc heading "Storage & Goal Archive" -> "Storage & Anchoring Archive"), c18 (same engine/mirror divergence as RED-2). Not committed, not pushed.
+ANOMALY: build-summary-input.py (skills/internal/create-team/scripts) was not renamed by W1, so the summary delivery root and its 5 test files still use .specify/goal — W1 owner decision required.
+ANOMALY: goal-utils.py source vs .specify mirror diverge in the worktree, failing two mirror-parity assertions; W1 territory, not repaired here.
+ANOMALY: goal-definitions.md renamed "## Storage & Goal Archive" to "## Storage & Anchoring Archive", breaking the criterion-subject c3/c19 pins that protect the historical section roster.
+A7-DONE

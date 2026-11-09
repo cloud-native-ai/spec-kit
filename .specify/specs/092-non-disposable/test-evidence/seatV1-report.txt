@@ -1,0 +1,20 @@
+SEAT-V1 wave-1 (76b4ec60) re-computed at 999d3c6a + dirty tree, 2026-11-09, read-only
+01 080 validate-requirements   PASS  rc=0, 0 err/0 warn, 271 lines; 080 smoke re-run 101 passed
+02 089 validate-tasks         PASS  rc=0, 0 err/68 warn, 0 unchecked rows; T081-T087 evidence pointers resolve
+03 085 decision-tensions      PASS  rc=0, status ok, 0 err/0 warn; T-001..T-003 pole_a/pole_b child lines parsed
+04 084 harness coverage       PASS  candidates 86 / excluded 73 / unclassified 0 / pending 0, rc=0; verify rc=0 0 findings (backward 16/17 disclosed)
+05 089 closure                PASS  verdict accept rc=0, final_path pass 10/10; machine block present, deferred_tasks=0
+06 089 closure smoke re-run   FAIL  3 failed/153 passed: c33+c35 sync-mirrors drift, t078 C-32; was 92 passed at 76b4ec60^
+07 090 closure                PASS  verdict accept rc=0, final_path pass 4/4
+08 090 runner guard (u05)     PASS  6 passed; mutant before-sentence REDS (G1 leg live), q1-renumber mutant REDS (G2)
+09 086 C-016 (u09)            PASS  renamed, body+assertions unchanged; -k c016 1 passed; REDS when projection refused
+10 088 headers (u11)          PASS  grep 'Feature.*087' rc=1; grep '087' rc=1; 8/8 headers read **Feature**: 088
+11 team run-checks 089 (u02)  PASS  goal-utils run-checks rc=0 verdict ok blocked false; team 089-*/team, grep 086 rc=1
+12 u13 runner-only carrier    PASS  path refs 087->088 in contracts+team; u12-claimed 4 extra bodies carry NONE
+13 u13/u14 mirrors+markers    FAIL  shared/ mirror deferred (sync-mirrors rc=2); 092 handoff D6/rows+D4 absent from sources
+ANOMALY: 089 contract suite regressed from 92 passed (76b4ec60^) to 3 failed/153 passed at 999d3c6a
+ANOMALY: u12 claims path refs updated in verification.md SC-001/SC-002 + checkpoints/12-final-closure.md; grep 087 finds none
+ANOMALY: u13 claims sync-mirrors --check clean; measured rc=2 with 9 .specify/shared/* mirrors DIRTY and uncommitted
+ANOMALY: 092 Shift-List handoff markers missing for D6 (mechanism-policy row) and D4/D1 rows per 12-marker count
+ANOMALY: 089 closure accepted despite T086 recording 78 NEW failures vs baseline-failed.txt (not honored)
+SEAT-V1-DONE

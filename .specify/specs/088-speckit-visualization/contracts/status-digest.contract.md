@@ -1,6 +1,6 @@
 # Contract: Current-State Digest and Guard
 
-**Feature**: 087 | **Covers**: FR-011, FR-012, FR-017, FR-022 (and, by the second slice, FR-023's host surface)
+**Feature**: 088 | **Covers**: FR-011, FR-012, FR-017, FR-022 (and, by the second slice, FR-023's host surface)
 **Contract object**: (a) the thin command `templates/commands/status.md` (entry `/speckit.status`) and its
 generated per-tool copies; (b) the deterministic script `scripts/python/status-digest.py` with three actions;
 (c) their shared reading of existing state.

@@ -1,0 +1,9 @@
+u11 — 088 contract header numbering repair (092 C4a)
+Scope: .specify/specs/088-speckit-visualization/contracts/*.md only.
+Files changed: 8 (one line each, line 3): efficiency-element, measure-report, ownership-map, reporter-seat, reporting-obligations, status-digest, status-report, supervision-report (.contract.md).
+Edit: "**Feature**: 087" -> "**Feature**: 088" (8 replacements).
+Per-file grep: each file had exactly one 087 occurrence (header only); no other 087 in any file.
+Verification: grep -rn "Feature.*087" on contracts/ -> no match (exit 1); grep -rn "087" -> no match (exit 1).
+Boundary: team name / dogfood slug untouched (u12); no commit, no push.
+Note (non-blocking, env): bash wrapper cannot write /tmp/qoder-51c3-cwd (owned by another user); command output unaffected.
+U11-DONE

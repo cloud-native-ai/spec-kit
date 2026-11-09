@@ -5,6 +5,9 @@
 **Input**: Specification from `.specify/specs/083-mechanism-policy-separation/requirements.md` (clarified 2026-11-05, scope update clarify 2026-11-05; two capabilities, one Feature — FR / SC / STR / 假设 / 约束的**当前计数以 requirements 的 `validate-requirements.py` 实测为准**，本文件不手抄)
 
 > **scope update 的处置（2026-11-05 plan 更新）**：本文件在 `58d3dc5b` 上**增量更新**，把第二个能力「技能引用归一化」纳入同一个计划。
+<!-- 092 handoff: E2 → 083 -->
+<!-- 092 handoff — E2 校正陈述（plan 侧基线三分）。上句与下文出现的 `58d3dc5b` 是**该次 plan 增量更新所基于的提交**，不是本特性的字节基线。三个同形字面量的正确对象：(a) `STR-002` = `3ffeb26e`（2026-11-04 081 收尾）是 SC-003 / SC-007 的**字节基线**，owner 在 `requirements.md` § Shared Strings；(b) `58d3dc5b`（2026-11-05 082 plan 收尾）是**本计划写作基准**，不是任何 `post_change` 比较对象；(c) 实现期**测试基线**是 `test-evidence/implement-part1-baseline.txt` 实测 `24 failed, 7157 passed, 7 skipped`（失败名清单 `baseline-failed.txt` 24 条），`verification.md` 的 `post_change_*` 槽位相对它读数。原文保留不改；任何「baseline」消歧一律回读 `verification.md` 的实测行与上述证据文件，本标记不复述其数值。-->
+
 > - **被撤回的早改**：不再有 `083a` / `083b` 两个切片。原 `## Scope Snapshot` 与 `## Slice 083b` 两节（工作树里未提交的早改，写于 FR 上限仍为 30 时）被替换为 § Decomposition & Ceiling 的单包结论；撤回依据是 clarify 裁决 ③（30 FR < 60 上限，切片前提消失）与 `decomposition-check.py --mode plan` 的实测读数（见 § Scope Update Record）。
 > - **被改写的既有行**：凡是「`coaching-skills` / `run-skills` 零改动」「允许差异集 6 条」「四个技能文件」，以及 FR / SC 的**前值**计数（见 § Scope Update Record 的变更台账）表述都已被第二能力证伪，本次逐条改写并在 § Scope Update Record 的 `SU-nn` 行披露。**D1–D7、T-001–T-003、EP-001–EP-006 的内容未被改写**，只做复核。本轮 repair（M3，2026-11-05）对 D2 / D6 / D7 / D13 的计数表述做了与实测对齐的更正，逐条记在 § Delivery Review 的 DC-008。
 

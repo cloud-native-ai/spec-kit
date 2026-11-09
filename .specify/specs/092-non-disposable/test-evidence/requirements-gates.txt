@@ -1,0 +1,39 @@
+=== requirements-gates (092-non-disposable) ===
+date: 2026-11-09
+artifact: .specify/specs/092-non-disposable/requirements.md
+
+--- gate 1: validate-requirements.py (require 0 error) ---
+file: .specify/specs/092-non-disposable/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 372 lines, 55 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+--- gate 2: flow-class-check.py --action lookup --unit-id spec:092-non-disposable ---
+unit_id: spec:092-non-disposable
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0
+
+--- gate 3: decomposition-check.py --mode plan ---
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 41, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T02:45:34Z"}
+EXIT=0
+
+--- appendix: FR/SC counts (deterministic) ---
+FR count: 41
+SC count: 14
+SC path=final: 11
+SC path=supporting: 3
+SC Measurement Source rows: 14
+
+verdict: validate-requirements 0 error / 0 warning; flow_class=execution (source=declaration); decomposition proceed (fr=41 <= 120, no task rows yet so TASK_CEILING not evaluated).

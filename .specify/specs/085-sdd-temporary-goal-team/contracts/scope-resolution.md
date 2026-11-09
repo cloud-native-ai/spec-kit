@@ -3,7 +3,9 @@
 Owner: `scripts/python/goal-utils.py` action `resolve-scope`. Consumers: `/speckit.goal`, `/speckit.team`, `run-checks`, `sdd-route.py authorize`, `create-team`, `run-team`, `improve-team`, evidence runs lane.
 
 - **C-001**: `resolve-scope` MUST accept `--scope global|spec|auto`, `--spec-dir <path>`, optional `--team <slug>`, and `--json`.
-- **C-002**: `global` MUST resolve `goal_root=.specify/goal` and `team_root=.specify/teams`.
+- **C-002**: `global` MUST resolve `goal_root=.specify/anchoring` and `team_root=.specify/teams`.
+  <!-- superseded (092: scope-not-temporary; path side: `.specify/goal` → `.specify/anchoring`) -->
+  <!-- prior text, retained (2026-11-09): "`global` MUST resolve `goal_root=.specify/goal` and `team_root=.specify/teams`." -->
 - **C-003**: `spec` MUST resolve `goal_root=<spec-dir>/goal` and `team_root=<spec-dir>/team`.
 - **C-004**: `spec` MUST require a spec directory that is under `.specify/specs/`; absent or invalid input exits 2 with a named reason.
 - **C-005**: `auto` MUST resolve only when exactly one of the global or spec candidate exists; both existing exits 2 `scope-ambiguous` and names both paths.

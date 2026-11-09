@@ -1,0 +1,161 @@
+# plan-stage gate readings — 092-non-disposable
+
+date: 2026-11-09
+HEAD at time of reading: 62f95298 (chore(092): checkpoint 02 and the plan-stage spine)
+plus this stage's own uncommitted writes under .specify/specs/092-non-disposable/
+environment: /usr/bin/python3 = CPython 3.11.0rc1; git available; pytest not invoked at this stage
+
+The readings below are pasted as produced. Nothing here is an attestation: each block names the
+exact command, so a later reader can re-run it.
+
+------------------------------------------------------------------------------
+## G1 — pre-analyze-check.py --stage plan
+
+    python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+        --spec-dir .specify/specs/092-non-disposable --stage plan --repo .
+
+stderr:
+    pre-analyze-check: stage=plan decision=pass errors=0 advisories=48 waived=0
+
+stdout (summary fields):
+    {"stage": "plan", "decision": "pass",
+     "summary": {"errors": 0, "advisories": 48, "waived": 0,
+                 "fr": 65, "sc": 20, "tasks": 0, "clauses": 0, "files": 13}}
+
+exit code: 0
+
+### Why 48 advisories, and why none of them is a defect of this stage
+
+All 48 are `missing-path` advisories over backticked path tokens in the formal files. Tally by
+target (each target is a file this feature *delivers* at a later stage, or a path that is named
+only to say it does not exist):
+
+     12  shared/definitions/non-disposable-definitions.md                NEW, package P1
+     11  tests/contract/test_non_disposable_contract.py                  NEW, package P5
+      8  shared/declarations/facts/non-disposable-review-surface.yaml    NEW, package P1
+      6  .specify/memory/features/092.md                                 NEW, package P1
+      3  .specify/scripts/python/non-disposable-check.py                 NEW mirror of P2's engine
+      2  .specify/shared/definitions/non-disposable-definitions.md       NEW mirror of P1
+      2  .specify/memory/sanitize/findings.json                          named in FR-035 as the
+                                                                         *prohibited* evidence store
+      1  .specify/shared/declarations/facts/non-disposable-review-surface.yaml   NEW mirror
+      1  .specify/templates/commands/                                    named in plan.md § Mirror
+                                                                         Obligations as "retired —
+                                                                         never a mirror"
+      1  .specify/skills/external/...                                    quoted verbatim as corpus
+                                                                         H1's bad path literal
+
+With `--repo` omitted the same invocation reports advisories=0 (the existence check is opt-in by
+design: `check_paths` returns immediately when `repo` is empty). With `--repo .` the count is the
+honest one: every advisory is a deliverable that does not exist yet, which is exactly what a
+plan-stage run is for. `--strict` is deliberately NOT used — it would red the whole
+design-before-implement contract, and the same would be true of every delivered plan in this
+repository that names a not-yet-created file.
+
+### non-advisory findings
+
+    none — zero errors, zero non-missing-path advisories.
+
+Both stage checks that produced *errors* on the first run were fixed structurally, not waived:
+the `## Inherited Blockers` section must own exactly one table (the gate parses the section's
+first table as the blocker table), and the dependency set is declared in prose beside it.
+
+------------------------------------------------------------------------------
+## G2 — validate-decision-tensions.py --spec .specify/specs/092-non-disposable
+
+    python3 scripts/python/validate-decision-tensions.py \
+        --spec .specify/specs/092-non-disposable --json
+
+exit code: 0
+
+stdout:
+    {
+      "spec": ".specify/specs/092-non-disposable",
+      "status": "ok",
+      "checks": [
+        {"label": "dtr-anchor",                 "status": "pass", "count": 0, "severity": 0},
+        {"label": "dtr-section-missing",        "status": "pass", "count": 0, "severity": 0},
+        {"label": "dtr-record-incomplete",      "status": "pass", "count": 0, "severity": 0},
+        {"label": "dtr-tension-id",             "status": "pass", "count": 0, "severity": 0},
+        {"label": "dtr-rejected-form",          "status": "pass", "count": 0, "severity": 0},
+        {"label": "expected-sacrifice-unmapped","status": "pass", "count": 0, "severity": 0}
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "scanned": {"lines": 458, "records": 7},
+      "channel": {"value_domain": "HIGH-or-0", "high": 0},
+      "findings": []
+    }
+
+7 records = T-001…T-007. Every `expected_sacrifice` binds exactly one SC id with a direction.
+(Lines scanned = the plan's line count at the moment of the run; the plan grew afterwards, which
+is why the summary table in plan.md § Phase 1 was backfilled after the contracts landed.)
+
+------------------------------------------------------------------------------
+## G3 — decomposition-check.py --mode plan
+
+    python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py \
+        --mode plan --requirements .specify/specs/092-non-disposable/requirements.md
+
+exit code: 0
+
+stdout:
+    {"mode": "plan", "decision": "proceed",
+     "measured": {"fr_count": 65, "task_count": null,
+                  "fr_ceiling": 120, "task_ceiling": 160},
+     "reasons": [], "checked_at": "2026-11-09T03:09:20Z"}
+
+65 / 120 = 54.2 % of the FR ceiling: room for the tasks stage to add rows, no room to split this
+feature into two slices without inventing a boundary the requirements do not have. The gate reads
+**requirements.md only** (`research.md` R12) — the implement package proposal in `plan.md`
+(P1…P8) is a design proposal for the tasks stage, not a gate input, and is labelled as such.
+
+------------------------------------------------------------------------------
+## G4 — review-surface re-measurement (not a gate; the coverage-declaration reference point)
+
+    find <the ten declared roots, minus .specify/.tmp and .git> -type f | wc -l
+      -> 4,357 files (2026-11-09, this tree)
+
+The requirements stage read 4,345 and clarify recorded 4,352; the three readings are taken at
+three moments and SC-014 states the baseline is a reference point, not a threshold. The engine
+must derive its own count from the declaration; this number exists only to check the engine's
+first coverage declaration against an independent enumeration (`quickstart.md` § 9).
+
+------------------------------------------------------------------------------
+## G5 — corpus integrity reading
+
+    notes/input-review-080-090.md § A–H: A 6, B 5, C 4, D 6, E 6, F 5, G 3, H 3 = 35 entries
+
+    tier split (plan.md § A–H Corpus Mapping): 档 I = 19, 档 II = 15, excluded = 1 (H3)
+
+------------------------------------------------------------------------------
+## G6 — live reproductions used by quickstart § 1 / § 2 (measured this stage)
+
+    python3 scripts/python/harness-triple-check.py --action verify
+      -> declarations 23 / candidates 86 / consistency 31-31 and 16-16
+         findings: 3 (unclassified-candidate: skills/external/ssh-utils/SKILL.md,
+                       templates/commands/measure.md, templates/commands/status.md)
+         exit 1
+    .specify/specs/084-harness-triple-structure/verification.md:70
+      -> "unclassified 0"                      => corpus A2 reproduces (false-closed-set)
+
+    sed -n '95,101p' scripts/bash/generate-instructions.sh
+      -> the reason block derives 37888; the declaration below reads INSTRUCTIONS_BUDGET_BYTES=38400
+    wc -c .specify/instructions.md
+      -> 35821                                 => corpus F2 reproduces (the arithmetic; the engine
+                                                  must NOT fire `stale-constant` on it — quickstart § 2)
+
+    tests/contract/test_sdd_loop_driver_reanchor.py:118-119
+      -> first_no = "1" / assert first_no == "1"   => corpus G2 reproduces (deferral-shaped)
+
+Note on the two copies of harness-triple-check: the `.specify/scripts/python/` copy resolves its
+root by C-028 ("the directory containing scripts/python/"), i.e. to `.specify/` — never to the
+repository root — so a declaration that names `skills/external/database-utils/scripts/query.py`
+(the framework source path, which exists) cannot resolve on the mirror side and the run ends
+`input-error: ... does not resolve`, exit 2. `.specify/skills/external/database-utils/` does not
+exist in this tree. The source copy at `scripts/python/harness-triple-check.py` resolves the
+repository root and reproduces corpus A2 (block above). Neither copy is edited here: the
+declaration file belongs to Feature 084's body and the root rule belongs to Feature 089's
+contract, and this stage's write boundary is `.specify/specs/092-non-disposable/**`. Recorded so
+a later reader does not mistake the two runs for the same reading, and so the mirror-side
+failure is not silently attributed to this feature.

@@ -1,0 +1,8 @@
+SEAT-I — 092 档 II E6 landed (087 Overview vs its own clarify ruling); one file + this report, no commit, no push
+file: /cws_data/cloud-native-ai/spec-kit/.specify/specs/087-arch-diagram-docs/requirements.md, +4/-0 (1 file changed, 4 insertions)
+defect (plan.md § A–H Corpus Mapping E6): :37 "stops being organised around prose document types" contradicted clarify A2 (:301 "维持 (ii), ratify" = six-type baseline + diagram obligation) and FR-002/FR-003 (:155)
+fix at the defect's location, straight after the Overview paragraph: marker `<!-- 092 handoff: E6 → 087 -->` (C-805 form, exactly one; receiving feature 087 per plan § Shift List) + one Correction line declaring the clarify ruling governs (additive obligation within the six types, not a reorganisation; no new type directory, no relocation)
+original sentence retained verbatim, not rewritten (C-805 "不改正文": marker + that one line only); scope = only the 087 requirements.md + this report, no other path, no regen/sync
+verify: validate-requirements.py on 087 -> exit 0, 0 error(s) 0 warning(s), 318 lines / 33 definition rows, all six checks pass; `grep -c "092 handoff"` = 1
+未发现异常
+SEAT-I-DONE

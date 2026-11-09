@@ -1,5 +1,7 @@
 # Verification Log — 086-efficient-test-execution
 
+evidence-path note: historical spelling, owner = efficiency-model.md
+
 baseline_commit=018b0455
 baseline_date=2026-11-06
 baseline_branch=086-efficient-test-execution

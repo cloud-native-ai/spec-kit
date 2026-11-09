@@ -17,3 +17,8 @@
 
 ## Directive for this run
 - Use large-concurrency subagents wherever dependencies allow: plan executors partitioned in parallel (up to 6), implement ~10 tasks/package up to 6 concurrent with worktree writes, review segments parallel. The goal/team "construction crew" is the consumer of the complex handoff; the spec "designer" retains design authority.
+
+## Addendum (2026-11-09): parallel-line isolation is mandatory
+- Dispatching the 092 tasks and the 093 requirements in one working tree put the 092 commits on the 093 branch (the two lines mixed). The correction moved 092 back to `master` via cherry-pick and rebuilt a clean `093-concurrency-by-default` branch.
+- Parallel lines MUST each run in their own worktree (worktree-per-write-line, 064/084); the driver's multi-line dispatch uses the line registry + worktrees, never one shared tree.
+- 093's dispatch-capability/default-concurrency requirements and this lesson are the same rule: concurrency without write isolation is not safe concurrency.

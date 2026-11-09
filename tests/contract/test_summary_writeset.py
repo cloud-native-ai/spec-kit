@@ -101,7 +101,7 @@ def test_inadmissible_locations_are_actually_git_ignored() -> None:
 def test_admissible_locations_are_not_git_ignored() -> None:
     for probe in (
         ".specify/teams/demo/items.jsonl",
-        ".specify/goal/demo-goal/summary/summary.md",
+        ".specify/anchoring/demo-goal/summary/summary.md",
         ".specify/agents/execution/configs/demo.yaml",
     ):
         result = subprocess.run(
@@ -160,7 +160,7 @@ def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
     """
     text = WRITESET_CONTRACT.read_text(encoding="utf-8")
     whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]
-    assert "project/goal/" in whitelist
+    assert "anchoring/" in whitelist
     assert ".specify/memory/feedback/" in whitelist
     assert "teams/<slug>/summary" not in whitelist, (
         "the dropped per-team summary directory must not reappear in the whitelist"
@@ -313,7 +313,7 @@ def test_writes_land_only_in_the_goal_delivery_directory(ws_sandbox: Path) -> No
     after = _fingerprint(ws_sandbox)
     changed = {p for p in set(before) | set(after) if before.get(p) != after.get(p)}
     assert changed, "generation produced no output at all"
-    stray = [p for p in changed if not p.startswith(".specify/goal/")]
+    stray = [p for p in changed if not p.startswith(".specify/anchoring/")]
     assert not stray, f"writes outside the goal delivery directory: {stray}"
 
 
@@ -324,7 +324,7 @@ def test_every_emitted_value_carries_resolvable_tracked_provenance(ws_sandbox: P
     import yaml as _yaml
 
     doc = _yaml.safe_load(
-        (ws_sandbox / ".specify/goal/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
+        (ws_sandbox / ".specify/anchoring/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
     )
     assert doc["work_items"]
     for row in doc["work_items"]:
@@ -362,7 +362,7 @@ def test_items_with_inadmissible_provenance_are_dropped_with_a_declared_gap(ws_s
     import yaml as _yaml
 
     doc = _yaml.safe_load(
-        (ws_sandbox / ".specify/goal/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
+        (ws_sandbox / ".specify/anchoring/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
     )
     ids = [w["item_id"] for w in doc["work_items"]]
     assert "ws.TI-0002" not in ids, "an item backed only by run intermediates was imported"
@@ -373,7 +373,7 @@ def test_items_with_inadmissible_provenance_are_dropped_with_a_declared_gap(ws_s
 def test_reader_sections_carry_no_internal_identifiers(ws_sandbox: Path) -> None:
     """WS-14 / FR-022 — attribution by team slug is fine; internals are not."""
     assert _generate(ws_sandbox).returncode == 0
-    text = (ws_sandbox / ".specify/goal/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
+    text = (ws_sandbox / ".specify/anchoring/ws/summary/data/project-input.yaml").read_text(encoding="utf-8")
     for forbidden in (".work/", "parallel-result-", ".live.log", ".status", "execution/logs/"):
         assert forbidden not in text, f"internal identifier {forbidden!r} leaked into the form"
 
@@ -407,7 +407,7 @@ def test_intake_does_not_double_when_run_count_doubles(ws_sandbox: Path) -> None
                 )
         assert _generate(ws_sandbox).returncode == 0
         return len(
-            (ws_sandbox / ".specify/goal/ws/summary/data/project-input.yaml").read_text(
+            (ws_sandbox / ".specify/anchoring/ws/summary/data/project-input.yaml").read_text(
                 encoding="utf-8"
             )
         )

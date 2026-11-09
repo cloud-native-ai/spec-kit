@@ -3,6 +3,10 @@
 Owner of the propositions below: this contract. The implementation owner is
 `scripts/bash/run-tests.sh` (runtime copy `.specify/scripts/bash/run-tests.sh`, byte-identical).
 
+> **Superseded**: the "byte-identical" carriage above and in C-016 is superseded by
+> `.specify/specs/089-script-interface-contract/contracts/mirror-projection.contract.md` (source + declared
+> projection). The original wording is retained verbatim as the pre-089 record.
+
 **Inherited, not restated**: RC-01…RC-08 of
 `.specify/specs/067-loop-efficiency-hardening/contracts/runner-contract.md` stay in force verbatim. This
 contract adds the **execution model** (default mode, worker resolution, exclusions, output combination); it
@@ -71,6 +75,11 @@ guarantee; this contract owns only what 067 left to "a future recorded scope dec
 - **C-016**: `scripts/bash/run-tests.sh` and `.specify/scripts/bash/run-tests.sh` MUST be byte-identical at
   every commit that touches either; the mirror is written by `scripts/python/sync-mirrors.py`, never by hand
   (FR-009).
+  **Superseded by
+  `.specify/specs/089-script-interface-contract/contracts/mirror-projection.contract.md` (source + declared
+  projection)**: `bash-version-guard` is declared for this pair, so the mirror MUST equal `project(source)`
+  and byte equality no longer holds; the "written by `sync-mirrors.py`, never by hand" half stays in force
+  (089 C-33/C-35). The clause above is kept verbatim as the pre-089 record.
 
 ## F. Contract test obligations
 

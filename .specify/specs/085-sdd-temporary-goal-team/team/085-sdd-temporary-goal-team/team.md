@@ -1,12 +1,12 @@
 ---
-name: SDD Temporary Team 085
+name: SDD Team 085 (scope spec)
 slug: 085-sdd-temporary-goal-team
 description: Run-scoped SDD team for Feature 085 — stage-specific agents, explicit concurrency, per-agent worktrees and checkpoints.
 scope: spec
 spec_dir: .specify/specs/085-sdd-temporary-goal-team
 lifecycle_state: active
 goal: >-
-  Deliver Feature 085 through the full SDD chain: a spec-local Temporary Goal/Team, stage-specific agents,
+  Deliver Feature 085 through the full SDD chain: a spec-local spec-scoped Goal and team, stage-specific agents,
   explicit concurrency (default 24), per-agent worktrees with an integration queue, and stage checkpoints
   that propose at most one evidence-driven configuration change.
 goal_slug: 085-sdd-temporary-goal-team
@@ -135,7 +135,7 @@ config:
 
 ## Goal
 
-Deliver Feature 085 through the full SDD chain with a spec-local Temporary Goal/Team, stage-specific agents, explicit concurrency, per-agent worktrees and integration queue, and stage checkpoints. Success is measured by the dogfood run's evidence, not by the presence of the definitions alone.
+Deliver Feature 085 through the full SDD chain with a spec-local spec-scoped Goal and team, stage-specific agents, explicit concurrency, per-agent worktrees and integration queue, and stage checkpoints. Success is measured by the dogfood run's evidence, not by the presence of the definitions alone.
 
 ## Static Structure
 
@@ -160,11 +160,11 @@ Deliver Feature 085 through the full SDD chain with a spec-local Temporary Goal/
 
 - **Outer chain**: serial across the eight canonical SDD stages; each stage closes before the next starts.
 - **Inner stage**: the stage's `stage_seats` bounds the ready work packages; read-only packages may overlap up to `max_parallel`, while write packages use per-agent worktrees and the integration queue.
-- **Checkpoints**: after every stage U4, the four-part checkpoint records artifact verification, goal degree, at most one configuration proposal, and the next stage's concurrency/roster decision.
+- **Checkpoints**: after every stage U4, the five-part checkpoint records artifact verification, goal degree, at most one configuration proposal, the next stage's concurrency/roster decision, and a direction audit.
 
 ## Self-Improvement Contract
 
-- **Subject**: `team:085-sdd-temporary-goal-team` (this temporary team).
+- **Subject**: `team:085-sdd-temporary-goal-team` (this spec-scope team).
 - **Runs-lane evidence**: `team/085-sdd-temporary-goal-team/runs/*-report.md` plus the goal checkpoint files.
 - **Improver route**: `improve-team` for roster/pattern/config edits; `/speckit.goal modify --scope spec` for goal content; no automatic mutation.
 - **Attempt cap**: one configuration change per checkpoint; a regression triggers rollback at the next checkpoint.

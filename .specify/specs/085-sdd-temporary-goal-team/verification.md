@@ -1,5 +1,7 @@
 # Verification Log — 085-sdd-temporary-goal-team
 
+evidence-path note: historical spelling, owner = efficiency-model.md
+
 # -- Baseline (recorded once, BEFORE implementation changes the tree) --
 
 baseline_commit=aafbf5a8352fa58daf5c09e5560d2ea36e1be99e

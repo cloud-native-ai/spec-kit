@@ -1,4 +1,9 @@
-"""Contract tests for the spec-local Temporary Team schema (Feature 085, T030/T032)."""
+"""Contract tests for the spec-scoped team schema (Feature 085, T030/T032).
+
+A team has a scope, never a "temporary" property: this suite pins the spec-scoped
+team — a definition under `<spec-dir>/team/<slug>/team.md` — and its declared
+isolation and concurrency keys.
+"""
 
 from __future__ import annotations
 
@@ -23,7 +28,7 @@ CANONICAL_STAGES = {
 
 
 def _text() -> str:
-    assert TEAM_MD.is_file(), f"temporary team missing: {TEAM_MD}"
+    assert TEAM_MD.is_file(), f"spec-scoped team missing: {TEAM_MD}"
     return TEAM_MD.read_text(encoding="utf-8")
 
 

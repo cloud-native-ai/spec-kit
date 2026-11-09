@@ -1,0 +1,56 @@
+# Analyze repair — gate readings (092-non-disposable)
+
+Run: 2026-11-09 (repair of `test-evidence/analyze-findings.md` F-1…F-25). HEAD `f91ae095`.
+
+All four gates were re-run after the repair. Each block carries the exact command, its exit code and its tail.
+
+## account-clause-coverage.py --spec-dir (clause lane + FR lane)
+
+```text
+$ python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/092-non-disposable
+exit=0
+spec-dir: .specify/specs/092-non-disposable
+corpus:   .specify/specs/*/contracts/*
+…
+
+companion (must be non-empty on a green run): claimed clauses 62, scanned files 296, clause universe 1970, FR universe 65
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 65 of 65 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+```
+
+## validate-tasks.py
+
+```text
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/092-non-disposable/tasks.md
+exit=0
+PASS: .specify/specs/092-non-disposable/tasks.md — 0 error(s), 0 warning(s)
+```
+
+## validate-decision-tensions.py --spec
+
+```text
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/092-non-disposable
+exit=0
+spec: .specify/specs/092-non-disposable
+status: ok
+…
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 496 lines, 7 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+```
+
+## pre-analyze-check.py --stage plan
+
+```text
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/092-non-disposable
+exit=0
+{"stage": "plan", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 65, "sc": 20, "tasks": 143, "clauses": 0, "files": 16}, "checked_at": "2026-11-09T04:04:01Z"}
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=0 waived=0
+```
+

@@ -187,3 +187,7 @@
 | 汇报义务 (Reporting Obligation) | - | 并发/异步流程向用户可见化的一项框架级义务:范围谓词、缺省周期(长跑档)、reporter 席位义务、主从汇报义务、停滞判定引用与当前态摘要契约的唯一 owner 为 shared/guidelines/reporting-obligations.md;节奏纪律与四要素内容下限仍归 progress-reporting.md(需求 087) | auto | proposed |
 | reporter 席位 (Reporter Seat) | - | team roster 中绑定 reporter agent Template 的必设席位:结构上必需、运行期可带显式记录的原因省略;不得持有派发/授权/重试/终止权(需求 087) | auto | proposed |
 | 当前态摘要 (Current-State Digest) | - | 有界的「现在到底在做什么」只读投影:/speckit.status 瘦命令 + scripts/python/status-digest.py 的 --action digest 共用同一读入口;按声明上限截断并报省略条数、对陈旧条目显示龄期、无运行时以声明退出码报「无正在运行」;不新建流程状态注册表(需求 087) | auto | proposed |
+| Non-Disposable | non-disposable, 不可一次性处置, use and throw | 任何过程与文档都不是用过即丢:历史是必读输入,过期 / 无用 / 延期 MUST 被处置而不是沉默留存。定义与全部封闭集见 `shared/definitions/non-disposable-definitions.md` | user | confirmed |
+| 处置 (Disposition) | disposition, archive / supersede / correct / exempt | Non-Disposable 条目必须落入的封闭四值处置;「留在原处什么都不做」不是处置。取值与桥映射见 `shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposition Bridge | user | confirmed |
+| 回顾面 (Review Surface) | review surface, 回顾范围 | 回顾的对象范围:当前 git HEAD 工作树里 `.specify/` 下的十个历史根,**不含** git 历史。成员声明于 `shared/declarations/facts/non-disposable-review-surface.yaml` | user | confirmed |
+| 豁免 (Exemption) | exemption, 显式豁免 | 唯一一种「不修也能留」的处置:必带理由与到期条件(`expiry_kind` / `expiry_value` / `expiry_recheck`),到期即重新成为未处置。语义见 `shared/definitions/non-disposable-definitions.md` § Exemption | user | confirmed |

@@ -59,6 +59,45 @@ OPT_LOCAL=false
 OPT_SOURCE_URL=""
 OPT_INDEX_URL=""
 OPT_PYTHON=""
+OPT_WITH_DEV=false
+
+# ---------------------------------------------------- declared dev toolchain
+# The framework DECLARES its test toolchain in pyproject's `[dev]` extra. A host without
+# pytest-xdist silently degrades the runner to serial (086 C-006), which is a different
+# execution than the declared one; this function makes the dependency explicit and installs
+# it instead of "using whatever is on PATH".
+DEV_VENV="${REPO_ROOT}/.venv"
+DEV_PY="${DEV_VENV}/bin/python"
+ensure_dev_toolchain() {
+  if [ "${OPT_DRY_RUN}" = true ]; then
+    log_info "[dry-run] would create ${DEV_VENV} and run: ${PY_BIN} -m venv ${DEV_VENV}"
+    log_info "[dry-run] would run: ${DEV_PY} -m pip install -e '${REPO_ROOT}[dev]'"
+    log_info "[dry-run] would verify: ${DEV_PY} -c 'import pytest, xdist'"
+    return 0
+  fi
+  if [ ! -x "${DEV_PY}" ]; then
+    log_info "Provisioning the declared dev toolchain: ${DEV_VENV}"
+    "${PY_BIN}" -m venv "${DEV_VENV}" || die 2 "python -m venv failed (python3-venv missing?)"
+  fi
+  "${DEV_PY}" -m pip install --quiet --upgrade pip || log_warn "pip self-upgrade failed; continuing"
+  if ! "${DEV_PY}" -m pip install --quiet -e "${REPO_ROOT}[dev]"; then
+    die 5 "declared dev extra could not be installed: ${REPO_ROOT}[dev]"
+  fi
+  # A host PYTHONPATH can make pip believe the test deps are satisfied while this interpreter
+  # cannot import them. Verify in an isolated environment; on failure, install the declared dev
+  # set into the venv explicitly and re-verify before failing.
+  if ! env -u PYTHONPATH "${DEV_PY}" -c "import pytest, xdist" >/dev/null 2>&1; then
+    log_warn "dev deps not importable in ${DEV_PY}; installing the declared set explicitly"
+    env -u PYTHONPATH "${DEV_PY}" -m pip install --quiet --ignore-installed --no-deps \
+      pytest pytest-xdist pluggy iniconfig packaging pygments execnet \
+      || die 5 "declared dev set could not be installed into ${DEV_PY}"
+  fi
+  if ! env -u PYTHONPATH "${DEV_PY}" -c "import pytest, xdist" >/dev/null 2>&1; then
+    die 5 "dev toolchain incomplete in ${DEV_PY}: pytest-xdist is not importable on this interpreter"
+  fi
+  log_info "Dev toolchain ready: ${DEV_PY} ($( ${DEV_PY} -c 'import pytest, xdist; print("pytest", pytest.__version__, "+ xdist", xdist.__version__)' ))"
+  log_info "Use it for the test runners: export SPECKIT_PYTHON=${DEV_PY}"
+}
 
 usage() {
   cat <<'EOF'
@@ -83,6 +122,12 @@ Options:
                    the intranet-first fallback loop.
   --local          Editable install (pip install -e) of the checkout this
                    script lives in — the self-hosting / dev path.
+  --with-dev       Also provision the DECLARED dev/test toolchain: a repo
+                   .venv with the `[dev]` extra (pytest + pytest-xdist) and a
+                   hard verification of both. The test runners prefer
+                   .venv/bin/python, so parallel execution then works instead
+                   of silently degrading to serial. In --dry-run this prints
+                   the exact commands and mutates nothing.
   --uv             Opt-in uv fast path: uv tool install with the resolved
                    python and index. uv must already exist on PATH; this
                    script NEVER installs uv. (Or SPECIFY_INSTALLER=uv.)
@@ -143,6 +188,10 @@ while [ $# -gt 0 ]; do
       ;;
     --local)
       OPT_LOCAL=true
+      shift
+      ;;
+    --with-dev)
+      OPT_WITH_DEV=true
       shift
       ;;
     --uv)
@@ -612,6 +661,10 @@ print_plan() {
   else
     printf '  PATH=%s:$PATH %s/specify check\n' "${BIN_DIR}" "${BIN_DIR}"
   fi
+  if [ "${OPT_WITH_DEV}" = true ]; then
+    printf 'dev toolchain (--with-dev):\n'
+    ensure_dev_toolchain 2>&1 | sed 's/^/  /'
+  fi
   printf '==== end plan ====\n'
 }
 
@@ -667,10 +720,15 @@ else
   SPECIFY_BIN="${BIN_DIR}/specify"
 fi
 
+
 # --------------------------------------------------------------- verify ----
 if [ ! -x "${SPECIFY_BIN}" ]; then
   die 5 "specify binary not found after install (expected: ${SPECIFY_BIN})"
 fi
+if [ "${OPT_WITH_DEV}" = true ]; then
+  ensure_dev_toolchain
+fi
+
 log_info "Verifying installation: ${SPECIFY_BIN} check"
 if ! "${SPECIFY_BIN}" check; then
   die 5 "specify check failed — installation incomplete"

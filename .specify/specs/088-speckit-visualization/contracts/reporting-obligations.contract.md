@@ -1,6 +1,6 @@
 # Contract: Reporting Obligations (the owner document)
 
-**Feature**: 087 | **Covers**: FR-001, FR-002, FR-003, FR-004, FR-013, FR-014, FR-015, FR-016, FR-018, FR-020, FR-021
+**Feature**: 088 | **Covers**: FR-001, FR-002, FR-003, FR-004, FR-013, FR-014, FR-015, FR-016, FR-018, FR-020, FR-021
 **Contract object**: the normative content of `shared/guidelines/reporting-obligations.md` (framework source) and its
 mirror `.specify/shared/guidelines/reporting-obligations.md`. Clauses are judged by reading the delivered owner
 document and, where a clause says "MUST", by the guard `status-digest.py --action guard`.

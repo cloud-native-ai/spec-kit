@@ -1,0 +1,28 @@
+{
+  "line": "092-non-disposable",
+  "architecture": "085 concurrency-and-worktrees C-001..C-018; shared-tree (C-015 default); writers do not commit; driver integrates in this declared order",
+  "concurrency": {"requested": 24, "stage_max_parallel": 15, "verifier_reserve": 1, "effective": 15},
+  "wave1": [
+    {"id":"u01","pkg":"P6-C1/C2/A4","territory":[".specify/specs/089-script-interface-contract/requirements.md",".specify/specs/089-script-interface-contract/tasks.md",".specify/specs/089-script-interface-contract/feature-ref.md"],"rows":["T115","T116","T117"]},
+    {"id":"u02","pkg":"P6-C3","territory":[".specify/specs/089-script-interface-contract/team/"],"rows":["T118"],"git_mv":true},
+    {"id":"u03","pkg":"P6-A1","territory":[".specify/specs/089-script-interface-contract/verification.md"],"rows":["T113"]},
+    {"id":"u04","pkg":"P6-A2","territory":[".specify/specs/084-harness-triple-structure/verification.md",".specify/specs/084-harness-triple-structure/requirements.md",".specify/specs/084-harness-triple-structure/contracts/"],"rows":["T112"]},
+    {"id":"u05","pkg":"P6-G1","territory":["tests/contract/test_sdd_loop_driver_reanchor.py"],"rows":["T119"]},
+    {"id":"u06","pkg":"P6-A5","territory":[".specify/specs/085-sdd-temporary-goal-team/plan.md"],"rows":["T114"]},
+    {"id":"u07","pkg":"P6-B2","territory":[".specify/specs/085-sdd-temporary-goal-team/contracts/temporary-goal-team.md",".specify/specs/085-sdd-temporary-goal-team/contracts/checkpoint-and-agents.md"],"rows":["T120"]},
+    {"id":"u08","pkg":"P6-A6","territory":[".specify/specs/080-humanize-run-output/requirements.md",".specify/specs/080-humanize-run-output/verification.md"],"rows":["T121"]},
+    {"id":"u09","pkg":"P6-B1","territory":[".specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md","tests/contract/test_run_tests_runner_contract.py"],"rows":["T122"]},
+    {"id":"u10","pkg":"P6-B3","territory":[".specify/specs/067-bilingual-expression/contracts/runner-contract.md"],"rows":["T123"]},
+    {"id":"u11","pkg":"P6-C4a","territory":[".specify/specs/088-speckit-visualization/contracts/"],"rows":["T124"]},
+    {"id":"u12","pkg":"P6-C4b","territory":[".specify/specs/088-speckit-visualization/team/"],"rows":["T125"]},
+    {"id":"u13","pkg":"P6-B4/B5","territory":[".specify/skills/sdd-loop-driver/references/efficiency-model.md",".specify/specs/085-sdd-temporary-goal-team/verification.md",".specify/specs/086-efficient-test-execution/verification.md"],"rows":["T126","T127"]},
+    {"id":"u14","pkg":"P3","territory":["skills/internal/manage-history/SKILL.md","templates/commands/history.md","tests/contract/test_expression_compatibility.py"],"rows":["T072-T079","T155"]},
+    {"id":"u15","pkg":"P4","territory":["templates/instructions-template.md"],"rows":["T083"]}
+  ],
+  "driver_after_wave1": ["edit .specify/memory/features.md rows 089/090 once", "regenerate mirrors and command copies", "run targeted + integration tests", "commit per unit in queue order"],
+  "wave2": [
+    {"id":"u16","pkg":"P5","territory":["tests/contract/test_non_disposable_contract.py"]},
+    {"id":"u17","pkg":"P7","territory":["档 II handoff markers (shift list)"]},
+    {"id":"u18","pkg":"P8","territory":["verification.md, closure, mirrors, registry final"]}
+  ]
+}

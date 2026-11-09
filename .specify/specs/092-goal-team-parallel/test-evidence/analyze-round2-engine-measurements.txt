@@ -1,0 +1,24 @@
+# analyze round 2 — engine measurements (2026-11-09)
+
+## 1. C-01 discriminator: source: ledger vs source: default
+/speckit.feedback            flow_class=execution source=ledger marker=None exit-of-lookup=0
+/speckit.plan                flow_class=execution source=ledger marker=None exit-of-lookup=0
+/speckit.nonexistentcommand  flow_class=execution source=default marker=未声明·按默认 exit-of-lookup=0
+
+## 2. C-71's stated predicate ('exits 0 with a registered class') ADMITS the undeclared command
+   /speckit.nonexistentcommand -> exit 0, flow_class=execution  => by C-71 in family
+   FR-006 / A9 / C-72           -> source=default => NOT in family
+   => C-71 and FR-006 contradict; C-72's own 'only inputs' sentence contradicts C-71.
+
+## 3. unit-id grammar the engine accepts (UNIT_ID_RE, flow-class-check.py:195)
+   ^(?:/speckit\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9-]*)$
+   command:feedback -> exit=2 (2 = invalid unit id)
+   => the 'command:<name>' form prescribed by C-71/C-72/C-74/T020 is NOT in the grammar.
+
+## 4. Pre-existing unified-archive residents carry NO binding block (C-1 requires one)
+   .specify/goal/*/goal.md : 6 definitions, binding present: 0
+   .specify/teams/*/team.md: 12 definitions, binding present: 0
+   migration subject is spec-local only: 8 goals / 8 teams
+
+## 5. Repair commit dae4a26c did not touch plan.md or feature-ref.md
+   (empty above = neither file changed by the repair)

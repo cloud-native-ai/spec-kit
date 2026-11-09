@@ -202,12 +202,16 @@ def test_unknown_state_yields_no_fabricated_progress(sandbox: Path) -> None:
 @requires_chain
 def test_real_repo_project_directory_is_not_written(sandbox: Path) -> None:
     """FG-11 / FR-036 — generation must not touch the real delivery tree."""
-    real_goal_dir = REPO_ROOT / ".specify/goal"
-    before = sorted(p.name for p in real_goal_dir.iterdir()) if real_goal_dir.is_dir() else None
+    real_anchoring_dir = REPO_ROOT / ".specify/anchoring"
+    # The guard must observe a directory that exists: a missing root would make
+    # "unchanged" true for the wrong reason (nothing to compare) and the invariant
+    # it claims to protect would go red nowhere.
+    assert real_anchoring_dir.is_dir(), f"real delivery root missing: {real_anchoring_dir}"
+    before = sorted(p.name for p in real_anchoring_dir.iterdir())
     teams = _teams_by_pattern()
     slug = _install(sandbox, teams["serial"])
     assert _run(
         [sys.executable, str(GENERATOR), "--team", slug, "--repo-root", str(sandbox)], sandbox
     ).returncode == 0
-    after = sorted(p.name for p in real_goal_dir.iterdir()) if real_goal_dir.is_dir() else None
-    assert before == after, "the real .specify/goal tree changed during a sandboxed run"
+    after = sorted(p.name for p in real_anchoring_dir.iterdir())
+    assert before == after, "the real .specify/anchoring tree changed during a sandboxed run"

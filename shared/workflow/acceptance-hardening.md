@@ -1,5 +1,8 @@
 # Acceptance Hardening — Feature Status, Verification Vocabulary, Gates and Closure Verdict
 
+**本文件为 owner，其余为指针（092 D1/D2）**：下文定义的每一条 schema 若在别处被复述，该处 MUST 改写成
+「路径 + `§ section anchor`」指针，MUST NOT 保留第二份定义（判定形态见 § Schema Uniqueness）。
+
 **Owner (single definition point)**: this file, `shared/workflow/acceptance-hardening.md`, owns the schemas that
 make "may this feature be called `Implemented`?" a deterministic question: the feature-status value `Blocked`
 and its four transitions, the verification vocabulary and its measurement ladder, the gate conditions that read

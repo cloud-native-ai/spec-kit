@@ -1,5 +1,5 @@
 ---
-name: SDD Temporary Team 087
+name: SDD Temporary Team 088
 slug: 088-speckit-visualization
 description: Run-scoped SDD team for Feature 088 — framework visualization, stage-specific agents, explicit concurrency, reporter obligations, and stage checkpoints.
 scope: spec

@@ -1,0 +1,30 @@
+seat D — run record for the D1/D2 owner-pointer correction (092), 2026-11-09
+
+Files written:
+  shared/workflow/acceptance-hardening.md                     (+3 lines: owner sentence)
+  .specify/shared/workflow/acceptance-hardening.md            (mirror, regenerated)
+  .specify/specs/081-acceptance-hardening/requirements.md     (6 handoff notes, 4 rewrites)
+  .specify/specs/081-acceptance-hardening/contracts/state-vocabulary.contract.md (1 handoff note)
+  .specify/specs/081-acceptance-hardening/tasks-081b.md       (4 handoff notes, 4 rewrites)
+  .specify/specs/081-acceptance-hardening/test-evidence/plan-runner-pins.txt    (re-captured pin)
+  test-evidence/seatD-owner-claims-092.txt                    (read record)
+  test-evidence/seatD-report.txt                              (this report's sibling)
+
+Validators: validate-requirements.py = 0 error/0 warning (281 lines, 17 STR); validate-tasks.py tasks-081b = PASS.
+Mirrors: sync-mirrors.py --check exit 0; owner+mirable byte-identical.
+
+Tests (targeted, /usr/bin/python3 -m pytest):
+  tests/contract/test_acceptance_state_machine.py test_closure_acceptance_check.py
+  test_acceptance_schema_ownership.py test_premise_carrier_contract.py
+  test_acceptance_premises.py test_gate_wiring_081.py test_line_state_blocked.py
+  -> 120 passed, 0 failed (15.67s)
+
+Closure checker on 081 (unchanged verdict): `python3 scripts/python/closure-acceptance-check.py --spec-dir
+.specify/specs/081-acceptance-hardening` -> exit 0, verdict accept, final_path pass=2 total=2, claimed_status
+Completed (unchanged; a pre-existing feature-081 state, not moved by this seat).
+
+Full contract+unit run (/usr/bin/python3 -m pytest tests/contract tests/unit): 78 failed / 7650 passed (726s).
+Containment vs `.specify/specs/081-acceptance-hardening/baseline-failed.txt` (id-level): 71 failures are listed
+in the baseline; 7 are NOT listed — all tests/unit/test_loop_state_engine.py (dead-process detection reads `DEAD`
+where the fixture expects `RUNNING`; file untouched by this seat; test contract dependency). Tree carries other
+seats' uncommitted edits (git status shows ~30 modified shared/ paths), so this run cannot be attributed to one seat.

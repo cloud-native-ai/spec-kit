@@ -37,6 +37,8 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 
 **Core Principles Compliance** (rendered from `.specify/memory/constitution.md`, 18 principles in file order):
 
+<!-- 092 handoff: F3 — 读数「18 principles」是 2026-10-30 的 plan-time 快照，保留不改。名册的唯一值 owner 是 `.specify/memory/constitution.md`（当日现值 22 条，版本 1.19.0，Last Amended 2026-11-09）；本表行数与编号 MUST NOT 被当作当前名册。参见 092 F3，2026-11-09。 -->
+
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每条设计决定都追到 FR：契约的可追溯性表是 FR→条款→测试的唯一映射（`contracts/*.contract.md` § 可追溯性），本文件不复述 |

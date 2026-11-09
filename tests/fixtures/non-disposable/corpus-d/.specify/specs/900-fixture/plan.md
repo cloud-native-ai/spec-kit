@@ -1,0 +1,3 @@
+# Plan
+
+REPORTER_CADENCE: 30s

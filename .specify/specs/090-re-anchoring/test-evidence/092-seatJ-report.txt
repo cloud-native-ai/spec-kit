@@ -1,0 +1,8 @@
+seat J (sdd-implement-executor) — FR-064(iv) — owner page § Relation to the Constitution only (+18/-3)
+landed: boundary table for One Source of Truth / Fast Fail / Directory Governance / Re-Anchoring — owner pointer + which half this doc owns; + "none is a new principle"; header row 16 and the FR-064(iv) sentence now name it
+mirror: sync-mirrors.py --write --only shared -> owner pair byte-identical; § Seam Bypass (landed concurrently in the mirror) restored in both halves; no projection marker lost
+regression: pytest -m contract test_non_disposable_contract.py -> 56 passed, 2 red (t089, t092); both red before my edit (t092 reds on a pristine tree, cwd drift) — not introduced, not repaired here
+also: sync-mirrors --check WITHOUT --only rewrites foreign pairs (content-identical to source); only --only is safe inside a wave
+ANOMALY: 092 handoff markers D1/D2/D3/D5/D6 are absent from their SOURCE files (re-anchoring-definitions, harness-triple-definitions, self-explanatory-definitions, mechanism-policy-definitions, acceptance-hardening) — the mirror-sync dropped them; which side is right is a ruling
+ANOMALY: .specify/skills/internal/create-team/references/create-mode.md reports DIFF with no change from me (outside my domain, reported only)
+SEAT-J-DONE

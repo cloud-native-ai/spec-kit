@@ -1,0 +1,12 @@
+# Fixture review surface for tests/contract/test_non_disposable_check.py.
+# The shape is the shipped fact's: `kind` + a `statement` list. The members are the fixture's
+# own roots -- the engine reads members and order from HERE, never from a literal (C-605).
+# `tests` is the root the guard cases use, `scripts` the one the value-owner case uses: a
+# value owner is a declaring script, and the surface is the only place a reading comes from.
+fact: non-disposable-review-surface
+kind: closed-set
+statement:
+  - .specify/specs
+  - .specify/memory
+  - tests
+  - scripts

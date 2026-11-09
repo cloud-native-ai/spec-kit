@@ -1,0 +1,10 @@
+W3-V2 092→090 merge, read-only verification, tree 58bfdf23 + uncommitted W3 edits, 2026-11-09
+(1) FR/SC: 090 originals 10 FR / 4 SC intact; merged section holds 65 ND-FR (001..065) + 20 ND-SC (001..020), 85 defs matching 092's 85, 0 cited-but-undefined. Gate caveat: validate-requirements.py on 090 = 121 [ref-resolvable] errors, 092 = 0.
+(2) CLAUSES: 8 contracts/nd-*.md define 62 unique ids = 092's own 55 (same ids 101-108/201-207/301-308/401-410/501-507/601-608/701-707/801-807) + 7 extra; 7 of 62 changed form (`- **ND-C-801**`), a form the clause grammar cannot parse, so validate-tasks.py 090 = 62 green-dangling "no machine-decidable clause form"; 0/8 pages parse.
+(3) TASKS: checked 158 rows in 092 (decomposition-check: proceed, 65 FR / ceiling 160). Merged 090 tasks.md = 197 rows -> decomposition-check `split-required`, 197 > 160, rc=1. 090 file = 39 own rows T001-T039 + 158 renamed T###A rows.
+DANGLING 092 refs: 98 repo files still name `.specify/specs/092-non-disposable` (14 in 090 test-evidence, 2 in 090 contracts, 1 shared/definitions, 1 manage-history/SKILL.md, 1 .specify/state). All resolve today; 092 dir not deleted.
+ANOMALY: 090 plan.md § Non-Disposable slice says 092 artifacts "remain under 092 … read in place, never copied here", but requirements.md, tasks.md and contracts/ carry copies — two authorities for one text, contradicting plan's own rule.
+ANOMALY: merged ND-FR-035 (requirements.md:171) pins evidence at `.specify/specs/092-non-disposable/test-evidence/` after the merge; nd-four-stage-command.contract.md:90 repeats that 092 evidence path literal — merged rules point at the absorbed spec.
+ANOMALY: `team/092-non-disposable/team.md` is cited (nd-acceptance-readability.contract.md:165, shared/definitions:645) but the file does not exist; 092's team.md sits at team/team.md and 090 has no team/team.md.
+ANOMALY: rows renamed T0xx→T0xxA ("single id space" claim in the 090 header), yet 090 own rows are T001-T039 and the 158 A-rows start at T043A (no T040A-T042A): id-contiguity of the merged space is unverified and no gate was run on it.
+V2-DONE

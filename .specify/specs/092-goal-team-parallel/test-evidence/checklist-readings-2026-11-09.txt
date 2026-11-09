@@ -1,0 +1,269 @@
+=== mechanical readings 2026-11-09T07:47:14Z ===
+-- A-id rows by number (requirements.md) --
+DUP - count=2
+DUP - count=2
+DUP - count=2
+DUP - count=2
+DUP - count=2
+DUP - count=2
+DUP - count=2
+DUP - count=2
+-- A-ids cited in body as 'A[0-9]+' outside Assumptions section --
+      1 131
+      1 166
+-- FR count / SC count --
+42
+11
+-- Clarifications Q lines --
+13
+-- exact duplicate A ids --
+-- A-id citations in body (lines <270) --
+131: - **FR-006**: 命令族判定 MUST 消费**既有类别声明**：`flow-class-classes.yaml` 中已登记类别的载体文件 `templates/commands/<command>.md` 构成命令族；判定 M
+166: - **FR-041**: 既有 085 的契约测试中钉住 spec-local 落点的用例 MUST 被显式处置（改写为统一落点断言，或标注为历史记录后移除）；本特性 MUST 列出处置清单，MUST NOT 让它们静默失效。处置面 MU
+-- FR-041 cites A7? --
+166:- **FR-041**: 既有 085 的契约测试中钉住 spec-local 落点的用例 MUST 被显式处置（改写为统一落点断言，或标注为历史记录后移除）；本特性 MUST 列出处置清单，MUST NOT 让它们静默失效。处置面 MUST 至少覆盖 A7 已点名的文件清单（以 plan 阶段的检索读数为准，不得只按 A7 抄录），且处置后的全套契约测试必须在 `>=3.8` 上全绿——**移除**只能用于「该用例断言的事实已被本特性删除」的情形，断言仍成立而只是落点变化的用例 MUST 改写而非移除。〔判据见 Clarifications 的 Q11〕
+278:- **A7（既有测试的处置是义务，不是可选项）**: FR-041 要求的处置清单必须先列全再动手；`tests/contract/test_scope_resolution.py`、`test_temp_goal_contract.py`、`test_temp_team_schema.py`、`test_team_command_routing.py`、`test_goal_writeset.py`、`test_goal_migration.py`、`test_goal_targets_engine.py`、`test_goal_definition.py` 与 `tests/unit/test_goal_scope_engine.py`、`test_goal_utils.py` 都含 spec-local 断言或 scope 断言，实际处置面以 plan 阶段的检索读数为准（A7 是起点，不是清单）。
+290:- **A7（既有测试的处置是义务，不是可选项）**: FR-041 要求的处置清单必须先列全再动手；`tests/contract/test_scope_resolution.py`、`test_temp_goal_contract.py`、`test_temp_team_schema.py`、`test_team_command_routing.py`、`test_goal_writeset.py`、`test_goal_migration.py`、`test_goal_targets_engine.py`、`test_goal_definition.py` 与 `tests/unit/test_goal_scope_engine.py`、`test_goal_utils.py` 都含 spec-local 断言或 scope 断言，实际处置面以 plan 阶段的检索读数为准。
+-- STR reference check: which STR ids referenced --
+      6 [[STR-001]]
+     16 [[STR-002]]
+      3 [[STR-003]]
+      4 [[STR-004]]
+      4 [[STR-005]]
+      2 [[STR-006]]
+-- A-duplicate line ranges (full-width) --
+line 272 A1
+line 273 A2
+line 274 A3
+line 275 A4
+line 276 A5
+line 277 A6
+line 278 A7
+line 279 A8
+line 280 A9
+line 281 A10
+line 282 A11
+line 284 A1
+line 285 A2
+line 286 A3
+line 287 A4
+line 288 A5
+line 289 A6
+line 290 A7
+line 291 A8
+-- stale FR cross-refs inside Assumptions block 2 --
+FR-009 FR-010 FR-013 FR-019 FR-025 FR-032 FR-041 FR-042 
+-- FR-007 / FR-032 / FR-019 / FR-025 / FR-013 / FR-009 / FR-010 cited in A2/A3/A4/A5/A6/A7 block2 vs actual headings --
+FR-005: - **FR-005**: 框架 MUST 给出一个**封闭的命令族�
+FR-006: - **FR-006**: 命令族判定 MUST 消费**既有类别声�
+FR-007: - **FR-007**: goal 与 team 的**唯一**写入落点 MUST �
+FR-008: - **FR-008**: goal 引擎的 `resolve-scope` MUST 不再返�
+FR-009: - **FR-009**: 框架 MUST 提供一个**幂等的迁移动�
+FR-010: - **FR-010**: 迁移 MUST 是 archive-not-delete（该事实
+FR-011: - **FR-011**: 迁移 MUST 在冲突时停下：目标 slug �
+FR-012: - **FR-012**: 框架 MUST 提供**只读残余探测**：报
+FR-013: - **FR-013**: 迁移完成后 MUST 不存在第二条写入�
+FR-019: - **FR-019**: 在交接模式下，`requirements.md`、`task
+FR-025: - **FR-025**: 引擎的作用域取值 MUST 由重定义后�
+FR-031: - **FR-031**: 可拥有 goal/team 的命令族判定，与�
+FR-032: - **FR-032**: 本特性 MUST 在框架源码侧落地并镜�
+FR-037: - **FR-037**: 一次运行的**临时作业区**（[[STR-002
+FR-038: - **FR-038**: 可写性与可读性 MUST 由绑定与档案�
+-- block-2 stale refs enumerated with context --
+FR-009 要求把 `--scope global|spec|auto
+FR-032），取证只覆盖 feedback 一条链。
+FR-019 要求的声明层条目给出，本阶段不发明具体数字。
+FR-025），迁移与探测的确定性部分以扩展既有 Python 引擎的方
+FR-010 的迁移动作是**被调用的**，FR-013 的探测是**只
+FR-042）由本特性的运行自行发起。
+FR-041 要求的处置清单必须先列全再动手；`tests/contra
+-- which refs point to rows that DO NOT carry the asserted content (spot) --
+A2 block2 says (FR-007, FR-032) for '命令族判定方式由声明层给出' -> actual owner is FR-006/FR-031
+A3 block2 says 'FR-019 要求的声明层条目' -> actual complexity threshold owner is FR-018/FR-031
+A4 block2 says 'concept owner 是 FR-025' -> actual concept owner rewrite is FR-024
+A5 block2 says 'FR-010...FR-013' -> pre-renumber ids; live are FR-009(migrate)/FR-012(probe)
+-- empty subsections B-F check --
+169:#### B. 档案统一与迁移
+170-
+171-
+172:#### C. 平行关系与交接契约
+173-
+174-
+175:#### D. 概念重定义：绑定 / 作用域 / 生命周期
+176-
+177-
+178:#### E. 判定面与取证
+179-
+180-
+181:#### F. 档案层级与运行时豁免
+182-
+183-
+-- contract requirement coverage heads --
+== binding-and-lifecycle.md ==
+## Requirement coverage
+
+FR-001, FR-002, FR-003, FR-004, FR-005, FR-008, FR-014, FR-015, FR-021, FR-023, FR-025, FR-026, FR-027,
+FR-028, FR-038.
+== command-family-and-declarations.md ==
+## Requirement coverage
+
+FR-005, FR-006, FR-018, FR-024, FR-031, FR-039, FR-040; SC-006.
+== handoff-contract.md ==
+## Requirement coverage
+
+FR-016, FR-017, FR-018, FR-019, FR-020, FR-034, FR-035, FR-036; SC-006, SC-007.
+== owner-rewrites-and-tests.md ==
+## Requirement coverage
+
+FR-013, FR-022, FR-028, FR-029, FR-030, FR-032, FR-033, FR-037, FR-041; SC-001…SC-011.
+== unified-archive-and-migration.md ==
+## Requirement coverage
+
+FR-007, FR-009, FR-010, FR-011, FR-012, FR-013, FR-029, FR-030, FR-037, FR-042; SC-002, SC-003, SC-004, SC-011.
+-- contract-coverage gap analysis --
+FR total=42 SC total=11 union-covered=49
+NOT covered by any contract coverage row: SC-005, SC-008, SC-009, SC-010
+-- SC-00x mentioned anywhere in contracts (incl. body, not just coverage row) --
+SC-005: .specify/specs/092-goal-team-parallel/contracts/owner-rewrites-and-tests.md 
+SC-008: .specify/specs/092-goal-team-parallel/contracts/owner-rewrites-and-tests.md 
+SC-009: .specify/specs/092-goal-team-parallel/contracts/binding-and-lifecycle.md .specify/specs/092-goal-team-parallel/contracts/owner-rewrites-and-tests.md 
+SC-010: .specify/specs/092-goal-team-parallel/contracts/owner-rewrites-and-tests.md 
+-- SC -> module map (owner-rewrites) --
+### SC → red-first module map
+
+| SC | Red-first module | What turns it red |
+|----|------------------|-------------------|
+| SC-001 | `tests/contract/test_command_run_goal_team.py` | a write landing under `.specify/specs/**` |
+| SC-002 | `tests/contract/test_no_spec_local_writes.py` | one writing surface reverted to the old path |
+| SC-003 | `tests/integration/test_archive_migration_real_data.py` | deleting a source file, or a missing unified definition |
+| SC-004 | `tests/contract/test_archive_migration.py` | a second-run write, or an overwrite on conflict |
+| SC-005 | `tests/integration/test_parallel_lines.py` | a "requires the other line" precondition |
+| SC-006 | `tests/contract/test_handoff_contract.py` | an unresolvable or mismatched three-way key; a deleted declaration |
+| SC-007 | `tests/contract/test_handoff_territory.py` | a crew write that is allowed onto a spec artifact |
+| SC-008 | `tests/contract/test_criterion_vocabulary_scan.py` | one re-injected `临时` / `temporary` criterion |
+| SC-009 | `tests/contract/test_binding_model.py` | ownership inferred from a directory prefix |
+| SC-010 | `tests/contract/test_085_disposal_table.py` | an undisposed row in the measured list |
+| SC-011 | `tests/contract/test_migration_interruption.py` | a second call that re-moves the tree or silently succeeds |
+
+## Requirement coverage
+-- FR -> tasks coverage --
+tasks.md rows: 80
+FR not cited in tasks.md: none
+FR cited but not defined (dangling): none
+-- FR-005 vs FR-006 command-family: FR-005 says closed determination by declared class; FR-006 says consume flow-class-classes.yaml --
+- **FR-005**: 框架 MUST 给出一个**封闭的命令族清单判定方式**：一个命令是否可拥有 goal/team，MUST 由其声明的类决定，MUST NOT 由逐命令硬编码的白名单决定；本特性 MUST 覆盖 `/speckit.feedback` 作为首个取证命令。〔绑定类声明 owner 见 FR-032〕
+- **FR-006**: 命令族判定 MUST 消费**既有类别声明**：`flow-class-classes.yaml` 中已登记类别的载体文件 `templates/commands/<command>.md` 构成命令族；判定 MUST 复用既有的类别读取入口 `.specify/scripts/python/flow-class-check.py`（`--action lookup` 退出 0 且返回某个登记类别即属该族），MUST NOT 新增类别声明表或第二份命令清单。〔未登记类别的命令是否入族见假设 A9〕
+
+-- FR-030 vs FR-012: command entry owner vs probe executor --
+- **FR-012**: 框架 MUST 提供**只读残余探测**：报告仍存在于 `.specify/specs/*/goal|team/` 的未迁移余额，并 MUST NOT 把残余当作当前档案读取或写入。探测的执行体归 FR-010 的迁移引擎（同一个可执行体的只读动作），MUST NOT 新增第二个可执行体。
+- **FR-030**: `templates/commands/goal.md` 与 `templates/commands/team.md` 的作用域说明 MUST 改为引用新模型 owner，MUST NOT 复述取值域。迁移与残余探测的**命令入口** MUST 明确唯一所有者：goal 侧归 `/speckit.goal` 的 `migrate-archive` 模式（该命令已是 go
+
+-- 'global' / 'temporary' criterion occurrences in runtime surfaces --
+0
+-- FR-032 (stage-landing/mirror) vs FR-005 pointer '绑定类声明 owner 见 FR-032' --
+- **FR-032**: 本特性 MUST 在框架源码侧落地并镜像同步；`templates/` 的框架模板中立性 MUST 保持（MUST NOT 写入本仓专有路径事实）。
+
+-- FR-031 (declaration entries owner) --
+- **FR-031**: 可拥有 goal/team 的命令族判定，与交接复杂度门槛，二者 MUST 各有一个**声明层**条目（`shared/declarations/facts/`），且 MUST 由现有声明读取入口消费；MUST NOT 在脚本内硬编码第三处取值。条目 MUST 在 `shared/declarations/contract.yaml` 完成登记后才可被读取（该契约是值域与 subset id 的 owner，未登记条目按 `owner-unavailable` 处理，不得当作默认值），且两处消费点 MUST 落在**本特性新增或修改的引擎内**，MUST NOT 要求修改既有 `flow-class-check.py` 或驱动脚本。〔登记义务见 Clarifications 的 Q9〕
+
+-- FR-024 concept owner --
+- **FR-024**: 概念的**唯一 owner** MUST 是既有的定义文档：goal 侧 `.specify/shared/definitions/goal-definitions.md`、team 侧 `.specify/skills/internal/create-team/references/conceptual-model.md`；本特性 MUST 改写这两处而非新建第三处，且其他面 MUST 只引用不复述（宪法 XIV）。
+
+-- FR-018 complexity threshold --
+- **FR-018**: 复杂工作的判定 MUST 可判定：是否走「spec 设计 + goal+team 执行」MUST 由一条**声明值**决定（例如任务数门槛），MUST NOT 由运行期自由裁量；门槛取值 MUST 有唯一 owner 并在边界值上有确定行为。〔取值面与边界语义见 Clarifications 的 Q5〕
+-- STR-003 cited by FR-029? --
+135:- **FR-010**: 迁移 MUST 是 archive-not-delete（该事实 MUST 同时写入每一份 [[STR-001]] 记录）：源路径的数据 MUST NOT 被删除，MUST 被移入归档位置 [[STR-003]] 并留下指名「来源 spec / 原 slug / 目标 slug / 关联目标档案 / 结果」的回执；迁移失败 MUST 报告失败阶段，MUST NOT 留下无回执的删除；中断的迁移 MUS
+154:- **FR-029**: 目录地图 MUST 同步：`.specify/shared/definitions/framework-map.md` 的 Goals / Teams 两行 MUST 表达新的落点与归档语义（含 [[STR-003]] 行）；`.specify/specs/` 行 MUST NOT 再暗示其下存在 goal/team。
+202:- **归档回执（Archive receipt）**: 一个退役定义迁离原位后留下的不可变记录，落 [[STR-003]]，承载原路径、原 slug、目标 slug、时间与结果；与**迁移回执**的区别在于它按定义一件一份、在档案内可枚举。
+242:| `STR-003` | `".specify/archive/goal-team/"` | FR-010, FR-029 |
+
+-- archive receipt (STR-003) vs rename/archive: FR-010 says '移入归档位置 [[STR-003]]' --
+- **FR-010**: 迁移 MUST 是 archive-not-delete（该事实 MUST 同时写入每一份 [[STR-001]] 记录）：源路径的数据 MUST NOT 被删除，MUST 被移入归档位置 [[STR-003]] 并留下指名「来源 spec / 原 slug / 目标 slug / 关联目标档案 / 结果」的回执；迁移失败 MUST 报告失败阶段，MUST NOT 留下无回执的删除；中断的迁移 MUST 可从其报告阶段续做（见 Edge Cases）。
+
+-- Edge cases count --
+8
+=== briefing premises (machine-derived, gate rule 8) 2026-11-09T07:48:00Z ===
+requirements.md lines: 291
+FR defs: 42
+SC defs: 11
+Edge case bullets: 8
+Clarification Q rows: 13
+Assumption A-def rows total: 19 (distinct: 11)
+Empty FR subsections B..F: 5
+contracts files: 5; contract clauses C-xx: 111
+tasks.md rows: 80
+Shared Strings rows: 6
+
+=== same-author detection gate (objective-analysis-gate.md) ===
+condition: FIRES — requirements/plan/contracts/tasks for 092 were authored in this same line of work (same-author chain requirements -> clarify -> plan -> tasks).
+delegation attempted: this worker's toolset carries no subagent-dispatch tool (no Task/Agent capability); dispatch cannot be issued.
+fallback applied: gate rule 7 — degrade to a direct bounded read; every row produced under this path carries the marker (detected: direct read, subagent unavailable).
+rule 8 compliance: every premise used was machine-derived first (see "briefing premises" block above); nothing briefed from memory.
+-- EP-002 says '14 spec-local definitions' and '6 goal / 12 team archive entries' — is that consistent with A6 (goal 7 / team 7)? --
+      1 14 spec-local
+      1 6 goal / 12 team
+      2 goal 7 / team 7
+-- actual spec-local goal/team definition counts on tree today --
+0
+0
+-- requirements-baseline-probe readings --
+# 2026-11-09 baseline: spec-local goal/team residual (read-only probe)
+## goal
+.specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md
+.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md
+.specify/specs/087-arch-diagram-docs/goal/087-arch-diagram-docs/goal.md
+.specify/specs/088-speckit-visualization/goal/088-speckit-visualization/goal.md
+.specify/specs/089-script-interface-contract/goal/script-interface-contract/goal.md
+.specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md
+.specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md
+count=7
+## team
+.specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md
+-- why 0 today: tree state --
+?? .specify/specs/092-goal-team-parallel/test-evidence/checklist-gates-2026-11-09.txt
+?? .specify/specs/092-goal-team-parallel/test-evidence/checklist-readings-2026-11-09.txt
+-- does probe path exist now? --
+YES
+-- archive trees present? --
+.specify/archive
+.specify/goal
+.specify/teams
+-- 089 team slug vs 088/089 deviation (A6 claims) --
+## team
+.specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md
+.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md
+.specify/specs/087-arch-diagram-docs/team/087-arch-diagram-docs/team.md
+.specify/specs/088-speckit-visualization/team/087-reporting-dogfood/team.md
+.specify/specs/089-script-interface-contract/team/086-script-interface-contract/team.md
+.specify/specs/090-re-anchoring/team/090-re-anchoring/team.md
+.specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md
+count=7
+-- find with correct depth --
+7
+7
+-- 092 own spec-local goal/team present? --
+.specify/specs/092-goal-team-parallel/goal/092-goal-team-parallel
+.specify/specs/092-goal-team-parallel/goal/092-goal-team-parallel/goal.md
+.specify/specs/092-goal-team-parallel/team/092-goal-team-parallel
+.specify/specs/092-goal-team-parallel/team/092-goal-team-parallel/team.md
+-- A6 claim: 089 goal slug = script-interface-contract (confirmed above), 088/089 team slugs deviate --
+probe team: 088 dir -> team slug 087-reporting-dogfood ; 089 dir -> team slug 086-script-interface-contract
+-- A6 block1 (line 277) --
+- **A6（实测基线读数，取自 requirements 阶段）**: 2026-11-09 只读探测（`.specify/specs/092-goal-team-parallel/test-evidence/requirements-baseline-probe.txt`）：`.specify/specs/*/goal/*/goal.md` 共 7 条、`.specify/specs/*/team/*/team.md` 共 7 条（085–090 各一对，加 089 的 goal slug `script-interface-contract` 与 088 / 089 的 team slug 分别偏离目录名；092 自身的 spec-local goal 在本特性落地后计入残余）。SC-003 引用该读数作为**基线**；按 091 的教训，本规格 MUST NOT 把该数字复制为第二
+
+-- A6 block2 (line 289) --
+- **A6（实测基线读数，取自本阶段）**: 2026-11-09 只读探测：`.specify/specs/*/goal/*/goal.md` 共 7 条、`.specify/specs/*/team/*/team.md` 共 7 条（085–091 各一对，其中 089 的 goal slug 为 `script-interface-contract` 而非目录名）。SC-003 引用该读数作为基线；按 091 的教训，本规格 MUST NOT 把该数字复制为第二处固定值，只在 SC-003 里作为比较基线出现。
+
+-- A1 block1 (272) vs A1 block2 (284) --
+- **A1（已由 clarify 裁定，不再是待选项）**: 原 A1 把 `--scope` 的两种处置推给 plan。clarify 已裁为「删除 `spec` 取值、保留 `global`/`auto` 并收窄其含义」，依据见 Clarifications 的 Q2，实现面（既有 scope 测试的改写清单）仍归 plan/implement 排布。
+- **A1（本阶段不裁 scope 取值名，只钉死「必须显式处置」）**: FR-009 要求把 `--scope global|spec|auto` 与新模型的字面冲突显式处置，但两种处置（保留取值名改含义 + 迁移期别名 / 删除取值并让旧调用可判定失败）各自都有一批既有测试与文档要跟着改。本阶段**不替 plan 做这个选择**，只要求 plan 阶段裁为一种并记录依据。理由：这是承重决策（影响既有 7 个档案的读写与全部 scope 测试），由具备完整实现视野的阶段裁定更合适。
+-- FR-008 (chosen ruling: delete spec) vs A1 block2 (not ruled) --
+- **FR-008**: goal 引擎的 `resolve-scope` MUST 不再返回 spec-local 的 goal/team 根，其取值域 MUST 被 [[STR-002]] 重写；`spec` 这一取值名 MUST 被删除并让旧调用以可判定的错误失败（`{{SCRIPT-ROOT}}/goal-utils.py` 现有 `invalid choice: <value>` 退出
+
+-- '已由 clarify 裁定' vs '本阶段不裁' occurrences --
+2
+-- A9 present only in block1? --
+280:- **A9（未登记类别的命令按「不入族」处理）**: FR-007 用「载体文件是否在 `flow-class-classes.yaml` 中登记了类别」判定命令族。当前 `templates/commands/` 有若干命令其载体未登记类别（`$ARGUMENTS` 驱动的入口层）；本阶段裁为「未登记 = 不入族」，理由是判定必须可由既有读入口回答（退出 0 + 合法取值），猜一个白名单会重新引入逐命令硬编码。若后续确需让某个入口层命令入族，正确做法是给它登记类别，而不是改本判据。
+-- A10/A11 only block1 --
+281:- **A10（绑定改成可写性的确定性函数，不靠禁令）**: 旧规则用「forbidden paths」表达「运行不得写共享档案」。本阶段裁为可判定函数（FR-038）：被任意 team 绑定的 goal 只能由 `human` 改写。边界情形——同一个 goal 被另一条线的 team 绑定时，原 `owner` 失去写权——是**有意接受**的代价：它把「谁的档案」变成可枚举的事实，而不是依赖禁令文本。
+282:- **A11（`origin` 只记直接来源，不建谱系）**: 迁移后的定义 `origin` 记录**直接来源 spec**；一条被迁移的 team 若其 `goal_slug` 指向也被迁移的 goal，迁移 MUST NOT 试图重建跨定义的历史谱系。理由：谱系不是本特性的诉求，且它会让「重跑迁移是否等价」变得不可判定。

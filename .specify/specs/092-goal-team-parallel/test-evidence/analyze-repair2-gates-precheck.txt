@@ -1,0 +1,12 @@
+### pre-analyze-check.py --repo . --spec-dir .specify/specs/092-goal-team-parallel --stage requirements
+exit=0
+stage=requirements decision=pass findings=88 severity={'advisory': 88}
+
+### pre-analyze-check.py --repo . --spec-dir .specify/specs/092-goal-team-parallel --stage plan
+exit=0
+stage=plan decision=pass findings=88 severity={'advisory': 88}
+
+### pre-analyze-check.py --repo . --spec-dir .specify/specs/092-goal-team-parallel --stage tasks
+exit=0
+stage=tasks decision=pass findings=88 severity={'advisory': 88}
+

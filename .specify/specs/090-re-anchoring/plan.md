@@ -275,8 +275,8 @@ Counts below were backfilled after the artifacts landed on disk (never pre-writt
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Research | [`research.md`](research.md) | R1–R9, the measurement record behind § Phase 0 |
-| Data model | [`data-model.md`](data-model.md) | 6 entities (E-1…E-6), 12 validation rules (V-1…V-12) |
-| Contracts | [`contracts/`](contracts/) | 4 files: `re-anchoring-faces.contract.md` (C-1…C-8), `direction-audit.contract.md` (C-1…C-9), `governance-landing.contract.md` (C-1…C-6), `guard-tests.contract.md` (C-1…C-8) |
+| Data model | [`data-model.md`](data-model.md) | Re-anchoring slice: 6 entities (E-1…E-6), 12 validation rules (V-1…V-12). Non-Disposable slice: 9 entities (ND-E-1…ND-E-9), the entry state machine, the expiry model, the human-facing output shape, the fact-owner table, 11 validation rules (ND-V-1…ND-V-11) |
+| Contracts | [`contracts/`](contracts/) | 12 files, two namespaces. Re-anchoring (4, as recorded when they landed): `re-anchoring-faces.contract.md` (C-1…C-8), `direction-audit.contract.md` (C-1…C-9), `governance-landing.contract.md` (C-1…C-6), `guard-tests.contract.md` (C-1…C-8). Non-Disposable, absorbed from 092 (8, clause ids `ND-C-NNN`): `nd-detection-categories` (ND-C-101…108), `nd-status-and-verification` (ND-C-201…207), `nd-disposition` (ND-C-301…308), `nd-four-stage-command` (ND-C-401…410), `nd-renumber-and-supersede` (ND-C-501…507), `nd-detection-engine-cli` (ND-C-601…608), `nd-report-schema` (ND-C-701…707), `nd-acceptance-readability` (ND-C-801…807) |
 | Quickstart | [`quickstart.md`](quickstart.md) | 7 scenarios (S-0…S-6) |
 | Feature ref | [`feature-ref.md`](feature-ref.md) | binding, delivery surface, FR→contract map, SC→measurement, disclosed rulings |
 
@@ -288,3 +288,105 @@ Counts below were backfilled after the artifacts landed on disk (never pre-writt
 | `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/090-re-anchoring --stage plan --repo .` | `stage=plan decision=pass errors=0 advisories=2 waived=0` — both advisories are `missing-path` on `requirements.md:72`, where the file writes the two source roots with a literal `...` ellipsis; the same two tokens quoted in this table add two more advisories of their own (the re-run reads `advisories=4`). Verbatim reading: `test-evidence/pre-analyze-plan.txt` |
 | `/usr/bin/python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/090-re-anchoring --json` | `status: error`; five of six labels pass (`dtr-anchor`, `dtr-section-missing`, `dtr-record-incomplete`, `dtr-tension-id`, `dtr-rejected-form` all `pass 0`); `expected-sacrifice-unmapped` fires **2** (at the two `expected_sacrifice` field lines of T-001 and T-002) because `requirements.md` carries no `### Measurement Sources & Collection Methods` section to resolve `SC-002 Source` / `SC-004 Source` — a defect of the requirements artifact, recorded as `research.md` R9 and `feature-ref.md` F-2, not repaired from this stage |
 | `/usr/bin/python3 scripts/python/validate-requirements.py .specify/specs/090-re-anchoring/requirements.md` | `status: error`, `path-marker` ×4 (SC-001…SC-004 carry no `**Path**` marker); same territory boundary — `research.md` R9, `feature-ref.md` F-1 |
+
+## Non-Disposable slice (092)
+
+Feature **092-non-disposable** is absorbed into this feature as a **second slice**. It is not a revision of the
+re-anchoring discipline: it adds a review mechanism (`回顾 → 设计 → 确认 → 执行`) with its own owner page, its own
+read-only engine and its own contract pages. That slice's five-stage artifacts stay where they are — its
+`requirements.md`, `research.md`, `quickstart.md`, `feature-ref.md`, `tasks.md` and its `test-evidence/` remain under
+`.specify/specs/092-non-disposable/` and are read **in place**, never copied here. What moves is exactly what the table
+below names:
+
+| 092 artifact | Where it now lives in 090 | Transformation |
+|---|---|---|
+| `contracts/*.contract.md` (8 files, 62 clauses — 55 `##` headings plus the 7 `- **C-NNN**` bullets of `acceptance-readability`) | `contracts/nd-<name>.contract.md` | every clause id `C-NNN` → `ND-C-NNN` (62 definitions, 1:1, no id added or dropped); intra-slice cross-references repointed at the `nd-` file names; the header's `**Feature**` line names this feature |
+| `data-model.md` entities E-1…E-9 | [`data-model.md`](data-model.md) § Entities `ND-E-1`…`ND-E-9` | entity ids prefixed; the entry state machine, the human-facing output shape and the fact-owner table carried as `ND-`-headed sections; the ND validation rules land as `ND-V-1`…`ND-V-11` |
+| `plan.md` summary, technical context, seven decision tensions, package proposal, risk register, corpus mapping, shift list | **this section** | summarised here; the verbatim bodies stay in `092-non-disposable/plan.md` |
+
+**Name collision, resolved by prefix, not by renumbering.** Both slices use `contracts/C-N`. The re-anchoring slice
+keeps its bare `C-1`…`C-10` identifiers on the four pages it already shipped (its `test-evidence/` and guard tests
+cite them); the absorbed slice takes `ND-C-NNN`. No delivered clause id changes meaning, which is what makes the merge
+reviewable by name: a reader who sees `C-` reads re-anchoring, `ND-C-` reads non-disposable.
+
+### What the slice delivers (summary only — one statement per object, the owner's text is elsewhere)
+
+- **Review surface**: exactly ten declared `.specify/` historical roots, held as a `closed-set` fact in
+  `shared/declarations/facts/non-disposable-review-surface.yaml` and read through `declaration_reader.py`. A sibling
+  directory that is not declared produces a hint, never a candidate.
+- **One deterministic engine**: `scripts/python/non-disposable-check.py`, stdlib-only, read-only, exit codes 0/1/2,
+  `--json`, `--scope`. It emits eight closed detection classes and a coverage declaration; a `unevaluated` seam is a
+  visible non-clean state, never a pass.
+- **One owner page**: `shared/definitions/non-disposable-definitions.md` — the disposition set
+  (`archive` / `supersede` / `correct` / `exempt`), the exemption form, the detection classes and their subjects, the
+  review-surface definition, the supersede protocol, the report schema, the bridge to `sanitize-utils.py`'s
+  `DISPOSITIONS`, and the boundary with `.specify/history/`.
+- **The four-stage command shape** inside the one existing `/speckit.history` entry
+  (`templates/commands/history.md` + `skills/internal/manage-history/SKILL.md`): a zero-write review, a zero-write
+  design, an explicit confirmation (`group` / `item` / `none-of`), and an execute segment writing four evidence
+  segments per group into `test-evidence/`.
+- **Seven landing faces, zero new principle** (the slice's D-2): owner page · declaration fact · four glossary terms ·
+  registry row + detail · the existing `pytest -m contract` guards with a mutation leg per closed set · three
+  history-surface pointer lines · one `register.md` decision row.
+
+### Decision tensions of the slice
+
+The slice's seven records are **carried verbatim in `092-non-disposable/plan.md` § Decision Tensions** (`T-001`…`T-007`)
+and are NOT restated here, for a mechanical reason that is worth stating because it constrains the merge: the
+validator that judges tension records (`scripts/python/validate-decision-tensions.py`) requires `T-NNN` identifiers to
+be **unique and increasing in document order** inside one `## Decision Tensions` section, and this plan's section
+already holds `T-001`/`T-002`. Copying the slice's records into that section would either collide on `T-001`/`T-002`
+or force the re-anchoring records to be renumbered — a change to delivered identifiers, which the naming discipline
+forbids. The slice's records therefore keep their owner file, and this section carries the **index**, not the bodies:
+
+| Slice tension | Decision (one line) | Reaches this feature as |
+|---|---|---|
+| `T-001` | The detecting engine is a local read-only script, not a resident review service | no second store, scheduler or daemon — the same shape `T-002` here protects for the anchor |
+| `T-002` | No new constitutional principle; the gap stays open as OI-4/OI-5 | the slice lands seven faces instead of a principle — § Seven landing faces above |
+| `T-003` | Deterministic vs semantic is decided by the assertion's subject; the seam degrades to `unevaluated` | § ND entry state machine (`unevaluated` is a visible state) |
+| `T-004` | The two disposition vocabularies coexist; one mapping table plus one adjudication rule | § ND-E-5 (`DispositionBridge`) |
+| `T-005` | The A–H corpus is tiered I/II by **where the repair belongs**, not by defect size | § ND Shift List below |
+| `T-006` | The semantic face reuses the 085 spec-local team; no second concurrency facility | the slice's shard contract (`ND-E-6`) |
+| `T-007` | An exemption is always time-bounded; there is no permanent exemption | § ND-E-3 (expiry model) |
+
+**Load-bearing tension of the merge itself — `T-ND-001`, prefix versus renumber.** `decision`: the absorbed slice's
+clause ids gain a `ND-` prefix and the re-anchoring ids keep their spelling. `antithesis`: renumber the whole set into
+one continuous clause sequence (`C-1`…`C-68`), giving a reader one numbering domain and one place to count clauses.
+`binding_constraints`: pole_a — the re-anchoring slice's clause ids are cited by delivered guard tests and by every
+file in `test-evidence/`, so renumbering them would silently break those citations in the same change that claims to
+merge; pole_b — a prefix that is only decorative would leave two `C-101`-shaped ids that a reader cannot tell apart,
+so every ND cross-reference inside the absorbed pages had to be repointed at the `nd-` file names in the same edit.
+`discriminating_evidence`: `grep -rn 'C-[0-9]' tests/contract/ .specify/specs/090-re-anchoring/test-evidence/`
+resolved before and after the merge — a renumbering is admissible only if that command returns the same resolution
+count; the prefix is admissible iff the count stays identical because no id moved.
+`expected_sacrifice`: **SC-002 Source ↓** — this record is not one the validator parses (it lives outside the
+`## Decision Tensions` section, whose two records and their `T-001`/`T-002` ids are untouched), and `SC-002` here means
+the Non-Disposable slice's criterion, read against that slice's own `requirements.md`, because both features number
+their criteria `SC-NNN` and the slice's set stays where it is. The cost paid: a reader must know two numbering
+conventions, and the clause count of the merged feature is a sum (`62` ND clauses beside the re-anchoring pages)
+rather than one sequence.
+`revision_trigger`: a third absorbed feature, or ≥2 guard tests that must cite both domains in one assertion → reopen,
+move to a single continuous numbering with a recorded migration map.
+
+### Verification basis of the slice (carried, not re-derived)
+
+- **A–H corpus**: 35 entries (`notes/input-review-080-090.md`), tiered I (19) / II (15); the per-entry table with the
+  tier and the detection class that must reproduce it is the slice's `plan.md` § A–H Corpus Mapping, and it is the
+  table a guard reads. Tier I entries reach name-level zero inside the slice; tier II entries reach a shift row.
+- **Shift List (档 II handoff)**: 12 rows = 12 receiving bodies = 12 markers, because the mapping is many-to-one
+  (`081` carries D1+D2, `083` carries E1+E2+E3+F5, and so on). The rows are owned by the slice's plan; the marker's
+  literal form is owned by `contracts/nd-acceptance-readability.contract.md` `ND-C-805`. Two of those rows land on
+  **this** feature — `090` carries `D5` (the rule anchor's four spellings) and `F2` (the instructions budget block's
+  arithmetic) — so the absorbed slice's own handoff includes this spec's body.
+- **Baseline**: the slice's `notes/baseline-failed-tests.txt` is the frozen failed-node-id set its guards compare
+  against; a count read at another moment is never evidence against it.
+
+### Boundaries this merge does not move
+
+- **092 is not deleted, and not stubbed.** Its directory stays intact and remains the place a reader finds the slice's
+  requirements, research, quickstart, tasks and evidence. Deleting it, or leaving a redirect file behind, is a later
+  decision recorded in `.specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md` — not this section's.
+- **The 092→090 registry merge is out of scope here.** `.specify/memory/features.md` and `features/092.md` are
+  single-owner registries; this section states what the merged feature *contains*, and does not edit a registry.
+- **No code lands here.** The engine, the owner page, the declaration and the guards are the slice's own implement
+  deliverables; this stage merges artifacts only.

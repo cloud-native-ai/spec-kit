@@ -1,0 +1,10 @@
+A4 W2 renamed 085 requirements/plan/feature-ref/team.md: "temporary Goal/Team" -> owner-canonical "spec-scoped Goal" / "team (scope: spec)" per goal-definitions.md § Scope Is Not Lifetime; 0 live temporary/临时 prose remains in 4 files
+Four-part -> five-part checkpoint aligned to checkpoint-protocol.md at 7 sites (requirements 28/98/102/106/216, plan 20, feature-ref 28, team 163); part 5 = direction audit
+Preserved by design: 085-sdd-temporary-goal-team slug/paths, lifecycle: temporary schema enum (89-128,144-157), real filenames temporary-goal-team.md + test_temp_goal_contract/test_temp_team_schema
+verification.md left untouched: every line is a dated 2026-11-06 run record and the file opens declaring historical spelling
+Also renamed "Global Goal"->"Global" only where it contrasted the spec scope; global hierarchy wording kept (074 unchanged)
+Verified: 24 passed (test_temp_goal_contract, test_temp_team_schema, test_wp_gate_085, test_scope_resolution); team.md YAML parses, 14 members / 8 stage_seats intact
+Self-repair disclosed: my first team.md name edit `(scope: spec)` broke YAML colon parsing; corrected to `(scope spec)` before validation
+ANOMALY: tests/contract/test_checkpoint_protocol.py::test_protocol_has_the_four_parts is RED (measured) — it asserts literal "### 2. Temporary Goal progress" but the protocol heading is now "### 2. Goal progress"; tests/ is outside my write domain, needs a W2 seat with tests/ territory
+ANOMALY: owner docs disagree on the global path — goal-definitions.md:35 + goal-utils.py ARCHIVE_DIRNAME say `.specify/anchoring/**`, but sdd-routing-definitions.md:41 and create-team/conceptual-model.md:106 still say `.specify/goal/**`; I left 085's forbidden `.specify/goal/**` unchanged pending that ruling
+A4-DONE

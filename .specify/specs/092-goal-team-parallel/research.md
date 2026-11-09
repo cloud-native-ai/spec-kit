@@ -142,5 +142,5 @@ name, and the probe output is the comparison baseline for SC-003.
 
 **R-31 — Evidence forms are already fixed by the driver gates.** `pre-analyze-check.py --stage plan` requires
 `EP-NNN` rows in § Execution Premises with a closed `Status` domain, and `decomposition-check.py --mode plan` reads
-FR definitions by the `^- **FR-NNN**:` shape. Consequence: the plan's premise table and the "42 FR" claim are shaped
+FR definitions by the `^- **FR-NNN**:` shape. Consequence: the plan's premise table and the "43 FR" claim are shaped
 for those readers, and their readings are recorded in `test-evidence/`.

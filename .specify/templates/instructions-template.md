@@ -142,7 +142,7 @@ Coverage is necessary and never sufficient: a suite that is not actually run pro
 
 A long-running task owes the user a periodic sign of life: minutes of silence are indistinguishable from a hang. Full discipline: `.specify/shared/guidelines/progress-reporting.md` (do NOT copy its rules; reference the file).
 
-- **Rhythm (沉默有上限)**: report every **15 minutes by default**, anchored on the task's start — a ceiling on silence, not a floor on chatter. A user-supplied interval replaces the default; report sooner at milestones, blockers or direction changes, and never skip a report for lack of news.
+- **Rhythm (沉默有上限)**: report every **15 minutes by default**, anchored on the task's start — a ceiling on silence, not a floor on chatter. A user-supplied interval replaces the default; report sooner at milestones, blockers or direction changes, and never skip a report for lack of news. A run declared unattended is exempt: it emits one final-state report at completion (anomalies still surface immediately), per the owner's Unattended Mode section.
 - **Content floor (四要素)**: one to three lines — where the run stands, what changed, what remains (rough estimate) and any blocker, with "no blocker" stated explicitly.
 - **Measured, not invented (数字须可溯源)**: take figures from an artifact this run actually produced; if no such sensor exists, say the progress cannot be quantified and label any estimate as one.
 - **Boundary-respecting (不打断原子步骤、不当确认门)**: land reports at step boundaries, never split an indivisible step; a report is a statement, not an approval request, and approving a destructive action keeps its own front-loaded criterion.
@@ -224,6 +224,7 @@ Full philosophy, the load-bearing criteria and where each kind of answer belongs
 ## Knowledge Recording & Promotion
 
 Every non-derivable takeaway from a run MUST be recorded before wrap-up; normative rules belong in their owner document. A point the user keeps emphasizing MUST be promoted into the main flow (owner, ambient surface, guard), not merely recorded. Scope, threshold, evidence: `.specify/shared/guidelines/knowledge-promotion.md`.
+**Non-Disposable (不可一次性处置)**: history is a required input, not a use-and-throw store — a carrier that no longer holds MUST be reviewed and then disposed, never silently retained; the definition, the closed sets and the disposal criteria are owned by `.specify/shared/definitions/non-disposable-definitions.md`.
 
 ## ID Register (编号登记)
 

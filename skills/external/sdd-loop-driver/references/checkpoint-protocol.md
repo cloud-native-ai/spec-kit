@@ -16,9 +16,9 @@ terminal `closure.md` repeats the same check (see `## The published-state check 
 - Record the artifact paths, the sentinel, the U4 evidence pointer, and any `ANOMALY:` line.
 - Never infer completion from an executor's self-report.
 
-### 2. Temporary Goal progress
+### 2. Goal progress
 
-- For each criterion of the spec's Temporary Goal, record `criterion / degree / evidence_ptr`.
+- For each criterion of the spec's Goal (scope = spec), record `criterion / degree / evidence_ptr`.
 - `degree` is a progress reading, not a binary checkbox; a missing measurement is `not_evaluated`, never zero.
 - Goal content changes only through the goal engine (`/speckit.goal modify --scope spec`); the checkpoint never writes `goal.md`.
 
@@ -168,7 +168,7 @@ one thing an "everything closed" closure sentence is not allowed to hide.
 - artifacts: <paths>
 - anomaly: <未发现异常 | ANOMALY: ...>
 
-## 2. Temporary Goal progress
+## 2. Goal progress
 | criterion | degree | evidence_ptr |
 |---|---|---|
 | <criterion> | <0-100% or not_evaluated> | <path> |

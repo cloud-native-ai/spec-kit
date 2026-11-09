@@ -1,0 +1,12 @@
+seat E2 — 083 档 II 移交标记 + 校正陈述 (092 P7, Shift List row 083 = E1, E2, E3, F5)
+wrote (3 files, +15 lines, 0 removed; original prose untouched): 083 {requirements.md, plan.md, verification.md}
+requirements.md: E1 @FR-011, E2 @A7, F5 @A7 (同点相邻), E3 @FR-001 — 4 statements
+plan.md: E2 @line-8 `58d3dc5b` 句 — 1. verification.md: E2 @baseline 块, @post_change 块, @SC-004_note — 3
+E1: FR-011 例外范围钉为五个消费方 (FR-026 括号已写死); "SC-003 因此为假" 实测不成立 (接线先于 3ffeb26e, 26 commits)
+E2: 三值分流 — STR-002=3ffeb26e 字节基线 / 58d3dc5b 写作基准 / implement-part1-baseline 24F-7157P-7S; post_change 只比后者
+E3: 宪法名册 I..XXII = 22 条, 无此原则; 「一等原则」= owner 文档承载, 不是宪法条款
+F5: 15+38 (目录, 2026-11-05) / 54 (find SKILL.md) / 16+38 (现值, +ssh-utils); owner = skills/ 源树
+verify: `git diff -U0` removed-lines = 0; pytest test_mechanism_policy_{ownership,guard}.py = 23 passed (env -u PYTHONPATH /usr/local/bin/python3, pytest 9.0.3)
+ANOMALY: marker form — C-805 定 `<!-- 092 handoff: <corpus id> → <receiving feature> -->`, 但已落地的兄弟席位用描述式 (u01/u02: `<!-- 092 handoff: D1（…）-->`, 082 F3)。本席位取两者交集: 一行精确形态 + 紧随一行校正陈述; 若守卫要求每 body 恰一行, 陈述行需改挂正文
+ANOMALY: E1 的 F5 检测证据 (`15+38 vs 54 vs 16+38`) 在 083 正文中无并列出现; 本席位按 092 notes 给出的三个对象逐一实测定位, 未改计数
+SEAT-E2-DONE

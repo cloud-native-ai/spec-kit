@@ -1,0 +1,19 @@
+### validate-tasks.py .specify/specs/092-goal-team-parallel/tasks.md
+WARN  239: blockedBy: T043 references later task T054 (forward dependency — verify this is intentional)
+PASS (with warnings): .specify/specs/092-goal-team-parallel/tasks.md — 0 error(s), 1 warning(s)
+exit=0
+
+### validate-decision-tensions.py --spec .specify/specs/092-goal-team-parallel
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 374 lines, 7 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+exit=0
+
+### decomposition-check.py --mode tasks --tasks .specify/specs/092-goal-team-parallel/tasks.md --requirements .specify/specs/092-goal-team-parallel/requirements.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 43, "task_count": 83, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T08:56:16Z"}
+exit=0
+
+### decomposition-check.py --mode plan --requirements .specify/specs/092-goal-team-parallel/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 43, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T08:56:16Z"}
+exit=0
