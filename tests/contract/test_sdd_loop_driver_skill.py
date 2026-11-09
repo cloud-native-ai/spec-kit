@@ -20,6 +20,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_DIR = REPO_ROOT / "skills" / "external" / "sdd-loop-driver"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 
+#: FR-035 / C-094 (093 T152): the ban statement beside the banned path's name.
+BAN_WINDOW = re.compile(
+    r"in-process[\s\S]{0,240}(BANNED|禁止|MUST NOT|not counted|不被计为|不计为)"
+    r"|(BANNED|禁止|MUST NOT|not counted|不被计为|不计为)[\s\S]{0,240}in-process")
+
 PINNED_H2_SECTIONS = [
     "What This Skill Does",
     # 060 C-26: obligation moved to run-agent
@@ -555,38 +560,35 @@ def test_c22_watch_target_hook_selftest():
 
 
 # ---------------------------------------------------------------- C-23
-# 2026-10-21: an entry with no host+path must resolve the nearest
-# .specify/ ancestor from the session cwd and dispatch to the host's native
-# subagent; qodercli is reserved for the remote topology. 2026-10-27: if no
-# .specify/ is found, the skill refuses and hands off sdd-project-setup.
+# 2026-11-09 (Feature 093, T152): re-pinned to the FR-035 / C-094 ruling — the local
+# carrier is the fork form (same-family qodercli child processes through stage-runner.sh),
+# heterogeneous agents use the subprocess carrier, and the host-internal in-process
+# subagent path is BANNED. The old "MUST NOT launch qodercli locally" / native-first rule
+# is disposed; every pin below turns red if it returns.
 
 
-def test_c23_local_native_subagent_default():
+def test_c23_local_carriers_and_the_in_process_ban():
     text = _skill_text()
-    fields, _ = _parse_frontmatter(text)
     assert "向上搜索" in text, "no host+path must search upward for .specify/"
     assert "会话 cwd" in text, "the upward search starts at the session cwd"
     assert "sdd-project-setup" in text, "missing .specify/ must hand off setup"
-    assert "原生子代理" in text, "local topology must name the native subagent"
-    assert "MUST NOT 启动 qodercli" in text, (
-        "local topology must forbid launching qodercli"
-    )
-    assert "原生子代理" in fields["description"], (
-        "description must describe both carrier forms, not qodercli only"
-    )
     recipes = _recipes_text()
-    assert "本地原生拓扑" in recipes and "watch-target.sh" in recipes, (
-        "local native dispatch must be documented apart from the external watcher"
-    )
+    combined = text + recipes
+    assert "qodercli" in combined and "stage-runner.sh" in combined, (
+        "the fork carrier is same-family qodercli children through stage-runner.sh")
+    assert re.search(r"子进程|child process|child-process", combined)
+    assert re.search(r"SUBPROCESS|subprocess|独立子进程", combined), (
+        "heterogeneous agents use the subprocess carrier")
+    assert re.search(r"heterogeneous|异构", combined)
+    assert BAN_WINDOW.search(combined), (
+        "the host-internal in-process subagent path is BANNED as a carrier")
+    for phrase in ("MUST NOT 启动 `qodercli`", "MUST NOT 启动 qodercli",
+                   "MUST NOT 以 `qodercli` 作为 SDD 缺省子代理"):
+        assert phrase not in combined, "the disposed old rule returned: %r" % phrase
     prompts = _prompts_text()
-    assert "本地原生" in prompts and "同步阻塞调用" in prompts, (
-        "stage-prompt skeleton must cover native dispatch"
-    )
+    assert "stage-runner.sh" in prompts and "in-process" in prompts, (
+        "the stage-prompt topology rule carries the carriers and the ban")
     watch = (SKILL_DIR / "references" / "watch-model.md").read_text(encoding="utf-8")
-    assert "本地原生子代理" in watch and "适用边界" in watch, (
-        "watch model must scope itself to external CLI dispatch"
-    )
-    docs = DOCS_PAGE.read_text(encoding="utf-8")
-    assert "当前项目" in docs and "原生子代理" in docs, (
-        "docs page must carry the local default and native-subagent rule"
-    )
+    assert "qodercli" in watch and re.search(r"fork|stage-runner\.sh", watch), (
+        "the watch model extends to the local fork carrier")
+    assert BAN_WINDOW.search(watch), "the in-process path is BANNED in the watch model"
