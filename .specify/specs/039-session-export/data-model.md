@@ -57,7 +57,7 @@
 
 ## Entity 3: 支持矩阵(Support Matrix)
 
-**持久化位置**: `skills/export-session/SKILL.md` 的支持矩阵表(人读)+ `export.py` 的 `PARSERS` 注册表(机读事实源)。
+**持久化位置**: `skills/internal/archive-session/SKILL.md` 的支持矩阵表(人读)+ `export.py` 的 `PARSERS` 注册表(机读事实源)。
 
 | 工具(STR-002) | 会话存储形态 | 可导出性(本环境探测) | requestId |
 |----------------|--------------|------------------------|-----------|

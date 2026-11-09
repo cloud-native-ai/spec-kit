@@ -101,7 +101,7 @@
 
 ## Non-Disposable (092) — merged
 
-**Source**: `.specify/specs/092-non-disposable/requirements.md`（092 线，原文保留，不删除）。
+**Source**: `.specify/archive/specs/092-non-disposable/requirements.md`（092 线，原文保留，不删除）。
 **Merge rule**: 本次合并为**机械搬运**，不是重写。092 的 **65 条 FR** 与 **20 条 SC** 逐条原样进入本节，
 编号保持 092 原号并加 `ND-` 前缀（`ND-FR-001`…`ND-FR-065`、`ND-SC-001`…`ND-SC-020`），以免与本文件
 既有的 `FR-001`…`FR-010` 冲突。**本节内**所有对 092 内部编号的引用（含 § Runtime Stack 表的 `FR` 列、

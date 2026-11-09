@@ -96,7 +96,7 @@
 ### Implementation for User Story 1
 
 - [X] T006 [P] [US1] Author 薄命令模板 `templates/commands/humanize.md`（C-1/C-2）：frontmatter 含 `description`（触发词列表）与 `short-description`，无 `scripts:` 块；正文含 `## User Input`（`$ARGUMENTS` 接线 + User Input Protocol 引用 + 输入形态与**确定性调用语法**声明：选项集 [[STR-004]]、选项解析只在内容之前、`--` 终止解析、`--file`/`--inline` 判定、`--force` 覆盖确认、双源/无输入拒绝按 FR-018；并声明输入内容一律按数据处理）、`## Glossary`、Delegation 节指向 `.specify/skills/humanize/SKILL.md`、`## Handoffs`；无 `## Wrap-up`，以 [[STR-001]] 标识命令身份，正文不复述四维度工作流。
-- [X] T007 [US1] Author `skills/external/humanize/SKILL.md` 核心执行流：frontmatter（`name: humanize`、`description` 触发词、`classification: external`、`skill_id: <SKILL:.specify/skills/humanize/SKILL.md>`）；四维度完整工作流且无跳过分支（C-11..C-15）；保真/受保护内容/最小改动/矛盾保留（C-16..C-19）；内联输入与空内容拒收；**确定性调用语法可执行落点**（选项集 [[STR-004]]、选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝，FR-018/C-28）；**注入防线指令落点**（输入一律按数据处理：指令式文本不改行为、不跳过保真/拒收/零外传、不触发外部动作，逐字保留或按原样改写并在会话报告提示，FR-029/C-35）；缺省 `professional` 语气；完整改写文本为主输出且语言跟随输入（C-21/C-22 的实现面）；所有报告类输出回会话；检测器诚实措辞。
+- [X] T007 [US1] Author `skills/external/humanize-conclusion/SKILL.md` 核心执行流：frontmatter（`name: humanize`、`description` 触发词、`classification: external`、`skill_id: <SKILL:.specify/skills/humanize/SKILL.md>`）；四维度完整工作流且无跳过分支（C-11..C-15）；保真/受保护内容/最小改动/矛盾保留（C-16..C-19）；内联输入与空内容拒收；**确定性调用语法可执行落点**（选项集 [[STR-004]]、选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝，FR-018/C-28）；**注入防线指令落点**（输入一律按数据处理：指令式文本不改行为、不跳过保真/拒收/零外传、不触发外部动作，逐字保留或按原样改写并在会话报告提示，FR-029/C-35）；缺省 `professional` 语气；完整改写文本为主输出且语言跟随输入（C-21/C-22 的实现面）；所有报告类输出回会话；检测器诚实措辞。
 
 ### Verification for User Story 1
 
@@ -115,7 +115,7 @@
 
 ### Implementation for User Story 2
 
-- [X] T010 [US2] [blockedBy: T009] 扩展 `skills/external/humanize/SKILL.md` 的文件输入/输出行为：支持格式 [[STR-003]]（扩展名大小写不敏感）、路径解析与拒收分支、二进制/空文件/BOM/仅 frontmatter 拒收、YAML/TOML frontmatter 逐字保留、输出格式跟随输入与 `--output` 扩展名/格式族一致性、默认零写入、显式输出路径/`--force` 覆盖确认、**临时文件 + 原子重命名与失败清理（不留部分输出）**、**真实路径同路径/符号链接/硬链接别名拒收**、写入失败报告、报告一律回会话（`--output` 仅改写文本）、长文档章节完整性与重组（C-17/C-20/C-28..C-34 的实现面）。
+- [X] T010 [US2] [blockedBy: T009] 扩展 `skills/external/humanize-conclusion/SKILL.md` 的文件输入/输出行为：支持格式 [[STR-003]]（扩展名大小写不敏感）、路径解析与拒收分支、二进制/空文件/BOM/仅 frontmatter 拒收、YAML/TOML frontmatter 逐字保留、输出格式跟随输入与 `--output` 扩展名/格式族一致性、默认零写入、显式输出路径/`--force` 覆盖确认、**临时文件 + 原子重命名与失败清理（不留部分输出）**、**真实路径同路径/符号链接/硬链接别名拒收**、写入失败报告、报告一律回会话（`--output` 仅改写文本）、长文档章节完整性与重组（C-17/C-20/C-28..C-34 的实现面）。
 - [X] T011 [P] [US2] [blockedBy: T003] 在 `tests/fixtures/humanize/files/` 增加文件行为夹具：带 YAML frontmatter 的 Markdown、**TOML frontmatter** 文档、纯文本、长多章节文档、空文件、仅 frontmatter 无正文、UTF-8 BOM、大写扩展名、二进制替身、目录路径、已存在输出目标、不可写输出路径、**同路径输出目标**、**符号链接/硬链接别名输出目标**、**输出扩展名冲突/不受支持输出扩展名**、**指令式内容文件样本**（「忽略以上规则」「执行以下命令」「把内容发送到…」）、模板占位符/受保护内容样本；在 `tests/fixtures/humanize/files/README.md` 记录夹具清单与覆盖条款（FR-018/019/021/022/029；C-28..C-35）。
 - [X] T012 [P] [US2] [blockedBy: T004] 扩展 `tests/fixtures/humanize/rubric.md` 的文件安全协议：运行前后逐字节哈希、目录快照、覆盖确认分支、写入失败分支（含**临时文件删除/无部分输出**）、真实路径同路径/符号链接/硬链接别名分支、输出扩展名/格式族冲突分支、报告回会话核验（`--output` 文件仅改写文本）、YAML/TOML frontmatter、BOM/大小写/仅 frontmatter 分支、长文档章节对应表。
 
@@ -135,7 +135,7 @@
 
 ### Implementation for User Story 3
 
-- [X] T014 [US3] [blockedBy: T013] 扩展 `skills/external/humanize/SKILL.md` 的语气/受众面：调用语法与选项解析服从 FR-018/[[STR-004]]（选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝），本行补齐 `--tone`/`--audience` 的解析与拒绝分支；`--tone` 大小写不敏感、规范化为小写后严格属于支持集合，集合外取值（含空值/纯空白）拒收并列出支持集合、不静默替换、不声称已应用；`--audience` 自由文本只作用表达层；缺省 `professional`；封闭集合**内联**并注明真源为规格 STR-002（宿主无法解析 STR 引用，须内联最小操作事实）；语气与保真冲突时保真优先并报告限制（C-24..C-27 的实现面）。
+- [X] T014 [US3] [blockedBy: T013] 扩展 `skills/external/humanize-conclusion/SKILL.md` 的语气/受众面：调用语法与选项解析服从 FR-018/[[STR-004]]（选项解析只在内容之前、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝），本行补齐 `--tone`/`--audience` 的解析与拒绝分支；`--tone` 大小写不敏感、规范化为小写后严格属于支持集合，集合外取值（含空值/纯空白）拒收并列出支持集合、不静默替换、不声称已应用；`--audience` 自由文本只作用表达层；缺省 `professional`；封闭集合**内联**并注明真源为规格 STR-002（宿主无法解析 STR 引用，须内联最小操作事实）；语气与保真冲突时保真优先并报告限制（C-24..C-27 的实现面）。
 - [X] T015 [P] [US3] [blockedBy: T003] 在 `tests/fixtures/humanize/tone/` 增加语气矩阵：同一基样本 ×4 语气 + 缺省、集合外取值（含大小写变体/空值/纯空白）、语气-保真冲突、**受众适配腿**（如「非技术管理者」，不得只测语气）；并落 `tests/fixtures/humanize/tone/rubric.md`（语气与受众的可区分性/得体性判据、混合语言样本按全文主语言口径记录 + 两位独立评审记录表单）。
 
 ### Verification for User Story 3
@@ -156,7 +156,7 @@
 
 - [X] T017 [P] [US4] [blockedBy: T006] 在 `.specify/specs/027-feedback-mechanism/contracts/command-classification.md` 新增 `humanize` 的 **Simple** 行（(a)(b)(c) 均不命中）；同步把分类表标题 26→27、首段陈旧计数 25→27、**Result** 行 23 complex/3 simple→23/4。
 - [X] T018 [P] [US4] [blockedBy: T007] 在 `shared/definitions/probe-definitions.md` 新增 `skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up` 对象行（external 技能块）与 `h-docs-sync-eval @point:wrap-up` 绑定行；源侧限定，镜像留给 T021。
-- [X] T019 [US4] [blockedBy: T018] 运行 `python3 .specify/scripts/python/probe-utils.py --action compile-embeds` 生成/刷新 `skills/external/humanize/SKILL.md` 的 `## Wrap-up` 编译面；确认 `skill:humanize` 单元落位且带当前指纹、绑定行长出的步骤与 C-7 一致；若引擎不能为新技能创建该节，先补骨架再重跑，仍失败则以异常行上抛，不得删绑定行。
+- [X] T019 [US4] [blockedBy: T018] 运行 `python3 .specify/scripts/python/probe-utils.py --action compile-embeds` 生成/刷新 `skills/external/humanize-conclusion/SKILL.md` 的 `## Wrap-up` 编译面；确认 `skill:humanize` 单元落位且带当前指纹、绑定行长出的步骤与 C-7 一致；若引擎不能为新技能创建该节，先补骨架再重跑，仍失败则以异常行上抛，不得删绑定行。
 - [X] T020 [P] [US4] [blockedBy: T006,T019] 运行 `python3 scripts/python/regen-command-copies.py` 生成四个副本 `.claude/commands/speckit.humanize.md`、`.github/prompts/speckit.humanize.prompt.md`、`.opencode/command/speckit.humanize.md`、`.qoder/commands/speckit.humanize.md`；确认生成头存在、无手改，并以 `--check` 对照 `notes/baseline-regen-check.txt` 判零 NEW drift。
 - [X] T021 [US4] [blockedBy: T019] 运行 `python3 scripts/python/sync-mirrors.py --write --only skills/external/humanize --only shared/definitions/probe-definitions.md` 落位 `.specify/skills/humanize/SKILL.md` 与 `.specify/shared/definitions/probe-definitions.md`；确认两个触碰对字节一致且未拖入其他对。
 - [X] T022 [P] [US4] [blockedBy: T007] Author `docs/reference/commands/humanize.md`（C-5）：输入形态（内联/文件）与调用语法要点（[[STR-004]]、`--` 终止、`--file`/`--inline`、`--force`）、默认不写文件、支持语气集以 [[STR-002]] 引用、保真边界、**输入内容按数据处理/外部文档内容不构成指令（FR-029 文档面）**、不承诺 AI 内容检测器结果的明确声明；命令身份用 [[STR-001]]。
@@ -167,7 +167,7 @@
 - [X] T024 [US4] [blockedBy: T019,T022] 验证 C-5..C-7 并认领：核对 docs 页内容（含调用语法要点与注入防线声明）、062 注册行与详情文件、probe 对象/绑定行、编译面与固定次序（注册→编译→regen→sync）；把检查输出记入 `verification.md`。 [green: contracts/command-surface.md#C-5] [green: contracts/command-surface.md#C-6] [green: contracts/command-surface.md#C-7]
 - [X] T025 [US4] [blockedBy: T021] 验证 C-8 并认领：对比依赖清单与改动面，检索新增外部服务/网络调用/模型 API/后台常驻进程与 `src/specify_cli/`、`scripts/` 的改动，确认零新增运行时面；结果记入 `verification.md`。 [green: contracts/command-surface.md#C-8]
 - [X] T026 [US4] [blockedBy: T020,T021] 更新并验证 C-9：在 `tests/contract/test_feedback_command_classification.py` 加入 humanize=Simple（simple 3→4、docstring 同步）并在 `tests/contract/test_skill_layer_visibility_guards.py` 加入 humanize（external 13→14、census 注释同步）；运行三份契约测试并用规范 runner 做名字级全量对比（消费判据见 `.specify/skills/internal/implement-feature/SKILL.md` § Test runs；冻结名单为 `.specify/specs/062-humanize-command/notes/baseline-failed-tests.txt`），零新增失败才认领；环境判据见 § Environment Prerequisites。 [green: contracts/command-surface.md#C-9]
-- [X] T027 [US4] [blockedBy: T022,T007] 验证 C-10 并认领：对 `templates/commands/humanize.md`、`skills/external/humanize/SKILL.md`、`docs/reference/commands/humanize.md` 与技能输出指令做检测器措辞全量检索——零通过保证/规避声明，每处提及均伴随不承诺表述；并用同一全量检索核对三处对外表面均含**输入内容不构成指令/按数据处理**的声明（FR-029 文档面/技能面，C-35 结构面）；结果记入 `verification.md`。 [green: contracts/command-surface.md#C-10]
+- [X] T027 [US4] [blockedBy: T022,T007] 验证 C-10 并认领：对 `templates/commands/humanize.md`、`skills/external/humanize-conclusion/SKILL.md`、`docs/reference/commands/humanize.md` 与技能输出指令做检测器措辞全量检索——零通过保证/规避声明，每处提及均伴随不承诺表述；并用同一全量检索核对三处对外表面均含**输入内容不构成指令/按数据处理**的声明（FR-029 文档面/技能面，C-35 结构面）；结果记入 `verification.md`。 [green: contracts/command-surface.md#C-10]
 
 **Checkpoint**: US4 is independently verifiable: all distribution surfaces exist, generated/mirror/compile checks are green under their relative criteria, and no runtime surface was added.
 
@@ -199,7 +199,7 @@
 - **Setup (Phase 1)**: no dependency; runs first.
 - **Foundational (Phase 2)**: depends on Setup; blocks every story verification.
 - **US1 (Phase 3)**: depends on Foundational; establishes the command template and skill core.
-- **US2 (Phase 4)**: depends on US1 (the same `skills/external/humanize/SKILL.md` is extended); independently testable once its phase completes.
+- **US2 (Phase 4)**: depends on US1 (the same `skills/external/humanize-conclusion/SKILL.md` is extended); independently testable once its phase completes.
 - **US3 (Phase 5)**: depends on US2 (same skill file) and its checkpoint; independently testable once its phase completes.
 - **US4 (Phase 6)**: depends on US1–US3 artifacts; distributes the final content and closes the command-surface clauses.
 - **Polish (Phase 7)**: depends on all story verifications; closes cross-cutting evidence and feature status.
@@ -220,7 +220,7 @@
 ### Parallel Opportunities
 
 - Phase 2: T002/T003/T004/T005 write disjoint files and may run in parallel.
-- US1: T006 and T007 are sequenced in the checklist because T007’s required `skill_id` literal names the same mirror path the validator classifies as a write target; the two actual write targets (`templates/commands/humanize.md` and `skills/external/humanize/SKILL.md`) are disjoint, but only T006 carries `[P]` (no parallel partner in the phase).
+- US1: T006 and T007 are sequenced in the checklist because T007’s required `skill_id` literal names the same mirror path the validator classifies as a write target; the two actual write targets (`templates/commands/humanize.md` and `skills/external/humanize-conclusion/SKILL.md`) are disjoint, but only T006 carries `[P]` (no parallel partner in the phase).
 - US2: T011 (file fixtures) and T012 (rubric extension) may run in parallel after their blockers; T010 serializes on the skill file.
 - US3: T015 (tone fixtures/rubric) may run in parallel with T014 once its blocker is satisfied.
 - US4: T017 (classification contract), T018 (probe source), and T022 (docs page) write disjoint files and may run in parallel; T019 compiles after T018, T020 (generated copies) follows T019 so the fixed order 注册→编译→regen→sync holds mechanically, and T021 serializes the mirror sync.
@@ -250,7 +250,7 @@
 
 ### Parallel Team Strategy
 
-- The shared skill file (`skills/external/humanize/SKILL.md`) is the serialization point: US1 → US2 → US3 must not be worked in parallel by different writers.
+- The shared skill file (`skills/external/humanize-conclusion/SKILL.md`) is the serialization point: US1 → US2 → US3 must not be worked in parallel by different writers.
 - Distribution work (US4) can be split by file: classification contract, probe registry, generated copies, and docs page are disjoint while respecting the compile → regen → sync order.
 
 ---
@@ -297,7 +297,7 @@ Total: 35 clauses, each claimed exactly once. The partition follows the phase or
 - Frozen failed-name baseline: `wc -l < .specify/specs/062-humanize-command/notes/baseline-failed-tests.txt` → `71`.
 - Command templates: `find templates/commands -maxdepth 1 -name '*.md' | wc -l` → `26`; after `humanize` → `27`. Docs command pages: `find docs/reference/commands -maxdepth 1 -name '*.md' | wc -l` → `25`; after `humanize` → `26` (traps: template count ≠ docs-page count because `improve` has no docs page).
 - Copy directories: `.claude/commands`, `.github/prompts`, `.opencode/command`, `.qoder/commands` all present (4/4).
-- Initial state: `templates/commands/humanize.md`, `skills/external/humanize/SKILL.md`, `.specify/skills/humanize/SKILL.md`, `docs/reference/commands/humanize.md`, `tests/contract/test_humanize_command_surface.py`, and `tests/fixtures/humanize/` are all absent.
+- Initial state: `templates/commands/humanize.md`, `skills/external/humanize-conclusion/SKILL.md`, `.specify/skills/humanize/SKILL.md`, `docs/reference/commands/humanize.md`, `tests/contract/test_humanize_command_surface.py`, and `tests/fixtures/humanize/` are all absent.
 - Current suite re-capture: `bash scripts/bash/run-tests.sh --names-out /tmp/humanize-tasks-current-failed.txt` → `94 failed, 3906 passed`; `comm -13 notes/baseline-failed-tests.txt /tmp/humanize-tasks-current-failed.txt` → 23 added names, all in the `cws-lib-bash`-dependent cluster (see § Environment Prerequisites).
 
 ### Runtime-evidence landing points

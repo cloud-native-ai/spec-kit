@@ -381,7 +381,7 @@ Dependency set: none
 | `improve-docs/SKILL.md` 在 069a 的 74 条冻结清单内且当前未漂移，因此改它需要 allowlist 条目 | 实测 | 2026-11-06 | `research.md` R7（`grep "  skills/external/improve-docs/SKILL.md$" notes/pre-change-file-hashes.txt` 与当前文件同哈希） |
 | 74 条 = **25 条非接线模板 + 49 条非接线技能**，两个分母不是同一件事 | 引用 | 2026-11-06 | `tests/contract/test_expression_compatibility.py` 模块 docstring 的 C-5 段（"the 25 non-wiring templates and 49 non-wiring skills … the 74 non-wiring sources"）+ `assert len(manifest) == 74`；`FROZEN_SKILLS` 是 49 条那一半的名字表 |
 | `create-docs/SKILL.md` 与 `templates/commands/docs.md` 不在冻结清单内（是 W1/W3 接线面），因此改它们无需 allowlist 条目 | 实测 | 2026-11-06 | `research.md` R7 的三条 `grep` 读数 |
-| 069a 把「接线面」与「冻结技能」分开登记，所以同一改动可能既要 allowlist 条目又不必 | 引用 | 2026-11-06 | `.specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` + `tests/contract/test_expression_compatibility.py` 的 `WIRING_SKILLS` / `ALLOWED_POST_BASELINE_CHANGES` 定义 |
+| 069a 把「接线面」与「冻结技能」分开登记，所以同一改动可能既要 allowlist 条目又不必 | 引用 | 2026-11-06 | `.specify/archive/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` + `tests/contract/test_expression_compatibility.py` 的 `WIRING_SKILLS` / `ALLOWED_POST_BASELINE_CHANGES` 定义 |
 
 ### Fact Owners
 

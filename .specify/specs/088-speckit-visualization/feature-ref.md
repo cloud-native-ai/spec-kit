@@ -174,7 +174,7 @@ slice's seven rows were added 2026-11-06 in the same table, and no pre-existing 
 | preserves | `shared/guidelines/fast-fail.md` § 子代理派发注入 | referenced, never modified |
 | consumes | `shared/guidelines/user-facing-comprehension.md` | the emitted line is a governed surface |
 | preserves | `shared/guidelines/confirmation-gates.md` | no gate added; blocking count stays 27 |
-| extends | `skills/internal/create-team/` | roster schema note + create step + `scripts/validate-roster.py` |
+| extends | `skills/internal/create-team/` | roster schema note + create step + `skills/internal/create-team/scripts/validate-roster.py` |
 | amends | `skills/external/coaching-skills/SKILL.md` § Dispatch Payload | exactly one field, one forbidden-content class, one return-handling clause; closed-set invariant preserved |
 | consumes | `skills/external/sdd-loop-driver/scripts/line-registry.py` | registry entry fields + `STATE_VALUES` / `ACTIVE_STATES` + directory resolution — read-only |
 | preserves | `shared/declarations/facts/quant-record-schema.yaml` | read by path, **not** extended: the elapsed field already exists and the extension route is closed for this feature (`FR-025`) |

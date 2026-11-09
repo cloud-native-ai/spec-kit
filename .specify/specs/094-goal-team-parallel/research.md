@@ -20,7 +20,7 @@ disappears; the remaining question ("who created it") is answered by data, not b
 name the existing `owner` / `owner_id` (C-27).
 
 **R-04 — Frontmatter in existing definitions is ordinary YAML-ish key/value.** Reading
-`.specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md` and the archive teams' `team.md`
+`.specify/archive/goal-team/trees/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md` and the archive teams' `team.md`
 shows flat `key: value` with inline lists. Consequence: a small closed reader inside `goal-utils.py` suffices.
 
 **R-05 — Archive layout must be per-entry files.** Per `## Concurrent Development Safety` (AGENTS.md), append-only

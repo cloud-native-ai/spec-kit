@@ -217,7 +217,7 @@
 - **V-33**:既有的纯枚举判据 MUST 保持完全一致的解析行为;本特性 MUST NOT 使任何既有 goal 失效或需要迁移才能继续解析(FR-038)。
 - **V-34**:SC-010 的名字级比对当前全集只有 **1** 份 goal 定义(实测 `.specify/goal/` 下仅 `draw-two-layer-structure`),该数太小以致「比对为空」近乎空真,故 MUST 配反空真哨兵:至少断言被扫描的 goal 定义数 ≥ 1 且解析器确实产出了成员集(D-14、FR-040)。
 
-**V-31 的实测依据**:`.specify/goal/draw-two-layer-structure/goal.md:15` 是本仓唯一真实的枚举型判据(「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」),其 `## History` `:36`/`:37` 记录了同一条判据随成员集变化被反复改写(「六个绘图技能…」→「七个绘图技能…」)——这正是 US5 要消灭的脆弱性的**实证**。
+**V-31 的实测依据**:`.specify/anchoring/draw-two-layer-structure/goal.md:15` 是本仓唯一真实的枚举型判据(「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」),其 `## History` `:36`/`:37` 记录了同一条判据随成员集变化被反复改写(「六个绘图技能…」→「七个绘图技能…」)——这正是 US5 要消灭的脆弱性的**实证**。
 
 ---
 

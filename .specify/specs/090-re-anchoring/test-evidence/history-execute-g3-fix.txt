@@ -1,0 +1,499 @@
+# History execute — Wave 5, G3 live-surface fix (153-entry plan executed) — 2026-11-10
+
+Run: /speckit.history four-stage seam, execute segment (Step 6), wave 5, G3 follow-up.
+Executor: bounded repair executor, main tree; no commit, no push, no subagents.
+Inputs: `.specify/specs/090-re-anchoring/test-evidence/history-execute-g3.txt` § dispositions
+(the 153-entry live-surface plan recorded by wave 4); owner page
+`shared/definitions/non-disposable-definitions.md` (§ Disposal Pathways — `correct` = in-place
+edit + before/after readings); archived `.specify/archive/specs/092-non-disposable/data-model.md`
+(E-4 / E-7); engine `scripts/python/non-disposable-check.py`.
+
+RESULT: all **153** planned mappings applied in place across **62 files**. `orphan-path` **736 → 599**; **137 entries closed**; **16 plan entries remain open** because a second, unmapped orphan token on the same
+line keeps the merged `entry_id` alive (C-703 merge key) — each named in § left-open.
+`not_closed.open` **899 → 762** (drop 137 = exactly the 137 entries actually closed). No dated record rewritten;
+no target invented (every new target is a dispositions row of the plan, existence-asserted before
+editing); no new orphan entry created; every other class count unchanged.
+
+## readings
+
+### Capture Rule — four readings
+
+Before = wave start (the tree carried only the fresh before-reading artifact, untracked); after =
+wave end. Readings 1–3 are unaffected by construction: none of the changed files is a mirror
+source or target, the instructions file, or the constitution.
+
+| # | reading | command | before | after | attribution |
+|---|---|---|---|---|---|
+| 1 | mirror baseline | `python3 scripts/python/sync-mirrors.py --check` | exit 0 · byte-identical (templates 22 / skills-external 426 / skills-internal 134 / agents 17 / scripts 124 / shared 110) | exit 0 · identical (same six `ok` rows) | unchanged (no mirror-source edit) |
+| 2 | instructions bytes | `wc -c .specify/instructions.md` | 36804 | 36804 | unchanged |
+| 3 | constitution pins | `grep -c '^### ' .specify/memory/constitution.md` / `.specify/templates/constitution-template.md` | 27 / 21 | 27 / 21 | unchanged |
+| 4 | worktree form | `git status --porcelain` | 1 entry (`??` the before-reading JSON) | 62 `M` + 2 `??` (both engine readings) before this report; this report adds a third `??` | all 62 modifications are the planned corrections — numstat **153 added / 153 deleted** |
+
+### Engine readings (command + exit + raw artifact)
+
+- before: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w5-before.json`
+  — exit **1**; classes: deferral-marker 15, false-closed-set 0, multi-owner 1, orphan-path 736, renumber-live-binding 96, stale-constant 0, status-unreadable 52, superseded-live 0;
+  `not_closed`: `open 899` (all other fields `0` / `0` / `0` / `0` / `1`).
+- after: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w5-after.json`
+  — exit **1**; classes: deferral-marker 15, false-closed-set 0, multi-owner 1, orphan-path 599, renumber-live-binding 96, stale-constant 0, status-unreadable 52, superseded-live 0;
+  `not_closed`: `open 762` (all other fields `0` / `0` / `0` / `0` / `1`).
+
+| class | before | after | delta |
+|---|---:|---:|---:|
+| deferral-marker | 15 | 15 | +0 |
+| false-closed-set | 0 | 0 | +0 |
+| multi-owner | 1 | 1 | +0 |
+| orphan-path | 736 | 599 | -137 |
+| renumber-live-binding | 96 | 96 | +0 |
+| stale-constant | 0 | 0 | +0 |
+| status-unreadable | 52 | 52 | +0 |
+| superseded-live | 0 | 0 | +0 |
+
+- Surface digest **identical** before/after (`e4e9acc82b79b92e931370144bd4fc97a91af6207b0d365aba353ff2ce13dc91`); checked candidates `1989` in both. The evidence files appear only as root-count deltas (`.specify/specs` 3418 → 3419, this run's own `history-w5-after.json`) and are excluded from checking as `dated-record` (test-evidence segment), so the checked surface is identical.
+- Closure set measured by `entry_id` set difference: **137** ids left the reading; every one is a planned live-surface id (`closed == planned − residual`, asserted).
+- **16** planned ids persist — each is a C-703 merge collision: the line carries a second orphan token the before-reading could not show (one `entry_id` per line keeps only one
+  evidence ref). Their planned token WAS rewritten (verified in `git diff`); the residual token
+  is named per entry in § left-open. Residuals were never part of the 153-entry plan and no
+  mapping was invented for them.
+- No new orphan entry: `after_ids − before_ids` is empty across the whole orphan-path class.
+
+### Per-entry before / after (153)
+
+Outcome `closed` = the planned token now resolves and the entry id is absent from the after
+reading. `open` = the planned token was rewritten but the entry id persists on the residual
+token named in § left-open. Line numbers refer to the citing file (unchanged: replacements
+only, no line inserted or deleted).
+
+| # | entry_id | reference corrected (before → after) | outcome |
+|---:|---|---|---|
+| 1 | `orphan-path/memory/features/013.md:54` | `scripts/detect-project-sources.py` → `skills/internal/summarize-project/scripts/detect-project-sources.py` | open — residual `.specify/project/visualization.md` on the same line |
+| 2 | `orphan-path/memory/features/016.md:40` | `templates/tool-webhook-template.md` → `skills/internal/create-tools/templates/tool-webhook-template.md` | closed |
+| 3 | `orphan-path/memory/features/019.md:17` | `.specify/specs/003-speckit-agents-command/tasks.md` → `.specify/archive/specs/003-speckit-agents-command/tasks.md` | closed |
+| 4 | `orphan-path/memory/features/019.md:55` | `templates/agent-supervision-delegation.md` → `skills/internal/create-agent/templates/agent-supervision-delegation.md` (2 occurrences on the line) | closed |
+| 5 | `orphan-path/memory/features/022.md:36` | `skills/agent-setup/scripts/config-agent.sh` → `skills/internal/manage-agents/scripts/config-agent.sh` | closed |
+| 6 | `orphan-path/memory/features/022.md:38` | `skills/agent-setup/scripts/config-agent.sh` → `skills/internal/manage-agents/scripts/config-agent.sh` | closed |
+| 7 | `orphan-path/memory/features/022.md:60` | `docs/quickstart.md` → `docs/tutorials/quickstart.md` | open — residual `docs/usage.md` on the same line |
+| 8 | `orphan-path/memory/features/026.md:29` | `skills/create-agent/templates/agent-skill-enablement.md` → `skills/internal/create-agent/templates/agent-skill-enablement.md` | closed |
+| 9 | `orphan-path/memory/features/026.md:30` | `docs/agents/command-and-skills.md` → `docs/reference/agents/command-and-skills.md` | open — residual `docs/agents/design.md` on the same line |
+| 10 | `orphan-path/memory/features/027.md:36` | `skills/create-team/references/summary-mapping.md` → `skills/internal/create-team/references/summary-mapping.md` | open — residual `skills/create-team/scripts/build-summary-input.py` on the same line |
+| 11 | `orphan-path/memory/features/030.md:22` | `docs/commands/history.md` → `docs/reference/commands/history.md` | closed |
+| 12 | `orphan-path/memory/features/037.md:37` | `.specify/templates/commands/docs.md` → `templates/commands/docs.md` | closed |
+| 13 | `orphan-path/memory/features/041.md:42` | `skills/create-team/SKILL.md` → `skills/internal/create-team/SKILL.md` | closed |
+| 14 | `orphan-path/memory/features/042.md:60` | `skills/create-team/SKILL.md` → `skills/internal/create-team/SKILL.md` | open — residual `agents/requirements-analyst.agent.md` on the same line |
+| 15 | `orphan-path/memory/features/044.md:72` | `.specify/specs/054-agent-registration-wiring/requirements.md` → `.specify/archive/specs/054-agent-registration-wiring/requirements.md` | closed |
+| 16 | `orphan-path/memory/features/050.md:46` | `skills/create-tools/SKILL.md` → `skills/internal/create-tools/SKILL.md` | open — residual `skills/improve-tools/SKILL.md` on the same line |
+| 17 | `orphan-path/memory/features/053.md:56` | `skills/create-team/scripts/build-summary-input.py` → `skills/internal/create-team/scripts/build-summary-input.py` | closed |
+| 18 | `orphan-path/memory/features/053.md:108` | `skills/create-team/scripts/build-summary-input.py` → `skills/internal/create-team/scripts/build-summary-input.py` | closed |
+| 19 | `orphan-path/memory/features/065.md:24` | `.specify/specs/066-loop-state-awareness-a/requirements.md` → `.specify/archive/specs/066-loop-state-awareness-a/requirements.md` | closed |
+| 20 | `orphan-path/memory/features/069.md:42` | `scripts/docs-utils.py` → `skills/external/create-docs/scripts/docs-utils.py` | closed |
+| 21 | `orphan-path/memory/features/069.md:68` | `.specify/specs/069a-flow-classification-docs-gates/requirements.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/requirements.md` | closed |
+| 22 | `orphan-path/memory/features/069.md:70` | `.specify/specs/069a-flow-classification-docs-gates/tasks.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/tasks.md` | closed |
+| 23 | `orphan-path/memory/features/069.md:71` | `.specify/specs/069b-isomorphism-migration-metrics/requirements.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/requirements.md` | closed |
+| 24 | `orphan-path/memory/features/069.md:72` | `.specify/specs/069b-isomorphism-migration-metrics/notes/parent-fr-mapping.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/notes/parent-fr-mapping.md` | closed |
+| 25 | `orphan-path/memory/features/069.md:76` | `.specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` | closed |
+| 26 | `orphan-path/memory/features/069.md:77` | `.specify/specs/069b-isomorphism-migration-metrics/tasks.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/tasks.md` | closed |
+| 27 | `orphan-path/memory/features/069.md:79` | `.specify/specs/066-loop-state-awareness-a/requirements.md` → `.specify/archive/specs/066-loop-state-awareness-a/requirements.md` | closed |
+| 28 | `orphan-path/memory/features/090.md:45` | `.specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md` → `.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md` | open — residual `.specify/specs/092-non-disposable/requirements.md` on the same line |
+| 29 | `orphan-path/memory/features/092.md:37` | `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` → `.specify/archive/specs/092-non-disposable/test-evidence/tasks-gates.txt` | closed |
+| 30 | `orphan-path/memory/features/092.md:73` | `.specify/specs/092-non-disposable/requirements.md` → `.specify/archive/specs/092-non-disposable/requirements.md` | closed |
+| 31 | `orphan-path/memory/features/092.md:74` | `.specify/specs/092-non-disposable/plan.md` → `.specify/archive/specs/092-non-disposable/plan.md` | closed |
+| 32 | `orphan-path/memory/features/092.md:75` | `.specify/specs/092-non-disposable/tasks.md` → `.specify/archive/specs/092-non-disposable/tasks.md` | closed |
+| 33 | `orphan-path/memory/features/092.md:77` | `.specify/specs/092-non-disposable/data-model.md` → `.specify/archive/specs/092-non-disposable/data-model.md` | closed |
+| 34 | `orphan-path/memory/features/092.md:78` | `.specify/specs/092-non-disposable/notes/input-review-080-090.md` → `.specify/archive/specs/092-non-disposable/notes/input-review-080-090.md` | closed |
+| 35 | `orphan-path/memory/features/092.md:79` | `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` → `.specify/archive/specs/092-non-disposable/test-evidence/tasks-gates.txt` | closed |
+| 36 | `orphan-path/memory/feedback/backlog.md:37` | `skills/create-team/scripts/verify-territory-disjoint.py` → `skills/internal/create-team/scripts/verify-territory-disjoint.py` | closed |
+| 37 | `orphan-path/memory/feedback/backlog.md:41` | `skills/create-team/scripts/verify-territory-disjoint.py` → `skills/internal/create-team/scripts/verify-territory-disjoint.py` | open — residual `skills/create-team/scripts/build-summary-input.py` on the same line |
+| 38 | `orphan-path/memory/feedback/backlog.md:43` | `skills/create-team/references/create-mode.md` → `skills/internal/create-team/references/create-mode.md` | closed |
+| 39 | `orphan-path/memory/feedback/backlog.md:49` | `skills/create-team/references/create-mode.md` → `skills/internal/create-team/references/create-mode.md` | open — residual `skills/create-agent/SKILL.md` on the same line |
+| 40 | `orphan-path/memory/feedback/backlog.md:66` | `skills/external/git-workspace/scripts/git_fleet.py` → `skills/external/git-utils/scripts/git_fleet.py` | closed |
+| 41 | `orphan-path/memory/feedback/backlog.md:69` | `.specify/templates/commands/tasks.md` → `templates/commands/tasks.md` | closed |
+| 42 | `orphan-path/memory/feedback/backlog.md:72` | `skills/external/git-workspace/references/execute-commands.md` → `skills/external/git-utils/references/execute-commands.md` | open — residual `skills/external/git-workspace/references/troubleshooting.md` on the same line |
+| 43 | `orphan-path/memory/feedback/backlog.md:110` | `scripts/redline-check.py` → `skills/external/improve-skills/scripts/redline-check.py` | closed |
+| 44 | `orphan-path/memory/feedback/backlog.md:112` | `scripts/coverage_probe.py` → `skills/external/merge-skills/scripts/coverage_probe.py` | open — residual `scripts/provenance_check.py` on the same line |
+| 45 | `orphan-path/memory/register.md:11` | `.specify/goal/session-driven-self-improvement/goal.md` → `.specify/anchoring/session-driven-self-improvement/goal.md` | closed |
+| 46 | `orphan-path/memory/register.md:27` | `.specify/goal/command-logic-as-classified-skills/goal.md` → `.specify/anchoring/command-logic-as-classified-skills/goal.md` | closed |
+| 47 | `orphan-path/memory/register.md:32` | `.specify/goal/session-driven-self-improvement/goal.md` → `.specify/anchoring/session-driven-self-improvement/goal.md` | closed |
+| 48 | `orphan-path/memory/register.md:34` | `.specify/goal/skill-layer-install-separation/goal.md` → `.specify/anchoring/skill-layer-install-separation/goal.md` | closed |
+| 49 | `orphan-path/memory/register.md:36` | `.specify/goal/post-refactor-mechanism-integrity/goal.md` → `.specify/anchoring/post-refactor-mechanism-integrity/goal.md` | closed |
+| 50 | `orphan-path/memory/register.md:62` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 51 | `orphan-path/memory/register.md:63` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 52 | `orphan-path/memory/register.md:64` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 53 | `orphan-path/memory/register.md:65` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 54 | `orphan-path/memory/register.md:66` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 55 | `orphan-path/memory/register.md:67` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 56 | `orphan-path/memory/register.md:68` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 57 | `orphan-path/memory/register.md:69` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 58 | `orphan-path/memory/register.md:70` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 59 | `orphan-path/memory/register.md:71` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 60 | `orphan-path/memory/register.md:72` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 61 | `orphan-path/memory/register.md:73` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 62 | `orphan-path/memory/register.md:74` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 63 | `orphan-path/memory/register.md:75` | `.specify/specs/069a-flow-classification-docs-gates/review.md` → `.specify/archive/specs/069a-flow-classification-docs-gates/review.md` | closed |
+| 64 | `orphan-path/memory/register.md:76` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 65 | `orphan-path/memory/register.md:77` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 66 | `orphan-path/memory/register.md:78` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 67 | `orphan-path/memory/register.md:79` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 68 | `orphan-path/memory/register.md:80` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 69 | `orphan-path/memory/register.md:81` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 70 | `orphan-path/memory/register.md:82` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 71 | `orphan-path/memory/register.md:83` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 72 | `orphan-path/memory/register.md:84` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 73 | `orphan-path/memory/register.md:85` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 74 | `orphan-path/memory/register.md:86` | `.specify/specs/069b-isomorphism-migration-metrics/review.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/review.md` | closed |
+| 75 | `orphan-path/memory/register.md:87` | `.specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` → `.specify/archive/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` | closed |
+| 76 | `orphan-path/memory/register.md:175` | `.specify/specs/092-non-disposable/requirements.md` → `.specify/archive/specs/092-non-disposable/requirements.md` | closed |
+| 77 | `orphan-path/specs/018-cli-priority-support/tasks.md:197` | `docs/commands/instructions.md` → `docs/reference/commands/instructions.md` | closed |
+| 78 | `orphan-path/specs/030-summarize-project/quickstart.md:43` | `skills/internal/study-project/references/uml-visualization-guide.md` → `skills/external/study-code/references/uml-visualization-guide.md` | closed |
+| 79 | `orphan-path/specs/030-summarize-project/tasks.md:125` | `skills/internal/study-project/references/uml-visualization-guide.md` → `skills/external/study-code/references/uml-visualization-guide.md` | closed |
+| 80 | `orphan-path/specs/039-session-export/contracts/export-skill-rework.contract.md:3` | `skills/export-session/SKILL.md` → `skills/internal/archive-session/SKILL.md` | closed |
+| 81 | `orphan-path/specs/039-session-export/data-model.md:60` | `skills/export-session/SKILL.md` → `skills/internal/archive-session/SKILL.md` | closed |
+| 82 | `orphan-path/specs/039-session-export/plan.md:89` | `skills/export-session/SKILL.md` → `skills/internal/archive-session/SKILL.md` | open — residual `.specify/skills/export-session/SKILL.md` on the same line |
+| 83 | `orphan-path/specs/039-session-export/tasks.md:59` | `skills/export-session/SKILL.md` → `skills/internal/archive-session/SKILL.md` | closed |
+| 84 | `orphan-path/specs/048-derive-command/feature-ref.md:40` | `.specify/memory/tools/derive-utils.md` → `.specify/memory/tools/derive-utils.py.md` | closed |
+| 85 | `orphan-path/specs/053-machine-decidable-artifacts/contracts/criterion-subject.md:33` | `.specify/goal/draw-two-layer-structure/goal.md` → `.specify/anchoring/draw-two-layer-structure/goal.md` | closed |
+| 86 | `orphan-path/specs/053-machine-decidable-artifacts/data-model.md:220` | `.specify/goal/draw-two-layer-structure/goal.md` → `.specify/anchoring/draw-two-layer-structure/goal.md` | closed |
+| 87 | `orphan-path/specs/053-machine-decidable-artifacts/research.md:252` | `.specify/goal/draw-two-layer-structure/goal.md` → `.specify/anchoring/draw-two-layer-structure/goal.md` | closed |
+| 88 | `orphan-path/specs/057-decompose-command-skills/requirements.md:17` | `.specify/goal/command-logic-as-classified-skills/goal.md` → `.specify/anchoring/command-logic-as-classified-skills/goal.md` | closed |
+| 89 | `orphan-path/specs/057-decompose-command-skills/requirements.md:110` | `.specify/goal/command-logic-as-classified-skills/goal.md` → `.specify/anchoring/command-logic-as-classified-skills/goal.md` | closed |
+| 90 | `orphan-path/specs/062-humanize-command/contracts/command-surface.md:10` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 91 | `orphan-path/specs/062-humanize-command/data-model.md:12` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 92 | `orphan-path/specs/062-humanize-command/plan.md:106` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | open — residual `.specify/skills/humanize/SKILL.md` on the same line |
+| 93 | `orphan-path/specs/062-humanize-command/tasks.md:99` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 94 | `orphan-path/specs/062-humanize-command/tasks.md:118` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 95 | `orphan-path/specs/062-humanize-command/tasks.md:138` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 96 | `orphan-path/specs/062-humanize-command/tasks.md:159` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 97 | `orphan-path/specs/062-humanize-command/tasks.md:170` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 98 | `orphan-path/specs/062-humanize-command/tasks.md:202` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 99 | `orphan-path/specs/062-humanize-command/tasks.md:223` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 100 | `orphan-path/specs/062-humanize-command/tasks.md:253` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 101 | `orphan-path/specs/062-humanize-command/tasks.md:300` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | open — residual `.specify/skills/humanize/SKILL.md` on the same line |
+| 102 | `orphan-path/specs/069-execution-expression-sdd/requirements.md:172` | `.specify/specs/066-loop-state-awareness-a/requirements.md` → `.specify/archive/specs/066-loop-state-awareness-a/requirements.md` | closed |
+| 103 | `orphan-path/specs/069-execution-expression-sdd/requirements.md:320` | `.specify/specs/066-loop-state-awareness-a/requirements.md` → `.specify/archive/specs/066-loop-state-awareness-a/requirements.md` | closed |
+| 104 | `orphan-path/specs/080-humanize-run-output/contracts/wiring-compat.contract.md:22` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 105 | `orphan-path/specs/080-humanize-run-output/plan.md:159` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | open — residual `.specify/skills/humanize/SKILL.md` on the same line |
+| 106 | `orphan-path/specs/080-humanize-run-output/tasks.md:20` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 107 | `orphan-path/specs/080-humanize-run-output/tasks.md:175` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 108 | `orphan-path/specs/080-humanize-run-output/tasks.md:201` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 109 | `orphan-path/specs/080-humanize-run-output/tasks.md:220` | `skills/external/humanize/references/run-mode.md` → `skills/external/humanize-conclusion/references/run-mode.md` | closed |
+| 110 | `orphan-path/specs/080-humanize-run-output/tasks.md:225` | `skills/external/humanize/references/report-shape.md` → `skills/external/humanize-conclusion/references/report-shape.md` | closed |
+| 111 | `orphan-path/specs/080-humanize-run-output/tasks.md:244` | `skills/external/humanize/references/report-shape.md` → `skills/external/humanize-conclusion/references/report-shape.md` | closed |
+| 112 | `orphan-path/specs/080-humanize-run-output/tasks.md:246` | `skills/external/humanize/references/run-mode.md` → `skills/external/humanize-conclusion/references/run-mode.md` | closed |
+| 113 | `orphan-path/specs/080-humanize-run-output/tasks.md:266` | `skills/external/humanize/references/run-mode.md` → `skills/external/humanize-conclusion/references/run-mode.md` | closed |
+| 114 | `orphan-path/specs/080-humanize-run-output/tasks.md:288` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 115 | `orphan-path/specs/080-humanize-run-output/tasks.md:290` | `skills/external/humanize/references/run-mode.md` → `skills/external/humanize-conclusion/references/run-mode.md` | closed |
+| 116 | `orphan-path/specs/084-harness-triple-structure/tasks.md:144` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | closed |
+| 117 | `orphan-path/specs/086-efficient-test-execution/data-model.md:128` | `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` → `.specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` | closed |
+| 118 | `orphan-path/specs/086-efficient-test-execution/plan.md:192` | `.specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py` → `.specify/skills/sdd-loop-driver/scripts/audit-test-budget.py` | closed |
+| 119 | `orphan-path/specs/086-efficient-test-execution/plan.md:210` | `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` → `.specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` | closed |
+| 120 | `orphan-path/specs/086-efficient-test-execution/plan.md:266` | `.specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py` → `.specify/skills/sdd-loop-driver/scripts/audit-test-budget.py` | closed |
+| 121 | `orphan-path/specs/087-arch-diagram-docs/plan.md:384` | `.specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` → `.specify/archive/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` | closed |
+| 122 | `orphan-path/specs/088-speckit-visualization/feature-ref.md:177` | `scripts/validate-roster.py` → `skills/internal/create-team/scripts/validate-roster.py` | closed |
+| 123 | `orphan-path/specs/088-speckit-visualization/plan.md:399` | `scripts/validate-roster.py` → `skills/internal/create-team/scripts/validate-roster.py` | closed |
+| 124 | `orphan-path/specs/088-speckit-visualization/plan.md:466` | `scripts/match-team-preset.py` → `skills/internal/create-team/scripts/match-team-preset.py` | open — residual `scripts/verify-territory-disjoint.py` on the same line |
+| 125 | `orphan-path/specs/090-re-anchoring/plan.md:388` | `.specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md` → `.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md` | closed |
+| 126 | `orphan-path/specs/090-re-anchoring/requirements.md:104` | `.specify/specs/092-non-disposable/requirements.md` → `.specify/archive/specs/092-non-disposable/requirements.md` | closed |
+| 127 | `orphan-path/specs/090-re-anchoring/tasks.md:260` | `.specify/specs/092-non-disposable/tasks.md` → `.specify/archive/specs/092-non-disposable/tasks.md` | closed |
+| 128 | `orphan-path/specs/090-re-anchoring/tasks.md:309` | `.specify/specs/092-non-disposable/notes/pre-change-measurements.md` → `.specify/archive/specs/092-non-disposable/notes/pre-change-measurements.md` | closed |
+| 129 | `orphan-path/specs/090-re-anchoring/tasks.md:313` | `.specify/specs/092-non-disposable/notes/measurement-corpus.md` → `.specify/archive/specs/092-non-disposable/notes/measurement-corpus.md` | closed |
+| 130 | `orphan-path/specs/090-re-anchoring/tasks.md:314` | `.specify/specs/092-non-disposable/coverage-baseline.txt` → `.specify/archive/specs/092-non-disposable/coverage-baseline.txt` | closed |
+| 131 | `orphan-path/specs/090-re-anchoring/tasks.md:342` | `.specify/specs/092-non-disposable/notes/quickstart-run.md` → `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md` | closed |
+| 132 | `orphan-path/specs/090-re-anchoring/tasks.md:351` | `.specify/specs/092-non-disposable/notes/quickstart-run.md` → `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md` | closed |
+| 133 | `orphan-path/specs/090-re-anchoring/tasks.md:369` | `.specify/specs/092-non-disposable/notes/quickstart-run.md` → `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md` | closed |
+| 134 | `orphan-path/specs/090-re-anchoring/tasks.md:463` | `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` → `.specify/archive/specs/092-non-disposable/test-evidence/tasks-gates.txt` | closed |
+| 135 | `orphan-path/specs/090-re-anchoring/tasks.md:464` | `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` → `.specify/archive/specs/092-non-disposable/test-evidence/tasks-gates.txt` | closed |
+| 136 | `orphan-path/specs/093-concurrency-by-default/plan.md:416` | `scripts/stage-runner.sh` → `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | closed |
+| 137 | `orphan-path/specs/093-concurrency-by-default/requirements.md:194` | `scripts/stage-runner.sh` → `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | closed |
+| 138 | `orphan-path/specs/093-concurrency-by-default/tasks.md:311` | `.specify/templates/commands/tasks.md` → `templates/commands/tasks.md` | closed |
+| 139 | `orphan-path/specs/093-concurrency-by-default/tasks.md:315` | `scripts/stage-runner.sh` → `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | closed |
+| 140 | `orphan-path/specs/093-concurrency-by-default/tasks.md:326` | `scripts/stage-runner.sh` → `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | closed |
+| 141 | `orphan-path/specs/094-goal-team-parallel/research.md:23` | `.specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md` → `.specify/archive/goal-team/trees/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md` | closed |
+| 142 | `orphan-path/teams/090-re-anchoring/team.md:137` | `.specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md` → `.specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring/goal.md` | closed |
+| 143 | `orphan-path/teams/091-auto-git-closeout/team.md:133` | `.specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md` → `.specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md` | closed |
+| 144 | `orphan-path/teams/094-goal-team-parallel/team.md:136` | `.specify/specs/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md` → `.specify/archive/goal-team/trees/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md` | closed |
+| 145 | `orphan-path/teams/command-logic-as-classified-skills/team.md:151` | `.specify/goal/command-logic-as-classified-skills/goal.md` → `.specify/anchoring/command-logic-as-classified-skills/goal.md` | closed |
+| 146 | `orphan-path/teams/command-logic-as-classified-skills/team.md:270` | `skills/create-team/SKILL.md` → `skills/internal/create-team/SKILL.md` | closed |
+| 147 | `orphan-path/teams/cws-workspace-cluster/team.md:200` | `skills/create-team/templates/teams/project-cluster.md` → `skills/internal/create-team/templates/teams/project-cluster.md` | closed |
+| 148 | `orphan-path/teams/draw-diagram-interactive/team.md:121` | `.specify/goal/draw-diagram-interactive/goal.md` → `.specify/anchoring/draw-diagram-interactive/goal.md` | closed |
+| 149 | `orphan-path/teams/draw-two-layer-structure/team.md:112` | `.specify/goal/draw-two-layer-structure/goal.md` → `.specify/anchoring/draw-two-layer-structure/goal.md` | closed |
+| 150 | `orphan-path/teams/post-refactor-mechanism-integrity/team.md:98` | `.specify/goal/post-refactor-mechanism-integrity/goal.md` → `.specify/anchoring/post-refactor-mechanism-integrity/goal.md` | closed |
+| 151 | `orphan-path/teams/session-driven-self-improvement/team.md:179` | `.specify/goal/session-driven-self-improvement/goal.md` → `.specify/anchoring/session-driven-self-improvement/goal.md` | closed |
+| 152 | `orphan-path/teams/skill-layer-install-separation/team.md:124` | `.specify/goal/skill-layer-install-separation/goal.md` → `.specify/anchoring/skill-layer-install-separation/goal.md` | closed |
+| 153 | `orphan-path/teams/skill-layer-install-separation/team.md:212` | `skills/create-team/SKILL.md` → `skills/internal/create-team/SKILL.md` | closed |
+
+No dated record was rewritten: all 153 citing entries are live-surface rows of the plan
+(feature details, feedback backlog, register, spec artifacts, team definitions); the
+dated-record and removed buckets (198 + 385 entries) were not touched.
+
+## paths
+
+Tracked paths changed (**62**; the whole `correct` surface — `git diff --name-only` scope; 153 planned lines across these files, `git diff --numstat` = 153/153):
+
+1. `.specify/memory/features/013.md`
+2. `.specify/memory/features/016.md`
+3. `.specify/memory/features/019.md`
+4. `.specify/memory/features/022.md`
+5. `.specify/memory/features/026.md`
+6. `.specify/memory/features/027.md`
+7. `.specify/memory/features/030.md`
+8. `.specify/memory/features/037.md`
+9. `.specify/memory/features/041.md`
+10. `.specify/memory/features/042.md`
+11. `.specify/memory/features/044.md`
+12. `.specify/memory/features/050.md`
+13. `.specify/memory/features/053.md`
+14. `.specify/memory/features/065.md`
+15. `.specify/memory/features/069.md`
+16. `.specify/memory/features/090.md`
+17. `.specify/memory/features/092.md`
+18. `.specify/memory/feedback/backlog.md`
+19. `.specify/memory/register.md`
+20. `.specify/specs/018-cli-priority-support/tasks.md`
+21. `.specify/specs/030-summarize-project/quickstart.md`
+22. `.specify/specs/030-summarize-project/tasks.md`
+23. `.specify/specs/039-session-export/contracts/export-skill-rework.contract.md`
+24. `.specify/specs/039-session-export/data-model.md`
+25. `.specify/specs/039-session-export/plan.md`
+26. `.specify/specs/039-session-export/tasks.md`
+27. `.specify/specs/048-derive-command/feature-ref.md`
+28. `.specify/specs/053-machine-decidable-artifacts/contracts/criterion-subject.md`
+29. `.specify/specs/053-machine-decidable-artifacts/data-model.md`
+30. `.specify/specs/053-machine-decidable-artifacts/research.md`
+31. `.specify/specs/057-decompose-command-skills/requirements.md`
+32. `.specify/specs/062-humanize-command/contracts/command-surface.md`
+33. `.specify/specs/062-humanize-command/data-model.md`
+34. `.specify/specs/062-humanize-command/plan.md`
+35. `.specify/specs/062-humanize-command/tasks.md`
+36. `.specify/specs/069-execution-expression-sdd/requirements.md`
+37. `.specify/specs/080-humanize-run-output/contracts/wiring-compat.contract.md`
+38. `.specify/specs/080-humanize-run-output/plan.md`
+39. `.specify/specs/080-humanize-run-output/tasks.md`
+40. `.specify/specs/084-harness-triple-structure/tasks.md`
+41. `.specify/specs/086-efficient-test-execution/data-model.md`
+42. `.specify/specs/086-efficient-test-execution/plan.md`
+43. `.specify/specs/087-arch-diagram-docs/plan.md`
+44. `.specify/specs/088-speckit-visualization/feature-ref.md`
+45. `.specify/specs/088-speckit-visualization/plan.md`
+46. `.specify/specs/090-re-anchoring/plan.md`
+47. `.specify/specs/090-re-anchoring/requirements.md`
+48. `.specify/specs/090-re-anchoring/tasks.md`
+49. `.specify/specs/093-concurrency-by-default/plan.md`
+50. `.specify/specs/093-concurrency-by-default/requirements.md`
+51. `.specify/specs/093-concurrency-by-default/tasks.md`
+52. `.specify/specs/094-goal-team-parallel/research.md`
+53. `.specify/teams/090-re-anchoring/team.md`
+54. `.specify/teams/091-auto-git-closeout/team.md`
+55. `.specify/teams/094-goal-team-parallel/team.md`
+56. `.specify/teams/command-logic-as-classified-skills/team.md`
+57. `.specify/teams/cws-workspace-cluster/team.md`
+58. `.specify/teams/draw-diagram-interactive/team.md`
+59. `.specify/teams/draw-two-layer-structure/team.md`
+60. `.specify/teams/post-refactor-mechanism-integrity/team.md`
+61. `.specify/teams/session-driven-self-improvement/team.md`
+62. `.specify/teams/skill-layer-install-separation/team.md`
+
+Every entry carries `moved = null` (no file moved or renamed; this group has no rename pair).
+Reversal per path: `git checkout -- <path>`.
+
+## corpus
+
+Corpus row executed by this group: **G3 (`orphan-path`)** — one of the 19 档 I entries
+(`shared/definitions/non-disposable-definitions.md` § Handoff Rows) that close in place with no
+handoff marker. This wave executes its recorded 153-entry plan: 137 of 153 closed; the row
+stays open with the 16 residual ids named below (their residual tokens are unclassified,
+not "removed").
+
+## dispositions
+
+One row per entry, E-4 shape. `group` = the confirmed group granularity value (`orphan-path`);
+`disposition` = `correct` was confirmed at group level and applied to every planned reference.
+E-4 records the confirmed disposition, not the probe state: for the 16 residual ids the entry
+stays `open` for the reason in § left-open, without changing the disposition of the applied
+correction.
+
+| entry_id | disposition | group | moved | superseded_by | reverted_by | irreversible |
+|---|---|---|---|---|---|---|
+| `orphan-path/memory/features/013.md:54` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/013.md` | false |
+| `orphan-path/memory/features/016.md:40` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/016.md` | false |
+| `orphan-path/memory/features/019.md:17` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/019.md` | false |
+| `orphan-path/memory/features/019.md:55` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/019.md` | false |
+| `orphan-path/memory/features/022.md:36` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/022.md` | false |
+| `orphan-path/memory/features/022.md:38` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/022.md` | false |
+| `orphan-path/memory/features/022.md:60` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/022.md` | false |
+| `orphan-path/memory/features/026.md:29` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/026.md` | false |
+| `orphan-path/memory/features/026.md:30` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/026.md` | false |
+| `orphan-path/memory/features/027.md:36` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/027.md` | false |
+| `orphan-path/memory/features/030.md:22` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/030.md` | false |
+| `orphan-path/memory/features/037.md:37` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/037.md` | false |
+| `orphan-path/memory/features/041.md:42` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/041.md` | false |
+| `orphan-path/memory/features/042.md:60` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/042.md` | false |
+| `orphan-path/memory/features/044.md:72` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/044.md` | false |
+| `orphan-path/memory/features/050.md:46` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/050.md` | false |
+| `orphan-path/memory/features/053.md:56` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/053.md` | false |
+| `orphan-path/memory/features/053.md:108` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/053.md` | false |
+| `orphan-path/memory/features/065.md:24` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/065.md` | false |
+| `orphan-path/memory/features/069.md:42` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:68` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:70` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:71` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:72` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:76` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:77` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/069.md:79` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/069.md` | false |
+| `orphan-path/memory/features/090.md:45` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/090.md` | false |
+| `orphan-path/memory/features/092.md:37` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:73` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:74` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:75` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:77` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:78` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/features/092.md:79` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/features/092.md` | false |
+| `orphan-path/memory/feedback/backlog.md:37` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:41` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:43` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:49` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:66` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:69` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:72` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:110` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/feedback/backlog.md:112` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/feedback/backlog.md` | false |
+| `orphan-path/memory/register.md:11` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:27` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:32` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:34` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:36` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:62` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:63` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:64` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:65` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:66` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:67` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:68` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:69` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:70` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:71` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:72` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:73` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:74` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:75` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:76` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:77` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:78` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:79` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:80` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:81` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:82` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:83` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:84` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:85` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:86` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:87` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/memory/register.md:175` | `correct` | orphan-path | null | null | `git checkout -- .specify/memory/register.md` | false |
+| `orphan-path/specs/018-cli-priority-support/tasks.md:197` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/018-cli-priority-support/tasks.md` | false |
+| `orphan-path/specs/030-summarize-project/quickstart.md:43` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/030-summarize-project/quickstart.md` | false |
+| `orphan-path/specs/030-summarize-project/tasks.md:125` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/030-summarize-project/tasks.md` | false |
+| `orphan-path/specs/039-session-export/contracts/export-skill-rework.contract.md:3` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/039-session-export/contracts/export-skill-rework.contract.md` | false |
+| `orphan-path/specs/039-session-export/data-model.md:60` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/039-session-export/data-model.md` | false |
+| `orphan-path/specs/039-session-export/plan.md:89` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/039-session-export/plan.md` | false |
+| `orphan-path/specs/039-session-export/tasks.md:59` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/039-session-export/tasks.md` | false |
+| `orphan-path/specs/048-derive-command/feature-ref.md:40` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/048-derive-command/feature-ref.md` | false |
+| `orphan-path/specs/053-machine-decidable-artifacts/contracts/criterion-subject.md:33` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/053-machine-decidable-artifacts/contracts/criterion-subject.md` | false |
+| `orphan-path/specs/053-machine-decidable-artifacts/data-model.md:220` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/053-machine-decidable-artifacts/data-model.md` | false |
+| `orphan-path/specs/053-machine-decidable-artifacts/research.md:252` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/053-machine-decidable-artifacts/research.md` | false |
+| `orphan-path/specs/057-decompose-command-skills/requirements.md:17` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/057-decompose-command-skills/requirements.md` | false |
+| `orphan-path/specs/057-decompose-command-skills/requirements.md:110` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/057-decompose-command-skills/requirements.md` | false |
+| `orphan-path/specs/062-humanize-command/contracts/command-surface.md:10` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/contracts/command-surface.md` | false |
+| `orphan-path/specs/062-humanize-command/data-model.md:12` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/data-model.md` | false |
+| `orphan-path/specs/062-humanize-command/plan.md:106` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/plan.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:99` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:118` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:138` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:159` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:170` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:202` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:223` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:253` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/062-humanize-command/tasks.md:300` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/062-humanize-command/tasks.md` | false |
+| `orphan-path/specs/069-execution-expression-sdd/requirements.md:172` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/069-execution-expression-sdd/requirements.md` | false |
+| `orphan-path/specs/069-execution-expression-sdd/requirements.md:320` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/069-execution-expression-sdd/requirements.md` | false |
+| `orphan-path/specs/080-humanize-run-output/contracts/wiring-compat.contract.md:22` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/contracts/wiring-compat.contract.md` | false |
+| `orphan-path/specs/080-humanize-run-output/plan.md:159` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/plan.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:20` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:175` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:201` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:220` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:225` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:244` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:246` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:266` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:288` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/080-humanize-run-output/tasks.md:290` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/080-humanize-run-output/tasks.md` | false |
+| `orphan-path/specs/084-harness-triple-structure/tasks.md:144` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/tasks.md` | false |
+| `orphan-path/specs/086-efficient-test-execution/data-model.md:128` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/086-efficient-test-execution/data-model.md` | false |
+| `orphan-path/specs/086-efficient-test-execution/plan.md:192` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/086-efficient-test-execution/plan.md` | false |
+| `orphan-path/specs/086-efficient-test-execution/plan.md:210` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/086-efficient-test-execution/plan.md` | false |
+| `orphan-path/specs/086-efficient-test-execution/plan.md:266` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/086-efficient-test-execution/plan.md` | false |
+| `orphan-path/specs/087-arch-diagram-docs/plan.md:384` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/087-arch-diagram-docs/plan.md` | false |
+| `orphan-path/specs/088-speckit-visualization/feature-ref.md:177` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/088-speckit-visualization/feature-ref.md` | false |
+| `orphan-path/specs/088-speckit-visualization/plan.md:399` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/088-speckit-visualization/plan.md` | false |
+| `orphan-path/specs/088-speckit-visualization/plan.md:466` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/088-speckit-visualization/plan.md` | false |
+| `orphan-path/specs/090-re-anchoring/plan.md:388` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/plan.md` | false |
+| `orphan-path/specs/090-re-anchoring/requirements.md:104` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/requirements.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:260` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:309` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:313` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:314` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:342` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:351` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:369` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:463` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/090-re-anchoring/tasks.md:464` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/090-re-anchoring/tasks.md` | false |
+| `orphan-path/specs/093-concurrency-by-default/plan.md:416` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/093-concurrency-by-default/plan.md` | false |
+| `orphan-path/specs/093-concurrency-by-default/requirements.md:194` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/093-concurrency-by-default/requirements.md` | false |
+| `orphan-path/specs/093-concurrency-by-default/tasks.md:311` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/093-concurrency-by-default/tasks.md` | false |
+| `orphan-path/specs/093-concurrency-by-default/tasks.md:315` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/093-concurrency-by-default/tasks.md` | false |
+| `orphan-path/specs/093-concurrency-by-default/tasks.md:326` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/093-concurrency-by-default/tasks.md` | false |
+| `orphan-path/specs/094-goal-team-parallel/research.md:23` | `correct` | orphan-path | null | null | `git checkout -- .specify/specs/094-goal-team-parallel/research.md` | false |
+| `orphan-path/teams/090-re-anchoring/team.md:137` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/090-re-anchoring/team.md` | false |
+| `orphan-path/teams/091-auto-git-closeout/team.md:133` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/091-auto-git-closeout/team.md` | false |
+| `orphan-path/teams/094-goal-team-parallel/team.md:136` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/094-goal-team-parallel/team.md` | false |
+| `orphan-path/teams/command-logic-as-classified-skills/team.md:151` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/command-logic-as-classified-skills/team.md` | false |
+| `orphan-path/teams/command-logic-as-classified-skills/team.md:270` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/command-logic-as-classified-skills/team.md` | false |
+| `orphan-path/teams/cws-workspace-cluster/team.md:200` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/cws-workspace-cluster/team.md` | false |
+| `orphan-path/teams/draw-diagram-interactive/team.md:121` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/draw-diagram-interactive/team.md` | false |
+| `orphan-path/teams/draw-two-layer-structure/team.md:112` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/draw-two-layer-structure/team.md` | false |
+| `orphan-path/teams/post-refactor-mechanism-integrity/team.md:98` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/post-refactor-mechanism-integrity/team.md` | false |
+| `orphan-path/teams/session-driven-self-improvement/team.md:179` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/session-driven-self-improvement/team.md` | false |
+| `orphan-path/teams/skill-layer-install-separation/team.md:124` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/skill-layer-install-separation/team.md` | false |
+| `orphan-path/teams/skill-layer-install-separation/team.md:212` | `correct` | orphan-path | null | null | `git checkout -- .specify/teams/skill-layer-install-separation/team.md` | false |
+
+### Left-open — the 16 residual entries (named, not repaired)
+
+Each line below carried TWO orphan tokens. The before-reading (one entry per `path:line`, C-703)
+exposed only the first; the plan therefore mapped only that one. After this wave's in-place
+rewrite the first token resolves, and the second becomes the reported ref under the same
+`entry_id`. The residual token was outside the confirmed 153-entry scope and received no
+invented target; it stays open for a follow-up plan. Where the identical old→new pair is
+already recorded elsewhere in this plan, that is noted — but it was still not applied, to keep
+the write surface exactly the confirmed one.
+
+| entry_id | planned token (applied) | residual orphan token | verbatim pair already in plan? |
+|---|---|---|---|
+| `orphan-path/memory/features/013.md:54` | `scripts/detect-project-sources.py` → `skills/internal/summarize-project/scripts/detect-project-sources.py` | `.specify/project/visualization.md` | no |
+| `orphan-path/memory/features/022.md:60` | `docs/quickstart.md` → `docs/tutorials/quickstart.md` | `docs/usage.md` | no |
+| `orphan-path/memory/features/026.md:30` | `docs/agents/command-and-skills.md` → `docs/reference/agents/command-and-skills.md` | `docs/agents/design.md` | no |
+| `orphan-path/memory/features/027.md:36` | `skills/create-team/references/summary-mapping.md` → `skills/internal/create-team/references/summary-mapping.md` | `skills/create-team/scripts/build-summary-input.py` | yes → `skills/internal/create-team/scripts/build-summary-input.py` |
+| `orphan-path/memory/features/042.md:60` | `skills/create-team/SKILL.md` → `skills/internal/create-team/SKILL.md` | `agents/requirements-analyst.agent.md` | no |
+| `orphan-path/memory/features/050.md:46` | `skills/create-tools/SKILL.md` → `skills/internal/create-tools/SKILL.md` | `skills/improve-tools/SKILL.md` | no |
+| `orphan-path/memory/features/090.md:45` | `.specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md` → `.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md` | `.specify/specs/092-non-disposable/requirements.md` | yes → `.specify/archive/specs/092-non-disposable/requirements.md` |
+| `orphan-path/memory/feedback/backlog.md:112` | `scripts/coverage_probe.py` → `skills/external/merge-skills/scripts/coverage_probe.py` | `scripts/provenance_check.py` | no |
+| `orphan-path/memory/feedback/backlog.md:41` | `skills/create-team/scripts/verify-territory-disjoint.py` → `skills/internal/create-team/scripts/verify-territory-disjoint.py` | `skills/create-team/scripts/build-summary-input.py` | yes → `skills/internal/create-team/scripts/build-summary-input.py` |
+| `orphan-path/memory/feedback/backlog.md:49` | `skills/create-team/references/create-mode.md` → `skills/internal/create-team/references/create-mode.md` | `skills/create-agent/SKILL.md` | no |
+| `orphan-path/memory/feedback/backlog.md:72` | `skills/external/git-workspace/references/execute-commands.md` → `skills/external/git-utils/references/execute-commands.md` | `skills/external/git-workspace/references/troubleshooting.md` | no |
+| `orphan-path/specs/039-session-export/plan.md:89` | `skills/export-session/SKILL.md` → `skills/internal/archive-session/SKILL.md` | `.specify/skills/export-session/SKILL.md` | no |
+| `orphan-path/specs/062-humanize-command/plan.md:106` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | `.specify/skills/humanize/SKILL.md` | no |
+| `orphan-path/specs/062-humanize-command/tasks.md:300` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | `.specify/skills/humanize/SKILL.md` | no |
+| `orphan-path/specs/080-humanize-run-output/plan.md:159` | `skills/external/humanize/SKILL.md` → `skills/external/humanize-conclusion/SKILL.md` | `.specify/skills/humanize/SKILL.md` | no |
+| `orphan-path/specs/088-speckit-visualization/plan.md:466` | `scripts/match-team-preset.py` → `skills/internal/create-team/scripts/match-team-preset.py` | `scripts/verify-territory-disjoint.py` | no |
+
+END OF EVIDENCE — 153 planned corrections applied; 137 closed, 16 left open
+(residual token named); open 899 → 762 (drop 137).

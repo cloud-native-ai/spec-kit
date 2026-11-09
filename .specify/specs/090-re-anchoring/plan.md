@@ -385,7 +385,7 @@ move to a single continuous numbering with a recorded migration map.
 
 - **092 is not deleted, and not stubbed.** Its directory stays intact and remains the place a reader finds the slice's
   requirements, research, quickstart, tasks and evidence. Deleting it, or leaving a redirect file behind, is a later
-  decision recorded in `.specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md` — not this section's.
+  decision recorded in `.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md` — not this section's.
 - **The 092→090 registry merge is out of scope here.** `.specify/memory/features.md` and `features/092.md` are
   single-owner registries; this section states what the merged feature *contains*, and does not edit a registry.
 - **No code lands here.** The engine, the owner page, the declaration and the guards are the slice's own implement

@@ -125,7 +125,7 @@ supplies values.
 
 | Field | Type | Source |
 |-------|------|--------|
-| `goal_slug` | string | `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` |
+| `goal_slug` | string | `.specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` |
 | `team_slug` | string | `.specify/specs/086-efficient-test-execution/team/**` (created by the driver after plan U4 per 085 C-008) |
 | `agent_concurrency_requested` | integer | `24` (A17) |
 | `agent_concurrency_effective` | integer per stage | Recomputed per stage; downgrades named |

@@ -30,7 +30,7 @@
 
 **C-8** [制品类] 一条判据同时使用指代形与成员枚举时 MUST 报冲突,MUST NOT 静默择一。冲突判据取:同一判据行内 `[subjects:]` 与**花括号展开记号** `\{[^}]*,[^}]*\}` 同现。(FR-037、D-14)
 
-**C-9** [行为类] C-8 的判据依据是**实测到的**枚举形态,不是猜测:本仓唯一真实的枚举型判据是 `.specify/goal/draw-two-layer-structure/goal.md:15`「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」,其 `## History` 直接证明了 US5 要消灭的脆弱性——同一条判据随成员集变化被反复改写(`:36` 前值「六个绘图技能(draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml})」、`:37` 前值「七个绘图技能(… drawio …)」)。(FR-037、D-14)
+**C-9** [行为类] C-8 的判据依据是**实测到的**枚举形态,不是猜测:本仓唯一真实的枚举型判据是 `.specify/anchoring/draw-two-layer-structure/goal.md:15`「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」,其 `## History` 直接证明了 US5 要消灭的脆弱性——同一条判据随成员集变化被反复改写(`:36` 前值「六个绘图技能(draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml})」、`:37` 前值「七个绘图技能(… drawio …)」)。(FR-037、D-14)
 
 **C-10** [行为类] **诚实边界**:不带花括号的散文枚举(如「所有绘图技能」)与指代形同现时**检不出**——自由散文里的枚举不可机械判定。该边界 MUST 记入 owner 文档与本契约,MUST NOT 声称覆盖了它;声称覆盖了实际覆盖不到的东西正是 `.specify/memory/glossary.md`「制品类/行为类条款」条目所禁止的形态。(FR-037、D-14、V-32)
 

@@ -37,7 +37,7 @@
 
 1. **概念面**:新概念锚 `shared/definitions/derivation-definitions.md` ×2 镜像(`shared/` ↔ `.specify/shared/`),拥有四套记录 schema、四级溯源等级、C1–C7、A1–A14、封闭禁用论证集、能力降级规则与 Script/Prompt 边界;其余文档一律引用。
 2. **命令面**:`templates/commands/derive.md`(复杂命令,携 `## Feedback` + `## Documentation`,节序固定)+ 四份工具副本经 `regen-command-copies.py` 再生成并携 AUTO-GENERATED 标记 + `docs/reference/commands/derive.md`。
-3. **引擎面**:`scripts/python/derive-utils.py`(stdlib-only,六动作 [[STR-003]],退出码 [[STR-004]])×2 镜像(`scripts/python/` ↔ `.specify/scripts/python/`)+ Tool 记录 `.specify/memory/tools/derive-utils.md`。
+3. **引擎面**:`scripts/python/derive-utils.py`(stdlib-only,六动作 [[STR-003]],退出码 [[STR-004]])×2 镜像(`scripts/python/` ↔ `.specify/scripts/python/`)+ Tool 记录 `.specify/memory/tools/derive-utils.py.md`。
 4. **存储面**:新顶层根 `.specify/derive/` —— `moves.md`(项目级累积算子库,引擎独写,git 跟踪)+ `<topic-slug>/derive.md`(每主题一份推导档案);`shared/definitions/framework-map.md` 新增一行使其对布局真源可见。
 5. **接线面**:probe Object `speckit-derive-wrapup`(internal 72→73,`--validate` 退出码 0,`--reconcile` 错误集仍为既有 2 条);复杂命令分类 18→19、docs-step 分类 15→16;门控扫描 total 保持 23(零新增阻塞门控,上限 23.25 无余量);glossary 新词条(词条名以概念锚 §Terminology Boundaries 的推导域行为准,不在本文件复列);全套件名字级新增失败 0(基线 50F)。
 

@@ -56,7 +56,7 @@
 
 ### Implementation for User Story 2
 
-- [X] T010 [US2] 重写技能文档(author-section,满足 T009):重写 `skills/export-session/SKILL.md`——frontmatter(description 六家表述、argument-hint 加 `--name`、去 `x-source`/`disable-model-invocation` 语义保持);移除 §1 aone-open 使用上报段;调用段(bash/PowerShell 两组,解释器探测纪律保持)探测目录收敛六家;输出节改目录形态(D4 布局 + SESSION.md/session-meta.json);`--tool` 取值表六家;支持矩阵表含 copilot/hermes「会话存储未探测到」声明行;退出码表五值保持;描述文档流程节(脚本元信息 + agent 总结补写 + 预算降级纪律) [blockedBy: T003,T009]
+- [X] T010 [US2] 重写技能文档(author-section,满足 T009):重写 `skills/internal/archive-session/SKILL.md`——frontmatter(description 六家表述、argument-hint 加 `--name`、去 `x-source`/`disable-model-invocation` 语义保持);移除 §1 aone-open 使用上报段;调用段(bash/PowerShell 两组,解释器探测纪律保持)探测目录收敛六家;输出节改目录形态(D4 布局 + SESSION.md/session-meta.json);`--tool` 取值表六家;支持矩阵表含 copilot/hermes「会话存储未探测到」声明行;退出码表五值保持;描述文档流程节(脚本元信息 + agent 总结补写 + 预算降级纪律) [blockedBy: T003,T009]
 - [X] T011 [US2] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 1 行):运行 `python3 scripts/python/sync-mirrors.py --write`;核验 `diff -q skills/export-session/SKILL.md .specify/skills/export-session/SKILL.md` 与 `diff -q skills/internal/archive-session/scripts/export.py skills/internal/archive-session/scripts/export.py` [blockedBy: T010]
 - [X] T012 [US2] 收敛验收(render-verify):按 quickstart §2 执行——零残留 grep 双文件计数 0、`--tool copilot`/`--tool hermes` 探测退出码 4 + 声明文本、保留四家逐家真跑(本环境可用者 claude-code/qoder-cli 真跑;未安装者按未安装路径)与改造前产物内容面对照(夹具级);结果回写 quickstart §2 [blockedBy: T011]
 

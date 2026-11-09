@@ -103,7 +103,7 @@ tests/fixtures/humanize/              # 新增：评估语料 + rubric.md + 确�
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `templates/commands/humanize.md`（新增） | `.claude/commands/speckit.humanize.md`；`.github/prompts/speckit.humanize.prompt.md`；`.opencode/command/speckit.humanize.md`；`.qoder/commands/speckit.humanize.md` — per-tool copies via regen-command-copies.py；NO `templates/commands/` mirror（retired） | 相对 `notes/baseline-regen-check.txt`：新副本落位且与模板一致，其余副本零变化（「no NEW drift」判据；复跑 `--check` 实测，不预写退出码） |
-| `skills/external/humanize/SKILL.md`（新增） | `.specify/skills/humanize/SKILL.md`（平铺对，新增） | 特性限定同步后**绝对字节一致**（新对无既有漂移可作相对基线） |
+| `skills/external/humanize-conclusion/SKILL.md`（新增） | `.specify/skills/humanize/SKILL.md`（平铺对，新增） | 特性限定同步后**绝对字节一致**（新对无既有漂移可作相对基线） |
 | `shared/definitions/probe-definitions.md`（增强） | `.specify/shared/definitions/probe-definitions.md`（shared 对；基线**已漂移**，见第 181 行） | 特性限定同步（`--only shared/definitions/probe-definitions.md`）后**绝对字节一致**；同步不拖入其他对 |
 | `tests/contract/test_humanize_command_surface.py`（新增）及两个下游钉扎测试（更新） | 无镜像（tests/ 不在 MIRROR_PAIRS） | pytest 直跑；分类测试与可见性测试必须绿（C-9） |
 | 技能体的编译 `## Wrap-up` 面 | 由 probe-utils compile-embeds 维护（`skill:humanize` 一个单元注册后编译）；命令侧 Simple，无编译面 | C-7 固定次序；相对 quickstart S3 判据（73/73 既有旧指纹漂移先于本规格；新单元落位带当前指纹；`--unit` 不限定范围已实测） |

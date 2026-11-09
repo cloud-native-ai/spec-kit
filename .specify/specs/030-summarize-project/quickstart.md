@@ -40,7 +40,7 @@ python -m pytest tests/contract/test_summarize_project_prompt_assets.py tests/co
    - Phase 5 (report structure design): plan UML figures for primary views per `references/uml-visualization-guide.md`.
    - Phase 8 (final report assembly): embed rendered figures with captions, PNG default + SVG available, keep `.puml` sources.
    - Output Requirements: UML figures as the standard for primary views; Mermaid retained for secondary sketches; degradation note rule.
-2. Create `skills/internal/study-project/references/uml-visualization-guide.md` with the normative view→diagram-type mapping (data-model.md Part 1 — including `activity` as the behavior-flow alternative for business/process flows), the `docs/figures/` storage convention with relative-path references, delegation pointers into `draw-plantuml/references/howto/`, and the renderer-unavailable degradation rule.
+2. Create `skills/external/study-code/references/uml-visualization-guide.md` with the normative view→diagram-type mapping (data-model.md Part 1 — including `activity` as the behavior-flow alternative for business/process flows), the `docs/figures/` storage convention with relative-path references, delegation pointers into `draw-plantuml/references/howto/`, and the renderer-unavailable degradation rule.
 3. Touch nothing else in the workflow — phases 1–4, 6–7, subagent discipline, and `$WORK_DIR/docs/overview.md` stay byte-identical in behavior (FR-018).
 
 ## 4. Registry and mirrors

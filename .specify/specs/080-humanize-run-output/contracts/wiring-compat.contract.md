@@ -19,7 +19,7 @@
 
 - **WC-05**: 四份按工具副本（`.claude/commands/speckit.humanize.md`、`.github/prompts/speckit.humanize.prompt.md`、`.opencode/command/speckit.humanize.md`、`.qoder/commands/speckit.humanize.md`）MUST 由 `scripts/python/regen-command-copies.py` 生成；MUST NOT 手改；`--check` MUST exit 0（FR-026）。
 - **WC-06**: 技能源在 `skills/external/humanize/`（`SKILL.md` + `references/`），运行时镜像在 `.specify/skills/humanize/`，由 `scripts/python/sync-mirrors.py --write` 产出；MUST NOT 手改镜像；`--check` MUST exit 0（FR-026）。
-- **WC-07**: `skills/external/humanize/SKILL.md` 的正文 MUST 保持 ≤ 5000 tokens（`skills/external/improve-skills/scripts/skill-shape.py` 判定 `pass`）；运行模式的细粒度步骤、载荷字段与报告形态 MUST 落在 `references/`，不塞进正文（Token 效率纪律；基线见 `test-evidence/stage-plan-baselines.txt` § 5）。
+- **WC-07**: `skills/external/humanize-conclusion/SKILL.md` 的正文 MUST 保持 ≤ 5000 tokens（`skills/external/improve-skills/scripts/skill-shape.py` 判定 `pass`）；运行模式的细粒度步骤、载荷字段与报告形态 MUST 落在 `references/`，不塞进正文（Token 效率纪律；基线见 `test-evidence/stage-plan-baselines.txt` § 5）。
 
 ## docs
 

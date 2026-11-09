@@ -249,7 +249,7 @@ def test_help_labels_every_action_read_or_write(capsys):
 
 **依据**:房子既有的行内方括号标签族——`[P]`、`[US<n>]`、`[blockedBy: …]`(`validate-tasks.py:54-61`)、US2 新增的 `[green: …]`(STR-001)、`requirements-template.md:173-176` 的 `[[STR-NNN]]`。方括号标签是可解析面的既有惯例,不引入新记号族。
 
-**为何冲突判据取花括号展开**:FR-037 要求「同时使用指代形与成员枚举」报冲突,而**自由散文里的枚举不可机械判定**。实测本仓唯一真实的枚举型判据正是花括号展开形态——`.specify/goal/draw-two-layer-structure/goal.md:15`「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」,其 `## History` 直接证明了 US5 要消灭的脆弱性:同一条判据随成员集变化被反复改写(`:36` 前值「六个绘图技能(draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml})」、`:37` 前值「七个绘图技能(… drawio …)」)。故花括号展开是**实测到的**枚举形态,不是猜测。
+**为何冲突判据取花括号展开**:FR-037 要求「同时使用指代形与成员枚举」报冲突,而**自由散文里的枚举不可机械判定**。实测本仓唯一真实的枚举型判据正是花括号展开形态——`.specify/anchoring/draw-two-layer-structure/goal.md:15`「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」,其 `## History` 直接证明了 US5 要消灭的脆弱性:同一条判据随成员集变化被反复改写(`:36` 前值「六个绘图技能(draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml})」、`:37` 前值「七个绘图技能(… drawio …)」)。故花括号展开是**实测到的**枚举形态,不是猜测。
 
 **诚实声明的边界**:不带花括号的散文枚举(如「所有绘图技能」)与 `[subjects:]` 同现时**检不出**。这是可判定性的边界,记进契约,MUST NOT 声称覆盖了它。
 

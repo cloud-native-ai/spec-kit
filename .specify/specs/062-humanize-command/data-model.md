@@ -9,7 +9,7 @@
 | # | 实体 | 层 | 承载制品 | 本特性变更 |
 |---|------|-----|----------|------------|
 | E1 | Humanize 命令模板 | Template | `templates/commands/humanize.md`（源）→ 4 个按工具副本目录（生成面） | 新增 |
-| E2 | Humanize 执行技能 | Skill | `skills/external/humanize/SKILL.md`（源）→ `.specify/skills/humanize/`（镜像） | 新增 |
+| E2 | Humanize 执行技能 | Skill | `skills/external/humanize-conclusion/SKILL.md`（源）→ `.specify/skills/humanize/`（镜像） | 新增 |
 | E3 | Humanize Request（改写请求） | 运行时概念 | 技能执行期的输入契约（不落盘） | 语义新增（FR-014..FR-021 字段面） |
 | E4 | Source Content（源内容） | 运行时概念 | 同上 | 语义新增（FR-019、FR-008 字段面） |
 | E5 | Humanized Result（改写结果） | 运行时概念 | 会话返回或显式输出路径 | 语义新增（FR-012、FR-021、FR-022 字段面） |

@@ -14,7 +14,7 @@
 
 本特性是 goal `command-logic-as-classified-skills`(T-001/T-003,命令核心逻辑尽可能由技能承载、命令模板只保留入口与委派)在 agent/team/skills 三个命令面上的补全:补齐缺失的 run 语义技能(run-skills、run-team),核查既有接线,不新建任何与既有技能语义重复的技能。
 
-「internal / external 技能标注」的概念真源为 goal `.specify/goal/command-logic-as-classified-skills/goal.md`(internal = 只服务 spec-kit 框架自身逻辑;external = 与 spec-kit 无依赖、任何项目皆可直接使用);术语与消歧真源为词汇表条目「技能分类标注 (Skill Classification)」。约束侧读取:skill 化命令逻辑产出的新技能 MUST 带标注,否则干扰既有技能分发与处理体系(标注必要性为用户 2026-10-05 口述主张,经词汇表该条记录,引用时按其要求标注口述属性,非制品事实)。本特性新增的两个技能均落在 internal 层、均带标注;其中 run-skills 是「内部技能默认不被 agent 发现」规则的一个具名例外(见 Assumptions)。
+「internal / external 技能标注」的概念真源为 goal `.specify/anchoring/command-logic-as-classified-skills/goal.md`(internal = 只服务 spec-kit 框架自身逻辑;external = 与 spec-kit 无依赖、任何项目皆可直接使用);术语与消歧真源为词汇表条目「技能分类标注 (Skill Classification)」。约束侧读取:skill 化命令逻辑产出的新技能 MUST 带标注,否则干扰既有技能分发与处理体系(标注必要性为用户 2026-10-05 口述主张,经词汇表该条记录,引用时按其要求标注口述属性,非制品事实)。本特性新增的两个技能均落在 internal 层、均带标注;其中 run-skills 是「内部技能默认不被 agent 发现」规则的一个具名例外(见 Assumptions)。
 
 ### 现状锚点(以源码与目录实测为准,2026-10-14)
 
@@ -107,7 +107,7 @@ agent 用户想执行一个技能,但它没有被宿主 agent 发现(没有可�
 - **FR-003**: run-skills MUST 接受技能标识(名称或规范路径)为输入,在框架已知技能位置集(dev 规范层 `skills/external/`、`skills/internal/`;installed 层 `.specify/skills/` 平铺与 `internal/` 嵌套)间做**确定性解析**;同名多命中时的优先级**已裁定(2026-10-14)**:dev 规范层(canonical)优先于 installed 镜像,优先级在技能体内一次性写明。**信任边界(已裁定)**:显式路径输入 MUST 落在上述已知技能位置集内,越界路径按 FR-004 快速失败。所选路径 MUST 在输出中披露。
 - **FR-004**: 解析零命中、目标 `SKILL.md` 无效、或显式路径越出已知技能位置集时,run-skills MUST 停在异常点并输出可行动错误(逐项列出已搜索位置,或指出文件缺陷/路径越界),MUST NOT 静默兜底、MUST NOT 降级为近似猜测(快速失败纪律)。
 - **FR-005**: run-skills MUST 以「加载并遵照目标技能 `SKILL.md` 正文执行」的方式运行该技能(输入按调用方接线、产出转述回调用方),MUST NOT 将任一目标技能的逻辑内联复制进自身。
-- **FR-006**: run-skills 技能体 MUST 自足到「无本仓 ambient 指令的 agent 仅读它即可完成一次运行」:以**引用真源 + 内联最小操作事实**记录框架约定——技能分层与各层规范路径、internal/external 标注语义(真源 goal `.specify/goal/command-logic-as-classified-skills/goal.md` 与词汇表条目)、发现无注册表规则与 `.github/skills` 兼容链接、镜像模型(改 canonical 不改镜像)、`${SKILL_HOME}`/`${SKILL_WORKDIR}` 路径约定、runtime-mode 门控;其中位置搜索顺序作为最小操作事实内联,其余一律引用既有真源,不复制其规则正文(One Source Of Truth)。
+- **FR-006**: run-skills 技能体 MUST 自足到「无本仓 ambient 指令的 agent 仅读它即可完成一次运行」:以**引用真源 + 内联最小操作事实**记录框架约定——技能分层与各层规范路径、internal/external 标注语义(真源 goal `.specify/anchoring/command-logic-as-classified-skills/goal.md` 与词汇表条目)、发现无注册表规则与 `.github/skills` 兼容链接、镜像模型(改 canonical 不改镜像)、`${SKILL_HOME}`/`${SKILL_WORKDIR}` 路径约定、runtime-mode 门控;其中位置搜索顺序作为最小操作事实内联,其余一律引用既有真源,不复制其规则正文(One Source Of Truth)。
 - **FR-007**: run-skills 对任意目标技能(含已注册者)照常执行;「已注册」判定为**尽力检测**(2026-10-14 裁定:按工作区内宿主扫描目录近似判断——注册是宿主相关观测,技能体内无确定性来源),判不准也照常执行,提示措辞为「可能可直接斜杠调用」(非阻断)。
 - **FR-008**: run-skills MUST 按 runtime-mode 纪律门控:非 Spec-Kit 部署下 external 目标技能照常可运行,框架耦合步骤按门控降级,不因缺 `.specify/` 而整体失败;非 Spec-Kit 部署下 **internal 目标技能拒绝执行**并给出可行动错误(internal 技能按 goal T-002 配合 `.specify/` 目录结构,离开该结构无运行意义)。
 

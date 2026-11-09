@@ -413,7 +413,7 @@ user ruling fixes the choice, and the runner's own contract (086
 
 The ruling fixes the dispatch policy this feature enforces: **the host-internal in-process subagent path is
 BANNED as a concurrency carrier; the only two legal carriers are the fork form (same-family `qodercli` child
-processes through `scripts/stage-runner.sh`) and the subprocess form (heterogeneous agents, each carried by an
+processes through `skills/external/sdd-loop-driver/scripts/stage-runner.sh`) and the subprocess form (heterogeneous agents, each carried by an
 independent child process of its own CLI).** Every surface below *declares dispatch* somewhere in its text; the
 correction rewrites that declaration to state the ban and the two carriers (by pointer to FR-035 / C-094), and its
 implement row is named here. The row set is closed: a surface not listed was measured as already covered by

@@ -156,7 +156,7 @@ tests/fixtures/humanize/run/              # NEW run-mode fixtures (success/failu
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `templates/commands/humanize.md` | `.claude/commands/speckit.humanize.md`；`.github/prompts/speckit.humanize.prompt.md`；`.opencode/command/speckit.humanize.md`；`.qoder/commands/speckit.humanize.md` — per-tool copies via `regen-command-copies.py`；no templates/commands mirror under `.specify/` (retired) | `python3 scripts/python/regen-command-copies.py` 后 `--check` exit 0（基线同样 exit 0，判据为绝对） |
-| `skills/external/humanize/SKILL.md` + `skills/external/humanize/references/*.md` | `.specify/skills/humanize/SKILL.md`、`.specify/skills/humanize/references/*.md` via `sync-mirrors.py` | `python3 scripts/python/sync-mirrors.py --write` 后 `--check` exit 0；`skills/external == .specify/skills` 对零差异（基线 406 files ok） |
+| `skills/external/humanize-conclusion/SKILL.md` + `skills/external/humanize/references/*.md` | `.specify/skills/humanize/SKILL.md`、`.specify/skills/humanize/references/*.md` via `sync-mirrors.py` | `python3 scripts/python/sync-mirrors.py --write` 后 `--check` exit 0；`skills/external == .specify/skills` 对零差异（基线 406 files ok） |
 | `shared/definitions/*`（本特性不改） | `.specify/shared/*` | 不改即无需再生成；`sync-mirrors.py --check` 仍须 exit 0（防止误改） |
 
 *Document Structure 章节未产出*：本线是 execution 类（`requirements.md` 的 `Flow Class: execution`），模板的类条件使该章节只对 expression 类是必需产物；此处不留空标题，以免被结构检查读成 `subsection-missing`。

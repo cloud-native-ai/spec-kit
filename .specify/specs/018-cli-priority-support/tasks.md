@@ -194,7 +194,7 @@ description: "Task list for CLI Priority AI Tool Support"
 - [X] T066 [P] Update `tests/unit/test_initialization_result_summary.py` — add `assistant_tiers` field assertions
 - [X] T067 Run full test suite: `pytest -q` — verify all tests pass (contract, integration, unit)
 - [~] T068 Run quickstart.md validation scenarios 1-7 manually — verify all quickstart scenarios produce expected output <!-- deferred: requires interactive CLI execution in a clean environment -->
-- [X] T069 [P] Update `docs/commands/instructions.md` — add Codex CLI to instructions refresh documentation
+- [X] T069 [P] Update `docs/reference/commands/instructions.md` — add Codex CLI to instructions refresh documentation
 - [X] T070 [P] Update `docs/reference/commands/agents.md` — add Codex CLI to agents documentation if applicable
 - [X] T071 Code cleanup: remove any dead code paths in `src/specify_cli/__init__.py` related to the pre-codex-onboarding state
 - [X] T072 Verify constitution amendment version bump is consistent between `.specify/memory/constitution.md` and `templates/constitution-template.md`

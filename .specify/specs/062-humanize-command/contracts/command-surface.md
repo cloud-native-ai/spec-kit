@@ -7,7 +7,7 @@
 
 - **C-1**: `templates/commands/humanize.md` 存在且为薄入口：frontmatter 含 `description`（带触发词列表）与 `short-description`、无 `scripts:` 块；正文节为 `## User Input`（`$ARGUMENTS` 接线 + User Input Protocol 引用 + 输入形态与调用语法声明——选项集 [[STR-004]]、`--` 终止选项解析、文件/内联输入判定按 FR-018）、`## Glossary`、委派节、`## Handoffs`。本命令按分类 owner `.specify/specs/027-feedback-mechanism/contracts/command-classification.md` 的 (a)(b)(c) 规则判为 **Simple**（不调用脚本、不产出/消费跨流程制品）——模板 MUST NOT 携带 `## Wrap-up`/feedback 步，同批在该 contract 的分类表新增本命令行并更新 **Result** 计数。模板正文对四维度改写工作流（FR-003 至 FR-006 的行为细则）的复述为零；[[STR-001]] 为命令身份字面 (FR-001, FR-018, FR-024, FR-025)。
 - **C-2**: 命令模板的委派节恰好命名一个技能——runtime path `.specify/skills/humanize/SKILL.md`；命令与技能的引用方向为命令→技能（镜像路径），命令模板不复制技能工作流，技能体不回指命令模板 (FR-024)。
-- **C-3**: `skills/external/humanize/SKILL.md` 存在，frontmatter 含 `name: humanize`、`classification: external`、`skill_id: <SKILL:.specify/skills/humanize/SKILL.md>`；技能体自足可加载——离开本仓 ambient 指令的宿主仅读技能体即可完成一次改写调用（引用真源 + 内联最小操作事实，057 C-34 先例形态）；技能正文对四维度、保真底线、语气处理、文件行为各有可执行落点 (FR-024, FR-002, FR-007, FR-015, FR-020)。
+- **C-3**: `skills/external/humanize-conclusion/SKILL.md` 存在，frontmatter 含 `name: humanize`、`classification: external`、`skill_id: <SKILL:.specify/skills/humanize/SKILL.md>`；技能体自足可加载——离开本仓 ambient 指令的宿主仅读技能体即可完成一次改写调用（引用真源 + 内联最小操作事实，057 C-34 先例形态）；技能正文对四维度、保真底线、语气处理、文件行为各有可执行落点 (FR-024, FR-002, FR-007, FR-015, FR-020)。
 - **C-4**: 全部按工具命令副本由 `scripts/python/regen-command-copies.py` 生成：`.claude/commands/speckit.humanize.md`、`.github/prompts/speckit.humanize.prompt.md`、`.opencode/command/speckit.humanize.md`、`.qoder/commands/speckit.humanize.md`（以既有 4 个副本目录为准，不含不存在目录的工具）；生成副本含手改警告头；`regen-command-copies.py --check` 相对 `notes/baseline-regen-check.txt` 冻结基线零 NEW 漂移 (FR-025, SC-007)。
 
 ## 文档、注册与技能 feedback 面
