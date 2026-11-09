@@ -1,0 +1,35 @@
+# WP2 red-first + green — T051–T056 (serial-reason: C-027…C-030)
+- date: 2026-11-09T11:37:19Z
+- records under .specify/.tmp/wp2/records/ (block-subset/v1, parsed through declaration_reader.parse_subset — T109 path)
+
+## RED — the action was a stub
+decision = fail | findings = [('not-implemented','serial-reason')] | exit status: 1
+
+## GREEN — the judgement matrix (one row per contract branch)
+record                 exit   codes
+serial-bare            1      decision=fail codes=['evidence-form-mismatch']
+serial-budget          0      decision=pass codes=none
+concurrent-with-codes  1      decision=fail codes=['form-reason-inconsistent']
+serial-empty           1      decision=fail codes=['form-reason-inconsistent']
+serial-simplicity      1      decision=fail codes=['prose-reason-not-a-code']
+serial-order           1      decision=fail codes=['code-order-violation']
+serial-two-codes       0      decision=pass codes=none
+serial-host            0      decision=pass codes=none
+serial-dup             1      decision=fail codes=['code-duplicate']
+serial-prose           1      decision=fail codes=['prose-reason-not-a-code']
+serial-unknown         1      decision=fail codes=['code-unknown']
+serial-no-evidence     1      decision=fail codes=['evidence-missing']
+
+## GREEN — T055 detail fields (code, condition, evidence pointer)
+{'code': 'evidence-missing', 'record_code': 'budget-reserve', 'condition': 'FR-005(e)', 'evidence_ptr': '.specify/.tmp/wp2/records/serial-no-evidence.yml#evidence.budget-reserve'}
+
+## GREEN — T056 the condition<->code bijection (mutated fact fixture; live fact is zero-gap)
+- exit status: 1
+decision = fail
+  bijection-gap | condition<->code bijection is short: conditions without a code ['FR-005(c)']; condition-bound codes without a condition ['write-conflict']
+- live fact bijection reading (zero gap):
+  exit status: 0
+  decision = pass | bijection findings = []
+
+## GREEN — T051 measured: the code count is reported as codes_declared, never as concurrency
+{"codes": ["dependency-edge", "write-conflict"], "codes_declared": 2, "condition_index": ["FR-005(b)", "FR-005(c)", "FR-005(d)", "FR-005(e)"], "declared_order": ["dependency-edge", "write-conflict", "host-no-parallel", "budget-reserve", "single-unit", "mechanism-not-yet-landed"], "evidence_forms": {"dependency-edge": "dependency-edge", "write-conflict": "write-conflict"}, "groups": ["condition-bound", "factual"], "pattern": "serial"}

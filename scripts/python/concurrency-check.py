@@ -525,8 +525,251 @@ def action_classify(repo, args):
     return envelope("classify", decision, findings, measured)
 
 
+# --------------------------------------------------------------------------- #
+# serial-reason judgement (C-027…C-030, T051–T056)
+# --------------------------------------------------------------------------- #
+#: The simplicity / controllability / history family FR-009 forbids as a serial reason.
+SIMPLICITY_FAMILY = re.compile(
+    r"(simpl|简单|controllable|可控|histor|历史上|clean|cleanliness|speed|faster|更快|速度)",
+    re.IGNORECASE)
+
+
+def resolves_in(repo, value):
+    """Whether a recorded pointer names a file inside the repository (source or mirror)."""
+    text = str(value or "").strip()
+    if not text or text == ".":
+        return False
+    candidates = [repo / text]
+    if text.startswith(".specify/"):
+        candidates.append(repo / text[len(".specify/"):])
+    else:
+        candidates.append(repo / ".specify" / text)
+    return any(candidate.is_file() for candidate in candidates)
+
+
+def numeric_reading(value):
+    """A slot/budget reading as an int, or ``None`` when the value is not one."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    if isinstance(value, str) and re.fullmatch(r"-?\d+", value.strip()):
+        return int(value.strip())
+    return None
+
+
+def judge_evidence(repo, code_entry, evidence):
+    """C-029: one code's evidence judged against its own declared form.
+
+    Returns ``None`` when the evidence matches, or ``(reason, detail)`` when it does
+    not. A bare string (including ``.``) never satisfies any form.
+    """
+    form = str(code_entry.get("evidence_form", "")).strip()
+    if not isinstance(evidence, dict):
+        return "evidence-form-mismatch", (
+            "evidence for %r must be a structured reading of form %r, not a bare value"
+            % (code_entry.get("code"), form))
+    if form == "dependency-edge":
+        predecessor = str(evidence.get("predecessor", "")).strip()
+        verdict_ptr = evidence.get("verdict_ptr")
+        if not predecessor:
+            return "evidence-form-mismatch", (
+                "dependency-edge needs a resolvable predecessor unit id")
+        if not resolves_in(repo, verdict_ptr):
+            return "evidence-form-mismatch", (
+                "dependency-edge needs a completion verdict pointer that resolves "
+                "(got %r)" % verdict_ptr)
+        return None
+    if form == "write-conflict":
+        paths = evidence.get("paths")
+        if not isinstance(paths, list) or not paths:
+            return "evidence-form-mismatch", (
+                "write-conflict needs the intersecting file-level path set")
+        for entry in paths:
+            text = str(entry).strip()
+            last = text.rsplit("/", 1)[-1]
+            if "/" not in text or "." not in last:
+                return "evidence-form-mismatch", (
+                    "write-conflict paths are file-level paths (got %r)" % entry)
+        return None
+    if form == "host-probe":
+        probe = str(evidence.get("probe", "")).strip()
+        landing = evidence.get("landing")
+        if not probe:
+            return "evidence-form-mismatch", "host-probe needs the probe reading"
+        if not resolves_in(repo, landing):
+            return "evidence-form-mismatch", (
+                "host-probe needs its landing point to resolve (got %r)" % landing)
+        return None
+    if form == "budget-readings":
+        for side in ("before", "after"):
+            reading = evidence.get(side)
+            if not isinstance(reading, dict):
+                return "evidence-form-mismatch", (
+                    "budget-reserve needs %s/after slot and budget readings" % side)
+            if numeric_reading(reading.get("slots")) is None or \
+                    numeric_reading(reading.get("budget")) is None:
+                return "evidence-form-mismatch", (
+                    "budget-reserve needs numeric slots and budget in the %s reading" % side)
+        return None
+    if form == "unit-set":
+        units = evidence.get("units")
+        if not isinstance(units, list) or len(units) > 1:
+            return "evidence-form-mismatch", (
+                "a factual code needs the enumerated representable unit set (size 0 or 1)")
+        if str(code_entry.get("code")) == "mechanism-not-yet-landed" and not str(
+                evidence.get("missing_mechanism", "")).strip():
+            return "evidence-form-mismatch", (
+                "mechanism-not-yet-landed needs the named missing mechanism")
+        return None
+    return "evidence-form-mismatch", "no judgeable evidence form %r" % form
+
+
 def action_serial_reason(repo, args):
-    return _not_implemented("serial-reason")
+    """C-027…C-030: validate one serial-reason record against the closed vocabulary."""
+    statement = fact_statement(load_fact(repo, "serial-reason"), "serial-reason")
+    catalogue = [entry for entry in (statement.get("codes") or []) if isinstance(entry, dict)]
+    by_code = {str(entry.get("code", "")).strip(): entry for entry in catalogue}
+    declared_order = [str(entry.get("code", "")).strip() for entry in catalogue]
+    condition_index = [str(c).strip() for c in (statement.get("condition_index") or [])]
+
+    record = load_record(args.record)
+    record_ref = str(args.record)
+    findings = []
+
+    pattern = str(record.get("pattern", "")).strip()
+    if pattern not in PATTERNS:
+        findings.append(finding(
+            "form-reason-inconsistent", record_ref,
+            "pattern must be one of %s (got %r)" % (list(PATTERNS), pattern),
+            record_ref + "#pattern"))
+
+    raw_codes = record.get("codes")
+    if raw_codes is None:
+        raw_codes = []
+    if not isinstance(raw_codes, list):
+        findings.append(finding(
+            "form-reason-inconsistent", record_ref,
+            "codes must be an ordered list (got %r)" % type(raw_codes).__name__,
+            record_ref + "#codes"))
+        raw_codes = []
+    codes = [str(item).strip() for item in raw_codes]
+
+    seen = set()
+    for position, code in enumerate(codes):
+        ptr = "%s#codes[%d]" % (record_ref, position)
+        if code in seen:
+            findings.append(finding(
+                "code-duplicate", record_ref,
+                "code %r is duplicated; the list MUST NOT repeat a member" % code, ptr,
+                kind="inconsistency", record_code=code, record=record_ref))
+            continue
+        seen.add(code)
+        if SIMPLICITY_FAMILY.search(code):
+            findings.append(finding(
+                "prose-reason-not-a-code", record_ref,
+                "%r is not a reason code: the closed vocabulary is %s; simplicity, "
+                "controllability and history are never codes" % (code, declared_order),
+                ptr, kind="inconsistency", record_code=code, record=record_ref,
+                compared=[code, declared_order]))
+            continue
+        if code not in by_code:
+            findings.append(finding(
+                "code-unknown", record_ref,
+                "code %r is outside the closed vocabulary %s" % (code, declared_order),
+                ptr, kind="inconsistency", record_code=code, record=record_ref,
+                compared=[code, declared_order]))
+
+    for field in ("reason", "rationale", "justification"):
+        prose = record.get(field)
+        if isinstance(prose, str) and SIMPLICITY_FAMILY.search(prose):
+            findings.append(finding(
+                "prose-reason-not-a-code", record_ref,
+                "%s %r is not a reason code; the closed vocabulary is %s"
+                % (field, prose, declared_order),
+                "%s#%s" % (record_ref, field), kind="inconsistency",
+                record_code=prose, record=record_ref, compared=[prose, declared_order]))
+
+    known_positions = [declared_order.index(code) for code in codes if code in by_code]
+    if known_positions != sorted(known_positions):
+        findings.append(finding(
+            "code-order-violation", record_ref,
+            "codes are not in the declared order %s (got %s)"
+            % (declared_order, codes),
+            record_ref + "#codes", kind="inconsistency", record=record_ref,
+            compared=[codes, declared_order]))
+
+    if pattern == "concurrent" and codes:
+        findings.append(finding(
+            "form-reason-inconsistent", record_ref,
+            "pattern=concurrent carries a non-empty code list %s" % codes,
+            record_ref + "#codes", record=record_ref, compared=[pattern, codes]))
+    if pattern == "serial" and not codes:
+        findings.append(finding(
+            "form-reason-inconsistent", record_ref,
+            "pattern=serial carries an empty code list", record_ref + "#codes",
+            record=record_ref, compared=[pattern, codes]))
+
+    # C-028 — the condition<->code bijection, both ways, over the condition-bound group
+    bound_conditions = []
+    for entry in catalogue:
+        if str(entry.get("group", "")).strip() != "condition-bound":
+            continue
+        bound_conditions.append(str(entry.get("condition", "")).strip())
+    missing_codes = [cond for cond in condition_index if cond not in bound_conditions]
+    missing_conditions = [entry.get("code") for entry in catalogue
+                          if str(entry.get("group", "")).strip() == "condition-bound"
+                          and str(entry.get("condition", "")).strip() not in condition_index]
+    if missing_codes or missing_conditions:
+        findings.append(finding(
+            "bijection-gap", "serial-reason",
+            "condition<->code bijection is short: conditions without a code %s; "
+            "condition-bound codes without a condition %s"
+            % (missing_codes, missing_conditions), "shared/declarations/facts/serial-reason.yaml",
+            kind="inconsistency", compared=[condition_index, bound_conditions]))
+
+    evidence = record.get("evidence")
+    evidence_map = evidence if isinstance(evidence, dict) else {}
+    if evidence is not None and not isinstance(evidence, dict):
+        findings.append(finding(
+            "evidence-form-mismatch", record_ref,
+            "evidence must be a per-code mapping (got %r)" % type(evidence).__name__,
+            record_ref + "#evidence"))
+        evidence_map = {}
+    for code in codes:
+        entry = by_code.get(code)
+        if entry is None:
+            continue
+        evidence_ptr = "%s#evidence.%s" % (record_ref, code)
+        if code not in evidence_map:
+            findings.append(finding(
+                "evidence-missing", record_ref,
+                "no evidence for code %r (its condition is %s)"
+                % (code, entry.get("condition", "none")),
+                evidence_ptr, kind="inconsistency", record_code=code,
+                condition=entry.get("condition", ""), record=record_ref))
+            continue
+        problem = judge_evidence(repo, entry, evidence_map[code])
+        if problem is not None:
+            findings.append(finding(
+                problem[0], record_ref, "%s: %s" % (code, problem[1]), evidence_ptr,
+                kind="inconsistency", record_code=code,
+                condition=entry.get("condition", ""), record=record_ref))
+
+    measured = {
+        "pattern": pattern,
+        "codes_declared": len(codes),
+        "codes": codes,
+        "declared_order": declared_order,
+        "groups": statement.get("groups"),
+        "condition_index": condition_index,
+        "evidence_forms": {code: by_code[code].get("evidence_form")
+                           for code in codes if code in by_code},
+    }
+    return envelope("serial-reason",
+                    "fail" if findings else "pass", findings, measured)
 
 
 def action_reading(repo, args):
