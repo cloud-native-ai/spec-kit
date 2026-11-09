@@ -76,6 +76,10 @@ RUNTIME_CACHE_PREFIXES = (
     # baseline and closure captures quote this guard's own failure text, so the needle is
     # present by construction; they are generated evidence, not live surfaces.
     ".specify/specs/089-script-interface-contract/test-evidence/",
+    # 2026-11-09 Feature 090: the same rule again — a full-suite capture quotes this guard's
+    # own failure text, so the needle is present by construction. Generated evidence, not a
+    # live surface that forgot the migration.
+    ".specify/specs/090-re-anchoring/test-evidence/",
 )
 
 #: Migration guards must *name* the old path in order to assert its absence, so they

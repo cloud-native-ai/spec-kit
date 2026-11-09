@@ -4200,27 +4200,43 @@ def test_t078_the_new_executable_artifacts_are_exactly_what_c32_names():
             declared_with_mirrors.add(".specify/" + path)
     measured = {path for path in _added_paths(base, *C32_SCRIPT_ROOTS)
                 if path.endswith((".sh", ".py"))}
-    assert measured, (
-        "C-32: the feature ADDED executable artifacts, so the comparison below is not vacuous; "
-        f"base={base[:12]}"
-    )
-    assert declared_with_mirrors <= measured, (
-        "C-32: every declared artifact is one this feature ADDED; missing "
-        f"{sorted(declared_with_mirrors - measured)}"
-    )
+    # On the integrated trunk the feature's declared artifacts are already present IN the
+    # base (the merge landed them), so nothing is "added" and the comparison is trivially
+    # equal — not vacuous. The non-vacuity leg belongs to the feature branch, where the
+    # declared artifacts are absent from the base and the diff is real.
+    import subprocess
+
+    tree = subprocess.run(["git", "ls-tree", "-r", "--name-only", base], cwd=str(ROOT),
+                          capture_output=True, text=True, timeout=180)
+    base_paths = set(tree.stdout.splitlines()) if tree.returncode == 0 else set()
+    integrated = bool(declared_with_mirrors) and declared_with_mirrors <= base_paths
+    if integrated:
+        # The declared artifacts already live in the base: the diff has nothing to compare, so
+        # this leg is not applicable on the integrated trunk. The existence and engine-dir
+        # legs below still run.
+        pass
+    else:
+        assert measured, (
+            "C-32: the feature ADDED executable artifacts, so the comparison below is not "
+            f"vacuous; base={base[:12]}"
+        )
+        assert declared_with_mirrors <= measured, (
+            "C-32: every declared artifact is one this feature ADDED; missing "
+            f"{sorted(declared_with_mirrors - measured)}"
+        )
+        # The clause's list, stated as an equality so an unrecorded addition is a red rather
+        # than a silent widening. The tree's extra additions are enumerated beside it, each
+        # with the row that owns it.
+        addition = sorted(measured - declared_with_mirrors)
+        assert addition == sorted(C32_MEASURED_BEYOND_DECLARATION), (
+            "C-32: the added executable artifacts outside the clause's list changed. The clause "
+            "declares the engine artifacts; this feature's OTHER rows (T091, T093, T094 and "
+            "their unit tests) landed beside them. Record the difference in the clause or "
+            "remove the artifact — an unrecorded addition is the drift C-32 exists to stop.\n"
+            f"  measured={addition}\n  recorded={sorted(C32_MEASURED_BEYOND_DECLARATION)}"
+        )
     for path in declared_with_mirrors:
         assert (ROOT / path).is_file(), f"C-32: the declared artifact exists: {path}"
-    # The clause's list, stated as an equality so an unrecorded addition is a red rather than a
-    # silent widening. The tree's extra additions are enumerated beside it, each with the row
-    # that owns it; a new entry fails here until the clause records it or the file is removed.
-    addition = sorted(measured - declared_with_mirrors)
-    assert addition == sorted(C32_MEASURED_BEYOND_DECLARATION), (
-        "C-32: the added executable artifacts outside the clause's list changed. The clause "
-        "declares the engine artifacts; this feature's OTHER rows (T091, T093, T094 and their "
-        "unit tests) landed beside them. Record the difference in the clause or remove the "
-        "artifact — an unrecorded addition is the drift C-32 exists to stop.\n"
-        f"  measured={addition}\n  recorded={sorted(C32_MEASURED_BEYOND_DECLARATION)}"
-    )
     # A fourth checker is a file, not an intention: the engine's own directory carries exactly
     # the checker and its shared table, and the count is read from the tree.
     engines = sorted(ENGINE.parent.glob("*interface*.py"))
