@@ -1,4 +1,9 @@
-"""Contract tests for the goal/team scope resolver CLI (Feature 085, T011/T012)."""
+"""Contract tests for the goal/team archive-layer resolver CLI (Feature 085, T011/T012).
+
+Rewritten by Feature 094 (FR-041 / SC-010, disposal row 1): the scope value set is
+`goal` / `teams` / `auto`; the retired position-named members are refused with the
+parser's invalid-choice exit, and `--spec-dir` never decides a landing or reading point.
+"""
 
 from __future__ import annotations
 
@@ -16,19 +21,14 @@ ENGINE = REPO_ROOT / "scripts/python/goal-utils.py"
 
 
 def _seed(root: Path) -> Path:
-    global_goal = root / ".specify/anchoring/global-goal/goal.md"
+    global_goal = root / ".specify/anchoring/archive-goal/goal.md"
     global_goal.parent.mkdir(parents=True, exist_ok=True)
-    global_goal.write_text("# Global Goal\n", encoding="utf-8")
-    global_team = root / ".specify/teams/global-team/team.md"
+    global_goal.write_text("# Archive Goal\n", encoding="utf-8")
+    global_team = root / ".specify/teams/archive-team/team.md"
     global_team.parent.mkdir(parents=True, exist_ok=True)
-    global_team.write_text("---\nslug: global-team\n---\n", encoding="utf-8")
+    global_team.write_text("---\nslug: archive-team\n---\n", encoding="utf-8")
     spec = root / ".specify/specs/084-sample"
-    spec_goal = spec / "goal/spec-goal/goal.md"
-    spec_goal.parent.mkdir(parents=True, exist_ok=True)
-    spec_goal.write_text("# Spec Goal\n", encoding="utf-8")
-    spec_team = spec / "team/spec-team/team.md"
-    spec_team.parent.mkdir(parents=True, exist_ok=True)
-    spec_team.write_text("---\nslug: spec-team\n---\n", encoding="utf-8")
+    spec.mkdir(parents=True, exist_ok=True)
     return spec
 
 
@@ -38,36 +38,37 @@ def _run(root: Path, *args: str) -> subprocess.CompletedProcess:
         capture_output=True, text=True, cwd=REPO_ROOT)
 
 
-def test_global_scope(tmp_path: Path):
-    _seed(tmp_path)
-    proc = _run(tmp_path, "resolve-scope", "--scope", "global")
+def test_goal_scope(tmp_path: Path):
+    spec = _seed(tmp_path)
+    proc = _run(tmp_path, "resolve-scope", "--scope", "goal", "--spec-dir", str(spec))
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["scope"] == "global"
+    assert payload["scope"] == "goal"
     assert payload["goal_root"].endswith("/.specify/anchoring")
     assert payload["team_root"].endswith("/.specify/teams")
 
 
-def test_spec_scope(tmp_path: Path):
-    spec = _seed(tmp_path)
-    proc = _run(tmp_path, "resolve-scope", "--scope", "spec", "--spec-dir", str(spec))
+def test_teams_scope(tmp_path: Path):
+    _seed(tmp_path)
+    proc = _run(tmp_path, "resolve-scope", "--scope", "teams")
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["scope"] == "spec"
-    assert payload["goal_root"] == str(spec / "goal")
-    assert payload["team_root"] == str(spec / "team")
+    assert payload["scope"] == "teams"
+    assert payload["goal_root"].endswith("/.specify/anchoring")
+    assert payload["team_root"].endswith("/.specify/teams")
 
 
-def test_spec_scope_requires_spec_dir(tmp_path: Path):
+@pytest.mark.parametrize("retired", ["spec", "global"])
+def test_retired_scopes_are_rejected_by_the_parser(tmp_path: Path, retired: str):
     _seed(tmp_path)
-    proc = _run(tmp_path, "resolve-scope", "--scope", "spec")
+    proc = _run(tmp_path, "resolve-scope", "--scope", retired)
     assert proc.returncode == 2
-    assert "spec-scope-requires-spec-dir" in proc.stdout
+    assert "invalid choice" in (proc.stderr + proc.stdout)
 
 
 def test_auto_ambiguity(tmp_path: Path):
-    spec = _seed(tmp_path)
-    proc = _run(tmp_path, "resolve-scope", "--scope", "auto", "--spec-dir", str(spec))
+    _seed(tmp_path)
+    proc = _run(tmp_path, "resolve-scope", "--scope", "auto")
     assert proc.returncode == 2
     assert "scope-ambiguous" in proc.stdout
 
@@ -77,35 +78,36 @@ def test_list_global_is_unchanged(tmp_path: Path):
     proc = _run(tmp_path, "list")
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert [row["slug"] for row in payload["goals"]] == ["global-goal"]
+    assert [row["slug"] for row in payload["goals"]] == ["archive-goal"]
 
 
-def test_list_spec_is_scoped(tmp_path: Path):
+def test_spec_dir_never_decides_the_listing(tmp_path: Path):
     spec = _seed(tmp_path)
-    proc = _run(tmp_path, "list", "--scope", "spec", "--spec-dir", str(spec))
+    proc = _run(tmp_path, "list", "--scope", "goal", "--spec-dir", str(spec))
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert [row["slug"] for row in payload["goals"]] == ["spec-goal"]
+    assert [row["slug"] for row in payload["goals"]] == ["archive-goal"]
 
 
 def test_write_with_auto_scope_is_rejected(tmp_path: Path):
-    spec = _seed(tmp_path)
+    _seed(tmp_path)
     proc = _run(tmp_path, "create", "new-goal", "--scope", "auto",
-                "--spec-dir", str(spec), "--objective", "an outcome")
+                "--objective", "an outcome")
     assert proc.returncode == 2
     assert "read-only" in proc.stdout
 
 
-def test_spec_write_leaves_global_stores_byte_identical(tmp_path: Path):
+def test_goal_write_leaves_the_team_store_byte_identical_and_no_spec_path(tmp_path: Path):
     spec = _seed(tmp_path)
-    globals_ = [
-        tmp_path / ".specify/anchoring/global-goal/goal.md",
-        tmp_path / ".specify/teams/global-team/team.md",
-    ]
-    before = {path: path.read_bytes() for path in globals_}
-    proc = _run(tmp_path, "create", "new-temp-goal", "--scope", "spec",
-                "--spec-dir", str(spec), "--objective", "a run-scoped outcome")
+    team_store = tmp_path / ".specify/teams/archive-team/team.md"
+    before = team_store.read_bytes()
+    spec_paths_before = {p for p in tmp_path.rglob("*") if ".specify/specs" in p.parts}
+    proc = _run(tmp_path, "create", "new-goal", "--scope", "goal",
+                "--spec-dir", str(spec), "--objective", "an archive-layer outcome")
     assert proc.returncode == 0, proc.stdout + proc.stderr
-    after = {path: path.read_bytes() for path in globals_}
-    assert after == before, "a spec-scoped write must not touch the global stores"
-    assert (spec / "goal/new-temp-goal/goal.md").is_file()
+    assert team_store.read_bytes() == before, (
+        "a goal-layer write must not touch the team store")
+    assert (tmp_path / ".specify/anchoring/new-goal/goal.md").is_file()
+    spec_paths_after = {p for p in tmp_path.rglob("*") if ".specify/specs" in p.parts}
+    assert spec_paths_after == spec_paths_before, (
+        "a definition write must add no path under .specify/specs/")

@@ -195,7 +195,7 @@ goal 与 team 只有一处落点：`.specify/anchoring/<slug>/goal.md` 与 `.spe
 
 ### Measurable Outcomes
 
-- **SC-001**: 一个不含 SDD 规格目录的夹具中，命令运行创建的 goal 与 team 全部落在 `.specify/anchoring/` 与 `.specify/teams/`，且 `.specify/specs/` 下新增路径数为零；把写入路径改回 spec 子目录时该测试转红。 **Path**: final
+- **SC-001**: 一个不含 SDD 规格目录的夹具中，命令运行创建的 goal 与 team 全部落在 `.specify/anchoring/` 与 `.specify/teams/`，且 `.specify/specs/` 下新增路径数为零；把写入路径改回 spec 子目录时该测试转红。〔2026-11-09 用户裁决 R2：Path 由 final 改为 supporting，T016–T019 验收由 SC-004 / SC-005 覆盖，见 § Clarifications〕 **Path**: supporting
 - **SC-002**: 框架中「写 `.specify/specs/<spec>/goal|team/` 的代码路径」数量为零：以既有写入面（goal 引擎写动作、`create-team` 落盘、驱动者指令）为对象逐条断言，且该断言在把任一写入改回旧路径时转红。 **Path**: final
 - **SC-003**: 迁移在本仓真实数据上的干跑产生可判定读数：迁移前残余 N 条（2026-11-09 只读探测实测为 goal 7 条、team 7 条）、迁移后统一档案对应 slug 全部存在、残余探测余额为零、且没有任何源数据被删除（逐条存在性断言）。本条是比较型封闭清单声明，基线取本特性第一个实现提交之前的只读探测读数；本条 MUST NOT 重新断言该总数常量。 **Path**: final
 - **SC-004**: 迁移幂等且冲突安全：对同一棵树连跑两次迁移，第二次零写入且退出码可判定；目标 slug 已存在且内容不等价时拒绝覆盖并指名两个候选。两个夹具各自转绿。 **Path**: final
@@ -267,6 +267,11 @@ goal 与 team 只有一处落点：`.specify/anchoring/<slug>/goal.md` 与 `.spe
 - Q（H-3）：C-1 要求每个定义都带 [[STR-001]] 记录，而统一档案里在本特性之前就存在的 6 个 goal / 12 个 team 定义无一携带它，迁移只处置 8 + 8 条 spec-local 定义——这 18 条常驻定义由谁负责？ → A: **给补录一个具名 owner（FR-043）**，不采用「把 C-1 的拒绝收窄到本特性创建/迁移的定义」这一读法。判据是失效模式而非成本：收窄读法在实现完成后留下 18 条引擎读不了的定义，而引擎读不了正好等于 `/speckit.goal`、`/speckit.team`、`run-team` 与驱动者在这棵树上失效——这正是本特性要交付的能力本身。补录取值裁定为 `owner: human` / `owner_id: human` / `origin: null`（C-3 已允许 `human` 形态），依据有三：(a) 这 18 条定义是先于绑定模型存在的人工产物，没有可解析的运行标识可填；(b) `human` 是唯一对任何 goal 恒可写的 owner（C-14），补录后不会制造一批「谁都不能改」的档案；(c) `origin: null` 是既有事实——它们不在任何 spec 目录下。`origin: null` 与 EP-002 的 slug 不相交两项实测共同保证补录不改变迁移判定（C-36 只给被迁移定义写 `origin`）。本条与 FR-009 的迁移是**两个动作**：迁移处置 spec-local 定义，补录处置常驻定义，任何一条定义只走其中一条路径。（FR-002、FR-043、C-1、C-3）
 
 - Q（H-5 / M-04）：`plan.md` T-004 的决策记录仍写 `{global, auto}` 而 FR-025 与契约 C-9 已裁为 `{goal, teams, auto}`；FR-009 是否要新写一句「MUST NOT 重建谱系」？ → A: **改 T-004 的决策正文到 `{goal, teams, auto}` 一枚读法**，并在同一记录里写明它取代了先前那版写 `{global, auto}` 的反题；A11 与 § Notes 的指针**改指 C-36**，不在 FR-009 里再写一句。依据：T-004 原先的标题与决策句写的都是「收窄为 `global` / `auto`」，而 `global` 已由 Q13 出域，一条自称「本轮裁决」的记录却载着已被判为出域的成员，读者无从分辨哪句是现行；T-004 是 `validate-decision-tensions.py` 校验的那份记录，也是 DoD 指名的设计 owner，它的正文必须与它指向的 FR 一致。**第二轮 analyze-repair 已按本裁决改写 T-004**（标题与 decision 为 `goal` / `teams` / `auto`，`discriminating_evidence` 改为 `--scope global|spec|<未登记值>` 三者同形退出 2、`--scope goal|teams` 退出 0 的正反两读），故此处不再是待办而是对既成事实的记载。反题一侧不需重写——原反题「保留 `spec` 作别名、零调用方修改」仍是那条被拒方案，只是它的「更优条件」收窄为「允许改 8 个 scope 测试时」。M-04 走**改指针**而非补 FR 句，因为禁令的规范面已经在 C-36 上（迁移 MUST NOT 重建跨定义谱系），再在 FR-009 写一遍就是同一事实的第二定义点，违反宪法 XIV；A11 是「假设」，指向契约条款与指向 FR 同样成立。§ Notes 第 277 行与 requirements 第 259 行两处「已由 FR-009 承载 / 已一致」的措辞随之改为事实陈述。（FR-008、FR-009、FR-025、A11）
+
+### Session 2026-11-09（repair-wave 用户裁决 R1 / R2，用户原文引用）
+
+- **R1（T079 `migrate-archive --apply` 迁移授权）**: 用户裁决（2026-11-09）："the T079 `migrate-archive --apply` migration is AUTHORIZED — run it"。据此 SC-003 的 apply 步骤获授权执行，执行记录（回执、迁移后残余探测、逐条存在性断言、幂等复跑）落在 `test-evidence/repairwave-*` 与 `notes/repairwave.md`；本裁决只解除 wp07 阶段「read-only + evidence 派发」造成的执行阻断，不改变 SC-003 的判据。（SC-003、T079、FR-009、FR-012）
+- **R2（SC-001 由 `final` 改 `supporting`）**: 用户裁决（2026-11-09）："SC-001 is RE-SCOPED from `final` to `supporting` (T016–T019 acceptance is covered by SC-004/SC-005) — record the ruling, do not implement a new guard"。据此 SC-001 的 `**Path**` 由 `final` 改为 `supporting`；T016–T019 的验收义务由 SC-004 / SC-005 的读数覆盖，本裁决不要求新写守卫模块（`tests/contract/test_command_run_goal_team.py`）或 T019 的绑定写入。SC-001 的状态按其自身实测证据记为 `partial`，测量阶梯与 re-scope 理由记录在 `verification.md`。（SC-001、SC-004、SC-005、T016–T019）
 
 ## Notes
 

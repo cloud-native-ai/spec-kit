@@ -11,7 +11,7 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = ROOT / "skills/external/sdd-loop-driver/references/checkpoint-protocol.md"
 SKILL = ROOT / "skills/external/sdd-loop-driver/SKILL.md"
-TEAM = ROOT / ".specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md"
+TEAM = ROOT / ".specify/teams/085-sdd-temporary-goal-team/team.md"
 
 
 def _text(path: Path) -> str:

@@ -1,0 +1,7 @@
+# idempotent re-run — snapshot before/after over .specify/anchoring, .specify/teams, .specify/archive/goal-team
+# command: python3 scripts/python/goal-utils.py migrate-archive --apply --json
+second-exit=0
+second-run counts: {"migrated": 0, "noop": 16, "conflict": 0, "interrupted": 0}
+results: ['noop']
+actions: ['noop']
+byte-diff over the three stores: NONE (zero writes)

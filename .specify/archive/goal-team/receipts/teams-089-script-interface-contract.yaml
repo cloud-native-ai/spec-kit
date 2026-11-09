@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 089-script-interface-contract
+source_slug: 089-script-interface-contract
+target_slug: 089-script-interface-contract
+target_path: .specify/teams/089-script-interface-contract/team.md
+archived_path: .specify/archive/goal-team/trees/089-script-interface-contract/teams/089-script-interface-contract
+concept_digest: sha256:bcb09fb1fdf8e50f65c3a804af81d2520334317d400fe7d61e17183e3db3a9fd
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

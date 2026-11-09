@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 091-auto-git-closeout
+source_slug: 091-auto-git-closeout
+target_slug: 091-auto-git-closeout
+target_path: .specify/anchoring/091-auto-git-closeout/goal.md
+archived_path: .specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout
+concept_digest: sha256:6b609cfd793aa626d00decb670833a40f6bccb1a388851622aa4e5639bd2ad1d
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

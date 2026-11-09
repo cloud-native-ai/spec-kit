@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 089-script-interface-contract
+source_slug: script-interface-contract
+target_slug: script-interface-contract
+target_path: .specify/anchoring/script-interface-contract/goal.md
+archived_path: .specify/archive/goal-team/trees/089-script-interface-contract/goal/script-interface-contract
+concept_digest: sha256:e335b6a9d58cccd85d8cc72550e6e9a92a8d9d01658e50e94c262b6fe7a245a1
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

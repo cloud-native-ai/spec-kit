@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TEAM = ROOT / ".specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md"
+TEAM = ROOT / ".specify/teams/085-sdd-temporary-goal-team/team.md"
 
 
 def test_rollback_restores_team_bytes_and_is_recorded(tmp_path):

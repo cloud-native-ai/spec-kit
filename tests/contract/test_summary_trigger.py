@@ -225,7 +225,9 @@ def test_present_and_execute_discloses_the_summary_decision(path: Path) -> None:
 )
 def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    assert ".specify/goal/<goal-slug>/summary/" in text, (
+    # 094 (T075) moved the truth source to the anchoring archive layer; the retired
+    # `.specify/goal/<goal-slug>/summary/` literal must not be pinned as current.
+    assert ".specify/anchoring/<goal-slug>/summary/" in text, (
         f"{path.name} does not name the goal delivery directory"
     )
     assert "project/goal" not in text, (

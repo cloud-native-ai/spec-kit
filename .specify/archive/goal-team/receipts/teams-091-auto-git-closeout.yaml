@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 091-auto-git-closeout
+source_slug: 091-auto-git-closeout
+target_slug: 091-auto-git-closeout
+target_path: .specify/teams/091-auto-git-closeout/team.md
+archived_path: .specify/archive/goal-team/trees/091-auto-git-closeout/teams/091-auto-git-closeout
+concept_digest: sha256:8ce3d89b9a05c1a2ea65cbc8a9dc01e038bfcb485f93d79b6eb79f88cf5de3c0
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

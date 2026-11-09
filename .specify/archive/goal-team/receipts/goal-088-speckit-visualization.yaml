@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 088-speckit-visualization
+source_slug: 088-speckit-visualization
+target_slug: 088-speckit-visualization
+target_path: .specify/anchoring/088-speckit-visualization/goal.md
+archived_path: .specify/archive/goal-team/trees/088-speckit-visualization/goal/088-speckit-visualization
+concept_digest: sha256:223115fd2e4bd4f49058bccedf37192ab99c5652fcf518738172d4befba1c476
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

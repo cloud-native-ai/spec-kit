@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 094-goal-team-parallel
+source_slug: 094-goal-team-parallel
+target_slug: 094-goal-team-parallel
+target_path: .specify/teams/094-goal-team-parallel/team.md
+archived_path: .specify/archive/goal-team/trees/094-goal-team-parallel/teams/094-goal-team-parallel
+concept_digest: sha256:3d35da0019a1e59a2d349ad209c7cf9811dbbb6610f6fbebab536688ff6a4cbb
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

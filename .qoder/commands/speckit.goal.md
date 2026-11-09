@@ -1,5 +1,5 @@
 ---
-description: 创建、查看、修改目标档案中的定义，管理 Targets、团队协同，并含 migrate-archive 档案迁移
+description: 创建、查看、修改目标档案，管理 Targets、团队协同与 migrate-archive 迁移
 ---
 <!-- AUTO-GENERATED from templates/commands/goal.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input

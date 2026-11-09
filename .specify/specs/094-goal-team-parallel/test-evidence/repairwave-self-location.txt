@@ -1,0 +1,15 @@
+# self-location probe: trigger-utils.py --action status --format json (cwd = this nested worktree)
+{
+  "ok": true,
+  "action": "status",
+  "workspaceRoot": "/storage/project/cloud-native-ai/spec-kit",
+  "generatedAt": "2026-11-09T13:26:43Z",
+  "errors": [],
+  "warnings": [],
+  "semanticJudgmentPending": [],
+  "notes": [],
+  "payload": {
+    "config": {
+      "enabled": true,
+# cwd=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-repairwave
+# git rev-parse --show-toplevel=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-repairwave

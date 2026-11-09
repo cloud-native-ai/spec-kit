@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 087-arch-diagram-docs
+source_slug: 087-arch-diagram-docs
+target_slug: 087-arch-diagram-docs
+target_path: .specify/anchoring/087-arch-diagram-docs/goal.md
+archived_path: .specify/archive/goal-team/trees/087-arch-diagram-docs/goal/087-arch-diagram-docs
+concept_digest: sha256:1f8afd1b22697d0d5f7e2403c09f7b1ac922ee364bdf2e8eb9bd425b5b5c4287
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete
