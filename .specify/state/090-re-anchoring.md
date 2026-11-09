@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261108T220214Z-8647
 slice: 090
-stage: analyze
-stage_started_at: 1794180314
-stage_deadline_epoch: 1794191114
+stage: review
+stage_started_at: 1794183854
+stage_deadline_epoch: 1794194654
 stage_base_commit: 9af8418e
 attempt: 1
 retry_limit: 3
-last_verdict: checklist U4 pass (66bb1ff5; 37 items, gates recorded, 20 fails handed to analyze); checkpoint 04 on-track
+last_verdict: implement U4 pass (95b7d071 + 9df034a3; ordering test red-first, member closure, zero new vs the 49-name baseline; checkpoint 06 on-track)
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch analyze (read-only; findings report in the stage log); U4 must show the report body and no artifact writes
+next_action: dispatch review (four segments + ARC); then closure-acceptance-check and the local merge
 direction_contract: |
   goal_verbatim: "将『开局加载一次』的动作，变成『每执行完一个核心步骤就再加载一次』，使用 session compact + reload + evaluation 来明确和最开始的方向是否存在偏差；在核心概念中针对 agent 加入『不忘初心：一直记得最开始的任务和规则』和『温故而知新：通过不断复习来强化记忆和回顾目标』"（后续纠正：回顾的重点是规则而不是目标——目标由当前/下一步隐含，被丢弃的是规则）。
   non_goals: [每工具调用重载全文, 新增评分器/日志服务/调度器, 第二个 checkpoint 系统, 改写历史记录, 改动 sdd-loop-driver 的阶段序列与哨兵]
