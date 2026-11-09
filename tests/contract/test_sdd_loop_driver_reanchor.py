@@ -34,15 +34,24 @@ MINIMAL_Q1_PREFIX = "- Q1 rules:"
 # that way in a requirement, the protocol itself asks it as "Is the state spine fresher…" and
 # also carries it as `spine written before acting` in the fifth-part bullet. Both forms are the
 # same rule; pinning the wording rather than the rule would make the guard a copy-editor.
+#
+# <!-- 092 handoff: D5 → 090-re-anchoring -->
+# One entry per member of the owner's rule anchor (`shared/definitions/re-anchoring-definitions.md`
+# §1.1, the only place that enumerates them), numbered ①-⑧ in the owner's order, so the set and
+# the owner's list are a one-to-one correspondence and a deleted member reds (092 G3). The
+# confirmation gate was missing entirely before this repair; the report discipline was missing
+# too and `unattended` / `no approval request` stood for one member between them - both ① forms
+# are kept here because the protocol names the rule twice, but they map to the single member ①.
 RULE_SET = (
-    ("unattended", r"unattended"),
-    ("no approval request", r"no approval request"),
-    ("U4 -> next stage", r"U4 -> next"),
-    ("spine written before acting", r"spine written before acting|spine fresher"),
-    ("workspace-guard --check", r"workspace-guard --check"),
-    ("fast-fail", r"fast-fail"),
-    ("the gate discipline", r"gate discipline"),
-    ("budget", r"budget"),
+    ("① unattended (no approval request)", r"unattended"),
+    ("① unattended (no approval request), verbatim form", r"no approval request"),
+    ("② U4 -> next stage", r"U4 -> next"),
+    ("③ spine written before acting", r"spine written before acting|spine fresher"),
+    ("④ workspace guard", r"workspace-guard --check"),
+    ("⑤ fast-fail correction/decision split", r"fast-fail"),
+    ("⑥ the gate discipline", r"gate discipline"),
+    ("⑦ budget discipline", r"budget"),
+    ("⑧ report discipline", r"\breport discipline\b"),
 )
 # The primary-object sentence carries the goal as a *contracted* half ("the RULES, not the
 # goal"), so the order is matched rather than a frozen spelling: a rewrite that names the goal

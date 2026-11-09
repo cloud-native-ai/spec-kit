@@ -1,0 +1,13 @@
+SEAT-H2 (092 implement-executor) — 档 II F1/F3 pointers @ 2026-11-09. Diff: 14 insertions, 0 deletions (additive only).
+Re-measured: constitution.md = 22 principles, v1.19.0, amended 2026-11-09; FR_CEILING=120 / TASK_CEILING=160 in
+.specify/skills/sdd-loop-driver/scripts/decomposition-check.py; INSTRUCTIONS_BUDGET_BYTES=38400 only in
+scripts/bash/generate-instructions.sh. All target files live under .specify/specs/.
+F3 (6 markers/4 files): 080-humanize-run-output/plan.md, 077-doc-sdd-integration/plan.md, 079-bilingual-expression/plan.md,
+082-self-explanatory-integration/plan.md (x2) and 082-.../requirements.md (x2).
+F1 (1 marker): 082-self-explanatory-integration/plan.md Constraints line ("29 B below INSTRUCTIONS_BUDGET_BYTES ceiling").
+069-execution-expression-sdd has no plan.md (requirements.md only) — not written. No commit, no push.
+Corrections in passing: F1 draft wrongly cited src/specify_cli/__init__.py as owner (fixed); duplicate F1 marker removed.
+Additive-only confirmed by a detector validated live (3 hits on HEAD~3..HEAD~2, 0 on this change).
+ANOMALY: brief's ceilings-owner path is under neither .specify/scripts/python/ nor scripts/python/; the real owner is
+.specify/skills/sdd-loop-driver/scripts/decomposition-check.py — the pointer cites the located path.
+SEAT-H2-DONE

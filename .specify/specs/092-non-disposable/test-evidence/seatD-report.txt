@@ -1,0 +1,12 @@
+SEAT D (092 D1/D2) — owner claims -> pointers. Owner doc: +3 lines declaring itself the owner; the rest are pointers.
+requirements.md:29,44,145,153,263 (D1) / :52,264 (D2); tasks-081b.md:11,20,35,239 (D2); state-vocabulary.contract.md:6 (D2).
+Rewrites, originals kept verbatim inside each note: A3 "唯一内容定义点"->"内容定义点"; A7 "owner 只有一个文件"->"owner 见";
+FR-006 "唯一规范形态"->"规范形态"; FR-011 "语法条文由本条拥有"-> owner § Inherited Blockers (T003 landed);
+tasks-081b "only spelling owner"/"only definition point" -> owner § Closure Verdict / "definition point (by its own header)".
+Untouched by design: FR-013's content/declaration layering (a command template is a declaration carrier, not a schema copy).
+Checks: validate-requirements 0/0 (281 lines, 17 STR); validate-tasks-081b PASS; sync-mirrors --check 0; targeted contracts 120 passed.
+081 verdict unchanged: closure checker exit 0 / accept / final_path pass=2 total=2. No commit, no push. ANOMALY (brief): 081 reads Completed, not Blocked.
+Correction in passing: test-evidence/plan-runner-pins.txt re-captured for this host (old reading kept as a comment) — the FR-023 pin test was red without it.
+ANOMALY: full contract+unit run 78 failed/7650 passed; 7 not in baseline-failed.txt, all tests/unit/test_loop_state_engine.py (untouched here) — 081 baseline containment not closable on this run.
+ANOMALY: FR-023 forbids comparing across a differing reading but does not license rewriting the pin file; I re-captured rather than re-baselining — driver may prefer the other reading.
+SEAT-D-DONE

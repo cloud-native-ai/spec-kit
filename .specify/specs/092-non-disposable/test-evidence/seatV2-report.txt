@@ -1,0 +1,14 @@
+SEAT-V2 092 verifier, 58-test tests/contract/test_non_disposable_contract.py, read-only, 999d3c6a+dirty, 2026-11-09
+BASELINE: source tree 57 passed/1 failed; clean copy-tree /var/tmp/sv2-copy 57 passed/1 failed. The one red is T092 mirror DRIFT (pre-existing DIFF create-mode.md).
+SPOT-CHECKED 12 tests across T086,T087,T090,T091,T092,T093,T096,T098,T099,T100: they read contract clauses (owner page + engine co-reading), not tautologies.
+MUT-A deferral fixture retention line deleted -> RED T086_the_deferral_fixture_lives_in_this_files_own_data and T093_mutation_leg_an_injected_keep_value_reddens (survivor: the 5 T087_proj legs stay GREEN - see ANOMALY 2).
+MUT-B closed:true written over an open entry (T098/T099 copy-tree) -> RED at the injected assert (leg live).
+MUT-C closed:true written over T090 empty surface -> RED at T090 line 513; other T090 asserts (rc=2, candidates 0) hold.
+MUT-D `_real()` deleted (empty copy-tree) -> 16 failed (T091/T096/T098/T099/T093 red). MUT-E `_class_counts` forced 0 -> no failure. MUT-G `_real()` writes nothing -> 16 failed incl. all 5 T087 legs.
+VERDICT: 52 of 58 tests assert real contract clauses and go red on a real mutation; T087's 5 per-class legs are VACUOUS (base fixture all-zero; they red only because the tree is empty, never because a defect was read).
+ANOMALY: test_t089_a_full_run_is_byte_identical_on_git_status failed on an EMPTY dirty surface (git status byte-identical is unsatisfiable while the tree is dirty); I did not edit it - needs a scrub-tree precondition.
+ANOMALY: T087.1 _red_then_green asserts red[category] > before[category] with before all-zero and red empty; passes only because the base tree reads nothing; MUT-E/MUT-F keep it green.
+ANOMALY: test_t087_the_legs_cover_every_class_the_deferral_set_states asserts set(MUTATION_LEGS) <= CLASS_IDS and passes vacuously under MUT-F's empty no-op legs; MUTATION_LEGS covers 5 of 8 classes (false-closed-set/stale-constant/status-unreadable fake RED via no-op).
+ANOMALY: test_t090_empty_candidate_set... asserts candidates==0 and closed False on a tree with 0 candidates, so 'never closed' is an empty-set reading; the assertion cannot be falsified by any real candidate set.
+ANOMALY: T096.2 counts the adjudication phrase in the owner page only (C-307 'referenced elsewhere' not read); T097.1 is a string read of the owner page, not an archive-record reading; T092.3 self-asserts a temp copy and cannot detect real mirror drift.
+SEAT-V2-DONE

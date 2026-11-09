@@ -1,0 +1,12 @@
+seat C — T082 quickstart.md §8 seam walk on a copy tree (/tmp/seatC-copy, rsync of 999d3c6a).
+Wrote .specify/specs/092-non-disposable/notes/quickstart-run.md §T082 (174 lines); nothing else, no commit.
+Review+design: snapshot pair byte-identical (diff 0 bytes, sha256 36f7f673…); negative control went red on a tracked write.
+Confirm: documented readings only (group default / item / none-of / unconfirmed); NOT executed — no user answer exists here, none fabricated.
+Execute: BLOCKED. Copy tree resolves to session_count=0 for every tool; no code path performs a confirmed repair disposition (engine is read-only, history-utils touches only the manifest). Walk stopped before any confirmation.
+Four segments (readings/paths/corpus/dispositions): no writer, and no reader — no guard parses the E-7 shape; §8's C-408 "remove a segment, assert red" leg is not green-able at HEAD. Store: 32 files, only p2-20261109T125609.txt carries all four.
+Substitute reading: two --scope s000-of-008 runs byte-identical (sha ad72a1ee…, 73 entries, closed=false) — reproducible, proves no repair.
+ANOMALY: §8 stage 4 (execute) is unreachable — the seam's repair writes are prose with no producer; needs a ruling on whether execute is a command-driven or engine-driven segment.
+ANOMALY: §8's pass line "execute only ran after confirmation" holds only vacuously, so a PASS there would misreport.
+ANOMALY: tasks.md T080 (a declared T082 dependency), T062 and T071 are still [ ] — this file was created, not appended, so the sections T062/T071 were to land are absent.
+ANOMALY: T080's command-face copies were not checked as part of this walk; the walk ran against the source template only.
+SEAT-C-DONE

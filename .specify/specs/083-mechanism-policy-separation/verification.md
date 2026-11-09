@@ -19,6 +19,8 @@ baseline_targeted_set_collected=893
 baseline_targeted_set_passed=892
 baseline_targeted_set_failed=1
 baseline_mirror_pairs_clean=6
+<!-- 092 handoff: E2 → 083 -->
+<!-- 092 handoff — E2 校正陈述（三条 baseline 槽位，两个不同对象）。`baseline_commit=28662977…` 是**实现期测试基线所测的那棵树**（本特性自身工作树上的提交，`base_sha` 是 `3ffeb26e`，见 `.specify/state/083-mechanism-policy-separation.md`）；**字节基线**是 `STR-002` = `3ffeb26e`，只供 SC-003 / SC-007 的逐字节与包含性断言。两者不是同一个对象，不得相互「对齐」。`baseline_commit` 的取值 owner 是本块（上方 `# -- Baseline` 行；原文保留不改）；下述 `baseline_full_suite_*` 的取值 owner 是 `test-evidence/implement-part1-baseline.txt`（实测 `24 failed, 7157 passed, 7 skipped`），失败名清单 owner 是 `baseline-failed.txt`（24 条）；`baseline_targeted_set_*` 的 owner 是 `test-evidence/plan2026-11-05-baseline.txt`。本标记不复制任何计数。-->
 
 > Owners of those numbers: the full-suite slot is `test-evidence/implement-part1-baseline.txt`
 > (E2, captured at implement start; its 24 failed node ids are listed in
@@ -43,6 +45,7 @@ post_change_targeted_set_passed=100
 post_change_targeted_set_failed=0
 post_change_new_failed_nodeids=0
 post_change_mirror_pairs_clean=6
+<!-- 092 handoff — E2 校正陈述（verification 侧，接 `baseline_mirror_pairs_clean` 之上的 E2 标记）。`post_change_*` 每一条只与**同范围的**测试基线比，不与字节基线比：`post_change_new_failed_nodeids=0` 的对象是 `baseline-failed.txt` 的 24 条**节点名**（GATE-2 的 `comm -13`），`post_change_targeted_set_*=100` 的对象是 GATE-1 的十一个模块；`post_change_full_suite_*=not-evaluated` 是**未测量**，不是零，也不得与 `baseline_full_suite_*` 相减读成「无变化」。故 `post_change == baseline` 只在一个意义上成立：相对同一范围没有**新增失败**；字节是否变化由 (a) 上的 SC-003 单独度量。原文保留不改；读数一律以本文件的实测行为准。-->
 
 > `post_change_full_suite_*=not-evaluated`: the closure full-suite slot is the driver's step after
 > `/speckit.review`; the dispatch forbids a second full run in this segment. `post_change_new_
@@ -138,6 +141,7 @@ SC-003_note=Two disclosures, both recorded in `final-gates.txt` GATE-4: the gate
 SC-004_status=pass
 SC-004_value=missing-policy host run: the owner's three-field prompt produced, **zero writes** (snapshot 8 files / 10 dirs identical before and after across the full file set); supplied-policy run: the produced path set and every file's sha256 are identical between the baseline and changed states, and equal the draft's own bytes
 SC-004_note=Host Qoder CLI 1.1.83 with write tools available, so the stop is the flow's own; the four trial/premise corrections are disclosed in `sc-004-2026-11-05.txt` § 5. The deterministic face (`test_mechanism_policy_missing_policy.py`) is green in GATE-1.
+<!-- 092 handoff — E2 校正陈述（SC-004 的等式不是「post_change == baseline」）。`SC-004_value` 的 `identical between the baseline and changed states` 读的是**同一个技能树在两种状态下的产物**，不是本特性的前后提交：`sc-004-2026-11-05.txt` § 1 写明 changed state = HEAD `28662977…`，baseline state = 从 `3ffeb26e` 读出的同一技能树（该基线里**没有** mechanism-policy owner）。等式的含义是「同一输入、同一策略 ⇒ 产物逐字节一致」，即确定性；它不主张本特性没有引入字节增量，也不使 `post_change` 的差集读数失效。两个不同问题：本条证确定性，SC-003 证字节不变性。原文保留不改。-->
 
 SC-005_status=partial
 SC-005_value=correct = 13 / 14 (full set size = 14); the one divergence is Q-06, answered `策略` while the owner's key is `待澄清`

@@ -20,6 +20,7 @@
 - **A2（输入与概念 owner）— 裁决：ratified**。本特性的输入是访谈收敛的三份制品：`shared/definitions/self-explanatory-definitions.md`（概念 owner）、`shared/guidelines/self-explanatory.md`（实践 owner）、`shared/workflow/best-practice-optimization.md`（优化工作流 owner）。本特性只做框架集成，不重定义概念；任何输出面 MUST 以指针或摘要引用 owner，MUST NOT 复制 owner 的完整定义。
 - **A3（Two Hats）— 裁决：ratified**。框架源是 `templates/`、`skills/`、`shared/`；`.specify/` 同名文件是生成镜像或本仓运行时。宪章模板与指令模板属于框架源；`.specify/memory/constitution.md` 与 `.specify/instructions.md` 是本仓运行时输出，由命令/生成器刷新，MUST NOT 用手改镜像代替源修复。机制与拓扑归 `shared/definitions/dogfooding-definitions.md` § 2.1，此处不复述。
 - **A4（编号差异）— 裁决：ratified**。宪章模板当前有 17 条原则，本仓 live 宪章当前有 18 条；新原则在各自表面取“下一个可用编号”，MUST NOT 把模板编号硬编码到 live 或测试。`tests/contract/test_constitution_double_landing.py` 的计数常量 MUST 各自 +1，并保持“数值不参与标题匹配”的既有形态。
+  <!-- 092 handoff: F3 — 「17 / 18 条」是要求成文时的读数，保留不改。live 名册的唯一值 owner 是 `.specify/memory/constitution.md`（2026-11-09 现值 22 条，版本 1.19.0）；模板名册以模板文件自身计数为准。参见 092 F3。 -->
 - **A5（`/speckit.improve` 接线不在本特性）— 裁决：ratified**。访谈 D23 要求每次 `/speckit.improve` 参考优化工作流；本特性只把 `shared/workflow/best-practice-optimization.md` 纳入镜像与分发，MUST NOT 声称已完成 `/speckit.improve` 的接线。该接线已登记为 `OI-082-01`（见 `.specify/memory/register.md`），作为后续 `/speckit.improve` 改进项处理。
 - **A6（术语登记）— 裁决：ratified**。概念的中文规范名是“不言自明”，英文规范名是“Self-explanatory”；旧名“望文生义”仅作为退役变体保留。glossary 条目按 `origin=auto`、`status=proposed` 登记，用户确认后再提升为 `confirmed`；MUST NOT 让旧名成为第二个 canonical 条目。
 - **A7（文档页）— 裁决：ratified**。访谈收尾已创建 `docs/concepts/self-explanatory.md` 指针页；本特性只保证该页引用的 owner 路径在源与镜像中存在，MUST NOT 把 owner 正文复制进文档页。
@@ -92,6 +93,7 @@
 ### Edge Cases
 
 - **模板与 live 的编号不同**：模板 17 条、live 18 条；新原则各自取下一个编号。测试必须按标题集合匹配，不得按固定罗马数字断言。
+  <!-- 092 handoff: F3 — 「模板 17 条、live 18 条」是成文时读数，保留不改；live 名册唯一值 owner 是 `.specify/memory/constitution.md`（2026-11-09 现值 22 条）。本行结论（按标题集合匹配、不钉固定编号）不依赖该数字。参见 092 F3。 -->
 - **已有客户项目**：live 宪章/instructions 可能已有自定义内容；生成器必须增量注入，MUST NOT 覆盖或删除既有小节。
 - **instructions 体积预算**：新增小节可能推高 live 文件体积；生成器必须报告体积，owner 是 `scripts/bash/generate-instructions.sh` 的预算常量；本特性不得为通过预算而删减既有小节。
 - **镜像漂移**：缺少镜像或镜像与源不一致时 `--check` 必须退出 2；镜像独有文件不得被静默当作有效源。

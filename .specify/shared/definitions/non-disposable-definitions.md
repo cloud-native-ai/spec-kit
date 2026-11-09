@@ -20,7 +20,8 @@
 | 13 | 改动前读数的捕获规则（四项读数 + 基线不是阈值） | `## Capture Rule` |
 | 14 | 档 II 移交标记的落点与计数口径 | `## Handoff Rows` |
 | 15 | 与 sanitize / history 的边界 | `## Boundary with Sanitize and History` |
-| 16 | 与宪法的关系 | `## Relation to the Constitution` |
+| 16 | 执行段不得绕过确认设计行（与 C-410 同一条读数；named 与 confirmed 两侧） | `## Seam Bypass` |
+| 17 | 与宪法的关系（未新增原则的裁定与理由；与 One Source of Truth / Fast Fail / Directory Governance / Re-Anchoring 的四条分界） | `## Relation to the Constitution` |
 
 其他任何位置——命令模板、技能、指令面、契约、守卫、检查器——MUST 以「摘要 + 路径」引用本文档，MUST NOT
 复制本文档的封闭集成员、矛盾表格子或处置映射表。检出引擎 `scripts/python/non-disposable-check.py` 的
@@ -740,6 +741,18 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 第二个历史存储、第二个 `/speckit.history` 入口、第二套并发机制（FR-046 / FR-050 / FR-051 为 process-grade，
 见 `contracts/acceptance-readability.contract.md` C-806）。
 
+## Seam Bypass
+
+**执行段触及的每一条路径 MUST 被一条 confirmed design row 点名**；未被点名的路径是红读数，不是一次顺手修复。
+这条规则与 `contracts/four-stage-command.contract.md` C-407 的执行段规则是**同一条读数**（该契约 C-410 已如此
+声明），本节不复述第二份判据：判据的固定权在该契约，读数的守卫载体是
+`tests/contract/test_non_disposable_seam_bypass.py`。
+
+- **named 与 confirmed 是两件事**：一条被点名但未确认的行不授权任何写入；守卫 MUST 分别翻转这两侧并各自转红。
+- **既有 spec 正文、owner 文档或守卫的改动是一次 confirmed design item**，并 MUST 携带改动前后的读数——读数
+  的取法归 § Capture Rule，本节只指向它，不复述四项。
+- **路径的同一性按规范化后的拼写**：`./x`、`x//y` 与 `x` 是同一条路径；一个目录名只覆盖它自己，不构成子树授权。
+
 ## Relation to the Constitution
 
 **本次未新增宪法原则，也 MUST NOT 新增**（clarify D-2）。理由：状态脊 `direction_contract.goal_verbatim` 的逐字
@@ -761,11 +774,26 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 | XI Dogfooding | A–H 首轮修复正是本机制在本仓的第一次真实使用，而不是一份清理清单。 |
 | XVI Fast Fail | 不可判定降级为 `unevaluated` 而非"干净"；"我看过了，没有"与"我没能看" MUST 分开报。 |
 | XIX Self-Explanatory Structure | 类别的三件套（可观察定义 + 判定主体 + 降级形态）让每个类别名本身说明它要什么。 |
-| 目录治理（XVII） | 新文件 MUST 在 `shared/definitions/framework-map.md` 的登记表可见；不新建目录。 |
+| 目录治理（XVII） | 新文件 MUST 在 `shared/definitions/framework-map.md` 的登记表可见；不新建目录。规则真源为 `shared/guidelines/directory-governance.md`（见下表首行）。 |
+
+**四条相邻纪律的边界（本节只说边界，规则按指针引用）**：这四条纪律各自已有 owner，本节 MUST NOT 复述其规则，
+也 MUST NOT 被读成它们的第二定义点。下表的「分界」一列是本节的唯一新增内容：它回答「同一件事被两条纪律同时
+看见时，归谁」。
+
+| 纪律 | 规则 owner（指针） | 分界（本文档管哪一半） |
+|---|---|---|
+| One Source of Truth（宪法 XIV） | `shared/guidelines/one-source-of-truth.md` | owner 纪律管**每一件事实**的唯一定义点；本文档只拥有 Non-Disposable 的那几件事实（表格前 16 行），并因此是 `multi-owner` / `stale-constant` 两类的**检出者**——检出别人违反 owner 纪律，不使本文档成为该纪律的 owner。 |
+| Fast Fail（宪法 XVI） | `shared/guidelines/fast-fail.md` | Fast Fail 管**一次运行中**的异常分流（纠正 vs 裁定）；本文档管**运行之间留在树上的**残留载体。二者的共面只有一处：不可判定 MUST 降级为 `unevaluated` 而不是「干净」——判据归本文档，披露义务归 Fast Fail。 |
+| Directory Governance（宪法 XVII） | `shared/guidelines/directory-governance.md` | 目录治理管**目录**能否存在（命名、登记、临时目录的忽略规则）；本文档管**文件与正文**是否过期、无用或延期，且不拥有「新文件要登记」这条规则——它只承接该规则的后果（`orphan-path` 类点名一处指向不存在路径的引用）。 |
+| Re-Anchoring（宪法 XXII） | `shared/definitions/re-anchoring-definitions.md`（执行步骤 owner 为 `sdd-loop-driver/references/checkpoint-protocol.md` § Direction audit） | Re-Anchoring 管 agent **在本轮内**是否仍忠于初始任务与规则；本文档管**本轮结束后**留在树上的载体。分界的判别：一个载体若只需重新读一遍就能被正确对待，那是 Re-Anchoring；若它需要一次**处置**（四个封闭值之一）才能不再误导下一位读者，那是本文档。 |
+
+**这四条都不构成新原则**：上表四行全部是宪法**既有**条目的承接关系，本特性没有新增一条，也不因此改动任何
+条目的正文或计数 pin（D-2 / OI-4）。
 
 **连带的四条义务（FR-064）**：(i) 新增文件在既有登记处可见；(ii) 被守物损坏时契约测试 MUST 变红（至少一条
 变异腿）；(iii) `AGENTS.md` 的指针只经 `/speckit.instructions` 生成，MUST NOT 手改；(iv) 本节存在本身——写明
-本次**未**新增原则及其理由，否则下一位读者会把"理念没有原则"读成遗漏。
+本次**未**新增原则及其理由，并给出与四条相邻纪律的分界（本节上面的分界表），否则下一位读者会把"理念没有原则"
+读成遗漏，或把本理念读成某条既有纪律的重复。
 
 **若用户日后裁定补一条原则（OI-4）**：届时按宪法既有五处落点 + 三计数 pin + Sync Impact Report 的完整流程，
 作为一次独立的 MINOR 修订执行（FR-065）。本特性的 FR/SC MUST NOT 预写其条号或 pin 数值。

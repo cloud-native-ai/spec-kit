@@ -32,7 +32,9 @@ mechanism).
 **Project Type**: framework / code generator (single Python package `src/specify_cli/` + packaged `templates/`, `skills/`, `scripts/`, `shared/` sources)  
 **Performance Goals**: N/A — no runtime path is changed; the only measured quantity is a byte budget (see Constraints)  
 **Constraints**: the live instructions file sits 29 B below the current `INSTRUCTIONS_BUDGET_BYTES` ceiling, so the new section cannot land without raising that constant by the smallest sufficient amount; the gate-scanner total is pinned at an exact integer by two contract tests, so every new passage on a scanned surface must carry zero blocking-pattern hits  
+<!-- 092 handoff: F1 — "29 B below the current `INSTRUCTIONS_BUDGET_BYTES` ceiling" is a plan-time reading and MUST NOT be updated. That constant's only definition point is `scripts/bash/generate-instructions.sh`; the FR/task decomposition ceilings are owned by `.specify/skills/sdd-loop-driver/scripts/decomposition-check.py` (`FR_CEILING = 120`, `TASK_CEILING = 160`). Re-read the owner; never quote this line's number. See 092 F1, 2026-11-09. -->
 **Scale/Scope**: 3 owner documents mirrored (already authored, untracked), 1 constitution template + 1 live constitution + 1 skill mandate list, 1 instructions template + 1 live instructions file + 1 budget constant, 1 glossary entry, 1 docs pointer page, 4 contract suites touched
+
 
 ## Constitution Check
 
@@ -40,6 +42,8 @@ mechanism).
 
 **Core Principles Compliance** (rendered from `.specify/memory/constitution.md`; the roster below is
 the live constitution's own roster, 18 principles, in file order):
+
+<!-- 092 handoff: F3 — 「18 principles」是 plan-time 快照，保留不改。本行原作自己的名册断言，并非引用；名册的唯一值 owner 是 `.specify/memory/constitution.md`（2026-11-09 现值 22 条，版本 1.19.0）。参见 092 F3。 -->
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -248,6 +252,8 @@ re-measures it, so `/speckit.tasks` can re-take it instead of inheriting it.
   `over` and the acceptance claim for SC-009 would be false on the same commit.
 - **Live constitution numbering**: the live roster is 18 principles and the template roster is 17 at
   plan time; the live constitution's new principle takes the next free numeral *on that surface*
+
+  <!-- 092 handoff: F3 — 「18 / 17 at plan time」是 plan-time 快照，保留不改。名册的唯一值 owner 是 `.specify/memory/constitution.md`（2026-11-09 现值 22 条，版本 1.19.0）；模板侧自按模板文件重新计数。参见 092 F3。 -->
   (XIX), while the template lands the same title at its own next free numeral (XVIII). No test and no
   plan row may pin a numeral.
 - **`/speckit.improve` wiring stays out** (`OI-082-01`): the optimization workflow document is

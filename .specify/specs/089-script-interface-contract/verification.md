@@ -4,7 +4,7 @@
 |----|------|--------|----------|
 | SC-001 | final | **pass** | `test-evidence/SC-001-zero-side-effect.txt` — contained per-family harness: 749 candidates / 16 families / 0 moved snapshot pairs |
 | SC-002 | final | **pass** | `test-evidence/SC-002-incident-script.txt` — `generate-instructions.sh` flags leave `.specify/instructions.md` and `.gitignore` byte-identical; unknown option exits 2 |
-| SC-003 | final | **pass** | `test-evidence/closure-check.json` — 751 candidates, **0 violations**, 737 exemptions (453 pytest-module, 140 inherited-from-source, 120 optional-read-only, 9 no-entry-point, 8 historical-record, 4 declared-exception, 3 out-of-scope), 2 declared exceptions recomputed, the only finding is the resolved `ignored-not-probed` |
+| SC-003 | final | **pass** | `test-evidence/closure-check.json` — 751 candidates, **0 violations**, `applicable=367` plus 737 exemptions (453 pytest-module, 140 inherited-from-source, 120 optional-read-only, 9 no-entry-point, 8 historical-record, 4 declared-exception, 3 out-of-scope), 2 declared exceptions recomputed, the only finding is the resolved `ignored-not-probed`; the two counts are NOT disjoint (`exempt` counts `exemptions[]` rows, 353 of which are also `applicable`), so the recomputable partition is `applicable + violations + (candidates − applicable − violations)` and **the identity `applicable + exempt == candidates` is void by construction** — see the re-measurement below <!-- 092 handoff: E4 --> |
 | SC-004 | final | **pass** | `test-evidence/SC-004-downstream.txt` |
 | SC-005 | supporting | **pass** | `test-evidence/SC-005-constitution-diff.txt` |
 | SC-006 | final | **pass** | `test_constitution_double_landing.py` (19/20/12 + watchlist 7) and `test_fast_fail_discipline.py` pins |
@@ -27,6 +27,10 @@ smoke_evidence_path: `.specify/specs/089-script-interface-contract/test-evidence
 
 - The clarification (Q3) says test modules are **applicable** and must be backfilled or registered as exemptions. Backfilling pytest modules with `--help/--version` is meaningless; the declared-exception register only accepts `skills/external/<skill>/` scripts, so `tests/**` cannot be registered there either.
 - Measured: 453 of the 488 violations are under `tests/**`; 361 are `probe-inconclusive` (importing a pytest module without pytest context), 92 are missing help/version limbs.
+
+**Count-identity re-measurement (2026-11-09)** — the identity the DoD/GATE rows used to state is void by construction, not merely unheld on this tree, so it is replaced by a recomputable partition. Measured on `test-evidence/closure-check.json`: `candidates=751`, `applicable=367`, `exempt=737`, `violations=0`. `367 + 737 = 1 104 ≠ 751`. <!-- 092 handoff: E4 -->
+
+The cause is mechanical: `applicable` counts `candidates[]` rows whose `applicable is True` (367) while `exempt` is `len(exemptions[])` (737), and the two sets are **not disjoint** — 353 of the exempted paths are also applicable candidates. Summing them therefore double-counts, and no tree on which any exemption is also applicable can satisfy the identity; the "surplus" is two overlapping classifiers, not a miscount. The recomputable statement is the accounting itself: `applicable` equals the number of `candidates[]` rows with `applicable is True`, `exempt` equals `len(exemptions[])` (every one of those paths a candidate), and no candidate falls outside `applicable` ∪ `exemptions[]` ∪ `violations[]` — on this payload the union covers all 751 with `violations=0`, and 384 candidates are not applicable while all 384 are exempted. That check replaces the identity in DoD-3 / GATE-5; the checker engine's own count semantics are untouched. <!-- 092 handoff: E4 -->
 
 The three viable dispositions, for the user to ratify:
 

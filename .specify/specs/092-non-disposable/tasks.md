@@ -472,3 +472,5 @@ the package territory in `plan.md` § Implement Package Proposal is the partitio
     `F-`/`OI-` id and are registered in the shape the table's `D-…` rows already use.
 
 - [ ] T157 Migrate the sibling spec-local teams that still nest the default team under its own spec slug (`085/086/087/089`) to `team/team.md`, keeping named extra teams under `team/<team-slug>/team.md`; re-run `goal-utils.py run-checks` per spec and record the before/after paths in `test-evidence/team-path-migration.txt` (the engine now resolves the default file first, so the migration is a rename, not a behavioural change).
+
+- [ ] T158 Root-fix the intermediate next-work narration: `shared/guidelines/progress-reporting.md` gains `## 无人值守模式（Unattended Mode）` (periodic reports suppressed; one final-state report; anomalies still immediate), the ambient section in both instruction surfaces points at it, and the change is recorded in `test-evidence/unattended-reporting-root-fix.md`.
