@@ -21,5 +21,7 @@ developers and the framework's unattended mechanisms. Do not edit it by hand.
 - **`.gitexcludes`**: 未初始化 —— 该机制服务层间同步的分支专属文件保护，本模型无长期并行层，无消费者；将来改声明三层模型时再初始化
 - **⚠ NOT a sync peer**: `main`（tracks `github/main`）属**上游项目** `github/spec-kit` 的另一条世系，相对 `master` 大幅分叉（2026-10-13 本地 ref 口径实测：ahead 736 / behind 716）。它不是 `master` 的别名，不参与本工作流的任何同步或合并；把它当作 MAIN 会让每次同步都面对巨大分叉
 - **⚠ Remote roles**: `origin` = 上游 `github/spec-kit` —— **只读参照，禁止推送**；`github` / `gitlab` / `gitee` = 同一 fork `cloud-native-ai/spec-kit` 的三处镜像。注意 `remote.origin.url` 指向上游而非本 fork，故任何 `{REPO_URL}@{SHA}` 形式的引用都不可解析
-- **Last updated**: 2026-10-13
+- **Closeout**: `ask`（四值闭集 `commit+merge+push` / `commit+merge` / `commit-only` / `ask`；缺失或未填即取 default `ask`，不得从相邻行推断取值）—— 收口序列由 `git-utils` 技能 scope A 的 `closeout` 操作按本块模型推导并呈现，本行只声明策略
+- **Closeout remotes**: `github`, `gitlab`, `gitee`（同一 fork 的三处镜像；`origin` 只读上游按角色排除，不得出现在此列表；显式空列表 empty 或未填 absent 即 "no pushable remote"，推送步退化为 skipped 并在报告说明原因）
+- **Last updated**: 2026-11-09
 <!-- GIT_WORKFLOW_END -->

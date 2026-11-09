@@ -109,7 +109,12 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # two `h-docs-sync-eval` HandlerBindings for status/measure, added by d41d0ced in
     # shared/definitions/probe-definitions.md; 120 -> 121. Measured:
     # `probe-utils.py --action probes` reports 121 Objects, 0 external, 0 errors.
-    assert internal == 121, (
+    # 2026-11-09: Feature 091 registers one more skill Object
+    # (`closeout-step-observe`, the skill:git-utils wrap-up arm of the close-out
+    # step, sharing the `closeout-step` class with 091's Handler row); 121 -> 122.
+    # Measured: `probe-utils.py --action probes` reports 122 Objects, 0 external,
+    # 0 errors; `--action validate` reports 11 classes, 122 internal + 0 external.
+    assert internal == 122, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

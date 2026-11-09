@@ -1,0 +1,41 @@
+# T052 — does shared/workflow/external-dispatch-recipes.md need a pointer line?
+
+Date: 2026-11-09
+Row: T052 (blockedBy T051, discharged by the T051 registry row)
+Owner file: shared/workflow/external-dispatch-recipes.md (read-only in this row)
+
+## Question
+
+T051 registered the wrap-up handler `h-closeout` (agent kind, order 60) with behaviour owner
+`shared/workflow/artifact-commit-step.md`. T052 asks whether this shared recipe document carries
+a *copied* default that is now stale against that row, and if so to add exactly one pointer line.
+
+## Measurement (both readings taken on the landed tree)
+
+$ grep -n "artifact-commit-step" shared/workflow/external-dispatch-recipes.md
+46:   - commit only this feature's artifacts; leave pre-existing dirty files untouched and
+      uncommitted (see `.specify/shared/workflow/artifact-commit-step.md`);
+    — one hit, and it already IS the pointer: it names the owner by path.
+
+$ grep -c "rap-up" shared/workflow/external-dispatch-recipes.md
+0
+    — no wrap-up step list is copied here at all.
+
+$ grep -ci "close-out\|closeout" shared/workflow/external-dispatch-recipes.md
+0
+    — no close-out vocabulary, so nothing here can describe the close-out wrongly.
+
+## Verdict (R-22): no edit
+
+The file's single mention of the step owner is a **pointer**, not a copied default: it names
+`.specify/shared/workflow/artifact-commit-step.md` and restates none of that owner's rules. Line
+46 also carries a pre-existing "do **not** push" instruction — that sentence belongs to Recipe 2
+(subagent dispatch for an *earlier* stage, where pushing is still the user's call), and it is not
+a close-out default: the close-out sequence is reached by the owner's own derivation, not from
+this line. Adding a second pointer here would duplicate a duty already discharged in each
+dispatching mechanism's own file (T053's guard reads those three), which
+`shared/guidelines/one-source-of-truth.md` forbids.
+
+Evidence that the owner file is untouched by this row:
+$ git diff --stat shared/workflow/external-dispatch-recipes.md
+(no output — byte-identical to HEAD)

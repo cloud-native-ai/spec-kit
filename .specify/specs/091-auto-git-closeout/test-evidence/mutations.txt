@@ -1,0 +1,42 @@
+# Mutation arms — every one is in-memory; no tree file is modified
+
+Date: 2026-11-09
+Module: tests/contract/test_git_closeout_contract.py
+Command: python -m pytest tests/contract/test_git_closeout_contract.py -q -k mutation
+
+Rule the arms obey: a guard is evidence only if it can go red for the reason its clause names.
+Each arm (a) first asserts the landed surface is GREEN under the predicate — otherwise the arm
+would be measuring a guard that is already broken — then (b) applies a string substitution to an
+in-memory copy and asserts the *same* predicate turns RED.
+
+$ python -m pytest tests/contract/test_git_closeout_contract.py -q -k mutation
+5 passed
+$ git status --porcelain   # after the run: the same file set as before it (no test-written path)
+
+| Arm | Row | Clause | Mutation (in memory) | Landed | Mutated |
+|-----|-----|--------|----------------------|--------|---------|
+| test_mutation_an_injected_retry_reds_the_no_retry_guard | T041 | executor C-5 / FR-011 / SC-003 | `1. stops at that step` → `1. retries the same step once` in `closeout-commands.md` § Failure discipline | green | **RED** — "stops at that step" disappears, so the run no longer stops at the first failure |
+| test_mutation_a_bare_force_form_reds_the_no_retry_guard | T041 | executor C-5 / SC-003 | `It performs **no `--force`**.` → `It performs `--force` when needed.` | green | **RED** — the bare force form is caught by the push-invocation sweep and no lease/confirmation backs it |
+| test_mutation_a_gate_list_copied_into_a_surface_reds_the_pointer_guard | T046 | lifecycle C-6 / declaration C-7 (R-20) | three of the gate owner's published subjects appended beside its pointer, on both surfaces (`artifact-commit-step.md`, `closeout-commands.md`) | green | **RED** — the surface copies the owner's rows instead of pointing at them |
+| test_mutation_a_dropped_gate_id_reds_the_closed_set_comparison | T048 | verification C-4 / SC-004 | one gate id dropped from an in-memory copy of the same-run scan (`gate-001` removed) | green | **RED** — "the destructive boundary shrank" |
+| test_mutation_a_second_closeout_owner_reds_the_single_owner_search | T053 | lifecycle C-9 / SC-005 | a synthetic in-memory document carrying `## Close-out` fed into the negative search | green | **RED** — "a second close-out owner document exists" |
+
+## Limit recorded, not papered over (R-21)
+
+The retry arm above reds through the **run shape** ("stops at that step"), not through the ban
+sentence. Measured: replacing `**no automatic retry**` with `**automatic retry**` leaves the
+predicate GREEN, because the § No retry, no force section still contains the heading text
+"No retry" and the sentence "It is never a retry mechanism" farther down. That is a real,
+recorded limit of a structural read: it detects the *negative* wording the owner publishes, not
+the polarity of every sentence in the section. The behavioural arms
+(`test_a_rejected_push_stops_before_the_remote_changes`,
+`test_a_merge_conflict_stops_before_any_push`) are what actually prove "no retry happened" —
+they assert the remote's ref listing and the pushed set after a failure, which a retry would
+change. The structural arm is the fast check, not the proof.
+
+## Why all arms are in-memory
+
+`closeout-verification.contract.md` C-1 separates the two evidence grades and this module's
+header restates it: a structural predicate reads files, a behavioural predicate runs git against
+a throwaway repository. Neither writes a tracked file, so a mutation cannot leave the tree in a
+half-mutated state — the substitution is applied to a local string and discarded.

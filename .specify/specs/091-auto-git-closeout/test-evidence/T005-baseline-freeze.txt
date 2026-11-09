@@ -1,0 +1,38 @@
+# T005 — clause-coverage baseline freeze (2026-11-09)
+
+Command:
+
+    /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py \
+        --spec-dir .specify/specs/091-auto-git-closeout --freeze \
+        > .specify/specs/091-auto-git-closeout/coverage-baseline.txt
+
+Exit status: 0. 600 lines written (2 header lines + 598 frozen clause names).
+
+Self-exclusion assertion (the freeze must not count this feature's own clauses):
+- the header line 2 states `frozen-from: .specify/specs/*/contracts/* excluding 091-auto-git-closeout`;
+- every other occurrence of the string in the file was searched for and only header line 2 matches;
+- the live account below is the proof that matters: it scanned 292 files (181 parsed + 107 named)
+  and reported `uncovered beyond baseline: 0`, i.e. this spec's 32 clauses are covered by
+  their own citation groups rather than hidden inside the frozen set.
+
+Re-run after the freeze:
+
+    /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/091-auto-git-closeout
+
+    uncovered beyond baseline: 0
+    FR universe: 28 / FR claimed: 28 / FR uncovered: 0
+    [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+    [fr-uncovered] pass (0) — 28 of 28 FRs cited from citation groups
+    [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them
+      declare a positive form (parse doubt, never read as zero-and-covered)
+    [coverage-baseline-delta] pass (0)
+    0 error(s), 0 warning(s)
+    status: ok
+    exit 0
+
+This discharges R-18 / GATE-6's accountant half: the status moves from `baseline-missing`
+to `ok` because the baseline now exists, and the FR lane stays 28/28 covered.
+
+Note on the R-14 premise cell: the superseded tasks.md reading said "FR uncovered: 4" and
+"598 clause-uncovered with status baseline-missing". The measured state after this freeze is
+`FR uncovered 0` and `598 uncovered items baseline-internal, 0 beyond baseline`.

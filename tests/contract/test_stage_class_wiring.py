@@ -120,14 +120,27 @@ BASELINE_COMMIT = "c1cd4600"
 # unchanged: *stripping the card restores the pinned bytes*.  Measured with this
 # module's own `strip_wiring` + `_sha256_text`, per the documented legitimate-edit
 # path above.
+#
+# 2026-11-09 all seven rows re-measured again, identically: feature 091
+# (T056, the Wrap-up probe `h-closeout`) moved the registry fingerprint
+# 8cb5a238739a -> 4682b9e38032 and compiled one new ordered step into every
+# command template's `## Wrap-up` — `7. Closeout — .../artifact-commit-step.md
+# § "The `## Close-out` step"`.  Measured, not assumed: with the machine-owned
+# banner swapped back to the pre-recompile fingerprint the strip differs from the
+# frozen pin by exactly that one new list line, and both deltas (banner + line)
+# sit inside the strip, so the file's bytes stay unchanged outside the card and
+# the assertion keeps its shape: *stripping the card restores the pinned bytes*.
+# Removing only the compiled `7. Closeout` line and restoring only the banner
+# fingerprint reproduces each previous pin byte for byte — which is what makes
+# these two deltas machine-owned rather than an authored edit riding along.
 BASELINE_SHA256 = {
-    "requirements": "afe094ea61eaeac6e8c5aeac10435b9c0aa4d1da5e39167fddab462a8b601fb4",
-    "clarify": "63441a05e923dac1f8dd30533c97ed38c54e67baa459e4a18ee17cc245dbad7e",
-    "plan": "720a470def7bb6a136766386fe8972346cd2a59f1f7d0e3eb48610027414d0cd",
-    "tasks": "bad18f749cbba7fc05c05a92581aa51524ebb4a4b3986d572596834d521bdc70",
-    "checklist": "0cdc5a68fd5da04f08df2a07093f6c005dce4201ccefb50fd73e528b769f931f",
-    "analyze": "45288d99f2b6c4561cf9c06bb6f4dee30d1f085622b869fb2e592335422a3a0c",
-    "implement": "e836ad4a683050d781557a61c042cb7ac7ef36a1ab61de292271db80a83269f5",
+    "requirements": "604b9f464ab593ab32bdb7088f779ef48cd77da8b801d1edd06f80fb298d37f6",
+    "clarify": "0d0596e04b9acb2973b870a9231673b7b14fc12d9cd089aec66e1ec9a6d3faf6",
+    "plan": "3f79be70a3f9b6f7a8bd4fe212d70f99674e408c7cab4972645e06881fd9a773",
+    "tasks": "1c8998141ebf3ffe55af4e5f6fbed167a992f4103a2af30dd2946d424a3d3e0c",
+    "checklist": "08fb8048e55f038b01e27347deb13c7362334060ff71d88dcac42f314f355d20",
+    "analyze": "0dbb094a6ce0aeacee81531197924734a4cf8535ede49939cc68607b4ab7bde7",
+    "implement": "a43d824a36c58d13bd3a38f918bf57256ba536332028ab3bf0aef4ef37be4f93",
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
@@ -152,8 +165,15 @@ BASELINE_SHA256 = {
 # reports zero matching subsections), which is what this guard actually asserts —
 # "these entry points gain no wiring card". Re-pinned to the merged bytes; the
 # `humanize` pin is untouched because that file carries no compiled banner.
+#
+# 2026-11-09 091 T056 re-measures `docs` once more for the same machine-owned
+# reason as the seven rows above (fingerprint 8cb5a238739a -> 4682b9e38032 plus
+# the compiled `7. Closeout` line).  The authored content the pin exists for is
+# untouched: `docs.md` still carries no wiring card and no authored line moved —
+# restoring the pre-recompile banner and dropping the one compiled list line
+# reproduces the previous pin byte for byte.  Re-pinned to the live bytes.
 UNCHANGED_SHA256 = {
-    "docs": "a4671ff57302d37dca1a15ec790681336f519047f2984565904d1c98ccfa6889",
+    "docs": "75cfc0db9b3806af2f7dec8a1c4716715619e39e85e7a0a2d084d502f5f9307c",
     "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
 }
 

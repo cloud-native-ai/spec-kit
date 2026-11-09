@@ -1,0 +1,41 @@
+# T054 — the instructions-template row, decided by measurement
+
+Date: 2026-11-09
+Row: T054 (blockedBy T023) — green: contracts/closeout-lifecycle.contract.md#C-10
+Inputs: T004's reading in notes/pre-change-measurements.md § "The instructions surface"
+
+## The T004 reading this row decides on
+
+The `## Git Workflow` section already reaches the close-out through two names:
+1. the mechanism list names "close-out" among the unattended mechanisms;
+2. the pointer chain `.specify/workflow/git.md` → the `git-utils` skill (scope A) → its
+   references reaches the step's own reference page.
+What is not reachable from that section is the new reference *file* by name.
+
+## Decision: "no edit"
+
+Why the gap is not a defect:
+- the section owns a **pointer**, not a procedure (`shared/guidelines/one-source-of-truth.md`):
+  it names the state file as the single source of truth and hands the procedure to the skill;
+- adding "see `skills/external/git-utils/references/closeout-commands.md`" would put a third
+  hop of the same pointer chain into the instructions template, a file every project receives —
+  i.e. it would copy a project-level path into a shipped template, which
+  `closeout-verification.contract.md` C-7 and the shipped-text neutrality rule both forbid;
+- the reader is not stranded: the skill's own § Resources list names the reference (T049), and
+  every unattended mechanism's file points at the owner directly (T053's guard).
+
+## Measurement (landed tree)
+
+$ git diff --stat templates/instructions-template.md .specify/instructions.md
+(no output — both files are byte-identical to HEAD; this row edited neither)
+
+$ grep -n "close-out" templates/instructions-template.md   → 1 hit (§ Git Workflow)
+$ grep -n ".specify/workflow/git.md" templates/instructions-template.md → 1 hit (§ Git Workflow)
+
+## T062's counterpart
+
+`tests/contract/test_git_closeout_contract.py::test_the_instruction_surface_reaches_the_step_without_restating_it`
+asserts both halves in one place: the section reaches the close-out by name and points at the
+state file, AND it carries no restatement ("Closeout remotes", "commit+merge+push",
+"stop at the first failure"). So "no edit" is a measured conclusion with a guard behind it,
+not an omission.
