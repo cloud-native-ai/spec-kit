@@ -216,7 +216,7 @@ pin moves.
 **Checkpoint**: the guard is green, every closed set has a mutation leg, and substituting the closure checker with a
 stub makes the `status-unreadable` leg fail.
 
-- [ ] T086 Create `tests/contract/test_non_disposable_contract.py` with its fixture data stated in the file itself — the seven-face existence legs and the `deferral-marker` fixture tree
+- [ ] T086 Create the contract-test group files under `tests/contract/` (`test_non_disposable_contract.py` plus one file per later clause group, so clause groups can be authored in parallel) with each file's fixture data stated in itself — the seven-face existence legs and the `deferral-marker` fixture tree
 - [ ] T087 Add the mutation-leg harness to `tests/contract/test_non_disposable_contract.py` — one defect-creating copy-tree edit per class, asserting red with the expected path:line, plus the inverse asserting green
 - [ ] T088 Add the engine CLI legs to `tests/contract/test_non_disposable_contract.py` — `-h`/`--help`/`--version` answer without acting and an undeclared option exits 2; every declared option is accepted and no other one is exposed
 - [ ] T089 Add the read-only leg to `tests/contract/test_non_disposable_contract.py` — a `git status --porcelain` comparison around a full run is byte-identical, with a mutation leg that touches a tracked path and asserts red
