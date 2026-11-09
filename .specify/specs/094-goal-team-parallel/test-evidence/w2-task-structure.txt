@@ -1,0 +1,123 @@
+== task rows ==
+rows: 83
+distinct ids: 83
+duplicate ids: none
+id range: T001..T083 ; gaps: none
+first row line: 141 ; last row line: 331
+contiguous order in file: NO — out of order: [('T082', 'T081')]
+state sigils: {' ': 83}
+
+== package map ==
+wp01-foundation          declared-count=15 expanded=15 OK
+wp02-archive-migration   declared-count=17 expanded=17 OK
+wp03-command-family      declared-count=19 expanded=19 OK
+wp04-handoff             declared-count=8 expanded=8 OK
+wp05-peers-and-vocabulary declared-count=16 expanded=16 OK
+wp06-owners-guards       declared-count=6 expanded=6 OK
+wp07-closure             declared-count=2 expanded=2 OK
+packages: 7 ; union ids: 83 ; unassigned: none ; unknown: none
+sum of declared counts: 83
+partition result: each task in exactly one package
+
+== blockedBy resolvability ==
+T002 -> T001
+T003 -> T001
+T004 -> T003
+T006 -> T005
+T007 -> T005
+T008 -> T005
+T009 -> T006,T007,T008
+T010 -> T009
+T011 -> T009
+T012 -> T009
+T013 -> T005
+T014 -> T013
+T015 -> T014
+T016 -> T015
+T017 -> T016
+T018 -> T016,T017
+T019 -> T015
+T020 -> T015
+T021 -> T020
+T022 -> T020
+T023 -> T021
+T024 -> T023
+T025 -> T020
+T026 -> T025
+T027 -> T025
+T028 -> T015
+T029 -> T028
+T030 -> T029
+T031 -> T030
+T032 -> T031
+T033 -> T028,T029,T030,T031,T032
+T034 -> T015
+T035 -> T034
+T036 -> T035
+T037 -> T034
+T038 -> T035
+T039 -> T034
+T040 -> T034
+T041 -> T034
+T042 -> T015
+T043 -> T015,T054  FORWARD=['T054']
+T044 -> T042,T043
+T045 -> T012
+T046 -> T045
+T047 -> T014
+T048 -> T012
+T049 -> T015
+T050 -> T015
+T051 -> T015
+T052 -> T049,T050,T051
+T053 -> T015
+T054 -> T015,T053
+T055 -> T054
+T056 -> T053
+T057 -> T056
+T058 -> T056
+T059 -> T015
+T060 -> T059
+T061 -> T012,T059
+T062 -> T059
+T063 -> T009
+T064 -> T015
+T065 -> T015
+T066 -> T063,T064,T065
+T067 -> T009
+T068 -> T067
+T069 -> T067
+T070 -> T069
+T071 -> T053
+T072 -> T071
+T073 -> T067
+T074 -> T014
+T075 -> T067
+T076 -> T034,T045
+T077 -> T076,T064
+T078 -> T034
+T079 -> T034,T073
+T080 -> T079
+T082 -> T005
+T081 -> T082  FORWARD=['T082']
+T083 -> T081,T082
+rows with blockedBy: 81 ; unresolved targets: 0 ; forward edges: 2
+
+== green tags ==
+total green tags: 113
+contracts/binding-and-lifecycle.md            tags=30 distinct=30
+contracts/command-family-and-declarations.md  tags=20 distinct=20
+contracts/handoff-contract.md                 tags=18 distinct=18
+contracts/owner-rewrites-and-tests.md         tags=21 distinct=21
+contracts/unified-archive-and-migration.md    tags=24 distinct=24
+clauses claimed by more than one row (should be 0): none
+rows carrying green tags: ['T005', 'T020', 'T028', 'T049', 'T076', 'T079', 'T080', 'T082']
+
+== FR quotes in task rows vs § FR -> row trace ==
+FR definitions counted via rows: 43
+FR ids in trace table: 42
+FR-005  trace=['T020', 'T021', 'T024', 'T025', 'T026'] rows=['T020', 'T021', 'T022', 'T024', 'T025', 'T026']  trace-missing=['T022'] trace-extra=[]
+FR-009  trace=['T008', 'T028', 'T034', 'T037', 'T039'] rows=['T008', 'T028', 'T029', 'T034', 'T037', 'T039']  trace-missing=['T029'] trace-extra=[]
+FR-019  trace=['T060', 'T062'] rows=['T060']  trace-missing=[] trace-extra=['T062']
+FR-035  trace=['T059', 'T060'] rows=['T059']  trace-missing=[] trace-extra=['T060']
+FR-043  in rows but missing from trace table

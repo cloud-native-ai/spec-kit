@@ -1,0 +1,28 @@
+referenced test-evidence basenames: 23
+
+PRESENT *.txt                                                      refs=execution-lessons-2026-11-09.md:7, plan.md:322
+ABSENT  T003-fixture-probe.txt                                     refs=tasks.md:143
+PRESENT analyze-repair2-baseline-*.txt                             refs=analyze-round2-repair.md:68
+PRESENT analyze-repair2-engine-measurements.txt                    refs=analyze-round2-repair.md:14, analyze-round2-repair.md:17, analyze-round2-repair.md:8...
+PRESENT analyze-repair2-gates-requirements.txt                     refs=analyze-round2-repair.md:67
+PRESENT analyze-repair2-resident-measurement.txt                   refs=analyze-round2-repair.md:16, analyze-round2-repair.md:8, requirements.md:209...
+PRESENT analyze-round2-engine-measurements.txt                     refs=analyze-round2-findings.md:59
+ABSENT  closure-failed.txt                                         refs=tasks.md:328, tasks.md:47
+PRESENT coverage-tasks.txt                                         refs=tasks.md:483
+PRESENT decomposition-tasks.json                                   refs=tasks.md:485
+ABSENT  implementation-baseline-names.txt                          refs=tasks.md:142
+ABSENT  migration-applied.json                                     refs=quickstart.md:59, tasks.md:37
+ABSENT  migration-dryrun.json                                      refs=quickstart.md:50, tasks.md:327
+ABSENT  migration-dryrun.txt                                       refs=plan.md:359
+PRESENT plan-baseline-names.txt                                    refs=owner-rewrites-and-tests.md:83, plan.md:257, plan.md:262...
+PRESENT pre-analyze-tasks.json                                     refs=tasks.md:485
+PRESENT pre-analyze-tasks.txt                                      refs=tasks.md:485
+PRESENT requirements-baseline-probe.txt                            refs=plan.md:258, plan.md:53, quickstart.md:54...
+ABSENT  resident-backfill.json                                     refs=tasks.md:331
+ABSENT  residual-after.txt                                         refs=tasks.md:37
+ABSENT  residual-before.json                                       refs=quickstart.md:49
+PRESENT validate-tasks.txt                                         refs=tasks.md:166, tasks.md:349, tasks.md:486
+ABSENT  w3-V2.txt                                                  refs=w3-trunk-reconciliation.md:231
+
+present=13 absent=10
+absent names: ['T003-fixture-probe.txt', 'closure-failed.txt', 'implementation-baseline-names.txt', 'migration-applied.json', 'migration-dryrun.json', 'migration-dryrun.txt', 'resident-backfill.json', 'residual-after.txt', 'residual-before.json', 'w3-V2.txt']

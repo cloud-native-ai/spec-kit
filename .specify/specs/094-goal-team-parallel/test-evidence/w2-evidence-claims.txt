@@ -1,0 +1,18 @@
+== references to analyze-repair2-* / analyze-round2-* in notes and artifacts ==
+.specify/specs/092-goal-team-parallel/contracts/command-family-and-declarations.md:15:test-evidence/analyze-repair2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/contracts/command-family-and-declarations.md:24:test-evidence/analyze-repair2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-findings.md:59:test-evidence/analyze-round2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:14:test-evidence/analyze-repair2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:16:test-evidence/analyze-repair2-resident-measurement.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:17:test-evidence/analyze-repair2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:67:test-evidence/analyze-repair2-gates-requirements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:8:test-evidence/analyze-repair2-engine-measurements.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round2-repair.md:8:test-evidence/analyze-repair2-resident-measurement.txt
+.specify/specs/092-goal-team-parallel/notes/analyze-round3/w1-closures.md:18:test-evidence/analyze-repair2-resident-measurement.txt
+.specify/specs/092-goal-team-parallel/requirements.md:209:test-evidence/analyze-repair2-resident-measurement.txt
+
+== existence check ==
+EXISTS  test-evidence/analyze-repair2-engine-measurements.txt
+EXISTS  test-evidence/analyze-repair2-gates-requirements.txt
+EXISTS  test-evidence/analyze-repair2-resident-measurement.txt
+EXISTS  test-evidence/analyze-round2-engine-measurements.txt

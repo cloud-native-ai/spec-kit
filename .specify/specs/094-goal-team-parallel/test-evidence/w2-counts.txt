@@ -1,0 +1,25 @@
+== counts measured from files (2026-11-09) ==
+FR definition rows (grep): 43
+SC definition rows (grep): 12
+STR rows: 6
+FR ids distinct: 43
+SC ids distinct: 12
+
+Clause markers per contract file (grep '^- \*\*C-'):
+.specify/specs/092-goal-team-parallel/contracts/binding-and-lifecycle.md:30
+.specify/specs/092-goal-team-parallel/contracts/command-family-and-declarations.md:20
+.specify/specs/092-goal-team-parallel/contracts/handoff-contract.md:18
+.specify/specs/092-goal-team-parallel/contracts/owner-rewrites-and-tests.md:21
+.specify/specs/092-goal-team-parallel/contracts/unified-archive-and-migration.md:24
+markers total=113 distinct ids=111
+
+Task rows: 83
+Task ids distinct: 83
+green tags total: 115
+
+plan-baseline-names.txt lines: 46
+coverage-baseline.txt lines: 600
+
+Constitution principles (for plan.md '22 principles'):
+1
+decomposition-model numbered sections (for tasks.md '22 sections'): 22

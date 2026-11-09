@@ -1,0 +1,42 @@
+W2 gate summary — rerun 2026-11-09 (repo root: /storage/project/cloud-native-ai/spec-kit, branch master)
+
+1) validate-requirements.py <S92>/requirements.md
+   reading: status ok; 0 error / 0 warning; 316 lines, 55 definition rows, 6 shared strings
+   exit: 0
+   raw: test-evidence/w2-gate-validate-requirements.txt
+
+2) account-clause-coverage.py <S92> --corpus-root <repo>/.specify/specs
+   reading: status uncovered, exit 1
+     fr-uncovered        pass (0)  — 43 of 43 FRs cited from citation groups
+     clause-uncovered    fail (599) — 599 uncovered, 1 beyond the frozen baseline
+                          BEYOND-BASELINE: 085-sdd-temporary-goal-team/contracts/checkpoint-and-agents.md#C-014
+     coverage-baseline-delta fail (1) — baseline holds 598 names; 598 baseline-internal uncovered
+     clause-unparsable   fail (115) — 1 file declares a positive form and yields zero clauses (parse doubt)
+                          parse-doubt file: 067-loop-efficiency-hardening/contracts/runner-contract.md (md-bold-closed, 0 clauses)
+     claimed clauses (this feature): 113 ; scanned 313 files ; clause universe 2116 (2140 ids, 24 collapsed)
+   exit: 1
+   raw: test-evidence/w2-gate-coverage.txt ; JSON: test-evidence/w2-gate-coverage.json
+
+3) validate-tasks.py <S92>/tasks.md
+   reading: PASS (with warnings) — 0 error(s), 1 warning(s); WARN 239 T043 -> T054 forward dependency
+   exit: 0
+   raw: test-evidence/w2-gate-validate-tasks.txt
+
+4) validate-decision-tensions.py --spec <S92>
+   reading: status ok; 7 records (T-001..T-007); 0 error / 0 warning
+   exit: 0
+   raw: test-evidence/w2-gate-tensions.txt
+
+5) pre-analyze-check.py --repo <repo> --spec-dir <S92> --stage {requirements,plan,tasks}
+   reading: decision=pass on all three; errors=0; advisories=100 each; fr=43; sc=12; tasks=83; clauses=0; files=13
+   exit: 0 each
+   raw: test-evidence/w2-gate-precheck.txt ; JSON: test-evidence/w2-precheck-{requirements,plan,tasks}.json
+
+6) decomposition-check.py --mode tasks --requirements ... --tasks ...
+   reading: decision=proceed; fr_count=43; task_count=83; ceilings 120/160
+   exit: 0
+   raw: test-evidence/w2-gate-decomposition.txt ; JSON: test-evidence/w2-decomposition-tasks.json
+
+Corpus-drift origin of the coverage failures (not caused by this round's edits):
+ - 085 C-014 added to .specify/specs/085-.../contracts/checkpoint-and-agents.md by upstream 8edd955d (092 repair wave u07/u10), after the 092 baseline freeze 9803b134.
+ - 067 runner-contract.md blockquote "> **C-001** of ..." added by 76b4ec60 (092 repair wave u10), makes form=md-bold-closed yield 0 marker lines (parse doubt).
