@@ -51,7 +51,7 @@
 |---------|---------|--------|----------|
 | WG-15 both directions | five-case probe (`--check preflight`, temp repo with an existing `shared/` dir) | file-level → admit; empty → `write-domain-empty`; existing dir → `write-domain-directory`; glob → `write-domain-directory`; read-only empty → admit | `wp3-wp-gate-wg15.txt` |
 | Existing wp-gate suites | `bash scripts/bash/run-tests.sh tests/unit/test_wp_gate.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/integration/test_wp_coordination_dry_runs.py -q` | **113 passed** (no regression from the WG-15 extension) | `wp3-wp-gate-wg15.txt` |
-| Mirror reading (T041) | `python3 scripts/python/sync-mirrors.py --check` | **exit 2** — drift set equals exactly the edited-source projection (29 command templates × 3 tool copies + 29 `.github/prompts`, 2 templates, 16 skills, 6 shared, 2 agents); zero unexpected pairs | `wp3-mirror-reading.txt` |
+| Mirror reading (T041) | `python3 scripts/python/sync-mirrors.py --check` | **exit 2** — drift set equals exactly the edited-source projection (116 per-tool copies from the 29 command templates + 31 DIFF pairs: 2 templates, 21 skills, 6 shared, 2 agents = 147 pairs); zero unexpected pairs | `wp3-mirror-reading.txt` |
 | Raw-invocation scan (T158) | invocation-shaped grep over `skills/ templates/ agents/ shared/ docs/reference/ .specify/instructions.md` | **zero hits** outside the T159 allowlist; remaining `pytest` occurrences are prose mentions only | `wp3-test-entry.txt` |
 | Full suite (context) | `bash scripts/bash/run-tests.sh -q` | 255 failed / baseline 161 → 94 new names, classified in § 4. The great majority are mirror-parity tests that clear at regeneration; the semantic re-pin set is named there | `test-evidence/wp3-full-suite-after-edits.txt` |
 | Old-rule scan | `grep -rn "MUST NOT 启动 qodercli\|MUST NOT launch qodercli\|host-native first" shared/ skills/ agents/ templates/` | zero hits | `wp3-carrier-ban.txt` |
@@ -71,7 +71,7 @@ a1e0435d2 feat(093-wp3): T139 T142 T157 — analyze wave, fork mechanism and tes
 1bac1d6e1 feat(093-wp3): T144 T145 — fork/subprocess carriers and the in-process ban in house-keeping and project-setup
 93754347a feat(093-wp3): T146 T147 T148 T149 T150 T151 T154 T157 — carrier ban across the remaining dispatch-declaring surfaces
 6759ab415 feat(093-wp3): T156 T157 T158 — test-entry rule, live instructions refresh and the measured raw-pytest sweep
-<final>     feat(093-wp3): T041 — evidence files and the WP3 implement record
+ce89e4e0e feat(093-wp3): T041 — per-row evidence, mirror reading and the WP3 implement record
 ```
 
 ---

@@ -163,11 +163,12 @@ DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
 
 --- interpretation ---
 # The drift set is exactly the projection of the sources edited by WP3:
-#   - 29 templates/commands/*.md -> 29 x (.claude/commands, .qoder/commands, .opencode/command) + 29 x .github/prompts
+#   - 29 templates/commands/*.md -> 29 x (.claude/commands, .qoder/commands, .opencode/command) + 29 x .github/prompts = 116 copies
 #   - templates/instructions-template.md, templates/plan-template.md -> .specify/templates/
-#   - 16 skills sources -> .specify/skills/ (flat and nested layers)
+#   - 21 skills sources -> .specify/skills/ (flat and nested layers)
 #   - 6 shared sources -> .specify/shared/
 #   - 2 agents sources -> .specify/agents/templates/
+# Drift pairs total 147 (116 copies + 31 DIFF: 2 templates + 21 skills + 6 shared + 2 agents).
 # Zero unexpected drift pairs. Byte-identity is established after regeneration (T130 / integration step);
 # source-level identity of the obligation text is verified by the T122 count (29/29) and the per-pair diff above.
 # exit: 0
