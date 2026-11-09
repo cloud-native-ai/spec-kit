@@ -149,6 +149,7 @@ def build_repo(
     root: Path | None = None,
     remotes: Sequence[str] = ("mirror",),
     readonly: Sequence[str] = (),
+    extra_configured: Sequence[str] = (),
     files: Mapping[str, str] | None = None,
     dirty: Mapping[str, str] | None = None,
     own_tmp: bool = True,
@@ -159,6 +160,12 @@ def build_repo(
     uncommitted (the "another line's files" arm of C-5 fork 3). ``readonly`` names the remotes
     the block marks read-only — they are still configured, so an accidental push is possible
     and therefore detectable.
+
+    ``remotes`` are the declared `Closeout remotes`; every one of them is configured.
+    ``extra_configured`` names remotes the *repository* has configured which the block never
+    declares. They exist so an arm can prove the derivation never falls back to them
+    (`closeout-declaration.contract.md` C-4) — a fallback to a configured remote that is not in
+    the declaration is a silent push, and only a configured-but-undeclared remote can catch it.
     """
     if root is None:
         tmp = tempfile.TemporaryDirectory(prefix=f"091-closeout-{model}-")
@@ -171,7 +178,7 @@ def build_repo(
     repo = root / "repo"
     repo.mkdir()
     bare_dirs: dict[str, Path] = {}
-    for name in remotes:
+    for name in tuple(remotes) + tuple(extra_configured):
         bare = root / f"{name}.git"
         _git("init", "-q", "--bare", str(bare), cwd=root)
         bare_dirs[name] = bare
@@ -259,6 +266,12 @@ def run_closeout(
     C-5). ``attempt_retry`` is a **mutation hook**: when >0 the driver retries the failing
     step that many times, which is exactly the behaviour FR-011 forbids, so a guard can prove
     the mutation turns red.
+
+    ``remote_name`` is how a caller instruction may name a remote. It is a **request, never an
+    override**: the push set is the plan's role-filtered ``targets`` (``Closeout remotes`` minus
+    the block's read-only upstream roles, `closeout-declaration.contract.md` C-4), and a named
+    remote outside that set is reported as a deviation instead of being pushed, so a named
+    read-only upstream is still refused.
     """
     commit_message = commit_message or message
     if dry_run:
@@ -278,7 +291,12 @@ def run_closeout(
     pushed: list[str] = []
     merged = False
     retries = 0
-    target_remote = plan.targets[0] if plan.targets else None
+    # C-4: every declared remote that the block did not mark read-only is a push target — the
+    # whole role-filtered set, never its first member. A named remote the filter excluded is
+    # reported and not pushed, so the exclusion is observable on the remote's own end state.
+    target_remotes = tuple(plan.targets)
+    if remote_name is not None and remote_name not in target_remotes:
+        deviations += (f"named remote {remote_name!r} is not a push target",)
     current = repo.trunk
 
     for step in plan.steps:
@@ -346,13 +364,12 @@ def run_closeout(
                                        proc.stderr, deviations)
             continue
         if step.kind == "push":
-            if target_remote is None:
+            if not target_remotes:
                 continue
-            remotes = [target_remote] if remote_name is None else [remote_name]
-            # C-3: a model pushes each branch its sequence declares, one push per branch in the
-            # derived order (three-tier: DEV, PRE, MAIN), so a mid-sequence rejection names the
-            # branch it was pushing.
-            for name in remotes:
+            # C-4: every target remote, in declaration order. A model pushes each branch its
+            # sequence declares, one push per branch in the derived order (three-tier: DEV, PRE,
+            # MAIN), so a mid-sequence rejection names the branch it was pushing (C-3).
+            for name in target_remotes:
                 for branch in plan.push_branches:
                     spec = f"{branch}:{branch}"
                     argv = ["push", "-q", name, spec]

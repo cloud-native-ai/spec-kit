@@ -668,7 +668,7 @@ def test_single_and_dual_branch_models_reach_the_expected_end_state():
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
     # --- single-branch -----------------------------------------------------
-    with build_repo("single-branch") as repo:
+    with build_repo("single-branch", remotes=["mirror"]) as repo:
         before = repo.head_of(repo.trunk)
         plan = derive_closeout(
             model="single-branch", strategy="commit+merge+push", remotes=["mirror"], readonly=[]
@@ -686,7 +686,7 @@ def test_single_and_dual_branch_models_reach_the_expected_end_state():
         )
 
     # --- dual-branch -------------------------------------------------------
-    with build_repo("dual-branch") as repo:
+    with build_repo("dual-branch", remotes=["mirror"]) as repo:
         # The declared relation: the archive branch is a different line of history, so it is
         # seeded from an *earlier* commit and the daily branch's commit advances it through the
         # merge. Seeded from the same commit it would be fast-forwardable and the merge would be
@@ -725,7 +725,7 @@ def test_three_tier_model_advances_through_the_intermediate_branch():
     """
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
-    with build_repo("three-tier") as repo:
+    with build_repo("three-tier", remotes=["mirror"]) as repo:
         pre_before = repo.head_of("pre")
         main_before = repo.head_of("main")
         plan = derive_closeout(
@@ -744,6 +744,126 @@ def test_three_tier_model_advances_through_the_intermediate_branch():
             assert repo.remote_branch_sha("mirror", branch) == repo.head_of(branch), (
                 f"all three declared branches reached the remote ({branch})"
             )
+
+
+def test_every_declared_remote_receives_the_push_on_every_model():
+    """SC-001 / SC-005 — `closeout-declaration.contract.md` C-4, plural remotes.
+
+    One arm per model, each with **two** declared remotes. The assertion is each remote's own
+    end state, so a driver that pushes only the first declared remote (`plan.targets[0]`) reds
+    here on the second one — the defect `code-review.md` C1 names. Parallel execution is also
+    checked against the declared set, never against a proxy.
+    """
+    from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
+
+    declared = ["mirror", "upstream"]
+    for model in ("single-branch", "dual-branch", "temp-branch", "three-tier"):
+        with build_repo(model, remotes=declared) as repo:
+            plan = derive_closeout(
+                model=model, strategy="commit+merge+push", remotes=declared, readonly=[]
+            )
+            assert plan.targets == tuple(declared), "both declared remotes are push targets"
+            outcome = run_closeout(repo, plan, paths=_seed_record(repo))
+            assert outcome.exit_code == 0, f"{model}: {outcome.stdout}"
+            assert set(outcome.pushed) == set(declared), (
+                f"{model}: the report names every remote it pushed, read {outcome.pushed!r}"
+            )
+            for remote in declared:
+                for branch in plan.push_branches:
+                    assert repo.remote_branch_sha(remote, branch) == repo.head_of(branch), (
+                        f"{model}: {remote}/{branch} did not reach the declared remote"
+                    )
+
+
+def test_the_readonly_upstream_is_never_pushed_and_is_observable():
+    """SC-005 / C-4 — the read-only role, on the remote's own end state.
+
+    Three arms, one per way a remote can be withdrawn: (1) declared in `Closeout remotes` but
+    marked read-only by the block; (2) not declared at all yet configured on the repository —
+    the derivation never falls back to it; (3) marked read-only *and* named by a caller
+    instruction — `remote_name` is a request, not an override.
+
+    Arm 3 is the one that reaches the previously unexercised branch (`code-review.md` C3): the named
+    remote is both read-only and absent from the plan, so a driver that honours the name would
+    push it, and the bare remote's empty reference listing catches that.
+    """
+    from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
+
+    # (1) declared, but the block marks it read-only
+    with build_repo("single-branch", remotes=["mirror", "origin"], readonly=["origin"]) as repo:
+        plan = derive_closeout(
+            model="single-branch", strategy="commit+merge+push",
+            remotes=["mirror", "origin"], readonly=["origin"],
+        )
+        assert plan.targets == ("mirror",), "the read-only role removes it from the target set"
+        outcome = run_closeout(repo, plan, paths=_seed_record(repo))
+        assert outcome.exit_code == 0, outcome.stdout
+        assert repo.remote_branch_sha("mirror", "master") == repo.head_of("master"), (
+            "the pushable remote receives the trunk"
+        )
+        assert repo.remote_branch_names("origin") == [], (
+            "a declared but read-only remote never receives the push"
+        )
+        assert "origin" not in outcome.pushed, "the report never claims a push it did not make"
+
+    # (2) configured on the repository, never declared: no fallback to it
+    with build_repo(
+        "single-branch", remotes=["mirror"], extra_configured=["fallback"]
+    ) as repo:
+        plan = derive_closeout(
+            model="single-branch", strategy="commit+merge+push", remotes=["mirror"], readonly=[]
+        )
+        outcome = run_closeout(repo, plan, paths=_seed_record(repo))
+        assert outcome.exit_code == 0, outcome.stdout
+        assert repo.remote_branch_names("fallback") == [], (
+            "the derivation MUST NOT fall back to a remote the block never declared"
+        )
+
+    # (3) read-only AND named by a caller instruction: the name is a request, not an override
+    with build_repo("single-branch", remotes=["mirror", "origin"], readonly=["origin"]) as repo:
+        plan = derive_closeout(
+            model="single-branch", strategy="commit+merge+push",
+            remotes=["mirror", "origin"], readonly=["origin"],
+        )
+        outcome = run_closeout(
+            repo, plan, paths=_seed_record(repo), remote_name="origin"
+        )
+        assert outcome.exit_code == 0, outcome.stdout
+        assert repo.remote_branch_sha("mirror", "master") == repo.head_of("master"), (
+            "the pushable remote still receives the trunk when a caller names another remote"
+        )
+        assert repo.remote_branch_names("origin") == [], (
+            "a caller naming a read-only upstream does not make it a push target"
+        )
+        assert any("origin" in line and "not a push target" in line
+                   for line in outcome.deviations), (
+            f"the refusal is reported rather than silent, read {outcome.deviations!r}"
+        )
+
+
+def test_an_absent_or_empty_remote_declaration_skips_the_push():
+    """SC-005 / C-4 — absent and empty are one outcome, and neither falls back.
+
+    The two cases are distinguished by the block reader, not here; both reach the driver as an
+    empty target set. What this arm proves is the repository effect: nothing is pushed — not to
+    a configured remote, not to a declared-but-withdrawn one — while the local commit stands.
+    """
+    from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
+
+    with build_repo("single-branch", remotes=[], extra_configured=["configured"]) as repo:
+        plan = derive_closeout(
+            model="single-branch", strategy="commit+merge+push", remotes=[], readonly=[]
+        )
+        assert plan.targets == (), "no declared remote means no push target"
+        assert "push" in plan.skipped, "an empty declaration degrades the push step"
+        outcome = run_closeout(repo, plan, paths=_seed_record(repo))
+        assert outcome.exit_code == 0, outcome.stdout
+        assert repo.remote_branch_names("configured") == [], (
+            "MUST NOT fall back to the repository's configured remotes"
+        )
+        assert repo.log_subjects("master")[0] != "seed: fixture repository", (
+            "the artifact commit still stands — the push is skipped, not the run"
+        )
 
 
 def test_short_lived_branch_rules_are_stated_and_guarded():
@@ -774,7 +894,7 @@ def test_short_lived_branch_rules_are_stated_and_guarded():
 
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
-    with build_repo("temp-branch") as repo:
+    with build_repo("temp-branch", remotes=["mirror"]) as repo:
         plan = derive_closeout(
             model="temp-branch", strategy="commit+merge+push", remotes=["mirror"], readonly=[]
         )
@@ -860,7 +980,7 @@ def test_a_rejected_push_stops_before_the_remote_changes():
     """
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
-    with build_repo("single-branch") as repo:
+    with build_repo("single-branch", remotes=["mirror"]) as repo:
         _advance_remote(repo)
         before = repo.remote_branch_names("mirror")
         head_before = repo.remote_branch_sha("mirror", "master")
@@ -889,7 +1009,7 @@ def test_a_merge_conflict_stops_before_any_push():
     """`closeout-executor.contract.md` C-5 — the merge class, and no push step runs after it."""
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
-    with build_repo("dual-branch") as repo:
+    with build_repo("dual-branch", remotes=["mirror"]) as repo:
         repo.git("commit", "-q", "--allow-empty", "-m", "seed: archive line base")
         repo.git("update-ref", "refs/heads/archive", "HEAD")
         repo.git("checkout", "-q", "archive")
@@ -961,7 +1081,7 @@ def test_another_lines_dirty_file_is_a_deviation_and_never_staged():
     """
     from tests.fixtures.git_closeout import build_repo, derive_closeout, run_closeout
 
-    with build_repo("single-branch") as repo:
+    with build_repo("single-branch", remotes=["mirror"]) as repo:
         repo.git("checkout", "-q", "-b", "other-line")
         foreign = repo.repo / "other-line-work.txt"
         foreign.write_text("another line's uncommitted work\n", encoding="utf-8")
@@ -1116,6 +1236,12 @@ def test_every_unattended_mechanism_reaches_the_one_owner():
     Three mechanisms must reach the close-out step by pointer: the driver's close, periodic
     house-keeping and the feedback digest. Each pointer must name the one owner; none may keep
     a close-out of its own.
+
+    The negative half is scoped by *role*, not by an open search: an owner-shaped document
+    declares the step in its own H2 heading, while a command-surface document only names the
+    operation (its title, or a section of the operation it describes). See
+    :func:`closeout_owners_among` for the two closed criteria and the one documented allow-list
+    entry.
     """
     mechanisms = {
         "driver": REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "references" / "dispatch-recipes.md",
@@ -1134,12 +1260,100 @@ def test_every_unattended_mechanism_reaches_the_one_owner():
         if re.search(r"closeout", p.name, re.I)
     ]
     assert engines == [], f"a second close-out engine exists: {engines}"
-    second_owners = [
-        p for p in (REPO_ROOT / "shared").rglob("*.md")
-        if re.search(r"^## .*[Cc]lose-out", p.read_text(encoding="utf-8"), re.M)
-        and p.name != "artifact-commit-step.md"
-    ]
+    second_owners = closeout_owners_among(
+        (REPO_ROOT / "shared").rglob("*.md"), owner_name=owner
+    )
     assert second_owners == [], f"a second close-out owner document exists: {second_owners}"
+
+
+#: Documents allowed to carry `## Close-out` headings and still not be the owner: the command
+#: surface of the skill's named `closeout` operation. It *describes* the operation (derivation,
+#: push targets, failure discipline) and declares that it owns no rule another document owns,
+#: so it is evidence of the pointer, never a second owner. Each entry carries its reason because
+#: the list is closed: a second name is a revision of this clause, not a silent extension.
+CLOSEOUT_DESCRIPTION_SURFACES = {
+    Path("skills") / "external" / "git-utils" / "references" / "closeout-commands.md":
+        "the command surface of the skill's named closeout operation; declares it owns no rule "
+        "another document owns (its header says so), and the owner's pointer names it",
+}
+
+
+def closeout_owners_among(paths, owner_name: str = "artifact-commit-step.md",
+                          extra: str | None = None) -> list:
+    """Documents that declare the close-out *step* as their own — the landed negative search.
+
+    Two closed criteria, both satisfied by the one owner and by neither of the two shapes that
+    are not owners:
+
+    1. the document carries a **step-shaped** `## … Close-out …` H2 heading — one that is not a
+       section *of the operation* (`## The <closeout> path`, `## <Closeout> inside the run`,
+       `## <Closeout> commands`); and
+    2. the document does not belong to the declared description-surface set above.
+
+    A command-surface document says what the operation *is* and how to run it; an owner says
+    *where the step sits in a run's lifecycle*. Criterion 1 is the mechanical form of that
+    distinction — it is what keeps `skills/external/git-utils/references/closeout-commands.md`'s
+    `## The `ask` path` and `## Substitution, not a literal` headings, which the sibling guard
+    requires, from reding this guard (`review.md` F5: a guard whose green depends on the absence
+    of a file its sibling requires is not evidence).
+
+    ``extra`` lets a mutation arm add one synthetic in-memory document, so the relaxed predicate
+    is still proven to red on a synthetic second owner.
+    """
+    found = []
+    owner_file = Path(owner_name).name
+    for path in paths:
+        name = path.name if hasattr(path, "name") else Path(str(path)).name
+        if name == owner_file:
+            continue
+        if Path(path) in CLOSEOUT_DESCRIPTION_SURFACES:
+            continue
+        text = read(path) if hasattr(path, "read_text") else str(path)
+        if declares_the_closeout_step(text):
+            found.append(path)
+    if extra is not None and declares_the_closeout_step(extra):
+        found.append("<synthetic second owner>")
+    return found
+
+
+#: Heading relatum words: what follows the "close-out" token when the heading names a part *of
+#: the operation* rather than the step inside a run — the `ask` path, the "inside the run"
+#: section (with or without its copula), and the command-surface family. The list is narrow on
+#: purpose: a heading naming one of these describes the operation, while every other relation
+#: ("step", "of a run", or nothing after the token) claims the lifecycle step, and a section
+#: that describes the operation can never be its owner.
+CLOSEOUT_OPERATION_RELATA = (
+    "ask", "is inside the run", "inside the run", "commands", "command surface",
+)
+
+
+def declares_the_closeout_step(text: str) -> bool:
+    """True when ``text`` carries a ``## … Close-out …`` H2 that declares the *step*.
+
+    The mechanical form of "owner-shaped, not command-surface-shaped": a heading whose relation
+    to the close-out names a part of the operation (see :data:`CLOSEOUT_OPERATION_RELATA`) says
+    what the operation is; any other close-out H2 claims the lifecycle step. The relatum is
+    matched anywhere in the relation — "the close-out command surface of a second skill" still
+    names the command surface, and a command surface is not an owner — while a relation such as
+    "step" or "of a run" names no part of the operation at all. Every H2 is read (one
+    operation-shaped heading does not mask a step-shaped one) and ``###`` subsections are never
+    read, because a subsection cannot declare a lifecycle step. Both spellings are accepted.
+    """
+    for line in text.splitlines():
+        if not line.startswith("## "):
+            continue
+        heading = " ".join(line[3:].replace("`", "").split()).lower()
+        if "close-out" not in heading:
+            continue
+        # the relation is what remains after the token; separators and a leading article are
+        # part of the shape, not of the claim
+        relation = re.sub(r"^.*?\bclose[- ]out\b\s*", "", heading)
+        relation = re.sub(r"^[-—:,]+\s*", "", relation)
+        relation = re.sub(r"^(?:the|a|an)\s+", "", relation)
+        if any(word in relation for word in CLOSEOUT_OPERATION_RELATA):
+            continue
+        return True
+    return False
 
 
 def test_the_instruction_surface_reaches_the_step_without_restating_it():
@@ -1268,7 +1482,7 @@ def test_mutation_a_behavioural_retry_loop_reds_the_no_retry_assertions():
 
     # --- arm A: rejected push — the retry loop is observable and the arm reds --------------
     def rejected_push(attempt_retry: int):
-        with build_repo("single-branch") as repo:
+        with build_repo("single-branch", remotes=["mirror"]) as repo:
             _advance_remote(repo)
             before = repo.remote_branch_sha("mirror", "master")
             plan = derive_closeout(
@@ -1296,7 +1510,7 @@ def test_mutation_a_behavioural_retry_loop_reds_the_no_retry_assertions():
 
     # --- arm B: merge conflict — recorded limit, not papered over --------------------------
     def merge_conflict(attempt_retry: int):
-        with build_repo("dual-branch") as repo:
+        with build_repo("dual-branch", remotes=["mirror"]) as repo:
             repo.git("commit", "-q", "--allow-empty", "-m", "seed: archive line base")
             repo.git("update-ref", "refs/heads/archive", "HEAD")
             repo.git("checkout", "-q", "archive")
@@ -1445,7 +1659,12 @@ def test_mutation_a_dropped_gate_id_reds_the_closed_set_comparison():
 
 
 def test_mutation_a_second_closeout_owner_reds_the_single_owner_search():
-    """T053 — SC-005: a second entry point carrying its own close-out reds the negative search."""
+    """T053 — SC-005: a second entry point carrying its own close-out reds the negative search.
+
+    The predicate is the landed one (role-scoped: see :func:`closeout_owners_among`), so a green
+    here is evidence about the search that actually ships rather than about a stricter search
+    the guard no longer runs.
+    """
     text = read(REPO_ROOT / "shared" / "workflow" / "artifact-commit-step.md")
     others = [
         p for p in (REPO_ROOT / "shared").rglob("*.md")
@@ -1461,11 +1680,10 @@ def test_mutation_a_second_closeout_owner_reds_the_single_owner_search():
 
 
 def _second_owner_list(paths, extra: str | None = None) -> None:
-    """The landed negative search over ``paths``, plus one synthetic in-memory document."""
-    found = [
-        p for p in paths
-        if re.search(r"^## .*[Cc]lose-out", p.read_text(encoding="utf-8"), re.M)
-    ]
-    if extra is not None and re.search(r"^## .*[Cc]lose-out", extra, re.M):
-        found.append("synthetic")
+    """The landed negative search over ``paths``, plus one synthetic in-memory document.
+
+    One predicate behind both the guard and its mutation arm, so the relaxed search cannot be
+    proven against a different rule than the one that ships.
+    """
+    found = closeout_owners_among(paths, extra=extra)
     assert found == [], f"a second close-out owner document exists: {found}"
