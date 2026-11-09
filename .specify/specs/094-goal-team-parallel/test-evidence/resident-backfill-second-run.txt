@@ -1,0 +1,20 @@
+# T083 second run — command: python3 scripts/python/goal-utils.py backfill-bindings --apply
+already-bound	.specify/anchoring/command-logic-as-classified-skills/goal.md
+already-bound	.specify/anchoring/draw-diagram-interactive/goal.md
+already-bound	.specify/anchoring/draw-two-layer-structure/goal.md
+already-bound	.specify/anchoring/post-refactor-mechanism-integrity/goal.md
+already-bound	.specify/anchoring/session-driven-self-improvement/goal.md
+already-bound	.specify/anchoring/skill-layer-install-separation/goal.md
+already-bound	.specify/teams/command-logic-as-classified-skills/team.md
+already-bound	.specify/teams/cws-workspace-cluster/team.md
+already-bound	.specify/teams/demo-seat-dispatch/team.md
+already-bound	.specify/teams/draw-diagram-interactive/team.md
+already-bound	.specify/teams/draw-plantuml-optimizer/team.md
+already-bound	.specify/teams/draw-two-layer-structure/team.md
+already-bound	.specify/teams/post-refactor-mechanism-integrity/team.md
+already-bound	.specify/teams/requirement-implement-monitor/team.md
+already-bound	.specify/teams/session-driven-self-improvement/team.md
+already-bound	.specify/teams/skill-layer-install-separation/team.md
+already-bound	.specify/teams/summarize-project-optimizer/team.md
+already-bound	.specify/teams/viz-skill-arena/team.md
+EXIT=0

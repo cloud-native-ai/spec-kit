@@ -87,6 +87,10 @@ summary:
     every: 1
     delivery_dir: .specify/goal/post-refactor-mechanism-integrity/summary/
     interactive: false
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

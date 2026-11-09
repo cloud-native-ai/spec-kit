@@ -126,6 +126,10 @@ config:
   constraints_file: .specify/teams/cws-workspace-cluster/constraints.md
   state_spine: .specify/teams/cws-workspace-cluster/STATE.md
   run_log: .specify/teams/cws-workspace-cluster/run-log.jsonl
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

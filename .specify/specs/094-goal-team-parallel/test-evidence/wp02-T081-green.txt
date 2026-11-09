@@ -1,0 +1,10 @@
+# row: T081
+# command: bash scripts/bash/run-tests.sh tests/contract/test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.47s
+EXIT=0

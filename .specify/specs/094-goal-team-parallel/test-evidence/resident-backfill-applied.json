@@ -1,0 +1,200 @@
+{
+  "command": "python3 scripts/python/goal-utils.py backfill-bindings --apply --json",
+  "exit": 0,
+  "dry_run_counts": {
+    "backfilled": 18,
+    "already-bound": 0
+  },
+  "apply_counts": {
+    "backfilled": 18,
+    "already-bound": 0
+  },
+  "denominator": {
+    "goal": 6,
+    "teams": 12,
+    "total": 18
+  },
+  "existence_assertions": [
+    {
+      "kind": "goal",
+      "slug": "command-logic-as-classified-skills",
+      "path": ".specify/anchoring/command-logic-as-classified-skills/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "goal",
+      "slug": "draw-diagram-interactive",
+      "path": ".specify/anchoring/draw-diagram-interactive/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "goal",
+      "slug": "draw-two-layer-structure",
+      "path": ".specify/anchoring/draw-two-layer-structure/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "goal",
+      "slug": "post-refactor-mechanism-integrity",
+      "path": ".specify/anchoring/post-refactor-mechanism-integrity/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "goal",
+      "slug": "session-driven-self-improvement",
+      "path": ".specify/anchoring/session-driven-self-improvement/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "goal",
+      "slug": "skill-layer-install-separation",
+      "path": ".specify/anchoring/skill-layer-install-separation/goal.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "command-logic-as-classified-skills",
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "cws-workspace-cluster",
+      "path": ".specify/teams/cws-workspace-cluster/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "demo-seat-dispatch",
+      "path": ".specify/teams/demo-seat-dispatch/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "draw-diagram-interactive",
+      "path": ".specify/teams/draw-diagram-interactive/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "draw-plantuml-optimizer",
+      "path": ".specify/teams/draw-plantuml-optimizer/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "draw-two-layer-structure",
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "post-refactor-mechanism-integrity",
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "requirement-implement-monitor",
+      "path": ".specify/teams/requirement-implement-monitor/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "session-driven-self-improvement",
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "skill-layer-install-separation",
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "summarize-project-optimizer",
+      "path": ".specify/teams/summarize-project-optimizer/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    },
+    {
+      "kind": "teams",
+      "slug": "viz-skill-arena",
+      "path": ".specify/teams/viz-skill-arena/team.md",
+      "exit": 0,
+      "owner": "human",
+      "owner_id": "human",
+      "origin": null,
+      "complete": true
+    }
+  ],
+  "all_complete": true
+}

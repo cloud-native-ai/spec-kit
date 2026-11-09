@@ -101,6 +101,10 @@ config:
     every: 1                           # bounded pattern 默认每阶段边界刷新一次
     delivery_dir: .specify/goal/draw-two-layer-structure/summary/
     interactive: false
+binding:
+  owner: human
+  owner_id: human
+  origin: null
 ---
 
 ## Goal

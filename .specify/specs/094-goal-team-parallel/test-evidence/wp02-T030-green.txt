@@ -1,0 +1,10 @@
+# row: T030
+# command: bash scripts/bash/run-tests.sh tests/contract/test_archive_migration.py::test_a_conflict_names_both_candidates_and_never_overwrites -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py::test_a_conflict_names_both_candidates_and_never_overwrites -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.18s
+EXIT=0

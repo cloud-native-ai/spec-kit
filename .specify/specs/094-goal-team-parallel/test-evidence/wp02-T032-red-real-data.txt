@@ -1,0 +1,36 @@
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_archive_migration_real_data.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_every_source_tree_stays_readable_after_migration _____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4808/popen-gw0/test_every_source_tree_stays_r0')
+
+    def test_every_source_tree_stays_readable_after_migration(tmp_path):
+        slugs = _build_shape(tmp_path)
+    
+>       before = _payload(_run(tmp_path, "probe-residual"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_archive_migration_real_data.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks')\n")
+
+    def _payload(proc: subprocess.CompletedProcess) -> dict:
+>       assert proc.stdout.strip(), f"no JSON payload; stderr={proc.stderr!r}"
+E       AssertionError: no JSON payload; stderr="usage: goal-utils.py [-h] [--repo-root REPO_ROOT] [--json]\n                     [--scope {goal,teams,auto}] [--spec-dir SPEC_DIR]\n                     {resolve-scope,create,validate,check-statement,list,status,objective,criteria,migrate,bind,binding,targets,run-checks}\n                     ...\ngoal-utils.py: error: argument action: invalid choice: 'probe-residual' (choose from 'resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks')\n"
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f192c8e4a60>()
+E        +    where <built-in method strip of str object at 0x7f192c8e4a60> = ''.strip
+E        +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks')\n").stdout
+
+tests/integration/test_archive_migration_real_data.py:90: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_archive_migration_real_data.py::test_every_source_tree_stays_readable_after_migration
+1 failed in 6.18s
+EXIT=1

@@ -1,0 +1,10 @@
+# row: T029
+# command: bash scripts/bash/run-tests.sh tests/contract/test_archive_migration.py::test_a_second_run_writes_nothing_and_is_a_noop -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_archive_migration.py::test_a_second_run_writes_nothing_and_is_a_noop -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.21s
+EXIT=0
