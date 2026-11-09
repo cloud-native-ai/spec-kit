@@ -1,0 +1,86 @@
+# Checklist stage readings — 091-auto-git-closeout — 2026-11-09
+# Captured at execution time (Single-Run Evidence Discipline): command line, exit status, output.
+# Working dir for every command: /storage/project/cloud-native-ai/spec-kit
+
+## 0. Flow-class read (the stage's ONE declaration read)
+
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:091-auto-git-closeout"
+unit_id: spec:091-auto-git-closeout
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0
+=> execution-class: the checklist stage's gate set is unchanged (zero added blocking rows);
+   expression-gates.md § 特性线阶段命令 adds operators only for the expression class.
+
+## 1. Success-criterion Path markers
+
+$ grep -c '\*\*Path\*\*: final' .specify/specs/091-auto-git-closeout/requirements.md
+6
+$ grep -c '\*\*Path\*\*: supporting' .specify/specs/091-auto-git-closeout/requirements.md
+2
+(SC-001/002/003/004/005/008 final; SC-006/007 supporting — 8 total)
+
+## 2. Counts re-derived this stage (never inherited)
+
+$ grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/091-auto-git-closeout/requirements.md
+28
+$ grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/091-auto-git-closeout/requirements.md
+8
+$ grep -c '^\*\*C-[0-9]\+\*\* —' .specify/specs/091-auto-git-closeout/contracts/*.md
+closeout-declaration.contract.md:7
+closeout-executor.contract.md:7
+closeout-lifecycle.contract.md:7
+closeout-verification.contract.md:5
+(total 26)
+$ sed -n '/^## Delivered paths/,/^## Deliberate/p' .specify/specs/091-auto-git-closeout/feature-ref.md | grep -cE '^\| [0-9]+ \|'
+11
+$ grep -cE '^\- \[[ x>~]\] T[0-9]{3} ' .specify/specs/091-auto-git-closeout/tasks.md
+60
+
+## 3. Execution-premise / assumption numbering
+
+$ grep -c '^| EP-' .specify/specs/091-auto-git-closeout/plan.md
+7        (EP-001..EP-007, all Status=verified)
+$ grep -c '^- \*\*A[0-9]' .specify/specs/091-auto-git-closeout/requirements.md
+21       (A1..A21)
+
+## 4. The checklist file's own counts (program-derived, not hand-counted)
+
+$ python3 - <checklist>   # items / anchors / dimensions / verdicts
+items 47
+Req-anchored 47   pct 100.0
+dims {'Clarity': 23, 'Measurability': 17, 'Completeness': 13, 'Consistency': 13, 'Traceability': 7, 'Edge Case': 1, 'Dependency': 1}
+marks {'Ambiguity': 6, 'Gap': 5, 'Conflict': 3, 'Assumption': 1}
+items with a non-Req marker: 15
+verdicts Counter({'pass': 25, 'fail': 15, '观察': 7})
+ids contiguous: True
+question_form 47/47 ; prohibited "Verify|Test|Confirm|Check" prefix 0
+
+## 5. FR -> contract citation coverage (the CHK045 measurement)
+
+$ grep -n 'FR-027' .specify/specs/091-auto-git-closeout/contracts/*.md
+(no matches)
+$ grep -n 'FR-020\|FR-021\|FR-022' .specify/specs/091-auto-git-closeout/contracts/*.md
+(no matches)
+=> four FRs (020 / 021 / 022 / 027) are cited by ZERO contract page, while feature-ref.md
+   § Plan refinement — FR → contract map maps them to named clauses. tasks.md § FR lane note
+   already records the residual and classifies it as a "citation-form gap"; CHK045 judges the
+   stronger reading (a mapping that does not express the mapped body) and is a fail.
+
+## 6. Reader-declaration measurement (the CHK046 evidence)
+
+$ grep -n -i 'readers\|reading scenario' .specify/templates/requirements-template.md   # exit=1
+(no matches — the shipped requirements template carries no reader lines)
+$ sed -n '1,8p' .specify/specs/091-auto-git-closeout/requirements.md
+# Requirements Specification: ...
+**Requirement Branch**: `091-auto-git-closeout`
+**Created**: 2026-11-09
+**Status**: Draft
+**Flow Class**: execution
+**Flow Type**: -
+**Input**: User description: "..."
+=> no **Readers** / **Reading scenario** line inside the first 40 non-empty lines.

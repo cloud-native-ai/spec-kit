@@ -1,0 +1,88 @@
+# Checklist stage gates — 091-auto-git-closeout — 2026-11-09
+# Captured at execution time; command line, exit status and full output per gate.
+# Working dir: /storage/project/cloud-native-ai/spec-kit
+
+## 1. G-checklist-duplicate (blocking) — cross-file hand-written copies
+$ python3 .specify/scripts/python/doc-consistency-check.py --faces duplicate --spec-dir /storage/project/cloud-native-ai/spec-kit/.specify/specs/091-auto-git-closeout --format text
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:07:10Z
+faces: duplicate=pass
+files_scanned: 11
+findings: 0
+EXIT=0
+
+## 2. G-checklist-reader (blocking) — reader declaration
+$ python3 .specify/scripts/python/doc-consistency-check.py --faces reader --spec-dir /storage/project/cloud-native-ai/spec-kit/.specify/specs/091-auto-git-closeout --format text
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:07:10Z
+faces: reader=not-applicable
+files_scanned: 11
+findings: 0
+EXIT=0
+# NOTE (gate-shape defect, registered not repaired): check_reader() runs only under an explicit
+# --path (doc-consistency-check.py:879-885); the --spec-dir branch returns not-applicable
+# unconditionally, so the blocking row can never fire on a spec directory.
+
+## 3. G-checklist-reader, re-run in the form that CAN judge — on this checklist file
+$ python3 .specify/scripts/python/doc-consistency-check.py --faces reader --path /storage/project/cloud-native-ai/spec-kit/.specify/specs/091-auto-git-closeout/checklists/2026-11-09-requirements-quality.md --format text
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:07:10Z
+faces: reader=pass
+files_scanned: 1
+findings: 0
+EXIT=0
+
+## 4. G-checklist-reader, same face on requirements.md — the CHK046 fail has a live reading
+$ python3 .specify/scripts/python/doc-consistency-check.py --faces reader --path /storage/project/cloud-native-ai/spec-kit/.specify/specs/091-auto-git-closeout/requirements.md --format text
+doc-consistency-check: verify
+checked_at: 2026-11-09T03:07:14Z
+faces: reader=fail
+files_scanned: 1
+.specify/specs/091-auto-git-closeout/requirements.md:1: reader-declaration-missing: missing or empty reader declaration: readers, reading_scenario
+    fix: 补齐标注（前 40 非空行内 **Readers** / **Reading scenario** 两行且值非空）
+findings: 1
+EXIT=1
+
+## 5. validate-requirements.py — the spec-side structural checker (CHK043 reading)
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/091-auto-git-closeout/requirements.md
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 306 lines, 36 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+## 6. pre-analyze-check.py --stage tasks — the formal-file gate now also reads checklists/
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/091-auto-git-closeout --stage tasks --repo .
+EXIT=0
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=47 waived=0
+decision: pass
+summary: {"errors": 0, "advisories": 47, "waived": 0, "fr": 28, "sc": 8, "tasks": 60, "clauses": 0, "files": 12}
+new findings in checklists/: [{'check': 'missing-path', 'severity': 'advisory', 'path': 'checklists/2026-11-09-requirements-quality.md', 'line': 44, 'message': 'path does not exist under the repo: .specify/memory/retention/closeout/'}]
+
+## 7. In-passing correction disclosed (fast-fail repair) — one named non-existent path removed
+# First run of § 6 (before the correction) reported one NEW advisory introduced by this checklist file:
+#   {"check": "missing-path", ..., "path": "checklists/2026-11-09-requirements-quality.md", "line": 44,
+#    \"message\": \"path does not exist under the repo: .specify/memory/retention/closeout/\"}
+# Classification: CORRECTION (one reading consistent with the recorded intent — the checklist quotes a
+# tasks-stage ruling, it does not declare a deliverable). Repair: the sentence now names the existing
+# holding root `.specify/memory/retention/` and describes the `closeout/` subdirectory in prose.
+# Re-run after the repair:
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/091-auto-git-closeout --stage tasks --repo .
+EXIT=0
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=46 waived=0
+decision: pass
+summary: {"errors": 0, "advisories": 46, "waived": 0, "fr": 28, "sc": 8, "tasks": 60, "clauses": 0, "files": 12}
+findings under checklists/: []
+advisories==baseline(46): True | files 11->12 (this checklist joined the scan)
+
+## 8. Scope confirmation — the stage wrote only its own artifacts
+$ git status --porcelain -- .specify/specs/091-auto-git-closeout
+?? .specify/specs/091-auto-git-closeout/checklists/
+?? .specify/specs/091-auto-git-closeout/test-evidence/checklist-gates-2026-11-09.txt
+?? .specify/specs/091-auto-git-closeout/test-evidence/checklist-readings-2026-11-09.txt
