@@ -1,0 +1,225 @@
+# Closure suite attribution — one representative cause per failing module
+# reading: .specify/specs/094-goal-team-parallel/test-evidence/wp07-closure-suite.out (2026-11-09)
+
+## tests/contract/test_085_disposal_table.py (1 failed id(s))
+- test_every_measured_module_has_exactly_one_disposition: assert not {'tests/contract/test_framework_map_archive_row.py', 'tests/contract/test_goal_command_template.py'}
+
+## tests/contract/test_acceptance_premises.py (1 failed id(s))
+- test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it: contract.test_acceptance_premises.PinMismatch: pytest reads 'pytest 8.4.2' but plan-runner-pins.txt records 'pytest 9.0.3' — the comparison is invalid (input error, exit 2), which 
+
+## tests/contract/test_ask_record_repeat.py (1 failed id(s))
+- test_canonical_engine_does_not_self_resolve_to_the_framework_repo: +    where resolve = PosixPath('<tmp>').resolve
+
+## tests/contract/test_clause_coverage.py (2 failed id(s))
+- test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census: (trace not matched)
+- test_c5_gate_budget_is_unchanged_by_the_owner_document: +      where <built-in method group of re.Match object at 0x7f82fb087130> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+## tests/contract/test_clause_forms.py (1 failed id(s))
+- test_the_four_md_forms_never_co_occur_in_one_file: Use -v to get more diff
+
+## tests/contract/test_client_guard_sweep.py (1 failed id(s))
+- test_c57_shipped_text_adds_no_fresh_neutrality_violation: assert not ['shared/declarations/contract.yaml', 'shared/declarations/facts/goal-team-command-family.yaml', 'shared/declarations/...ace.yaml', 'shared/definitions/harness-triple-de
+
+## tests/contract/test_coaching_wiring_contract.py (1 failed id(s))
+- test_c1_eight_identity_coordinates_all_hold: assert not {'8-description-triggers': 'missing=[] call-form=False'}
+
+## tests/contract/test_compile_embeds.py (4 failed id(s))
+- test_compile_embeds_check_clean_and_drift: json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+- test_compiled_form_contract: assert '使用.specify/goal/收编.specify/project/goal/' in '# Requirements Specification: Goal 作为项目级一等概念(goal 定义归档 + 团队引用 + 单一撰写入口 + 多团队协调)\n\n**Requirement Branch**: `037-goal-... `task
+
+## tests/contract/test_compile_reconcile_guards.py (7 failed id(s))
+- test_clean_tree_check_is_green: json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+- test_wording_hit_refuses_the_write: assert 'wording gate' in "error: compile-embeds refused:\n- handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md\n"
+
+## tests/contract/test_confirmation_gates_sweep.py (1 failed id(s))
+- test_residual_total_within_sc002_target: assert 28 <= 23.25
+
+## tests/contract/test_criterion_subject.py (2 failed id(s))
+- test_c19_the_gate_budget_survives_the_new_section: assert 28 == 27
+- test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten: (trace not matched)
+
+## tests/contract/test_docs_command_template.py (1 failed id(s))
+- test_c10_runtime_copies_exist_for_every_present_tool: assert []
+
+## tests/contract/test_engine_face_contract.py (5 failed id(s))
+- test_c20_convention_line_rendered_once_verbatim: json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+- test_c22_missing_manifest_fails_the_compile_loudly: assert 'h-run-determination' in "error: compile-embeds refused:\n- handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md\n"
+
+## tests/contract/test_evidence_findings_schema.py (1 failed id(s))
+- test_package_zip_contains_no_evidence_paths: (trace not matched)
+
+## tests/contract/test_execution_config_engine.py (1 failed id(s))
+- test_warning_surface_is_json_and_stderr: (trace not matched)
+
+## tests/contract/test_expression_compatibility.py (3 failed id(s))
+- test_c2_no_project_side_classification_store: assert not ['.specify/memory/features/088.md:62 — flow_class assignment', '.specify/memory/features.md:96 — flow_class assignment']
+- test_c5_non_wiring_files_keep_their_frozen_hashes: +    where is_file = PosixPath('<path>'
+- test_c5_wiring_surface_is_closed: assert []
+
+## tests/contract/test_expression_faces.py (2 failed id(s))
+- test_a_copied_criterion_line_in_each_surface_turns_red: Use -v to get more diff
+- test_duplicate_face_is_clean_over_the_declared_wide_scope: +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...loud-native-ai/spec-kit/.specify/.tmp/sdd
+
+## tests/contract/test_fast_fail_discipline.py (1 failed id(s))
+- test_g9_total_equals_frozen_baseline: assert 28 == 23
+
+## tests/contract/test_goal_migration.py (2 failed id(s))
+- test_the_user_directive_quoting_the_old_path_survives_verbatim: (trace not matched)
+
+## tests/contract/test_isomorphism_map.py (1 failed id(s))
+- test_no_second_map_or_boundary_table_exists: assert not [('.specify/.tmp/s094/decl-jc9b7yv_/shared/definitions/flow-class-definitions.md', 'requirements'), ('.specify/.tmp/s094/decl-jc9b7yv_/shared/definitions/flow-class-defi
+
+## tests/contract/test_lifecycle_detach_reattach.py (2 failed id(s))
+- test_lc_07_identity_ok_mismatch_dead: + mismatch
+
+## tests/contract/test_measurement_instruments.py (9 failed id(s))
+- test_all_quantities_share_one_freeze_point: +    where is_file = PosixPath('<path>').is_
+- test_no_second_baseline_store_under_the_slice_notes: Use -v to get more diff
+
+## tests/contract/test_nested_run_report.py (1 failed id(s))
+- test_attribution_is_observational_so_the_goal_field_set_is_unchanged: Use -v to get more diff
+
+## tests/contract/test_neutrality_budget.py (2 failed id(s))
+- test_c4_budget_total_and_violations_after_the_feature_landed: assert 28 == 27
+- test_c5_the_cap_leaves_zero_integer_headroom: assert 28 <= 23.25
+
+## tests/contract/test_no_spec_local_writes.py (2 failed id(s))
+- test_no_writing_surface_targets_a_spec_local_goal_or_team: Use -v to get more diff
+- test_the_guard_goes_red_when_one_surface_is_reverted: +  where ["the action table's write set changed: ['backfill-bindings', 'bind', 'create', 'criteria', 'handoff-ref', 'migrate', ...bind', 'create', 'criteria', 'migrate', 'migrate-a
+
+## tests/contract/test_proactive_trigger_section.py (1 failed id(s))
+- test_c11_gate_scan_total_unchanged: assert 28 == 23
+
+## tests/contract/test_qoder_command_frontmatter.py (1 failed id(s))
+- test_every_template_has_short_description: +  where 56 = len('创建、查看、修改目标档案中的定义，管理 Targets、团队协同，并含 migrate-archive 档案迁移')
+
+## tests/contract/test_run_checks.py (1 failed id(s))
+- test_c1_the_action_exists_and_the_roster_grew_by_exactly_one: +  and   11 = len(['create', 'validate', 'check-statement', 'list', 'status', 'objective', ...])
+
+## tests/contract/test_scope_resolution.py (5 failed id(s))
+- test_global_scope: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...oal-utils.py resolve-scope: error: argument --
+- test_list_spec_is_scoped: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...PEC_DIR]\ngoal-utils.py list: error: argument 
+- test_spec_scope: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...ngoal-utils.py resolve-scope: error: argument 
+- test_spec_scope_requires_spec_dir: Input: "scope 'spec' is outside the closed set goal / teams / auto"
+- test_spec_write_leaves_global_stores_byte_identical: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...  slug\ngoal-utils.py create: error: argument 
+
+## tests/contract/test_sdd_diffusion.py (1 failed id(s))
+- test_trigger_edit_moves_no_gate: assert 28 == 27
+
+## tests/contract/test_shared_reference_rewrite.py (1 failed id(s))
+- test_skills_use_installed_absolute_shared_form: assert not ['skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/SKI...s/internal/run-skills/SKILL.md', 'skills/interna
+
+## tests/contract/test_shipped_surface_client_neutrality.py (1 failed id(s))
+- test_shipped_surface_has_no_framework_runtime_references: assert not ['shared/declarations/contract.yaml:64: # Feature 094, contract `contracts/command-family-and-declarations.md` C-83 / ...ble-definitions.md:39: | 条目的字段集、状态机、豁免字段形状、证据文件形
+
+## tests/contract/test_spec_feature_binding_integrity.py (2 failed id(s))
+- test_c1_every_referenced_spec_path_exists: assert not ['Feature 048: .specify/specs/046-browser-site-memory/requirements.md', 'Feature 092: .specify/specs/092-non-disposable/requirements.md']
+- test_c2_active_spec_feature_bindings_resolve: assert not ['086-efficient-test-execution: Feature 086 has no row', '088-speckit-visualization: Feature 088 has no row', '089-script-interface-contract: Feature 089 has no row', '0
+
+## tests/contract/test_summary_trigger.py (2 failed id(s))
+- test_gate_discloses_goal_identity_and_target_directory: (trace not matched)
+
+## tests/contract/test_temp_directory_discipline.py (1 failed id(s))
+- test_scanner_real_tree_is_clean: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '<path>', '--summary'], returncode=2, stdout='temp-directory violations: 
+
+## tests/contract/test_temp_goal_contract.py (2 failed id(s))
+- test_resolve_scope_returns_the_spec_roots: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...ngoal-utils.py resolve-scope: error: argument 
+- test_spec_scope_lists_the_spec_scoped_goal: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...PEC_DIR]\ngoal-utils.py list: error: argument 
+
+## tests/contract/test_temp_team_schema.py (2 failed id(s))
+- test_spec_scoped_authorize_resolves_the_team: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...t {json,text}]\nsdd-route.py: error: argument 
+- test_spec_scoped_run_checks_resolves_the_team: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...g>\ngoal-utils.py run-checks: error: argument 
+
+## tests/contract/test_token_efficiency_discipline.py (1 failed id(s))
+- test_cd5_headings_only_in_discipline_doc: assert not ['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp07/shared/guidelines/reporting-obli...t/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loo
+
+## tests/contract/test_trigger_engine.py (21 failed id(s))
+- test_c14_assess_appends_exactly_one_row: +  where 0 = len([])
+- test_c14_compliance_done_clears_the_violation: IndexError: list index out of range
+- test_c14_ordering_violation_reported_but_row_still_written: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_c16_accepted_increments_and_declined_resets: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...r-assess"\n  ],\n  "warnings": [],\n  "semanti
+- test_c17_destructive_never_promotes_over_ten_acceptances: assert (None is not None)
+- test_c18_threshold_priority_chain: +  where 5 = <function test_c18_threshold_priority_chain.<locals>.stored_threshold at 0x7ff751d4ca40>()
+- test_c19_no_write_outside_workspace_root: +      where PosixPath('<tmp>') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-5439/popen-
+- test_c20_new_session_is_not_suppressed: +    where <built-in method get of dict object at 0x7f7cb207d640> = {'enabled': True, 'reason': 'session-suppressed', 'sessionId': 'sb', 'signals': ['needs-clarification'], ...}.ge
+- test_c23_escalation_pct_and_budget_flag: assert 0 == 2
+- test_c6_no_partial_file_left_behind: +      where PosixPath('<tmp>') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-5439/popen
+- test_c8_state_unreadable_degrades_to_suggest_only: (trace not matched)
+- test_init_maintains_the_telemetry_ignore_entry: +    where is_file = PosixPath('<tmp>').is_file
+
+## tests/contract/test_user_facing_comprehension_doc.py (1 failed id(s))
+- test_gn_c2_gate_scan_total_unchanged: assert 28 == 27
+
+## tests/contract/test_user_facing_comprehension_section.py (1 failed id(s))
+- test_c11_no_dangling_guideline_pointer_on_either_instruction_surface: assert not ['reporting-obligations.md', 'self-explanatory.md']
+
+## tests/contract/test_wrap_up_wording_gate_safe.py (1 failed id(s))
+- test_confirmation_gate_budget_unchanged: +      where <built-in method group of re.Match object at 0x7f0b5cb828c0> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+## tests/integration/test_goal_aggregation.py (10 failed id(s))
+- test_aggregate_form_passes_the_upstream_validator: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...5439/popen-gw127/test_aggregate_form_passes_th
+- test_all_teams_work_items_are_present: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_colliding_per_team_ids_survive_aggregation: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...5439/popen-gw135/test_colliding_per_team_ids_s
+- test_declaring_goal_slug_migrates_the_team_into_the_shared_goal: +    where is_dir = (PosixPath(...)).is_dir
+
+## tests/integration/test_goal_concurrent_refresh.py (5 failed id(s))
+- test_a_held_lock_makes_the_second_refresh_stand_down: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_concurrent_refreshes_yield_exactly_one_current_summary: +  where 0 = len([])
+
+## tests/integration/test_goal_definition_sourcing.py (4 failed id(s))
+- test_empty_criteria_definition_declares_absence_not_invented_milestones: (trace not matched)
+- test_narrative_and_milestones_come_from_the_definition: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+
+## tests/integration/test_goal_migration_path.py (1 failed id(s))
+- test_migration_preserves_the_resolved_objective: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+
+## tests/integration/test_goal_reference.py (5 failed id(s))
+- test_broken_reference_is_reported_not_degraded: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_reference_inline_divergence_prefers_the_definition_and_surfaces_it: (trace not matched)
+
+## tests/integration/test_goal_roster.py (1 failed id(s))
+- test_roster_written_to_summary_never_to_goal_md: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+
+## tests/integration/test_summary_accumulation.py (10 failed id(s))
+- test_aggregation_keeps_expanded_nodes_within_the_upstream_threshold: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_chain_still_loads_after_repeated_refreshes: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...-of-agent/pytest-5439/popen-gw61/test_chain_st
+- test_delivery_directory_holds_exactly_one_current_form: +  where 0 = len([])
+
+## tests/integration/test_summary_legacy_backfill.py (10 failed id(s))
+- test_backfilled_form_still_passes_the_upstream_validator: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...agent/pytest-5439/popen-gw176/test_backfilled_
+- test_backfilled_items_use_hashed_inferred_identities: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_maturity_promotion_does_not_retroactively_rewrite_earlier_states: (trace not matched)
+
+## tests/integration/test_target_fold.py (7 failed id(s))
+- test_invalid_ref_degrades_to_the_whole_and_is_declared: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+
+## tests/integration/test_target_milestones.py (4 failed id(s))
+- test_criteria_projection_rows_keep_their_semantics: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+
+## tests/integration/test_trigger_promotion.py (18 failed id(s))
+- test_decline_after_promotion_demotes: FileNotFoundError: [Errno 2] No such file or directory: '<tmp>'
+- test_destructive_rule_never_promotes_over_ten_acceptances: assert None is not None
+- test_disabled_state_survives_instructions_regeneration: assert 30 == 39
+- test_three_acceptances_promote_a_reversible_rule: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '<path>'"\n  ],\n  "warnings": [],\n  "semanticJudgmentPending": [
+
+## tests/integration/test_trigger_telemetry.py (1 failed id(s))
+- test_cli_subprocess_smoke_pins_payload_and_exit_semantics: Use -v to get more diff
+
+## tests/integration/test_trigger_tuning.py (12 failed id(s))
+- test_acceptance_yields_no_proposal: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...r-assess"\n  ],\n  "warnings": [],\n  "semanti
+- test_min_sample_is_configurable: +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '<path>'"\n  ],\n  "warnings": [],\n  "semanticJudgmentPending": [
+
+## tests/unit/test_goal_scope_engine.py (8 failed id(s))
+- test_auto_is_ambiguous_when_both_exist: Failed: DID NOT RAISE <class 'goal_utils_scope.ScopeError'>
+- test_auto_prefers_global_when_only_global_exists: + goal
+- test_auto_prefers_spec_when_only_spec_exists: goal_utils_scope.ScopeError: not-found: no archive layer contains any definition (checked .specify/anchoring and .specify/teams)
+- test_auto_with_team_identity_resolves_the_only_candidate: goal_utils_scope.ScopeError: not-found: no archive layer contains slug 'spec-team' (checked .specify/anchoring and .specify/teams)
+- test_global_scope_paths: goal_utils_scope.ScopeError: scope 'global' is outside the closed set goal / teams / auto
+- test_spec_dir_must_live_under_specify_specs: Input: "scope 'spec' is outside the closed set goal / teams / auto"
+- test_spec_scope_paths: goal_utils_scope.ScopeError: scope 'spec' is outside the closed set goal / teams / auto
+
+## tests/unit/test_loop_state_engine.py (9 failed id(s))
+- test_dead_no_exit_record_is_never_done: Use -v to get more diff
+- test_derived_dead_no_signal_and_running: + DEAD
+- test_trailing_anomaly_line_with_live_process_is_watch_not_done: + ANOMALY
+

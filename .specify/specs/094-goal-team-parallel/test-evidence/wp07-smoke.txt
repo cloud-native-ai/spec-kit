@@ -1,0 +1,3 @@
+# command: python3 -m pytest tests/contract/test_archive_migration.py tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py tests/contract/test_parallel_lines.py tests/integration/test_parallel_lines.py tests/contract/test_criterion_vocabulary_scan.py tests/contract/test_binding_model.py tests/contract/test_resident_backfill.py tests/contract/test_migration_interruption.py tests/contract/test_declaration_facts.py -q
+# started_at: 2026-11-09T13:07:04Z
+# exit_code: 0

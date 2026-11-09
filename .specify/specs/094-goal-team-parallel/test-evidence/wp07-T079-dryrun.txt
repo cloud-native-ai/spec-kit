@@ -1,0 +1,463 @@
+# command: python3 scripts/python/goal-utils.py migrate-archive --repo-root . --dry-run --json
+# captured_at: 2026-11-09T12:58:21Z
+{
+  "action": "migrate-archive",
+  "mode": "dry-run",
+  "decisions": [
+    {
+      "kind": "goal",
+      "slug": "085-sdd-temporary-goal-team",
+      "source_spec": "085-sdd-temporary-goal-team",
+      "source_path": ".specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md",
+      "target_path": ".specify/anchoring/085-sdd-temporary-goal-team/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team",
+      "concept_digest": "sha256:0ef680e6c09479a0d907180d82dabec0e0a366f0c86e02717a5063b414bec85e",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "085-sdd-temporary-goal-team"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "085-sdd-temporary-goal-team",
+        "source_slug": "085-sdd-temporary-goal-team",
+        "target_slug": "085-sdd-temporary-goal-team",
+        "target_path": ".specify/anchoring/085-sdd-temporary-goal-team/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team",
+        "concept_digest": "sha256:0ef680e6c09479a0d907180d82dabec0e0a366f0c86e02717a5063b414bec85e",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "086-efficient-test-execution",
+      "source_spec": "086-efficient-test-execution",
+      "source_path": ".specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md",
+      "target_path": ".specify/anchoring/086-efficient-test-execution/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution",
+      "concept_digest": "sha256:b7e34ef3c8d738c411d3960c87417eb17a384952e08f64718495d935268eccf2",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "086-efficient-test-execution"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "086-efficient-test-execution",
+        "source_slug": "086-efficient-test-execution",
+        "target_slug": "086-efficient-test-execution",
+        "target_path": ".specify/anchoring/086-efficient-test-execution/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution",
+        "concept_digest": "sha256:b7e34ef3c8d738c411d3960c87417eb17a384952e08f64718495d935268eccf2",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "087-arch-diagram-docs",
+      "source_spec": "087-arch-diagram-docs",
+      "source_path": ".specify/specs/087-arch-diagram-docs/goal/087-arch-diagram-docs/goal.md",
+      "target_path": ".specify/anchoring/087-arch-diagram-docs/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/087-arch-diagram-docs/goal/087-arch-diagram-docs",
+      "concept_digest": "sha256:1f8afd1b22697d0d5f7e2403c09f7b1ac922ee364bdf2e8eb9bd425b5b5c4287",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "087-arch-diagram-docs"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "087-arch-diagram-docs",
+        "source_slug": "087-arch-diagram-docs",
+        "target_slug": "087-arch-diagram-docs",
+        "target_path": ".specify/anchoring/087-arch-diagram-docs/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/087-arch-diagram-docs/goal/087-arch-diagram-docs",
+        "concept_digest": "sha256:1f8afd1b22697d0d5f7e2403c09f7b1ac922ee364bdf2e8eb9bd425b5b5c4287",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "088-speckit-visualization",
+      "source_spec": "088-speckit-visualization",
+      "source_path": ".specify/specs/088-speckit-visualization/goal/088-speckit-visualization/goal.md",
+      "target_path": ".specify/anchoring/088-speckit-visualization/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/088-speckit-visualization/goal/088-speckit-visualization",
+      "concept_digest": "sha256:223115fd2e4bd4f49058bccedf37192ab99c5652fcf518738172d4befba1c476",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "088-speckit-visualization"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "088-speckit-visualization",
+        "source_slug": "088-speckit-visualization",
+        "target_slug": "088-speckit-visualization",
+        "target_path": ".specify/anchoring/088-speckit-visualization/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/088-speckit-visualization/goal/088-speckit-visualization",
+        "concept_digest": "sha256:223115fd2e4bd4f49058bccedf37192ab99c5652fcf518738172d4befba1c476",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "090-re-anchoring",
+      "source_spec": "090-re-anchoring",
+      "source_path": ".specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md",
+      "target_path": ".specify/anchoring/090-re-anchoring/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring",
+      "concept_digest": "sha256:6af03dd62f66dafa710dbc38d3403d1838e3faa44fc1f62a0c911bad08fc9a8d",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "090-re-anchoring"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "090-re-anchoring",
+        "source_slug": "090-re-anchoring",
+        "target_slug": "090-re-anchoring",
+        "target_path": ".specify/anchoring/090-re-anchoring/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring",
+        "concept_digest": "sha256:6af03dd62f66dafa710dbc38d3403d1838e3faa44fc1f62a0c911bad08fc9a8d",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "091-auto-git-closeout",
+      "source_spec": "091-auto-git-closeout",
+      "source_path": ".specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md",
+      "target_path": ".specify/anchoring/091-auto-git-closeout/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout",
+      "concept_digest": "sha256:6b609cfd793aa626d00decb670833a40f6bccb1a388851622aa4e5639bd2ad1d",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "091-auto-git-closeout"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "091-auto-git-closeout",
+        "source_slug": "091-auto-git-closeout",
+        "target_slug": "091-auto-git-closeout",
+        "target_path": ".specify/anchoring/091-auto-git-closeout/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout",
+        "concept_digest": "sha256:6b609cfd793aa626d00decb670833a40f6bccb1a388851622aa4e5639bd2ad1d",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "094-goal-team-parallel",
+      "source_spec": "094-goal-team-parallel",
+      "source_path": ".specify/specs/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md",
+      "target_path": ".specify/anchoring/094-goal-team-parallel/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/094-goal-team-parallel/goal/094-goal-team-parallel",
+      "concept_digest": "sha256:e750d73d06b2c0249545cd8ab9eb98b3ea8e143d5c8ab618e6582e18d47018f8",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "094-goal-team-parallel"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "094-goal-team-parallel",
+        "source_slug": "094-goal-team-parallel",
+        "target_slug": "094-goal-team-parallel",
+        "target_path": ".specify/anchoring/094-goal-team-parallel/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/094-goal-team-parallel/goal/094-goal-team-parallel",
+        "concept_digest": "sha256:e750d73d06b2c0249545cd8ab9eb98b3ea8e143d5c8ab618e6582e18d47018f8",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "goal",
+      "slug": "script-interface-contract",
+      "source_spec": "089-script-interface-contract",
+      "source_path": ".specify/specs/089-script-interface-contract/goal/script-interface-contract/goal.md",
+      "target_path": ".specify/anchoring/script-interface-contract/goal.md",
+      "archived_path": ".specify/archive/goal-team/trees/089-script-interface-contract/goal/script-interface-contract",
+      "concept_digest": "sha256:e335b6a9d58cccd85d8cc72550e6e9a92a8d9d01658e50e94c262b6fe7a245a1",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "089-script-interface-contract"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "goal",
+        "source_spec": "089-script-interface-contract",
+        "source_slug": "script-interface-contract",
+        "target_slug": "script-interface-contract",
+        "target_path": ".specify/anchoring/script-interface-contract/goal.md",
+        "archived_path": ".specify/archive/goal-team/trees/089-script-interface-contract/goal/script-interface-contract",
+        "concept_digest": "sha256:e335b6a9d58cccd85d8cc72550e6e9a92a8d9d01658e50e94c262b6fe7a245a1",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "085-sdd-temporary-goal-team",
+      "source_spec": "085-sdd-temporary-goal-team",
+      "source_path": ".specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md",
+      "target_path": ".specify/teams/085-sdd-temporary-goal-team/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/085-sdd-temporary-goal-team/teams/085-sdd-temporary-goal-team",
+      "concept_digest": "sha256:714379754592cd2a1af84836bb9ee4a68555f4fb98a4f98d97e7144ed2073cf1",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "085-sdd-temporary-goal-team"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "085-sdd-temporary-goal-team",
+        "source_slug": "085-sdd-temporary-goal-team",
+        "target_slug": "085-sdd-temporary-goal-team",
+        "target_path": ".specify/teams/085-sdd-temporary-goal-team/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/085-sdd-temporary-goal-team/teams/085-sdd-temporary-goal-team",
+        "concept_digest": "sha256:714379754592cd2a1af84836bb9ee4a68555f4fb98a4f98d97e7144ed2073cf1",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "086-efficient-test-execution",
+      "source_spec": "086-efficient-test-execution",
+      "source_path": ".specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md",
+      "target_path": ".specify/teams/086-efficient-test-execution/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/086-efficient-test-execution/teams/086-efficient-test-execution",
+      "concept_digest": "sha256:e0e73f3f35fcc59e1f4b46c2f1e092f6267844736e21e9c4c2f138c25e8e5b33",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "086-efficient-test-execution"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "086-efficient-test-execution",
+        "source_slug": "086-efficient-test-execution",
+        "target_slug": "086-efficient-test-execution",
+        "target_path": ".specify/teams/086-efficient-test-execution/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/086-efficient-test-execution/teams/086-efficient-test-execution",
+        "concept_digest": "sha256:e0e73f3f35fcc59e1f4b46c2f1e092f6267844736e21e9c4c2f138c25e8e5b33",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "087-arch-diagram-docs",
+      "source_spec": "087-arch-diagram-docs",
+      "source_path": ".specify/specs/087-arch-diagram-docs/team/087-arch-diagram-docs/team.md",
+      "target_path": ".specify/teams/087-arch-diagram-docs/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/087-arch-diagram-docs/teams/087-arch-diagram-docs",
+      "concept_digest": "sha256:51e3c438bea68ab44e4e95cecfd0ad6f62b91dd5647f84f4d3c7ebcbe8b98cb4",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "087-arch-diagram-docs"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "087-arch-diagram-docs",
+        "source_slug": "087-arch-diagram-docs",
+        "target_slug": "087-arch-diagram-docs",
+        "target_path": ".specify/teams/087-arch-diagram-docs/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/087-arch-diagram-docs/teams/087-arch-diagram-docs",
+        "concept_digest": "sha256:51e3c438bea68ab44e4e95cecfd0ad6f62b91dd5647f84f4d3c7ebcbe8b98cb4",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "088-reporting-dogfood",
+      "source_spec": "088-speckit-visualization",
+      "source_path": ".specify/specs/088-speckit-visualization/team/088-reporting-dogfood/team.md",
+      "target_path": ".specify/teams/088-reporting-dogfood/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/088-speckit-visualization/teams/088-reporting-dogfood",
+      "concept_digest": "sha256:ceee3a8cc4e544cf2032a59e4915672060b8420839b8bdd355500dd4d9a0f3c2",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "088-speckit-visualization"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "088-speckit-visualization",
+        "source_slug": "088-reporting-dogfood",
+        "target_slug": "088-reporting-dogfood",
+        "target_path": ".specify/teams/088-reporting-dogfood/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/088-speckit-visualization/teams/088-reporting-dogfood",
+        "concept_digest": "sha256:ceee3a8cc4e544cf2032a59e4915672060b8420839b8bdd355500dd4d9a0f3c2",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "089-script-interface-contract",
+      "source_spec": "089-script-interface-contract",
+      "source_path": ".specify/specs/089-script-interface-contract/team/089-script-interface-contract/team.md",
+      "target_path": ".specify/teams/089-script-interface-contract/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/089-script-interface-contract/teams/089-script-interface-contract",
+      "concept_digest": "sha256:bcb09fb1fdf8e50f65c3a804af81d2520334317d400fe7d61e17183e3db3a9fd",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "089-script-interface-contract"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "089-script-interface-contract",
+        "source_slug": "089-script-interface-contract",
+        "target_slug": "089-script-interface-contract",
+        "target_path": ".specify/teams/089-script-interface-contract/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/089-script-interface-contract/teams/089-script-interface-contract",
+        "concept_digest": "sha256:bcb09fb1fdf8e50f65c3a804af81d2520334317d400fe7d61e17183e3db3a9fd",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "090-re-anchoring",
+      "source_spec": "090-re-anchoring",
+      "source_path": ".specify/specs/090-re-anchoring/team/090-re-anchoring/team.md",
+      "target_path": ".specify/teams/090-re-anchoring/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/090-re-anchoring/teams/090-re-anchoring",
+      "concept_digest": "sha256:8033b42d0934112763cf6cbf087eedb5cc7ea4d9d9ed1043a290c8f3875640cb",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "090-re-anchoring"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "090-re-anchoring",
+        "source_slug": "090-re-anchoring",
+        "target_slug": "090-re-anchoring",
+        "target_path": ".specify/teams/090-re-anchoring/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/090-re-anchoring/teams/090-re-anchoring",
+        "concept_digest": "sha256:8033b42d0934112763cf6cbf087eedb5cc7ea4d9d9ed1043a290c8f3875640cb",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "091-auto-git-closeout",
+      "source_spec": "091-auto-git-closeout",
+      "source_path": ".specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md",
+      "target_path": ".specify/teams/091-auto-git-closeout/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/091-auto-git-closeout/teams/091-auto-git-closeout",
+      "concept_digest": "sha256:8ce3d89b9a05c1a2ea65cbc8a9dc01e038bfcb485f93d79b6eb79f88cf5de3c0",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "091-auto-git-closeout"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "091-auto-git-closeout",
+        "source_slug": "091-auto-git-closeout",
+        "target_slug": "091-auto-git-closeout",
+        "target_path": ".specify/teams/091-auto-git-closeout/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/091-auto-git-closeout/teams/091-auto-git-closeout",
+        "concept_digest": "sha256:8ce3d89b9a05c1a2ea65cbc8a9dc01e038bfcb485f93d79b6eb79f88cf5de3c0",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    },
+    {
+      "kind": "teams",
+      "slug": "094-goal-team-parallel",
+      "source_spec": "094-goal-team-parallel",
+      "source_path": ".specify/specs/094-goal-team-parallel/team/094-goal-team-parallel/team.md",
+      "target_path": ".specify/teams/094-goal-team-parallel/team.md",
+      "archived_path": ".specify/archive/goal-team/trees/094-goal-team-parallel/teams/094-goal-team-parallel",
+      "concept_digest": "sha256:3d35da0019a1e59a2d349ad209c7cf9811dbbb6610f6fbebab536688ff6a4cbb",
+      "binding": {
+        "owner": "human",
+        "owner_id": "human",
+        "origin": "094-goal-team-parallel"
+      },
+      "action": "migrate",
+      "result": "migrated",
+      "receipt": {
+        "kind": "teams",
+        "source_spec": "094-goal-team-parallel",
+        "source_slug": "094-goal-team-parallel",
+        "target_slug": "094-goal-team-parallel",
+        "target_path": ".specify/teams/094-goal-team-parallel/team.md",
+        "archived_path": ".specify/archive/goal-team/trees/094-goal-team-parallel/teams/094-goal-team-parallel",
+        "concept_digest": "sha256:3d35da0019a1e59a2d349ad209c7cf9811dbbb6610f6fbebab536688ff6a4cbb",
+        "result": "migrated",
+        "at": "2026-11-09T12:58:21Z",
+        "delete_policy": "archive-not-delete"
+      }
+    }
+  ],
+  "counts": {
+    "migrated": 16,
+    "noop": 0,
+    "conflict": 0,
+    "interrupted": 0
+  }
+}
+# exit_code: 0

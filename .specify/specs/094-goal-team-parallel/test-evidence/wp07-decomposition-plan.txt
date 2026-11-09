@@ -1,0 +1,3 @@
+# command: python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/094-goal-team-parallel/requirements.md --json-out .specify/specs/094-goal-team-parallel/test-evidence/wp07-decomposition-plan.json
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 43, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T13:00:18Z"}
+# exit_code: 0

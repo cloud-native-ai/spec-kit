@@ -1,0 +1,11 @@
+# command: python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/094-goal-team-parallel --feature-registry .specify/memory/features.md
+# started_at: 2026-11-09T13:08:03Z
+verdict: block
+spec_dir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp07/.specify/specs/094-goal-team-parallel
+flow_class: execution
+claimed_status: Planned
+final_path: pass=6 blocked=1 deferred=0 partial=1 fail=1 unknown=0 total=9
+reason: final-path-not-pass: SC-001
+reason: final-path-not-pass: SC-002
+reason: final-path-not-pass: SC-003
+# exit_code: 1
