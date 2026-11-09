@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794224585
 stage_base_commit: 215c3dcb
 attempt: 1
 retry_limit: 3
-last_verdict: "Repair round 3 = REPAIR-DONE: V1B CLOSED (3 MEDIUM manifest gaps -> dedicated implement rows T153 (§ 13.4 decomposition-model carrier declaration), T154 (stage-team-preset stage-worker line), T155 (subagent-definitions mode selection); plan manifest rows 4/6/16 updated) / V3B CLOSED (V3B-F1: T006 92 -> measured 94 clauses; V3B-F2: quickstart S-9 -> S-0 and S-1, no S-9 added). Gates green: validate-requirements 0/0, validate-tasks 0/0 over 155 rows, pre-analyze pass 0 errors / 112 advisories, decision-tensions 0/0, decomposition proceed 35/155 (ceiling 160), clause lane baseline-missing expected."
+last_verdict: "Analyze round 4 final = FVA PASS (T153–T155 manifest closures, T006 clause count 94, S-9, gates green) / FVB FAIL with ONE item D1 (MEDIUM: DoD-1 clause totality sentence contradicted by measurement 39/94 task-row citations, 69/94 map coverage) — corrected in passing to the measured wording (commit follows); all other checks green: 35 FR / 12 SC / 94 clauses / 155 contiguous rows / partition 16+26+27+37+49 / 155 ≤ 160 / SC-006 not_evaluated everywhere / F-093-004 resolved / F-093-003 adjudicated. Analyze U4 PASS."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze round 4 verification (final)"
+next_action: "write checkpoint 07-analyze, then implement: coordinate the driver-surface write-domain overlap with 094 (094 wp05 and 093 WP3-owners both target skills/external/sdd-loop-driver/** — serialize on those paths; 093 waves WP1-facts entry, then WP2-engine + WP3-owners + WP4-tests, then WP5-release)"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
