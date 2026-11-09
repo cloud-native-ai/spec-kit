@@ -141,14 +141,24 @@ BASELINE_COMMIT = "c1cd4600"
 # document that declines the claim MUST NOT coexist with a registry row that makes it.
 # The six other rows are untouched (their templates did not move). The assertion keeps
 # its shape: *stripping the card restores the pinned bytes*.
+#
+# 2026-11-09 all seven rows re-measured again, plus both pre-077 entry points:
+# Feature 093 T122 adds one authored pointer block ("Concurrency obligation（执行义务，
+# 按指针抵达）") to every command template, deliberately OUTSIDE the 077 wiring card —
+# it is a shipped-template obligation sentence that reaches its owner by path and
+# carries no repo-specific fact (FR-031). Measured with this module's own
+# `strip_wiring` + `_sha256_text` per the documented legitimate-edit path: the strip
+# still removes exactly the one card, the files stay wired, and the pinned value is
+# the post-093 bytes. The assertion is unchanged: *stripping the card restores the
+# pinned bytes*, and `docs`/`humanize` still gain no wiring card.
 BASELINE_SHA256 = {
-    "requirements": "604b9f464ab593ab32bdb7088f779ef48cd77da8b801d1edd06f80fb298d37f6",
-    "clarify": "0d0596e04b9acb2973b870a9231673b7b14fc12d9cd089aec66e1ec9a6d3faf6",
-    "plan": "3f79be70a3f9b6f7a8bd4fe212d70f99674e408c7cab4972645e06881fd9a773",
-    "tasks": "1c8998141ebf3ffe55af4e5f6fbed167a992f4103a2af30dd2946d424a3d3e0c",
-    "checklist": "08fb8048e55f038b01e27347deb13c7362334060ff71d88dcac42f314f355d20",
-    "analyze": "0dbb094a6ce0aeacee81531197924734a4cf8535ede49939cc68607b4ab7bde7",
-    "implement": "87fa5cd45ebd353426727038bcd97107e9dfb476589a59733fee83158096c2a0",
+    "requirements": "2af13a138821a5786a80aeb419fa854e67e19769743e070cd51c6f154ff86acb",
+    "clarify": "ec1b73759c377da78c88c6684b23ba4de4cc77f0137dbc7c62cc3630d3aac835",
+    "plan": "8882270821dadf2203a545fcf0fc9677692b485875d85b85bc67bb176091022c",
+    "tasks": "231b28881969a302e7c51ed9e8ec6fa39f5caa4275fe4379c539a9f0ad0c6d65",
+    "checklist": "eaa2620129ee83bc5b33e26873fe2f350273da56db5cb34c6eb66eecc6d987a1",
+    "analyze": "724366ac72fb0be4ae1b7a680309323c66d6b3801c479ea8994705f01f112939",
+    "implement": "dd672990245e1df8e137dfcd67198fd351e6afe9d95b1a191c04dbd83546293c",
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
@@ -181,15 +191,17 @@ BASELINE_SHA256 = {
 # restoring the pre-recompile banner and dropping the one compiled list line
 # reproduces the previous pin byte for byte.  Re-pinned to the live bytes.
 #
-# 2026-11-09 the `humanize` row re-measured for an authored reason (skill rename):
-# the W2 command template's single delegation path moved with its skill from
-# `.specify/skills/humanize/SKILL.md` to
-# `.specify/skills/humanize-conclusion/SKILL.md`.  No compiled banner lives in this
-# file, so the delta is exactly that one path literal; everything else the pin
-# protects (Simple shape, no wiring card, the 079 migration block) is untouched.
+# 2026-11-09/10 merged: two authored re-pins coincide on these two entry points.
+# (a) Feature 093 T122 adds the concurrency-obligation pointer block to `docs.md`
+# and `humanize.md` (outside any wiring card; both still carry zero wiring cards);
+# (b) the humanize→humanize-conclusion rename moved the W2 delegation path inside
+# `humanize.md` only. Measured on the merged bytes: `docs.md` equals the 093 re-pin
+# (the rename touched no byte there); `humanize.md` carries the 093 pointer block
+# plus the renamed delegation path. Both still carry no wiring card — the guard's
+# subject is unchanged.
 UNCHANGED_SHA256 = {
-    "docs": "75cfc0db9b3806af2f7dec8a1c4716715619e39e85e7a0a2d084d502f5f9307c",
-    "humanize": "1de8b4c3fe97d138178517d17e6586c4efaa738be80d1f3dbab7365c9cc6189a",
+    "docs": "45a9542ea596538be85539e7698debb42131f19e70ad35ffb0e6f09093ca5e18",
+    "humanize": "11a11670a9fa4f21408e672f65c7f831f8be0df79eb51ec72d99addb4bd6cb1c",
 }
 
 

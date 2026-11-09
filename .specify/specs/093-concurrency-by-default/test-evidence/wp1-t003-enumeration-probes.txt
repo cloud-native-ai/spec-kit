@@ -1,0 +1,34 @@
+# T003 enumeration probes — 2026-11-09T10:49:08Z
+
+$ ls -d skills/internal/*/ | wc -l
+38
+$ ls -d skills/external/*/ | wc -l
+16
+$ ls templates/commands/*.md | wc -l
+29
+$ ls agents/*.md | wc -l
+17
+$ ls -d .specify/teams/*/ | wc -l
+12
+$ ls -d .specify/anchoring/*/ | wc -l
+6
+$ ls -d .specify/skills/*/ | wc -l
+17
+$ ls .specify/skills/
+coaching-skills
+create-docs
+create-pages
+create-skills
+database-utils
+document-utils
+draw-diagram
+git-utils
+humanize
+improve-docs
+improve-skills
+internal
+merge-skills
+sdd-house-keeping
+sdd-loop-driver
+sdd-project-setup
+ssh-utils

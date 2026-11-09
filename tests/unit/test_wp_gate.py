@@ -524,7 +524,8 @@ def test_benefit_branch_b_admits_a_forked_graph(tmp_path):
     plan["packages"][1].update(
         kind="write",
         parallel_safe=False,
-        owned_paths=["src/generated/"],
+        # FR-012: this unit runs concurrently with plan-wp01, so its domain is file-level.
+        owned_paths=["src/generated/wp02.md"],
     )
     third = wp_fixtures.make_write_package(
         "plan-wp03",

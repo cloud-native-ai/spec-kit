@@ -1,0 +1,10 @@
+{
+  "decision": "clear",
+  "current_spec": "093-concurrency-by-default",
+  "checked_specs": [
+    "093-concurrency-by-default"
+  ],
+  "overlaps": [],
+  "note": "current feature has no declaration artifact",
+  "checked_at": "2026-11-09T07:48:35Z"
+}

@@ -1,0 +1,38 @@
+# Review-repair R2 — gate readings (records / registry repair)
+# Date: 2026-11-10 (session readings; the feature's evidence runs are dated 2026-11-09)
+# Worktree: .specify/.tmp/sdd-loop/worktrees/093-review · Branch: 093-review · Base: 46bcb8716
+# Fork: R2 (records / registry) — territory: .specify/specs/093-concurrency-by-default/**,
+#       .specify/memory/features.md, .specify/memory/features/093.md, .specify/memory/register.md,
+#       .specify/state/093-concurrency-by-default.md. No commit, no push.
+# Each block below is the command line followed by its complete stdout/stderr and exit status.
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/093-concurrency-by-default/requirements.md
+file: .specify/specs/093-concurrency-by-default/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 345 lines, 48 definition rows, 11 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 scripts/python/validate-tasks.py .specify/specs/093-concurrency-by-default/tasks.md
+PASS: .specify/specs/093-concurrency-by-default/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/093-concurrency-by-default --feature-registry .specify/memory/features.md
+verdict: block
+spec_dir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-review/.specify/specs/093-concurrency-by-default
+flow_class: execution
+claimed_status: Blocked
+final_path: pass=5 blocked=1 deferred=0 partial=0 fail=0 unknown=0 total=6
+reason: final-path-not-pass: SC-006
+EXIT=1
+
+# Expected readings: validate-requirements 0 error / 0 warning (EXIT=0); validate-tasks 0 error /
+# 0 warning (EXIT=0); closure verdict block, claimed_status Blocked (the registry row landed by this
+# repair), sole reason final-path-not-pass: SC-006, exit 1 (C-10: 1 = block).
+# All three match.

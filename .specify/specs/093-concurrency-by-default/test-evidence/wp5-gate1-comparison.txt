@@ -1,0 +1,69 @@
+# GATE-1 comparison — final suite vs the frozen failure-name baseline
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1 (final tree: notes/evidence included)
+# Baseline: notes/test-baseline.txt (161 serial failed ids, WP1 T002); form: sed 's/^FAILED //;s/ - .*//' | sort -u
+
+## Final suite reading
+# Source run: test-evidence/wp5-suite-final.txt (line 7207) — the final tree at 46bcb8716
+207 failed, 8256 passed, 2 skipped, 576 warnings in 49.90s
+1 passed, 8465 deselected, 3 warnings in 17.85s
+
+## Superseded reading (dated record — not the headline)
+# 2026-11-09, an earlier WP5 run on the pre-final tree: 211 failed, 8252 passed, 2 skipped, 576 warnings in 49.96s.
+# Superseded by the final run above (AF-2, review of 2026-11-09); the 4-test delta between the two runs is
+# recorded here as unexplained, never attributed. The 46-name NEW set below is the final run's list.
+
+## NEW names vs the frozen baseline (46 names)
+tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold
+tests/contract/test_criterion_vocabulary_scan.py::test_no_runtime_surface_uses_temporary_or_global_as_a_criterion
+tests/contract/test_criterion_vocabulary_scan.py::test_the_routing_carve_out_keeps_the_hierarchy_prohibition_verbatim
+tests/contract/test_expression_compatibility.py::test_c5_wiring_surface_is_closed
+tests/contract/test_expression_gate_wiring.py::test_a6_wiring_set_is_closed
+tests/contract/test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged
+tests/contract/test_nested_sdd_invocation.py::test_nested_run_reaches_review_zero_merge_zero_push
+tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+tests/contract/test_scope_resolution.py::test_global_scope
+tests/contract/test_scope_resolution.py::test_list_spec_is_scoped
+tests/contract/test_scope_resolution.py::test_spec_scope
+tests/contract/test_scope_resolution.py::test_spec_scope_requires_spec_dir
+tests/contract/test_scope_resolution.py::test_spec_write_leaves_global_stores_byte_identical
+tests/contract/test_sdd_authorization.py::test_absent_seat_entry_defaults_to_forbidden
+tests/contract/test_sdd_authorization.py::test_absent_seats_map_defaults_to_forbidden
+tests/contract/test_sdd_authorization.py::test_agent_key_absent_names_the_agent_half
+tests/contract/test_sdd_authorization.py::test_both_halves_allowed_resolves_allowed
+tests/contract/test_sdd_authorization.py::test_both_halves_failing_names_both
+tests/contract/test_sdd_authorization.py::test_dangling_seat_entry_is_refused_with_the_seat_named
+tests/contract/test_sdd_authorization.py::test_flow_style_seats_map_is_refused_with_the_seat_named
+tests/contract/test_sdd_authorization.py::test_refusal_record_carries_two_source_paths_and_the_seat_slug
+tests/contract/test_sdd_authorization.py::test_seat_forbidden_names_the_seat_half
+tests/contract/test_sdd_invocation_governance.py::test_c1_an_agent_definition_without_the_key_resolves_forbidden
+tests/contract/test_sdd_invocation_governance.py::test_c1_a_seat_without_the_policy_entry_resolves_forbidden[block-seat_absent-absent-entry]
+tests/contract/test_sdd_invocation_governance.py::test_c1_a_seat_without_the_policy_entry_resolves_forbidden[no-seats-seat_allowed-absent-map]
+tests/contract/test_sdd_invocation_governance.py::test_c1_the_absent_recipient_cannot_receive_a_driver_naming_dispatch
+tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_agent_key_changes_no_other_field_of_the_dispatch
+tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_seat_key_changes_no_other_field_of_the_dispatch
+tests/contract/test_sdd_invocation_governance.py::test_the_authorized_form_is_allowed_and_its_basis_is_recorded
+tests/contract/test_sdd_invocation_governance.py::test_the_prompt_forms_without_both_halves_are_refused_naming_the_half[seat_allowed-agent_forbidden-agent]
+tests/contract/test_sdd_invocation_governance.py::test_the_prompt_forms_without_both_halves_are_refused_naming_the_half[seat_forbidden-agent_allowed-seat]
+tests/contract/test_sdd_invocation_governance.py::test_the_prompt_forms_without_both_halves_are_refused_naming_the_half[seat_forbidden-agent_forbidden-both]
+tests/contract/test_temp_goal_contract.py::test_resolve_scope_returns_the_spec_roots
+tests/contract/test_temp_goal_contract.py::test_spec_scope_lists_the_spec_scoped_goal
+tests/contract/test_temp_team_schema.py::test_spec_scoped_authorize_resolves_the_team
+tests/contract/test_temp_team_schema.py::test_spec_scoped_run_checks_resolves_the_team
+tests/contract/test_trigger_engine.py::test_c23_escalation_pct_and_budget_flag
+tests/contract/test_trigger_engine.py::test_c23_rows_and_turns_are_distinct
+tests/unit/test_goal_scope_engine.py::test_auto_is_ambiguous_when_both_exist
+tests/unit/test_goal_scope_engine.py::test_auto_prefers_global_when_only_global_exists
+tests/unit/test_goal_scope_engine.py::test_auto_prefers_spec_when_only_spec_exists
+tests/unit/test_goal_scope_engine.py::test_auto_with_team_identity_resolves_the_only_candidate
+tests/unit/test_goal_scope_engine.py::test_global_scope_paths
+tests/unit/test_goal_scope_engine.py::test_spec_dir_must_live_under_specify_specs
+tests/unit/test_goal_scope_engine.py::test_spec_scope_paths
+tests/unit/test_goal_scope_engine.py::test_spec_scope_requires_spec_dir
+
+## Classification (46)
+- 44 = inherited from the master sync, not 093-caused: 38 from 094's scope-vocabulary rename (goal-utils resolve-scope now accepts {goal,teams,auto} while test_sdd_invocation_governance 10, test_sdd_authorization 9, test_goal_scope_engine 8, test_scope_resolution 5, test_temp_team_schema 2, test_temp_goal_contract 2, test_criterion_vocabulary_scan 2 still assert 'global'/'spec'), plus 6 module-level reds inherited the same way (test_run_checks, test_nested_sdd_invocation, test_nested_run_report, test_expression_gate_wiring, test_expression_compatibility, test_coaching_wiring_contract). No 093 commit touches those tests or their subjects.
+- 2 = the trigger engine family, order- and state-sensitive between serial and parallel runs (WP1 T002's recorded caveat).
+- 0 = 093-caused and undispositioned: the re-pin set (stage-class wiring 8, humanize 1, validation carrier 2, house-keeping 1, wp coordination 2) is green; the two transient names from the previous run (the untracked-module finding and the corpus-md5 race) resolved on the committed, stable tree.
+
+## Trend
+pre-suite NEW at WP5 start: 70 names; post-WP5 NEW: 46 names, none 093-caused (the 70 -> 46 drop is exactly the 13 re-pin names, the 2 cleared not_evaluated skips, and 9 order/state-sensitive trigger names).

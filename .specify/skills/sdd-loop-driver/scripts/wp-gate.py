@@ -1057,6 +1057,94 @@ def _read_territory(package, repo_root):
     return _path_set(package.get("read_only_paths"), repo_root)
 
 
+def _is_directory_level_entry(raw, repo_root):
+    """A write-domain entry is directory-level when it names a materialized region.
+
+    The preflight gate judges the workspace as materialized: an entry that contains
+    a glob metacharacter, or that resolves to an existing directory under the repo,
+    declares a directory region and is red. An entry that does not resolve to an
+    existing directory is treated as a declared (future) file path.
+    """
+    if any(character in raw for character in "*?["):
+        return True
+    return os.path.isdir(_normalize_repo_path(raw, repo_root))
+
+
+def _is_declared_directory_entry(raw, repo_root):
+    """A write-domain entry is directory-level by its declared form as well.
+
+    The plan gate judges the declaration before the workspace materializes: a
+    trailing path separator is the declaration's own directory marker, alongside
+    the glob and existing-directory forms.
+    """
+    if raw.endswith(("/", os.sep)):
+        return True
+    return _is_directory_level_entry(raw, repo_root)
+
+
+def _declared_write_domain_findings(packages, graph, slot_cap, repo_root):
+    """FR-012's file-level form for units that can actually run concurrently.
+
+    A directory-level domain is red where it can mislead the overlap judgement: the
+    unit is a write unit, the plan admits concurrency (slot_cap >= 2) and the unit
+    has at least one independent peer. A plan that cannot execute a pair
+    concurrently judges no overlap, so the retained 070 plan semantics hold there.
+    """
+    findings = []
+    if not (_is_int(slot_cap) and slot_cap >= 2):
+        return findings
+    for package in packages:
+        if package.get("kind") != "write":
+            continue
+        wp_id = package["wp_id"]
+        peers = [other["wp_id"] for other in packages if other["wp_id"] != wp_id]
+        if not any(_independent(graph, wp_id, peer) for peer in peers):
+            continue
+        for raw in package.get("owned_paths") or []:
+            if _is_text(raw) and _is_declared_directory_entry(raw, repo_root):
+                findings.append(
+                    _finding(
+                        "write-domain-directory",
+                        wp_id,
+                        "write domain entry is a directory-level region, not a "
+                        "file-level path: %s" % raw,
+                    )
+                )
+    return findings
+
+
+def _write_domain_findings(packages, repo_root):
+    """WG-15 unit-level form: a non-read-only unit needs a non-empty file-level domain."""
+    findings = []
+    for package in packages:
+        if package.get("kind") != "write":
+            continue
+        wp_id = package["wp_id"]
+        raw_paths = [
+            raw for raw in (package.get("owned_paths") or []) if _is_text(raw)
+        ]
+        if not raw_paths:
+            findings.append(
+                _finding(
+                    "write-domain-empty",
+                    wp_id,
+                    "non-read-only unit declares no write domain",
+                )
+            )
+            continue
+        for raw in raw_paths:
+            if _is_directory_level_entry(raw, repo_root):
+                findings.append(
+                    _finding(
+                        "write-domain-directory",
+                        wp_id,
+                        "write domain entry is a directory-level region, not a "
+                        "file-level path: %s" % raw,
+                    )
+                )
+    return findings
+
+
 def _concurrent_candidates(packages, graph, slot_cap):
     """Read-only packages that can overlap an independent peer under the slot cap."""
     if not (_is_int(slot_cap) and slot_cap >= 2):
@@ -1093,6 +1181,7 @@ def _append_unique(findings, finding):
 def _preflight_findings(plan, packages, graph, manifest, slot_ceiling, repo_root):
     """WG-14 manifest coverage/forbidden, WG-15 territories, WG-16 slot cap/isolation."""
     findings = []
+    findings.extend(_write_domain_findings(packages, repo_root))
     for package in packages:
         wp_id = package["wp_id"]
         owned = _write_territory(package, repo_root)
@@ -1690,7 +1779,7 @@ def _emit(record, json_out):
     print(text)
 
 
-def _plan_findings(plan, args, attempt, base_plan_hash, amendments):
+def _plan_findings(plan, args, attempt, base_plan_hash, amendments, repo_root):
     findings = validate_plan_schema(plan, args.stage, attempt)
     schema_failed = any(
         finding["code"] == "schema-missing" for finding in findings
@@ -1701,10 +1790,15 @@ def _plan_findings(plan, args, attempt, base_plan_hash, amendments):
     if not findings and isinstance(packages, list):
         graph_findings, layers = _graph_findings(packages)
         findings.extend(graph_findings)
+        graph = _known_dependency_graph(packages)
         findings.extend(_output_findings(plan, packages))
         findings.extend(_kind_findings(packages))
         findings.extend(_bounded_findings(packages))
-        graph = _known_dependency_graph(packages)
+        findings.extend(
+            _declared_write_domain_findings(
+                packages, graph, plan.get("slot_cap"), repo_root
+            )
+        )
         findings.extend(_pattern_findings(plan, packages, graph))
         findings.extend(_amendment_hash_findings(base_plan_hash, amendments))
         recomputed = canonical_plan_hash(plan)
@@ -1817,7 +1911,7 @@ def run(args):
         )
 
     findings, layers, graph, schema_failed, recomputed = _plan_findings(
-        plan, args, attempt, base_plan_hash, amendments
+        plan, args, attempt, base_plan_hash, amendments, repo_root
     )
     if args.check == "preflight" and not schema_failed:
         findings.extend(

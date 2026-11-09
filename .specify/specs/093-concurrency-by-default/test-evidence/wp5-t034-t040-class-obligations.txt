@@ -1,0 +1,69 @@
+# WP5 readings — T034 · T035 · T036 (class obligations, C-045/C-046/C-047) · T038 (C-043) · T039 · T040
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The three owner_anchor values declared by concurrency-class.yaml
+4:# each class's `obligation` / `unit_form` / `owner_anchor`, and the FR-004 decision rule that assigns a
+21:      owner_anchor: shared/definitions/subagent-definitions.md#class-concurrent-by-default
+28:      owner_anchor: shared/definitions/subagent-definitions.md#class-partition-required
+34:      owner_anchor: shared/definitions/subagent-definitions.md#class-serial-only
+58:note: "Class design, recorded once here because no earlier artifact had fixed it: concurrent-by-default covers the bodies that partition their own duty (skills, commands); partition-required covers the bodies whose unit set IS the product (goal targets, team seats) so a one-unit run is a recorded decision; serial-only covers the agent definitions, whose own advance is a single executor run (measured 2026-11-09: none of the 17 definitions carries a dispatch tool, 14 forbid dispatching in prose), with the serial condition named by pointer to serial-reason.yaml rather than restated, and the class re-openable only by revising this fact (C-047). The decision rule keys on (root_id, produced_shape); produced_shape uses the run-time unit vocabulary of data-model.md E-1 (work-package, command-run, target, seat-group, executor-run), so a root whose members ever resolve to two shapes is decided by its shape row, and a pair matching no row is uncovered and red. owner_anchor sections are authored by the implement rows that write the class obligations; the anchor fragment is the section id to create."
+
+## The anchor sections in shared/definitions/subagent-definitions.md
+### class-concurrent-by-default — concurrent-by-default (`work-package`)
+
+**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`; the decision rule that assigns a body to this class is owned there too). A skill or command body partitions its own duty into work packages and runs them concurrently whenever the FR-005 conditions hold. A serial result is never a free choice: it carries a reason code from the closed vocabulary plus that code's form-matching evidence — a non-empty string such as `.` is not a basis — and the run records the reading triple. Membership is decided by the fact's `(root_id, produced_shape)` rule, never by this section.
+
+### class-partition-required — partition-required (`target-or-seat-group`)
+
+**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`). A goal's targets or a team's seats ARE the unit set the body produces, so a single-unit execution is itself a decision that MUST be recorded — the target set is exactly one, or the serial reason is named — never a silent default. Partitioning is judged before dispatch: intersecting target or seat write domains are red at binding time.
+
+### class-serial-only — serial-only (`executor-run`)
+
+**Obligation**: `may-serial` (value owner: `shared/declarations/facts/concurrency-class.yaml`). An agent definition's own advance is a single executor run, so it may proceed serially; it names which host or dependency condition applies by pointing at `shared/declarations/facts/serial-reason.yaml` rather than restating the vocabulary, so the class is not a free pass.
+
+## Three Execution Modes
+
+## T034 — concurrent-by-default: serial requires a closed-vocabulary code + form-matching evidence
+44:**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`; the decision rule that assigns a body to this class is owned there too). A skill or command body partitions its own duty into work packages and runs them concurrently whenever the FR-005 conditions hold. A serial result is never a free choice: it carries a reason code from the closed vocabulary plus that code's form-matching evidence — a non-empty string such as `.` is not a basis — and the run records the reading triple. Membership is decided by the fact's `(root_id, produced_shape)` rule, never by this section.
+## T035 — partition-required: a single-unit execution is a recorded decision, never a silent default
+48:**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`). A goal's targets or a team's seats ARE the unit set the body produces, so a single-unit execution is itself a decision that MUST be recorded — the target set is exactly one, or the serial reason is named — never a silent default. Partitioning is judged before dispatch: intersecting target or seat write domains are red at binding time.
+## T036 — serial-only: names the condition by pointer to serial-reason.yaml, never restates the vocabulary
+52:**Obligation**: `may-serial` (value owner: `shared/declarations/facts/concurrency-class.yaml`). An agent definition's own advance is a single executor run, so it may proceed serially; it names which host or dependency condition applies by pointing at `shared/declarations/facts/serial-reason.yaml` rather than restating the vocabulary, so the class is not a free pass.
+
+## The anchor-resolvability assertions (T029)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_high_order.py::test_unresolvable_owner_anchor_is_obligation_missing tests/contract/test_concurrency_high_order.py::test_live_tree_has_no_obligation_missing_finding -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_high_order.py::test_unresolvable_owner_anchor_is_obligation_missing tests/contract/test_concurrency_high_order.py::test_live_tree_has_no_obligation_missing_finding -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.20s
+EXIT=0
+
+## T038 — the obligation carries no tuning value (C-043)
+obligation section: numeric tuning hits = none
+command pointer block: numeric hits = none
+class anchors: numeric tuning hits = none
+
+## T039 — each grain reaches the single anchor by pointer (no fifth copy)
+| Grain | Unit | The grain's own pointer |
+|-------|------|-------------------------|
+| skill or command body | work package / bounded step group | the body's own text; class table: `shared/declarations/facts/concurrency-class.yaml` |
+| goal slice | target | [`goal-definitions.md`](goal-definitions.md) § Target concurrency |
+| team | seat group | `skills/internal/create-team/references/conceptual-model.md` |
+| loop stage | stage package (driver) / entry (house-keeping) / step (project-setup) | `skills/external/sdd-loop-driver/SKILL.md` and its `references/decomposition-model.md` |
+
+-- command surfaces carrying the authored pointer block (29 expected)
+29
+-- plan template pointer
+9:> **Concurrency obligation (执行义务，按指针抵达)**: this plan authorizes execution bodies. Each one follows the framework's single concurrency obligation — consider concurrency first, default to it when the class and capability allow, and name a reason code plus record the `requested` / `effective` / `effective_reason` reading when serial. The obligation's authored text is `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; its class table is `shared/declarations/facts/concurrency-class.yaml`, its reason codes `shared/declarations/facts/serial-reason.yaml`, and its reading fields `shared/declarations/facts/effective-concurrency.yaml`. This template restates none of their rules.
+
+## T040 — every execution body reaches its class owner (live classify)
+$ python3 scripts/python/concurrency-check.py classify --repo . --json-out .specify/.tmp/wp5/decl/classify.json
+classify: decision=pass findings=0 -> .specify/.tmp/wp5/decl/classify.json
+EXIT=0
+
+decision: pass findings: 0
+root_counts: {'agents': 17, 'anchoring': 6, 'commands': 29, 'skills': 54, 'teams': 12}
+-- the body universe measured per root (118 bodies at 2026-11-09: 54 skills + 29 commands + 17 agents + 12 teams + 6 anchoring)

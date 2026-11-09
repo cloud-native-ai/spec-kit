@@ -474,10 +474,24 @@ def test_c11_ladder_is_closed_and_zero_observation_keeps_the_plan():
 
 
 def test_c12_one_dispatch_mechanism_with_a_recorded_mode():
+    """Re-pinned by Feature 093 T152 (FR-035 / C-094): the fork carrier is first."""
     body = _require_section(_text(SKILL), "Boundaries")
-    assert re.search(r"host-native subagent capability first", body, re.IGNORECASE)
-    assert re.search(r"`run-agent` is the fallback", body, re.IGNORECASE)
-    assert re.search(r"`run-skills` only resolves and executes the Trainee", body, re.IGNORECASE)
+    assert re.search(r"fork carrier", body, re.IGNORECASE), (
+        "the fork carrier is the default local dispatch")
+    assert "stage-runner.sh" in body and "qodercli" in body, (
+        "the fork carrier is same-family qodercli children through stage-runner.sh")
+    assert re.search(r"SUBPROCESS|subprocess|独立子进程", body), (
+        "heterogeneous agents use the subprocess carrier")
+    assert re.search(r"heterogeneous|异构", body)
+    assert re.search(
+        r"in-process[\s\S]{0,240}(BANNED|禁止|MUST NOT)"
+        r"|(BANNED|禁止|MUST NOT)[\s\S]{0,240}in-process", body), (
+        "the host-internal in-process subagent path is BANNED as a carrier")
+    assert re.search(r"`?run-agent`?[^.]{0,160}resolves[^.]{0,160}relays", body,
+                     re.IGNORECASE), "run-agent only resolves and relays"
+    assert "`run-agent` is the fallback" not in body, (
+        "the disposed fallback framing must not return")
+    assert re.search(r"`run-skills` only resolves and executes the Trainee", body)
     assert re.search(r"no second\s+mechanism", body, re.IGNORECASE | re.DOTALL)
     assert re.search(r"mode used is recorded in the DispatchRecord", body, re.IGNORECASE)
 

@@ -1,0 +1,61 @@
+# WP2 red-first + green — T138 (validate-tasks [green:] semantics, F-093-004/F-093-015)
+- date: 2026-11-09T11:44:43Z
+
+## RED — the new contract test against the pre-edit validator (git HEAD copy)
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_validate_tasks_green_semantics.py -q`
+  (the edited validator was swapped for `git show HEAD:scripts/python/validate-tasks.py` for this reading, then restored)
+FAILED test_c1_rule_block_states_the_marker_reading
+FAILED test_c2_emitted_message_states_the_marker_reading
+  assertion: 'a claimed clause belongs to one row' not in '...one clause belongs to one row, so re-cut the partition...'
+FAILED test_c3_help_banner_states_the_marker_reading
+FAILED test_c8_dead_owner_pointer_is_repointed
+4 failed, 5 passed in 6.62s
+- exit status: 1
+
+## GREEN — after the rewording + regeneration
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_validate_tasks_green_semantics.py -q`
+.........                                                                [100%]
+9 passed in 6.21s
+- exit status: 0
+
+## GREEN — the nine propositions, by name
+  tests/contract/test_validate_tasks_green_semantics.py::test_c1_rule_block_states_the_marker_reading
+  tests/contract/test_validate_tasks_green_semantics.py::test_c2_emitted_message_states_the_marker_reading
+  tests/contract/test_validate_tasks_green_semantics.py::test_c3_help_banner_states_the_marker_reading
+  tests/contract/test_validate_tasks_green_semantics.py::test_c4_totality_phrasings_are_absent
+  tests/contract/test_validate_tasks_green_semantics.py::test_c5_strict_subset_passes
+  tests/contract/test_validate_tasks_green_semantics.py::test_c5_dangling_clause_is_still_an_error
+  tests/contract/test_validate_tasks_green_semantics.py::test_c6_093_green_partition
+  tests/contract/test_validate_tasks_green_semantics.py::test_c7_validator_mirror_is_byte_identical
+  tests/contract/test_validate_tasks_green_semantics.py::test_c8_dead_owner_pointer_is_repointed
+
+## GREEN — regression neighbour: the parallel-safety contract suite (same file's other pins)
+16 passed in 6.24s
+- exit status: 0
+
+## GREEN — 093's own green partition (C-6), from the same run
+PASS: .specify/specs/093-concurrency-by-default/tasks.md — 0 error(s), 0 warning(s)
+claims = 37 | double-claimed = 0 | dangling = 0
+
+## GREEN — the three surfaces carry the marker reading
+- docstring rule block:
+46:                  clause green; a claimed clause belongs to one row, while a
+502:        # one clause claimed by two rows: a claimed clause belongs to one row, while
+- --help banner:
+Deterministic structural validator for a feature's tasks.md (row format, ID uniqueness, blockedBy resolvability, [P] parallel safety, story-label placement, DoD format, and the four green-point attribution checks). A [green:] tag is a red-first marker: a claimed clause belongs to one row, and a feature MAY claim a strict subset of its contract clauses.
+
+positional arguments:
+- emitted message (from C-2 fixture): the message now reads:
+  "a claimed clause belongs to one row; a feature MAY claim a strict subset of its contract clauses ..."
+
+## GREEN — F-093-015: the dead pointer is re-pointed and its mirror regenerated
+templates/tasks-template.md:110:- **[green: <contract>#<clause>]** (optional, repeatable): green-point attribution tag — this row is the one that turns that contract clause green. A row may declare zero or more; a row declaring none keeps exactly the plain form above, so the tag is purely additive. The contract path resolves relative to this tasks.md's own directory first and the repository root second. Keep the tag on the task row: the one-line-per-task rule is owned by `.specify/skills/internal/create-tasks/SKILL.md` § "One line per task (mechanical-validation contract)" and is machine-enforced, so a tag folded onto a continuation line is a format error. `scripts/python/validate-tasks.py` parses the tag and reports: a contract path or clause id that does not resolve → `green-dangling` (**ERROR**); claims on one contract whose clause order runs backwards against the row order → `green-cross-phase` (WARN, an earlier row cannot leave that contract green at its own phase); one clause claimed by two rows → `green-clause-collision` (WARN); one test path claimed green at two different points by two rows → `green-path-divergence` (WARN). Partition a contract's clauses across the rows that own them so each clause is claimed exactly once, and never silence a WARN by deleting the tag — that removes the evidence of the conflict without removing the conflict.
+.specify/templates/tasks-template.md:110:- **[green: <contract>#<clause>]** (optional, repeatable): green-point attribution tag — this row is the one that turns that contract clause green. A row may declare zero or more; a row declaring none keeps exactly the plain form above, so the tag is purely additive. The contract path resolves relative to this tasks.md's own directory first and the repository root second. Keep the tag on the task row: the one-line-per-task rule is owned by `.specify/skills/internal/create-tasks/SKILL.md` § "One line per task (mechanical-validation contract)" and is machine-enforced, so a tag folded onto a continuation line is a format error. `scripts/python/validate-tasks.py` parses the tag and reports: a contract path or clause id that does not resolve → `green-dangling` (**ERROR**); claims on one contract whose clause order runs backwards against the row order → `green-cross-phase` (WARN, an earlier row cannot leave that contract green at its own phase); one clause claimed by two rows → `green-clause-collision` (WARN); one test path claimed green at two different points by two rows → `green-path-divergence` (WARN). Partition a contract's clauses across the rows that own them so each clause is claimed exactly once, and never silence a WARN by deleting the tag — that removes the evidence of the conflict without removing the conflict.
+templates/tasks-template.md:0
+.specify/templates/tasks-template.md:0
+- section resolvability:
+274:**One line per task (mechanical-validation contract)**: the ENTIRE task row — checkbox,
+
+## GREEN — interface gates after the edit
+validate-tasks.py 0.0.22
+help exit=0

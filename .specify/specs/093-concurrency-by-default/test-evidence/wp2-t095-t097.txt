@@ -1,0 +1,35 @@
+# WP2 red-first + green — T095–T097 (capability: C-037…C-040)
+- date: 2026-11-09T11:39:43Z
+
+## RED — the action was a stub
+decision = fail | findings = [('not-implemented','capability')] | exit status: 1
+
+## GREEN — T096/C-039: the live tree has no adjudicated verdict -> owner-unavailable (exit 2, never a default)
+- exit status: 2
+ decision = owner-unavailable | verdict = None
+ finding = no adjudicated verdict readable (decision_state='unadjudicated', verdict=None); the allowed values are ['allow', 'forbid'] — the owner's ruling is required, never a default
+- fact absent entirely (empty fixture):
+  exit status: 2
+  decision = owner-unavailable | codes = ['owner-unavailable']
+
+## GREEN — T095/C-037: the static sweep over a verdict-bearing fixture (forbid), existing frontmatter key only
+- exit status: 0
+ decision = pass | verdict = forbid
+  agents/demo-capable.agent.md -> dispatch-capable | a dispatch tool is present in capability-tools
+  agents/demo-external.agent.md -> external-process | the body declares an external-process form
+  agents/demo-handoff.agent.md -> handoff-declared | the body declares an explicit handoff
+  agents/demo-incapable.agent.md -> incapable | no dispatch tool, handoff or external-process form is declared
+
+## GREEN — T097/C-040: declaration-execution-mismatch, both forms, with compared statements + record
+- form 1: a record declaring 6 units for an incapable body
+  exit status: 1
+  {'code': 'declaration-execution-mismatch', 'subject': 'agents/demo-incapable.agent.md', 'kind': 'inconsistency', 'compared': [{'declared_units': 6}, {'capability_tools': ['Read', 'Grep'], 'verdict': 'incapable'}], 'record': '.specify/.tmp/wp2/records/capability-fixture-mismatch.yml'}
+- form 2: a run record with 3 units, one executor id, no interval overlap
+  exit status: 1
+  record_units = {'count': 3, 'executor_ids': ['solo'], 'intervals_complete': True, 'max_overlap': 1}
+  [('declaration-execution-mismatch', "the run record shows 3 units all executed by 'solo' with no interval overlap (max overlap ")]
+
+## GREEN — T097: the envelope carries the verdict value the fact decided
+ capability-fixture-ok verdict='forbid'
+ capability-fixture-mismatch verdict='forbid'
+ capability-run-serial verdict='forbid'

@@ -1,0 +1,27 @@
+# T007 — mirror baseline re-read (tasks entry point) — 2026-11-09T10:54:09Z
+
+## Pre-sync reading (the new sources are not yet projected; the check catches exactly them)
+$ python3 scripts/python/sync-mirrors.py --check
+8 MISS (the eight new facts under .specify/shared/declarations/facts/) + 1 DIFF (.specify/shared/declarations/contract.yaml)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit=2
+
+## Regeneration (the sanctioned direction: edit the source, regenerate the projection)
+$ python3 scripts/python/sync-mirrors.py --write --only shared/
+sync  shared/ -> .specify/shared/ (9 files)
+exit=0
+
+## Post-sync baseline (the reading this row records)
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (123 files, byte-identical)
+ok    shared/ == .specify/shared/ (108 files, byte-identical)
+exit=0
+
+## File-count delta against test-evidence/mirror-baseline-plan.txt (the pair set stays owned there)
+shared/: 98 (plan baseline) -> 108 (now); this package adds 8 fact files + 0 net contract line count, so 2 of the delta predate this package.
+scripts/: 121 (plan baseline) -> 123 (now); no file in scripts/ was written by this package, so the 2-file delta predates it.
+templates/ 22, skills/external/ 417, skills/internal/ 139, agents/ 17: unchanged counts, all byte-identical.

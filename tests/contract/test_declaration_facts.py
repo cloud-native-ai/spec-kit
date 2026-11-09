@@ -45,6 +45,16 @@ PRE_EXISTING_CONTRACT_KEYS = {
     "required_exclusion_keys", "gate_call_sites",
 }
 
+# 2026-11-10 merged (093-concurrency-by-default): the concurrency feature registers its
+# eight facts by adding their top-level keys to contract.yaml; `registered_facts` stays
+# the last section. The additions are additive exactly as C-86 allows, and the clause's
+# subject (no pre-existing key renamed or removed) is unchanged.
+POST_094_FACT_KEYS = {
+    "concurrency-class", "concurrency-contract", "concurrency-slot-and-reserve",
+    "coordinator-dispatch-verdict", "decomposition-coverage", "effective-concurrency",
+    "executor-enumeration-roots", "serial-reason",
+}
+
 TASK_ROW = "- [ ] T{n:03d} deliver the fixture row"
 
 
@@ -439,7 +449,7 @@ def test_registration_is_additive_and_both_consumers_are_in_scope():
     # the one addition, appended after every key it must not disturb.
     vanished = PRE_EXISTING_CONTRACT_KEYS - set(contract)
     assert not vanished, f"pre-existing contract keys vanished: {sorted(vanished)}"
-    assert set(contract) - PRE_EXISTING_CONTRACT_KEYS == {"registered_facts"}, (
+    assert set(contract) - PRE_EXISTING_CONTRACT_KEYS == {"registered_facts"} | POST_094_FACT_KEYS, (
         "the registration is the only change to contract.yaml (C-86); unexpected keys: "
         f"{sorted(set(contract) - PRE_EXISTING_CONTRACT_KEYS - {'registered_facts'})}")
     top_level = re.findall(r"^([a-z_]+):", contract_path.read_text(encoding="utf-8"),

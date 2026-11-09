@@ -1,0 +1,33 @@
+# WP5 readings — T088 (the coordinator-verdict read: absent -> owner-unavailable; restored -> verbatim)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The assertions
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_dispatch_capability.py::test_absent_coordinator_verdict_fact_is_owner_unavailable tests/contract/test_concurrency_dispatch_capability.py::test_unadjudicated_verdict_fact_reads_owner_unavailable tests/contract/test_concurrency_dispatch_capability.py::test_adjudicated_verdict_is_reported_verbatim -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_dispatch_capability.py::test_absent_coordinator_verdict_fact_is_owner_unavailable tests/contract/test_concurrency_dispatch_capability.py::test_unadjudicated_verdict_fact_reads_owner_unavailable tests/contract/test_concurrency_dispatch_capability.py::test_adjudicated_verdict_is_reported_verbatim -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.20s
+EXIT=0
+
+## Raw readings
+-- the live fact is unadjudicated: the action exits 2 with owner-unavailable (the fail-closed window)
+$ python3 scripts/python/concurrency-check.py capability --repo . --record .specify/.tmp/wp5/judge/rec-single.yaml --json-out .specify/.tmp/wp5/judge/cap-live.json
+capability: decision=owner-unavailable findings=1 -> .specify/.tmp/wp5/judge/cap-live.json
+EXIT=2
+
+decision: owner-unavailable verdict: None
+-- remove the fact from a fixture copy: same owner-unavailable, exit 2
+$ python3 scripts/python/concurrency-check.py capability --repo .specify/.tmp/wp5/judge/nofact --record .specify/.tmp/wp5/judge/rec-single.yaml --json-out .specify/.tmp/wp5/judge/cap-nofact.json
+capability: decision=owner-unavailable findings=1 -> .specify/.tmp/wp5/judge/cap-nofact.json
+EXIT=2
+
+decision: owner-unavailable findings: ['owner-unavailable']
+-- restore it with an adjudicated value (fixture input): the verdict is reported verbatim
+$ python3 scripts/python/concurrency-check.py capability --repo .specify/.tmp/wp5/judge/withfact --record .specify/.tmp/wp5/judge/rec-single.yaml --json-out .specify/.tmp/wp5/judge/cap-withfact.json
+capability: decision=pass findings=0 -> .specify/.tmp/wp5/judge/cap-withfact.json
+EXIT=0
+
+verdict carried: forbid

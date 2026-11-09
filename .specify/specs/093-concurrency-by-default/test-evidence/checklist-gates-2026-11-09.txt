@@ -1,0 +1,126 @@
+=== Feature 093 checklist gates — 2026-11-09T08:39:20Z ===
+
+=== workspace-guard --snapshot (BEFORE any write) ===
+cmd: python3 scripts/python/workspace-guard.py --snapshot .specify/specs/093-concurrency-by-default/test-evidence/workspace-checklist.json --repo /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-clarify
+recorded .specify/specs/093-concurrency-by-default/test-evidence/workspace-checklist.json
+EXIT=0
+
+=== G-checklist-duplicate: doc-consistency-check.py --faces duplicate --path <checklist> --spec-dir .specify/specs/093-concurrency-by-default ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:20Z
+faces: duplicate=pass
+files_scanned: 15
+findings: 0
+EXIT=0
+
+=== G-checklist-reader: doc-consistency-check.py --faces reader --path <checklist> --spec-dir .specify/specs/093-concurrency-by-default ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:20Z
+faces: reader=pass
+files_scanned: 15
+findings: 0
+EXIT=0
+
+=== red-first mutation probe 1 (reader face) — 2026-11-09T08:39:27Z ===
+mutation: copied the checklist to .specify/.tmp/sdd-loop/tmp/concurrency-by-default/reader-mutation.md and removed the '**Readers**:' line (44 CHK items kept, readers-declaration count = 0)
+cmd: python3 .specify/scripts/python/doc-consistency-check.py --action verify --faces reader --path .specify/.tmp/sdd-loop/tmp/concurrency-by-default/reader-mutation.md --spec-dir .specify/specs/093-concurrency-by-default
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:27Z
+faces: reader=fail
+files_scanned: 16
+.specify/.tmp/sdd-loop/tmp/concurrency-by-default/reader-mutation.md:1: reader-declaration-missing: missing or empty reader declaration: readers
+    fix: 补齐标注（前 40 非空行内 **Readers** / **Reading scenario** 两行且值非空）
+findings: 1
+EXIT=1
+
+=== red-first mutation probe 2 (anchor break, reader face) — 2026-11-09T08:39:42Z ===
+mutation: reader declaration restored; the traceability anchor on CHK001 changed from '[Completeness, Clarity, Req §FR-001, Req §FR-003]' to '[Completeness, Clarity, Req]' (44 CHK items kept)
+cmd: python3 .specify/scripts/python/doc-consistency-check.py --action verify --faces reader --path .specify/.tmp/sdd-loop/tmp/concurrency-by-default/reader-mutation.md --spec-dir .specify/specs/093-concurrency-by-default
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:42Z
+faces: reader=pass
+files_scanned: 16
+findings: 0
+EXIT=0
+
+=== red-first mutation probe 3 (duplicate face) — 2026-11-09T08:39:42Z ===
+mutation: CHK010 cloned verbatim as CHK045 (45 CHK rows; one hand-written copy of a judgement line)
+cmd: python3 .specify/scripts/python/doc-consistency-check.py --action verify --faces duplicate --path .specify/.tmp/sdd-loop/tmp/concurrency-by-default/duplicate-mutation.md --spec-dir .specify/specs/093-concurrency-by-default
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:43Z
+faces: duplicate=pass
+files_scanned: 16
+findings: 0
+EXIT=0
+
+=== red-first mutation probe 3b (duplicate face, retry) — 2026-11-09T08:39:52Z ===
+mutation: CHK010 cloned as CHK045 and given a second trailing full stop; after normalisation the two rows are byte-identical (trailing punctuation is stripped)
+cmd: python3 .specify/scripts/python/doc-consistency-check.py --action verify --faces duplicate --path .specify/.tmp/sdd-loop/tmp/concurrency-by-default/duplicate-mutation.md --spec-dir .specify/specs/093-concurrency-by-default
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:39:52Z
+faces: duplicate=pass
+files_scanned: 16
+findings: 0
+EXIT=0
+
+=== red-first mutation probe 2b (traceability anchors, reader face) — 2026-11-09T08:40:21Z ===
+mutation: reader declaration kept; the Req anchors on CHK001, CHK012 and CHK023 replaced by the non-resolution sentinel 'Req ; 編' so the item carries a [Req] with no resolvable section. NOTE the earlier probe 2 result is retained above as a NEGATIVE control (see § findings).
+cmd: python3 .specify/scripts/python/doc-consistency-check.py --action verify --faces reader --path .specify/.tmp/sdd-loop/tmp/concurrency-by-default/reader-mutation.md --spec-dir .specify/specs/093-concurrency-by-default
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:40:21Z
+faces: reader=pass
+files_scanned: 16
+findings: 0
+EXIT=0
+
+=== G-checklist-reader against the REAL checklist (final) ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:40:21Z
+faces: reader=pass
+files_scanned: 15
+findings: 0
+EXIT=0
+
+=== G-checklist-duplicate against the REAL checklist (final) ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T08:40:21Z
+faces: duplicate=pass
+files_scanned: 15
+findings: 0
+EXIT=0
+
+=== workspace-guard --check (AFTER the probes) — 2026-11-09T08:40:24Z ===
+cmd: python3 scripts/python/workspace-guard.py --check .specify/specs/093-concurrency-by-default/test-evidence/workspace-checklist.json --repo /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-clarify
+clean
+EXIT=0
+
+=== FINDINGS — what the three probes actually prove (recorded, not hidden) ===
+1. G-checklist-reader CAN go red, but ONLY on the reader declaration itself.
+   - probe 1 (removed the '**Readers**:' line): reader=fail, exit 1, finding reader-declaration-missing at line 1
+     -> the gate is not a blind green on its own subject.
+   - probe 2 (traceability anchor broken on CHK001): reader=PASS, exit 0
+   - probe 2b (anchors on CHK001/CHK012/CHK023 reduced to an unresolvable 'Req ;'): reader=PASS, exit 0
+   -> the reader face has exactly TWO markers (doc-consistency-check.py READER_MARKERS, :44-47). It checks that a
+      checklist declares its readers; it does NOT read, resolve or judge CHK items, their requirement anchors or
+      their counts. Anchor traceability for this checklist is therefore NOT covered by the gate; it is covered by the
+      machine check recorded in checklist-readings-2026-11-09.txt §1 (44/44 items carry a [Req §…] anchor, 0
+      duplicates, ids contiguous CHK001..CHK044).
+2. G-checklist-duplicate returned PASS on a page whose rows are all one line each, and CANNOT detect a verbatim
+   duplicate in this checklist at all — regardless of mutation.
+   - probe 3  (CHK010 cloned as CHK045, identical):  duplicate=pass, exit 0
+   - probe 3b (same clone plus one extra full stop): duplicate=pass, exit 0
+   cause (measured, not inferred): is_excluded_path (:279-290) returns True for ANY path with a '.specify' path
+   component, so every --path under .specify/ contributes ZERO records; the duplicate face then compares an empty
+   subject set against itself and reports "pass". Measured directly: collect_records() on the probe-3b mutant returned
+   0 records with root = the worktree. The sibling line 092 recorded the same face as "duplicate=pass" for the same
+   reason (its checklist also lives under .specify/).
+   -> G-checklist-duplicate as configured in this topology is a BLIND CHECK: its green carries no information about
+      this file. Per .specify/shared/guidelines/fast-fail.md § "A green check is a claim, not evidence", the reading is
+      kept verbatim and labelled; it is NOT reported as evidence of absence of duplicates.
+   -> The property the gate was meant to establish is established instead by the machine check in
+      checklist-readings-2026-11-09.txt §1.3: 44 items, 44 distinct ids, 0 duplicate id, 0 duplicate normalised
+      body (normalisation = strip the 'CHKnnn - ' prefix, collapse whitespace, drop trailing punctuation, ASCII
+      fold — the same rule the engine documents at :318-324).
+   -> Framework observation (not repaired here): a path-exclusion rule that also swallows explicit --path subjects
+      turns the duplicate face into a constant pass for every subject that lives under .specify/. 092 recorded it as
+      a green; 093 records it as a blind check and routes it to the findings list for analyze.

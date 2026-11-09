@@ -15,7 +15,7 @@ Both topologies support parallel lines: one connection/process per line, each li
 
 **SSH transport owner**: concrete option sets, quoting, stdin script push and exit-code propagation are owned by the `ssh-utils` skill (`scripts/ssh-exec.py`). Every non-interactive ssh invocation MUST carry `-o RemoteCommand=none` — a host whose ssh_config presets `RemoteCommand` otherwise rejects the command line with `Cannot execute command-line and remote command`. The recipes below show the topology shape; prefer the wrapper when executing.
 
-> **SDD-driving skills boundary**: for `sdd-project-setup`, `sdd-house-keeping` and `sdd-loop-driver`, the **local** topology defaults to the orchestrator / host native subagent and MUST NOT launch `qodercli` locally. The local external-CLI variant in Recipe 5 is for consumers that explicitly choose external dispatch; it is not the SDD local default. The **remote** topology is `ssh <alias>` → `su - <run-user>` → `cd <project-dir>` → subagent CLI; the CLI default is the execution-config defaults layer (`templates/execution-config-defaults.yaml`, `cli: qodercli`). The **only local exception** is the bounded read-only validation/detection fan-out (`/speckit.analyze` §5.5, `objective-analysis-gate.md`): it is worker dispatch, not stage dispatch, and selects External per `subagent-definitions.md` § Mode Selection (Recipe 7).
+> **SDD-driving skills boundary**: for `sdd-project-setup`, `sdd-house-keeping` and `sdd-loop-driver`, local stage dispatch MUST default to the **fork carrier** — same-family `qodercli` child processes through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` — and heterogeneous agents MUST use the **subprocess carrier** (an independent child process of the agent's own CLI). The **host-internal in-process subagent path is BANNED** as a carrier (neither a default nor a degradation option). The **remote** topology is `ssh <alias>` → `su - <run-user>` → `cd <project-dir>` → subagent CLI; the CLI default is the execution-config defaults layer (`templates/execution-config-defaults.yaml`, `cli: qodercli`). The bounded read-only validation/detection fan-out (`/speckit.analyze` §5.5, `objective-analysis-gate.md`) is worker dispatch, not stage dispatch, and rides the same two process carriers (Recipe 7); the read-only allowlist and `--no-session-persistence` flags stay unchanged.
 
 ## Recipe 1 — Breakpoint Probe (断点探测)
 
@@ -87,9 +87,11 @@ On one host, split by role into parallel lines: one run user solidifies infrastr
 ## Recipe 7 — Read-only Validation Fan-out (只读验证波)
 
 Carrier for `/speckit.analyze` §5.5 and the same-author detection delegation wave: **one external
-process per finding, all in parallel, no host sessions.** Use this recipe when the executing agent
-is itself a non-nesting subagent (no native subagent tool) and must still obtain fresh-context
-read-only validators.
+process per finding, all in parallel, no host sessions.** This is the **subprocess carrier** for a
+heterogeneous agent (an independent child process of the agent's own CLI) and the read-only form of
+the **fork carrier** when the CLI is same-family (`qodercli` through `stage-runner.sh`); the
+**host-internal in-process subagent path is BANNED** as a carrier for this wave. Use it whenever the
+executing agent must obtain fresh-context read-only validators without host sessions.
 
 ```bash
 # one dispatch per finding; the flags carry the read-only allowlist and keep the run out of history

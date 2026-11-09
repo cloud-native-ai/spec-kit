@@ -1,0 +1,34 @@
+# WP5 readings — T116 (team preset carries the obligation, C-068) · T117 (per-stage coverage + per-unit reading, C-069/C-070) · T118 (per-stage default, C-035)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T116 — the stage-team preset carries the obligation and one slot-cap projection line
+76:**Concurrency obligation (C-068)**: this preset carries the obligation once for every seat and every Work Package — `shared/definitions/subagent-definitions.md` § The Concurrency Obligation (consider concurrency first; dispatch concurrently when allowed; otherwise a named reason code with its evidence form plus the reading triple). The slot cap and the ceiling are reached through the two `projection-of` lines above; this preset carries no numeric slot cap and no numeric ceiling, and an instantiated team text MUST NOT carry its own hand-written parallel section.
+77-
+48:  slot_cap_default: projection-of shared/declarations/facts/concurrency-slot-and-reserve.yaml#/statement/slot_cap_default
+49:  slot_cap_ceiling: projection-of skills/external/sdd-loop-driver/scripts/wp-gate.py --slot-cap-ceiling (WG-16); read at dispatch, never copied here
+
+## T117 — each loop stage declares its own coverage; the reading is per unit, never per round
+155:- **逐阶段覆盖与逐单元读数（C-069/C-070）**：每个循环阶段 MUST 声明自己的拆解覆盖，MUST NOT 继承上一阶段的覆盖；读数按**推进单元**记录——driver 按阶段/包、`sdd-house-keeping` 按条目、`sdd-project-setup` 按步骤，MUST NOT 写成「每轮」。
+
+## T118 — a stage with concurrent units decomposes by default; single-package is a recorded decision
+325:**The per-stage default is explicit**: a stage with concurrent units decomposes by default whenever the gate admits and the benefit test holds; staying `single-package` (or `disabled` / `fallback`) is itself a **recorded decision** with its reason, never an unstated default (FR-029, C-035).
+326-
+327-Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable it in the same run; otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults. The built-in defaults are **no longer enumerated here** — they are owned by `shared/declarations/facts/decomposition-coverage.yaml` ([[STR-007]]), through which every stage resolves; the spine's `decomposition`, `decomposition_stages` and `decomposition_slot_cap` keys are its run-scoped projections, and a fourth source that assigns "which stages decompose" is a defect. In that entry **`analyze` no longer defaults to `off`**: it decomposes by default (`coverage: on`) at N-way concurrency — N concurrent SDD Analysis Workers (`agents/sdd-analysis-worker.agent.md`), N read from the stage's team configuration / the spine's `agent_concurrency_requested` and never frozen here — and a serial analyze (`N = 1`) is admissible only with a reason code from `shared/declarations/facts/serial-reason.yaml`. Feature-level `off` remains the hard opt-out; the precedence rule above is unchanged for every stage.
+-- the live coverage action resolves every stage through the fact
+$ python3 scripts/python/concurrency-check.py coverage --repo . --json-out .specify/.tmp/wp5/model/coverage.json
+coverage: decision=pass findings=0 -> .specify/.tmp/wp5/model/coverage.json
+EXIT=0
+
+decision: pass | analyze: {'concurrency_source': 'stage-team-configuration-or-agent_concurrency_requested', 'coverage': 'on', 'decision': 'covered'} | requirements: covered-by-default
+
+## The preset's own contract module
+$ bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_wp_preset.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_loop_driver_wp_preset.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..............                                                           [100%]
+14 passed in 6.23s
+EXIT=0
+

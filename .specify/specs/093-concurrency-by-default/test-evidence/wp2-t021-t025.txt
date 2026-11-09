@@ -1,0 +1,69 @@
+# WP2 red-first + green — T021–T025 (engine skeleton, C-019…C-022)
+- date: 2026-11-09T11:34:38Z
+- worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp2 on branch 093-wp2
+
+## RED — before the engine file existed
+- command: `python3 scripts/python/concurrency-check.py --help`
+python3: can't open file '.../scripts/python/concurrency-check.py': [Errno 2] No such file or directory [captured 2026-11-09T11:32:50Z]
+- exit status: 2
+- command: `python3 .specify/scripts/python/script-interface-check.py --files scripts/python/concurrency-check.py`
+candidate-not-collected: requested candidate scripts/python/concurrency-check.py is not in the candidate set
+candidates=0 applicable=0 exempt=0 violations=0
+- exit status: 1
+- command: `bash scripts/bash/run-tests.sh tests/unit/test_concurrency_check_engine.py -q`
+no tests ran in 6.37s
+- exit status: 5
+
+## GREEN — T021 (C-019): help / version / unknown option
+- command: `python3 scripts/python/concurrency-check.py --help`
+- exit status: 0
+usage: concurrency-check.py [-h] [--repo REPO] [--record RECORD]
+side-effects: reads the repository; writes only the file named by --json-out
+exit-codes: 0 the judgement passed; 1 a documented check failed; 2 input or environment error, or no owner verdict readable
+- command: `python3 scripts/python/concurrency-check.py --version`
+concurrency-check.py 0.0.22
+- exit status: 0
+- command: `python3 scripts/python/concurrency-check.py classify --bogus-opt`
+error: unrecognized option: --bogus-opt
+- exit status: 2
+
+## GREEN — T022 (C-020): exactly five read-only actions
+- command: `python3 scripts/python/concurrency-check.py --help` (positional block)
+positional arguments:
+  {classify,serial-reason,reading,coverage,capability}
+                        the read-only action to run
+
+- probe: a sixth action name is refused
+- exit status: 2
+- probe: each action reaches its dispatch (expected reading at this row: classify fail=not-implemented, record actions exit 2 for the missing record)
+classify exit=1 decision=fail
+serial-reason exit=1 decision=fail
+reading exit=1 decision=fail
+coverage exit=1 decision=fail
+capability exit=1 decision=fail
+
+## GREEN — T023 (C-021): --repo resolution from the engine's own location
+default_repo = /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-wp2
+is_worktree_root = True
+literal .specify component directly above scripts/ is stripped; no ancestor walk
+- probe: --record on a non-record action is refused (C-021 record-flag scope)
+- exit status: 2
+not-applicable ['record-not-applicable']
+- probe: a record-judging action without --record exits 2
+- exit status: 2
+not-applicable ['record-required']
+
+## GREEN — T024 (C-022): the envelope
+- exit status: 1
+keys = ['action', 'checked_at', 'decision', 'findings', 'measured']
+findings carry code+subject = True
+checked_at = 2026-11-09T11:34:39Z
+
+## GREEN — T025: the skeleton's own gates
+- command: `python3 .specify/scripts/python/script-interface-check.py --files scripts/python/concurrency-check.py`
+candidates=1 applicable=1 exempt=1 violations=0
+- exit status: 0
+- collect half: `bash scripts/bash/run-tests.sh tests/unit/test_concurrency_check_engine.py -q`
+
+no tests ran in 6.36s
+- exit status: 5 — module is WP4's (T015/T136), absent in this isolated worktree; recorded as the row's open half, not fabricated green

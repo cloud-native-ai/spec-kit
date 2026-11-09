@@ -1,0 +1,66 @@
+# WP1 red readings before implementation — 2026-11-09T10:49:45Z
+
+## T004 / T014 / T098 — the eight facts are unregistered (red before the files land)
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-class --repo .
+no declaration for fact 'concurrency-class'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact serial-reason --repo .
+no declaration for fact 'serial-reason'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact effective-concurrency --repo .
+no declaration for fact 'effective-concurrency'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-slot-and-reserve --repo .
+no declaration for fact 'concurrency-slot-and-reserve'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact decomposition-coverage --repo .
+no declaration for fact 'decomposition-coverage'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact executor-enumeration-roots --repo .
+no declaration for fact 'executor-enumeration-roots'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-contract --repo .
+no declaration for fact 'concurrency-contract'
+exit=1
+
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact coordinator-dispatch-verdict --repo .
+no declaration for fact 'coordinator-dispatch-verdict'
+exit=1
+
+## T026 — the Phase-2 subjects do not exist yet (red at WP1 close; assertion-level reds land with WP4/WP2)
+$ python3 -m pytest tests/unit/test_concurrency_check_engine.py -q     # T015
+ERROR: file or directory not found: tests/unit/test_concurrency_check_engine.py
+
+
+no tests ran in 0.00s
+exit=4
+
+$ python3 -m pytest tests/contract/test_concurrency_declarations.py -q     # T016–T020
+ERROR: file or directory not found: tests/contract/test_concurrency_declarations.py
+
+
+no tests ran in 0.00s
+exit=4
+
+$ python3 .specify/scripts/python/script-interface-check.py --files scripts/python/concurrency-check.py     # T025
+candidate-not-collected: requested candidate scripts/python/concurrency-check.py is not in the candidate set
+candidates=0 applicable=0 exempt=0 violations=0
+exit=1
+
+$ python3 .specify/scripts/python/script-interface-check.py scripts/python/concurrency-check.py     # the T025/GATE-5 literal command
+usage: script-interface-check.py [-h] [--root ROOT] [--json]
+                                 [--files PATH[,PATH]] [--emit-rule]
+                                 [--skip-probe] [--sandbox DIR]
+                                 [--budget-seconds N] [--check-projection]
+                                 [--version]
+script-interface-check.py: error: unrecognized arguments: scripts/python/concurrency-check.py
+exit=2
+
+NOTE: the literal command quoted by T025/GATE-5 does not match the tool's CLI (its candidates are selected
+with --files PATH[,PATH]); the row reading above uses the declared flag. Recorded, not repaired, here.

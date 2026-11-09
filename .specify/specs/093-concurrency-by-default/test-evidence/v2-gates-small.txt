@@ -1,0 +1,34 @@
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/093-concurrency-by-default/requirements.md
+file: .specify/specs/093-concurrency-by-default/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 335 lines, 47 definition rows, 11 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/093-concurrency-by-default/tasks.md
+PASS: .specify/specs/093-concurrency-by-default/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/093-concurrency-by-default
+spec: .specify/specs/093-concurrency-by-default
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 415 lines, 5 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+EXIT=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements ... --tasks ...
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 35, "task_count": 143, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T09:47:10Z"}
+EXIT=0

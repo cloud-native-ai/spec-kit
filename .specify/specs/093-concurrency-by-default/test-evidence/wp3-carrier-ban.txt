@@ -1,0 +1,20 @@
+# WP3 evidence — T144 / T145 / T146 / T147 / T148 / T149 / T150 / T151 / T154 (carrier ban wave)
+# date: 2026-11-09
+
+skills/external/sdd-house-keeping/SKILL.md                                     BANNED=4 fork=4
+skills/external/sdd-house-keeping/references/maintenance-recipes.md            BANNED=1 fork=1
+skills/external/sdd-project-setup/SKILL.md                                     BANNED=4 fork=4
+skills/external/sdd-project-setup/references/setup-recipes.md                  BANNED=1 fork=1
+skills/external/sdd-loop-driver/references/watch-model.md                      BANNED=1 fork=1
+skills/external/sdd-loop-driver/references/stage-prompts.md                    BANNED=1 fork=3
+skills/external/coaching-skills/SKILL.md                                       BANNED=1 fork=1
+skills/internal/analyze-artifacts/references/validation-and-report.md          BANNED=0 fork=3
+shared/workflow/execution-topology.md                                          BANNED=1 fork=2
+shared/workflow/external-dispatch-recipes.md                                   BANNED=2 fork=3
+shared/definitions/agent-definitions.md                                        BANNED=0 fork=3
+skills/external/sdd-loop-driver/templates/stage-team-preset.md                 BANNED=1 fork=1
+
+--- residual old-rule scan over framework artifacts (expect 0 hits) ---
+$ grep -rn "MUST NOT 启动 qodercli\|MUST NOT launch qodercli\|host-native first" shared/ skills/ agents/ templates/
+exit=1 (1 = zero hits)
+# exit: 0

@@ -1,0 +1,15 @@
+# 093 — pre-analyze-check.py --stage requirements (clarify stage gate)
+Captured: 2026-11-09T07:55:08Z
+Command:
+    python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --repo /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-clarify --spec-dir .specify/specs/093-concurrency-by-default --stage requirements
+
+Note: the clarify gate reuses --stage requirements because the target artifact IS requirements.md (092 lesson: keep the stage in the evidence filename so the two readings stay distinguishable).
+
+Output (verbatim):
+----8<----
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 33, "sc": 12, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-11-09T07:55:08Z"}
+----8<----
+
+Exit code: 0
+pac_exit=0

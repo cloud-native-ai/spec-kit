@@ -1,0 +1,51 @@
+# T002 — pre-change test baseline by failure name — 2026-11-09T11:16:28Z
+
+## The authoritative run (serial canonical runner, stable tree)
+$ bash scripts/bash/run-tests.sh --serial --names-out .specify/specs/093-concurrency-by-default/notes/test-baseline.txt -q
+  banner: # test runner: python3 -m pytest -n0 -q / mode=serial reason=explicit
+  summary: 161 failed, 8147 passed, 2 skipped, 3 warnings in 706.93s (0:11:46)
+  wrote:   # failed-name list written: .../notes/test-baseline.txt (161 entries) passes=1
+  full record: .specify/specs/093-concurrency-by-default/test-evidence/suite-baseline-093.txt
+  exit: 1 (pytest failures)
+
+notes/test-baseline.txt holds the sorted, de-duplicated bare test-id list (the --names-out form).
+
+## Run provenance (three readings, one comparison surface)
+
+| Run | Command | Mode | Summary | Names | Role |
+|---|---|---|---|---|---|
+| 1 | python3 -m pytest -q (the T002 row literal) | serial | 163 failed, 8137 passed, 2 skipped in 713.70s | 163 | overlaps the fact landing window — kept as `suite-baseline-093-run1-overlap-window.txt` |
+| 2 | run-tests.sh --names-out ... -q | parallel (n auto) | 167 failed, 8140 passed + 1 serial-pass test in 49.84s | 167 | stable tree; kept as `suite-baseline-093-run2-canonical-parallel.txt` |
+| 3 | run-tests.sh --serial --names-out ... -q | serial (n0) | 161 failed, 8147 passed, 2 skipped in 706.93s | 161 | **authoritative** — `suite-baseline-093.txt` + `notes/test-baseline.txt` |
+
+## Comparison readings
+
+run1 vs run3 (serial vs serial): run1-only 5, run3-only 3.
+  run1-only: the four live-tree checks whose subjects changed while run 1 was in flight
+    (test_coaching_wiring_contract::test_c3_mirrors_and_command_copies_are_zero_drift,
+     test_coaching_wiring_contract::test_c8_the_verification_surface_runs_green,
+     test_compile_propagation_order::test_propagation_chain_is_green_in_canonical_order,
+     test_non_disposable_contract::test_t089_a_full_run_is_byte_identical_on_git_status)
+    plus test_trigger_tuning::test_high_decline_rate_yields_a_suppress_proposal.
+  run3-only: test_trigger_engine::test_c18_threshold_priority_chain,
+    test_trigger_tuning::test_acceptance_yields_no_proposal,
+    test_trigger_tuning::test_every_proposal_carries_evidence_with_metric_and_sample_size.
+
+run2 vs run3 (parallel vs serial) differs by 6 names, all inside the trigger engine/promotion/tuning suites
+  (test_c12_no_match_is_reported_not_invented, test_c23_escalation_pct_and_budget_flag,
+   test_c23_rows_and_turns_are_distinct, test_invalid_environment_threshold_is_ignored,
+   test_tune_alone_changes_nothing, test_tune_apply_requires_a_reason).
+
+## GATE-1 normalization (owner: /speckit.implement step 6 **Test runs**; 092 execution lesson 3)
+
+The baseline is the serial failed-id set. A later run derives its side the same way:
+  grep '^FAILED' <after-run record> | sed 's/^FAILED //;s/ - .*//' | sort -u > /tmp/after-names.txt
+  comm -13 .specify/specs/093-concurrency-by-default/notes/test-baseline.txt /tmp/after-names.txt
+Comparing raw FAILED-prefixed lines against the bare-id baseline would report every failure as new.
+
+## Disclosed noise band
+
+The trigger engine/promotion/tuning suites are order-sensitive in this tree: the union of their
+failures moves by 3-6 names between otherwise identical runs. A NEW-failure reading inside those
+modules must be re-confirmed by a second run before it is treated as a regression; outside them,
+the serial-vs-serial delta above is explained by the overlap window alone.

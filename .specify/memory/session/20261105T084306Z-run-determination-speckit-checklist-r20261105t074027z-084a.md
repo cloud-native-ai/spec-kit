@@ -6,10 +6,10 @@ feature: "084-harness-triple-structure"
 tags: ["run-determination", "r20261105t074027z-084a"]
 title: "run-determination /speckit.checklist r20261105T074027Z-084a"
 created: "2026-11-05T08:43:06Z"
-summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
+summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
 ---
 
-/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
+/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elap
   "feature": "084-harness-triple-structure",
   "feature_id": "084",
   "determined_at": "2026-11-05T08:43:06Z",
-  "settled_at": "2026-11-09T07:51:24Z",
+  "settled_at": "2026-11-09T08:40:58Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elap
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "accepted",
-      "reason": null,
-      "user_turn_class": "continuation_non_negative",
+      "verdict": "not_evaluated",
+      "reason": "no_user_input",
+      "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -157,6 +157,18 @@ summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elap
         },
         "evidence_refs": [],
         "status": "observed"
+      },
+      {
+        "axis": "satisfaction",
+        "verdict": "not_evaluated",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
+        "signal": {
+          "key": "satisfaction",
+          "direction": "improve"
+        },
+        "evidence_refs": [],
+        "status": "observed"
       }
     ]
   },
@@ -176,6 +188,11 @@ summary: "/speckit.checklist run=r20261105T074027Z-084a token=not_evaluated elap
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
+        "parked_via": "none",
+        "ref": null
+      },
+      {
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

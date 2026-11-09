@@ -58,6 +58,38 @@ PRESET_FIELDS = {
     "provenance",
 }
 
+# 2026-11-09 Feature 093 (T124/T133, C-082): the numeric slot cap now lives only in
+# `shared/declarations/facts/concurrency-slot-and-reserve.yaml`. The preset's
+# `slot_cap_default` / `slot_cap_ceiling` rows become projection lines, so the ST-02 /
+# ST-12 assertions re-pin from "== 6" to "projects the slot fact" — the assertion the
+# guard still makes is unchanged: *no second assignable numeric site exists*.
+SLOT_FACT = (
+    REPO_ROOT / "shared" / "declarations" / "facts" / "concurrency-slot-and-reserve.yaml"
+)
+
+
+def _fact_slot_cap() -> int:
+    match = re.search(
+        r"^\s+slot_cap_default:\s*(\d+)\s*$",
+        SLOT_FACT.read_text(encoding="utf-8"),
+        re.MULTILINE,
+    )
+    assert match, "the slot fact must declare slot_cap_default"
+    return int(match.group(1))
+
+
+def _projects_the_slot_fact(value) -> None:
+    assert isinstance(value, str), "the preset must project the fact, never restate the number"
+    assert value.startswith("projection-of "), value
+    assert "shared/declarations/facts/concurrency-slot-and-reserve.yaml" in value
+
+
+def _projects_the_ceiling_owner(value) -> None:
+    assert isinstance(value, str), "the preset must project the ceiling owner, never restate it"
+    assert value.startswith("projection-of "), value
+    assert "wp-gate.py" in value and "--slot-cap-ceiling" in value
+
+
 
 def _preset_text() -> str:
     assert PRESET.is_file(), "missing stage-team preset: %s" % PRESET
@@ -146,7 +178,8 @@ def test_st_02_frontmatter_carries_the_preset_contract_fields():
     ]
     assert [bool(item["required"]) for item in inputs] == [True, True, True, False]
     assert frontmatter["config"]["default_pattern"] == "parallel"
-    assert frontmatter["config"]["slot_cap_default"] == 6
+    _projects_the_slot_fact(frontmatter["config"]["slot_cap_default"])
+    _projects_the_ceiling_owner(frontmatter["config"]["slot_cap_ceiling"])
 
 
 def test_st_03_body_carries_the_six_mandatory_sections():
@@ -344,7 +377,7 @@ def test_st_12_graph_derived_values_take_precedence_over_preset_defaults():
 
     preset = _frontmatter()
     assert preset["pattern"] == "parallel"
-    assert preset["config"]["slot_cap_default"] == 6
+    _projects_the_slot_fact(preset["config"]["slot_cap_default"])
 
     write_plan = wp_fixtures.make_plan(
         packages=[
@@ -358,7 +391,7 @@ def test_st_12_graph_derived_values_take_precedence_over_preset_defaults():
     assert projection["pattern"] == "serial"
     assert projection["pattern"] != preset["pattern"]
     assert projection["slot_cap"] == 1
-    assert projection["slot_cap"] != preset["config"]["slot_cap_default"]
+    assert projection["slot_cap"] != _fact_slot_cap()
     worker_seat = [
         seat for seat in projection["seats"] if seat["role"] == "stage-worker"
     ][1]

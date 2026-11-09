@@ -1,0 +1,21 @@
+# WP5 readings — T093 (string registration as a closed set, C-055 family)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The live closed-set assertion (T092's test)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_declarations.py::test_shared_string_table_is_closed_and_singly_owned tests/contract/test_concurrency_declarations.py::test_reason_codes_and_class_names_do_not_cross_roles -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_declarations.py::test_shared_string_table_is_closed_and_singly_owned tests/contract/test_concurrency_declarations.py::test_reason_codes_and_class_names_do_not_cross_roles -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.21s
+EXIT=0
+
+## Mutation: add a string row without an owner — the closed-set check must go red
+added STR-012 with no owner
+closed-set judge: RED [('string-set-changed', ['STR-001', 'STR-002', 'STR-003', 'STR-004', 'STR-005', 'STR-006', 'STR-007', 'STR-008', 'STR-009', 'STR-010', 'STR-011', 'STR-012']), ('owner-missing', 'STR-012', None)]
+
+## Live reading (the unmutated fact): the judge is green over STR-001…STR-011
+ids: ['STR-001', 'STR-002', 'STR-003', 'STR-004', 'STR-005', 'STR-006', 'STR-007', 'STR-008', 'STR-009', 'STR-010', 'STR-011']
+all owners resolve: True

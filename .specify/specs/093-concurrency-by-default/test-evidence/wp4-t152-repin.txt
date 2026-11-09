@@ -1,0 +1,191 @@
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_carrier_contract.py tests/contract/test_sdd_project_setup_skill.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_coaching_run_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+...........................................................FFFFFF.FF.    [100%]
+=================================== FAILURES ===================================
+________ test_shared_dispatch_doc_declares_the_two_carriers_and_the_ban ________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_shared_dispatch_doc_declares_the_two_carriers_and_the_ban():
+        text = _read(DISPATCH)
+        assert "SDD-driving skills boundary" in text
+>       _assert_two_carriers(text, "external-dispatch-recipes.md")
+
+tests/contract/test_sdd_carrier_contract.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# External Dispatch Recipes (外部子代理派发配方) — 远端 ssh+su 与本地直驱拓扑\n\nOperational recipes for driving an **external subagent...ligations.md`](../guidelines/reporting-obligations.md); the recipes below stay command shapes and define none of it.\n'
+where = 'external-dispatch-recipes.md'
+
+    def _assert_two_carriers(text: str, where: str):
+        assert "qodercli" in text, f"{where}: the fork carrier names qodercli"
+>       assert "stage-runner.sh" in text, f"{where}: the fork carrier runs through stage-runner.sh"
+E       AssertionError: external-dispatch-recipes.md: the fork carrier runs through stage-runner.sh
+E       assert 'stage-runner.sh' in '# External Dispatch Recipes (外部子代理派发配方) — 远端 ssh+su 与本地直驱拓扑\n\nOperational recipes for driving an **external subagent...ligations.md`](../guidelines/reporting-obligations.md); the recipes below stay command shapes and define none of it.\n'
+
+tests/contract/test_sdd_carrier_contract.py:58: AssertionError
+__________________ test_house_keeping_local_and_remote_shapes __________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_house_keeping_local_and_remote_shapes():
+        text = _read(HOUSE) + _read(HOUSE_RECIPES)
+        assert "当前项目" in text
+        assert "ssh <alias>" in text and "su - <run-user>" in text
+        assert "cd <project-dir>" in text
+>       _assert_two_carriers(text, "sdd-house-keeping")
+
+tests/contract/test_sdd_carrier_contract.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '---\nname: sdd-house-keeping\ndescription: This skill can run periodic house-keeping on a target SDD project, includi...，可 handoff setup。远端先跑 execution-side target-root probe。setup 的规则不同（它不依赖 `.specify/`，由 setup 自己创建基线），见 owner。本节不复写规则。\n'
+where = 'sdd-house-keeping'
+
+    def _assert_two_carriers(text: str, where: str):
+        assert "qodercli" in text, f"{where}: the fork carrier names qodercli"
+>       assert "stage-runner.sh" in text, f"{where}: the fork carrier runs through stage-runner.sh"
+E       AssertionError: sdd-house-keeping: the fork carrier runs through stage-runner.sh
+E       assert 'stage-runner.sh' in '---\nname: sdd-house-keeping\ndescription: This skill can run periodic house-keeping on a target SDD project, includi...，可 handoff setup。远端先跑 execution-side target-root probe。setup 的规则不同（它不依赖 `.specify/`，由 setup 自己创建基线），见 owner。本节不复写规则。\n'
+
+tests/contract/test_sdd_carrier_contract.py:58: AssertionError
+______________________ test_setup_local_and_remote_shapes ______________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_setup_local_and_remote_shapes():
+        text = _read(SETUP) + _read(SETUP_RECIPES)
+        assert "当前项目" in text
+        assert "ssh <alias>" in text and "su - <run-user>" in text
+        assert "cd <project-dir>" in text
+>       _assert_two_carriers(text, "sdd-project-setup")
+
+tests/contract/test_sdd_carrier_contract.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '---\nname: sdd-project-setup\ndescription: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deter...trap 完成\n  后再按需 handoff house-keeping 做周期维护。\n- 职责切分线：bootstrap = setup；周期维护 = house-keeping；SDD 阶段循环 = loop-driver。\n'
+where = 'sdd-project-setup'
+
+    def _assert_two_carriers(text: str, where: str):
+        assert "qodercli" in text, f"{where}: the fork carrier names qodercli"
+>       assert "stage-runner.sh" in text, f"{where}: the fork carrier runs through stage-runner.sh"
+E       AssertionError: sdd-project-setup: the fork carrier runs through stage-runner.sh
+E       assert 'stage-runner.sh' in '---\nname: sdd-project-setup\ndescription: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deter...trap 完成\n  后再按需 handoff house-keeping 做周期维护。\n- 职责切分线：bootstrap = setup；周期维护 = house-keeping；SDD 阶段循环 = loop-driver。\n'
+
+tests/contract/test_sdd_carrier_contract.py:58: AssertionError
+___________________ test_shared_carrier_owner_has_both_rules ___________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_shared_carrier_owner_has_both_rules():
+        text = _read(TOPOLOGY)
+        assert "## Carrier decision (local vs remote)" in text
+        assert "No remote information" in text and "local" in text
+        assert "current project" in text or "current working directory" in text
+>       _assert_two_carriers(text, "execution-topology.md")
+
+tests/contract/test_sdd_carrier_contract.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Execution Topology (执行拓扑) — 编排侧与执行侧的两环境模型\n\nSingle source of truth for the **two-side execution topology** of the ...nd=none`（主机预置 `RemoteCommand` 时裸 ssh 会与命令行冲突）；本文只声明拓扑形态。\n- 团队（/speckit.team）经 `dispatch.sh` 的派发不改变本模型：团队座位同样是执行侧形态。\n'
+where = 'execution-topology.md'
+
+    def _assert_two_carriers(text: str, where: str):
+        assert "qodercli" in text, f"{where}: the fork carrier names qodercli"
+>       assert "stage-runner.sh" in text, f"{where}: the fork carrier runs through stage-runner.sh"
+E       AssertionError: execution-topology.md: the fork carrier runs through stage-runner.sh
+E       assert 'stage-runner.sh' in '# Execution Topology (执行拓扑) — 编排侧与执行侧的两环境模型\n\nSingle source of truth for the **two-side execution topology** of the ...nd=none`（主机预置 `RemoteCommand` 时裸 ssh 会与命令行冲突）；本文只声明拓扑形态。\n- 团队（/speckit.team）经 `dispatch.sh` 的派发不改变本模型：团队座位同样是执行侧形态。\n'
+
+tests/contract/test_sdd_carrier_contract.py:58: AssertionError
+____________________ test_local_default_and_native_subagent ____________________
+[gw24] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_local_default_and_native_subagent():
+        """FR-035 / C-094 re-pin (093 T152): fork + subprocess carriers, in-process ban."""
+        text = _skill()
+        assert "S0 入口缺省解析" in text
+        assert "当前项目" in text
+        combined = text + _recipes()
+>       assert "qodercli" in combined and "stage-runner.sh" in combined, (
+            "the fork carrier is same-family qodercli children through stage-runner.sh")
+E       AssertionError: the fork carrier is same-family qodercli children through stage-runner.sh
+E       assert ('qodercli' in '---\nname: sdd-project-setup\ndescription: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deter...trap 完成\n  后再按需 handoff house-keeping 做周期维护。\n- 职责切分线：bootstrap = setup；周期维护 = house-keeping；SDD 阶段循环 = loop-driver。\n' and 'stage-runner.sh' in '---\nname: sdd-project-setup\ndescription: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deter...trap 完成\n  后再按需 handoff house-keeping 做周期维护。\n- 职责切分线：bootstrap = setup；周期维护 = house-keeping；SDD 阶段循环 = loop-driver。\n')
+
+tests/contract/test_sdd_project_setup_skill.py:234: AssertionError
+________________ test_loop_driver_local_carriers_and_remote_cli ________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_loop_driver_local_carriers_and_remote_cli():
+        text = _read(LOOP) + _read(LOOP_RECIPES)
+        assert "会话 cwd" in text
+        assert "向上搜索" in text
+        # the fork carrier replaces the old local-native default; qodercli is now the local
+        # same-family carrier, not a remote-only tool
+>       _assert_two_carriers(text, "sdd-loop-driver")
+
+tests/contract/test_sdd_carrier_contract.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '---\nname: sdd-loop-driver\ndescription: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶...d-loop-pattern.md` 底稿；运行时零依赖。同型机制段已按 2026-10-16 委派化裁定坍缩为引用（Preflight→run-agent、R0/R1/R5→配方真源），保留面=心跳/脱离形态权威落点/阶段链收尾。\n'
+where = 'sdd-loop-driver'
+
+    def _assert_two_carriers(text: str, where: str):
+        assert "qodercli" in text, f"{where}: the fork carrier names qodercli"
+        assert "stage-runner.sh" in text, f"{where}: the fork carrier runs through stage-runner.sh"
+        assert re.search(r"子进程|child process|child-process", text), (
+            f"{where}: a carrier is an independent child process")
+>       assert re.search(r"SUBPROCESS|subprocess|独立子进程", text), (
+            f"{where}: the subprocess carrier must be named")
+E       AssertionError: sdd-loop-driver: the subprocess carrier must be named
+E       assert None
+E        +  where None = <function search at 0x7f97460ea3e0>('SUBPROCESS|subprocess|独立子进程', '---\nname: sdd-loop-driver\ndescription: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶...d-loop-pattern.md` 底稿；运行时零依赖。同型机制段已按 2026-10-16 委派化裁定坍缩为引用（Preflight→run-agent、R0/R1/R5→配方真源），保留面=心跳/脱离形态权威落点/阶段链收尾。\n')
+E        +    where <function search at 0x7f97460ea3e0> = re.search
+
+tests/contract/test_sdd_carrier_contract.py:61: AssertionError
+________________ test_c23_local_carriers_and_the_in_process_ban ________________
+[gw48] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c23_local_carriers_and_the_in_process_ban():
+        text = _skill_text()
+        assert "向上搜索" in text, "no host+path must search upward for .specify/"
+        assert "会话 cwd" in text, "the upward search starts at the session cwd"
+        assert "sdd-project-setup" in text, "missing .specify/ must hand off setup"
+        recipes = _recipes_text()
+        combined = text + recipes
+        assert "qodercli" in combined and "stage-runner.sh" in combined, (
+            "the fork carrier is same-family qodercli children through stage-runner.sh")
+        assert re.search(r"子进程|child process|child-process", combined)
+>       assert re.search(r"SUBPROCESS|subprocess|独立子进程", combined), (
+            "heterogeneous agents use the subprocess carrier")
+E       AssertionError: heterogeneous agents use the subprocess carrier
+E       assert None
+E        +  where None = <function search at 0x7f6281a423e0>('SUBPROCESS|subprocess|独立子进程', '---\nname: sdd-loop-driver\ndescription: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶...d-loop-pattern.md` 底稿；运行时零依赖。同型机制段已按 2026-10-16 委派化裁定坍缩为引用（Preflight→run-agent、R0/R1/R5→配方真源），保留面=心跳/脱离形态权威落点/阶段链收尾。\n')
+E        +    where <function search at 0x7f6281a423e0> = re.search
+
+tests/contract/test_sdd_loop_driver_skill.py:580: AssertionError
+_____________ test_c12_one_dispatch_mechanism_with_a_recorded_mode _____________
+[gw66] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c12_one_dispatch_mechanism_with_a_recorded_mode():
+        """Re-pinned by Feature 093 T152 (FR-035 / C-094): the fork carrier is first."""
+        body = _require_section(_text(SKILL), "Boundaries")
+>       assert re.search(r"fork carrier", body, re.IGNORECASE), (
+            "the fork carrier is the default local dispatch")
+E       AssertionError: the fork carrier is the default local dispatch
+E       assert None
+E        +  where None = <function search at 0x7f4052c1a3e0>('fork carrier', "- Dispatch mechanism: host-native subagent capability first; `run-agent` is the fallback; `run-skills` only resolves ...h's conclusions. The coach never pre-digests `<work>`; divergence is a reportable finding, not something to eliminate.", re.IGNORECASE)
+E        +    where <function search at 0x7f4052c1a3e0> = re.search
+E        +    and   re.IGNORECASE = re.IGNORECASE
+
+tests/contract/test_coaching_run_contract.py:460: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_sdd_carrier_contract.py::test_shared_dispatch_doc_declares_the_two_carriers_and_the_ban
+FAILED tests/contract/test_sdd_carrier_contract.py::test_house_keeping_local_and_remote_shapes
+FAILED tests/contract/test_sdd_carrier_contract.py::test_setup_local_and_remote_shapes
+FAILED tests/contract/test_sdd_carrier_contract.py::test_shared_carrier_owner_has_both_rules
+FAILED tests/contract/test_sdd_project_setup_skill.py::test_local_default_and_native_subagent
+FAILED tests/contract/test_sdd_carrier_contract.py::test_loop_driver_local_carriers_and_remote_cli
+FAILED tests/contract/test_sdd_loop_driver_skill.py::test_c23_local_carriers_and_the_in_process_ban
+FAILED tests/contract/test_coaching_run_contract.py::test_c12_one_dispatch_mechanism_with_a_recorded_mode
+8 failed, 61 passed in 6.31s
+.                                                                        [100%]
+1 passed, 69 deselected in 16.23s

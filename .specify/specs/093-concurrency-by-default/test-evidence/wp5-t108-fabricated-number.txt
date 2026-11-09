@@ -1,0 +1,25 @@
+# WP5 readings — T108 (fabricated numbers are red; cost-benefit result-set identity)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The fabricated-number assertions (T106's judge)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_real_run_evidence.py::test_zero_and_estimates_are_fabricated_numbers tests/contract/test_concurrency_real_run_evidence.py::test_claim_without_intervals_is_red tests/contract/test_concurrency_real_run_evidence.py::test_missing_baseline_is_incomplete tests/contract/test_concurrency_real_run_evidence.py::test_fixture_run_is_rejected -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_real_run_evidence.py::test_zero_and_estimates_are_fabricated_numbers tests/contract/test_concurrency_real_run_evidence.py::test_claim_without_intervals_is_red tests/contract/test_concurrency_real_run_evidence.py::test_missing_baseline_is_incomplete tests/contract/test_concurrency_real_run_evidence.py::test_fixture_run_is_rejected -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 6.20s
+EXIT=0
+
+## The cost-benefit fixture: identical result set, lower wall clock (SC-012, T136)
+$ bash scripts/bash/run-tests.sh tests/unit/test_concurrency_check_engine.py::test_cost_benefit_fixture_identical_result_set_lower_wall_clock -q
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_concurrency_check_engine.py::test_cost_benefit_fixture_identical_result_set_lower_wall_clock -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.87s
+EXIT=0
+

@@ -1,0 +1,29 @@
+# WP5 readings — T090 (the 092 reproduction fixture: red before the repair, green after)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The module (tests/contract/test_concurrency_reproduction_092.py)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_reproduction_092.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_reproduction_092.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 6.20s
+EXIT=0
+
+## The pre-repair behaviour reproduced on an engine copy with the capability judgement disabled
+engine copy: capability judgement disabled (pre-repair behaviour)
+-- pre-repair engine: the 092 shape is accepted (exit 0) — the defect the feature closes
+$ python3 .specify/.tmp/wp5/judge/engine-before.py capability --repo .specify/.tmp/wp5/judge/repro --record .specify/.tmp/wp5/judge/repro/run-092.yaml --json-out .specify/.tmp/wp5/judge/repro/before.json
+capability: decision=pass findings=0 -> .specify/.tmp/wp5/judge/repro/before.json
+EXIT=0
+
+decision: pass findings: 0
+-- the repaired engine: both readings refuse it (exit 1, two declaration-execution-mismatch findings)
+$ python3 scripts/python/concurrency-check.py capability --repo .specify/.tmp/wp5/judge/repro --record .specify/.tmp/wp5/judge/repro/run-092.yaml --json-out .specify/.tmp/wp5/judge/repro/after.json
+capability: decision=fail findings=2 -> .specify/.tmp/wp5/judge/repro/after.json
+EXIT=1
+
+decision: fail
+findings: [('declaration-execution-mismatch', 'agents/coordinator.agent.md'), ('declaration-execution-mismatch', '.specify/.tmp/wp5/judge/repro/run-092.yaml')]

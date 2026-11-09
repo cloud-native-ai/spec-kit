@@ -1,0 +1,5 @@
+CMD: python3 .specify/scripts/python/validate-tasks.py .specify/specs/093-concurrency-by-default/tasks.md
+DATE: 2026-11-09T18:09:25+08:00
+---
+PASS: .specify/specs/093-concurrency-by-default/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0

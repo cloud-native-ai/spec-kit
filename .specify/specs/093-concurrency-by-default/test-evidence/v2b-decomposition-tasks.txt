@@ -1,0 +1,6 @@
+CMD: python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/093-concurrency-by-default/requirements.md --tasks .specify/specs/093-concurrency-by-default/tasks.md
+DATE: 2026-11-09T18:09:35+08:00
+---
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 35, "task_count": 152, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T10:09:35Z"}
+
+EXIT=0

@@ -1,0 +1,40 @@
+# 093-concurrency-by-default — clarify U4 overlap pre-check
+Captured: 2026-11-09T07:48:34Z (stage=clarify; worktree 093-clarify; branch 093-concurrency-by-default; stage base commit e55d8136)
+
+Command:
+    python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py --repo /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-clarify --spec-dir .specify/specs/093-concurrency-by-default
+
+Output (verbatim):
+----8<----
+overlap-check: current=093-concurrency-by-default checked=1 overlaps=0 decision=clear
+{"decision": "clear", "current_spec": "093-concurrency-by-default", "checked_specs": ["093-concurrency-by-default"], "overlaps": [], "note": "current feature has no declaration artifact", "checked_at": "2026-11-09T07:48:35Z"}
+----8<----
+
+Exit code: 0
+oc_exit=0
+json_exit=0
+
+## Vacuous-clear measurement and cross-feature risk probe (read-only, clarify stage)
+
+The engine reported `decision=clear` on `checked_specs=1`. That is the documented
+vacuous-clear path: `declared_paths()` found neither `feature-ref.md` nor `tasks.md`/`plan.md`
+in the 093 spec dir, so no comparison against other features could run. The verdict is
+therefore **not evidence of no overlap**; the declaration that makes the check meaningful
+is the plan stage's to write (FR-032 / feature-ref.md).
+
+Measured likewise on 2026-11-09 with the same declaration extractor the engine uses
+(backticked tokens and leading path tokens under skills/ shared/ scripts/ templates/ src/ agents/ docs/):
+
+| feature | declared delivery paths |
+|---------|------------------------|
+| 064-subagent-concurrency | 9 (skills/external/sdd-loop-driver/** incl. line-registry.py, integrate-lines.py; shared/definitions/probe-definitions.md; docs/) |
+| 070-subagent-task-teams | 7 (skills/external/sdd-loop-driver/** incl. decomposition-model.md, wp-gate.py, stage-team-preset.md; scripts/python/sync-mirrors.py) |
+| 086-efficient-test-execution | 7 (shared/guidelines/test-execution-efficiency.md; scripts/bash/run-tests.sh; templates/{constitution,instructions}-template.md) |
+| 092-goal-team-parallel | 1 (scripts/python/goal-utils.py) |
+
+093's FR-032 surface (`skills/`, `agents/`, `shared/`, `scripts/`, `templates/` + mirrors) is a
+superset of every row above except the two features whose delivery is *inside that area*.
+Under the engine's `nested-path` relation, 093 as declared will collide with 064/070/086 at
+the area level unless the plan's `feature-ref.md` names file-level paths and the ownership
+of every touched concurrent-semantics file is adjudicated (FR-035's disposition list).
+Recorded here so plan does not read this stage's clear as a green.

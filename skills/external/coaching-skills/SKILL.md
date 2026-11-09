@@ -283,9 +283,13 @@ four artifact paths.
 
 ## Boundaries
 
-- Dispatch mechanism: host-native subagent capability first; `run-agent` is the
-  fallback; `run-skills` only resolves and executes the Trainee and carries no
-  dispatch duty. No second mechanism is introduced; the mode used is recorded in the
+- Dispatch mechanism: the **fork carrier** is first for same-family agents (a separate `qodercli`
+  child process through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` — prompt via
+  stdin, stream-json output, sentinel-judged completion); heterogeneous agents use the
+  **subprocess carrier** (an independent child process of the agent's own CLI). `run-agent` only
+  resolves and relays; `run-skills` only resolves and executes the Trainee and carries no dispatch
+  duty. The host-internal in-process subagent path is **BANNED** as a carrier — neither a default
+  nor a degradation option. No second mechanism is introduced; the mode used is recorded in the
   DispatchRecord.
 - Governance: this skill stays `classification: external`. Relaying a destructive
   step that belongs to the Trainee's own flow is a governance-kept relay: state the

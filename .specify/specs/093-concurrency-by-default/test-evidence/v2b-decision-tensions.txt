@@ -1,0 +1,15 @@
+CMD: python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/093-concurrency-by-default
+DATE: 2026-11-09T18:09:27+08:00
+---
+spec: .specify/specs/093-concurrency-by-default
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 466 lines, 5 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+EXIT=0

@@ -1,0 +1,19 @@
+# WP2 final smoke — all five actions + interface gates
+- date: 2026-11-09T11:45:53Z
+
+- classify: exit=1 decision=fail findings=107
+- coverage: exit=0 decision=pass findings=0
+- serial-reason (valid two-code record): exit=0 decision=pass
+- reading (3 overlapping units): exit=0 decision=pass effective=3
+- capability (live tree, verdict unadjudicated): exit=2 decision=owner-unavailable
+
+## interface gates
+candidates=2 applicable=2 exempt=2 violations=0
+- exit=0
+concurrency-check.py 0.0.22
+validate-tasks.py 0.0.22
+
+## contract neighbors
+.........................                                                [100%]
+25 passed in 6.26s
+- exit=0

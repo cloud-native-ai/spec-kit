@@ -1,0 +1,74 @@
+# WP5 readings — T130 (source-only edits, release parity) · T131 (generated copies, retired tree)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The frozen baseline this reading is judged against (plan.md § Mirror Obligations)
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (417 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+
+## Release parity — sync-mirrors --check (exit 0 = no NEW drift on any pair)
+$ python3 .specify/scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (419 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (124 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (110 files, byte-identical)
+EXIT=0
+
+
+## Generated per-tool command copies — regenerated, never hand-edited
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+
+
+## The retired command-template mirror is still retired
+ABSENT (as retired by 077)
+
+## Every projection changed in this package has a changed source (no hand-edited projection)
+.specify/shared/definitions/subagent-definitions.md
+.specify/skills/sdd-loop-driver/references/decomposition-model.md
+.specify/skills/sdd-loop-driver/references/dispatch-recipes.md
+.specify/skills/sdd-loop-driver/SKILL.md
+.specify/skills/sdd-loop-driver/templates/stage-team-preset.md
+.specify/specs/093-concurrency-by-default/notes/coordination-report.md
+.specify/specs/093-concurrency-by-default/notes/disposal-ledger.md
+.specify/specs/093-concurrency-by-default/notes/serial-baseline.md
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t017-t019-owner-unavailable.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t028-t043-t045-mutations.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t034-t040-class-obligations.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t058-t059-reserve.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t062-t085-unit-obligations.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t088-coordinator-verdict.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t090-reproduction-092.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t093-string-registration.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t099-dispatch-capability.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t101-t105-coordinator.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t108-fabricated-number.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t110-t112-coordination-coverage.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t116-t118-team-loop.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t124-t134-owners.txt
+.specify/specs/093-concurrency-by-default/test-evidence/wp5-t130-t131-release-parity.txt
+-- the sources of those projections (each pair is projected by sync-mirrors.py):
+shared/definitions/subagent-definitions.md
+skills/external/sdd-loop-driver/references/decomposition-model.md
+skills/external/sdd-loop-driver/references/dispatch-recipes.md
+skills/external/sdd-loop-driver/SKILL.md
+skills/external/sdd-loop-driver/templates/stage-team-preset.md

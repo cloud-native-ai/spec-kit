@@ -138,8 +138,16 @@ def test_sdd_driver_carveout_is_visible(root_kind: str) -> None:
     assert "验证波" in recipes
     assert "subagent-definitions.md" in recipes
     assert _bypass_lines(recipes)
-    assert "阶段派发 MUST NOT 启动 qodercli" in skill
-    assert "验证波例外" in skill
+    # 2026-11-09 Feature 093 (FR-035 / C-094): the pre-093 rule "阶段派发 MUST NOT 启动
+    # qodercli" is disposed — the local default is now the fork carrier (same-family
+    # qodercli children through stage-runner.sh) or the subprocess carrier, with the
+    # host-internal in-process path BANNED. The carve-out assertion keeps its subject
+    # (the driver states its dispatch carrier and the validation-wave rule) and pins
+    # the replacement rule; the validation-wave sentence itself moved to the analyze
+    # paragraph (读域 / verdict) and to `dispatch-recipes.md` § 本地原生拓扑.
+    assert "stage-runner.sh" in skill and "qodercli" in skill
+    assert "BANNED" in skill and "in-process" in skill
+    assert "analyze" in skill.lower() and "读域" in skill and "verdict" in skill
 
 
 def test_source_and_mirror_are_byte_identical() -> None:

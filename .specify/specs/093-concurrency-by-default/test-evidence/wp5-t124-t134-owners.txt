@@ -1,0 +1,107 @@
+# WP5 readings — the owner-collapse rows
+T124 (C-082 slot-cap owner) · T126 (C-084 spine projection) · T127 (kinds) · T128 (no renamed keys) · T133 (pointer dispositions) · T134 (C-092 disposal)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T124 — the numeric slot cap lives in the fact and nowhere else; the ceiling in the gate
+-- slot-cap / ceiling numeric restatements in the framework sources (expect only the fact and the gate):
+shared/declarations/facts/concurrency-slot-and-reserve.yaml:13:  slot_cap_default: 6
+1959:    parser.add_argument("--slot-cap-ceiling", type=int, default=4)
+-- the 093 spine's slot key equals the fact's value (the other lines' spines are their own run projections)
+41:  decomposition_slot_cap: 6
+
+## T126 — the spine's slot key is a run-scoped projection of the fact
+38:    decomposition_slot_cap: projection of concurrency-slot-and-reserve.yaml slot_cap_default
+41:  decomposition_slot_cap: 6
+-- the engine reads the spine projection and reports whether it matches the fact
+$ python3 scripts/python/concurrency-check.py coverage --repo . --json-out .specify/.tmp/wp5/owners/cover.json
+coverage: decision=pass findings=0 -> .specify/.tmp/wp5/owners/cover.json
+EXIT=0
+
+{'keys': {'decomposition': 'auto', 'decomposition_slot_cap': '2', 'decomposition_stages': '[plan, implement, review]'}, 'relation': 'projection', 'slot_cap_matches_fact': False, 'spine': '.specify/state/090-re-anchoring.md', 'stages_not_projected': ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']}
+{'keys': {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'}, 'relation': 'projection', 'slot_cap_matches_fact': True, 'spine': '.specify/state/091-auto-git-closeout.md', 'stages_not_projected': ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']}
+{'keys': {'decomposition': 'auto', 'decomposition_slot_cap': '15', 'decomposition_stages': '[plan, implement, review]'}, 'relation': 'projection', 'slot_cap_matches_fact': False, 'spine': '.specify/state/092-non-disposable.md', 'stages_not_projected': ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']}
+{'keys': {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'}, 'relation': 'projection', 'slot_cap_matches_fact': True, 'spine': '.specify/state/093-concurrency-by-default.md', 'stages_not_projected': ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']}
+{'keys': {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'}, 'relation': 'projection', 'slot_cap_matches_fact': True, 'spine': '.specify/state/094-goal-team-parallel.md', 'stages_not_projected': ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']}
+
+## T127 — every fact's kind is a member of the existing five-member set; no sixth kind
+15:fact_kinds:
+16-  - threshold
+17-  - closed-set
+18-  - ordered-operator-table
+19-  - mapping
+20-  - record-schema
+21-
+22-# FR-007 / data-model E-6 — the derived completeness state is two-valued, never a third value.
+$ bash scripts/bash/run-tests.sh tests/unit/test_concurrency_check_engine.py::test_every_fact_kind_is_a_declared_member tests/unit/test_concurrency_check_engine.py::test_declared_kind_assignment_matches_c003 tests/unit/test_concurrency_check_engine.py::test_eight_stems_equal_their_fact_keys -q
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_concurrency_check_engine.py::test_every_fact_kind_is_a_declared_member tests/unit/test_concurrency_check_engine.py::test_declared_kind_assignment_matches_c003 tests/unit/test_concurrency_check_engine.py::test_eight_stems_equal_their_fact_keys -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.16s
+EXIT=0
+
+
+## T128 — no existing declaration key was renamed; the feature appended new readings
+-- pre-093 key set (16561f2ad, the last commit before WP1's registration) vs the current key set:
+before: completeness_states exclusion_reasons exit_codes fact_kinds gate_call_sites required_exclusion_keys required_fact_keys schema yaml_subset 
+after:  completeness_states concurrency-class concurrency-contract concurrency-slot-and-reserve coordinator-dispatch-verdict decomposition-coverage effective-concurrency exclusion_reasons executor-enumeration-roots exit_codes fact_kinds gate_call_sites registered_facts required_exclusion_keys required_fact_keys schema serial-reason yaml_subset 
+removed keys (expect none): 
+added keys: concurrency-class concurrency-contract concurrency-slot-and-reserve coordinator-dispatch-verdict decomposition-coverage effective-concurrency executor-enumeration-roots registered_facts serial-reason 
+note: registered_facts is Feature 094's registration block (master sync), not 093's; 093 appended exactly the eight slug keys.
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_declarations.py::test_every_fact_file_carries_its_registration_line -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_declarations.py::test_every_fact_file_carries_its_registration_line -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.19s
+EXIT=0
+
+
+## T133 — pointer dispositions leave a resolving path; the preset slot sentence is a pointer, seats stay
+-- every 'pointer' row's evidence path resolves:
+pointer rows: 5
+  OK skills/external/sdd-loop-driver/scripts/wp-gate.py
+  OK .specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md
+  OK shared/declarations/facts/concurrency-slot-and-reserve.yaml
+  OK shared/declarations/facts/decomposition-coverage.yaml
+  OK shared/declarations/facts/concurrency-slot-and-reserve.yaml
+-- the preset: slot pointer lines + unchanged four-seat roster
+48:  slot_cap_default: projection-of shared/declarations/facts/concurrency-slot-and-reserve.yaml#/statement/slot_cap_default
+49:  slot_cap_ceiling: projection-of skills/external/sdd-loop-driver/scripts/wp-gate.py --slot-cap-ceiling (WG-16); read at dispatch, never copied here
+25:  - role: stage-planner
+30:  - role: stage-worker
+35:  - role: stage-verifier
+40:  - role: stage-integrator
+69:| `stage-planner` | executor | Worker | persistent | the driver itself |
+70:| `stage-worker` | executor | Worker | temporary | one execution per Work Package |
+
+## T134 — the disposal ledger and its live assertion
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_disposal.py::test_every_pre_existing_statement_has_a_readable_disposition tests/contract/test_concurrency_disposal.py::test_disposition_domain_is_the_closed_four_member_set tests/contract/test_concurrency_disposal.py::test_ceiling_owner_is_the_gate_default_and_is_not_duplicated -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_disposal.py::test_every_pre_existing_statement_has_a_readable_disposition tests/contract/test_concurrency_disposal.py::test_disposition_domain_is_the_closed_four_member_set tests/contract/test_concurrency_disposal.py::test_ceiling_owner_is_the_gate_default_and_is_not_duplicated -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.20s
+EXIT=0
+
+| # | Pre-existing statement (owner × entry, reached by path) | Disposition | Evidence | Date | Reason / record |
+|---|---|---|---|---|---|
+| 1 | 064 write-line / worktree / integration-queue statements (`skills/external/sdd-loop-driver/references/decomposition-model.md` §13.1, §16) | dated-record | `skills/external/sdd-loop-driver/references/decomposition-model.md` | 2026-11-09 | retained: 093 reuses the mechanism unchanged (C-091); this record marks the review, no rule text moved |
+| 2 | 064/084 integration-order rule (SD-05 / VI-07, `decomposition-model.md` §13.2, §16) | dated-record | `skills/external/sdd-loop-driver/references/decomposition-model.md` | 2026-11-09 | retained; FR-017 adds the replay-equality sentence beside it, the order rule itself is unchanged |
+| 3 | 070 slot-cap value (SD-04 in `.specify/specs/070-subagent-task-teams/contracts/scheduler-and-dispatch.md`; the preset's `slot_cap_default: 6`) | owner-moved | `shared/declarations/facts/concurrency-slot-and-reserve.yaml` | 2026-11-09 | the numeric cap now lives only in the fact; the preset and the 070 test read the projection (T116/T124/T133) |
+| 4 | 070 ceiling statements (`min(6, line remaining)`, `min(4, line remaining)`, `min(effective_concurrency, 24)` in `decomposition-model.md` §13.2/§22 and the preset) | pointer | `skills/external/sdd-loop-driver/scripts/wp-gate.py` | 2026-11-09 | the ceiling stays with the gate's declared default (`--slot-cap-ceiling`, WG-16); the prose sites now point at it |
+| 5 | 070 WG-15 directory-level write-domain fixtures (`tests/contract/test_sdd_loop_driver_wp_coordination.py`, `tests/unit/test_wp_gate.py`) | dated-record | `tests/contract/test_sdd_loop_driver_wp_coordination.py` | 2026-11-09 | FR-012 makes the write domain file-level; the fixtures are re-pinned to file-level paths, recorded here rather than silently edited |
+| 6 | 070 old local topology ("one native host subagent per package"; "MUST NOT launch `qodercli` locally"; `host-no-parallel-native`) | removed | `skills/external/sdd-loop-driver/references/dispatch-recipes.md` § 本地原生拓扑 | 2026-11-09 | FR-035 disposes the rule by explicit revision; the fork / subprocess carriers and the in-process ban replace it, and the old literal survives only as the dated record in `decomposition-model.md` §13.2 |
+| 7 | 086 test-execution entry ("prefer the canonical runner"; raw `pytest` forms) | pointer | `.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md` | 2026-11-09 | FR-036 hardens the entry to "only entry"; the runner's own behaviour stays with 086's owner |
+| 8 | 092 "plan parallelism not delivered" deferral | dated-record | `tests/contract/test_concurrency_reproduction_092.py` | 2026-11-09 | resolved in this slice by the reproduction fixture (SC-005); this record names the closing artifact, the 092 deferral itself is not rewritten |
+| 9 | 077 stage-class byte baselines (7 stage templates + `docs`/`humanize` entry points, `tests/contract/test_stage_class_wiring.py`) | dated-record | `tests/contract/test_stage_class_wiring.py` | 2026-11-09 | 093 T122 adds the authored concurrency-obligation pointer block outside the wiring card; the pins are re-measured under the test's documented legitimate-edit path |
+| 10 | stage-team preset slot sentence (`slot_cap_default: 6`, `slot_cap_ceiling: "min(6, …)"`, `skills/external/sdd-loop-driver/templates/stage-team-preset.md`) | pointer | `shared/declarations/facts/concurrency-slot-and-reserve.yaml` | 2026-11-09 | the preset now carries one obligation paragraph and two `projection-of` lines; the seat structure is unchanged (T116/T133) |
+| 11 | decomposition-model §20.1 built-in per-stage defaults (the pre-093 list with `analyze: off`) | pointer | `shared/declarations/facts/decomposition-coverage.yaml` | 2026-11-09 | the fact owns per-stage coverage; the model resolves through it and the built-in list is removed (T118/T140) |
+| 12 | 093's own four slot-cap prose restatements (`stage-team-preset.md`, `decomposition-model.md` §13.2/§22, driver `SKILL.md`, `dispatch-recipes.md`) | pointer | `shared/declarations/facts/concurrency-slot-and-reserve.yaml` | 2026-11-09 | one disposition, not two values: the numeric cap lives in the fact and every other site points (T124) |
+

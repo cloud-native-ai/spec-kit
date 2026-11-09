@@ -18,6 +18,8 @@ scripts:
   sh: scripts/python/search-todo.py --json
 ---
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this command is an execution body — consider concurrency first, default to it when the class and capability allow, and, when serial, name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This template restates none of their rules.
+
 ## Philosophy
 
 A SPECKIT TODO block lives **at the code or document location it refers to** — the surrounding context completes a short intent, and every other workflow that passes the spot reads it as a declared future change. The full discipline (form ownership, interpretation rules, perception obligations, lifecycle) is owned by shared/guidelines/todo-in-context.md — reference it, do not restate it here.

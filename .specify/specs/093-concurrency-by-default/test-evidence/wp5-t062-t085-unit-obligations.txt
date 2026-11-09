@@ -1,0 +1,44 @@
+# WP5 readings — the unit-obligation document rows
+T062/T080 (per-unit reading) · T063/T081 (coordinator shape) · T064/T082 (falsifiability)
+T065 (partial settlement) · T083 (readiness) · T084 (integration order) · T085 (failure isolation/re-entry)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## T062/T080 — the reading triplet is recorded per advancing unit
+27:3. **…and otherwise name the reason and record the reading (串行须具名理由并记读数)** — a serial result MUST carry a reason code from the closed vocabulary plus that code's declared evidence form (a bare `.` is never evidence), and every advancing unit records the `requested` / `effective` / `effective_reason` triple, with the literal `not_evaluated` wherever the intervals are absent — never `0` and never an estimate. A serial shape with no code is `code-required`; a record with one or two of the three fields is `reading-incomplete`; a concurrent pattern carrying serial codes (or a serial pattern carrying none) is `form-reason-inconsistent`.
+162:**The default is concurrent; serial carries a named reason.** Whenever the ready units are independent, their write domains (file-level) are disjoint or a write-isolation form is declared, a legal process carrier is available (section 13.4) and the budget allows, the driver dispatches them concurrently. A stage that stays serial MUST record a reason code from the closed vocabulary owned by `shared/declarations/facts/serial-reason.yaml`, with that code's declared evidence form, plus the `requested` / `effective` / `effective_reason` reading (fields owned by `shared/declarations/facts/effective-concurrency.yaml`; `not_evaluated` where intervals are absent). This file restates neither vocabulary — the facts are the values' single owners.
+
+## T063/T081 — a coordinator emits its packages and states the shape actually achieved
+164:**Concurrency obligations travel with the dispatch (C-076/C-077)**: every dispatched sub-agent's brief MUST carry the concurrency obligation as brief content — the three parts of § The Concurrency Obligation, or an explicit pointer to that section — injected at dispatch rather than inherited from an ambient layer. Every sub-agent **return** MUST carry its own `requested` / `effective` / `effective_reason` triple; a return without it is `report-incomplete` and MUST be reported by the coordinator, never filled in by the coordinator. A coordinator that plans parallel packages MUST emit the packages (each naming its scope, inputs and output path) before dispatching and MUST state the execution shape actually achieved — including a serial shape: "partition ready, execution serial" is a named disclosure with its reason code, never a silence (C-059, C-073, C-074).
+152:- **先划分后派发（C-073）**：协调者 MUST 先产出包集再派发——每个包命名其范围、输入与输出路径；派发临时包（ad hoc packages）即 `unpartitioned`。协调者自身工具集缺派发能力时，该包集仍是可用的交付物（后到的可派发执行者无需重新推导）。
+153:- **真实执行形态（C-074）**：协调者 MUST 报告实际达成的执行形态，即使它是串行——「划分就绪、执行串行」是具名披露（附理由码），MUST NOT 沉默；不得把串行运行呈现为并发。
+
+## T064/T082 — the declaration is falsifiable against its run record
+40:**The declaration is falsifiable against its run record (C-057)**: a body that declares concurrency MUST emit at least the dispatched unit ids and their intervals; a body that cannot emit them MUST declare serial and say why. The unit record is the evidence — a declaration without a record is unproven, and a record showing one executor in sequence is `declaration-execution-mismatch`, never concurrency evidence.
+
+## T065 — partial settlement in the failure-isolation section
+182:After a complete result, the driver dispatches one independent verifier and waits for the verdict before treating the package as verified (SD-10; VI-01 owns independence). A dependency unlocks only on `verdict=pass` with an evidence pointer. A failed, stalled, or budget-exhausted package never cancels unrelated running packages; its dependents remain blocked, unrelated ready packages continue and are recorded, and the failure is surfaced (SD-11). A package that fails twice appends `wp_failed` and the stage enters the unchanged U5 path (SD-12).
+
+## T083 — readiness is a recorded verdict + evidence pointer; the partition rule stays with the class fact
+166:A package is **ready** when every `depends_on` entry has a ledger `verdict=pass` with an evidence pointer in the current stage attempt. A failed, missing, or malformed verdict keeps the dependent `blocked`; the driver records it instead of dropping it. The dependency status is re-read from the ledger after every settlement, never from session memory. Readiness is answerable only from that recorded verdict plus its evidence pointer; the partition rule that decides which units exist in the first place is owned by `shared/declarations/facts/concurrency-class.yaml` and is not restated here (C-073/C-075 family).
+
+## T084 — integration order is the declared order, replay-identical
+176:The ready set is ordered by topological layer and then `wp_id` lexicographic, the declared tie-break (WP-04). The ledger records the actual `dispatch_order` counter separately; integration uses the declared order, never the dispatch timing order (SD-05). Replaying the same plan yields the same order — the tie-break is total over the declared inputs.
+234:Verified outputs are integrated in topological layers, each layer sorted by `wp_id` lexicographic (VI-07). The order is declared by the plan and recorded in the `integrate` event; it is not the dispatch order, and replaying the same plan reproduces the identical integration order (FR-017). An integration conflict or a missing output stops integration, fails the stage gate, and leaves no partial commit presented as a complete stage deliverable (VI-08).
+
+## T085 — re-entry from recorded state; the re-dispatch count is ledger-derived
+196:On re-entry the driver reads the spine, re-runs `watch-target.sh --once` for any detached runners, and **never redispatches a completed package**. A U5 stage retry starts a new `stage_attempt` with a fresh plan fence, a fresh plan hash, and a fresh per-package attempt counter; earlier records remain in the spine. The re-dispatch count is derived from the ledger's `dispatch` events (§14, OR-14), never from a counter file; re-entry continues only from recorded state, never from session memory (FR-019).
+196:On re-entry the driver reads the spine, re-runs `watch-target.sh --once` for any detached runners, and **never redispatches a completed package**. A U5 stage retry starts a new `stage_attempt` with a fresh plan fence, a fresh plan hash, and a fresh per-package attempt counter; earlier records remain in the spine. The re-dispatch count is derived from the ledger's `dispatch` events (§14, OR-14), never from a counter file; re-entry continues only from recorded state, never from session memory (FR-019).
+
+## The retained 070 mechanical model (readiness, ordering, isolation, re-entry) still passes
+$ bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_model.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_model.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 42%]
+........................................................................ [ 85%]
+........................                                                 [100%]
+168 passed in 6.51s
+EXIT=0
+

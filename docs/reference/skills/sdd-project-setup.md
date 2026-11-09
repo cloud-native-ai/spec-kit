@@ -13,7 +13,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），任�
 | 参数 | 取值 | 说明 |
 |------|------|------|
 | 目标项目 | 本地路径，或 `ssh <alias>` + 运行用户 + 项目目录；**未给 → 当前项目**（git 根，非 git 取工作目录） | 目标解析唯一契约：`shared/workflow/target-resolution.md`；setup **不依赖 `.specify/`**，不做向上搜索，缺失时由本技能创建 |
-| 执行拓扑 / 子代理承载 | 无 host → 本地：编排者直执或宿主**原生子代理**（不启动 `qodercli`）；远端三元组给全 → run-agent 派发外部 agent CLI | 只给 host 或三元组不完整 → 问一个澄清问题，不猜 |
+| 执行拓扑 / 子代理承载 | 无 host → 本地：编排者直执，或 **fork 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`）/ **subprocess 承载**（异构 agent 自身 CLI 的独立子进程）；宿主 in-process subagent 路径 **BANNED**。远端三元组给全 → run-agent 派发外部 agent CLI | 只给 host 或三元组不完整 → 问一个澄清问题，不猜 |
 | 模式 | `install`（全新安装）/ `refresh`（刷新既有）/ `bootstrap-content-check`（只查首批内容） | 未给时按 S1 分级：absent=install、degraded/partial=refresh、complete=bootstrap-content-check |
 | 目标 AI 工具 | qoder / claude / codex / opencode / hermes / copilot | 未给时 `all` |
 
@@ -58,7 +58,7 @@ HANDOFF      调 sdd-house-keeping H0–H4；H4 三条件成立才返回 ready�
 - **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`。
 - **通用远端命令形态**：`shared/workflow/external-dispatch-recipes.md`。
 - **SSH 传输 owner**：`ssh-utils`（`scripts/ssh-exec.py`，固定 `-o RemoteCommand=none`、引号、stdin 脚本推送、su 包装与退出码）；setup 的远端命令一律经其执行。
-- **治理命令的子代理派发**：本地由编排者直执或宿主**原生子代理**承载（不启动 `qodercli`）；远端经 run-agent 派发外部 agent CLI。
+- **治理命令的子代理派发**：本地由编排者直执，或 fork / subprocess 进程承载（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`；异构 agent 用自身 CLI 的独立子进程；宿主 in-process subagent 路径 BANNED）；远端经 run-agent 派发外部 agent CLI。
 - **指令体积预算**：预算常量 owner 是 `scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES`；R1/R2 owner 是 `manage-instructions`；R3 归 house-keeping H2。
 
 ## 边界

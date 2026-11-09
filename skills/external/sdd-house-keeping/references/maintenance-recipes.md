@@ -32,7 +32,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <projec
 | 4 | `/speckit.docs` | docs 树与代码/特性/指令漂移 | 委托 create-docs 收敛 |
 
 - 执行 **H1 缺口 OR owner 自检报告的漂移**；每项登记 `executed / existing / skipped + reason`；未处理项进 H5 清单。H1 只回答“资产在不在”，不替代 sanitize/feature/instructions/docs 的漂移检查。
-- **Carrier**：本地 H2/H3 由编排者/原生子代理在当前项目执行；远端每个 `/speckit.*` 在 `<project-dir>` 下经 run-agent 驱动——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli（execution-config defaults，可覆盖）。
+- **Carrier**：本地 H2/H3 的派发 MUST 缺省使用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 使用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，不作为承载。远端每个 `/speckit.*` 在 `<project-dir>` 下经 run-agent 驱动——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli（execution-config defaults，可覆盖）。
 - constitution 缺失 → 停止并 handoff `sdd-project-setup`。
 - **sanitize 调用契约**：
   - `check` 模式：同时跑 `/speckit.sanitize check`（materials）与 `/speckit.sanitize --lane retention check`；两份摘要一起报告，不删除。

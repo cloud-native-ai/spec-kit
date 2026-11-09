@@ -1,0 +1,43 @@
+# WP5 readings — T099 (dispatch-capability definition, STR-004)
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The definition section (owner of the literal "dispatch-capability")
+## Dispatch Capability (派发能力 — `"dispatch-capability"`, STR-004)
+
+**Owner**: this section owns the definition behind the shared string `"dispatch-capability"` (STR-004 of Feature 093's shared-string table) — what *can create a sibling executor* means for a body's definition. The judgement that reads it is `scripts/python/concurrency-check.py`'s `capability` action, whose dispatch-tool spelling set is that engine's single executable form; the value read is the **existing** frontmatter key `capability-tools` — no new key is introduced (FR-022, C-038).
+
+A body **can create a sibling executor** when its own definition satisfies one of the three forms FR-021 admits, judged from the definition alone (never a runtime probe):
+
+| Form | Verdict | Reading |
+|------|---------|---------|
+| a dispatch-class tool is present in the definition's `capability-tools` list | `dispatch-capable` | the list itself |
+| the body text explicitly hands dispatch to a capable superior (driver / main agent) and names the handoff's form | `handoff-declared` | the handoff sentence |
+| the body declares one of § Three Execution Modes' two process carriers (fork for same-family `qodercli` children through `stage-runner.sh`, subprocess for heterogeneous agents) | `external-process` | the carrier declaration |
+| none of the above | `incapable` | — a body declaring `N >= 2` units while `incapable` is `declaration-execution-mismatch`, judged red and never repaired silently (C-040) |
+
+The three execution modes are § Three Execution Modes above (native / virtual / external); only the **external** mode's two process carriers are a concurrency mechanism (C-094). Gaining dispatch capability never changes the anti-nesting rule: the permitted chain stays **depth 2** with the three prohibitions stated in § Dispatch-Time Governance Obligation — a stage executor remains a leaf and never hosts or starts an SDD run (FR-025). This section adds no fourth form, no second predicate and no new frontmatter key.
+
+## Execution Topology Declaration (执行拓扑声明)
+
+## What 'can create a sibling executor' means — the four verdict forms and the depth-2 rule
+99:| a dispatch-class tool is present in the definition's `capability-tools` list | `dispatch-capable` | the list itself |
+100:| the body text explicitly hands dispatch to a capable superior (driver / main agent) and names the handoff's form | `handoff-declared` | the handoff sentence |
+101:| the body declares one of § Three Execution Modes' two process carriers (fork for same-family `qodercli` children through `stage-runner.sh`, subprocess for heterogeneous agents) | `external-process` | the carrier declaration |
+102:| none of the above | `incapable` | — a body declaring `N >= 2` units while `incapable` is `declaration-execution-mismatch`, judged red and never repaired silently (C-040) |
+104:The three execution modes are § Three Execution Modes above (native / virtual / external); only the **external** mode's two process carriers are a concurrency mechanism (C-094). Gaining dispatch capability never changes the anti-nesting rule: the permitted chain stays **depth 2** with the three prohibitions stated in § Dispatch-Time Governance Obligation — a stage executor remains a leaf and never hosts or starts an SDD run (FR-025). This section adds no fourth form, no second predicate and no new frontmatter key.
+170:**Permitted chain（许可链，深度 2）**: the permitted nesting chain is depth 2: team orchestrator → invoking member (driver host) → stage executor (leaf). This chain replaces the unqualified depth-1 claim that used to stand here, because an unconditioned rule and a narrowed predicate cannot both hold. Three prohibitions bind at every depth: a stage executor MUST NOT start or host any SDD run; an SDD stage executor MUST NOT itself be an SDD invocation host; SDD-within-SDD recursion is prohibited. A stage executor is a leaf — never a driver host.
+
+## The engine reads the existing key only; the reading is named (C-037/C-038)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_dispatch_capability.py::test_capability_reads_the_existing_capability_tools_field tests/contract/test_concurrency_dispatch_capability.py::test_a_new_frontmatter_key_is_not_the_reading -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_dispatch_capability.py::test_capability_reads_the_existing_capability_tools_field tests/contract/test_concurrency_dispatch_capability.py::test_a_new_frontmatter_key_is_not_the_reading -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.21s
+EXIT=0
+
+
+## The anti-nesting depth statement sits beside it (unchanged by this definition)
+170:**Permitted chain（许可链，深度 2）**: the permitted nesting chain is depth 2: team orchestrator → invoking member (driver host) → stage executor (leaf). This chain replaces the unqualified depth-1 claim that used to stand here, because an unconditioned rule and a narrowed predicate cannot both hold. Three prohibitions bind at every depth: a stage executor MUST NOT start or host any SDD run; an SDD stage executor MUST NOT itself be an SDD invocation host; SDD-within-SDD recursion is prohibited. A stage executor is a leaf — never a driver host.

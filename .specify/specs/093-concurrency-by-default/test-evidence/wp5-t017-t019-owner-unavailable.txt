@@ -1,0 +1,38 @@
+# WP5 readings — T017 (C-011) · T019 (C-013) · the unregistered / removal direction
+# Date: 2026-11-09 · Branch: 093-wp5 · Base: 6001c9ad1
+
+## The assertions (authored in tests/contract/test_concurrency_declarations.py at release)
+$ bash scripts/bash/run-tests.sh tests/contract/test_concurrency_declarations.py::test_unregistered_slug_reads_owner_unavailable_with_a_named_message tests/contract/test_concurrency_declarations.py::test_removed_fact_never_falls_back_to_a_default -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_declarations.py::test_unregistered_slug_reads_owner_unavailable_with_a_named_message tests/contract/test_concurrency_declarations.py::test_removed_fact_never_falls_back_to_a_default -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.22s
+EXIT=0
+
+## Raw readings the assertions rest on
+-- reader (the observed unregistered shape: exit 1, named message)
+$ python3 scripts/python/declaration_reader.py --action get --fact concurrency-class --repo .specify/.tmp/wp5/decl/absent
+no declaration for fact 'concurrency-class'
+EXIT=1
+
+-- engine classify (translated: exit 2, owner-unavailable, no default)
+$ python3 scripts/python/concurrency-check.py classify --repo .specify/.tmp/wp5/decl/absent --json-out .specify/.tmp/wp5/decl/absent/out.json
+classify: decision=owner-unavailable findings=1 -> .specify/.tmp/wp5/decl/absent/out.json
+EXIT=2
+
+decision: owner-unavailable
+findings: [('owner-unavailable', "no declaration for fact 'concurrency-class'")]
+-- engine serial-reason with the fact: key broken (removal direction)
+$ python3 scripts/python/concurrency-check.py serial-reason --repo .specify/.tmp/wp5/decl/broken --record .specify/.tmp/wp5/decl/rec.yaml --json-out .specify/.tmp/wp5/decl/broken/out.json
+serial-reason: decision=owner-unavailable findings=1 -> .specify/.tmp/wp5/decl/broken/out.json
+EXIT=2
+
+decision: owner-unavailable
+findings: [('owner-unavailable', "no declaration for fact 'serial-reason'")]
+
+## SC-009 mutation form: the removal direction never falls back to a default
+Both forms read owner-unavailable at exit 2; no default class table / code list is produced
+(measured is empty on the owner-unavailable envelope).

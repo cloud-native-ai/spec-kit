@@ -61,6 +61,17 @@ gate_call_sites:
   - path: tests/contract/test_harness_triple_structure.py
     mode: contract-test
 
+# 093 — fact registration (FR-031, C-010): one key per registered slug, pointing at its fact entry.
+# Append-only: the domain keys above are untouched, and this block grows only by revising its owner.
+concurrency-class: shared/declarations/facts/concurrency-class.yaml
+serial-reason: shared/declarations/facts/serial-reason.yaml
+effective-concurrency: shared/declarations/facts/effective-concurrency.yaml
+concurrency-slot-and-reserve: shared/declarations/facts/concurrency-slot-and-reserve.yaml
+decomposition-coverage: shared/declarations/facts/decomposition-coverage.yaml
+executor-enumeration-roots: shared/declarations/facts/executor-enumeration-roots.yaml
+concurrency-contract: shared/declarations/facts/concurrency-contract.yaml
+coordinator-dispatch-verdict: shared/declarations/facts/coordinator-dispatch-verdict.yaml
+
 # Feature 094, contract `contracts/command-family-and-declarations.md` C-83 / C-84 / C-85
 # — the two facts registered before any consumer reads them. One entry per fact:
 # `subset_id` names the grammar the fact file is written in, `value_domain` the closed

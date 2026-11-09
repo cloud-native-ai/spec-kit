@@ -1,0 +1,62 @@
+# WP2 red-first + green — T109 / T113 / T119 (block-subset record read; goal partition; coverage C-035/C-036/C-063)
+- date: 2026-11-09T11:41:28Z
+
+## RED — the coverage action was a stub before this row group
+- command: `python3 <engine at commit e0c58d34> coverage --repo . --json-out <tmp>`
+decision = fail | findings = [('not-implemented','coverage')] | exit status: 1
+
+## GREEN — T109: records are parsed through declaration_reader.parse_subset (block-subset/v1)
+- a JSON record (flow collection) is refused (exit 2, decision not-applicable):
+  exit status: 2
+  decision = not-applicable | finding = [('record-outside-subset', '.specify/.tmp/wp2/records/record-json.json:1: expected `key: value`')]
+- a YAML anchor is refused (exit 2):
+  exit status: 2
+  finding = [('record-outside-subset', '.specify/.tmp/wp2/records/record-anchor.yml:1: an anchor is outside the subset')]
+- a block-subset record passes the same path (all three record actions share load_record)
+
+## GREEN — T119/C-035: per-stage coverage resolved from the fact (live tree, all 8 stages)
+- exit status: 0
+ decision = pass
+  analyze -> on / covered
+  checklist -> auto / covered-by-default
+  clarify -> auto / covered-by-default
+  implement -> auto / covered-by-default
+  plan -> auto / covered-by-default
+  requirements -> auto / covered-by-default
+  review -> auto / covered-by-default
+  tasks -> auto / covered-by-default
+ analyze concurrency_source = stage-team-configuration-or-agent_concurrency_requested
+- a stage outside the fact is coverage-undeclared:
+  exit status: 1
+  findings = [('coverage-undeclared', 'frobnicate')]
+- a stage declared off with no named decision record fails (mutated fact fixture):
+  exit status: 1
+  findings = [('coverage-undeclared', 'clarify', "stage 'clarify' stays serial (coverage=off) with no named decision record")]
+
+## GREEN — T119/C-036: the observed fact<->spine relation and the fourth-source failure
+ spine_relation (live, this feature line plus prior lines):
+   .specify/state/090-re-anchoring.md | keys = {'decomposition': 'auto', 'decomposition_slot_cap': '2', 'decomposition_stages': '[plan, implement, review]'} | slot_matches_fact = False | stages_not_projected = ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']
+   .specify/state/091-auto-git-closeout.md | keys = {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'} | slot_matches_fact = True | stages_not_projected = ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']
+   .specify/state/092-goal-team-parallel.md | keys = {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'} | slot_matches_fact = True | stages_not_projected = ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']
+   .specify/state/092-non-disposable.md | keys = {'decomposition': 'auto', 'decomposition_slot_cap': '15', 'decomposition_stages': '[plan, implement, review]'} | slot_matches_fact = False | stages_not_projected = ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']
+   .specify/state/093-concurrency-by-default.md | keys = {'decomposition': 'auto', 'decomposition_slot_cap': '6', 'decomposition_stages': '[plan, implement, review]'} | slot_matches_fact = True | stages_not_projected = ['requirements', 'clarify', 'tasks', 'checklist', 'analyze']
+- a competing authored rule is a fourth source (fixture):
+  exit status: 1
+  findings = [('fourth-source', 'docs/reference/competing.md', 'docs/reference/competing.md:3')]
+
+## GREEN — T113/C-063: goal target partition under cap minus reserve (fixtures)
+- --ceiling 4 (exit 0):
+  bound = {'ceiling': 4, 'ceiling_source': '--ceiling at call time', 'effective_available': 3, 'slot_cap': 6, 'verifier_reserve': 1}
+   goal-five | open = ['T-001', 'T-002', 'T-003', 'T-004', 'T-005'] | packages = [['T-001', 'T-002', 'T-003'], ['T-004', 'T-005']] | serial_reason = None
+   goal-one | open = ['T-001'] | packages = [['T-001']] | serial_reason = None
+- --ceiling 2 (exit 0):
+  bound = {'ceiling': 2, 'ceiling_source': '--ceiling at call time', 'effective_available': 1, 'slot_cap': 6, 'verifier_reserve': 1}
+   goal-five | open = ['T-001', 'T-002', 'T-003', 'T-004', 'T-005'] | packages = [] | serial_reason = budget-reserve
+   goal-one | open = ['T-001'] | packages = [['T-001']] | serial_reason = None
+- live tree goal reading:
+   command-logic-as-classified-skills | open = 3 | packages = [['T-001', 'T-002', 'T-003']]
+   draw-diagram-interactive | open = 0 | packages = []
+   draw-two-layer-structure | open = 0 | packages = []
+   post-refactor-mechanism-integrity | open = 0 | packages = []
+   session-driven-self-improvement | open = 0 | packages = []
+   skill-layer-install-separation | open = 0 | packages = []
