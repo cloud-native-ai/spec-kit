@@ -5,7 +5,7 @@ failure means; the normative statements live in `contracts/*` and are reached by
 
 **Measured premise (2026-11-09, this worktree)**: `declaration_reader.py --action get --fact concurrency-class`
 exits **1** with `no declaration for fact 'concurrency-class'`. Everything below that assumes the fact exists is
-therefore *red today by construction* — that is the point of S-1 and S-9.
+therefore *red today by construction* — that is the point of S-0 and S-1.
 
 ---
 

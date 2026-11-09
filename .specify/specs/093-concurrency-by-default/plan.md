@@ -401,9 +401,9 @@ T139/T140/T142/T116/T133/T037/T060/T099/T132.
 | 1 | `skills/external/sdd-loop-driver/SKILL.md` | — | T139, T142 | already scheduled (N-Worker analyze; fork mechanism) |
 | 2 | `skills/external/sdd-loop-driver/references/dispatch-recipes.md` | — | T139, T142 | already scheduled (本地原生拓扑 + Recipe 2) |
 | 3 | `skills/external/sdd-loop-driver/references/watch-model.md` | MEDIUM | T146 | watch model extended to the local fork carrier; in-process path is not a carrier |
-| 4 | `skills/external/sdd-loop-driver/references/decomposition-model.md` | — | T140 | already scheduled (§ 20.1 analyze default) |
+| 4 | `skills/external/sdd-loop-driver/references/decomposition-model.md` | MEDIUM (round-3 re-measure) | T140, T153 | § 20.1 analyze default (T140); § 13.4 local dispatch declaration (~L184) rewritten to the fork / subprocess carriers with the in-process ban (T153; round-3 re-measure) |
 | 5 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | MEDIUM | T146 | the two-topology rule becomes fork / subprocess; ban stated |
-| 6 | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | — | T116, T133 | already scheduled (team obligation + slot pointer) |
+| 6 | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | MEDIUM (round-3 re-measure) | T116, T133, T154 | team obligation + slot pointer (T116/T133); the `stage-worker` fill sentence (~L74, "a native subagent locally") rewritten to the fork / subprocess carriers with the in-process ban (T154; round-3 re-measure) |
 | 7 | `skills/external/sdd-house-keeping/SKILL.md` | HIGH | T144 | invert "MUST NOT 启动 qodercli" (~L109/L140/L144); ban + two carriers |
 | 8 | `skills/external/sdd-house-keeping/references/maintenance-recipes.md` | HIGH | T144 | H2 Carrier line (~L35): fork / subprocess; ban stated |
 | 9 | `skills/external/sdd-project-setup/SKILL.md` | HIGH | T145 | invert "MUST NOT 启动 qodercli" (~L57/L59/L73/L104); ban + two carriers |
@@ -413,14 +413,16 @@ T139/T140/T142/T116/T133/T037/T060/T099/T132.
 | 13 | `shared/workflow/execution-topology.md` | MEDIUM | T149 | local carrier bullet (~L33): fork / subprocess; ban stated |
 | 14 | `shared/workflow/external-dispatch-recipes.md` | MEDIUM | T150 | SDD boundary (~L18) + Recipe 7 (~L91): the two carriers + ban |
 | 15 | `shared/definitions/agent-definitions.md` | MEDIUM | T151 | execution layer names the carrier; in-process ban pinned |
-| 16 | `shared/definitions/subagent-definitions.md` | — | T037, T060, T099, T132 | already scheduled (dispatch capability + three modes) |
+| 16 | `shared/definitions/subagent-definitions.md` | MEDIUM (round-3 re-measure) | T037, T060, T099, T132, T155 | dispatch capability + three modes (T037/T060/T099/T132); the "native first" / "native parallel calls" mode selection rewritten to the two carriers with the in-process ban (T155; round-3 re-measure) |
 | 17 | `tests/contract/test_sdd_loop_driver_skill.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
 | 18 | `tests/contract/test_sdd_project_setup_skill.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
 | 19 | `tests/contract/test_coaching_run_contract.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
 | 20 | `tests/contract/test_sdd_carrier_contract.py` | MEDIUM | T152 | re-pin the ban + fork/subprocess carriers |
 
-Task rows T144–T152 are appended in Phase 8 of `tasks.md`; each row carries the ban sentence and both carriers in
-its own text, so a reader of the row can judge it without this table.
+Task rows T144–T155 are appended in Phase 8 of `tasks.md`; each row carries the ban sentence and both carriers in
+its own text, so a reader of the row can judge it without this table. Rows T153–T155 come from the round-3
+re-measure: the three baseline surfaces whose pre-existing rows named them without carrying the carrier
+requirement (#4 § 13.4, #6 the `stage-worker` line, #16 the mode selection) now each have a dedicated row.
 
 ## Complexity Tracking
 
