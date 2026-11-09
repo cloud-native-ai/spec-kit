@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794231364
 stage_base_commit: e8d716e3
 attempt: 0
 retry_limit: 3
-last_verdict: "Implement stage complete (wp07 merged): closure-acceptance on the MAIN tree = verdict block — final_path pass=6 blocked=1 (SC-003) partial=1 (SC-002) fail=1 (SC-001); SC-010 fail as supporting. GATE-1 main-tree full suite = 152 failed / 8227 passed / 2 skipped in 41.39s; the failures bucket as: 085-disposal family (scope_resolution/temp_goal/temp_team/disposal), goal_migration/live-face, run_checks roster pin, plus other pre-existing debt. The line is NOT Implemented; named items: SC-003 needs explicit authorization for the T079 migrate-archive --apply; SC-001 needs an owner or re-scope; SC-002 one pin line; SC-010 disposal wave + exclusion-list repair; two one-line repairs (goal.md description, summary_trigger path pin). Next = review stage (mandatory) + the user decisions."
+last_verdict: "Implement stage CLOSED — closure-acceptance on the MAIN tree = verdict ACCEPT, final_path 8/8 pass, reason none (SC-001 moved to supporting per R2; SC-003 migration applied with 16 receipts + 16 archived definitions per R1; SC-002 pin, SC-010 disposal, two one-line repairs). Requirements 0/0; tasks 85 rows 0 err/1 disclosed warn, all sigils ticked by the integration sweep; mirrors byte-identical. Residuals: 128 pre-existing reds unchanged (outside the causal surface); trigger/index.json host mutation left uncommitted; the one-level 088 team.md outside the probe glob needs a future ruling."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch the review stage (4 segments) with the closure block as input; surface the SC-003 authorization and SC-001 owner decisions to the user; after decisions, repair wave + closure re-run"
+next_action: "dispatch the review stage (4 segments: process / artifacts / implementation / code + ARC) on the closure-accepted tree; then the line close-out (registry status transition + merge/push history)"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
