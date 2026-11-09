@@ -1,0 +1,10 @@
+{
+  "decision": "clear",
+  "current_spec": "092-goal-team-parallel",
+  "checked_specs": [
+    "092-goal-team-parallel"
+  ],
+  "overlaps": [],
+  "note": "current feature has no declaration artifact",
+  "checked_at": "2026-11-09T06:56:00Z"
+}

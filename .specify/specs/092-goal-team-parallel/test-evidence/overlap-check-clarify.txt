@@ -1,0 +1,3 @@
+overlap-check: current=092-goal-team-parallel checked=1 overlaps=0 decision=clear
+{"decision": "clear", "current_spec": "092-goal-team-parallel", "checked_specs": ["092-goal-team-parallel"], "overlaps": [], "note": "current feature has no declaration artifact", "checked_at": "2026-11-09T06:56:00Z"}
+oc_exit=0
