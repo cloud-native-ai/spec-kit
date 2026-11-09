@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh <wp04 neighbourhood: handoff, territory, declarations, command family, parallel lines (contract+integration), team territory, territory containment, overlap verdicts> -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py tests/contract/test_declaration_facts.py tests/contract/test_command_family.py tests/contract/test_parallel_lines.py tests/integration/test_parallel_lines.py tests/contract/test_team_territory.py tests/contract/test_territory_containment.py tests/contract/test_overlap_verdicts.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...................................................                      [100%]
+51 passed in 12.16s
+exit=0

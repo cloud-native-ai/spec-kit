@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh tests/contract/test_declaration_facts.py::test_the_threshold_literal_exists_only_in_its_fact_file -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py::test_the_threshold_literal_exists_only_in_its_fact_file -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.23s
+exit=0

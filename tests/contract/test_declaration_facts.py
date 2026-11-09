@@ -1,10 +1,10 @@
 """Contract tests for the two 094 declaration facts and their registration.
 
 Feature 094, `contracts/command-family-and-declarations.md` C-76…C-87; tasks rows
-T025, T026, T027, T051, T053, T054, T056. Every fact is read through the layer's one
-parser (`scripts/python/declaration_reader.py`, `parse_subset`) and every decision is
-driven through the engine CLI a consumer actually calls — never through a helper only
-the test can reach.
+T025, T026, T027, T051, T053, T054, T055, T056, T057, T058. Every fact is read through
+the layer's one parser (`scripts/python/declaration_reader.py`, `parse_subset`) and
+every decision is driven through the engine CLI a consumer actually calls — never
+through a helper only the test can reach.
 
 The threshold value is deliberately NOT pinned in this module: it is read from the fact
 file so changing the declared number stays a one-file edit (C-82). The same reason keeps
@@ -287,3 +287,195 @@ def test_both_facts_are_registered_with_subset_and_value_domain():
     threshold_keys = set(registered[THRESHOLD_SLUG]["statement_keys"])
     assert {"metric", "threshold", "boundary", "on_direct", "on_handoff"} <= threshold_keys, (
         "the threshold registration names every statement key the consumer validates")
+
+
+# ---------------------------------------------------------------------------
+# T055 / C-82 — the threshold literal lives only in its fact file
+# ---------------------------------------------------------------------------
+#: The three surface families the row names: engine constants, driver sentences and
+#: command templates. The `.specify/` mirrors are byte-identical projections of these
+#: sources (`sync-mirrors.py --check`), so scanning the sources covers both forms
+#: without reporting every hit twice. Third-party skills ship their own unrelated
+#: thresholds and exit codes, so the scan stays on the surfaces that carry this fact.
+THRESHOLD_SCAN_SURFACES = (
+    "scripts/python/goal-utils.py",       # the engine that could hold a constant
+    "skills/external/sdd-loop-driver",    # driver sentences
+    "templates/commands",                 # command templates
+)
+THRESHOLD_SCAN_SUFFIXES = (".py", ".md", ".sh", ".yaml", ".yml", ".json")
+THRESHOLD_CONTEXT = re.compile(r"threshold|阈值|task[_-]?count|任务数", re.IGNORECASE)
+
+
+def test_the_threshold_literal_exists_only_in_its_fact_file():
+    threshold = _threshold()
+    number = re.compile(r"(?<![0-9])%d(?![0-9])" % threshold)
+    offenders = []
+    for surface in THRESHOLD_SCAN_SURFACES:
+        root = REPO_ROOT / surface
+        paths = [root] if root.is_file() else sorted(root.rglob("*"))
+        for path in paths:
+            if not path.is_file() or path.suffix.lower() not in THRESHOLD_SCAN_SUFFIXES:
+                continue
+            for lineno, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), 1):
+                if THRESHOLD_CONTEXT.search(line) and number.search(line):
+                    offenders.append(
+                        f"{path.relative_to(REPO_ROOT)}:{lineno}: {line.strip()}")
+    assert not offenders, (
+        f"the declared threshold {threshold} MUST stay a one-file edit (C-82); it is "
+        "restated in a threshold sentence outside "
+        f"{THRESHOLD_FACT.relative_to(REPO_ROOT)}:\n" + "\n".join(offenders))
+    assert str(_fact_body(THRESHOLD_FACT)["statement"]["threshold"]) == str(threshold), (
+        "the owner is the fact file; the guard must read the same number it scanned for")
+
+
+# ---------------------------------------------------------------------------
+# T057 / C-84 / C-85 — another grammar or another domain is refused at load
+# ---------------------------------------------------------------------------
+def test_a_fact_in_another_grammar_is_refused_at_load(sandbox):
+    root = _declaration_fixture(sandbox)
+    tasks = _tasks_file(root, 2)
+    contract_path = root / "shared/declarations/contract.yaml"
+    fact_path = root / "shared/declarations/facts" / THRESHOLD_FACT.name
+    contract_text = contract_path.read_text(encoding="utf-8")
+    fact_text = fact_path.read_text(encoding="utf-8")
+
+    # Control: the unmutated fixture answers both questions, so every refusal below is
+    # caused by the mutation alone and not by the fixture.
+    proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+    assert proc.returncode == 0, (
+        f"the unmutated fixture must decide: {proc.stdout!r} {proc.stderr!r}")
+    proc = _run(root, "command-family", "--command", "feedback")
+    assert proc.returncode == 0, (
+        f"the unmutated fixture must answer the family lookup: "
+        f"{proc.stdout!r} {proc.stderr!r}")
+
+    # A fact file written outside the subset grammar is refused when it is loaded.
+    fact_path.write_text(fact_text.replace(
+        "boundary: exclusive", "boundary: [exclusive]"), encoding="utf-8")
+    proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+    assert proc.returncode == 2, (
+        "a fact written outside the subset grammar is an input error at load: "
+        f"got {proc.returncode}: {proc.stdout!r} {proc.stderr!r}")
+    combined = proc.stdout + proc.stderr
+    assert "owner-unavailable" in combined, (
+        f"the refusal names the degraded load; got {combined!r}")
+    assert "outside the subset" in combined, (
+        f"the refusal names the grammar breach; got {combined!r}")
+    fact_path.write_text(fact_text, encoding="utf-8")
+
+    # A fact registered under a grammar the shared reader does not implement.
+    contract_path.write_text(contract_text.replace(
+        "  - fact: goal-team-handoff-threshold\n    subset_id: declaration-subset/v1",
+        "  - fact: goal-team-handoff-threshold\n    subset_id: yaml/v0"), encoding="utf-8")
+    proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+    assert proc.returncode == 2, (
+        f"another registered grammar must be refused: {proc.stdout!r} {proc.stderr!r}")
+    combined = proc.stdout + proc.stderr
+    assert "declaration-invalid" in combined, (
+        f"the refusal names the declaration label; got {combined!r}")
+    assert "yaml/v0" in combined and "declaration-subset/v1" in combined, (
+        "the refusal names both grammars")
+    payload = json.loads(proc.stdout)
+    assert payload["decision"] is None and payload["threshold"] is None, (
+        "no decision may be produced from a fact refused at load (C-84)")
+
+    contract_path.write_text(contract_text.replace(
+        "  - fact: goal-team-command-family\n    subset_id: declaration-subset/v1",
+        "  - fact: goal-team-command-family\n    subset_id: yaml/v0"), encoding="utf-8")
+    proc = _run(root, "command-family", "--command", "feedback")
+    assert proc.returncode == 2, (
+        "the family consumer refuses another registered grammar too: "
+        f"{proc.stdout!r} {proc.stderr!r}")
+    assert "declaration-invalid" in (proc.stdout + proc.stderr)
+
+    # Both consumers validate against the registered value_domain, never a private copy.
+    for old_domain, new_domain, args in (
+        ("value_domain: closed-set", "value_domain: ordered-operator-table",
+         ("command-family", "--command", "feedback")),
+        ("value_domain: threshold+timing-map", "value_domain: closed-set",
+         ("handoff-decision", "--tasks", str(tasks))),
+    ):
+        contract_path.write_text(contract_text.replace(old_domain, new_domain),
+                                 encoding="utf-8")
+        proc = _run(root, *args)
+        assert proc.returncode == 2, (
+            f"a registered domain the consumer does not implement must be refused: "
+            f"{proc.stdout!r} {proc.stderr!r}")
+        combined = proc.stdout + proc.stderr
+        assert "declaration-invalid" in combined, (
+            f"the refusal names the declaration label; got {combined!r}")
+        assert new_domain.split(": ")[1] in combined, (
+            "the refusal names the registered domain")
+        assert old_domain.split(": ")[1] in combined, (
+            "the refusal names the domain this consumer implements")
+
+    # Restored, the fixture decides again: the refusal tracks the registration only.
+    contract_path.write_text(contract_text, encoding="utf-8")
+    proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+    assert proc.returncode == 0, (
+        f"the restored fixture must decide again: {proc.stdout!r} {proc.stderr!r}")
+
+
+# ---------------------------------------------------------------------------
+# T058 / C-86 / C-87 — additive registration; both consumers inside the owned engines
+# ---------------------------------------------------------------------------
+IN_SCOPE_CONSUMERS = {
+    "scripts/python/goal-utils.py",
+    "skills/internal/create-team/SKILL.md",
+}
+OUT_OF_SCOPE_SCRIPTS = (
+    "scripts/python/flow-class-check.py",
+    "skills/external/sdd-loop-driver/scripts/run-stage.sh",
+    "skills/external/sdd-loop-driver/scripts/stage-runner.sh",
+)
+
+
+def test_registration_is_additive_and_both_consumers_are_in_scope():
+    contract_path = REPO_ROOT / "shared/declarations/contract.yaml"
+    contract = dr.load_contract(str(REPO_ROOT))
+
+    # C-86 — nothing pre-existing was renamed or removed; the registration sequence is
+    # the one addition, appended after every key it must not disturb.
+    vanished = PRE_EXISTING_CONTRACT_KEYS - set(contract)
+    assert not vanished, f"pre-existing contract keys vanished: {sorted(vanished)}"
+    assert set(contract) - PRE_EXISTING_CONTRACT_KEYS == {"registered_facts"}, (
+        "the registration is the only change to contract.yaml (C-86); unexpected keys: "
+        f"{sorted(set(contract) - PRE_EXISTING_CONTRACT_KEYS - {'registered_facts'})}")
+    top_level = re.findall(r"^([a-z_]+):", contract_path.read_text(encoding="utf-8"),
+                           re.MULTILINE)
+    assert top_level[-1] == "registered_facts" and top_level.count("registered_facts") == 1, (
+        "the registration is appended as the last top-level section, never interleaved")
+
+    rows = contract["registered_facts"]
+    assert sorted(row["fact"] for row in rows) == sorted((FAMILY_SLUG, THRESHOLD_SLUG)), (
+        "one registration row per new fact, no duplicates")
+
+    # C-87 — every declared consumption point exists and lives in an engine this feature
+    # owns or modifies: `goal-utils.py` and the `create-team` skill.
+    for slug in (FAMILY_SLUG, THRESHOLD_SLUG):
+        consumers = {str(item) for item in _fact_body(FACTS_DIR / f"{slug}.yaml")["consumers"]}
+        stray = consumers - IN_SCOPE_CONSUMERS
+        assert not stray, (
+            f"{slug} declares consumption point(s) outside goal-utils.py / create-team: "
+            f"{sorted(stray)} (C-87)")
+        for consumer in consumers:
+            assert (REPO_ROOT / consumer).is_file(), (
+                f"{slug} declares a consumer that does not exist: {consumer}")
+
+    engine_text = (REPO_ROOT / "scripts/python/goal-utils.py").read_text(encoding="utf-8")
+    for action in ("command-family", "handoff-decision"):
+        assert f'"{action}"' in engine_text, (
+            f"the engine does not implement the {action!r} action (C-74/C-81)")
+    skill_text = (REPO_ROOT / "skills/internal/create-team/SKILL.md").read_text(
+        encoding="utf-8")
+    for invocation in ("command-family --command", "handoff-decision --tasks"):
+        assert invocation in skill_text, (
+            f"create-team does not invoke the {invocation!r} consumption point (C-74)")
+
+    for path in OUT_OF_SCOPE_SCRIPTS:
+        text = (REPO_ROOT / path).read_text(encoding="utf-8")
+        for slug in (FAMILY_SLUG, THRESHOLD_SLUG):
+            assert slug not in text, (
+                f"{path} MUST NOT consume {slug}; the consumption points stay in "
+                "goal-utils.py and create-team (C-87)")

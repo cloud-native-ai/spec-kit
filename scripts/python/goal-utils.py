@@ -38,6 +38,9 @@ Write group (mutates one definition file):
 Write group (094 unified archive; explicit actions, never implicit):
   migrate-archive   --dry-run | --apply   (move spec-local trees, archive-not-delete)
   backfill-bindings --dry-run | --apply   (insert the recorded binding on residents)
+  handoff-ref       --handoff <path>      (validate a handoff contract's two keys and
+                                           write the reverse handoff_ref on both
+                                           definitions)
 
 Exit codes: 0 ok | 2 input error | 3 not found or migration interrupted | 4 validation failed or migration conflict | 5 blocked
 """
@@ -2385,6 +2388,96 @@ def handoff_decision(repo_root: Path, tasks_path: Path):
 
 
 # --------------------------------------------------------------------------
+# 094 — handoff contract keys (C-58/C-59): validate both keys, write the reverse refs
+# --------------------------------------------------------------------------
+
+HANDOFF_REF_KEY = "handoff_ref"
+HANDOFF_DANGLING = "handoff-dangling-key"
+
+
+def _with_handoff_ref(text: str, ref: str, path: Path) -> tuple[str, bool]:
+    """Set one `handoff_ref` frontmatter line; every other byte is preserved (C-6/C-59)."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise GoalError(
+            f"handoff-ref-unwritable: {path} carries no frontmatter; the reverse key "
+            "cannot be written without one")
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    except StopIteration:
+        raise GoalError(
+            f"handoff-ref-unwritable: {path}'s frontmatter is unterminated") from None
+    key = f"{HANDOFF_REF_KEY}:"
+    wanted = f"{key} {ref}"
+    hits = [i for i in range(1, end) if lines[i].startswith(key)]
+    if len(hits) > 1:
+        raise GoalError(
+            f"handoff-ref-unwritable: {path} carries {len(hits)} handoff_ref lines; "
+            "the engine refuses to guess which one is the reverse key")
+    if hits and lines[hits[0]] == wanted:
+        return text, False
+    if hits:
+        rewritten = lines[:hits[0]] + [wanted] + lines[hits[0] + 1:]
+    else:
+        rewritten = lines[:end] + [wanted] + lines[end:]
+    new_text = "\n".join(rewritten)
+    if text.endswith("\n"):
+        new_text += "\n"
+    return new_text, True
+
+
+def handoff_ref(repo_root: Path, handoff_path: Path) -> dict:
+    """`handoff-ref --handoff <path>` (C-58/C-59): validate the keys, write the refs.
+
+    `goal_slug` and `team_slug` must each resolve to an archive definition; an
+    unresolvable one is `handoff-dangling-key` (exit 2) naming the value, because a
+    contract never names a goal or team that does not exist. Once both resolve, each
+    definition gains exactly one `handoff_ref` pointing back at this contract; every
+    other byte of each file stays identical (C-6's discipline applied to C-59).
+    """
+    repo_root = Path(repo_root)
+    handoff_path = Path(handoff_path)
+    try:
+        text = handoff_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise GoalError(
+            f"handoff-unreadable: {handoff_path} ({exc.strerror or exc})") from None
+    meta, _start, _end = read_frontmatter_subset(text)
+    resolved: dict[str, Path] = {}
+    unresolved: list[str] = []
+    for key, layer, filename in (("goal_slug", ARCHIVE_DIRNAME, DEFINITION_FILENAME),
+                                 ("team_slug", TEAM_DIRNAME, "team.md")):
+        value = str(meta.get(key) or "").strip()
+        path = (Path(repo_root) / layer / value / filename
+                if is_valid_identity(value) else None)
+        if path is None or not path.is_file():
+            unresolved.append(f"{key} {value!r}")
+        else:
+            resolved[key] = path
+    if unresolved:
+        raise GoalError(
+            f"{HANDOFF_DANGLING}: " + ", ".join(unresolved)
+            + f" resolves to no definition under {ARCHIVE_DIRNAME}/ or {TEAM_DIRNAME}/; "
+            "a handoff contract never names a goal or team that does not exist (C-58)")
+    try:
+        ref = handoff_path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        raise GoalError(
+            f"handoff-outside-repo: {handoff_path} is not inside {repo_root}; the "
+            "reverse key is a repo-relative path (C-59)") from None
+    written = []
+    for kind, key in (("goal", "goal_slug"), ("team", "team_slug")):
+        path = resolved[key]
+        original = path.read_text(encoding="utf-8")
+        rewritten, changed = _with_handoff_ref(original, ref, path)
+        if changed:
+            path.write_text(rewritten, encoding="utf-8")
+        written.append({"kind": kind, "slug": str(meta.get(key)).strip(),
+                        "path": str(path.relative_to(repo_root)), "changed": changed})
+    return {"action": "handoff-ref", "handoff": ref, "refs": written}
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -2456,8 +2549,25 @@ def _run_declaration_action(args, repo_root: Path) -> int:
     return code
 
 
+def _run_handoff_action(args, repo_root: Path) -> int:
+    """Dispatch `handoff-ref`; it addresses both archive layers directly (C-58/C-59)."""
+    try:
+        payload = handoff_ref(repo_root, Path(args.handoff_path))
+    except GoalNotFound as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_NOT_FOUND
+    except GoalInvalid as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INVALID
+    except GoalError as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INPUT_ERROR
+    _emit(payload, args.json)
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks', '--handoff'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -2607,6 +2717,15 @@ def main(argv: list[str] | None = None) -> int:
     p_handoff.add_argument("--tasks", dest="tasks_path", required=True, metavar="PATH",
                            help="path to the tasks file whose task rows are counted")
 
+    p_handoff_ref = sub.add_parser(
+        "handoff-ref", parents=[common],
+        help="write: validate a handoff contract's goal_slug/team_slug and write the "
+             "reverse handoff_ref on both definitions (094; C-58/C-59)")
+    p_handoff_ref.add_argument("--handoff", dest="handoff_path", required=True,
+                               metavar="PATH",
+                               help="path to the handoff contract whose two keys are "
+                                    "validated before either reverse key is written")
+
     p_migrate_archive = sub.add_parser(
         "migrate-archive", parents=[common],
         help="write: move spec-local definitions into the unified archive "
@@ -2639,6 +2758,8 @@ def main(argv: list[str] | None = None) -> int:
         return _run_archive_action(args, repo_root)
     if args.action in ("command-family", "handoff-decision"):
         return _run_declaration_action(args, repo_root)
+    if args.action == "handoff-ref":
+        return _run_handoff_action(args, repo_root)
 
     global _ACTIVE_SCOPE
     _ACTIVE_SCOPE = None
@@ -2896,6 +3017,11 @@ def _emit(payload: dict, as_json: bool) -> None:
     if "definitions" in payload:
         for row in payload["definitions"]:
             print(f"{row['result']}\t{row['path']}")
+        return
+    if "refs" in payload:
+        for row in payload["refs"]:
+            state = "updated" if row["changed"] else "already-set"
+            print(f"{row['kind']}\t{state}\t{row['path']}")
         return
     for key, value in payload.items():
         print(f"{key}: {value}")

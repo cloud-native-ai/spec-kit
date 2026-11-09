@@ -1,0 +1,9 @@
+command: bash scripts/bash/run-tests.sh tests/contract/test_handoff_contract.py::test_a_dangling_handoff_key_is_refused_at_creation -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py::test_a_dangling_handoff_key_is_refused_at_creation -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.22s
+exit=0
