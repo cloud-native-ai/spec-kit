@@ -1,0 +1,81 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_command_family.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____ test_flow_class_check_is_not_modified_and_no_second_whitelist_exists _____
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_flow_class_check_is_not_modified_and_no_second_whitelist_exists():
+        digest = hashlib.sha256(FLOW_CLASS.read_bytes()).hexdigest()
+        assert digest == FLOW_CLASS_SHA256, (
+            "flow-class-check.py MUST NOT be modified by this feature (C-74); "
+            f"measured sha256 {digest}")
+    
+        engine_text = ENGINE.read_text(encoding="utf-8")
+>       assert "flow-class-check" in engine_text, (
+            "the engine action must delegate to the class lookup (C-74)")
+E       AssertionError: the engine action must delegate to the class lookup (C-74)
+E       assert 'flow-class-check' in '#!/usr/bin/env python3\n"""Goal definition engine for `/speckit.goal` (requirement 037, Feature 041).\n\nThe command ... in payload.items():\n        print(f"{key}: {value}")\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'
+
+tests/contract/test_command_family.py:184: AssertionError
+_ test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected _
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/family-fikwu03v')
+
+    def test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected(
+            sandbox):
+        assert not (COMMANDS_DIR / "nonexistentcommand.md").exists()
+        proc = _family("nonexistentcommand")
+>       assert proc.returncode == 0, (
+            "an unregistered unit is a decided verdict (source: default, exit 0), "
+            f"not an action failure: {proc.stdout!r} {proc.stderr!r}")
+E       AssertionError: an unregistered unit is a decided verdict (source: default, exit 0), not an action failure: '' 'error: unrecognized option: --command\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:145: AssertionError
+_____ test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list _____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list():
+        stems = sorted(path.stem for path in COMMANDS_DIR.glob("*.md"))
+        assert stems, "no command carriers found — the class predicate has no subject"
+    
+        disagreements = []
+        for name in stems:
+            proc = _family(name)
+>           assert proc.returncode == 0, (
+                f"command-family {name!r} must answer from the class lookup: "
+                f"{proc.stdout!r} {proc.stderr!r}")
+E           AssertionError: command-family 'agents' must answer from the class lookup: '' 'error: unrecognized option: --command\n'
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:120: AssertionError
+___________ test_a_non_family_command_may_still_read_but_not_create ____________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/family-xeprjnrw')
+
+    def test_a_non_family_command_may_still_read_but_not_create(sandbox):
+        _seed_bound_goal(sandbox)
+        before = _tree_digest(sandbox)
+    
+        side = _family("nonexistentcommand")
+>       assert side.returncode == 0, (
+            f"the family verdict must resolve: {side.stdout!r} {side.stderr!r}")
+E       AssertionError: the family verdict must resolve: '' 'error: unrecognized option: --command\n'
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:227: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_command_family.py::test_flow_class_check_is_not_modified_and_no_second_whitelist_exists
+FAILED tests/contract/test_command_family.py::test_an_unregistered_carrier_is_not_in_the_family_and_readability_is_not_affected
+FAILED tests/contract/test_command_family.py::test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list
+FAILED tests/contract/test_command_family.py::test_a_non_family_command_may_still_read_but_not_create
+4 failed in 6.53s

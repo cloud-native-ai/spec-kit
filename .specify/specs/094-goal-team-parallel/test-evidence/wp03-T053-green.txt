@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py::test_the_handoff_threshold_fact_declares_the_boundary_and_the_timing_pair -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.20s

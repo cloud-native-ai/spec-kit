@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py -q -k command_family_fact or parse_under or threshold_fact or registered
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 6.23s

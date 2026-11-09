@@ -1,0 +1,30 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_declaration_facts.py::test_handoff_decision_refuses_when_the_fact_is_unavailable -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_handoff_decision_refuses_when_the_fact_is_unavailable __________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+sandbox = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp03/.specify/.tmp/s094/decl-r49qnhpu')
+
+    def test_handoff_decision_refuses_when_the_fact_is_unavailable(sandbox):
+        root = _declaration_fixture(sandbox, drop_threshold=True)
+        tasks = _tasks_file(root, 3)
+    
+        proc = _run(root, "handoff-decision", "--tasks", str(tasks))
+        assert proc.returncode == 2, (
+            "an unavailable fact exits 2 (owner-unavailable), never a default: "
+            f"got {proc.returncode}: {proc.stdout!r} {proc.stderr!r}")
+        combined = proc.stdout + proc.stderr
+>       assert "owner-unavailable" in combined, (
+            f"the refusal names the degradation label; got {combined!r}")
+E       AssertionError: the refusal names the degradation label; got 'error: unrecognized option: --tasks\n'
+E       assert 'owner-unavailable' in 'error: unrecognized option: --tasks\n'
+
+tests/contract/test_declaration_facts.py:250: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_declaration_facts.py::test_handoff_decision_refuses_when_the_fact_is_unavailable
+1 failed in 6.21s

@@ -1,0 +1,28 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_command_family.py::test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list _____
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list():
+        stems = sorted(path.stem for path in COMMANDS_DIR.glob("*.md"))
+        assert stems, "no command carriers found — the class predicate has no subject"
+    
+        disagreements = []
+        for name in stems:
+            proc = _family(name)
+>           assert proc.returncode == 0, (
+                f"command-family {name!r} must answer from the class lookup: "
+                f"{proc.stdout!r} {proc.stderr!r}")
+E           AssertionError: command-family 'agents' must answer from the class lookup: '' 'error: unrecognized option: --command\n'
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...tmp/sdd-loop/worktrees/094-wp03', '--json'], returncode=2, stdout='', stderr='error: unrecognized option: --command\n').returncode
+
+tests/contract/test_command_family.py:120: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_command_family.py::test_the_family_predicate_is_the_declared_class_not_a_hardcoded_list
+1 failed in 6.18s
