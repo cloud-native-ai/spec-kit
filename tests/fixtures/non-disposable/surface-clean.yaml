@@ -1,0 +1,13 @@
+# Fixture review surface for C-107's mutation legs (tests/contract/test_non_disposable_check.py).
+# Same shape as `surface.yaml`: `kind` + a `statement` list, members and order read from HERE.
+# The members are the roots a created defect lands on: `.specify/specs` (the body-side
+# readings), `tests` (the guard side of `superseded-live`) and `scripts` (the value owner of
+# `stale-constant` -- an owner is a declaring script). The tree under it, `corpus-clean`, is
+# green on every class, so a leg can create exactly one defect and show that it is the
+# created defect that turns the run red.
+fact: non-disposable-review-surface
+kind: closed-set
+statement:
+  - .specify/specs
+  - tests
+  - scripts

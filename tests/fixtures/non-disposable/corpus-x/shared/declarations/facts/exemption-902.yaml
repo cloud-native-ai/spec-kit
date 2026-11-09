@@ -1,0 +1,7 @@
+fact: exemption-902
+kind: record
+feature: "902"
+reason: "the block lands with the next record completion"
+expiry_kind: on-date
+expiry_value: "2020-01-01"
+expiry_recheck: "2020-01-01"

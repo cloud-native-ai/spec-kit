@@ -87,8 +87,8 @@ MUST 落在程序可读或带引用的语义读物上；MUST NOT 以「作者认
 
 ## Detection Categories
 
-**八类是封闭集**（FR-001 / FR-003 / FR-010）。
-
+**八类是封闭集**（FR-001 / FR-003 / FR-010）。第九类是一次契约修订（先改本文档，再改
+`contracts/detection-categories.contract.md`），绝不是引擎侧的局部新增；引擎遇到一个不在本节的类别名时，
 MUST 报一条 `unknown-class` 条目，MUST NOT 把它当作一个额外的类别静默发出。
 
 | # | 类别 | 状态轴 | 一句话判据 |
@@ -201,7 +201,7 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 |-------------|--------|
 | 注册表状态值域（`Draft` / `Planned` / `Implemented` / `Blocked` / `Ready for Review` / `Completed` / `Relocated`） | `shared/workflow/feature-integration.md` § Status State Machine；载体声明在 `templates/feature-details-template.md` § Canonical Status State Machine |
 | 闭环裁决（`accept` / `block`）与 7 个 reason code | `shared/workflow/acceptance-hardening.md` § Closure Verdict；实现于 `scripts/python/closure-acceptance-check.py` 的 `ARC_VERDICTS` / `REASON_CODES` |
-| 验证词表与 smoke 字段名（`SC-NNN_status=` / `smoke_command` / `smoke_exit_code` / `smoke_evidence_path` / `smoke_comparison`） | `shared/workflow/acceptance-hardening.md` § Verification Vocabulary |
+| 验证词表与 smoke 字段名（`SC-NNN_status=` / `smoke_command` / `smoke_exit_code` / `smoke_evidence_path`） | `shared/workflow/acceptance-hardening.md` § Verification Vocabulary |
 | 决定张力记录的六字段形态 | `shared/guidelines/decision-tension.md`；判据于 `scripts/python/validate-decision-tensions.py` |
 | `**Path**:` 标记的位置与取值域 | `shared/workflow/acceptance-hardening.md` § Measurement Sources；判据于 `scripts/python/validate-requirements.py` 的 `path-marker` |
 

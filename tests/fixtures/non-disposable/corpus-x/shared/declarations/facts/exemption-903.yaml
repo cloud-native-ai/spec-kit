@@ -1,0 +1,7 @@
+fact: exemption-903
+kind: record
+feature: "903"
+reason: "the block lands with the next record completion"
+expiry_kind: on-condition
+expiry_value: "build.budget_holds"
+expiry_recheck: "2026-12-01"
