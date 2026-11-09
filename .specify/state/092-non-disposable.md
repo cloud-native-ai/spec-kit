@@ -43,10 +43,10 @@ project_config:
   write_isolation: shared-tree
   decomposition: auto
   decomposition_stages: [plan, implement, review]
-  decomposition_slot_cap: 8
+  decomposition_slot_cap: 15
   agent_concurrency_requested: 24
-  agent_concurrency_effective: 24
-  agent_concurrency_reason: local native subagents; the user requires a team with large-concurrency subagents (085 cadence: team created after clarify + plan U4)
+  agent_concurrency_effective: 15
+  agent_concurrency_reason: 15-slot wave per the user's directive; effective = min(requested 24, stage max_parallel 15, ready 15 + verifier reserve 1) per 085 C-002
   verifier_reserve: 1
   breakpoint_verdict: "new feature; no spec directory yet => next stage = requirements"
   history_review_surface: ".specify/{archive,derive,goal,history,memory,project,review,specs,state,teams}/* under the current git HEAD worktree"
