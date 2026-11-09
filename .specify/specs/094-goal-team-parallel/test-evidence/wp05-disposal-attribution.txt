@@ -1,0 +1,28 @@
+# Disposal attribution — new-vs-plan-baseline failing ids in the twelve measured modules
+# Reading: wp05-contract-post-disposal.txt (2026-11-09, tests/contract)
+# Cause: wp01's T013 narrowed the engine's --scope set to goal/teams/auto (by design);
+# these 085-era modules assert the retired value names / spec-local roots and are marked
+# "rewrite" in the tasks.md § 085 disposal table. No package in the § Package Map
+# declares their rewrite (wp01 residual risk 2); wp05 does not own their write domain.
+# The disposition remains owed to a follow-up owner; this file records the attribution
+# so the failures are adjudicated, never silenced (tasks.md § Notes; C-111).
+
+module: tests/contract/test_scope_resolution.py
+ids: test_global_scope test_list_spec_is_scoped test_spec_scope test_spec_scope_requires_spec_dir test_spec_write_leaves_global_stores_byte_identical
+cause: asserts the retired --scope values and the spec-local roots; disposition=rewrite, rewrite owner unassigned
+
+module: tests/contract/test_temp_goal_contract.py
+ids: test_resolve_scope_returns_the_spec_roots test_spec_scope_lists_the_spec_scoped_goal
+cause: asserts the spec-local scope roots; disposition=rewrite, rewrite owner unassigned
+
+module: tests/contract/test_temp_team_schema.py
+ids: test_spec_scoped_authorize_resolves_the_team test_spec_scoped_run_checks_resolves_the_team
+cause: drives authorize/run-checks with the retired spec scope; disposition=rewrite, rewrite owner unassigned
+
+module: tests/contract/test_expression_compatibility.py
+ids: test_c5_wiring_surface_is_closed
+cause: dated compatibility record whose expectations reference the retired wiring; disposition=historical, kept as the dated record
+
+# Disposed by this package (reading the post-disposal run): test_checkpoint_protocol.py
+# now passes (row 6 rewrite: the part-2 heading assertion follows "Goal progress" and the
+# T072 guard pins the new keys while the stage chain and sentinels stay unchanged).

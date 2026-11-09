@@ -440,3 +440,85 @@ def test_a_bound_goal_is_writable_only_by_human(tmp_path: Path):
     proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "human",
                 "--owner-id", "human")
     assert proc.returncode == 0, proc.stdout + proc.stderr
+
+
+# ---------------------------------------------------------------------------
+# T067 / C-88 — the goal owner owns the concepts, not the action signatures
+# ---------------------------------------------------------------------------
+
+GOAL_OWNER = REPO_ROOT / "shared/definitions/goal-definitions.md"
+TEAM_OWNER = REPO_ROOT / "skills/internal/create-team/references/conceptual-model.md"
+
+
+def _owner_text(path: Path) -> str:
+    assert path.is_file(), f"concept owner missing: {path}"
+    return path.read_text(encoding="utf-8")
+
+
+def _section(text: str, heading: str) -> str:
+    assert heading in text, f"missing section: {heading}"
+    tail = text[text.index(heading) + len(heading):]
+    end = re.search(r"(?m)^## ", tail)
+    return tail[: end.start()] if end else tail
+
+
+def test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures():
+    text = _owner_text(GOAL_OWNER)
+
+    # The four owned concept faces are present by name.
+    assert "### Archive Layers" in text, "the archive-layer vocabulary lives here"
+    assert "### The Binding Record" in text, "the binding record's meaning lives here"
+    assert "### Goal Lifecycle" in text, "the lifecycle names live here"
+    assert "origin" in _section(text, "### The Binding Record"), (
+        "the origin semantics are owned by the binding-record section")
+    for value in ("`active`", "`achieved`", "`abandoned`"):
+        assert value in _section(text, "### Goal Lifecycle"), (
+            f"the goal lifecycle names are owned here: {value}")
+    assert "retained" in _section(text, "### Goal Lifecycle") and "reopen" in text, (
+        "the terminal-retained and reopen rules are stated")
+    assert ".specify/anchoring/<slug>/goal.md" in text and ".specify/teams/<slug>/team.md" in text
+
+    # The legacy-key removal point is recorded in § Terminology Boundaries (C-23).
+    boundaries = _section(text, "## Terminology Boundaries")
+    assert "removed at the first minor release after 094" in boundaries, (
+        "the alias removal point is declared in Terminology Boundaries")
+
+    # It does not restate the engine's action signatures (C-88).
+    signatures = re.findall(r"goal-utils\.py\s+[a-z-]+\s+<", text)
+    assert not signatures, f"action signatures restated in the owner: {signatures}"
+    for flag in ("--owner-id", "--owner ", "--origin ", "--scope "):
+        assert flag not in text, f"engine flag {flag!r} restated in the concept owner"
+
+
+# ---------------------------------------------------------------------------
+# T068 / C-89 / C-90 — the two owners cite each other, neither restates the other
+# ---------------------------------------------------------------------------
+
+def test_the_two_owners_cite_each_other_and_restate_no_value_domain():
+    goal_text = _owner_text(GOAL_OWNER)
+    team_text = _owner_text(TEAM_OWNER)
+
+    # Each cites the other by path and section.
+    assert "skills/internal/create-team/references/conceptual-model.md" in goal_text
+    assert "§ The Team Definition and the Binding Model" in goal_text, (
+        "the goal owner cites the team owner's section explicitly")
+    assert "shared/definitions/goal-definitions.md" in team_text
+    assert "§ The Binding Record" in team_text, (
+        "the team owner cites the binding-record section explicitly")
+
+    # The team owner owns binding / handoff_ref / the crew notion without restating
+    # the goal-side value domains.
+    assert "handoff_ref" in team_text and "crew" in team_text.lower()
+    for goal_domain in ("achieved", "abandoned", "sdd-run", "command-run",
+                        "`human`", "`goal` / `teams` / `auto`"):
+        assert goal_domain not in team_text, (
+            f"the team owner restates a goal-side domain value: {goal_domain!r}")
+    # The team key may be named only inside a citation of its owner, never defined here.
+    for line in goal_text.splitlines():
+        if "handoff_ref" in line:
+            assert "conceptual-model.md" in line, (
+                "the goal owner names the team key only while citing the team owner")
+
+    # The goal owner does not restate the team lifecycle pair.
+    assert "active` / `archived" not in goal_text and "`archived`" not in goal_text, (
+        "the goal owner must cite the team lifecycle, not enumerate it")

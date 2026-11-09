@@ -1,0 +1,11 @@
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_parallel_lines.py tests/contract/test_criterion_vocabulary_scan.py tests/contract/test_085_disposal_table.py tests/contract/test_checkpoint_protocol.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_binding_model.py tests/contract/test_declaration_facts.py tests/integration/test_parallel_lines.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+...............................................................          [100%]
+63 passed in 6.84s
+.                                                                        [100%]
+1 passed, 63 deselected in 15.25s
+exit=0

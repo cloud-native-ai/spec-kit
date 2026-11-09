@@ -1,0 +1,5 @@
+(a) re-injected phrase: '## Temporary Goal (run-scoped) written under the spec'
+(a) patterns that hit: ['temporary-goal-team']
+(b) clean engine answers: command-run
+(b) position-inferring mutant answers: human
+MUTATIONS TURN THE US5 GUARDS RED: yes

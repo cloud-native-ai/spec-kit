@@ -355,11 +355,11 @@ This layer **adds pre-U4 steps only**. The preserved-behavior obligations are ow
 - **FN-15 (red-first evidence)** — new behavior is red before implementation; each verification record carries the command, exit code, pass/fail counts, changed paths, and an evidence pointer. A green check that would not turn red when its subject breaks is not cited.
 - **FN-16 (delivery surface)** — Delivery is confined to the driver skill source (`SKILL.md`, this reference, the template, `wp-gate.py`, `wp-report.py`), the driver documentation page, the canonical test suites, the generated mirror, and this feature's specification and evidence. No runtime service, daemon, external dependency, model API, second registry, second ownership model, second integration queue, second brief format, second ledger, or persisted team directory is added. The stage-team preset stays a driver template and is never written into `.specify/teams/`.
 
-## 22. Team mode (scope = spec)
+## 22. Team mode (a goal-bound team)
 
 This section is additive; the shared-tree behavior above remains the default and every pinned literal is unchanged.
 
 - **`write_isolation`**: an optional plan field with the closed values `shared-tree` (default) and `worktree`. Under `shared-tree`, the write-alone rule above is unchanged. Under `worktree`, each writing package runs in a child line with its own git worktree and branch (`.specify/.tmp/sdd-loop/worktrees/<child_line_id>`); commits are serialized by the existing integration queue in the declared `integration_order`. The stage sentinel and U4 remain unchanged.
 - **New decomposition rules**: `decompose-requirements-v1` (FR/SC cluster derivations, validator evidence, coverage reconciliation; `requirements.md` is integrator-owned) and `decompose-tasks-v1` (task-group derivations, dependency edges, tests-mode decision; `tasks.md` is integrator-owned). They are admitted only when the run-scoped `decomposition_stages` map enables them; built-in defaults stay `off`.
 - **Budget bound**: every package's `max_turns` MUST be in `1..500`; a retry that would exceed 500 is capped and must change scope or topology.
-- **Slot cap**: temporary-team mode MAY pass a `slot_cap_ceiling` of `min(effective_concurrency, 24)`; the legacy ceiling `min(4, line remaining)` is unchanged for all other runs.
+- **Slot cap**: team mode MAY pass a `slot_cap_ceiling` of `min(effective_concurrency, 24)`; the legacy ceiling `min(4, line remaining)` is unchanged for all other runs.

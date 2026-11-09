@@ -1,0 +1,31 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_085_disposal_table.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_the_post_disposal_reading_is_baseline_internal_for_the_disposal_surface _
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_post_disposal_reading_is_baseline_internal_for_the_disposal_surface():
+>       meta = _reading_meta()
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_085_disposal_table.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _reading_meta() -> dict:
+>       assert READING.is_file(), (
+            f"the post-disposal contract reading is missing: {READING} (record it with "
+            "scripts/bash/run-tests.sh tests/contract --names-out ...)")
+E       AssertionError: the post-disposal contract reading is missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp05/.specify/specs/094-goal-team-parallel/test-evidence/wp05-contract-post-disposal.txt (record it with scripts/bash/run-tests.sh tests/contract --names-out ...)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp05/.specify/specs/094-goal-team-parallel/test-evidence/wp05-contract-post-disposal.txt').is_file
+
+tests/contract/test_085_disposal_table.py:128: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_085_disposal_table.py::test_the_post_disposal_reading_is_baseline_internal_for_the_disposal_surface
+1 failed, 1 passed in 6.46s
+exit=1

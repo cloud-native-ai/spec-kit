@@ -1,6 +1,6 @@
 # Conceptual Model: Role × Stage × Type + Team/Loop
 
-**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the **single source of truth** for the multi-agent conceptual model (FR-011, FR-012, SC-006). Single-agent skills (`create-agent`, `improve-agent`) MUST link here rather than re-defining any part of this model.
+**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the **single source of truth** for the multi-agent conceptual model (FR-011, FR-012, SC-006) and for the **team side of the binding model** — the team's binding application, its lifecycle value pair, `handoff_ref`, and the construction-crew notion. The **binding record's meaning** (its keys, value domains, `origin` semantics) and the goal-side lifecycle are owned by `shared/definitions/goal-definitions.md` § Archive Layers / § The Binding Record; this file cites them by path and section and must not restate them. Single-agent skills (`create-agent`, `improve-agent`) MUST link here rather than re-defining any part of this model.
 
 ## The three orthogonal dimensions
 
@@ -89,22 +89,19 @@ The team domain has **four** collaboration patterns. Each encodes a different **
 - **temporary** — a worker/stage agent instantiated for a single run from a stage/worker template; discarded when the run ends. Lives only in the orchestrator's context.
 - **persistent** — a reusable agent stored at `.specify/agents/templates/<slug>.agent.md` (role Template) or `.specify/agents/instances/<slug>.agent.md` (Instance) and symlinked into each supported tool.
 
-## Temporary (Run-Scoped) Team
+## The Team Definition and the Binding Model
 
-A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the same team schema, create/run/improve machinery, and report contract as a Global Team; only its **storage and lifecycle scope** differ.
+A team is a **persisted definition** in the one team archive layer: `.specify/teams/<slug>/team.md`, with its run reports accumulating under `.specify/teams/<slug>/runs/`. There is no second team store: a spec directory holds no current team definition, and a leftover spec-local tree is a migration source only. The binding record's meaning — its three keys, their value domains, `origin` semantics and the goal-side lifecycle — is owned by `shared/definitions/goal-definitions.md` § Archive Layers / § The Binding Record; this section owns the team's side of that model and restates none of the goal side's value domains.
 
-```
-.specify/specs/<NNN-slug>/team/
-├── team.md
-└── runs/<run_id>-report.md
-```
-
-- **Creation timing**: created only after both `clarify` and `plan` pass U4 — the design is what makes the roster and concurrency decidable. It is bound to the spec's Temporary Goal.
-- **Frontmatter extension**: `scope: spec`, `spec_dir`, `goal_slug`, optional `lifecycle_state`, and a `stage_seats` block map. These are additive; existing keys keep their meaning.
+- **Binding on a team.** A team definition carries the same binding record every goal carries (written only by the engine / `create-team` persistence path, never hand-edited). Ownership and writability are answered by that record, never by where the file sits. The team's own binding says which run created it, independently of whether the goal it serves has since been bound by another line.
+- **`goal_slug` — identity, not content.** A team serves exactly one goal by declaring `goal_slug`; the binding is N teams : 1 goal, and the team stores the identity reference only — never a copy of the goal's objective or criteria. Several teams bound to one goal are a legal, first-class shape.
+- **`handoff_ref` — the reverse key.** When a spec-side handoff contract hands construction work to this team, the team definition carries `handoff_ref`, a spec-dir-relative path back to that contract. It is written by the engine's binding action; the contract and the two definitions form a three-way key pair. The contract's shape is owned by `skills/internal/create-team/references/handoff-contract-template.md`.
+- **Team lifecycle.** The team's lifecycle is its own pair — `active` / `archived` — never the goal's three values. An `archived` team is refused by `run-team`; reviving it is an explicit modify, never a side effect.
+- **The construction crew (施工队).** A team bound to a goal under an active handoff contract is the **construction crew** of the design-vs-construction split: the spec side keeps design authority (`requirements.md`, `tasks.md`, `verification.md` and the contract itself are spec-side writes), the crew executes inside its declared territory and writes back one record per completed task. The two lines are peers; neither requires the other, and the handoff is the only documented collaboration shape.
+- **Creation timing** is read from `shared/declarations/facts/goal-team-handoff-threshold.yaml`: a direct run creates no team, a handoff run creates it after `tasks` U4, and a command run declares its creation moment in its command template. This section does not restate the threshold or the timing labels.
 - **Stage dimension is not the SDD stage roster**: the Team's own `Stage` values remain `executor` / `evaluator` / `optimizer`. The canonical SDD stages exist only as `stage_seats` keys, each carrying its seats and `max_parallel`.
 - **Dynamic roster**: the number and type of agents per stage are implementation details decided by the work-package benefit test, effective concurrency, and checkpoint evidence. No fixed per-stage count is a contract.
-- **Lifecycle**: active by default; archived in place at completion. It never writes `.specify/teams/**` or `.specify/goal/**`.
-- **One per spec by default**: multiple runs append `runs/` and checkpoints rather than creating new team directories.
+- **One definition per slug**: multiple runs append `runs/` and checkpoints rather than creating new team directories.
 
 ## Template home
 

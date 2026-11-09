@@ -103,3 +103,47 @@ FAILED tests/contract/test_resident_backfill.py::test_a_second_backfill_writes_n
 - failure form: `error: unrecognized option: --dry-run` (exit 2) — the action did not exist.
 - full reading: `test-evidence/wp02-T082-red-backfill.txt`
 - green reading: `test-evidence/wp02-T081-green.txt`, `wp02-T082-green.txt`
+
+### T042 — peer-lines contract module (guard rows T042, T045–T048)
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_parallel_lines.py -q`
+- exit status: 1
+- output (verbatim excerpt):
+```text
+FAILED tests/contract/test_parallel_lines.py::test_authorize_records_the_archive_layer_not_a_scope_name
+FAILED tests/contract/test_parallel_lines.py::test_neither_line_requires_the_other_to_exist
+FAILED tests/contract/test_parallel_lines.py::test_run_checks_carries_the_binding_and_keeps_its_resolution_keys
+FAILED tests/contract/test_parallel_lines.py::test_no_owner_is_derived_from_a_path_prefix
+FAILED tests/contract/test_parallel_lines.py::test_many_teams_may_bind_one_goal_and_no_goal_content_is_copied
+5 failed in 6.41s
+```
+- failure forms: `handoff-decision` had no declaration fact in the self-contained fixture; the authorize record carried `scope` instead of `archive_layer`; `run-checks` carried no `binding` key; the team mechanism still named a spec-local team store; `run-checks` accepted a team lifecycle outside active/archived.
+- full reading: `test-evidence/wp05-T042-t045-t048-red.txt`
+
+### T044 — injected-precondition mutation (the peer assertion is not blind)
+- date: 2026-11-09
+- command: `python3` drill script (recorded verbatim in the evidence file)
+- exit status: 0 (the drill asserts the two readings below)
+- output (verbatim):
+```text
+clean exit: 0 | verdict: ok
+mutated exit: 2 | error: injected-requires-spec-line
+MUTATION TURNS THE PEER-B PATH RED: yes
+```
+- reading: `test-evidence/wp05-T044-mutation.txt`
+
+### T063–T065 — US5 guard readings
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_binding_model.py -q` (14 passed, includes T063's `test_rebind_changes_only_the_binding_block`)
+- T065 red reading: `test-evidence/wp05-T065-disposal-red.txt` (the recorded post-disposal reading did not exist yet)
+- T066 mutation reading: `test-evidence/wp05-T066-mutations.txt` — a re-injected criterion phrase hits the scan predicate (`temporary-goal-team`), and a position-inferring engine mutant answers `human` where the record answers `command-run`.
+
+### T064 / T069–T070 — criterion vocabulary scan turned green
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_criterion_vocabulary_scan.py -q`
+- exit status: 0
+- output (verbatim excerpt):
+```text
+3 passed in 6.70s
+```
+- red reading (29 classification hits across seven surfaces) is reproduced in the module docstring and was re-measured at fork entry; the surfaces reworded are the wp05-owned ones plus `skills/internal/create-team/references/create-mode.md` (the sweep disclosed in `notes/implement-wp03.md` §5).
