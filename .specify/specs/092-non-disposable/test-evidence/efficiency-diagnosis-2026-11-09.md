@@ -49,3 +49,10 @@ measurement did not capture duration, so this table is derived from git, which i
 
 Finishing P2 driver-side (mirror sync + 81 contract tests + commit) took **≈2 minutes**, where a
 third 500-turn dispatch would have re-read the corpus and risked a third stall.
+
+## Script-level concurrency (2026-11-09, follow-up)
+
+- No interpreter on this host has `pytest-xdist` (`/usr/bin/python3`, `/usr/local/bin/python3`: pytest 9.0.3, no xdist), so `run-tests.sh --workers` always degrades to serial; this is also why its `-n0` runs 25 tests red.
+- Added `scripts/bash/run-tests-shards.sh`: shards by module (not node id, to stay under ARG_MAX), runs N concurrent pytest processes, merges the FAILED list, honours `--names-out`, and resolves the interpreter by the same ladder with an xdist-independent check.
+- Measured: 8 heavy modules, 8 shards, 225 passed + 1 known mirror-drift failure, 82 s. The critical path is the 80 s `test_non_disposable_check.py` module — the next lever is splitting that module, not raising N.
+- Budget interaction: 15 writer seats and 8 test shards on 32 CPUs contend; shards run at stage boundaries, never inside a writer wave. The engine already offers `--scope sNNN-of-N` shards for parallel review runs.
