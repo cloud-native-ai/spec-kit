@@ -1,0 +1,43 @@
+{
+  "file": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/092-goal-team-parallel/requirements.md",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "id-contiguous",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "doc-order",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "ref-resolvable",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "marker-count",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "dup-id",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "path-marker",
+      "status": "pass",
+      "count": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 306,
+    "definition_rows": 53,
+    "shared_strings": 6
+  }
+}

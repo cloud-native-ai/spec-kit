@@ -288,9 +288,10 @@ goal 与 team 只有一处落点：`.specify/goal/<slug>/` 与 `.specify/teams/<
 
 ## Assumptions
 
-`A1`–`A8` only; `A9`–`A11` are the clarify-stage additions that follow. Two blocks had accumulated here (a
-clarify-written block and an older requirements-written block); the merge rule and the two diffs it consumed are
-recorded in § Notes → 「Assumptions 双段合并」 so the consolidation is auditable rather than silent.
+本段是**单一连续块**，`A1`–`A11` 共 11 条，编号不重复、不再分段；`A9`–`A11` 是 clarify 阶段的追加，与 `A1`–`A8`
+同处一段，位置不表示不同的裁定来源。本段曾有两个并列块（clarify 段与 requirements 段各写一份 A1–A8），已于
+2026-11-09 analyze-repair 合并；合并规则与它消费的两份差集记录在 § Notes →「Assumptions 双段合并」，因此这次
+合并可审计而不是静默发生。
 
 - **A1（scope 取值名已由 clarify 裁定，不再是待选项）**: 原 A1 把 `--scope` 的两种处置推给 plan。clarify 已裁为「删除 `spec` 取值」，并在本阶段把保留行的取值名钉为 `goal` / `teams`（连同 `auto` 共三成员，唯一 owner 是 FR-025，见 Clarifications 的 Q13）；依据见 Clarifications 的 Q2。实现面（既有 scope 测试的改写清单）仍归 plan/implement 排布。
 - **A2（`/speckit.feedback` 作为首个取证命令，不新增命令）**: 用户点名 `/speckit.feedback`；本特性把它作为命令族扩展的取证实例，但**不新增任何 `/speckit.*` 命令**（状态脊 `non_goals` 已声明）。命令族判定方式由声明层条目 + 既有类别读取入口给出（FR-006、FR-031），取证只覆盖 feedback 一条链。
