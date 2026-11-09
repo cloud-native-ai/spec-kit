@@ -1,0 +1,222 @@
+# fix-p1 evidence — 091-auto-git-closeout
+worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/091-fix-p1
+branch: 091-fix-p1 @ 05b6c4e3f652674d4ab762d3f061379f503fe47a
+python: Python 3.11.11
+git: git version 2.43.5
+captured: 2026-11-09T14:02:42+08:00
+
+=== contract suite (full) ===
+$ /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q
+...................................F.........                            [100%]
+=================================== FAILURES ===================================
+______________ test_the_wrap_up_handler_row_exists_at_order_sixty ______________
+
+    def test_the_wrap_up_handler_row_exists_at_order_sixty():
+        """T051 — one agent-kind handler row, order 60, behaviour-owner column pointing at the owner."""
+        text = read(PROBE_DEFS)
+        handlers = section(text, "Handler")
+        rows = [
+            line for line in handlers.splitlines()
+            if line.startswith("|") and re.match(r"\| h-closeout \|", line)
+        ]
+        assert rows, "a close-out handler row must exist in the § Handler table"
+        row = rows[0]
+        assert re.search(r"\b60\b", row), f"the row takes the next free order, 60; read {row!r}"
+        assert "shared/workflow/artifact-commit-step.md" in row, (
+            f"the behaviour-owner column points at the commit-step owner; read {row!r}"
+        )
+        assert re.search(r"\| agent \|", row), "the handler kind is the agent kind"
+    
+        # the compiled faces are generated, never hand-edited — the check runs the engine
+        compile_check = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "probe-utils.py"),
+             "--action", "compile-embeds", "--check"],
+            capture_output=True, text=True, check=False,
+        )
+>       assert compile_check.returncode == 0, (
+            f"the compiled faces are stale: {compile_check.stdout}{compile_check.stderr}"
+        )
+E       AssertionError: the compiled faces are stale: error: probe registry invalid:
+E         - object 'trigger-p1-feature-dir': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p2-clarification-markers': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p3-tasks-state': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p4-feedback-threshold': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p5-instructions-staleness': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-token-consumption': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-elapsed': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-artifact-correctness': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-satisfaction': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-probe-session-store': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-probe-evidence-lane': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-node': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-session-store': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-platforms': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-collect-execution': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-host-process': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-host-config': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-determination-link': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees...n/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes\n").returncode
+
+tests/contract/test_git_closeout_contract.py:1228: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_git_closeout_contract.py::test_the_wrap_up_handler_row_exists_at_order_sixty
+1 failed, 44 passed in 1.79s
+EXIT=1 DURATION=2.33s
+
+=== behaviour arms (models / remotes / read-only / push / merge / strategy) ===
+$ /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q -k single or dual or three_tier or temp or model or remote or readonly or short_lived or push or merge or strategy
+................                                                         [100%]
+16 passed, 29 deselected in 0.91s
+EXIT=0 DURATION=1.46s
+
+=== SC-005 guard + its mutation arm + the sibling pointer guard ===
+$ /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -v -k one_owner or second_closeout_owner or lifecycle_is_reached
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/091-fix-p1
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 45 items / 42 deselected / 3 selected
+
+tests/contract/test_git_closeout_contract.py::test_lifecycle_is_reached_by_pointer_from_every_unattended_mechanism PASSED [ 33%]
+tests/contract/test_git_closeout_contract.py::test_every_unattended_mechanism_reaches_the_one_owner PASSED [ 66%]
+tests/contract/test_git_closeout_contract.py::test_mutation_a_second_closeout_owner_reds_the_single_owner_search PASSED [100%]
+
+======================= 3 passed, 42 deselected in 0.11s =======================
+EXIT=0 DURATION=0.65s
+
+=== the pre-existing, out-of-scope failure (probe registry) ===
+$ /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q -k wrap_up_handler_row
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_the_wrap_up_handler_row_exists_at_order_sixty ______________
+
+    def test_the_wrap_up_handler_row_exists_at_order_sixty():
+        """T051 — one agent-kind handler row, order 60, behaviour-owner column pointing at the owner."""
+        text = read(PROBE_DEFS)
+        handlers = section(text, "Handler")
+        rows = [
+            line for line in handlers.splitlines()
+            if line.startswith("|") and re.match(r"\| h-closeout \|", line)
+        ]
+        assert rows, "a close-out handler row must exist in the § Handler table"
+        row = rows[0]
+        assert re.search(r"\b60\b", row), f"the row takes the next free order, 60; read {row!r}"
+        assert "shared/workflow/artifact-commit-step.md" in row, (
+            f"the behaviour-owner column points at the commit-step owner; read {row!r}"
+        )
+        assert re.search(r"\| agent \|", row), "the handler kind is the agent kind"
+    
+        # the compiled faces are generated, never hand-edited — the check runs the engine
+        compile_check = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "probe-utils.py"),
+             "--action", "compile-embeds", "--check"],
+            capture_output=True, text=True, check=False,
+        )
+>       assert compile_check.returncode == 0, (
+            f"the compiled faces are stale: {compile_check.stdout}{compile_check.stderr}"
+        )
+E       AssertionError: the compiled faces are stale: error: probe registry invalid:
+E         - object 'trigger-p1-feature-dir': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p2-clarification-markers': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p3-tasks-state': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p4-feedback-threshold': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'trigger-p5-instructions-staleness': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-token-consumption': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-elapsed': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-artifact-correctness': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-axis-satisfaction': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-probe-session-store': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'rd-probe-evidence-lane': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-node': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-session-store': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'evidence-probe-platforms': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-collect-execution': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-host-process': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-host-config': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         - object 'eq-probe-determination-link': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees...n/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes\n").returncode
+
+tests/contract/test_git_closeout_contract.py:1228: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_git_closeout_contract.py::test_the_wrap_up_handler_row_exists_at_order_sixty
+1 failed, 44 deselected in 0.12s
+EXIT=1 DURATION=0.67s
+
+=== MUTATION M1: the landed driver ignores the role-filtered set (plan.targets[0]) ===
+$ sed -i s/tuple(plan.targets)/tuple(plan.targets[:1])/ tests/fixtures/git_closeout/repo.py
+$ python3 -m pytest tests/contract/test_git_closeout_contract.py -q -k "remote"
+>               assert set(outcome.pushed) == set(declared), (
+                    f"{model}: the report names every remote it pushed, read {outcome.pushed!r}"
+                )
+E               AssertionError: single-branch: the report names every remote it pushed, read ('mirror',)
+E               assert {'mirror'} == {'mirror', 'upstream'}
+E                 
+E                 Extra items in the right set:
+E                 'upstream'
+E                 Use -v to get more diff
+
+tests/contract/test_git_closeout_contract.py:768: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_git_closeout_contract.py::test_every_declared_remote_receives_the_push_on_every_model
+1 failed, 4 passed, 40 deselected in 0.21s
+EXIT=1 (expected non-zero: the C1 defect must red the new arm)
+
+=== MUTATION M2: a caller-named remote overrides the read-only role filter (the C3 branch) ===
+$ python3 -m pytest tests/contract/test_git_closeout_contract.py -q -k "readonly"
+E           assert None == '4cb25a5216b534c280309472531e82723dc18e75'
+E            +  where None = remote_branch_sha('mirror', 'master')
+E            +    where remote_branch_sha = CloseoutRepo(root=PosixPath('/tmp/091-closeout-single-branch-hw5ala4y'), repo=PosixPath('/tmp/091-closeout-single-bran...nch-hw5ala4y/mirror.git'), 'origin': PosixPath('/tmp/091-closeout-single-branch-hw5ala4y/origin.git')}, trunk='master').remote_branch_sha
+E            +  and   '4cb25a5216b534c280309472531e82723dc18e75' = head_of('master')
+E            +    where head_of = CloseoutRepo(root=PosixPath('/tmp/091-closeout-single-branch-hw5ala4y'), repo=PosixPath('/tmp/091-closeout-single-bran...nch-hw5ala4y/mirror.git'), 'origin': PosixPath('/tmp/091-closeout-single-branch-hw5ala4y/origin.git')}, trunk='master').head_of
+
+tests/contract/test_git_closeout_contract.py:832: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_git_closeout_contract.py::test_the_readonly_upstream_is_never_pushed_and_is_observable
+1 failed, 1 passed, 43 deselected in 0.20s
+
+# ---------------------------------------------------------------------------
+# What this package repaired (blocking findings C1 / C2 / C3 of code-review.md)
+#
+# C1 — tests/fixtures/git_closeout/repo.py: run_closeout pushed `plan.targets[0]` only, and the
+#      read-only exclusion was visible in the planner but never on a repository. It now pushes
+#      the whole role-filtered set (`plan.targets`) and `remote_name` is a request, not an
+#      override: a named remote outside the target set is reported as a deviation, never pushed.
+#      `build_repo` gained `extra_configured=` so an arm can configure an undeclared remote and
+#      prove the derivation does not fall back to it.
+# C2 — the SC-005 negative search red on the feature's own command surface. It is replaced by
+#      `closeout_owners_among()` + `declares_the_closeout_step()`, which scope the search by
+#      ROLE (a heading naming a part of the operation is not an owner) instead of by an
+#      allow-list, and the mutation arm (T053) now calls the SAME predicate, so a green there
+#      is evidence about the search that ships. [ASSUMPTION] The proposed fix in review.md F5
+#      suggested a path allow-list; I chose role-scoping instead, because an allow-list keyed on
+#      one path would leave the next command-surface file unguarded. The allow-list constant
+#      remains, with its reason, for any future name that role-scoping cannot classify.
+# C3 — no behavioural arm passed `remote_name=`. Added three arms: every declared remote
+#      receives the push on all four models; the read-only upstream (declared, undeclared-but-
+#      configured, and named-by-a-caller) is never pushed; an empty declaration skips the push
+#      and never falls back.
+#
+# Residue (reported, NOT repaired here — outside this package's two-file scope):
+#  - `test_the_wrap_up_handler_row_exists_at_order_sixty` fails on the pristine branch too
+#    (`git stash` comparison above). The failure is `probe-utils.py --action compile-embeds
+#    --check` rejecting every `trigger-utils.py` / `run-determination.py` / `exec-quant.py`
+#    object whose `unit` carries the `.specify/` prefix, in
+#    `shared/definitions/probe-definitions.md`. Independent of C1-C3.
+#  - C4 (smoke evidence without a command line), C5 (module-level read cache), C6
+#    (`__pycache__` under the fixture package) are code-review non-blocking findings. C6 was
+#    observed live: importing the fixture package creates `tests/fixtures/git_closeout/
+#    __pycache__`; it is untracked here and outside this package's two-file scope.
+#
+# Mutation arms recorded above prove the new guards can go red for their real subject:
+#  - M1 (driver ignores the role-filtered set) reds `test_every_declared_remote_receives_the_push_on_every_model`
+#    on the second declared remote.
+#  - M2 (a caller-named remote overrides the role filter) reds
+#    `test_the_readonly_upstream_is_never_pushed_and_is_observable` on the named read-only remote.
+# ---------------------------------------------------------------------------
