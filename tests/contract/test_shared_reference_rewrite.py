@@ -28,6 +28,8 @@ SHARED_DOCS = {
         "feature-integration.md",
         "feedback-step.md",
         "user-input-protocol.md",
+        # owner of the artifact-commit step and its `## Close-out` section (feature 091)
+        "artifact-commit-step.md",
     },
     "guidelines": {
         "checklist-methodology.md",

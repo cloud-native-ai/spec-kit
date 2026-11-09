@@ -480,11 +480,12 @@ def test_gm03_allowed_set_parses_to_the_registered_rows():
     inside, outside = registered_allowed_set((REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8"))
     # 10 rows from 083 (8 feature paths + 2 absorbed coaching files) + 22 rows
     # registered by 085 for the temporary Goal/Team, stage agents, child lines and
-    # checkpoint protocol. The 083 rows keep their own meaning; this expectation
+    # checkpoint protocol + 1 row registered by 091 for the named `closeout` operation's
+    # command reference. The 083 and 085 rows keep their own meaning; this expectation
     # moves only when a later feature deliberately registers another in-unit path.
-    assert len(inside) == 32, (
-        "GM-03 in-unit rows must register the allowed set (10 from 083 + 22 from 085); "
-        "parsed %d path(s): %s" % (len(inside), sorted(inside))
+    assert len(inside) == 33, (
+        "GM-03 in-unit rows must register the allowed set (10 from 083 + 22 from 085 "
+        "+ 1 from 091); parsed %d path(s): %s" % (len(inside), sorted(inside))
     )
     assert outside, "GM-03 rows 9–18 register the out-of-unit new paths; parsed none"
     for rel in inside:
