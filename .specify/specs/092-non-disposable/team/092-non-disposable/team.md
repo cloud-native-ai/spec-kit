@@ -111,7 +111,7 @@ stage_seats:
     max_parallel: 4
   implement:
     seats: [sdd-implement-coordinator, sdd-implement-executor, sdd-stage-verifier, sdd-stage-integrator, reporter]
-    max_parallel: 8
+    max_parallel: 15
   review:
     seats: [sdd-review-coordinator, sdd-review-executor, sdd-stage-verifier, sdd-stage-integrator, reporter]
     max_parallel: 4
@@ -162,7 +162,7 @@ config:
     implement: 8
     review: 4
   verifier_reserve: 1
-  decomposition_slot_cap: 8
+  decomposition_slot_cap: 15
   checkpoint_policy:
     propose: true
     max_config_changes: 1
@@ -234,7 +234,7 @@ tasks  ──(U4)──►  implement  ──(U4)──►  review
   closes at U4. Checklists / analyze are already-completed canonical stages and are not re-declared here.
 - **In-stage parallelism (checkpoint 03 decision)**: `stage_seats.<stage>.max_parallel` is the ceiling for
   concurrent seats inside one stage — `tasks: 4`, `implement: 8`, `review: 4` — and none exceeds the run's
-  effective concurrency (24, verifier reserve 1). `decomposition_slot_cap: 8` matches the implement ceiling.
+  effective concurrency (24, verifier reserve 1). `decomposition_slot_cap: 15` matches the implement ceiling.
   All write packages share one tree (`isolation: shared-tree`), so concurrent executors MUST hold **disjoint
   write paths**.
 - **Package plan (plan.md § Implement Package Proposal)**: `P1` owner + declaration + registration →
