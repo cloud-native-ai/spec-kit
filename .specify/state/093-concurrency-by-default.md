@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794224585
 stage_base_commit: 215c3dcb
 attempt: 1
 retry_limit: 3
-last_verdict: "FR-036 amendment = applied (user ruling 2026-11-09, routed sdd-capability-or-contract-change at 11:14:16Z): requirements FR-036 + Clarifications session, plan § Test-entry enforcement note, tasks T156–T159 (159 contiguous rows, partition 16+26+30+38+49, 159 ≤ 160), feature-ref 36/36 map rows, register FR-036@093; gates: validate-requirements 0/0 (48 definition rows), validate-tasks 0/0 over 159, pre-analyze requirements/plan/tasks pass 0 errors, validate-decision-tensions 0/0 (5 records), decomposition --mode tasks proceed 36 FR / 159 tasks (ceilings 120/160); evidence test-evidence/amend-fr036-*.txt; amendment self-verified (U4), independent analyze-lite verification pending per next_action. Prior stage: analyze round 4 FVA PASS / FVB corrected D1."
+last_verdict: "Integration wave: WP2+WP3+WP4 merged into the 093 branch (pre-merge per-package greens verified where applicable: WP2 9 passed; WP4 alone 56 red by cross-package design); branch synced onto master (merge ed8168a0d; 4 conflicts resolved as unions — contract.yaml facts (093 flat keys + 094 registered_facts), features.md (093 row + master 094 row), register rows; mirrors re-synced). Combined 12-module run on the merged branch: 22 failed / 122 passed / 2 skipped — the WP2 engine does not yet satisfy the WP4 contract tests (interval semantics, negative-path detection, evidence forms, verdict named-reading, wp-gate ceiling default, and the #class-concurrent-by-default anchor). 093-enginefix fork dispatched to turn all 22 green."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze-lite verification of the amendment, then resume implement waves"
+next_action: "on enginefix completion: pre-merge check in its worktree (12 modules → 0 failed), merge into the 093 branch, gates + mirror sync, push branch; then WP5 release (49 rows) and line closure"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
