@@ -1,5 +1,5 @@
 # coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
-# frozen-from: .specify/specs/*/contracts/* excluding 094-goal-team-parallel | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 66e5b8e369e0 | files: 292 (parsed 185 + named 107)
+# frozen-from: /storage/project/cloud-native-ai/spec-kit/.specify/specs/*/contracts/* excluding 094-goal-team-parallel | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: abfc12d19412 | files: 308 (parsed 193 + named 115)
 003-speckit-agents-command/contracts/agents-command.openapi.yaml#post
 003-speckit-agents-command/contracts/agents-command.openapi.yaml#put
 006-add-qoder-support/contracts/qoder-support.openapi.yaml#get
@@ -573,6 +573,7 @@
 084-harness-triple-structure/contracts/shared-reader.contract.md#C-057
 084-harness-triple-structure/contracts/shared-reader.contract.md#C-058
 084-harness-triple-structure/contracts/shared-reader.contract.md#C-059
+085-sdd-temporary-goal-team/contracts/checkpoint-and-agents.md#C-014
 088-speckit-visualization/contracts/efficiency-element.contract.md#C-65
 088-speckit-visualization/contracts/efficiency-element.contract.md#C-69
 088-speckit-visualization/contracts/efficiency-element.contract.md#C-70

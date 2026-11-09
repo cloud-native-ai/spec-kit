@@ -1,4 +1,4 @@
-# Quickstart — Feature 092
+# Quickstart — Feature 094
 
 Nine walks. S-0 is preflight and must run first; S-1…S-8 each start from a state S-0 produces. Every command runs from
 the repository root. Paths are repo-relative here because the reader runs them here; the evidence records the absolute
@@ -32,8 +32,8 @@ edge rather than read as a regression.
 
 ```bash
 # fixture: a spec directory with no goal/ or team/ subdirectory
-mkdir -p .specify/.tmp/s092/s1/.specify/specs/900-fixture
-cd .specify/.tmp/s092/s1
+mkdir -p .specify/.tmp/s094/s1/.specify/specs/900-fixture
+cd .specify/.tmp/s094/s1
 python3 ../../../../scripts/python/goal-utils.py create demo-command-goal \
   --objective "the feedback bundle is triaged and answered" --scope goal
 python3 ../../../../scripts/python/goal-utils.py binding goal demo-command-goal --json
@@ -121,9 +121,9 @@ Expected: zero residual; the archived trees are enumerable and no receipt lacks 
 ## Teardown
 
 ```bash
-rm -rf .specify/.tmp/s092
+rm -rf .specify/.tmp/s094
 ```
 
 Expected: the fixture root is gone; `git status --short` shows no fixture path. Teardown runs after the last walk that
 uses the fixtures, and before the closure suite — worktrees and fixtures under `.specify/.tmp/` are the duplicate-repo
-trap measured in the 092 execution-lessons record.
+trap measured in the execution-lessons record (`notes/execution-lessons-2026-11-09.md`).

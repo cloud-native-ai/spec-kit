@@ -25,18 +25,21 @@ contracts below are the conformance owner; `plan.md` is the design owner. This p
 | FR-010 | C-32, C-33, C-34, C-35, C-37, C-39 | FR-032 | C-108 |
 | FR-011 | C-40, C-41 | FR-033 | C-104, C-108, C-109, C-110, C-111 |
 | FR-012 | C-43, C-44, C-45 | FR-034 | C-58, C-59, C-60 |
-| FR-013 | C-46, C-47, C-106, C-108 | FR-035 | C-53, C-54, C-55, C-56, C-57, C-68, C-69, C-70 |
+| FR-013 | C-46, C-47, C-106, C-108 | FR-035 | handoff-contract#C-53, handoff-contract#C-54, C-55, C-56, C-57, C-68, C-69, C-70 |
 | FR-014 | C-25 | FR-036 | C-15, C-61, C-62, C-63, C-64 |
 | FR-015 | C-8, C-26 | FR-037 | C-49, C-107 |
-| FR-016 | C-53, C-54, C-55, C-56, C-57, C-58, C-59, C-60, C-61 | FR-038 | C-14, C-15, C-16, C-26 |
+| FR-016 | handoff-contract#C-53, handoff-contract#C-54, C-55, C-56, C-57, C-58, C-59, C-60, C-61 | FR-038 | C-14, C-15, C-16, C-26 |
 | FR-017 | C-64 | FR-039 | C-68, C-69, C-70, C-80, C-81 |
 | FR-018 | C-79, C-80, C-81 | FR-040 | C-73, C-99 |
 | FR-019 | C-62, C-67 | FR-041 | C-102, C-103, C-104, C-105 |
 | FR-020 | C-65, C-66, C-67 | FR-042 | C-42, C-51, C-52 |
-| FR-021 | C-27 | FR-043 | C-53, C-54 |
-| FR-022 | C-107, C-108 | | | |
+| FR-021 | C-27 | FR-043 | unified-archive-and-migration#C-112, unified-archive-and-migration#C-113 |
+| FR-022 | C-107, C-108 | | |
 
-Count: 43 map rows, 43 distinct FR ids — every requirement reaches at least one clause.
+Count: 43 FR entries across 22 physical table rows (two FR cells per row), 43 distinct FR ids — every
+requirement reaches at least one clause. `page#id` cells anchor the four clause ids that were page-ambiguous
+before the D1 renumber (`handoff-contract#C-53` / `#C-54` on FR-016 and FR-035; the archive-page backfill
+clauses are `unified-archive-and-migration#C-112` / `#C-113` on FR-043).
 
 **This table is generated, not authored.** It is the deterministic export of the contracts' own citation
 groups; regenerate it (never hand-edit a cell) with:
@@ -46,15 +49,25 @@ python3 - <<'EOF'   # run from the repo root; same 22-row/two-column layout
 import sys; sys.path.insert(0, '.specify/scripts/python')
 import clause_extract as ce, glob
 files = sorted(glob.glob('.specify/specs/094-goal-team-parallel/contracts/*.md'))
+ANCHOR = {('handoff-contract', 'C-53'), ('handoff-contract', 'C-54'),
+          ('unified-archive-and-migration', 'C-112'), ('unified-archive-and-migration', 'C-113')}
 fr = {}
 for f in files:
+    page = f.rsplit('/', 1)[-1][:-3]
     for cid, frs in ce.clause_citations(f).items():
         for x in frs:
-            fr.setdefault(x, []).append((f.rsplit('/', 1)[-1][:-3], cid))
+            fr.setdefault(x, []).append((page, cid))
 for x in sorted(fr):
-    print(x, [c for _, c in fr[x]])
+    cells = [f'{p}#{c}' if (p, c) in ANCHOR else c
+             for p, c in sorted(fr[x], key=lambda pc: int(pc[1].split('-')[1]))]
+    print(x, cells)
 EOF
 ```
+
+The snippet sorts each FR's clause list by clause number, so regeneration reproduces both membership and
+column order on all 22 rows; the four `page#id` cells are emitted through the `ANCHOR` set. An earlier
+revision printed in contract-file order and therefore differed on five rows in order only (FR-013, FR-029,
+FR-030, FR-037, FR-039); membership was identical on both sides — membership is the invariant, order is not.
 
 `clause_extract.py` is the executable counterpart of
 `.specify/shared/definitions/contract-clause-definitions.md` § 4: a clause cites FRs through the **last

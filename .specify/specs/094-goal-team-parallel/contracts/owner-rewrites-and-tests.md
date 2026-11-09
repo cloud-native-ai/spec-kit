@@ -81,7 +81,7 @@ obligations that make the other four contracts decidable. Every clause here name
 (FR-041)
 - **C-104**: After disposal, `pytest -m contract` MUST be green with respect to the serial baseline
   (`test-evidence/plan-baseline-names.txt`): zero NEW failing ids. An absolute "all green" claim is not a criterion,
-  because 44 ids already fail on this tree for unrelated reasons.
+  because 46 ids already fail on this tree for unrelated reasons.
 
 (FR-041, FR-033)
 - **C-105**: The disposal table MUST be written into `feature-ref.md` § 085 Disposal and mirrored into

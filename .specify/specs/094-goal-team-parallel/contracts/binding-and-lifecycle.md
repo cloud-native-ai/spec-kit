@@ -7,7 +7,7 @@ Owner of the executable rules: `scripts/python/goal-utils.py` (actions `resolve-
 (FR-024) — this contract fixes behaviour and never re-defines a concept.
 
 Clause ids are `C-NNN` inside this specification's contract namespace and are contiguous across the five
-files in `contracts/` (C-1…C-111).
+files in `contracts/` (C-1…C-113).
 
 ## 1. The binding record ([[STR-001]] `binding`)
 

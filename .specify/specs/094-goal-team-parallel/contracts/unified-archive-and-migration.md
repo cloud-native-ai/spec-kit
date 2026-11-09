@@ -121,7 +121,7 @@ probe reading.
   never restated as a constant in a second document (SC-003).
 
 (FR-042)
-- **C-53**: The binding record requirement (C-1) MUST hold for **every** definition in the unified archive,
+- **C-112**: The binding record requirement (C-1) MUST hold for **every** definition in the unified archive,
   including the residents that predate this feature. Measured 2026-11-09: `.specify/goal/*/goal.md` carries 6
   definitions and `.specify/teams/*/team.md` 12, and none carries a `binding` block. Those residents are NOT part
   of the migration subject (C-35, FR-009 names spec-local trees only), so a second, separate action owns them:
@@ -131,7 +131,7 @@ probe reading.
   one file per reading.
 
 (FR-043)
-- **C-54**: `backfill-bindings` MUST write the record `owner: human`, `owner_id: human`, `origin: null` on every
+- **C-113**: `backfill-bindings` MUST write the record `owner: human`, `owner_id: human`, `origin: null` on every
   resident that has no binding block, MUST refuse (exit 2, naming the definition) a resident whose binding block is
   present but incomplete rather than overwriting it, MUST leave every other byte of the definition identical
   (C-6's comparison, applied to an insertion), and MUST be idempotent: a second run over a backfilled tree performs

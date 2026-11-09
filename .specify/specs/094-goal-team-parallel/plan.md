@@ -1,21 +1,21 @@
 # Implementation Plan: goal/team 与 spec 的平行关系（重定义 085 的作用域与绑定模型）
 
 **Branch**: `094-goal-team-parallel` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
-**Requirement → Feature**: `094-goal-team-parallel` → Feature 092 goal/team 与 spec 的平行关系（Goal/Team × Spec Parallelism）
+**Requirement → Feature**: `094-goal-team-parallel` → Feature 094 goal/team 与 spec 的平行关系（Goal/Team × Spec Parallelism）
 **Input**: Specification from `.specify/specs/094-goal-team-parallel/requirements.md` (43 FR / 12 SC; requirements + clarify validated 2026-11-09, commit `8badbd03`)
 
 ## Summary
 
 Feature 085 hung the goal/team mechanism *below* the SDD flow: one scope resolver with a `spec` member
 (`<spec-dir>/goal/`, `<spec-dir>/team/`), one pair of "Temporary Goal / Temporary Team" concepts, and one routing
-carve-out that made `.specify/goal/**` and `.specify/teams/**` forbidden paths for a run. Feature 092 deletes that
+carve-out that made `.specify/goal/**` and `.specify/teams/**` forbidden paths for a run. Feature 094 deletes that
 subordination and replaces the directory-position criterion with a **binding model**:
 
 ```text
 archive layers (STR-002 "archive-scope", closed three rows)
-  .specify/goal/<slug>/     goal archive   ─┐
-  .specify/teams/<slug>/    team archive    ├─ the ONLY write targets (FR-007)
-  .specify/.tmp/            run scratch     ┘  (not an archive row; FR-037)
+  .specify/anchoring/<slug>/goal.md   goal archive  ─┐  (dir renamed from .specify/goal/ upstream 2026-11-09;
+  .specify/teams/<slug>/team.md       team archive   ├─ the ONLY write targets (FR-007)
+  .specify/.tmp/                      run scratch    ┘  (not an archive row; FR-037)
 
 binding record (STR-001), carried inside each definition:
   owner: sdd-run | command-run | human
@@ -44,13 +44,13 @@ single-agent bottleneck (§ Execution Model).
 
 **Language/Version**: Python `>=3.8` (`pyproject.toml` `requires-python`) for `scripts/python/goal-utils.py`, the two declaration facts and the new contract/unit suites; Markdown for concept owners, command templates, skills and contracts. Host interpreter measured `3.11.11` (pytest 8.4.2).
 **Primary Dependencies**: none new. Consumes `declaration_reader.py` (fact reader), `flow-class-check.py` (existing command-class entry, left unmodified), `sync-mirrors.py` + `regen-command-copies.py` (mirror/copy projection), `scripts/bash/run-tests.sh` (serial runner), and the pre-analyze / decomposition / decision-tension gates.
-**Storage**: `.specify/goal/<slug>/` and `.specify/teams/<slug>/` (unified archive, STR-002); `.specify/archive/goal-team/` (migration receipts + archived source trees, STR-003); `<spec-dir>/handoff.md` (STR-004); `<spec-dir>/test-evidence/` (dated records). No new top-level directory; `.specify/.tmp/` is the existing git-ignored scratch row.
+**Storage**: `.specify/anchoring/<slug>/goal.md` and `.specify/teams/<slug>/team.md` (unified archive, STR-002; the goal directory was renamed from `.specify/goal/` upstream 2026-11-09, definition filename unchanged); `.specify/archive/goal-team/` (migration receipts + archived source trees, STR-003); `<spec-dir>/handoff.md` (STR-004); `<spec-dir>/test-evidence/` (dated records). No new top-level directory; `.specify/.tmp/` is the existing git-ignored scratch row.
 **Testing**: pytest (`contract` / `integration` / `serial` markers registered in `pyproject.toml`); Tests Mode ON. Serial baseline captured at plan entry in `test-evidence/plan-baseline-names.txt` (46 pre-existing failing ids, identical across three consecutive serial runs); GATE-1 compares against that serial `FAILED` set, never a parallel-mode reading.
 **Target Platform**: macOS/Linux maintainer hosts and every downstream project initialised from this framework; framework sources are edited here and reach client runtimes through publish → install → `specify init`.
 **Project Type**: SDD framework (shared definitions, declaration facts, skills, command templates, Python engines, tests) — no runtime platform, no scheduler, no daemon.
 **Performance Goals**: no wall-clock promise. The measurable target is execution shape: plan = 6 concurrent packages; implement = at least one stage dispatching several packages concurrently under `write_isolation=worktree`, every dispatch recording requested/effective concurrency.
 **Constraints**: no new `/speckit.*` command; no second goal/team engine or schema; archive-not-delete for every migration; no new top-level directory; no push; framework template neutrality preserved; `flow-class-check.py` and the driver scripts are not modified by the new declaration entries.
-**Scale/Scope**: 43 FR / 12 SC; 1 engine file extended (`goal-utils.py`) with about 9 new actions; 2 concept owners rewritten; 2 declaration facts plus their registration; 3 command templates; 6 skill/reference surfaces; 1 new contract artifact (`handoff.md`) with a three-way key pair; about 8 new test modules plus 11 dispositioned existing modules; 14 real spec-local definitions to migrate (goal 7 / team 7, baseline `test-evidence/requirements-baseline-probe.txt`).
+**Scale/Scope**: 43 FR / 12 SC; 1 engine file extended (`goal-utils.py`) with about 9 new actions; 2 concept owners rewritten; 2 declaration facts plus their registration; 3 command templates; 6 skill/reference surfaces; 1 new contract artifact (`handoff.md`) with a three-way key pair; about 8 new test modules plus 11 dispositioned existing modules; 18 spec-local definition files measured 2026-11-09 (goal 9 / team 9; the team side includes one non-conforming `092-non-disposable/team/team.md` at a one-level path — plan-entry baseline was goal 7 / team 7 in `test-evidence/requirements-baseline-probe.txt`, the tasks-stage reading was 8 / 8 in tasks.md N-4, and the residual probe remains the authority over all three numbers).
 
 ## Constitution Check
 
@@ -61,7 +61,7 @@ single-agent bottleneck (§ Execution Model).
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling cites FR ids; `contracts/` maps 43/43 FR in `feature-ref.md` § Delivery map. |
-| II | Feature-Centric Development | ✅ Pass | Feature 092 row created in `.specify/memory/features.md` and `.specify/memory/features/092.md`; this stage advances `Draft → Planned` only. |
+| II | Feature-Centric Development | ✅ Pass | Feature 094 row created in `.specify/memory/features.md` and `.specify/memory/features/094.md`; this stage advances `Draft → Planned` only. |
 | III | Intent-Driven Development | ✅ Pass | The same-objective binding record and the peer model come from the user's verbatim brief; the two open variants are recorded as T-004 / T-005 with named antitheses. |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Tests Mode ON; every SC and every FR group has a red-first module named in `contracts/owner-rewrites-and-tests.md` X; § Complexity Tracking records the pre-implement baseline as a ruling, not as pre-written red. |
 | V | AI Agent Integration Standards | ✅ Pass | No agent roster or neutral-metadata-key change; the crew/handoff design consumes existing `team.md` seats untouched. |
@@ -70,7 +70,7 @@ single-agent bottleneck (§ Execution Model).
 | VIII | Code as the Single Source of Truth | ✅ Pass | § Execution Premises and § Phase 0 cite live reads: the `goal-utils.py` action list, `resolve_scope` closed set, `create_goal` collision behaviour, `MIRROR_PAIRS`, and the 46-id serial baseline. |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | One engine extended, two fact files, two owners rewritten, one new contract artifact; no scheduler, daemon, registry or second queue. |
 | X | Documentation Naming & Location Conventions | ✅ Pass | `handoff.md` is lowercase and path-semantic (STR-004); `receipts/` and `trees/` under STR-003 are registered in `framework-map.md` (FR-029). |
-| XI | Dogfooding (Self-Application) | ✅ Pass | Framework-source edits only (`scripts/`, `skills/`, `shared/`, `templates/`); `.specify/` copies regenerate through `sync-mirrors.py` / `regen-command-copies.py`; the 092 run itself is migrated by the mechanism it ships (A8). |
+| XI | Dogfooding (Self-Application) | ✅ Pass | Framework-source edits only (`scripts/`, `skills/`, `shared/`, `templates/`); `.specify/` copies regenerate through `sync-mirrors.py` / `regen-command-copies.py`; the 094 run itself is migrated by the mechanism it ships (A8). |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | Reuses `goal-utils.py`, `declaration_reader.py`, `flow-class-check.py`, `sync-mirrors.py`, `create-team` / `run-team` / `improve-team`; migration and probe are actions of the existing engine (RS-004), never a second executable. |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | Strengthens Task Understanding (one binding vocabulary) and Reliable Delivery (handoff contract, territory as mechanism, archive-not-delete); every evidence claim is bounded to a measured reading. |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | Binding / scope / lifecycle owned by `goal-definitions.md` and `conceptual-model.md` (FR-024); the scope value set has one owner doc (FR-025); both facts are owned by `shared/declarations/facts/`; every other surface cites by path. |
@@ -81,7 +81,7 @@ single-agent bottleneck (§ Execution Model).
 | XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | The user-visible surface is one question — where does this goal live, who owns it, who may write it — answered by the binding line; receipt columns and engine actions stay internal. |
 | XX | Efficient Test Execution (Concurrent by Default) | ✅ Pass | GATE-1 baseline is the serial `FAILED` id set in `test-evidence/plan-baseline-names.txt`; targeted suites per package during implement; `serial`-marked tests stay out of the parallel pass. |
 | XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | Every new `goal-utils.py` action inherits the existing `guard_argv` plus `--help` / `--version`; RS-004's joint acceptance pins it. |
-| XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | § Execution Model carries the re-anchor duty into every package brief (rules before goal), matching the 092 driver contract. |
+| XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | § Execution Model carries the re-anchor duty into every package brief (rules before goal), matching the 094 driver contract. |
 
 **Gates Status**: ✅ All 22 rows Pass. No ❌ and no ⚠ row; § Complexity Tracking records one **ruling** (the pre-implement test baseline), which is not a violation.
 
@@ -95,19 +95,19 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 
 ### T-001 — 把「临时 goal」升格为统一档案里的一条绑定记录，而不是保留两层档案
 
-- **decision**: 删除 spec-local 档案层级与「临时/全局」分类，所有定义落 `.specify/goal/` 与 `.specify/teams/`，归属只由 [[STR-001]] 记录的 `owner` / `owner_id` / `origin` 回答。
-- **antithesis**: 保留两层档案，只把 spec-local 路径改名并继续用目录位置回答归属；当仓库只需要「一眼看出哪些 goal 属于活跃 spec」、且没有任何命令运行需要 goal/team 时它更优——无需迁移、无需绑定重写、无需改动 14 条既有定义。
+- **decision**: 删除 spec-local 档案层级与「临时/全局」分类，所有定义落 `.specify/anchoring/<slug>/goal.md` 与 `.specify/teams/<slug>/team.md`，归属只由 [[STR-001]] 记录的 `owner` / `owner_id` / `origin` 回答。
+- **antithesis**: 保留两层档案，只把 spec-local 路径改名并继续用目录位置回答归属；当仓库只需要「一眼看出哪些 goal 属于活跃 spec」、且没有任何命令运行需要 goal/team 时它更优——无需迁移、无需绑定重写、无需改动既有 spec-local 定义（plan-entry 14 条）。
 - **binding_constraints**:
   - pole_a: 归属必须可判定且只有一处回答；目录位置一旦参与回答，两条线就再次变成从属。
-  - pole_b: 既有 14 条 spec-local 定义与全部 scope 测试必须可迁移、可解释，不能一次改动就丢失历史。
-- **discriminating_evidence**: 在同一棵树上创建 `owner=command-run` 与 `owner=sdd-run` 两条定义后断言：`goal-utils.py resolve-scope --json` 的两个根是否恒为 `.specify/goal` 与 `.specify/teams`；结果二值：恒等 / 出现 spec 根。
-- **expected_sacrifice**: SC-003 Source ↓ 一次性迁移 14 条定义必须产出逐条回执，迁移证据面从零变为 14 条。
+  - pole_b: 既有 spec-local 定义（plan-entry 14 条，2026-11-09 复测 18 条）与全部 scope 测试必须可迁移、可解释，不能一次改动就丢失历史。
+- **discriminating_evidence**: 在同一棵树上创建 `owner=command-run` 与 `owner=sdd-run` 两条定义后断言：`goal-utils.py resolve-scope --json` 的两个根是否恒为 `.specify/anchoring` 与 `.specify/teams`；结果二值：恒等 / 出现 spec 根。
+- **expected_sacrifice**: SC-003 Source ↓ 一次性迁移全部 spec-local 定义（plan-entry 14 条；2026-11-09 复测 18 条）必须产出逐条回执，迁移证据面从零变为逐条。
 - **revision_trigger**: 迁移后出现「同一 slug 两条候选」或任一调用方仍能从路径推断归属（契约测试转红）≥2 次 → 重开，恢复分层档案并把它声明为 `origin` 的唯一来源。
 - **tension_id**: T-001
 
 ### T-002 — 可写性写成绑定 × 档案层级的确定性函数，而不是一张 forbidden-paths 禁令
 
-- **decision**: goal 档案在「被任意 team 绑定时只由 `human`（`/speckit.goal`）可写」，team 档案由其 owner 身份可写，越权写以退出码拒绝；不再用 `.specify/goal/**` forbidden path 表达防线。
+- **decision**: goal 档案在「被任意 team 绑定时只由 `human`（`/speckit.goal`）可写」，team 档案由其 owner 身份可写，越权写以退出码拒绝；不再用 `.specify/anchoring/**` forbidden path 表达防线（rename 前该字面为 `.specify/goal/**`）。
 - **antithesis**: 保留 085 的禁令文本（运行与 child line 不得写 `.specify/goal/**`、`.specify/teams/**`）并在派发前检查；当只有一个运行、且所有写入都经 `/speckit.goal` 时它更优——没有新的判定函数要测，也没有跨线失权的意外。
 - **binding_constraints**:
   - pole_a: 平行线必须能各自写自己的档案，禁令式防线会把「谁的档案」变成文档解释问题。
@@ -131,14 +131,14 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 
 ### T-004 — 引擎作用域取值收窄为 `goal` / `teams` / `auto`（`global` 与 `spec` 一并出域），而不是保留位置命名成员
 
-- **decision**: `resolve-scope` 的 `--scope` 只保留封闭三成员 `goal` / `teams` / `auto`：前两个直接命名 [[STR-002]] 的两条档案行，`auto` 表示引擎在两条档案行之间唯一解析；`spec` 按 FR-008 删除，`global` 随档案行改名为 `goal` / `teams` 而不再有对应成员——两个旧取值名一并出域，旧调用以 argparse 既有形态 `invalid choice: <value>` 退出 2。`--spec-dir` 仍被接受，只用于解析 `origin` 与 `auto` 的输入有效性，不再决定落点。〔本条的取值集与 FR-025、契约 [[C-9]] 是同一份；Q13 判读见 requirements.md Clarifications〕
+- **decision**: `resolve-scope` 的 `--scope` 只保留封闭三成员 `goal` / `teams` / `auto`：前两个直接命名 [[STR-002]] 的两条档案行，`auto` 表示引擎在两条档案行之间唯一解析；`spec` 按 FR-008 删除，`global` 随单一全局档案行拆分为两条并列档案行而不再有对应成员——两个旧取值名一并出域，旧调用以 argparse 既有形态 `invalid choice: <value>` 退出 2。`--spec-dir` 仍被接受，只用于解析 `origin` 与 `auto` 的输入有效性，不再决定落点。**成员名命名档案行/定义种类，不命名目录**：上游 2026-11-09 已把 goal 档案行目录从 `.specify/goal/` 改名为 `.specify/anchoring/`（`ARCHIVE_DIRNAME` 实测），定义文件名仍是 `goal.md`（`DEFINITION_FILENAME` 实测），故 `goal` 成员不随目录改名 `anchoring`——改名会同时撕开 FR-025 / 本条 / 契约 C-9 的三面同一取值集，并把「取值 = 目录名」的旧读法重新引入 FR-025 明文禁止的位置语义。引擎现值仍为 `global|spec|auto`，这是本特性要改写的事实起点，不是本条的退让。〔本条的取值集与 FR-025、契约 [[C-9]] 是同一份；Q13 判读见 requirements.md Clarifications；D4 裁决记录见 requirements.md § Notes 的 round-3 小节〕
 - **antithesis**: 保留 `global` / `auto` 两个取值名并只收窄其含义（`global` 不再指「全局目录」而指「档案层」），从而既有 8 个 scope 测试与全部调用脚本的文本几乎不动；当「一次性改完所有调用面」的成本高于「一个名字带着旧含义继续存活」的风险时它更优——零调用方修改。
 - **binding_constraints**:
   - pole_a: 一个取值的**名字**就是它的含义面。让 `global` 改名后继续接受，等于让「全局/临时」这套被本特性判定为误读的词汇以取值名的形状回流，与 FR-025「不含任何以 spec 位置命名的成员」同源的判据对它一样成立。
   - pole_b: 删除成员会让既有调用以退出 2 失败，必须一次性改完 8 个测试模块与全部调用面，包括 `test_scope_resolution.py` 与 `test_goal_scope_engine.py` 的 `global` / `spec` 断言。
 - **discriminating_evidence**: 对 `--scope global`、`--scope spec` 与 `--scope <任意未登记值>` 各执行一次 `resolve-scope`；结果二值：三者以同一 `invalid choice` 形态退出 2 / 任一被接受。反向读数：`--scope goal`、`--scope teams` 各退出 0。
 - **expected_sacrifice**: SC-010 Source ↓ `test_scope_resolution.py` 与 `test_goal_scope_engine.py` 的 22 处 `global` / `spec` 断言全部进入处置清单，其中一部分从断言改为「拒绝该取值」；`goal-utils.py` 中七处 `"global"` 字面量与两处 guidance 字符串一并改动（任务 T013 / T014）。
-- **revision_trigger**: 下游项目报告「一次性迁走既有 `--scope global` / `--scope spec` 调用」阻塞 ≥2 次 → 重开，提供一版只读别名并在声明的版本点移除。
+- **revision_trigger**: 下游项目报告「一次性迁走既有 `--scope global` / `--scope spec` 调用」阻塞 ≥2 次 → 重开，提供一版只读别名并在声明的版本点移除。另一条重开条件（D4 成员名裁决）：下游调用方把成员名当作目录名逐字映射（例如把 `--scope goal` 映射到 `.specify/goal/`）≥2 次 → 重开，把首成员改名为 `anchoring` 并同步 C-9 / 命令模板 / 8 个 scope 测试。
 - **tension_id**: T-004
 
 ### T-005 — 复杂度判定与 goal/team 创建时机绑同一组声明值（任务数门槛）
@@ -160,7 +160,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 - **binding_constraints**:
   - pole_a: goal 档案只有一个写入口（`/speckit.goal` 与 `goal-utils.py`），第二个写入口会撕开 FR-007 的单一落点纪律。
   - pole_b: 迁移是破坏性风险动作，必须有人工可见的入口与回执，不能藏在整理类命令的后台处理里。
-- **discriminating_evidence**: 检索「写 `.specify/goal/**` 的可执行路径」；结果二值：只有 `goal-utils.py` 的登记动作集合 / 出现第二个可执行体。
+- **discriminating_evidence**: 检索「写 `.specify/anchoring/**`（rename 前字面 `.specify/goal/**`）的可执行路径」；结果二值：只有 `goal-utils.py` 的登记动作集合 / 出现第二个可执行体。
 - **expected_sacrifice**: SC-002 Source ↓ 两个命令面各要一份说明（迁移归 goal，探测归 sanitize），读者需要知道去哪执行。
 - **revision_trigger**: sanitize 的调用频率显著高于 goal 且迁移长期未执行 ≥2 轮 → 重开，在 sanitize 里加一个只转调的入口（仍不新增写路径）。
 - **tension_id**: T-006
@@ -188,7 +188,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 ├── data-model.md           # Phase 1 output — 13 entities, validation rules, state transitions
 ├── contracts/              # Phase 1 output — 5 files, 113 clauses
 │   ├── binding-and-lifecycle.md           # C-1…C-30  binding record, scope values, writability, lifecycle, parallelism
-│   ├── unified-archive-and-migration.md   # C-31…C-54  archive layers, receipts, migration, probe, idempotency, resident backfill
+│   ├── unified-archive-and-migration.md   # C-31…C-52, C-112…C-113  archive layers, receipts, migration, probe, idempotency, resident backfill
 │   ├── handoff-contract.md                # C-53…C-70  handoff.md shape, three-way keys, territory, writeback
 │   ├── command-family-and-declarations.md # C-71…C-90  command family, two facts, contract.yaml registration
 │   └── owner-rewrites-and-tests.md        # C-91…C-111  owner rewrites, driver protocol, 085 disposal, evidence
@@ -255,11 +255,11 @@ Owner of this table's shape, its `Status` / `Decision` domains and the invalid-r
 | ID | Premise | Evidence | Status | Decision |
 |----|---------|----------|--------|----------|
 | EP-001 | `python3` >= 3.8 with `pytest` is available and the suite runs without network or a daemon. | `pyproject.toml` `requires-python`; host `python3 --version` = 3.11.11; `test-evidence/plan-baseline-names.txt` produced by `scripts/bash/run-tests.sh` in this session | verified | — |
-| EP-002 | The 14 spec-local definitions in this repository are the migration subject, and their slugs collide with none of the 6 goal / 12 team archive entries. | `test-evidence/requirements-baseline-probe.txt` (goal 7 / team 7); programmatic overlay of the two archive trees against the spec-local trees in this session returned two empty intersections | verified | — |
+| EP-002 | The spec-local definitions the residual probe enumerates are the migration subject — the count is the probe's reading, not a frozen constant: plan-entry 7 goal / 7 team, tasks-stage 8 / 8 (tasks.md N-4), repair-stage 2026-11-09 goal 9 / team 9 definition files (the team side includes one non-conforming `092-non-disposable/team/team.md`) — and their slugs collide with none of the 6 goal / 12 team archive entries. | `test-evidence/requirements-baseline-probe.txt` (goal 7 / team 7); re-measured on this tree 2026-11-09 during analyze-repair round 3 (goal 9 / team 9 files, one at a one-level non-conforming path); programmatic overlay of the two archive trees against the spec-local trees returned two empty intersections | verified | — |
 | EP-003 | `create_goal` and `definition_path` already refuse duplicate definitions, so the single-archive collision refusal (FR-021 and the Edge Case) needs no second detector. | `scripts/python/goal-utils.py` `create_goal` raises `GoalError` when `definition_path(...).exists()`; `definition_path` resolves `archive_root(repo_root)/slug/goal.md` | verified | — |
 | EP-004 | The declaration layer is readable through one entry point and an unregistered fact surfaces as `owner-unavailable`, so two new facts can be consumed without touching `flow-class-check.py`. | `declaration_reader.py --action get --fact flow-class-classes` returns the entry; `load_fact` raises the absent finding for an unknown slug; `flow-class-check.py --action lookup --unit-id spec:094-goal-team-parallel` exits 0 | verified | — |
-| EP-005 | Implement-stage concurrency (up to 6 executors, per-package ceiling 16, worktree writes) has an existing integration queue in 064 and is safe to reuse. | the 092 execution-lessons record in `notes/` § 1 (3-package fix loop, zero integration conflicts); `skills/external/sdd-loop-driver/references/decomposition-model.md` § 13 and § 16 | verified | — |
-| EP-006 | The serial `FAILED` id set is a stable comparison surface and the 44 baseline failures are unrelated to goal/team behaviour. | `test-evidence/plan-baseline-names.txt` (46 fully qualified ids) and `plan-baseline-stability.txt` (empty diff between consecutive runs); goal/team suites are green on this tree — `test_scope_resolution.py` 8 passed, the 7-module goal/team set 171 passed | verified | — |
+| EP-005 | Implement-stage concurrency (up to 6 executors, per-package ceiling 16, worktree writes) has an existing integration queue in 064 and is safe to reuse. | the execution-lessons record `notes/execution-lessons-2026-11-09.md` § 1 (3-package fix loop, zero integration conflicts); `skills/external/sdd-loop-driver/references/decomposition-model.md` § 13 and § 16 | verified | — |
+| EP-006 | The serial `FAILED` id set is a stable comparison surface and the 46 baseline failing ids are unrelated to goal/team behaviour. | `test-evidence/plan-baseline-names.txt` (46 fully qualified ids) and `plan-baseline-stability.txt` (empty diff between consecutive runs); goal/team suites are green on this tree — `test_scope_resolution.py` 8 passed, the 7-module goal/team set 171 passed | verified | — |
 
 ## Inherited Blockers
 
@@ -351,7 +351,7 @@ package reads this `plan.md` as its frame and never re-derives the delivery surf
 |-------|-------|---------------|
 | S0 | Preflight: serial baseline, drift baseline, real-data probe | `test-evidence/plan-baseline-names.txt`; recorded `sync-mirrors --check` reading; `requirements-baseline-probe.txt` |
 | S1 | Binding model and scope value set in `goal-utils.py` (C-1…C-30) | `test_binding_model.py`; rewritten `test_scope_resolution.py` / `test_goal_scope_engine.py` |
-| S2 | Unified archive, `migrate-archive`, residual probe, resident backfill (C-31…C-54) | `test_archive_migration.py`, `test_residual_probe.py`, `test_migration_interruption.py` |
+| S2 | Unified archive, `migrate-archive`, residual probe, resident backfill (C-31…C-52, C-112…C-113) | `test_archive_migration.py`, `test_residual_probe.py`, `test_migration_interruption.py` |
 | S3 | Two declaration facts, their registration, command family (C-71…C-90) | `test_declaration_facts.py`, `test_command_family.py` |
 | S4 | Handoff contract, territory expansion, writeback (C-53…C-70) | `test_handoff_contract.py`, `test_handoff_territory.py` |
 | S5 | Owner rewrites, driver and checkpoint protocol, command templates (C-91…C-97) | binding-model owner assertions; `test_checkpoint_protocol.py` updates; `regen-command-copies --check` |
@@ -369,6 +369,6 @@ Backfilled after the artifacts landed on disk; counts are taken from the files, 
 |----------|------|---------------|
 | Research | [`research.md`](research.md) | R-01…R-31 (31 rulings) |
 | Data model | [`data-model.md`](data-model.md) | 13 entities: E-1 binding record, E-2 goal definition, E-3 team definition, E-4 archive layer, E-5 migration receipt, E-6 residual probe reading, E-7 archive receipt, E-8 handoff contract, E-9 command-family fact, E-10 handoff threshold fact, E-11 legacy key alias, E-12 territory set, E-13 writability decision |
-| Contracts | [`contracts/`](contracts/) | 5 files, 113 clauses: `binding-and-lifecycle.md` C-1…C-30, `unified-archive-and-migration.md` C-31…C-54, `handoff-contract.md` C-53…C-70, `command-family-and-declarations.md` C-71…C-90, `owner-rewrites-and-tests.md` C-91…C-111 |
+| Contracts | [`contracts/`](contracts/) | 5 files, 113 clauses (C-1…C-113; D1 rename): `binding-and-lifecycle.md` C-1…C-30, `unified-archive-and-migration.md` C-31…C-52 + C-112…C-113, `handoff-contract.md` C-53…C-70, `command-family-and-declarations.md` C-71…C-90, `owner-rewrites-and-tests.md` C-91…C-111 |
 | Quickstart | [`quickstart.md`](quickstart.md) | 9 scenarios: S-0 preflight, S-1 command-run goal/team, S-2 migration dry run, S-3 migration apply, S-4 idempotent re-run and conflict, S-5 binding rewrite, S-6 handoff on a complex spec, S-7 crew write refusal and writeback, S-8 residual probe |
 | Feature ref | [`feature-ref.md`](feature-ref.md) | binding, delivery surface, FR→contract map (43/43, generated by `clause_extract.clause_citations`), SC→measurement map (12/12), disclosed rulings |
