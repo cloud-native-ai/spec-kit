@@ -31,9 +31,11 @@ Write domain used — exactly the dispatch's four surfaces:
 | T061 | **partial — artifact closed, guard authored red, engine half unowned** — the `create-team` SKILL.md now carries the handoff discipline (creation timing, `handoff-dangling-key` refusal through the engine, reverse `handoff_ref` written by the engine's binding action, territory expansion, writeback). The guard `test_a_dangling_handoff_key_is_refused_at_creation` drives the engine action `handoff-ref --handoff <path>`; `goal-utils.py` is outside this package's write domain, so the guard is red until that action lands. | `wp04-T061-red-engine-unowned.txt`; § Residual risks |
 | T062 | **closed** — `improve-team/SKILL.md` gains `## Handoff Territory Expansion`: one record per team, `## Territory` → `territory.write`, the four spec artifacts forced into `territory.forbidden`, granted entries inside the spec dir and out of the two archive layers, writeback one record per task. | `wp04-T050-T062-test_the_territory_expansion_is_recorded_and_forbids_the_four_spec_artifacts.txt` |
 
-**Rows closed by this fork: 5 of 8 package rows** (T059, T060, T062 fully; T061 artifact-half)
-**plus 2 delegated guards** (T049, T050) = **7 guards green**; T055/T057/T058 are blocked by
-the dispatch's domain boundary, not by missing behaviour (T056 is already closed by wp03).
+**Rows closed by this fork: 3 of 8 package rows fully** (T059, T060, T062) **plus 2 delegated
+guards** (T049, T050) = **5 guards green by this package**; **T061 is half-closed** (artifact
+delivered into `create-team/SKILL.md`, guard authored red on an unowned engine action);
+**T056 was closed by wp03**; **T055/T057/T058 are blocked** by the dispatch's domain boundary,
+not by missing behaviour.
 
 ## Test readings
 
