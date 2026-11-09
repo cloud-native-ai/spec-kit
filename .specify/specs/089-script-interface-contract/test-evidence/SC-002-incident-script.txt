@@ -1,0 +1,105 @@
+SC-002 — the incident script's flag path is free (T058)
+=======================================================
+
+Clause: SC-002 of requirements.md / C-10 and C-11 of
+contracts/script-interface-criteria.contract.md. The subject is
+`scripts/bash/generate-instructions.sh`: the script whose unguarded `--help` used to rewrite
+`.specify/instructions.md` and append to `.gitignore` (the incident this feature remembers).
+
+Where this was run
+------------------
+`/var/tmp/sc002/tree`, a real `git clone` of this repository at branch
+089-script-interface-contract with the post-T057 `scripts/bash/` copied in. C-10 forbids taking
+the evidence inside the measured tree: the scripts' own temporary directories would mask or
+counterfeit a real write, and the measured tree must not be the thing that gets damaged. The
+clone sits under `/var/tmp`, which is not `noexec` on this host (the owner page § 3 requires
+this; `/tmp` is `noexec` here and is never used).
+
+What was measured
+-----------------
+Two things per tree, and BOTH must hold:
+
+  * the two files SC-002 names — `.specify/instructions.md` and `.gitignore` — by sha256;
+  * the tree's whole `git status --porcelain`, by sha256 and by line count.
+
+Four invocations were run per tree: `-h`, `--help`, `--version`, `--no-such-flag`.
+
+Run 1 — CLEAN tree (the guard block present)
+--------------------------------------------
+--- BEFORE
+instructions.md  d971fe829d145247c45fbbf4cc1cb98f6619db379e5195f46644fef84cd38361
+.gitignore       fcf24bb7ef77bab4e365e2a507e677560b72148c0e03c1ed1949f44689cfa029
+porcelain        5adb7284138bb177f2c6428e962347f10f48e44ae91fb354885dd7450b63b142
+arg=-h            exit=0 stdout_bytes=440  stderr_bytes=0   stdout_lines=6  first_line=[usage: generate-instructions.sh (no options)]
+arg=--help        exit=0 stdout_bytes=440  stderr_bytes=0   stdout_lines=6  first_line=[usage: generate-instructions.sh (no options)]
+arg=--version     exit=0 stdout_bytes=32   stderr_bytes=0   stdout_lines=1  first_line=[generate-instructions.sh 0.0.22]
+arg=--no-such-flag exit=2 stdout_bytes=0   stderr_bytes=483 stdout_lines=0  first_line=[]
+--- AFTER
+instructions.md  d971fe829d145247c45fbbf4cc1cb98f6619db379e5195f46644fef84cd38361
+.gitignore       fcf24bb7ef77bab4e365e2a507e677560b72148c0e03c1ed1949f44689cfa029
+porcelain        5adb7284138bb177f2c6428e962347f10f48e44ae91fb354885dd7450b63b142
+
+Verdict: the pair is IDENTICAL across all four invocations. `-h` and `--help` print one body
+(440 B, 6 lines, carrying `usage`, `options`, `side-effects` and `exit-codes`); `--version`
+prints exactly one line; the undeclared option exits 2 with its error on stderr and nothing on
+stdout. SC-002's positive limb holds.
+
+Run 2 — RED control: the SAME tree with the guard block deleted
+---------------------------------------------------------------
+This is the half that makes the first half mean anything. A check that cannot go red proves
+nothing (fast-fail discipline: "a green check is a claim, not evidence"). The damaged copy is
+byte-identical to the clean one except that the `# Script-interface guard (feature 086)` block
+and its two calls were removed from `scripts/bash/generate-instructions.sh`.
+
+--- BEFORE
+instructions.md  d971fe829d145247c45fbbf4cc1cb98f6619db379e5195f46644fef84cd38361
+.gitignore       fcf24bb7ef77bab4e365e2a507e677560b72148c0e03c1ed1949f44689cfa029
+porcelain        03929d02377c7360210fee07e41e47c364683a3150948e8fe2a873b0655f59d9
+arg=-h            exit=0 stdout_bytes=5019 stderr_bytes=0 stdout_lines=47 first_line=[[2026-11-07 02:15:44][56645][INFO]Generating tool JSON manifests...]
+arg=--help        exit=0 stdout_bytes=5019 stderr_bytes=0 stdout_lines=47 first_line=[[2026-11-07 02:15:45][56962][INFO]Generating tool JSON manifests...]
+arg=--version     exit=0 stdout_bytes=5019 stderr_bytes=0 stdout_lines=47 first_line=[[2026-11-07 02:15:47][57279][INFO]Generating tool JSON manifests...]
+arg=--no-such-flag exit=0 stdout_bytes=5019 stderr_bytes=0 stdout_lines=47 first_line=[[2026-11-07 02:15:49][57587][INFO]Generating tool JSON manifests...]
+--- AFTER
+instructions.md  d971fe829d145247c45fbbf4cc1cb98f6619db379e5195f46644fef84cd38361
+.gitignore       fcf24bb7ef77bab4e365e2a507e677560b72148c0e03c1ed1949f44689cfa029
+porcelain        03929d02377c7360210fee07e41e47c364683a3150948e8fe2a873b0655f59d9
+backup files under `.specify/instructions.md-*`: 1 before the run, 5 after it
+
+Three limbs of the answer move, and any ONE of them is enough to call the control red:
+
+  1. SIZE. Every flag returns the whole 5 019-byte / 47-line reconcile log instead of an
+     answer. One line is the contract's shape for `--version`; 47 lines is the main action.
+  2. THE UNKNOWN OPTION RUNS THE ACTION. `--no-such-flag` exits 0 on the damaged copy — the
+     incident's exact shape, where an undeclared token is silently ignored and the write
+     happens anyway. C-9's rejection is what the truncation above it buys.
+  3. IT WRITES. The `.specify/instructions.md-*` backup count goes from 1 to 5: four more
+     backups, one per invocation, because each invocation is a full reconcile.
+
+The `.gitignore` and `.specify/instructions.md` digests happen to be stable on the damaged copy
+too — this repository's live `instructions.md` is already in the reconciled steady state, and
+the `.gitignore` patterns those runs would append are already present. That is exactly why the
+control records a THIRD observable: a snapshot pair that watches only those two files would be
+green on a script that plainly runs the main action. Watching bytes alone is not enough, and
+this run states that rather than hiding it behind a green.
+
+Conclusion
+----------
+SC-002 holds on the incident script, and the pair used to judge it discriminates: with the
+guard block present nothing changes and every flag answers; with it removed every flag runs
+the reconcile, appends a backup per invocation, and lets an undeclared option through at exit
+0. The zero-byte-change limb and the unknown-option limb are both shown, on a tree outside the
+measured repository.
+
+Reproduce
+---------
+    cd /var/tmp/sc002
+    git clone /cws_data/cloud-native-ai/spec-kit tree && cd tree
+    git checkout 089-script-interface-contract
+    cp /cws_data/cloud-native-ai/spec-kit/scripts/bash/*.sh scripts/bash/
+    cd .. && ./probe.sh /var/tmp/sc002/tree
+    cp -a tree damaged   # then delete the guard block from damaged/scripts/bash/generate-instructions.sh
+    ./probe.sh /var/tmp/sc002/damaged
+
+`probe.sh` is the twelve-line harness quoted in this file's method section; it lives in the
+scratch root, not in the repository, because it is a one-shot capture rather than a shipped
+asset.

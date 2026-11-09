@@ -1,0 +1,74 @@
+# SC-004 — the reload tiers agree across the owner page and the protocol — 2026-11-09
+
+Two sides read line by line: the owner page's tier table and the checkpoint protocol's tier bullet.
+"Agrees" means the same trigger and the same payload for each tier; the cost column is the owner
+page's own (the protocol carries no cost number, see § Legitimate asymmetry).
+
+## Side A — `shared/definitions/re-anchoring-definitions.md` § 2 (lines 40–:48; the table proper at :43–:45)
+
+| Tier | Trigger (verbatim) | Payload (verbatim) | Cost |
+|---|---|---|---|
+| T0 | `:43` 每个核心步骤 | 状态脊的 `driver_contract` + `direction_contract` + `next_action`；或 agent 的分配锚摘要 | 约 1 KB |
+| T1 | `:44` 阶段边界、检测到会话压缩、子代理轮次上限之后、连续两次同向漂移 | 驱动 `SKILL.md` 的 Hard Requirements 段 + checkpoint 协议；agent 的规则摘要 | 约 5 KB |
+| T2 | `:45` 仅在派发形态不清或处置卡死时 | 完整手册与相关 reference | 按需 |
+
+Ban, with its reason, at `:47`–`:48`: "MUST NOT 在每个工具调用后重载整本手册：那是仪式，会把锚淹没在噪声里。"
+
+## Side B — `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 5 (lines 38–:42)
+
+| Tier | Trigger (verbatim) | Payload (verbatim) |
+|---|---|---|
+| T0 | `:38`–`:39` `at every checkpoint` | `the state spine's driver_contract + direction_contract + next_action` |
+| T1 | `:39`–`:40` `at every stage boundary, after a subagent turn-limit stall, and after a detected context compaction` | `the driver SKILL.md Hard Requirements block plus this protocol` |
+| T2 | `:40`–`:41` `only when a dispatch form is unclear or a stall is being handled` | `the full manual plus a reference` |
+
+Ban, with its reason, at `:41`–`:42`: "A full reload of every reference at every step is forbidden: it
+is ceremony and it buries the anchor in noise."
+
+## Tier-by-tier agreement
+
+| Tier | Trigger agrees? | Payload agrees? | Note |
+|---|---|---|---|
+| T0 | yes | yes | "每个核心步骤" (owner) and "at every checkpoint" (protocol) are the same cadence: the protocol is the checkpoint procedure, and `re-anchoring-definitions.md:5` delegates the executable cadence to it, so the protocol's wording is the executable name of the owner's step. |
+| T1 | yes, plus one extension | yes | the owner lists the same three triggers AND "连续两次同向漂移" (two consecutive same-direction drifts); the protocol does not repeat that trigger inside the T1 sentence but carries it as its own rule at `:61` ("Two consecutive audits flagging the same drift escalate as a recurring anomaly"). Same obligation, two locations, no contradiction. |
+| T2 | yes | yes | both gate T2 on "dispatch form unclear" or "a stall being handled"; both call for the full manual. |
+
+## Legitimate asymmetry (named, not smoothed over)
+
+- **Cost figures exist only on side A.** The owner page owns the cost column (`约 1 KB` / `约 5 KB` /
+  `按需`); the protocol states triggers and payloads, never bytes. This is the intended division: the
+  owner owns the tier table, the protocol owns the procedure (`re-anchoring-definitions.md:5`). A copy
+  of the cost column in the protocol would be a second authority for a fact the owner already declares.
+- **Side B names the anchor's source per tier, side A names it once.** A says "状态脊的 … 或 agent 的
+  分配锚摘要"; B says "the state spine's …" and, for agents, "agent 的规则摘要" appears on side A only.
+  Both sides therefore carry the *payload*, and neither adds a tier the other lacks (3 = 3).
+
+## T028 — the anchor carries both halves and is persisted, never conversation-only
+
+| Half | Carrier (owner page) | Carrier (protocol / skill) |
+|---|---|---|
+| **task anchor** (goal verbatim, non-goals, acceptance authority, stage plan, decision gates) | `:17` § 1.1 bullet 2; `:20` "MUST 落在可持久、可重读的载体上（驱动状态脊 / agent 的分配简报），MUST NOT 只存在于会话上下文" | T0's payload `driver_contract + direction_contract + next_action` (protocol `:38`–`:39`) is exactly that tuple in the state spine; `agent-definitions.md:109`–`:110` puts it in every subagent brief |
+| **rule anchor** (the eight operating rules) | `:18`–`:19` rule list; `:59`–`:63` § 3 member-set paragraph (F-08) | the driver `SKILL.md` Hard Requirements block, loaded at T1 (protocol `:39`) |
+
+Neither half has a conversation-only carrier: both name a file (`SPECIFY/state/<line>.md` or the brief)
+and the owner page forbids the conversation as the only carrier.
+
+## T029 — the four-kind core-step set is closed and the tier is chosen by position
+
+| Kind (owner `:25`) | Kind (constitution template/ live, `§ Re-Anchoring`) | Kind (protocol) |
+|---|---|---|
+| 阶段 U4 | "stage U4" | T1 trigger: "every stage boundary" |
+| 包边界 | "package boundary" | (T1, stage boundary) |
+| 检查点 | "checkpoint" | T0 trigger: "at every checkpoint" |
+| 子代理返回 | "subagent return" | T1 trigger: "after a subagent turn-limit stall" |
+
+The set is closed at four: neither the owner page, the two constitutions nor the protocol adds a fifth
+kind, and the reload tier is selected by which kind just happened, never by preference —
+`re-anchoring-definitions.md:67` states it as "选择哪一层由核心步骤的位置决定" and `:47` forbids
+choosing the full reload. Confirmed by reading: no surface says "reload what you feel you need".
+
+## Reading
+
+Three tiers, three triggers, three payloads, one ban with one reason — the two sides agree on every
+tier, the two asymmetries are named above, and neither side adds a tier the other lacks.
+**SC-004 = pass.**

@@ -1,0 +1,5 @@
+# the four guard modules — Feature 090-re-anchoring
+# run at 2026-11-08T22:37:42Z by the plan stage
+# command: /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py -q
+# note: the two FAILED rows are the pre-existing entries recorded in research.md R6 (measured before this stage wrote anything)
+

@@ -1,0 +1,68 @@
+# T084 — positional-flag regression guard (the `goal-utils.py` class)
+
+Task: `tasks.md` T084 (blockedBy T058, T077). Clauses: C-9 (an undeclared `-*` token is
+refused) and FR-018 (existing option semantics unchanged).
+Guards:
+`tests/contract/test_script_interface_contract.py::test_t084_an_option_before_the_subcommand_is_never_silently_ignored`
+and `::test_t084_the_live_goal_utils_position_is_read_and_judged`.
+
+## What is being guarded, measured first
+
+`scripts/python/goal-utils.py` attaches its shared options to BOTH the top parser and every
+subparser, and its own source says what that does not buy (line ~1293):
+
+    # Shared flags are attached to BOTH the top-level parser and every subparser. That does
+    # NOT make them position-independent ... `goal-utils.py --json list` silently emits the
+    # human form and `--repo-root X list` silently resolves to the cwd.
+
+Measured today, on the live script:
+
+| invocation | exit | observation |
+|---|---|---|
+| `goal-utils.py list --json` | 0 | the option AFTER the subcommand is honoured |
+| `goal-utils.py --json list` | 0 | the option BEFORE the subcommand is dropped (human form) |
+| `goal-utils.py --bogus list` | **2** | `error: unrecognized option: --bogus` on stderr, nothing on stdout |
+| `goal-utils.py list --bogus` | **2** | same |
+
+So on this class of script the guarantee is C-9's rejection at both positions; the
+honour-or-refuse choice for a *declared* option before the subcommand is `argparse`'s own
+semantics, and FR-018 forbids changing it inside this feature.
+
+## The fixture assertion (position independence, as it is decidable)
+
+Two scenario trees carry one script each, shaped like `goal-utils.py`: one required
+subcommand, `--json` declared on the top parser and on the subparser, `guard_argv(argv,
+declared=["--json", "list"])` as the first statement of `main()`.
+
+| shape | `list --json` | `--json list` | `--bogus list` | `list --bogus` |
+|---|---|---|---|---|
+| position-independent (echoes a top-level `--json`) | `json`, exit 0 | **`json`, exit 0** | exit 2, stdout empty | exit 2, stdout empty |
+| library-defect (the `goal-utils.py` shape) | `json`, exit 0 | `human`, exit 0 | exit 2, stdout empty | exit 2, stdout empty |
+
+Asserted:
+
+- the AFTER-subcommand baseline is `json` for both shapes (a fixture that is red there would
+  say nothing);
+- for both positions and both shapes, an undeclared token exits **2**, prints
+  `unrecognized option`, and leaves **stdout empty** — the rejection happens before anything is
+  acted on, whichever side of the subcommand the token sits;
+- the position-independent shape honours the option BEFORE the subcommand too
+  (`(0, "json")`);
+- the library-defect shape records `(0, "human")`, and the guard also asserts that
+  `goal-utils.py`'s own source still carries the `NOT make them position-independent`
+  statement — so the fixture's second shape is the measured behaviour of a real script, and
+  deleting that documentation fails the guard instead of passing silently.
+
+## How this covers the requirement
+
+The `goal-utils.py` class cannot be fixed inside 086 (FR-018, and its own comment says the fix
+is "outside 053's declared scope"), so it is covered the way the task asks: a fixture pins the
+shape, C-9's rejection is asserted at both positions inside pytest, and the live script is read
+and recorded in the table above. What the fixture forbids is the silent-ignore-then-act
+outcome, which no shape here exhibits for an UNDECLARED token.
+
+## Verdict
+
+**T084: covered, guard green.** 2 tests, `2 passed`. Position handling for undeclared tokens is
+position-independent (refused at both positions, nothing acted on); the pre-subcommand drop of
+a DECLARED option is pinned as the library's measured, documented behaviour under FR-018.

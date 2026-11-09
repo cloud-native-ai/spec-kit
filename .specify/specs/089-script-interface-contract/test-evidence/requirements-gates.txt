@@ -1,0 +1,94 @@
+# Feature 089 — requirements stage gate readings
+
+Captured: 2026-11-06 (unattended SDD run r20261106T090000Z-086a, stage=requirements)
+Repository: /cws_data/cloud-native-ai/spec-kit
+Branch at capture: 089-script-interface-contract (base 24cb4edc)
+Feature commit: 27b8080d (requirements stage artifacts only; 5b470835 appends this pointer line)
+
+## 1. Deterministic requirements checker (authority for structure)
+
+Command:
+    python3 scripts/python/validate-requirements.py .specify/specs/089-script-interface-contract/requirements.md
+
+Output (verbatim):
+----8<----
+file: .specify/specs/089-script-interface-contract/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 303 lines, 31 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+----8<----
+
+Exit code: 0
+
+## 2. Flow-class lookup (before / after the `**Flow Class**` declaration)
+
+Before the declaration landed (spec directory absent) — the dispatch payload carried
+`flow_class=null; source=default; error=owner-unavailable`:
+
+Command:
+    python3 scripts/python/flow-class-check.py --action lookup --unit-id "spec:089-script-interface-contract" --repo .
+
+Output (verbatim):
+----8<----
+owner-unavailable: spec input not found: .specify/specs/089-script-interface-contract/requirements.md
+unit_id: spec:089-script-interface-contract
+flow_class: null
+flow_type: null
+source: default
+marker: null
+basis: null
+neutral: false
+----8<----
+
+Exit code: 2 (the degradation branch the dispatch declared; not an author input error —
+the key `spec:089-script-interface-contract` matches `^spec:[a-z0-9][a-z0-9-]*$`).
+
+After the declaration landed (`**Flow Class**: execution` / `**Flow Type**: -`):
+
+Command:
+    python3 scripts/python/flow-class-check.py --action lookup --unit-id "spec:089-script-interface-contract" --repo .
+
+Output (verbatim):
+----8<----
+unit_id: spec:089-script-interface-contract
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+----8<----
+
+Exit code: 0. This reading proves the declaration line is machine-readable and is the same
+reading the plan / tasks / implement stages will reuse.
+
+## 3. Ledger check (flow-class ledger unchanged by this stage)
+
+Command:
+    python3 scripts/python/flow-class-check.py --action check --repo .
+
+Output (verbatim):
+----8<----
+flow-class check: 81 unit(s) scanned, 0 finding(s) [matched=81 inventory_units=81, clean]
+coverage: ledger_rows=81 matched=81 inventory_units=81 gaps=0 parse_errors=0 floor=39
+----8<----
+
+Exit code: 0.
+
+## 4. Stage status
+
+- Stage: requirements
+- Stage outcome: spec written, checker green (0 error / 0 warning), flow class resolved to
+  `execution` from the declaration line, checklist written, branch and Feature registry row
+  landed.
+- Stage verdict: pass
+- Next stage (not entered by this run; owned by the driver): clarify
+- Feature commit: 27b8080d (5 files: requirements.md, checklists/requirements.md,
+  test-evidence/requirements-gates.txt, .specify/memory/features/086.md, features.md row)
+- Evidence-pointer commit: 5b470835 (this file only)

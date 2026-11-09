@@ -1,0 +1,56 @@
+# clause accounting — implement-tree re-measurement — 2026-11-08T23:59:24Z
+
+## T035: the accountant live against the frozen baseline
+$ /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/090-re-anchoring
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-08
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-09
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-10
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-11
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-12
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-13
+UNCOVERED: 088-speckit-visualization/contracts/status-digest.contract.md#C-72
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-23
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-30
+UNCOVERED: 088-speckit-visualization/contracts/supervision-report.contract.md#C-36
+UNCOVERED: 088-speckit-visualization/contracts/supervision-report.contract.md#C-38
+uncovered beyond baseline: 0
+
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 10
+FR claimed: 10
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 31, scanned files 288, clause universe 1908, FR universe 10
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 10 of 10 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+exit=0
+
+$ ... --json | <field projection>
+(first projection attempt raised AttributeError on the `checks` field — it is a list of rows, not a
+ dict; the corrected projection below is the reading. The traceback is kept so the capture records the
+ run that happened, not a retouched one. The engine's own text output above is the authoritative
+ reading and it is unaffected.)
+
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+AttributeError: 'list' object has no attribute 'items'
+status        ok
+errors        0 warnings 0
+baseline      .specify/specs/090-re-anchoring/coverage-baseline.txt present: True freeze: False
+scanned       {'total': 288, 'parsed': 181, 'named_unparseable': 107}
+clause        {'universe': 1908, 'claimed': 31, 'claimed_all_specs': 1310}
+clause.uncovered count 598
+fr            {'universe': 10, 'claimed': 10, 'uncovered': []}
+
+## the FR lane (DoD-1): fr.uncovered == [] and 10 of 10 claimed
+## the clause lane (DoD-2): 31 claimed of 31 clauses on the four pages
+
+## residual clause.uncovered explanation (tasks.md § Notes F-6)
+# the 598-name residual belongs to OTHER specs and is reported, never repaired here: the frozen
+# baseline was produced over a corpus that excludes this feature own clauses by construction.
+# The decidable reading is "no uncovered name beyond the frozen baseline", which the engine
+# reports as clause-uncovered delta 0 (see the check block above).

@@ -1,0 +1,43 @@
+# mirror parity — re-run after every edit of the implement stage — 2026-11-08T23:56:52Z
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --write   (projection pass after the last edit)
+# then the check:
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (416 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (98 files, byte-identical)
+exit=0
+
+## the six pairs plan.md § Mirror Obligations names
+IDENTICAL shared/definitions/re-anchoring-definitions.md
+IDENTICAL shared/definitions/agent-definitions.md
+IDENTICAL templates/constitution-template.md
+IDENTICAL templates/instructions-template.md
+IDENTICAL skills/internal/manage-constitution/SKILL.md
+IDENTICAL skills/external/sdd-loop-driver/references/checkpoint-protocol.md
+
+## the seventh file this stage touched (the budget the C-4 rule permits)
+$ cmp -s scripts/bash/generate-instructions.sh .specify/scripts/bash/generate-instructions.sh
+DRIFT (expected -- see below)
+$ grep -n "INSTRUCTIONS_BUDGET_BYTES=" scripts/bash/generate-instructions.sh .specify/scripts/bash/generate-instructions.sh
+scripts/bash/generate-instructions.sh:100:INSTRUCTIONS_BUDGET_BYTES=38400
+.specify/scripts/bash/generate-instructions.sh:163:INSTRUCTIONS_BUDGET_BYTES=38400
+
+The two files are NOT byte-identical by design: `.specify/` is the *projected* copy and carries the
+bash-version-guard block (64 lines) that `sync-mirrors.py` emits on top of the source. The projection's
+declared rule is source + guard, so a byte comparison is the wrong reading; the right one is that the
+budget value agrees on both sides (38400 = 38400) and `sync-mirrors.py --check` accepts the pair, which
+it does (exit 0, `ok scripts/ == .specify/scripts/ (121 files, byte-identical)` — the check compares
+the projection FORM, not raw bytes).
+
+# reading: six pairs byte-identical, the generated/projected scripts pair accepted by the engine's own
+# check, sync-mirrors.py --check exit 0. New drift on any named pair would be a failure of this stage.

@@ -1,0 +1,67 @@
+# SC-004 — a clean downstream project receives the rule from the generators
+# Host: 499e05d41efc   Date: 2026-11-06T18:28:45+08:00
+# Scope: T027. Path marker: final (requirements.md SC-004).
+
+## Setup — a CLEAN project, initialised by the working tree's own sources
+An isolated venv was built and THIS working tree installed into it editable, so the CLI that
+runs is the tree under test, not a released package:
+  $ /usr/bin/python3 -m venv /var/tmp/086-sc004/venv
+  $ /var/tmp/086-sc004/venv/bin/pip install hatchling editables
+  $ /var/tmp/086-sc004/venv/bin/pip install --no-build-isolation -e /cws_data/cloud-native-ai/spec-kit
+  -> specify-cli-0.0.22 installed from the working tree
+  [the released package at /cws_data/profiles/.venv dates from Aug 6 and carries OLD templates;
+   using it would prove nothing about this amendment]
+
+  $ cd /var/tmp/086-sc004/sc004-probe && specify init --here --ai claude --script sh --no-git --skip-tls --ignore-agent-tools
+  -> exit 0 ; project created at /var/tmp/086-sc004/sc004-probe
+
+## Leg 1 — the CONSTITUTION leg, as the generator actually produces it
+The framework does not ship a ready-made constitution to a downstream project: `specify init`
+copies the constitution TEMPLATE and seeds .specify/memory/constitution.md with a placeholder;
+the project's own /speckit.constitution step fills it in (owner: skills/internal/manage-constitution).
+
+$ cat $P/.specify/memory/constitution.md
+This file is a placeholder for the project constitution. It should be replaced with actual content during development.
+
+use `/speckit.constitution` command line to fill content.
+$ grep -n "Script Interface Contract (Declared, Zero-Side-Effect)" $P/.specify/templates/constitution-template.md
+326:### XIX. Script Interface Contract (Declared, Zero-Side-Effect)
+  -> the generated constitution template carries the principle: PASS
+
+  Byte identity of the downstream template with the framework source:
+  $ diff -q /var/tmp/086-sc004/sc004-probe/.specify/templates/constitution-template.md /cws_data/cloud-native-ai/spec-kit/templates/constitution-template.md
+  -> identical (exit 0)
+
+## Leg 2 — the INSTRUCTIONS leg
+$ grep -n "^## Script Interface Contract$" $P/.specify/templates/instructions-template.md
+102:## Script Interface Contract
+  -> the generated instructions template carries the ambient heading: PASS
+  $ diff -q <(downstream template) <(framework source template)
+  -> identical (exit 0)
+
+  .specify/instructions.md does NOT exist in a fresh downstream project — `specify init` does not
+  run the instructions generator; /speckit.instructions does. Section COUNT of the generated template:
+  template top-level '## ' sections: 33 (framework source: 33)
+
+## Leg 3 — running the downstream copy of generate-instructions.sh (the second generator)
+$ cd $P && bash .specify/scripts/bash/generate-instructions.sh
+exit: 1
+--- complete output ---
+[2026-11-06 18:28:26][3885254][INFO]Generating tool JSON manifests...
+touch: cannot touch '//.gitignore': Permission denied
+--- end ---
+
+## Verdict
+SC-004 = PASS on both elements the criterion names: the clean downstream project's generated
+constitution surface carries the principle title, and its generated instructions surface carries
+the ambient heading. Both come from the generation flow (init's asset copy), byte-identical to
+the framework source, not hand-written into the project.
+
+Known limitation, disclosed rather than folded in: a downstream project that runs its own copy of
+generate-instructions.sh on a NON-GIT tree aborts at line 65, before any instructions reconcile.
+Cause is measured and is not this feature's: common.sh:5 sources ${CWS_LIB_BASH_HOME}/bin/cws_bash_env
+on THIS host, whose git_repo_root() falls back to a path derived from the LIBRARY's own location
+(/cws_data/cws-lib-bash) and returns '/' in a non-git directory, so .gitignore resolves to
+//.gitignore. The same script passes in the T024 evidence because that clone IS a git work tree,
+where git_repo_root() returns the real root. Pre-existing defect (recorded in
+.specify/memory/feedback/backlog.md, 2026-10-15, M-1), outside this package's write territory.

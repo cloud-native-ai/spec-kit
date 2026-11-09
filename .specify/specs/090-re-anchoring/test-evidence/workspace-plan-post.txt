@@ -1,0 +1,5 @@
+# workspace-guard --check — Feature 090-re-anchoring, plan stage
+# run at 2026-11-08T22:37:50Z
+# command: python3 scripts/python/workspace-guard.py --check .specify/specs/090-re-anchoring/test-evidence/workspace-plan-pre.json --repo .
+clean
+exit=0

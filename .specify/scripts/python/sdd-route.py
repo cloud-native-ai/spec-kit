@@ -1020,6 +1020,8 @@ def build_parser() -> argparse.ArgumentParser:
             "Exit 0 for any produced verdict or judged row, 2 for malformed or unreadable input."
         ),
     )
+    _sig_configure(parser)
+
     parser.add_argument("--action", required=True, choices=("route", "authorize", "golden"))
     parser.add_argument("--agent", help="agent definition (.agent.md) carrying the capability")
     parser.add_argument("--team", help="team slug — the first authorization coordinate")
@@ -1050,7 +1052,31 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+# --version, wired through the one version source (C-8)
+#
+# `guard_argv()` answers `--version` (and rejects an undeclared option) BEFORE any parser
+# reads the line, so it works for a flat argparse parser, for one whose subcommands are
+# required, and for the two modules that read sys.argv by hand. It writes nothing and
+# resolves `<script-name> <framework-version>` from the nearest pyproject.toml at run
+# time — this file carries no version literal. `--help` is left to the module's own body.
+import sys as _sig_sys  # noqa: E402
+import pathlib as _sig_pathlib
+
+_SIG_DIR = str(_sig_pathlib.Path(__file__).resolve().parent)
+if _SIG_DIR not in _sig_sys.path:
+    _sig_sys.path.insert(0, _SIG_DIR)
+try:  # the helper owns the rule; an engine copied WITHOUT it still runs its actions
+    from script_interface_cli import configure_parser as _sig_configure  # noqa: E402
+    from script_interface_cli import guard_argv as _sig_guard  # noqa: E402
+except ImportError:  # a sandbox/handler copy carries the engine but not the helper
+    def _sig_configure(parser, **_kwargs):
+        return parser
+
+    def _sig_guard(_argv=None, declared=None, **_kwargs):
+        return None
+
 def main(argv=None) -> int:
+    _sig_guard(argv, declared=['--action', '--agent', '--team', '--seat', '--scope', '--spec-dir', '--nature', '--traceability', '--blast-radius', '--reversibility', '--complexity', '--rationale', '--actor', '--recorded-at', '--owner-doc', '--format'])  # answer --version / reject an undeclared option
     args = build_parser().parse_args(argv)
     try:
         if args.action == "route":

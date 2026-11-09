@@ -78,6 +78,26 @@ Create or update the project constitution — the non-negotiable principles and 
 
 - Use when governance/principles need to be introduced or amended
 
+## Script Interface Contract (Feature 086)
+
+The constitution carries one principle about script entry points: every **functional, non-read-only**
+script answers `-h` / `--help` and `--version` without acting, and rejects an undeclared option.
+Pytest modules, pure libraries and read-only scripts are outside the required set (read-only:
+recommended, optional). The rule's full definition is owned by
+`shared/definitions/script-interface-definitions.md`; this page is a pointer, not a second copy.
+
+The deterministic checker is `scripts/python/script-interface-check.py`:
+
+```bash
+python3 scripts/python/script-interface-check.py --root .           # human report
+python3 scripts/python/script-interface-check.py --root . --json    # machine report
+python3 scripts/python/script-interface-check.py --root . --check-projection
+```
+
+Exemption and optional bases in the report: `pytest-module`, `optional-read-only`, `out-of-scope`,
+`historical-record`, `declared-exception`. The checker runs every executable probe in a sandbox copy
+and reports `probe-escaped` if the measured repository changes.
+
 ## Next Steps
 
 - Run [`/speckit.feature`](feature.md) to refresh the feature index under updated rules

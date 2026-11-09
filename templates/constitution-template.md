@@ -354,6 +354,65 @@ run, and the two fail independently — an idle suite keeps its coverage number 
 protection while every report stays green. Naming execution cost as a quality attribute keeps
 the cheaper-to-run suite from becoming a suite nobody runs.
 
+### XX. Script Interface Contract (Declared, Zero-Side-Effect)
+Every functional, non-read-only script in this project — and in every project generated from this
+template — MUST answer three questions before it does anything else:
+- A flag present anywhere on the command line MUST win: `-h` and `--help` MAY change nothing,
+  `--version` MUST print one machine-readable identity line, and every question they answer
+  MUST be answered before any action, write, backup or confirmation prompt.
+- An undeclared option MUST be rejected with a non-zero exit and a recognizable error, never
+  silently ignored and never allowed to reach the main action, including after a bare `--`.
+- Any file that acts when run directly MUST satisfy the same contract whether another file
+  also sources or imports it; a script is a script for that reason alone.
+- A pytest module, a pure library, and a read-only script MUST be treated as
+  outside the REQUIRED set
+  (`--help`/`--version` are recommended for a read-only script and optional elsewhere); the
+  owner document owns the mechanical bases (`pytest-module`, `optional-read-only`, `out-of-scope`,
+  `historical-record`).
+- The rule MUST be pointer, not copy: this principle names its owner document and MUST NOT
+  restate that document's label set or classification steps, and neither MUST any other
+  surface that carries the rule.
+- The rule MUST NOT justify a second checker, an extra command, or a new mandatory workflow
+  step: it is enforced on the surfaces that already exist.
+
+Rationale: a script that writes something as a side effect of being asked what it does
+destroys the one safe move a reader has. The standalone points above are the non-delegable
+core, the full definition (candidate derivation, classification, flag content, the
+zero-side-effect boundary, unrecognized-option rejection, exemptions) lives at
+`.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not
+restated, here; the framework's own source copy of that owner stays at
+`shared/definitions/script-interface-definitions.md` and MUST NOT be the path a downstream
+project is told to open. The rule binds framework scripts, scripts of downstream projects and
+third-party scripts alike, and it does not expire because a script was distributed rather than
+authored here.
+
+### XXI. Re-Anchoring (不忘初心 · 温故而知新)
+Every agent in this project — the driver and every dispatched subagent — MUST keep its original
+task and rules in view, and MUST re-confirm them after every core step:
+- **不忘初心 (Never Forget the Initial Rules and Task)**: the entry anchor MUST persist BOTH the task
+  anchor (goal verbatim, non-goals, acceptance authority, stage plan, decision gates) AND the RULE anchor
+  (the operating rules in force: unattended / no approval request / U4 -> next stage / spine before action /
+  workspace guard / fast-fail / the gate discipline / budget and report discipline). A compaction, handoff or reentry MUST resume
+  from that anchor, never from memory or impression.
+- **温故而知新 (Review the Old, Know the New)**: after every core step (stage U4, package
+  boundary, checkpoint, subagent return), the agent MUST run compact -> reload -> evaluate and
+  answer the five rule-first direction questions, recording one of `on-track` / `correction-applied` /
+  `decision-needed`. The review's primary object is the RULES: the current and next action already
+  carry the goal, while a dropped rule (e.g. "unattended") leaves no trace in them. Only
+  `decision-needed` is surfaced; the audit is a statement, never an approval request.
+- The reload is tiered: T0 (the anchor digest at every core step), T1 (the rule digest at stage
+  boundaries, after a detected compaction and after a subagent turn-limit stall), T2 (the full
+  manual only when a dispatch form is unclear or a stall is handled). A full reload after every
+  tool call MUST NOT be substituted — it is ceremony that buries the anchor.
+- The full definition (the two concepts, the tiers, the agent obligation and its boundaries)
+  lives at `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated, here.
+- This principle adds a reviewing habit, not machinery: it MUST NOT justify a new scorer, a
+  ledger, a scheduler or a second checkpoint system.
+
+Rationale: a long run's most expensive failure is silent drift — the loop keeps executing while
+the original direction has been lost. Rules loaded once at the start do not survive compaction;
+a persisted anchor plus a periodic review does, and it costs one cheap reload per core step.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

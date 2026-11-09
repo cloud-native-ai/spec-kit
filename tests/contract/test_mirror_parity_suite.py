@@ -11,9 +11,11 @@ automatically. House loading pattern: ``tests/contract/helpers_prompt_assets.py`
 What each test pins:
 
 * ``test_mirror_file_byte_identical`` — one param per SOURCE file across all
-  engine pairs; asserts the mirror twin is present and byte-identical. This is
-  the ``compare_pair`` missing/differing half, per file, with both paths in the
-  param id (FR-020: a failure names its own source→mirror file pair and the
+  engine pairs; asserts the mirror twin is present and equal to what the engine
+  would write: byte-identical for an ordinary file, ``project(source)`` for a
+  mirror named in the engine's ``PROJECTED_FILES`` declaration (C-35, 086). This
+  is the ``compare_pair`` missing/differing half, per file, with both paths in
+  the param id (FR-020: a failure names its own source→mirror file pair and the
   node id is directly re-runnable).
 * ``test_pair_mirror_extras_match_engine_strictness`` — the ``extra_in_dst``
   half at exactly the engine's strictness: strict pairs (``scripts``) fail on
@@ -73,11 +75,40 @@ def _file_pair_params():
     return params
 
 
+def _projected_pairs():
+    """The declared projected mirrors, read out of the engine's ONE declaration (C-35).
+
+    The suite must not keep a second list of which mirrors are projected: a list here would
+    be a copy of the rule that drifts the moment the rule changes. Everything below derives
+    from ``PROJECTED_FILES``.
+    """
+    return {
+        (REPO_ROOT / source).resolve(): (mirror, kind)
+        for mirror, kind, source in SYNC_MIRRORS.PROJECTED_FILES
+    }
+
+
 @pytest.mark.parametrize("file_pair", _file_pair_params())
 def test_mirror_file_byte_identical(file_pair):
     src, dst, rel = file_pair
     mirror = dst / rel
     assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+    projected = _projected_pairs().get((src / rel).resolve())
+    if projected is not None:
+        # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+        # equality. The expected bytes come from the engine's own rule, so this suite and
+        # `--check` cannot disagree about what the projection is.
+        _mirror_rel, kind = projected
+        source_text = (src / rel).read_text(encoding="utf-8")
+        expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+        assert applied is True, (
+            f"C-34: the projection of {src / rel} was refused: {expected}"
+        )
+        assert mirror.read_text(encoding="utf-8") == expected, (
+            f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+            f"`source + {kind}` (engine --check reports DIFF[projected])"
+        )
+        return
     assert (src / rel).read_bytes() == mirror.read_bytes(), (
         f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
         "(engine compare_pair DIFF; sync fix owned by 067 T023)"

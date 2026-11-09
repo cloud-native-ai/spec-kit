@@ -116,6 +116,8 @@ def test_ng_05_stdlib_only_engine():
         "argparse", "contextlib", "errno", "fcntl", "hashlib", "json", "os", "re",
         "secrets", "shutil", "socket", "subprocess", "sys", "tempfile", "time",
         "datetime", "pathlib", "__future__",
+        # shipped beside the engine by the same `scripts/` mirror (script-interface guard)
+        "script_interface_cli",
     }
     external = imports - allowed
     assert external == set(), f"non-stdlib imports: {sorted(external)}"

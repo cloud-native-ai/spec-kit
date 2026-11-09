@@ -512,10 +512,25 @@ def test_c015_exit_code_is_non_zero_iff_a_pass_failed(tmp_path):
 # --------------------------------------------------------------------------- #
 @MARK_CONTRACT
 def test_c016_runner_carriers_are_byte_identical():
+    """C-016 under the declared projection: the mirror equals source + bash-version-guard.
+
+    Byte identity was the pre-089 form. `run-tests.sh` now carries the projected version
+    answer, so the pair is judged by the projection the sync engine declares (C-34/C-35),
+    not by raw equality — the mirror is still generated, never hand-edited.
+    """
+    import importlib.util
+
     assert RUNNER.is_file() and MIRROR.is_file()
-    assert RUNNER.read_bytes() == MIRROR.read_bytes(), (
-        "scripts/bash/run-tests.sh and .specify/scripts/bash/run-tests.sh drifted — "
-        "regenerate the mirror with `python3 scripts/python/sync-mirrors.py --write --only scripts/bash`"
+    spec = importlib.util.spec_from_file_location(
+        "sync_mirrors_under_test", ROOT / "scripts" / "python" / "sync-mirrors.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    expected, applied = module.project_source(RUNNER.read_text(encoding="utf-8"),
+                                              "bash-version-guard")
+    assert applied, f"the projection refused the pair: {expected}"
+    assert expected == MIRROR.read_text(encoding="utf-8"), (
+        "scripts/bash/run-tests.sh and .specify/scripts/bash/run-tests.sh drifted from the "
+        "declared projection — regenerate with `sync-mirrors.py --write --only scripts`"
     )
 
 

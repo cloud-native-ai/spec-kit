@@ -1,0 +1,119 @@
+# ordering red control — four arms — 2026-11-08T23:49:35Z
+# guard-tests.contract.md C-7 acceptance form: the new assertion MUST fail on each reworded
+# protocol and MUST pass on the landed one. Each mutant is a copy of the driver skill under
+# test-evidence/tmp/<mutant>/; the tracked protocol is never edited.
+# SPECKIT_CONTRACT_ROOT redirects the module root, so every mutant arm runs the REAL module
+# (same assertions) against the copy.
+
+## Arm 0 (landed) — 2026-11-08T23:49:35Z
+$ /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=no -rA
+.....                                                                    [100%]
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+5 passed in 0.05s
+
+## Mutant m1-goal-first-q1
+$ diff -u skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/m1-goal-first-q1/.../checkpoint-protocol.md
+@@ -44,7 +44,7 @@
+   the goal; a dropped rule leaves no trace in them (the canonical failure: "unattended" was ignored — package
+   boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
+ - Answer five binary questions, each with a path or a reading as evidence:
+-  1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next
++  1. Which goal governs this step, and is each still in force (`unattended` / no approval request / U4 -> next
+      stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?
+   2. Was the last action completed under those rules — no report substituting for execution, no subagent
+      turn-limit treated as a reason to hand back?
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m1-goal-first-q1 /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+E   AssertionError: leg 2: the first question no longer asks which RULES govern the step
+    assert 'Which rules govern this step' in '  1. Which goal governs this step, and is each still in force (`unattended` / no approval request / U4 -> next\n     stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?\n'
+/cws_data/cloud-native-ai/spec-kit/tests/contract/test_sdd_loop_driver_reanchor.py:120: AssertionError: leg 2: the first question no longer asks which RULES govern the step
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+1 failed, 4 passed in 0.05s
+
+## Mutant m2-goal-first-shape
+$ diff -u skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/m2-goal-first-shape/.../checkpoint-protocol.md
+@@ -99,7 +99,7 @@
+ 
+ ## 5. Direction audit
+ - reload tier: <T0 | T0+T1 | T2>
+-- Q1 rules: <which rules, each in force?> — <evidence>
++- Q1 goal: <which rules, each in force?> — <evidence>
+ - Q2 process: <verdict> — <evidence>
+ - Q3 next action: <verdict> — <evidence>
+ - Q4 spine freshness: <verdict> — <evidence>
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m2-goal-first-shape /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+E   AssertionError: leg 3: the minimal shape's first question line is '- Q1 goal: <which rules, each in force?> — <evidence>', not the rules line
+    assert False
+     +  where False = <built-in method startswith of str object at 0x7f33fc175fb0>('- Q1 rules:')
+     +    where <built-in method startswith of str object at 0x7f33fc175fb0> = '- Q1 goal: <which rules, each in force?> — <evidence>'.startswith
+/cws_data/cloud-native-ai/spec-kit/tests/contract/test_sdd_loop_driver_reanchor.py:131: AssertionError: leg 3: the minimal shape's first question line is '- Q1 goal: <which rules, each in force?> — <evidence>', not the rules line
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+1 failed, 4 passed in 0.05s
+
+## Mutant m3-primary-object-goal
+$ diff -u skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/m3-primary-object-goal/.../checkpoint-protocol.md
+@@ -40,7 +40,7 @@
+   every stage boundary, after any subagent turn-limit stall, and after a detected context compaction; **T2** the
+   full manual plus a reference only when a dispatch form is unclear or a stall is being handled. A full reload of
+   every reference at every step is forbidden: it is ceremony and it buries the anchor in noise.
+-- **The audit's primary object is the RULES, not the goal.** The current action and the next one already carry
++- **The audit's primary object is the goal.** The current action and the next one already carry
+   the goal; a dropped rule leaves no trace in them (the canonical failure: "unattended" was ignored — package
+   boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
+ - Answer five binary questions, each with a path or a reading as evidence:
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m3-primary-object-goal /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+F...F                                                                    [100%]
+=================================== FAILURES ===================================
+E   AssertionError: RULES
+    assert 'RULES' in '# Checkpoint Protocol\n\n**When**: after every stage U4 passes and before the next stage is dispatched. A checkpoint ...n- Q5 territory/workspace: <verdict> — <evidence>\n- verdict: <on-track | correction-applied | decision-needed>\n```\n'
+/cws_data/cloud-native-ai/spec-kit/tests/contract/test_sdd_loop_driver_reanchor.py:61: AssertionError: RULES
+E   AssertionError: leg 1: the direction audit no longer states that its primary object is the RULES, not the goal
+    assert None
+     +  where None = <built-in method search of re.Pattern object at 0x270fd00>("\n\n- Reload the loop anchor before answering: **T0** the state spine's `driver_contract` + `direction_contract` +\n ...the user.\n- Two consecutive audits flagging the same drift escalate as a recurring anomaly (fast-fail growth rule).\n")
+     +    where <built-in method search of re.Pattern object at 0x270fd00> = re.compile('primary object is the RULES\\b.*?\\bnot the goal\\b|primary object is the rules\\b.*?\\bnot the goal\\b').search
+/cws_data/cloud-native-ai/spec-kit/tests/contract/test_sdd_loop_driver_reanchor.py:105: AssertionError: leg 1: the direction audit no longer states that its primary object is the RULES, not the goal
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+2 failed, 3 passed in 0.05s
+
+# READING
+# arm 0           : 5 passed — the landed protocol satisfies the guard.
+# m1 (Q1 goal)    : 4 passed, 1 failed — leg 2: the first question no longer asks which RULES govern the step.
+# m2 (shape Q1)   : 4 passed, 1 failed — leg 3: the minimal shape first question line is not the rules line.
+# m3 (primary)    : 3 passed, 2 failed — leg 1 ("no longer states that its primary object is the
+#                   RULES, not the goal") and, additionally, the pre-existing
+#                   test_five_parts_and_direction_audit, because that test's presence marker list
+#                   also contains the bare token "RULES". Disclosed rather than smoothed over:
+#                   m3 is the one mutation an existing green already catches. The gap C-7 closes is
+#                   ORDER, and m3 alone does not demonstrate it — m1 and m2 do, and there the
+#                   pre-existing greens stay green.
+# In every mutant arm the ordering assertion is the failure:
+#   test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+# Self-falsifying premise of SC-002, stated exactly: on the two goal-first rewrites (m1, m2) the
+# four pre-existing tests all still pass, so none of "part 5 exists", "T0/T1/T2 appear", "three
+# verdicts appear", "the minimal shape has part 5" can be cited as ordering evidence.

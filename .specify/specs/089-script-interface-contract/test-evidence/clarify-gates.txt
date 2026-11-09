@@ -1,0 +1,137 @@
+# Feature 089 — clarify stage gate readings
+
+Captured: 2026-11-06 (unattended SDD run r20261106T090000Z-086a, stage=clarify)
+Repository: /cws_data/cloud-native-ai/spec-kit
+Branch at capture: 089-script-interface-contract (stage base commit 19f53dd2)
+Mode: A (post-requirements) — no plan.md exists in the spec dir, so the target is
+requirements.md. The two spec-local questions of run-scope that a driver normally
+asks ("which artifact", "how many rounds") were answered by the dispatch brief.
+
+## 1. Deterministic requirements checker (authority for structure)
+
+Command:
+    python3 scripts/python/validate-requirements.py .specify/specs/089-script-interface-contract/requirements.md
+
+Output (verbatim):
+----8<----
+file: .specify/specs/089-script-interface-contract/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 374 lines, 43 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+----8<----
+
+Exit code: 0
+
+Baseline before this stage (verbatim):
+----8<----
+file: .specify/specs/089-script-interface-contract/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 303 lines, 31 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+----8<----
+
+Delta: 303 -> 374 lines, 31 -> 43 definition rows (31 FR incl. one tombstone + 12 SC).
+
+Two intermediate reds were produced during integration and repaired before this reading;
+they are recorded here because a green that never went red proves nothing:
+
+    doc-order: ORDER BREAK: FR-028 after FR-031 — definition rows must ascend ...
+    ref-resolvable: FR-032 is referenced here but never defined — ...
+
+Both were the same defect: the tombstone row was placed below its neighbours and the
+prose around it cited a next-free id (FR-032) that does not exist. Repair: the tombstone
+sits at its numeric position (between FR-027 and FR-029) and the prose cites no
+nonexistent id. The validator — not a re-reading — supplied both the finding and the
+verdict that it was closed.
+
+## 2. Flow-class lookup (unchanged by this stage)
+
+Command:
+    python3 scripts/python/flow-class-check.py --action lookup --unit-id "spec:089-script-interface-contract" --repo .
+
+Output (verbatim):
+----8<----
+unit_id: spec:089-script-interface-contract
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+----8<----
+
+Exit code: 0. This is the same reading the requirements stage recorded; the clarify stage
+added no `**Flow Class**` line and changed none. No expression-class gate row applies, so
+the stage keeps the existing gate set byte-identical.
+
+## 3. Flow-class ledger (unchanged by this stage)
+
+Command:
+    python3 scripts/python/flow-class-check.py --action check --repo .
+
+Output (verbatim):
+----8<----
+flow-class check: 81 unit(s) scanned, 0 finding(s) [matched=81 inventory_units=81, clean]
+coverage: ledger_rows=81 matched=81 inventory_units=81 gaps=0 parse_errors=0 floor=39
+----8<----
+
+Exit code: 0. 81 units before and after: the clarify stage coined no new flow-class unit.
+
+## 4. Derived-count refresh (taxonomy § Derived-count revisit)
+
+The FR/SC additions falsified the counts in `checklists/requirements.md`. That file was
+re-measured from the spec (never restated from its own previous numbers):
+
+| quantity | before | after | source of the "after" |
+|----------|--------|-------|------------------------|
+| FR definitions   | 23 | 31 | `**FR-(\d+)**` over the live spec body |
+| SC definitions   | 8  | 12 | `**SC-(\d+)**` over the live spec body |
+| acceptance scenarios | 21 | 22 | `^\d+\. \*\*Given\*\*` |
+| edge cases       | 9  | 10 | `^- \*\*` inside § Edge Cases |
+| assumptions      | 9  | 10 | `^- \*\*A\d+ —` |
+
+Residual-literal assertion (the superseded literals MUST return no hit outside the note
+that explains them):
+
+    grep -nE 'FR 23|SC 8|9 edge cases|A1–A9|FR-001…FR-023|303 lines|31 definition' \
+        .specify/specs/089-script-interface-contract/checklists/requirements.md
+
+Output (verbatim):
+----8<----
+84:  nothing): `FR 23`, `SC 8`, `9 edge cases`, `A1–A9` — those four strings are now cited
+----8<----
+
+The single hit is the explanatory note itself, by design; no stale count survives.
+
+## 5. Append-only invariant
+
+`## Clarifications` session rows after this stage: **9** (`- Q:` entries under
+`### Session 2026-11-06`). It was 0 before the stage and 0 rows were rewritten — the
+section was created once and appended to only.
+
+## 6. Stage status
+
+- Stage: clarify
+- Stage outcome: 9 open points decided and integrated into `requirements.md`; validator
+  green (0 error / 0 warning) after two self-caught reds; checklist counts refreshed;
+  Feature 089 detail's Latest Review replaced with the decision list.
+- Stage verdict: pass
+- Next stage (not entered by this run; owned by the driver): plan
+- Sections touched in `requirements.md`: § Overview (amendment pointer), § User Scenarios
+  & Testing (Edge Cases: `-h` collision, mirror/vendored, unclassifiable upstream), §
+  Requirements (FR-002, FR-009, FR-017, FR-020 amended; FR-024 … FR-031 added), § Key
+  Entities (Declared Exception carrier), § Success Criteria (SC-009 … SC-012 + their
+  measurement sources), § Assumptions (A3, A4, A6, A7 decided; A10 added; A2 corrections),
+  § Clarifications (new session block).

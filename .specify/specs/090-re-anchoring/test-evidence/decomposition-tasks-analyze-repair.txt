@@ -1,0 +1,4 @@
+# decomposition-check.py --mode tasks — analyze-repair run (final), 2026-11-08T23:40:26Z
+$ /usr/bin/python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/090-re-anchoring/requirements.md --tasks .specify/specs/090-re-anchoring/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 10, "task_count": 39, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-08T23:40:26Z"}
+exit=0

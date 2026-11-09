@@ -1,0 +1,11 @@
+# FR-lane export check (tasks.md § FR → citation group vs clause_extract.clause_citations) — 2026-11-08T23:39:40Z
+fr.universe 10 fr.claimed 10 fr.uncovered []
+
+per-page citation groups actually extracted:
+direction-audit.contract.md        md-bold-closed {'C-4': ['FR-004'], 'C-6': ['FR-005'], 'C-7': ['FR-007'], 'C-8': ['FR-006']}
+governance-landing.contract.md     md-bold-closed {'C-1': ['FR-002'], 'C-3': ['FR-009'], 'C-4': ['FR-010']}
+guard-tests.contract.md            md-bold-closed {'C-1': ['FR-010'], 'C-2': ['FR-010'], 'C-8': ['FR-010']}
+re-anchoring-faces.contract.md     md-bold-closed {'C-1': ['FR-001'], 'C-3': ['FR-002'], 'C-4': ['FR-003'], 'C-5': ['FR-008'], 'C-6': ['FR-009'], 'C-8': ['FR-001']}
+FRs cited from clause groups: 10 ['FR-001', 'FR-002', 'FR-003', 'FR-004', 'FR-005', 'FR-006', 'FR-007', 'FR-008', 'FR-009', 'FR-010']
+
+expected from tasks.md § FR → citation group: FR-001…FR-010 (10)

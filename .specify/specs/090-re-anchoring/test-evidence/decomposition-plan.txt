@@ -1,0 +1,6 @@
+# decomposition-check --mode plan — Feature 090-re-anchoring
+# run at 2026-11-08T22:37:31Z by the plan stage (SDD Plan Coordinator)
+# command: python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/090-re-anchoring/requirements.md
+
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 10, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-08T22:37:31Z"}
+exit=0

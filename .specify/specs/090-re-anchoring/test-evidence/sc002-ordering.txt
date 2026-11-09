@@ -1,0 +1,83 @@
+# SC-002 — the direction audit asks the RULES first, and that is falsifiable — 2026-11-09
+
+The criterion (`requirements.md` SC-002, tightened at clarify C-4): the five-question order is
+**rules-first** in the checkpoint protocol AND a contract test pins it — the pin MUST NOT be satisfied
+by "some `Q1` appears" or "three verdicts appear", and one test function MUST assert both that Q1
+asks the rules and that the verdict/action precedes any goal statement.
+
+## 1. Landed-versus-mutated pair (the core evidence)
+
+| Arm | Protocol under test | Result |
+|---|---|---|
+| 0 landed | `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` as committed | **5 passed** — the guard is green on the real file |
+| m1 | Q1 reworded to ask the goal (`1. Which goal governs this step`) | **1 failed** (`leg 2`), 4 passed |
+| m2 | the minimal shape's first question relabelled (`- Q1 goal:`) | **1 failed** (`leg 3`), 4 passed |
+| m3 | the primary-object sentence reworded to name the goal | **1 failed** (`leg 1`) plus the pre-existing presence test, 3 passed |
+
+The failing test in every mutant arm is the same function:
+`test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal`.
+Raw output for all four arms: `ordering-red-control.txt`.
+
+**Self-falsifying premise, stated exactly**: on m1 and m2 the four pre-existing tests of the module
+still pass. So "part 5 exists", "T0/T1/T2 appear", "the three verdict values appear" and "the minimal
+shape has part 5" are each provably insufficient — none can be cited as ordering evidence. That is
+why the gap survived; the new test is the first thing in the repository that reds on a goal-first
+rewrite.
+
+**Red-first order**: `red-first-090-c7.txt` records the tree BEFORE the row landed — 4 tests, none of
+them ordering, and `grep -rnE "primary object is the RULES|Q1 rules" tests/` returning nothing. The
+guard therefore could not have passed before it existed.
+
+## 2. How the red control runs without editing the tracked file
+
+`SPECKIT_CONTRACT_ROOT` redirects the module's `ROOT` to a mutated copy under
+`test-evidence/tmp/<mutant>/`, so the same assertions run against the copy and the tracked protocol is
+never touched (`git status` after the whole capture shows the protocol modified only by this stage's
+own contract repair, documented below). This mirrors the mutation-probe form already used by
+`test_constitution_double_landing.py::test_c10` (temp copy, never the real file).
+
+## 3. The landed protocol read against `direction-audit.contract.md` C-4, C-5, C-6
+
+`$ grep -n <pattern> skills/external/sdd-loop-driver/references/checkpoint-protocol.md`
+
+| Clause | Reading |
+|---|---|
+| **C-4** Q1 asks the rules and names the eight-rule set | `:50`–`:51` "1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?" — eight rules, inline, first numbered item |
+| **C-5** exactly three verdicts, only one surfaced | `:58`–`:59` "The verdict is exactly one of `on-track`, `correction-applied`, `decision-needed`. Only `decision-needed` is surfaced; the other two are recorded and the loop continues." |
+| **C-6** verdict/action precede any goal statement; the goal is implicit in Q3 | `:43`–`:45` primary-object statement + its reason; `:46`–`:48` (added this stage) "So the rule verdict and the action it licenses are stated **before** any goal statement: the first question asks the rules, the last two ask the process and the territory, and the goal is asked by no question of its own."; `:53`–`:55` Q3 "(The goal is implicit in it; do not ask the goal as a separate question.)" |
+| **C-7** a statement, never an approval request; mirrored in the driver | `:60` "The audit is a statement, never an approval request: it MUST NOT end with a question to the user."; `skills/external/sdd-loop-driver/SKILL.md:125` carries the same prohibition in Hard Requirement 14 (`MUST NOT 以征求用户「继续」收尾`) |
+| **C-8** tiered and bounded | `:38`–`:42` T0/T1/T2 with triggers, plus "A full reload of every reference at every step is forbidden: it is ceremony and it buries the anchor in noise." |
+| **C-9** repeated drift escalates | `:61` "Two consecutive audits flagging the same drift escalate as a recurring anomaly (fast-fail growth rule)." |
+
+`direction-audit` C-1…C-3 (the mandatory fifth part, the minimal shape carrying the audit, the
+primary object being the rules) are read at `:7` `## The five parts (all mandatory)`, `:36`
+`### 5. Direction audit`, `:103`–`:104` the minimal shape's `## 5. Direction audit` with its
+`reload tier:` line, and `:43` the primary-object sentence.
+
+## 4. Contract repair made by this row (disclosed, not folded into green)
+
+C-6 required more than the protocol said: it demands the ordering be **stated**, not merely
+implied by Q1's position. Before this stage the protocol said "the audit's primary object is the
+RULES" and then asked Q1 first — an order a reader could follow but that no sentence asserted.
+`checkpoint-protocol.md:46`–`:48` now states it explicitly (three lines, mirror re-projected by
+`sync-mirrors.py --write`). This is a correction under fast-fail's test: exactly one reading fits the
+recorded intent (C-6's own wording), it is local and reversible, and it falsifies no downstream
+premise — the guard's leg 1 and the m3 mutant both exercise the sentence.
+
+## 5. The four pre-existing tests are structural only (T015)
+
+| Test | What it asserts |
+|---|---|
+| `test_five_parts_and_direction_audit` | presence: the parts heading, part 5's heading, five marker literals, three verdict literals |
+| `test_reload_tiers_are_bounded` | presence of T0/T1/T2 and the ban sentence |
+| `test_skill_carries_the_rule_and_the_owner_pointer` | presence in `SKILL.md` of the audit name, the protocol pointer and the "no approval request" prohibition |
+| `test_minimal_shape_has_part_five` | presence of part 5 and a `reload tier:` line in the minimal shape |
+
+None reads position, adjacency or ordering. `test_reanchoring_contract.py` likewise asserts presence
+and pointers only (`guard-tests.contract.md` C-5).
+
+## Reading
+
+The ordering proposition is now stated in the protocol, asserted by exactly one test function, and
+that test reds on each of the three stated rewrites while every pre-existing green still passes.
+**SC-002 = pass** (`guard-tests.contract.md` C-7 closed).

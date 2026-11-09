@@ -1,0 +1,159 @@
+# team-create — Feature 090-re-anchoring (spec-local temporary team)
+# run at 2026-11-09 by the dispatched team-creation worker (SDD Stage Integrator, assignment scope: create only)
+# boundary: this file and .specify/specs/090-re-anchoring/team/** are the ONLY writes; no team run, no implementation change, no push
+
+## 1. Authority artifacts read
+
+- goal (authoritative): .specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md — status active, objective + 4 criteria (SC-001…SC-004)
+- creation timing: .specify/specs/090-re-anchoring/checkpoints/01-clarify.md §1 (team created after plan U4 per the 085 cadence); 02-plan.md §3 (proposal pending -> dispatched as the next action)
+- schema owner: .specify/skills/internal/create-team/references/create-mode.md (persisted team.md schema + Schema notes)
+- concept owner: .specify/skills/internal/create-team/references/conceptual-model.md (Temporary (Run-Scoped) Team section)
+- spec-local contract: .specify/specs/085-sdd-temporary-goal-team/contracts/temporary-goal-team.md C-007…C-014
+- pattern owner: .specify/skills/internal/create-team/references/patterns.md (decision tree, Stage granularity discipline, Substance floor)
+- plan write surface: .specify/specs/090-re-anchoring/plan.md § Project Structure / Mirror Obligations
+- concurrency/topology: .specify/state/090-re-anchoring.md § project_config (requested 24 / effective 24, verifier_reserve 1, decomposition_slot_cap 2, shared-tree)
+- governance: .specify/memory/constitution.md v1.19.0; .specify/instructions.md
+
+## 2. Goal-based create branch (verdict disclosed, not gated)
+
+- recognition: the assignment names goal slug `090-re-anchoring`; the definition is spec-scoped and loads via the
+  spec scope root `<spec>/goal/`, not the global archive, so `.specify/memory/goal-utils.py list` (global archive) is
+  not the resolving enumeration for this branch — the spec-local path is the one the 085 model defines (§ Temporary
+  (Run-Scoped) Team: `goal/` and `team/` siblings under the spec directory).
+- load: status=active (not terminal), 1 objective, 4 criteria, no `## Targets` section.
+- four-element analysis (advisory): 维度 = the SDD execution plane (rules reload/evaluation discipline, not a
+  business domain surface); 判据覆盖 = 4 criteria listed (SC-001…SC-004), none missing; 既有 Target = none
+  (no `## Targets` entries, so no reuse baseline and no decomposition object); 可达成性 = single-team short-term
+  achievable — the remaining chain is tasks -> implement -> review over one spec.
+- adjudication recorded: single-team path (no decomposition), `focus_target` not written (no open Target exists;
+  the field's creation rule requires one, and inventing a placeholder is forbidden by Schema notes).
+
+## 3. Preset match (deterministic)
+
+- `python3 skills/internal/create-team/scripts/match-team-preset.py --goal "<090 goal text>"` -> `confidence: none`,
+  `matches: []`. No preset reused; roster and pattern derived from scratch. `preset:` frontmatter omitted.
+
+## 4. Pattern selection
+
+- Q1 long-lived/cadence-driven? NO — one bounded delivery run; the goal has no cadence and the team holds no
+  termination budget/kill-switch of its own. (Long-lived-ness lives in the Goal lifecycle, not the team form.)
+- Q2 independent sub-tasks, no shared mutable state? NO — implement packages edit one shared tree
+  (`isolation: shared-tree`) and several touch the same mirror pairs.
+- Q3 strict sequence, output of one stage feeds the next? YES — tasks -> implement -> review, each stage U4 gated,
+  file-path-only handoff. -> **serial** (质量优先), with in-stage parallel packages ("serial with parallel stages").
+
+## 5. Roster (Role × Stage × Type)
+
+| Seat | SDD stage | Role | Type (by operating object) | Lifecycle | Definition (reused) |
+|------|-----------|------|---------------------------|-----------|---------------------|
+| sdd-task-coordinator | tasks | coordinator | Worker (business artifacts) | temporary | .specify/agents/templates (mirror agents/) |
+| sdd-task-executor | tasks | executor | Worker | temporary | same |
+| sdd-implement-coordinator | implement | coordinator | Worker | temporary | same |
+| sdd-implement-executor | implement | executor | Worker | temporary | same |
+| sdd-review-coordinator | review | coordinator | Worker | temporary | same |
+| sdd-review-executor | review | executor | Worker | temporary | same |
+| sdd-stage-verifier | tasks/implement/review | verifier | Worker | temporary | same |
+| reporter | all stages (lifecycle-wide) | reporter | Meta (run state + its own stream artifact) | temporary | .specify/agents/templates/reporter.agent.md |
+
+- Reuse-first held: **zero seats instantiated**, therefore zero `team-scope:` seat instances and no new agent
+  definition was created (the assignment's conditional path — "instantiate absent seats from the stage frame" — did
+  not fire; every needed capacity already ships as an SDD template).
+- Coordinator duty is carried by the orchestrating SDD driver session (the driver owns stage/slice/next-step and is
+  the sole tracked-artifact writer per the Report contract). Coordinator seats stay in the roster because the 085
+  model §3.6 requires the tasks/implement/review stages to declare a coordinator + executor pair; recorded in
+  `config.coordinator_slot: roster-only`.
+- Verifier independence: `sdd-stage-verifier` is never the executor of the object it verifies; reserve = 1
+  (`config.verifier_reserve`), matching the state spine.
+- Reporter seat (087 obligation): exactly one `role: reporter` row, `reporting-territory` write list holds one stream
+  artifact (`test-evidence/reporter-090-re-anchoring.live.log`), `reporting-cadence: default` (cadence owner:
+  .specify/shared/guidelines/progress-reporting.md). No `config.reporting-reason` recorded — the seat is present.
+
+## 6. Stage seats / concurrency
+
+- stage_seats keys: tasks, implement, review only (the three remaining stages of the assigned scope; requirements /
+  clarify / plan already closed and are not re-declared).
+- max_parallel = 2 on all three stages = `decomposition_slot_cap` from the state spine (no invented third slot) and
+  <= effective concurrency 24.
+- requested 24 / effective 24 (local native subagents, shared-tree), verifier reserve 1, isolation shared-tree.
+
+## 7. Territory
+
+- write: `.specify/specs/090-re-anchoring/**`, the state spine, the six framework-source/mirror pairs named in
+  plan.md § Project Structure / Mirror Obligations, the two live governance files, the four guard test modules and
+  `scripts/bash/generate-instructions.sh`.
+- read: `**` (read overlap allowed).
+- forbidden: `.specify/goal/**`, `.specify/teams/**` (085 C-014) and the five sibling legacy spec directories
+  (085/086/087/088/089) so a package cannot edit another feature's spec.
+- non_path: host agent concurrency and rendered agent surfaces.
+
+## 8. Roster guard (mandatory step)
+
+command: `python3 skills/internal/create-team/scripts/validate-roster.py .specify/specs/090-re-anchoring/team/090-re-anchoring/team.md`
+
+- run 1 -> exit 2, `input error: frontmatter unparsable … (unrecognised frontmatter line: '        - .specify/state/090-re-anchoring.md')`.
+  Cause: the guard's narrow reader maps a member `key:` line with an empty value to a nested **mapping**, so a BLOCK
+  sequence under a member's nested key is rejected. Not a roster defect.
+- repair (correction, disclosed): the reporter's `reporting-territory` lists were written in flow style
+  (`read: [ "…", "…" ]` / `write: [ "…" ]`), the same shape `.specify/specs/088-speckit-visualization/team/087-reporting-dogfood/team.md`
+  already uses and the one the guard's fixture accepts. Semantics unchanged (same three read globs, same one write path).
+- run 2 -> exit 0, `conforming: team 090-re-anchoring carries exactly one reporter seat (agent: reporter)`.
+
+## 9. Structural self-checks (programmatic)
+
+- `members[]` rows: 8; `role: reporter` rows: 1 (cardinality at most one satisfied)
+- `stage_seats` keys: ['tasks', 'implement', 'review']; every seat resolves to a `members[].agent`
+- `## Self-Improvement Contract` occurrences: 1
+- `forbidden` contains `.specify/goal/**` and `.specify/teams/**`
+- team.md size: 10431 bytes; `git check-ignore` -> not ignored (tracked candidate)
+
+## 10. Guard-adjacent contract tests (read-only, unaffected by the new team)
+
+command: `/usr/bin/python3 -m pytest tests/contract/test_temp_team_schema.py tests/contract/test_roster_reporter_seat.py -q`
+result: `31 passed in 0.59s` (these modules pin the 085 team and the guard's own fixtures; they do not enumerate the
+spec-local team population, so a new team cannot make them red).
+
+## 11. Render trigger (SKILL.md step 7) — disclosed deviation
+
+- `specify render-agents --ai qoder` is **not available**: the globally installed `/usr/local/bin/specify` exposes
+  only `init` and `check` (checked via `specify --help`). The project's own CLI source does define the command
+  (`src/specify_cli/__init__.py` `def render_agents`), but reaching it requires editing or shadowing a file the
+  permission surface denies.
+- Deterministic equivalents run instead, one per claim the step exists to make:
+  1. **seats reach the registration surface**: all eight seat definitions already ship as rendered copies in
+     `.qoder/agents/` (pre-existing, unchanged by this creation), so nothing new needed rendering.
+  2. **definitions validate**: `load_project_agent_definitions('.')` -> `20 definitions validated`, exit 0 (neutral
+     metadata contract holds for every definition, including the eight seats).
+  3. **render pipeline is healthy**: `render_agents_for_tool('.', 'qoder')` -> `rendered 20`, `backups []`.
+- side effect and repair (disclosed): call 3 rewrote 17 `.qoder/agents/*.agent.md` plus
+  `.specify/agents/.render-manifest.json` — the render resolves the injected fast-fail pointer literal to
+  `.specify/shared/guides/fast-fail.md` (the runtime path) where the committed copies carry
+  `shared/guidelines/fast-fail.md` (the source-tree path). Pre-existing drift, unrelated to this creation, and outside
+  this assignment's write territory, so it was reverted byte-for-byte (`git checkout -- .qoder/agents/ .specify/agents/.render-manifest.json`);
+  `git status --short` shows none of those paths afterwards.
+
+## 12. Assumptions adjudicated in lieu of interview (recorded, not asked)
+
+- A1 The roster covers only the three stages named in the assignment, with coordinator + executor + independent
+  verifier each; the four closed stages are not re-declared in `stage_seats`. (Read from the assignment brief.)
+- A2 `max_parallel: 2` per stage, from `decomposition_slot_cap` in the state spine — the spine is the authority for
+  concurrency, so no larger number was invented even though effective concurrency is 24.
+- A3 Team slug `090-re-anchoring` equals the spec basename, so the team lives at
+  `team/090-re-anchoring/team.md` (the `<team-root>/<slug>/` form in create-mode) — the same layout the sibling
+  spec-local teams use.
+- A4 `pattern: serial` (not parallel): the stage chain is sequenced and quality-gated; parallelism is per stage only.
+- A5 Reporter seat added (roster obligation) although the assignment did not name it: its omission would only be legal
+  under the RS-05 condition, which does not hold because lanes are executed by dispatched subagents rather than only
+  by the orchestrating session.
+- A6 `config.summary: enabled: false` (run-scoped, as in all sibling spec-local teams) — the goal summary refresh is
+  not this run's product.
+
+## 13. Artifacts
+
+- team definition: `.specify/specs/090-re-anchoring/team/090-re-anchoring/team.md`
+- this evidence: `.specify/specs/090-re-anchoring/test-evidence/team-create.txt`
+- run reports: none — creation only; execution belongs to the SDD driver (no `runs/` directory created).
+
+anomaly:
+- ANOMALY: `specify` CLI on this host lacks `render-agents` (only init/check), so the SKILL.md step-7 render trigger could not be run as written; replaced by equivalent source-level validation (see § 11).
+- ANOMALY: the render pipeline call rewrote 17 `.qoder/agents/*.agent.md` + `.specify/agents/.render-manifest.json` with pre-existing fast-fail pointer-path drift; reverted byte-for-byte because those paths are outside this assignment's write boundary.
+- ANOMALY: `goal-utils.py run-checks` cannot resolve a spec-scoped team by slug even with `--scope spec --spec-dir` (it reads `<spec>/team/<slug>/team.md` while the 085 model and every existing spec-local team store `<spec>/team/team.md`); verified with the landed 085/089 teams as well, so this creation is not the cause and no in-scope repair exists.

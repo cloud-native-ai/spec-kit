@@ -216,21 +216,23 @@ def test_medium_fixture_admitted(admission_engine, tmp_path, medium_template):
     assert payload["checklist"] == "skipped(fast-lane)"
 
 
-def test_large_fixture_denied(admission_engine, tmp_path, large_template):
+def test_large_fixture_is_admitted_under_the_raised_ceiling(admission_engine, tmp_path, large_template):
+    """Stale-expectation update (089): the task ceiling moved 80 -> 160, so a 90-task
+    fixture is inside the window and admits; the full-chain decision is unchanged."""
     project, base = _clone(large_template, tmp_path)
     code, payload = _run(admission_engine, project, base, expected_branch="013-large",
                          spec_name="013-large")
-    assert code == 1, payload and payload["reasons"]
-    assert payload["decision"] == "full-chain"
+    assert code == 0, payload and payload["reasons"]
+    assert payload["decision"] == "fast-lane"
     assert payload["measured"]["task_count"] == 90
-    assert _criteria(payload)["a"]["verdict"] == "fail"
+    assert _criteria(payload)["a"]["verdict"] == "pass"
 
 
 @pytest.mark.parametrize("fr_count,task_count,admitted", [
-    (8, 10, True), (60, 80, True), (7, 80, False), (61, 80, False),
-    (12, 9, False), (12, 81, False),
+    (8, 10, True), (120, 160, True), (7, 160, False), (121, 160, False),
+    (12, 9, False), (12, 161, False),
     # 067 T005 sibling rows (same shape; every row keeps its own assertions and id):
-    (60, 10, True),   # fr upper bound x task lower bound, both inside the window
+    (120, 10, True),  # fr upper bound x task lower bound, both inside the window
     (7, 9, False),    # both counts below their lower bounds
 ])
 def test_task_count_boundary_edges(admission_engine, tmp_path, medium_template,

@@ -1,0 +1,66 @@
+=== checklist stage — readings cited by checklist items (2026-11-09) ===
+
+--- CHK002 / CHK011 / CHK013: the rule-set and tier enumerations in three places ---
+$ sed -n "25p" .specify/specs/090-re-anchoring/requirements.md   # FR-004 rule anchor
+- **FR-004**: 方向锚 MUST 同时包含任务锚（目标逐字、非目标、验收权威、阶段计划、裁定门）与**规则锚**（无人值守/不征求继续/U4→下一阶段/先写脊后行动/workspace guard/fast-fail/确认门/预算）。
+$ sed -n "16,18p" shared/definitions/re-anchoring-definitions.md   # owner § 1.1 rule anchor
+  - **任务锚**：用户原始目标（逐字）、非目标、验收权威、阶段计划、裁定门；
+  - **规则锚**：当前生效的**操作规则集**——无人值守（不征求继续）、U4 通过即派发下一阶段、状态脊先写后动、
+    workspace guard、fast-fail 的纠正/裁定二分、确认门、预算与报告纪律等。
+$ sed -n "44,46p" skills/external/sdd-loop-driver/references/checkpoint-protocol.md   # protocol Q1
+  the goal; a dropped rule leaves no trace in them (the canonical failure: "unattended" was ignored — package
+  boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
+- Answer five binary questions, each with a path or a reading as evidence:
+$ sed -n "27p" .specify/specs/090-re-anchoring/requirements.md   # FR-006 tier triggers
+- **FR-006**: 重载 MUST 分层：T0（方向锚摘要，每核心步骤）、T1（规则摘要，阶段边界/压缩后/子代理轮次上限后）、T2（全文，仅在派发形态不清或处置卡死时）；MUST NOT 每工具调用重载全文。
+$ sed -n "43,43p" shared/definitions/re-anchoring-definitions.md   # owner § 2 T0/T1 rows
+| **T0** | 每个核心步骤 | 状态脊的 `driver_contract` + `direction_contract` + `next_action`；或 agent 的分配锚摘要 | 约 1 KB |
+| **T1** | 阶段边界、检测到会话压缩、子代理轮次上限之后、连续两次同向漂移 | 驱动 `SKILL.md` 的 Hard Requirements 段 + checkpoint 协议；agent 的规则摘要 | 约 5 KB |
+$ grep -n "two consecutive" skills/external/sdd-loop-driver/references/checkpoint-protocol.md
+
+--- CHK014: SC-001 names five faces; data-model.md E-5 lists six ---
+$ sed -n "45p" .specify/specs/090-re-anchoring/requirements.md
+- **SC-001**: owner 文档、两侧宪法、两侧指令面、agent 条款五处同时存在且以指针互引（契约测试）。 **Path**: final
+$ sed -n "62,74p" .specify/specs/090-re-anchoring/data-model.md
+One of the surfaces that must carry the rule. Closed set of six:
+
+| # | Face | Path |
+|---|------|------|
+| 1 | Owner page | `shared/definitions/re-anchoring-definitions.md` |
+| 2 | Constitution (template) | `templates/constitution-template.md` |
+| 3 | Constitution (live) | `.specify/memory/constitution.md` |
+| 4 | Instructions (template) | `templates/instructions-template.md` |
+| 5 | Instructions (live) | `.specify/instructions.md` |
+| 6 | Agent obligation | `shared/definitions/agent-definitions.md` |
+
+Plus the protocol face `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 5, which carries the
+executable procedure rather than the concept.
+
+--- CHK019: SC-003 says green; the baseline carries two pre-existing failures ---
+$ sed -n "47p" .specify/specs/090-re-anchoring/requirements.md
+- **SC-003**: 双落地计数与 watchlist 同批移动；`test_constitution_double_landing` 与 `test_fast_fail_discipline` 绿。 **Path**: final
+$ grep -n "no NEW failure" .specify/specs/090-re-anchoring/tasks.md | head -3
+33:- DoD-4: The four named guard modules carry zero NEW failures against the frozen baseline — `test_reanchoring_contract.py` 4 passed, `test_sdd_loop_driver_reanchor.py` 5 passed after the new row, `test_constitution_double_landing.py` 19 passed, `test_fast_fail_discipline.py` 104 passed 2 failed (both pre-existing, see § Environment Prerequisites).
+56:- The four named guard modules on the untouched tree: **green except two** — probe: `pytest <four modules> -q` @ 2026-11-09 → `2 failed, 129 passed in 1.91s`; the two are `test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies` and `::test_g9_total_equals_frozen_baseline`, both pre-existing (`plan.md` EP-003, `research.md` R6); affected: every no-new-failure row, so acceptance is "no NEW failure", never "green".
+249:- **Pre-existing red set (carried from `plan.md` EP-003)**: the repo-wide contract suite is red before this feature touches anything (49 failed, 6368 passed, 2 skipped at plan time; measured this stage as 2 failed, 129 passed over the four named modules). Acceptance is **no NEW failure against the measured baseline**, never "the suite is green".
+$ cat .specify/specs/090-re-anchoring/test-evidence/tasks-baseline-failed.txt | tail -6
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+
+--- CHK030 / CHK031: non-goals and the no-new-mechanism ban are absent from requirements.md ---
+$ grep -c "Non-Goals\|非目标\|评分系统\|调度器" .specify/specs/090-re-anchoring/requirements.md
+1
+$ grep -n "评分系统\|调度器\|ledger" .specify/specs/090-re-anchoring/plan.md | head -3
+39:ledger, scorer, scheduler or second checkpoint system (FR-001 / constitution XXII last bullet).
+117:  - pole_a: 本纪律 MUST NOT 引入新的评分系统、日志服务或调度器（FR-001 / 宪法 XXII 末条）：多一个机制就多一处会与检查点漂移的第二定义点。
+
+--- CHK035: requirements.md carries no reader declaration ---
+$ grep -c "^\*\*Readers\*\*\|^\*\*Reading scenario\*\*" .specify/specs/090-re-anchoring/requirements.md
+0
+
+--- CHK027: the six pre-landed commits exist as objects (see checklist-self-check.txt § 3) ---
+--- CHK017: the four guard modules named by FR-010 / A5 all exist ---
+present tests/contract/test_reanchoring_contract.py
+present tests/contract/test_sdd_loop_driver_reanchor.py
+present tests/contract/test_constitution_double_landing.py
+present tests/contract/test_fast_fail_discipline.py

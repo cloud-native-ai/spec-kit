@@ -1,0 +1,11 @@
+# validate-tasks.py — analyze-repair run (final), 2026-11-08T23:40:26Z
+$ /usr/bin/python3 .specify/scripts/python/validate-tasks.py .specify/specs/090-re-anchoring/tasks.md
+PASS: .specify/specs/090-re-anchoring/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+
+$ grep -o '\[green: contracts/[^]]*\]' tasks.md | wc -l   # claims
+31
+$ ... | sort -u | wc -l   # distinct clauses
+31
+$ grep -c '^- \[ \] T' tasks.md   # rows
+39

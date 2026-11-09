@@ -1,0 +1,42 @@
+# PKG-3b readings — checker CLI and report faces (T042-T049)
+# captured 2026-11-07 on branch 089-script-interface-contract
+
+## --check-projection on the live tree (twice, byte-compared)
+$ python3 scripts/python/script-interface-check.py --check-projection --root .
+candidates=0 applicable=0 exempt=0 violations=0
+exit=0
+run2 -> exit=0; diff(run1,run2) = empty
+$ ... --check-projection --root . --json
+{
+  "applicable": 0,
+  "candidates": [],
+  "elapsed_ms": 6,
+  "exceptions": [],
+  "exempt": 0,
+  "exemptions": [],
+  "findings": [],
+  "mode": "check-projection",
+  "projection": [],
+  "root": "/cws_data/cloud-native-ai/spec-kit",
+  "schema": "script-interface-check/1",
+  "source": "tracked",
+  "violation_rows": [],
+  "violations": 0
+}
+
+# projection[] is empty because PROJECTED_FILES is declared by T050 (a later package);
+# with no declaration there is no pair to verify, which is the idempotent reading of C-22.
+
+## --json twice on one tree, --skip-probe (743 candidates)
+# differing paths between the two flattened payloads:
+/elapsed_ms
+# every other key and value identical (keys equal: True)
+# counts: candidates=743 exemptions=0 exceptions=0 findings=1 projection=0 violations=0 applicable=0
+# the single finding is ignored-not-probed, resolved=true (all sandbox leftovers dropped)
+
+## --json twice on one tree, probed subset (scripts/python/sync-mirrors.py)
+# run1 exit=1 counts applicable=1 exempt=0 violations=1 elapsed_ms=37067
+# run2 exit=1 counts applicable=1 exempt=0 violations=1 elapsed_ms=35678
+# equal minus elapsed_ms: True
+# row: applicable=True probe=ran basis=entry-point-side-effect zero_side_effect=True
+# violation_rows: [{"missing": ["help","version","unknown-rejected"], "path": "scripts/python/sync-mirrors.py"}]

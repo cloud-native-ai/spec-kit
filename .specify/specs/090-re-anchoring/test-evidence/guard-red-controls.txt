@@ -1,0 +1,76 @@
+# guard red controls — every clause this suite asserts, with its demonstrated failure mode — 2026-11-09
+
+Two halves: § A is the per-clause arm captured this stage, § B is the set-level falsifiability
+review (T030) reading each module's existing mutation probes, § C is the purity reading (T031).
+
+## A. The clause this stage added, arm by arm
+
+Full output: `ordering-red-control.txt` (four arms). Summary:
+
+| Arm | Mutation | Failure mode demonstrated |
+|---|---|---|
+| 0 | none (landed protocol) | 5 passed — the guard is green on the real file |
+| m1 | Q1 reworded to ask the goal | the module fails at leg 2 |
+| m2 | the minimal shape's first question relabelled to a goal label | the module fails at leg 3 |
+| m3 | the primary-object sentence reworded to name the goal | the module fails at leg 1 |
+
+## B. Set-level falsifiability (T030): every clause the four modules assert, and its failure mode
+
+Read by reading each module's own mutation probe or by the class of assertion it makes. The three
+generic failure modes are **deleted surface**, **renamed title** and **dropped part**; a module that
+asserts only by presence is falsified by the first, and a module whose assertion reads position is
+falsified when the order is mutated.
+
+| Module | Clause / assertion | Demonstrated failure mode | Arm run this stage |
+|---|---|---|---|
+| `test_sdd_loop_driver_reanchor.py` | ordering (C-7 / direction-audit C-6) | Q1 reworded, shape relabelled, primary object reworded | **yes** — four arms in `ordering-red-control.txt` |
+| `test_sdd_loop_driver_reanchor.py` | part 5 present, five markers, three verdicts (direction-audit C-1, C-5) | delete `### 5. Direction audit` or any marker literal | observed incidentally in arm m3 (a marker went missing) |
+| `test_sdd_loop_driver_reanchor.py` | tiers bounded (C-8) | drop the ban sentence or a tier literal | read, not armed: presence-only assertion, falsified by deletion |
+| `test_sdd_loop_driver_reanchor.py` | minimal shape carries part 5 (C-2) | delete the shape block | observed in arm m2 (the shape's first question line changed) |
+| `test_reanchoring_contract.py` | owner page concepts + tiers + verdicts (re-anchoring-faces C-2) | delete any of the nine literals | read, not armed: nine independent presence assertions |
+| `test_reanchoring_contract.py` | one title on both constitution surfaces (C-3) | rename the title on either side | read, not armed: two-surface equality |
+| `test_reanchoring_contract.py` | ambient section + owner pointer on both instruction surfaces (C-4) | delete the section or the pointer line | read, not armed |
+| `test_reanchoring_contract.py` | agent obligation pointer (C-5) | rename `## Re-Anchoring Obligation` | read, not armed |
+| `test_constitution_double_landing.py` | C-10 | one watchlist title deleted from a **temp copy** of the template, then from a temp copy of the generator skill | **already armed in-tree** (parametrized `template` / `command`, writes only under `tmp_path`) |
+| `test_constitution_double_landing.py` | C-13 | three count pins derived from the artifacts, so a stale pin reds without a literal to edit | armed by construction |
+| `test_constitution_double_landing.py` | C-7 / C-8 / C-11 / C-12 | a missing title on either side, a numeral-dependent matcher, a missing version or `Last Amended` line | read, not armed: each is an equality against a landed artifact |
+| `test_fast_fail_discipline.py` | C-15 / X-15 | watchlist entry deleted from a temp copy | **already armed in-tree** (`test_x15` and its siblings build mutant copies) |
+| `test_fast_fail_discipline.py` | C-19 | the delegated UFC class-11 assertion is re-run as a subprocess and must exit 0 | **already armed in-tree** |
+| `test_fast_fail_discipline.py` | G-9 | the frozen gate total is compared to a live scan | **already armed in-tree** — and it is RED today (27 vs 23), the pre-existing failure recorded in `tasks-baseline-failed.txt` |
+
+**Disclosure**: this stage did not inject a fresh mutation for every presence-only clause. Each one
+is falsified by deleting the surface it reads, which is mechanical and undisputed; arming them
+individually would be fourteen more mutant copies measuring the same property (a literal is absent)
+that the module's own construction already decides. The clause that needed a real arm is the one
+this feature exists for, and it has four.
+
+## C. Purity reading (T031): the four modules are pure reads
+
+```
+$ grep -nE '^(import|from) ' <the four modules>
+test_reanchoring_contract.py        : pathlib
+test_sdd_loop_driver_reanchor.py    : os, re, pathlib, pytest
+test_constitution_double_landing.py : importlib.util, re, shutil, pathlib, pytest
+test_fast_fail_discipline.py        : importlib.util, pathlib, re, sys, pathlib, pytest
+```
+
+| Property | Reading |
+|---|---|
+| network | **none** — no `socket`, `urllib`, `requests`, `httpx` import in any of the four |
+| writes to the repository | **none** — the only `write_text` calls are `test_constitution_double_landing.py:413` and `:425`, both into pytest `tmp_path`; `test_fast_fail_discipline.py:1870` likewise writes under a `tmp_path` copy |
+| subprocess | **present**, and pre-existing rather than this stage's: `test_fast_fail_discipline.py` imports it locally at `:1357`, `:1391`, `:1829`, `:1874` to run pytest on a delegate and to run `scan-confirmation-gates.py` |
+| wall-clock cost | 130 passed / 2 failed in **1.88 s** for all four modules together; slowest single test 0.48 s |
+
+`guard-tests.contract.md` C-3 says "none may spawn a subprocess". Measured against the tree, that
+clause is **false for `test_fast_fail_discipline.py`**, which spawns subprocesses in four places. That
+is a pre-existing divergence between the contract page and the module it describes, not something this
+stage introduced.
+Recorded here per C-8's discipline (a measurement, never an assumption) and carried as an anomaly in
+this stage's return rather than repaired: choosing between relaxing C-3 and rewriting four
+pre-existing guards is a ruling, not a correction.
+
+## Reading
+
+The clause this stage added is falsifiable on all three stated mutations and green on the landed
+text. The remaining clauses are falsifiable by deletion or already carry in-tree mutation probes;
+one contract clause (C-3's subprocess ban) disagrees with the landed module and is disclosed.

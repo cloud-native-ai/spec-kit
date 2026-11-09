@@ -1,0 +1,2 @@
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies

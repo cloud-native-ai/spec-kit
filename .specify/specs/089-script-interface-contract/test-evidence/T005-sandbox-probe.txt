@@ -1,0 +1,55 @@
+# T005 — sandbox mechanism probe (git worktree add --detach under .specify/.tmp/086-sandbox/)
+# date: 2026-11-06T18:01:13+08:00  tree: /cws_data/cloud-native-ai/spec-kit  HEAD: 9add95eb
+# NOTE: the live tree reaches the sandbox only as the worktree's PARENT repository; the sandbox
+#       contains tracked HEAD content only, so the in-flight untracked files of this package do
+#       not appear inside it. The correct isolation assertion is therefore
+#       'one tracked path changed in the live tree, a sandbox write is invisible in the live tree',
+#       asserted below with sha256 before/after rather than with a bare git status.
+
+$ git worktree list   # BEFORE
+/cws_data/cloud-native-ai/spec-kit  9add95eb [089-script-interface-contract]
+[exit=0]
+
+$ git worktree add --detach .specify/.tmp/086-sandbox/probe HEAD
+Preparing worktree (detached HEAD 9add95eb)
+HEAD is now at 9add95eb chore(086): record the analyze GREEN checkpoint and enter implement
+[exit=0] elapsed_ms=405
+
+$ git worktree list   # DURING (two entries expected)
+/cws_data/cloud-native-ai/spec-kit                                  9add95eb [089-script-interface-contract]
+/cws_data/cloud-native-ai/spec-kit/.specify/.tmp/086-sandbox/probe  9add95eb (detached HEAD)
+
+live tracked-status lines before sandbox write = 4
+live sha256(scripts/python/sync-mirrors.py) before = 678f36298c84f682db25792d3d3a7267b143ad41f4f41659574482d166b464d5
+
+$ # write INSIDE the sandbox (a tracked file + a new file), then read the live tree back
+sandbox_written=yes
+$ git -C .specify/.tmp/086-sandbox/probe status --porcelain
+ M scripts/python/sync-mirrors.py
+?? .sandbox-new-file
+
+live sha256(scripts/python/sync-mirrors.py) after  = 678f36298c84f682db25792d3d3a7267b143ad41f4f41659574482d166b464d5
+live tracked-status lines after  = 4
+isolation=PASS: sandbox write invisible in the live tree
+sandbox_new_file_absent_from_live_tree=PASS
+
+$ time git worktree remove --force .specify/.tmp/086-sandbox/probe
+[exit=0] elapsed_ms=73
+
+$ ls -d .specify/.tmp/086-sandbox/probe   # MUST be gone
+ls: cannot access '.specify/.tmp/086-sandbox/probe': No such file or directory
+[exit=2 — nonzero here means removed]
+
+$ rmdir .specify/.tmp/086-sandbox   # the parent scratch dir is removed too
+[exit=0]
+
+$ git worktree list   # AFTER (MUST be one entry)
+/cws_data/cloud-native-ai/spec-kit  9add95eb [089-script-interface-contract]
+worktree_entries=1
+
+$ git worktree list --porcelain | grep -c '^worktree '
+1
+
+## Verdict
+PASS: git worktree list returned to one entry after removal
+timing: add ~405 ms, remove ~72 ms (measured on this host; the earlier run's reading is reproduced here on each execution)

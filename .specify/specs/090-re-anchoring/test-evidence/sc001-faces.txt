@@ -1,0 +1,102 @@
+# SC-001 — the five rule faces exist and point at one owner — 2026-11-09
+
+Command (all rows): `/usr/bin/python3` reads the file and matches one pattern per row, printing the
+hit count and the first hit line. Re-derived on the implement tree at HEAD `1a274860` plus this
+stage's working-tree edits. Line numbers are **implement-tree** numbers, not generation-time ones.
+
+```
+$ /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py -q
+4 passed in 0.06s
+```
+
+## Face 1 — the owner page (`re-anchoring-faces.contract.md` C-1, C-2, C-8)
+
+| Clause | Evidence | Reading |
+|---|---|---|
+| C-1 owner declaration | `shared/definitions/re-anchoring-definitions.md:3` `**Owner（唯一所有者）**` | the page declares ownership of the concept definitions, the reload tiers and the agent obligation |
+| C-1 delegation by path | same file `:5` `sdd-loop-driver/references/checkpoint-protocol.md § Direction audit` | the executable procedure is delegated, not restated |
+| C-1 owns no machinery | same file `:62`–`:63` § 3 last bullets | no store, ledger, score or schedule is defined |
+| C-2 both concepts | `:1` title, `:15` `不忘初心`, `:27` `温故而知新` | both literals present |
+| C-2 rule anchor | `:17` `**规则锚**` | the anchor carries both halves (T028) |
+| C-2 tiers | `:43` `\| **T0** \|` through `:45` `\| **T2** \|` | three tiers with trigger, payload and cost |
+| C-2 verdicts | `:29` `on-track` / `correction-applied` / `decision-needed` | three literals on one line |
+| C-8 carriers, no machinery | `:62` "本纪律的载体是既有的状态脊、checkpoint、分配简报与 fast-fail 通道" | carriers named, no new machine |
+
+**C-7 (pointer, never a copy) — per-face judgment.** The owner page is the only place carrying the
+tier cost table and the five-question list. Each consumer below names the rule in one sentence and
+links `re-anchoring-definitions.md`; none restates the tier table (no `| **T0** |` row) and none
+enumerates the five questions (no numbered `1.` … `5.` block inside the consumer's own section):
+
+| Consumer | Carries the tier table? | Carries the question list? | Verdict |
+|---|---|---|---|
+| `templates/constitution-template.md` § XXI | no — names T0/T1/T2 by trigger only | no — says "the five rule-first direction questions" | pointer |
+| `.specify/memory/constitution.md` § XXII | no | no | pointer |
+| `templates/instructions-template.md` § Re-Anchoring | no | no | pointer |
+| `.specify/instructions.md` § Re-Anchoring | no | no | pointer |
+| `shared/definitions/agent-definitions.md` § Re-Anchoring Obligation | no | no — says "the five-question verdict" | pointer |
+
+## Face 2 — the two constitution surfaces (C-3; `governance-landing` C-1)
+
+| Surface | Path:line | Reading |
+|---|---|---|
+| template | `templates/constitution-template.md:389` `### XXI. Re-Anchoring (不忘初心 · 温故而知新)` | title verbatim |
+| live | `.specify/memory/constitution.md:490` `### XXII. Re-Anchoring (不忘初心 · 温故而知新)` | title verbatim |
+
+The numeral differs (XXI vs XXII) and MUST NOT be aligned: the live roster carries 13
+project-specific principles the template does not (measured: 21 vs 22 `^### [IVXLC]+\. ` headings).
+Neither surface carries another consumer's obligation — the template's block names no instruction
+face, no agent-definitions face and no generator entry.
+
+## Face 3 — the two instruction surfaces (C-4)
+
+| Surface | Path:line | Reading |
+|---|---|---|
+| template | `templates/instructions-template.md:106` `## Re-Anchoring (不忘初心 · 温故而知新)`, body `:108` names `.specify/shared/definitions/re-anchoring-definitions.md` | section + owner pointer |
+| live | `.specify/instructions.md:118` same heading, body `:120` same pointer | section + owner pointer |
+
+Production path: the live file is produced by `scripts/bash/generate-instructions.sh` from
+`.specify/templates/instructions-template.md` (the mirror of `templates/instructions-template.md`).
+The only admissible script edit for this feature is `INSTRUCTIONS_BUDGET_BYTES`; measured this stage
+at **37 888 → 38 400 B** (source line 100, projected mirror line 163), because the rule-set addition
+pushed the live file from 35 790 B to **35 821 B** (headroom 2 579 B after the raise). No section was
+shrunk to fit.
+
+**Disclosure (F-08 scope)**: `generate-instructions.sh` ran this stage and kept the live file as the
+refresh base (`[info] Existing instructions kept as the refresh base (not overwritten)`), so the live
+section stayed one rule-set item behind the template. The identical edit was then applied to the live
+section; the template stays the source of truth and the live file its projection. A `diff` of the two
+`## Re-Anchoring` sections after stripping line numbers is byte-identical.
+
+## Face 4 — the agent obligation (C-5)
+
+| Evidence | Path:line | Reading |
+|---|---|---|
+| section heading | `shared/definitions/agent-definitions.md:104` `## Re-Anchoring Obligation (不忘初心 · 温故而知新)` | section exists |
+| owner pointer | `:107` `shared/definitions/re-anchoring-definitions.md` | names the owner page |
+| entry duty | `:107` "restate its assignment anchor at entry" | duty 1 |
+| after-each-core-step duty | `:108`–`:109` "after every core step … re-read the RULES in force first and record the five-question verdict" | duty 2 |
+| dispatcher duty | `:109`–`:110` "The dispatcher carries the anchor summary (goal, non-goals, acceptance authority, decision gates) in every subagent brief" | brief carries the anchor |
+| no machinery | `:111`–`:112` "the state spine, checkpoints, assignment brief and the fast-fail channel are its only carriers" | closed carrier set |
+
+## Face 5 — the generator mandate (C-6)
+
+| Evidence | Path:line | Reading |
+|---|---|---|
+| sub-entry | `skills/internal/manage-constitution/SKILL.md:259` `  - **Re-Anchoring (不忘初心 · 温故而知新)** —` | inside the `- **MUST include**` block, as a `  - **<Title>** — …` sub-entry |
+| owner pointer | `:263`–`:264` `.specify/shared/definitions/re-anchoring-definitions.md` | the sub-entry links the owner |
+| both required halves | entry carries the rule and the "adds a reviewing habit, not machinery" sentence | scope sub-bullets present |
+
+## Guards over the faces — one attribution per assertion
+
+`test_reanchoring_contract.py` attributes one landed face per assertion: owner document (concepts +
+tiers), both constitution surfaces, both instruction surfaces, agent-definitions pointer. `4 passed`.
+
+## Mirror parity of every face above
+
+`/usr/bin/python3 scripts/python/sync-mirrors.py --check` → exit 0, six pairs byte-identical; the
+reading is captured in `mirrors-tasks.txt` and re-taken at closure there.
+
+## Reading
+
+All five faces exist, all five point at `shared/definitions/re-anchoring-definitions.md`, no consumer
+restates the owner's tier table or question list. **SC-001 = pass.**

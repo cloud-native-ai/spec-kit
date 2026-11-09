@@ -1,0 +1,82 @@
+# SC-003 — the count pins and their guards agree with the artifacts — 2026-11-09
+
+Every quantity below is measured twice, by two independent readings, and both are printed: the
+**literal** read out of the guard file and the **derived** read produced from the artifact the pin
+describes. Equality of the two is the criterion; neither reading is a restatement of the other.
+
+```
+$ /usr/bin/python3 - <<'EOF'   (regex counts + pin literals + watchlist parse)
+template principles (derived): 21
+live principles     (derived): 22
+generator entries   (derived): 14
+pin literals: [('TEMPLATE_COUNT', '21'), ('LIVE_COUNT', '22'), ('COMMAND_COUNT', '14')]
+watchlist entries: 9 | newest: Re-Anchoring (不忘初心 · 温故而知新)
+newest is a template title: True
+re-anchoring sections in instructions (template/live): 1 1
+EOF
+
+$ /usr/bin/python3 -m pytest tests/contract/test_constitution_double_landing.py -q   -> 19 passed
+$ /usr/bin/python3 -m pytest tests/contract/test_fast_fail_discipline.py -q          -> 104 passed, 2 failed (the two pre-existing)
+```
+
+## C-1 — both constitution surfaces, one title, no forced numeral alignment
+
+| Surface | Path:line | Title | Numeral |
+|---|---|---|---|
+| template | `templates/constitution-template.md:389` | `Re-Anchoring (不忘初心 · 温故而知新)` | **XXI** |
+| live | `.specify/memory/constitution.md:490` | `Re-Anchoring (不忘初心 · 温故而知新)` | **XXII** |
+
+The numerals differ and were **not** aligned. Derived heading counts `^### [IVXLC]+\. `: template 21,
+live 22 — the live roster carries project-specific principles the template does not. Forcing the
+numerals equal would be a defect against this clause; no row of this stage did so.
+
+## C-2 — the Sync Impact Report names the amendment
+
+` .specify/memory/constitution.md:3` — `- Version change: 1.18.0 → 1.19.0 (MINOR; new Principle XXII
+added, 2026-11-09)`; `:4` names the principle title; the footer `:567` reads
+`**Version**: 1.19.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-09`. The report block
+also lists the seven artifacts the landing touched (owner page, two instructions surfaces,
+`agent-definitions.md`, the checkpoint protocol, the two count-guard modules).
+
+## C-6 — no historical record is rewritten
+
+| Record | Reading |
+|---|---|
+| the incident (2026-11-07 RCA: "unattended" ignored, package boundaries asked for permission, the spine lagged) | **cited** at `shared/definitions/re-anchoring-definitions.md:9`–`:11` and at `skills/external/sdd-loop-driver/references/checkpoint-protocol.md:44`–`:46`; neither file rewrites it |
+| the earlier Sync Impact Report blocks | `.specify/memory/constitution.md:22`, `:39`, `:58`, `:75`, `:91`, `:109`, `:128` — all still carry their own dated version lines (1.17.0, 1.16.0, 1.15.0, 1.14.0, 1.13.0, 1.12.0, 1.11.0); the 1.19.0 block was **prepended**, not merged over them |
+| past checkpoints | `checkpoints/01…05` untouched this stage (`git status` shows no modification) |
+
+This stage's only edits inside the 1.19.0 blocks are the rule-set parenthetical (F-08); no dated line,
+version number or incident citation was changed.
+
+## C-3 — the generator's mandate list grew with the principle, in the same landing
+
+`skills/internal/manage-constitution/SKILL.md` `- **MUST include**` block: derived entry count
+`^  - \*\*(.+?)\*\* —` = **14**, pin `COMMAND_COUNT = 14`. The Re-Anchoring sub-entry is
+`:259`–`:265` and is the one entry this feature added (`# stale-pin update (2026-11-09, 090): 13 -> 14`).
+
+## C-4 — the three count pins and the watchlist agree with their artifacts
+
+| Pin | Literal (guard file) | Derived (artifact) | Agree |
+|---|---|---|---|
+| `TEMPLATE_COUNT` | 21 (`test_constitution_double_landing.py:75`) | 21 `^### [IVXLC]+\. ` headings in `templates/constitution-template.md` | yes |
+| `LIVE_COUNT` | 22 (`:80`) | 22 `^### [IVXLC]+\. ` headings in `.specify/memory/constitution.md` | yes |
+| `COMMAND_COUNT` | 14 (`:84`) | 14 `^  - **<Title>** —` entries in the generator's MUST-include block | yes |
+| `DOUBLE_LANDING_WATCHLIST` length | 9 entries, last = `"Re-Anchoring (不忘初心 · 温故而知新)"` (`:51`–`:60`) | the newest entry is a title that exists in `templates/constitution-template.md` | yes |
+
+`test_fast_fail_discipline.py::test_x13` derives all three expectations from the artifacts themselves,
+so "same batch" is recomputable rather than asserted by a literal alone; `test_constitution_double_landing.py::test_c7`
+asserts every watchlist title on both sides. Both pass.
+
+## C-5 — the watchlist length is pinned at its new value
+
+`tests/contract/test_fast_fail_discipline.py::test_x15`: `len(entries) == 9` (`:1269`) and
+`entries[-1] in templates/constitution-template.md` (`:1270`). Reading: 9 entries, newest
+`Re-Anchoring (不忘初心 · 温故而知新)`, which is present in the template — the append reached the
+surface it guards. **pass.**
+
+## Reading
+
+Three pins, one watchlist length and one newest-entry check all agree with independently derived
+readings. SC-003 = **pass** (and the two pre-existing reds in `test_fast_fail_discipline.py` are
+unchanged against the frozen baseline — see `closure-guards.txt`).

@@ -1,0 +1,76 @@
+# implement-stage gate sweep — 2026-11-09T00:00:19Z
+
+## GATE-4: no open task rows
+$ grep -cE '^- \[[ >]\]' .specify/specs/090-re-anchoring/tasks.md
+0
+(0 = no open or claimed rows; a grep with no match exits 1, which is the passing case here)
+
+## GATE-6(a): structure
+$ /usr/bin/python3 .specify/scripts/python/validate-tasks.py .specify/specs/090-re-anchoring/tasks.md
+PASS: .specify/specs/090-re-anchoring/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+# note: --strict is not an option of this engine (its documented surface is [--json]); the
+# default invocation above is the strictest form the engine offers.
+
+## GATE-6(b): clause accounting and the FR lane
+$ /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/090-re-anchoring
+
+companion (must be non-empty on a green run): claimed clauses 31, scanned files 288, clause universe 1908, FR universe 10
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 10 of 10 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+exit=0
+
+## GATE-5 / DoD-6: every final-path criterion is pass, and the smoke record is present
+
+`requirements.md` carries four success criteria, all marked `**Path**: final` (SC-001 … SC-004). Each
+carries a measured evidence file produced in this run:
+
+| Criterion | Evidence file | Reading |
+|---|---|---|
+| SC-001 | `sc001-faces.txt` | five faces exist, all point at the owner, no consumer restates it — pass |
+| SC-002 | `sc002-ordering.txt` (+ `ordering-red-control.txt`) | ordering stated, one guard, three mutants red — pass |
+| SC-003 | `sc003-counts.txt` | three pins + watchlist length agree with derived readings — pass |
+| SC-004 | `sc004-tiers.txt` | three tiers agree across owner page and protocol — pass |
+
+smoke record:
+```
+smoke_command=SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py -q --tb=no -rA
+smoke_exit_code=1
+smoke_evidence_path=.specify/specs/090-re-anchoring/test-evidence/closure-guards.txt
+```
+
+`smoke_exit_code=1` is the honest value: the guard surface carries two PRE-EXISTING failures
+(`tasks-baseline-failed.txt`), so no invocation of it can exit 0 on this tree. The gate condition is
+"`smoke_exit_code=0`", and this stage does not claim it. What it claims instead, per
+`guard-tests.contract.md` C-8 and SC-003's own wording, is **zero NEW failures against the frozen
+node-id baseline**, which `closure-guards.txt` demonstrates with an empty `LC_ALL=C comm -13`.
+
+## GATE-3 / DoD-5: mirror parity
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (416 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+ok    shared/ == .specify/shared/ (98 files, byte-identical)
+exit=0
+
+## workspace guard
+$ /usr/bin/python3 scripts/python/workspace-guard.py --check --repo .
+usage: workspace-guard.py [-h] (--snapshot FILE | --check FILE) [--repo PATH]
+                          [--json] [--version]
+workspace-guard.py: error: argument --check: expected one argument
+(the first invocation was malformed: --check takes the snapshot FILE. Corrected below; the exit=0
+ recorded by the capture wrapper for this line is the wrapper's, not the engine's — disclosed.)
+
+$ /usr/bin/python3 scripts/python/workspace-guard.py --snapshot .specify/specs/090-re-anchoring/test-evidence/workspace-implement.json --repo .
+recorded .specify/specs/090-re-anchoring/test-evidence/workspace-implement.json
+exit=0
+
+$ /usr/bin/python3 scripts/python/workspace-guard.py --check .specify/specs/090-re-anchoring/test-evidence/workspace-implement.json --repo .
+clean
+exit=0

@@ -1,0 +1,18 @@
+# ordering-assertion feasibility probe — tasks stage, 2026-11-08T23:10:27Z
+# purpose: prove the C-7 assertion is writable and reds on every mutation BEFORE the implement row lands it.
+# this probe writes nothing outside .specify/.tmp/090-probe/ and edits no tracked file.
+
+$ /usr/bin/python3 .specify/.tmp/090-probe/order_probe.py
+LANDED: (True, 'ok')
+GOAL-FIRST-Q1: (False, 'Q1 asks goal')
+GOAL-FIRST-SHAPE: (False, 'shape Q1 not rules')
+NO-RULES-STATEMENT: (False, 'no rules-first statement')
+exit=0
+
+# mutation diff (in memory, never written to the tracked file):
+  landed  : '1. Which rules govern this step'
+  mutant  : '1. Which goal governs this step'
+  landed  : '- Q1 rules: <which rules, each in force?> — <evidence>'
+  mutant  : '- Q1 goal: <which rules, each in force?> — <evidence>'
+  landed  : '**The audit's primary object is the RULES, not the goal.**'
+  mutant  : '**The audit's primary object is the goal.**'

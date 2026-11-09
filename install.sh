@@ -91,8 +91,10 @@ Options:
   --dry-run        Print the full plan (python resolution, index pairing,
                    per-source preflight, commands) without mutating anything.
   -h, --help       Show this help.
+  --version        Print the script name and the framework version, then exit.
 
-Exit codes: 0 ok | 2 missing prerequisite (python/pip/git/uv) | 3 no viable
+side-effects: installs the Specify CLI when a source is reachable; the flags write nothing
+exit-codes: 0 ok | 2 missing prerequisite (python/pip/git/uv) | 3 no viable
 source x index (unreachable, or install failed on all sources) | 5 post-
 install verification failed.
 
@@ -158,6 +160,15 @@ while [ $# -gt 0 ]; do
     --dry-run)
       OPT_DRY_RUN=true
       shift
+      ;;
+    --version)
+      _ver="unknown"
+      if [ -f "$REPO_ROOT/pyproject.toml" ]; then
+        _ver="$(sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$REPO_ROOT/pyproject.toml" | head -n 1)"
+        [ -n "$_ver" ] || _ver="unknown"
+      fi
+      printf 'install.sh %s\n' "$_ver"
+      exit 0
       ;;
     -h | --help)
       usage

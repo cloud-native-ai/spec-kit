@@ -1,0 +1,76 @@
+# 090-re-anchoring, implement stage -- full contract-suite baseline comparison
+# generated: 2026-11-09
+
+baseline_source   = .specify/specs/090-re-anchoring/test-evidence/plan-contract-baseline-raw.txt (FAILED lines)
+now_source        = .specify/specs/090-re-anchoring/test-evidence/implement-contract-full-raw.txt
+suite_command     = /usr/bin/python3 -m pytest -m contract -q --tb=no -rA
+baseline_count    = 49
+now_count         = 41
+now_summary       = 41 failed, 4673 passed, 2 skipped, 3348 deselected, 3 warnings in 343.79s (0:05:43)
+
+--- NEW failures (present now, absent at baseline): 1
+tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+
+--- FIXED (failed at baseline, passing now): 9
+tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean
+
+--- set-difference method
+LC_ALL=C comm -13 <baseline-sorted> <now-sorted>   # NEW  -> must be empty for SC-003
+LC_ALL=C comm -23 <baseline-sorted> <now-sorted>   # FIXED
+
+--- verdict
+SC-003 (zero new failures vs the frozen baseline): FAIL -- 1 new failure node id is attributable
+to this feature's own evidence lane. See the ANOMALY block in verification.md (n-5).
+
+--- attribution of the one NEW failure
+
+node_id  = tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+reading  = offenders == [.specify/specs/090-re-anchoring/test-evidence/plan-contract-baseline-raw.txt]
+cause    = that file is the analyze-stage full-suite capture for THIS feature and is committed
+           (tracked, unmodified vs HEAD). It quotes the guard's own failure text, so it contains
+           the pre-migration needle by construction.
+owner    = tests/contract/test_goal_migration.py RUNTIME_CACHE_PREFIXES, whose own comment already
+           states the binding rule: "every feature's evidence lane ... a full-suite log is a
+           *generated* capture of a run's stdout: it quotes the failure text of this very guard,
+           so a spec-directory evidence lane always contains the needle by construction."
+           The list enumerates 085, 088, 089 and 086/baseline.txt but not 090.
+
+carrying trees (all off the live-face list for that guard, measured 2026-11-09):
+  historical  .specify/memory/features/027.md, .specify/memory/features/041.md
+  historical  .specify/specs/037-goal-registry/{checklists/requirements.md,contracts/*,plan.md,
+              quickstart.md,requirements.md,research.md,tasks.md,verification.md}
+  excluded    .specify/specs/085-sdd-temporary-goal-team/test-evidence/full-suite-final.txt
+  excluded    .specify/specs/086-efficient-test-execution/test-evidence/baseline.txt
+  excluded    .specify/specs/089-script-interface-contract/test-evidence/{baseline-full-suite*,closure-suite.txt}
+  NOT excluded .specify/specs/090-re-anchoring/test-evidence/plan-contract-baseline-raw.txt   <-- the offender
+  guards      tests/contract/test_goal_migration.py, test_goal_writeset.py, test_summary_trigger.py,
+              test_summary_writeset.py
+
+--- second, PRE-EXISTING red on the same guard (not a new failure)
+
+node_id  = tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+status   = already red at baseline (member of the 49) -- NOT introduced here.
+cause    = the 2026-08-04 user directive is quoted at .specify/specs/037-goal-registry/requirements.md:309
+           as "使用.specify/goal/收编.specify/goal/,.specify/project/目录不再存放goal", while the guard
+           still asserts the pre-sanitize form "使用.specify/goal/收编<old-path>/". Commit c4605da6d
+           (chore(sanitize), 2026-11-05) repaired the quote inside a HISTORICAL_PREFIXES tree -- a face
+           RS-1 says MUST NOT be rewritten -- and left the guard asserting the unrepaired form.
+
+--- action taken, and not taken
+not taken = no rewrite of the 037 historical quote (RS-1 forbids it), and no edit to the 090 capture
+            to dodge the guard (an evidence file must keep the text that made the guard red).
+observed but reverted = a needle redaction of plan-contract-baseline-raw.txt was attempted and reverted;
+            it reddened the sibling historical-face test, confirming the capture is not the place to fix
+            this. The file is byte-identical to HEAD (`git diff --quiet` clean).
+deferred  = both readings are recorded as ANOMALY n-5 in verification.md. The owner's rule plainly
+            extends to this lane, but adding a prefix to RUNTIME_CACHE_PREFIXES is a change to another
+            feature's guard (037), and repairing the 037 quote is a change to a historical face.
+            Both are rulings for the driver, not local corrections.

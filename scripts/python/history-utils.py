@@ -271,6 +271,7 @@ def _empty_manifest() -> Dict[str, object]:
 
 def read_manifest(output_dir: Path) -> Dict[str, object]:
     p = _manifest_path(output_dir)
+
     if p.is_file():
         try:
             return json.loads(p.read_text(encoding="utf-8"))
@@ -483,6 +484,8 @@ def action_manifest_update(args) -> Dict[str, object]:
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="History utilities for /speckit.history")
+    _sig_configure(p)
+
     p.add_argument(
         "--action",
         choices=["locate", "extract", "manifest-read", "manifest-update"],
@@ -505,7 +508,31 @@ _DISPATCH = {
 }
 
 
+# --version, wired through the one version source (C-8)
+#
+# `guard_argv()` answers `--version` (and rejects an undeclared option) BEFORE any parser
+# reads the line, so it works for a flat argparse parser, for one whose subcommands are
+# required, and for the two modules that read sys.argv by hand. It writes nothing and
+# resolves `<script-name> <framework-version>` from the nearest pyproject.toml at run
+# time — this file carries no version literal. `--help` is left to the module's own body.
+import sys as _sig_sys  # noqa: E402
+import pathlib as _sig_pathlib
+
+_SIG_DIR = str(_sig_pathlib.Path(__file__).resolve().parent)
+if _SIG_DIR not in _sig_sys.path:
+    _sig_sys.path.insert(0, _SIG_DIR)
+try:  # the helper owns the rule; an engine copied WITHOUT it still runs its actions
+    from script_interface_cli import configure_parser as _sig_configure  # noqa: E402
+    from script_interface_cli import guard_argv as _sig_guard  # noqa: E402
+except ImportError:  # a sandbox/handler copy carries the engine but not the helper
+    def _sig_configure(parser, **_kwargs):
+        return parser
+
+    def _sig_guard(_argv=None, declared=None, **_kwargs):
+        return None
+
 def main() -> None:
+    _sig_guard(declared=['--action', '--tool', '--project', '--full', '--sids', '--sids-file', '--json'])  # answer --version / reject an undeclared option
     args = _build_parser().parse_args()
     # FR-012 / FR-013: a tree without the declaration layer keeps working on the labelled
     # compatibility value — the label is a reading of the wiring, never a pass.

@@ -1,0 +1,7 @@
+# green-partition export check (tasks.md § Green Partition vs the rows themselves) — 2026-11-08T23:39:37Z
+Program: parse every '- [ ] TNNN' row's [green: contracts/<page>#<clause>] tags, collapse each page's
+claims into a contiguous range, compare with the § Green Partition table cell by cell.
+claiming rows: 20
+total claims: 31
+distinct clause claims: 31
+table/row mismatches: none

@@ -1,0 +1,4 @@
+# validate-tasks.py — tasks stage, 2026-11-08T23:09:26Z
+$ /usr/bin/python3 .specify/scripts/python/validate-tasks.py .specify/specs/090-re-anchoring/tasks.md
+PASS: .specify/specs/090-re-anchoring/tasks.md — 0 error(s), 0 warning(s)
+exit=0

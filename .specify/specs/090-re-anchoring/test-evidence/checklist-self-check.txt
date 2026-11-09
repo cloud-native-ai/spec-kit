@@ -1,0 +1,57 @@
+=== checklist stage — structural self-check of the checklist artifact ===
+date: 2026-11-09
+artifact: .specify/specs/090-re-anchoring/checklists/2026-11-09-requirements-quality.md
+
+--- § 1 item numbering / traceability / decisions / prohibited openers (program-derived, no hand typing) ---
+item_count: 37
+id_contiguous_from_CHK001: True
+ids_unique: True
+traceable_items: 37 / 37 = 100%
+traceability_floor_80pct_met: True
+soft_cap_40_respected: True
+decisions: {'fail': 20, 'pass': 11, '观察': 6} total: 37
+question_shaped_items: 37
+prohibited_openers(Verify/Test/Confirm/Check+behaviour): 0
+items_with_a_quality_bracket: 37 / 37
+bracket_tags: {'Ambiguity': 3, 'Assumption': 1, 'Clarity': 15, 'Completeness': 9, 'Conflict': 1, 'Consistency': 11, 'Dependency': 1, 'Edge Case': 2, 'Gap': 6, 'Measurability': 11, 'Traceability': 7}
+section_headings: ['## 一、方向锚与规则锚的可判定性', '## 二、五问的规则优先与判定值', '## 三、重载分层 T0/T1/T2', '## 四、五处面、指针与覆盖', '## 五、成功标准的可测量性与可复算', '## 六、运行时栈、前提与依赖', '## 七、术语、命名与跨面一致性', '## 八、边界、例外与非目标', '## 九、跨产物一致性与可追溯性（需求自身视角）', '## Notes']
+
+--- § 2 the artifact was created new, no existing checklist overwritten ---
+$ ls .specify/specs/090-re-anchoring/checklists/
+2026-11-09-requirements-quality.md
+
+--- § 3 counts cited by the checklist, re-measured this run ---
+$ git cat-file -t for the six commits the requirements § Note names
+5a1041e4 commit
+55776937 commit
+137adb7f commit
+e2119d1d commit
+05b109b7 commit
+9af8418e commit
+
+$ wc -l shared/definitions/re-anchoring-definitions.md   # the checklist does not cite 63; recorded for contrast with plan.md
+63 shared/definitions/re-anchoring-definitions.md
+
+$ grep -c "^### E-" .specify/specs/090-re-anchoring/data-model.md   # entity count (E-1..E-6)
+6
+$ grep -c "^## C-" .specify/specs/090-re-anchoring/contracts/*.md    # clause counts per page
+direction-audit.contract.md 9
+governance-landing.contract.md 6
+guard-tests.contract.md 8
+re-anchoring-faces.contract.md 8
+
+--- § 4 flow-class read (the stage's single read, reused by every gate above) ---
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:090-re-anchoring"
+unit_id: spec:090-re-anchoring
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+--- § 5 prerequisites (REQUIREMENTS_DIR / AVAILABLE_DOCS, absolute) ---
+$ bash .specify/scripts/bash/check-prerequisites.sh --json
+{"REQUIREMENTS_DIR":"/cws_data/cloud-native-ai/spec-kit/.specify/specs/090-re-anchoring","REQUIREMENT_ID":"090","FEATURE_ID":"090","FEATURE_NAME":"Re-Anchoring（不忘初心 · 温故而知新）","AVAILABLE_DOCS":["research.md","data-model.md","contracts/","quickstart.md","checklists/","feature-ref.md"],"MODE":"C","WRITABLE":true}
+exit=0
