@@ -35,10 +35,10 @@ project_config:
   execution_topology: local-native-subagents
   spec_dir: .specify/specs/091-auto-git-closeout
   evidence_dir: .specify/specs/091-auto-git-closeout/test-evidence
-  write_isolation: shared-tree
+  write_isolation: worktree
   decomposition: auto
   decomposition_stages: [plan, implement, review]
-  decomposition_slot_cap: 2
+  decomposition_slot_cap: 6
   agent_concurrency_requested: 24
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages will be recomputed per stage

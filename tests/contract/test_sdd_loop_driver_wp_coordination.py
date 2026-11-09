@@ -52,8 +52,8 @@ SD_CONTRACT_PINS = {
     ),
     "SD-04": (
         "Up to `slot_cap` read-only packages",
-        "The default is 2",
-        "ceiling is `min(4, the line's remaining concurrency allowance)`",
+        "The default is 6",
+        "ceiling is `min(6, the line's remaining concurrency allowance)`",
     ),
     "SD-05": (
         "topological layer and then `wp_id` lexicographic",
@@ -1225,7 +1225,7 @@ FN_CONTRACT_PINS = {
     "FN-01": (
         "decomposition: auto|off",
         "decomposition_stages: <stage>=auto|on|off",
-        "decomposition_slot_cap: <int>` (default 2)",
+        "decomposition_slot_cap: <int>` (default 6)",
         "decomposition_override: auto|on|off",
         "spine fields, not new command arguments",
     ),
@@ -1355,7 +1355,7 @@ def test_fn_model_doc_carries_the_runtime_projection():
 def test_fn_01_declaration_fields_carry_documented_defaults():
     resolved = wp_driver_sim.normalize_entry_declaration()
     assert resolved["decomposition"] == "auto"
-    assert resolved["decomposition_slot_cap"] == 2
+    assert resolved["decomposition_slot_cap"] == 6
     assert resolved["decomposition_stages"] == {
         "plan": "auto",
         "implement": "auto",

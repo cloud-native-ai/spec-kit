@@ -72,7 +72,7 @@ stage_seats:
     max_parallel: 2
   implement:
     seats: [sdd-implement-coordinator, sdd-implement-executor, sdd-stage-verifier]
-    max_parallel: 2
+    max_parallel: 6
   review:
     seats: [sdd-review-coordinator, sdd-review-executor, sdd-stage-verifier]
     max_parallel: 2
@@ -106,13 +106,13 @@ members:
       write: [".specify/specs/091-auto-git-closeout/test-evidence/reporter-091-auto-git-closeout.live.log"]
     reporting-cadence: default
 config:
-  isolation: shared-tree
+  isolation: worktree
   agent_concurrency:
     requested: 24
     effective: 24
     reason: local native subagents, shared-tree isolation; ready packages recomputed per stage
   verifier_reserve: 1
-  decomposition_slot_cap: 2
+  decomposition_slot_cap: 6
   checkpoint_policy:
     propose: true
     max_config_changes: 1

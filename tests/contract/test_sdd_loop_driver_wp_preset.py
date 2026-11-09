@@ -146,7 +146,7 @@ def test_st_02_frontmatter_carries_the_preset_contract_fields():
     ]
     assert [bool(item["required"]) for item in inputs] == [True, True, True, False]
     assert frontmatter["config"]["default_pattern"] == "parallel"
-    assert frontmatter["config"]["slot_cap_default"] == 2
+    assert frontmatter["config"]["slot_cap_default"] == 6
 
 
 def test_st_03_body_carries_the_six_mandatory_sections():
@@ -344,7 +344,7 @@ def test_st_12_graph_derived_values_take_precedence_over_preset_defaults():
 
     preset = _frontmatter()
     assert preset["pattern"] == "parallel"
-    assert preset["config"]["slot_cap_default"] == 2
+    assert preset["config"]["slot_cap_default"] == 6
 
     write_plan = wp_fixtures.make_plan(
         packages=[

@@ -3,7 +3,7 @@
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
 **Owner**: this file for the opt-out/fallback semantics; preserved behaviors are owned by their original features and cited, never redefined.
 
-- **FN-01 (Declaration fields)**: The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages: <stage>=auto|on|off` (defaults recorded per stage), and `decomposition_slot_cap: <int>` (default 2). The stage-attempt declaration carries `decomposition_decision` and an optional `decomposition_override: auto|on|off`. These are spine fields, not new command arguments.
+- **FN-01 (Declaration fields)**: The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages: <stage>=auto|on|off` (defaults recorded per stage), and `decomposition_slot_cap: <int>` (default 6). The stage-attempt declaration carries `decomposition_decision` and an optional `decomposition_override: auto|on|off`. These are spine fields, not new command arguments.
 - **FN-02 (Precedence)**: Feature-level `decomposition: off` is a hard opt-out and no stage override can re-enable it in the same run. Otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults.
 - **FN-03 (Built-in defaults)**: `plan`, `implement`, and `review` are `auto`; `analyze` and `clarify` are `off` and require an explicit `on`; `requirements`, `tasks`, and `checklist` are `off` for the first slice.
 - **FN-04 (Auto and benefit)**: `auto` resolves to `decomposed` only when the gate returns `admit` with at least two packages and the WG-13 benefit test holds. Otherwise it resolves to `single-package` with `reason=not-beneficial`. A stage with one artifact and no separable work is single-package.
