@@ -146,6 +146,8 @@ from the declarations, not from the prompt's wording. Provenance: the sdd-loop-d
 Topology defect fix (2026-10-16); obligation declared in
 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.
 
+**Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2` concurrent units MUST NOT be handed to a body that cannot dispatch. Before dispatch, judge the recipient's dispatch capability from its **existing** `capability-tools` frontmatter key (the `capability` action of `scripts/python/concurrency-check.py` reads the same list; no frontmatter key is introduced here). When the recipient is incapable, the framework MUST route the duty to a capable executor — the orchestrator/main agent itself, a capable sibling, or the driver — and **record the routing decision** (recipient, capability reading, routed-to, reason) in the run record. A coordinator whose own toolset lacks dispatch still emits its partition (each package naming its scope, inputs and output path) so the capable executor can run the packages without re-deriving them; a duty silently serialised inside an incapable body is a defect, not a degradation. The candidate carrier for any dispatched execution is one of the two legal process carriers named by `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes (fork for same-family agents, subprocess for heterogeneous agents); the host-internal in-process subagent path is not a concurrency carrier.
+
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. For
 multi-agent orchestration (parallel dispatch, serial chains, iteration loops, long-running
 loops), use `/speckit.team` — not this skill.
