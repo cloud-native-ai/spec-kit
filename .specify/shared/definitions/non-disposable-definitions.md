@@ -701,7 +701,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 权威次序都在同一方向上）。
 
 因此本特性的落点是**七面**（FR-063）：本文档（owner，新）、声明层（新）、术语表四条、特性注册表行与详情、
-既有守卫（`pytest -m contract`）、三份历史面的**指针行**（只加一行，MUST NOT 新增常驻顶级 `##` 章节，否则
+既有守卫（`bash scripts/bash/run-tests.sh -m contract`）、三份历史面的**指针行**（只加一行，MUST NOT 新增常驻顶级 `##` 章节，否则
 宪法模板 35 / 现网 36 的计数 pin 抖动）、`register.md` 决定条目。两条宪法计数 pin **保持原值**。
 
 本特性与既有原则是**承接**关系，不是新原则：
