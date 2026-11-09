@@ -1,0 +1,7 @@
+row: T009
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_rebind_changes_only_the_binding_block' -q
+date: 2026-11-09T10:46:33Z
+---
+.                                                                        [100%]
+1 passed in 0.12s
+exit=0

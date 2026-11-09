@@ -1,0 +1,7 @@
+row: T006
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_owner_outside_the_closed_three_values_is_refused' -q
+date: 2026-11-09T10:46:31Z
+---
+.                                                                        [100%]
+1 passed in 0.08s
+exit=0

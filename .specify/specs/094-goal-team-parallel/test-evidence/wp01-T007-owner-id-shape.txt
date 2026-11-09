@@ -1,0 +1,7 @@
+row: T007
+command: python3 -m pytest 'tests/contract/test_binding_model.py::test_owner_id_is_validated_by_shape_and_the_grammar_is_cited_not_restated' -q
+date: 2026-11-09T10:46:32Z
+---
+.                                                                        [100%]
+1 passed in 0.16s
+exit=0

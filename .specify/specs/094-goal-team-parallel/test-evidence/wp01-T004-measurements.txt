@@ -1,0 +1,21 @@
+row: T004
+artifact: .specify/specs/094-goal-team-parallel/notes/pre-change-measurements.md
+date: 2026-11-09T10:47:41Z
+--- the six re-derivation commands and readings ---
+1) ls -d .specify/specs/*/goal/*/goal.md | wc -l
+9
+2) ls -d .specify/specs/*/team/*/team.md | wc -l
+8
+3) basename -a .specify/anchoring/*/ | wc -l
+6
+4) basename -a .specify/teams/*/ | wc -l
+12
+5) wc -l < test-evidence/plan-baseline-names.txt
+46
+6) grep -n 'common.add_argument("--scope"' scripts/python/goal-utils.py (pre-change reading)
+   1339: choices=("global", "spec", "auto")
+7) grep -c 'sub.add_parser(' scripts/python/goal-utils.py
+   11 (10 actions + run-checks) at implement entry
+8) ls shared/declarations/facts/*.yaml | wc -l
+24
+exit=0
