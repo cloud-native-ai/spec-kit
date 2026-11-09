@@ -175,9 +175,12 @@ and everything after it (including a `git commit`) never happens while the check
 reports success. Use `;`, or append `|| true`, and confirm the chain's tail actually
 executed.
 
-**Test runs**: prefer the canonical runner `scripts/bash/run-tests.sh` (resolves the
-pytest interpreter once, pipe-safe) for baseline and regression tasks instead of ad-hoc
-`python -m pytest | tail` pipelines whose exit codes mask interpreter failures.
+**Test runs — the runner is the only entry**: every test execution in this skill MUST go through
+`scripts/bash/run-tests.sh` (its default is the parallel form `-n <effective> --dist load`; test
+paths and further arguments are forwarded to the framework — single-test debugging included, it
+MUST NOT be used as a reason to bypass the runner). Direct interpreter-level test commands (the
+bare test CLI or its `-m` module entry) are forbidden here, and a pipeline that pipes test output
+is forbidden because it masks the exit code.
 **Baseline captures names, not just counts**: record the baseline with
 `--names-out <spec-dir>/baseline-failed.txt` and re-run regression the same way, so
 zero-new-failures is proven by `comm -13 baseline current` instead of count archaeology.
@@ -190,8 +193,8 @@ unanchored baseline produces refactor-unrelated false diffs that need a live con
 experiment to attribute.
 
 **Assert suite collection, not just totals**: when a task expects a specific suite to
-run, verify that suite's collection count (`pytest --collect-only -q <path>`) is non-zero
-/ matches intent — pytest only collects `test_*.py` by default, so suites named otherwise
+run, verify that suite's collection count (`bash scripts/bash/run-tests.sh <path> --collect-only -q`) is non-zero
+/ matches intent — the test framework only collects `test_*.py` by default, so suites named otherwise
 (e.g. `contract_*.py`) are silently skipped while the total pass count stays green.
 
 **Runnable-runner probe**: a baseline whose collection fails (e.g.

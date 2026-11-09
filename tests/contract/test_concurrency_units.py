@@ -283,8 +283,8 @@ def test_missing_interval_yields_not_evaluated_and_names_the_unit(tmp_path):
 # --------------------------------------------------------------------------- #
 def test_bound_recomputation_reports_its_operands(tmp_path):
     statement = _slot_statement()
-    slot_cap = statement["slot_cap_default"]
-    reserve = statement["verifier_reserve"]
+    slot_cap = int(statement["slot_cap_default"])
+    reserve = int(statement["verifier_reserve"])
     ceiling = _ceiling_default()
     repo = _repo(tmp_path)
     record = _record(repo, "bound.yaml", [

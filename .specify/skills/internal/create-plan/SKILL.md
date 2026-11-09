@@ -126,6 +126,14 @@ Follow the structure in the IMPL_PLAN template to:
     Gate's execution-verify rule owns that requirement.
 - Re-evaluate Constitution Check post-design
 
+### Step 4.5 — Concurrency of this stage (default-concurrent)
+
+The plan stage is an execution body under the framework concurrency obligation (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation — the one authored text; this step references it, never restates it). Concretely:
+
+- **Partition**: the stage's work is partitioned into its units (research, the design artifacts, the feature-registry update, the post-generation verification) before an execution shape is chosen; the replayable partition rule is `decompose-plan-v1`.
+- **Default concurrent**: independent units with file-level, pairwise-disjoint write domains run concurrently whenever a legal process carrier is available and the budget allows (the fork/subprocess carriers defined in the obligation's owner; the host-internal in-process path is not a carrier). A serial shape MUST name a reason code from `shared/declarations/facts/serial-reason.yaml` with its declared evidence form.
+- **Record the reading**: the stage records its own `requested` / `effective` / `effective_reason` triple in the plan's execution record (`not_evaluated` where intervals are absent). The fields, the codes and the slot/reserve values live in `shared/declarations/facts/` — read them, never restate them here.
+
 ### Step 5 — Plan integrity gate + stop and report
 
 Before finishing, verify the filled IMPL_PLAN contains (a) **no** residual

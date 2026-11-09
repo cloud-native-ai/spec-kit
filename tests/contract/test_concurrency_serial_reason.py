@@ -147,6 +147,12 @@ def _judge(repo: Path, record: Path, out: Path):
     return proc, envelope
 
 
+def _reading(repo: Path, record: Path, out: Path):
+    proc = _run_engine("reading", "--repo", repo, "--record", record, "--json-out", out)
+    envelope = json.loads(out.read_text(encoding="utf-8")) if out.is_file() else None
+    return proc, envelope
+
+
 def _codes(envelope):
     return [finding.get("code") for finding in (envelope or {}).get("findings", [])]
 
@@ -195,7 +201,7 @@ def test_default_concurrency_fixture_reads_effective_two(tmp_path):
         "    executor_id: exec-b",
         "    verifier_id: ver-b",
     ])
-    proc, envelope = _judge(repo, record, tmp_path / "out.json")
+    proc, envelope = _reading(repo, record, tmp_path / "out.json")
     assert envelope is not None, proc.stdout + proc.stderr
     assert proc.returncode == 0, envelope.get("findings")
     assert _find(envelope.get("measured"), "effective") == 2

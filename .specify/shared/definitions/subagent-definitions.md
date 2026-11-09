@@ -37,6 +37,18 @@ The grain decides what a "unit" is; the obligation is the same statement at ever
 
 The obligation at authoring time knows none of the tuning values — the slot cap, the ceiling, the per-unit budget and the effective bound are read at execution time through the facts named above (C-043). The reading triple and its `not_evaluated` literal are the only concurrency metric; a dispatched count, a configured value or a neighbouring run's number is not a reading.
 
+### class-concurrent-by-default — concurrent-by-default (`work-package`)
+
+**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`; the decision rule that assigns a body to this class is owned there too). A skill or command body partitions its own duty into work packages and runs them concurrently whenever the FR-005 conditions hold. A serial result is never a free choice: it carries a reason code from the closed vocabulary plus that code's form-matching evidence — a non-empty string such as `.` is not a basis — and the run records the reading triple. Membership is decided by the fact's `(root_id, produced_shape)` rule, never by this section.
+
+### class-partition-required — partition-required (`target-or-seat-group`)
+
+**Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`). A goal's targets or a team's seats ARE the unit set the body produces, so a single-unit execution is itself a decision that MUST be recorded — the target set is exactly one, or the serial reason is named — never a silent default. Partitioning is judged before dispatch: intersecting target or seat write domains are red at binding time.
+
+### class-serial-only — serial-only (`executor-run`)
+
+**Obligation**: `may-serial` (value owner: `shared/declarations/facts/concurrency-class.yaml`). An agent definition's own advance is a single executor run, so it may proceed serially; it names which host or dependency condition applies by pointing at `shared/declarations/facts/serial-reason.yaml` rather than restating the vocabulary, so the class is not a free pass.
+
 ## Three Execution Modes
 
 The word "subagent" covers three materially different execution mechanisms. Keep them distinct — they differ in isolation, parallelism, and how (or whether) their progress is observable.

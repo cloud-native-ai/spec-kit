@@ -19,6 +19,10 @@ The capacity vs. responsibility boundary — which template set defines an agent
 
 The **goal** concept is defined authoritatively in `references/goal.md`. When a goal's theme is **optimization**, classify it per `references/optimization-goals.md`.
 
+## Command Family Gate (which commands may create a goal/team)
+
+Whether the invoking command run may own a goal/team is decided by the declared class axis, never by a per-command list kept here (contract C-74): ask the engine with `python3 scripts/python/goal-utils.py command-family --command <stem> --json` and read `in_family` from its answer. The action resolves the class through `flow-class-check.py --action lookup --unit-id /speckit.<stem>` and reports `source: ledger` = in family, `source: default` = not in family; a degraded lookup exits 2 and is never read as a family membership. This skill carries no second whitelist.
+
 ## Team Definition & Persistence (create mode)
 
 Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/team.md`. Establish the goal first, then derive both structures from it. Full procedure, schema, and persistence rules: [`references/create-mode.md`](references/create-mode.md).
@@ -33,6 +37,8 @@ Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/tea
 6. **直接落盘并呈现** — **直接写入** `team.md`(不设阻塞式停等),随后呈现 goal + roster + pattern 与修改途径(`/speckit.team` modify / `improve-team`),按执行报告约定收尾。
    > **Reporter-seat obligation (087)**: the persisted roster MUST carry the reporting seat — a `members[]` row whose `role` is the literal `reporter`, written as `reporting-territory` (read list + the one write list for its stream artifact) plus `reporting-cadence` — unless the runtime-omission condition of [`references/create-mode.md`](references/create-mode.md) § Schema notes (RS-05) holds, in which case `config.reporting-reason` records which of the two accepted values applies. The seat is a roster row, never a parallel `reporter:` block. Before presenting, run the seat guard: `python3 ${SKILL_HOME}/scripts/validate-roster.py .specify/teams/<slug>/team.md` — exit `0` = satisfied (seat present or reason recorded), exit `1` = one named defect on one line (fix it before presenting), exit `2` = input error (disclose it). Rule source: [`references/create-mode.md`](references/create-mode.md) § Schema notes; the procedure is a step of create, not a separate command.
 7. **渲染触发** — `team.md` 与席位实例落盘后,直接执行 `specify render-agents --ai <当前宿主工具>` 使席位到达宿主注册面(渲染模式工具:qoder/claude/copilot/opencode);stats 摘要(rendered/backups/unmapped)进执行报告;渲染触发失败 MUST 披露原因并作为流程异常上送,不得静默跳过。存量团队经一次 modify 即可让席位上注册面。
+
+**Member class and stated concurrency capability (成员类别与并发能力声明)**: every `members[]` row MUST carry a **class** drawn from `shared/declarations/facts/concurrency-class.yaml` (a pointer — the class table is never copied here), and the team MUST state **how many of its members can run concurrently**; that statement MUST be derivable from the member classes and the slot cap read at execution time (`shared/declarations/facts/concurrency-slot-and-reserve.yaml`), never asserted independently. The team MUST NOT be instantiated with more concurrent members than the statement supports: the roster step reads each member's dispatch-capability verdict (the capability judgement reads the existing `capability-tools` frontmatter key — no new key is introduced) and **reports the reduction** when it applies. Per-seat **territories are judged at binding time** — intersecting or undeclared territories are red before any run (`references/conceptual-model.md` § Seat territories judged at binding time).
 
 `goal_slug` identifies the **goal**, not the team slug; it is a different axis from `slug` (the team's identity). See `references/goal.md` and `references/summary-mapping.md`.
 

@@ -54,7 +54,8 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 
 ### 6. Orchestrate(按团队 pattern 编排)
 
-- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `skills/internal/create-team/references/` 与词汇表 Team Territory)。
+- **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess，定义 owner：`.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes）且预算允许，本次运行 MUST 并发派发席位；串行 MUST 给出 `shared/declarations/facts/serial-reason.yaml` 的具名理由码与依据。运行报告 MUST 记录 `requested` / `effective` / `effective_reason` 三元组（字段 owner：`shared/declarations/facts/effective-concurrency.yaml`；`effective` 取席位派发/返回区间的最大重叠数，区间缺失记字面量 `not_evaluated`，MUST NOT 写 0 或估计值）。宿主内建 in-process subagent 路径 BANNED，不计为并发机制。
+- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `skills/internal/create-team/references/` 与词汇表 Team Territory);未声明或相交的领地按绑定期判定判红,不带病运行。
 - 串行链(serial):DAG 无环校验 + 逐交接(harness)验证。
 - 迭代(iteration):强制最大迭代上限。
 - 持续(continuous):每轮 run 一个 cycle,按声明成熟度运行,独立校验者(独立 verifier)在 L2+ 常驻。
