@@ -1027,6 +1027,77 @@ def render_digest(state) -> str:
     return "\n".join(lines)
 
 
+def render_digest_table(state) -> str:
+    """Human-readable rendering of the SAME digest state — presentation only, no second reading (C-41).
+
+    Groups the entries ACTIVE / STALE / RECENT, then prints each entry as a two-line block carrying every field
+    the kv render carries (line, run, state, stage, age, the flags, the activity pack, the efficiency element).
+    The header, the single ``last_completion`` footer, the ``omitted`` line and the ``store`` line carry the same
+    content as the kv render; the empty set renders the same ``nothing-running`` literal (C-45).
+    """
+    if not state["entries"]:
+        return NOTHING_RUNNING
+
+    efficiency = state.get("efficiency") or {}
+    depth = efficiency.get("depth")
+    elements = efficiency.get("elements") or []
+    blocks = [
+        "status digest  generated_at=%s  cap=%d  stale_bound=%s  profile=%s"
+        % (
+            state["generated_at"],
+            state["cap"],
+            format_duration(state["stale_bound_seconds"]),
+            profile_in_force(state),
+        )
+    ]
+    decorated = []
+    for position, item in enumerate(state["entries"]):
+        flags = []
+        if item["is_active"]:
+            flags.append("active")
+        if item["stale"]:
+            flags.append("stale")
+        entry_lines = [
+            "%s  [%s]" % (item["line_id"] or DASH, ",".join(flags) or "idle"),
+            "    run=%s  state=%s  stage=%s  age=%s"
+            % (item["run_id"] or DASH, item["state"] or DASH, item["stage"], item["age"]),
+        ]
+        activity = item.get("line_activity")
+        if activity:
+            entry_lines.append(
+                "    activity=%s,state=%s,age=%s"
+                % (activity["label"] or DASH, activity["state"], activity["age"])
+            )
+        if efficiency.get("available") and position < len(elements):
+            entry_lines.append("    " + render_element(elements[position], depth))
+        decorated.append((item, entry_lines))
+    groups = (
+        ("ACTIVE", lambda item: item["is_active"]),
+        ("STALE", lambda item: (not item["is_active"]) and item["stale"]),
+        ("RECENT", lambda item: (not item["is_active"]) and (not item["stale"])),
+    )
+    for label, predicate in groups:
+        members = [entry_lines for item, entry_lines in decorated if predicate(item)]
+        if not members:
+            continue
+        blocks.append("")
+        blocks.append("-- %s (%d) --" % (label, len(members)))
+        for entry_lines in members:
+            blocks.extend(entry_lines)
+    completion = last_completion(state)
+    if completion is not None:
+        blocks.append("")
+        blocks.append(
+            "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
+        )
+    withheld = efficiency.get("withheld") or ""
+    if state["omitted"] or withheld:
+        blocks.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
+    if not efficiency.get("available"):
+        blocks.append("store=%s" % efficiency_vocabulary()["no_measurements"])
+    return "\n".join(blocks)
+
+
 def action_digest(args) -> int:
     workspace = Path(args.workspace).expanduser().resolve()
     state, error = read_state(args.cap, args.stale_bound, workspace, args.element_bound)
@@ -1034,7 +1105,10 @@ def action_digest(args) -> int:
         print(error, file=sys.stderr)
         return EXIT_INPUT_ERROR
 
-    if args.format == "json":
+    fmt = args.format
+    if fmt == "auto":
+        fmt = "table" if sys.stdout.isatty() else "text"
+    if fmt == "json":
         payload = dict(state)
         payload["profile"] = profile_in_force(state)
         payload["state_summary"] = "active" if state["entries"] else NOTHING_RUNNING
@@ -1044,6 +1118,8 @@ def action_digest(args) -> int:
         payload.pop("now", None)
         payload.pop("store", None)
         print(json.dumps(payload, indent=2, sort_keys=True))
+    elif fmt == "table":
+        print(render_digest_table(state))
     else:
         print(render_digest(state))
 
@@ -2140,7 +2216,7 @@ def build_parser():
         ),
     )
     parser.add_argument("--action", required=True, choices=("digest", "guard", "report"))
-    parser.add_argument("--format", default="text", choices=("text", "json"))
+    parser.add_argument("--format", default="auto", choices=("auto", "text", "json", "table"))
     parser.add_argument(
         "--workspace",
         default=os.environ.get("SPECIFY_STATUS_WORKSPACE") or str(Path.cwd()),
