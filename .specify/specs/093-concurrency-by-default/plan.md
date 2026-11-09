@@ -2,7 +2,7 @@
 
 **Branch**: `093-concurrency-by-default` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
 **Requirement → Feature**: `093-concurrency-by-default` → Feature 093 Concurrency by Default（subagent 并发作为框架基本属性）
-**Input**: Specification from `.specify/specs/093-concurrency-by-default/requirements.md` (35 FR / 12 SC / 11 shared strings; requirements + clarify validated 2026-11-09, commits `11d49f18` + `6b291bb7`; FR-034/FR-035 added by the analyze-repair 2026-11-09 rulings)
+**Input**: Specification from `.specify/specs/093-concurrency-by-default/requirements.md` (36 FR / 12 SC / 11 shared strings; requirements + clarify validated 2026-11-09, commits `11d49f18` + `6b291bb7`; FR-034/FR-035 added by the analyze-repair 2026-11-09 rulings, FR-036 by the 2026-11-09 test-entry amendment)
 
 ## Summary
 
@@ -30,7 +30,7 @@ reserve, independent verification by a different id, declared-order integration,
 
 Nothing new is invented for scheduling. The delivery is **eight declaration-layer fact entries** (the same
 `shared/declarations/` substrate Feature 092 just proved), **one new read-only checker engine**
-(`scripts/python/concurrency-check.py`) that is the only program turning those facts into verdicts, **ten new
+(`scripts/python/concurrency-check.py`) that is the only program turning those facts into verdicts, **eleven new
 contract test modules**, and **rewrites of the concept owners that already own this vocabulary** —
 `subagent-definitions.md`, `decomposition-model.md`, `conceptual-model.md`, `goal-definitions.md`,
 `stage-team-preset.md`, the agent definitions, and the command/skill surfaces. No second registry, no second
@@ -41,7 +41,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 
 ## Technical Context
 
-**Language/Version**: Python `>=3.8` (`pyproject.toml` `requires-python`) for `scripts/python/concurrency-check.py`, the eight declaration facts and the ten new test modules; Markdown for the concept owners, agent definitions, command templates, skills and contracts. The new engine is standard-library only and is exercised on the lower bound the project declares.
+**Language/Version**: Python `>=3.8` (`pyproject.toml` `requires-python`) for `scripts/python/concurrency-check.py`, the eight declaration facts and the eleven new test modules; Markdown for the concept owners, agent definitions, command templates, skills and contracts. The new engine is standard-library only and is exercised on the lower bound the project declares.
 **Primary Dependencies**: none new. The engine consumes `scripts/python/declaration_reader.py` — the one read entry for `shared/declarations/` (measured 2026-11-09: `--action list` returns the nine `contract.yaml` keys plus 23 `facts/` slugs; `--action get --fact concurrency-class` currently exits 1 with `no declaration for fact`). Mirrors ride `scripts/python/sync-mirrors.py`; command copies ride `scripts/python/regen-command-copies.py`; existing gates ride `pre-analyze-check.py`, `decomposition-check.py`, `overlap-check.py`, `validate-decision-tensions.py`, `wp-gate.py`.
 **Storage**: `shared/declarations/facts/*.yaml` (eight new fact entries, one per judgement surface); `<spec-dir>/test-evidence/` (dated records, one file per entry); the run's existing state-spine fences (owned by 070 — this feature reads them and adds no fence). No new directory kind, no ledger, no registry (Constitution XVII).
 **Testing**: pytest with the project's registered markers (`contract` / `integration` / `serial`); Tests Mode ON. The serial baseline for GATE-1 is captured at plan entry under `test-evidence/` and compared by failure *name*, never by count and never against a parallel-mode reading (092 execution lesson 3).
@@ -49,7 +49,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 **Project Type**: SDD framework — declaration facts, one Python engine, concept-owner documents, agent definitions, command templates, skills, contract tests. No runtime platform, no scheduler, no daemon.
 **Performance Goals**: no wall-clock promise is the release criterion. The measurable target is **execution shape**: every enumeration-root member mapped to exactly one declaration class, every serial record carrying a resolvable reason code, and at least one real run (not a fixture) reporting an effective concurrency `>= 2` measured as maximum interval overlap (SC-006).
 **Constraints**: no new `/speckit.*` command; no second dispatch engine or registry; no unconditional parallelism; the SDD stage chain and its sentinels byte-unchanged; no push; `templates/` stays project-neutral (no repo-specific path facts); the new engine satisfies the script interface contract (Constitution XXI).
-**Scale/Scope**: 35 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept owners plus every dispatch-declaring surface in the complete-correction manifest (§ The analyze wave) rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 10 new contract test modules; 4 existing framework contract modules re-pinned; 8 existing test modules dispositioned; 6 contract files carrying 94 clauses.
+**Scale/Scope**: 36 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept owners plus every dispatch-declaring surface in the complete-correction manifest (§ The analyze wave) rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 11 new contract test modules; 4 existing framework contract modules re-pinned; 8 existing test modules dispositioned; 6 contract files carrying 94 clauses.
 
 ## Constitution Check
 
@@ -59,7 +59,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling here cites FR ids; `feature-ref.md` § 1 maps 35/35 FR to contract clauses. |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling here cites FR ids; `feature-ref.md` § 1 maps 36/36 FR — 35 via contract clauses and FR-036 via its guard test (`tests/contract/test_test_entry_guard.py`). |
 | II | Feature-Centric Development | ✅ Pass | Feature 093 row and `.specify/memory/features/093.md` advance `Draft → Planned` in this stage; no new Feature invented; the four related Features (064/070/086/092) are dispositioned, never renumbered. |
 | III | Intent-Driven Development | ✅ Pass | The five load-bearing choices carry named antitheses and reopening conditions in § Decision Tensions T-001…T-005, each traced to the user's verbatim brief. |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Tests Mode ON; every SC and every FR group names a red-first module in `contracts/executor-obligations.contract.md` C-060; the 092-shaped fixture must be red before the fix and green after (SC-005). |
@@ -234,6 +234,7 @@ tests/contract/test_sdd_loop_driver_skill.py                        # pins fork/
 tests/contract/test_sdd_project_setup_skill.py                      # same
 tests/contract/test_coaching_run_contract.py                        # same
 tests/contract/test_sdd_carrier_contract.py                         # same
+tests/contract/test_test_entry_guard.py                             # FR-036: raw pytest is not an entry (scans the framework artifacts)
 ```
 
 **Structure Decision**: this feature extends the existing declaration-layer + engine + contract-test shape the
@@ -329,9 +330,9 @@ memory.
 | Contracts | [`contracts/`](contracts/) | 6 files: `declaration-facts.contract.md` (C-001…C-018), `judgement-engine.contract.md` (C-019…C-040), `executor-obligations.contract.md` (C-041…C-062), `high-order-executors.contract.md` (C-063…C-078, C-093…C-094), `existing-semantics-disposal.contract.md` (C-079…C-092), `concurrency-contracts.md` (index only, no clause bodies) |
 | Contract clauses | `contracts/*.contract.md` | 94 clauses (C-001…C-094), counted by `grep -c '^- \*\*C-[0-9][0-9][0-9]\*\*'` over the five clause-bearing files — the pattern matches only a clause definition line anchored at column 0 (the plan stage shipped 92; C-093/C-094 were added by the analyze-repair 2026-11-09 rulings on FR-034/FR-035) |
 | Quickstart | [`quickstart.md`](quickstart.md) | 7 scenarios (S-0…S-6): S-0 executed against the live tree; S-1…S-6 are **not executable yet** (the engine and facts land at implement) and each names the clause that pins it and the premises it assumes |
-| Feature ref | [`feature-ref.md`](feature-ref.md) | 35 FR map rows, 12 SC map rows, one delivery-surface table, and the 064/070/086/092 overlap adjudication (F-093-001) |
+| Feature ref | [`feature-ref.md`](feature-ref.md) | 36 FR map rows, 12 SC map rows, one delivery-surface table, and the 064/070/086/092 overlap adjudication (F-093-001) |
 | Execution premises | this file | 10 rows, all `verified` |
-| Gates run at this stage | [`test-evidence/`](test-evidence/) | `pre-analyze-check --stage plan` pass (0 error / 44 missing-path advisories, every one a path this feature creates), `validate-decision-tensions` pass (5 records), `decomposition-check --mode plan` proceed (33 FR was the count at that reading; 35 after the analyze-repair added FR-034/FR-035), `overlap-check` reading retained with the file-level adjudication above |
+| Gates run at this stage | [`test-evidence/`](test-evidence/) | `pre-analyze-check --stage plan` pass (0 error / 44 missing-path advisories, every one a path this feature creates), `validate-decision-tensions` pass (5 records), `decomposition-check --mode plan` proceed (33 FR was the count at that reading; 36 after the analyze-repair added FR-034/FR-035 and the 2026-11-09 amendment added FR-036), `overlap-check` reading retained with the file-level adjudication above |
 
 Drift from the Phase 0 expectation: the expectation was "five facts, one engine, about ten contract files"; the
 actual is eight fact entries (the extra three are `concurrency-slot-and-reserve.yaml`, `concurrency-contract.yaml`
@@ -385,6 +386,28 @@ conflicts they create are named here instead of being absorbed silently.
   subagents; FR-035 reverses that default for the concurrency mechanism — the same explicit revision (FR-033
   disposal list) converges them. Editing either rule in this stage would have decided the user's ruling by
   paraphrase; the ledger in `notes/analyze-repair.md` records both conflicts and the refused in-place edits.
+
+### Test-entry enforcement (user ruling 2026-11-09, FR-036)
+
+Every test execution named by a framework artifact goes through `scripts/bash/run-tests.sh`; raw `pytest` /
+`python3 -m pytest` never appears as an entry (single-test debugging included — the runner forwards paths and
+arguments to pytest). The enforcement is three layers, each with one owner, and it adds no decision tension: the
+user ruling fixes the choice, and the runner's own contract (086
+`runner-contract-086.contract.md` C-001…C-016) is consumed unchanged — this plan only records the elevation
+"preferred → only entry" as a disposition on FR-033's 086 row.
+
+- **Rule statement surfaces** — `templates/instructions-template.md` § Tech Stack states the rule and the live
+  `.specify/instructions.md` is refreshed through the instructions flow (never hand-edited) [T156]; the driver
+  dispatch references `stage-prompts.md` / `dispatch-recipes.md` state the test entry and forbid raw pytest in
+  briefs [T157]; the executor guidance `skills/internal/implement-feature/SKILL.md` plus the SDD implement
+  executor definition, and the measured sweep of the remaining scanned surfaces that name raw pytest today, are
+  reworded to the runner form [T158].
+- **Guard test** — `tests/contract/test_test_entry_guard.py` scans the tracked framework artifacts (`skills/`,
+  `templates/`, `agents/`, `shared/`, `docs/reference/`, `.specify/instructions.md`) for raw invocations and
+  proves itself red-first on a mutated copy, green on the tree [T159].
+- **Allowlist** — exactly four entries: the runner itself (`scripts/bash/run-tests.sh`), `tests/fixtures/**`,
+  dated records (`.specify/memory/{session,feedback,history,evidence}/**`, `test-evidence/**`), and feature spec
+  trees (`.specify/specs/**`). The allowlist is owned by the guard test; no other surface restates it.
 
 ### Complete-correction manifest (analyze round 2, V2; user ruling recorded 2026-11-09)
 

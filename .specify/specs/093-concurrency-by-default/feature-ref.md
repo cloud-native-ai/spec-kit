@@ -4,7 +4,7 @@
 **Spec directory**: `.specify/specs/093-concurrency-by-default/`
 **Binding**: `spec:093-concurrency-by-default`; `flow_class=execution; source=declaration; marker=; error=-`
 **Requirement → Feature**: `093-concurrency-by-default` → **Feature 093** (`.specify/memory/features/093.md`)
-**Authority**: `requirements.md` (35 FR, 12 SC, 15 clarify rulings + 2 dated user rulings of 2026-11-09) owns intent; `contracts/*` own conformance;
+**Authority**: `requirements.md` (36 FR, 12 SC, 15 clarify rulings + 3 dated user rulings of 2026-11-09) owns intent; `contracts/*` own conformance;
 `plan.md` owns design. This page restates no rule — it maps.
 
 ---
@@ -30,11 +30,14 @@
 | FR-015 | declaration-facts C-008; high-order-executors C-065 | FR-032 | existing-semantics-disposal C-079…C-081; plan Fact Owners |
 | FR-016 | judgement-engine C-040; declaration-facts C-008 | FR-033 | existing-semantics-disposal C-085…C-092 |
 | FR-017 | high-order-executors C-069; declaration-facts C-004 | FR-034 | high-order-executors C-093 |
-| FR-035 | high-order-executors C-094 | | |
+| FR-035 | high-order-executors C-094 | FR-036 | no contract clause — the enforcement is the guard test `tests/contract/test_test_entry_guard.py` (T159) |
 
-Count: 35 map rows, 35 distinct FR ids. Whether every requirement reaches at least one clause is decided by the
+Count: 36 map rows, 36 distinct FR ids. Whether every requirement reaches at least one clause is decided by the
 machine reading, not by this table: `account-clause-coverage.py` reports the FR lane as claimed / uncovered names
 (from clause citation groups), and this map is the human index over that reading — it asserts no totality of its own.
+FR-036 is the one declared exception: the 2026-11-09 user ruling names a guard test, not a clause, as its
+enforcement, so the machine FR lane will report it uncovered until an owner revises that ruling; the exception is
+recorded here rather than hidden.
 
 ## Measurement map — SC → red-first module
 
@@ -139,7 +142,7 @@ in full, and it is **not** taken as the verdict, for two measured reasons:
    case FR-012 says a directory-level claim must *not* call a collision.
 2. **The current-spec path set the engine reads is coarser than this feature's delivery surface** — it lists
    `scripts/python`, `shared/declarations/facts` and `templates/instructions-template.md`, none of which 093
-   writes as a directory, and it omits the eight fact filenames, the ten test modules and the 17 agent files. That
+   writes as a directory, and it omits the eight fact filenames, the eleven test modules and the 17 agent files. That
    is F-093-002's family: the engine's declared-surface extraction, not the surface itself.
 
 The adjudication above is therefore **file-level and by reading**, against each earlier feature's own
