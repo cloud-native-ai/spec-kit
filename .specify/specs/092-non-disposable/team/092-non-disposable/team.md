@@ -69,7 +69,11 @@ territory:
   # column — never redesign the body and never rewrite a 档 II body's prose. P7 (档 II detection) may land
   # exactly ONE marker line per receiving body, in the form C-805 fixes, at the defect's location. Which
   # surface lands the marker (P7 cross-line write or the receiving body's own line) is a recorded decision,
-  # not a correction.
+  # not a correction. RECORDED (P1/T005): the P7 cross-line write face is chosen — P7 lands ONE marker line
+  # per receiving body, and `forbidden` is narrowed to that one line for the twelve receiving rows
+  # (eleven receiving bodies + `.specify/memory/features.md`) named in plan.md § Shift List; every other byte of those bodies stays off-limits to P7. The receiving body's
+  # own line is NOT used, because a marker landed by the receiving feature would be authored by a feature
+  # that has not run yet, and the handoff would then be unverifiable at this feature's closure.
   write_carve_outs:
     - pkg: P6
       paths: [.specify/specs/080-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/memory/features.md]
