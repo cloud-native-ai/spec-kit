@@ -1,6 +1,6 @@
 # Dispatch Recipes — 五大执行机制命令形态（sdd-loop-driver）
 
-> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用宿主原生子代理，远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
+> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用 **fork 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`；异构 agent 用 subprocess 承载），远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 >
 > **委派化声明（2026-10-16 裁定）**：与配方真源 `.specify/shared/workflow/external-dispatch-recipes.md` 同型的机制段已坍缩为引用；本文件保留 **loop-driver 特有差异面**（心跳机制、脱离形态权威落点、阶段链与收尾编排）与对真源的引用——单一事实落点，重复即漂移。
 
@@ -16,16 +16,31 @@
 
 ## 本地原生拓扑（默认：入口未给 host+path）
 
-本地拓扑不使用 SSH/`su`，也不启动外部 agent CLI。目标项目按 SKILL.md § U0 与 `.specify/shared/workflow/target-resolution.md` 解析：强依赖 `.specify/`，从显式路径/会话 cwd **向上搜索**最近的合法 `.specify/` 根；找不到就拒绝执行并 handoff `sdd-project-setup` / 提示 `specify init`。阶段派发直接使用当前宿主 agent 的原生子代理（如 Claude Code `Agent`/`Task`、Qoder CLI 原生 subagent）：
+本地拓扑不使用 SSH/`su`。目标项目按 SKILL.md § U0 与 `.specify/shared/workflow/target-resolution.md` 解析：强依赖 `.specify/`，从显式路径/会话 cwd **向上搜索**最近的合法 `.specify/` 根；找不到就拒绝执行并 handoff `sdd-project-setup` / 提示 `specify init`。
 
-- **派发**：把 `stage-prompts.md` 的三段骨架直接作为原生子代理提示词（上下文较大时可先落一份 brief 文件并让子代理读取）；一阶段一次调用，不写 runner、不建 FIFO/hook。
-- **等待**：原生调用是同步阻塞调用，返回即阶段结束——这次调用本身就是 U3 的等待；不适用 `watch-model.md` 的窗口/心跳/退出记录判定，也不得为它启动 `watch-target.sh`。
-- **状态与校验**：U2 派发前写状态脊；返回后按 U4 独立校验（校验者仍不是执行子代理）。失败/超时按 U5 的重试与上送规则处置——没有后台进程可杀。
-- **多线**：宿主支持并行原生调用时可按线并行；否则串行，一线一状态脊。
-- **边界**：MUST NOT 在本地以 `qodercli` / `claude -p` 等外部 CLI 启动子代理；本文件 Recipe 2–3 的 runner/脱离/统一监听仅用于远端拓扑。宿主没有原生子代理能力时，由驱动者在本会话直接执行阶段命令（单代理形态），仍不得降级到外部 CLI。本条只约束**阶段派发**：`/speckit.analyze` §5.5 的只读验证波不是阶段子代理，执行者不可嵌套时按 `.specify/shared/definitions/subagent-definitions.md` § Mode Selection 选 external 只读校验器（`qodercli` 允许），MUST NOT 用宿主会话创建 API（`create_chat_session` 等）。
+**并发承载（FR-035 / C-094）**：并发的承载 MUST 是**独立子进程**，且仅有两类合法形态；宿主内建 Agent 扇出（in-process subagent）路径 **BANNED**（既不是缺省、也不是降级选项）：
+
+- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `scripts/stage-runner.sh` 启动——prompt 经 stdin 传入、输出以 `--output-format stream-json` 流式落盘、完成以阶段哨兵判定。进程池上限取宿主 `nproc` 的**运行期读数**（MUST NOT 固化为常量）；请求并发度取阶段/运行声明；实际进程数 = min(请求值, nproc 读数, 槽位上限)。命令形态见本文件 Recipe 2（本地与远端同构）。
+- **SUBPROCESS 承载（异构 agent）**：当并发单元由与 `qodercli` 不同族的 agent CLI 执行时，由**该 agent 自身 CLI 的独立子进程**承载，并与 FORK 承载满足同一判据：独立进程、逐单元派发/返回区间（最大重叠数即 effective）、完成以哨兵或退出记录判定；MUST NOT 因族差异回落到宿主内建扇出。
+- **in-process 路径不是承载**：同一进程内的 subagent 共享一个进程与一个 CPU 核，扇出只会把单核跑满；该路径 MUST NOT 被计为满足「并行派发」条件，也 MUST NOT 在派发记录中被写成并发机制。无进程承载能力时，登记串行并给出具名理由码（`host-no-parallel`，证据为该次运行的能力探针读数），MUST NOT 声称并行。
+
+**analyze 波（FR-034）**：`analyze` 阶段默认 **N 个并发 SDD Analysis Worker**（`agents/sdd-analysis-worker.agent.md`），N 取自阶段团队配置 / 状态脊 `agent_concurrency_requested`。三件事与并发同时成立，缺任一项判红：
+
+- **(a) 读域互斥（文件级）**：每个 Worker 的读域在派发前逐条声明为**文件级**路径集；同一路径出现在两个并发 Worker 的读域里，即**派发前判红**，不得靠运行时避让。
+- **(b) 确定性归并**：N 份 findings 由一条确定性规则归并为单一报告——先按声明的读域次序分节，节内按 finding id 的字典序；跨 Worker 的重复 id 按「先声明先得」破平，并保留一条指向被抑制副本的指针；MUST NOT 依赖返回时刻。
+- **(c) 记录面**：记录 `requested` / `effective` / `effective_reason` 三元组（`effective` 取逐 Worker 派发/返回区间的最大重叠数，缺失区间记 `not_evaluated`），并记录每个 Worker 的 `executor_id` 与其 verdict 的 `verifier_id`。
+
+**派发与等待**：
+
+- **派发**：fork 承载把 `stage-prompts.md` 的三段骨架经 `stage-runner.sh` 以 stdio prompt 传入（上下文较大时先落一份 brief 文件并让子代理读取）；subprocess 承载按异构 CLI 的等价形态发起。
+- **等待**：fork 子进程与远端 runner 同规——按 `watch-model.md` 的信号源/窗口/正证据/哨兵监听（退出记录、PID、心跳、日志尾行），不适用「同步返回即阶段结束」的旧读法。
+- **状态与校验**：U2 派发前写状态脊；返回后按 U4 独立校验（校验者仍不是执行子代理）。失败/超时按 U5 的重试与上送规则处置。
+- **多线**：宿主支持并行进程承载时按线并行；否则串行，一线一状态脊。
+- **边界**：本条只约束**阶段派发与并发承载**；`/speckit.analyze` §5.5 的只读验证波是 worker 派发，按同一承载规则（fork / subprocess）执行，MUST NOT 用宿主会话创建 API（`create_chat_session` 等）。
 
 ## 阶段子代理预算与分段（Stage Subagent Budget & Bounded Dispatch）
 
+- **测试入口（FR-036）**：任何测试执行 MUST 经 `scripts/bash/run-tests.sh`（缺省 xdist 形态；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
 - **默认预算**：阶段执行子代理的 `run-turn-budget` 统一为 **500**（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-10-22 由 40 上调至 120，2026-11-05 在 1M-context 运行档下由 120 上调至 400，2026-11-06 统一为 500）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
 - **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并由 **最多 6 个执行子代理并发**推进；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
@@ -38,6 +53,8 @@
 两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
+
+> **使用面（FR-035 / C-094）**：`stage-runner.sh` 不只是远端机制——**本地缺省阶段派发同样以它作为 FORK 承载**（同族 `qodercli` 子进程；prompt 经 stdin、`--output-format stream-json`、完成以阶段哨兵判定；进程池上限取运行期 `nproc` 读数，不固化）。宿主内建 in-process subagent 路径 BANNED，不作为并发承载；异构 agent 走 SUBPROCESS 承载（该 agent 自身 CLI 的独立子进程）。
 
 基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
 
@@ -182,9 +199,9 @@ ssh -o BatchMode=yes <alias> \
 
 ## Recipe 5 — 本地拓扑与远端 runner 变体
 
-> **SDD local default**：本地拓扑的缺省承载是**宿主原生子代理 / 编排者直执**（见本文件 `## 本地原生拓扑`）。下面的 runner/脱离形态用于**远端**；本地 MUST NOT 以 `qodercli` 作为 SDD 缺省子代理。只有入口显式要求“本地外部派发”时才允许本地 runner，并须记录该例外。（analyze 验证波例外见 `## 本地原生拓扑` 边界条。）
+> **SDD local default**：本地拓扑的缺省承载是 **FORK 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`，见本文件 `## 本地原生拓扑`）；异构 agent 用 **SUBPROCESS 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**。下面的脱离/统一监听形态在本地与远端同构（本地缺省即 fork 子进程 + 窗口监听；远端为 ssh 下的同形 runner）。
 
-- **本地原生缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`<repo>/.specify/.tmp/sdd-loop/tmp/<line_id>/brief-<topic>.md`，HR11 唯一落点；shared Recipe 5 的 `~/tmp` 示例不适用于本技能），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」；一阶段一次原生调用，不写 runner、不建 FIFO/hook。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听不适用窗口模型（`watch-model.md` §6）。
+- **本地 fork 缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`<repo>/.specify/.tmp/sdd-loop/tmp/<line_id>/brief-<topic>.md`，HR11 唯一落点；shared Recipe 5 的 `~/tmp` 示例不适用于本技能），阶段提示词经 `stage-runner.sh` 的 stdio/文件形态传入；监听按 `watch-model.md`（fork 子进程与远端 runner 同规）。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5 与本节 runner 形态。
 - **远端 runner（缺省形态，与远端同构）**：`setsid` 可用时优先，本机 macOS 无 `setsid` 时用 `nohup + disown`；stdin 接 `/dev/null`，stdout/stderr 重定向到 runner-log：
 
   ```bash
