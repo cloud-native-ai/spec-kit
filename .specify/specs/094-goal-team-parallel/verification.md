@@ -131,3 +131,12 @@ notes=The closure judgement was run over this file (see notes/closure-readings.m
 - Gates: `wp07-validate-requirements.txt`, `wp07-validate-tasks.txt`, `wp07-validate-decision-tensions.txt`, `wp07-pre-analyze-{requirements,plan,tasks}.txt`, `wp07-decomposition-{plan,tasks}.txt`, `wp07-mirror-check.txt`, `wp07-copy-check.txt`, `wp07-script-interface.txt`.
 - Smoke: `wp07-smoke.txt` (command + exit) and `wp07-smoke.out` (54 passed).
 - Readiness: `wp07-closure-acceptance.txt` (verdict + final_path, recorded by T080).
+
+# -- Review transition (2026-11-09) --
+
+review_gate=pass
+review_segments=A process pass / B artifacts pass (round 2 after repair 0f02c32fb; round 1 blocked on AF-1/AF-2, both closed) / C implementation pass / D code pass (no blocking) / ARC accept sustained (SC-010 status corrected to partial on the supporting path)
+review_records=notes/review-consolidated.md, notes/review-process-artifacts.md, notes/review-implementation-code.md, notes/review-arc.md, notes/review-artifacts-round2.md
+registry_transition=Planned → Ready for Review (owner: /speckit.review; features.md row 094 status + Last Updated in the same pass)
+final_path=pass=8 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=8 (reproduced at 0f02c32fb before and after the repair)
+carried_residuals=notes/review-consolidated.md § 4 (D-I1 dangling archive pointers, D-I2 create→bind gap, GATE-1 main-tree reading, 088 one-level team.md, trigger/index.json host mutation)
