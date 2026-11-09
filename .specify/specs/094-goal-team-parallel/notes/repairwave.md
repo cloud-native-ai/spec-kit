@@ -71,7 +71,7 @@ outside the probe and the migration (residual risk 4).
 - **Post-wave reading** (this worktree, canonical runner, parallel pass):
   **186 failed, 8199 passed, 2 skipped, 576 warnings in 41.28 s**; serial mini-pass
   1 passed (not GATE-1). Failed-name set: `repairwave-failed.txt` (186 ids).
-- **Fixed = 24**, **New = 58**, arithmetic 152 − 24 + 58 = 186
+- **Fixed = 24**, **New = 58**, arithmetic (152 − 24) + 58 = 128 + 58 = 186 — re-expressed 2026-11-10 (history wave G2): same readings, written so the truncated pair sum no longer hides the starting total
   (`repairwave-fixed-vs-pre.txt` / `repairwave-new-vs-pre.txt`, `LC_ALL=C comm`).
 
 **Fixed (24)** — 23 are the wave's own ids:

@@ -9,7 +9,7 @@
 
   Consequence: the feature is **`Completed`** (user acceptance, 2026-11-06). After the T032 classification slice and the
   user-authorized 2026-11-05 final test budget, both `final`-path criteria pass: SC-001 on the
-  seconds-level coverage/verify readings (`unclassified 0`, determinism, no orphan declarations,
+  seconds-level coverage/verify readings (`unclassified`: 0 at the 2026-11-05 run, determinism, no orphan declarations,
   consumer consistency), SC-002 on the contract module (68 passed) and the residual `duplicate`
   face (pass / 0 findings). The smoke record is complete (two byte-identical coverage runs, exit
   0). Supporting criteria SC-003/SC-005/SC-006 remain deferred/partial; the state machine's
@@ -67,11 +67,11 @@ verdict=pass
 # -- Success Criteria evaluation --
 
 SC-001_status=pass
-SC-001_value=candidates 86 / in-scope 13 / excluded 73 / unclassified 0; coverage exit 0; verify exit 0 with 0 findings; two consecutive coverage runs byte-identical (sha256 1b45a860…49e6, 68 ms / 65 ms); no declaration outside the candidate set; consumer consistency declarations→carriers 32/32 and carriers→declarations 16/16
+SC-001_value=candidates 86 / in-scope 13 / excluded 73 / `unclassified`: 0 at the 2026-11-05 run; coverage exit 0; verify exit 0 with 0 findings; two consecutive coverage runs byte-identical (sha256 1b45a860…49e6, 68 ms / 65 ms); no declaration outside the candidate set; consumer consistency declarations→carriers 32/32 and carriers→declarations 16/16
 SC-001_note=all four limbs read on the final tree after T032: (i) determinism holds; (ii) zero `unclassified-candidate:`; (iii) zero orphan declaration; (iv) bidirectional consumer consistency. Fast deterministic readings, not test suites; evidence in test-evidence/t032-classification-readings-2026-11-05.txt
 SC-001_evidence=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
 SC-001_verified_at=2026-11-05 (T032 classification slice, commit 94d9db33)
-SC-001_recheck=2026-11-09 (092 A2, u04): the tree drifted after 084 closed — three carriers entered the screen (`templates/commands/measure.md`, `templates/commands/status.md` from 087, `skills/external/ssh-utils/SKILL.md` from the ssh-utils refactor). Before: candidates 86 / excluded 70 / unclassified 3, `unclassified-candidate` on those three, coverage exit 1 and verify exit 1 (3 findings). Fix: one `no-harness-asset` row each (32 → 35 rows), source and `.specify/` copies byte-identical. After: excluded 73 / unclassified 0, coverage exit 0 and verify exit 0 with 0 findings. At the fix instant verify read consistency 32/32 and 16/16; a concurrent 092 edit to `skills/internal/manage-history/SKILL.md` (a pointer to `non-disposable-review-surface`, added after that run and not registered in its `consumers`/`former_carriers`) makes the live backward reading 16/17 — not caused by this change and outside the 084 exclusion set. `requirements.md:219` is the SC-001 criterion, not a reading — unchanged, still satisfied
+SC-001_recheck=2026-11-09 (092 A2, u04): the tree drifted after 084 closed — three carriers entered the screen (`templates/commands/measure.md`, `templates/commands/status.md` from 087, `skills/external/ssh-utils/SKILL.md` from the ssh-utils refactor). Before: candidates 86 / excluded 70 / unclassified 3, `unclassified-candidate` on those three, coverage exit 1 and verify exit 1 (3 findings). Fix: one `no-harness-asset` row each (32 → 35 rows), source and `.specify/` copies byte-identical. After: excluded 73 / `unclassified`: 0 at the fix instant (2026-11-09), coverage exit 0 and verify exit 0 with 0 findings. At the fix instant verify read consistency 32/32 and 16/16; a concurrent 092 edit to `skills/internal/manage-history/SKILL.md` (a pointer to `non-disposable-review-surface`, added after that run and not registered in its `consumers`/`former_carriers`) makes the live backward reading 16/17 — not caused by this change and outside the 084 exclusion set. `requirements.md:219` is the SC-001 criterion, not a reading — unchanged, still satisfied
 
 SC-002_status=pass
 SC-002_value=declarations 24; consistency declarations→carriers 32/32, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 73 exclusion rows (13 in-scope / 73 excluded / 0 unclassified); residual `duplicate` face pass / 0 findings; contract module 68 passed
@@ -91,10 +91,11 @@ SC-003_why_reduced_insufficient=fixture-backed 6/6 with verbatim instances is th
 SC-003_unblock=run the contract module under an unwaived budget; nothing else is missing
 
 SC-004_status=pass
-SC-004_value=73 exclusion rows in 2 reason files (`no-machine-fact` 38 rows, `no-harness-asset` 35 rows); `by-owner-decree` 0 rows and consequently no third file created; `exclusion-anchor-unresolvable` 0; unit named twice 0; `coverage` exit 0 with `unclassified 0`
+SC-004_value=73 exclusion rows in 2 reason files (`no-machine-fact` 38 rows, `no-harness-asset` 35 rows); `by-owner-decree` 0 rows and consequently no third file created; `exclusion-anchor-unresolvable` 0; unit named twice 0; `coverage` exit 0 with `unclassified`: 0 at the 2026-11-05 run
 SC-004_note=both limbs measured mechanically on the final tree: every reason value is a filename equal to a member of `contract.yaml#/exclusion_reasons` (the engine rejects any other, an input error that did not occur) and every anchor resolves (0 `STR-012`). Whether each reason is *sufficient* remains a review judgement, which the criterion itself says it does not claim
 SC-004_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
-SC-004_recheck=2026-11-09 (092 A2, u04): before = 70 rows (`no-machine-fact` 38, `no-harness-asset` 32); after = 73 rows (`no-harness-asset` 35, appended at the end per E-2). Every new anchor resolves (`#Delegation` on the two command templates, `#Boundary` on the ssh-utils skill), no unit named twice, `unclassified 0`
+SC-004_recheck=2026-11-09 (092 A2, u04): before = 70 rows (`no-machine-fact` 38, `no-harness-asset` 32); after = 73 rows (`no-harness-asset` 35, appended at the end per E-2). Every new anchor resolves (`#Delegation` on the two command templates, `#Boundary` on the ssh-utils skill), no unit named twice, `unclassified`: 0 at the 2026-11-09 recheck
+SC-004_recheck_2026-11-10=history wave G2 re-measurement: declarations 34; candidates 87; consistency declarations→carriers 47/51 and carriers→declarations 16/101; `unclassified`: 2 (unclassified-candidate: shared/workflow/execution-topology.md and unclassified-candidate: skills/internal/create-team/SKILL.md); coverage exit 1; verify exit 1 with two findings. The 2026-11-05 and 2026-11-09 zeros above are dated readings; this line is their current recomputation.
 
 SC-005_status=partial
 SC-005_value=mirror limb READ: `sync-mirrors.py --check` exit 0, six pairs `ok` (templates 22, skills/external 409, skills/internal 138, agents 3, scripts 121, shared 89); second `--write` changed nothing in the tree

@@ -26,7 +26,9 @@ Live count claims in the seven files: all agree with the measured table or carry
 `tasks.md:7,30,35,38,47,87-89,96,126,349,478-488`; `feature-ref.md:9,39`; `quickstart.md:27`;
 `features.md:101`; `features/094.md:33-49`. Minor description nuance (not a count violation):
 `feature-ref.md:39` "two FR cells per row" over 22 rows holds for 21 rows — the 22nd carries one FR
-cell (21×2 + 1 = 43 entries; the stated 43 / 22 / 43 numbers are exact).
+cell (21 rows carrying two FR cells each make 42 entries, and the 22nd row's single cell makes 43
+entries in all; the stated 43 / 22 / 43 numbers are exact). Re-expressed 2026-11-10 (history wave
+G2): same readings, spelled so the line's leading product is visible to a line-level reader.
 
 ## 2. W2's M-5 anomaly — what the three sites now say
 

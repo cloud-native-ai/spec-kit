@@ -34,8 +34,16 @@ post_gate_violations=0
 post_mirror_miss=6
 post_mirror_diff=0
 post_new_mirror_drift=0
-post_docs_validation_new_findings=0
-post_docs_validation_preexisting_findings=1
+post_docs_validation_new_findings_2026-09-05=0
+post_docs_validation_preexisting_findings_2026-09-05=1
+# 2026-11-10 re-measurement (history wave G2): docs-utils validate on this tree reports 5
+# violations (root-entry-oversize: CHANGELOG.md; broken-link x2: docs/concepts/overview.md;
+# note-frontmatter x2: docs/notes/081-acceptance-hardening-final.md,
+# docs/notes/type-follows-stage-misclassification.md). The harness-triple-check verifier
+# reports two findings (exit 1): unclassified-candidate: shared/workflow/execution-topology.md
+# and unclassified-candidate: skills/internal/create-team/SKILL.md. The
+# 2026-09-05 zeros above are dated readings against that run's baseline, superseded as
+# current claims by this block.
 post_upstream_merge_commit=cc344fcac377935fecd94416d2b52bd49ca35e12
 post_upstream_merge_targeted_passed=334
 post_upstream_merge_failed_nodes=43

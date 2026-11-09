@@ -86,8 +86,9 @@ SC-004_value=追溯重写文件数=0；面摘要：diff-audit=pass（7c835ba6..H
 SC-004_note=逐文件判定见 us14。
 
 SC-005_status=pass
-SC-005_value=implement 面=pass（受控语料端到端：一致 rc=0 / census_total=3；负控 rc=1 证比对真实执行；中文侧逐字比对含 Variants 归一；100% census 无抽样）；review 面=pass（us19：quickstart S8 原样命令实跑真实词汇表，rc=0 / census_total=7 / findings=0 / 墙钟 0.275s << 60s；glossary-utils 独立解析与契约腿 test_census_action 期望一致；不一致处数=0）
+SC-005_value=implement 面=pass（受控语料端到端：一致 rc=0 / census_total=3；负控 rc=1 证比对真实执行；中文侧逐字比对含 Variants 归一；100% census 无抽样）；review 面=pass（us19：quickstart S8 原样命令实跑真实词汇表，rc=0 / census_total=7 / 0 findings（词汇 census 面）/ 墙钟 0.275s << 60s；glossary-utils 独立解析与契约腿 test_census_action 期望一致；不一致处数=0）
 SC-005_note=两面齐备；census 解析独立于 review 修复的 scan S1 分支，修复前后输出逐字一致。
+SC-005_recheck=2026-11-10 (history wave G2 re-measurement): the zero findings recorded above belong to the glossary census face (glossary-utils validate: valid, zero findings on 2026-11-10 too), not to the harness-triple-check verifier; the verifier on this tree reports two findings (exit 1): unclassified-candidate: shared/workflow/execution-topology.md and unclassified-candidate: skills/internal/create-team/SKILL.md.
 
 # -- Deferred tasks --
 

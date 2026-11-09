@@ -1,0 +1,102 @@
+# History execute — Wave 1, G2 (false-closed-set → correct) — 2026-11-10
+
+Run: /speckit.history four-stage seam, execute segment (Step 6), wave 1 group G2.
+Executor: bounded repair executor, main tree; no commit, no push, no subagents.
+Inputs: `.specify/.tmp/history-review.json` (read-only; the confirmed 10 false-closed-set entries),
+`.specify/.tmp/history-execute-plan.md` (group `correct`), owner page § Disposal Pathways (`correct` = in-place
+edit + before/after readings).
+
+RESULT: G2 is **closed** — false-closed-set 10 → **0** (measured). `not_closed.open` 918 → 908 (−10, exactly
+the group size). No class count moved because of these edits; one anchor cascade is named below.
+
+### Line-anchor cascade (named)
+
+The 049 edit inserts an 8-line dated block above two existing orphan-path readings, so those two entries'
+anchors move by +8 lines (`specs/049-docs-reconcile/verification.md:58 → :66` and `:74 → :82`). The defect
+set is otherwise identical: `orphan-path` 736 → 736, with exactly those two ids added and removed (measured by
+set difference of `entry_id` across `history-w1-before.json` and `history-w1-after-g2.json`).
+
+## readings
+
+### Capture Rule
+
+The four readings and their attribution are recorded once, in `history-execute-g1.txt` § readings (same wave,
+same tree). Summary: mirrors before/after `ok` byte-identical (102 → 110 files, the +8 is the concurrent 093
+merge `fc19cccc9`); instructions 36419 → 36804 B (same merge); constitution pins 27 / 21 unchanged; worktree
+before 10 `??` → after 6 `M` (this group) + 2 `??` (this group's JSON readings). The review-surface digest was
+identical across every engine run of this wave (`e4e9acc82b79b92e…`, candidates 1989).
+
+### Engine readings (command + exit + raw artifact)
+
+- before: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w1-before.json`
+  — exit 1; false-closed-set **10**; `not_closed.open` 918.
+- after: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w1-after-g2.json`
+  — exit 1; false-closed-set **0**; `not_closed.open` 908.
+
+### Per-entry before / after readings
+
+Recomputation instruments (run at write time, 2026-11-10): `harness-triple-check.py --action verify` →
+declarations 34, candidates 87, consistency declarations→carriers 47/51, carriers→declarations 16/101,
+**findings 2** (`unclassified-candidate: shared/workflow/execution-topology.md`,
+`unclassified-candidate: skills/internal/create-team/SKILL.md`), exit 1. `docs-utils.py --action validate` →
+**5 violations** (`root-entry-oversize CHANGELOG.md`; `broken-link docs/concepts/overview.md` ×2;
+`note-frontmatter docs/notes/081-acceptance-hardening-final.md` and `…/type-follows-stage-misclassification.md`).
+`glossary-utils.py --action validate` → valid (0 findings on the glossary face).
+
+| # | entry_id | claim read at the line (before) | recomputation | after (body edit) |
+|---:|---|---|---|---|
+| 1 | `false-closed-set/specs/049-docs-reconcile/verification.md:37` | `post_docs_validation_new_findings=0` — an unqualified zero on the docs-validation face | docs-utils today: 5 violations; verifier today: 2 findings | keys date-scoped to the measurement (`…_2026-09-05=0`, `…_preexisting_findings_2026-09-05=1`) + a dated `2026-11-10` re-measurement block beside them naming both instruments' current readings |
+| 2 | `false-closed-set/specs/079-bilingual-expression/verification.md:89` | `census_total=7 / findings=0` — the zero belongs to the glossary census face | glossary-utils today: valid, zero findings on that face; the verifier (a different instrument) reports 2 findings | `census_total=7 / 0 findings（词汇 census 面）` (same numeral, producer named) + `SC-005_recheck` dated `2026-11-10` carrying the verifier reading |
+| 3 | `…/084-harness-triple-structure/verification.md:12` | `unclassified 0` inside the 2026-11-05 waiver narrative | verifier today: `unclassified`: 2 (both named) | `unclassified`: 0 **at the 2026-11-05 run** |
+| 4 | `…/084-harness-triple-structure/verification.md:70` | `excluded 73 / unclassified 0` (SC-001 value) | same | `unclassified`: 0 **at the 2026-11-05 run** |
+| 5 | `…/084-harness-triple-structure/verification.md:74` | `excluded 73 / unclassified 0` (SC-001 recheck) | same | `unclassified`: 0 **at the fix instant (2026-11-09)** |
+| 6 | `…/084-harness-triple-structure/verification.md:94` | `` `unclassified 0` `` (SC-004 value) | same | `unclassified`: 0 **at the 2026-11-05 run** |
+| 7 | `…/084-harness-triple-structure/verification.md:97` | `` `unclassified 0` `` (SC-004 recheck) | same | `unclassified`: 0 **at the 2026-11-09 recheck**; a new `SC-004_recheck_2026-11-10` line carries declarations 34 / candidates 87 / 47:51 / 16:101 / `unclassified`: 2 / exit 1 |
+| 8 | `…/089-script-interface-contract/verification.md:31` | `367 + 737 = 1 104 ≠ 751` — a refutation spelled as an arithmetic identity (the line-level reader took `1` as the claimed total) | 367 + 737 = 1104; candidates 751; the identity `applicable + exempt == candidates` is void (the file's own next paragraph names the 353 overlapping paths) | the sum is stated in prose (“the sum of `applicable` and `exempt` is 1104, which exceeds 751”) and the refutation is preserved; a dated re-expression note says the three readings and the sum are unchanged and why the equality spelling is gone |
+| 9 | `…/094-goal-team-parallel/notes/analyze-round4/fv2-consistency.md:29` | `21×2 + 1 = 43` — true (42 + 1 = 43); the line-level reader truncated it to `2 + 1 = 43` (3 ≠ 43) | 21 rows × 2 + 1 row × 1 = 43; the stated 43 / 22 / 43 are exact | the product is spelled out (“21 rows carrying two FR cells each make 42 entries, and the 22nd row's single cell makes 43 in all”); all readings kept; dated note |
+| 10 | `…/094-goal-team-parallel/notes/repairwave.md:74` | `152 − 24 + 58 = 186` — true (128 + 58 = 186); the line-level reader truncated it to `24 + 58 = 186` (82 ≠ 186) | 152 − 24 = 128; 128 + 58 = 186; the recorded set sizes agree | `(152 − 24) + 58 = 128 + 58 = 186`; all three numbers kept; dated note |
+
+No dated reading was renumbered or re-valued: every original numeral and date survives in place; the edit
+either scopes it to its measurement (a zero is now "at the <date> run") or completes its arithmetic (an
+identity is now spelled completely). Each edited line carries a `2026-11-10` provenance note.
+
+Cross-instrument note: `harness-triple-check` itself moved between this wave's first and last runs (findings 1 →
+2, declarations 26 → 34) because the concurrent 093 merge `fc19cccc9` added
+`shared/workflow/execution-topology.md` to its screen; the numbers written into the records are the ones measured
+*after* that merge (the final run). The delta is not attributable to G2.
+
+## paths
+
+Tracked paths changed (6; the whole `correct` surface — `git diff --name-only` scope):
+
+1. `.specify/specs/049-docs-reconcile/verification.md`
+2. `.specify/specs/079-bilingual-expression/verification.md`
+3. `.specify/specs/084-harness-triple-structure/verification.md`
+4. `.specify/specs/089-script-interface-contract/verification.md`
+5. `.specify/specs/094-goal-team-parallel/notes/analyze-round4/fv2-consistency.md`
+6. `.specify/specs/094-goal-team-parallel/notes/repairwave.md`
+
+Reversal per path: `git checkout -- <path>`. No file was moved or renamed (`moved` = null for every entry).
+
+## corpus
+
+Empty: none of the ten entries carries a `source_entry`. Shape correspondence only (recorded, not claimed as an
+id): the measurement-claim family matches corpus shape A2 and entry 8 matches corpus shape E4
+(`.specify/archive/specs/092-non-disposable/plan.md` lines 401 and 424).
+
+## dispositions
+
+One row per entry, E-4 shape. `group` = the user-confirmed group granularity value (`false-closed-set`).
+
+| entry_id | disposition | group | moved | superseded_by | reverted_by | irreversible |
+|---|---|---|---|---|---|---|
+| `false-closed-set/specs/049-docs-reconcile/verification.md:37` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/049-docs-reconcile/verification.md` | false |
+| `false-closed-set/specs/079-bilingual-expression/verification.md:89` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/079-bilingual-expression/verification.md` | false |
+| `false-closed-set/specs/084-harness-triple-structure/verification.md:12` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/verification.md` | false |
+| `false-closed-set/specs/084-harness-triple-structure/verification.md:70` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/verification.md` | false |
+| `false-closed-set/specs/084-harness-triple-structure/verification.md:74` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/verification.md` | false |
+| `false-closed-set/specs/084-harness-triple-structure/verification.md:94` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/verification.md` | false |
+| `false-closed-set/specs/084-harness-triple-structure/verification.md:97` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/084-harness-triple-structure/verification.md` | false |
+| `false-closed-set/specs/089-script-interface-contract/verification.md:31` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/089-script-interface-contract/verification.md` | false |
+| `false-closed-set/specs/094-goal-team-parallel/notes/analyze-round4/fv2-consistency.md:29` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/094-goal-team-parallel/notes/analyze-round4/fv2-consistency.md` | false |
+| `false-closed-set/specs/094-goal-team-parallel/notes/repairwave.md:74` | `correct` | false-closed-set | null | null | `git checkout -- .specify/specs/094-goal-team-parallel/notes/repairwave.md` | false |

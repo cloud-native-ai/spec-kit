@@ -1,0 +1,127 @@
+# History execute — Wave 1, G1 (deferral-marker → exempt) — 2026-11-10
+
+Run: /speckit.history four-stage seam, execute segment (Step 6), wave 1 group G1.
+Executor: bounded repair executor, main tree; no commit, no push, no subagents.
+Inputs: `.specify/.tmp/history-review.json` (read-only; the confirmed 14 deferral-marker entries),
+`.specify/.tmp/history-execute-plan.md` (group `exempt`), owner page `shared/definitions/non-disposable-definitions.md`
+§ Exemption, `.specify/archive/specs/092-non-disposable/data-model.md` E-3 / E-4 / E-7.
+
+RESULT: G1 is BLOCKED — no exemption file was written and no deferral marker was closed. The prescribed
+mechanism (a declaration-layer exemption fact) is inert for this class and its shape is rejected by the
+declaration layer's own schema. Both statements are measured below; the class count is 15 before and 15 after
+(no drop is claimed). `HIST-W1-G1-BLOCKED`.
+
+## readings
+
+### Capture Rule (four readings, before / after, same ruler)
+
+| # | reading | command | before (wave start) | after (wave end) | attribution |
+|---|---|---|---|---|---|
+| 1 | mirror baseline | `python3 scripts/python/sync-mirrors.py --check` | exit 0 · `ok shared/ == .specify/shared/ (102 files, byte-identical)` | exit 0 · `(110 files, byte-identical)` | +8 files from the concurrent 093 merge `fc19cccc9` (8 new `shared/declarations/facts/*.yaml`), not from this wave |
+| 2 | instructions bytes | `wc -c .specify/instructions.md` | 36419 | 36804 | +385 B from the same concurrent merge's instructions refresh, not from this wave |
+| 3 | constitution pins | `grep -c '^### ' .specify/memory/constitution.md` / `.specify/templates/constitution-template.md` | 27 / 21 | 27 / 21 | unchanged (no principle added; no template drift) |
+| 4 | worktree form | `git status --porcelain` | 10 entries, all `??` (session/coaching/feedback/exec-quant records written by another session) | 6 `M` (this wave's G2 edits) + 2 `??` (this wave's two JSON readings) | the before-set was committed by `163805e5e` mid-wave; G1 itself wrote no tracked path |
+
+The wave ran on a live shared worktree: commits `2344a1036`, `fc19cccc9`, `163805e5e` landed between the
+before and after readings. The review surface digest was **identical** across every engine run taken for this
+wave (`e4e9acc82b79b92e…`, candidates 1989), so the readings below compare like with like.
+
+### Engine readings (command + exit + raw artifact)
+
+- before: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w1-before.json`
+  — exit **1**; classes: deferral-marker **15**, false-closed-set 10, multi-owner 1, orphan-path 736,
+  renumber-live-binding 105, stale-constant 0, status-unreadable 52, superseded-live 0; `not_closed.open` 918.
+- after (G2 edits done; G1 wrote nothing): `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w1-after-g2.json`
+  — exit **1**; classes: deferral-marker **15** (unchanged), false-closed-set **0**; `not_closed.open` 908.
+- The class count in `classes.*` counts entries regardless of state; even a fully wired exemption would leave
+  `deferral-marker.count` non-zero and move entries to `not_closed.closed_by_exemption`. The gate's literal
+  "count drops to 0" is therefore unattainable by *any* exemption (state change), not only by files.
+
+### Mechanism verification — how an exemption is keyed, and what reads it
+
+- `_exemptions(root)` at `scripts/python/non-disposable-check.py:565-583` builds `{feature-id: exemption}` from
+  `shared/declarations/facts/*.yaml` (through `declaration_reader.load_facts`). It is called from exactly one
+  class: `class_status_unreadable` (`:680`), where it decides the state of the verification-machine-block (O2)
+  entry of that feature. `class_deferral_marker` (`:748-788`) never consults it; its only exemption-like test is
+  `EXPIRY_FIELD_RE.search(window)` over the marker's own paragraph in the marker's own file.
+- Probe P1 (mechanism inert). Scratch tree `.specify/.tmp/histw1-scratch/g1probe/` holds one spec file carrying a
+  retention statement with no expiry field, plus one in-force exemption fact (`feature: "999"`, four E-3 fields,
+  expiry in 2099).
+  `python3 scripts/python/non-disposable-check.py --root .specify/.tmp/histw1-scratch/g1probe --json` → exit 1:
+  `deferral-marker/specs/999-probe/requirements.md:3 | state=open | exemption=None`; deferral-marker count 1;
+  `not_closed: {'closed_by_exemption': 0, 'open': 1, …}`. The fact changes nothing for this class.
+- Probe P2 (schema collision). The exemption fact shape (`fact`, `kind: record`, `feature`, the four E-3
+  fields) violates the declaration layer's schema owner: `shared/declarations/contract.yaml` requires
+  `fact, kind, statement, consumers, former_carriers`, keeps `note` as the only optional key, and closes
+  `fact_kinds` to threshold / closed-set / ordered-operator-table / mapping / record-schema (no `record`).
+  `python3 scripts/python/harness-triple-check.py --action verify --repo .specify/.tmp/histw1-scratch/repo`
+  (a scratch copy of `shared/declarations` plus one exemption fact) → exit **2**:
+  `input-error: shared/declarations/facts/exemption-test.yaml: missing required key(s) statement, consumers, former_carriers`.
+  Writing the 14-entry carriers into the real `shared/declarations/facts/` would turn the live declaration
+  layer into an input error for every `harness-triple-check.py` consumer.
+- Probe P3 (cross-group keying — why "the fewest files the engine reads" resolves to zero). Were the facts
+  written keyed by feature, the same key is read by `class_status_unreadable`; features 045 / 051 / 059 / 072 /
+  090 each carry a G5 `status-unreadable` entry, so their G5 entries would flip to `exempt` — a cascade into a
+  group whose confirmed disposition is `correct` and which this wave does not execute. One entry
+  (`.specify/teams/viz-skill-arena/STATE.md`) has no feature id to key on at all.
+
+## paths
+
+- Tracked paths changed by G1: **none** (no exemption file, no mirror, no spec edit).
+- Scratch readings (git-ignored, retained per the wave's no-delete rule): `.specify/.tmp/histw1-scratch/g1probe/**`,
+  `.specify/.tmp/histw1-scratch/g1probe.json`, `.specify/.tmp/histw1-scratch/repo/**`.
+- New evidence files (untracked until the driver commits):
+  `.specify/specs/090-re-anchoring/test-evidence/history-w1-before.json`,
+  `.specify/specs/090-re-anchoring/test-evidence/history-w1-after-g2.json`, this file.
+- Reversal: nothing to revert for G1.
+
+## corpus
+
+Empty. `deferral-marker` has no A–H corpus row — the class is proven by construction (owner page § Detection
+Categories, C-106); the 14 entries carry no `source_entry`.
+
+## dispositions
+
+No E-4 record is emitted for any entry: an E-4 row with `disposition: exempt` would claim a closure that does
+not exist (`derive_closed` rejects an `exempt` entry without an in-force exemption reading, `:1626-1629`), and
+E-7's `dispositions` segment records what was written, not what was intended.
+
+| # | entry_id | derived feature key | suggested | applied | blocker |
+|---:|---|---|---|---|---|
+| 1 | `deferral-marker/memory/features/090.md:47` | 090 | exempt | none | no engine-readable, schema-valid carrier (P1 + P2) |
+| 2 | `deferral-marker/memory/features/092.md:19` | 092 | exempt | none | same |
+| 3 | `deferral-marker/specs/018-cli-priority-support/tasks.md:70` | 018 | exempt | none | same |
+| 4 | `deferral-marker/specs/030-summarize-project/tasks.md:254` | 030 | exempt | none | same |
+| 5 | `deferral-marker/specs/045-sanitize-command/quickstart.md:23` | 045 | exempt | none | same; feature key also read by the O2 class (P3) |
+| 6 | `deferral-marker/specs/051-user-facing-comprehension/requirements.md:379` | 051 | exempt | none | same; feature key also read by the O2 class (P3) |
+| 7 | `deferral-marker/specs/059-exec-quant-recording/tasks.md:227` | 059 | exempt | none | same; feature key also read by the O2 class (P3) |
+| 8 | `deferral-marker/specs/072-client-self-improvement/tasks.md:365` | 072 | exempt | none | same; feature key also read by the O2 class (P3) |
+| 9 | `deferral-marker/specs/081-acceptance-hardening/code-review-081b.md:60` | 081 | exempt | none | same |
+| 10 | `deferral-marker/specs/084-harness-triple-structure/tasks.md:261` | 084 | exempt | none | same |
+| 11 | `deferral-marker/specs/086-efficient-test-execution/tasks.md:336` | 086 | exempt | none | same |
+| 12 | `deferral-marker/specs/090-re-anchoring/data-model.md:288` | 090 | exempt | none | same |
+| 13 | `deferral-marker/specs/090-re-anchoring/tasks.md:532` | 090 | exempt | none | same |
+| 14 | `deferral-marker/teams/viz-skill-arena/STATE.md:58` | (none) | exempt | none | same, and no feature id exists to key on |
+
+Mapping (recorded per instruction): 14 entries → 11 distinct feature keys (090 covers three entries:
+`memory/features/090.md`, `specs/090-re-anchoring/data-model.md`, `specs/090-re-anchoring/tasks.md`; 092 covers
+`memory/features/092.md`; 018 / 030 / 045 / 051 / 059 / 072 / 081 / 084 / 086 one each; the team STATE entry
+none). **Files the engine actually reads for deferral markers: 0** — so the instruction's "fewest files that
+the engine actually reads" is satisfied by writing none.
+
+### Cascades (named, each measured)
+
+1. **Surface drift vs the review snapshot.** Live deferral-marker count is 15, not 14: the 093 merge
+   (`fc19cccc9`, 2026-11-10 00:40:57) added
+   `specs/093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md:5` to the class after
+   the snapshot. It is outside the confirmed set and was not touched. The same merge added one `multi-owner`
+   entry (`specs/093-concurrency-by-default/notes/quickstart-run.md:52`, state `unevaluated`).
+2. **Mechanism gap (P1 + P2).** The owner page's exemption carrier is incompatible with the declaration
+   layer's schema owner (084's `contract.yaml` + `harness-triple-check.py`), and the engine wires exemptions
+   only into `status-unreadable`. Fixing this is a framework decision: add an exemption kind to the
+   declaration schema (owner revision + checker + tests), or wire a per-entry exemption store in the engine,
+   or reclassify G1 as `correct` (the class's own reader accepts an expiry field in the marker's paragraph,
+   which is a repair, not an exemption).
+3. **Gate reading.** "deferral-marker count drops to 0" was measured as **not achieved** (15 → 15). No drop is
+   claimed. Under the engine's semantics the class count never drops on exemption; the reachable readings are
+   `state: exempt` plus `closed_by_exemption` (both 0 here).
