@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794224585
 stage_base_commit: 215c3dcb
 attempt: 1
 retry_limit: 3
-last_verdict: "Analyze-repair round 2 = PART A CLOSED: complete-correction manifest 20/20 surfaces (15 added via T144–T152 + the plan manifest table), FR-035 now states the ban + fork/subprocess carriers; PART B V3 fixes closed (V3-F1/F3/F4 + LOWs); gates: validate-requirements 0/0, validate-tasks 0/0 over 152 rows, tensions 5 records 0/0, pre-analyze x3 pass 0 errors (112 advisories), decomposition proceed 35 FR / 152 tasks; commits 86b9e43c + 8c5198d7."
+last_verdict: "Analyze round 3 verification = V1B FAIL (3 MEDIUM manifest gaps: decomposition-model.md § 13.4 carrier, stage-team-preset.md L74 native-local, subagent-definitions.md ban row missing) / V2B PASS (V3-F1/F3/F4 + LOWs closed; gates green: tasks 152 rows 0/0, pre-analyze pass, decomposition proceed 35/152) / V3B FAIL (V3B-F1 MEDIUM: tasks.md T006 says 92 clauses vs 94 measured; V3B-F2 LOW: quickstart S-9 dangling). Repair round 3 dispatched."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze round 3 verification as 3 fork verifiers (manifest coverage 20/20; V3 fixes + gates; counts/consistency)"
+next_action: "dispatch repair round 3 (fork 093-r3): the 3 manifest gaps + V3B items; then analyze round 4 verification (final)"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
