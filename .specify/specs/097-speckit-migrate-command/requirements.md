@@ -11,8 +11,10 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 024
+**Feature Name**: Specification Workspace Versioning
+
+**绑定说明（2026-11-10 clarify）**: 本规格是 Feature 024 的首个子规格，实现其「跨 CLI 版本的 `.specify/` 工作区安全升级」能力。024 详情中原设想的 `.specify/version` 标记、版本→迁移注册表与 `specify upgrade` 命令不作为实现形态——本规格以「当前已安装版本的声明与资产即期望态、一次直达」取代（FR-005、FR-020）。该演进的 registry 集成（024 详情 related-specifications、索引行 Last Updated）受本阶段「只改 requirements.md」约束，记为待办恢复点。
 
 ## Overview
 
@@ -88,7 +90,7 @@
 
 - **目标已存在且内容不等价**（如锚点迁移的目标文件已占用）：命令 MUST 拒绝覆盖并指名双方，不得择一胜出。
 - **应用中途崩溃**：已归档对象与已写目标并存时，重跑 MUST 识别已完成的阶段并续做，不重复搬移。
-- **无 tty / 无人值守**：破坏性项不得自动批准；命令以 blocked 结束并给出报告，不抛出确认提问。
+- **无 tty / 无人值守**：破坏性项不得自动批准；命令不抛出确认提问、以 blocked 结束并给出报告（交互终端下则由一次单批确认提示构成第二把钥匙；本命令不提供非交互确认旗标）。
 - **用户手改过框架文件**：替换前必须先归档；不得静默丢弃用户改动。
 - **项目未执行过 init（缺 `.specify/`）**：命令拒绝并指向 `specify init`，不得隐式初始化。
 - **已是最新**：计划为空、退出码可判定、零写入。
@@ -110,7 +112,7 @@
 
 #### B. 期望态与只读探测
 
-- **FR-005**: 期望态的唯一来源 MUST 是当前已安装版本随包分发的声明与资产（模板、生成物规则、脚本与镜像、布局声明、退役清单等）；命令 MUST NOT 按源项目版本号选择迁移路径，MUST NOT 内置对旧版结构的猜测性判据。新增或修改一个期望态维度 MUST 经修订声明层或既有引擎完成，MUST NOT 在命令内加入一次性检查。
+- **FR-005**: 期望态的唯一来源 MUST 是当前已安装版本随包分发的声明与资产；具体读取入口 MUST 固定为以下既有 owner，不得另立来源：退役清单＝CLI 源内 `OBSOLETE-ASSET-REGISTRY` 标记块（`src/specify_cli/__init__.py`；`sanitize-utils.py` 侧为受漂移测试钉住的镜像）、残留/镜像/链接/索引/死引用＝`sanitize-utils.py` 的确定性检查器、锚点布局＝`anchor-layout-migrate.py` 的 check 动作、生成副本与镜像一致性＝`regen-command-copies.py --check` 与 `sync-mirrors.py --check`、框架资产刷新与退役处置＝init 的既有 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills`。命令 MUST NOT 按源项目版本号选择迁移路径，MUST NOT 读取或引入 `.specify/version` 类版本标记作为判据（当前不存在且本特性不新增），MUST NOT 以模板指纹或命令内置的旧结构清单猜测旧版本。新增或修改一个期望态维度 MUST 经修订声明层或既有引擎完成，MUST NOT 在命令内加入一次性检查。
 - **FR-006**: 探测 MUST 只读且确定性：同一棵树上的重复干跑 MUST 产出逐项相同的计划（稳定顺序与内容）；干跑 MUST NOT 写入、移动或删除任何文件与数据。计划 MUST 逐项承载「维度、当前态、期望态、拟处置、依据路径」，使每个差异项可独立审阅。
 - **FR-007**: 期望态覆盖维度 MUST 至少包含五类：①模板与生成物（含命令副本、技能与代理镜像）；②锚点布局（`anchor-layout-migrate.py` 的判定对象）；③兼容链接（符号链接模型）；④镜像一致性（框架源与 `.specify/` 镜像）；⑤迁移残留（前代安装形态的残余类）。各维度的检查项集合以既有声明与引擎为唯一 owner，本规格不复述其清单。
 - **FR-008**: 探测 MUST NOT 产生假绿：每个维度 MUST 具备可转红断言——移除该维度的收敛处置、或在夹具中注入一处差异时，对应检查 MUST 报出该项；「计划为空」只允许在真实无差异时出现。
@@ -118,18 +120,18 @@
 #### C. 复用与职责边界
 
 - **FR-009**: 框架资产刷新与退役 MUST 复用 `init` 的既有迁移分支能力（含 obsolete 资产处置与平铺 internal 目录收敛语义），MUST NOT 存在第二份实现：两个入口 MUST 由同一可执行体或同一共享函数承载，并以等价性测试钉住「同一维度、同一结论」。
-- **FR-010**: 迁移残留、镜像与链接维度的确定性检查 MUST 消费 `/speckit.sanitize` 既有引擎（`sanitize-utils.py`）的检查器与发现格式，MUST NOT 复制一份检查实现；migrate MUST 以这些检查器的只读发现作为计划输入。
+- **FR-010**: 迁移残留、镜像与链接维度的确定性检查 MUST 消费 `/speckit.sanitize` 既有引擎（`sanitize-utils.py`）的检查器与发现格式，MUST NOT 复制一份检查实现；migrate MUST 以这些检查器的只读发现作为计划输入。只读消费 MUST 采用进程内导入检查器或经引擎新增的只读动作完成；MUST NOT 以 `--action collect` 作为计划输入（该动作会写 `findings.json` 台账），MUST NOT 读写 sanitize 的发现台账——pending 台账是周期治理状态，只归 sanitize 所有。
 - **FR-011**: 锚点布局维度 MUST 由既有 `anchor-layout-migrate.py` 的 check/apply 动作唯一承载；migrate MUST NOT 另写布局迁移逻辑，MUST NOT 绕过该引擎的拒绝覆盖与幂等语义。
-- **FR-012**: 职责边界 MUST 为「migrate = 一次性收尾；sanitize = 周期性治理」：migrate MUST NOT 吸收 sanitize 的周期性职责（保留期回收、跨运行的 pending 台账、序号重排等）；一次成功的 migrate 之后，用户 MUST NOT 被要求再运行 sanitize 才能达到迁移后的预期态；sanitize MUST 继续可用并保持既有 lane 语义不变。
+- **FR-012**: 职责边界 MUST 为「migrate = 一次性收尾；sanitize = 周期性治理」：migrate MUST NOT 吸收 sanitize 的周期性职责（保留期回收、跨运行的 pending 台账、序号重排等）；一次成功的 migrate 之后，用户 MUST NOT 被要求再运行 sanitize 才能达到迁移后的预期态；sanitize MUST 继续可用，其 Migration wrap-up lane 的检查器与处置语义 MUST 保持不变。该 lane 现状声明「本 lane 即 init 后的指定收尾步骤」，MUST 在同一变更内收敛为：一次性收尾主入口是 migrate，本 lane 保持周期复检兜底。
 - **FR-013**: goal/team 档案迁移的唯一入口 MUST 仍是既有 `/speckit.goal` 的 `migrate-archive`；本命令 MUST NOT 吸收或重复该迁移，只在计划与回执中以静止指针列出责任方，不探测、不处置。
 
 #### D. 处置、安全与回执
 
 - **FR-014**: 每个差异项的处置结果 MUST 落入封闭六值集：`converged`（已收敛，零写入）、`write`（可逆安全写，自动执行）、`replace`（先归档后写入）、`archive`（移动或移除并归档，可找回）、`refuse`（冲突或歧义，停住并指名双方）、`blocked`（破坏性且未获确认）。`refuse` MUST NOT 择一胜出，任何处置 MUST NOT 静默跳过差异项。
-- **FR-015**: 破坏性/不可逆动作（删除、移动/归档既有工件、覆盖用户既有内容）MUST 保留前置确认门，判据与清单的唯一 owner 是 `.specify/shared/guidelines/confirmation-gates.md`，本规格不复述清单；无交互或无人值守环境下，未确认的破坏性项 MUST 以 `blocked` 结局收束，MUST NOT 被自动批准。
+- **FR-015**: 破坏性/不可逆动作（删除、移动/归档既有工件、覆盖用户既有内容）MUST 保留前置确认门，判据与清单的唯一 owner 是 `.specify/shared/guidelines/confirmation-gates.md`，本规格不复述清单。确认机制 MUST 为双键：[[STR-004]] 只进入写入模式、不构成对破坏性桶的批准；第二把钥匙在交互终端下为一次单批确认提示（以干跑审阅为前提）；无交互或无人值守环境下不存在第二把钥匙，未确认的破坏性项 MUST 以 `blocked` 结局收束，MUST NOT 被自动批准，且本命令 MUST NOT 提供非交互确认旗标。
 - **FR-016**: 用户内容保护 MUST 成立：用户自建技能、项目专属扩展、用户手改的框架文件 MUST NOT 被当作残留删除；替换用户内容的处置 MUST 先归档再写，并在回执中给出恢复路径；替换与归档 MUST 沿用 reconcile 家族的 archive-not-delete 语义。
-- **FR-017**: 幂等与可续跑 MUST 成立：成功应用后再次运行 MUST 为 clean 计划且零写入；应用中断后再次运行 MUST 能从已落盘的回执与计划续做，MUST NOT 二次搬移已归档对象；同一对象的重复处置 MUST 收敛为 no-op。
-- **FR-018**: 每次运行（干跑与应用）MUST 产出一份逐运行回执，承载运行时间、当前版本、差异项清单、逐项处置、归档位置、拒绝原因、恢复途径与最终结果；回执 MUST 是一文一件的逐条目记录（并发开发安全纪律），MUST NOT 写入单一可变聚合文件。
+- **FR-017**: 幂等与可续跑 MUST 成立：成功应用后再次运行 MUST 为 clean 计划且零写入；应用中断后再次运行 MUST 能从已落盘的回执与计划续做，MUST NOT 二次搬移已归档对象；同一对象的重复处置 MUST 收敛为 no-op。失败语义 MUST 为前向续跑 + 逐项经归档位置找回（FR-016、FR-018）；命令 MUST NOT 提供全局回滚/undo 动作，回滚能力不在本特性范围内。
+- **FR-018**: 每次运行（干跑与应用）MUST 产出一份逐运行回执，承载运行时间、当前版本、差异项清单、逐项处置、归档位置、拒绝原因、恢复途径与最终结果；回执 MUST 是一文一件的逐条目记录（并发开发安全纪律），MUST NOT 写入单一可变聚合文件。落点 MUST 为 `.specify/memory/migrate/receipts/` 下的独立文件（文件名含运行时间戳/运行 ID），该目录须按目录治理在同一变更内登记。
 - **FR-019**: 命令 MUST 稳定区分四类运行结局并给出可脚本判定的退出码：`clean`（无差异，退出 0）、`planned`（有差异的干跑，退出 1）、`applied`（应用完成或已无剩余差异，退出 0）、`blocked`（因确认门或冲突未完成，退出 3）；输入或前置条件错误退出 2。同一结局的退出码 MUST 稳定，MUST NOT 用退出 0 掩盖未完成的处置。
 
 #### E. 跨版本与分发
@@ -140,7 +142,7 @@
 
 #### F. 验收取证
 
-- **FR-023**: 验收 MUST 至少包含三类夹具：纯旧版夹具（旧布局与历史残留）、新旧混杂夹具（部分 init 后）、已最新夹具；纯旧版与混杂夹具 MUST 在干跑报 `planned`、应用后收敛；已最新夹具 MUST 在干跑与再次运行时都报 `clean` 且零写入。
+- **FR-023**: 验收 MUST 至少包含三类夹具：纯旧版夹具（旧布局与历史残留）、新旧混杂夹具（部分 init 后）、已最新夹具；纯旧版与混杂夹具 MUST 在干跑报 `planned`、应用后收敛；已最新夹具 MUST 在干跑与再次运行时都报 `clean` 且零写入。旧布局夹具的构成 MUST 只由 FR-005 钉名的声明与检查器已知的残留/布局类合成（退役清单条目、旧代状态文件、平铺 internal 残留、旧锚点布局），MUST NOT 取自历史发行快照，MUST NOT 按命令内猜测清单构造——夹具与探测共享同一来源。
 - **FR-024**: 安全取证 MUST 以可转红断言覆盖：确认门缺失时破坏性处置 MUST 被测试判红；归档缺失或回执不可枚举时 MUST 判红；把「全量删除」注入处置时 MUST 判红。
 - **FR-025**: 等价性、幂等与续跑取证 MUST 以可转红断言覆盖：两个入口同树同计划（FR-002）；第二次运行零写入（FR-017）；中断续跑不二次搬移。复制或移除其中任一检查实现时，结构测试 MUST 转红。
 
@@ -211,14 +213,22 @@
 - Q: 回执落点在哪里？ → A: 逐运行一文一件；候选落点 `.specify/memory/migrate/`，最终路径由 plan 在并发开发安全约束下定名，并配两写者不同路径的测试。见 A6。
 - Q: 无人值守时破坏性动作怎么办？ → A: 不自动批准；未确认项以 `blocked` 结局收束并给出报告（confirmation-gates 的无人值守行）。见 A9。
 
+### Session 2026-11-10（clarify，无人值守自我裁决）
+
+- Q: Feature 绑定——本规格归入既有 Feature 还是新建？ → A: 绑定既有 Feature 024（Specification Workspace Versioning，Draft）；其能力域正是「跨 CLI 版本的 `.specify/` 工作区安全升级」，且当前没有已绑定规格（Spec Path 为 `-`）。024 早先设想的 `.specify/version` 标记、版本→迁移注册表与 `specify upgrade` 命令由本规格的「声明驱动期望态 + 一次直达」取代（FR-005、FR-020）；依据：仓库当前不存在 `.specify/version`，而声明/引擎面均已就绪。候选对照：015 CLI Interface 仅泛化终端界面、047 框架材料卫生仅周期治理，均不如 024 贴合。registry 集成（024 详情 related-specifications、索引行 Last Updated）受本阶段「只改 requirements.md」约束，记为待办恢复点。
+- Q: 混杂态判定清单的确定性来源是什么，是否使用版本标记/模板指纹？ → A: 钉名五个既有 owner 作为唯一来源（退役清单＝CLI 的 `OBSOLETE-ASSET-REGISTRY`；检查器＝`sanitize-utils.py`；锚点布局＝`anchor-layout-migrate.py` check；副本/镜像一致性＝`regen-command-copies.py --check` / `sync-mirrors.py --check`；刷新退役＝init 的 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills`），见 FR-005；不使用 `.specify/version` 标记（不存在且不新增）、项目侧版本号或模板指纹识别旧版本。`--dry-run` 默认维持既有裁定（默认即干跑、零写入；A3）。
+- Q: 与 sanitize 的复用方式与写面边界？ → A: 只读消费检查器（进程内导入或引擎只读动作扩展）；MUST NOT 以 `--action collect` 作计划输入（它写 `findings.json` 台账），MUST NOT 读写 sanitize 台账（FR-010）；sanitize-materials 的 Migration wrap-up lane 定位声明在同一变更内改为「周期复检兜底，一次性收尾主入口是 migrate」，其检查器与处置语义不变（FR-012）。migrate 的唯一写面是自有逐运行回执，落点定名 `.specify/memory/migrate/receipts/`（FR-018）。
+- Q: 确认门形态与失败回滚语义？ → A: 双键确认——[[STR-004]] 只进入写模式，破坏性桶另需第二把钥匙（交互终端下为一次单批确认提示，以干跑审阅为前提）；非交互环境不存在第二把钥匙，破坏性项 blocked、可逆项照常、退出 3（FR-015、FR-019），且不提供非交互确认旗标。失败语义为前向续跑（从回执续做）加逐项归档找回，不提供全局回滚/undo（FR-017）；跨版本 N→N+k 一次直达维持 FR-020/A5。
+- Q: 旧布局夹具的构成从哪来？ → A: 只由 FR-005 钉名的声明与检查器已知的残留/布局类合成（退役清单条目、旧代状态文件、平铺 internal 残留、旧锚点布局），不得取自历史发行快照或命令内猜测清单；夹具与探测共享同一来源（FR-023）。
+
 ## Assumptions
 
 - **A1（类别判定：execution）**: 本特性判定为 `execution` 类：交付物是机器执行、解析与消费的命令面（CLI 子命令、运行期模板、迁移引擎与契约测试），验收 oracle 是运行命令得到的退出码、计划与文件树差异，而不是读者阅读；`Flow Type` 写 `-`。
 - **A2（入口形态裁定：双面一引擎）**: 用户简报要求入口形态先调查再定。调查结论见 Clarifications 第一条与 A2 引用的事实；裁为「CLI 子命令为唯一确定性可执行体，模板为薄投影」。理由：三步流程处于 CLI 上下文；代理会话需要同一入口；单一引擎满足宪法 XIV（一个事实一个 owner）与 XII（复用优先于新造）。
 - **A3（dry-run 默认）**: 默认运行即干跑、零写入；写入只经显式应用旗标进入；干跑与应用共享同一计划。与 sanitize 需确认后 apply、migrate-archive 需互斥旗标的既有安全默认一致。
-- **A4（期望态来源）**: 期望态取「当前已安装版本」的声明与资产，不从项目侧文件猜测版本；plan 阶段钉住具体声明文件与读取入口。
+- **A4（期望态来源）**: 期望态取「当前已安装版本」的声明与资产，不从项目侧文件猜测版本；具体读取入口已于 clarify 钉入 FR-005，不再留给 plan 选型。
 - **A5（跨版本直达）**: 期望态判据与源版本无关，故 N→N+k 一次收敛；本特性不产出按版本号的迁移脚本链，也不要求中间版本。
-- **A6（回执落点）**: 回执逐运行一文一件；候选落点 `.specify/memory/migrate/`，最终路径由 plan 在并发开发安全约束下（两写者不同路径）定名并配测试。
+- **A6（回执落点）**: 回执逐运行一文一件，落点于 clarify 定名为 `.specify/memory/migrate/receipts/`（FR-018）；目录登记与两写者不同路径测试随实现落地。
 - **A7（不在本命令重做 install/init）**: 缺 `.specify/` 时拒绝并指向 init；命令不下载包、不重建基础设施。
 - **A8（goal/team 档案迁移排除）**: 沿用 sanitize 模板既有声明——该迁移唯一入口是 `/speckit.goal` 的 `migrate-archive`；migrate 以静止指针列出责任方，不探测、不处置。
 - **A9（无人值守行为）**: 依 `.specify/shared/guidelines/confirmation-gates.md` 的决策门矩阵「无人值守」行：可逆写自动执行并记录；不可逆动作停住并给 blocked 报告，不产生确认提问。
