@@ -1,0 +1,11 @@
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 238 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+exit=0
