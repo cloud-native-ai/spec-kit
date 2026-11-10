@@ -1,0 +1,90 @@
+# Closure acceptance verdict — 081 mechanism reading and GATE-4 self-check (T053, 2026-11-10)
+
+## 1) Preliminary reading (before the task flip and before the smoke capture)
+
+$ python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/095-superagent-role --repo . --json
+
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": false,
+    "smoke_record_pass": false,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 7,
+    "total": 7,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "",
+    "evidence_exists": false,
+    "evidence_path": "",
+    "exit_code": "",
+    "present": false,
+    "records": 0
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/095-superagent-role",
+  "tasks": {
+    "closed": 42,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 12
+  },
+  "verdict": "accept",
+  "waived": []
+}
+
+exit=0 (verdict accept; completion_conditions no_open_rows=false and smoke_record_pass=false at this point — the two readings that the close-out itself produces)
+
+
+## 2) Final reading (after the task flip and the smoke capture)
+
+$ python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/095-superagent-role --repo . --json
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 7,
+    "total": 7,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/contract/test_role_edge_engine.py tests/contract/test_role_transition_payload.py tests/contract/test_status_digest_roles.py tests/contract/test_superagent_definitions.py tests/contract/test_instructions_budget_superagent_section.py tests/contract/test_superagent_zero_mechanism.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/095-superagent-role/test-evidence/smoke-six-modules.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/095-superagent-role",
+  "tasks": {
+    "closed": 53,
+    "deferred": 1,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+EXIT=0

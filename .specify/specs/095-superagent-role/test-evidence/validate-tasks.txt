@@ -1,0 +1,7 @@
+# validate-tasks verdict — T052 (2026-11-10)
+
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/095-superagent-role/tasks.md
+PASS: .specify/specs/095-superagent-role/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+WARN adjudication: zero WARN rows emitted, so there is nothing to adjudicate; the two authoring-time WARNs of the tasks stage were repaired in commit 4369dc7fe before this package.

@@ -119,3 +119,21 @@ Command: `grep -n '^## Spec Kit Framework Map\|^## Spec Kit Runtime & Symlink Mo
 - `better-harness.md` is **not** modified (clarify Q6 ruling; it is the improvement north star, not a
   role owner). The plan brief's “better-harness.md 增加指针” line was superseded by that ruling.
 - Flow class for this spec: `flow_class: execution` / `source: declaration` (lookup exit 0).
+
+## 8. Re-measurement at P6 close-out (late T002 execution, 2026-11-10)
+
+The implement pre-flight refresh (T002) was not executed at implement start; it was executed late at P6. These values supersede §1–§7 where they differ; the original readings remain for history.
+
+| Measurement | Command | Value at P6 |
+|---|---|---|
+| Live instructions size | `wc -c .specify/instructions.md` | **38,301 B** (was 37,454) |
+| Template size | `wc -c templates/instructions-template.md` | **33,822 B** (was 32,975) |
+| Budget constant | `grep -n 'INSTRUCTIONS_BUDGET_BYTES' scripts/bash/generate-instructions.sh` | line **107** = `38400` (unchanged) |
+| Arithmetic headroom | `38400 - 38301` | **99 B** (was 946); `over` still fires at `size >= budget`, so the last admissible byte is 38,399 |
+| Mirror drift | `python3 scripts/python/sync-mirrors.py --check` | **19 lines / 6 DIFF-class**, all six `DIFF[projected]` declared pairs (was 437/428 at task generation; the 428 premise was measured void at P1 — `test-evidence/definitions-readings.txt` §4) |
+| Per-Agent Payload rows | count `^\| \`[a-z_]+\` \|` in `skills/internal/create-team/references/patterns.md` | **8** (was 7) — `role_fields` added by T022, `test_i13` pin updated in the same commit |
+| Slice inventory | `ls .specify/specs/ \| grep -E '^0(8\|9)[0-9]'` | **15 including 095 → 14 in range** (unchanged; 092 absent) |
+| Template anchors | `grep -n '^## Spec Kit Framework Map\|^## Super Agent\|^## Spec Kit Runtime & Symlink Model'` | template **268 / 274 / 278**; live **285 / 291 / 295** |
+| Creation targets | `ls scripts/python/role-edge-check.py tests/fixtures/superagent-role` | both **exist** now (§7 recorded them absent as creation targets) |
+
+The live/template delta (+847 B each) includes the 333 B `## Super Agent (相对逻辑角色)` section; the remainder accrued between task generation and the P5 generator run (P5's commit message discloses the template-mirror `.gitignore` paragraph and the stale anti-patterns section-count pin).
