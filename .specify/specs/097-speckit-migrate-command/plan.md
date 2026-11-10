@@ -100,7 +100,7 @@
 ├── quickstart.md        # Phase 1：4 个用户旅程场景
 ├── feature-ref.md       # Phase 1：Feature 024 绑定与 FR→WP 矩阵
 ├── tasks.md             # 下一阶段（/speckit.tasks）产出
-└── verification.log     # 实现阶段产出
+└── verification.md      # 实现阶段产出
 ```
 
 ### Source Code (repository root)
