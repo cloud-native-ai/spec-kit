@@ -1329,7 +1329,7 @@ def test_c55_the_element_never_grows_the_digest_past_its_cap_and_omitted_count(t
     """C-55: the cap bounds the ENTRY set, and the element is content of an entry — never an extra entry."""
     workspace, registry = _digest_fixture(tmp_path, 6)
     proc = _run_digest(
-        ["--action", "digest", "--workspace", str(workspace), "--cap", "2"],
+        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--cap", "2"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
@@ -1356,7 +1356,7 @@ def test_c55_a_listed_unit_with_no_record_carries_the_marker_and_no_entry_is_dro
     """C-67 at the digest surface: an unmeasured unit is marked, never omitted beside a neighbour's number."""
     workspace, registry = _digest_fixture(tmp_path, 2)
     proc = _run_digest(
-        ["--action", "digest", "--workspace", str(workspace), "--cap", "5"],
+        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--cap", "5"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
@@ -1406,7 +1406,7 @@ def test_c68_a_stale_entry_still_carries_its_staleness_beside_the_element(tmp_pa
     """C-44 survives the dimension: a stale entry is still marked stale, with the element as extra content."""
     workspace, registry = _digest_fixture(tmp_path, 1)
     proc = _run_digest(
-        ["--action", "digest", "--workspace", str(workspace), "--stale-bound", "0"],
+        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--stale-bound", "0"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
@@ -1521,12 +1521,22 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
     assert "state=%s" % entry["state"] in out, out
 
 
-def test_the_default_format_under_non_tty_is_the_text_render(tmp_path):
-    """``auto`` resolves to ``text`` when stdout is not a TTY — machine consumers see unchanged bytes."""
+def test_the_default_format_is_the_table_render(tmp_path):
+    """The user-facing default is the readable table (2026-11-10 directive); ``auto`` keeps the TTY rule and ``text`` the kv bytes."""
     workspace, registry, _entry, _paths = _fixture_tree(tmp_path)
     env = {"SPECIFY_LINE_REGISTRY_DIR": str(registry)}
     default = _run_digest(
         ["--action", "digest", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides=env,
+    )
+    table = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides=env,
+    )
+    auto = _run_digest(
+        ["--action", "digest", "--format", "auto", "--workspace", str(workspace)],
         cwd=workspace,
         env_overrides=env,
     )
@@ -1535,15 +1545,19 @@ def test_the_default_format_under_non_tty_is_the_text_render(tmp_path):
         cwd=workspace,
         env_overrides=env,
     )
-    assert default.returncode == text.returncode == 0
+    assert default.returncode == table.returncode == auto.returncode == text.returncode == 0
 
     def without_clock(text_out: str) -> str:
         import re
 
         return re.sub(r"generated_at=[^ ]+", "generated_at=<clock>", text_out)
 
-    assert without_clock(default.stdout) == without_clock(text.stdout), (
-        "auto must not change the non-TTY digest content (the reading clock aside)"
+    assert without_clock(default.stdout) == without_clock(table.stdout), (
+        "the default render must be the readable table"
+    )
+    assert default.stdout.startswith("status digest"), default.stdout[:80]
+    assert without_clock(auto.stdout) == without_clock(text.stdout), (
+        "auto still resolves to text under non-TTY (machine bytes unchanged)"
     )
 
 

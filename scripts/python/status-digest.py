@@ -2218,7 +2218,7 @@ def build_parser():
         ),
     )
     parser.add_argument("--action", required=True, choices=("digest", "guard", "report"))
-    parser.add_argument("--format", default="auto", choices=("auto", "text", "json", "table"))
+    parser.add_argument("--format", default="table", choices=("auto", "text", "json", "table"))
     parser.add_argument(
         "--workspace",
         default=os.environ.get("SPECIFY_STATUS_WORKSPACE") or str(Path.cwd()),

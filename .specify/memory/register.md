@@ -180,6 +180,7 @@
 | D-6 (092) | 四段契约四者各自可达判定：零写盘 = 两次快照逐字节比较；确认粒度封闭三值（缺省 `group`）；未确认项 `unconfirmed` 可见且不计闭合；证据一次运行一个文件、四段 | 同上 D-6（落地于 `contracts/four-stage-command.contract.md` C-401…C-409） | open（实现期落地） |
 | D-7 (092) | 「大并发」只在既有机制内表达：并发度取状态脊 `agent_concurrency_requested`（本线 24），有效值按既有公式取最小值，降级须具名 | 同上 D-7（落地于 `plan.md` § Execution Premises EP-004） | open（实现期落地） |
 | D-8 (092) | A–H 语料按类别判据分两档（封闭）：档 I 19 条由本特性首轮修复、档 II 15 条只检出 + 移交、H3 登记为排除 | 同上 D-8 + `plan.md` § A–H Corpus Mapping | open（档 I 由 P6 修复、档 II 由 P7 移交） |
+| D-9 (用户裁定 2026-11-10) | 「优化」作为默认流程而非可选项：已实现的优化结构进入默认执行路径（digest 默认渲染可读表格；/speckit.* 的 wrap-up 链默认执行；并发能力默认评估与并发执行），不要求用户额外指定；opt-in 仅保留为逃生口 | 用户 2026-11-10 指示 + `.specify/memory/coaching/20261109T161132Z-speckit-status/improvement-plan.md` | active（表格默认已落地；wrap-up 链已恢复；并发覆盖实施待排期） |
 | F-2 (089) | Feature 089 的 `__main__` 携带 `.py` 数争议（曾读数 208 / requirements 207） | 同上 § 7 F-2 | closed 2026-11-06（逐文件复测 207 携带 / 459 不携带） |
 | F-3 (089) | Feature 089 的 `--version` 在 `pyproject.toml` 不可达时的退出码表述冲突 | 同上 § 7 F-3 | closed 2026-11-06（A4 与 C-8 / C-18 统一为 `unknown` + exit 0） |
 | F-4 (089) | Feature 089 的镜像一致性表述冲突（旧 FR-030「逐字节相同」vs 声明式投射） | 同上 § 7 F-4 | closed 2026-11-06（FR-030 改为两类判定，与 C-33…C-38 一致） |
