@@ -40,7 +40,7 @@ The engine opens the journal for append and takes a non-blocking exclusive `floc
 
 ## C-07 — Identity check
 
-The engine reads the latest state spine observer record section. It requires `state: started`, a matching `line_id` / `run_id` and a matching `execution_label` for the invoking execution; a mismatch (stale or foreign execution) exits `2` with a label and appends nothing. `--final` requires the same match.
+The engine reads the latest state spine observer record section. It requires `state: started`, a matching `line_id` / `run_id` and a matching `execution_label` for the invoking execution; a mismatch (stale or foreign execution) exits `2` with a label and appends nothing. This is the sole enforcement point of `data-model.md` V-16. `--final` requires the same match.
 
 (FR-007, FR-010)
 
@@ -52,7 +52,7 @@ On the first append of an execution (or of a new `execution_label`), if the prev
 
 ## C-09 — Check invocation and findings
 
-`check` takes `--spec-dir` and `--repo`. It validates every rule in `data-model.md` V-1…V-13 and V-16…V-17 and reports each finding as `code: path:line`, exiting `0` (no finding), `1` (at least one finding) or `2` (input error). The checker never writes.
+`check` takes `--spec-dir` and `--repo`. It validates every rule in `data-model.md` V-1…V-13 and V-17 and reports each finding as `code: path:line`, exiting `0` (no finding), `1` (at least one finding) or `2` (input error). V-16 is not in this rule set: it is an append-time refusal that `append` enforces under C-07, and `check` holds no execution identity to evaluate. The checker never writes.
 
 (FR-014, FR-015)
 

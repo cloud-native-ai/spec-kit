@@ -157,7 +157,7 @@ Closed observation-input list (FR-013): state spine (E-9 section + the two narro
 - **V-13** Rows are never rewritten: a checker run never mutates the journal; the engine opens the file for append only.
 - **V-14** The engine refuses a second concurrent writer with exit 3 and appends nothing.
 - **V-15** The observer record section parses with the fixed key set; unknown keys are a spine-side finding, not a journal one.
-- **V-16** An observer execution whose label does not match the latest spine record's `execution_label` is refused (exit 2) — a foreign or stale execution cannot append.
+- **V-16** An observer execution whose label does not match the latest spine record's `execution_label` is refused (exit 2) — a foreign or stale execution cannot append. Append-time rule, enforced by `journal-engine.contract.md` C-07; `check` does not evaluate it (C-09).
 - **V-17** `observer-gap` exists whenever a new execution's `started_at` is later than the last entry's `observed_at`; its window is [last `observed_at`, new execution's first `observed_at`].
 - **V-18** The observer writes nothing except the journal and its own execution artifacts: the template declares exactly that surface and the driver text forbids observer spine writes.
 - **V-19** Each line has its own journal path derived from its spec key; two parallel lines' journals never share a path (fixture proves it).
