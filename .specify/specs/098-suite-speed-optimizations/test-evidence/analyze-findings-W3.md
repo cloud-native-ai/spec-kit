@@ -1,0 +1,34 @@
+# Analyze Findings — W3 (tasks.md)
+
+- Feature: 098-suite-speed-optimizations
+- Stage: analyze (concurrent wave), worker W3
+- Date: 2026-11-10
+- Read domain: `.specify/specs/098-suite-speed-optimizations/tasks.md` only (file-level exclusive). Strictly read-only: no artifact was modified; this file is the only write.
+- Method: analyze-artifacts passes A–I restricted to claims decidable inside `tasks.md`. Cross-artifact passes over `requirements.md`, `plan.md`, `contracts/`, `checklists/` and the feature registry belong to sibling workers and are not judged here; the clause-coverage accountant run is the stage coordinator's fixed step (skill §3) and was not executed from this worker because it reads files outside this read domain.
+- Validation: W3-01 and W3-11 are HIGH and still require the stage-level independent read-only validation wave before entering the final report (skill §7).
+
+## Findings
+
+| ID | Severity | Anchor | One-sentence fact | Suggested owner |
+|----|----------|--------|-------------------|-----------------|
+| W3-01 | HIGH | `tasks.md:384–389` (§ Clause Attribution Deviation); `tasks.md:67` (T002); `tasks.md:7` | The six contract files declare prefixed clause ids (`TS-01`…`IC-10`) that the canonical clause engines (`C-<n>` only) cannot parse, so the mandated coverage-accounting run reads all 68 clauses as `md-none` and T002's freeze would pin a baseline in which every FR registers `fr-uncovered`. | plan stage (renumber contract clause ids to `C-<n>` and update every citation, per the section's own remedy); tasks stage re-emits attribution tags afterwards |
+| W3-02 | MEDIUM | `tasks.md:248` vs `tasks.md:38` and `tasks.md:382–389` | "Within Each User Story" states every contract clause is claimed by exactly one `[green:]` row, while the Format section and § Clause Attribution Deviation state this file carries no clause-attribution tags — two mutually exclusive claims about the same file (the section's `green-dangling` narrative also presupposes attributions the file says it does not carry). | tasks stage (rewrite the claim to reference the deviation, or emit `[green:]` tags only after the plan-owned renumbering) |
+| W3-03 | MEDIUM | `tasks.md:317–363` (trace tables); `tasks.md:335` (FR-015 row); `tasks.md:165–166` (T032, T033) | Seven rows (T001, T002, T011, T032, T033, T059, T060) appear in neither the FR nor the SC trace table, and T032/T033 are the rows that implement the `--now` injected clock in `feedback-utils.py` and regenerate its mirror, so FR-015's mechanism has no traceability row. | tasks stage (map T032/T033 to FR-015; record a trace home for the setup/evidence-index rows) |
+| W3-04 | MEDIUM | `tasks.md:161` (T031) vs `tasks.md:170` (T037) and `tasks.md:57` (P-7) | T031's `wait_until` default assertions (`timeout <= 30`, `interval <= 0.2`) are already satisfied by the measured pre-change defaults (`timeout=5.0`, `interval=0.05`, P-7), so this leg is green before T037, cannot serve as red-first evidence, and cannot detect a revert to 5.0. | tasks stage (assert the enacted value, e.g. `timeout == 30`); plan stage if the EW clause wording owns the bound |
+| W3-05 | MEDIUM | `tasks.md:91–92` (T012, T013) vs `tasks.md:118` (T021) and `tasks.md:373` (TS carrier row) | T012 claims to run `test_suite_tier_contract.py` "obligations 1–11" and T013 runs the TS-M drills whose carrier row names guard T021, yet obligation 11 is authored by T021 in US2 (`blockedBy: T020`) and neither T012 nor T013 depends on T021. | tasks stage (move the obligation-11 case into US1, or add T021 to T012/T013 `blockedBy` and re-sequence) |
+| W3-06 | MEDIUM | `tasks.md:31` (GATE-5) vs `tasks.md:141–142`, `tasks.md:167–173`, `tasks.md:197–202` (changed-file rows) | GATE-5's claim covers "every new or changed test file" and "every red-first record", but its mechanical check runs only the five new contract files and tests one shared red-first file for non-emptiness, leaving every changed test file and every per-row red record outside the check. | tasks stage (extend the check to the changed-file green records and the five red-first entries, or narrow the claim to cite the per-row records) |
+| W3-07 | LOW | `tasks.md:143` (T028) vs `tasks.md:141–142` (T026, T027) | T028 instructs running both corpus files "before/after" while being `blockedBy: T003, T026, T027`, so the pre-conversion state no longer exists when it runs and only T003's recorded names can be the "before" side, which the row does not say. | tasks stage (state that the before side is T003's recorded names) |
+| W3-08 | LOW | `tasks.md:9` (Tests Mode) vs `tasks.md:16` (DoD-2) and `tasks.md:31` (GATE-5) | The Tests Mode paragraph enumerates "5 new guard files + the tier contract file" (implying six files), while DoD-2 and GATE-5 name exactly five new contract files of which the tier contract is one. | tasks stage (correct the count) |
+| W3-09 | LOW | `tasks.md:11` (Organization) vs `tasks.md:310–311` (Work Package table) | The Organization paragraph says "WP-9 → Polish and the closure-stage row", but the Work Package table places T003/T022 in WP-9 and T061 in the separate "Setup / closure handoff" package. | tasks stage (align the sentence with the table) |
+| W3-10 | MEDIUM | `tasks.md:122` (US2 checkpoint) and `tasks.md:242` vs `tasks.md:114` (T017) and `tasks.md:112–113` (T015, T016) | The US2 checkpoint and the story-dependency section claim the parallel-consistency drill (T014/T017) has no US1 dependency, but T017 is `blockedBy: T014, T015, T016` and T015/T016 depend on US1 rows (T007, T009). | tasks stage (drop the independence claim, or restructure T017 so it no longer requires T015/T016) |
+| W3-11 | HIGH | `tasks.md:21` (DoD-7), `tasks.md:394` (Notes), `tasks.md:27` (GATE-1) vs `tasks.md:221` (T061) | DoD-7 and the Notes declare exactly two full-suite runs (T003 slot 1, T061 slot 2), but T061 itself commands two full-suite executions — `--full --names-out` plus a same-tree `--full --serial` validation run — so executing it as written produces three full-suite runs against a declared budget of two. | plan stage (budget owner, driver reference) and tasks stage (align DoD-7/GATE-1/Notes with the executed count, or drop/limit the serial validation leg) |
+
+## Severity summary
+
+| CRITICAL | HIGH | MEDIUM | LOW | Total |
+|----------|------|--------|-----|-------|
+| 0 | 2 | 6 | 3 | 11 |
+
+- Passes with zero in-domain findings: A (no near-duplicate rows), B (no placeholder/unmeasurable-adjective drift), D (Tests Mode ON with red-first rows; no decidable constitution conflict inside this read domain).
+- C/E/F produced W3-03 through W3-11; W3-01 is the artifact-side statement of the clause-form defect the stage's coverage-accounting run will also print (plan-owned remedy).
+- H (checklist accountability) and G (feature registry/linkage) are outside this worker's read domain and are not dispositioned here.
