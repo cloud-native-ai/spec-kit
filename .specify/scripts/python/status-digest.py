@@ -967,12 +967,13 @@ def render_digest(state) -> str:
     efficiency = state.get("efficiency") or {}
     depth = efficiency.get("depth")
     lines = [
-        "generated_at=%s cap=%d stale_bound=%s profile=%s"
+        "generated_at=%s cap=%d stale_bound=%s profile=%s registry=%s"
         % (
             state["generated_at"],
             state["cap"],
             format_duration(state["stale_bound_seconds"]),
             profile_in_force(state),
+            state["registry_dir"],
         )
     ]
     elements = efficiency.get("elements") or []
@@ -1042,12 +1043,13 @@ def render_digest_table(state) -> str:
     depth = efficiency.get("depth")
     elements = efficiency.get("elements") or []
     blocks = [
-        "status digest  generated_at=%s  cap=%d  stale_bound=%s  profile=%s"
+        "status digest  generated_at=%s  cap=%d  stale_bound=%s  profile=%s  registry=%s"
         % (
             state["generated_at"],
             state["cap"],
             format_duration(state["stale_bound_seconds"]),
             profile_in_force(state),
+            state["registry_dir"],
         )
     ]
     decorated = []

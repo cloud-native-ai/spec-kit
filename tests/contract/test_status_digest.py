@@ -413,6 +413,21 @@ def test_c42_over_a_fixture_registry_the_script_reads_the_entry_and_its_three_tr
     )
 
 
+def test_digest_header_names_the_resolved_registry_dir(tmp_path):
+    """P-1 (coaching 20261109T161132Z): the reading header names the resolved registry directory."""
+    workspace, registry, _entry, _paths = _fixture_tree(tmp_path)
+    proc = _run_digest(
+        ["--action", "digest"],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    header = proc.stdout.splitlines()[0]
+    assert "registry=" + str(registry) in header, (
+        "the digest header must name the resolved registry directory; got %r" % (header,)
+    )
+
+
 def test_c42_a_digest_leaves_the_fixture_tree_byte_identical(tmp_path):
     """C-42 at process level: the reading writes no file anywhere under the fixture tree."""
     workspace, registry, _entry, _paths = _fixture_tree(tmp_path)
