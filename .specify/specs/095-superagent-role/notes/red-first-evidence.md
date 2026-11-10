@@ -203,3 +203,63 @@ FAILED tests/contract/test_role_transition_payload.py::test_team_report_mapping_
 6 failed, 15 passed in 7.02s
 ```
 
+### Instance 5 — T034 digest role view contract (red-first)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_status_digest_roles.py -q`
+- Exit status: **1**
+- Red state: the contract module (T034) and the `interrupted/` fixture (T035) exist; `status-digest.py`
+  carries no role view yet. Every failing leg names its own missing subject — the field helper finds
+  `read_carrier_inputs: 0`, the JSON field legs fail on the absent `id` row / absent
+  `role_set_marker`, the fan-out leg gets the pre-095 `nothing-running` (exit 3, empty registry),
+  and the structural legs report the missing declaration/attachment. Five legs are green by
+  construction (`nothing-running` unchanged, marker absent as required for pass-through, the action
+  still delegates to the one table renderer, and the mirror equality leg runs green-by-default) —
+  they are the guards the change must not break, not legs that weaken the red.
+- Note (disclosed when the green run follows): the mirror leg is trivially green while the pair is
+  byte-identical, so it only gains force once T037 syncs the runtime copy in the same package.
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_status_digest_roles.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...FFFFFFFFF.FFF.F                                                       [100%]
+=================================== FAILURES ===================================
+________ test_c1_the_digest_adds_no_second_carrier_parser_or_root_scan _________
+...
+________ test_c1_the_role_model_is_one_materialization_per_run _____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c1_the_role_model_is_one_materialization_per_run():
+        """C-1: one ``read_carrier_inputs`` + one ``evaluate_role_model`` per digest run, from ``read_state``."""
+        source = _engine_source()
+        counts = _call_counts(source)
+>       assert counts["counts"]["read_carrier_inputs"] == 1, (
+            "the role model must be materialized by exactly one carrier read; got %r"
+            % counts["counts"]
+        )
+E       AssertionError: the role model must be materialized by exactly one carrier read; got {'read_carrier_inputs': 0, 'evaluate_role_model': 0, 'read_role_materialization': 0}
+E       assert 0 == 1
+
+tests/contract/test_status_digest_roles.py:209: AssertionError
+... (the remaining legs fail on their own named assertions; full failure list below)
+=========================== short test summary info ============================
+FAILED tests/contract/test_status_digest_roles.py::test_c1_the_digest_adds_no_second_carrier_parser_or_root_scan
+FAILED tests/contract/test_status_digest_roles.py::test_c7_dropping_a_role_field_turns_the_declaration_check_red
+FAILED tests/contract/test_status_digest_roles.py::test_c2_the_four_role_fields_are_declared_once
+FAILED tests/contract/test_status_digest_roles.py::test_c1_the_role_model_is_one_materialization_per_run
+FAILED tests/contract/test_status_digest_roles.py::test_c5_role_fields_are_attached_without_process_state
+FAILED tests/contract/test_status_digest_roles.py::test_c4_one_read_renders_the_parent_and_ten_children
+FAILED tests/contract/test_status_digest_roles.py::test_without_carrier_roots_the_role_fields_render_as_empty_not_missing
+FAILED tests/contract/test_status_digest_roles.py::test_c4_the_table_carries_the_role_columns
+FAILED tests/contract/test_status_digest_roles.py::test_c6_the_existing_json_keys_keep_their_names
+FAILED tests/contract/test_status_digest_roles.py::test_c3_omitted_declares_the_truncated_merged_set
+FAILED tests/contract/test_status_digest_roles.py::test_the_interrupted_child_renders_stale_interrupted_and_never_completed
+FAILED tests/contract/test_status_digest_roles.py::test_c2_line_rows_gain_the_role_fields_and_keep_their_family
+FAILED tests/contract/test_status_digest_roles.py::test_c2_executor_rows_outside_the_registry_use_the_role_names
+13 failed, 5 passed in 6.19s
+```
+
+

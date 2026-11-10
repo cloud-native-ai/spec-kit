@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "line_id": "demo-line",
+  "run_id": "r-fixture-root",
+  "project_dir": "@WORKSPACE@",
+  "repo_root": "@WORKSPACE@",
+  "driver_session": "pid:1",
+  "cli": "qodercli",
+  "state": "stalled",
+  "last_event": "stage-interrupted",
+  "created_at": "2026-11-10T00:00:00Z",
+  "updated_at": "2026-11-10T00:00:00Z",
+  "run_history": []
+}
