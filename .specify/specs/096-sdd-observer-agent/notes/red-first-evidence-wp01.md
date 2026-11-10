@@ -110,3 +110,46 @@ FAILED tests/contract/test_journal_engine.py::test_persistent_pointers_resolve
 FAILED tests/contract/test_journal_engine.py::test_gap_drill_emits_exactly_one_window_row
 7 failed in 6.57s
 ```
+
+## wp01 closeout — row-by-row verification (2026-11-10)
+
+Verifier: wp01 closeout pass. Rows audited: T006–T017, T036 (13 rows; write territory
+`shared/declarations/facts/journal-format.yaml`, `tests/fixtures/sdd-observer/`,
+`scripts/python/journal-utils.py`, `tests/contract/test_journal_engine.py`). No artifact was
+missing; nothing was authored in the wp01 write territory during closeout — the only closeout
+writes are the 13 task checkboxes and this record.
+
+| Row | Artifact / evidence | Check reading | Verdict |
+|-----|--------------------|---------------|---------|
+| T006 | `shared/declarations/facts/journal-format.yaml` | `kind: record-schema`; 5 header keys, 9 entry columns in order, 16 event classes with `min_persistent`, retention classes `persistent`/`runtime`, 10 pointer kinds, `-` placeholder, escaping rule; consumed through `declaration_reader` (engine + tests, no second copy) | pass |
+| T006 | `test-evidence/journal-format-harness.txt` | `harness-triple-check.py --action verify`: declarations 34 → 35, findings 4 → 4 (identical four advisory `unclassified-candidate` rows, zero NEW). The row's "exit 0" literal is contradicted by the measured exit (1, pre and post); the disclosure in that evidence file stands and the criterion "gains no NEW finding" is met | pass (disclosed slip) |
+| T007 | `tests/fixtures/sdd-observer/line_builder.py` | Builds the stub line under caller `tmp_path`: spine with U0 block + observer record section, quartet envelopes, sentinel logs, checkpoints, meta envelopes, git history; stage list + sentinel template read from the fact owners via `declaration_reader`, not restated | pass |
+| T008 | `tests/contract/test_journal_engine.py` (US1 slice, 7 cases) | Red run recorded above: `7 failed`, exit 1, all before the engine existed | pass |
+| T009 | `scripts/python/journal-utils.py` CLI | Exactly `append` / `check`; `configure_parser` / `guard_argv` with ImportError fallback; C-03 append flags incl. mutually exclusive `--settle` / `--final`; closed exit set; stdlib only | pass |
+| T010 | `scripts/python/journal-utils.py` projection | Header written once; nine-column table; closed carrier list projected; stable row identities skip repeats; `seq` continues; `\|` escape / newline collapse from the fact | pass |
+| T011 | `scripts/python/journal-utils.py` writer protocol | Non-blocking exclusive `flock` on the journal file itself → exit 3 `concurrent-writer-refused`, writes nothing, no lock file; `check_identity` mismatch → exit 2 before the journal is opened | pass |
+| T012 | `test-evidence/us1-journal-coverage.txt` | Declared US1 invocation re-run at closeout: `3 passed in 6.31s`, exit 0 (matches the stored reading) | pass |
+| T013 | `test-evidence/sc001-mutations.txt` | Both mutations re-run at closeout: delete-journal → `1 failed`; drop-stage-end:plan → `1 failed` (each exit 1) | pass |
+| T014 | `tests/fixtures/sdd-observer/tamper_builder.py` | Five variants: tenth column `recommendation`, `should-improve` outside the closed set, free narrative paragraph, forged persistent pointer, unresolvable commit | pass |
+| T015 | `scripts/python/journal-utils.py` gap derivation | `_gap_candidates`: first append of a later execution appends exactly one `observer-gap` (window start = last `observed_at`, window end = new first write); gap drill green, mutated-engine leg turns V-17 red | pass |
+| T016 | `tests/contract/test_journal_engine.py` (US2 slice, 8 cases) | Red run recorded above: `7 failed`, exit 1 before T015/T017; now covers five tamper drills, gap drill with teeth, persistent-pointer resolution, free-narrative rejection | pass |
+| T017 | `scripts/python/journal-utils.py` `check` | Findings as `code: path:line`; V-1…V-13 and V-17 (V-16 is append-time under C-07); closed sets from the facts; pointer resolution; escaping and free narrative; exit 0/1/2; strictly read-only | pass |
+| T036 | `tests/fixtures/sdd-observer/dual_line_builder.py` | Two independent roots, each with its own spec dir, spine and state dir; consumption test owned by wp02 T037 | pass |
+
+Closeout readings (all through `bash scripts/bash/run-tests.sh`):
+
+- Full module `tests/contract/test_journal_engine.py -q` → **15 passed in 6.73s**, exit 0
+- US1 declared selection `-k "coverage or append or idempotent or header"` → **3 passed in 6.31s**
+- Mutation A `SDD_OBSERVER_MUTATION=delete-journal … -k stage_coverage` → **1 failed** (red as designed)
+- Mutation B `SDD_OBSERVER_MUTATION=drop-stage-end:plan … -k stage_coverage` → **1 failed** (red as designed)
+- CLI probes: `--help` exit 0, `--version` exit 0 (`journal-utils.py 0.0.22`), `--bogus-option` exit 2
+
+Checkboxes: 13 of 13 wp01 rows flipped `[ ]` → `[X]` in `tasks.md` (no other row touched).
+
+Commits: wp01 artifacts landed in `50cdd6cb5` (T006, T007), `2678448c4` (T014, T036),
+`e0074755f` (T008, T016), `81f46a369` (T009–T011, T015, T017), `c5edfc9f8` (T012, T013, T006
+harness). This closeout record ships in the closeout commit itself.
+
+Anomaly line: `ANOMALY: none`; in-passing repairs: none during closeout (the T006 exit-code
+literal slip was already disclosed in `journal-format-harness.txt` before this pass).
+
