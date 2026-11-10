@@ -1,0 +1,489 @@
+=== Analyze Round 3 deterministic checks — 2026-11-10 (run r20261110T121314Z-b099) ===
+
+--- 1) account-clause-coverage.py --spec-dir ... --json (full JSON: analyze-coverage-r3-2026-11-10.json) ---
+accountant_exit=2
+{
+  "status": "baseline-missing",
+  "baseline_present": false,
+  "errors": 686,
+  "warnings": 1,
+  "fr": {
+    "universe": 28,
+    "claimed": 28,
+    "uncovered": []
+  },
+  "scanned": {
+    "total": 290,
+    "parsed": 183,
+    "named_unparseable": 107,
+    "named_files": [
+      "023-agent-framework-redesign/contracts/agents-command-contract.md",
+      "023-agent-framework-redesign/contracts/conceptual-model-contract.md",
+      "023-agent-framework-redesign/contracts/template-migration-contract.md",
+      "024-agent-env-config/contracts/tool-config-targets.md",
+      "024-agent-env-config/contracts/unified-env-contract.md",
+      "027-feedback-mechanism/contracts/command-classification.md",
+      "027-feedback-mechanism/contracts/feedback-entry-schema.md",
+      "027-feedback-mechanism/contracts/feedback-step-convention.md",
+      "027-feedback-mechanism/contracts/feedback-utils-cli.md",
+      "028-sdd-workflow-refactor/contracts/install-copy.contract.md",
+      "028-sdd-workflow-refactor/contracts/path-rewrite.contract.md",
+      "028-sdd-workflow-refactor/contracts/reference-rewrite.contract.md",
+      "028-sdd-workflow-refactor/contracts/skill-removal.contract.md",
+      "028-sdd-workflow-refactor/contracts/zero-reference-gate.contract.md",
+      "034-evidence-infra/contracts/engine-subset-boundary.md",
+      "034-evidence-infra/contracts/evidence-utils-cli.md",
+      "034-evidence-infra/contracts/findings-contract.md",
+      "035-token-efficiency/contracts/audit-and-gates.md",
+      "035-token-efficiency/contracts/discipline-doc.md",
+      "035-token-efficiency/contracts/feedback-marker.md",
+      "036-team-summary/contracts/items-ledger.contract.md",
+      "036-team-summary/contracts/summary-trigger.contract.md",
+      "036-team-summary/contracts/summary-writeset.contract.md",
+      "036-team-summary/contracts/team-project-form.contract.md",
+      "037-goal-registry/contracts/goal-command.contract.md",
+      "037-goal-registry/contracts/goal-definition.contract.md",
+      "037-goal-registry/contracts/goal-writeset-migration.contract.md",
+      "037-goal-registry/contracts/team-territory.contract.md",
+      "038-goal-target/contracts/run-target-assignment.contract.md",
+      "038-goal-target/contracts/target-ref-ledger.contract.md",
+      "038-goal-target/contracts/targets-engine.contract.md",
+      "039-session-export/contracts/export-skill-rework.contract.md",
+      "039-session-export/contracts/session-command.contract.md",
+      "039-session-export/contracts/session-description.contract.md",
+      "040-agent-metadata-portability/contracts/relocation-taxonomy.md",
+      "040-agent-metadata-portability/contracts/render-pipeline.md",
+      "040-agent-metadata-portability/contracts/tool-mapping.md",
+      "045-sanitize-command/contracts/sanitize-command-template.md",
+      "045-sanitize-command/contracts/sanitize-detection-rules.md",
+      "045-sanitize-command/contracts/sanitize-engine.md",
+      "045-sanitize-command/contracts/sanitize-findings.md",
+      "048-derive-command/contracts/derivation-model.md",
+      "048-derive-command/contracts/derive-command-template.md",
+      "048-derive-command/contracts/derive-engine.md",
+      "048-derive-command/contracts/move-library.md",
+      "049-docs-reconcile/contracts/action-routing.md",
+      "049-docs-reconcile/contracts/docs-command-orchestration.md",
+      "049-docs-reconcile/contracts/target-structure-declaration.md",
+      "056-probe-handler-system/contracts/compile-embeds.md",
+      "056-probe-handler-system/contracts/engine-action-sets.md",
+      "056-probe-handler-system/contracts/handler-registry.md",
+      "056-probe-handler-system/contracts/probe-registry.md",
+      "057-decompose-command-skills/contracts/run-team-parity.md",
+      "059-exec-quant-recording/contracts/exec-quant-cli.md",
+      "059-exec-quant-recording/contracts/probe-registration.md",
+      "061-subagent-cli-config/contracts/dispatch-wiring.md",
+      "061-subagent-cli-config/contracts/exec-quant-v2.md",
+      "061-subagent-cli-config/contracts/execution-config-cli.md",
+      "064-subagent-concurrency/contracts/cli-profiles.md",
+      "064-subagent-concurrency/contracts/lifecycle-detach-reattach.md",
+      "064-subagent-concurrency/contracts/line-envelope-and-ingress.md",
+      "064-subagent-concurrency/contracts/line-registry.md",
+      "064-subagent-concurrency/contracts/non-regression-and-tests.md",
+      "064-subagent-concurrency/contracts/workspace-isolation.md",
+      "065-loop-interruption-recovery/contracts/loop-state-cli.md",
+      "065-loop-interruption-recovery/contracts/non-regression-and-tests.md",
+      "065-loop-interruption-recovery/contracts/recovery-actions.md",
+      "065-loop-interruption-recovery/contracts/snapshot-and-interruptions.md",
+      "065-loop-interruption-recovery/contracts/spine-and-watchbeat.md",
+      "067-loop-efficiency-hardening/contracts/consolidation-ledger.md",
+      "067-loop-efficiency-hardening/contracts/failure-baseline.md",
+      "067-loop-efficiency-hardening/contracts/measurement.md",
+      "067-loop-efficiency-hardening/contracts/runner-contract.md",
+      "070-subagent-task-teams/contracts/fallback-and-nonregression.md",
+      "070-subagent-task-teams/contracts/observability-and-retry.md",
+      "070-subagent-task-teams/contracts/scheduler-and-dispatch.md",
+      "070-subagent-task-teams/contracts/stage-team-adapter.md",
+      "070-subagent-task-teams/contracts/verification-and-integration.md",
+      "070-subagent-task-teams/contracts/work-package-model.md",
+      "070-subagent-task-teams/contracts/wp-gate.md",
+      "075-sdd-loop-efficiency/contracts/delivery-and-invariants.md",
+      "075-sdd-loop-efficiency/contracts/fast-lane.md",
+      "075-sdd-loop-efficiency/contracts/plan-constraint.md",
+      "075-sdd-loop-efficiency/contracts/progress-decoupling.md",
+      "075-sdd-loop-efficiency/contracts/test-budget.md",
+      "080-humanize-run-output/contracts/content-mode.contract.md",
+      "080-humanize-run-output/contracts/execution-dispatch.contract.md",
+      "080-humanize-run-output/contracts/invocation-parse.contract.md",
+      "080-humanize-run-output/contracts/report-assembly.contract.md",
+      "080-humanize-run-output/contracts/wiring-compat.contract.md",
+      "081-acceptance-hardening/contracts/artifact-schemas.contract.md",
+      "081-acceptance-hardening/contracts/gate-wiring.contract.md",
+      "081-acceptance-hardening/contracts/review-composition.contract.md",
+      "081-acceptance-hardening/contracts/state-vocabulary.contract.md",
+      "083-mechanism-policy-separation/contracts/guard-and-measurement.contract.md",
+      "083-mechanism-policy-separation/contracts/owner-document.contract.md",
+      "083-mechanism-policy-separation/contracts/skill-reference.contract.md",
+      "083-mechanism-policy-separation/contracts/skill-wiring.contract.md",
+      "090-re-anchoring/contracts/nd-acceptance-readability.contract.md",
+      "090-re-anchoring/contracts/nd-detection-categories.contract.md",
+      "090-re-anchoring/contracts/nd-detection-engine-cli.contract.md",
+      "090-re-anchoring/contracts/nd-disposition.contract.md",
+      "090-re-anchoring/contracts/nd-four-stage-command.contract.md",
+      "090-re-anchoring/contracts/nd-renumber-and-supersede.contract.md",
+      "090-re-anchoring/contracts/nd-report-schema.contract.md",
+      "090-re-anchoring/contracts/nd-status-and-verification.contract.md",
+      "093-concurrency-by-default/contracts/concurrency-contracts.md"
+    ],
+    "zero_clause_parseable": 1,
+    "sentinel_holds": true,
+    "yaml_total": 7,
+    "yaml_parsed": 7,
+    "yaml_named": 0,
+    "per_form": {
+      "md-bold-closed": {
+        "files": 127,
+        "clauses": 1649
+      },
+      "md-bold-paren": {
+        "files": 4,
+        "clauses": 45
+      },
+      "md-heading": {
+        "files": 46,
+        "clauses": 333
+      },
+      "yaml-openapi": {
+        "files": 6,
+        "clauses": 30
+      },
+      "yaml-assertions": {
+        "files": 1,
+        "clauses": 6
+      },
+      "md-none": {
+        "files": 106,
+        "clauses": 0
+      }
+    }
+  }
+}
+None fail 685 None
+None pass 0 None
+None fail 107 None
+None fail 685 None
+
+--- 2) validate-requirements.py ---
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+validate_requirements_exit=0
+
+--- 3) validate-tasks.py ---
+PASS: .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 0 warning(s)
+validate_tasks_exit=0
+
+--- 4) validate-decision-tensions.py --spec plan --json ---
+{
+  "spec": ".specify/specs/099-speckit-seal",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 333,
+    "records": 6
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 0
+  },
+  "findings": []
+}
+validate_decision_tensions_exit=0
+
+--- 5) pre-analyze-check.py --stage requirements / plan / tasks ---
+[stage=requirements]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=101 waived=0
+[stage=plan]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=101 waived=0
+[stage=tasks]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=101 waived=0
+
+--- 6) decomposition-check.py --mode tasks ---
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 28, "task_count": 51, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T15:00:42Z"}
+exit=0
+
+--- 7) 074 acceptance-case baseline readings (reproduced this round) ---
+parent_open_rows: 57
+parent_closed_rows: 0
+074a_closed_rows: 32
+074a_open_rows: 0
+074b_closed_rows: 26
+074b_open_rows: 0
+parent_review_present: no
+parent_code_review_present: no
+parent_verification_lines: 41
+parent_verification_sc_status_rows: 8
+parent_requirements_path_markers: 0
+074b_requirements_path_markers: 0
+074b_verification_sc_status_rows: 2
+verification_landed_by_commit: 91726a64171c3fcbb265ae0cacabb5ed5390c176
+split_record_proposed_slices: 1 occurrence(s)
+split_record_declared_order:
+- proposed_slices:
+  - `074a-authorized-routing`（MVP）：控制层级 + 双层授权 + 三值分流 + 授权席位启动嵌套运行 + 治理嵌套；FR-001–FR-019 + FR-025（20 FR）；任务 ≈ Setup 3 + Foundational 2 + US1 9 + US2 7 + US3 5 + Polish 8 = 34；新 spec 目录 `074a-authorized-routing`；`Related Feature: 074`。
+  - `074b-nested-governance`：外层消费与交接 + team report 段 + 概念扩散 + 兼容/安全；FR-020–FR-024 + FR-026–FR-028（8 FR）；任务 ≈ US4 9 + US5 6 + Polish 8 = 23；新 spec 目录 `074b-nested-governance`；`Related Feature: 074`。
+create_team_slice_local_str_refs:
+99:- **每次调用一行**: 一行恰好五个字段 —— `outcome`、`artifact paths`、`evidence paths`、`routing-verdict reference`、`anomalies`。`outcome` 取自三值封闭集 `[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]`;第四值、自由文本或空值一律非法。
+101:- **路径以路径携带**: artifact / evidence 只写路径,段内 MUST NOT 内联工件正文;`[[STR-005]]` / `[[STR-006]]` 的嵌套运行 MUST NOT 改写成成功语气 —— 它们原样上抛。
+
+--- 8) STR tables cross-check ---
+[parent 074 requirements § Shared Strings]
+| `STR-001` | `"sdd-invocation"` | authorization schema checks (Agent definition + Team seat), pre-dispatch governance tests |
+| `STR-002` | `"allowed"` | authorization schema checks, pre-dispatch governance tests, SDD-host Agent responsibility contract |
+| `STR-003` | `"forbidden"` | schema-default tests, backward-compatibility tests |
+| `STR-004` | `"sdd"` | routing golden table, routing-engine unit tests |
+| `STR-005` | `"direct"` | routing golden table, direct-modification gate tests |
+| `STR-006` | `"adjudicate"` | routing golden table, ambiguity and conflict property test |
+| `STR-007` | `"completed"` | nested-run handoff contract test, team run-report contract test |
+| `STR-008` | `"blocked"` | nested-run handoff contract test, authorization-failure tests |
+| `STR-009` | `"failed"` | nested-run handoff contract test, stall and timeout tests |
+| `STR-010` | `"## Nested SDD Runs"` | team run-report contract test |
+| `STR-011` | `"seats"` | team.md seat-policy schema tests, authorization contract tests |
+[074a STR-010 + mapping]
+| STR-010 | STR-011 | 席位策略映射键名 `"seats"` |
+90:| STR-010 | STR-011 | 席位策略映射键名 `"seats"` |
+[074b STR-004..007 + mapping]
+| `STR-004` | `"completed"` | team run-report contract test; local FR-002 outcome value |
+| `STR-005` | `"blocked"` | team run-report contract test; local FR-002 outcome value |
+| `STR-006` | `"failed"` | team run-report contract test; local FR-002 outcome value |
+| `STR-007` | `"## Nested SDD Runs"` | team run-report contract test; local FR-002 mandatory heading literal |
+| STR-001 | STR-001 | 授权能力键名 `"sdd-invocation"` |
+| STR-002 | STR-002 | 能力/策略允许值 `"allowed"` |
+| STR-003 | STR-003 | 能力/策略禁止值与缺省值 `"forbidden"` |
+| STR-004 | STR-007 | 嵌套运行 outcome `"completed"` |
+| STR-005 | STR-008 | 嵌套运行 outcome `"blocked"` |
+| STR-006 | STR-009 | 嵌套运行 outcome `"failed"` |
+| STR-007 | STR-010 | 团队运行报告嵌套段标题字面量 `"## Nested SDD Runs"` |
+
+--- 9) feature registry / detail linkage readings ---
+102:| 099 | Speckit Seal（/speckit.seal：按 review 封装 spec 与分片合并回写） | 按 review 结论封装 spec：`Sealed` 是 `Ready for Review` 之后的终态、是归档准入的唯一状态；承载 split + merge 回写流程——分片同名输出件按声明顺序并回父级（编号重排/语义对齐/词汇表对齐/冲突显式呈现），074 回合为首个真实验收。 | Planned | .specify/features/099-speckit-seal.md | .specify/specs/099-speckit-seal/requirements.md | 2026-11-10 planned via /speckit.plan — plan.md（22 项 Constitution 全 Pass）+ research.md(R-01…R-20) + data-model.md(14 实体) + contracts(4 页 45 条款 C-001…C-045) + quickstart.md(9 走查，S-1 已实跑) + feature-ref.md（FR 28/28、SC 9/9）；6 条 decision-tension(T-001…T-006)、12 条 Execution Premise 全 verified、Dependency set none；9 个工作包（每包 ≤16 行） |
+6:**Status**: Planned
+latest_review_section:
+## Latest Review
+
+尚未评审——当前阶段为 plan（2026-11-10）。
+
+## Key Changes
+4:**Total Features**: 90
+
+--- 10) r2 repair surface: F-05 fix anchors + closed-set phrase scan (path-domain exclusion) ---
+[plan.md P8 acceptance anchor]
+| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单逐条覆盖 FR-027 五项（下限），额外具名阻断逐条点名 |
+[feature detail Key Changes 6]
+39:   终态二值（`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的具名阻断清单）。
+[phrase scan: 一一对应|恰好五项|仅五项|限于五项|只允许五项|恰五项|exactly five|one-to-one]
+hits_exit=1 (1 = ZERO-LIVE-HITS)
+[all 五项 mentions in live surface]
+  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:101:**C-043** — 074 回合记录与五项处置。
+  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:104:（`test-evidence/074-round-*.txt`）、以及（仅 `Sealed` 终态时）`seal.md` 构成；MUST NOT 新建第三份台账。FR-027 的五项实测
+  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:106:以「已解决（证据指针）」或「阻断（理由）」出现在回合记录中——五项是下限，回合计出的额外具名阻断 MUST
+  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:131:| SC-006 | `tests/integration/test_seal_074_round.py`（只读 plan 面 + 阻断态重跑）+ 回合实测记录 | `test-evidence/074-round-*.txt`；五项裁决逐条对照；重跑清单一致 |
+  .specify/specs/099-speckit-seal/data-model.md:191:| `item` | FR-027(a)…(e) 五项之一（缺 `Path` 标记 / STR 同号不同义 / 出厂文档引用 / P0 驱动者豁免 / 57 行拆前记录） |
+  .specify/specs/099-speckit-seal/plan.md:29:为目标执行 split → merge-back → seal 全流程，五项实测输入缺陷（缺 `Path` 标记、STR 同号不同义、
+  .specify/specs/099-speckit-seal/plan.md:31:`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的拒绝清单。
+  .specify/specs/099-speckit-seal/plan.md:145:- **discriminating_evidence**: 在 074b P0 仍只有驱动者记录的状态下运行 `seal`；结果二值：`Sealed` / 至少逐条覆盖五项实测输入、并逐条点名额外阻断的拒绝清单。
+  .specify/specs/099-speckit-seal/plan.md:310:| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单逐条覆盖 FR-027 五项（下限），额外具名阻断逐条点名 |
+  .specify/specs/099-speckit-seal/quickstart.md:171:期望终态（二值）：`Sealed`（`exit=0`），或至少逐条覆盖 FR-027 五项实测输入、并逐条点名额外阻断的拒绝清单
+  .specify/specs/099-speckit-seal/quickstart.md:174:> **不可执行于 plan 阶段。** Premises：(a) 五项输入缺陷的实测形态按 research R-9/R-10/R-12/R-17（本日实测）；
+  .specify/specs/099-speckit-seal/requirements.md:69:维护者按本特性交付的流程对 074 运行合并回写与 seal。流程必须能识别 074a/074b、把它们全部同名输出件并回父级、让父 `tasks.md` 不再携带未勾选行（57 行被拆前记录按既有 non-disposable 纪律被复核与处置，而不是被静默覆盖）、让父级验收记录可被闭包判定器求值（每条 SC 有状态行且 requirements 满足 Path 标记模式）、并产出父级合并后的 review 结论。最终 seal 给出**完整裁决**：要么 `Sealed`，要么一份逐条点名的拒绝清单——每个已知输入缺陷（缺 Path 标记导致闭包判定器 exit 2、共享字符串同号不同义、出厂文档引用分片本地 ID、review P0 只有驱动者记录的豁免、父 tasks.md 的拆前行）都必须被显式解决或显式阻断，MUST NOT 有静默默认；五项是下限而非上限——回合检出的额外具名阻断同样逐条点名即合规。
+  .specify/specs/099-speckit-seal/requirements.md:73:**Independent Test**: 在 074 的当前树上运行完整回合，断言：合并清单覆盖两片的全部输出件；父 `tasks.md` 未勾选行为 0；父 `verification.md` 每条 SC 有状态行；父级 review 记录由两片合并而来且保留 P0 处置引用；seal 裁决要么 `Sealed` 要么列出至少覆盖五项实测输入、并逐条点名额外阻断的具名阻断项；重复运行幂等。
+  .specify/specs/099-speckit-seal/requirements.md:162:- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2——逐条记录取值（显式决定，或记录过的严格默认 `final`），MUST NOT 读作通过；(b) 分片本地 STR 编号与父级同号不同义——实测两组：074a 本地 `STR-010`（`"seats"`，已声明映射 → 父 `STR-011`）与 074b 本地 `STR-004`–`STR-007`（`"completed"`/`"blocked"`/`"failed"`/`"## Nested SDD Runs"`，已声明映射 → 父 `STR-007`–`STR-010`）——按 FR-016 的冲突规则呈现并解决；(c) 出厂文档 `skills/internal/create-team/SKILL.md` 以 074b 分片本地 ID 引用 outcome 字面量（`STR-004`/`STR-005`/`STR-006` 在 074b 本地表为 `completed`/`blocked`/`failed`；父级同号为 `sdd`/`direct`/`adjudicate`）——按 FR-016 检出并记录重指向（合并后父 ID `STR-007`/`STR-008`/`STR-009`）或逐字字面量；(d) 074b review 的 P0（字母分片分支解析到父目录）只带驱动者记录的豁免——按 FR-006 不算用户豁免，须有修复证据或用户显式裁定，否则为具名阻断；(e) 父 `tasks.md` 的 57 行拆前记录——按 FR-018 处置，MUST NOT 静默覆盖或删除。每项 MUST 在回合记录中逐条出现，状态为「已解决（证据指针）」或「阻断（理由）」。五项是**下限**：回合实测新增的具名阻断（含五项之外的同号不同义、目录同名产物冲突）MUST 同样逐条点名，MUST NOT 以「不在五项内」为由省略。
+  .specify/specs/099-speckit-seal/requirements.md:191:- **SC-006**: 074 真实回合（用户指定的 acceptance 用例）可执行且可复现：以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行 split→merge-back→seal 全流程；实测输入 MUST 为：074a 32/32、074b 26/26 任务行闭合；父 `tasks.md` 57 个未勾选行；父级无 `review.md`/`code-review.md`；父 `verification.md` 以聚合指针集存在（提交 `91726a641`，每 SC 一行——本条以实测更正简报的「父目录无 verification.md」前提）。回合产出覆盖两片全部实际输出件的合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0（57 行按 FR-018 显式处置）；父 `verification.md` 每条 SC 有状态行；seal 终态为 `Sealed` 或至少逐条覆盖 FR-027 五项实测输入的具名阻断清单——五项之外的实测阻断只需逐条点名即合规，不构成不合规；验收断言：回合记录对五项逐项呈 resolved/blocked，且拒绝清单每条阻断都能解析到回合证据（五项之外的多出条目不判违规）；阻断状态下重跑清单一致。 **Path**: final
+  .specify/specs/099-speckit-seal/requirements.md:203:- **SC-006 Source**: 074 回合的合并清单、回合记录与 seal 裁决（封装记录或拒绝清单），逐项对照 FR-027 的五项实测输入（下限），并核对五项之外阻断的逐条点名；重跑对照。
+  .specify/specs/099-speckit-seal/tasks.md:24:| 6 用户故事 3（P1） | 074 真实回合：split → merge-back → seal，五项输入逐条处置 | T039–T044 | US3、SC-006 |
+  .specify/specs/099-speckit-seal/tasks.md:52:- DoD-6: **074 回合二值终态** — `.specify/specs/074-goal-team-sdd-unification/` 回合产出完整合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0；seal 终态为 `Sealed` 或至少逐条覆盖 FR-027 五项实测输入（额外具名阻断逐条点名）的拒绝清单；重跑清单一致（SC-006、FR-027、FR-028）。Check: `test-evidence/074-round-20261110.txt` 存在且五个 FR-027 项各有 resolved/blocked 记录。
+  .specify/specs/099-speckit-seal/tasks.md:216:**Goal**: 以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行真实 split → merge-back → seal 回合，五项实测输入缺陷逐条显式处置，终态二值（`Sealed` 或具名阻断清单）。
+  .specify/specs/099-speckit-seal/tasks.md:218:**Independent Test**: 在 074 当前树（074a 32/32、074b 26/26 闭合；父 `tasks.md` 57 个 `[ ]` 行；父级无 `review.md`/`code-review.md`；父 `verification.md` 为聚合指针集）运行完整回合——断言合并清单覆盖两片全部实际输出件、父 `tasks.md` 未勾选行为 0、父 `verification.md` 每条 SC 有状态行、seal 裁决至少逐条覆盖 FR-027 五项（额外阻断逐条点名）、阻断态重跑清单一致。
+  .specify/specs/099-speckit-seal/tasks.md:224:- [ ] T043 [US3] 先提交回合产物（074 父目录 + 两片标注 + 出厂文档修正），再对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `seal`，把完整 stdout 裁决捕获到 `test-evidence/074-round-20261110.txt`；终态 MUST 二值——`Sealed`（exit 0）或至少逐条覆盖 FR-027 五项实测输入、并逐条点名额外阻断的拒绝清单（exit 1；`state-drift` 为 exit 2）；重跑一次证明清单一致（FR-026、FR-027、FR-028、SC-006、plan § Decision Tensions T-005、[blockedBy: T042]）。
+  .specify/specs/099-speckit-seal/tasks.md:225:- [ ] T044 [US3] 把回合裁决写入既有承载（不建第三份台账）：`merge-manifest.json` 的 `conflicts[]`/`dispositions[]`、仅 `Sealed` 时的 `seal.md` `waivers[]`、被阻断时的 `test-evidence/074-round-20261110.txt`；FR-027 五项（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、074b P0 仅驱动者豁免、57 行拆前记录）逐项呈 `resolved`（证据指针）或 `blocked`（理由），五项之外阻断同样逐条落承载，无第三态、无静默默认（FR-027、C-043、[blockedBy: T043]）。
+  .specify/features/099-speckit-seal.md:38:6. 074 真实回合（首个验收）：split → merge-back → seal 全流程，五项实测输入缺陷逐条显式处置，
+  .specify/features/099-speckit-seal.md:39:   终态二值（`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的具名阻断清单）。
+  .specify/features.md:56:| 047 | Framework Material Hygiene | 框架自有资料卫生:`/speckit.sanitize` 对 parked/draft/索引与存储、specs(含归档)、history、镜像目录、兼容性符号链接、docs 树做过期残留与冗余检测(语义声明 vs 仓库证据,程序采集证据)及正确性检查(死引用/索引一致/链接有效性/镜像漂移,纯确定性判定);发现报告持久化携带 pending 状态,提示是否修复;确认后按两级判据清理(删除/归档前置确认、可逆修复自动执行),处置完成更新状态并出具执行报告。不触及用户代码/脚本/测试。交叉引用 037/008/046/040。 | Implemented | .specify/features/047-framework-material-hygiene.md | .specify/specs/045-sanitize-command/requirements.md | 2026-08-20 implemented via /speckit.implement — 32/32 任务关闭,SC-001..005 全 pass(见 verification.md);GATE-1..6 全过(全套件 44F=基线零新增、+109 通过;镜像 diff 一致 + sync-check exit 0;门控扫描 total 23/ violations 空;分类 18;regen 零 stale);dogfood 本仓真实运行:台账 691 pending(689 死引用集中于存活 specs 引用 docs 重构前旧路径、1 skills 孤儿镜像、1 过期残留=动机案例 0801 todo 携带 1a090c72 证据),清理留待用户确认;dogfood 驱动 5 项机制修订(冻结历史豁免/feedback 簿记豁免/孤儿检测收窄 skills 对/证据包无日期过滤+片段 glob/sync-mirrors lane 局部性)+ 2 守卫测试豁免 sanitize 台账;事故记录:Phase 3 提交曾意外包含 0801 todo 删除(未经确认),已恢复并如实入档。Earlier: planned via /speckit.plan — plan.md + data-model.md(5 实体)+ 4 contracts(sanitize-engine / sanitize-findings / sanitize-command-template / sanitize-detection-rules)+ quickstart.md(3 走查)+ feature-ref.md;Constitution 13 项 12 Pass / 1 Partial(IX,已豁免论证:新命令面+引擎+台账均为 FR 必需,复用面 docs-utils/sync-mirrors/.specify/archive/ 全复用);设计 = stdlib-only 引擎 sanitize-utils.py(collect/record/status/apply)+ 累积台账 .specify/memory/sanitize/findings.json(稳定 ID 合并、pending→resolved 状态机、未检出自动收敛)+ 破坏性清理前置确认挂 gate-sanitize-destructive-cleanup probe;实现批次义务:复杂命令分类 17→18、baseline.json total +1、Tool 记录、docs/reference/commands/sanitize.md。Earlier: registered via /speckit.clarify for requirement 045: new Feature rather than binding 037 Docs Command / 038 Evidence Infra / 025 Todo Command — 资料卫生为横向能力,037 仅 docs/ 域、038 是证据采集层(过期证据 todo 只是触发实例)、025 管理 TODO 块;直接动因 = 2026-08-12 结转 parked todo 声称五项未落地而 1a090c72 已于 07-30 全部合入,人工 08-20 才发现;clarify 同轮决策:报告持久化 + pending 状态生命周期(修复后更新状态)、仅手动触发零挂点) |
+  .specify/features.md:59:| 050 | Proactive Flow Trigger | 主动触发机制:在每个受支持 agent 的必经指令路径上埋设触发点(init / `/speckit.instructions` 写入 `.specify/instructions.md`,经既有 symlink 抵达 AGENTS.md / CLAUDE.md / QODER.md 等),agent 每回合接续既有 constitution 合规分析做情境评估(默认只消费已在上下文中的环境信息、不足时才升级到确定性探测的摘要输出),主动建议"现在该执行哪个流程"并附**确切可复制的调用形式**,使用户不必记得任何 `/speckit.*` 命令名或技能名。建议的采纳/拒绝记录进项目本地学习状态(规则集 / 晋升态 / 建议事件 / 每回合遥测),同一规则连续采纳达阈值(默认 3,一次拒绝即重置)后晋升为免确认自动执行——**破坏性/不可逆流程永不晋升**(判据归确认门控治理,学习计数不得覆盖)、**建议永不阻塞当前请求**(回流约束);自动执行仍出三段式执行报告。出厂种子规则集从 25 个命令模板既有 `## Handoffs` 条件式**派生**(不另撰第二份 situation→flow 知识),故新项目第一天即有建议;情境身份取粗粒度受控词表(生命周期阶段 × 待处理信号集)使连续计数良定义;规则本身为数据,依命中率/拒绝率/误报/漏报经用户确认后调优。交叉引用 032(同为指令段投递的行为指令,归属判定的决定性先例)、008(投递载体)、001(Handoffs 为种子派生来源)、022(全 agent 覆盖议题)、028(计数-阈值范式)、046(破坏性判据与回流约束)。 | Implemented | .specify/features/050-proactive-flow-trigger.md | .specify/specs/050-proactive-flow-trigger/requirements.md | 2026-09-07 (registered — 判定为**新 Feature** 而非绑定既有:按绑定先例启发式逐个核验 6 个候选的同胞吸收证据(022 吸收 4、028 吸收 3,均强吸收但主题不符;032/008/001/046 各 1),无一拥有本能力,各只匹配一个侧面(032/008=投递载体、001=能力前身但静态命令域、022=仅 FR-003 议题、028=计数机制先例、046=破坏性判据消费);决定性先例是 **032**——投递载体完全相同却仍自成 Feature 而非绑 008,确立「以指令段形式嵌入是**投递事实、非归属事实**」。两轮澄清完成:首轮三项(指令文件为**唯一**触发通道 / 环境信息为主 + 按需升级探测 / **每回合**评估)、第二轮五项(Feature 绑定 / 种子规则从 Handoffs 派生 / 阈值语义取**连续采纳**拒绝即重置 / 情境身份取**粗粒度受控词表** / 扩展 FR-009 增每回合遥测以补齐 SC-011·SC-012 的分母缺口)。另采纳用户指示把评估**挂在既有 constitution 每回合合规分析之后**,并按源码实测收敛为两级:只挂 Documentation Map 的轻量常驻义务,**禁止**把 plan 期逐原则枚举门控(`plan-template.md:31–33`)每回合化。残留 `NEEDS CLARIFICATION` 0;26 FR / 15 SC / 4 user stories / 7 key entities / 32 acceptance scenarios / 17 edge cases。**待 plan 阶段优先复核的机械约束**:确认门控预算余量为 **0**(扫描 total 23,上限 = 044 `baseline.json` total × 25%),而 `scan-confirmation-gates.py` 的 `SCAN_ROOT_FILES=("templates",)` 覆盖 `templates/*.md`,本特性文案天然是"建议/确认/询问"语义,极易命中 `BLOCKING_PATTERNS` 而同时打爆 sweep 契约。索引行与表头计数一律**手工编辑**——`update-feature-index.sh` 为破坏性脚本(承 Feature 049 记录:整体重写、缺 Spec Path 列、覆盖手写散文、重置全部 Status,而 test_c3 仍通过); 2026-09-07 **planned** via `/speckit.plan`(Draft → **Planned**)——plan.md + data-model.md(7 实体 / 2 状态机 / 受控词表 **13** 命名情境 + 9 阶段 + **12** 信号 / 升级判据 P1–P5 / 校验规则 **6 组 32 条** V1…V6)+ contracts ×4 共 **61 条款**(trigger-section 12 / trigger-engine **23** / seed-derivation 10 / discipline-doc **16**;原 47,analyze 补 C-19…C-23 与 C-8…C-16)+ quickstart.md(6 场景)+ feature-ref.md,无独立 research.md(Phase 0 findings 以 D-1…D-10 内联,全部仓库内部实测);**Constitution v1.11.0 13 Pass / 1 Partial(XIV,已论证)**,Complexity Tracking 已填(原记 14/14 Pass,2026-09-08 经 analyze 订正)。设计取向 = 主动**收缩制品面**:零新命令、零新技能、零新确认门控、零新依赖、零 `src/` 逻辑改动,唯一新制品是一个 stdlib 引擎(`trigger-utils.py`,11 action 封闭枚举,复制 `derive-utils.py` 的 camelCase 信封 + 原子写 + 分级退出码),必要性由 Program-First 强制。四项决定性裁定:① **管理面不引入命令**(取 glossary 域同构形态:引擎 + 触发段路由管理意图)——三个候选里唯一对已钉死计数(复杂命令 19、docs-step 16)、probe 注册表(internal 73)与门控预算全部**零扰动**,且与"用户不必记名字"的特性论点自洽;② **种子规则取「provenance 副本 + 漂移检出」**——`## Handoffs` 是散文不可确定性解析,漂移由**被检出**取代被防止。**归类经 analyze 订正**:该形态**不属** `one-source-of-truth.md` 的三类合法副本(guard copy 须 pinned inside a test 且 serves the build never the reader,而种子是随包分发的运行时制品),故 Principle XIV 记 **Partial** 并在 plan.md §Complexity Tracking 论证;已否决给 25 模板加结构化 frontmatter 键(需再生 100 份 per-tool 副本,且与既有 `handoffs:` 键同名不同义);③ **每回合评估 = 每回合一次紧凑引擎调用**——agent 只传粗信号、引擎做匹配/计数/阈值,遥测因此**机制自产**,闭合 clarify 轮发现的 SC-011/SC-012 分母缺口;④ **状态按变动频率切分跟踪边界**——`.specify/memory/trigger/index.json` 跟踪(用户调优跨 clone 存活)、`telemetry.jsonl` 忽略(每回合 churn,承 `implement-loop.local.md` 先例)。计划期实测**推翻两处既有记录**(Principle VIII 的直接应用):指令模板实为 **14 个 `## ` 章节**而非 spec 原写的 17(14 才是关键数字,因 additive reconcile 只按 `## ` 切分,`###` 与既有章节内部改动**不传播**),已就地订正 spec 锚点;`sync-mirrors.py --check` 当前 **exit 0 全绿**,Feature 049 记录的 git-fleet 6 MISS 基线**已失效**,故全树 exit-0 门禁可用、049 的 `--only` workaround 不再需要。门控预算处置 = **设计规避而非改写 baseline**:两份新文案零 `BLOCKING_PATTERNS` 命中,钉为 `trigger-section.md` C-6 与 `discipline-doc.md` C-3,并在后者给出五处最易误犯表述的合规替代写法(`shared/guidelines/proactive-trigger.md` 不匹配任何 `GOVERNANCE_PATH_PATTERNS`,不享豁免)。实现期义务:新增 Tool 记录 `trigger-utils.py.md`(Principle XII,经 `refresh-tools.sh` 进 `tools.md`)、`generate-instructions.sh` 补 `HERMES.md` 与 `.opencode/instructions.md` 两条 symlink(FR-003 硬前置,消除 `_check_instructions` 两处恒 fail)、开工前重新冻结 `baseline-failed.txt`(当前最近为 049 的 47 条); 2026-09-07 **tasks** via `/speckit.tasks`(状态保持 **Planned**,不推进)——**51 项任务 / 7 Phase**(Setup 3 · Foundational 4 · US1 8 · US2 13 · US3 8 · US4 7 · Polish 8),13 项 `[P]`、**40** 处任务行 `[blockedBy]`,格式经程序校验(ID 连续唯一、单行含路径、故事标签放置正确、DoD 与 Completion Gate 零 checkbox 语法、blockedBy 无悬空引用)。**Tests Mode ON**(Principle IV)+ **混合型判定**:Principle VII 的 template-only 门(constitution.md:95)只豁免文档/模板制品面,`trigger-utils.py` 是可执行运行时代码故单元与集成测试**强制**;测试面由 plan 的 3 契约文件扩为 **8 个**(4 契约一契约一文件以保 `[P]` 资格 + 1 单元 + 3 集成按故事分文件),plan.md 四处已同步订正。**关键路径** = 单文件引擎串行链 T021→T023→T031→T038(US2/US3/US4 共改 `trigger-utils.py`,房式单文件约定),为本特性并行度硬上限;测试任务跨故事可并行。**MVP = US1 + US2**(两个 P1 合起来才构成独立有价值增量)。**Feature 列表复审**:未暴露新 Feature、未使既有失效;发现一处跨 Feature 交付效应——T011 补齐 `HERMES.md` / `.opencode/instructions.md` 闭合的是 **Feature 022** 范围内的既有覆盖缺口(`_check_instructions` 对两 key 恒 fail),归属仍在 022、050 为交付方,已记入 `features/022.md`。Completion Gate 8 项检查命令已逐一存在性核验(13/13 存在); 2026-09-08 **analyzed + remediated** via `/speckit.analyze`(状态保持 **Planned**)——只读分析产出 **37 条发现**(1 CRITICAL / 7 HIGH / 19 MEDIUM / 10 LOW);因全部工件同会话撰写,**检测与验证都委派 fresh-context 子代理**(3 检测通道 + 4 验证代理,验证者只收 finding 与证据位置),10 条 CRITICAL/HIGH 中 7 confirm、1 由 CRITICAL 降 HIGH、2 由 HIGH 降 MEDIUM、0 reject。**CRITICAL** = plan.md 把 Principle XIV 记为 Pass 的归类不成立(种子 JSON 非 `one-source-of-truth.md` 三类合法副本中任何一类),已改记 **Partial** 并补 Complexity Tracking 完整论证,不以重新解释指南清账。**HIGH×7** = ① 14 条 seed provenance anchor 中 **9 条不成立**(交叉扫描全部 25 个 Handoffs 段证实)→ FR-022 派生来源扩为两类(`anchorKind ∈ {handoffs, owning-section}`;`/speckit.feedback` 等在**任何** Handoffs 段都不出现,其 owner 是 `shared/workflow/feedback-step.md` §Threshold prompt protocol)、7 条 anchor 改指、命名情境 14→**13**(删 s14:无状态可触发且与 quickstart 场景 3 矛盾)、信号枚举 9→**12**(新增 checklist-absent / feature-index-absent / constitution-absent,解决 s03/s13 同身份违反 V1.3 与 s05 越界)、新增 V1.5/V1.6(匹配谓词 + 最具体优先消歧);② FR-019 / FR-020 **零机械覆盖**且映射指向不相干条款 → 新增 `trigger-engine.md` C-19(禁网络能力 import)/ C-20(会话级重复抑制,给 FR-008 机制)/ C-21(引擎从不自行执行流程)/ C-22(错误码封闭集)/ C-23(status payload schema),并把 `discipline-doc.md` 原**无编号**的内容表提升为 **C-8…C-16**(此前十余条 FR 被路由到只断言结构属性的 C-1…C-7);③ `complianceDone` 无输入通道致 SC-012 空洞、C-14 分支为死代码 → 封闭 flag 集 19→**20**(新增 `--compliance-done`,缺省 false)。SC-005/011/013/015 口径订正;**Measurement Sources 全节重写,15 条 SC 逐条具名产出任务**(此前 7 条无产出任务);tasks.md 补 T026 的 T023/T024 blocker 与 T044/T045/T049 blocker、DoD-4 豁免 Mirror 第 6 行、门控字面量改引用 T002 冻结前值;`feature-ref.md` FR→契约映射全面重写。契约条款 47→**61**; 2026-09-08 **implemented** via `/speckit.implement`(状态推进见 Pre-Status-Flip Gate)——**51 任务 → 50 `[X]` + 1 `[~]`**(T050 dogfood 需 ≥20 个普通工作回合,本会话在建造机制故非真实样本),**8 新测试文件 / 313 新测试全绿**,名字级回归每个 phase 边界为空(43 = 42 自有 + 1 外部归因);零扰动承诺机械复核成立(门控 **23/0** == 冻结前值、19/4/16 字面量未改写、probe **73**、`regen-command-copies`/`sync-mirrors` 均 exit 0);引擎 **1480 行 stdlib**,11 action / 20 flag / 10 码与契约封闭集逐项相符;**FR-003 缺口闭合**——8/8 agent 路径 symlink 至唯一 canonical,`_check_instructions` **6/6** pass(hermes/opencode 由恒 fail 转 pass,交付落在 Feature 022 范围);**SC 13 pass / 2 deferred**(SC-008 part2、SC-011,同因 T050);破坏性规则连续 10 次采纳 `promoted`/`autoExecute` 恒 false(附可逆对照)、再生后 `index.json` sha256 逐字节相同、三态降级 exit 0 + `suggest-only`、窗口 50 下 60/60 次追加恒 ≤50 且轮转前后规则集 sha256 相同、漂移守卫经受控实验(一次性 worktree,live 仓零修改)+ **负对照**证明为活体;实现期订正两处工件前提缺陷(quickstart 场景 1 的 `specify init` 一步假设;**T044/DoD-8 的 `tools.md` 子句 VOID**——全仓无写入方、该文件是 MCP 索引,详见 tasks.md §Implementation-Period Corrections C-1);类级发现已报告未修(同一虚假陈述散布 **7 个表面**,含 ambient,应乘独立变更);本特性催生一次独立治理变更 `61813fbf`(两顶帽子可达性 + Ask/Record/Repeat 理念,含与 XIV 的裁定:指针形态可重复、内容形态仍禁止) |
+  .specify/features.md:62:| 053 | 机器可判定的制品命题(Machine-Decidable Artifact Propositions) | 把制品对**自己**或对**兄弟制品**做出的结构性断言(编号连续、引用可解析、计数正确、某条款由哪一行任务转绿、某判据的主体是否被覆盖)从「代理阅读后声明」改为「程序判定后输出」。五处同题缺口:① `requirements.md` 无确定性检查器(同型先例 `validate-tasks.py` 已在 tasks 侧);② 条款→任务的绿点归属对结构检查器不可见,需在 tasks 模板定义行内归属声明面 `[green: <contract>#<clause>]` 并给检查器增 WARN 级「绿点跨阶段」检查;③ 机器覆盖核算,其前置缺口是契约条款语法当前**无 owner**(契约语法至少 6 种机器可辨形态;逐形态计数由其 owner 文件 notes/clause-form-census.md 拥有);④ goal 判据主体的「目录指代形」,当前靠成员枚举、脆弱且不可程序指代;⑤ `goal-utils.py` 增 `run-checks` action,一次输出团队 run 前置五项检查的机读 verdict。跨切面约束:每个新检查都 MUST 有逆样本(快速失败纪律对机器给出的绿同样成立)、门控预算整数余量为 0 故新增措辞须零命中、`templates/` 保持项目中立、新检查器走 Program-First 的既有归属声明形态。并偿还一笔既有债务:移除 `clarify-taxonomy.md` 里的过渡期 awk 抽取副本。 | Implemented | .specify/features/053-machine-decidable-artifacts.md | .specify/specs/053-machine-decidable-artifacts/requirements.md | 2026-10-04 · 2026-10-02 (plan: Draft → Planned —— `/speckit.plan` 产出 research.md(D-1…D-18 + A-1…A-6)、data-model.md(11 个实体 / V-1…V-40)、contracts/ ×7(**182** 条条款:139 制品类 + 43 行为类,逐文件 id 连续、0 条未标注)、quickstart.md(**12** 个场景,其中 10 个含改前已实跑的真实输出、7 处逐例前提清单)、feature-ref.md(FR→条款 **48/48**、SC→条款 **12/12**,未覆盖均为 0)。三项设计裁定经用户批准:条款语法 owner 取「新建一份 `shared/definitions/contract-clause-definitions.md`」、`.yaml` 取「手写两个最小抽取器,不引入 PyYAML」、FR-018 取「两个命题都机械化」——第三项扩大了 FR-018 范围,故按上游优先规则先改 requirements.md(FR-018 改写 + US2 增验收场景 6 + 追加 Session 2026-10-02)并复验清单(16/16)再填模板。Constitution v1.13.0 逐条动态枚举 **16** 项 = **16 Pass / 0 Partial / 0 Fail**;该评分**两轮委托**给不相交的新鲜上下文只读子代理(同作者条件成立),第一轮报 2 Fail(XII、XIV-CRITICAL)+ 3 Partial(VI、XIII、XV)、第二轮仍报 1 Fail(XIV)+ 1 Partial(VIII),全部**订正而非论证**,故 Complexity Tracking 为 N/A。委托评分查出本特性自己的两处自指缺陷:① SC-006 的反空真哨兵原为字面 `110`,而本特性自己的 7 份契约就在被扫描面内(落盘后同一命令得 117),该哨兵会在自己的制品落盘那一刻自我证伪——已改为关系式;② feature-ref 映射表的生成器有两个**互相抵消**的缺陷(把反引号内的示例 `FR-7`/`FR-007` 当成引用,以及用单反引号奇偶近似代码跨度而在行内围栏处反相、吞掉真实的 `(FR-020)`),总数看似正确而两行皆错——已修并升为契约条款 C-28/C-29。另订正:全量测试出现 2 条新增失败,均归因于**断言侧**而非被测物(一条把「旗标被接受」绑在 tasks.md 是否存在上、一条为报告旧路径冲突而抄录了被守卫禁止的字面量),已修并做变异演练,名字级 `comm -13` 双向为空(65/2927)。本轮产物日期戳原取自会话上下文而非机器时钟,已全部订正为 2026-10-02,并在 plan.md 加「Date span」说明两个日期戳的含义 · tasks: 产出 tasks.md 49 项/8 Phase,validate-tasks exit 0(0/0),状态保持 Planned) · 2026-10-03 `/speckit.analyze` 二轮整改:基线面改为排除本特性自身目录、FR 退出 `[green:]` 认领面、条款引用组规则写入 C-2 并据此整表重导映射(数值由其 owner `feature-ref.md` § 覆盖统计 拥有,此处不复写)、补 `skills`+`templates` 两条镜像行;状态仍为 Planned(实现未开始) · 2026-10-04 `/speckit.implement`(flip Planned → Implemented):49 项任务全部 `[X]`、`deferred_tasks=` 为空、DoD **9/9** 达成;十项 Completion Gate 对**当前树**逐项重跑而非采信「任务都打勾了」的状态,全部 pass——GATE-1 名字级 `comm -13` 新增 0 / 治好 0(基线 65 条,md5 `02177c0e…`,全量 65 failed / 3165 passed / 2 skipped,本特性十个专属套件 267 passed / 0 failed)、GATE-6 门控扫描 total 仍 23 / violations 0 且扫描器源码 `ad190d46..HEAD` diff 为空、GATE-7 `validate-tasks.py` exit 0 且 182 条款 / 182 认领 / 182 去重 / 0 未覆盖、GATE-8 关系式哨兵成立(64 + 53 == 117)、`LC_ALL=C comm -13` delta 0 且配对伴随量 182 > 0、FR 侧 48/48 未覆盖 0、GATE-2 逐镜像对按各自判据(scripts/python 1、templates 2、skills 30、整树 33,与既有债务逐项对账)、GATE-10 三份真实 spec exit 0 且五份弄坏副本各 exit 1 并各自点名自己的标签。**SC 12 条:11 pass、SC-007 如实记 partial**——仓内唯一 goal 处于 `active`,「对已终态 goal 的团队跑」这一档**无真实样本**,故在临时副本里构造并如实标注为构造,未编造;其判据里的「输入错误档」实测是 not-found `3` 而非 input-error `2`,亦如实记入。**七项继承前提被执行证伪并写回上游而非绕过**(普查 id 总数 508→507、场景 3 的逆样本因交叉掩蔽换 FR、T022「今日不可能 exit 0」实测为 PASS 且该行推理反了、场景 5 的样本落点违反 checker-form C-17、FR-020 只写围栏块致本特性自己的 tasks.md 撞自己的 GATE-7、普查逐形态列自相矛盾、E-4 把 `test_paths` 定义成全部写入目标致 3 条假 `green-path-divergence`),其中**四项由自举查出**——包括「本特性自己的定义行撞坏本特性自己的门」这一条,是它所主张的命题为真的最强可得证据。**三项上送而非就地修**(A-7 FR 侧是否要跨仓基线、A-8 OpenAPI 方法键在文件内重复致 24/689 个 id 同名、A-9 共享父解析器**并不**使 `--json`/`--repo-root` 位置无关——子解析器默认值会静默覆盖顶层值,源码注释与 Tool 记录两处假陈述已订正、C-11 的被证伪前提已内联注解、两个方向都钉住);另实测出两项仓内既有状态并刻意不修(`.specify/teams/viz-skill-arena` 的 goal 绑定悬空、44 份 spec 中 18 份的 requirements 侧既有债务)。**一处流程偏差已披露并单独成提交**(`26bd2feb`):Phase 3 的写门在编辑**之后**才跑,回溯裁定为 6/6 `allow` EXIT=0 故未写入任何门会拦的东西,但顺序本身错了;Phase 4–8 均在首次编辑前跑门且裁定回显在该阶段首份进度报告里。翻转证据落点 `specs/053-machine-decidable-artifacts/verification.md` 与详情文件 § 状态翻转 |
+  .specify/features.md:82:| 072 | 客户项目的持续反馈与自我提升（Client-Project Feedback & Self-Improvement） | 把 feedback 与 improve 机制从框架自身扩散到客户项目：代码段发现经非交互路径第五步自动采集为**一条指针形态客户条目**（记录路径 + 适用性 + 按严重度抄自汇总命令的计数，不搬意见正文），落在既有 `.specify/memory/feedback/` 存储里按 `kind`/`slice`/`custom:` 单元分区，由打包侧既有外部排除保证永不外流；客户发现的消化复用既有就地消化路径、后续载体闭集为 todo Park 模式 / 新需求规格 / 改进循环主体；客户改进循环复用 self-improvement 的 SI-0…SI-9（主体须过执行主体五条判据，why 段对 `custom:` 主体如实披露"运行判定历史未评估"并改用客户通道 + 证据车道）；"持续"定义为每次合格运行采集 + 既有非阻塞提示 + 显式触发，无调度器/常驻进程；四条循环度量（捕获覆盖、进入回路、闭环、重复）即读即建、零分母报未评估、不合成评分；框架反馈四条红线与前一特性的闭合面原样保留，不新增命令/引擎/台账/评分/依赖，零自动传输。 | Ready for Review | .specify/features/072-client-self-improvement.md | .specify/specs/072-client-self-improvement/requirements.md | 2026-10-27 review: 过程段 review.md（P0 0/P1 1/P2 3，REC-072-01…04 同提交登记）与代码段 code-review.md 落盘，triage=run、changed 111/judged 28/skipped 83/gap 0、段裁决 not-evaluated（合法跳过）、门禁 allow（零 blocking/important），capture 框架帽 skipped 披露；简报五项披露裁决见 review.md §1；状态 Implemented → Ready for Review；2026-10-27 (registered via /speckit.requirements under the stage brief: new Feature 072 bound in the requirements stage — deviation from the default clarify-time binding, recorded in the spec's Assumptions A2; `requirements.md` 29 FR definition rows / 7 SC / 6 user stories / 10 Shared Strings, `validate-requirements.py` exit 0 (`status: ok`, 0 error / 0 warning, scanned 300 lines, 36 definition rows), `decomposition-check.py --mode plan` decision=proceed (fr_count=29 / ceiling=30), `pre-analyze-check.py --stage requirements` decision=pass (errors=0, advisories all naming `.specify/memory/feedback/probes/`, a directory the feedback engine creates lazily at first probe injection — absent in this repo today, so the advisory is expected and left as a measurement: 1 from the spec, plus 1 more once the quality checklist names the same path); quality checklist 16/16; the brief's Q1–Q10 are adjudicated one by one in the spec's `## Clarifications`; scaffold deviation recorded (Assumptions A1): numbering and spec-dir creation came from the project's own script while its branch-switch action was suppressed. **Planned 2026-10-27 via /speckit.plan**: `plan.md` (16-row Constitution Check, all Pass, subagent-unavailable disclosed) + `research.md` (R1–R12) + `data-model.md` (E1–E10 / V1–V33 / 2 transitions) + six contract files C-1…C-62 (`clause_extract.py` all `md-bold-closed`) + `quickstart.md` (S1–S2 executed, S3–S8 per-example disclaimers) + `feature-ref.md`; `pre-analyze-check.py --stage plan` decision=pass errors=0; `account-clause-coverage.py` FR lane 29/29 claimed from citation groups; five behavior groups pinned to five new test files with red-first duty (SC-006); mirror baseline: 1 pre-existing drift recorded, criterion = no NEW drift. **Tasks 2026-10-27 via /speckit.tasks**: `tasks.md` 29 rows (T001–T029 ≤ 40 ceiling) grouped by the six user stories, MVP = US1+US2; five red-first contract groups (`tests/contract/test_client_{capture,armed_state,package_exclusion,improve_loop,metrics}.py`) + shared fixture `tests/fixtures/client_project.py` planned into the tree, 62/62 clauses claimed by `[green:]` rows; `validate-tasks.py` 0 error / 0 warning exit 0; `decomposition-check.py --mode tasks` decision=proceed (fr_count=29 ≤ 30, task_count=29 ≤ 40); `pre-analyze-check.py --stage tasks` decision=pass errors=0 (52 advisories, all expected: the five planned test files + the fixture + `docs/reference/commands/improve.md` (plan sync surface absent at generation) + the plan-stage expected set (lazy `feedback/probes/`, retired `templates/commands/`, hat five-dir slugs) + 2 non-concrete blockedBy tokens from the file's own Format documentation); `account-clause-coverage.py` status=ok, claimed=62/62, beyond baseline=0, FR lane 29/29; coverage-baseline body re-verified delta=0 at HEAD 646e1bfe (frozen at plan stage, not re-frozen); docs-only budget — no suite run, E2/closure slots untouched; status stays `Planned`) **Implemented 2026-10-27 via /speckit.implement (8 parts, T001–T029 全 `[X]`)**: 镜像收尾无新增漂移（T001 既录 loop-playbook.md 漂移随同步消解）；quickstart S3–S8 客户夹具实跑落 `notes/quickstart-run.md`；`validate-tasks.py` 0 error/0 warning 29/29；`verification.md` SC-001…SC-007 状态行 + 证据绑定齐备；最终定向核验 590 用例 588 passed / 2 failed，失败名 ⊆ T002 基线 26 名（零 NEW），全量 closure 留 driver review 后执行；E3 行记于 verification.md notes。 状态机 `Planned → Implemented`（tasks 零 `[ ]` + verification.md 齐备） |
+  .specify/features.md:86:| 077 | 项目文档的 SDD 接入（特性级类别与文档型阶段门禁） | 把项目文档开发接入 SDD 阶段链：在 `requirements.md` 头部声明特性线类别（`flow_class`，封闭取值 `execution` / `expression`），七个阶段命令在门禁判定前读取一次并按 `shared/workflow/expression-gates.md` 的阶段算子表切换；表达类的 plan 产出 `## Document Structure`（章节树 / 基准读者与阅读场景 / 证据清单 / 事实 owner 清单），implement 按结构落文并过 reader / evidence / duplicate / count 四面 + `structure` 子步的 blocking 门禁；`sdd-loop-driver` 阶段提示词携带类别、U4 校验门禁证据、两槽位测试预算在表达类下换成两个文档门禁槽位。不新增命令、不引入运行时，执行类行为零变化；承接 Feature 069 显式推迟的阶段命令接线。 | Ready for Review | .specify/features/077-doc-sdd-integration.md | .specify/specs/077-doc-sdd-integration/requirements.md | 2026-10-30 (requirements via /speckit.requirements——25 FR / 8 SC / 4 user stories / Shared Strings 条数以 `validate-requirements.py` 输出为准（本行不复述派生计数）；validator `status: ok`（五项全 pass；行数 / 定义行 / 字符串数以 `validate-requirements.py` 输出为准，本行不复述——派生计数不落登记面）；pre-analyze `--stage requirements` pass（errors=0 / advisories=0）；decomposition `--mode plan` proceed（fr_count=25 ≤ 30）；绑定新建 Feature 077；门禁证据见 spec 的 `test-evidence/`)；**planned** via /speckit.plan——plan.md + Phase 1 产物（research 13 条裁决 / data-model 9 实体 E1–E9 / contracts ×6 共 77 条款全 md-bold-closed / quickstart 7 场景 S1–S6 带实测 / feature-ref 25 FR + 8 SC）；Constitution Check 18 项全 Pass（Complexity Tracking N/A）；Decision Tensions 3 记录（T-013 声明落规格头部 / T-014 扩既有引擎键族 / T-015 结构校验落既有检查器新动作），validate-decision-tensions status=ok；pre-analyze --stage plan decision=pass（errors=0 / advisories=13 全为 red-first 测试文件尚不存在）；FR 车道 25/25；clause 车道 baseline-missing 属设计内红（不冻结他线豁免）；sync-mirrors / regen-command-copies 相对基线零新增漂移；规划期连带义务：七模板接线须同步修订 069a 闭合集守卫 test_a6_wiring_set_is_closed（mutation 实证））；**tasks** via /speckit.tasks（`tasks.md` 28 任务 / 19 个 `[green:]` 认领行覆盖 77 条款；`ab288aab` 落 tasks 与 77 条款分区并冻结 `coverage-baseline.txt`（base-sha `06c31b1d`），`45b6b732` 收尾记账；validate-tasks PASS / pre-analyze `--stage tasks` pass / clause claimed=77·beyond=0 / decomposition proceed）；**analyze 三轮**（第一轮 14 HIGH 修复于 `6217a86f`；第二轮 1 HIGH + 6 MEDIUM + 5 LOW → `0c8f95d3`；第三轮 0 HIGH / 3 MEDIUM + 10 LOW → `f7ec22c5`，13/13 处置逐行登记在 `checklists/readiness-2026-10-30.md` 第 30–42 行，状态保持 `Planned`）；**implemented** via /speckit.implement（`tasks.md` 28/28 零 `[ ]`；四段提交 `29b515b4` / `a401db98` / `0fb8a2bf` + `f5835e0e` / 本段；定向集五个 077 套件 174 passed；四条收尾门禁 validate-tasks PASS 0/0 · decomposition proceed 28 ≤ 40 · pre-analyze pass errors=0 advisories=3 · clause `status: ok` claimed 77 / FR 25/25；零新增机制复测 命令 27=27 / 依赖 6=6 / 进程 19=19 / 确认门 27=27 / `--faces` 四面；镜像六对 ok + 四工具副本 OK；两态等价 35/35 剥离后逐字等于 `c1cd4600`；`verification.md` 8 条 SC = 4 pass + 4 partial，partial 均为「需表达类试点线实跑」且逐条写明未测部分；069/069a/069b 正文与状态零改动；**review** via /speckit.review——过程段 0 P0 / 2 P1 / 4 P2（`review.md`；P0 独立校验空集），代码段 triage=run（base `c1cd4600` · head `794a7f2b`）、覆盖回执 177/23/154/0、段裁决 `not-evaluated`（跳过不计覆盖信用）、合入门禁 `allow`（`blocking_entries=0`）、六级计数 blocking 0 / important 3 / suggestion 4 / nitpick 2 / question 1 / praise 2（`code-review.md`），三条 important（答复与本轮落地见下方「review 修复轮」段）；状态门三条件全满足，`Implemented → Ready for Review`；**review 修复轮**——P1-a 落一条合成表达类试点线（八条阶段算子 8/8、三个 mutation 控制转红；定性为 synthetic fixture pilot，非客户线），P1-b 把 `quickstart.md` S2 改成可跑通形态并按 DoD-9 登记 PLAN-EDIT，代码段三条 `important` 逐条答复并落地（exit-2 输入缺失改报 `owner-unavailable` 且 `flow_class: null`；plan 模板去掉 `[[STR-NNN]]` 改逐字标题 + 检查器常量 owner），P2 全登记（analyze #3 的 13 项进 checklist 第 30–42 行、状态脊 MEDIUM 计数按 `review.md` 更正为 3、本行「analyze 三轮」、框架字面量 owner 记 roadmap）；`verification.md` 8 条 SC 更新为 5 pass / 3 partial，三条 partial 的剩余缺口各不相同且逐条写明；状态保持 `Ready for Review`）；2026-10-30 (extension 077a: /speckit.requirements 自动写入 **Flow Class** + **Flow Type**；记录九→十字段；owner § 文档类型；状态不变) |
+  .specify/features.md:88:| 079 | 双语表述（Bilingual Expression） | 把「核心概念 / 关键流程在定义处使用中英双语」固化为可执行的项目级约定：唯一 owner 文档（`shared/guidelines/bilingual-expression.md`）承载方向规则（中文文档 `中文(English)`、英文文档 `English(中文)`）、唯一形态（半角括号、紧贴）、覆盖定义面封闭集、豁免面封闭集、跨文档一致性（以词汇表 Canonical 为准）与迁移边界（不追溯重写）；instructions 模板与运行时只放 ambient 摘要 + 指针；确定性检查器只做机械形态判定（定义行双语形态 / 括号语言与主语言相反 / 覆盖面齐全），不判语义；全部规则落框架源，经镜像与 `specify init` 分发到下游项目。不新增命令、运行时或服务。 | Ready for Review | .specify/features/079-bilingual-expression.md | .specify/specs/079-bilingual-expression/requirements.md | 2026-10-30 (requirements via /speckit.requirements——18 FR / 5 SC / 4 用户故事 / 3 Shared Strings；validator `status: ok` 五项全 pass（0 error / 0 warning；23 定义行，计数以 `validate-requirements.py` 输出为准，本行不复述）；pre-analyze-check --stage requirements `decision=pass`（errors=0 / advisories=0 / fr=18 / sc=5）；decomposition-check --mode plan `decision=proceed`（fr_count=18 ≤ 30）；flow-class-check lookup exit 0（`expression` / `technique-document`，source=declaration）；现状锚点 7 项实测（M-1…M-7：1609 半角 / 1383 全角 / 32 混用文件 / 词汇表 132/161 双语）；三处开放点 Session 2026-10-30 会话内裁定（笔误更正 / 半角形态 / 直接绑定），零 `[NEEDS CLARIFICATION]`；绑定新建 Feature 079)；**planned** via /speckit.plan——plan.md（含 ## Document Structure 四子节：章节树 9 章 / 基准读者 / 证据清单 9 行 / 事实 owner 清单）+ Phase 1 产物（research R-1…R-12 含三项基线冻结 / data-model E1…E7 / contracts ×4 共 35 条款全 md-bold-closed / quickstart S1…S8（S4/S5/S6 实测，余 Pinned by）/ feature-ref 18 FR + 5 SC）；Constitution Check 18 项全 Pass（Complexity Tracking N/A，同作者降级 disclosed）；Decision Tensions 4 记录（T-013 owner 新建 guidelines / T-014 独立检查器不并入 doc-consistency / T-015 不接线门禁 changed-scope 采证 / T-016 SC-005 100% census），validate-decision-tensions status=ok；pre-analyze --stage plan decision=pass（errors=0 / advisories=19 全为交付前路径）；FR 车道 18/18；clause 车道 35 beyond baseline 属 plan 期设计内红（tasks 认领）；docs-utils validate 相对基线 4 零新增；镜像基线六对 ok 冻结；plan 侧 structure 判定 3 条 owner-path-missing 为 P1 已声明排期内预期）；**implemented** via /speckit.implement——19/19 任务 `[X]`（分段 4 段提交）；owner 文档 `shared/guidelines/bilingual-expression.md` 九章成文 + ambient 小节 + 确定性检查器（scan/coverage/census、退出码 0/1/2、四值码）+ 契约测试 15 腿全绿；镜像六对同步、live instructions 刷新（32,600B<32,768 预算）；SC 采证齐落 test-evidence/（SC-001 复制位置数 0 / SC-002 changed-scope 205 信号行新写合规率 100% / SC-003 pilot rc=0 / SC-004 追溯重写 0 审计 / SC-005 受控语料 census 端到端）；verification.md 五行齐备（SC-002/005 记 unknown——review 面未评估不预支）；checklist 豁免门 35/35 satisfied 0 waiver（waivers.md）；Pre-Status-Flip Gate 满足（零 `[ ]` 任务 + 每 SC 有 status 行）状态 Planned→Implemented；SC-002 review 面抽样复核与 SC-005 真实词汇表 census 实跑归 review 阶段  **review** via /speckit.review（2026-10-30）——过程段 0 P0 / 1 P1 / 2 P2（`review.md`，REC-079-01…03 已登记 register.md）；代码段 triage=run（base `7c835ba6` · head `04b32f87`）、覆盖回执 77/77 judged 0 gap、六级计数 blocking 0 / important 1 / suggestion 1 / nitpick 0 / question 0 / praise 1、合入门禁 allow（`code-review.md`）；important 逐条答复并本轮回落地（检查器 S1 header ≥5 列修复 + 红先行契约腿 test_scan_glossary_shape_skips_column_definitions_decoy，定向集 16/16；E6 追加 26 行存量清单）；SC-002 review 面 9/9 抽样复核分歧 1 条已登记处置（us18）、SC-005 真实词汇表 census rc=0 / census_total=7 / 0.275s（us19），五 SC 两面齐备全 pass；表达类门禁 G-review-review（本轮 100%）/ G-review-fact（verify 0 findings）全绿；状态门三条件满足 → `Implemented → Ready for Review` |
+
+--- 11) research count cross-reference (R-range mentions) ---
+research_records: 21
+[R-01…R-20 mentions (drift instances)]
+.specify/specs/099-speckit-seal/feature-ref.md:115:- `research.md` R-01…R-20 — 全部设计输入的文件级实测。
+.specify/specs/099-speckit-seal/plan.md:62:| VIII | Code as the Single Source of Truth | ✅ Pass | research.md R-01…R-20 全部带 file:line 或实测命令；074 读数（57/32/26、exit 2、STR 表）取自本日实测。 |
+.specify/specs/099-speckit-seal/plan.md:169:├── research.md          # Phase 0 output (R-01…R-20, all measured 2026-11-10)
+.specify/features/099-speckit-seal.md:43:- **方案（planned 2026-11-10）**：`plan.md` + `research.md`（R-01…R-20，全部 file:line/实测）+ `data-model.md`
+.specify/features.md:102:| 099 | Speckit Seal（/speckit.seal：按 review 封装 spec 与分片合并回写） | 按 review 结论封装 spec：`Sealed` 是 `Ready for Review` 之后的终态、是归档准入的唯一状态；承载 split + merge 回写流程——分片同名输出件按声明顺序并回父级（编号重排/语义对齐/词汇表对齐/冲突显式呈现），074 回合为首个真实验收。 | Planned | .specify/features/099-speckit-seal.md | .specify/specs/099-speckit-seal/requirements.md | 2026-11-10 planned via /speckit.plan — plan.md（22 项 Constitution 全 Pass）+ research.md(R-01…R-20) + data-model.md(14 实体) + contracts(4 页 45 条款 C-001…C-045) + quickstart.md(9 走查，S-1 已实跑) + feature-ref.md（FR 28/28、SC 9/9）；6 条 decision-tension(T-001…T-006)、12 条 Execution Premise 全 verified、Dependency set none；9 个工作包（每包 ≤16 行） |
+[R-01…R-21 mentions (correct instances)]
+.specify/specs/099-speckit-seal/plan.md:327:| Research | [`research.md`](research.md) | R-01…R-21, all file:line or measured reading |
+.specify/specs/099-speckit-seal/tasks.md:7:**Prerequisites**: requirements.md (28 FR / 9 SC / 3 STR + Clarifications + Assumptions A1–A7), plan.md (9 个工作包 P1–P9、6 条 decision-tension T-001…T-006、12 条 Execution Premise EP-001…EP-012、Mirror Obligations), research.md (R-01…R-21), data-model.md (E1–E14, V1–V16), contracts/ (4 文件 C-001…C-045), quickstart.md (S-1…S-9), feature-ref.md（FR 28/28、SC 9/9 映射）
+
+--- 12) FR/SC → row trace re-verification (claimed rows actually cite the ID inline) ---
+FR: universe=28 rows_checked=96 inline_ok=90 missing_rows=[] not_inline=[('FR-010', 'T028', 182), ('FR-014', 'T023', 161), ('FR-025', 'T019', 148), ('FR-025', 'T026', 177), ('FR-026', 'T039', 220), ('FR-028', 'T044', 225)]
+FR_single_row_members=[]
+SC: universe=9 rows_checked=34 inline_ok=18 missing_rows=[] not_inline=[('SC-001', 'T028', 182), ('SC-001', 'T029', 183), ('SC-002', 'T028', 182), ('SC-003', 'T023', 161), ('SC-004', 'T023', 161), ('SC-005', 'T018', 147), ('SC-005', 'T039', 220), ('SC-006', 'T041', 222), ('SC-006', 'T044', 225), ('SC-007', 'T031', 201), ('SC-007', 'T032', 202), ('SC-007', 'T033', 203), ('SC-008', 'T004', 117), ('SC-008', 'T005', 118), ('SC-008', 'T012', 128), ('SC-009', 'T040', 221)]
+SC_single_row_members=[]
+FR_never_inline_in_any_task_row: []
+SC_never_inline_in_any_task_row: []
+sample FR-005: rows=['T025', 'T026', 'T028'] inline_hits=[('T025', 176), ('T026', 177), ('T028', 182)]
+sample FR-012: rows=['T019', 'T020', 'T023'] inline_hits=[('T019', 148), ('T020', 152), ('T023', 161)]
+sample FR-021: rows=['T016', 'T017', 'T035', 'T036', 'T037', 'T038', 'T051'] inline_hits=[('T016', 132), ('T017', 133), ('T035', 205), ('T036', 206), ('T037', 207), ('T038', 208), ('T051', 241)]
+sample FR-025: rows=['T002', 'T016', 'T019', 'T026', 'T045', 'T050'] inline_hits=[('T002', 102), ('T016', 132), ('T045', 235), ('T050', 240)]
+sample FR-027: rows=['T039', 'T043', 'T044'] inline_hits=[('T039', 220), ('T043', 224), ('T044', 225)]
+sample SC-002: rows=['T025', 'T026', 'T028'] inline_hits=[('T025', 176), ('T026', 177)]
+sample SC-006: rows=['T039', 'T040', 'T041', 'T042', 'T043', 'T044', 'T047'] inline_hits=[('T039', 220), ('T040', 221), ('T042', 223), ('T043', 224), ('T047', 237)]
+sample SC-008: rows=['T003', 'T004', 'T005', 'T012', 'T034'] inline_hits=[('T003', 116), ('T034', 204)]
+
+--- 13) constitution vs plan Constitution Check (principle names) ---
+constitution_principles=22 plan_rows=22
+name_mismatches: []
+
+--- 14) closure-acceptance-check exit readings (FR-027(a) reviewability) ---
+parent_exit=2
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md:392 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+074b_exit=2
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074b-nested-governance/requirements.md:210 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+
+--- 15) checklist unchecked item count ---
+quality_checklist_unchecked: 40
+requirements_checklist_unchecked: 0
+
+--- 16) r2 repair commit verification ---
+commit 484a9930c 099 analyze repair r2
+
+ .specify/features/099-speckit-seal.md              |   2 +-
+ .specify/specs/099-speckit-seal/plan.md            |   2 +-
+ .../analyze-repair-dispositions-r2-2026-11-10.md   |  85 +++++++++++
+ .../analyze-repair-gates-r2-2026-11-10.txt         | 160 +++++++++++++++++++++
+ 4 files changed, 247 insertions(+), 2 deletions(-)
+-| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单与 FR-027 五项一一对应 |
++| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单逐条覆盖 FR-027 五项（下限），额外具名阻断逐条点名 |
+-   终态二值（`Sealed` 或一一对应的具名阻断清单）。
++   终态二值（`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的具名阻断清单）。
+
+--- 17) closed-findings anchor re-verification (r1 closures remain closed; grep readings) ---
+[B-01 lower-bound wording]
+.specify/specs/099-speckit-seal/requirements.md:69:维护者按本特性交付的流程对 074 运行合并回写与 seal。流程必须能识别 074a/074b、把它们全部同名输出件并回父级、让父 `tasks.md` 不再携带未勾选行（57 行被拆前记录按既有
+.specify/specs/099-speckit-seal/requirements.md:162:- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2
+.specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:106:以「已解决（证据指针）」或「阻断（理由）」出现在回合记录中——五项是下限，回合计出的额外具名阻断 MUST
+191:- **SC-006**: 074 真实回合（用户指定的 acceptance 用例）可执行且可复现：以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行 split→mer
+[C-03 directory file-level units]
+.specify/specs/099-speckit-seal/requirements.md:141:- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md
+.specify/specs/099-speckit-seal/data-model.md:132:- **E5 Artifact Merge Record**：`name` 取自 15 项封闭候选（FR-012）；`action` 四值；目录型候选按文件级单元落行（`name`
+[C-04 token->registry binding]
+.specify/specs/099-speckit-seal/requirements.md:145:- **FR-016**: **词汇表对齐** MUST 保证合并后每个共享字符串引用（`[[STR-NNN]]` 形态）解析到合并后的父级唯一注册表；同号不同义（同一 ID 
+.specify/specs/099-speckit-seal/contracts/merge-back.contract.md:72:MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。**token→注册表绑定**：`[[STR-NNN]]` 的解析域由其
+[E-01 slice-unclosed]
+.specify/specs/099-speckit-seal/requirements.md:107:- **分片状态不一**（一片已闭合、另一片仍有未勾选行或未决冲突）：合并不得替分片「补完」；未闭合行保持未闭合，seal 以 `slice-unclosed`（验收/合并前置
+.specify/specs/099-speckit-seal/requirements.md:134:- **FR-008**: 「合并回写完成」MUST 由合并清单证成（FR-018）：当分片集合非空时，每个分片 × 每个输出件都必须有一条合并记录，未决冲突数为 0，且合并后
+.specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:93:`closure-refused`、`closure-input-defect`、`merge-incomplete`、
+.specify/specs/099-speckit-seal/data-model.md:180:| `slice-unclosed` | 分片 `tasks.md` 存在未勾选行（`- [ ]` / `- [>]`），或 `- [~]` 行缺分片 `verification.
+[F-01 dated-record pointer inclusion]
+.specify/specs/099-speckit-seal/requirements.md:148:- **FR-019**: **证据保全** MUST 遵守 dated-record 红线：分片的 `review.md`、`code-review.md`、`verific
+.specify/specs/099-speckit-seal/contracts/merge-back.contract.md:106:目录型候选内的 dated-record 文件按**指针纳入**处置：同名文件父级保持 `keep` 并在合并清单留指针，仅分片
+[F-02 review-missing + mandatory code-review view]
+132:- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）的 findings 摘要 MUST 显示**零个未处置 P0**——处置只有两种：已修复（有修复指
+141:- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contract
+[F-04 two measured STR groups]
+162:- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2——逐条记录取值（显式决定，或记录过的严格默认 `final`），MUST 
+
+--- 18) placeholder / ambiguity floor ---
+placeholder_hits_exit=1 (1 = none)
+
+--- 19) FR-012 15-item universe vs C-013 (machine list comparison) ---
+FR-012_universe_hits: 15 ['requirements.md', 'plan.md', 'tasks.md', 'data-model.md', 'contracts/', 'research.md', 'quickstart.md', 'feature-ref.md', 'verification.md', 'review.md', 'code-review.md', 'checklists/', 'checkpoints/', 'test-evidence/', 'notes/']
+C-013_universe_hits: 15 ['requirements.md', 'plan.md', 'tasks.md', 'data-model.md', 'contracts/', 'research.md', 'quickstart.md', 'feature-ref.md', 'verification.md', 'review.md', 'code-review.md', 'checklists/', 'checkpoints/', 'test-evidence/', 'notes/']
+symmetric_difference: {}
+
+--- 20) registry row count / status pair ---
+registry_feature_rows: 90
+4:**Total Features**: 90
+registry_099_status: Planned
+detail_099_status: Planned
+
+--- 21) carried-finding current-state readings (C-02 / F-03 / F-06 / G-01) ---
+[C-02 review-like current-set ambiguity]
+132:- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）
+  .specify/specs/081-acceptance-hardening/review-081a.md
+  .specify/specs/081-acceptance-hardening/review-081b.md
+  .specify/specs/081-acceptance-hardening/review-081c.md
+  .specify/specs/084-harness-triple-structure/review-r1.md
+  .specify/specs/084-harness-triple-structure/review-r2.md
+  .specify/specs/084-harness-triple-structure/review-r3.md
+  .specify/specs/088-speckit-visualization/review-second-slice.md
+[F-03 dirty-scope wording]
+33:维护者对一条已处于 `Ready for Review` 的 spec 运行 `/speckit.seal`。引擎逐条判定封装前置条件——当前 review 记录存在且结论中
+112:- **封装记录与工作树**：父 spec 树存在本流程之外的未提交改动时拒绝封装（`dirty-spec-tree`），避免对移动中的状态盖章；本流程自身产生的改动在提交
+136:- **FR-010**: 封装记录 MUST 每个 spec 一份，落在父 spec 目录的固定文件名 `seal.md`（[[STR-002]]），机器可读核心至少含：
+66:改动 MUST 在提交后再判定。检测 MUST 以 `git status --porcelain -- <parent-spec-dir>` 为单一依据，MUST NOT
+[F-06 extended location: feature detail Plan Notes]
+- **方案（planned 2026-11-10）**：`plan.md` + `research.md`（R-01…R-20，全部 file:line/实测）+ `data-model.md`
+[G-01 stale stage notes]
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+planned via /speckit.plan
+## Latest Review
+
+尚未评审——当前阶段为 plan（2026-11-10）。
+[checklist unchanged since creation]
+105d22c30 docs(099-speckit-seal): land the requirements-quality checklist
