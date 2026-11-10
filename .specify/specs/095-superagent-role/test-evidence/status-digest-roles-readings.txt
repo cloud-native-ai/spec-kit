@@ -132,3 +132,10 @@ One `read_carrier_inputs` + one `evaluate_role_model` per digest run, both insid
 registry `*.json` scan and the legacy `pid-*` state scan. Structural pins:
 `test_c1_the_role_model_is_one_materialization_per_run`,
 `test_c1_the_digest_adds_no_second_carrier_parser_or_root_scan`.
+
+**Disclosed limit (contract seam, not silently repaired)**: the legacy registry scan above and the
+engine's own registry cross-check parse both open the same registry directory. Collapsing them would
+require the engine's importable interface to hand back the full entry payloads (it returns only
+`path` + `line_id`), i.e. an engine-contract change that is outside this package's write domain. The
+role-view layer itself holds C-1's one-materialization rule (one call each, no second parser); the
+double registry pass remains, named here for the review round rather than hidden.
