@@ -1,0 +1,68 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T055657Z-b095-r2merge",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261110T080438Z-run-determination-speckit-analyze-r20261110t080102z-b095-r2w.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/session/20261110T080529Z-run-determination-speckit-analyze-r20261110t055657z-b095-r2w.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/session/20261110T080800Z-run-determination-speckit-analyze-r20261110t055657z-b095-r2w.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/session/20261110T081631Z-run-determination-speckit-analyze-r20261110t055657z-b095-r2m.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T080443723487Z-d2dfa9c2.json",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T080536949332Z-a3e82c5a.json",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T080806145548Z-c33d7598.json",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T081631561733Z-92d76c48.json",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T080448Z-speckit-analyze.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T080543Z-speckit-analyze.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T080814Z-speckit-analyze.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T081631Z-speckit-analyze.md",
+      "action": "included",
+      "commit": "b31f87ba5"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-10T08:16:53Z"
+}
