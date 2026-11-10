@@ -1029,12 +1029,12 @@ def render_digest(state) -> str:
 
 
 def render_digest_table(state) -> str:
-    """Human-readable rendering of the SAME digest state — presentation only, no second reading (C-41).
+    """The ONE human-facing digest rendering — a compact columnar table over the same state (C-41).
 
-    Groups the entries ACTIVE / STALE / RECENT, then prints each entry as a two-line block carrying every field
-    the kv render carries (line, run, state, stage, age, the flags, the activity pack, the efficiency element).
-    The header, the single ``last_completion`` footer, the ``omitted`` line and the ``store`` line carry the same
-    content as the kv render; the empty set renders the same ``nothing-running`` literal (C-45).
+    One aligned row per entry (line, state, stage, age, flags, unit, elapsed); the header, the single
+    ``last_completion`` footer, the ``omitted`` line and the ``store`` line carry the same content the
+    state carries; the empty set renders the same ``nothing-running`` literal (C-45). Presentation only:
+    no second reading.
     """
     if not state["entries"]:
         return NOTHING_RUNNING
@@ -1042,7 +1042,7 @@ def render_digest_table(state) -> str:
     efficiency = state.get("efficiency") or {}
     depth = efficiency.get("depth")
     elements = efficiency.get("elements") or []
-    blocks = [
+    header = (
         "status digest  generated_at=%s  cap=%d  stale_bound=%s  profile=%s  registry=%s"
         % (
             state["generated_at"],
@@ -1051,53 +1051,51 @@ def render_digest_table(state) -> str:
             profile_in_force(state),
             state["registry_dir"],
         )
-    ]
-    decorated = []
+    )
+    rows = []
     for position, item in enumerate(state["entries"]):
         flags = []
         if item["is_active"]:
             flags.append("active")
         if item["stale"]:
             flags.append("stale")
-        entry_lines = [
-            "%s  [%s]" % (item["line_id"] or DASH, ",".join(flags) or "idle"),
-            "    run=%s  state=%s  stage=%s  age=%s"
-            % (item["run_id"] or DASH, item["state"] or DASH, item["stage"], item["age"]),
-        ]
+        if not flags:
+            flags.append("recent")
         activity = item.get("line_activity")
         if activity:
-            entry_lines.append(
-                "    activity=%s,state=%s,age=%s"
-                % (activity["label"] or DASH, activity["state"], activity["age"])
-            )
+            flags.append("activity=%s@%s" % (activity["label"] or DASH, activity["age"]))
+        element_text = DASH
         if efficiency.get("available") and position < len(elements):
-            entry_lines.append("    " + render_element(elements[position], depth))
-        decorated.append((item, entry_lines))
-    groups = (
-        ("ACTIVE", lambda item: item["is_active"]),
-        ("STALE", lambda item: (not item["is_active"]) and item["stale"]),
-        ("RECENT", lambda item: (not item["is_active"]) and (not item["stale"])),
-    )
-    for label, predicate in groups:
-        members = [entry_lines for item, entry_lines in decorated if predicate(item)]
-        if not members:
-            continue
-        blocks.append("")
-        blocks.append("-- %s (%d) --" % (label, len(members)))
-        for entry_lines in members:
-            blocks.extend(entry_lines)
+            element_text = render_element(elements[position], depth)
+        rows.append(
+            (
+                item["line_id"] or DASH,
+                item["state"] or DASH,
+                item["stage"] or DASH,
+                item["age"],
+                ",".join(flags),
+                element_text,
+            )
+        )
+    head = ("LINE ID", "STATE", "STAGE", "AGE", "FLAGS", "EFFICIENCY")
+    widths = [max(len(r[i]) for r in rows + [head]) for i in range(6)]
+    def fmt_row(r):
+        return "  ".join(r[i].ljust(widths[i]) for i in range(6)).rstrip()
+    lines = [header, "", fmt_row(head),
+             fmt_row(tuple("-" * w for w in widths))]
+    lines.extend(fmt_row(r) for r in rows)
     completion = last_completion(state)
     if completion is not None:
-        blocks.append("")
-        blocks.append(
+        lines.append("")
+        lines.append(
             "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
         )
     withheld = efficiency.get("withheld") or ""
     if state["omitted"] or withheld:
-        blocks.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
+        lines.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
     if not efficiency.get("available"):
-        blocks.append("store=%s" % efficiency_vocabulary()["no_measurements"])
-    return "\n".join(blocks)
+        lines.append("store=%s" % efficiency_vocabulary()["no_measurements"])
+    return "\n".join(lines)
 
 
 def action_digest(args) -> int:
@@ -1108,8 +1106,6 @@ def action_digest(args) -> int:
         return EXIT_INPUT_ERROR
 
     fmt = args.format
-    if fmt == "auto":
-        fmt = "table" if sys.stdout.isatty() else "text"
     if fmt == "json":
         payload = dict(state)
         payload["profile"] = profile_in_force(state)
@@ -1120,10 +1116,8 @@ def action_digest(args) -> int:
         payload.pop("now", None)
         payload.pop("store", None)
         print(json.dumps(payload, indent=2, sort_keys=True))
-    elif fmt == "table":
-        print(render_digest_table(state))
     else:
-        print(render_digest(state))
+        print(render_digest_table(state))
 
     return EXIT_OK if state["entries"] else EXIT_NOTHING_ACTIVE
 
@@ -2218,7 +2212,7 @@ def build_parser():
         ),
     )
     parser.add_argument("--action", required=True, choices=("digest", "guard", "report"))
-    parser.add_argument("--format", default="table", choices=("auto", "text", "json", "table"))
+    parser.add_argument("--format", default="table", choices=("table", "json"))
     parser.add_argument(
         "--workspace",
         default=os.environ.get("SPECIFY_STATUS_WORKSPACE") or str(Path.cwd()),

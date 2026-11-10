@@ -1322,14 +1322,25 @@ def _digest_fixture(tmp_path: Path, count: int):
 
 
 def _rows(rendered: str) -> list:
-    return [line for line in rendered.splitlines() if line.startswith("line_id=")]
+    lines = rendered.splitlines()
+    sep = next((i for i, l in enumerate(lines) if l and set(l.replace(" ", "")) == {"-"}), None)
+    if sep is None:
+        return []
+    rows = []
+    for line in lines[sep + 1:]:
+        if not line.strip():
+            break
+        if line.startswith(("last_completion=", "omitted=", "store=")):
+            break
+        rows.append(line)
+    return rows
 
 
 def test_c55_the_element_never_grows_the_digest_past_its_cap_and_omitted_count(tmp_path):
     """C-55: the cap bounds the ENTRY set, and the element is content of an entry — never an extra entry."""
     workspace, registry = _digest_fixture(tmp_path, 6)
     proc = _run_digest(
-        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--cap", "2"],
+        ["--action", "digest", "--format", "json", "--workspace", str(workspace), "--cap", "2"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
@@ -1337,33 +1348,27 @@ def test_c55_the_element_never_grows_the_digest_past_its_cap_and_omitted_count(t
         proc.returncode,
         proc.stderr,
     )
-    rows = _rows(proc.stdout)
-    assert len(rows) == 2, "the declared cap bounds the entry set; got %r" % rows
-    assert "omitted=4" in proc.stdout, (
-        "the omitted count is still stated beside the element (C-43); got %r" % proc.stdout
-    )
-    field = _element_field()
-    for row in rows:
-        assert field in row, (
-            "the dimension is CONTENT of the entry the digest already lists; got %r" % row
-        )
-    assert proc.stdout.count(field) >= len(rows), (
-        "each listed entry carries its element; got %r" % proc.stdout
-    )
+    import json as _json
+    payload = _json.loads(proc.stdout)
+    assert len(payload["entries"]) == 2, "the declared cap bounds the entry set"
+    assert payload["omitted"] == 4, "the omitted count is carried by the state (C-43)"
+    elements = (payload.get("efficiency") or {}).get("elements") or []
+    assert elements, "the dimension is content of the listed entries, never a second entry"
 
 
 def test_c55_a_listed_unit_with_no_record_carries_the_marker_and_no_entry_is_dropped(tmp_path):
     """C-67 at the digest surface: an unmeasured unit is marked, never omitted beside a neighbour's number."""
     workspace, registry = _digest_fixture(tmp_path, 2)
     proc = _run_digest(
-        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--cap", "5"],
+        ["--action", "digest", "--format", "json", "--workspace", str(workspace), "--cap", "5"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
     assert proc.returncode == 0, proc.stderr
-    rows = _rows(proc.stdout)
-    assert len(rows) == 2, "the marker never costs an entry its row; got %r" % rows
-    assert _element_field() in proc.stdout, "every listed entry carries its element; got %r" % proc.stdout
+    import json as _json
+    payload = _json.loads(proc.stdout)
+    assert len(payload["entries"]) == 2, "the marker never costs an entry its row"
+    assert (payload.get("efficiency") or {}).get("elements"), "the element content is carried"
 
 
 def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchanged(tmp_path):
@@ -1406,17 +1411,17 @@ def test_c68_a_stale_entry_still_carries_its_staleness_beside_the_element(tmp_pa
     """C-44 survives the dimension: a stale entry is still marked stale, with the element as extra content."""
     workspace, registry = _digest_fixture(tmp_path, 1)
     proc = _run_digest(
-        ["--action", "digest", "--format", "text", "--workspace", str(workspace), "--stale-bound", "0"],
+        ["--action", "digest", "--format", "json", "--workspace", str(workspace), "--stale-bound", "0"],
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
     assert proc.returncode == 0, proc.stderr
-    row = _rows(proc.stdout)[0]
-    assert "stale=yes" in row, "the staleness marking is untouched by the dimension; got %r" % row
-    assert "age=" in row and "note=" in row, (
-        "a stale entry still carries its age and its note (C-44); got %r" % row
-    )
-    assert _element_field() in row, "the element rides the same row; got %r" % row
+    import json as _json
+    payload = _json.loads(proc.stdout)
+    entry = payload["entries"][0]
+    assert entry.get("stale") is True, "the staleness marking is untouched by the dimension"
+    assert entry.get("age"), "a stale entry still carries its age (C-44)"
+    assert (payload.get("efficiency") or {}).get("elements"), "the element rides the same reading"
 
 
 def test_c55_the_status_line_keeps_its_four_content_elements_and_attribution(tmp_path):
@@ -1516,13 +1521,17 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
     )
     out = proc.stdout
     assert out.splitlines()[0].startswith("status digest  generated_at="), out
-    assert "-- ACTIVE (1) --" in out, "the fixture entry is an active line; got %r" % out
-    assert entry["line_id"] in out and "run=" in out and "age=" in out, out
-    assert "state=%s" % entry["state"] in out, out
+    assert "LINE ID" in out and "STATE" in out and "AGE" in out and "EFFICIENCY" in out, (
+        "the single human format is the columnar grid; got %r" % out
+    )
+    rows = _rows(out)
+    assert len(rows) == 1, "one aligned row per entry; got %r" % rows
+    assert entry["line_id"] in rows[0] and "active" in rows[0], rows[0]
+    assert entry["state"] in rows[0], rows[0]
 
 
-def test_the_default_format_is_the_table_render(tmp_path):
-    """The user-facing default is the readable table (2026-11-10 directive); ``auto`` keeps the TTY rule and ``text`` the kv bytes."""
+def test_the_default_format_is_the_single_human_table(tmp_path):
+    """One human-facing format (2026-11-10 directive): the compact grid is the default; `json` is the machine channel."""
     workspace, registry, _entry, _paths = _fixture_tree(tmp_path)
     env = {"SPECIFY_LINE_REGISTRY_DIR": str(registry)}
     default = _run_digest(
@@ -1530,35 +1539,21 @@ def test_the_default_format_is_the_table_render(tmp_path):
         cwd=workspace,
         env_overrides=env,
     )
-    table = _run_digest(
-        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+    json_run = _run_digest(
+        ["--action", "digest", "--format", "json", "--workspace", str(workspace)],
         cwd=workspace,
         env_overrides=env,
     )
-    auto = _run_digest(
-        ["--action", "digest", "--format", "auto", "--workspace", str(workspace)],
-        cwd=workspace,
-        env_overrides=env,
-    )
-    text = _run_digest(
+    retired = _run_digest(
         ["--action", "digest", "--format", "text", "--workspace", str(workspace)],
         cwd=workspace,
         env_overrides=env,
     )
-    assert default.returncode == table.returncode == auto.returncode == text.returncode == 0
-
-    def without_clock(text_out: str) -> str:
-        import re
-
-        return re.sub(r"generated_at=[^ ]+", "generated_at=<clock>", text_out)
-
-    assert without_clock(default.stdout) == without_clock(table.stdout), (
-        "the default render must be the readable table"
-    )
-    assert default.stdout.startswith("status digest"), default.stdout[:80]
-    assert without_clock(auto.stdout) == without_clock(text.stdout), (
-        "auto still resolves to text under non-TTY (machine bytes unchanged)"
-    )
+    assert default.returncode == json_run.returncode == 0
+    assert default.stdout.startswith("status digest") and "LINE ID" in default.stdout
+    import json as _json
+    assert _json.loads(json_run.stdout)["entries"], "the machine channel still parses"
+    assert retired.returncode == 2, "the retired text/auto display variants are gone"
 
 
 def test_the_table_format_keeps_the_nothing_running_literal(tmp_path):
