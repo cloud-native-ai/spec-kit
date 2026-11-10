@@ -1,0 +1,104 @@
+# Definitions layer readings — Package P1 (T004–T010)
+
+- Date: 2026-11-10
+- Branch: `095-superagent-role`
+- Scope: `shared/definitions/` ×4 source pages + their runtime mirrors; the definitions
+  contract module `tests/contract/test_superagent_definitions.py`.
+- Commands: every test execution below goes through the single runner
+  `bash scripts/bash/run-tests.sh`; mirror readings use `python3 scripts/python/sync-mirrors.py`.
+
+## 1. T004 red-first — definitions contract
+
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_superagent_definitions.py -q`
+- Exit status: **1**
+- Result: `9 failed, 1 passed` — the owner page and its mirror did not exist; the one passing
+  leg guards the untouched sibling page (`test_agent_definitions_has_no_second_subagent_definition`).
+- Full command output pasted at `.specify/specs/095-superagent-role/notes/red-first-evidence.md`
+  § Instance 1.
+
+## 2. T009 — file-scoped sync of the four definition sources
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/superagent-definitions.md
+scope --only: shared/definitions/superagent-definitions.md
+MISS  .specify/shared/definitions/superagent-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/agent-definitions.md
+scope --only: shared/definitions/agent-definitions.md
+DIFF .specify/shared/definitions/agent-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/subagent-definitions.md
+scope --only: shared/definitions/subagent-definitions.md
+DIFF .specify/shared/definitions/subagent-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/framework-map.md
+scope --only: shared/definitions/framework-map.md
+DIFF .specify/shared/definitions/framework-map.md
+sync  shared/ -> .specify/shared/ (1 files)
+EXIT=0
+```
+
+A second file-scoped sync re-ran `agent-definitions.md` after one wording correction in the
+pointer line (`fourth taxonomy layer` → `not a fourth layer of the taxonomy`); same output
+shape (`DIFF` → synced, exit 0).
+
+Disclosure (plan § Mirror Obligations premise): the plan anticipated “three pre-existing dirty
+definition mirrors” whose path-prefix drift this sync would normalize. Measured on this tree at
+implement start, all three pairs were **byte-identical before any edit** (`sync-mirrors.py
+--check` scoped run: `ok shared/ == .specify/shared/ (3 files, byte-identical)`; `diff -q`
+clean for each). The premise is falsified by measurement; no normalization side effect
+occurred, and no file outside the four named pairs was touched by the sync.
+
+## 3. T010 — definitions contract green
+
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_superagent_definitions.py -q`
+- Exit status: **0**
+- Result: `10 passed in 6.15s`
+
+```text
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 6.15s
+```
+
+## 4. T010 — mirror readings
+
+Scoped pair check (the four pairs this spec touches):
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/superagent-definitions.md --only shared/definitions/agent-definitions.md --only shared/definitions/subagent-definitions.md --only shared/definitions/framework-map.md
+scope --only: shared/definitions/superagent-definitions.md, shared/definitions/agent-definitions.md, shared/definitions/subagent-definitions.md, shared/definitions/framework-map.md
+ok    shared/ == .specify/shared/ (4 files, byte-identical)
+EXIT=0
+```
+
+Full-tree check (baseline comparison):
+
+- Exit status: **2** — pre-existing: the six `DIFF[projected]` rows below, each with its own
+  `projected[...]: ok` line. This exit code is the tree's existing state, not drift introduced
+  by this package.
+- Output lines: 19; DIFF-class lines: **6**, all `DIFF[projected]`:
+  `.specify/scripts/bash/{check-prerequisites,generate-instructions,run-tests}.sh`,
+  `.specify/scripts/python/{script-interface-check,sync-mirrors,script_interface_cli}.py`.
+- `shared/` pair: `ok shared/ == .specify/shared/ (112 files, byte-identical)` — the new
+  `superagent-definitions.md` pair is clean and the three pre-existing pairs remain clean.
+
+Implement-start baseline re-measurement (premise decay, recorded instead of the frozen value):
+the tasks-stage file recorded a **428 DIFF-class / 437-line** tree-wide baseline. Re-measured
+at implement start on this tree, the check reports **19 lines / 6 DIFF-class** (all six are the
+declared projected pairs, each followed by its `ok` projection line); `shared/` reports 111
+files byte-identical before this package's edits (112 after). The frozen 428 premise is
+therefore **void on this tree**; the criterion that remains binding — and holds — is "no NEW
+drift on the pairs this spec touches", judged by the scoped check above.
+
+## 5. Existing guards touched by the definitions edits
+
+- `bash scripts/bash/run-tests.sh tests/contract/test_agent_dispatch_mechanism.py -q` →
+  exit **0**, `32 passed in 6.16s` (includes
+  `test_c3_no_third_owner_of_three_layers`, the three-layer marker guard invoked by T004).
+- `bash scripts/bash/run-tests.sh tests/contract/test_bilingual_expression.py -q -k drift_str_literal`
+  → exit **0**, `1 passed in 6.16s` (the new page introduces no bilingual STR literal leakage).

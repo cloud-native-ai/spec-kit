@@ -4,6 +4,8 @@ Canonical definition of a **Subagent**, its three execution modes, the mode-sele
 
 **Position in the Agent taxonomy**: a subagent is the **Agent Execution** layer of the three-layer model defined in [`agent-definitions.md`](agent-definitions.md) — *Agent Template → Agent Instance → Agent Execution* — viewed from the orchestrator that delegated it. This document governs only the Execution layer: how an Agent Instance's definition becomes a live run, and how that run stays observable.
 
+**Super agent pointer**: the parent-side relative logical role on a dispatch edge — the endpoint that created the child execution — is owned by [`superagent-definitions.md`](superagent-definitions.md). The parent-side role is owned there; this page owns the child side.
+
 ## What a Subagent Is
 
 A **Subagent** is a **task-scoped delegated worker**: an orchestrator (the main session or a team supervisor) hands it a bounded task brief plus an **independent prompt and configuration**, it executes autonomously within that scope, and it delivers a result through an agreed contract (returned message, result manifest, or declared output paths).

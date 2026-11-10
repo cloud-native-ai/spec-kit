@@ -89,6 +89,7 @@ The taxonomy renames nothing — it gives canonical layer names to distinctions 
 |------|---------|---------------|
 | **Agent Template / Instance / Execution** (this document) | The three layers above | here |
 | **Subagent** | A delegated Agent Execution and its three modes (native/virtual/external) | `shared/definitions/subagent-definitions.md` |
+| **Super agent** | The parent-side relative logical role on a dispatch edge | [`superagent-definitions.md`](superagent-definitions.md) — the single owner; it is not a fourth layer of the taxonomy |
 | **Team** | Multi-agent structure binding Instances into seats and orchestrating their Executions | `/speckit.team`, `skills/internal/create-team` |
 | **`AGENTS.md`** | The project-instructions file for AI tools — unrelated to the agent artifact system | `/speckit.instructions` |
 | **AI agent CLI** | A supported coding agent binary (`qodercli`, `claude`, …) that *hosts* executions | `docs/reference/cli/` |
