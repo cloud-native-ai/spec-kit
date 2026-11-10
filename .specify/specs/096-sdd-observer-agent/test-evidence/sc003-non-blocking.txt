@@ -1,0 +1,51 @@
+# sc003-non-blocking — start-failure, mid-run-kill and the doctored-gate red leg (T030)
+
+Package: `wp03-driver-lifecycle`; discharges SC-003 (observer failure never gates the line;
+absence is a recorded, disclosed non-observation). Fixtures: `tests/fixtures/sdd-observer/failure_builder.py`.
+Captured: 2026-11-10, line worktree `096-sdd-observer-agent` (base `2aef87f040939b03adcd6cd7e9e88c724a07beaa`).
+
+## 1 — targeted guard run
+
+Command: bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_lifecycle.py -q -k "start_failure or mid_run_kill or doctored_gate"
+Exit status: 0
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_observer_lifecycle.py -q -k start_failure or mid_run_kill or doctored_gate
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.24s
+```
+
+## 2 — direct fixture readings
+
+Command: python3 - (fixture + predicate readings under `.specify/.tmp/096/wp03-fixtures`, removed after the run)
+Exit status: 0
+
+```text
+== start-failure ==
+record: state=failed label=- started_at=- reason=observer start failed (fixture: dispatch refused)
+envelope: state=failed reason=observer start failed (fixture: dispatch refused) at=1794319308 line=line-demo stage=- event=status
+envelope carries exit=: False
+terminal review: exit=0 at=1794319377 sentinel=1 line=line-demo stage=review event=status progress=stream detached=yes
+triplet files: []
+
+== mid-run-kill ==
+record: state=started label=line-demo--run-demo--observer started_at=2026-11-10T14:01:46Z reason=-
+record: state=failed label=line-demo--run-demo--observer started_at=2026-11-10T14:01:56Z reason=observer killed mid-run (fixture: status envelope left failed)
+record: state=started label=line-demo--run-demo-b--observer started_at=2026-11-10T14:02:06Z reason=-
+envelope: state=failed exit=137 reason=observer killed mid-run (fixture: status envelope left failed) at=1794319316 line=line-demo stage=- event=status
+A status: state=failed
+reason=observer killed mid-run (fixture: status envelope left failed)
+B status: state=running
+terminal review: exit=0 at=1794319377 sentinel=1 line=line-demo stage=review event=status progress=stream detached=yes
+
+== doctored-gate red leg ==
+real section violations: []
+doctored English violations: ['Stage advance requires observer liveness before U4.']
+doctored Chinese violations: ['阶段推进（U4）以 observer 存活为前置条件。']
+
+fixture workdir removed: True
+```
