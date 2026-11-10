@@ -82,7 +82,7 @@ This script writes no file and prints to stdout only; the caller redirects.
 The canonical caller is generate-instructions.sh, which writes
 .specify/tools/{system,shell,project}.json.
 
-Note: .specify/memory/tools.md is NOT produced here — it is a hand-maintained
+Note: the .specify/tools.md § Helper Tools Index is NOT produced here — it is a hand-maintained
 index of MCP servers. See shared/definitions/tool-definitions.md.
 
 Options:

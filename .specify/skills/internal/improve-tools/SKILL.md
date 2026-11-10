@@ -54,7 +54,7 @@ The input is a description of the tool to improve. Interpret it as follows:
 - **Never silently promote to `Verified`.** Promotion is an explicit, validated decision reported to the user.
 - **Never weaken a behavioral rule without stated cause.** Rules are the record's safety surface; removing or loosening one requires the user's explicit instruction, recorded in the report.
 - **One record per invocation.** Improving several tools is several runs.
-- **Do not edit `.specify/memory/tools.md`** — it is a hand-maintained MCP-server index, not a definition record and not the tools discovery inventory (those are the generated `.specify/tools/{system,shell,project}.json`). See `.specify/shared/definitions/tool-definitions.md`.
+- **Do not edit `.specify/tools.md`** — its § Helper Tools Index is a hand-maintained MCP-server index, not a definition record and not the tools discovery inventory (those are the generated `.specify/tools/{system,shell,project}.json`). See `.specify/shared/definitions/tool-definitions.md`.
 
 ## Resource ID
 

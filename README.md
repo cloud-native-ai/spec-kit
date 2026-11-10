@@ -29,7 +29,7 @@ Based on [github.com/github/spec-kit](https://github.com/github/spec-kit.git) wi
 - **Extensible Skills & Agents**: managed via `/speckit.skills` / `/speckit.agents`
 - **Documentation Management**: `/speckit.docs` reconcile engine ([ADR-0001](docs/decisions/0001-adopt-docs-taxonomy.md))
 
-Full feature roadmap: `.specify/memory/features.md` (single source of truth).
+Full feature roadmap: `.specify/features.md` (single source of truth).
 
 ## 🤖 Supported AI Agents
 

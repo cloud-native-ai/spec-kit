@@ -83,7 +83,7 @@ Invocation is gated. The command MUST NOT execute a tool before explicit user co
 
 ### Persistence
 
-Definition records: `.specify/memory/tools/<name>.md`; `tool_id` is the canonical form `<TOOL:.specify/memory/tools/<name>.md>`; the record file is the single source of truth — no registry. Discovery inventories, the `.specify/memory/tools.md` index trap, and store ownership: `.specify/shared/definitions/tool-definitions.md`. Agent-specific detection, guidance, and execution-feedback capture follow the routed skill's own Agent-Specific Configuration section (`create-tools` / `improve-tools`); for shared operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
+Definition records: `.specify/memory/tools/<name>.md`; `tool_id` is the canonical form `<TOOL:.specify/memory/tools/<name>.md>`; the record file is the single source of truth — no registry. Discovery inventories, the `.specify/tools.md` § Helper Tools Index trap, and store ownership: `.specify/shared/definitions/tool-definitions.md`. Agent-specific detection, guidance, and execution-feedback capture follow the routed skill's own Agent-Specific Configuration section (`create-tools` / `improve-tools`); for shared operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
 
 ## Wrap-up
 

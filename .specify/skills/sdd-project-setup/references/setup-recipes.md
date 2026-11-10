@@ -25,7 +25,7 @@
 | reg | `.specify/register.md` | ID 登记 |
 | kb | `.specify/memory/knowledge/` | 长期知识库 |
 | session | `.specify/memory/session/` | 会话记忆 |
-| tools | `.specify/memory/tools.md` + `tools/` | 工具注册表 |
+| tools | `.specify/tools.md`（§ Helper Tools Index）+ `tools/` | 工具注册表 |
 | skills | `.specify/skills/` 非空 | 安装技能集 |
 | tmpl | `.specify/templates/` | 阶段模板 |
 | specs | `.specify/specs/` | 规格产物目录（计数） |

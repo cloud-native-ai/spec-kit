@@ -100,7 +100,7 @@ def main() -> int:
         "reg": exists("register.md"),
         "kb": os.path.isdir(os.path.join(sp, "memory/knowledge")),
         "session": os.path.isdir(os.path.join(sp, "memory/session")),
-        "tools": exists("memory/tools.md"),
+        "tools": exists("tools.md"),
         "skills": skills_count > 0,
         "skills_count": skills_count,
         "tmpl": os.path.isdir(os.path.join(sp, "templates")),

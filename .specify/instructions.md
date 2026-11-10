@@ -274,7 +274,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - Treat Constitution as the authority for architecture and workflow constraints.
 - **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/memory/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
+> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
 
 ## AI Tool Compatibility
 - **Supported Agents**: the canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` (`src/specify_cli/__init__.py`); per-tool config and CLI arguments: `docs/reference/cli/supported-agent-tools.md` — never guess flags or config keys.
