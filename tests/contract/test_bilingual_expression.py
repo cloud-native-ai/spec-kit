@@ -44,6 +44,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -141,12 +142,7 @@ def all_keywords() -> list[str]:
 
 def _run_checker(*args: str) -> subprocess.CompletedProcess:
     assert CHECKER.is_file(), f"checker missing: {CHECKER_REL}"
-    return subprocess.run(
-        [sys.executable, str(CHECKER), *args],
-        capture_output=True,
-        text=True,
-        cwd=REPO_ROOT,
-    )
+    return run_engine_in_process(CHECKER, args)
 
 
 def _ambient_section_lines() -> list[str]:

@@ -12,6 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -23,10 +24,13 @@ ACTIONS = {"scan", "expire", "clean", "archive-check", "stats", "validate", "aud
 
 
 def run_engine(*args: str, cwd: Path | None = None) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), *args],
-        capture_output=True, text=True, cwd=cwd or REPO_ROOT,
-    )
+    if cwd is None:
+        proc = run_engine_in_process(SCRIPT, args)
+    else:
+        proc = subprocess.run(
+            [sys.executable, str(SCRIPT), *args],
+            capture_output=True, text=True, cwd=cwd,
+        )
     assert proc.returncode == 0, f"engine failed: {proc.stderr}"
     return json.loads(proc.stdout)
 
@@ -156,9 +160,8 @@ def test_c8_audit_appends_record_even_for_noop(tmp_path: Path):
 
 @pytest.mark.contract
 def test_c9_exit_zero_even_with_violations(messy_project: Path):
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), "--action", "validate", "--root", str(messy_project)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        SCRIPT, ["--action", "validate", "--root", str(messy_project)]
     )
     assert proc.returncode == 0, "violations are a normal report, not an error"
 

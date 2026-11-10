@@ -26,6 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -124,11 +125,7 @@ def write_spec(tmp_path: Path, plan_text: str, requirements_text: str = VALID_RE
 
 
 def run(spec_dir: Path, *extra: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(VALIDATOR), "--spec", str(spec_dir), *extra],
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(VALIDATOR, ["--spec", str(spec_dir), *extra])
 
 
 def payload_of(proc: subprocess.CompletedProcess) -> dict:

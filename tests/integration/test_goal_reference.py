@@ -13,6 +13,7 @@ import json
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 import yaml
 
@@ -51,14 +52,13 @@ def _define(root: Path, slug: str, objective: str, criteria: list[str]) -> None:
            "--repo-root", str(root)]
     for c in criteria:
         cmd += ["--criterion", c]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = run_engine_in_process(GOAL_UTILS, cmd[2:])
     assert proc.returncode == 0, proc.stderr
 
 
 def _refresh(root: Path, goal_slug: str) -> dict:
-    proc = subprocess.run(
-        ["python3", str(GENERATOR), "--goal", goal_slug, "--repo-root", str(root), "--json"],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        GENERATOR, ["--goal", goal_slug, "--repo-root", str(root), "--json"]
     )
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
@@ -121,16 +121,14 @@ def test_editing_the_definition_changes_all_referencing_teams(tmp_path):
     first = _refresh(tmp_path, "evolve")
     assert _form(tmp_path, "evolve")["project"]["project_desc"] == "First objective."
     # edit the definition only — touch no team file
-    subprocess.run(
-        ["python3", str(GOAL_UTILS), "criteria", "evolve", "--criterion", "new",
-         "--repo-root", str(tmp_path)],
-        capture_output=True, text=True, check=True,
-    )
-    subprocess.run(
-        ["python3", str(GOAL_UTILS), "status", "evolve", "--set", "active",
-         "--repo-root", str(tmp_path)],
-        capture_output=True, text=True, check=True,
-    )
+    run_engine_in_process(
+        GOAL_UTILS,
+        ["criteria", "evolve", "--criterion", "new", "--repo-root", str(tmp_path)],
+    ).check_returncode()
+    run_engine_in_process(
+        GOAL_UTILS,
+        ["status", "evolve", "--set", "active", "--repo-root", str(tmp_path)],
+    ).check_returncode()
     second = _refresh(tmp_path, "evolve")
     assert [m["milestone_name"] for m in _form(tmp_path, "evolve")["milestones"]] == ["new"]
     assert sorted(second["contributing_teams"]) == ["t1", "t2"]

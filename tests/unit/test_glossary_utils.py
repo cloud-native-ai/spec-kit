@@ -14,6 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,10 +23,7 @@ TEMPLATE = ROOT / "templates" / "glossary-template.md"
 
 
 def run(root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(ENGINE), "--root", str(root), *args],
-        capture_output=True, text=True,
-    )
+    return run_engine_in_process(ENGINE, ["--root", str(root), *args])
 
 
 def out(cp: subprocess.CompletedProcess) -> dict:

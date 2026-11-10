@@ -13,6 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -29,9 +30,7 @@ ROOT_ENTRIES = {
 
 
 def run_engine(*args: str) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SCRIPT, args)
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 
@@ -939,9 +938,11 @@ def test_c001_before_implementation_exit2_is_gone():
     engine = read(REPO / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py")
     assert '"obligation"' in engine, "the action must be registered in the closed choice list"
     assert "invalid choice: 'obligation'" not in engine, "the retired pre-state must not be reproduced in source"
-    proc = subprocess.run([sys.executable, str(SCRIPT), "--action", "obligation", "--root",
-                           str(REPO / "tests" / "fixtures" / "docs-obligation" / "clean"), "--json"],
-                          capture_output=True, text=True)
+    proc = run_engine_in_process(
+        SCRIPT,
+        ["--action", "obligation", "--root",
+         str(REPO / "tests" / "fixtures" / "docs-obligation" / "clean"), "--json"],
+    )
     assert proc.returncode == 0, f"a real run must exit 0 (judged, not necessarily clean): {proc.stderr}"
     payload = json.loads(proc.stdout)
     assert payload["action"] == "obligation" and "summary" in payload, "the run must answer with a payload"

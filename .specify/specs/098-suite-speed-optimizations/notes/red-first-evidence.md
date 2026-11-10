@@ -320,3 +320,25 @@ Anomaly line: one in-passing repair, disclosed in `test-evidence/inprocess-equiv
 four corpus-owner guards red, was moved out of the worktree (reversible quarantine). No
 guard case and no converted assertion was weakened to obtain a green.
 
+
+## WP-8 / T052 — full-tree manifest guard (inprocess-conversion C-001/C-006)
+
+- Date: 2026-11-11
+- Tree state at package start: WP-7 closed; the manifest covers 179 rows over the
+  contract-area groups and the fixture layer. Every remaining `subprocess.run` site
+  under `tests/` is unclassified — the honest handoff WP-7 left for T052.
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q`
+- Exit code: `1`; result: `1 failed, 7 passed in 4.46s`.
+- Failing case: `test_c006_the_full_tree_scan_names_its_uncovered_files` —
+  `AssertionError: 295 site(s) unclassified; 164 file(s) still uncovered (T052 owner)`,
+  naming every remaining file. The complete log for this state is
+  `test-evidence/inprocess-guard-wp7.txt` (WP-7 close, identical failure).
+- Green owner: T052. After the WP-8 conversions and the 324 new manifest rows the same
+  case passes with the new C-008 route-preservation leg:
+  `test-evidence/inprocess-guard-wp8.txt` (9 passed).
+
+Anomaly line: one conversion was reverted during T053 — `test_clause_forms.py::
+test_the_extractor_runs_as_a_script_and_exits_zero` was converted in-process, and the
+after-arm equivalence run reddened it; the case's subject is that the extractor runs as a
+script (a process-boundary contract), so it was restored to subprocess and classified
+`keep`/`cli-contract`. No assertion was weakened to obtain the green.

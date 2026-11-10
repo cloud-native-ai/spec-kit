@@ -14,6 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -64,10 +65,7 @@ def _run(args: list[str], bindir: Path | None = None, env: dict | None = None):
 
 
 def _dry(args: list[str]) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(WRAPPER), *args, "--dry-run", "--json"],
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(WRAPPER, [*args, "--dry-run", "--json"])
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 

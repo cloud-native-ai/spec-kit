@@ -1,0 +1,344 @@
+# In-process conversion — mutation drills IC-M1…IC-M5 (T054)
+
+Feature: 098-suite-speed-optimizations (US5). Contract:
+`contracts/inprocess-conversion.contract.md` § D. Carrier: `test-evidence/inprocess-conversion.md`.
+
+Execution model: each drill is applied to a **throwaway copy** — a `git clone --shared` of
+the worktree at HEAD with the WP-8 working-tree diff applied (`.specify/.tmp/wp8/mutant/`,
+git-ignored scratch). The tracked file is restored after each drill; a final guard run
+confirms the restored copy is green. The real worktree is never mutated.
+
+| Leg | Mutation | Guard case that must fail | Observed |
+|-----|----------|---------------------------|----------|
+| IC-M1 | one converted call returned to `subprocess.run` | C-007 revert detection | FAIL (exit 1), site named |
+| IC-M2 | one manifest row deleted for a discovered site | C-006 completeness | FAIL (exit 1), site named |
+| IC-M3 | one `keep` row given a class outside the closed set | C-002 closed set | FAIL (exit 1), row named |
+| IC-M4 | one converted helper rewritten as an import-only check | C-008 route-preservation leg | FAIL (exit 1), row named |
+| IC-M5 | one `--help` case converted while its keep row stays | C-002/C-010 keep-side sample | FAIL (exit 1), stale keep row named |
+
+Guard command for every leg:
+`bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q`
+
+## IC-M1 — revert one converted point to subprocess.run (C-007)
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=1
+bringing up nodes...
+bringing up nodes...
+
+......FFF                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_c008_converted_rows_still_make_the_in_process_call ____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c008_converted_rows_still_make_the_in_process_call():
+        """A converted row must name a function that still calls the equivalence route.
+    
+        The canonical weakening (C-008) replaces the route with an import-only check
+        (``import engine; assert engine.main is not None``). That rewrite removes the
+        route call, so the row reddens and is named; the file must also keep at least
+        one assertion so an empty shell cannot pass.
+        """
+        offenders = []
+        cache: dict[str, tuple[ast.Module, dict[str, ast.AST]]] = {}
+        for row in _manifest_rows():
+            if row["verdict"] != "convert":
+                continue
+            file = row["file"]
+            if file not in cache:
+                tree = ast.parse((ROOT / file).read_text(encoding="utf-8"))
+                cache[file] = (tree, _function_defs(tree))
+            tree, defs = cache[file]
+            name = row["call_site"].split(" :: ", 1)[0].rsplit(".", 1)[-1]
+            func = defs.get(name)
+            if func is None:
+                offenders.append(
+                    "%s :: %s names no function %r (C-008)"
+                    % (file, row["call_site"], name)
+                )
+            elif not _calls_route(func):
+                offenders.append(
+                    "%s :: %s no longer calls the in-process route "
+                    "(run_engine_in_process/CliRunner) — import-only weakening (C-008)"
+                    % (file, row["call_site"])
+                )
+            if not any(isinstance(node, ast.Assert) for node in ast.walk(tree)):
+                offenders.append("%s carries no assertion at all (C-008)" % file)
+>       assert not offenders, "\n".join(offenders)
+E       AssertionError: tests/contract/test_clarify_semantic_completeness.py :: _doc_order_findings :: validate-requirements.py no longer calls the in-process route (run_engine_in_process/CliRunner) — import-only weakening (C-008)
+E       assert not ['tests/contract/test_clarify_semantic_completeness.py :: _doc_order_findings :: validate-requirements.py no longer calls the in-process route (run_engine_in_process/CliRunner) — import-only weakening (C-008)']
+
+tests/contract/test_inprocess_conversion_contract.py:499: AssertionError
+___________ test_c001_every_covered_file_classifies_all_of_its_sites ___________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c001_every_covered_file_classifies_all_of_its_sites():
+        """A file with at least one manifest row must classify every site it carries.
+    
+        This is the WP-7-scope half of C-001: the conversion groups plus the fixture layer
+        are closed here, and drift inside a covered file reddens immediately. Files with no
+        rows at all are named by the full-tree case below (T052 owner).
+        """
+        rows = _manifest_rows()
+        covered = {row["file"] for row in rows}
+        sites = scan_sites()
+        in_scope = [site for site in sites if site[0] in covered]
+        findings = classify(in_scope, rows)
+>       assert not findings, (
+            "covered-file drift:\n%s" % "\n".join(findings)
+        )
+E       AssertionError: covered-file drift:
+E         reverted conversion: tests/contract/test_clarify_semantic_completeness.py :: _doc_order_findings :: validate-requirements.py is still a subprocess.run site but the manifest marks it convert (C-007)
+E       assert not ['reverted conversion: tests/contract/test_clarify_semantic_completeness.py :: _doc_order_findings :: validate-requirements.py is still a subprocess.run site but the manifest marks it convert (C-007)']
+
+tests/contract/test_inprocess_conversion_contract.py:348: AssertionError
+____________ test_c006_the_full_tree_scan_names_its_uncovered_files ____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c006_the_full_tree_scan_names_its_uncovered_files():
+        """Full-tree completeness (C-001/C-006) — closed by T052 over the whole census.
+    
+        A site with no row, or a revert, is named, so no site can be silently forgotten.
+        """
+        findings = classify(scan_sites(), _manifest_rows())
+        unclassified_files = sorted(
+            {finding.split("unclassified call site: ")[1].split(" :: ")[0]
+             for finding in findings
+             if finding.startswith("unclassified call site: ")}
+        )
+>       assert not findings, (
+            "%d site(s) unclassified; %d file(s) still uncovered (T052 owner): %s"
+            % (len(findings), len(unclassified_files), ", ".join(unclassified_files))
+        )
+E       AssertionError: 1 site(s) unclassified; 0 file(s) still uncovered (T052 owner): 
+E       assert not ['reverted conversion: tests/contract/test_clarify_semantic_completeness.py :: _doc_order_findings :: validate-requirements.py is still a subprocess.run site but the manifest marks it convert (C-007)']
+
+tests/contract/test_inprocess_conversion_contract.py:364: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c008_converted_rows_still_make_the_in_process_call
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c001_every_covered_file_classifies_all_of_its_sites
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c006_the_full_tree_scan_names_its_uncovered_files
+3 failed, 6 passed in 4.95s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```
+
+## IC-M2 — delete a manifest row for a discovered call site (C-006)
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=1
+bringing up nodes...
+bringing up nodes...
+
+........F                                                                [100%]
+=================================== FAILURES ===================================
+____________ test_c006_the_full_tree_scan_names_its_uncovered_files ____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c006_the_full_tree_scan_names_its_uncovered_files():
+        """Full-tree completeness (C-001/C-006) — closed by T052 over the whole census.
+    
+        A site with no row, or a revert, is named, so no site can be silently forgotten.
+        """
+        findings = classify(scan_sites(), _manifest_rows())
+        unclassified_files = sorted(
+            {finding.split("unclassified call site: ")[1].split(" :: ")[0]
+             for finding in findings
+             if finding.startswith("unclassified call site: ")}
+        )
+>       assert not findings, (
+            "%d site(s) unclassified; %d file(s) still uncovered (T052 owner): %s"
+            % (len(findings), len(unclassified_files), ", ".join(unclassified_files))
+        )
+E       AssertionError: 1 site(s) unclassified; 1 file(s) still uncovered (T052 owner): tests/contract/test_client_guard_sweep.py
+E       assert not ['unclassified call site: tests/contract/test_client_guard_sweep.py :: git :: git']
+
+tests/contract/test_inprocess_conversion_contract.py:364: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c006_the_full_tree_scan_names_its_uncovered_files
+1 failed, 8 passed in 4.54s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```
+
+## IC-M3 — keep row with a class outside the closed set (C-002)
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=1
+bringing up nodes...
+bringing up nodes...
+
+..F......                                                                [100%]
+=================================== FAILURES ===================================
+___ test_c002_keep_rows_use_the_closed_class_set_and_convert_rows_use_a_dash ___
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c002_keep_rows_use_the_closed_class_set_and_convert_rows_use_a_dash():
+        offenders = []
+        for row in _manifest_rows():
+            if row["verdict"] == "keep":
+                if row["boundary_class"] not in KEEP_CLASSES:
+                    offenders.append(
+                        "%s :: %s keep class %r is outside the closed set (C-002)"
+                        % (row["file"], row["call_site"], row["boundary_class"])
+                    )
+            elif row["verdict"] == "convert":
+                if row["boundary_class"] != CONVERT_CLASS:
+                    offenders.append(
+                        "%s :: %s convert row must carry %r as its boundary_class"
+                        % (row["file"], row["call_site"], CONVERT_CLASS)
+                    )
+            else:
+                offenders.append(
+                    "%s :: %s verdict %r is not convert|keep"
+                    % (row["file"], row["call_site"], row["verdict"])
+                )
+>       assert not offenders, "\n".join(offenders)
+E       AssertionError: tests/contract/test_client_guard_sweep.py :: git :: git keep class 'git-magic' is outside the closed set (C-002)
+E       assert not ["tests/contract/test_client_guard_sweep.py :: git :: git keep class 'git-magic' is outside the closed set (C-002)"]
+
+tests/contract/test_inprocess_conversion_contract.py:307: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c002_keep_rows_use_the_closed_class_set_and_convert_rows_use_a_dash
+1 failed, 8 passed in 4.44s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```
+
+## IC-M4 — weakened converted assertion: import-only check (C-008)
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=1
+bringing up nodes...
+bringing up nodes...
+
+......F..                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_c008_converted_rows_still_make_the_in_process_call ____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c008_converted_rows_still_make_the_in_process_call():
+        """A converted row must name a function that still calls the equivalence route.
+    
+        The canonical weakening (C-008) replaces the route with an import-only check
+        (``import engine; assert engine.main is not None``). That rewrite removes the
+        route call, so the row reddens and is named; the file must also keep at least
+        one assertion so an empty shell cannot pass.
+        """
+        offenders = []
+        cache: dict[str, tuple[ast.Module, dict[str, ast.AST]]] = {}
+        for row in _manifest_rows():
+            if row["verdict"] != "convert":
+                continue
+            file = row["file"]
+            if file not in cache:
+                tree = ast.parse((ROOT / file).read_text(encoding="utf-8"))
+                cache[file] = (tree, _function_defs(tree))
+            tree, defs = cache[file]
+            name = row["call_site"].split(" :: ", 1)[0].rsplit(".", 1)[-1]
+            func = defs.get(name)
+            if func is None:
+                offenders.append(
+                    "%s :: %s names no function %r (C-008)"
+                    % (file, row["call_site"], name)
+                )
+            elif not _calls_route(func):
+                offenders.append(
+                    "%s :: %s no longer calls the in-process route "
+                    "(run_engine_in_process/CliRunner) — import-only weakening (C-008)"
+                    % (file, row["call_site"])
+                )
+            if not any(isinstance(node, ast.Assert) for node in ast.walk(tree)):
+                offenders.append("%s carries no assertion at all (C-008)" % file)
+>       assert not offenders, "\n".join(offenders)
+E       AssertionError: tests/contract/test_requirements_checker.py :: _run :: validate-requirements.py no longer calls the in-process route (run_engine_in_process/CliRunner) — import-only weakening (C-008)
+E       assert not ['tests/contract/test_requirements_checker.py :: _run :: validate-requirements.py no longer calls the in-process route (run_engine_in_process/CliRunner) — import-only weakening (C-008)']
+
+tests/contract/test_inprocess_conversion_contract.py:499: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c008_converted_rows_still_make_the_in_process_call
+1 failed, 8 passed in 4.98s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```
+
+## IC-M5 — convert a --help case that asserts the process contract (C-002/C-010)
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=1
+bringing up nodes...
+bringing up nodes...
+
+.......FF                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_c001_every_covered_file_classifies_all_of_its_sites ___________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c001_every_covered_file_classifies_all_of_its_sites():
+        """A file with at least one manifest row must classify every site it carries.
+    
+        This is the WP-7-scope half of C-001: the conversion groups plus the fixture layer
+        are closed here, and drift inside a covered file reddens immediately. Files with no
+        rows at all are named by the full-tree case below (T052 owner).
+        """
+        rows = _manifest_rows()
+        covered = {row["file"] for row in rows}
+        sites = scan_sites()
+        in_scope = [site for site in sites if site[0] in covered]
+        findings = classify(in_scope, rows)
+>       assert not findings, (
+            "covered-file drift:\n%s" % "\n".join(findings)
+        )
+E       AssertionError: covered-file drift:
+E         stale keep row: tests/contract/test_expression_gates_doc.py :: _help_text :: validate-requirements.py has 1 keep row(s) but 0 discovered site(s)
+E       assert not ['stale keep row: tests/contract/test_expression_gates_doc.py :: _help_text :: validate-requirements.py has 1 keep row(s) but 0 discovered site(s)']
+
+tests/contract/test_inprocess_conversion_contract.py:348: AssertionError
+____________ test_c006_the_full_tree_scan_names_its_uncovered_files ____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c006_the_full_tree_scan_names_its_uncovered_files():
+        """Full-tree completeness (C-001/C-006) — closed by T052 over the whole census.
+    
+        A site with no row, or a revert, is named, so no site can be silently forgotten.
+        """
+        findings = classify(scan_sites(), _manifest_rows())
+        unclassified_files = sorted(
+            {finding.split("unclassified call site: ")[1].split(" :: ")[0]
+             for finding in findings
+             if finding.startswith("unclassified call site: ")}
+        )
+>       assert not findings, (
+            "%d site(s) unclassified; %d file(s) still uncovered (T052 owner): %s"
+            % (len(findings), len(unclassified_files), ", ".join(unclassified_files))
+        )
+E       AssertionError: 1 site(s) unclassified; 0 file(s) still uncovered (T052 owner): 
+E       assert not ['stale keep row: tests/contract/test_expression_gates_doc.py :: _help_text :: validate-requirements.py has 1 keep row(s) but 0 discovered site(s)']
+
+tests/contract/test_inprocess_conversion_contract.py:364: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c001_every_covered_file_classifies_all_of_its_sites
+FAILED tests/contract/test_inprocess_conversion_contract.py::test_c006_the_full_tree_scan_names_its_uncovered_files
+2 failed, 7 passed in 4.48s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```
+
+## Restoration check
+
+```text
+# command: bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
+# exit=0
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 4.43s
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+```

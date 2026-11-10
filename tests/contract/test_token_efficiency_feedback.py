@@ -10,6 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -48,8 +49,8 @@ def test_cm1_clean_run_sentence_and_no_fabrication():
 # C-M2 / C-M3: list --contains over a fixture store
 # --------------------------------------------------------------------------- #
 def run_engine(workspace: Path, *args: str) -> dict:
-    cmd = [sys.executable, str(ENGINE), "--workspace-root", str(workspace), "--format", "json", *args]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    cmd = ["--workspace-root", str(workspace), "--format", "json", *args]
+    proc = run_engine_in_process(ENGINE, cmd)
     assert proc.returncode == 0, f"engine failed: {proc.stderr}"
     return json.loads(proc.stdout)
 

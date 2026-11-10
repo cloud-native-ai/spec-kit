@@ -29,6 +29,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHECKER = REPO_ROOT / "scripts" / "python" / "doc-consistency-check.py"
 CHECKER_REL = "scripts/python/doc-consistency-check.py"
@@ -56,9 +58,11 @@ def _run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
         "doc-consistency checker missing: %s — expected at T020/T021 (069a). "
         "Red is the intended pre-implementation state for T014." % CHECKER_REL
     )
+    if cwd is None:
+        return run_engine_in_process(CHECKER, args)
     return subprocess.run(
         [sys.executable, str(CHECKER), *args],
-        cwd=str(cwd or REPO_ROOT),
+        cwd=str(cwd),
         capture_output=True,
         text=True,
     )

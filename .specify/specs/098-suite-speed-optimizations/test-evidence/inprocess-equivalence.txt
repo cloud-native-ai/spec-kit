@@ -1,0 +1,87 @@
+# In-process conversion — WP-8 equivalence evidence (T050–T054)
+
+Feature: 098-suite-speed-optimizations (US5). Contract: `contracts/inprocess-conversion.contract.md`
+C-009 / C-010. Carrier of the classification rows: `test-evidence/inprocess-conversion.md`.
+WP-7's pairs for the contract-area groups are in `test-evidence/inprocess-equivalence-wp7.txt`.
+
+## Arms
+
+- Before: `git clone --shared` of the worktree at HEAD `ad4e88902` (WP-7 close; no WP-8 change),
+  located under the sanctioned scratch root (`.specify/.tmp/wp8/before/`, git-ignored).
+- After: this worktree with the WP-8 conversions, the closed manifest and the C-008 guard leg.
+- Both arms: same host, same day (2026-11-11), same runner, `--serial` so the order is
+  deterministic (the branch carries order-dependent pre-existing reds). Selection is the
+  identical file list in both arms; the comparison surface is the pass/fail NAME set.
+
+## Pairs (complete output retained beside this file)
+
+| Group | Selection | Before (exit, result, wall) | After (exit, result, wall) | Name diff |
+|-------|-----------|------------------------------|-----------------------------|-----------|
+| Unit engine group | 19 files | 1, `4 failed, 372 passed in 29.93s` | 1, `4 failed, 372 passed in 7.06s` | empty |
+| Contract leftovers (T052 closure) | 34 files | 1, `16 failed, 900 passed in 46.14s` | 1, `16 failed, 900 passed in 27.36s` | empty |
+| Integration group (docs-scenario, goal/summary, queue lanes) | 16 files | 1, `11 failed, 147 passed in 40.95s` | 1, `11 failed, 147 passed in 33.76s` | empty |
+
+Full logs (command line, complete output, exit code):
+
+- `test-evidence/inprocess-equivalence-wp8-before-unit.txt` / `…-after-unit.txt`
+- `test-evidence/inprocess-equivalence-wp8-before-contract.txt` / `…-after-contract.txt`
+- `test-evidence/inprocess-equivalence-wp8-before-integration.txt` / `…-after-integration.txt`
+
+## Pre-existing reds (identical names in both arms)
+
+These fail on the untouched before arm and fail identically after; they are branch state,
+not conversion effects (the same set is recorded at WP-7 close).
+
+- `tests/unit/test_docs_obligation_reuse.py::test_sc005_engine_domain_is_single_owner`
+- `tests/unit/test_glossary_utils.py::test_init_creates_then_is_non_destructive`
+- `tests/unit/test_glossary_utils.py::test_init_force_overwrites`
+- `tests/unit/test_glossary_utils.py::test_validate_rejects_bad_origin`
+- `tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it`
+- `tests/contract/test_bilingual_expression.py::test_census_action`
+- `tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file`
+- `tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration`
+- `tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_a3_alias_list_still_exists`
+- `tests/contract/test_engine_face_contract.py::test_c20_convention_line_rendered_once_verbatim`
+- `tests/contract/test_engine_face_contract.py::test_c20_face_renders_required_and_source_placeholders`
+- `tests/contract/test_engine_face_contract.py::test_c20_no_placeholder_free_section_carries_no_convention`
+- `tests/contract/test_engine_face_contract.py::test_c21_rendered_flags_are_exactly_the_manifest_set`
+- `tests/contract/test_engine_face_contract.py::test_c22_missing_manifest_fails_the_compile_loudly`
+- `tests/contract/test_humanize_command_surface.py::test_c06_registry_rows_resolve`
+- `tests/contract/test_humanize_command_surface.py::test_wc07_skill_body_budget`
+- `tests/contract/test_humanize_command_surface.py::test_wc10_feature_062_status_held`
+- `tests/contract/test_humanize_command_surface.py::test_wc11_feature_row_name_description`
+- `tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured`
+- `tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean`
+- `tests/integration/test_goal_definition_sourcing.py::test_empty_criteria_definition_declares_absence_not_invented_milestones`
+- `tests/integration/test_goal_definition_sourcing.py::test_narrative_and_milestones_come_from_the_definition`
+- `tests/integration/test_goal_definition_sourcing.py::test_no_definition_behaviour_is_unchanged_from_036`
+- `tests/integration/test_goal_definition_sourcing.py::test_refresh_never_writes_the_definition_file`
+- `tests/integration/test_goal_migration_path.py::test_migration_preserves_the_resolved_objective`
+- `tests/integration/test_goal_reference.py::test_broken_reference_is_reported_not_degraded`
+- `tests/integration/test_goal_reference.py::test_editing_the_definition_changes_all_referencing_teams`
+- `tests/integration/test_goal_reference.py::test_inline_only_team_still_works_with_no_archive`
+- `tests/integration/test_goal_reference.py::test_reference_inline_divergence_prefers_the_definition_and_surfaces_it`
+- `tests/integration/test_goal_reference.py::test_two_teams_sharing_a_goal_resolve_to_one_definition`
+- `tests/integration/test_goal_roster.py::test_roster_written_to_summary_never_to_goal_md`
+
+## Conversion boundary decisions
+
+- 87 call sites converted across 66 files; 237 sites in the same surface kept with a C-002
+  class (git 70, bash/external programs, pytest children, `ps` tokens, copy topology,
+  `--help`/`--version`/usage contracts, `cwd=`/`env=` invocations).
+- One reverted decision during T053: `test_the_extractor_runs_as_a_script_and_exits_zero`
+  was converted, then restored to subprocess — the case's subject IS that the extractor
+  runs as a script (a process-boundary contract), so it is `keep`/`cli-contract`. The
+  failing after-arm run that exposed it is superseded by the final pair above.
+- Branch conversions (default-`cwd` in-process, explicit-`cwd` subprocess) remain a single
+  scanned site and therefore a `keep` row: `tests/contract/test_docs_utils_cli.py`,
+  `tests/integration/test_expression_line_pilot.py`, `tests/unit/test_concurrency_check_engine.py`,
+  `tests/unit/test_doc_consistency_rules.py` (C-004 pattern, same as WP-7's doc-consistency helper).
+
+## Guard
+
+- Full-tree completeness is green (T052): `test_c006_the_full_tree_scan_names_its_uncovered_files`
+  passes over 359 scanned sites and 503 manifest rows (WP-7 179 + WP-8 324).
+- C-008's assertion leg was added by T052 and is exercised by IC-M4
+  (`test-evidence/inprocess-mutations.txt`).
+- Final guard run (whole file): `test-evidence/inprocess-guard-wp8.txt`.

@@ -11,6 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "audit-plan-changes.py"
 
@@ -59,11 +61,11 @@ def _declarations(tmp_path, lines):
 
 
 def _run(repo, base, head, declarations, plan_owned=None):
-    cmd = [sys.executable, str(SCRIPT), "--repo", str(repo), "--base", base,
+    cmd = ["--repo", str(repo), "--base", base,
            "--head", head, "--declarations", str(declarations)]
     for path in (plan_owned or PLAN_OWNED):
         cmd += ["--plan-owned", path]
-    completed = subprocess.run(cmd, capture_output=True, text=True)
+    completed = run_engine_in_process(SCRIPT, cmd)
     payload = None
     if completed.stdout.strip():
         payload = json.loads(completed.stdout)

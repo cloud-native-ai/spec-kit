@@ -14,6 +14,7 @@ import json
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -42,15 +43,15 @@ def _team(root, slug, *, goal_slug=None, territory_write=None):
 
 
 def _define(root, slug):
-    subprocess.run(["python3", str(GOAL_UTILS), "create", slug, "--objective",
-                    "An outcome.", "--repo-root", str(root)],
-                   capture_output=True, text=True, check=True)
+    run_engine_in_process(
+        GOAL_UTILS, ["create", slug, "--objective", "An outcome.", "--repo-root", str(root)]
+    ).check_returncode()
 
 
 def _refresh(root, goal_slug):
-    proc = subprocess.run(["python3", str(GENERATOR), "--goal", goal_slug,
-                           "--repo-root", str(root), "--json"],
-                          capture_output=True, text=True)
+    proc = run_engine_in_process(
+        GENERATOR, ["--goal", goal_slug, "--repo-root", str(root), "--json"]
+    )
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 

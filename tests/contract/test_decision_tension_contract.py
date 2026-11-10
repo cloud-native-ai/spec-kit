@@ -31,6 +31,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 ROOT = Path(__file__).resolve().parents[2]
 
 OWNER = ROOT / "shared" / "guidelines" / "decision-tension.md"
@@ -730,11 +732,7 @@ def write_channel_spec(root: Path, plan_text: str, requirements_text: str = CHAN
 
 def run_validator(spec_dir: Path) -> subprocess.CompletedProcess:
     assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
-    return subprocess.run(
-        [sys.executable, str(VALIDATOR), "--spec", str(spec_dir), "--json"],
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(VALIDATOR, ["--spec", str(spec_dir), "--json"])
 
 
 def verdict_of(spec_dir: Path) -> tuple[int, dict]:

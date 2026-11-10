@@ -19,6 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -147,10 +148,7 @@ def test_gitignore_and_ignore_patterns_cover_tmp():
 
 
 def test_scanner_real_tree_is_clean():
-    result = subprocess.run(
-        [sys.executable, str(SCANNER), "--summary"],
-        cwd=str(ROOT), capture_output=True, text=True,
-    )
+    result = run_engine_in_process(SCANNER, ["--summary"])
     assert result.returncode == 0, result.stdout + result.stderr
     assert "temp-directory violations: 0" in result.stdout
 
@@ -160,10 +158,7 @@ def test_scanner_flags_violations(tmp_path: Path):
     (tmp_path / "shared" / "bad.md").write_text(
         "path: /tmp/foo\nrun: mktemp -d\n", encoding="utf-8"
     )
-    result = subprocess.run(
-        [sys.executable, str(SCANNER), "--root", str(tmp_path), "--json"],
-        capture_output=True, text=True,
-    )
+    result = run_engine_in_process(SCANNER, ["--root", str(tmp_path), "--json"])
     assert result.returncode == 2, result.stdout + result.stderr
     payload = json.loads(result.stdout)
     assert len(payload["violations"]) == 2
@@ -180,10 +175,7 @@ def test_scanner_allows_sanctioned_roots(tmp_path: Path):
         'mktemp -d "$ROOT/.specify/.tmp/run.XXXXXX"\n',
         encoding="utf-8",
     )
-    result = subprocess.run(
-        [sys.executable, str(SCANNER), "--root", str(tmp_path), "--json"],
-        capture_output=True, text=True,
-    )
+    result = run_engine_in_process(SCANNER, ["--root", str(tmp_path), "--json"])
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(result.stdout)["violations"] == []
 

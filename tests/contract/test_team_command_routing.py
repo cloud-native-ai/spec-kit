@@ -49,6 +49,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -179,10 +180,9 @@ def _fixture_presets(tmp_path) -> Path:
 
 
 def _match(goal: str, presets: Path):
-    return subprocess.run(
-        [sys.executable, str(MATCHER), "--goal", goal,
-         "--presets-dir", str(presets)],
-        capture_output=True, text=True)
+    return run_engine_in_process(
+        MATCHER, ["--goal", goal, "--presets-dir", str(presets)]
+    )
 
 
 def test_keyword_only_goal_never_recommends_a_preset(tmp_path):
@@ -275,10 +275,9 @@ def _proposal(tmp_path, teams: list[dict], goal_slug: str = "g") -> Path:
 
 
 def _verify(repo: Path, proposal: Path):
-    return subprocess.run(
-        [sys.executable, str(VERIFY), "--input", str(proposal),
-         "--repo-root", str(repo), "--json"],
-        capture_output=True, text=True)
+    return run_engine_in_process(
+        VERIFY, ["--input", str(proposal), "--repo-root", str(repo), "--json"]
+    )
 
 
 def test_verify_script_exists():

@@ -21,6 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -38,9 +39,7 @@ _spec.loader.exec_module(fixtures)
 
 
 def run_engine(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
-    )
+    return run_engine_in_process(SCRIPT, args)
 
 
 def run_json(*args: str) -> dict:

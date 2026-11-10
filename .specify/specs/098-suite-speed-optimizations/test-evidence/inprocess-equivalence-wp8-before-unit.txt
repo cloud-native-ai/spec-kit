@@ -1,0 +1,158 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/unit/test_audit_plan_changes.py tests/unit/test_audit_test_budget.py tests/unit/test_concurrency_check_engine.py tests/unit/test_decomposition_check.py tests/unit/test_derive_live_log.py tests/unit/test_doc_consistency_rules.py tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_carriers.py tests/unit/test_docs_utils_obligation.py tests/unit/test_flow_class_check.py tests/unit/test_flow_class_spec_key.py tests/unit/test_glossary_utils.py tests/unit/test_isomorphism_checker.py tests/unit/test_overlap_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_reconciler_extensions.py tests/unit/test_workspace_guard.py tests/unit/test_wp_gate.py tests/unit/test_wp_report.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+........................................................................ [ 19%]
+...............................F........................................ [ 38%]
+...........................................................FF.F......... [ 57%]
+........................................................................ [ 76%]
+........................................................................ [ 95%]
+................                                                         [100%]
+=================================== FAILURES ===================================
+___________________ test_sc005_engine_domain_is_single_owner ___________________
+
+    @pytest.mark.contract
+    def test_sc005_engine_domain_is_single_owner():
+        """This feature added no second enumeration of the engine layers.
+    
+        The inventory half of `SC-005`, read as a change-scoped inventory: whatever the repository already carries
+        inside draw-diagram's own tree belongs to that capability's owner, and the contract's `C-010` example is a
+        schema illustration. What matters for this delivery is that no file it touched added one, so the assertion
+        reads the changed-file set and pins the verdict on the code this feature authored.
+    
+        The population and the claim are kept apart on purpose. The **population** is every tracked file under the
+        scanned roots — non-empty, so an empty read means the scan broke rather than that the claim held. The
+        **claim** is about the subset this feature actually authored: files whose own text (not a test's fixture
+        string, not this capability's owner tree) enumerates two or more engine layers. That subset must be empty
+        both because no such file exists today and because the assertion has to be able to say so out loud instead
+        of failing on a vacuous premise.
+    
+        red-when: a file this feature changed enumerates two or more engine layers, i.e. it published a second
+        engine list.
+        """
+        names = engine_names()
+        population = tracked_files()
+        assert population, "the premise: the scanned roots carry tracked files to inventory"
+    
+        # `docs-utils.py` carries the `.mmd` / `.puml` *file suffixes* a diagram reference may name. A suffix is not
+        # an engine layer, and its own obligation block cites the engine names it reads out of a record; neither is a
+        # second enumeration. `tests/` is this feature's evidence, not a surface a reader consults to pick an engine.
+        allowed_paths = {"skills/external/create-docs/scripts/docs-utils.py"}
+        allowed_prefixes = (DRAW_DIAGRAM_TREE, ".specify/skills/draw-diagram/", "tests/")
+        authored = [rel for rel in sorted(set(files_changed_by_this_feature(SCANNED_ROOTS))
+                                          | set(files_changed_in_worktree(SCANNED_ROOTS)))
+                    if rel not in allowed_paths and not rel.startswith(allowed_prefixes)]
+>       assert set(authored) <= set(population), "the scan reported files outside the scanned roots: " + str(
+            sorted(set(authored) - set(population)))
+E       AssertionError: the scan reported files outside the scanned roots: ['skills/internal/study-project/SKILL.md']
+E       assert {'scripts/bas...ents.sh', ...} <= {'scripts/bas...ents.sh', ...}
+E         
+E         Extra items in the left set:
+E         'skills/internal/study-project/SKILL.md'
+
+tests/unit/test_docs_obligation_reuse.py:408: AssertionError
+__________________ test_init_creates_then_is_non_destructive ___________________
+
+workspace = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_init_creates_then_is_non_0')
+
+    def test_init_creates_then_is_non_destructive(workspace: Path):
+        first = out(run(workspace, "--action", "init"))
+        assert first["created"] is True
+        gloss = workspace / ".specify" / "memory" / "glossary.md"
+>       gloss.write_text(gloss.read_text() + "\n<!-- user marker -->\n")
+                         ^^^^^^^^^^^^^^^^^
+
+tests/unit/test_glossary_utils.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_init_creates_then_is_non_0/.specify/memory/glossary.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7926/test_init_creates_then_is_non_0/.specify/memory/glossary.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________________ test_init_force_overwrites __________________________
+
+workspace = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_init_force_overwrites0')
+
+    def test_init_force_overwrites(workspace: Path):
+        gloss = seeded(workspace)
+>       gloss.write_text(gloss.read_text() + "\n<!-- user marker -->\n")
+                         ^^^^^^^^^^^^^^^^^
+
+tests/unit/test_glossary_utils.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_init_force_overwrites0/.specify/memory/glossary.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7926/test_init_force_overwrites0/.specify/memory/glossary.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________________ test_validate_rejects_bad_origin _______________________
+
+workspace = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_validate_rejects_bad_orig0')
+
+    def test_validate_rejects_bad_origin(workspace: Path):
+        gloss = seeded(workspace)
+>       gloss.write_text(gloss.read_text().replace(
+                         ^^^^^^^^^^^^^^^^^
+            "| None yet. | - | - | - | - |",
+            "| Term | - | a meaning | bogus | confirmed |",
+        ))
+
+tests/unit/test_glossary_utils.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7926/test_validate_rejects_bad_orig0/.specify/memory/glossary.md')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7926/test_validate_rejects_bad_orig0/.specify/memory/glossary.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/unit/test_docs_obligation_reuse.py::test_sc005_engine_domain_is_single_owner
+FAILED tests/unit/test_glossary_utils.py::test_init_creates_then_is_non_destructive
+FAILED tests/unit/test_glossary_utils.py::test_init_force_overwrites - FileNo...
+FAILED tests/unit/test_glossary_utils.py::test_validate_rejects_bad_origin - ...
+4 failed, 372 passed in 29.93s

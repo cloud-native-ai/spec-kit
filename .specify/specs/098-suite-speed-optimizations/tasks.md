@@ -198,11 +198,11 @@ Every count below was produced by the command shown, run in this worktree on 202
 - [X] T047 [US5] [blockedBy: T045] Convert the contract-area engine group B (docs/probe/trigger/summary engines) and fill their manifest rows.
 - [X] T048 [US5] [blockedBy: T045] Convert the contract-area engine group C (mirror/measure/state engines) where non-boundary and fill their manifest rows.
 - [X] T049 [US5] [blockedBy: T046, T047, T048] Record the contract-area keep rows with boundary classes (fixture-layer `cwd=`/`env=` helpers, `copy-topology` cases) in `test-evidence/inprocess-conversion.md` (FR-027).
-- [ ] T050 [US5] [blockedBy: T045] Convert the integration-area groups (docs-scenario and evidence-lane) non-boundary engine calls and fill their manifest rows.
-- [ ] T051 [US5] [blockedBy: T045] Convert the unit-area engine-call group and fill their manifest rows.
-- [ ] T052 [US5] [blockedBy: T049, T050, T051] Record the integration/unit keep rows, run the guard over the full manifest, fix every unclassified site and update the manifest evidence pointers. [green: contracts/inprocess-conversion.contract.md#C-007] [green: contracts/inprocess-conversion.contract.md#C-008]
-- [ ] T053 [US5] [blockedBy: T052] Run the guard and the converted files green with equivalence evidence in `test-evidence/inprocess-equivalence.txt`. [green: contracts/inprocess-conversion.contract.md#C-009] [green: contracts/inprocess-conversion.contract.md#C-010]
-- [ ] T054 [US5] [blockedBy: T053] Execute mutation drills IC-M1…IC-M5 on throwaway copies (including revert-one-converted-point red then restore) and record each output in `test-evidence/inprocess-mutations.txt`.
+- [X] T050 [US5] [blockedBy: T045] Convert the integration-area groups (docs-scenario and evidence-lane) non-boundary engine calls and fill their manifest rows.
+- [X] T051 [US5] [blockedBy: T045] Convert the unit-area engine-call group and fill their manifest rows.
+- [X] T052 [US5] [blockedBy: T049, T050, T051] Record the integration/unit keep rows, run the guard over the full manifest, fix every unclassified site and update the manifest evidence pointers. [green: contracts/inprocess-conversion.contract.md#C-007] [green: contracts/inprocess-conversion.contract.md#C-008]
+- [X] T053 [US5] [blockedBy: T052] Run the guard and the converted files green with equivalence evidence in `test-evidence/inprocess-equivalence.txt`. [green: contracts/inprocess-conversion.contract.md#C-009] [green: contracts/inprocess-conversion.contract.md#C-010]
+- [X] T054 [US5] [blockedBy: T053] Execute mutation drills IC-M1…IC-M5 on throwaway copies (including revert-one-converted-point red then restore) and record each output in `test-evidence/inprocess-mutations.txt`.
 
 **Checkpoint**: US5's independent criterion is the closed manifest plus the equivalence pair; group file sets are proven disjoint by the manifest scan before any concurrent dispatch of T046–T048/T050/T051.
 

@@ -47,6 +47,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from tests.script_api import _load_module
@@ -169,10 +170,9 @@ def _seed_store(ws: Path) -> None:
 
 
 def _run(ws: Path, *flags: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(ENGINE), "--action", "aggregate",
-         "--workspace-root", str(ws), *flags],
-        capture_output=True, text=True, timeout=120)
+    return run_engine_in_process(
+        ENGINE, ["--action", "aggregate", "--workspace-root", str(ws), *flags]
+    )
 
 
 def _run_json(ws: Path, *flags: str) -> tuple[dict, subprocess.CompletedProcess]:

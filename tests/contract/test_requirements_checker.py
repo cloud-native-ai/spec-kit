@@ -22,6 +22,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -73,9 +74,7 @@ def _load():
 
 
 def _run(args, expect=None):
-    r = subprocess.run(
-        [sys.executable, str(CHECKER), *args], capture_output=True, text=True, cwd=str(ROOT)
-    )
+    r = run_engine_in_process(CHECKER, args)
     if expect is not None:
         assert r.returncode == expect, f"exit {r.returncode}\n{r.stdout}\n{r.stderr}"
     return r

@@ -19,6 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -143,18 +144,9 @@ sources:
 def _load(tmp_path: Path, item_id: str) -> subprocess.CompletedProcess:
     form = tmp_path / "project-input.yaml"
     form.write_text(_minimal_form(item_id), encoding="utf-8")
-    return subprocess.run(
-        [
-            sys.executable,
-            str(PROJECT_DB),
-            "--db",
-            str(tmp_path / "project.db"),
-            "--load",
-            str(form),
-        ],
-        capture_output=True,
-        text=True,
-        cwd=str(REPO_ROOT),
+    return run_engine_in_process(
+        PROJECT_DB,
+        ["--db", str(tmp_path / "project.db"), "--load", str(form)],
     )
 
 
@@ -207,11 +199,8 @@ sources:
 """
     form = tmp_path / "collide.yaml"
     form.write_text(colliding, encoding="utf-8")
-    clash = subprocess.run(
-        [sys.executable, str(PROJECT_DB), "--db", str(tmp_path / "c.db"), "--load", str(form)],
-        capture_output=True,
-        text=True,
-        cwd=str(REPO_ROOT),
+    clash = run_engine_in_process(
+        PROJECT_DB, ["--db", str(tmp_path / "c.db"), "--load", str(form)]
     )
     assert clash.returncode == 3, "unprefixed duplicate ids must be rejected"
 
@@ -221,11 +210,8 @@ sources:
                                 "item_id: team-b.TI-0001\n    item_name: \"team B item\"")
     form2 = tmp_path / "prefixed.yaml"
     form2.write_text(prefixed, encoding="utf-8")
-    ok = subprocess.run(
-        [sys.executable, str(PROJECT_DB), "--db", str(tmp_path / "p.db"), "--load", str(form2)],
-        capture_output=True,
-        text=True,
-        cwd=str(REPO_ROOT),
+    ok = run_engine_in_process(
+        PROJECT_DB, ["--db", str(tmp_path / "p.db"), "--load", str(form2)]
     )
     assert ok.returncode == 0, (
         "team-namespaced ids must load cleanly\n" + ok.stdout + ok.stderr

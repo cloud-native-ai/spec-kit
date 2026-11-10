@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 from fixtures.line_fixtures import (
     engine_json,
     git,
@@ -52,11 +54,10 @@ def _commit(worktree: Path, relative: str, content: str, message: str) -> str:
 
 
 def _execute(repo: Path, reg: Path, archive: Path) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(EXECUTOR), "--repo", str(repo), "--trunk", "main",
-         "--registry", str(reg), "--archive", str(archive),
-         "--gate-cmd", "test -f README.md"],
-        capture_output=True, text=True,
+    return run_engine_in_process(
+        EXECUTOR,
+        ["--repo", str(repo), "--trunk", "main", "--registry", str(reg),
+         "--archive", str(archive), "--gate-cmd", "test -f README.md"],
     )
 
 

@@ -16,6 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -24,9 +25,8 @@ TYPED_DIRS = ("concepts", "tutorials", "tasks", "reference", "decisions", "contr
 
 
 def obligation(root: Path) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), "--action", "obligation", "--root", str(root)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        SCRIPT, ["--action", "obligation", "--root", str(root)]
     )
     assert proc.returncode == 0, f"engine exited {proc.returncode}: {proc.stderr}{proc.stdout}"
     return json.loads(proc.stdout)

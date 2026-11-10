@@ -87,6 +87,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -326,10 +327,9 @@ def _ws(tmp_path: Path) -> Path:
 
 def _record_feedback(ws: Path, unit_id: str, run_id: str, points: str):
     unit_type = "command" if unit_id.startswith("/") else "skill"
-    return subprocess.run(
+    return run_engine_in_process(
+        FEEDBACK_UTILS,
         [
-            sys.executable,
-            str(FEEDBACK_UTILS),
             "--action",
             "record",
             "--workspace-root",
@@ -345,18 +345,14 @@ def _record_feedback(ws: Path, unit_id: str, run_id: str, points: str):
             "--points",
             points,
         ],
-        capture_output=True,
-        text=True,
-        check=False,
     )
 
 
 def _determine(ws: Path, unit_id: str, run_id: str):
     unit_type = "command" if unit_id.startswith("/") else "skill"
-    return subprocess.run(
+    return run_engine_in_process(
+        RUN_DETERMINATION,
         [
-            sys.executable,
-            str(RUN_DETERMINATION),
             "--action",
             "determine",
             "--workspace-root",
@@ -371,9 +367,6 @@ def _determine(ws: Path, unit_id: str, run_id: str):
             "complex",
             "--json",
         ],
-        capture_output=True,
-        text=True,
-        check=False,
     )
 
 

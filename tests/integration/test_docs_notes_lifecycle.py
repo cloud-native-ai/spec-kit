@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -19,9 +20,7 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs_command"
 
 
 def run_engine(*args: str) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SCRIPT, args)
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 

@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "audit-test-budget.py"
 # Mutation-leg hook: a doctored copy of the parser is exercised through the SAME
@@ -153,12 +155,12 @@ def _write_all_stage_evidence(spec_dir, checklist="ran", overrides=None):
 
 
 def _run(spine, spec_dir, logs_dir=None, stage_check=None):
-    cmd = [sys.executable, str(PARSER), "--spine", str(spine), "--spec-dir", str(spec_dir)]
+    cmd = ["--spine", str(spine), "--spec-dir", str(spec_dir)]
     if logs_dir is not None:
         cmd += ["--logs-dir", str(logs_dir)]
     if stage_check is not None:
         cmd += ["--stage-check", stage_check]
-    return subprocess.run(cmd, capture_output=True, text=True)
+    return run_engine_in_process(PARSER, cmd)
 
 
 def _slots(completed):

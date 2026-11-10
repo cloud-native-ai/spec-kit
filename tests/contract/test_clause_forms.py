@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]

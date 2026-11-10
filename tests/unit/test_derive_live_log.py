@@ -14,6 +14,8 @@ import sys
 import time
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "derive-live-log.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "sdd_loop_efficiency"
@@ -28,10 +30,7 @@ def _last_nonempty(text):
 
 
 def _run(events, *args):
-    return subprocess.run(
-        [sys.executable, str(SCRIPT), "--events", str(events), *args],
-        capture_output=True, text=True,
-    )
+    return run_engine_in_process(SCRIPT, ["--events", str(events), *args])
 
 
 def test_non_terminal_sentinel_not_bare_last_line():

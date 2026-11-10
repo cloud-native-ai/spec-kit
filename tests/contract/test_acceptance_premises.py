@@ -58,6 +58,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -229,9 +230,8 @@ def _rewrite(path, old, new):
 
 def _pre(spec_dir, stage="plan"):
     """Run the stage gate. `--repo` is the checkout, so a `Contract` cell resolves for real."""
-    cmd = [sys.executable, str(PRE), "--spec-dir", str(spec_dir), "--stage", stage,
-           "--repo", str(ROOT)]
-    return subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT))
+    cmd = ["--spec-dir", str(spec_dir), "--stage", stage, "--repo", str(ROOT)]
+    return run_engine_in_process(PRE, cmd)
 
 
 def _pre_record(proc):

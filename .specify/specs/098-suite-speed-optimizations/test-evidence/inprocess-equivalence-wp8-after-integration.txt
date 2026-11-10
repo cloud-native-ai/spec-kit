@@ -1,0 +1,424 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/integration/test_coordination_round.py tests/integration/test_docs_command_scenarios.py tests/integration/test_docs_notes_lifecycle.py tests/integration/test_docs_obligation_scenarios.py tests/integration/test_expression_line_pilot.py tests/integration/test_goal_definition_sourcing.py tests/integration/test_goal_migration_path.py tests/integration/test_goal_progress_state.py tests/integration/test_goal_reference.py tests/integration/test_goal_roster.py tests/integration/test_hugo_scaffold_scenarios.py tests/integration/test_sdd_house_keeping_flow.py tests/integration/test_sdd_loop_efficiency_regression.py tests/integration/test_temp_team_worktree_queue.py tests/integration/test_worktree_integration_queue.py tests/integration/test_wp_coordination_dry_runs.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+........................................................................ [ 45%]
+......F.FFFF........FFFFF....F.......................................... [ 91%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+____________ test_narrative_and_milestones_come_from_the_definition ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_narrative_and_milestones_0')
+
+    def test_narrative_and_milestones_come_from_the_definition(tmp_path):
+        _team(tmp_path, "a", goal_slug="g", inline_goal="team a wording")
+        _team(tmp_path, "b", goal_slug="g", inline_goal="team b wording")
+        _define(tmp_path, "g", "The authoritative objective.", ["MS one", "MS two"])
+        _refresh(tmp_path, "g")
+>       form = _form(tmp_path, "g")
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_definition_sourcing.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_definition_sourcing.py:62: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_narrative_and_milestones_0/.specify/goal/g/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_narrative_and_milestones_0/.specify/goal/g/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________ test_no_definition_behaviour_is_unchanged_from_036 ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_no_definition_behaviour_i0')
+
+    def test_no_definition_behaviour_is_unchanged_from_036(tmp_path):
+        _team(tmp_path, "solo", goal_slug="g", inline_goal="the inline outcome")
+        # no _define call and no archive → pure-036 path
+        report = _refresh(tmp_path, "g")
+        assert report["goal_source"] == "inline"
+>       form = _form(tmp_path, "g")
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_definition_sourcing.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_definition_sourcing.py:62: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_no_definition_behaviour_i0/.specify/goal/g/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_no_definition_behaviour_i0/.specify/goal/g/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________ test_refresh_never_writes_the_definition_file _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_refresh_never_writes_the_0')
+
+    def test_refresh_never_writes_the_definition_file(tmp_path):
+        _team(tmp_path, "a", goal_slug="g", inline_goal="x")
+        _define(tmp_path, "g", "An objective.", ["c1"])
+        definition = tmp_path / ".specify/goal/g/goal.md"
+>       before = hashlib.sha256(definition.read_bytes()).hexdigest()
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_definition_sourcing.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_refresh_never_writes_the_0/.specify/goal/g/goal.md')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_refresh_never_writes_the_0/.specify/goal/g/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___ test_empty_criteria_definition_declares_absence_not_invented_milestones ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_empty_criteria_definition0')
+
+    def test_empty_criteria_definition_declares_absence_not_invented_milestones(tmp_path):
+        _team(tmp_path, "a", goal_slug="g", inline_goal="x")
+        _define(tmp_path, "g", "An objective with no measurable criteria yet.", [])
+        report = _refresh(tmp_path, "g")
+>       form = _form(tmp_path, "g")
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_definition_sourcing.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_definition_sourcing.py:62: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_empty_criteria_definition0/.specify/goal/g/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_empty_criteria_definition0/.specify/goal/g/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________ test_migration_preserves_the_resolved_objective ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_migration_preserves_the_r0')
+
+    def test_migration_preserves_the_resolved_objective(tmp_path):
+        _team(tmp_path, "legacy", inline="Reach a reviewed, stable release.")
+        # before: resolves from the inline goal
+        before = _refresh(tmp_path, "legacy")
+        assert before["goal_source"] == "inline"
+        before_desc = yaml.safe_load(
+>           (tmp_path / ".specify/goal/legacy/summary/data/project-input.yaml").read_text()
+        )["project"]["project_desc"]
+
+tests/integration/test_goal_migration_path.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_migration_preserves_the_r0/.specify/goal/legacy/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_migration_preserves_the_r0/.specify/goal/legacy/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________ test_two_teams_sharing_a_goal_resolve_to_one_definition ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_two_teams_sharing_a_goal_0')
+
+    def test_two_teams_sharing_a_goal_resolve_to_one_definition(tmp_path):
+        _team(tmp_path, "team-a", goal_slug="shared", inline_goal="local phrasing a")
+        _team(tmp_path, "team-b", goal_slug="shared", inline_goal="local phrasing b")
+        _define(tmp_path, "shared", "The shared objective is reached.", ["Criterion one."])
+        report = _refresh(tmp_path, "shared")
+        assert report["goal_source"] == "definition"
+        assert sorted(report["contributing_teams"]) == ["team-a", "team-b"]
+>       form = _form(tmp_path, "shared")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_reference.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_reference.py:69: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_two_teams_sharing_a_goal_0/.specify/goal/shared/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_two_teams_sharing_a_goal_0/.specify/goal/shared/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________ test_broken_reference_is_reported_not_degraded ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_broken_reference_is_repor0')
+
+    def test_broken_reference_is_reported_not_degraded(tmp_path):
+        _team(tmp_path, "orphan", goal_slug="missing-goal", inline_goal="fallback outcome")
+        _define(tmp_path, "unrelated", "Unrelated.", [])  # archive exists, target absent
+        report = _refresh(tmp_path, "missing-goal")
+        assert report["goal_source"] == "inline", "must fall back, not fail"
+        assert any("断链" in g or "FR-010" in g for g in report["material_gaps"]), report["material_gaps"]
+        # honest degradation: it fell back to the inline goal, not an empty one
+>       form = _form(tmp_path, "missing-goal")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_reference.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_reference.py:69: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_broken_reference_is_repor0/.specify/goal/missing-goal/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_broken_reference_is_repor0/.specify/goal/missing-goal/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________ test_inline_only_team_still_works_with_no_archive _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_inline_only_team_still_wo0')
+
+    def test_inline_only_team_still_works_with_no_archive(tmp_path):
+        _team(tmp_path, "legacy", inline_goal="the legacy inline outcome")
+        report = _refresh(tmp_path, "legacy")
+        assert report["goal_source"] == "inline"
+        assert not any("断链" in g for g in report["material_gaps"]), (
+            "a team that never adopted goal_slug must not be reported as broken"
+        )
+>       form = _form(tmp_path, "legacy")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_reference.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_reference.py:69: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_inline_only_team_still_wo0/.specify/goal/legacy/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_inline_only_team_still_wo0/.specify/goal/legacy/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___ test_reference_inline_divergence_prefers_the_definition_and_surfaces_it ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_reference_inline_divergen0')
+
+    def test_reference_inline_divergence_prefers_the_definition_and_surfaces_it(tmp_path):
+        _team(tmp_path, "diverge", goal_slug="canon", inline_goal="stale inline wording")
+        _define(tmp_path, "canon", "The canonical objective.", ["c1"])
+        report = _refresh(tmp_path, "canon")
+        assert report["goal_source"] == "definition"
+>       form = _form(tmp_path, "canon")
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_reference.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_reference.py:69: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_reference_inline_divergen0/.specify/goal/canon/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_reference_inline_divergen0/.specify/goal/canon/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________ test_editing_the_definition_changes_all_referencing_teams ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_editing_the_definition_ch0')
+
+    def test_editing_the_definition_changes_all_referencing_teams(tmp_path):
+        _team(tmp_path, "t1", goal_slug="evolve", inline_goal="x")
+        _team(tmp_path, "t2", goal_slug="evolve", inline_goal="y")
+        _define(tmp_path, "evolve", "First objective.", ["old"])
+        first = _refresh(tmp_path, "evolve")
+>       assert _form(tmp_path, "evolve")["project"]["project_desc"] == "First objective."
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_reference.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_goal_reference.py:69: in _form
+    (root / f".specify/goal/{goal_slug}/summary/data/project-input.yaml").read_text(encoding="utf-8")
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_editing_the_definition_ch0/.specify/goal/evolve/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_editing_the_definition_ch0/.specify/goal/evolve/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________ test_roster_written_to_summary_never_to_goal_md ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_roster_written_to_summary0')
+
+    def test_roster_written_to_summary_never_to_goal_md(tmp_path):
+        _team(tmp_path, "a", goal_slug="g", territory_write=["docs/**"])
+        _define(tmp_path, "g")
+        definition = tmp_path / ".specify/goal/g/goal.md"
+>       before = hashlib.sha256(definition.read_bytes()).hexdigest()
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_goal_roster.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7938/test_roster_written_to_summary0/.specify/goal/g/goal.md')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7938/test_roster_written_to_summary0/.specify/goal/g/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/integration/test_goal_definition_sourcing.py::test_narrative_and_milestones_come_from_the_definition
+FAILED tests/integration/test_goal_definition_sourcing.py::test_no_definition_behaviour_is_unchanged_from_036
+FAILED tests/integration/test_goal_definition_sourcing.py::test_refresh_never_writes_the_definition_file
+FAILED tests/integration/test_goal_definition_sourcing.py::test_empty_criteria_definition_declares_absence_not_invented_milestones
+FAILED tests/integration/test_goal_migration_path.py::test_migration_preserves_the_resolved_objective
+FAILED tests/integration/test_goal_reference.py::test_two_teams_sharing_a_goal_resolve_to_one_definition
+FAILED tests/integration/test_goal_reference.py::test_broken_reference_is_reported_not_degraded
+FAILED tests/integration/test_goal_reference.py::test_inline_only_team_still_works_with_no_archive
+FAILED tests/integration/test_goal_reference.py::test_reference_inline_divergence_prefers_the_definition_and_surfaces_it
+FAILED tests/integration/test_goal_reference.py::test_editing_the_definition_changes_all_referencing_teams
+FAILED tests/integration/test_goal_roster.py::test_roster_written_to_summary_never_to_goal_md
+11 failed, 147 passed in 33.76s

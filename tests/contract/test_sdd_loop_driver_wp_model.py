@@ -23,6 +23,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from fixtures import wp_fixtures
@@ -134,9 +135,7 @@ def load_gate():
 
 
 def _run(*args):
-    return subprocess.run(
-        [sys.executable, str(GATE), *args], capture_output=True, text=True
-    )
+    return run_engine_in_process(GATE, args)
 
 
 def _spine(tmp_path: Path, plan=None, **kwargs) -> Path:

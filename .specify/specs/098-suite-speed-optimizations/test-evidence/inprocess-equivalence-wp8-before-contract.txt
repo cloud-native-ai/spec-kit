@@ -1,0 +1,540 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_acceptance_premises.py tests/contract/test_bilingual_expression.py tests/contract/test_checker_form.py tests/contract/test_clarify_semantic_completeness.py tests/contract/test_clause_forms.py tests/contract/test_decision_tension_contract.py tests/contract/test_decision_tension_validator.py tests/contract/test_docs_utils_cli.py tests/contract/test_engine_face_contract.py tests/contract/test_exec_quant_aggregate.py tests/contract/test_exec_quant_engine.py tests/contract/test_falsification_quartet_validator.py tests/contract/test_glossary_mechanism.py tests/contract/test_handler_registry.py tests/contract/test_humanize_command_surface.py tests/contract/test_knowledge_promotion.py tests/contract/test_merge_provenance_gate.py tests/contract/test_record_retention_engine.py tests/contract/test_requirements_checker.py tests/contract/test_review_feedback_boundary.py tests/contract/test_roster_reporter_seat.py tests/contract/test_sanitize_renumber_lane.py tests/contract/test_sanitize_retention_lane.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_self_explanatory_glossary.py tests/contract/test_ssh_utils_skill.py tests/contract/test_team_command_routing.py tests/contract/test_team_item_ledger.py tests/contract/test_temp_directory_discipline.py tests/contract/test_token_efficiency_feedback.py tests/contract/test_user_facing_comprehension_pointers.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+..................F..................F.................................. [  7%]
+.............................F.......................................... [ 15%]
+....F.............F........................................F.FFF.F...... [ 23%]
+........................................................................ [ 31%]
+...............................................F........................ [ 39%]
+........................................................F..FF.F......... [ 47%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+........................................................................ [ 70%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+........................F...........................                     [100%]
+=================================== FAILURES ===================================
+_____ test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it ______
+
+    def test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it():
+        """The pin is valid only while re-reading it reproduces it — and a mismatch is exit-2 class."""
+        for tool, reading in _live_readings().items():
+            assert reading, "%s produced no reading; a pin comparison on nothing proves nothing" % tool
+>           assert _assert_pin(tool, reading)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_acceptance_premises.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'pytest', reading = 'pytest 8.4.2'
+
+    def _assert_pin(tool, reading):
+        """Compare one reading against its recorded pin; a difference is an input error."""
+        pins = _pins()
+        if tool not in pins:
+            raise PinMismatch("no recorded pin for %r in %s" % (tool, PINS))
+        if reading.strip() != pins[tool].strip():
+>           raise PinMismatch(
+                "%s reads %r but %s records %r — the comparison is invalid (input error, exit 2), "
+                "which is not a new failure" % (tool, reading.strip(), PINS.name, pins[tool].strip())
+            )
+E           contract.test_acceptance_premises.PinMismatch: pytest reads 'pytest 8.4.2' but plan-runner-pins.txt records 'pytest 9.0.3' — the comparison is invalid (input error, exit 2), which is not a new failure
+
+tests/contract/test_acceptance_premises.py:627: PinMismatch
+______________________________ test_census_action ______________________________
+
+    def test_census_action():
+        glossary_utils = _load_module(GLOSSARY_UTILS, "glossary_utils_for_census")
+>       entries = glossary_utils.parse_entries(REAL_GLOSSARY.read_text(encoding="utf-8"))
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_bilingual_expression.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/glossary.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/glossary.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+_ TestScenarioBAnalyzeStructuralChannel.test_channel_only_add_allowed_delta_enumeration _
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x7fac50a19b90>
+
+    def test_channel_only_add_allowed_delta_enumeration(self):
+        detection = read(ANALYZE_DETECTION)
+    
+        # (1) The count heading changes by exactly one, and the new channel letter is unique.
+        count_headings = [line for line in detection.splitlines()
+                          if line.startswith("## The ") and line.endswith("passes")]
+        assert count_headings == ["## The eight passes"], (
+            "C-5: the count heading must carry the new channel; found "
+            f"{count_headings!r}"
+        )
+        subsections = [line for line in detection.splitlines()
+                       if re.match(r"^### [A-Z]\. ", line)]
+        letters = [re.match(r"^### ([A-Z])\. ", line).group(1) for line in subsections]
+        assert letters == ["A", "B", "C", "D", "E", "F", "G", "I"], (
+            f"C-5: the channel letters must be A-G plus I (H is the checklist pass); {letters!r}"
+        )
+        assert len(set(letters)) == len(letters), f"C-5: a channel letter repeats: {letters!r}"
+    
+        # (2) The declared allowed delta is exactly 「the new channel section + the count line」.
+        removed, added = diff_lines(ANALYZE_DETECTION)
+        assert removed == ["## The seven passes"], (
+            "C-5: the delta set declares ZERO deleted or rewritten lines outside the count "
+            f"line; removed {removed!r}"
+        )
+        assert added == ["## The eight passes"] + channel_section_lines(), (
+            "C-5: every added line must belong to the new channel section or be the count "
+            "heading; the comparison unit is 「existing paragraph / new paragraph」"
+        )
+    
+        # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only
+        # deltas are the pass-enumeration paragraph, the `## Rounds` section (added by
+        # Feature 081c, f892c8a8, 2026-11-03 — the two-round adjudication; see
+        # rounds_section_lines), the compiled Wrap-up banner (see compiled_banner_delta
+        # below) and the compiled close-out step line (added by Feature 091, the
+        # singular close-out that appended one wrap-up handler row to the registry this
+        # face is compiled from; see closeout_step_delta below — both machine-owned).
+        # The added-line multiset must equal paragraph-delta ∪ Rounds-section ∪
+        # banner-line ∪ close-out-line exactly (hunk order is file order, so the
+        # comparison is order-free); any fifth delta stays red.
+        old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
+        new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
+        old_banner, new_banner = compiled_banner_delta(ANALYZE_SKILL)
+        _, closeout_step = closeout_step_delta(ANALYZE_SKILL)
+        removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
+>       assert removed_skill == (
+            [line for line in old_paragraph if line not in new_paragraph]
+            + [old_banner]
+        ), (
+            "C-5: SKILL.md must change only inside its pass-enumeration paragraph and its "
+            f"compiled Wrap-up banner; removed {removed_skill!r}"
+        )
+E       AssertionError: C-5: SKILL.md must change only inside its pass-enumeration paragraph and its compiled Wrap-up banner; removed ['- **Constitution authority**: `.specify/memory/constitution.md` is non-negotiable in this', '`.specify/memory/features.md` (if present); `FEATURE_DETAILS_DIR` =', '`.specify/memory/features/` (if present) — the index rows live in `features.md`, the', 'matching detail file at `features/<ID>.md`, and the install-shipped sample at', '| constitution | `.specify/memory/constitution.md` for principle validation |', 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment', '· E coverage gaps · F inconsistency · G feature relevance & accuracy) plus one checklist', 'pass (H), the same-author delegation rule, the stale-copy decision test, and the', 'do-not-flag noise floor:', '<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 7877db82c58c — do not edit; edit the registry, then recompile -->']
+E       assert ['- **Constit...ignment', ...] == ['Seven passe...ecompile -->']
+E         
+E         At index 0 diff: '- **Constitution authority**: `.specify/memory/constitution.md` is non-negotiable in this' != 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment'
+E         Left contains 5 more items, first extra item: 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment'
+E         Use -v to get more diff
+
+tests/contract/test_decision_tension_contract.py:1147: AssertionError
+_______ TestScenarioFTerminologyZeroHit.test_a3_alias_list_still_exists ________
+
+self = <contract.test_decision_tension_contract.TestScenarioFTerminologyZeroHit object at 0x7fac50a26c50>
+
+    def test_a3_alias_list_still_exists(self):
+        aliases = a3_aliases()
+        assert aliases == EXPECTED_ALIASES, (
+            "the positive control failed: A3's alias list was renamed, reordered or emptied "
+            f"({aliases!r}); the zero-hit scan below would otherwise look for nothing"
+        )
+        assert len(set(aliases)) == len(aliases) == 5, (
+            f"A3 must enumerate five distinct aliases; got {aliases!r}"
+        )
+        # The ruling still declares the whitelist as exactly two places and names the second.
+        line = a3_line()
+        assert "白名单只有两处" in line, (
+            "A3 must keep declaring a two-place whitelist; a widened whitelist is a contract "
+            "change, not a wording tweak"
+        )
+>       assert ".specify/features/076-decision-tension-contract.md" in line, (
+            "A3 must keep naming the feature-detail appendix as the second whitelisted place"
+        )
+E       AssertionError: A3 must keep naming the feature-detail appendix as the second whitelisted place
+E       assert '.specify/features/076-decision-tension-contract.md' in '- **A3（术语裁决）**：对外一律工程词——DTR、反题（antithesis）、反指标（落在 `expected_sacrifice`）、判别性证据（`discriminating_evidence`）、重开条件（`revisi...tures/076.md` § 附「内部别名映射（仅供理解，不进用户界面）」；该文件是 Feature 详情，不在 `shared/`、`templates/`、`skills/` 三棵分发面内，因此不参与 SC-007 的零命中计数。'
+
+tests/contract/test_decision_tension_contract.py:1861: AssertionError
+____________ test_c20_face_renders_required_and_source_placeholders ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7928/test_c20_face_renders_required0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fac50cea910>
+
+    @pytest.mark.contract
+    def test_c20_face_renders_required_and_source_placeholders(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fac52760e10>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_______________ test_c20_convention_line_rendered_once_verbatim ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7928/test_c20_convention_line_rende0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fac5015f150>
+
+    @pytest.mark.contract
+    def test_c20_convention_line_rendered_once_verbatim(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fac52760e10>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________ test_c20_no_placeholder_free_section_carries_no_convention __________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7928/test_c20_no_placeholder_free_s0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fac501ece10>
+
+    @pytest.mark.contract
+    def test_c20_no_placeholder_free_section_carries_no_convention(tmp_path, capsys):
+        # Agent-only wrap-up projection: no engine line, no placeholder, no convention.
+        registry = "\n".join(
+            line for line in REGISTRY.read_text(encoding="utf-8").splitlines()
+            if not re.match(r"^\|\s*h-(run-determination|exec-quant|feedback-record)\s*\|",
+                            line))
+        assert "h-run-determination | engine" not in registry
+>       face = _sandbox_face(tmp_path, capsys, registry)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fac52760e10>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_____________ test_c21_rendered_flags_are_exactly_the_manifest_set _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7928/test_c21_rendered_flags_are_ex0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fac501d0f50>
+
+    @pytest.mark.contract
+    def test_c21_rendered_flags_are_exactly_the_manifest_set(tmp_path, capsys):
+        """Bidirectional C-21 pin: per (engine, action) the rendered flag set is
+        exactly the manifest's required ∪ source (minus the identity pair the base
+        call line already carries with real values) — nothing extra (a non-accepted
+        argument never renders), nothing missing."""
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fac52760e10>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________ test_c22_missing_manifest_fails_the_compile_loudly ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7928/test_c22_missing_manifest_fail0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fac50f77190>
+
+    @pytest.mark.contract
+    def test_c22_missing_manifest_fails_the_compile_loudly(tmp_path, capsys):
+        registry = REGISTRY.read_text(encoding="utf-8")
+        ws = CE._build_workspace(tmp_path, registry)
+        engine = ws / "scripts" / "python" / "run-determination.py"
+        stripped = engine.read_text(encoding="utf-8").replace(
+            '"args-manifest"', '"args-manifest-disabled"')
+        assert stripped != engine.read_text(encoding="utf-8"), (
+            "mutation must actually strip the manifest action"
+        )
+        engine.write_text(stripped, encoding="utf-8")
+        rc = probe_utils.main(["--action", "compile-embeds",
+                               "--workspace-root", str(ws), "--format", "json"])
+        assert rc == 2, (
+            f"an engine/action pair without a manifest MUST fail the compile loudly "
+            f"(rc=2), got rc={rc}"
+        )
+        err = capsys.readouterr().err
+>       assert "h-run-determination" in err, (
+            f"the refusal MUST name the handler: {err[:400]}"
+        )
+E       AssertionError: the refusal MUST name the handler: error: compile-embeds refused:
+E         - handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md
+E         - handler 'h-git-workflow-observe': behavior_owner unreachable: scripts/python/git-workflow-observe.py
+E         
+E       assert 'h-run-determination' in "error: compile-embeds refused:\n- handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md\n- handler 'h-git-workflow-observe': behavior_owner unreachable: scripts/python/git-workflow-observe.py\n"
+
+tests/contract/test_engine_face_contract.py:317: AssertionError
+________________________ test_c06_registry_rows_resolve ________________________
+
+    def test_c06_registry_rows_resolve():
+        # 2026-10-31 (080 renumber): Feature 062's Spec Path moved from the retired
+        # 062-humanize-command spec to its extension spec. Resolve the row's current
+        # cell instead of pinning the retired path.
+>       assert FEATURE_DETAILS.is_file(), f"feature details file missing: {FEATURE_DETAILS}"
+E       AssertionError: feature details file missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features/062.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features/062.md').is_file
+
+tests/contract/test_humanize_command_surface.py:218: AssertionError
+_________________________ test_wc07_skill_body_budget __________________________
+
+    def test_wc07_skill_body_budget():
+        script = REPO_ROOT / "skills" / "external" / "improve-skills" / "scripts" / "skill-shape.py"
+        out = subprocess.run(
+            [sys.executable, str(script), str(SKILL_SRC), "--json"],
+            capture_output=True, text=True, encoding="utf-8", cwd=str(REPO_ROOT), timeout=180,
+        )
+>       assert out.returncode == 0, f"skill-shape.py failed (WC-07): {out.stderr[-800:]}"
+E       AssertionError: skill-shape.py failed (WC-07): 
+E       assert 10 == 0
+E        +  where 10 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...low": 57,\n    "注入防线（FR-029 执行细则）": 5,\n    "Evaluation hooks（本技能的质量证据链）": 5,\n    "Wrap-up": 14\n  }\n}\n', stderr='').returncode
+
+tests/contract/test_humanize_command_surface.py:1718: AssertionError
+______________________ test_wc10_feature_062_status_held _______________________
+
+    def test_wc10_feature_062_status_held():
+>       detail = _read(FEATURE_DETAILS)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_humanize_command_surface.py:1758: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_humanize_command_surface.py:98: in _read
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features/062.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features/062.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________________ test_wc11_feature_row_name_description ____________________
+
+    def test_wc11_feature_row_name_description():
+>       cells = _feature_row_062()
+                ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_humanize_command_surface.py:1775: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_humanize_command_surface.py:1664: in _feature_row_062
+    for line in _read(REGISTRY).splitlines():
+                ^^^^^^^^^^^^^^^
+tests/contract/test_humanize_command_surface.py:98: in _read
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp8/before/.specify/memory/features.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________________ test_wc13_stage_class_pin_remeasured _____________________
+
+    def test_wc13_stage_class_pin_remeasured():
+        module = _import_test_module("test_stage_class_wiring.py")
+        pinned = module.UNCHANGED_SHA256.get("humanize")
+        measured = hashlib.sha256(TEMPLATE.read_bytes()).hexdigest()
+        assert pinned, "UNCHANGED_SHA256 lost its humanize row (WC-13)"
+>       assert pinned == measured, (
+            f"the humanize byte pin is stale — re-measure it, do not drop it (WC-13): "
+            f"pinned={pinned} measured={measured}"
+        )
+E       AssertionError: the humanize byte pin is stale — re-measure it, do not drop it (WC-13): pinned=11a11670a9fa4f21408e672f65c7f831f8be0df79eb51ec72d99addb4bd6cb1c measured=0ff25f2ecd4264288c2307a517a07eee823ae41608a99c0e8e654e90f68f2244
+E       assert '11a11670a9fa...9addb4bd6cb1c' == '0ff25f2ecd42...54e90f68f2244'
+E         
+E         - 0ff25f2ecd4264288c2307a517a07eee823ae41608a99c0e8e654e90f68f2244
+E         + 11a11670a9fa4f21408e672f65c7f831f8be0df79eb51ec72d99addb4bd6cb1c
+
+tests/contract/test_humanize_command_surface.py:1815: AssertionError
+_______________________ test_scanner_real_tree_is_clean ________________________
+
+    def test_scanner_real_tree_is_clean():
+        result = subprocess.run(
+            [sys.executable, str(SCANNER), "--summary"],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+>       assert result.returncode == 0, result.stdout + result.stderr
+E       AssertionError: temp-directory violations: 3
+E         scanned files: 468
+E         allowlisted: 74
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...', '--summary'], returncode=2, stdout='temp-directory violations: 3\nscanned files: 468\nallowlisted: 74\n', stderr='').returncode
+
+tests/contract/test_temp_directory_discipline.py:154: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_bilingual_expression.py::test_census_action - File...
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_a3_alias_list_still_exists
+FAILED tests/contract/test_engine_face_contract.py::test_c20_face_renders_required_and_source_placeholders
+FAILED tests/contract/test_engine_face_contract.py::test_c20_convention_line_rendered_once_verbatim
+FAILED tests/contract/test_engine_face_contract.py::test_c20_no_placeholder_free_section_carries_no_convention
+FAILED tests/contract/test_engine_face_contract.py::test_c21_rendered_flags_are_exactly_the_manifest_set
+FAILED tests/contract/test_engine_face_contract.py::test_c22_missing_manifest_fails_the_compile_loudly
+FAILED tests/contract/test_humanize_command_surface.py::test_c06_registry_rows_resolve
+FAILED tests/contract/test_humanize_command_surface.py::test_wc07_skill_body_budget
+FAILED tests/contract/test_humanize_command_surface.py::test_wc10_feature_062_status_held
+FAILED tests/contract/test_humanize_command_surface.py::test_wc11_feature_row_name_description
+FAILED tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured
+FAILED tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean
+16 failed, 900 passed in 46.14s

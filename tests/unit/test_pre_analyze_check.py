@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "pre-analyze-check.py"
 
@@ -53,9 +55,9 @@ def _spec(tmp_path, plan_extra="", task_extra="", requirement_extra="",
 
 
 def _run(spec, *args):
-    return subprocess.run(
-        [sys.executable, str(SCRIPT), "--spec-dir", str(spec), "--stage", "tasks", *args],
-        capture_output=True, text=True)
+    return run_engine_in_process(
+        SCRIPT, ["--spec-dir", str(spec), "--stage", "tasks", *args]
+    )
 
 
 def _record(proc):

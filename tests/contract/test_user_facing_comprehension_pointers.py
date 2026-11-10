@@ -49,6 +49,7 @@ import re
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -462,9 +463,7 @@ def test_c13_no_content_form_restatement():
 
 
 def test_c14_per_tool_copies_regenerated_and_retired_mirror_absent():
-    proc = subprocess.run(
-        ["python3", str(REGEN), "--check"], cwd=ROOT, capture_output=True, text=True
-    )
+    proc = run_engine_in_process(REGEN, ["--check"])
     assert proc.returncode == 0, (
         f"regen-command-copies.py --check exited {proc.returncode} — the four per-tool trees "
         f"are out of sync with templates/commands/: {proc.stdout[-400:]}"

@@ -20,6 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -69,11 +70,7 @@ def write(tmp_path: Path, text: str, name: str = "payload.md") -> Path:
 
 def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
     assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
-    return subprocess.run(
-        [sys.executable, str(VALIDATOR), str(target), *extra],
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(VALIDATOR, [str(target), *extra])
 
 
 def verdict_of(proc: subprocess.CompletedProcess) -> dict:

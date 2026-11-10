@@ -10,10 +10,11 @@ that enumerates every ``subprocess.run`` call site. The manifest is generated fr
 scan and completed by hand for the verdicts; this file re-scans and judges the manifest,
 so a discovered site with no row, or a reverted conversion, turns red and is named.
 
-Scope note (C-001 final green owner): the full-tree completeness case stays red for files
-the 098 WP-8 package has not classified yet and names them; WP-7 closes the contract-area
-and fixture-layer surface, and every *covered* file (one that has at least one manifest
-row) is required to classify all of its sites.
+Scope note (C-001 final green): WP-7 closed the contract-area groups and the fixture
+layer; WP-8 (T050–T052) closed the integration/unit areas and every remaining
+contract-leftover file, so the full-tree completeness case judges the whole census. Every
+*covered* file is still required to classify all of its sites, and the C-008 leg requires
+every converted row to keep its in-process route.
 """
 from __future__ import annotations
 
@@ -350,10 +351,9 @@ def test_c001_every_covered_file_classifies_all_of_its_sites():
 
 
 def test_c006_the_full_tree_scan_names_its_uncovered_files():
-    """Full-tree completeness (C-001/C-006). Green owner: T052 after WP-8's rows land.
+    """Full-tree completeness (C-001/C-006) — closed by T052 over the whole census.
 
-    Until then the failure is the honest handoff: the remaining files and sites are
-    named, so no site can be silently forgotten.
+    A site with no row, or a revert, is named, so no site can be silently forgotten.
     """
     findings = classify(scan_sites(), _manifest_rows())
     unclassified_files = sorted(
@@ -434,3 +434,66 @@ def test_c010_the_keep_side_sample_covers_the_named_boundary_kinds():
         "the keep-side sample must cover the named boundary kinds (C-010); missing: %s"
         % ", ".join(missing)
     )
+
+
+# --------------------------------------------------------------------------- #
+# C-008 — a converted row still carries the in-process route, not an import-only stub
+# --------------------------------------------------------------------------- #
+def _function_defs(tree: ast.Module) -> dict[str, ast.AST]:
+    return {
+        node.name: node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+
+def _calls_route(node: ast.AST) -> bool:
+    for sub in ast.walk(node):
+        if not isinstance(sub, ast.Call):
+            continue
+        func = sub.func
+        if isinstance(func, ast.Name) and func.id in (
+            "run_engine_in_process",
+            "run_specify_init",
+            "run_specify_check",
+        ):
+            return True
+        if isinstance(func, ast.Attribute) and func.attr == "invoke":
+            return True
+    return False
+
+
+def test_c008_converted_rows_still_make_the_in_process_call():
+    """A converted row must name a function that still calls the equivalence route.
+
+    The canonical weakening (C-008) replaces the route with an import-only check
+    (``import engine; assert engine.main is not None``). That rewrite removes the
+    route call, so the row reddens and is named; the file must also keep at least
+    one assertion so an empty shell cannot pass.
+    """
+    offenders = []
+    cache: dict[str, tuple[ast.Module, dict[str, ast.AST]]] = {}
+    for row in _manifest_rows():
+        if row["verdict"] != "convert":
+            continue
+        file = row["file"]
+        if file not in cache:
+            tree = ast.parse((ROOT / file).read_text(encoding="utf-8"))
+            cache[file] = (tree, _function_defs(tree))
+        tree, defs = cache[file]
+        name = row["call_site"].split(" :: ", 1)[0].rsplit(".", 1)[-1]
+        func = defs.get(name)
+        if func is None:
+            offenders.append(
+                "%s :: %s names no function %r (C-008)"
+                % (file, row["call_site"], name)
+            )
+        elif not _calls_route(func):
+            offenders.append(
+                "%s :: %s no longer calls the in-process route "
+                "(run_engine_in_process/CliRunner) — import-only weakening (C-008)"
+                % (file, row["call_site"])
+            )
+        if not any(isinstance(node, ast.Assert) for node in ast.walk(tree)):
+            offenders.append("%s carries no assertion at all (C-008)" % file)
+    assert not offenders, "\n".join(offenders)
