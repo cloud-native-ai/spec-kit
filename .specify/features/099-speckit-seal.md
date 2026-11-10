@@ -18,6 +18,7 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 
 ## Latest Review
 
+- **2026-11-11 `/speckit.review`（四段评审 + ARC；`Implemented → Ready for Review` 拒绝：`blocking-unresolved`）**：review.md 与 code-review.md 落盘；过程段 findings P0 1 / P1 2 / P2 7；代码段回执 451 / 29 / 422 / 0（changed / judged / skipped / gap），`report --summary --file` 返回 `gate=deny`（1 条 `blocking`：分片父级的 seal P0 判据只读父级指针视图，切片 review 的 P0 对 `p0-unresolved` 不可见）；实现段复核 P8b 修复可复现（seal 套件 133/133、两次 seal 运行逐字一致、47/47 分片 dated record 哈希不变、smoke 5/5）；ARC `verdict=accept`，final_path pass 6 / total 6，claimed `Implemented` 与记录一致。**状态保持 `Implemented`**：当前 `code-review.md` 含 blocking 条目，未attended 处置为 halt-and-report；P0 的修复或用户显式裁定后方可重跑 review。详见 `review.md` § 2.1 / § 3 F1。
 - **2026-11-11 `/speckit.implement`（P9 收尾，`Planned → Implemented`）**：P1–P8b 已闭合（状态域七面、四动作引擎、074 真实回合约 blocked——FR-027(d)+B2 具名，合法）；P9 完成全量套件零新增（serial 定版 268 failed / 8415 passed / 2 skipped，相对 280 条实现入口基线 `comm -13` 为空、12 条基线红转绿；并行样本的 14 条基线外红逐条归因并修复 8 条 pin 漂移，`test-evidence/final-suite.txt`）、镜像与命令副本零漂移（`test-evidence/final-mirror-checks.txt`）、quickstart S-1…S-9 实跑（`notes/quickstart-run.md`，smoke 命令 exit 0）、`verification.md` SC-001…SC-009 全 `pass`（final 6/6，闭包判定 accept，前后两份 payload 在 `test-evidence/closure-verdict-099*.json`）、条款覆盖 45/45（`test-evidence/coverage-final.txt`）。**披露**：T050 延后 `[~]`——074 回合按 merge-back C-022 强制把父级 57 条拆前行的 green 认领转为引用记录，遗留 67 条 074 父契约未覆盖名（逐名归因，非本 spec 契约缺口）；T041 保留 P8 的历史延后记录。仍未 `Sealed`：`Ready for Review → Sealed` 属 `/speckit.seal`（review 完成后）。
 
 ## Key Changes
