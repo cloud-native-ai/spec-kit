@@ -178,7 +178,7 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 
 ## Inherited Blockers
 
-**Dependency set: none**
+Dependency set: none
 
 本特性不依赖任何携带未结记录的依赖特性；被消费的 init / sanitize / anchor-layout / sync-mirrors / regen 面均为已落地的框架能力（`research.md` R-2/R-3/R-8），不以 feature 依赖身份进入本表。
 
