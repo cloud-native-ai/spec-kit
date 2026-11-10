@@ -121,11 +121,11 @@ SKILL_BASELINE = frozenset(
         "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
         "run-team", "sanitize-materials", "self-improvement", "study-code",
-        "summarize-project",
+        "study-online", "study-kb", "summarize-project",
     }
 )
 assert len(COMMAND_BASELINE) == 29
-assert len(SKILL_BASELINE) == 54
+assert len(SKILL_BASELINE) == 56
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

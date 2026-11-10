@@ -57,6 +57,7 @@ EXTERNAL_SKILLS = {
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
     "coaching-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
     "sdd-project-setup", "ssh-utils", "humanize-conclusion", "study-code",
+    "study-online",
 }
 INTERNAL_SKILLS = {
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -68,7 +69,7 @@ INTERNAL_SKILLS = {
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
     "sanitize-materials",
-    "self-improvement", "summarize-project",
+    "self-improvement", "study-kb", "summarize-project",
 }
 
 
@@ -105,16 +106,16 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 17, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 17 external "
+    assert len(seen) == 18, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 18 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
     # 2026-11-09：study-project 重构为 external 的 study-code，内部 38 -> 37（同任务更新计数契约）
-    assert len(internal_nested) == 37, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 37 — "
+    assert len(internal_nested) == 38, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 38 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

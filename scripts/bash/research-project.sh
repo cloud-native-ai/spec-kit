@@ -142,54 +142,54 @@ main() {
         export FEATURE_SPEC IMPL_PLAN REQUIREMENTS_DIR CURRENT_BRANCH HAS_GIT
         export DOC_PATHS_STR=$(printf "%s\n" "${DOC_PATHS[@]}")
         python3 -c "
-    import json, os, re
+import json, os, re
 
-    def get_md_title(filepath):
-        try:
-            if not os.path.exists(filepath):
-                return '(No title)'
-
-            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                lines = f.readlines()
-
-            # 1. Try to find a header in the first 5 lines
-            for i in range(min(5, len(lines))):
-                line = lines[i]
-                # Match line starting with one or more # followed by space
-                if re.match(r'^#+\s+', line):
-                        return re.sub(r'^#+\s*', '', line).strip()
-
-            # 2. Fallback: Take first 3 non-empty lines
-            non_empty_lines = [line.strip() for line in lines if line.strip()]
-            if non_empty_lines:
-                return ' '.join(non_empty_lines[:3])
-
-            return '(No title)'
-        except Exception:
+def get_md_title(filepath):
+    try:
+        if not os.path.exists(filepath):
             return '(No title)'
 
-    doc_paths_str = os.environ.get('DOC_PATHS_STR', '')
-    doc_paths = [p for p in doc_paths_str.split('\n') if p]
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            lines = f.readlines()
 
-    available_docs = []
-    for p in doc_paths:
-        available_docs.append({
-            'path': p, 
-            'title': get_md_title(p)
-        })
+        # 1. Try to find a header in the first 5 lines
+        for i in range(min(5, len(lines))):
+            line = lines[i]
+            # Match line starting with one or more # followed by space
+            if re.match(r'^#+\s+', line):
+                    return re.sub(r'^#+\s*', '', line).strip()
 
-    data = {
-        'FEATURE_SPEC': os.environ.get('FEATURE_SPEC'),
-        'IMPL_PLAN': os.environ.get('IMPL_PLAN'),
-        'SPECS_DIR': os.environ.get('REQUIREMENTS_DIR'),
-        'BRANCH': os.environ.get('CURRENT_BRANCH'),
-        'BRANCH_NOTE': ('resolved from latest spec dir (branch prefix mismatch / non-feature branch)'
-                         if os.environ.get('BRANCH_RESOLVED_FROM_SPEC_DIR') == 'true'
-                         else 'git branch'),
-        'HAS_GIT': os.environ.get('HAS_GIT'),
-        'AVAILABLE_DOCS': available_docs
-    }
-    print(json.dumps(data, ensure_ascii=False))
+        # 2. Fallback: Take first 3 non-empty lines
+        non_empty_lines = [line.strip() for line in lines if line.strip()]
+        if non_empty_lines:
+            return ' '.join(non_empty_lines[:3])
+
+        return '(No title)'
+    except Exception:
+        return '(No title)'
+
+doc_paths_str = os.environ.get('DOC_PATHS_STR', '')
+doc_paths = [p for p in doc_paths_str.split('\n') if p]
+
+available_docs = []
+for p in doc_paths:
+    available_docs.append({
+        'path': p, 
+        'title': get_md_title(p)
+    })
+
+data = {
+    'FEATURE_SPEC': os.environ.get('FEATURE_SPEC'),
+    'IMPL_PLAN': os.environ.get('IMPL_PLAN'),
+    'SPECS_DIR': os.environ.get('REQUIREMENTS_DIR'),
+    'BRANCH': os.environ.get('CURRENT_BRANCH'),
+    'BRANCH_NOTE': ('resolved from latest spec dir (branch prefix mismatch / non-feature branch)'
+                     if os.environ.get('BRANCH_RESOLVED_FROM_SPEC_DIR') == 'true'
+                     else 'git branch'),
+    'HAS_GIT': os.environ.get('HAS_GIT'),
+    'AVAILABLE_DOCS': available_docs
+}
+print(json.dumps(data, ensure_ascii=False))
     "
     else
         echo "FEATURE_SPEC: $FEATURE_SPEC"

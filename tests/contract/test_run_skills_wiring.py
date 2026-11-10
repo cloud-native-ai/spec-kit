@@ -38,7 +38,7 @@ BASELINE_EXTERNAL = [
     "coaching-skills", "create-docs", "create-pages", "create-skills", "database-utils",
     "document-utils", "draw-diagram", "git-utils", "humanize-conclusion", "improve-docs",
     "improve-skills", "merge-skills", "sdd-house-keeping", "sdd-loop-driver",
-    "sdd-project-setup", "ssh-utils", "study-code",
+    "sdd-project-setup", "ssh-utils", "study-code", "study-online",
 ]
 BASELINE_INTERNAL = [
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -49,7 +49,7 @@ BASELINE_INTERNAL = [
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
-    "sanitize-materials", "self-improvement", "summarize-project",
+    "sanitize-materials", "self-improvement", "study-kb", "summarize-project",
 ]
 # 2026-11-03 (Feature 081c, df9bbe0e): `review-feature-quality` joins the internal
 # layer as the dogfooding review carrier (37 -> 38 internal dirs); the roster pin
@@ -164,6 +164,8 @@ def test_c9_compile_embeds_zero_drift_75_units():
     # templates carry the AUTO-GENERATED embed), so the compile census grows by
     # two while the zero-drift property is unchanged. Source of the reading: the
     # engine's own `compile-embeds --check --format json` `units` field.
+    # Stale-pin update (2026-11-10, research/study fusion): 79 -> 81 units —
+    # study-online and study-kb each ship a compiled Wrap-up embed.
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
     # the ssh-utils skill ships its own compiled Wrap-up embed, so the compile
     # census grows by one while the zero-drift property is unchanged.
@@ -176,7 +178,7 @@ def test_c9_compile_embeds_zero_drift_75_units():
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "79 units" in combined, f"expected 79 units, got: {combined[-400:]}"
+    assert "81 units" in combined, f"expected 81 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

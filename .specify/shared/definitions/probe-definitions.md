@@ -131,6 +131,8 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |
 | skill-sdd-house-keeping-wrapup | skill-wrapup | skill:sdd-house-keeping | wrap-up |
 | skill-study-code-wrapup | skill-wrapup | skill:study-code | wrap-up |
+| skill-study-online-wrapup | skill-wrapup | skill:study-online | wrap-up |
+| skill-study-kb-wrapup | skill-wrapup | skill:study-kb | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |

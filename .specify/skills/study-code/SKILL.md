@@ -9,6 +9,12 @@ classification: external
 
 五步固定流程，逐步落盘，最终交付一份可索引报告。每一步的产物都写到 `$STUDY_DIR`（见 § Workspace），最终报告与证据归档到 `$STUDY_ARCHIVE`。
 
+## Invocation modes
+
+- **Direct**: 用户要求研读某仓库 → 按五步流程执行。
+- **Delegated by `/speckit.research` (SDD mode)**: 研究流程的自身项目研读即本技能对当前项目的调用——先复用 `.specify/studies/<repo>-study/`（`target-commit.txt` 与 HEAD 一致且结论仍适用时），否则执行研读；证据路径回流到 `research.md` 的 Project Context Analysis 与 References。
+- **Standalone research carrier**: `/speckit.research` 独立模式在子问题落在代码实现时选择本技能；报告即交付物（单载体充分时不再另写综述）。
+
 > **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Workspace & inputs

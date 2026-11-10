@@ -1,5 +1,5 @@
 ---
-description: 为实现规划开展深度调研与分析
+description: 深度调研——SDD 模式经 study-code 研读自身项目；独立模式按问题选择 study-code / study-kb / study-online
 ---
 <!-- AUTO-GENERATED from templates/commands/research.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 > **Concurrency obligation（执行义务，按指针抵达）**: this command is an execution body — consider concurrency first, default to it when the class and capability allow, and, when serial, name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This template restates none of their rules.
@@ -26,11 +26,34 @@ When processing the user input:
 
 ## Delegation
 
-Conduct the in-depth research and analysis that backs the implementation plan — resolve the documentation inventory, load spec + constitution + relevant project docs and feature memory, resolve every unknown, and land the findings as structured Decisions & Rationale. The entire executable flow (setup, context loading, analysis, `research.md` generation, and the research output structure) is delegated to one internal skill; this command keeps entry, the `scripts:` block, the User Input Protocol, and the wrap-up lifecycle only.
+`/speckit.research` runs in one of two modes, and the mode decides which study carriers run:
+
+| Mode | Selected when | Carriers | Output |
+|------|---------------|----------|--------|
+| **SDD** (default) | the frontmatter `scripts:` run resolves an existing feature spec | `research-feature` flow, whose project-context study is carried by **`study-code` against this project** — the only study carrier SDD research invokes | `SPECS_DIR/research.md` |
+| **Standalone** | no feature spec resolves, or `--standalone` forces it | chosen per question from **`study-code` / `study-kb` / `study-online`** | `$STUDY_ARCHIVE/report.md` + the carrier reports |
+
+**Mode decision** — run the `scripts:` block first. A payload naming an existing `FEATURE_SPEC` file selects SDD; a failure, a missing spec file, or an empty feature resolution selects standalone — report which signal decided. `--standalone` forces standalone even when a spec resolves. `--carriers code|kb|online[,…]` restricts the standalone carrier set; an absent value lets the command decide from the question.
+
+### SDD mode — research-feature with the study-code carrier
 
 - **Skill**: `research-feature` — runtime path `.specify/skills/internal/research-feature/SKILL.md`.
+- Its Information Gathering step performs the **own-project study through `study-code`** (target = this project; archive `.specify/studies/<repo>-study/`; reuse the archived study when its `target-commit.txt` matches HEAD, otherwise run the study) and cites the study report's evidence paths in `research.md`.
+- SDD research does **not** auto-invoke `study-kb` or `study-online`: unknowns the project itself cannot answer stay in `research.md` § Open Questions & Risks, and the standalone mode is the route to investigate them.
 - **Inputs**: setup variables (`FEATURE_SPEC`, `IMPL_PLAN`, `SPECS_DIR`, `BRANCH`, `AVAILABLE_DOCS`) from the frontmatter `scripts:` run (`.specify/scripts/bash/research-project.sh --json`, executed by the skill from repo root); `$ARGUMENTS` research questions, supplemental reference material, and special-handling requests (wired by `## User Input` above).
-- **Outputs**: `SPECS_DIR/research.md` — created or incrementally appended (merge-only: never overwrite existing valid research), structured as Project Context Analysis / References / Decisions & Rationale / Open Questions & Risks; the skill reports the generated path and the key findings.
+- **Outputs**: `SPECS_DIR/research.md` — created or incrementally appended (merge-only: never overwrite existing valid research), structured as Project Context Analysis / References / Decisions & Rationale / Open Questions & Risks.
+
+### Standalone mode — per-question carrier selection
+
+| Carrier | Answers | Default archive |
+|---------|---------|-----------------|
+| `study-code` (`.specify/skills/study-code/SKILL.md`) | how a repository's code actually works — concepts / architecture / components / key implementations | `.specify/studies/<repo>-study/docs/overview.md` |
+| `study-kb` (`.specify/skills/internal/study-kb/SKILL.md`) | what this project already knows, decided or learned (history / memory / docs / features / specs) | `.specify/studies/<slug>-kb/report.md` |
+| `study-online` (`.specify/skills/study-online/SKILL.md`) | what the outside world says (facts, ecosystem, best practices) — every claim sourced and dated | `.specify/studies/<slug>-online/report.md` |
+
+- **Selection rule** — run the carrier(s) the sub-questions actually land in: code → `study-code`; project memory → `study-kb`; external world → `study-online`. Combine carriers only when the question genuinely spans domains, and keep each carrier's evidence in its own report.
+- **Synthesis** — write `$STUDY_ARCHIVE/report.md` (default `<host project>/.specify/studies/<question-slug>-research/`): question & decision, carrier coverage, findings with evidence pointers, conflicts, answer, gaps. When one carrier fully answers, its own report is the deliverable and `report.md` only links it.
+- **Write boundary** — standalone never writes `SPECS_DIR/research.md` (that artifact belongs to SDD mode) and never modifies the studied project.
 
 ## Wrap-up
 
@@ -49,8 +72,10 @@ Conduct the in-depth research and analysis that backs the implementation plan �
 
 **Before running this command**:
 
-- Run when the plan/spec has open questions that require evidence or repo context confirmation.
+- SDD mode: run when the plan/spec has open questions that require evidence or repo context confirmation.
+- Standalone mode: any research question — about a repository's code (`study-code`), this project's accumulated knowledge (`study-kb`), or the outside world (`study-online`).
 
 **After running this command**:
 
-- Proceed to `/speckit.plan` (or re-run it) to encode research decisions into the technical plan.
+- SDD mode: proceed to `/speckit.plan` (or re-run it) to encode research decisions into the technical plan.
+- Standalone mode: the report feeds whatever comes next (a decision, `/speckit.requirements`, or a plan); there is no automatic command handoff.

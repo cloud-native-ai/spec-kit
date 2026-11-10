@@ -174,6 +174,7 @@ FROZEN_SKILLS = (
     "external/sdd-loop-driver",
     "external/sdd-project-setup",
     "external/ssh-utils",
+    "external/study-online",
     "internal/analyze-artifacts",
     "internal/archive-session",
     "internal/clarify-artifact",
@@ -210,6 +211,7 @@ FROZEN_SKILLS = (
     "internal/run-team",
     "internal/sanitize-materials",
     "internal/self-improvement",
+    "internal/study-kb",
     "external/study-code",
     "internal/summarize-project",
 )
@@ -909,6 +911,26 @@ for _rel in _FEATURE_087_BANNER_ONLY:
         ),
         "markers": ("COMPILED_BANNER_ONLY",),
     }
+
+# 2026-11-10 research/study fusion: two of the banner-only paths gained material
+# content — the SDD research flow's project-context study is now carried by
+# study-code, and the command serves a standalone mode over the three study
+# carriers. Declared here so the allowance states what the drift is, not only
+# that a compiled banner moved.
+ALLOWED_POST_BASELINE_CHANGES["skills/internal/research-feature/SKILL.md"] = {
+    "reason": (
+        "2026-11-10 research/study fusion: the project-context study is carried by "
+        "study-code (the only study carrier in SDD mode)"
+    ),
+    "markers": ("study-code", "Own-project study"),
+}
+ALLOWED_POST_BASELINE_CHANGES["templates/commands/research.md"] = {
+    "reason": (
+        "2026-11-10 research/study fusion: two modes — SDD (study-code) and standalone "
+        "(study-code / study-kb / study-online, chosen per question)"
+    ),
+    "markers": ("study-code", "Standalone mode"),
+}
 
 # The historical baseline stays; a later amendment that legitimately edits an
 # untouchable path records itself here with the content it must carry.
