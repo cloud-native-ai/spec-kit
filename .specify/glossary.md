@@ -191,3 +191,4 @@
 | 处置 (Disposition) | disposition, archive / supersede / correct / exempt | Non-Disposable 条目必须落入的封闭四值处置;「留在原处什么都不做」不是处置。取值与桥映射见 `shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposition Bridge | user | confirmed |
 | 回顾面 (Review Surface) | review surface, 回顾范围 | 回顾的对象范围:当前 git HEAD 工作树里 `.specify/` 下的十个历史根,**不含** git 历史。成员声明于 `shared/declarations/facts/non-disposable-review-surface.yaml` | user | confirmed |
 | 豁免 (Exemption) | exemption, 显式豁免 | 唯一一种「不修也能留」的处置:必带理由与到期条件(`expiry_kind` / `expiry_value` / `expiry_recheck`),到期即重新成为未处置。语义见 `shared/definitions/non-disposable-definitions.md` § Exemption | user | confirmed |
+| 一次性收尾迁移 (One-Shot Migration) | speckit.migrate, migrate, 迁移收尾, 收尾迁移 | 在 specify install + init 之后把新旧混杂的 .specify 收敛为当前已安装版本期望态的一次性收尾入口；与 /speckit.sanitize 的周期性治理分工（需求 097） | auto | proposed |
