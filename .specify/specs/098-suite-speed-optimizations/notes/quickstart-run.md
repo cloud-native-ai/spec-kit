@@ -82,7 +82,7 @@ exit 1, wall 177 s, summary 157 failed, 6761 passed, 2 skipped in 151.74 s
 mode: mode=parallel workers=4 dist=load passes=2 tier=fast excluded_slow=5
 
 $ bash scripts/bash/run-tests.sh --serial tests/contract --names-out .specify/.tmp/wp9/qs/s4-ser-names.txt -q
-exit 1, wall ≈568 s (pytest summary 565.34 s; start 01:35:44 → finish 01:45:12)
+exit 1, wall ≈569 s (capture files born 01:35:43.5 → finished 01:45:12.8; pytest summary 565.34 s)
 summary: 159 failed, 6760 passed, 2 skipped, 5 deselected in 565.34 s (0:09:25)
 mode: mode=serial reason=explicit tier=fast excluded_slow=5
 ```
