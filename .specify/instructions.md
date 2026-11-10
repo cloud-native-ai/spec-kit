@@ -305,3 +305,7 @@ No registration tables — agents discover resources from the filesystem:
 
 - **Skills**: `.specify/skills/`, one directory per skill; guide: `.specify/skills.md`. Create/improve via the `create-skills` / `improve-skills` skills.
 - **Tools**: `.specify/memory/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
+
+## Agent Anti-Patterns (agent 反模式)
+
+A shared registry of operations agents MUST avoid — unescaped regex metacharacters in grep/find (e.g. `grep [CN]` is a character class, never a literal), shell-expanded literals judged as missing, over-broad `find` roots, text search used as an existence oracle, and searches that ignore the live/dated boundary — is owned by `shared/guidelines/agent-anti-patterns.md`; read it before shell text-matching and follow its fixed practices. The list accumulates through the feedback mechanism (`/speckit.feedback`): a new anti-pattern is recorded as feedback and lands in the registry through the improvement flow, never appended here.
