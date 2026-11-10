@@ -27,7 +27,7 @@ If empty, generate a complete `tasks.md` from available design artifacts.
 
 ## Glossary
 
-Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Documentation Map) and apply the protocol in `.specify/shared/workflow/glossary.md`:
+Consult the project glossary (`.specify/glossary.md`, ambient via the Documentation Map) and apply the protocol in `.specify/shared/workflow/glossary.md`:
 
 - **Before acting on the user input**, map any recorded homophone/confusable variant to its canonical term (correcting voice/dictated input); surface each correction so the user can override it, and defer to the user on ambiguous variants.
 - **At wrap-up**, propose any new project-specific terms (`origin=auto`, `status=proposed`), excluding common words; run conflict detection; non-conflicting new terms MUST be written directly and merged into the wrap-up report (non-blocking); only writes that conflict with or overwrite an existing user entry MUST still pause for user confirmation. User-authored entries are authoritative.
@@ -50,7 +50,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 - The Completion Gate's **`GATE-4`** obligation in its upgraded form (GW-09): every `final`-path success criterion is `pass` **and** the feature's smoke record is present — or an explicit user waiver names that criterion. Owner of the condition set: `.specify/shared/workflow/acceptance-hardening.md` § Gates; the row that physically carries the check is `tasks-template.md` § Completion Gate, so emit it and restate no threshold of your own.
 - Mechanical structural validation: `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` run on the written file until exit 0 (the invocation instruction stays in the skill; fix every ERROR, adjudicate each WARN).
 - The run report: total/per-story task counts, parallel opportunities, independent test criteria, MVP scope, and the final validator verdict.
-- Feature-list review per the Feature Integration Protocol (the tasks phase MUST review the Feature list — new or invalidated features update `.specify/memory/features.md` and detail files synchronously).
+- Feature-list review per the Feature Integration Protocol (the tasks phase MUST review the Feature list — new or invalidated features update `.specify/features.md` and detail files synchronously).
 
 Run the skill's Workflow as written; it also owns the rerun **validate-and-amend** contract when tasks.md already exists (never renumber; regenerate from scratch only on explicit user request).
 

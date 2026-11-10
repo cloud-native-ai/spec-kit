@@ -14,7 +14,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Glossary
 
-Consult the project glossary (`.specify/memory/glossary.md`) and apply the protocol in `.specify/shared/workflow/glossary.md`: correct recorded homophone/confusable variants before acting; propose new terms at wrap-up with user confirmation.
+Consult the project glossary (`.specify/glossary.md`) and apply the protocol in `.specify/shared/workflow/glossary.md`: correct recorded homophone/confusable variants before acting; propose new terms at wrap-up with user confirmation.
 
 ## Outline
 

@@ -25,7 +25,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ### 技能产出
 
-- `.specify/memory/features/<ID>.md` 详情文件(从 `.specify/templates/feature-details-template.md` 实例化)与 `.specify/memory/features.md` 索引表(`FEATURE_COUNT` 自动派生)。
+- `.specify/features/<ID>.md` 详情文件(从 `.specify/templates/feature-details-template.md` 实例化)与 `.specify/features.md` 索引表(`FEATURE_COUNT` 自动派生)。
 - README "Feature List" 段同步(Functional / Non-functional)。
 - 残差报告:收敛行 / 容差行 / 新增行 / 需用户决策项;无变更时如实说明。
 

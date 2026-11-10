@@ -15,7 +15,7 @@ Host AI agent CLIs (Claude Code / Codex CLI / Qoder CLI / GitHub Copilot / openc
 
 ## Glossary
 
-Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. At wrap-up propose new project-specific terms (`origin=auto`, `status=proposed`) with user confirmation.
+Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. At wrap-up propose new project-specific terms (`origin=auto`, `status=proposed`) with user confirmation.
 
 ## Delegation
 

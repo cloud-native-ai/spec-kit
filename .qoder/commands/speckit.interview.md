@@ -22,7 +22,7 @@ Use it when the information needed lives in the user's head and the decisions br
 
 ## Glossary
 
-Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. Vocabulary discipline matters more here than in most commands, and it runs **both ways**:
+Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. Vocabulary discipline matters more here than in most commands, and it runs **both ways**:
 
 - **Inbound** — an interview records the user's own words into a durable artifact, so a misheard proper noun propagates into every downstream decision.
 - **Outbound** — questions must use the glossary's **canonical** term for a concept. Which terms may stand unexplained, how each is glossed at first use, and what context a question must carry for a reader who opens it alone days later are defined once in `.specify/shared/guidelines/user-facing-comprehension.md`; its condition sets MUST NOT be restated here.

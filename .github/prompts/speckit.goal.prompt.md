@@ -15,7 +15,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Glossary
 
-Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. At wrap-up propose new project-specific terms (`origin=auto`, `status=proposed`); non-conflicting terms are written directly and merged into the wrap-up report (non-blocking) — only conflicts/overwrites of user entries still pause.
+Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map recorded homophone/confusable variants to canonical terms before acting, surfacing each correction. At wrap-up propose new project-specific terms (`origin=auto`, `status=proposed`); non-conflicting terms are written directly and merged into the wrap-up report (non-blocking) — only conflicts/overwrites of user entries still pause.
 
 ## Outline
 
