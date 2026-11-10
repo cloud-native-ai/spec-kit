@@ -5,10 +5,10 @@ source: "skill:review-sdd-process"
 tags: ["run-determination", "r20261109t023000z-auto-closeout-review"]
 title: "run-determination skill:review-sdd-process r20261109T023000Z-auto-closeout-review"
 created: "2026-11-09T05:35:45Z"
-summary: "skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_ev
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-11-09T05:35:45Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T18:38:42Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -88,14 +88,14 @@ skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_ev
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": "red_state_undeclared",
+      "user_turn_class": "topic_change",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
       },
-      "adjacent": false,
+      "adjacent": true,
       "signal": {
         "key": "satisfaction",
         "direction": "improve"
@@ -167,18 +167,6 @@ skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_ev
           ".specify/specs/091-auto-git-closeout/notes/red-first-evidence.md"
         ],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -198,11 +186,6 @@ skill:review-sdd-process run=r20261109T023000Z-auto-closeout-review token=not_ev
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=4 collected=3 reason=no_baseline",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

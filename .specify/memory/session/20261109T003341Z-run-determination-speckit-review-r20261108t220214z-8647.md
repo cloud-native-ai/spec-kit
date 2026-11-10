@@ -21,7 +21,7 @@ summary: "/speckit.review run=r20261108T220214Z-8647 token=not_evaluated elapsed
   "feature": "090",
   "feature_id": "090",
   "determined_at": "2026-11-09T00:33:41Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T18:38:34Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,13 +87,13 @@ summary: "/speckit.review run=r20261108T220214Z-8647 token=not_evaluated elapsed
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "reason": "red_adjacent",
+      "user_turn_class": "topic_change",
       "unresolved_red": {
         "present": "true",
         "source": "surfaced_anomaly_unanswered"
       },
-      "adjacent": false,
+      "adjacent": true,
       "signal": {
         "key": "satisfaction",
         "direction": "improve"
@@ -171,8 +171,8 @@ summary: "/speckit.review run=r20261108T220214Z-8647 token=not_evaluated elapsed
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "reason": "red_adjacent",
+        "observation": "satisfaction not_evaluated: user_turn_class=topic_change unresolved_red=true adjacent=True reason=red_adjacent",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -202,7 +202,7 @@ summary: "/speckit.review run=r20261108T220214Z-8647 token=not_evaluated elapsed
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=topic_change unresolved_red=true adjacent=True reason=red_adjacent",
         "parked_via": "none",
         "ref": null
       }
