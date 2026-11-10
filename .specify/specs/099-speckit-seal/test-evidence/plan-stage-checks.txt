@@ -1,0 +1,89 @@
+# Plan-stage deterministic checks — 099-speckit-seal — 2026-11-10T13:06:31Z
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/099-speckit-seal/requirements.md
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/099-speckit-seal
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 333 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --repo . --spec-dir .specify/specs/099-speckit-seal --stage plan
+exit=0
+decision=pass errors=0 advisories=65 waived=0 fr=28 sc=9 tasks=0 clauses=0 files=11
+advisory paths (all are this feature's future outputs):
+  - .specify/memory/session/interview-blocked-stalled-lines-2026-11-10.md
+  - .specify/scripts/python/seal-utils.py
+  - .specify/skills/internal/seal-artifact/SKILL.md
+  - .specify/templates/commands/
+  - docs/reference/commands/seal.md
+  - skills/internal/seal-artifact/
+  - skills/internal/seal-artifact/SKILL.md
+  - templates/commands/seal.md
+  - tests/contract/test_seal_archive_gate.py
+  - tests/contract/test_seal_boundaries.py
+  - tests/contract/test_seal_concurrency_and_readonly.py
+  - tests/contract/test_seal_engine_contract.py
+  - tests/contract/test_seal_merge_apply.py
+  - tests/contract/test_seal_merge_plan.py
+  - tests/contract/test_seal_seal.py
+  - tests/contract/test_sealed_status_domain.py
+  - tests/fixtures/seal/
+  - tests/fixtures/seal/split-pair/
+  - tests/integration/test_seal_074_round.py
+  - tests/integration/test_seal_merge_determinism.py
+
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/099-speckit-seal/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T13:06:31Z"}
+exit=0
+
+$ python3 scripts/python/clause_extract.py .specify/specs/099-speckit-seal/contracts/*.md
+merge-back.contract.md	form=md-bold-closed	clauses=13
+records-and-boundaries.contract.md	form=md-bold-closed	clauses=14
+seal-engine.contract.md	form=md-bold-closed	clauses=10
+status-sealed.contract.md	form=md-bold-closed	clauses=8
+clause count: 45
+
+$ python3 scripts/python/sync-mirrors.py --check; echo exit=$?
+exit=0
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+$ python3 scripts/python/regen-command-copies.py --check; echo exit=$?
+exit=0
+OK: all per-tool command copies match the source templates.
+
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/074-goal-team-sdd-unification --json; echo exit=$?
+exit=2
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md:392 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+
+$ 074 task-row counts
+.specify/specs/074-goal-team-sdd-unification open=57 closed=0
+.specify/specs/074a-authorized-routing open=0 closed=32
+.specify/specs/074b-nested-governance open=0 closed=26
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_status_gate_owner.py -q
+32 passed in 6.49s
+
+$ plan integrity: placeholder tokens / heading count / stamp
+bracket-UPPER tokens in plan.md: 0
+top-level Implementation Plan headings: 1
+4:**Requirement → Feature**: `099-speckit-seal` → Feature 099 Speckit Seal（/speckit.seal：按 review 封装 spec 与分片合并回写）
+
+$ delivery-map parity: feature-ref table vs clause_extract citation groups
+FR rows compared: 28; mismatches: none
+
+$ 074 STR collision mapping rows + create-team refs (research R-12 / EP-006 / EP-007 inputs)
+69:| STR-004 | STR-007 | 嵌套运行 outcome `"completed"` |
+70:| STR-005 | STR-008 | 嵌套运行 outcome `"blocked"` |
+71:| STR-006 | STR-009 | 嵌套运行 outcome `"failed"` |
+99:- **每次调用一行**: 一行恰好五个字段 —— `outcome`、`artifact paths`、`evidence paths`、`routing-verdict reference`、`anomalies`。`outcome` 取自三值封闭集 `[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]`;第四值、自由文本或空值一律非法。
+101:- **路径以路径携带**: artifact / evidence 只写路径,段内 MUST NOT 内联工件正文;`[[STR-005]]` / `[[STR-006]]` 的嵌套运行 MUST NOT 改写成成功语气 —— 它们原样上抛。
+
+$ declared green checks (literal names for run-determination --green-check)
+- pre-analyze-plan-pass: decision=pass errors=0 advisories=65 (all future outputs)
+- validate-decision-tensions-ok: 0 error(s), 0 warning(s), 6 records
+- delivery-map-parity-ok: FR rows compared: 28; mismatches: none
