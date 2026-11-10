@@ -167,7 +167,7 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | 规范测试运行器与选择语义 | signed-contract | runner 契约（`.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md`） | `pyproject.toml` 既有 `pytest` 依赖；本特性零新增第三方依赖 | `scripts/bash/run-tests.sh` 与 runner 契约 | 既有 C-001…C-016 对应用例保持全绿；新增档位行为另有契约用例 | FR-001, FR-002, FR-007, FR-008, FR-009, FR-022 | EP-001 |
+| RS-001 | 规范测试运行器与选择语义 | signed-contract | runner 契约（`.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md`） | `pyproject.toml` 既有 `pytest` 依赖；本特性零新增第三方依赖 | `scripts/bash/run-tests.sh` | 既有 C-001…C-016 对应用例保持全绿；新增档位行为另有契约用例 | FR-001, FR-002, FR-007, FR-008, FR-009, FR-022 | EP-001 |
 | RS-002 | 进程并行引擎（pytest-xdist） | signed-contract | pytest-xdist 上游（本仓只消费） | `pyproject.toml` 既有 `pytest-xdist; python_version >= '3.9'` 声明；探针实测可导入版本 3.8.0 | `pyproject.toml` | 缺省并行在 contract 子集与全量上达到名称级一致；3.8 无 xdist 时完整串行 | FR-001, FR-002, FR-003, FR-004 | EP-002 |
 | RS-003 | CPython `>=3.8` 标准库（子进程、时钟、文件系统）与 pytest session 夹具模型 | signed-contract | CPython / pytest 上游（本仓只消费） | `pyproject.toml` 既有 `requires-python` 声明 | `pyproject.toml` | 会话夹具在 `>=3.8` 与并行 worker 下行为一致；注入时钟不依赖第三方库 | FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018 | EP-003 |
 | RS-004 | 本特性修订的测试基础设施面（runner 档位、marker 注册、共享夹具、转换清单） | in-scope | 本特性自身 | 不适用（无外部版本面） | `scripts/bash/run-tests.sh`、`pyproject.toml`、`tests/conftest.py`、受管测试文件 | 档位、缓存、去 sleep 与直调四组断言在 `>=3.8` 与缺省并行下全绿 | FR-005, FR-006, FR-010, FR-011, FR-019, FR-020, FR-021 | EP-004 |
