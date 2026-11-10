@@ -31,6 +31,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -286,10 +288,7 @@ def test_c4_owner_doc_copies_no_clause_body_from_any_contract():
 
 
 def test_c5_gate_budget_is_unchanged_by_the_owner_document():
-    r = subprocess.run(
-        [sys.executable, str(SCRIPTS / "scan-confirmation-gates.py"), "--summary"],
-        capture_output=True, text=True, cwd=str(ROOT),
-    )
+    r = run_engine_in_process(SCRIPTS / "scan-confirmation-gates.py", ["--summary"])
     assert r.returncode == 0, r.stdout + r.stderr
     m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
     v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)

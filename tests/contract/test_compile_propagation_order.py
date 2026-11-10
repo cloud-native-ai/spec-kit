@@ -15,6 +15,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from tests.script_api import probe_utils
@@ -69,17 +71,17 @@ def test_propagation_chain_is_green_in_canonical_order():
         "run probe-utils.py --action compile-embeds BEFORE regen/sync"
     )
     # Step 2 — regen: per-tool copies match the (compiled) source templates.
-    proc = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "python" / "regen-command-copies.py"),
-         "--check"], capture_output=True, text=True, check=False)
+    proc = run_engine_in_process(
+        REPO_ROOT / "scripts" / "python" / "regen-command-copies.py", ["--check"]
+    )
     assert proc.returncode == 0, (
         "step 2 (regen --check) red: per-tool copies drifted from the compiled "
         "templates — run regen-command-copies.py after every compile-embeds"
     )
     # Step 3 — sync: the .specify mirrors match the sources.
-    proc = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
-         "--check"], capture_output=True, text=True, check=False)
+    proc = run_engine_in_process(
+        REPO_ROOT / "scripts" / "python" / "sync-mirrors.py", ["--check"]
+    )
     assert proc.returncode == 0, (
         "step 3 (sync --check) red: .specify mirrors drifted from the sources — run "
         "sync-mirrors.py after regen"

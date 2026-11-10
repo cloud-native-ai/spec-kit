@@ -27,6 +27,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -217,10 +219,7 @@ def test_c1_stdlib_only():
 
 
 def test_c2_sync_mirrors_check_clean():
-    proc = subprocess.run(
-        [sys.executable, str(SYNC_MIRRORS), "--check"], cwd=ROOT,
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SYNC_MIRRORS, ["--check"])
     assert proc.returncode == 0, f"sync-mirrors --check exit {proc.returncode}:\n{proc.stdout[-1500:]}"
 
 

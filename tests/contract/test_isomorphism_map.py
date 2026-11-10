@@ -43,6 +43,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OWNER = REPO_ROOT / "shared" / "definitions" / "flow-class-definitions.md"
 GATES = REPO_ROOT / "shared" / "workflow" / "expression-gates.md"
@@ -295,11 +297,9 @@ def _cell_grammar_problem(cell: str):
 # --------------------------------------------------------------------------- #
 def _engine(repo: Path):
     assert ENGINE.is_file(), "flow-class engine missing: %s" % ENGINE.relative_to(REPO_ROOT)
-    proc = subprocess.run(
-        [sys.executable, str(ENGINE), "--action", "isomorphism", "--repo", str(repo), "--format", "json"],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
+    proc = run_engine_in_process(
+        ENGINE,
+        ["--action", "isomorphism", "--repo", str(repo), "--format", "json"],
     )
     try:
         record = json.loads(proc.stdout) if proc.stdout.strip() else None

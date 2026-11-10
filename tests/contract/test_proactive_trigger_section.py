@@ -65,6 +65,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from specify_cli import _INSTRUCTIONS_FILE_MAP, _check_instructions
@@ -353,13 +355,7 @@ def test_c11_gate_scan_total_unchanged():
         f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
     )
     frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
-    proc = subprocess.run(
-        [
-            "python3", str(SCANNER), "--root", str(ROOT), "--json",
-        ],
-        capture_output=True,
-        text=True,
-    )
+    proc = run_engine_in_process(SCANNER, ["--root", str(ROOT), "--json"])
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["total"] == frozen["total"], (

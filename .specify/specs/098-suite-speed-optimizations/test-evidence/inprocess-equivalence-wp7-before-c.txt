@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_compile_propagation_order.py tests/contract/test_non_disposable_contract.py tests/contract/test_non_regression_064.py tests/contract/test_script_interface_contract.py tests/contract/test_scripts_distribution_parity.py tests/contract/test_sync_mirrors_only.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+........................................................................ [ 42%]
+........................................................................ [ 85%]
+..........s..............                                                [100%]
+168 passed, 1 skipped in 47.56s
+exit=0

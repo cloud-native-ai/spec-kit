@@ -1,0 +1,438 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_doc_consistency_checker.py tests/contract/test_document_structure_gate.py tests/contract/test_git_workflow_observe.py tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_trigger_engine.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+........................................................................ [ 31%]
+......................F..FFF...........F.FF..FFFF.FFFFFF.FFF..F.......FF [ 62%]
+FF...................................................................... [ 93%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+_____________________ test_c6_no_partial_file_left_behind ______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c6_no_partial_file_left_b0')
+
+>   ???
+E   AssertionError: assert False
+E    +  where False = is_file()
+E    +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json').is_file
+E    +      where PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c6_no_partial_file_left_b0'))
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:316: AssertionError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[missing] __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra0')
+breakage = 'missing'
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:363: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json')
+missing_ok = False
+
+    def unlink(self, missing_ok=False):
+        """
+        Remove this file or link.
+        If the path is a directory, use rmdir() instead.
+        """
+        try:
+>           os.unlink(self)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1147: FileNotFoundError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[corrupt] __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra1')
+breakage = 'corrupt'
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra1/.specify/memory/trigger/index.json')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra1/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______ test_c8_state_unreadable_degrades_to_suggest_only[incompatible] ________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra2')
+breakage = 'incompatible'
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:367: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra2/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_c8_state_unreadable_degra2/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_c12_assess_resolves_a_unique_situation __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c12_assess_resolves_a_uni0')
+
+>   ???
+E   AssertionError: (requirements-unclear, needs-clarification) must resolve to s01, got None
+E   assert None == 's01'
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:517: AssertionError
+_______________________ test_c12_v1_6_most_specific_wins _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c12_v1_6_most_specific_wi0')
+
+>   ???
+E   AssertionError: V1.6 most-specific-first must resolve to s05 when both signals are present, got None
+E   assert None == 's05'
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:539: AssertionError
+__________________ test_c12_no_match_is_reported_not_invented __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c12_no_match_is_reported_0')
+
+>   ???
+E   AssertionError: reason must be 'no-situation-match', got None
+E   assert None == 'no-situation-match'
+E    +  where None = <built-in method get of dict object at 0x7f78eedb9ac0>('reason')
+E    +    where <built-in method get of dict object at 0x7f78eedb9ac0> = {'enabled': False, 'sessionId': 'snomatch', 'signals': [], 'situationId': None, ...}.get
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:551: AssertionError
+___________________ test_c14_assess_appends_exactly_one_row ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c14_assess_appends_exactl0')
+
+>   ???
+E   AssertionError: expected exactly one new row, got 0
+E   assert 0 == (0 + 1)
+E    +  where 0 = len([])
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:612: AssertionError
+__________________ test_c14_silent_turn_has_no_visible_output __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c14_silent_turn_has_no_vi0')
+
+>   ???
+E   IndexError: list index out of range
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:622: IndexError
+__________ test_c14_ordering_violation_reported_but_row_still_written __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c14_ordering_violation_re0')
+
+>   ???
+E   AssertionError: fixture expected a hit
+E   assert None is not None
+E    +  where None = <built-in method get of dict object at 0x7f78ef60d6c0>('suggestion')
+E    +    where <built-in method get of dict object at 0x7f78ef60d6c0> = {'enabled': False, 'sessionId': 'sord', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:635: AssertionError
+________________ test_c14_compliance_done_clears_the_violation _________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c14_compliance_done_clear0')
+
+>   ???
+E   IndexError: list index out of range
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:652: IndexError
+______________________ test_c15_suggestion_key_set_exact _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c15_suggestion_key_set_ex0')
+
+>   ???
+E   assert None is not None
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:677: AssertionError
+_______________ test_c16_accepted_increments_and_declined_resets _______________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c16_accepted_increments_a0')
+
+>   ???
+E   AssertionError: 
+E   assert 2 == 0
+E    +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...r-assess"\n  ],\n  "warnings": [],\n  "semanticJudgmentPending": [],\n  "notes": [],\n  "payload": {}\n}\n', stderr='').returncode
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:697: AssertionError
+___________________ test_c16_reaching_the_threshold_promotes ___________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c16_reaching_the_threshol0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:722: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:173: in read_index
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________ test_c17_destructive_never_promotes_over_ten_acceptances ___________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c17_destructive_never_pro0')
+
+>   ???
+E   assert (None is not None)
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:739: AssertionError
+______________________ test_c18_threshold_priority_chain _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c18_threshold_priority_ch0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f78ef6a9ed0>
+
+>   ???
+E   AssertionError: default threshold is 3
+E   assert 5 == 3
+E    +  where 5 = <function test_c18_threshold_priority_chain.<locals>.stored_threshold at 0x7f78eec5c5e0>()
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:761: AssertionError
+______________________ test_c18_threshold_floor_rejected _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c18_threshold_floor_rejec0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:173: in read_index
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_c19_no_write_outside_workspace_root ___________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c19_no_write_outside_work0')
+
+>   ???
+E   AssertionError: init must write inside the workspace
+E   assert False
+E    +  where False = is_file()
+E    +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json').is_file
+E    +      where PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c19_no_write_outside_work0'))
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:809: AssertionError
+________________ test_c20_repeat_in_same_session_is_suppressed _________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c20_repeat_in_same_sessio0')
+
+>   ???
+E   AssertionError: first turn should suggest
+E   assert None is not None
+E    +  where None = <built-in method get of dict object at 0x7f78ee980b00>('suggestion')
+E    +    where <built-in method get of dict object at 0x7f78ee980b00> = {'enabled': False, 'sessionId': 'ssup', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:820: AssertionError
+____________________ test_c20_new_session_is_not_suppressed ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c20_new_session_is_not_su0')
+
+>   ???
+E   AssertionError: a session switch means state may have changed — the first turn must not be suppressed
+E   assert None is not None
+E    +  where None = <built-in method get of dict object at 0x7f78ee980e80>('suggestion')
+E    +    where <built-in method get of dict object at 0x7f78ee980e80> = {'enabled': False, 'sessionId': 'sb', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:837: AssertionError
+_____________________ test_c21_auto_execute_is_only_a_flag _____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_c21_auto_execute_is_only_0')
+
+>   ???
+E   TypeError: 'NoneType' object is not subscriptable
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:881: TypeError
+___________________________ test_init_is_idempotent ____________________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_is_idempotent0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:1002: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_is_idempotent0/.specify/memory/trigger/index.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_init_is_idempotent0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________________ test_init_writes_the_e6_shape _________________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_writes_the_e6_shape0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:1012: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:173: in read_index
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________ test_init_maintains_the_telemetry_ignore_entry ________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_maintains_the_teleme0')
+
+>   ???
+E   AssertionError: init must create/extend .specify/.gitignore
+E   assert False
+E    +  where False = is_file()
+E    +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_maintains_the_teleme0/.specify/.gitignore').is_file
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:1026: AssertionError
+____________________ test_init_does_not_revert_local_tuning ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_does_not_revert_loca0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:1042: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_trigger_engine.py:173: in read_index
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7872/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7872/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/contract/test_trigger_engine.py::test_c6_no_partial_file_left_behind
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[missing]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[corrupt]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[incompatible]
+FAILED tests/contract/test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation
+FAILED tests/contract/test_trigger_engine.py::test_c12_v1_6_most_specific_wins
+FAILED tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+FAILED tests/contract/test_trigger_engine.py::test_c14_assess_appends_exactly_one_row
+FAILED tests/contract/test_trigger_engine.py::test_c14_silent_turn_has_no_visible_output
+FAILED tests/contract/test_trigger_engine.py::test_c14_ordering_violation_reported_but_row_still_written
+FAILED tests/contract/test_trigger_engine.py::test_c14_compliance_done_clears_the_violation
+FAILED tests/contract/test_trigger_engine.py::test_c15_suggestion_key_set_exact
+FAILED tests/contract/test_trigger_engine.py::test_c16_accepted_increments_and_declined_resets
+FAILED tests/contract/test_trigger_engine.py::test_c16_reaching_the_threshold_promotes
+FAILED tests/contract/test_trigger_engine.py::test_c17_destructive_never_promotes_over_ten_acceptances
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_priority_chain
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_floor_rejected
+FAILED tests/contract/test_trigger_engine.py::test_c19_no_write_outside_workspace_root
+FAILED tests/contract/test_trigger_engine.py::test_c20_repeat_in_same_session_is_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c20_new_session_is_not_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c21_auto_execute_is_only_a_flag
+FAILED tests/contract/test_trigger_engine.py::test_init_is_idempotent - FileN...
+FAILED tests/contract/test_trigger_engine.py::test_init_writes_the_e6_shape
+FAILED tests/contract/test_trigger_engine.py::test_init_maintains_the_telemetry_ignore_entry
+FAILED tests/contract/test_trigger_engine.py::test_init_does_not_revert_local_tuning
+25 failed, 206 passed in 18.01s
+exit=1

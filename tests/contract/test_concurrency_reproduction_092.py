@@ -27,6 +27,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -80,10 +82,9 @@ def _six_package_record(repo: Path, executor: str = "exec-one") -> Path:
 
 
 def _capability(repo: Path, record: Path, out: Path):
-    proc = subprocess.run(
-        [sys.executable, str(ENGINE), "capability", "--repo", str(repo),
-         "--record", str(record), "--json-out", str(out)],
-        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=120,
+    proc = run_engine_in_process(
+        ENGINE,
+        ["capability", "--repo", str(repo), "--record", str(record), "--json-out", str(out)],
     )
     envelope = json.loads(out.read_text(encoding="utf-8")) if out.is_file() else None
     return proc, envelope

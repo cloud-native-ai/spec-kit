@@ -27,6 +27,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 DOC_NAME = "user-facing-comprehension.md"   # STR-002 basename; its stem is STR-005's marker value
@@ -561,10 +563,7 @@ def test_c18b_baseline_declarations_only_at_registered_sites():
 @pytest.mark.contract
 def test_gn_c2_gate_scan_total_unchanged():
     """Run the real scanner and assert equality — not <=, per the clause."""
-    proc = subprocess.run(
-        ["python3", str(SCANNER), "--root", str(ROOT), "--json"],
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SCANNER, ["--root", str(ROOT), "--json"])
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["total"] == 27, (

@@ -1,0 +1,592 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_archive_migration.py tests/contract/test_binding_model.py tests/contract/test_clause_coverage.py tests/contract/test_command_family.py tests/contract/test_concurrency_class_table.py tests/contract/test_concurrency_declarations.py tests/contract/test_concurrency_dispatch_capability.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_high_order.py tests/contract/test_concurrency_real_run_evidence.py tests/contract/test_concurrency_reproduction_092.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_concurrency_units.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_criterion_subject.py tests/contract/test_declaration_facts.py tests/contract/test_delegation_classes.py tests/contract/test_expression_faces.py tests/contract/test_fast_fail_discipline.py tests/contract/test_flow_class_correctness.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_spec_declaration.py tests/contract/test_git_closeout_contract.py tests/contract/test_handoff_contract.py tests/contract/test_isomorphism_map.py tests/contract/test_ledger_reconciliation.py tests/contract/test_neutrality_budget.py tests/contract/test_parallel_lines.py tests/contract/test_proactive_trigger_section.py tests/contract/test_resident_backfill.py tests/contract/test_run_checks.py tests/contract/test_scan_confirmation_gates.py tests/contract/test_scope_resolution.py tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_diffusion.py tests/contract/test_user_facing_comprehension_doc.py tests/contract/test_wrap_up_wording_gate_safe.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=5
+..............................F......................................... [ 11%]
+........................................................................ [ 22%]
+...........F..............................................F............. [ 33%]
+.F...........F..............FF.....................................F.... [ 44%]
+...........FFFFFFFF.F..F.F...F.................................F........ [ 55%]
+...................................FF................................... [ 66%]
+..................................................F..................... [ 77%]
+...FF..............................F.............F...................... [ 88%]
+.................................................F....................F. [ 99%]
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+
+>   ???
+E   AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 28
+E   assert 28 == 27
+E    +  where 28 = int('28')
+E    +    where '28' = <built-in method group of re.Match object at 0x7f9a581e1630>(1)
+E    +      where <built-in method group of re.Match object at 0x7f9a581e1630> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_clause_coverage.py:297: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+>   ???
+E   AssertionError: SC-002 target missed: residual 28 > 25% of baseline 93
+E   assert 28 <= 23.25
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+____ test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten _____
+
+>   ???
+E   AssertionError: an existing section was removed or renamed: ## Storage & Goal Archive
+E   assert '## Storage & Goal Archive' in ['# Goal Definitions Reference', '', 'Canonical definition of the **Goal** concept in Spec Kit, of the **binding recor... anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.', '', '', '## What a Goal Is', ...]
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_criterion_subject.py:181: AssertionError
+______________ test_c19_the_gate_budget_survives_the_new_section _______________
+
+>   ???
+E   AssertionError: the owner doc sits in shared/, inside the scanned surface, and the integer headroom is 0: total moved to 28
+E   assert 28 == 27
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_criterion_subject.py:555: AssertionError
+___________ test_every_template_edge_is_same_class_or_neutral_exempt ___________
+
+>   ???
+E   AssertionError: delegation on the real tree must be green; findings=[{'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-code ('expression') — a command and its delegated skill MUST share one class", 'line': 58}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-kb ('expression') — a command and its delegated skill MUST share one class", 'line': 59}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-online ('expression') — a command and its delegated skill MUST share one class", 'line': 60}] stderr=''
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...ommand and its delegated skill MUST share one class",\n      "line": 60\n    }\n  ],\n  "error": null\n}\n', stderr='').returncode
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_delegation_classes.py:282: AssertionError
+__________ test_duplicate_face_is_clean_over_the_declared_wide_scope ___________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_expression_faces.py:314: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = ('shared', 'templates/commands', 'skills', 'docs')
+args = ['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/scripts/python/doc-consistency-check.py', '--action', 'verify', '--faces', 'duplicate', ...]
+path = 'docs'
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...d-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n')
+
+>   ???
+E   AssertionError: doc-consistency-check must print JSON; stderr='doc-consistency-check: input error: --spec-dir is not a directory: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n'
+E   assert ''
+E    +  where '' = <built-in method strip of str object at 0x7f9a6904da60>()
+E    +    where <built-in method strip of str object at 0x7f9a6904da60> = ''.strip
+E    +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...d-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n').stdout
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_expression_faces.py:292: AssertionError
+____________ test_a_copied_criterion_line_in_each_surface_turns_red ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7862/test_a_copied_criterion_line_i0')
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_expression_faces.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = ('/tmp/pytest-of-agent/pytest-7862/test_a_copied_criterion_line_i0/templates/commands',)
+args = ['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/scripts/python/doc-consistency-check.py', '--action', 'verify', '--faces', 'duplicate', ...]
+path = '/tmp/pytest-of-agent/pytest-7862/test_a_copied_criterion_line_i0/templates/commands'
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...d-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n')
+
+>   ???
+E   AssertionError: doc-consistency-check must print JSON; stderr='doc-consistency-check: input error: --spec-dir is not a directory: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n'
+E   assert ''
+E    +  where '' = <built-in method strip of str object at 0x7f9a6904da60>()
+E    +    where <built-in method strip of str object at 0x7f9a6904da60> = ''.strip
+E    +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-0...d-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/specs/069b-isomorphism-migration-metrics\n').stdout
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_expression_faces.py:292: AssertionError
+_________________ test_a7_section_counts_20_to_21_and_21_to_22 _________________
+
+>   ???
+E   AssertionError: C-7: template has 36 top-level sections; expected 35 (the template changed by 1: raise TPL_EXPECTED in the commit that adds the section)
+E   assert 36 == 35
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:755: AssertionError
+___________________ test_x4_live_constitution_principle_xvi ____________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1064: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________________ test_x5_live_version_minor_bump ________________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1078: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________________ test_x6_sync_impact_report_prepended _____________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1088: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:151: in _lines
+    ???
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x7_version_three_segment_form ______________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x8_principle_block_structure _______________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________ test_x9_principle_block_pointer_and_no_new_mechanism _____________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_x10_principle_block_lines_under_100 ___________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_x11_principle_block_no_restated_content _________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_x13_double_landing_three_count_pins ___________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x16_plan_template_zero_change ______________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________________ test_x18_downstream_gate_rows_15_to_16 ____________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:147: in _text
+    ???
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_x22_cross_discipline_change_recorded ___________________
+
+>   ???
+E   AssertionError: C-22: trace location missing: .specify/memory/features/051.md
+E   assert False
+E    +  where False = is_file()
+E    +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/features/051.md').is_file
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1410: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+>   ???
+E   AssertionError: G-9: gate total moved from the frozen 23 to 28; the integer headroom on the budget is 0
+E   assert 28 == 23
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_fast_fail_discipline.py:1991: AssertionError
+____________________ test_feature_index_has_no_class_column ____________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_flow_class_spec_declaration.py:440: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/features.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/features.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_feature_detail_stores_no_class_value ___________________
+
+>   ???
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_flow_class_spec_declaration.py:453: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/features/077.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp7-before-tree/.specify/memory/features/077.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______ test_real_tree_reconciles_clean_with_the_declared_coverage_numbers ______
+
+>   ???
+E   assert 85 == 83
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_ledger_reconciliation.py:308: AssertionError
+_________ test_c4_budget_total_and_violations_after_the_feature_landed _________
+
+>   ???
+E   AssertionError: the feature changed the blocking-gate total from 27 to 28; the integer headroom is zero so this is a violation, not a rounding: blocking confirmation gates: 28
+E       destructive: 21
+E       governance_kept: 7
+E     violations (reversible gates still blocking): 0
+E     
+E   assert 28 == 27
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_neutrality_budget.py:175: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+>   ???
+E   AssertionError: over cap: 28 > 23.25
+E   assert 28 <= 23.25
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_neutrality_budget.py:193: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+>   ???
+E   AssertionError: gate total moved from the frozen 23 to 28; the integer headroom on the budget is 0
+E   assert 28 == 23
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_proactive_trigger_section.py:365: AssertionError
+_________ test_c1_the_action_exists_and_the_roster_grew_by_exactly_one _________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7f9a588a8cd0>
+
+>   ???
+E   AssertionError: the roster was 10 before this feature and must be exactly 11 now: ['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks', 'probe-residual', 'command-family', 'handoff-decision', 'handoff-ref', 'migrate-archive', 'backfill-bindings']
+E   assert 19 == 11
+E    +  where 19 = len(['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', ...])
+E    +  and   11 = len(['create', 'validate', 'check-statement', 'list', 'status', 'objective', ...])
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_run_checks.py:266: AssertionError
+_______________________ test_trigger_edit_moves_no_gate ________________________
+
+>   ???
+E   AssertionError: the confirmation-gate scan total moved from the pre-change 27 to 28; the headroom on that budget is 0, so this slice's sentence must add no gate-scannable declaration (C-19)
+E   assert 28 == 27
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_sdd_diffusion.py:580: AssertionError
+_____________________ test_gn_c2_gate_scan_total_unchanged _____________________
+
+>   ???
+E   AssertionError: gate total moved to 28; the recorded budget is 27 and the integer headroom is 0, so any new BLOCKING_RE hit in scan scope lands here
+E   assert 28 == 27
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_user_facing_comprehension_doc.py:570: AssertionError
+___________________ test_confirmation_gate_budget_unchanged ____________________
+
+>   ???
+E   AssertionError: gate budget moved: 28 != 27 — the compiled sections changed the confirmation-gate surface; the budget owner must re-adjudicate first
+E   assert 28 == 27
+E    +  where 28 = int('28')
+E    +    where '28' = <built-in method group of re.Match object at 0x7f9a58069fc0>(1)
+E    +      where <built-in method group of re.Match object at 0x7f9a58069fc0> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/.tmp/wp7/before-tree/tests/contract/test_wrap_up_wording_gate_safe.py:76: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_criterion_subject.py::test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+FAILED tests/contract/test_delegation_classes.py::test_every_template_edge_is_same_class_or_neutral_exempt
+FAILED tests/contract/test_expression_faces.py::test_duplicate_face_is_clean_over_the_declared_wide_scope
+FAILED tests/contract/test_expression_faces.py::test_a_copied_criterion_line_in_each_surface_turns_red
+FAILED tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+FAILED tests/contract/test_fast_fail_discipline.py::test_x4_live_constitution_principle_xvi
+FAILED tests/contract/test_fast_fail_discipline.py::test_x5_live_version_minor_bump
+FAILED tests/contract/test_fast_fail_discipline.py::test_x6_sync_impact_report_prepended
+FAILED tests/contract/test_fast_fail_discipline.py::test_x7_version_three_segment_form
+FAILED tests/contract/test_fast_fail_discipline.py::test_x8_principle_block_structure
+FAILED tests/contract/test_fast_fail_discipline.py::test_x9_principle_block_pointer_and_no_new_mechanism
+FAILED tests/contract/test_fast_fail_discipline.py::test_x10_principle_block_lines_under_100
+FAILED tests/contract/test_fast_fail_discipline.py::test_x11_principle_block_no_restated_content
+FAILED tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+FAILED tests/contract/test_fast_fail_discipline.py::test_x16_plan_template_zero_change
+FAILED tests/contract/test_fast_fail_discipline.py::test_x18_downstream_gate_rows_15_to_16
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_index_has_no_class_column
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_detail_stores_no_class_value
+FAILED tests/contract/test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers
+FAILED tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+FAILED tests/contract/test_sdd_diffusion.py::test_trigger_edit_moves_no_gate
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+FAILED tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+31 failed, 621 passed, 5 deselected in 58.78s
+exit=1

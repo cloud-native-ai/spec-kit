@@ -26,6 +26,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -45,9 +47,7 @@ RUN_ID = "r20261109T064500Z-094a"
 
 
 def _run_engine(root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args, "--repo-root", str(root), "--json"],
-        capture_output=True, text=True, cwd=REPO_ROOT)
+    return run_engine_in_process(ENGINE, [*args, "--repo-root", str(root), "--json"])
 
 
 def _family(name: str, root: Path | None = None) -> subprocess.CompletedProcess:
@@ -55,10 +55,10 @@ def _family(name: str, root: Path | None = None) -> subprocess.CompletedProcess:
 
 
 def _lookup(name: str) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(FLOW_CLASS), "--action", "lookup",
-         "--unit-id", f"/speckit.{name}", "--format", "json"],
-        capture_output=True, text=True, cwd=REPO_ROOT)
+    proc = run_engine_in_process(
+        FLOW_CLASS,
+        ["--action", "lookup", "--unit-id", f"/speckit.{name}", "--format", "json"],
+    )
     assert proc.returncode == 0, (
         f"the class lookup must resolve /speckit.{name}: {proc.stdout!r} {proc.stderr!r}")
     return json.loads(proc.stdout)

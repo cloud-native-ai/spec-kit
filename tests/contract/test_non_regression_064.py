@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from fixtures.line_fixtures import (
@@ -125,22 +127,19 @@ def test_ng_05_stdlib_only_engine():
 
 
 def test_ng_08_mirror_no_new_drift():
-    skill = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
-         "--check", "--only", "skills/external/sdd-loop-driver"],
-        capture_output=True, text=True,
+    skill = run_engine_in_process(
+        REPO_ROOT / "scripts" / "python" / "sync-mirrors.py",
+        ["--check", "--only", "skills/external/sdd-loop-driver"],
     )
     assert skill.returncode == 0, skill.stdout + skill.stderr
-    probe = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
-         "--check", "--only", "shared/definitions/probe-definitions.md"],
-        capture_output=True, text=True,
+    probe = run_engine_in_process(
+        REPO_ROOT / "scripts" / "python" / "sync-mirrors.py",
+        ["--check", "--only", "shared/definitions/probe-definitions.md"],
     )
     assert probe.returncode == 0, probe.stdout + probe.stderr
-    shared = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
-         "--check", "--only", "shared/definitions"],
-        capture_output=True, text=True,
+    shared = run_engine_in_process(
+        REPO_ROOT / "scripts" / "python" / "sync-mirrors.py",
+        ["--check", "--only", "shared/definitions"],
     )
     diffs = {
         Path(line.split()[-1]).name

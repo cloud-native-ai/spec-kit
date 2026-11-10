@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_DIR = REPO_ROOT / "skills" / "external" / "sdd-loop-driver"
 CLI_DIR = SKILL_DIR / "references" / "cli"
@@ -329,10 +331,7 @@ def test_clp_17_no_063_duplicate_owner():
 
     # Branch-aware guard: the 063 branch tree is inspected, not just this worktree.
     guard = SKILL_DIR / "scripts" / "check-063-overlap.py"
-    proc = subprocess.run(
-        [sys.executable, str(guard), "--repo", str(REPO_ROOT)],
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(guard, ["--repo", str(REPO_ROOT)])
     assert proc.returncode == 0, proc.stdout + proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["status"] in {"branch-absent", "pending-merge-obligation", "clean"}
@@ -341,10 +340,7 @@ def test_clp_17_no_063_duplicate_owner():
             path.endswith("075-sdd-loop-efficiency/contracts/cli-profiles.md")
             for path in payload["paths"]
         ), payload
-    strict = subprocess.run(
-        [sys.executable, str(guard), "--repo", str(REPO_ROOT), "--strict-premerge"],
-        capture_output=True, text=True,
-    )
+    strict = run_engine_in_process(guard, ["--repo", str(REPO_ROOT), "--strict-premerge"])
     if payload["status"] == "pending-merge-obligation":
         assert strict.returncode == 3, strict.stdout
     else:

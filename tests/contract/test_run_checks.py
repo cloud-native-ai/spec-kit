@@ -30,6 +30,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -147,8 +149,7 @@ def _run(root, *args, expect=None):
     # resolves to the cwd. Pre-existing in this binary, measured, escalated as research.md
     # A-9; this feature must not change flag precedence for nine existing actions in passing.
     action, rest = args[0], args[1:]
-    cmd = [sys.executable, str(GOAL_UTILS), action, "--repo-root", str(root), *rest]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    r = run_engine_in_process(GOAL_UTILS, [action, "--repo-root", str(root), *rest])
     if expect is not None:
         assert r.returncode == expect, (
             f"{' '.join(args)} -> exit {r.returncode}, expected {expect}\n"
@@ -441,9 +442,9 @@ def test_c10b_each_name_is_pinned_to_the_verdicts_it_may_emit(tmp_path):
 
 def test_c11_json_is_accepted_on_either_side_of_the_action_and_goes_through__emit(tmp_path):
     root = _repo(tmp_path)
-    after = subprocess.run(
-        [sys.executable, str(GOAL_UTILS), "run-checks", "--repo-root", str(root),
-         "t1", "--json"], capture_output=True, text=True)
+    after = run_engine_in_process(
+        GOAL_UTILS, ["run-checks", "--repo-root", str(root), "t1", "--json"]
+    )
     assert after.returncode == 0, after.stderr
     assert json.loads(after.stdout)["team_slug"] == "t1"
 
@@ -451,9 +452,9 @@ def test_c11_json_is_accepted_on_either_side_of_the_action_and_goes_through__emi
     # and was false before this feature: the subparser's default clobbers the top-level
     # value, so `--json <action>` silently emits the human form. Pinned as measured, in
     # both directions, so neither a future fix nor a further regression passes unnoticed.
-    before = subprocess.run(
-        [sys.executable, str(GOAL_UTILS), "--json", "run-checks", "--repo-root", str(root),
-         "t1"], capture_output=True, text=True)
+    before = run_engine_in_process(
+        GOAL_UTILS, ["--json", "run-checks", "--repo-root", str(root), "t1"]
+    )
     assert before.returncode == 0
     with pytest.raises(json.JSONDecodeError):
         json.loads(before.stdout)

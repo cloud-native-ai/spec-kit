@@ -1,0 +1,914 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_archive_migration.py tests/contract/test_binding_model.py tests/contract/test_clause_coverage.py tests/contract/test_command_family.py tests/contract/test_concurrency_class_table.py tests/contract/test_concurrency_declarations.py tests/contract/test_concurrency_dispatch_capability.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_high_order.py tests/contract/test_concurrency_real_run_evidence.py tests/contract/test_concurrency_reproduction_092.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_concurrency_units.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_criterion_subject.py tests/contract/test_declaration_facts.py tests/contract/test_delegation_classes.py tests/contract/test_expression_faces.py tests/contract/test_fast_fail_discipline.py tests/contract/test_flow_class_correctness.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_spec_declaration.py tests/contract/test_git_closeout_contract.py tests/contract/test_handoff_contract.py tests/contract/test_isomorphism_map.py tests/contract/test_ledger_reconciliation.py tests/contract/test_neutrality_budget.py tests/contract/test_parallel_lines.py tests/contract/test_proactive_trigger_section.py tests/contract/test_resident_backfill.py tests/contract/test_run_checks.py tests/contract/test_scan_confirmation_gates.py tests/contract/test_scope_resolution.py tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_diffusion.py tests/contract/test_user_facing_comprehension_doc.py tests/contract/test_wrap_up_wording_gate_safe.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=5
+..............................F......................................... [ 11%]
+........................................................................ [ 22%]
+...........F..............................................F............. [ 33%]
+.F...........F..............FF.....................................F.... [ 44%]
+...........FFFFFFFF.F..F.F...F.................................F........ [ 55%]
+...................................FF................................... [ 66%]
+..................................................F..................... [ 77%]
+...FF..............................F.............F...................... [ 88%]
+.................................................F....................F. [ 99%]
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+
+    def test_c5_gate_budget_is_unchanged_by_the_owner_document():
+        r = run_engine_in_process(SCRIPTS / "scan-confirmation-gates.py", ["--summary"])
+        assert r.returncode == 0, r.stdout + r.stderr
+        m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
+        v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)
+        assert m and v, r.stdout
+>       assert int(m.group(1)) == GATE_TOTAL, (
+            f"the owner document sits in shared/, i.e. inside the scanned surface, and the "
+            f"integer headroom is 0: total moved to {m.group(1)}"
+        )
+E       AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 28
+E       assert 28 == 27
+E        +  where 28 = int('28')
+E        +    where '28' = <built-in method group of re.Match object at 0x7f731f36b7f0>(1)
+E        +      where <built-in method group of re.Match object at 0x7f731f36b7f0> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+tests/contract/test_clause_coverage.py:296: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 28 > 25% of baseline 93
+E       assert 28 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:164: AssertionError
+____ test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten _____
+
+    def test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten():
+        """C-3's premise: before US5 the owner doc carried no glob/directory-reference form at
+        all (measured 2026-10-02: the probe returns nothing). So every hit the probe makes now
+        must sit inside the new section — a hit anywhere else means an existing section was
+        rewritten rather than left alone."""
+        lines = OWNER_DOC.read_text(encoding="utf-8").splitlines()
+        for heading in PREEXISTING_SECTIONS:
+>           assert heading in lines, f"an existing section was removed or renamed: {heading}"
+E           AssertionError: an existing section was removed or renamed: ## Storage & Goal Archive
+E           assert '## Storage & Goal Archive' in ['# Goal Definitions Reference', '', 'Canonical definition of the **Goal** concept in Spec Kit, of the **binding recor... anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.', '', '', '## What a Goal Is', ...]
+
+tests/contract/test_criterion_subject.py:183: AssertionError
+______________ test_c19_the_gate_budget_survives_the_new_section _______________
+
+    def test_c19_the_gate_budget_survives_the_new_section():
+        r = run_engine_in_process(
+            ROOT / "scripts" / "python" / "scan-confirmation-gates.py", ["--summary"]
+        )
+        assert r.returncode == 0, r.stdout + r.stderr
+        total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
+        violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))
+        # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total, 23 -> 27
+        # via pre-067 gate additions (27 already at branch point 7f9033ec).
+>       assert total == 27, (
+            f"the owner doc sits in shared/, inside the scanned surface, and the integer "
+            f"headroom is 0: total moved to {total}"
+        )
+E       AssertionError: the owner doc sits in shared/, inside the scanned surface, and the integer headroom is 0: total moved to 28
+E       assert 28 == 27
+
+tests/contract/test_criterion_subject.py:557: AssertionError
+___________ test_every_template_edge_is_same_class_or_neutral_exempt ___________
+
+    def test_every_template_edge_is_same_class_or_neutral_exempt():
+        ledger, neutral = _owner_tables()
+        assert ledger, "the owner ledger must parse for this test to mean anything"
+    
+        proc, record = _delegation(REPO_ROOT)
+>       assert proc.returncode == 0, (
+            "delegation on the real tree must be green; findings=%r stderr=%r"
+            % (None if record is None else record.get("findings"), proc.stderr)
+        )
+E       AssertionError: delegation on the real tree must be green; findings=[{'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-code ('expression') — a command and its delegated skill MUST share one class", 'line': 58}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-kb ('expression') — a command and its delegated skill MUST share one class", 'line': 59}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-online ('expression') — a command and its delegated skill MUST share one class", 'line': 60}] stderr=''
+E       assert 1 == 0
+E        +  where 1 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-opt...d-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations', '--format', 'json'] returncode=1>.returncode
+
+tests/contract/test_delegation_classes.py:279: AssertionError
+__________ test_duplicate_face_is_clean_over_the_declared_wide_scope ___________
+
+    def test_duplicate_face_is_clean_over_the_declared_wide_scope():
+>       proc, record = _run_duplicate(*DECLARED_SUBJECT_ROOTS)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_expression_faces.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = ('shared', 'templates/commands', 'skills', 'docs')
+args = ['--action', 'verify', '--faces', 'duplicate', '--owner-path', 'shared/definitions/flow-class-definitions.md', ...]
+path = 'docs'
+proc = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-opt...ees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics', '--format', 'json'] returncode=2>
+
+    def _run_duplicate(*paths: str) -> tuple[subprocess.CompletedProcess, dict]:
+        args = [
+            "--action",
+            "verify",
+            "--faces",
+            "duplicate",
+            "--owner-path",
+            OWNER_REL.as_posix(),
+        ]
+        for path in paths:
+            args.extend(["--path", path])
+        args.extend(["--spec-dir", str(SPEC_DIR), "--format", "json"])
+        proc = run_engine_in_process(DOC_CHECK, args)
+>       assert proc.stdout.strip(), (
+            "doc-consistency-check must print JSON; stderr=%r" % proc.stderr
+        )
+E       AssertionError: doc-consistency-check must print JSON; stderr='doc-consistency-check: input error: --spec-dir is not a directory: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics\n'
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f732fb77a60>()
+E        +    where <built-in method strip of str object at 0x7f732fb77a60> = ''.strip
+E        +      where '' = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-opt...ees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics', '--format', 'json'] returncode=2>.stdout
+
+tests/contract/test_expression_faces.py:287: AssertionError
+____________ test_a_copied_criterion_line_in_each_surface_turns_red ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7867/test_a_copied_criterion_line_i0')
+
+    def test_a_copied_criterion_line_in_each_surface_turns_red(tmp_path):
+        """A copy placed in templates/commands, skills or docs must not stay green."""
+        line = _longest_owner_line()
+        surfaces = {
+            "templates/commands": tmp_path / "templates" / "commands" / "copy.md",
+            "skills": tmp_path / "skills" / "external" / "copy" / "SKILL.md",
+            "docs": tmp_path / "docs" / "copy.md",
+        }
+        for label, path in surfaces.items():
+            _write(path, "# copied criterion\n\n%s\n" % line)
+>           proc, record = _run_duplicate(str(path.parent))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_expression_faces.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = ('/tmp/pytest-of-agent/pytest-7867/test_a_copied_criterion_line_i0/templates/commands',)
+args = ['--action', 'verify', '--faces', 'duplicate', '--owner-path', 'shared/definitions/flow-class-definitions.md', ...]
+path = '/tmp/pytest-of-agent/pytest-7867/test_a_copied_criterion_line_i0/templates/commands'
+proc = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-opt...ees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics', '--format', 'json'] returncode=2>
+
+    def _run_duplicate(*paths: str) -> tuple[subprocess.CompletedProcess, dict]:
+        args = [
+            "--action",
+            "verify",
+            "--faces",
+            "duplicate",
+            "--owner-path",
+            OWNER_REL.as_posix(),
+        ]
+        for path in paths:
+            args.extend(["--path", path])
+        args.extend(["--spec-dir", str(SPEC_DIR), "--format", "json"])
+        proc = run_engine_in_process(DOC_CHECK, args)
+>       assert proc.stdout.strip(), (
+            "doc-consistency-check must print JSON; stderr=%r" % proc.stderr
+        )
+E       AssertionError: doc-consistency-check must print JSON; stderr='doc-consistency-check: input error: --spec-dir is not a directory: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics\n'
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f732fb77a60>()
+E        +    where <built-in method strip of str object at 0x7f732fb77a60> = ''.strip
+E        +      where '' = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-opt...ees/098-suite-speed-optimizations/.specify/specs/069b-isomorphism-migration-metrics', '--format', 'json'] returncode=2>.stdout
+
+tests/contract/test_expression_faces.py:287: AssertionError
+_________________ test_a7_section_counts_20_to_21_and_21_to_22 _________________
+
+    def test_a7_section_counts_20_to_21_and_21_to_22():
+        """C-7: top-level counts -- template 32, live 33.
+    
+        Stale-pin update (2026-11-06, Feature 086 T028): the Efficient Test Execution
+        amendment adds one ambient `##` section to the template, and T025's regeneration
+        carries it into the live file (32/33 -> 33/34). Stale-pin update (2026-11-05,
+        Feature 082 T022): the Self-Explanatory Structure amendment adds one ambient
+        `##` section to the template, and T024's reconcile carries it into the live
+        file (31/32 -> 32/33). Earlier updates: feature 078
+        bilingual-expression adds one ambient section (the Bilingual Expression
+        pointer); slice 074b adds one ambient section (the SDD routing pointer) on top
+        of the Closed-Set Claims amendment's one (2026-10-27) and the Grounded Naming
+        amendment's two; the pin had already drifted to 28/29 via pre-067
+        instructions-section additions.
+    
+        This pin went stale twice in a row before, and both times the tree was green
+        while the *guard* was red on nothing (078's closure-repair 4e23dad2 fixed the
+        30/31 -> 31/32 drift; this repair fixes 31/32 -> 32/33). The stale pin is not
+        self-detecting, so the delta pairing below is stated explicitly: a change that
+        adds or removes a `##` section MUST raise or lower `TPL_EXPECTED` /
+        `LIVE_EXPECTED` in the same commit.
+        """
+        TPL_EXPECTED = 35  # .specify/specs/090-re-anchoring: +1 ambient section (on top of 089's 34)
+        LIVE_EXPECTED = 36  # the reconcile carries that same section into the live file
+        tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
+        live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
+>       assert tpl == TPL_EXPECTED, (
+            f"C-7: template has {tpl} top-level sections; expected {TPL_EXPECTED} "
+            f"(the template changed by {tpl - TPL_EXPECTED}: raise TPL_EXPECTED in the "
+            f"commit that adds the section)"
+        )
+E       AssertionError: C-7: template has 36 top-level sections; expected 35 (the template changed by 1: raise TPL_EXPECTED in the commit that adds the section)
+E       assert 36 == 35
+
+tests/contract/test_fast_fail_discipline.py:757: AssertionError
+___________________ test_x4_live_constitution_principle_xvi ____________________
+
+    def test_x4_live_constitution_principle_xvi():
+        """C-4: the live constitution carries the corresponding principle."""
+>       text = _text(CONST_LIVE)
+               ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1066: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________________ test_x5_live_version_minor_bump ________________________
+
+    def test_x5_live_version_minor_bump():
+        """C-5: the live version took the MINOR bump to 1.13.0 (raised to 1.15.0 on 2026-10-27
+        by the Grounded Naming amendment; raised to 1.16.0 on 2026-11-05 by Feature 082's
+        Self-Explanatory Structure amendment; raised to 1.17.0 on 2026-11-06 by Feature 086's
+        Efficient Test Execution amendment; raised to 1.18.0 on 2026-11-09 by Feature 089's
+        Script Interface Contract amendment; raised to 1.19.0 on 2026-11-09 by Feature 090's
+        Re-Anchoring amendment; raised to 1.19.1 on 2026-11-10 by the verification-carrier
+        correction amendment)."""
+>       text = _text(CONST_LIVE)
+               ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1080: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________________ test_x6_sync_impact_report_prepended _____________________
+
+    def test_x6_sync_impact_report_prepended():
+        """C-6: a Sync Impact Report block is prepended, in the house form."""
+>       lines = _lines(CONST_LIVE)
+                ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1090: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:153: in _lines
+    return _text(path).splitlines()
+           ^^^^^^^^^^^
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x7_version_three_segment_form ______________________
+
+    def test_x7_version_three_segment_form():
+        """C-7: the version is a 3-segment number (upstream's 4-segment rule is a recorded divergence)."""
+>       m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", _text(CONST_LIVE), re.M)
+                                                        ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x8_principle_block_structure _______________________
+
+    def test_x8_principle_block_structure():
+        """C-8: both new blocks follow the house structure."""
+        for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+>           block = _principle_block(_text(path), heading)
+                                     ^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________ test_x9_principle_block_pointer_and_no_new_mechanism _____________
+
+    def test_x9_principle_block_pointer_and_no_new_mechanism():
+        """C-9: each block carries a pointer bullet and a no-new-mechanism bullet."""
+        for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+>           block = _principle_block(_text(path), heading)
+                                     ^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_x10_principle_block_lines_under_100 ___________________
+
+    def test_x10_principle_block_lines_under_100():
+        """C-10: every line of both new blocks is hard-wrapped under 100 characters."""
+        for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+>           block = _principle_block(_text(path), heading)
+                                     ^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_x11_principle_block_no_restated_content _________________
+
+    def test_x11_principle_block_no_restated_content():
+        """C-11: the blocks reference the discipline; they do not restate it."""
+        for path, heading in ((CONST_TPL, TPL_HEADING), (CONST_LIVE, LIVE_HEADING)):
+>           block = _principle_block(_text(path), heading)
+                                     ^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_x13_double_landing_three_count_pins ___________________
+
+    def test_x13_double_landing_three_count_pins():
+        """C-13: the three count pins were raised in the same batch.
+    
+        Stale-pin update (2026-10-27): the Directory Governance amendment moved template
+        15 -> 16, live 16 -> 17, and command 8 -> 9 in one landing.
+        (2026-11-05, Feature 082 review repair): template 17 -> 18, live 18 -> 19,
+        command 10 -> 11, all in T016.
+    
+        The expected values are **derived from the artifacts they describe**, not restated as
+        numerals here. `.specify/specs/082-self-explanatory-integration/contracts/
+        constitution-double-landing.contract.md#C-5` already owns the proposition "the three
+        surfaces agree on one count"; a literal in this file was a second-order copy of that
+        fact, and the A4 assumption this feature lands ("MUST NOT hardcode the template numeral")
+        applies to its derived counts as well. Deriving them here means the next amendment does
+        not have to edit a pin inside a foreign feature's guard.
+        """
+        src = _text(DOUBLE_LANDING_TEST)
+        # The three pins in the double-landing guard, and what each one must equal. Every
+        # expected value is measured from the artifact the pin is about:
+        #   template  -> the template's own `### <numeral>. <title>` roster
+        #   live      -> the live constitution's own roster
+        #   command   -> the generator skill's `- **MUST include**` sub-entry block
+        template_n = len(PRINCIPLE_RE.findall(_text(CONST_TPL)))
+>       live_n = len(PRINCIPLE_RE.findall(_text(CONST_LIVE)))
+                                          ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______________________ test_x16_plan_template_zero_change ______________________
+
+    def test_x16_plan_template_zero_change():
+        """C-16: plan-template.md needed no edit -- it enumerates dynamically.
+    
+        The git-level zero-change proof is GATE-3 (a diff against the frozen BASE_SHA
+        literal); a test cannot own a SHA. What a test CAN own is the substance: the
+        template hard-codes no principle name, so a new principle reaches every
+        downstream plan gate without an edit here.
+        """
+        text = _text(PLAN_TPL)
+        assert PRINCIPLE_TITLE not in text, (
+            "C-16: plan-template.md now hard-codes this principle's name -- it is supposed to enumerate "
+            "dynamically, so any hard-coded name is drift waiting to happen"
+        )
+>       known = [t for _n, t in PRINCIPLE_RE.findall(_text(CONST_LIVE))]
+                                                     ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________________ test_x18_downstream_gate_rows_15_to_16 ____________________
+
+    def test_x18_downstream_gate_rows_15_to_16():
+        """C-18: rendering the enumeration logic gives 16 rows, up from 15. Stale-pin
+        update (2026-10-27): the Directory Governance amendment added one row (17 / 16).
+        Stale-pin update (2026-11-05, Feature 082): the Self-Explanatory Structure
+        amendment added one row (18 / 17). Stale-pin update (2026-11-06, Feature 086):
+        the Efficient Test Execution amendment added one row (20 / 19). Stale-pin update
+        (2026-11-09, Feature 089): the Script Interface Contract amendment added one row
+        (21 / 20). Stale-pin update (2026-11-09, Feature 090): the Re-Anchoring amendment
+        added one row (22 / 21)."""
+>       live = _text(CONST_LIVE)
+               ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_fast_fail_discipline.py:1318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_fast_fail_discipline.py:149: in _text
+    return path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/constitution.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_x22_cross_discipline_change_recorded ___________________
+
+    def test_x22_cross_discipline_change_recorded():
+        """C-22: this is the only change to a Feature-051-owned artifact, traced in four places."""
+        traces = (
+            SPEC_DIR / "plan.md",
+            SPEC_DIR / "feature-ref.md",
+            ROOT / ".specify" / "memory" / "features" / "051.md",
+            ROOT / ".specify" / "memory" / "features" / "052.md",
+        )
+        for tr in traces:
+>           assert tr.is_file(), f"C-22: trace location missing: {tr.relative_to(ROOT)}"
+E           AssertionError: C-22: trace location missing: .specify/memory/features/051.md
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/features/051.md').is_file
+
+tests/contract/test_fast_fail_discipline.py:1412: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 28; the integer headroom on the budget is 0
+E       assert 28 == 23
+
+tests/contract/test_fast_fail_discipline.py:1987: AssertionError
+____________________ test_feature_index_has_no_class_column ____________________
+
+    def test_feature_index_has_no_class_column():
+>       text = FEATURE_INDEX.read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_flow_class_spec_declaration.py:437: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/features.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/features.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_feature_detail_stores_no_class_value ___________________
+
+    def test_feature_detail_stores_no_class_value():
+>       text = FEATURE_DETAIL.read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_flow_class_spec_declaration.py:450: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/features/077.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/memory/features/077.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+______ test_real_tree_reconciles_clean_with_the_declared_coverage_numbers ______
+
+    def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 rows/units —
+        # the review-feature-quality registration grew the ledger and the inventory
+        # together, so all three matched counts move as one. The anti-vacuous floor
+        # stays at its measured 2026-10-24 constants (27/51 -> 39): it is a lower
+        # bound on the inventory side, not a denominator, and 39 still sits below the
+        # real 80 so a truncation keeps firing as a gap.
+        # Stale-pin update (2026-11-06, Feature 087 second slice): 81 -> 83 rows/units —
+        # `/speckit.status` (+ its unit) and `/speckit.measure` (+ `measure.py`) join the
+        # flow-class inventory and the ledger together; the three matched counts move as
+        # one again, and the floor is untouched.
+        proc, record = _check(REPO_ROOT)
+        assert proc.returncode == 0, (
+            "the real 83-row ledger must reconcile clean; findings=%r stderr=%r"
+            % (None if record is None else record.get("findings"), proc.stderr)
+        )
+        assert record is not None and record.get("findings") == []
+        assert record.get("red_kind") == "clean", (
+            "red_kind must be `clean` on a zero-finding tree (C-3); got %r"
+            % record.get("red_kind")
+        )
+        coverage = _coverage(record)
+        _assert_coverage_shape(coverage)
+>       assert coverage["inventory_units"] == record["units"] == 83
+E       assert 85 == 83
+
+tests/contract/test_ledger_reconciliation.py:305: AssertionError
+_________ test_c4_budget_total_and_violations_after_the_feature_landed _________
+
+    def test_c4_budget_total_and_violations_after_the_feature_landed():
+        total, violations, out = _summary()
+>       assert total == GATE_TOTAL, (
+            f"the feature changed the blocking-gate total from {GATE_TOTAL} to {total}; the "
+            f"integer headroom is zero so this is a violation, not a rounding: {out}"
+        )
+E       AssertionError: the feature changed the blocking-gate total from 27 to 28; the integer headroom is zero so this is a violation, not a rounding: blocking confirmation gates: 28
+E           destructive: 21
+E           governance_kept: 7
+E         violations (reversible gates still blocking): 0
+E         
+E       assert 28 == 27
+
+tests/contract/test_neutrality_budget.py:176: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 28 > 23.25
+E       assert 28 <= 23.25
+
+tests/contract/test_neutrality_budget.py:194: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = run_engine_in_process(SCANNER, ["--root", str(ROOT), "--json"])
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 28; the integer headroom on the budget is 0
+E       assert 28 == 23
+
+tests/contract/test_proactive_trigger_section.py:361: AssertionError
+_________ test_c1_the_action_exists_and_the_roster_grew_by_exactly_one _________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7f731e52eb90>
+
+    def test_c1_the_action_exists_and_the_roster_grew_by_exactly_one(capsys):
+        mod = _load()
+        with pytest.raises(SystemExit):
+            mod.main(["--help"])
+        out = capsys.readouterr().out
+        choices = [m.group(1) for m in re.finditer(r"\{([a-z,-]+)\}", out)]
+        names = next((c.split(",") for c in choices if "run-checks" in c), [])
+        assert names, f"no action choices row in --help:\n{out}"
+        assert "run-checks" in names, f"run-checks is not an action: {names}"
+>       assert len(names) == len(ACTIONS) == 11, (
+            f"the roster was 10 before this feature and must be exactly 11 now: {names}"
+        )
+E       AssertionError: the roster was 10 before this feature and must be exactly 11 now: ['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks', 'probe-residual', 'command-family', 'handoff-decision', 'handoff-ref', 'migrate-archive', 'backfill-bindings']
+E       assert 19 == 11
+E        +  where 19 = len(['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', ...])
+E        +  and   11 = len(['create', 'validate', 'check-statement', 'list', 'status', 'objective', ...])
+
+tests/contract/test_run_checks.py:267: AssertionError
+_______________________ test_trigger_edit_moves_no_gate ________________________
+
+    def test_trigger_edit_moves_no_gate():
+        proc = run_engine_in_process(GATE_SCANNER, ["--root", str(REPO_ROOT), "--json"])
+        assert proc.returncode == 0, proc.stderr
+        total = json.loads(proc.stdout)["total"]
+>       assert total == PRE_CHANGE_GATE_TOTAL, (
+            f"the confirmation-gate scan total moved from the pre-change {PRE_CHANGE_GATE_TOTAL} to "
+            f"{total}; the headroom on that budget is 0, so this slice's sentence must add no "
+            "gate-scannable declaration (C-19)"
+        )
+E       AssertionError: the confirmation-gate scan total moved from the pre-change 27 to 28; the headroom on that budget is 0, so this slice's sentence must add no gate-scannable declaration (C-19)
+E       assert 28 == 27
+
+tests/contract/test_sdd_diffusion.py:578: AssertionError
+_____________________ test_gn_c2_gate_scan_total_unchanged _____________________
+
+    @pytest.mark.contract
+    def test_gn_c2_gate_scan_total_unchanged():
+        """Run the real scanner and assert equality — not <=, per the clause."""
+        proc = run_engine_in_process(SCANNER, ["--root", str(ROOT), "--json"])
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == 27, (
+            f"gate total moved to {payload['total']}; the recorded budget is 27 and the integer "
+            "headroom is 0, so any new BLOCKING_RE hit in scan scope lands here"
+        )
+E       AssertionError: gate total moved to 28; the recorded budget is 27 and the integer headroom is 0, so any new BLOCKING_RE hit in scan scope lands here
+E       assert 28 == 27
+
+tests/contract/test_user_facing_comprehension_doc.py:569: AssertionError
+___________________ test_confirmation_gate_budget_unchanged ____________________
+
+    @pytest.mark.contract
+    def test_confirmation_gate_budget_unchanged():
+        proc = run_engine_in_process(SCAN)
+        out = proc.stdout
+        m_total = re.search(r"blocking confirmation gates: (\d+)", out)
+        m_viol = re.search(r"violations \(reversible gates still blocking\): (\d+)", out)
+        assert m_total and m_viol, f"scan-confirmation-gates output unparsable:\n{out}{proc.stderr}"
+        # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total, 23 -> 27
+        # via pre-067 gate additions (27 already at branch point 7f9033ec).
+>       assert int(m_total.group(1)) == 27, (
+            f"gate budget moved: {m_total.group(1)} != 27 — the compiled sections changed "
+            f"the confirmation-gate surface; the budget owner must re-adjudicate first"
+        )
+E       AssertionError: gate budget moved: 28 != 27 — the compiled sections changed the confirmation-gate surface; the budget owner must re-adjudicate first
+E       assert 28 == 27
+E        +  where 28 = int('28')
+E        +    where '28' = <built-in method group of re.Match object at 0x7f731e7c5090>(1)
+E        +      where <built-in method group of re.Match object at 0x7f731e7c5090> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+tests/contract/test_wrap_up_wording_gate_safe.py:77: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_criterion_subject.py::test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+FAILED tests/contract/test_delegation_classes.py::test_every_template_edge_is_same_class_or_neutral_exempt
+FAILED tests/contract/test_expression_faces.py::test_duplicate_face_is_clean_over_the_declared_wide_scope
+FAILED tests/contract/test_expression_faces.py::test_a_copied_criterion_line_in_each_surface_turns_red
+FAILED tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+FAILED tests/contract/test_fast_fail_discipline.py::test_x4_live_constitution_principle_xvi
+FAILED tests/contract/test_fast_fail_discipline.py::test_x5_live_version_minor_bump
+FAILED tests/contract/test_fast_fail_discipline.py::test_x6_sync_impact_report_prepended
+FAILED tests/contract/test_fast_fail_discipline.py::test_x7_version_three_segment_form
+FAILED tests/contract/test_fast_fail_discipline.py::test_x8_principle_block_structure
+FAILED tests/contract/test_fast_fail_discipline.py::test_x9_principle_block_pointer_and_no_new_mechanism
+FAILED tests/contract/test_fast_fail_discipline.py::test_x10_principle_block_lines_under_100
+FAILED tests/contract/test_fast_fail_discipline.py::test_x11_principle_block_no_restated_content
+FAILED tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins
+FAILED tests/contract/test_fast_fail_discipline.py::test_x16_plan_template_zero_change
+FAILED tests/contract/test_fast_fail_discipline.py::test_x18_downstream_gate_rows_15_to_16
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_index_has_no_class_column
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_detail_stores_no_class_value
+FAILED tests/contract/test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers
+FAILED tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+FAILED tests/contract/test_sdd_diffusion.py::test_trigger_edit_moves_no_gate
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+FAILED tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+31 failed, 621 passed, 5 deselected in 29.98s
+exit=1

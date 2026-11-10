@@ -188,16 +188,16 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T043 [US5] Author the in-process conversion contract cases in `tests/contract/test_inprocess_conversion_contract.py`: the AST census over `tests/**/*.py` and the read-only `tests/conftest.py`, manifest completeness against that denominator, the closed keep-class set, and the revert-red leg; record the red run in `notes/red-first-evidence.md`. [green: contracts/inprocess-conversion.contract.md#C-001] [green: contracts/inprocess-conversion.contract.md#C-002]
+- [X] T043 [US5] Author the in-process conversion contract cases in `tests/contract/test_inprocess_conversion_contract.py`: the AST census over `tests/**/*.py` and the read-only `tests/conftest.py`, manifest completeness against that denominator, the closed keep-class set, and the revert-red leg; record the red run in `notes/red-first-evidence.md`. [green: contracts/inprocess-conversion.contract.md#C-001] [green: contracts/inprocess-conversion.contract.md#C-002]
 
 ### Implementation for User Story 5
 
-- [ ] T044 [US5] [blockedBy: T043] Add the generic in-process invocation helper to `tests/script_api.py` (importlib load, stdout/stderr capture, `main(argv)` exit code; `typer.testing.CliRunner` equivalent for the Typer CLI).
-- [ ] T045 [US5] [blockedBy: T044] Generate `test-evidence/inprocess-conversion.md` from the AST census (one row per site: `file | call_site | verdict | boundary_class | reason`) and pilot-convert one contract file with local `_run` wrappers, recording before/after equivalence (FR-019). [green: contracts/inprocess-conversion.contract.md#C-003] [green: contracts/inprocess-conversion.contract.md#C-004] [green: contracts/inprocess-conversion.contract.md#C-005] [green: contracts/inprocess-conversion.contract.md#C-006]
-- [ ] T046 [US5] [blockedBy: T045] Convert the contract-area engine group A (goal/flow/concurrency/confirmation engines) to in-process calls and fill their manifest rows.
-- [ ] T047 [US5] [blockedBy: T045] Convert the contract-area engine group B (docs/probe/trigger/summary engines) and fill their manifest rows.
-- [ ] T048 [US5] [blockedBy: T045] Convert the contract-area engine group C (mirror/measure/state engines) where non-boundary and fill their manifest rows.
-- [ ] T049 [US5] [blockedBy: T046, T047, T048] Record the contract-area keep rows with boundary classes (fixture-layer `cwd=`/`env=` helpers, `copy-topology` cases) in `test-evidence/inprocess-conversion.md` (FR-027).
+- [X] T044 [US5] [blockedBy: T043] Add the generic in-process invocation helper to `tests/script_api.py` (importlib load, stdout/stderr capture, `main(argv)` exit code; `typer.testing.CliRunner` equivalent for the Typer CLI).
+- [X] T045 [US5] [blockedBy: T044] Generate `test-evidence/inprocess-conversion.md` from the AST census (one row per site: `file | call_site | verdict | boundary_class | reason`) and pilot-convert one contract file with local `_run` wrappers, recording before/after equivalence (FR-019). [green: contracts/inprocess-conversion.contract.md#C-003] [green: contracts/inprocess-conversion.contract.md#C-004] [green: contracts/inprocess-conversion.contract.md#C-005] [green: contracts/inprocess-conversion.contract.md#C-006]
+- [X] T046 [US5] [blockedBy: T045] Convert the contract-area engine group A (goal/flow/concurrency/confirmation engines) to in-process calls and fill their manifest rows.
+- [X] T047 [US5] [blockedBy: T045] Convert the contract-area engine group B (docs/probe/trigger/summary engines) and fill their manifest rows.
+- [X] T048 [US5] [blockedBy: T045] Convert the contract-area engine group C (mirror/measure/state engines) where non-boundary and fill their manifest rows.
+- [X] T049 [US5] [blockedBy: T046, T047, T048] Record the contract-area keep rows with boundary classes (fixture-layer `cwd=`/`env=` helpers, `copy-topology` cases) in `test-evidence/inprocess-conversion.md` (FR-027).
 - [ ] T050 [US5] [blockedBy: T045] Convert the integration-area groups (docs-scenario and evidence-lane) non-boundary engine calls and fill their manifest rows.
 - [ ] T051 [US5] [blockedBy: T045] Convert the unit-area engine-call group and fill their manifest rows.
 - [ ] T052 [US5] [blockedBy: T049, T050, T051] Record the integration/unit keep rows, run the guard over the full manifest, fix every unclassified site and update the manifest evidence pointers. [green: contracts/inprocess-conversion.contract.md#C-007] [green: contracts/inprocess-conversion.contract.md#C-008]

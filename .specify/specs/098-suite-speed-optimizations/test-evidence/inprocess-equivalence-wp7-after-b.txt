@@ -1,0 +1,608 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_doc_consistency_checker.py tests/contract/test_document_structure_gate.py tests/contract/test_git_workflow_observe.py tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_trigger_engine.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+........................................................................ [ 31%]
+......................F..FFF...........F.FF..FFFF.FFFFFF.FFF..F.......FF [ 62%]
+FF...................................................................... [ 93%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+_____________________ test_c6_no_partial_file_left_behind ______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c6_no_partial_file_left_b0')
+
+    def test_c6_no_partial_file_left_behind(ws):
+        do_init(ws)
+>       assert index_path(ws).is_file()
+E       AssertionError: assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json').is_file
+E        +      where PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c6_no_partial_file_left_b0'))
+
+tests/contract/test_trigger_engine.py:315: AssertionError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[missing] __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra0')
+breakage = 'missing'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+>           p.unlink()
+
+tests/contract/test_trigger_engine.py:362: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json')
+missing_ok = False
+
+    def unlink(self, missing_ok=False):
+        """
+        Remove this file or link.
+        If the path is a directory, use rmdir() instead.
+        """
+        try:
+>           os.unlink(self)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1147: FileNotFoundError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[corrupt] __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra1')
+breakage = 'corrupt'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+            p.unlink()
+        elif breakage == "corrupt":
+>           p.write_text("{not json", encoding="utf-8")
+
+tests/contract/test_trigger_engine.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra1/.specify/memory/trigger/index.json')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra1/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______ test_c8_state_unreadable_degrades_to_suggest_only[incompatible] ________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra2')
+breakage = 'incompatible'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+            p.unlink()
+        elif breakage == "corrupt":
+            p.write_text("{not json", encoding="utf-8")
+        else:
+>           data = json.loads(p.read_text(encoding="utf-8"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:366: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra2/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_c8_state_unreadable_degra2/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_c12_assess_resolves_a_unique_situation __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c12_assess_resolves_a_uni0')
+
+    def test_c12_assess_resolves_a_unique_situation(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sc12", "--turn-id", "sc12-01",
+                        "--compliance-done", "--stage", "requirements-unclear",
+                        "--signal", "needs-clarification"], ws)
+        assert proc.returncode == 0, proc.stderr
+        payload = envelope_of(proc)["payload"]
+        sid = payload.get("situationId")
+>       assert sid == "s01", f"(requirements-unclear, needs-clarification) must resolve to s01, got {sid}"
+E       AssertionError: (requirements-unclear, needs-clarification) must resolve to s01, got None
+E       assert None == 's01'
+
+tests/contract/test_trigger_engine.py:516: AssertionError
+_______________________ test_c12_v1_6_most_specific_wins _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c12_v1_6_most_specific_wi0')
+
+    def test_c12_v1_6_most_specific_wins(ws):
+        """s05 (open-tasks + checklist-absent) must beat its subset s06 (open-tasks)."""
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sspec", "--turn-id", "sspec-01",
+                        "--compliance-done", "--stage", "tasks-ready",
+                        "--signal", "open-tasks", "--signal", "checklist-absent"], ws)
+        sid = envelope_of(proc)["payload"].get("situationId")
+>       assert sid == "s05", (
+            f"V1.6 most-specific-first must resolve to s05 when both signals are present, got {sid}"
+        )
+E       AssertionError: V1.6 most-specific-first must resolve to s05 when both signals are present, got None
+E       assert None == 's05'
+
+tests/contract/test_trigger_engine.py:538: AssertionError
+__________________ test_c12_no_match_is_reported_not_invented __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c12_no_match_is_reported_0')
+
+    def test_c12_no_match_is_reported_not_invented(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "snomatch", "--turn-id", "snomatch-01",
+                        "--stage", "non-feature"], ws)
+        assert proc.returncode == 0, proc.stderr
+        payload = envelope_of(proc)["payload"]
+        assert payload.get("suggestion") is None, "no match must yield a null suggestion"
+>       assert payload.get("reason") == "no-situation-match", (
+            f"reason must be 'no-situation-match', got {payload.get('reason')!r}"
+        )
+E       AssertionError: reason must be 'no-situation-match', got None
+E       assert None == 'no-situation-match'
+E        +  where None = <built-in method get of dict object at 0x7fdc2aa32600>('reason')
+E        +    where <built-in method get of dict object at 0x7fdc2aa32600> = {'enabled': False, 'sessionId': 'snomatch', 'signals': [], 'situationId': None, ...}.get
+
+tests/contract/test_trigger_engine.py:550: AssertionError
+___________________ test_c14_assess_appends_exactly_one_row ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c14_assess_appends_exactl0')
+
+    def test_c14_assess_appends_exactly_one_row(ws):
+        do_init(ws)
+        before = len(telemetry_rows(ws))
+        run_cli(["--action", "assess", "--session", "stel", "--turn-id", "stel-01",
+                 "--compliance-done", "--stage", "non-feature"], ws)
+        rows = telemetry_rows(ws)
+>       assert len(rows) == before + 1, f"expected exactly one new row, got {len(rows) - before}"
+E       AssertionError: expected exactly one new row, got 0
+E       assert 0 == (0 + 1)
+E        +  where 0 = len([])
+
+tests/contract/test_trigger_engine.py:611: AssertionError
+__________________ test_c14_silent_turn_has_no_visible_output __________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c14_silent_turn_has_no_vi0')
+
+    def test_c14_silent_turn_has_no_visible_output(ws):
+        do_init(ws)
+        run_cli(["--action", "assess", "--session", "squiet", "--turn-id", "squiet-01",
+                 "--stage", "non-feature"], ws)
+>       row = telemetry_rows(ws)[-1]
+              ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:621: IndexError
+__________ test_c14_ordering_violation_reported_but_row_still_written __________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c14_ordering_violation_re0')
+
+    def test_c14_ordering_violation_reported_but_row_still_written(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sord", "--turn-id", "sord-01",
+                        "--stage", "requirements-unclear", "--signal", "needs-clarification"], ws)
+        env = envelope_of(proc)
+>       assert env["payload"].get("suggestion") is not None, "fixture expected a hit"
+E       AssertionError: fixture expected a hit
+E       assert None is not None
+E        +  where None = <built-in method get of dict object at 0x7fdc2aad40c0>('suggestion')
+E        +    where <built-in method get of dict object at 0x7fdc2aad40c0> = {'enabled': False, 'sessionId': 'sord', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+tests/contract/test_trigger_engine.py:634: AssertionError
+________________ test_c14_compliance_done_clears_the_violation _________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c14_compliance_done_clear0')
+
+    def test_c14_compliance_done_clears_the_violation(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sord2", "--turn-id", "sord2-01",
+                        "--compliance-done", "--stage", "requirements-unclear",
+                        "--signal", "needs-clarification"], ws)
+        env = envelope_of(proc)
+        assert "ordering-violation" not in env["errors"]
+>       assert telemetry_rows(ws)[-1]["complianceDone"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:651: IndexError
+______________________ test_c15_suggestion_key_set_exact _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c15_suggestion_key_set_ex0')
+
+    def test_c15_suggestion_key_set_exact(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "skeys", "--turn-id", "skeys-01",
+                        "--compliance-done", "--stage", "requirements-unclear",
+                        "--signal", "needs-clarification"], ws)
+        sug = envelope_of(proc)["payload"]["suggestion"]
+>       assert sug is not None
+E       assert None is not None
+
+tests/contract/test_trigger_engine.py:676: AssertionError
+_______________ test_c16_accepted_increments_and_declined_resets _______________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c16_accepted_increments_a0')
+
+    def test_c16_accepted_increments_and_declined_resets(ws):
+        do_init(ws)
+        for i in range(1, 3):
+            session = f"sc16-{i}"
+            run_cli(["--action", "assess", "--session", session, "--turn-id", f"{session}-01",
+                     "--compliance-done", "--stage", "requirements-unclear",
+                     "--signal", "needs-clarification"], ws)
+            proc = run_cli(["--action", "record", "--session", session, "--rule", "r-001",
+                            "--response", "accepted"], ws)
+>           assert proc.returncode == 0, proc.stderr
+E           AssertionError: 
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...r-assess"\n  ],\n  "warnings": [],\n  "semanticJudgmentPending": [],\n  "notes": [],\n  "payload": {}\n}\n', stderr='').returncode
+
+tests/contract/test_trigger_engine.py:696: AssertionError
+___________________ test_c16_reaching_the_threshold_promotes ___________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c16_reaching_the_threshol0')
+
+    def test_c16_reaching_the_threshold_promotes(ws):
+        do_init(ws)
+        for i in range(1, 4):
+            session = f"sc16p-{i}"
+            run_cli(["--action", "assess", "--session", session, "--turn-id", f"{session}-01",
+                     "--compliance-done", "--stage", "requirements-unclear",
+                     "--signal", "needs-clarification"], ws)
+            run_cli(["--action", "record", "--session", session, "--rule", "r-001",
+                     "--response", "accepted"], ws)
+>       rule = next(r for r in read_index(ws)["rules"] if r["ruleId"] == "r-001")
+                               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:721: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:175: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________ test_c17_destructive_never_promotes_over_ten_acceptances ___________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c17_destructive_never_pro0')
+
+    def test_c17_destructive_never_promotes_over_ten_acceptances(ws):
+        do_init(ws)
+        for i in range(1, 11):
+            session = f"sc17-{i}"
+            proc = run_cli(["--action", "assess", "--session", session,
+                            "--turn-id", f"{session}-01", "--compliance-done",
+                            "--stage", "tasks-ready", "--signal", "open-tasks"], ws)
+            assert proc.returncode == 0, proc.stderr
+            sug = envelope_of(proc)["payload"]["suggestion"]
+>           assert sug is not None and sug["ruleId"] == "r-006"
+E           assert (None is not None)
+
+tests/contract/test_trigger_engine.py:738: AssertionError
+______________________ test_c18_threshold_priority_chain _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c18_threshold_priority_ch0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdc2abf0590>
+
+    def test_c18_threshold_priority_chain(ws, monkeypatch):
+        do_init(ws)
+    
+        def stored_threshold():
+            proc = run_cli(["--action", "status"], ws)
+            return envelope_of(proc)["payload"]["config"]["threshold"]
+    
+>       assert stored_threshold() == 3, "default threshold is 3"
+E       AssertionError: default threshold is 3
+E       assert 5 == 3
+E        +  where 5 = <function test_c18_threshold_priority_chain.<locals>.stored_threshold at 0x7fdc2ac86f20>()
+
+tests/contract/test_trigger_engine.py:760: AssertionError
+______________________ test_c18_threshold_floor_rejected _______________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c18_threshold_floor_rejec0')
+
+    def test_c18_threshold_floor_rejected(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "config", "--threshold", "1"], ws)
+        assert proc.returncode == EXIT_CODES["EXIT_USAGE"], (
+            f"a threshold below the floor of 2 must exit {EXIT_CODES['EXIT_USAGE']}, "
+            f"got {proc.returncode}"
+        )
+        assert "threshold-below-floor" in envelope_of(proc)["errors"]
+>       assert read_index(ws)["config"]["threshold"] == 3, "a rejected value must not be stored"
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:780: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:175: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_c19_no_write_outside_workspace_root ___________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c19_no_write_outside_work0')
+
+    def test_c19_no_write_outside_workspace_root(ws):
+        src = ENGINE.read_text(encoding="utf-8")
+        for token in ("~/.specify", "Path.home()", "expanduser"):
+            assert token not in src, (
+                f"engine references a user-global path ({token}); all writes must stay "
+                "under workspaceRoot"
+            )
+        do_init(ws)
+>       assert index_path(ws).is_file(), "init must write inside the workspace"
+E       AssertionError: init must write inside the workspace
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json').is_file
+E        +      where PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c19_no_write_outside_work0'))
+
+tests/contract/test_trigger_engine.py:808: AssertionError
+________________ test_c20_repeat_in_same_session_is_suppressed _________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c20_repeat_in_same_sessio0')
+
+    def test_c20_repeat_in_same_session_is_suppressed(ws):
+        do_init(ws)
+        args = ["--action", "assess", "--session", "ssup", "--compliance-done",
+                "--stage", "requirements-unclear", "--signal", "needs-clarification"]
+        first = envelope_of(run_cli([*args, "--turn-id", "ssup-01"], ws))
+>       assert first["payload"].get("suggestion") is not None, "first turn should suggest"
+E       AssertionError: first turn should suggest
+E       assert None is not None
+E        +  where None = <built-in method get of dict object at 0x7fdc2a8d7f40>('suggestion')
+E        +    where <built-in method get of dict object at 0x7fdc2a8d7f40> = {'enabled': False, 'sessionId': 'ssup', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+tests/contract/test_trigger_engine.py:819: AssertionError
+____________________ test_c20_new_session_is_not_suppressed ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c20_new_session_is_not_su0')
+
+    def test_c20_new_session_is_not_suppressed(ws):
+        do_init(ws)
+        base = ["--action", "assess", "--compliance-done", "--stage", "requirements-unclear",
+                "--signal", "needs-clarification"]
+        run_cli([*base, "--session", "sa", "--turn-id", "sa-01"], ws)
+        env = envelope_of(run_cli([*base, "--session", "sb", "--turn-id", "sb-01"], ws))
+>       assert env["payload"].get("suggestion") is not None, (
+            "a session switch means state may have changed — the first turn must not be suppressed"
+        )
+E       AssertionError: a session switch means state may have changed — the first turn must not be suppressed
+E       assert None is not None
+E        +  where None = <built-in method get of dict object at 0x7fdc2ad96500>('suggestion')
+E        +    where <built-in method get of dict object at 0x7fdc2ad96500> = {'enabled': False, 'sessionId': 'sb', 'signals': ['needs-clarification'], 'situationId': None, ...}.get
+
+tests/contract/test_trigger_engine.py:836: AssertionError
+_____________________ test_c21_auto_execute_is_only_a_flag _____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_c21_auto_execute_is_only_0')
+
+    def test_c21_auto_execute_is_only_a_flag(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sae", "--turn-id", "sae-01",
+                        "--compliance-done", "--stage", "requirements-unclear",
+                        "--signal", "needs-clarification"], ws)
+        sug = envelope_of(proc)["payload"]["suggestion"]
+>       assert isinstance(sug["autoExecute"], bool), (
+                          ^^^^^^^^^^^^^^^^^^
+            "autoExecute is advice for the agent, never an execution the engine performs"
+        )
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/contract/test_trigger_engine.py:880: TypeError
+___________________________ test_init_is_idempotent ____________________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_is_idempotent0')
+
+    def test_init_is_idempotent(ws):
+        do_init(ws)
+>       first = index_path(ws).read_bytes()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1001: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_is_idempotent0/.specify/memory/trigger/index.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_init_is_idempotent0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________________ test_init_writes_the_e6_shape _________________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_writes_the_e6_shape0')
+
+    def test_init_writes_the_e6_shape(ws):
+        do_init(ws)
+>       data = read_index(ws)
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1011: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:175: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________ test_init_maintains_the_telemetry_ignore_entry ________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_maintains_the_teleme0')
+
+    def test_init_maintains_the_telemetry_ignore_entry(ws):
+        do_init(ws)
+        gi = ws / ".specify" / ".gitignore"
+>       assert gi.is_file(), "init must create/extend .specify/.gitignore"
+E       AssertionError: init must create/extend .specify/.gitignore
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_maintains_the_teleme0/.specify/.gitignore').is_file
+
+tests/contract/test_trigger_engine.py:1025: AssertionError
+____________________ test_init_does_not_revert_local_tuning ____________________
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_does_not_revert_loca0')
+
+    def test_init_does_not_revert_local_tuning(ws):
+        do_init(ws)
+>       data = read_index(ws)
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1041: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:175: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-7873/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-7873/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/contract/test_trigger_engine.py::test_c6_no_partial_file_left_behind
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[missing]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[corrupt]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[incompatible]
+FAILED tests/contract/test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation
+FAILED tests/contract/test_trigger_engine.py::test_c12_v1_6_most_specific_wins
+FAILED tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+FAILED tests/contract/test_trigger_engine.py::test_c14_assess_appends_exactly_one_row
+FAILED tests/contract/test_trigger_engine.py::test_c14_silent_turn_has_no_visible_output
+FAILED tests/contract/test_trigger_engine.py::test_c14_ordering_violation_reported_but_row_still_written
+FAILED tests/contract/test_trigger_engine.py::test_c14_compliance_done_clears_the_violation
+FAILED tests/contract/test_trigger_engine.py::test_c15_suggestion_key_set_exact
+FAILED tests/contract/test_trigger_engine.py::test_c16_accepted_increments_and_declined_resets
+FAILED tests/contract/test_trigger_engine.py::test_c16_reaching_the_threshold_promotes
+FAILED tests/contract/test_trigger_engine.py::test_c17_destructive_never_promotes_over_ten_acceptances
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_priority_chain
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_floor_rejected
+FAILED tests/contract/test_trigger_engine.py::test_c19_no_write_outside_workspace_root
+FAILED tests/contract/test_trigger_engine.py::test_c20_repeat_in_same_session_is_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c20_new_session_is_not_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c21_auto_execute_is_only_a_flag
+FAILED tests/contract/test_trigger_engine.py::test_init_is_idempotent - FileN...
+FAILED tests/contract/test_trigger_engine.py::test_init_writes_the_e6_shape
+FAILED tests/contract/test_trigger_engine.py::test_init_maintains_the_telemetry_ignore_entry
+FAILED tests/contract/test_trigger_engine.py::test_init_does_not_revert_local_tuning
+25 failed, 206 passed in 15.55s
+exit=1

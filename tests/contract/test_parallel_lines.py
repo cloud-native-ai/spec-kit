@@ -20,6 +20,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -41,9 +43,7 @@ CRITERION = "PEER-CRITERION-SENTINEL each line delivers alone."
 
 
 def _run(root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(GOAL_ENGINE), *args, "--repo-root", str(root), "--json"],
-        capture_output=True, text=True, cwd=REPO_ROOT)
+    return run_engine_in_process(GOAL_ENGINE, [*args, "--repo-root", str(root), "--json"])
 
 
 def _payload(proc: subprocess.CompletedProcess) -> dict:

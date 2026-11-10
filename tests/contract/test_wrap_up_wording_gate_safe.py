@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from tests.script_api import probe_utils
@@ -65,8 +67,7 @@ def test_compiled_wording_hits_no_blocking_patterns():
 
 @pytest.mark.contract
 def test_confirmation_gate_budget_unchanged():
-    proc = subprocess.run(
-        [sys.executable, str(SCAN)], capture_output=True, text=True, check=False)
+    proc = run_engine_in_process(SCAN)
     out = proc.stdout
     m_total = re.search(r"blocking confirmation gates: (\d+)", out)
     m_viol = re.search(r"violations \(reversible gates still blocking\): (\d+)", out)

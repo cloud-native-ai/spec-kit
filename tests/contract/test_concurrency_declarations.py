@@ -41,6 +41,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -77,10 +79,7 @@ def _reader_module():
 
 
 def _cli(*args, repo):
-    return subprocess.run(
-        [sys.executable, str(READER), *args, "--repo", str(repo)],
-        capture_output=True, text=True,
-    )
+    return run_engine_in_process(READER, [*args, "--repo", str(repo)])
 
 
 def _copy_layer(dst: Path) -> Path:
@@ -322,10 +321,7 @@ def test_unregistered_fact_file_turns_the_judgement_red(tmp_path):
 # --------------------------------------------------------------------------- #
 def _engine(*args):
     assert ENGINE.is_file(), "the judgement engine must exist for the translation reading"
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *[str(arg) for arg in args]],
-        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=120,
-    )
+    return run_engine_in_process(ENGINE, [str(arg) for arg in args])
 
 
 def _fixture_agent(repo: Path) -> None:

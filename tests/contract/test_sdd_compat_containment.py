@@ -50,6 +50,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -141,11 +143,7 @@ def _delivery_surface() -> list:
 
 
 def _gate_report() -> dict:
-    proc = subprocess.run(
-        ["python3", str(GATE_SCANNER), "--root", str(REPO_ROOT), "--json"],
-        capture_output=True,
-        text=True,
-    )
+    proc = run_engine_in_process(GATE_SCANNER, ["--root", str(REPO_ROOT), "--json"])
     assert proc.returncode == 0, f"gate scanner failed: {proc.stderr}"
     return json.loads(proc.stdout)
 
@@ -294,11 +292,7 @@ def test_c10_no_confirmation_gate_is_declared_by_any_delivered_document():
 
 def test_c11_the_flow_class_inventory_stays_clean():
     """C-11: the inventory keeps its finding count — the engine's verdict, not a pinned size."""
-    proc = subprocess.run(
-        ["python3", str(FLOW_CLASS_ENGINE), "--action", "check"],
-        capture_output=True,
-        text=True,
-    )
+    proc = run_engine_in_process(FLOW_CLASS_ENGINE, ["--action", "check"])
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert "0 finding(s)" in proc.stdout, (
         "the flow-class inventory reports findings; a new command or skill that this slice "
