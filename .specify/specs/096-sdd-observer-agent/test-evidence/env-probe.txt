@@ -1,0 +1,51 @@
+# Environment probe — implement entry (T004)
+
+Capture: 2026-11-10T13:45:43Z · worktree `.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent`
+
+## Implement-entry base
+
+`git rev-parse HEAD` → `c9b86e7fa4d216dde4c7c772ac7cc92a61cd90cd`
+
+This commit is the implement-entry base that DoD-6, GATE-8 and T032 compare against; no other commit.
+
+## Readings (re-probed, never cached)
+
+| Prerequisite | Verdict at generation | Entry probe | Verdict |
+|---|---|---|---|
+| CPython interpreter | available — `Python 3.11.11` | `python3 --version` → `Python 3.11.11` (exit 0) | **available**, unchanged |
+| pytest runner | available — `pytest 8.4.2` | `python3 -m pytest --version` → `pytest 8.4.2` (exit 0) | **available**, unchanged |
+| git read forms | available — `git version 2.43.5` | `git --version` → `git version 2.43.5` (exit 0) | **available**, unchanged |
+| Per-tool agent render entry | available — lists qoder, claude, copilot, opencode | `specify render-agents --help` (via `/usr/local/bin/specify`) → `--ai` option text lists `qoder, claude, copilot, opencode` (exit 0) | **available**, unchanged |
+| External services / network / container runtime / daemon | not required — no probe needed | no probe run (every fixture builds under `tmp_path`) | **not required**, unchanged |
+
+## Raw capture
+
+```text
+== python3 --version ==
+Python 3.11.11
+exit=0
+== python3 -m pytest --version ==
+pytest 8.4.2
+exit=0
+== git --version ==
+git version 2.43.5
+exit=0
+== specify --version ==
+/usr/local/bin/specify
+Usage: specify [OPTIONS] COMMAND [ARGS]...
+Try 'specify --help' for help.
+exit=0
+== specify render-agents --help ==
+ Usage: specify render-agents [OPTIONS]
+ Render validated agent definitions into the target tool's agent directory.
+ ...
+ *  --ai          TEXT  Render agent definitions for this tool's registration
+                       surface: qoder, claude, copilot, opencode
+                       [required]
+exit=0
+== git rev-parse HEAD ==
+c9b86e7fa4d216dde4c7c772ac7cc92a61cd90cd
+exit=0
+== date -u ==
+2026-11-10T13:45:43Z
+```
