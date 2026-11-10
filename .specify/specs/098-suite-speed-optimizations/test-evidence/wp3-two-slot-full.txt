@@ -1,0 +1,152 @@
+# WP-3 — Two-slot commands request the full tier (T018–T021)
+
+- date: 2026-11-10
+- worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations
+- head at run: 719f78b90 (WP-3 changes uncommitted during the runs below)
+- interpreter: python 3.11.11 (pytest 8.4.2, xdist 3.8.0)
+
+## T018 — efficiency-model.md §2 slot rows carry `--full`
+
+File: `skills/external/sdd-loop-driver/references/efficiency-model.md`
+
+```diff
+-| `baseline` | implement 起点（首个任务前） | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
+-| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
++| `baseline` | implement 起点（首个任务前） | `run-tests.sh --full --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
++| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --full --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
+```
+
+## T019 — stage-prompts.md baseline/closure restatements carry `--full`
+
+File: `skills/external/sdd-loop-driver/references/stage-prompts.md`
+
+```diff
+@@ implement block (line 165)
+-  bash scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt
++  bash scripts/bash/run-tests.sh --full --names-out <spec-dir>/baseline-failed.txt
+@@ closure block (line 206)
+-  bash scripts/bash/run-tests.sh --names-out <spec-dir>/final-failed.txt
++  bash scripts/bash/run-tests.sh --full --names-out <spec-dir>/final-failed.txt
+```
+
+## T020 — mirror regeneration and drift check
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external
+scope --only: skills/external
+DIFF .specify/skills/sdd-loop-driver/references/efficiency-model.md
+DIFF .specify/skills/sdd-loop-driver/references/stage-prompts.md
+sync  skills/external/ -> .specify/skills/ (2 files)
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+(all pairs ok; runner pair reported projected[bash-version-guard] ok, shared/ 111 files ok)
+exit=0
+```
+
+The two driver reference pairs are byte-identical after the sync (sha256 below equals across
+source and mirror), so `--check` reports no NEW drift on either pair.
+
+## T021 — the two appended contract cases
+
+File: `tests/contract/test_suite_tier_contract.py` (17 → 18 case items: obligation 3 remains
+parametrized ×2; the file now carries 18 items — 16 existing + 2 appended).
+
+New cases:
+
+1. `test_the_two_slot_commands_request_the_full_tier` (FR-010): on both the source
+   (`skills/external/sdd-loop-driver/references/`) and the runtime mirror
+   (`.specify/skills/sdd-loop-driver/references/`), asserts the one `baseline` and one
+   `closure` slot row in `efficiency-model.md` and the one `baseline-failed.txt` /
+   `final-failed.txt` restatement line in `stage-prompts.md` each contain
+   `run-tests.sh --full --names-out`.
+2. `test_obligation_11_the_full_collection_never_loses_a_baseline_id`
+   (tier-selection §E obligation 11 / C-015): compares the live `--serial --full
+   --collect-only -q` id set against the implement-start id set that T003 records in
+   `notes/pre-change-measurements.md`; removals redden unless each id appears, one per
+   line, in `test-evidence/full-collection-disposed.txt`; a disposed id that is still
+   collected also reddens. A missing or empty baseline record is a red guard, never an
+   empty baseline.
+
+### Red-first run (before T018/T019 edits, before the mirror sync)
+
+```text
+$ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py \
+    -q -k "two_slot or obligation_11"
+exit=1; 2 failed in 0.45s
+FAILED ...::test_the_two_slot_commands_request_the_full_tier
+  AssertionError: .../skills/external/.../efficiency-model.md: the baseline slot MUST request
+  the full tier, or the default tier can silently shrink the budget:
+  | `baseline` | ... | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，... |
+FAILED ...::test_obligation_11_the_full_collection_never_loses_a_baseline_id
+  AssertionError: the implement-start full-tier id set is not recorded:
+  .../notes/pre-change-measurements.md is missing. T003 owns that record (tasks.md T003);
+  a missing baseline MUST NOT read as equality (tier-selection C-015).
+```
+
+### Discriminating-power drill (throwaway copy, deleted after the drill)
+
+The drill copy was taken before the final parser fix; the first green leg caught that pytest
+node ids can carry spaces inside parametrize brackets (`...[more controllable]`), so
+`NODE_ID` was widened from `^tests/\S+::\S+$` to `^tests/\S+::.+$` and the drill re-ran.
+
+```text
+Copy: tar of the worktree excluding .git, .specify/.tmp and __pycache__ (133 MB), under
+.specify/.tmp/wp3/drill (sanctioned temp root; removed after the drill).
+Baseline: the copy's own `--serial --full --collect-only -q` reading (8561 ids =
+8543 pre-change + 18 new tier cases), written into the copy's
+notes/pre-change-measurements.md between the two markers below.
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_suite_tier_contract.py -q -k obligation_11
+  baseline == current tree                         -> exit 0; 1 passed in 10.78s
+  rename tests/unit/test_admission_check.py::test_medium_fixture_admitted
+                                                   -> exit 1; 1 failed in 10.11s
+     AssertionError: ... no longer yields ids recorded in the implement-start baseline ...
+     ['tests/unit/test_admission_check.py::test_medium_fixture_admitted']
+  the renamed id recorded in full-collection-disposed.txt
+                                                   -> exit 0; 1 passed in 9.38s
+```
+
+This exercises TS-M8's mechanism (delete or rename one existing test → obligation 11 red);
+the drill does not close T013 — TS-M8 still needs the T003 record on the real tree.
+
+### Input contract this guard requires from T003 / T022
+
+- `notes/pre-change-measurements.md` MUST carry exactly one
+  `<!-- implement-start-full-ids:begin -->` … `<!-- implement-start-full-ids:end -->`
+  pair; inside it, one pytest node id per line (blank lines and `#` lines ignored).
+- Intentional per-test dispositions land in `test-evidence/full-collection-disposed.txt`,
+  one node id per line; absence of the file records no dispositions.
+
+### Final targeted run (after T018–T020 and the appended cases)
+
+```text
+$ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py -q
+exit=1; 1 failed, 17 passed in 35.56s
+FAILED ...::test_obligation_11_the_full_collection_never_loses_a_baseline_id
+  (missing T003 baseline record — the designed red-first state; T022 owns C-015's green run
+   after T003 records the id set)
+```
+
+## Hashes (sha256, post-change tree)
+
+```text
+15266afca8a26656cbea331983a30186b5a72e37dbc21924e4a49551c244044a  skills/external/sdd-loop-driver/references/efficiency-model.md
+15266afca8a26656cbea331983a30186b5a72e37dbc21924e4a49551c244044a  .specify/skills/sdd-loop-driver/references/efficiency-model.md
+5334a0eb2e9309a6c0d986cab64511b7994556139b4719f1ddb2edeb79b4bcc4  skills/external/sdd-loop-driver/references/stage-prompts.md
+5334a0eb2e9309a6c0d986cab64511b7994556139b4719f1ddb2edeb79b4bcc4  .specify/skills/sdd-loop-driver/references/stage-prompts.md
+c6612677fe9fa5f06b35b5a7a09022d7bcbfe75a9c24ea620ca6f0e4507d966c  tests/contract/test_suite_tier_contract.py
+```
+
+## Anomalies
+
+- No run anomaly and no in-passing repair of a prior artifact.
+- Disclosed state, not an anomaly: obligation 11 is red on the real tree because its
+  baseline producer (T003) has not run; the case names T003 in its failure message. The
+  T013 mutation leg TS-M8 now has its guard in source but needs T003's recorded id set
+  before it can redden on the real tree (the throwaway-copy drill above proves the
+  mechanism). This is the known producer-chain item (analyze r3 X-1 / W2-02, carried).

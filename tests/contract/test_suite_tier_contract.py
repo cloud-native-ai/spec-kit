@@ -2,10 +2,14 @@
 
 Owner of the propositions: `.specify/specs/098-suite-speed-optimizations/contracts/
 tier-selection.contract.md` (§ A–C clauses C-001…C-011, carried here as obligations 1–10;
-obligation 11 — full-collection equality — lands with WP-3) and
-`contracts/slow-membership.contract.md` (§ A–C clauses C-005…C-009, the guard cases at the
-end of this file). The guard derives both sides at run time — the registry table and
-`pytest --collect-only -q -m slow` — and embeds no member count (slow-membership C-005).
+§ E obligation 11 / C-015 — full-collection equality — plus the FR-010 two-slot doc
+assertion) and `contracts/slow-membership.contract.md` (§ A–C clauses C-005…C-009, the
+guard cases at the end of this file). The slow-membership guard derives both sides at run
+time — the registry table and `pytest --collect-only -q -m slow` — and embeds no member
+count (slow-membership C-005). The obligation-11 guard compares the live full-tier
+collection against the implement-start id set that T003 records in
+`notes/pre-change-measurements.md`; a missing baseline is a red guard, never an empty one
+(tier-selection C-015: the baseline is the implement-start baseline slot reading).
 
 Construction constraints:
 
@@ -57,6 +61,21 @@ MEASUREMENT = EVIDENCE_DIR / "slow-members-measurement.txt"
 GUARD_FILE = "tests/contract/test_suite_tier_contract.py"
 REGISTRY_HEADER = ("test_id", "category", "reason", "date")
 SLOW_CATEGORIES = ("process-boundary", "corpus-scan")
+
+#: Owner surfaces of the two-slot commands (FR-010): efficiency-model §2 owns the slot
+#: rules, stage-prompts carries the dispatched restatements, and the mirror is the
+#: runtime copy the driver actually reads.
+DRIVER_SOURCE = ROOT / "skills" / "external" / "sdd-loop-driver" / "references"
+DRIVER_MIRROR = ROOT / ".specify" / "skills" / "sdd-loop-driver" / "references"
+
+#: Obligation 11 inputs: T003 records the implement-start full-tier id set between these
+#: markers in the notes file; per-test dispositions live in their own evidence file.
+BASELINE_RECORD = SPEC_DIR / "notes" / "pre-change-measurements.md"
+BASELINE_BEGIN = "<!-- implement-start-full-ids:begin -->"
+BASELINE_END = "<!-- implement-start-full-ids:end -->"
+DISPOSED_RECORD = EVIDENCE_DIR / "full-collection-disposed.txt"
+# Parametrize ids may carry spaces inside the bracket (e.g. ``test_x[more controllable]``).
+NODE_ID = re.compile(r"^tests/\S+::.+$")
 
 CONTRACT_TREE = {
     "test_selection.py": (
@@ -224,6 +243,49 @@ def _collect_via_runner(*args) -> set:
     done = _run(["--serial", "--collect-only", "-q", *args], cwd=ROOT)
     assert done.returncode == 0, done.stdout + done.stderr
     return _collected(done)
+
+
+def _id_set(lines, source: str) -> set:
+    """Parse one node id per line; malformed or duplicate lines are red, never dropped."""
+    ids = set()
+    for number, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        assert NODE_ID.fullmatch(stripped), (
+            f"{source}:{number} is not a pytest node id: {stripped!r}"
+        )
+        assert stripped not in ids, f"{source}:{number} duplicates {stripped}"
+        ids.add(stripped)
+    return ids
+
+
+def _baseline_ids() -> set:
+    """Obligation 11 input: the implement-start full-tier id set recorded by T003."""
+    assert BASELINE_RECORD.is_file(), (
+        f"the implement-start full-tier id set is not recorded: {BASELINE_RECORD} is "
+        "missing. T003 owns that record (tasks.md T003); a missing baseline MUST NOT read "
+        "as equality (tier-selection C-015)."
+    )
+    text = BASELINE_RECORD.read_text(encoding="utf-8")
+    assert text.count(BASELINE_BEGIN) == 1 and text.count(BASELINE_END) == 1, (
+        f"{BASELINE_RECORD} must carry exactly one {BASELINE_BEGIN} / {BASELINE_END} pair "
+        "around the implement-start full-tier id set"
+    )
+    block = text.split(BASELINE_BEGIN, 1)[1].split(BASELINE_END, 1)[0]
+    ids = _id_set(block.splitlines(), BASELINE_RECORD.name)
+    assert ids, (
+        f"the {BASELINE_BEGIN} block in {BASELINE_RECORD} carries no node id; an empty "
+        "baseline MUST NOT read as equality (tier-selection C-015)"
+    )
+    return ids
+
+
+def _disposed_ids() -> set:
+    """The per-test disposed list; an absent file records no dispositions."""
+    if not DISPOSED_RECORD.is_file():
+        return set()
+    return _id_set(DISPOSED_RECORD.read_text(encoding="utf-8").splitlines(), DISPOSED_RECORD.name)
 
 
 # --------------------------------------------------------------------------- #
@@ -490,6 +552,56 @@ def test_obligation_10_the_header_carries_the_injected_expression(tmp_path):
     header = _command_lines(full.stderr)
     assert len(header) == 1, full.stderr
     assert _m_tokens(header[0]) == [], header[0]
+
+
+# --------------------------------------------------------------------------- #
+# FR-010 — the two-slot budget commands request the full tier on every owner surface
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_the_two_slot_commands_request_the_full_tier():
+    for tree in (DRIVER_SOURCE, DRIVER_MIRROR):
+        model = (tree / "efficiency-model.md").read_text(encoding="utf-8")
+        for slot in ("baseline", "closure"):
+            rows = [ln for ln in model.splitlines() if ln.startswith(f"| `{slot}` |")]
+            assert len(rows) == 1, (
+                f"{tree / 'efficiency-model.md'}: expected one {slot} slot row, got {len(rows)}"
+            )
+            assert "run-tests.sh --full --names-out" in rows[0], (
+                f"{tree / 'efficiency-model.md'}: the {slot} slot MUST request the full "
+                f"tier, or the default tier can silently shrink the budget: {rows[0]}"
+            )
+        prompts = (tree / "stage-prompts.md").read_text(encoding="utf-8")
+        for names in ("baseline-failed.txt", "final-failed.txt"):
+            lines = [ln for ln in prompts.splitlines() if "run-tests.sh" in ln and names in ln]
+            assert len(lines) == 1, (
+                f"{tree / 'stage-prompts.md'}: expected one {names} restatement, got {len(lines)}"
+            )
+            assert "run-tests.sh --full --names-out" in lines[0], (
+                f"{tree / 'stage-prompts.md'}: the {names} restatement MUST request the "
+                f"full tier: {lines[0]}"
+            )
+
+
+# --------------------------------------------------------------------------- #
+# Obligation 11 — the full collection never loses an implement-start baseline id
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_obligation_11_the_full_collection_never_loses_a_baseline_id():
+    baseline = _baseline_ids()
+    disposed = _disposed_ids()
+    current = _collect_via_runner("--full")
+    unrecorded = sorted((baseline - current) - disposed)
+    assert not unrecorded, (
+        "the full-tier collection no longer yields ids recorded in the implement-start "
+        f"baseline ({BASELINE_RECORD}): deleting or renaming an existing test MUST redden "
+        "this case; record each intentional disposition, one id per line, in "
+        f"{DISPOSED_RECORD}: {unrecorded[:10]}"
+        + (f" (+{len(unrecorded) - 10} more)" if len(unrecorded) > 10 else "")
+    )
+    reappeared = sorted(disposed & current)
+    assert not reappeared, (
+        f"ids recorded as disposed in {DISPOSED_RECORD} are still collected: {reappeared[:10]}"
+    )
 
 
 # --------------------------------------------------------------------------- #

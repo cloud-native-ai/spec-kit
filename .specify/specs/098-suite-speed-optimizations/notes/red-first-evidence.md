@@ -84,3 +84,40 @@ proven by the SL-M1…SL-M5 mutation legs (T013), which redden them on membershi
 
 Anomaly line: none in this record — every failure is the expected red of the guard
 against the tree without a registry; no in-passing repair was applied to the guard.
+
+## WP-3 / T021 — two-subject guard: two-slot `--full` (FR-010) + obligation 11 (C-015)
+
+- Date: 2026-11-10
+- Tree state at the red run: neither reference file carries `--full` yet
+  (`efficiency-model.md` slot rows and `stage-prompts.md` restatements unchanged), the
+  mirror is pre-sync, and `notes/pre-change-measurements.md` does not exist (T003 has
+  not recorded the implement-start id set).
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py -q -k "two_slot or obligation_11"`
+- Exit code: `1`
+- Result: `2 failed in 0.45s` (`16` deselected).
+- Full run-time log: `.specify/.tmp/wp3/red-first.log` (this worktree; scratch, not retained).
+
+Failing cases and the decisive excerpts (each failure blames its missing subject):
+
+```text
+FAILED ...::test_the_two_slot_commands_request_the_full_tier
+E  AssertionError: .../efficiency-model.md: the baseline slot MUST request the full tier,
+   or the default tier can silently shrink the budget:
+   | `baseline` | ... | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，... |
+
+FAILED ...::test_obligation_11_the_full_collection_never_loses_a_baseline_id
+E  AssertionError: the implement-start full-tier id set is not recorded:
+   .../notes/pre-change-measurements.md is missing. T003 owns that record (tasks.md T003);
+   a missing baseline MUST NOT read as equality (tier-selection C-015).
+```
+
+After T018/T019 and the T020 mirror sync the doc-assertion case is green
+(`-k "two_slot or obligation_11"` → `1 failed, 1 passed in 0.45s`; the remaining failure is
+the obligation-11 baseline subject, whose green owner is T022 after T003 records the id
+set). The obligation-11 mechanism was proven on a throwaway copy: a baseline equal to the
+copy's own reading passes, renaming one existing test reddens it with the old id named, and
+recording that id in `full-collection-disposed.txt` restores green. Details and hashes:
+`test-evidence/wp3-two-slot-full.txt`.
+
+Anomaly line: none in this record — every failure is the expected red of the guard against
+the tree before its subject exists; no in-passing repair was applied to the guards.
