@@ -4,6 +4,7 @@
 **Slice**: `074a-authorized-routing`
 **Created**: 2026-10-28
 **Status**: Draft
+**Merged into**: .specify/specs/074-goal-team-sdd-unification（merge-manifest.json）
 **编号口径**: 切片内连续本地编号（FR-001–FR-020、SC-001–SC-006、STR-001–STR-010）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
 **Input**: 父 Feature 074 的 `US1 + US2 + US3` 切片（MVP）。父权威：`.specify/specs/074-goal-team-sdd-unification/requirements.md`（2026-10-28 requirements + clarify 已裁定）；父设计：同目录 `plan.md` / `data-model.md` / `contracts/` / `quickstart.md` / `research.md` / `feature-ref.md`（已提交 @6297c14f6，本切片是其投影，不重新设计）；拆分记录：`.specify/state/074-goal-team-sdd-unification.md` § 拆分记录（tasks U4，2026-10-28，confirmed-user）。切片定义：把 Goal → Team → Agent 立为顶层控制链，授权席位可有界地启动嵌套 SDD 运行；用确定性三值分流判据把「何时走 SDD、何时直接修改」定死；把既有反嵌套义务收窄为可判定谓词（深度 2 链）。外层消费与交接报告段、概念扩散、兼容与安全由 `074b-nested-governance` 承接。
 

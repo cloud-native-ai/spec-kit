@@ -40,7 +40,7 @@ pytestmark = pytest.mark.contract
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OWNER_PATH = REPO_ROOT / "shared" / "definitions" / "sdd-routing-definitions.md"
 REQUIREMENTS_PATH = (
-    REPO_ROOT / ".specify" / "specs" / "074a-authorized-routing" / "requirements.md"
+    REPO_ROOT / ".specify" / "specs" / "074-goal-team-sdd-unification" / "requirements.md"
 )
 
 #: The four facts the owner document declares it owns, in the order the contract lists

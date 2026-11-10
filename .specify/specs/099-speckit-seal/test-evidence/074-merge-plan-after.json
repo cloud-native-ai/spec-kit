@@ -1,0 +1,2177 @@
+{
+  "action": "merge-plan",
+  "conditions": [],
+  "exit_code": 0,
+  "plan": {
+    "artifacts": [
+      {
+        "action": "merge",
+        "name": "requirements.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "name": "plan.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "name": "tasks.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "name": "data-model.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "keep",
+        "name": "contracts/authorization-and-probe.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "contracts/bootstrap-and-maintenance.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "contracts/compat-and-safety.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "keep",
+        "name": "contracts/diffusion-and-compat.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "contracts/diffusion.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "contracts/hierarchy-and-authorization.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "contracts/nested-invocation.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "contracts/report-and-attribution.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "keep",
+        "name": "contracts/route-decision.md",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "contracts/routing-decision.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "research.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "name": "quickstart.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "name": "feature-ref.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "merge",
+        "basis": "aggregated pointer view over the slice records (summary rows + pointers)",
+        "name": "verification.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "pointer": {
+          "kind": "pointer-view",
+          "paths": [
+            ".specify/specs/074a-authorized-routing/verification.md",
+            ".specify/specs/074b-nested-governance/verification.md"
+          ]
+        },
+        "pointer_view": true,
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "create",
+        "basis": "required pointer view (parent record absent; summary rows + pointers)",
+        "name": "review.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "pointer": {
+          "kind": "pointer-view",
+          "paths": [
+            ".specify/specs/074a-authorized-routing/review.md",
+            ".specify/specs/074b-nested-governance/review.md"
+          ]
+        },
+        "pointer_view": true,
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "create",
+        "basis": "required pointer view (parent record absent; summary rows + pointers)",
+        "name": "code-review.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "pointer": {
+          "kind": "pointer-view",
+          "paths": [
+            ".specify/specs/074a-authorized-routing/code-review.md",
+            ".specify/specs/074b-nested-governance/code-review.md"
+          ]
+        },
+        "pointer_view": true,
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "file"
+      },
+      {
+        "action": "create",
+        "name": "checklists/readiness-2026-10-29.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "checklists/recheck-2026-10-29-implement-start.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "checklists/requirements.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "not-applicable",
+        "basis": "no files on the parent or on any slice",
+        "name": "checkpoints",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [],
+        "unit": "directory"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/analyze-fix-checks.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/analyze.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/checklist-stage-checks.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/checklist.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/clarify.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/compat-baseline-nodeids.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/containment-post-change-collect.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/containment-post-change-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-baseline-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part1-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part1-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part1-supp-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part1-supp-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part2-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part2-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part2-supp-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part2-supp-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part3-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part3-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part4-failed.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement-targeted-part4-run.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/implement.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "test-evidence/plan-stage-checks.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/plan.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/requirements-checks.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/review.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "test-evidence/targeted-set-v1-baseline.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "merge",
+        "name": "test-evidence/tasks-stage-checks.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "test-evidence/tasks.jsonl",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/closure-full-run-2.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/closure-full-run-3.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/closure-full-run.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/full-baseline-run.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/golden-rows.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/golden-run1.json",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/golden-run2.json",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t016-demo.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t016.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t017.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t021.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t025-targeted.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/green-t025.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/part5-failed.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/part5-regression.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/pre-change-file-sets.txt",
+        "per_slice": [
+          {
+            "present": false,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/pre-change-measurements.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/quickstart-run.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-first-evidence.md",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": true,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing",
+          "074b-nested-governance"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-t005.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-t007.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-t012.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-t018.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/red-t022.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      },
+      {
+        "action": "create",
+        "name": "notes/targeted-set-v1-failed.txt",
+        "per_slice": [
+          {
+            "present": true,
+            "slice": "074a-authorized-routing"
+          },
+          {
+            "present": false,
+            "slice": "074b-nested-governance"
+          }
+        ],
+        "sources": [
+          "074a-authorized-routing"
+        ],
+        "unit": "directory-file"
+      }
+    ],
+    "checks": {
+      "artifact_rows": 78,
+      "candidate_count": 15,
+      "excluded_candidates": 0,
+      "factory_doc_refs": 0,
+      "id_map_entries": 111,
+      "open_conflicts": 0,
+      "slice_conditions": [
+        "name-family",
+        "parent-declaration"
+      ],
+      "slice_count": 2
+    },
+    "conflicts": [],
+    "factory_doc_refs": [],
+    "id_maps": {
+      "C": [],
+      "E": [],
+      "FR": [
+        {
+          "kind": "mapped",
+          "parent_id": "FR-001",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-001"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-002",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-002"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-003",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-003"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-004",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-004"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-005",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-005"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-006",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-006"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-007",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-007"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-008",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-008"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-009",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-009"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-010",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-010"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-011",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-011"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-012",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-012"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-013",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-013"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-014",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-014"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-015",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-015"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-016",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-016"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-017",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-017"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-018",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-018"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "FR-019",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-019"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-025",
+          "slice": "074a-authorized-routing",
+          "slice_id": "FR-020"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-020",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-001"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-021",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-002"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-022",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-003"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-023",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-004"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-024",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-005"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-026",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-006"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-027",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-007"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "FR-028",
+          "slice": "074b-nested-governance",
+          "slice_id": "FR-008"
+        }
+      ],
+      "SC": [
+        {
+          "kind": "localization",
+          "parent_id": "SC-001",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-001"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-002",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-002"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-003",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-003"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-004",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-004"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-006",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-005"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-007",
+          "slice": "074a-authorized-routing",
+          "slice_id": "SC-006"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-005",
+          "slice": "074b-nested-governance",
+          "slice_id": "SC-001"
+        },
+        {
+          "kind": "localization",
+          "parent_id": "SC-008",
+          "slice": "074b-nested-governance",
+          "slice_id": "SC-002"
+        }
+      ],
+      "STR": [
+        {
+          "kind": "mapped",
+          "parent_id": "STR-001",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-001"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-002",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-002"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-003",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-003"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-004",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-004"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-005",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-005"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-006",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-006"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-007",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-007"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-008",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-008"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-009",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-009"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-011",
+          "slice": "074a-authorized-routing",
+          "slice_id": "STR-010"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-001",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-001"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-002",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-002"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-003",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-003"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-007",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-004"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-008",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-005"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-009",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-006"
+        },
+        {
+          "kind": "mapped",
+          "parent_id": "STR-010",
+          "slice": "074b-nested-governance",
+          "slice_id": "STR-007"
+        }
+      ],
+      "T": [
+        {
+          "kind": "appended",
+          "parent_id": "T001",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T001"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T002",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T002"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T003",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T003"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T004",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T004"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T005",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T005"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T006",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T006"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T007",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T007"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T008",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T008"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T009",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T009"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T010",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T010"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T011",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T011"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T012",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T012"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T013",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T013"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T014",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T014"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T015",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T015"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T016",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T016"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T017",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T017"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T018",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T018"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T019",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T019"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T020",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T020"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T021",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T021"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T022",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T022"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T023",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T023"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T024",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T024"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T025",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T025"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T026",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T026"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T027",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T027"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T028",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T028"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T029",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T029"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T030",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T030"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T031",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T031"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T032",
+          "slice": "074a-authorized-routing",
+          "slice_id": "T032"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T033",
+          "slice": "074b-nested-governance",
+          "slice_id": "T001"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T034",
+          "slice": "074b-nested-governance",
+          "slice_id": "T002"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T035",
+          "slice": "074b-nested-governance",
+          "slice_id": "T003"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T036",
+          "slice": "074b-nested-governance",
+          "slice_id": "T004"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T037",
+          "slice": "074b-nested-governance",
+          "slice_id": "T005"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T038",
+          "slice": "074b-nested-governance",
+          "slice_id": "T006"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T039",
+          "slice": "074b-nested-governance",
+          "slice_id": "T007"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T040",
+          "slice": "074b-nested-governance",
+          "slice_id": "T008"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T041",
+          "slice": "074b-nested-governance",
+          "slice_id": "T009"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T042",
+          "slice": "074b-nested-governance",
+          "slice_id": "T010"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T043",
+          "slice": "074b-nested-governance",
+          "slice_id": "T011"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T044",
+          "slice": "074b-nested-governance",
+          "slice_id": "T012"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T045",
+          "slice": "074b-nested-governance",
+          "slice_id": "T013"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T046",
+          "slice": "074b-nested-governance",
+          "slice_id": "T014"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T047",
+          "slice": "074b-nested-governance",
+          "slice_id": "T015"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T048",
+          "slice": "074b-nested-governance",
+          "slice_id": "T016"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T049",
+          "slice": "074b-nested-governance",
+          "slice_id": "T017"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T050",
+          "slice": "074b-nested-governance",
+          "slice_id": "T018"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T051",
+          "slice": "074b-nested-governance",
+          "slice_id": "T019"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T052",
+          "slice": "074b-nested-governance",
+          "slice_id": "T020"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T053",
+          "slice": "074b-nested-governance",
+          "slice_id": "T021"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T054",
+          "slice": "074b-nested-governance",
+          "slice_id": "T022"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T055",
+          "slice": "074b-nested-governance",
+          "slice_id": "T023"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T056",
+          "slice": "074b-nested-governance",
+          "slice_id": "T024"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T057",
+          "slice": "074b-nested-governance",
+          "slice_id": "T025"
+        },
+        {
+          "kind": "appended",
+          "parent_id": "T058",
+          "slice": "074b-nested-governance",
+          "slice_id": "T026"
+        }
+      ]
+    },
+    "schema_version": 1,
+    "slices": [
+      {
+        "carrier_tasks": ".specify/specs/074a-authorized-routing/tasks.md",
+        "order": 1,
+        "order_basis": "split-record",
+        "order_source": ".specify/state/074-goal-team-sdd-unification.md#拆分记录.proposed_slices",
+        "retention": "pending-review",
+        "slug": "074a-authorized-routing"
+      },
+      {
+        "carrier_tasks": ".specify/specs/074b-nested-governance/tasks.md",
+        "order": 2,
+        "order_basis": "split-record",
+        "order_source": ".specify/state/074-goal-team-sdd-unification.md#拆分记录.proposed_slices",
+        "retention": "pending-review",
+        "slug": "074b-nested-governance"
+      }
+    ],
+    "spec": "074-goal-team-sdd-unification"
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification",
+  "verdict": "ok"
+}

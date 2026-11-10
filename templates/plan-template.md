@@ -197,7 +197,7 @@ Owner of this table's shape, its `Disposition` domain, the `Source row` / `Carri
   verbatim — the chapter heading `## Document Structure` and its four subsections `### Chapter Tree`,
   `### Reader Baseline`, `### Evidence List`, `### Fact Owners`. Read them from this file, not from
   another project's spec artifacts: `[[STR-NNN]]` ids are a per-spec namespace, so a downstream
-  project that went looking for `[[STR-002]]`…`[[STR-006]]` in its own § Shared Strings would find
+  project that went looking for `STR-002`…`STR-006` in its own § Shared Strings would find
   unrelated literals or nothing at all.
   The semantics, and the code-first owner of the grammar, are
   `scripts/python/doc-consistency-check.py` (`STRUCTURE_HEADING`, `STRUCTURE_SUBSECTIONS`,

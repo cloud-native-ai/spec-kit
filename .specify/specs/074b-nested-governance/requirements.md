@@ -5,6 +5,7 @@
 **Slice**: `074b-nested-governance`
 **Created**: 2026-10-29
 **Status**: Draft
+**Merged into**: .specify/specs/074-goal-team-sdd-unification（merge-manifest.json）
 **编号口径**: 切片内连续本地编号（FR-001–FR-008、SC-001–SC-002、STR-001–STR-007）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
 **Input**: 父 Feature 074 的 `US4 + US5` 切片（两片拆分中的第二片）。父权威：`.specify/specs/074-goal-team-sdd-unification/requirements.md`（2026-10-28 requirements + clarify 已裁定）；父设计：同目录 `plan.md` / `data-model.md` / `contracts/` / `quickstart.md` / `research.md` / `feature-ref.md`（本切片是其投影，不重新设计）；拆分记录：`.specify/state/074-goal-team-sdd-unification.md` § 拆分记录（tasks U4，2026-10-28，confirmed-user）。切片定义：把 074a 交付的嵌套 SDD 运行结果纳入外层 Goal/Team 消费面——团队运行报告强制嵌套段、Goal 侧观察性归因（经既有 ledger 引用、不新增 Goal 字段）、Team Stage 维度与 SDD 阶段名册消歧、SDD-host Agent 责任声明、项目指令的指针级分流面，并给出兼容与安全的可判定包含性声明。控制层级、双层授权、三值分流与嵌套调用核心由 `074a-authorized-routing` 已实现面承载，本切片只读引用，不重定义。
 

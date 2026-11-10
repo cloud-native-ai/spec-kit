@@ -7,7 +7,7 @@
 **机器键**: `flow_class`（[[STR-003]]）。**取值域的成员与次序不在本文件**——它们由声明层
 `shared/declarations/facts/flow-class-classes.yaml#/statement`（`kind: closed-set`，有序：成员 0 是未声明单元的缺省类别）
 单一拥有；父规格 069 的 `[[STR-001]]` / `[[STR-002]]` 登记的是这两个字面量的语义，本节只引用语义、不重列取值。
-四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
+四个共享字面量（`execution` / `expression` / `flow_class` / `未声明·按默认`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
 清单规模（实测 2026-10-30：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。

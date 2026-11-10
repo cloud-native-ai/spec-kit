@@ -1,0 +1,7 @@
+<!-- merged from 074a-authorized-routing (source: .specify/specs/074a-authorized-routing/test-evidence/checklist.jsonl) -->
+
+{"seq": 1, "row_type": "stage-status", "stage": "checklist", "status": "not-run-docs-only", "selection_basis": "docs-only checklist stage; no executable change", "evidence_ptr": ".specify/specs/074a-authorized-routing/checklists/readiness-2026-10-29.md", "changed_paths": ["checklists/readiness-2026-10-29.md"]}
+
+<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/checklist.jsonl) -->
+
+{"seq": 1, "row_type": "stage-status", "stage": "checklist", "status": "not-run-docs-only", "selection_basis": "docs-only checklist; no executable change", "evidence_ptr": ".specify/specs/074b-nested-governance/checklists/readiness-2026-10-29.md", "changed_paths": ["checklists/readiness-2026-10-29.md"]}

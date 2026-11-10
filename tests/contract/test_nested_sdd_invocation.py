@@ -69,8 +69,10 @@ HANDOFF_FIELDS = (
 #: C-36 — the integration identity is exactly four facts.
 INTEGRATION_FACTS = ("line_id", "branch", "worktree_path", "head_commit")
 
-#: C-35 — the outcome takes exactly one of three values ([[STR-007]] / [[STR-008]] / [[STR-009]]).
-OUTCOME_STRINGS = ("STR-007", "STR-008", "STR-009")
+#: C-35 — the outcome takes exactly one of three values, as verbatim literals: the 074
+#: merge (099 round) aligned the handoff schema with the merged parent's values
+#: (`completed` / `blocked` / `failed`).
+OUTCOME_STRINGS = ("completed", "blocked", "failed")
 
 PROHIBITION_MARKERS = ("MUST NOT", "不得", "禁止", "never")
 
@@ -312,8 +314,8 @@ def test_a_handoff_missing_any_field_is_incomplete(dropped):
 def test_outcome_takes_exactly_three_values():
     body = _own_body(_reference_section("Handoff schema"))
     for string_id in OUTCOME_STRINGS:
-        assert f"[[{string_id}]]" in body, (
-            f"§ Handoff schema does not name the outcome value [[{string_id}]] (C-35)"
+        assert f"`{string_id}`" in body, (
+            f"§ Handoff schema does not name the outcome value {string_id!r} (C-35)"
         )
     assert re.search(r"(三值|three values|exactly three|四值以上|fourth)", body), (
         "§ Handoff schema MUST state that the outcome is exactly three-valued (C-35)"
@@ -511,7 +513,7 @@ def test_failure_and_stall_handoff_has_four_elements():
     assert re.search(r"(状态脊|state spine)", body), (
         "on stall the run persists its state spine (C-39)"
     )
-    assert f"[[{OUTCOME_STRINGS[2]}]]" in body, (
+    assert f"`{OUTCOME_STRINGS[2]}`" in body, (
         "a stalled run returns a failed handoff (C-39)"
     )
     assert re.search(r"(不静默等待|MUST NOT wait silently|不静默)", body), (
@@ -525,8 +527,8 @@ def test_consumer_duty_carries_the_handoff_and_hides_no_failure():
         "the invoking Agent carries the handoff verbatim or by stable path (C-40)"
     )
     for string_id in OUTCOME_STRINGS[1:]:
-        assert f"[[{string_id}]]" in body, (
-            f"§ Consumer duty MUST name [[{string_id}]] as a value that must never be "
+        assert f"`{string_id}`" in body, (
+            f"§ Consumer duty MUST name {string_id!r} as a value that must never be "
             f"reported as success (C-40)"
         )
     assert re.search(r"(MUST NOT .*成功|不得报成功|never .*success)", body), (

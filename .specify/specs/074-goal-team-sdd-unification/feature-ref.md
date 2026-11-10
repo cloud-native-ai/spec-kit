@@ -128,3 +128,21 @@ mechanical (C-62): the named suites' collected test-node-id sets are frozen at t
 commit `7831bb4bb`, and the post-change check asserts set containment plus identical verdicts for
 shared ids. Everything else in the targeted set is expected to stay green unchanged; the only
 intentional change to an existing assertion is item 2 of § 5.
+
+## Merged from slices
+
+<!-- source: 074b-nested-governance -->
+
+### 6. Non-regression / containment statement
+
+
+The slice's containment claims are local FR-026, FR-027 and SC-005. Their discharge is mechanical: the
+seven named suite sets are collected as node-id sets at `33269994a` before any edit (266 cases, frozen
+into `test-evidence/compat-baseline-nodeids.txt`), and the post-change check asserts set containment
+plus identical verdicts for the shared ids. A count comparison is non-conforming.
+
+Two facts are recorded so the claim cannot be read as wider than it is. **First**, the baseline must be
+re-captured at implement start under the never-cache rule: this capture is valid for the commit it
+names, and a sibling suite may have moved since. **Second**, the suite that pins the trigger document
+already carries one failing case at that commit (ruling 6); that case's verdict must remain *the same*
+— red before, red after — and no green claim is made over it.

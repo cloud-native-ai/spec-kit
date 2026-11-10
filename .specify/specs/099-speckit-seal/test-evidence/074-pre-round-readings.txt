@@ -1,0 +1,11 @@
+captured_at: 2026-11-10T17:10:07Z
+parent_tasks_open_rows: 57
+parent_tasks_closed_rows: 0
+parent_requirements_path_markers: 0
+074a_closed: 32
+074b_closed: 26
+parent_review: absent
+parent_code_review: absent
+parent_verification: present
+factory_open_conflicts: 36
+slices: 074a-authorized-routing(split-record), 074b-nested-governance(split-record)

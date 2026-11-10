@@ -1,0 +1,7 @@
+<!-- merged from 074a-authorized-routing (source: .specify/specs/074a-authorized-routing/test-evidence/clarify.jsonl) -->
+
+{"seq": 1, "row_type": "stage-status", "stage": "clarify", "status": "not-run-docs-only", "selection_basis": "docs-only clarify stage; no executable change", "evidence_ptr": ".specify/specs/074a-authorized-routing/requirements.md", "changed_paths": ["requirements.md"]}
+
+<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/clarify.jsonl) -->
+
+{"seq": 1, "row_type": "stage-status", "stage": "clarify", "status": "not-run-docs-only", "selection_basis": "docs-only clarify; no executable change", "evidence_ptr": ".specify/specs/074b-nested-governance/requirements.md", "changed_paths": ["requirements.md"]}

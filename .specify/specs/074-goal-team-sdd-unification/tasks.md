@@ -72,9 +72,6 @@ is a generated projection and MUST NOT be hand-edited.
 **Purpose**: Create the runtime-evidence landing points and freeze the pre-change baselines that
 the later phases measure against.
 
-- [ ] T001 Create the runtime-evidence landing points under `.specify/specs/074-goal-team-sdd-unification/notes/` — `red-first-evidence.md`, `quickstart-run.md`, `pre-change-measurements.md` — each header naming the capture command that fills it
-- [ ] T002 Freeze the pre-change test-node-id case set of the 13-file targeted set at baseline commit `6297c14f6` into `.specify/specs/074-goal-team-sdd-unification/notes/pre-change-measurements.md` with `python3 -m pytest --collect-only -q` over those 13 files (contract C-62: a count comparison is non-conforming)
-- [ ] T003 Re-measure the committed `.specify/specs/074-goal-team-sdd-unification/coverage-baseline.txt` with `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074-goal-team-sdd-unification` and record both lanes plus the delta in `notes/pre-change-measurements.md`; re-freeze only if the corpus uncovered set moved
 
 ---
 
@@ -86,8 +83,6 @@ assertion turn nothing green.
 
 **⚠️ CRITICAL**: No user story task may start until this phase is complete.
 
-- [ ] T004 Create `scripts/python/sdd-route.py`: a stdlib-only, read-only engine exposing `--action route|authorize|golden` with the exit alphabet `0` (a verdict or a judged finding was produced) / `2` (input error) / `3` (authorization refused), one constant naming the owner document `.specify/shared/definitions/sdd-routing-definitions.md`, no file writes, and no copy of any value domain
-- [ ] T005 [P] Create `tests/fixtures/nested_sdd.py`: a temporary repository fixture holding a minimal `.specify/`, one `team.md` with a block-style `seats:` map declaring one `allowed` and one `forbidden` seat, two agent definitions, and one goal with an open Target
 
 **Checkpoint**: engine shell and fixture exist; US1–US5 can now extend them.
 
@@ -106,18 +101,9 @@ confirm the returned handoff carries the closed field set and performs no merge 
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
-- [ ] T006 [P] [US1] Author the red-first contract cases in `tests/contract/test_sdd_authorization.py`: agent-half and seat-half resolution, the AND matrix, absent key / absent `seats` / absent entry defaulting to `forbidden`, a flow-style map refused with the seat named, a dangling seat reported, and the refusal naming the failed half with both source paths plus the seat slug
-- [ ] T007 [P] [US1] Author the red-first contract cases in `tests/contract/test_nested_sdd_invocation.py`: the six-fact entry form, the six fail-closed conditions, handoff field presence, the three-value outcome alphabet, the four-fact integration identity, zero merge and zero push read from `git log` / `git status`, and the failure/stall handoff
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Add `sdd-invocation` to `NEUTRAL_AGENT_METADATA_KEYS` (closed domain `allowed`/`forbidden`, default `forbidden`, `renders_to_tools = False`) and to `NEUTRAL_AGENT_FRAMEWORK_KEYS` in `src/specify_cli/__init__.py` [green: contracts/authorization-and-probe.md#C-15]
-- [ ] T009 [P] [US1] Add the `seats:` block map to the persisted `team.md` schema in `skills/internal/create-team/references/create-mode.md`: block style only, flow style refused as malformed input with the seat named, a dangling seat reported rather than ignored, an absent entry resolving to `forbidden`, and no back-fill for existing teams [green: contracts/authorization-and-probe.md#C-16] [green: contracts/authorization-and-probe.md#C-17]
-- [ ] T010 [P] [US1] Add `team_slug` and `seat_slug` to the dispatch payload declaration in `shared/definitions/subagent-definitions.md` § Execution Topology Declaration, so the seat policy resolves by (team, seat) instead of by seat alone [green: contracts/authorization-and-probe.md#C-18]
-- [ ] T011 [US1] Implement `--action authorize` in `scripts/python/sdd-route.py`: resolve both halves, return `effective` as their AND, name the failing half (`agent` / `seat` / `both`), record both source paths plus the seat slug, exit `3` on refusal and `2` on malformed input [green: contracts/authorization-and-probe.md#C-19] [blockedBy: T004]
-- [ ] T012 [US1] Update the declared pin in `tests/contract/test_neutral_metadata_schema.py` so `NEUTRAL_AGENT_FRAMEWORK_KEYS` gains exactly one member, `sdd-invocation`, in the same change as the key (R12; this is the feature's only intentional change to an existing assertion) [blockedBy: T008]
-- [ ] T013 [US1] Add § Invoked-from-Team Entry to `skills/external/sdd-loop-driver/SKILL.md`: the six accepted facts (Goal reference, optional Target, team slug, invoking seat, authorized scope, routing verdict reference), the validation table, the stop-at-review boundary, and one Hard Requirement line; the standalone entry contract stays unchanged [green: contracts/nested-invocation.md#C-31] [green: contracts/nested-invocation.md#C-32] [green: contracts/nested-invocation.md#C-33]
-- [ ] T014 [US1] Create `skills/external/sdd-loop-driver/references/nested-invocation.md`: the handoff's closed field set, the entry-validation table, the three-value outcome, the four-fact integration identity with the retained branch named, the zero-merge/zero-push rule, registration as one write line in the existing registry, and the failure/stall handoff [green: contracts/nested-invocation.md#C-34] [green: contracts/nested-invocation.md#C-35] [green: contracts/nested-invocation.md#C-36] [green: contracts/nested-invocation.md#C-37] [green: contracts/nested-invocation.md#C-38] [green: contracts/nested-invocation.md#C-39] [green: contracts/nested-invocation.md#C-40] [blockedBy: T013]
 
 **Checkpoint**: US1 is independently testable — the fixture's authorized seat resolves to `allowed`, the unauthorized seat is refused with the failed half named, and the entry form accepts or refuses all six facts.
 
@@ -135,16 +121,9 @@ a missing or conflicting input set returns `adjudicate` and never `direct`.
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T015 [P] [US2] Author the red-first contract cases in `tests/contract/test_sdd_routing_definitions.py`: the owner declaration and the four facts it owns, the five closed value domains, the Task Complexity Rubric cited rather than copied, the definition-class cross-cutting default with its bounded-correction escape, and the single-declaration-point scan for a second table
-- [ ] T016 [P] [US2] Author the red-first contract cases in `tests/contract/test_sdd_routing_engine.py`: determinism, the precedence `adjudicate > sdd > direct`, reason codes, ambiguity and conflict never returning `direct`, identical repeated evaluations, every golden row judged twice, and exit codes `0` (a verdict, including `adjudicate`) / `2` (input error)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Author `shared/definitions/sdd-routing-definitions.md` § Owner declaration, § Hierarchy and boundary, § Direct modification, and § Input domains: the five inputs' closed domains, the prohibition on medium/extension/language/count/author-identity inputs, and the definition-class cross-cutting default [green: contracts/route-decision.md#C-1] [green: contracts/route-decision.md#C-2] [green: contracts/route-decision.md#C-3] [green: contracts/route-decision.md#C-4] [green: contracts/route-decision.md#C-5] [green: contracts/route-decision.md#C-6]
-- [ ] T018 [US2] Author § Verdict table, § Precedence, § Conflict set, and § Reason-code vocabulary in `shared/definitions/sdd-routing-definitions.md`: the SDD conditions, the direct conditions, the single fixed precedence with the conflict closed set, and the reason codes in their declared order [green: contracts/route-decision.md#C-7] [green: contracts/route-decision.md#C-8] [green: contracts/route-decision.md#C-9] [green: contracts/route-decision.md#C-10]
-- [ ] T019 [US2] Author § Override record and § Per-duty application in `shared/definitions/sdd-routing-definitions.md`: the user instruction verbatim with the overridden verdict retained, and one application per declared member duty reused until an input changes [green: contracts/route-decision.md#C-11] [green: contracts/route-decision.md#C-12]
-- [ ] T020 [US2] Implement `--action route` in `scripts/python/sdd-route.py`, reading the domains, verdict table, precedence and reason codes out of `shared/definitions/sdd-routing-definitions.md` at run time and writing no file [green: contracts/route-decision.md#C-13] [blockedBy: T004,T018]
-- [ ] T021 [US2] Author § Golden case table in `shared/definitions/sdd-routing-definitions.md` covering the seven required faces and implement `--action golden` judging every row from that table with no second copy in test code or a data file [green: contracts/route-decision.md#C-14] [blockedBy: T020]
 
 **Checkpoint**: US2 is independently testable — every golden row returns its documented verdict and reason code twice identically, and no ambiguous or conflicting input set reaches `direct`.
 
@@ -163,14 +142,9 @@ refusal naming the failed condition, while every pre-change case keeps its recor
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T022 [US3] Author the red-first contract cases in `tests/contract/test_sdd_invocation_governance.py`: the three-condition predicate matrix, the depth-2 chain, the virtual-mode prohibition, the stage-executor refusal, and the per-member cap
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Narrow § Dispatch-Time Governance Obligation in `shared/definitions/subagent-definitions.md` to the three-condition predicate (capability `allowed` ∧ seat policy `allowed` ∧ an SDD assignment), keeping the original prohibition unchanged for every dispatch that fails it [green: contracts/authorization-and-probe.md#C-20]
-- [ ] T024 [US3] Enforce the predicate fail-closed in the `skills/internal/run-agent/SKILL.md` pre-dispatch probe by calling `scripts/python/sdd-route.py --action authorize` instead of re-reading the definitions in prose, with the refusal naming the condition that failed [green: contracts/authorization-and-probe.md#C-21] [blockedBy: T011,T023]
-- [ ] T025 [US3] State the depth-2 chain, the three prohibitions (a stage executor starts nothing, no SDD-inside-SDD, no virtual-mode host) and the per-member cap in the same § Dispatch-Time Governance Obligation, replacing the unqualified "loop depth is always 1" claim [green: contracts/authorization-and-probe.md#C-22] [green: contracts/authorization-and-probe.md#C-23] [green: contracts/authorization-and-probe.md#C-24] [blockedBy: T023]
-- [ ] T026 [US3] Extend `tests/contract/test_sdd_invocation_governance.py` with the leaf assertion over `agents/sdd-executor.agent.md`, the hosting-declaration conformance case (three responsibility statements read together with the declaration), the pre-change case-set containment comparison, and the refused-dispatch record assertions [green: contracts/authorization-and-probe.md#C-25] [green: contracts/authorization-and-probe.md#C-26] [green: contracts/authorization-and-probe.md#C-27] [green: contracts/authorization-and-probe.md#C-28] [green: contracts/authorization-and-probe.md#C-29] [blockedBy: T022,T025]
 
 **Checkpoint**: US3 is independently testable — only an authorized SDD assignment is dispatched, every other shape keeps the original prohibition, and the narrowing is provably an addition, not an escape.
 
@@ -189,18 +163,9 @@ identical before and after.
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T027 [P] [US4] Author the red-first contract cases in `tests/contract/test_nested_run_report.py`: the `## Nested SDD Runs` heading literal, explicit-when-empty, the per-invocation field list, the peer relationship to `## Verification`, supervisor-only writes, exactly one ledger item carrying the existing Target reference, and the parsed Goal field set identical before and after
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] Add `## Nested SDD Runs` to § Report contract in `skills/internal/create-team/SKILL.md` as a mandatory section listing per invocation the outcome, artifact paths, evidence paths, routing-verdict reference and anomalies, plus the explicit "no nested SDD invocation this run" line [green: contracts/report-and-attribution.md#C-47] [green: contracts/report-and-attribution.md#C-48] [green: contracts/report-and-attribution.md#C-49]
-- [ ] T029 [US4] Add the writer, attribution, peer and verdict-reference duties to the same § Report contract: the supervisor is the sole writer, exactly one ledger item carrying the existing Target reference is appended at report time with no new Goal field and no `goal.md` write, the nested section stays a peer of `## Verification` rather than a replacement, and the routing verdict is consumed by reference [green: contracts/report-and-attribution.md#C-50] [green: contracts/report-and-attribution.md#C-51] [green: contracts/report-and-attribution.md#C-52] [green: contracts/report-and-attribution.md#C-53] [green: contracts/report-and-attribution.md#C-54] [blockedBy: T028]
-- [ ] T030 [US4] Add the invoking-Agent consumption duty to `skills/internal/create-team/SKILL.md` § Execution (run mode): the handoff is included in the Agent's own result and in the run report verbatim or by stable path, and success is never reported on a `blocked` or `failed` outcome [green: contracts/nested-invocation.md#C-41]
-- [ ] T031 [US4] Extend `tests/contract/test_nested_sdd_invocation.py` with the end-to-end acceptance case: one nested run to review, the complete artifact chain, zero merge and zero push, and every artifact and evidence path present in the report section [green: contracts/nested-invocation.md#C-42] [blockedBy: T007,T028]
-- [ ] T032 [US4] Verify the Feature 070 stage-team preset contract is additive-unchanged: run its suite and assert no preset key, section, entry form, or exit code was removed, renamed, or re-meant, recording the output in `.specify/specs/074-goal-team-sdd-unification/verification.md` [green: contracts/nested-invocation.md#C-43]
-- [ ] T033 [US4] Verify the Feature 058 U0–U6 contract is additive-unchanged: run the driver's stage, sentinel, independent-verification, watcher and stall cases and assert no semantics moved, recording the output in `verification.md` [green: contracts/nested-invocation.md#C-44] [blockedBy: T032]
-- [ ] T034 [US4] Add the setup-path entry to the invocation-kind classification in `shared/definitions/sdd-routing-definitions.md`: a target project carrying no `.specify/` structure routes to the setup skill and is never degraded into a direct modification [green: contracts/nested-invocation.md#C-45] [blockedBy: T017]
-- [ ] T035 [US4] Add the incomplete-handoff obligation to `skills/external/sdd-loop-driver/references/nested-invocation.md`: a handoff missing its integration identity is incomplete by definition, and the consuming check is a field-presence test over the handoff block, not a prose reading [green: contracts/nested-invocation.md#C-46] [blockedBy: T014]
 
 **Checkpoint**: US4 is independently testable — a completed, a blocked and a failed nested run each produce the required report content, and the Goal layer shows attribution only through the ledger row.
 
@@ -218,15 +183,9 @@ unchanged.
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T036 [US5] Extend `tests/contract/test_sdd_routing_definitions.py` and `tests/contract/test_sdd_invocation_governance.py` with the diffusion assertions: each new surface cites its owner by path, the team Stage vocabulary is unchanged, and no second copy of the input set, verdict table, or precedence exists
 
 ### Implementation for User Story 5
 
-- [ ] T037 [US5] Disambiguate the Stage dimension in `skills/internal/create-team/references/conceptual-model.md`: executor/evaluator/optimizer is not the SDD stage roster, the roster stays owned by the driver, and no team Stage value is renamed or overloaded [green: contracts/diffusion-and-compat.md#C-55]
-- [ ] T038 [US5] Add exactly one pointer-level routing ambient section to `templates/instructions-template.md`: when a write-bearing change is proposed, run the decision at `.specify/shared/definitions/sdd-routing-definitions.md`, with no input set, no verdict table, and no second copy of the precedence [green: contracts/diffusion-and-compat.md#C-56] [blockedBy: T017]
-- [ ] T039 [P] [US5] Add the promotion-conjunction pointer sentence to `shared/guidelines/proactive-trigger.md`: promotion to an SDD run requires both a routing verdict of the SDD kind and an effective authorization of `allowed`, stated once in the routing owner and reached from here [green: contracts/diffusion-and-compat.md#C-57]
-- [ ] T040 [US5] Add § Invocation kinds to `shared/definitions/sdd-routing-definitions.md`: the driver, framework bootstrap, periodic maintenance and direct modification as four distinct kinds, with the same effective-authorization predicate applying when the setup or house-keeping skill dispatches subagents [green: contracts/diffusion-and-compat.md#C-58] [green: contracts/diffusion-and-compat.md#C-59] [blockedBy: T017]
-- [ ] T041 [P] [US5] Add `sdd-invocation` to the § Authoring Baseline supported-field list in `skills/internal/run-agent/SKILL.md` as a pointer to the key set's owner, so an authored instance can declare it and a validator rejects a value outside the closed set [green: contracts/diffusion-and-compat.md#C-60]
 
 **Checkpoint**: US5 is independently testable — every diffused surface cites its owner and no surface duplicates a table, a threshold, or the stage roster.
 
@@ -237,22 +196,6 @@ unchanged.
 **Purpose**: Mirror and generator projections, the containment discharge, the negative structural
 checks, and the evidence sweeps that close the feature.
 
-- [ ] T042 [P] Sync every edited source to its projection with `python3 scripts/python/sync-mirrors.py --write --only <source prefix>` for plan.md § Mirror Obligations rows 1–5 (`shared/`, `skills/internal/`, `skills/external/`, `scripts/`, `templates/`), never hand-editing a `.specify/` copy
-- [ ] T043 Verify the mirror obligations byte-identically with `python3 scripts/python/sync-mirrors.py --check`, enumerating rows 1–5 of plan.md § Mirror Obligations and requiring zero drift against the measured-clean baseline
-- [ ] T044 Regenerate `.specify/instructions.md` with `bash scripts/bash/generate-instructions.sh`, then assert the new routing section heading is present, no existing section was rewritten, and record the byte delta against the declared per-section ceiling (the file was already 41,948 B over the 32,768 B budget before this feature) [blockedBy: T038,T042]
-- [ ] T045 Assert the CLI neutral-key single definition point with `grep -c 'sdd-invocation' src/specify_cli/__init__.py`, and keep `tests/contract/test_tool_mapping.py` and `tests/contract/test_neutral_metadata_schema.py` green (plan.md § Mirror Obligations row 7) [blockedBy: T008]
-- [ ] T046 Discharge both containment claims by comparing the frozen pre-change node-id set in `notes/pre-change-measurements.md` with the post-change collected set: superset relation plus identical verdicts for the shared ids, never a count comparison [green: contracts/diffusion-and-compat.md#C-61] [green: contracts/diffusion-and-compat.md#C-62]
-- [ ] T047 Negative check over the changed tree: no automatic merge or push, no scheduler or daemon, no automatic feedback transmission, no second confirmation gate, and no scheduler or second registry behind the authorization surface — its only stored state stays the two declared values [green: contracts/authorization-and-probe.md#C-30] [green: contracts/diffusion-and-compat.md#C-63]
-- [ ] T048 Structure check over the changed tree: no second registry, ledger, state spine, ownership model, or integration queue, and the nested run's records resolve to the existing line entry and state spine [green: contracts/diffusion-and-compat.md#C-64]
-- [ ] T049 Run the pre-dispatch governance suite and assert every pre-change case returns its recorded verdict, so an undeclared Agent definition or Team seat still resolves to `forbidden` [green: contracts/diffusion-and-compat.md#C-65]
-- [ ] T050 Roster check over the added text: no SDD stage-name enumeration, no duplicated roster, and no second team Stage vocabulary [green: contracts/diffusion-and-compat.md#C-66]
-- [ ] T051 Delivered-file-set check: no new `/speckit.*` command and no new skill — `python3 scripts/python/flow-class-check.py --action check` stays at 79 units with zero findings [green: contracts/diffusion-and-compat.md#C-67]
-- [ ] T052 Execute quickstart scenarios S1–S6 against the delivered artifacts and paste each real command output and exit code into `.specify/specs/074-goal-team-sdd-unification/notes/quickstart-run.md` with its teardown [blockedBy: T021,T024]
-- [ ] T053 Collect the red-first evidence for every new test file into `.specify/specs/074-goal-team-sdd-unification/notes/red-first-evidence.md`: the command, the real output, and the exit status of each pre-implementation run [blockedBy: T006]
-- [ ] T054 Run the clause-coverage accounting against the frozen baseline and record both lanes (FR and clause) with the measured delta in `notes/pre-change-measurements.md` [blockedBy: T003]
-- [ ] T055 Run the 13-file targeted set plus the six new and one edited contract file, and record command, selection basis, selected paths, pass/fail counts, and any new failure against the frozen baseline in `verification.md` [blockedBy: T026,T031]
-- [ ] T056 Review the Feature list per the Feature Integration Protocol: confirm `.specify/memory/features.md` and `.specify/memory/features/074.md` still describe Feature 074 accurately, and update them synchronously only if the breakdown exposed a new or invalidated feature
-- [ ] T057 Confirm the plan's "no `templates/commands/**` change" claim and that `python3 scripts/python/regen-command-copies.py --check` stays clean [blockedBy: T042]
 
 ---
 
@@ -356,3 +299,291 @@ a dependency.
 - **A6 (no environment dependency)**: This feature needs only the local Python/pytest toolchain, recorded once in § Environment Prerequisites; no docker daemon, network image, cluster, or special hardware is involved, so no task is `[~]`-eligible on environment grounds.
 - **A7 (pre-change baseline commit)**: The containment claims' pre-change case sets are captured at `6297c14f6` (the plan-stage commit, which equals `approved_baseline_commit`); the plan's `feature-ref.md` § 6 names `7831bb4bb` as the freeze point, and the verification record names whichever commit the implementation actually freezes at — the two are reconciled in `verification.md` rather than silently.
 - **A8 (no shipped preset)**: R9 governs — FR-023 is implemented as a conditional conformance rule plus a negative assertion over `agents/sdd-executor.agent.md`; no new shipped Agent preset is created.
+- [X] T001 捕获改前基线：创建 `.specify/specs/074a-authorized-routing/notes/pre-change-measurements.md`，逐项贴真实输出与捕获日期——`python3 scripts/python/sync-mirrors.py --check`（六对逐对）、`python3 scripts/python/regen-command-copies.py --check`、`grep -c 'sdd-invocation' src/specify_cli/__init__.py`、`grep -n 'loop depth' shared/definitions/subagent-definitions.md`、`git rev-parse HEAD`、`git status --short`，外加 `.specify/state/` 与 `.specify/memory/` 的当前文件名清单（GATE-7 的对照物）；本行不写任何源文件。
+- [X] T002 [P] 在实现起点按 never-cache 规则重采名字级测试基线：重跑 `.specify/specs/074a-authorized-routing/test-evidence/targeted-set-v1-baseline.txt` 内记录的 13 个契约文件命令，把该文件的 HEAD / 日期 / 命令 / 结果四行更新为本次真实值（该文件是这条 targeted-set-v1 基线的唯一所有者）；失败 nodeid 名单的捕获与比较形式归 owner `.specify/skills/internal/implement-feature/SKILL.md` § Test runs，本行不复述比较形式，也不改选择理由行。
+- [X] T003 [P] 在实现起点按 never-cache 规则重采条款覆盖基线：`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/074a-authorized-routing --freeze > .specify/specs/074a-authorized-routing/coverage-baseline.txt`（脚本只打印、不写文件），核对头部含 `frozen-from:` 与 `excluding 074a-authorized-routing`，并确认基线正文**不含**本切片 47 条 `C-N` 名——`--freeze` 排除被核算 spec 本身，本切片条款只能被任务行认领、不能被自己的基线豁免。
+- [X] T004 落 `shared/definitions/sdd-routing-definitions.md` 的地基三节：开篇声明它是路由规则的唯一 owner 并列出它拥有的四项事实（五项输入的封闭取值域、三值裁决表、固定优先级、理由码词表），`## Hierarchy`（Goal 最高 / Team 编排 Agent 成员 / Agent 执行职责 / SDD 运行是从属执行路径；SDD 运行 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team、roster），`## Direct modification`（无 SDD 工件链但仍受全部适用质量门与确认门；门禁集合按路径引用 `.specify/shared/guidelines/confirmation-gates.md` 与宪法质量原则，不复述），`## Invocation kinds`（驱动 = SDD 开发流程 / setup 技能 = 框架引导 / house-keeping 技能 = 周期性维护 / 直接修改；无 `.specify/` 结构的目标项目走 setup 路径且 MUST NOT 把 SDD 分流降级为直接修改；setup 与 house-keeping 派发子代理时适用同一有效授权谓词；只有 `sdd-loop-driver` 构成 SDD 调用）。 [green: contracts/hierarchy-and-authorization.md#C-1] [green: contracts/hierarchy-and-authorization.md#C-2] [green: contracts/routing-decision.md#C-17] [green: contracts/bootstrap-and-maintenance.md#C-44] [green: contracts/bootstrap-and-maintenance.md#C-45] [green: contracts/bootstrap-and-maintenance.md#C-46]
+- [X] T005 [blockedBy: T004] 红先编写契约测试到 `tests/contract/test_sdd_routing_definitions.py`：owner 文档开篇声明它拥有四项事实；四项事实在仓库内只有一处落盘（对其余新增面按落盘短语反向计数，命中即 finding）；五项输入各自封闭取值域在场且禁用输入（实现介质 / 扩展名 / 语言 / 工件数 / 作者身份）被写成规则；`## Invocation kinds` 恰四类且 setup / house-keeping 与开发流程区分；每个 `[[STR-NNN]]` 引用解析到 `requirements.md` § Shared Strings 的一行；运行红跑（红形态 = 章节缺失），把命令、真实输出、退出码写入 `.specify/specs/074a-authorized-routing/notes/red-first-evidence.md`。
+- [X] T006 [US1] 建夹具 `tests/fixtures/nested_sdd.py`：在受认可临时根（`.specify/shared/guidelines/temp-directory-discipline.md`）下生成最小 `.specify/` 目标项目——`team.md` frontmatter 含 `seats` 块映射（一席 `[[STR-002]]`、一席 `[[STR-003]]`、一席无条目）、两份 `.agent.md`（一份声明 `[[STR-001]]: [[STR-002]]`、一份缺键）、一个 Goal 带 `open` Target、一条已记录的裁决记录（`data-model.md` E4 字段面，verdict 为 `[[STR-004]]`，使 US1 不依赖 US2 的引擎）。
+- [X] T007 [US1] [blockedBy: T006] 红先编写契约测试到 `tests/contract/test_sdd_authorization.py`：两半 AND 的四种组合；缺键 / 缺 `seats` 映射 / 缺席条目一律解析为 `[[STR-003]]`；流式 `seats` 映射与悬空席条目被拒并点名席位（不回退为 `[[STR-002]]`）；`(team, seat)` 两坐标缺一即拒；拒绝记录点名失败的一半（`agent` / `seat` / `both`）并携带两个来源路径与 seat slug；`--action authorize` 只读零写入、退出码 0（任何裁决，含拒绝；拒绝由 JSON verdict / reason 表达）/ 2（输入错误）分层；运行红跑并把命令、真实输出、退出码写入 `notes/red-first-evidence.md`。
+- [X] T008 [US1] [blockedBy: T007] 在 `src/specify_cli/__init__.py` 把 `sdd-invocation` 加入 `NEUTRAL_AGENT_METADATA_KEYS`（封闭值 `[[STR-002]]` / `[[STR-003]]`、缺省 `[[STR-003]]`、`renders_to_tools = False`）与 `NEUTRAL_AGENT_FRAMEWORK_KEYS`，并在同一次改动里把 `tests/contract/test_neutral_metadata_schema.py` 的框架键 frozenset 字面量加恰好一个成员（`feature-ref.md` § 5 ruling 5 声明的唯一 pin 变更）；该键 MUST NOT 出现在任何宿主工具的渲染字段里。 [green: contracts/hierarchy-and-authorization.md#C-3]
+- [X] T009 [US1] [blockedBy: T008] 在 `skills/internal/run-agent/SKILL.md` 的 agent 编写基线里列出新键，值域 / 缺省 / 不渲染三项只作指针指向 `src/specify_cli/__init__.py` 的键集 owner，不复述取值。 [green: contracts/hierarchy-and-authorization.md#C-4]
+- [X] T010 [US1] [blockedBy: T008] 在 `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema 增加 `[[STR-011]]` 块映射（按 seat slug 键控、条目内为同一键；块式唯一、流式判畸形、悬空席条目标 dangling、缺省 `[[STR-003]]`、既有团队零回填）。 [green: contracts/hierarchy-and-authorization.md#C-5]
+- [X] T011 [US1] [blockedBy: T008,T010] 新建只读 stdlib 引擎 `scripts/python/sdd-route.py` 并落第一个动作 `--action authorize`：按 `(team, seat)` 解析两半、AND 求值、块式唯一解析、拒绝点名失败的一半并附两个来源路径与 seat slug；零写入、`route` / `golden` 两个动作由 US2 的后续行加入同一文件；本行不手写 `.specify/scripts/python/` 镜像（归 T026）。 [green: contracts/hierarchy-and-authorization.md#C-6] [green: contracts/hierarchy-and-authorization.md#C-7] [green: contracts/hierarchy-and-authorization.md#C-8]
+- [X] T012 [US1] [blockedBy: T011] 红先编写契约测试到 `tests/contract/test_nested_sdd_invocation.py`：六项事实缺一即拒且点名条件（缺 Goal / Target 悬空或关闭或越出绑定 Goal / 终态 Goal / 缺 team 或 seat / scope 越出 territory / 缺裁决或裁决非 `[[STR-004]]`）；运行止于 review 且不进入 merge 步；handoff 字段集封闭（outcome / stages reached / artifact paths / evidence paths / 未决 findings / 异常行 / 集成身份）；三值 outcome；集成身份四事实与被点名的保留 branch；零 merge 零 push（`git log` / `git status` 断言）；卡死 / 超时 / 预算触顶产出 `[[STR-009]]` handoff；缺集成身份的 handoff 不算成功；D-3 的路径引用面（不断言 `## Nested SDD Runs` 标题字面量）；运行红跑并记录。
+- [X] T013 [US1] [blockedBy: T012] 在 `skills/external/sdd-loop-driver/SKILL.md` 增加 § Invoked-from-Team Entry（六项事实、U0 前校验、止于 review）与一条 Hard Requirement（作为一条写线注册到既有 line registry；不 merge、不 push）；独立入口契约逐字不变。 [green: contracts/nested-invocation.md#C-31] [green: contracts/nested-invocation.md#C-32] [green: contracts/nested-invocation.md#C-33]
+- [X] T014 [US1] [blockedBy: T013] 新建 `skills/external/sdd-loop-driver/references/nested-invocation.md` 的 § Entry validation table 与 § Handoff schema：字段集封闭、三值 outcome、集成身份四事实与被点名的保留 branch、零 merge 零 push 的越权判据。 [green: contracts/nested-invocation.md#C-34] [green: contracts/nested-invocation.md#C-35] [green: contracts/nested-invocation.md#C-36] [green: contracts/nested-invocation.md#C-37]
+- [X] T015 [US1] [blockedBy: T014] 同一参考文档补 § Line registration（复用 Feature 064 的 line registry 与 worktree-per-write-line，领域重叠串行或拒绝，MUST NOT 新建第二套机制）、§ Failure and stall handoff（停止、持久化既有状态脊、`[[STR-009]]` handoff 四要素、外层失败隔离与上报）、§ Consumer duty（调用方结果原样或按稳定路径携带 handoff；`[[STR-008]]` / `[[STR-009]]` MUST NOT 报成功）。 [green: contracts/nested-invocation.md#C-38] [green: contracts/nested-invocation.md#C-39] [green: contracts/nested-invocation.md#C-40]
+- [X] T016 [US1] [blockedBy: T015] US1 转绿与取证：`python3 -m pytest -q tests/contract/test_sdd_authorization.py tests/contract/test_nested_sdd_invocation.py` 跑到全绿并把绿证据追加 `notes/red-first-evidence.md`；把两席夹具结果（允许席启动一次嵌套运行 / 禁止席派发前被阻断且点名失败的一半）、止于 review、零 merge 零 push 的真实输出贴入 `notes/quickstart-run.md` 的 S4 / S5 小节。 [green: contracts/nested-invocation.md#C-41] [green: contracts/nested-invocation.md#C-42]
+- [X] T017 [US2] [blockedBy: T005] 在 `shared/definitions/sdd-routing-definitions.md` 落路由正文：五项声明输入的封闭取值域与禁用输入（`change_nature` 的域含 `definition-class`，其成员资格由目标路径谓词派生，谓词清单归 `requirements.md` FR-008 且不新增第六输入）、复杂度层级引用 `.specify/shared/guidelines/task-complexity-rubric.md` 作 owner 且不复述其信号与表、definition-class 默认 cross-cutting 与「有界修正」独立取值 + 非空理由、`[[STR-004]]` 的命中条件、`[[STR-005]]` 的全部条件、固定优先级 `[[STR-006]] > [[STR-004]] > [[STR-005]]`、冲突集的封闭枚举与多条件命中的取码次序、用户显式指示覆盖并记为裁定（含被覆盖的裁决与 FR-011 理由码）、每成员职责一次并复用至输入变化（输入变化即重判、旧裁决保留）、裁决记录载体（本切片 = Agent 执行证据；handoff 与调用方结果按稳定路径引用同一条记录，不复算）。 [green: contracts/routing-decision.md#C-18] [green: contracts/routing-decision.md#C-19] [green: contracts/routing-decision.md#C-20] [green: contracts/routing-decision.md#C-21] [green: contracts/routing-decision.md#C-22] [green: contracts/routing-decision.md#C-23] [green: contracts/routing-decision.md#C-24] [green: contracts/routing-decision.md#C-25] [green: contracts/routing-decision.md#C-26] [green: contracts/routing-decision.md#C-27]
+- [X] T018 [US2] [blockedBy: T017] 红先编写契约测试到 `tests/contract/test_sdd_routing_engine.py`：同输入同输出（确定性）、优先级次序、理由码取码次序（多条件命中时按 owner 声明次序取首条且携带全部命中条件）、退出码阶梯（产出裁决即 exit 0，含 `[[STR-006]]`；输入错误 exit 2）、零写入与 stdlib-only、引擎不自带第二份取值域 / 裁决表 / 优先级 / 理由码；运行红跑并记录。
+- [X] T019 [US2] [blockedBy: T018] 在 `scripts/python/sdd-route.py` 加入 `--action route` 与 `--action golden`：运行时解析 owner 文档取值（MUST NOT 自带第二份四项事实）、`route` 产出裁决即 exit 0（含 `[[STR-006]]`）、输入错误 exit 2、`golden` 解析并判定表内每一行；`--action authorize` 的既有行为零改动。 [green: contracts/routing-decision.md#C-28]
+- [X] T020 [US2] [blockedBy: T019] 在 owner 文档落 § Golden case table（Markdown 表：case id / 五项输入 / 期望裁决 / 期望理由码 / 覆盖的需求面；至少覆盖 feature-scale、bounded maintenance、cross-cutting、irreversible、ambiguous、conflicting 与满足其余全部条件的有界定义修正七类），并连跑两次 `--action golden` 证明逐行裁决与理由码一致；行集唯一落点在该表，测试代码与独立数据文件 MUST NOT 复制行。 [green: contracts/routing-decision.md#C-29]
+- [X] T021 [US2] [blockedBy: T020] US2 转绿与取证：`python3 -m pytest -q tests/contract/test_sdd_routing_definitions.py tests/contract/test_sdd_routing_engine.py` 跑到全绿；`python3 scripts/python/sdd-route.py --action golden --format json` 两次输出逐字节一致，并把两段真实输出与逐行核对贴入 `notes/quickstart-run.md` 的 S1 / S2 / S3 小节；同时复核 ambiguous 与 conflicting 行返回 `[[STR-006]]` 而非 `[[STR-005]]`。
+- [X] T022 [US3] [blockedBy: T016] 红先编写契约测试到 `tests/contract/test_sdd_invocation_governance.py`：四种派发形态（授权 SDD 指派放行并记录授权依据 / 未满足两半的提示词点名驱动 → 派发前阻断并点名条件 / 阶段执行者尝试加载驱动 → 拒绝并报异常 / 阶段内的嵌套 SDD 尝试 → 拒绝）；virtual 模态承载被拒；深度 2 链（团队编排者 → 成员 driver host → 阶段执行者叶子）；既有反嵌套契约用例在非授权路径上保持绿；运行红跑并记录。
+- [X] T023 [US3] [blockedBy: T022] 就地把反嵌套义务收窄为可判定谓词：在 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation 把 `:104` 的「loop depth 恒为 1」句改写为三条件谓词（收件 Agent 定义声明 `[[STR-002]]` ∧ 其席位策略声明 `[[STR-002]]` ∧ 指派任务是 SDD 指派，其中 SDD 指派按 `requirements.md` FR-005 的定义 = 已记录裁决为 `[[STR-004]]` 的成员职责；不满足三者的一切派发保持原禁令逐字不变），并让 `skills/internal/run-agent/SKILL.md` 的派发前探针改调 `python3 scripts/python/sdd-route.py --action authorize` 后 fail-closed（改写提示词无法修好一次拒绝）。 [green: contracts/hierarchy-and-authorization.md#C-9] [green: contracts/hierarchy-and-authorization.md#C-10]
+- [X] T024 [US3] [blockedBy: T023] 在同一 owner 位点同一趟声明深度 2 链、virtual 模态禁令与每成员一运行的硬上限（无可声明的更高上限；第二个并发职责由既有 line 机制串行化或拒绝，不新增并发原语），并把拒绝记录收紧为「点名失败条件 + 收件方解析值 + 两个来源路径 + seat slug」，MUST NOT 只写「未授权」。 [green: contracts/hierarchy-and-authorization.md#C-11] [green: contracts/hierarchy-and-authorization.md#C-12] [green: contracts/hierarchy-and-authorization.md#C-13] [green: contracts/hierarchy-and-authorization.md#C-14]
+- [X] T025 [US3] [blockedBy: T024] US3 转绿与取证：`python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py` 全绿；既有反嵌套用例逐条仍绿（按 T002 基线名集核对）；结构面复核授权面未新增确认门 / 调度器 / 第二 registry；把阶段执行者与未合格提示词的阻断记录（含点名条件）贴入 `notes/quickstart-run.md` 的 governance 小节（quickstart 无该场景，不复用 S6）。 [green: contracts/hierarchy-and-authorization.md#C-15] [green: contracts/hierarchy-and-authorization.md#C-16]
+- [X] T026 镜像同步与逐对核验：`python3 scripts/python/sync-mirrors.py --write --only shared --only skills --only scripts` 后 `python3 scripts/python/sync-mirrors.py --check`（相对 T001 基线零新增差异），并用 `cmp` 逐对核对 7 个源文件与各自 `.specify/` 投影同字节——`shared/definitions/sdd-routing-definitions.md`、`shared/definitions/subagent-definitions.md`、`skills/internal/run-agent/SKILL.md`、`skills/internal/create-team/references/create-mode.md`、`skills/external/sdd-loop-driver/SKILL.md`、`skills/external/sdd-loop-driver/references/nested-invocation.md`、`scripts/python/sdd-route.py`；`python3 scripts/python/regen-command-copies.py --check` 仍 `OK`（证明命令模板零改动）；禁止手改镜像。
+- [X] T027 单一 owner 审计：按落盘短语反向计数，确认五项输入取值域、三值裁决表、固定优先级与理由码词表在 `shared/definitions/sdd-routing-definitions.md` 之外零副本（探针、驱动入口、执行证据记录形状一律按路径抵达）；把命令与真实输出写入 `notes/quickstart-run.md` 的 single-owner 小节。 [green: contracts/routing-decision.md#C-30]
+- [X] T028 结构面复核（与 T027 共用同一证据落点，故按行序串行）：(a) 零新增 `/speckit.*` 命令与零新增技能——`ls templates/commands/*.md | wc -l` 与 `ls -d skills/external/*/ | wc -l`、`ls -d skills/internal/*/ | wc -l` 相对 T001 基线不变；(b) 零新增 registry / ledger / 状态脊 / ownership 模型 / 集成队列——`.specify/state/`、既有 line registry 目录与 `.specify/memory/` 的文件名集合相对 T001 基线 `comm -13` 为空，嵌套运行的记录解析到既有 line 条目与既有状态脊；把命令与输出贴入 `notes/quickstart-run.md` 的 structure 小节。 [green: contracts/nested-invocation.md#C-43] [green: contracts/bootstrap-and-maintenance.md#C-47]
+- [X] T029 [blockedBy: T026] 定向回归与分类诚实性审计面：重跑 `test-evidence/targeted-set-v1-baseline.txt` 的 13 个既有契约文件 + 5 个新测试文件（`python3 -m pytest -q …`），把既有 13 文件的失败 nodeid 排序后与 T002 重采名单做 `comm -13`（MUST 为空，判据是名字级不是条数级），5 个新文件 MUST 全绿；同趟落审计职责——`/speckit.review` 是本切片的分类诚实性审计面（复核每条已声明输入的分类、记录不一致；嵌套运行另加驱动 U4 独立校验），引擎的确定性只覆盖声明输入，故审计结论记入 review 证据而不回写裁决；结果与命令追加 `notes/pre-change-measurements.md` 的回归小节。
+- [X] T030 [blockedBy: T029] 快速走查取证：按 `quickstart.md` 的 S1–S7 逐条执行（S1 route feature-scale / S2 bounded maintenance / S3 missing input / S4 effective authorization / S5 nested run + handoff / S6 acceptance evidence / S7 三项基线在实现起点重测），把每条命令、真实输出、退出码写入 `notes/quickstart-run.md`；无法执行的场景记 `not-evaluated` + reason，不记达成。
+- [X] T031 [blockedBy: T030] SC 证据与登记收口：把 SC-001…SC-007 的状态（只从 `.specify/templates/verification-log-template.md` 的封闭词表取值）、命令、输出摘要与证据指针逐条写入 `.specify/specs/074a-authorized-routing/verification.md`，并逐条声明本趟的 `PLAN-EDIT:`（若有）；同步 `.specify/memory/features/074.md` 的切片行与 `.specify/memory/features.md` 的 074 行 Last Updated（状态列保持 `Planned`；`Implemented` 转移按 `.specify/shared/workflow/feature-integration.md` 判定，不在本行擅自推进）。
+- [X] T032 [blockedBy: T031] 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/074a-authorized-routing/tasks.md`（0 error / 0 warning）、`python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/074a-authorized-routing --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/074a-authorized-routing/requirements.md --tasks .specify/specs/074a-authorized-routing/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/074a-authorized-routing`（claimed = 47 / FR 20 / uncovered beyond baseline = 0），把四段真实输出贴入 `verification.md` 的 gates 小节；若发现与冻结清单的结构漂移，按 rerun 契约追加新行而不重编号。
+- [X] T033 捕获改前基线：创建 `.specify/specs/074b-nested-governance/notes/` 目录并写 `notes/pre-change-measurements.md`，逐项贴真实输出与捕获日期——`python3 scripts/python/sync-mirrors.py --check`（六对逐对）、`python3 scripts/python/regen-command-copies.py --check`、`git rev-parse HEAD`、`git status --short`、`wc -c templates/instructions-template.md .specify/instructions.md`、`grep -c 'sdd-invocation' agents/sdd-executor.agent.md`、`grep -n 'target_ref' skills/internal/create-team/references/summary-mapping.md`、`python3 .specify/scripts/python/flow-class-check.py --action check`，外加 9 行交付面的存在性普查（5 个编辑目标 + 1 个既有测试 + 1 个复用夹具 + 1 个叶子预设全部在位、3 个新测试文件全部缺位）与 `.specify/state/`、`.specify/memory/` 的当前文件名清单（GATE-7 的对照物）；本行不写任何产品文件。
+- [X] T034 [P] 在实现起点按 never-cache 规则重采名字级测试基线：重跑 `.specify/specs/074b-nested-governance/test-evidence/targeted-set-v1-baseline.txt` 内记录的 19 个契约文件命令，把该文件的 `stage_base` / HEAD / 日期 / 命令 / 结果五行更新为本次真实值（该文件是这条 targeted-set-v1 基线的唯一所有者）；失败 nodeid 名单的捕获与比较形式归 owner `.specify/skills/internal/implement-feature/SKILL.md` § Test runs，本行不复述比较形式，也不改选择理由行与"既有红"声明行。
+- [X] T035 [P] 在本文件 30 条 `[green:]` 认领就位后冻结条款覆盖基线：`python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074b-nested-governance --freeze > .specify/specs/074b-nested-governance/coverage-baseline.txt`（脚本只打印、不写文件）；核对头部含 `frozen-from:` 且正文**不含**本切片 30 条 `C-n` 名（`--freeze` 排除被核算 spec 本身，本切片条款只能被任务行认领、不能被自己的基线豁免），随后 `python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074b-nested-governance` 必须 exit 0。
+- [X] T036 [US1] 红先编写契约测试到 `tests/contract/test_nested_run_report.py`：段标题字面量逐字等于 `"## Nested SDD Runs"` 且该字面量全仓只有报告契约一处落点；段对**每次运行**强制（有界 pattern 与 continuous 一律）；逐次列出 outcome（三值封闭集）+ artifact paths + evidence paths + routing-verdict reference + anomalies；无调用时显式声明"无嵌套 SDD 调用"且段不可省略（省略即判违约）；被阻断 / 失败不被改写成成功语气；路径以路径携带、不内联工件正文；既有必填段的名称与次序不变、新增段只在末尾追加；`## Verification` 与嵌套段并列（嵌套段证据不替代外层验证义务）；归因只经既有台账 `target_ref`、Goal 字段集前后一致、无新 Goal 字段；裁决引用缺记录时记 missing 且不得重算；运行红跑（红形态 = 报告契约无该段），把命令、真实输出、退出码写入 `.specify/specs/074b-nested-governance/notes/red-first-evidence.md`。
+- [X] T037 [US1] [blockedBy: T036] 在 `skills/internal/create-team/SKILL.md` § Report contract（`:53`，骨架块 `:57-63`）追加**恰好一个**强制段：标题字面量 `## Nested SDD Runs`，逐次一行的五个字段（outcome 取 `completed` / `blocked` / `failed`、artifact paths、evidence paths、routing-verdict reference、anomalies），无调用时显式声明而非省略，且该段是既有必填段的**末尾追加**——既有段的名称、次序与内容义务逐字不变。 [green: contracts/report-and-attribution.md#C-21] [green: contracts/report-and-attribution.md#C-22] [green: contracts/report-and-attribution.md#C-23]
+- [X] T038 [US1] [blockedBy: T037] 在同一 owner 段落归因边界：team supervisor 是段与全部 tracked 工件的唯一写者、嵌套运行不写任何 tracked 工件；报告时追加**恰好一条**台账条目，复用既有归因字段 `target_ref`（owner `skills/internal/create-team/references/summary-mapping.md` § 6.5，值形 `T-\d{3}`，由 `run-team/SKILL.md:66` 既有行承载），未声明 Target 的运行不发明占位 Target、其行不带归因字段；无新 Goal 字段、无 Goal→requirements 结构链接、无 Goal 定义写入；解析出的 Goal 字段集运行前后完全一致。 [green: contracts/report-and-attribution.md#C-24] [green: contracts/report-and-attribution.md#C-25] [green: contracts/report-and-attribution.md#C-26]
+- [X] T039 [US1] [blockedBy: T038] 在同一 owner 段落三件读法：嵌套段与 `## Verification` 并列而非替代（嵌套运行的验证证据不解除外层运行的验证义务）；routing-verdict reference 是**引用**——指向 `074a` 在 Agent 执行证据里记录的那条裁决，段内不复制输入集 / 裁决表 / 理由码词表，记录不可定位时记 missing 且外层 MUST NOT 重算；handoff 的封闭字段集按引用读取，交接未携带的字段记 missing、不用调用方叙述补齐，`blocked` / `failed` 原样上抛。 [green: contracts/report-and-attribution.md#C-27] [green: contracts/report-and-attribution.md#C-28] [green: contracts/report-and-attribution.md#C-29]
+- [X] T040 [US1] [blockedBy: T039] 单一 owner 审计：`grep -n 'Nested SDD Runs' skills/internal/create-team/SKILL.md skills/internal/run-team/SKILL.md skills/internal/run-agent/SKILL.md` 必须只在报告契约一处出现（`run-team/SKILL.md:66` 继续按路径委派、零第二份陈述），把命令与真实输出追加到 `notes/red-first-evidence.md` 的 single-owner 小节。 [green: contracts/report-and-attribution.md#C-30]
+- [X] T041 [US1] [blockedBy: T040] US1 转绿与取证：`python3 -m pytest -q tests/contract/test_nested_run_report.py` 跑到全绿并把绿证据追加 `notes/red-first-evidence.md`；用夹具团队实测把 quickstart 的 S2（段强制且空时显式声明）与 S3（归因后 Goal 字段集不变，`parse_goal` 前后比对）的命令、真实输出、退出码写入 `notes/quickstart-run.md`。
+- [X] T042 [US2] 红先编写契约测试到 `tests/contract/test_sdd_diffusion.py`：Stage 消歧句在场且 team Stage 取值集（`executor` / `evaluator` / `optimizer`）逐字不变、无名册形状枚举、名册 owner 仍唯一；承载声明与三条职责陈述**一起**读取（只有声明缺三条陈述判不合规，反之亦判不合规）；出厂叶子预设 `agents/sdd-executor.agent.md` 不声明 `sdd-invocation`（负向断言对制品而非对约定）；指令面恰一个指针段、反向计数审计为 0（查询集从**已落盘 owner** 提取实际短语，不用"我以为写了的短语"）；触发纪律的合取句只作指针且 `## ` 段集不变；每个 `[[STR-NNN]]` 引用解析到 `requirements.md` § Shared Strings 的一行；运行红跑（红形态 = 四个扩散面均未落盘），把命令、真实输出、退出码写入 `notes/red-first-evidence.md`。
+- [X] T043 [US2] [blockedBy: T042] 在 `skills/internal/create-team/references/conceptual-model.md:10` 的既有 Stage bullet 就地追加消歧句：本 Stage 维度（`executor` / `evaluator` / `optimizer`）**不是** SDD 阶段名册，SDD 阶段名册仍归驱动所有；不重命名、不重载任何 team Stage 取值；作为既有 bullet 的句子追加，MUST NOT 新开顶层段；新增文本中不出现名册形状的枚举。 [green: contracts/diffusion.md#C-13] [green: contracts/diffusion.md#C-14]
+- [X] T044 [US2] [blockedBy: T043] 在 `skills/internal/run-agent/SKILL.md` § Authoring Baseline（`:171`）既有 `sdd-invocation` 段之后落承载责任规则：声明 `allowed` 的定义 MUST 同时写明三件事——承载驱动、自身不执行阶段命令、止于 review；声明与正文 MUST 一起被读取；阶段执行者能力仍是叶子、MUST NOT 声明 `allowed`，该禁令对本仓出厂预设 `agents/sdd-executor.agent.md` 断言；取值域 / 缺省 / 不渲染三项只作指针指向键集 owner `src/specify_cli/__init__.py`（`NEUTRAL_AGENT_METADATA_KEYS`），不复述取值。 [green: contracts/diffusion.md#C-15] [green: contracts/diffusion.md#C-16] [green: contracts/diffusion.md#C-17]
+- [X] T045 [US2] [blockedBy: T044] 在 `templates/instructions-template.md` 追加**恰好一个**附加式 `## ` 段作为指针级分流面：出现写留存变更时到 owner 路径执行裁决（`shared/definitions/sdd-routing-definitions.md` 与引擎 `scripts/python/sdd-route.py`）；段内 MUST NOT 出现输入集、封闭取值域、裁决表、理由码词表或第二条优先级表述；段内自声明本节字节上限（改前实测 live 41,948 B / template 34,666 B，判据是上限 + 增量，不是"装得下 32,768 B 预算"）。 [green: contracts/diffusion.md#C-18]
+- [X] T046 [US2] [blockedBy: T045] 在 `shared/guidelines/proactive-trigger.md` § Promotion & Safety Boundary（`:68`；该文档的 `## ` 段集是交付的封闭集，共 10 段）内加**一句**：晋升为一次 SDD 运行 MUST 同时具备 SDD 类分流裁决与有效授权（`allowed`）；该合取由路由 owner 拥有、此处只作指针；MUST NOT 新开段、MUST NOT 新增任何可被门禁扫描的声明（gate total 不得移动）。 [green: contracts/diffusion.md#C-19]
+- [X] T047 [US2] [blockedBy: T046] 运行 `bash scripts/bash/generate-instructions.sh` 把新段生成进 `.specify/instructions.md`，随即核验三件事：新 `## ` 段标题在 live 文件中在场；无既有段被改写（`git diff --stat` 只落在附加块上）；实测增量在 T045 声明的本段字节上限内；四个兼容指令符号链接（`AGENTS.md` / `CLAUDE.md` / `QODER.md` / `.github/copilot-instructions.md`）仍指向 live 文件、无需修复；live 文件 MUST NOT 手改。 [green: contracts/diffusion.md#C-20]
+- [X] T048 [US2] [blockedBy: T047] US2 转绿与取证：`python3 -m pytest -q tests/contract/test_sdd_diffusion.py` 跑到全绿并把绿证据追加 `notes/red-first-evidence.md`；把 quickstart 的 S4（Stage 消歧且零重命名）与 S5（指令指针恰一个附加段、经生成器再生）的命令、真实输出、退出码写入 `notes/quickstart-run.md`。
+- [X] T049 以**超集方向**编辑 `tests/contract/test_sdd_invocation_governance.py`：新增"未声明即缺省"用例——Agent 定义或 Team 席位不携带 `sdd-invocation` 声明时解析为 `forbidden`，派发前探针拒绝任何点名 SDD 驱动的该类收件方派发；同时断言该缺失**不改变**该收件方派发的其他一切（其他键解析、payload 字段、失败消息形态不变，改动前未点名驱动的派发逐位保持既有行为）。既有用例的命题一条不改；本行按 migration/regression 例外处置（守的是 `074a` 已交付行为，只能先有行为后有测试），故绿即写、无红先步骤；改完先单独跑该文件确认既有 17 例仍绿、新增例全绿。 [green: contracts/compat-and-safety.md#C-1] [green: contracts/compat-and-safety.md#C-2]
+- [X] T050 兑现两项包含性声明（载体 `test-evidence/compat-baseline-nodeids.txt`，7 个具名集合 / 17 文件 / 266 例，冻结于 `33269994a`）：用同一命令与同一文件清单做改后 `pytest --collect-only`，逐集合断言 post ⊇ pre 且共享 id 裁决不变（**计数比较判不合规**；pre \ post 非空即失败并列出被丢 id）；同时对四个前驱面做可加性审计——`git diff --stat` 覆盖 `skills/external/sdd-loop-driver/**`、070 阶段团队预设契约、064 线 / 工作树 / 归属契约、058 U0–U6 契约的 owner 必须为空 diff（本切片不触碰它们），任何既有键 / 段 / 入口形式 / 退出码含义的变化即是违约；把命令与真实输出写入 `notes/pre-change-measurements.md` 的 containment 小节。 [green: contracts/compat-and-safety.md#C-3] [green: contracts/compat-and-safety.md#C-4] [green: contracts/compat-and-safety.md#C-5] [green: contracts/compat-and-safety.md#C-6]
+- [X] T051 红先编写契约测试到 `tests/contract/test_sdd_compat_containment.py`：四面可加性的结构负向断言（独立驱动入口的默认解析行为不变、嵌套形态仍是"先校验后拒绝"的独立入口；070 阶段团队预设的键 / 段 / 入口形式不变、工作包仍是唯一的运行内分解机制；064 线注册表字段 / 工作树形态 / 归属与集成队列接口不变；058 的 U0–U6 阶段语义、哨兵、独立验证、watcher 判定与退出码、卡死处置、测试预算规则不变）；安全负向面（无自动 merge / push、无调度器或守护进程、无自动 feedback 传输、无第二确认门、段内 outcome 是数据不构成集成授权）；零新增 `/speckit.*` 命令与零新增技能（flow-class 单元数与发现数不变）；零新增存储面（报告段是既有报告里的文本、归因行是既有台账的一条、指针面是既有文档的段、包含性载体是测试证据工件，无 registry / ledger / 状态脊 / ownership 模型 / 集成队列）；运行红跑（红形态 = 该文件不存在），把命令、真实输出、退出码写入 `notes/red-first-evidence.md`。 [green: contracts/compat-and-safety.md#C-7] [green: contracts/compat-and-safety.md#C-8] [green: contracts/compat-and-safety.md#C-9] [green: contracts/compat-and-safety.md#C-10] [green: contracts/compat-and-safety.md#C-11] [green: contracts/compat-and-safety.md#C-12]
+- [X] T052 [blockedBy: T051] 兼容阶段转绿与取证：`python3 -m pytest -q tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_invocation_governance.py` 跑到全绿并把绿证据追加 `notes/red-first-evidence.md`；把 quickstart S6 的**改后半**（改后集合同样可判定、逐集合超集比较的真实输出）接着 S6 改前半写入 `notes/quickstart-run.md`。
+- [X] T053 镜像同步与逐对核验：`python3 scripts/python/sync-mirrors.py --write --only templates --only skills --only shared` 后 `python3 scripts/python/sync-mirrors.py --check`（相对 T033 基线零新增差异），并用 `cmp` 逐对核对 5 个被编辑源文件与各自 `.specify/` 投影同字节——`skills/internal/create-team/SKILL.md`、`skills/internal/create-team/references/conceptual-model.md`、`skills/internal/run-agent/SKILL.md`、`shared/guidelines/proactive-trigger.md`、`templates/instructions-template.md`；`python3 scripts/python/regen-command-copies.py --check` 仍 `OK`（证明 `templates/commands/**` 零改动）；禁止手改镜像。
+- [X] T054 refresh-verify（与 T053 共用同一证据落点，故按行序串行）：再跑一次 `bash scripts/bash/generate-instructions.sh`，确认 `.specify/instructions.md` 与首次生成逐字节相同（幂等），且 `ls -l AGENTS.md CLAUDE.md QODER.md .github/copilot-instructions.md` 四条兼容路径仍解析到该 live 文件；把两次运行与幂等比较的真实输出追加 `notes/quickstart-run.md` 的 refresh 小节。
+- [X] T055 定向回归与分类诚实性：重跑 `test-evidence/targeted-set-v1-baseline.txt` 的 19 个既有契约文件 + 3 支新套件，把既有文件的失败 nodeid 排序后与 T034 重采名单做 `comm -13`（MUST 为空，判据是名字级不是条数级）；3 支新文件 MUST 全绿；唯一既有红 `test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged` MUST 保持红且**未移动**（gate total 仍 27），不对它作任何绿声明；同趟落审计职责——`/speckit.review` 是本切片的分类诚实性审计面，结论记入 review 证据而不回写裁决；结果与命令追加 `notes/pre-change-measurements.md` 的回归小节。
+- [X] T056 结构面复核（与 T055 共用同一证据落点，故按行序串行）：(a) 零新增命令 / 技能——`ls templates/commands/*.md | wc -l`、`ls -d skills/external/*/ | wc -l`、`ls -d skills/internal/*/ | wc -l` 相对 T033 基线不变；(b) 零新增存储面——`.specify/state/` 与既有 line registry 目录、`.specify/memory/` 的文件名集合相对 T033 基线 `comm -13` 为空；(c) `python3 .specify/scripts/python/flow-class-check.py --action check` 仍为 `79 unit(s) / 0 finding(s)`；把命令与输出写入 `notes/quickstart-run.md` 的 structure 小节。
+- [X] T057 覆盖、SC 证据与登记收口：`python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074b-nested-governance` 必须 exit 0 且报 `claimed clauses = 30`、`FR 8 / 8`、`uncovered beyond baseline: 0`；把 SC-005 / SC-008 的状态（只从 `.specify/templates/verification-log-template.md` 的封闭词表取值）、命令、输出摘要与证据指针逐条写入 `.specify/specs/074b-nested-governance/verification.md`，并逐条声明本趟的 `PLAN-EDIT:`（若有）；同步把本切片的条目追加到 `.specify/memory/features/074.md` § Latest Review（状态列保持 `Planned`，`features.md` 的 074 行不新增行——`Implemented` 转移按 `.specify/shared/workflow/feature-integration.md` 判定，不在本行擅自推进）。
+- [X] T058 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/074b-nested-governance/tasks.md`（0 error）、`python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/074b-nested-governance --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/074b-nested-governance/requirements.md --tasks .specify/specs/074b-nested-governance/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074b-nested-governance`（30 / FR 8 / beyond baseline 0），把四段真实输出贴入 `verification.md` 的 gates 小节；若发现与冻结清单的结构漂移，按 rerun 契约追加新行而不重编号。
+
+## Superseded pre-split record
+
+> - [ ] T001 Create the runtime-evidence landing points under `.specify/specs/074-goal-team-sdd-unification/notes/` — `red-first-evidence.md`, `quickstart-run.md`, `pre-change-measurements.md` — each header naming the capture command that fills it
+>
+> superseded: tasks.md:75 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T002 Freeze the pre-change test-node-id case set of the 13-file targeted set at baseline commit `6297c14f6` into `.specify/specs/074-goal-team-sdd-unification/notes/pre-change-measurements.md` with `python3 -m pytest --collect-only -q` over those 13 files (contract C-62: a count comparison is non-conforming)
+>
+> superseded: tasks.md:76 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T003 Re-measure the committed `.specify/specs/074-goal-team-sdd-unification/coverage-baseline.txt` with `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074-goal-team-sdd-unification` and record both lanes plus the delta in `notes/pre-change-measurements.md`; re-freeze only if the corpus uncovered set moved
+>
+> superseded: tasks.md:77 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T004 Create `scripts/python/sdd-route.py`: a stdlib-only, read-only engine exposing `--action route|authorize|golden` with the exit alphabet `0` (a verdict or a judged finding was produced) / `2` (input error) / `3` (authorization refused), one constant naming the owner document `.specify/shared/definitions/sdd-routing-definitions.md`, no file writes, and no copy of any value domain
+>
+> superseded: tasks.md:89 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T005 [P] Create `tests/fixtures/nested_sdd.py`: a temporary repository fixture holding a minimal `.specify/`, one `team.md` with a block-style `seats:` map declaring one `allowed` and one `forbidden` seat, two agent definitions, and one goal with an open Target
+>
+> superseded: tasks.md:90 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T006 [P] [US1] Author the red-first contract cases in `tests/contract/test_sdd_authorization.py`: agent-half and seat-half resolution, the AND matrix, absent key / absent `seats` / absent entry defaulting to `forbidden`, a flow-style map refused with the seat named, a dangling seat reported, and the refusal naming the failed half with both source paths plus the seat slug
+>
+> superseded: tasks.md:109 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T007 [P] [US1] Author the red-first contract cases in `tests/contract/test_nested_sdd_invocation.py`: the six-fact entry form, the six fail-closed conditions, handoff field presence, the three-value outcome alphabet, the four-fact integration identity, zero merge and zero push read from `git log` / `git status`, and the failure/stall handoff
+>
+> superseded: tasks.md:110 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T008 [US1] Add `sdd-invocation` to `NEUTRAL_AGENT_METADATA_KEYS` (closed domain `allowed`/`forbidden`, default `forbidden`, `renders_to_tools = False`) and to `NEUTRAL_AGENT_FRAMEWORK_KEYS` in `src/specify_cli/__init__.py` [green: contracts/authorization-and-probe.md#C-15]
+>
+> superseded: tasks.md:114 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T009 [P] [US1] Add the `seats:` block map to the persisted `team.md` schema in `skills/internal/create-team/references/create-mode.md`: block style only, flow style refused as malformed input with the seat named, a dangling seat reported rather than ignored, an absent entry resolving to `forbidden`, and no back-fill for existing teams [green: contracts/authorization-and-probe.md#C-16] [green: contracts/authorization-and-probe.md#C-17]
+>
+> superseded: tasks.md:115 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T010 [P] [US1] Add `team_slug` and `seat_slug` to the dispatch payload declaration in `shared/definitions/subagent-definitions.md` § Execution Topology Declaration, so the seat policy resolves by (team, seat) instead of by seat alone [green: contracts/authorization-and-probe.md#C-18]
+>
+> superseded: tasks.md:116 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T011 [US1] Implement `--action authorize` in `scripts/python/sdd-route.py`: resolve both halves, return `effective` as their AND, name the failing half (`agent` / `seat` / `both`), record both source paths plus the seat slug, exit `3` on refusal and `2` on malformed input [green: contracts/authorization-and-probe.md#C-19] [blockedBy: T004]
+>
+> superseded: tasks.md:117 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T012 [US1] Update the declared pin in `tests/contract/test_neutral_metadata_schema.py` so `NEUTRAL_AGENT_FRAMEWORK_KEYS` gains exactly one member, `sdd-invocation`, in the same change as the key (R12; this is the feature's only intentional change to an existing assertion) [blockedBy: T008]
+>
+> superseded: tasks.md:118 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T013 [US1] Add § Invoked-from-Team Entry to `skills/external/sdd-loop-driver/SKILL.md`: the six accepted facts (Goal reference, optional Target, team slug, invoking seat, authorized scope, routing verdict reference), the validation table, the stop-at-review boundary, and one Hard Requirement line; the standalone entry contract stays unchanged [green: contracts/nested-invocation.md#C-31] [green: contracts/nested-invocation.md#C-32] [green: contracts/nested-invocation.md#C-33]
+>
+> superseded: tasks.md:119 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T014 [US1] Create `skills/external/sdd-loop-driver/references/nested-invocation.md`: the handoff's closed field set, the entry-validation table, the three-value outcome, the four-fact integration identity with the retained branch named, the zero-merge/zero-push rule, registration as one write line in the existing registry, and the failure/stall handoff [green: contracts/nested-invocation.md#C-34] [green: contracts/nested-invocation.md#C-35] [green: contracts/nested-invocation.md#C-36] [green: contracts/nested-invocation.md#C-37] [green: contracts/nested-invocation.md#C-38] [green: contracts/nested-invocation.md#C-39] [green: contracts/nested-invocation.md#C-40] [blockedBy: T013]
+>
+> superseded: tasks.md:120 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T015 [P] [US2] Author the red-first contract cases in `tests/contract/test_sdd_routing_definitions.py`: the owner declaration and the four facts it owns, the five closed value domains, the Task Complexity Rubric cited rather than copied, the definition-class cross-cutting default with its bounded-correction escape, and the single-declaration-point scan for a second table
+>
+> superseded: tasks.md:138 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T016 [P] [US2] Author the red-first contract cases in `tests/contract/test_sdd_routing_engine.py`: determinism, the precedence `adjudicate > sdd > direct`, reason codes, ambiguity and conflict never returning `direct`, identical repeated evaluations, every golden row judged twice, and exit codes `0` (a verdict, including `adjudicate`) / `2` (input error)
+>
+> superseded: tasks.md:139 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T017 [US2] Author `shared/definitions/sdd-routing-definitions.md` § Owner declaration, § Hierarchy and boundary, § Direct modification, and § Input domains: the five inputs' closed domains, the prohibition on medium/extension/language/count/author-identity inputs, and the definition-class cross-cutting default [green: contracts/route-decision.md#C-1] [green: contracts/route-decision.md#C-2] [green: contracts/route-decision.md#C-3] [green: contracts/route-decision.md#C-4] [green: contracts/route-decision.md#C-5] [green: contracts/route-decision.md#C-6]
+>
+> superseded: tasks.md:143 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T018 [US2] Author § Verdict table, § Precedence, § Conflict set, and § Reason-code vocabulary in `shared/definitions/sdd-routing-definitions.md`: the SDD conditions, the direct conditions, the single fixed precedence with the conflict closed set, and the reason codes in their declared order [green: contracts/route-decision.md#C-7] [green: contracts/route-decision.md#C-8] [green: contracts/route-decision.md#C-9] [green: contracts/route-decision.md#C-10]
+>
+> superseded: tasks.md:144 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T019 [US2] Author § Override record and § Per-duty application in `shared/definitions/sdd-routing-definitions.md`: the user instruction verbatim with the overridden verdict retained, and one application per declared member duty reused until an input changes [green: contracts/route-decision.md#C-11] [green: contracts/route-decision.md#C-12]
+>
+> superseded: tasks.md:145 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T020 [US2] Implement `--action route` in `scripts/python/sdd-route.py`, reading the domains, verdict table, precedence and reason codes out of `shared/definitions/sdd-routing-definitions.md` at run time and writing no file [green: contracts/route-decision.md#C-13] [blockedBy: T004,T018]
+>
+> superseded: tasks.md:146 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T021 [US2] Author § Golden case table in `shared/definitions/sdd-routing-definitions.md` covering the seven required faces and implement `--action golden` judging every row from that table with no second copy in test code or a data file [green: contracts/route-decision.md#C-14] [blockedBy: T020]
+>
+> superseded: tasks.md:147 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T022 [US3] Author the red-first contract cases in `tests/contract/test_sdd_invocation_governance.py`: the three-condition predicate matrix, the depth-2 chain, the virtual-mode prohibition, the stage-executor refusal, and the per-member cap
+>
+> superseded: tasks.md:166 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T023 [US3] Narrow § Dispatch-Time Governance Obligation in `shared/definitions/subagent-definitions.md` to the three-condition predicate (capability `allowed` ∧ seat policy `allowed` ∧ an SDD assignment), keeping the original prohibition unchanged for every dispatch that fails it [green: contracts/authorization-and-probe.md#C-20]
+>
+> superseded: tasks.md:170 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T024 [US3] Enforce the predicate fail-closed in the `skills/internal/run-agent/SKILL.md` pre-dispatch probe by calling `scripts/python/sdd-route.py --action authorize` instead of re-reading the definitions in prose, with the refusal naming the condition that failed [green: contracts/authorization-and-probe.md#C-21] [blockedBy: T011,T023]
+>
+> superseded: tasks.md:171 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T025 [US3] State the depth-2 chain, the three prohibitions (a stage executor starts nothing, no SDD-inside-SDD, no virtual-mode host) and the per-member cap in the same § Dispatch-Time Governance Obligation, replacing the unqualified "loop depth is always 1" claim [green: contracts/authorization-and-probe.md#C-22] [green: contracts/authorization-and-probe.md#C-23] [green: contracts/authorization-and-probe.md#C-24] [blockedBy: T023]
+>
+> superseded: tasks.md:172 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T026 [US3] Extend `tests/contract/test_sdd_invocation_governance.py` with the leaf assertion over `agents/sdd-executor.agent.md`, the hosting-declaration conformance case (three responsibility statements read together with the declaration), the pre-change case-set containment comparison, and the refused-dispatch record assertions [green: contracts/authorization-and-probe.md#C-25] [green: contracts/authorization-and-probe.md#C-26] [green: contracts/authorization-and-probe.md#C-27] [green: contracts/authorization-and-probe.md#C-28] [green: contracts/authorization-and-probe.md#C-29] [blockedBy: T022,T025]
+>
+> superseded: tasks.md:173 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T027 [P] [US4] Author the red-first contract cases in `tests/contract/test_nested_run_report.py`: the `## Nested SDD Runs` heading literal, explicit-when-empty, the per-invocation field list, the peer relationship to `## Verification`, supervisor-only writes, exactly one ledger item carrying the existing Target reference, and the parsed Goal field set identical before and after
+>
+> superseded: tasks.md:192 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T028 [US4] Add `## Nested SDD Runs` to § Report contract in `skills/internal/create-team/SKILL.md` as a mandatory section listing per invocation the outcome, artifact paths, evidence paths, routing-verdict reference and anomalies, plus the explicit "no nested SDD invocation this run" line [green: contracts/report-and-attribution.md#C-47] [green: contracts/report-and-attribution.md#C-48] [green: contracts/report-and-attribution.md#C-49]
+>
+> superseded: tasks.md:196 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T029 [US4] Add the writer, attribution, peer and verdict-reference duties to the same § Report contract: the supervisor is the sole writer, exactly one ledger item carrying the existing Target reference is appended at report time with no new Goal field and no `goal.md` write, the nested section stays a peer of `## Verification` rather than a replacement, and the routing verdict is consumed by reference [green: contracts/report-and-attribution.md#C-50] [green: contracts/report-and-attribution.md#C-51] [green: contracts/report-and-attribution.md#C-52] [green: contracts/report-and-attribution.md#C-53] [green: contracts/report-and-attribution.md#C-54] [blockedBy: T028]
+>
+> superseded: tasks.md:197 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T030 [US4] Add the invoking-Agent consumption duty to `skills/internal/create-team/SKILL.md` § Execution (run mode): the handoff is included in the Agent's own result and in the run report verbatim or by stable path, and success is never reported on a `blocked` or `failed` outcome [green: contracts/nested-invocation.md#C-41]
+>
+> superseded: tasks.md:198 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T031 [US4] Extend `tests/contract/test_nested_sdd_invocation.py` with the end-to-end acceptance case: one nested run to review, the complete artifact chain, zero merge and zero push, and every artifact and evidence path present in the report section [green: contracts/nested-invocation.md#C-42] [blockedBy: T007,T028]
+>
+> superseded: tasks.md:199 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T032 [US4] Verify the Feature 070 stage-team preset contract is additive-unchanged: run its suite and assert no preset key, section, entry form, or exit code was removed, renamed, or re-meant, recording the output in `.specify/specs/074-goal-team-sdd-unification/verification.md` [green: contracts/nested-invocation.md#C-43]
+>
+> superseded: tasks.md:200 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T033 [US4] Verify the Feature 058 U0–U6 contract is additive-unchanged: run the driver's stage, sentinel, independent-verification, watcher and stall cases and assert no semantics moved, recording the output in `verification.md` [green: contracts/nested-invocation.md#C-44] [blockedBy: T032]
+>
+> superseded: tasks.md:201 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T034 [US4] Add the setup-path entry to the invocation-kind classification in `shared/definitions/sdd-routing-definitions.md`: a target project carrying no `.specify/` structure routes to the setup skill and is never degraded into a direct modification [green: contracts/nested-invocation.md#C-45] [blockedBy: T017]
+>
+> superseded: tasks.md:202 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T035 [US4] Add the incomplete-handoff obligation to `skills/external/sdd-loop-driver/references/nested-invocation.md`: a handoff missing its integration identity is incomplete by definition, and the consuming check is a field-presence test over the handoff block, not a prose reading [green: contracts/nested-invocation.md#C-46] [blockedBy: T014]
+>
+> superseded: tasks.md:203 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T036 [US5] Extend `tests/contract/test_sdd_routing_definitions.py` and `tests/contract/test_sdd_invocation_governance.py` with the diffusion assertions: each new surface cites its owner by path, the team Stage vocabulary is unchanged, and no second copy of the input set, verdict table, or precedence exists
+>
+> superseded: tasks.md:221 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T037 [US5] Disambiguate the Stage dimension in `skills/internal/create-team/references/conceptual-model.md`: executor/evaluator/optimizer is not the SDD stage roster, the roster stays owned by the driver, and no team Stage value is renamed or overloaded [green: contracts/diffusion-and-compat.md#C-55]
+>
+> superseded: tasks.md:225 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T038 [US5] Add exactly one pointer-level routing ambient section to `templates/instructions-template.md`: when a write-bearing change is proposed, run the decision at `.specify/shared/definitions/sdd-routing-definitions.md`, with no input set, no verdict table, and no second copy of the precedence [green: contracts/diffusion-and-compat.md#C-56] [blockedBy: T017]
+>
+> superseded: tasks.md:226 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T039 [P] [US5] Add the promotion-conjunction pointer sentence to `shared/guidelines/proactive-trigger.md`: promotion to an SDD run requires both a routing verdict of the SDD kind and an effective authorization of `allowed`, stated once in the routing owner and reached from here [green: contracts/diffusion-and-compat.md#C-57]
+>
+> superseded: tasks.md:227 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T040 [US5] Add § Invocation kinds to `shared/definitions/sdd-routing-definitions.md`: the driver, framework bootstrap, periodic maintenance and direct modification as four distinct kinds, with the same effective-authorization predicate applying when the setup or house-keeping skill dispatches subagents [green: contracts/diffusion-and-compat.md#C-58] [green: contracts/diffusion-and-compat.md#C-59] [blockedBy: T017]
+>
+> superseded: tasks.md:228 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T041 [P] [US5] Add `sdd-invocation` to the § Authoring Baseline supported-field list in `skills/internal/run-agent/SKILL.md` as a pointer to the key set's owner, so an authored instance can declare it and a validator rejects a value outside the closed set [green: contracts/diffusion-and-compat.md#C-60]
+>
+> superseded: tasks.md:229 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T042 [P] Sync every edited source to its projection with `python3 scripts/python/sync-mirrors.py --write --only <source prefix>` for plan.md § Mirror Obligations rows 1–5 (`shared/`, `skills/internal/`, `skills/external/`, `scripts/`, `templates/`), never hand-editing a `.specify/` copy
+>
+> superseded: tasks.md:240 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T043 Verify the mirror obligations byte-identically with `python3 scripts/python/sync-mirrors.py --check`, enumerating rows 1–5 of plan.md § Mirror Obligations and requiring zero drift against the measured-clean baseline
+>
+> superseded: tasks.md:241 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T044 Regenerate `.specify/instructions.md` with `bash scripts/bash/generate-instructions.sh`, then assert the new routing section heading is present, no existing section was rewritten, and record the byte delta against the declared per-section ceiling (the file was already 41,948 B over the 32,768 B budget before this feature) [blockedBy: T038,T042]
+>
+> superseded: tasks.md:242 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T045 Assert the CLI neutral-key single definition point with `grep -c 'sdd-invocation' src/specify_cli/__init__.py`, and keep `tests/contract/test_tool_mapping.py` and `tests/contract/test_neutral_metadata_schema.py` green (plan.md § Mirror Obligations row 7) [blockedBy: T008]
+>
+> superseded: tasks.md:243 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T046 Discharge both containment claims by comparing the frozen pre-change node-id set in `notes/pre-change-measurements.md` with the post-change collected set: superset relation plus identical verdicts for the shared ids, never a count comparison [green: contracts/diffusion-and-compat.md#C-61] [green: contracts/diffusion-and-compat.md#C-62]
+>
+> superseded: tasks.md:244 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T047 Negative check over the changed tree: no automatic merge or push, no scheduler or daemon, no automatic feedback transmission, no second confirmation gate, and no scheduler or second registry behind the authorization surface — its only stored state stays the two declared values [green: contracts/authorization-and-probe.md#C-30] [green: contracts/diffusion-and-compat.md#C-63]
+>
+> superseded: tasks.md:245 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T048 Structure check over the changed tree: no second registry, ledger, state spine, ownership model, or integration queue, and the nested run's records resolve to the existing line entry and state spine [green: contracts/diffusion-and-compat.md#C-64]
+>
+> superseded: tasks.md:246 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T049 Run the pre-dispatch governance suite and assert every pre-change case returns its recorded verdict, so an undeclared Agent definition or Team seat still resolves to `forbidden` [green: contracts/diffusion-and-compat.md#C-65]
+>
+> superseded: tasks.md:247 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T050 Roster check over the added text: no SDD stage-name enumeration, no duplicated roster, and no second team Stage vocabulary [green: contracts/diffusion-and-compat.md#C-66]
+>
+> superseded: tasks.md:248 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T051 Delivered-file-set check: no new `/speckit.*` command and no new skill — `python3 scripts/python/flow-class-check.py --action check` stays at 79 units with zero findings [green: contracts/diffusion-and-compat.md#C-67]
+>
+> superseded: tasks.md:249 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T052 Execute quickstart scenarios S1–S6 against the delivered artifacts and paste each real command output and exit code into `.specify/specs/074-goal-team-sdd-unification/notes/quickstart-run.md` with its teardown [blockedBy: T021,T024]
+>
+> superseded: tasks.md:250 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T053 Collect the red-first evidence for every new test file into `.specify/specs/074-goal-team-sdd-unification/notes/red-first-evidence.md`: the command, the real output, and the exit status of each pre-implementation run [blockedBy: T006]
+>
+> superseded: tasks.md:251 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T054 Run the clause-coverage accounting against the frozen baseline and record both lanes (FR and clause) with the measured delta in `notes/pre-change-measurements.md` [blockedBy: T003]
+>
+> superseded: tasks.md:252 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T055 Run the 13-file targeted set plus the six new and one edited contract file, and record command, selection basis, selected paths, pass/fail counts, and any new failure against the frozen baseline in `verification.md` [blockedBy: T026,T031]
+>
+> superseded: tasks.md:253 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T056 Review the Feature list per the Feature Integration Protocol: confirm `.specify/memory/features.md` and `.specify/memory/features/074.md` still describe Feature 074 accurately, and update them synchronously only if the breakdown exposed a new or invalidated feature
+>
+> superseded: tasks.md:254 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md
+
+> - [ ] T057 Confirm the plan's "no `templates/commands/**` change" claim and that `python3 scripts/python/regen-command-copies.py --check` stays clean [blockedBy: T042]
+>
+> superseded: tasks.md:255 (original position); superseded_by: merge-manifest.json line 0 (whole-file fact); carriers: .specify/specs/074a-authorized-routing/tasks.md, .specify/specs/074b-nested-governance/tasks.md

@@ -1,0 +1,3 @@
+<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part3-failed.txt) -->
+
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged

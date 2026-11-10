@@ -39,3 +39,22 @@ SC-007_note=.specify/specs/074a-authorized-routing/verification.md (074a local S
 SC-008_status=pass
 SC-008_value=see 074b verification SC-002
 SC-008_note=.specify/specs/074b-nested-governance/verification.md (074b local SC-002 ← parent SC-008)
+
+<!-- begin: merge-apply aggregated pointer view (generated) -->
+SC-001_status=pass
+SC-001_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-001)
+SC-002_status=pass
+SC-002_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-002)
+SC-003_status=pass
+SC-003_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-003)
+SC-004_status=pass
+SC-004_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-004)
+SC-006_status=pass
+SC-006_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-005)
+SC-007_status=pass
+SC-007_note=.specify/specs/074a-authorized-routing/verification.md (074a-authorized-routing local row SC-006)
+SC-005_status=pass
+SC-005_note=.specify/specs/074b-nested-governance/verification.md (074b-nested-governance local row SC-001)
+SC-008_status=pass
+SC-008_note=.specify/specs/074b-nested-governance/verification.md (074b-nested-governance local row SC-002)
+<!-- end: merge-apply aggregated pointer view -->
