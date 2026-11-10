@@ -95,6 +95,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | speckit-research-wrapup | command-wrapup | /speckit.research | wrap-up |
 | speckit-review-wrapup | command-wrapup | /speckit.review | wrap-up |
 | speckit-sanitize-wrapup | command-wrapup | /speckit.sanitize | wrap-up |
+| speckit-seal-wrapup | command-wrapup | /speckit.seal | wrap-up |
 | speckit-session-wrapup | command-wrapup | /speckit.session | wrap-up |
 | speckit-skills-wrapup | command-wrapup | /speckit.skills | wrap-up |
 | speckit-tasks-wrapup | command-wrapup | /speckit.tasks | wrap-up |
@@ -201,6 +202,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-run-skills-wrapup | skill-wrapup | skill:run-skills | wrap-up |
 | skill-run-team-wrapup | skill-wrapup | skill:run-team | wrap-up |
 | skill-sanitize-materials-wrapup | skill-wrapup | skill:sanitize-materials | wrap-up |
+| skill-seal-artifact-wrapup | skill-wrapup | skill:seal-artifact | wrap-up |
 
 ## Handler
 

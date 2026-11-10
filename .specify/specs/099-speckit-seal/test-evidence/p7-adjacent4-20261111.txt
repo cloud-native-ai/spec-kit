@@ -1,0 +1,8 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_acceptance_schema_ownership.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_review_composition.py tests/contract/test_agent_skill_enablement.py tests/contract/test_agent_specific_config_skills.py tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_skill_reference_command_surface.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 54%]
+.............................................................            [100%]
+133 passed in 6.99s

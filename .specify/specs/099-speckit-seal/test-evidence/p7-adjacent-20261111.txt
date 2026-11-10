@@ -1,0 +1,73 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_feedback_step_reference_form.py tests/contract/test_docs_step_injection.py tests/contract/test_compile_propagation_order.py tests/contract/test_wrap_up_line_budget.py tests/contract/test_qoder_command_frontmatter.py tests/contract/test_feedback_probe_registry.py tests/contract/test_probe_nonentity_catalog.py tests/contract/test_concurrency_coverage.py tests/contract/test_command_family.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+....................................................................FF.. [ 87%]
+...........................................                              [100%]
+=================================== FAILURES ===================================
+__________________ test_every_template_has_short_description ___________________
+[gw103] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_template_has_short_description():
+        templates = sorted(TEMPLATES_DIR.glob("*.md"))
+        assert templates, "no command templates found"
+        for template in templates:
+            match = SHORT_DESCRIPTION_RE.search(template.read_text(encoding="utf-8"))
+            assert match, f"{template.name} missing frontmatter short-description"
+            value = match.group(1).strip()
+            assert value, f"{template.name} has empty short-description"
+>           assert len(value) <= 50, (
+                f"{template.name} short-description exceeds 50 chars: {value!r}"
+            )
+E           AssertionError: research.md short-description exceeds 50 chars: '深度调研——SDD 模式经 study-code 研读自身项目；独立模式按问题选择 study-code / study-kb / study-online'
+E           assert 78 <= 50
+E            +  where 78 = len('深度调研——SDD 模式经 study-code 研读自身项目；独立模式按问题选择 study-code / study-kb / study-online')
+
+tests/contract/test_qoder_command_frontmatter.py:36: AssertionError
+_____________ test_catalog_does_not_participate_in_registry_counts _____________
+[gw128] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_catalog_does_not_participate_in_registry_counts() -> None:
+        registry = probe_utils.load_probe_registry(ROOT)
+        internal = len(registry["objects"])
+        external = len(registry["external"])
+        assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
+        assert external == 0, "external probes must stay out of the framework registry"
+        # 72 既有 + 14 散布探测点入册 + 20 reconcile 缺口补登 + 057 新增 2 个 skill-wrapup Object + 059 新增 4 个 exec-quant Object（同任务更新计数契约）
+        # stale-pin update (067 T025, 2026-10-22): 112 -> 116; +4 Objects registered by
+        # pre-067 features (063 evidence/gate objects etc.; the engine-loaded registry
+        # already holds 116 at branch point 7f9033ec, errors-free at HEAD).
+        # 2026-10-27: Feature 071 adds one skill-wrapup Object (sdd-house-keeping); 116 -> 117.
+        # 2026-11-03: Feature 081c (df9bbe0e) adds one skill-wrapup Object
+        # (skill-review-feature-quality-wrapup, the dogfooding review carrier); 117 -> 118.
+        # 2026-11-05: improve-skills adds one skill-wrapup Object
+        # (skill-ssh-utils-wrapup, the SSH transport owner); 118 -> 119.
+        # 2026-11-06: Feature 087's second slice adds one command-wrapup Object
+        # (speckit-measure-wrapup, the /speckit.measure Wrap-up embed — the registry row
+        # 70df8130 registered); the first slice (`status.md`) registered no probe Object of
+        # its own, so that slice contributed no Object; 119 -> 120.
+        # 2026-11-06 (correction, d41d0ced): the premise above is incomplete. Feature 087
+        # DOES register a second Object — `speckit-status-wrapup` (/speckit.status) — plus the
+        # two `h-docs-sync-eval` HandlerBindings for status/measure, added by d41d0ced in
+        # shared/definitions/probe-definitions.md; 120 -> 121. Measured:
+        # `probe-utils.py --action probes` reports 121 Objects, 0 external, 0 errors.
+        # 2026-11-09: Feature 091 registers one more skill Object
+        # (`closeout-step-observe`, the skill:git-utils wrap-up arm of the close-out
+        # step, sharing the `closeout-step` class with 091's Handler row); 121 -> 122.
+        # Measured: `probe-utils.py --action probes` reports 122 Objects, 0 external,
+        # 0 errors; `--action validate` reports 11 classes, 122 internal + 0 external.
+>       assert internal == 122, (
+            f"catalog leaked into the engine population or Objects drifted: internal={internal}"
+        )
+E       AssertionError: catalog leaked into the engine population or Objects drifted: internal=126
+E       assert 126 == 122
+
+tests/contract/test_probe_nonentity_catalog.py:117: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_qoder_command_frontmatter.py::test_every_template_has_short_description
+FAILED tests/contract/test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts
+2 failed, 329 passed in 13.80s

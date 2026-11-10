@@ -1,0 +1,80 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_mirror_parity_suite.py tests/contract/test_delegation_classes.py tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py tests/contract/test_run_determination_passive_wiring.py tests/contract/test_probe_engine_action_sets.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 22%]
+........................................................................ [ 29%]
+........................................................................ [ 37%]
+........................................................................ [ 44%]
+........................................................................ [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 67%]
+........................................................................ [ 74%]
+........................................................................ [ 82%]
+........................................................................ [ 89%]
+...............................................F........................ [ 97%]
+............F..........F..                                               [100%]
+=================================== FAILURES ===================================
+___________ test_a6_wiring_inventory_matches_the_frozen_denominator ____________
+[gw89] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_a6_wiring_inventory_matches_the_frozen_denominator():
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): 53 -> 54 skills —
+        # the ssh-utils transport unit joins the inventory; the wiring census must
+        # still cover every unit the inventory actually holds.
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 52 -> 53 skills — the
+        # review-feature-quality carrier joins the inventory; the wiring census must
+        # still cover every unit the inventory actually holds.
+        # Stale-pin update (2026-11-06, Feature 087): 27 -> 29 command templates —
+        # `/speckit.status` and `/speckit.measure` are the feature's two sanctioned
+        # additions (FR-022/FR-026); the wiring census must still cover every unit.
+        templates = sorted(COMMANDS_DIR.glob("*.md"))
+        skills = sorted(SKILLS_DIR.glob("external/*/SKILL.md")) + sorted(
+            SKILLS_DIR.glob("internal/*/SKILL.md")
+        )
+>       assert len(templates) == 29, "template inventory drifted: %d (expected 29)" % len(templates)
+E       AssertionError: template inventory drifted: 30 (expected 29)
+E       assert 30 == 29
+E        +  where 30 = len([PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/templates/comm...project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/templates/commands/derive.md'), ...])
+
+tests/contract/test_expression_gate_wiring.py:391: AssertionError
+_____________ test_c10_runtime_copies_exist_for_every_present_tool _____________
+[gw103] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_c10_runtime_copies_exist_for_every_present_tool():
+        history_copies = [
+            p for p in REPO_ROOT.glob("**/speckit.history.*")
+            if ".specify" not in p.parts and "specs" not in p.parts
+            and ".venv" not in p.parts and "node_modules" not in p.parts
+        ]
+>       assert history_copies, "no tool runtime dirs detected via history copies"
+E       AssertionError: no tool runtime dirs detected via history copies
+E       assert []
+
+tests/contract/test_docs_command_template.py:190: AssertionError
+___________ test_every_template_edge_is_same_class_or_neutral_exempt ___________
+[gw94] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_template_edge_is_same_class_or_neutral_exempt():
+        ledger, neutral = _owner_tables()
+        assert ledger, "the owner ledger must parse for this test to mean anything"
+    
+        proc, record = _delegation(REPO_ROOT)
+>       assert proc.returncode == 0, (
+            "delegation on the real tree must be green; findings=%r stderr=%r"
+            % (None if record is None else record.get("findings"), proc.stderr)
+        )
+E       AssertionError: delegation on the real tree must be green; findings=[{'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-code ('expression') — a command and its delegated skill MUST share one class", 'line': 58}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-kb ('expression') — a command and its delegated skill MUST share one class", 'line': 59}, {'kind': 'delegation-mismatch', 'unit_id': '/speckit.research', 'message': "/speckit.research ('execution') delegates to skill:study-online ('expression') — a command and its delegated skill MUST share one class", 'line': 60}] stderr=''
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...ommand and its delegated skill MUST share one class",\n      "line": 60\n    }\n  ],\n  "error": null\n}\n', stderr='').returncode
+
+tests/contract/test_delegation_classes.py:282: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_expression_gate_wiring.py::test_a6_wiring_inventory_matches_the_frozen_denominator
+FAILED tests/contract/test_docs_command_template.py::test_c10_runtime_copies_exist_for_every_present_tool
+FAILED tests/contract/test_delegation_classes.py::test_every_template_edge_is_same_class_or_neutral_exempt
+3 failed, 959 passed in 7.26s

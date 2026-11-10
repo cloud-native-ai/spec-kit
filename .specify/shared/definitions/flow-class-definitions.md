@@ -164,6 +164,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | /speckit.research | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |
 | /speckit.review | execution | behavior-oracle |  | 交付评审结论；findings 逐条对回阶段记录与制品 |
 | /speckit.sanitize | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| /speckit.seal | execution | behavior-oracle |  | 交付合并回写与封装终态；由引擎裁决与状态面写入判定 |
 | /speckit.session | execution | behavior-oracle |  | 交付会话导出目录；文件集与清单可校验 |
 | /speckit.skills | execution | behavior-oracle |  | 交付技能实体；以再运行与校验判定 |
 | /speckit.status | execution | behavior-oracle |  | 交付一次状态读取的三个渲染面（摘要 / 守卫裁决 / 单行状态）；条目集、有界与退出码由脚本复算判定 |
@@ -222,6 +223,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:run-skills | execution | behavior-oracle |  | 交付技能运行结果；以实际执行判定 |
 | skill:run-team | execution | behavior-oracle |  | 交付团队运行报告；以运行结果判定 |
 | skill:sanitize-materials | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| skill:seal-artifact | execution | behavior-oracle |  | 交付一次合并回写与封装运行；判定全部由 seal 引擎给出 |
 | skill:self-improvement | execution | behavior-oracle |  | 交付改进点与运行记录；由引擎记录判定 |
 | skill:study-code | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
 | skill:study-kb | expression | reader-oracle |  | 交付知识库调查报告；结论由读者对照知识库路径与现役复核判定 |

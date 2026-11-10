@@ -95,13 +95,16 @@ ENGINE_REF = "flow-class-check.py"
 # `/speckit.measure` (FR-022/FR-026) ship as two more `templates/commands/*.md` files
 # inside the same staged payload, so the shipped-set census and the pinned length move
 # together; a missing one still fails here rather than only at runtime.
+# 2026-11-11 (Feature 099): 29 -> 30 commands and 56 -> 57 skills. `/speckit.seal`
+# and `skill:seal-artifact` (FR-021/C-041) ship inside the same staged payload, so
+# both rosters and both pinned lengths move together again.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
         "implement", "improve", "instructions", "interview", "measure", "plan",
-        "requirements", "research", "review", "sanitize", "session", "skills",
-        "status", "tasks", "team", "todo", "tools",
+        "requirements", "research", "review", "sanitize", "seal", "session",
+        "skills", "status", "tasks", "team", "todo", "tools",
     }
 )
 SKILL_BASELINE = frozenset(
@@ -120,12 +123,12 @@ SKILL_BASELINE = frozenset(
         "memory-recall", "memory-record", "research-feature",
         "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
-        "run-team", "sanitize-materials", "self-improvement", "study-code",
+        "run-team", "sanitize-materials", "seal-artifact", "self-improvement", "study-code",
         "study-online", "study-kb", "summarize-project",
     }
 )
-assert len(COMMAND_BASELINE) == 29
-assert len(SKILL_BASELINE) == 56
+assert len(COMMAND_BASELINE) == 30
+assert len(SKILL_BASELINE) == 57
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

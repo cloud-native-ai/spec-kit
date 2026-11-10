@@ -202,10 +202,10 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [X] T032 [P] [US4] 接线归档 lane：`skills/internal/sanitize-materials/SKILL.md` 在退休/归档 spec 或标归档指针前查询 `seal-utils.py --action archive-gate`；拒绝 `1`/`2` 时具名拒绝并指回 `/speckit.seal`，绝不退化为「未查询即允许」（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
 - [X] T033 [P] [US4] 接线注册表归档指针：`skills/internal/manage-features/SKILL.md` 的 `Relocated` 形态归档指针动作先查询 `archive-gate`；注册表 reconcile 本身仍归 manage-features（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
 - [X] T034 [US4] 写边界审计测试 `tests/contract/test_seal_boundaries.py`：引擎动作表无 move/delete/archive/push/scheduler、状态值域单 owner、无第二套状态机/第二份注册表/第二份台账/并行 spec 树，目录与注册表差异审计干净；审计读数记入 `test-evidence/boundaries-audit.txt`（FR-020、FR-022、FR-024、SC-008、C-008、C-036、[blockedBy: T031]）。
-- [ ] T035 [US4] 写命令模板 `templates/commands/seal.md`：薄入口（User Input、Delegation 到 `seal-artifact`、Glossary、Wrap-up 探针嵌入、Handoffs），全部判定委派引擎，owner 按路径引用不复述（FR-021、C-041、[blockedBy: T031]）。
-- [ ] T036 [US4] 写 internal 技能 `skills/internal/seal-artifact/SKILL.md`（只做编排与报告、不复算判定，命名先例 `clarify-artifact`），并在 `shared/definitions/flow-class-definitions.md` 登记 `/speckit.seal` 与 `skill:seal-artifact` 两行（`flow_class: execution`）、在 `shared/definitions/probe-definitions.md` 登记 wrap-up 探针条目（FR-021、C-041、[blockedBy: T035]）。
-- [ ] T037 [US4] 更新名册/台账 pin：`tests/contract/test_flow_class_ledger.py` 的普查 pin —— 实测 2026-11-10 `flow-class-check.py --action check` 报告 85 units（29 个命令模板 + 56 个技能）；本特性落地后台账须报告 87（30 + 57），按文件内既有的 dated stale-pin 约定更新（FR-021、[blockedBy: T036]）。
-- [ ] T038 [US4] 生成四个 per-tool 命令副本 `python3 scripts/python/regen-command-copies.py`（绝不手抄），技能经 `python3 scripts/python/sync-mirrors.py --write` 投影，并确认两条 `--check` 均 exit 0、零新增漂移（FR-021、C-041、[blockedBy: T037]）。
+- [X] T035 [US4] 写命令模板 `templates/commands/seal.md`：薄入口（User Input、Delegation 到 `seal-artifact`、Glossary、Wrap-up 探针嵌入、Handoffs），全部判定委派引擎，owner 按路径引用不复述（FR-021、C-041、[blockedBy: T031]）。
+- [X] T036 [US4] 写 internal 技能 `skills/internal/seal-artifact/SKILL.md`（只做编排与报告、不复算判定，命名先例 `clarify-artifact`），并在 `shared/definitions/flow-class-definitions.md` 登记 `/speckit.seal` 与 `skill:seal-artifact` 两行（`flow_class: execution`）、在 `shared/definitions/probe-definitions.md` 登记 wrap-up 探针条目（FR-021、C-041、[blockedBy: T035]）。
+- [X] T037 [US4] 更新名册/台账 pin：`tests/contract/test_flow_class_ledger.py` 的普查 pin —— 实测 2026-11-10 `flow-class-check.py --action check` 报告 85 units（29 个命令模板 + 56 个技能）；本特性落地后台账须报告 87（30 + 57），按文件内既有的 dated stale-pin 约定更新（FR-021、[blockedBy: T036]）。
+- [X] T038 [US4] 生成四个 per-tool 命令副本 `python3 scripts/python/regen-command-copies.py`（绝不手抄），技能经 `python3 scripts/python/sync-mirrors.py --write` 投影，并确认两条 `--check` 均 exit 0、零新增漂移（FR-021、C-041、[blockedBy: T037]）。
 
 **Checkpoint**: 归档准入单 owner 可查询且被消费；命令三件套与副本齐备；边界静态可核验。
 
@@ -238,7 +238,7 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [ ] T048 写 `.specify/specs/099-speckit-seal/verification.md`：SC-001…SC-009 每条一行 `SC-NNN_status=`（词汇 owner：`shared/workflow/acceptance-hardening.md` § Verification Vocabulary），并给出 smoke 记录三键（`smoke_command=`、`smoke_exit_code=0`、`smoke_evidence_path=` 指向 `notes/quickstart-run.md`）；任一 `final` 判据非 `pass` 即 GATE-4 不通过（SC-001…SC-009、GATE-4、[blockedBy: T045,T046,T047]）。
 - [ ] T049 对 Feature 099 执行 Feature Integration reconcile（`manage-features` 流程）：`.specify/features/099-speckit-seal.md` 与 `.specify/features.md` 行同步为实现阶段状态并追加实现/评审记录；确认 tasks 阶段的特性清单复核未暴露新增或失效 Feature（plan § Phase 1 summary：已有 099 行，无合并/废弃/改名）（FR-024、SC-008、[blockedBy: T048]）。
 - [ ] T050 覆盖基线终局对照：`python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal` 确认相对 T002 冻结的 `coverage-baseline.txt` 零新增未覆盖名，读数记入 `test-evidence/coverage-final.txt`（FR-025、SC-008、[blockedBy: T049]）。
-- [ ] T051 [P] 写命令参考页 `docs/reference/commands/seal.md`（执行流、产物与用法；四个动作与退出码按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复述封闭集），属项目文档面、不扩张 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py` 的三件套边界（FR-021、plan § Project Structure、[blockedBy: T038]）。
+- [X] T051 [P] 写命令参考页 `docs/reference/commands/seal.md`（执行流、产物与用法；四个动作与退出码按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复述封闭集），属项目文档面、不扩张 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py` 的三件套边界（FR-021、plan § Project Structure、[blockedBy: T038]）。
 
 **Checkpoint**: 全部 SC 有落点，门禁全绿，验收记录齐备。
 

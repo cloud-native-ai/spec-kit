@@ -612,3 +612,69 @@ FAILED tests/contract/test_seal_archive_gate.py::test_sealed_spec_is_admitted_an
 `## Latest Review`）同时点名该特性；单载体不计数（C-044「单一载体不计数」）。`Sealed`
 状态但回执缺失/不可读按输入缺陷 exit 2（FR-023 要求同时查询封装记录与状态），与 P5 的
 `seal-receipt-invalid` 同码。
+
+## 9. P7 红先读数与转绿（T035–T038、T051）
+
+**采集顺序**：模板先于台账登记落地（红 #1）→ 技能与两处声明落地 → 名册/台账 pin 仍钉旧计数（红 #2）→
+T037 更新 pin → T038 生成副本与镜像 → 绿。
+
+**红 #1（T035 落地、T036 登记之前）**——命令（verbatim）：
+
+```bash
+python3 scripts/python/flow-class-check.py --action check --format json
+```
+
+退出码 1，读数：`units=86`、`coverage.ledger_rows=85`、`gaps=1`、
+finding `{"kind":"missing","unit_id":"/speckit.seal","message":"inventory unit has no ledger row"}`。
+全文捕获于 `test-evidence/p7-red-first-template-only-20261111.txt`。
+
+**转绿（T036 登记后）**：同一命令退出码 0，`units=87`（30 命令 + 57 技能）、`gaps=0`、`findings=[]`；
+`probe-utils.py --action probes --validate` 报 11 classes / 126 internal objects（+2 wrap-up Object）。
+
+**红 #2（T036 登记后、T037 更新 pin 之前）**——
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_flow_class_ledger.py -q
+```
+
+退出码 1，`3 failed, 8 passed`：三条普查 pin（行数、check units、模板/技能扫描文件数）钉在 85。
+全文捕获于 `test-evidence/p7-red-first-pins-20261111.txt`。
+
+**红 #3（同一时点的关联普查 pin）**——
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_feedback_command_classification.py \
+  tests/contract/test_docs_step_injection.py tests/contract/test_migration_distribution.py \
+  "tests/contract/test_humanize_command_surface.py::test_wc16_command_roster_unchanged" -q
+```
+
+退出码 1，`5 failed, 79 passed`：027 分类表缺 `seal` 行（表/模板覆盖、Complex 集与实测载体不一致）、
+命令与技能名册冻结集（双向）、WC-16 命令名册。全文捕获于
+`test-evidence/p7-red-first-related-pins-20261111.txt`。
+
+**转绿读数（T037/T038/T051 落地后）**：
+
+- 上述 7 个普查/接线文件合计 `103 passed`（含 `test_command_family.py`、`test_concurrency_coverage.py`）。
+- `probe-utils.py --action compile-embeds --check` → `83 units, zero drift`；
+  `regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均 exit 0；
+  `test_compile_propagation_order.py` `2 passed`。
+- 相邻套件 `329 passed / 2 failed` 与 `959 passed / 3 failed`——五个失败逐个对照
+  `test-evidence/baseline-failed.txt` 均为实现入口既有失败（`test_qoder_command_frontmatter.py::
+  test_every_template_has_short_description` 报 `research.md` 超长、`test_probe_nonentity_catalog.py::
+  test_catalog_does_not_participate_in_registry_counts` 钉 122 实为 124、`test_expression_gate_wiring.py::
+  test_a6...` 技能基数、`test_docs_command_template.py::test_c10...` 运行时目录探测、`test_delegation_classes.py::
+  test_every_template_edge...` 为 `/speckit.research → study-*` 的既有跨类边），本包零新增失败。
+- 汇总证据：`test-evidence/p7-command-surface-20261111.txt`。
+
+**披露（有意不绑定 docs-sync HandlerBinding）**：`/speckit.seal` 的 wrap-up 面由注册表的 6 条
+`@point:wrap-up / scope=all` 订阅渲染，未新增 `h-docs-sync-eval` 的逐单元绑定。理由：该绑定行会改变
+wrap-up 投影的**全局指纹**，使全部 83 个已编译面需要同批重编译（先例 d41d0ced 触及 235 个文件），
+超出 P7 声明的文件级写域；`/speckit.history` 是既有同形先例（复合命令、有 wrap-up、无 docs-sync 行）。
+该形态已在 `tests/contract/test_docs_step_injection.py` 的 `DOCS_STEP_EXCLUDED` 中以实测理由登记，
+重测腿会拒绝无声漂移。
+
+**就地修正（fast-fail: correction，非语义变更）**：初版模板把状态转移箭头逐字写进 Delegation 段，
+`test_seal_boundaries.py::test_the_transition_arrow_lives_only_on_the_owner_and_its_protocol_row` 转红
+（C-025/C-036：该转移只由 schema owner 与协议行陈述）。已改为按指针引用两个 owner，未改任何断言语义；
+复跑 seal 回归批 125 passed（含边界审计与传播链），读数落
+`test-evidence/p7-seal-regression-20261111.txt`。
