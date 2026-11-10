@@ -1,0 +1,313 @@
+=== Analyze Round 2 deterministic checks — 2026-11-10 (run r20261110T121314Z-b099) ===
+
+--- 1) account-clause-coverage.py --spec-dir ... --json (full JSON: analyze-coverage-r2-2026-11-10.json) ---
+accountant_exit=2
+{
+  "status": "baseline-missing",
+  "baseline_present": false,
+  "errors": 686,
+  "warnings": 1,
+  "fr": {
+    "universe": 28,
+    "claimed": 28,
+    "uncovered": []
+  },
+  "scanned": {"total": 290, "parsed": 183, "named_unparseable": 107}
+}
+clause-uncovered fail 685 | 685 uncovered, 685 beyond the frozen baseline
+fr-uncovered pass 0 | 28 of 28 FRs cited from citation groups
+clause-unparsable fail 107 | 107 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+coverage-baseline-delta fail 685 | baseline holds 0 names; 0 uncovered items are baseline-internal and do not block
+PROBLEM: frozen baseline not found: .specify/specs/099-speckit-seal/coverage-baseline.txt — an absent baseline is NOT an empty exemption list, so this run cannot judge the delta; freeze it with `account-clause-coverage.py .specify/specs/099-speckit-seal --freeze > .specify/specs/099-speckit-seal/coverage-baseline.txt`
+
+--- 2) validate-requirements.py ---
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+validate_requirements_exit=0
+
+--- 3) validate-tasks.py ---
+PASS: .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 0 warning(s)
+validate_tasks_exit=0
+
+--- 4) validate-decision-tensions.py --spec plan ---
+{
+  "spec": ".specify/specs/099-speckit-seal",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 333,
+    "records": 6
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 0
+  },
+  "findings": []
+}
+dtr_exit=0
+
+--- 5) pre-analyze-check.py --stage requirements / plan / tasks (json head + summary tail) ---
+[stage=requirements]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+summary_line: pre-analyze-check: stage=requirements decision=pass errors=0 advisories=101 waived=0
+
+
+[stage=plan]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+summary_line: pre-analyze-check: stage=plan decision=pass errors=0 advisories=101 waived=0
+
+
+[stage=tasks]
+exit=0
+decision= pass errors= 0 advisories= 101 waived= 0 fr= 28 sc= 9 tasks= 51 clauses= 0 files= 13
+summary_line: pre-analyze-check: stage=tasks decision=pass errors=0 advisories=101 waived=0
+
+
+
+--- 6) decomposition-check.py --mode tasks ---
+exit=0
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 28, "task_count": 51, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T14:18:53Z"}
+
+--- 7) 074 acceptance-case baseline readings (reproduced this round) ---
+parent_open_rows: 57
+parent_closed_rows: 0
+074a_closed_rows: 32
+074a_open_rows: 0
+074b_closed_rows: 26
+074b_open_rows: 0
+parent_review_present: no
+parent_code_review_present: no
+parent_verification_lines: 41
+parent_verification_sc_status_rows: 8
+parent_requirements_path_markers: 0
+074b_verification_sc_status_rows: 2
+verification_landed_by_commit: 91726a64171c3fcbb265ae0cacabb5ed5390c176
+split_record_proposed_slices: 1 occurrence(s)
+split_record_lines_128_140:
+  ## 拆分记录（tasks U4，2026-10-28）
+  
+  - measured: `fr_count=28`, `task_count=57`, `fr_ceiling=30`, `task_ceiling=40`
+  - reasons: `task rows=57 exceeds ceiling 40`
+  - ceilings: 8–30 FR / 10–40 tasks per slice
+  - base_commit: `371869045`（tasks artifact）；`6297c14f6`（plan）
+  - proposed_slices:
+    - `074a-authorized-routing`（MVP）：控制层级 + 双层授权 + 三值分流 + 授权席位启动嵌套运行 + 治理嵌套；FR-001–FR-019 + FR-025（20 FR）；任务 ≈ Setup 3 + Foundational 2 + US1 9 + US2 7 + US3 5 + Polish 8 = 34；新 spec 目录 `074a-authorized-routing`；`Related Feature: 074`。
+    - `074b-nested-governance`：外层消费与交接 + team report 段 + 概念扩散 + 兼容/安全；FR-020–FR-024 + FR-026–FR-028（8 FR）；任务 ≈ US4 9 + US5 6 + Polish 8 = 23；新 spec 目录 `074b-nested-governance`；`Related Feature: 074`。
+  - 边界说明：两片 FR 集合互斥且并集 = 28；当前 `074-goal-team-sdd-unification` 作为父规格/总需求保留，`tasks.md` 的 57 行作为被拆分对象保留为历史（不删除、不重排）；两片各自重走 requirements → plan → tasks → checklist → analyze → implement → review；按顺序串行，禁止同线并行。
+  - confirmation: `confirmed-user`（2026-10-28：两片拆分确认；先 074a，后 074b，串行）
+  
+  ## Test Budget (E2/E3 台账)
+driver_p0_waiver_row: 40:2026-10-29 `/speckit.review`（**切片 074b-nested-governance**，**Ready for Review**，`stage_base=91726a641`）：过程段 findings P0×1 / P1×3 / P2×2，代码段 `blocking 0` / `important 2`（已在记录内答复）/ `suggestion 3`。**P0 F1** 是框架级缺陷（字母切片分支 `074b-` 不匹配 `^[0-9]+-`，`/speckit.*` 前置脚本把 `REQUIREMENTS_DIR` 解析到父 074 目录），不在本切片交付面内；全程以显式目标覆盖规避，驱动记录为**显式豁免（P0 waiver）**，不阻断合并；建议后续以框架修复（分支前缀解析扩展或切片编号规范）收口。P1：交付面 9 行表被实际 delta 超出、切片内共享字符串重编号导致 shipped report contract 的 outcome token 解析、拆分特性的父侧验证形态缺失。review 证据：`review.md` + `code-review.md`（提交 `a48426611`）。`Implemented → Ready for Review` 三条件（无未处置 `[~]`、review 证据已产出、`code-review.md` 无 `blocking`）均满足，状态推进为 `Ready for Review`；`Completed` 仍属人工/治理终验。
+create_team_slice_local_str_refs: 99:- **每次调用一行**: 一行恰好五个字段 —— `outcome`、`artifact paths`、`evidence paths`、`routing-verdict reference`、`anomalies`。`outcome` 取自三值封闭集 `[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]`;第四值、自由文本或空值一律非法。
+101:- **路径以路径携带**: artifact / evidence 只写路径,段内 MUST NOT 内联工件正文;`[[STR-005]]` / `[[STR-006]]` 的嵌套运行 MUST NOT 改写成成功语气 —— 它们原样上抛。
+
+--- 8) STR tables cross-check (FR-027(b) fix verification) ---
+[parent 074 requirements § Shared Strings]
+  444:| `STR-004` | `"sdd"` | routing golden table, routing-engine unit tests |
+  445:| `STR-005` | `"direct"` | routing golden table, direct-modification gate tests |
+  446:| `STR-006` | `"adjudicate"` | routing golden table, ambiguity and conflict property test |
+  447:| `STR-007` | `"completed"` | nested-run handoff contract test, team run-report contract test |
+  448:| `STR-008` | `"blocked"` | nested-run handoff contract test, authorization-failure tests |
+  449:| `STR-009` | `"failed"` | nested-run handoff contract test, stall and timeout tests |
+  450:| `STR-010` | `"## Nested SDD Runs"` | team run-report contract test |
+  451:| `STR-011` | `"seats"` | team.md seat-policy schema tests, authorization contract tests |
+[074a STR-010 + mapping]
+  7:**编号口径**: 切片内连续本地编号（FR-001–FR-020、SC-001–SC-006、STR-001–STR-010）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
+  30:| 共享字符串 | `STR-001`–`STR-009`、`STR-011` | 全部纳入（本地 `STR-001`–`STR-010`） |
+  32:| team report 嵌套段 | 父 `STR-010` | 不在本切片；由 `074b-nested-governance` 承接 |
+  90:| STR-010 | STR-011 | 席位策略映射键名 `"seats"` |
+  208:- **The seat has no [[STR-010]] entry**: the policy resolves to [[STR-003]]; the run is refused
+  244:  key [[STR-010]] keyed by seat slug; an absent seat entry or key means [[STR-003]]. The
+[074b STR-004..007 + mapping]
+  8:**编号口径**: 切片内连续本地编号（FR-001–FR-008、SC-001–SC-002、STR-001–STR-007）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
+  30:| 共享字符串 | Parent STR 001–Parent STR 003、Parent STR 007–Parent STR 010 | 纳入本切片实际引用者（本地 `STR-001`–`STR-007`） |
+  47:| `FR-002` | Parent FR 021 | 团队运行报告契约新增一个强制嵌套段（段标题字面量为 `[[STR-007]]`），逐次列出 outcome、工件与证据路径、分流裁决引用与异常；无嵌套调用的运行必须显式声明而非省略该段 |
+  69:| STR-004 | STR-007 | 嵌套运行 outcome `"completed"` |
+  72:| STR-007 | STR-010 | 团队运行报告嵌套段标题字面量 `"## Nested SDD Runs"` |
+  155:- **FR-002**: The team run-report contract, owned by `create-team/SKILL.md` § Report contract, MUST gain a mandatory nested-SDD section ([[STR-007]]) that lists, per invocation, an outcome of [[STR-004]], [[STR-005]], or [[STR-006]],
+  234:| `STR-004` | `"completed"` | team run-report contract test; local FR-002 outcome value |
+  235:| `STR-005` | `"blocked"` | team run-report contract test; local FR-002 outcome value |
+  236:| `STR-006` | `"failed"` | team run-report contract test; local FR-002 outcome value |
+  237:| `STR-007` | `"## Nested SDD Runs"` | team run-report contract test; local FR-002 mandatory heading literal |
+
+--- 9) feature registry / detail linkage readings ---
+102:| 099 | Speckit Seal（/speckit.seal：按 review 封装 spec 与分片合并回写） | 按 review 结论封装 spec：`Sealed` 是 `Ready for Review` 之后的终态、是归档准入的唯一状态；承载 split + merge 回写流程——分片同名输出件按声明顺序并回父级（编号重排/语义对齐/词汇表对齐/冲突显式呈现），074 回合为首个真实验收。 | Planned | .specify/features/099-speckit-seal.md | .specify/specs/099-speckit-seal/requirements.md | 2026-11-10 planned via /speckit.plan — plan.md（22 项 Constitution 全 Pass）+ research.md(
+detail_status: 6:**Status**: Planned
+latest_review_section:
+  ## Latest Review
+  
+  尚未评审——当前阶段为 plan（2026-11-10）。
+  
+4:**Total Features**: 90
+
+--- 10) same-name artifact inventory across the 074 triple (r2 re-measure) ---
+checklists/readiness-2026-10-29.md => ['a', 'b']
+checklists/requirements.md => ['a', 'b', 'parent']
+contracts/nested-invocation.md => ['a', 'parent']
+contracts/report-and-attribution.md => ['b', 'parent']
+notes/closure-full-run-2.txt => ['a', 'b']
+notes/closure-full-run.txt => ['a', 'b']
+notes/pre-change-measurements.md => ['a', 'b']
+notes/quickstart-run.md => ['a', 'b']
+notes/red-first-evidence.md => ['a', 'b']
+test-evidence/analyze-fix-checks.md => ['a', 'b']
+test-evidence/analyze.jsonl => ['a', 'b']
+test-evidence/checklist-stage-checks.md => ['a', 'b']
+test-evidence/checklist.jsonl => ['a', 'b']
+test-evidence/clarify.jsonl => ['a', 'b']
+test-evidence/implement.jsonl => ['a', 'b']
+test-evidence/plan-stage-checks.md => ['a', 'b', 'parent']
+test-evidence/plan.jsonl => ['a', 'b']
+test-evidence/review.jsonl => ['a', 'b']
+test-evidence/targeted-set-v1-baseline.txt => ['a', 'b', 'parent']
+test-evidence/tasks-stage-checks.md => ['a', 'b', 'parent']
+test-evidence/tasks.jsonl => ['a', 'b']
+same_name_files_count: 21
+
+--- 11) checklist unchecked item count ---
+quality_checklist_unchecked: 40
+requirements_checklist_unchecked: 0
+
+--- 12) r1 fix-anchor verification (grep readings) ---
+[B-01] SC-006 下限口径:
+  191:- **SC-006**: 074 真实回合（用户指定的 acceptance 用例）可执行且可复现：以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行 split→merge-back→seal 全流程；实测输入 MUST 为：074a 32/32、074b 26/26 任务行闭合；父 `tasks.md` 57 个未勾选行；父级无 `review.md`/`code-review.md`；父 `verification.md` 以聚合指针集存在（提交 `91726a641`，每 SC 一行——本条以实测更正简报的「父目录无 verification.md」前提）。回合产出覆盖两片全部实际输出件的合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0（57 行按 FR-018 显式处置）；父 `verification.md` 每条 SC 有状态行；seal 终态为 `Sealed` 或至少逐条覆盖 FR-027 五项实测输入的具名阻断清单——五项之外的实测阻断只需逐条点名即合规，不构成不合规；验收断言：回合记录对五项逐项呈 resolved/blocked，且拒绝清单每条阻断都能解析到回合证据（五项之外的多出条目不判违规）；阻断状态下重跑清单一致。 **Path**: final
+  .specify/specs/099-speckit-seal/requirements.md:1
+  .specify/specs/099-speckit-seal/plan.md:0
+  .specify/specs/099-speckit-seal/tasks.md:0
+[C-03] FR-012 目录型候选 + 同名三态:
+  .specify/specs/099-speckit-seal/requirements.md:141:- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contracts/`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`checklists/`、`checkpoints/`、`test-evidence/` 与 `notes/`。**目录型候选**（`contracts/`、`checklists/`、`checkpoints/`、`test-evidence/`、`notes/`）的合并单位 MUST 是**文件**：按文件名在父级与全部分片间取并集，逐文件处置——两侧同名 → 该文件为合并单元（`merge`；内容按其声明结构归并，无法确定性归并或同一锚点双端编辑 → 冲突）；仅分片有 → `create`；仅父级有 → `keep`。`test-evidence/`、`checkpoints/` 内的既有日期化测量文件属 dated record：MUST NOT 复制或改写原件；同名时父级文件维持 `keep` 并在合并清单记录指向分片原件的指针，仅分片有时以父级**指针视图**（汇总行 + 指针）`create`，分片原件字节不变。**必选下限**：`tasks.md` 无论分片是否产出 MUST 被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席则新建）、父 `review.md`（分片 review 记录的汇总指针视图，缺席则新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，缺席则新建）与合并清单 MUST 产出。**其余候选按实际产出枚举**：两侧皆有 → `merge`；仅分片有 → `create`；仅父级有 → `keep` 并接受同一套对齐检查；两侧皆无 → `not-applicable`。每个输出件 MUST 记录动作（merge / create / keep / not-applicable）与来源。MUST NOT 为单个输出件发明第二套合并流程：输出件差异只体现在其**声明的 ID 家族**与结构单元上。
+  .specify/specs/099-speckit-seal/requirements.md:148:- **FR-019**: **证据保全** MUST 遵守 dated-record 红线：分片的 `review.md`、`code-review.md`、`verification.md`、`test-evidence/` 与其它既有日期化测量 MUST NOT 被改写；父级合并视图 MUST 以「汇总行 + 指针」形态引用它们（与 074 父 `verification.md` 既有的聚合指针形态同构），MUST NOT 制造第二份测量；目录型候选内的 dated-record 文件 MUST 按 FR-012 的指针纳入动作处置（不复制、不改写原件）。
+  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md:27:`checkpoints/`、`test-evidence/`、`notes/`。**目录型候选**（`contracts/`、`checklists/`、`checkpoints/`、
+  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md:106:目录型候选内的 dated-record 文件按**指针纳入**处置：同名文件父级保持 `keep` 并在合并清单留指针，仅分片
+  .specify/specs/099-speckit-seal/data-model.md:112:- V9 `artifacts[]` 的 `per_slice` 必须覆盖每个分片 × 每个候选输出件（`present` 真假都记录）；目录型候选必须逐文件成行（`name` = `<dir>/<file>`）；dated-record 文件必须带指针语义（无文件副本）；`not-applicable` 必须带 `basis`（FR-012、FR-018、FR-019）。
+  .specify/specs/099-speckit-seal/data-model.md:132:- **E5 Artifact Merge Record**：`name` 取自 15 项封闭候选（FR-012）；`action` 四值；目录型候选按文件级单元落行（`name` 记 `<dir>/<file>`，同名三态见 C-013）；dated-record 文件的动作语义是指针纳入（不复制原件）；`sources` 为分片 slug 列表；`checks` 记录该件自身的后置校验（如 `id_continuity`）。
+[C-04] FR-016 token→注册表绑定:
+  .specify/specs/099-speckit-seal/requirements.md:145:- **FR-016**: **词汇表对齐** MUST 保证合并后每个共享字符串引用（`[[STR-NNN]]` 形态）解析到合并后的父级唯一注册表；同号不同义（同一 ID 在分片与父级指向不同字面量）MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。**token→注册表绑定** MUST 可机械判定：`[[STR-NNN]]` 的解析域是其声明登记处——spec 文档以自身 `requirements.md` § Shared Strings 为登记处（登记处口径 owner：`shared/definitions/sdd-routing-definitions.md` § 字面量登记处，MUST NOT 在本规格复制）；spec 之外的文档 MUST 显式声明所用登记处（spec 路径 + 节锚），未声明登记处的引用 MUST 做跨登记处解析检查：恰好一个分片注册表命中且字面量一致 → 按该分片本地 ID 检出并按本条记录解决方式；零命中、或多处命中且字面量不同 → 判为冲突，MUST NOT 猜测归属。出厂文档（框架源与镜像）中对分片本地 ID 的引用 MUST 被检出：在合并后语义下解析会改变含义的引用，MUST 逐条记录解决（重指向合并后 ID / 改用逐字字面量 / 用户豁免）。新术语 MUST 经 `.specify/glossary.md` 的既有协议进入词汇表，MUST NOT 在 spec 内联定义第二份术语表。
+  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md:72:MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。**token→注册表绑定**：`[[STR-NNN]]` 的解析域由其
+[E-01] slice-unclosed:
+  .specify/specs/099-speckit-seal/requirements.md:107:- **分片状态不一**（一片已闭合、另一片仍有未勾选行或未决冲突）：合并不得替分片「补完」；未闭合行保持未闭合，seal 以 `slice-unclosed`（验收/合并前置条件）阻断并点名分片与行（判据与计数来源见 FR-008）。
+  .specify/specs/099-speckit-seal/requirements.md:134:- **FR-008**: 「合并回写完成」MUST 由合并清单证成（FR-018）：当分片集合非空时，每个分片 × 每个输出件都必须有一条合并记录，未决冲突数为 0，且合并后校验（FR-014…FR-016）全绿；分片集合非空时，「完成」还 MUST 要求每个分片**已闭合**：分片 `tasks.md` 中未勾选行（`- [ ]` 与 `- [>]`）计数为 0，`- [~]` deferred 行 MUST 在分片 `verification.md` 的 `deferred_tasks=` 逐项有名（行形态与计数来源：与父 `tasks.md` 相同的任务行正则；缺记录计为未闭合）；任一未闭合分片 MUST 以 `slice-unclosed` 具名阻断并点名分片与行，MUST NOT 替分片补完或伪勾选；当分片集合为空时，记录 MUST 写 `not-applicable` 并说明判定依据，MUST NOT 静默跳过。
+  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md:93:`closure-refused`、`closure-input-defect`、`merge-incomplete`、`conflict-open`、`slice-unclosed`、
+  .specify/specs/099-speckit-seal/data-model.md:180:| `slice-unclosed` | 分片 `tasks.md` 存在未勾选行（`- [ ]` / `- [>]`），或 `- [~]` 行缺分片 `verification.md` 的 `deferred_tasks=` 记录 | FR-008 |
+  .specify/specs/099-speckit-seal/tasks.md:177:- [ ] T026 [US1] 写红先契约测试 `tests/contract/test_seal_seal.py`：主路径（exit 0、`seal.md` 落盘、注册表行与详情同批 `Sealed`）、幂等重跑（`already-sealed`、无第二份回执、状态面不动）、八类拒绝逐夹具点名封闭码（含分片未闭合报 `slice-unclosed`）且状态不变、「三缺一」变异转红、074 形态的闭包 exit 2 报 `closure-input-defect` 且不读作通过，红输出记入 `notes/red-first-evidence.md`（FR-005、FR-006、FR-007、FR-008、FR-009、FR-010、SC-001、SC-002、[blockedBy: T025]）。
+  .specify/specs/099-speckit-seal/tasks.md:182:- [ ] T028 [US1] 在 `scripts/python/seal-utils.py` 实现 `seal` 只读判定段：状态对读取（与闭包引擎 `resolve_claimed_status` 同源；不一致/缺失 → `state-drift` exit 2）、review/P0 判定（C-044 两载体 `- **User waiver**:` 字面形式才计豁免）、`code-review.md` 的 `blocking` 扫描与 `review.md`/`code-review.md` 缺失判定（`review-missing`）、闭包子进程与七键回执逐字复制（exit 2 → `closure-input-defect`）、`merge-manifest.json` 完成度检查（`not-applicable` 须带 `basis`）与分片闭合判据（`slice-unclosed`：未勾选行计数 + `[~]` 的 `deferred_tasks=` 记录）、`git status --porcelain -- <parent-spec-dir>` 脏树探测、以及 stdout-only 且顺序稳定的拒绝报告（FR-004、FR-005、FR-006、FR-007、FR-008、FR-009、C-031、C-042、[blockedBy: T026,T027]）。
+  .specify/specs/099-speckit-seal/quickstart.md:122:验收状态行缺失、闭包引擎 exit 2、分片存在未决冲突、分片未闭合（`slice-unclosed`）、脏 spec 树、状态面漂移。
+[F-01] dated-record 指针纳入:
+  .specify/specs/099-speckit-seal/requirements.md:148:- **FR-019**: **证据保全** MUST 遵守 dated-record 红线：分片的 `review.md`、`code-review.md`、`verification.md`、`test-evidence/` 与其它既有日期化测量 MUST NOT 被改写；父级合并视图 MUST 以「汇总行 + 指针」形态引用它们（与 074 父 `verification.md` 既有的聚合指针形态同构），MUST NOT 制造第二份测量；目录型候选内的 dated-record 文件 MUST 按 FR-012 的指针纳入动作处置（不复制、不改写原件）。
+  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md:106:目录型候选内的 dated-record 文件按**指针纳入**处置：同名文件父级保持 `keep` 并在合并清单留指针，仅分片
+  .specify/specs/099-speckit-seal/data-model.md:132:- **E5 Artifact Merge Record**：`name` 取自 15 项封闭候选（FR-012）；`action` 四值；目录型候选按文件级单元落行（`name` 记 `<dir>/<file>`，同名三态见 C-013）；dated-record 文件的动作语义是指针纳入（不复制原件）；`sources` 为分片 slug 列表；`checks` 记录该件自身的后置校验（如 `id_continuity`）。
+[F-02] 父 code-review.md 必选下限:
+  .specify/specs/099-speckit-seal/requirements.md:141:- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contracts/`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`checklists/`、`checkpoints/`、`test-evidence/` 与 `notes/`。**目录型候选**（`contracts/`、`checklists/`、`checkpoints/`、`test-evidence/`、`notes/`）的合并单位 MUST 是**文件**：按文件名在父级与全部分片间取并集，逐文件处置——两侧同名 → 该文件为合并单元（`merge`；内容按其声明结构归并，无法确定性归并或同一锚点双端编辑 → 冲突）；仅分片有 → `create`；仅父级有 → `keep`。`test-evidence/`、`checkpoints/` 内的既有日期化测量文件属 dated record：MUST NOT 复制或改写原件；同名时父级文件维持 `keep` 并在合并清单记录指向分片原件的指针，仅分片有时以父级**指针视图**（汇总行 + 指针）`create`，分片原件字节不变。**必选下限**：`tasks.md` 无论分片是否产出 MUST 被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席则新建）、父 `review.md`（分片 review 记录的汇总指针视图，缺席则新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，缺席则新建）与合并清单 MUST 产出。**其余候选按实际产出枚举**：两侧皆有 → `merge`；仅分片有 → `create`；仅父级有 → `keep` 并接受同一套对齐检查；两侧皆无 → `not-applicable`。每个输出件 MUST 记录动作（merge / create / keep / not-applicable）与来源。MUST NOT 为单个输出件发明第二套合并流程：输出件差异只体现在其**声明的 ID 家族**与结构单元上。
+  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md:34:（分片 review 记录的汇总指针视图，缺席新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，
+  .specify/specs/099-speckit-seal/requirements.md:132:- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）的 findings 摘要 MUST 显示**零个未处置 P0**——处置只有两种：已修复（有修复指向）或**用户显式裁定豁免**（user-authored artifact 或本会话用户裁定）；驱动者/协调者/代理的确认与「无人反对」MUST NOT 计为豁免。当前 `code-review.md` MUST 零 `blocking` 条目（与既有 `Implemented → Ready for Review` 门同源，MUST NOT 另立判据）。当前 `review.md` 或 `code-review.md` 缺失 MUST 以 `review-missing` 具名阻断（退出码 `1`）并点名 `/speckit.review`。seal MUST 只读 review 记录：不改写 finding、不重新裁决、不降级。
+  .specify/specs/099-speckit-seal/data-model.md:174:| `review-missing` | 当前 `review.md` 或 `code-review.md` 缺失 | FR-006 |
+[F-04] 074a STR-010 / 074b STR-004–007:
+  162:- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2——逐条记录取值（显式决定，或记录过的严格默认 `final`），MUST NOT 读作通过；(b) 分片本地 STR 编号与父级同号不同义——实测两组：074a 本地 `STR-010`（`"seats"`，已声明映射 → 父 `STR-011`）与 074b 本地 `STR-004`–`STR-007`（`"completed"`/`"blocked"`/`"failed"`/`"## Nested SDD Runs"`，已声明映射 → 父 `STR-007`–`STR-010`）——按 FR-016 的冲突规则呈现并解决；(c) 出厂文档 `skills/internal/create-team/SKILL.md` 以 074b 分片本地 ID 引用 outcome 字面量（`STR-004`/`STR-005`/`STR-006` 在 074b 本地表为 `completed`/`blocked`/`failed`；父级同号为 `sdd`/`direct`/`adjudicate`）——按 FR-016 检出并记录重指向（合并后父 ID `STR-007`/`STR-008`/`STR-009`）或逐字字面量；(d) 074b review 的 P0（字母分片分支解析到父目录）只带驱动者记录的豁免——按 FR-006 不算用户豁免，须有修复证据或用户显式裁定，否则为具名阻断；(e) 父 `tasks.md` 的 57 行拆前记录——按 FR-018 处置，MUST NOT 静默覆盖或删除。每项 MUST 在回合记录中逐条出现，状态为「已解决（证据指针）」或「阻断（理由）」。五项是**下限**：回合实测新增的具名阻断（含五项之外的同号不同义、目录同名产物冲突）MUST 同样逐条点名，MUST NOT 以「不在五项内」为由省略。
+[medium-residue] C-01/C-02/F-03 anchors:
+  132:- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）的 findings 摘要 MUST 显示**零个未处置 P0**——处置只有两种：已修复（有修复指向）或**用户显式裁定豁免**（user-authored artifact 或本会话用户裁定）；驱动者/协调者/代理的确认与「无人反对」MUST NOT 计为豁免。当前 `code-review.md` MUST 零 `blocking` 条目（与既有 `Implemented → Ready for Review` 门同源，MUST NOT 另立判据）。当前 `review.md` 或 `code-review.md` 缺失 MUST 以 `review-missing` 具名阻断（退出码 `1`）并点名 `/speckit.review`。seal MUST 只读 review 记录：不改写 finding、不重新裁决、不降级。
+  33:维护者对一条已处于 `Ready for Review` 的 spec 运行 `/speckit.seal`。引擎逐条判定封装前置条件——当前 review 记录存在且结论中没有未处置的 P0、验收记录齐备（每条 SC 有状态行、每条 final 路径判据为 `pass`）、若存在分片则合并回写已完成且无未决冲突、工作树没有本流程之外的未提交改动。全部成立时写入一份按 spec 的封装记录并把状态推进为 `Sealed`（[[STR-001]]）；任一不成立时**拒绝封装**，状态保持不变，并逐条点名未满足的条件与修复路径。
+  125:- **FR-002**: `Sealed`（[[STR-001]]）MUST 是终态：不存在离开它的前向转移。唯一合法的后向转移 MUST 是审计更正 `Sealed → Ready for Review`，且 MUST 携带使原封装结论不成立的证据并同时落在注册表行与特性详情两处可验证载体上；其余任何后向转移 MUST 判为非法。该例外与既有 `Implemented → Blocked` 审计更正同形，MUST NOT 扩大为一般回退通道。
+
+--- 13) 074 round reviewability extras ---
+074a_parent_mapping: 7:**编号口径**: 切片内连续本地编号（FR-001–FR-020、SC-001–SC-006、STR-001–STR-010）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
+074b_parent_mapping: 8:**编号口径**: 切片内连续本地编号（FR-001–FR-008、SC-001–SC-002、STR-001–STR-007）；父条目逐条映射见 `## Parent Mapping`。父规格仍是权威，切片编号只是投影，编号变化不构成删除、合并或重排。
+074a_review_files:
+  code-review.md
+  review.md
+074b_review_files:
+  code-review.md
+  review.md
+074b_review_p0_rows:
+  81:| P0 | 1 | Blocks correct use of spec-kit, or creates silent corruption risk. Fix before next spec. |
+  117:- **Severity**: P0
+  304:| P0 | Slice-aware spec-directory resolution | `scripts/bash/common.sh` + `.specify/scripts/bash/` | F1 |
+  319:- [x] P0 validation status is stated explicitly: one P0 finding (F1) was raised and carries `(validated: direct re-read, subagent unavailable)` — this environment exposes no subagent dispatch, so the documented fallback was used and its weaker evidence path is stated on the finding row rather than hidden.
+074b_code_review_blocking:
+0
+parent_verification_head:
+  # Verification Log — 074-goal-team-sdd-unification
+  
+  baseline_commit=7831bb4bb
+  baseline_date=2026-10-28
+  baseline_branch=074-goal-team-sdd-unification
+  
+parent_tasks_row_shapes:
+     57 - [ ]
+
+--- 14) research count cross-reference (R-range mentions) ---
+research_records: 21
+  .specify/specs/099-speckit-seal/plan.md:62:| VIII | Code as the Single Source of Truth | ✅ Pass | research.md R-01…R-20 全部带 file:line 或实测命令；074 读数（57/32/26、exit 2、STR 表）取自本日实测。 |
+  .specify/specs/099-speckit-seal/plan.md:169:├── research.md          # Phase 0 output (R-01…R-20, all measured 2026-11-10)
+  .specify/specs/099-speckit-seal/plan.md:327:| Research | [`research.md`](research.md) | R-01…R-21, all file:line or measured reading |
+  .specify/specs/099-speckit-seal/feature-ref.md:115:- `research.md` R-01…R-20 — 全部设计输入的文件级实测。
+  .specify/specs/099-speckit-seal/tasks.md:7:**Prerequisites**: requirements.md (28 FR / 9 SC / 3 STR + Clarifications + Assumptions A1–A7), plan.md (9 个工作包 P1–P9、6 条 decision-tension T-001…T-006、12 条 Execution Premise EP-001…EP-012、Mirror Obligations), research.md (R-01…R-21), data-model.md (E1–E14, V1–V16), contracts/ (4 文件 C-001…C-045), quickstart.md (S-1…S-9), feature-ref.md（FR 28/28、SC 9/9 映射）
+
+--- 15) FR/SC → row trace re-verification (trace table rows actually cite the FR/SC inline) ---
+FR traced: 28 SC traced: 9 task rows: 51
+trace defects: [('FR-010', 'T028', 'not-inline'), ('FR-014', 'T023', 'not-inline'), ('FR-025', 'T019', 'not-inline'), ('FR-025', 'T026', 'not-inline'), ('FR-026', 'T039', 'not-inline'), ('FR-028', 'T044', 'not-inline'), ('SC-001', 'T028', 'not-inline'), ('SC-001', 'T029', 'not-inline'), ('SC-002', 'T028', 'not-inline'), ('SC-003', 'T023', 'not-inline'), ('SC-004', 'T023', 'not-inline'), ('SC-005', 'T018', 'not-inline'), ('SC-005', 'T039', 'not-inline'), ('SC-006', 'T041', 'not-inline'), ('SC-006', 'T044', 'not-inline'), ('SC-007', 'T031', 'not-inline'), ('SC-007', 'T032', 'not-inline'), ('SC-007', 'T033', 'not-inline'), ('SC-008', 'T004', 'not-inline'), ('SC-008', 'T005', 'not-inline'), ('SC-008', 'T012', 'not-inline'), ('SC-009', 'T040', 'not-inline')]
+single-row FRs: 0
+zero-floor sample: [('FR-003', ['T007', 'T014'], True), ('FR-013', ['T018', 'T022', 'T023'], True), ('FR-016', ['T019', 'T020', 'T039'], True), ('FR-022', ['T032', 'T033', 'T034'], True), ('FR-028', ['T042', 'T043', 'T044'], False)]
+
+--- 16) constitution vs plan Constitution Check (principle names) ---
+live principles: 22
+plan rows: 22
+name mismatches: 0
+status pair: registry=Planned? True
+detail Planned? True
+
+--- 17) closure-acceptance-check exit readings (FR-027(a) reviewability) ---
+[parent 074]
+exit=2
+  stderr: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md:392 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+[074b]
+exit=2
+  stderr: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074b-nested-governance/requirements.md:210 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
