@@ -1545,8 +1545,1017 @@
     "id_continuity": "pass",
     "open_rows": 0
   },
-  "conflicts": [],
-  "digest": "sha256:a014f031637925b9613d2ab97a9b52e5f1fd500f48e71ed272974ebdec3db351",
+  "conflicts": [
+    {
+      "artifact": ".specify/shared/definitions/flow-class-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-001",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-002",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-003",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": ".specify/shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-004",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": ".specify/shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-005",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-006",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": ".specify/shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-007",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": ".specify/shared/workflow/expression-gates.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-008",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-009",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-010",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-011",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-012",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-013",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": ".specify/skills/internal/create-team/references/goal.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-014",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": ".specify/skills/sdd-loop-driver/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-015",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": ".specify/skills/sdd-loop-driver/references/decomposition-model.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-016",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": ".specify/skills/sdd-loop-driver/references/nested-invocation.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-017",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": ".specify/templates/plan-template.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-018",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": "shared/definitions/flow-class-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-019",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-020",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-021",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": "shared/definitions/sdd-routing-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-022",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": "shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-023",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-024",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": "shared/definitions/subagent-definitions.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-025",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": "shared/workflow/expression-gates.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-026",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "skills/external/sdd-loop-driver/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-027",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": "skills/external/sdd-loop-driver/references/decomposition-model.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-028",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": "skills/external/sdd-loop-driver/references/nested-invocation.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-029",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-007 = \"completed\" in 074a-authorized-routing",
+        "line": 427,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-007 = \"## Nested SDD Runs\" in 074b-nested-governance",
+        "line": 237,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-007"
+    },
+    {
+      "artifact": "skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-030",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-031",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": "skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-032",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-005 = \"direct\" in 074a-authorized-routing",
+        "line": 425,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-005 = \"blocked\" in 074b-nested-governance",
+        "line": 235,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-005"
+    },
+    {
+      "artifact": "skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-033",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": "skills/internal/create-team/SKILL.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-034",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    },
+    {
+      "artifact": "skills/internal/create-team/references/goal.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-035",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-004 = \"sdd\" in 074a-authorized-routing",
+        "line": 424,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-004 = \"completed\" in 074b-nested-governance",
+        "line": 234,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-004"
+    },
+    {
+      "artifact": "templates/plan-template.md",
+      "candidates": [
+        "declare the registry (spec path + section anchor) in the factory doc",
+        "repoint the reference to one merged parent id",
+        "or record a user-waiver after review"
+      ],
+      "code": "factory-doc-ref-ambiguous",
+      "id": "CF-036",
+      "resolution": {
+        "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+        "form": "recheck-clean",
+        "kind": "literal",
+        "note": "the reference was rewritten to the verbatim literal (or the declared registry value) so the rerun no longer reproduces it; mirror copies projected by sync-mirrors.py"
+      },
+      "side_a": {
+        "excerpt": "STR-006 = \"adjudicate\" in 074a-authorized-routing",
+        "line": 426,
+        "path": ".specify/specs/074a-authorized-routing/requirements.md"
+      },
+      "side_b": {
+        "excerpt": "STR-006 = \"failed\" in 074b-nested-governance",
+        "line": 236,
+        "path": ".specify/specs/074b-nested-governance/requirements.md"
+      },
+      "status": "resolved",
+      "unit": "STR-006"
+    }
+  ],
+  "digest": "sha256:aedcccadce0dc69d4cb3763db2fef7781fe45acfcfe830d610e73780b3b07b60",
   "dispositions": [
     {
       "disposition": "supersede",
@@ -2459,9 +3468,121 @@
         "line": 0,
         "path": "merge-manifest.json"
       }
+    },
+    {
+      "disposition": "fr-027-adjudication",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#D",
+      "item": "FR-027(a)",
+      "note": "eight parent SC lines now carry exactly one trailing **Path**: final (0 -> 8)",
+      "status": "resolved"
+    },
+    {
+      "disposition": "fr-027-adjudication",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-merge-plan-after.json",
+      "item": "FR-027(b)",
+      "note": "declared STR mappings honoured: 074a STR-010->STR-011; 074b STR-004..007->STR-007..010",
+      "status": "resolved"
+    },
+    {
+      "disposition": "fr-027-adjudication",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#A",
+      "item": "FR-027(c)",
+      "note": "18 source references (36 records with mirrors) disposed by recheck-clean; rerun 0 open conflicts",
+      "status": "resolved"
+    },
+    {
+      "disposition": "fr-027-adjudication",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:115",
+      "item": "FR-027(d)",
+      "reason": "074b review P0 F1 carries a driver-recorded waiver only (C-044 does not count it); no fix evidence: scripts/bash/common.sh:86 still uses ^[0-9]+- and the latest-directory fallback; no user-authored waiver on both carriers",
+      "status": "blocked"
+    },
+    {
+      "disposition": "fr-027-adjudication",
+      "evidence": ".specify/specs/074-goal-team-sdd-unification/tasks.md#Superseded pre-split record",
+      "item": "FR-027(e)",
+      "note": "57 pre-split open rows preserved as > quoted records with 57 supersede dispositions; merged open rows = 0",
+      "status": "resolved"
+    },
+    {
+      "disposition": "round-blocker",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-round-20261110.txt",
+      "item": "B1-state-drift-false-positive",
+      "reason": "the seal registry reader resets its header on blank lines inside .specify/features.md (lines 71/76/78/80) and reports registry=None; both carriers measurably read Ready for Review",
+      "status": "blocked"
+    },
+    {
+      "disposition": "round-blocker",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-round-20261110.txt",
+      "item": "B2-closure-input-defect",
+      "reason": "closure-acceptance-check exits 2: 074 requirements.md carries no Runtime Stack & Dependency Ownership section (predates that gate); the round does not invent one",
+      "status": "blocked"
+    },
+    {
+      "disposition": "round-blocker",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-merge-checks.txt",
+      "item": "B3-merged-tasks-validation",
+      "reason": "validate-tasks reports 43 errors on the merged parent tasks.md (33 story-label placement + 10 green-dangling); readings in 074-merge-checks.txt",
+      "status": "blocked"
+    },
+    {
+      "disposition": "round-blocker",
+      "evidence": ".specify/specs/074-goal-team-sdd-unification/contracts/report-and-attribution.md",
+      "item": "B4-contract-clauses-not-merged",
+      "reason": "the merge engine clause regex accepts three-digit ids only, so 074b clauses C-21..C-30 were not appended to contracts/report-and-attribution.md (content loss vs C-018)",
+      "status": "blocked"
     }
   ],
-  "factory_doc_resolutions": [],
+  "factory_doc_resolutions": [
+    {
+      "after": "**字面量登记处**: `[[STR-001]]` … `[[STR-011]]` 的取值与语义 owner 是合并后的父规格 `.specify/specs/074-goal-team-sdd-unification/requirements.md` § Shared Strings（原切片登记处为其被合并前的投影）；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。",
+      "before": "**字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是本特性切片的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 16,
+      "path": "shared/definitions/sdd-routing-definitions.md"
+    },
+    {
+      "after": "| `team.md` frontmatter schema（`[[STR-011]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |",
+      "before": "| `team.md` frontmatter schema（`[[STR-010]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 28,
+      "path": "shared/definitions/sdd-routing-definitions.md"
+    },
+    {
+      "after": "- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-011]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。",
+      "before": "- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-010]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 71,
+      "path": "shared/definitions/sdd-routing-definitions.md"
+    },
+    {
+      "after": "**字面量登记处**: `[[STR-001]]` … `[[STR-011]]` 的取值与语义 owner 是合并后的父规格 `.specify/specs/074-goal-team-sdd-unification/requirements.md` § Shared Strings（原切片登记处为其被合并前的投影）；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。",
+      "before": "**字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是本特性切片的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 16,
+      "path": ".specify/shared/definitions/sdd-routing-definitions.md"
+    },
+    {
+      "after": "| `team.md` frontmatter schema（`[[STR-011]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |",
+      "before": "| `team.md` frontmatter schema（`[[STR-010]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 28,
+      "path": ".specify/shared/definitions/sdd-routing-definitions.md"
+    },
+    {
+      "after": "- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-011]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。",
+      "before": "- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-010]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。",
+      "evidence": ".specify/specs/099-speckit-seal/test-evidence/074-factory-resolutions.md#B1",
+      "kind": "repoint",
+      "line": 71,
+      "path": ".specify/shared/definitions/sdd-routing-definitions.md"
+    }
+  ],
   "generated_by": {
     "command": "seal-utils.py --action merge-apply --spec-dir .specify/specs/074-goal-team-sdd-unification",
     "engine": "seal-utils.py",
