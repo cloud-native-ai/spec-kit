@@ -17,6 +17,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 
 2026-11-10 (plan, `/speckit.migrate` 097): the version-marker premise was superseded by a declaration-driven design — the expected state is projected from the currently installed CLI's assets and declarations, so no `.specify/version` marker and no version→migration registry are needed. Bound sub-spec: `.specify/specs/097-speckit-migrate-command/` (requirements → plan: 3 contracts, 9 entities, 14 work packages).
 
+2026-11-10 (review, `/speckit.review` 097): four segments + Acceptance Reality Check complete — process report `.specify/specs/097-speckit-migrate-command/review.md`, code record `code-review.md` (123 changed / 97 judged / 26 generated-skipped / 0 gap; 1 `blocking`). `Implemented → Ready for Review` **refused — `blocking-unresolved`**: the current code-segment record carries a blocking entry (unfailable zero-write test, `tests/integration/test_migrate_us2_safety.py:273`) and the feature still claims `Planned` (the `Planned → Implemented` flip was never landed although the checker returns `accept` with `final_path` pass 4/4), so the transition has no matching From-state. Status left unchanged; no waiver presented. ARC record: pass 4 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 4.
+
 ## Key Changes
 
 1. `specify migrate` CLI 子命令：默认零写入干跑，`--apply` 进入写入模式；四类结局 `clean` / `planned` / `applied` / `blocked` 配稳定退出码（0/1/0/3，输入错误 2）。
