@@ -495,13 +495,14 @@ def test_same_line_second_writer_exits_three(tmp_path):
     assert "concurrent-writer-refused" in refused.stdout
     assert fixture["journal"].read_bytes() == before, "a refused writer must write nothing"
 
-    # The drill has teeth: with the flock line removed from a copied engine, the same held
-    # lock is not refused — so exit 3 comes from the protocol, not from the fixture.
+    # The drill has teeth: with the flock call replaced by a no-op in a copied engine, the
+    # same held lock is not refused — so exit 3 comes from the protocol, not from the fixture.
+    # (Deleting the line would leave `try:` with no body: an IndentationError, not a probe.)
     source = ENGINE.read_text(encoding="utf-8")
     marker = "            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)\n"
     assert marker in source, "the single-writer marker moved; update the drill"
     mutated_engine = tmp_path / "journal-utils-mutated.py"
-    mutated_engine.write_text(source.replace(marker, "", 1), encoding="utf-8")
+    mutated_engine.write_text(source.replace(marker, "            pass\n", 1), encoding="utf-8")
     mutated_fixture = _fresh_line(tmp_path / "mutated")
     assert append(mutated_fixture).returncode == 0
     mutated_env = dict(os.environ)
@@ -513,6 +514,6 @@ def test_same_line_second_writer_exits_three(tmp_path):
             unrefused = append(mutated_fixture, engine=mutated_engine, env=mutated_env)
         finally:
             fcntl.flock(holder.fileno(), fcntl.LOCK_UN)
-    assert unrefused.returncode != 3, unrefused.stdout
+    assert unrefused.returncode == 0, (unrefused.stdout, unrefused.stderr)
     assert "concurrent-writer-refused" not in unrefused.stdout
 

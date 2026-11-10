@@ -63,5 +63,9 @@ The red capability is held inside the passing tests rather than in a past run:
   earlier `observed_at` for the first journal row; an engine that projected stage completions
   before the observer's first entry turns it red.
 - `test_same_line_second_writer_exits_three` reruns the held-lock probe against a copied engine
-  with the `fcntl.flock` line removed and asserts that engine is NOT refused (exit != `3`, no
-  `concurrent-writer-refused`), so the exit-3 assertion cannot pass vacuously.
+  whose `fcntl.flock` call is replaced by a no-op and asserts that engine exits `0` without
+  `concurrent-writer-refused`, so the exit-3 assertion cannot pass vacuously. (An earlier form
+  deleted the line outright; the `try:` block then had no body and the mutated engine died with
+  an `IndentationError` — a probe that proved nothing. The no-op replacement keeps the probe
+  executable; the corrected reading is recorded in `test-evidence/wp02-observer-definition.txt`
+  § Correction after commit 9903ff6c1.)
