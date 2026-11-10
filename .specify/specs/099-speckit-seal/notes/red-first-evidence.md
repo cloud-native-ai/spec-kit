@@ -308,3 +308,66 @@ ERROR tests/contract/test_seal_engine_contract.py::test_c010_json_payload_is_can
 ```
 
 **读数**：31/31 红，全部落在同一 `engine` fixture 的 `ENGINE.is_file()` 断言上（红由「引擎尚不存在」引起，不是语法/收集失败）；用例面覆盖 C-001…C-010 + FR-021 stdlib-only 附加腿。
+
+## 3. T019 红先契约测试 `tests/contract/test_seal_merge_plan.py`
+
+**采集点**：T018 夹具树与 T019 测试落地之后、T020 `merge-plan` 动作体落地之前（工作树仅新增 `tests/fixtures/seal/` 与该测试文件；引擎仍是 P2 骨架，`merge-plan` 走 `_pending`）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_seal_merge_plan.py -q
+```
+
+**退出码**：1（18 failed — 15 个 `KeyError: 'plan'`（骨架 payload 无 `plan` 键），3 个退出码断言（`assert 2 == 1` ×2、`assert 2 == 0` ×1，骨架统一返回 `2`））。
+
+**完整 stdout/stderr（verbatim；`-n auto --dist load` 使失败块顺序非确定）**：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_merge_plan.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_c017_factory_doc_slice_local_detection __________________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7800/popen-gw12/test_c017_factory_doc_slice_lo0')
+
+    def test_c017_factory_doc_slice_local_detection(tmp_path):
+        proc, payload = _run_plan(_copy_fixture("factory-doc", tmp_path))
+>       plan = payload["plan"]
+               ^^^^^^^^^^^^^^^
+E       KeyError: 'plan'
+
+tests/contract/test_seal_merge_plan.py:382: KeyError
+
+[… 14 个同构 `KeyError: 'plan'` 失败块省略：`_plan()` / `payload["plan"]` 取值失败，根因同为「动作体未实现」；
+另 3 个失败为退出码断言（`test_c016_unmapped_entry_is_a_conflict`、`test_merge_plan_is_rerun_stable` 的
+`assert 2 == 1` 与 `test_merge_plan_exit_semantics` 的 `assert 2 == 0`），同样由骨架 `_pending` 的 exit 2 引起 …]
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_merge_plan.py::test_c017_factory_doc_slice_local_detection
+FAILED tests/contract/test_seal_merge_plan.py::test_c012_split_record_order_with_basis_and_source
+FAILED tests/contract/test_seal_merge_plan.py::test_c013_mandatory_floor_pointer_views
+FAILED tests/contract/test_seal_merge_plan.py::test_c013_directory_candidates_are_file_level_units
+FAILED tests/contract/test_seal_merge_plan.py::test_c015_id_maps_families - K...
+FAILED tests/contract/test_seal_merge_plan.py::test_c013_dated_records_are_pointer_inclusions
+FAILED tests/contract/test_seal_merge_plan.py::test_c017_same_number_different_meaning_conflict
+FAILED tests/contract/test_seal_merge_plan.py::test_c011_slice_set_uses_both_conditions
+FAILED tests/contract/test_seal_merge_plan.py::test_merge_plan_is_read_only
+FAILED tests/contract/test_seal_merge_plan.py::test_merge_plan_exit_semantics
+FAILED tests/contract/test_seal_merge_plan.py::test_c013_candidate_universe_is_the_closed_fifteen
+FAILED tests/contract/test_seal_merge_plan.py::test_c015_id_maps_are_rerun_stable
+FAILED tests/contract/test_seal_merge_plan.py::test_c011_half_condition_candidates_are_named_conflicts
+FAILED tests/contract/test_seal_merge_plan.py::test_c016_unmapped_entry_is_a_conflict
+FAILED tests/contract/test_seal_merge_plan.py::test_c018_same_anchor_dual_edit_is_a_conflict
+FAILED tests/contract/test_seal_merge_plan.py::test_c017_cross_registry_ambiguity_is_a_conflict
+FAILED tests/contract/test_seal_merge_plan.py::test_c012_letter_order_fallback_leaves_a_trace
+FAILED tests/contract/test_seal_merge_plan.py::test_merge_plan_is_rerun_stable
+18 failed in 6.20s
+```
+
+**读数**：18/18 红、无一静默通过；红因「动作体缺失」而非语法/收集错误。用例面覆盖 C-011…C-018 的 plan 面，外加 C-001（只读零写盘）、C-002/C-010（退出码与 verdict 一致）与 C-006（stdout-only、重跑稳定）的守护腿。夹具覆盖三种树：干净双片（`split-pair/`）、逐类冲突注入（`conflict-injections/`）、出厂文档引用（`factory-doc/`）。

@@ -1,0 +1,137 @@
+# P3 (T018–T020) evidence — fixtures, merge-plan contract suite and the read-only plan body
+
+Collected 2026-11-10 → 2026-11-11 in
+`/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal`
+(branch `099-speckit-seal`, package base `34f2a40fc`). Red-first reading:
+`notes/red-first-evidence.md` § 3. Every test command goes through the single runner
+`scripts/bash/run-tests.sh`.
+
+## 1. Red-first reading (T019, before the `merge-plan` body existed)
+
+See `notes/red-first-evidence.md` § 3 — command verbatim, exit 1, 18/18 red: 15 ×
+`KeyError: 'plan'` (the skeleton returned the `_pending` payload) and 3 exit-code
+assertions (`assert 2 == 1` ×2, `assert 2 == 0` ×1). No collection error and no
+silently-green leg.
+
+## 2. Green runs (T020)
+
+### 2.1 merge-plan contract suite
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_merge_plan.py -q
+
+```text
+................                                                         [100%]
+18 passed in 6.22s
+```
+
+EXIT=0 — 18/18 green.
+
+### 2.2 P2 engine contract suite stays green (no surface regression)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q
+
+```text
+...............................                                          [100%]
+31 passed in 6.45s
+```
+
+EXIT=0 — 31/31 green.
+
+### 2.3 Combined run (the durable record)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_merge_plan.py tests/contract/test_seal_engine_contract.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_merge_plan.py tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.................................................                        [100%]
+49 passed in 6.77s
+```
+
+EXIT=0 — 49/49 green (18 merge-plan + 31 engine-contract).
+
+## 3. Mirror projection
+
+$ python3 scripts/python/sync-mirrors.py --write
+$ python3 scripts/python/sync-mirrors.py --check
+
+```text
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+CHECK_EXIT=0
+```
+
+`scripts/python/seal-utils.py` and `.specify/scripts/python/seal-utils.py` are
+byte-identical (sha256 below); no other mirror pair drifted.
+
+## 4. Hashes (measured at capture time)
+
+```text
+58ea3f71fa630e3356d876d4f335bed9f02368447fcd4b5bdaadd5fd5eaa2464  scripts/python/seal-utils.py
+58ea3f71fa630e3356d876d4f335bed9f02368447fcd4b5bdaadd5fd5eaa2464  .specify/scripts/python/seal-utils.py
+cbf978e307f138f43e29b431ee84ae4148df81303418d164dbddde50a33949a1  tests/contract/test_seal_merge_plan.py
+fixtures: 50 files under tests/fixtures/seal/ (sorted per-file sha256 list digest:
+8a426ffaddb1ba840a598a314dbda874c86a11ffb46f0f24867a4e4532080224)
+```
+
+## 5. Clause coverage map (C-011 … C-018 plan face)
+
+| Clause | Legs |
+|--------|------|
+| C-011 | two-condition slice set (`name-family` + `parent-declaration`); half-condition candidates become `slice-candidate-unconfirmed` conflicts naming the unmet condition; the set and both condition results land in the plan (`checks.slice_conditions`) |
+| C-012 | declared order from `.specify/state/<parent>.md` § 拆分记录 `proposed_slices` with `order_basis=split-record` + `order_source`; letter-order fallback recorded with `order_basis=letter-order` |
+| C-013 | closed 15-candidate universe; all four actions exercised; `not-applicable` carries `basis`; `tasks.md` floor row; per-slice presence on every row; directory candidates as file-level units (same-name three states); dated records keep/pointer-view (never a copy); mandatory-floor parent `verification.md` / `review.md` / `code-review.md` pointer views |
+| C-014 | rerun-stable payload byte-for-byte; `id_maps` identical across runs; no time/enumeration-order dependence |
+| C-015 | FR/SC/STR declared-mapping reuse (`mapped` / `localization`); slice-unique append in merge order (FR α:FR-005→FR-003, β:FR-005→FR-004; tasks α:T001→T002…β:T002→T005); clause append uses the parent file's next free `C-N`; entity family appended |
+| C-016 | no-mapping conflict (slice FR-002 collides with a parent FR-002 without a declared row); declared mappings validated (target missing / duplicate injected legs live in the engine) |
+| C-017 | same-number-different-meaning conflict with both literals side by side; factory-doc slice-local detection with `repoint` resolution (STR-001 → STR-007); cross-registry ambiguity conflict (STR-002 hit by two slice registries with differing literals); a token hitting no slice registry is out of merge scope and produces no finding |
+| C-018 | every conflict carries artifact / unit / both sides / candidates / status; open conflicts refuse with exit 1 and are named in `conditions` (complete stdout-only report) |
+| C-001/C-002/C-006/C-010 | merge-plan writes nothing (tree snapshot); exit 0 ⇔ no open conflicts, exit 1 ⇔ open conflicts; payload/verdict/exit agree; same input reproduces the same report |
+
+## 6. Sample readings (fixture trees, `--json` payloads)
+
+`split-pair/`:
+
+```json
+{
+  "artifact_rows": 19,
+  "candidate_count": 15,
+  "excluded_candidates": 0,
+  "factory_doc_refs": 0,
+  "id_map_entries": 17,
+  "open_conflicts": 0,
+  "slice_conditions": ["name-family", "parent-declaration"],
+  "slice_count": 2
+}
+```
+
+`conflict-injections/` — 6 open conflicts, all named in `conditions`:
+
+```text
+CF-001 same-anchor-dual-edit                   § Execution Model
+CF-002 no-mapping                              FR-002
+CF-003 str-same-number-different-meaning       STR-001
+CF-004 factory-doc-ref-ambiguous               STR-002
+CF-005 slice-candidate-unconfirmed             099y-fixture-name-only
+CF-006 slice-candidate-unconfirmed             slice-099z-declared-only
+```
+
+`factory-doc/` — one detected reference, resolution `repoint` to `STR-007`
+(slice `099a-fixture-fd`, literal `"completed"`, parent `STR-001` literal
+`"routing"`), status `resolved`, zero open conflicts, exit 0.
+
+## 7. Fixture inventory (T018)
+
+```text
+tests/fixtures/seal/split-pair/          parent 099-fixture-parent + slices 099a-fixture-alpha / 099b-fixture-beta,
+                                         each slice carries `## Parent Mapping`; split record at
+                                         .specify/state/099-fixture-parent.md
+tests/fixtures/seal/conflict-injections/ same-number-different-meaning STR-001; undeclared-registry ambiguity
+                                         (skills/internal/demo-factory/SKILL.md → STR-002); unmapped FR-002;
+                                         half-condition candidates 099y-fixture-name-only + slice-099z-declared-only;
+                                         same-anchor dual edit (plan.md § Execution Model); directory same-name
+                                         three states (contracts core / parent-only / alpha-only)
+tests/fixtures/seal/factory-doc/         factory doc citing slice-local STR-001 with a declared mapping to STR-007
+```

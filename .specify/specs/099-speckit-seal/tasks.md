@@ -144,12 +144,12 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for User Story 2 (plan face, MANDATORY) ⚠️
 
-- [ ] T018 [P] [US2] 构建夹具树 `tests/fixtures/seal/`：`split-pair/`（父 `099-fixture-parent` + 两片各带 `## Parent Mapping` 与 `.specify/state/<parent>.md` 拆分记录）、`conflict-injections/`（同号不同义 `[[STR-NNN]]`、未声明登记处的 `[[STR-NNN]]`（跨登记处歧义）、无映射条目、只命中一半条件的分片候选、同一锚点双端编辑、目录同名文件三态）、`factory-doc/`（出厂文档引用分片本地 ID）（FR-011、FR-013、FR-017）。
-- [ ] T019 [US2] 写红先契约测试 `tests/contract/test_seal_merge_plan.py`：两条件分片集合、声明顺序与 `order_basis`、15 项封闭候选的动作分类（`merge|create|keep|not-applicable` 且 `not-applicable` 带 `basis`）、目录型候选的文件级单元与同名三态、dated-record 文件的指针纳入（不复制原件）、token→注册表绑定（未声明登记处的引用检出与歧义冲突）、`id_maps` 家族、同号不同义与无映射冲突、出厂文档分片本地 ID 检出，红输出记入 `notes/red-first-evidence.md`（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、SC-005、[blockedBy: T018]）。
+- [X] T018 [P] [US2] 构建夹具树 `tests/fixtures/seal/`：`split-pair/`（父 `099-fixture-parent` + 两片各带 `## Parent Mapping` 与 `.specify/state/<parent>.md` 拆分记录）、`conflict-injections/`（同号不同义 `[[STR-NNN]]`、未声明登记处的 `[[STR-NNN]]`（跨登记处歧义）、无映射条目、只命中一半条件的分片候选、同一锚点双端编辑、目录同名文件三态）、`factory-doc/`（出厂文档引用分片本地 ID）（FR-011、FR-013、FR-017）。
+- [X] T019 [US2] 写红先契约测试 `tests/contract/test_seal_merge_plan.py`：两条件分片集合、声明顺序与 `order_basis`、15 项封闭候选的动作分类（`merge|create|keep|not-applicable` 且 `not-applicable` 带 `basis`）、目录型候选的文件级单元与同名三态、dated-record 文件的指针纳入（不复制原件）、token→注册表绑定（未声明登记处的引用检出与歧义冲突）、`id_maps` 家族、同号不同义与无映射冲突、出厂文档分片本地 ID 检出，红输出记入 `notes/red-first-evidence.md`（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、SC-005、[blockedBy: T018]）。
 
 ### Implementation for User Story 2 (merge-plan)
 
-- [ ] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作（目录型候选按文件级单位、dated-record 文件指针纳入）、token→注册表绑定检查、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。
+- [X] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作（目录型候选按文件级单位、dated-record 文件指针纳入）、token→注册表绑定检查、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。
 
 ### Tests for User Story 2 (apply face, MANDATORY) ⚠️
 
