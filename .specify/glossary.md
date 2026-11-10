@@ -191,3 +191,6 @@
 | 处置 (Disposition) | disposition, archive / supersede / correct / exempt | Non-Disposable 条目必须落入的封闭四值处置;「留在原处什么都不做」不是处置。取值与桥映射见 `shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposition Bridge | user | confirmed |
 | 回顾面 (Review Surface) | review surface, 回顾范围 | 回顾的对象范围:当前 git HEAD 工作树里 `.specify/` 下的十个历史根,**不含** git 历史。成员声明于 `shared/declarations/facts/non-disposable-review-surface.yaml` | user | confirmed |
 | 豁免 (Exemption) | exemption, 显式豁免 | 唯一一种「不修也能留」的处置:必带理由与到期条件(`expiry_kind` / `expiry_value` / `expiry_recheck`),到期即重新成为未处置。语义见 `shared/definitions/non-disposable-definitions.md` § Exemption | user | confirmed |
+| SDD 观察者 (sdd-observer) | sdd-observer, sdd observer, 观察者 | SDD 线的第三方只读观察角色:按现有三层 agent 模型(Template→Instance→Execution)落地,只观察、不参与执行/评价/评审/决策,只写该线的 journal 与自身运行产物;不注册写线、不占工作树;角色面与边界见 .specify/specs/096-sdd-observer-agent/requirements.md | auto | proposed |
+| 观察记录 (Journal) | journal, journal.md, 观察日志 | 一条 SDD 线的追加式观察记录,落在 .specify/specs/<NNN-slug>/journal.md,一条线一份;条目是既有载体事实(状态脊/哨兵/checkpoint/git/执行四件套)的确定性投影,结构封闭、无评价/建议字段;随线收束提交 | auto | proposed |
+| 观察缺口 (Observer Gap) | observer-gap, 观察盲区 | 一段没有被任何 observer 执行覆盖的时间窗口的显式记录(事件类 observer-gap);不是推断出来的事件,也不是静默缺失;由下一次观察执行或线收束披露 | auto | proposed |
