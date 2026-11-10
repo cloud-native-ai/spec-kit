@@ -98,8 +98,8 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 运行时证据的固定落点（owner：`create-tasks` 技能 § Runtime-evidence landing points）：`notes/red-first-evidence.md`、`notes/quickstart-run.md`、`notes/pre-change-measurements.md`、`coverage-baseline.txt`；失败测试基线名单路径由 `/speckit.implement` step 6 `**Test runs**` 拥有，本文件不另立第二路径。
 
-- [ ] T001 [P] 创建 `.specify/specs/099-speckit-seal/notes/` 并把前置实测冻结进 `notes/pre-change-measurements.md`：`python3 scripts/python/sync-mirrors.py --check`（实测 2026-11-10：exit 0，`shared/ == .specify/shared/ (111 files, byte-identical)`）、`python3 scripts/python/regen-command-copies.py --check`（exit 0）；失败测试基线名单按 `/speckit.implement` step 6 `**Test runs**` 所有者的形式在实现入口捕获。
-- [ ] T002 [P] 冻结条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/099-speckit-seal --freeze > .specify/specs/099-speckit-seal/coverage-baseline.txt`（本 spec 有契约集 C-001…C-045，MUST 冻结而非伪造空基线）（FR-025、SC-008）。
+- [X] T001 [P] 创建 `.specify/specs/099-speckit-seal/notes/` 并把前置实测冻结进 `notes/pre-change-measurements.md`：`python3 scripts/python/sync-mirrors.py --check`（实测 2026-11-10：exit 0，`shared/ == .specify/shared/ (111 files, byte-identical)`）、`python3 scripts/python/regen-command-copies.py --check`（exit 0）；失败测试基线名单按 `/speckit.implement` step 6 `**Test runs**` 所有者的形式在实现入口捕获。
+- [X] T002 [P] 冻结条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/099-speckit-seal --freeze > .specify/specs/099-speckit-seal/coverage-baseline.txt`（本 spec 有契约集 C-001…C-045，MUST 冻结而非伪造空基线）（FR-025、SC-008）。
 
 **Checkpoint**: 基线可比较、证据落点就绪。
 
