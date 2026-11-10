@@ -189,10 +189,10 @@ Owner of this table's shape, its `Disposition` domain, the `Source row` / `Carri
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|
-| 1 | `088:SC-009_status` (`blocked`; supporting path) | not-applicable | — | — | 088's blocked row asks for a real multi-minute dogfood run; 095 reuses the already-passing digest renderer and neither carries nor closes 088's supporting criterion |
-| 2 | `093:SC-006_status` (`blocked`; final path) | not-applicable | — | — | 093's unblock condition is "a real run that dispatches ≥2 units and records their intervals". 095's own implementation run may incidentally produce such a reading, but 095's success criteria do not include carrying 093's row; claiming it here would be a configuration-existence inference |
-| 3 | `093:SC-007_status` (`partial`; supporting path) | not-applicable | — | — | 093's missing team/loop concurrency fixture is 093's supporting gap; 095 adds no team/loop concurrency fixture and does not claim the row |
-| 4 | `093:SC-010_status` (`partial`; supporting path) | not-applicable | — | — | 093's frozen-baseline reds sit outside 095's write domain; 095's own suites are judged on their own criterion (FR-036: no NEW red caused by this feature) |
+| 1 | `088:SC-009_status` | not-applicable | — | — | parent status `blocked` (supporting path): 088's blocked row asks for a real multi-minute dogfood run; 095 reuses the already-passing digest renderer and neither carries nor closes 088's supporting criterion |
+| 2 | `093:SC-006_status` | not-applicable | — | — | parent status `blocked` (final path): 093's unblock condition is "a real run that dispatches ≥2 units and records their intervals". 095's own implementation run may incidentally produce such a reading, but 095's success criteria do not include carrying 093's row; claiming it here would be a configuration-existence inference |
+| 3 | `093:SC-007_status` | not-applicable | — | — | parent status `partial` (supporting path): 093's missing team/loop concurrency fixture is 093's supporting gap; 095 adds no team/loop concurrency fixture and does not claim the row |
+| 4 | `093:SC-010_status` | not-applicable | — | — | parent status `partial` (supporting path): 093's frozen-baseline reds sit outside 095's write domain; 095's own suites are judged on their own criterion (FR-036: no NEW red caused by this feature) |
 
 ## Complexity Tracking
 
