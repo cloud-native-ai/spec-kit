@@ -47,6 +47,9 @@ PINNED_H2_SECTIONS = [
     "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
     "Feedback & Probe Points（反馈与探针采集点）",  # 060: in-loop framework-feedback capture points
     "CLI Capability Profiles",  # 064: CLI behaviour knowledge entry
+    # 096 intentional pin update (2026-11-10): the observer lifecycle section is the
+    # record-section shape owner; it lands immediately before the compiled section.
+    "SDD Observer（观察者：启动、记录节与收束）",
     "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
 ]
 
@@ -377,6 +380,7 @@ MIRROR_FILES = [
     "SKILL.md",
     "references/dispatch-recipes.md",
     "references/stage-prompts.md",
+    "references/observer-lifecycle.md",
     "references/watch-model.md",
     "references/state-awareness.md",
     "scripts/watch-target.sh",

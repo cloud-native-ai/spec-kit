@@ -301,6 +301,7 @@ sleep turn and do not start any resident service.
 
 - **程序**：U0 入口声明时、U2 派发前、U3 收到终止判定时、U4 校验后、U5 停线时**先写状态、后做动作**——续环与重入只读状态脊，零上下文可接手；循环 MUST NOT 依赖会话记忆。
 - **重入**：任何新会话接手该线时，从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照；终止判定在即按 U4/U5 续环，否则从对应阶段续跑或恢复监听窗口。
+- **观察者记录节**：observer 记录节由 driver 追加写入状态脊，键与形状的唯一 owner 是 `skills/external/sdd-loop-driver/SKILL.md` § SDD Observer；本节只给指针，不复述其键集。
 
 ## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，064）
 

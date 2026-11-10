@@ -111,6 +111,13 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - 观测侧故障矩阵（pgrep 零匹配、无关会话作用域、登录 shell 噪声、共享目录误删、hook 未触发、进程消失≠完成）与双信号规则见 skill 手册 `references/watch-model.md` §12–§13。
 
 
+## 观察者生命周期（096-sdd-observer-agent 切片）
+
+**机制一句话**：每条 driver 驱动的 SDD 线在入口 `observer: on|off`（缺省 on）下拥有一个第三方 observer——它以既有 `--sub-flow <label>=<triplet-dir>` 监督投影作为普通已派发 sub-flow 呈现，按有界执行窗口启动与重启，把发生过的载体事实追加进线级 `journal.md`；observer 的缺失与失败只被记录并在既有收束报告中披露，从不阻塞阶段。
+
+- **owner 指针**：生命周期条款与状态脊记录节形状——`skills/external/sdd-loop-driver/SKILL.md` § SDD Observer；派发简报模板、引擎调用循环与缺口/失败语义——`skills/external/sdd-loop-driver/references/observer-lifecycle.md`；记录格式与事件类——`shared/declarations/facts/journal-format.yaml`；写入/校验引擎——`scripts/python/journal-utils.py`；角色模板——`agents/sdd-observer.agent.md`。
+- 本页不复述记录节键集、事件类清单或状态字段；`/speckit.status` 的字段面与既有汇报义务不因本切片改变。
+
 ## 触发与路由
 
 - 以 `/sdd-loop-driver` 给出功能/改进描述 = SDD 目标；目标项目可为当前仓库，**包括 sdd-loop-driver 自身**。
