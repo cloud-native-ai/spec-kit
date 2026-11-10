@@ -194,14 +194,14 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T030 [US4] 写红先契约测试 `tests/contract/test_seal_archive_gate.py`：`Sealed` → exit 0；非 `Sealed` → exit 1 且 `pointer` 指向 `/speckit.seal`；遗留 `Completed` 无 C-044 用户裁定 → exit 1 具名；`state-drift` → exit 2；把准入判据复制到第二个实现处时守卫转红，红输出记入 `notes/red-first-evidence.md`（FR-023、SC-007、C-030、[blockedBy: T029]）。
+- [X] T030 [US4] 写红先契约测试 `tests/contract/test_seal_archive_gate.py`：`Sealed` → exit 0；非 `Sealed` → exit 1 且 `pointer` 指向 `/speckit.seal`；遗留 `Completed` 无 C-044 用户裁定 → exit 1 具名；`state-drift` → exit 2；把准入判据复制到第二个实现处时守卫转红，红输出记入 `notes/red-first-evidence.md`（FR-023、SC-007、C-030、[blockedBy: T029]）。
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] 在 `scripts/python/seal-utils.py` 实现 `archive-gate` 只读动作（data-model E11 的裁决负载、准入判据唯一实现、引擎不可用时的读取错误透传）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-023、C-030、[blockedBy: T030]）。
-- [ ] T032 [P] [US4] 接线归档 lane：`skills/internal/sanitize-materials/SKILL.md` 在退休/归档 spec 或标归档指针前查询 `seal-utils.py --action archive-gate`；拒绝 `1`/`2` 时具名拒绝并指回 `/speckit.seal`，绝不退化为「未查询即允许」（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
-- [ ] T033 [P] [US4] 接线注册表归档指针：`skills/internal/manage-features/SKILL.md` 的 `Relocated` 形态归档指针动作先查询 `archive-gate`；注册表 reconcile 本身仍归 manage-features（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
-- [ ] T034 [US4] 写边界审计测试 `tests/contract/test_seal_boundaries.py`：引擎动作表无 move/delete/archive/push/scheduler、状态值域单 owner、无第二套状态机/第二份注册表/第二份台账/并行 spec 树，目录与注册表差异审计干净；审计读数记入 `test-evidence/boundaries-audit.txt`（FR-020、FR-022、FR-024、SC-008、C-008、C-036、[blockedBy: T031]）。
+- [X] T031 [US4] 在 `scripts/python/seal-utils.py` 实现 `archive-gate` 只读动作（data-model E11 的裁决负载、准入判据唯一实现、引擎不可用时的读取错误透传）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-023、C-030、[blockedBy: T030]）。
+- [X] T032 [P] [US4] 接线归档 lane：`skills/internal/sanitize-materials/SKILL.md` 在退休/归档 spec 或标归档指针前查询 `seal-utils.py --action archive-gate`；拒绝 `1`/`2` 时具名拒绝并指回 `/speckit.seal`，绝不退化为「未查询即允许」（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
+- [X] T033 [P] [US4] 接线注册表归档指针：`skills/internal/manage-features/SKILL.md` 的 `Relocated` 形态归档指针动作先查询 `archive-gate`；注册表 reconcile 本身仍归 manage-features（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
+- [X] T034 [US4] 写边界审计测试 `tests/contract/test_seal_boundaries.py`：引擎动作表无 move/delete/archive/push/scheduler、状态值域单 owner、无第二套状态机/第二份注册表/第二份台账/并行 spec 树，目录与注册表差异审计干净；审计读数记入 `test-evidence/boundaries-audit.txt`（FR-020、FR-022、FR-024、SC-008、C-008、C-036、[blockedBy: T031]）。
 - [ ] T035 [US4] 写命令模板 `templates/commands/seal.md`：薄入口（User Input、Delegation 到 `seal-artifact`、Glossary、Wrap-up 探针嵌入、Handoffs），全部判定委派引擎，owner 按路径引用不复述（FR-021、C-041、[blockedBy: T031]）。
 - [ ] T036 [US4] 写 internal 技能 `skills/internal/seal-artifact/SKILL.md`（只做编排与报告、不复算判定，命名先例 `clarify-artifact`），并在 `shared/definitions/flow-class-definitions.md` 登记 `/speckit.seal` 与 `skill:seal-artifact` 两行（`flow_class: execution`）、在 `shared/definitions/probe-definitions.md` 登记 wrap-up 探针条目（FR-021、C-041、[blockedBy: T035]）。
 - [ ] T037 [US4] 更新名册/台账 pin：`tests/contract/test_flow_class_ledger.py` 的普查 pin —— 实测 2026-11-10 `flow-class-check.py --action check` 报告 85 units（29 个命令模板 + 56 个技能）；本特性落地后台账须报告 87（30 + 57），按文件内既有的 dated stale-pin 约定更新（FR-021、[blockedBy: T036]）。

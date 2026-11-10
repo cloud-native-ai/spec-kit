@@ -570,3 +570,45 @@ FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_dirty_spec_tre
 
 命令与读数落 `.specify/specs/099-speckit-seal/test-evidence/p5-seal-20261111.txt`（含 P2 引擎契约
 31 passed、P5 23 passed、相邻回归 157 passed 与镜像复核 exit 0）。
+
+## 8. T030 红先契约测试 `tests/contract/test_seal_archive_gate.py`
+
+**采集点**：T030 落地、T031/T032/T033 任何实现修改之前（工作树仅新增该测试文件）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_gate.py -q
+```
+
+**退出码**：1（10 failed, 4 passed）。
+
+**完整 stdout/stderr（verbatim）**：全文捕获于
+`.specify/specs/099-speckit-seal/test-evidence/p6-red-first-20261111.txt`
+（sha256 `420d4877b7479aceeef7c3f0d080868563db15ebd70a6120b68116b4f3c12bdf`，246 行）。
+
+**读数**：10/14 红。八条门禁判定腿全部同因——`archive-gate` 动作体仍是骨架的
+`_pending` 负载（`code: not-implemented`，exit 2），无收集/语法错误；两条消费面接线腿
+（T032/T033）因技能文件尚无门禁步骤而红；`test_archive_gate_is_read_only_and_rerun_stable`
+在出口码断言处红（同样是 `not-implemented` 的 exit 2）。其余 4 条是守卫/审计腿，红先阶段
+即可绿且如实记录：单一 owner 扫描在真实树零命中、伪造准则复制（prose + code）被扫描器
+点名、gate 裁定词表未被消费面复制、`--json` 规范形态成立。失败行清单：
+
+```text
+FAILED tests/contract/test_seal_archive_gate.py::test_manage_features_queries_the_gate_before_writing_an_archive_pointer
+FAILED tests/contract/test_seal_archive_gate.py::test_sanitize_materials_queries_the_gate_before_retiring_a_spec
+FAILED tests/contract/test_seal_archive_gate.py::test_legacy_completed_with_the_two_carrier_ruling_is_admitted
+FAILED tests/contract/test_seal_archive_gate.py::test_a_single_carrier_ruling_never_admits_a_legacy_row
+FAILED tests/contract/test_seal_archive_gate.py::test_ready_for_review_is_refused_by_name_and_points_back_to_seal
+FAILED tests/contract/test_seal_archive_gate.py::test_legacy_completed_without_a_user_ruling_is_refused_by_name
+FAILED tests/contract/test_seal_archive_gate.py::test_state_drift_is_an_input_error_not_a_one_sided_reading
+FAILED tests/contract/test_seal_archive_gate.py::test_archive_gate_is_read_only_and_rerun_stable
+FAILED tests/contract/test_seal_archive_gate.py::test_sealed_pair_without_a_readable_receipt_is_an_input_error
+FAILED tests/contract/test_seal_archive_gate.py::test_sealed_spec_is_admitted_and_points_at_the_receipt
+```
+
+**披露（红先期的判定细节）**：遗留 `Completed` 的放行腿要求 C-044 字面
+`- **User waiver**:` 行按 C-030 的「两处载体」（`review.md` code 小节 + 特性详情
+`## Latest Review`）同时点名该特性；单载体不计数（C-044「单一载体不计数」）。`Sealed`
+状态但回执缺失/不可读按输入缺陷 exit 2（FR-023 要求同时查询封装记录与状态），与 P5 的
+`seal-receipt-invalid` 同码。

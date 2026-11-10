@@ -1,0 +1,25 @@
+# Seal boundaries audit (Feature 099, T034)
+
+Engine: scripts/python/seal-utils.py
+Action table: merge-plan, merge-apply, seal, archive-gate
+Read-only: merge-plan, archive-gate
+Write: merge-apply, seal
+Gate reasons: sealed, legacy-completed-ruled, not-sealed, legacy-completed-unruled, state-drift, seal-receipt-invalid
+Git verbs: cat-file, rev-parse, status
+Scheduler imports: none
+Status owner: shared/workflow/acceptance-hardening.md § Feature Status
+Transition arrow sites: shared/workflow/acceptance-hardening.md, shared/workflow/feature-integration.md
+Transition row sites: templates/feature-details-template.md
+Seven-status lines: 4 (declared carriers only)
+Registries: .specify/features.md (live); memory/features.md (shipped placeholder)
+ID register: .specify/register.md
+Spec trees: .specify/specs (live); .specify/archive/specs (archive)
+Registry rows: 90
+Live spec dirs: 77; archived: 9; slice dirs: 5
+Unregistered live specs: 067 (documented registry gap; the spec tree is complete (see .specify/features/069-execution-expression-sdd.md § 067 的登记缺口)), 075 (extension spec bound to feature 058 (see .specify/features/058-sdd-loop-driver.md § Related Specifications)), 080 (extension spec bound to feature 062 (see .specify/features/062-humanize-command.md § Related Specifications))
+Unregistered archived specs: 054 (archived spec bound to feature 044 (see .specify/features/044-agent-metadata-portability.md)), 066 (archived slice A bound to feature 065 (see .specify/features/065-loop-interruption-recovery.md))
+Detail-only rows: 002, 004, 005, 010, 011, 014, 015, 019, 026
+Orphan slices: none
+Shared mutable aggregates introduced by seal: none (seal.md and merge-manifest.json are per-spec single files)
+
+Verdict: clean

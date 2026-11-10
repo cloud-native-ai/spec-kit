@@ -214,6 +214,23 @@ user **in a single batch**. Deletion and move/archive are the destructive bucket
 for user confirmation before any execution (the engine refuses apply with
 `confirmed != true` at exit 2, zero execution).
 
+#### Archive admission gate (spec retirement)
+
+An item that would retire or archive a spec directory under `.specify/specs/` — or mark
+its feature row as an archive pointer — MUST pass the single admission owner before it
+enters the cleanup plan:
+
+```bash
+python3 .specify/scripts/python/seal-utils.py --action archive-gate --spec-dir .specify/specs/<target> --json
+```
+
+Exit `0` → admitted; the item may enter the plan. Exit `1` (refused) or Exit `2`
+(input/environment error) → keep the item out of the plan and refuse it by name: surface
+the engine's `reason` and verdict, and point the user back to `/speckit.seal`. An engine
+that cannot be executed is an error, never a pass — "not queried" never means "allowed".
+The criterion is owned by the seal engine (C-030); this skill queries it and never
+re-implements it.
+
 > Gate probe: gate-sanitize-destructive-cleanup — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
 ### Stage 6 — Apply

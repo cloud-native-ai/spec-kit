@@ -72,6 +72,17 @@ MIRROR_CODE = "mirror-copy"
 SPEC_DIR_CODE = "spec-dir-invalid"
 PENDING_CODE = "not-implemented"
 
+#: C-030 / E11: the archive gate's closed reason vocabulary — two admitted outcomes,
+#: two refusals, two input/environment errors. A new reason is a contract change.
+ARCHIVE_GATE_REASONS = (
+    "sealed",                   # allowed: the status pair reads Sealed, receipt readable
+    "legacy-completed-ruled",   # allowed: legacy Completed + the C-044 ruling on both carriers
+    "not-sealed",               # refused: any other status pair
+    "legacy-completed-unruled", # refused: legacy Completed without the C-044 ruling
+    "state-drift",              # error: the carriers disagree or one is missing
+    "seal-receipt-invalid",     # error: Sealed without a readable receipt
+)
+
 #: C-004: the full declared option vocabulary (the pre-parse guard judges against it).
 DECLARED_OPTIONS = ("--action", "--spec-dir", "--repo", "--feature-detail",
                     "--feature-registry", "--json")
@@ -169,6 +180,12 @@ def render(payload: Dict[str, Any], as_json: bool) -> None:
         print("  status: %s -> %s" % (sealed.get("from_status", "-"),
                                       sealed.get("to_status", "-")))
         print("  writes: %d" % len(sealed.get("writes") or []))
+    gate = payload.get("gate")
+    if isinstance(gate, dict):
+        print("  allowed: %s (reason=%s)" % ("yes" if gate["allowed"] else "no",
+                                             gate["reason"]))
+        print("  status: %s" % (gate["status"] if gate["status"] else "-"))
+        print("  pointer: %s" % gate["pointer"])
     for condition in payload["conditions"]:
         print("  - %s: %s" % (condition["code"], condition["evidence"]))
         print("    fix: %s" % condition["fix_path"])
@@ -2740,8 +2757,108 @@ def action_seal(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any
     return apply_seal(args, spec_dir, state)
 
 
+def _gate_waiver_carrier(text: str, section_pattern: str, keys) -> bool:
+    """C-044 literal form on one carrier: a `- **User waiver**:` line naming the row."""
+    block = _heading_block(text, section_pattern)
+    if block is None:
+        return False
+    return any(SEAL_USER_WAIVER_RE.match(line)
+               and any(_names_finding(line, key) for key in keys)
+               for _line_no, line in block["body"])
+
+
+def _gate_ruling_present(spec_dir: Path, status: Dict[str, Any]) -> bool:
+    """C-030: a legacy `Completed` row needs the user's ruling on BOTH carriers."""
+    keys = [spec_dir.name, spec_dir.name.split("-", 1)[0]]
+    review_path = spec_dir / "review.md"
+    review_text = _read_text(review_path) if review_path.is_file() else ""
+    detail_text = _read_text(status["detail_path"]) \
+        if status["detail_path"].is_file() else ""
+    return (_gate_waiver_carrier(review_text, r"Code Segment", keys)
+            and _gate_waiver_carrier(detail_text, r"Latest Review", keys))
+
+
 def action_archive_gate(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
-    return _pending("archive-gate", spec_dir)
+    """C-030: the single archive-admission owner; read-only, one verdict per query.
+
+    E11 payload: `{target, status, allowed, reason, pointer, exit}` under `gate`.
+    `Sealed` (pair agrees, receipt readable) admits; every other status refuses by a
+    named reason and points back to `/speckit.seal`; a drifting pair or a `Sealed` row
+    without a readable receipt is an input defect (exit 2). A legacy `Completed` row is
+    admitted only with the C-044 literal user ruling on both carriers.
+    """
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    status = _seal_state(repo, spec_dir, args)
+    detail_status = status["detail_status"]
+    registry_status = status["registry_status"]
+    target = _rel_path(repo, spec_dir)
+
+    def verdict(claimed, allowed, reason, pointer, exit_code, conditions):
+        tally = {EXIT_OK: "ok", EXIT_REFUSED: "refused", EXIT_INPUT_ERROR: "error"}
+        payload = _payload("archive-gate", spec_dir, tally[exit_code], exit_code,
+                           conditions)
+        payload["gate"] = {"target": target, "status": claimed, "allowed": allowed,
+                           "reason": reason, "pointer": pointer, "exit": exit_code}
+        return payload, exit_code
+
+    if detail_status is None or registry_status is None \
+            or detail_status != registry_status:
+        return verdict(
+            None, False, "state-drift", "/speckit.seal", EXIT_INPUT_ERROR,
+            [_condition(
+                "state-drift",
+                "the claimed status pair is inconsistent: detail=%r (%s); registry=%r (%s)"
+                % (detail_status, _rel_path(repo, status["detail_path"]),
+                   registry_status, _rel_path(repo, status["registry_path"])),
+                "repair the status pair through the registry reconcile owner; the gate "
+                "never picks one carrier over the other",
+                "rerun the archive lane after the status pair agrees")])
+
+    receipt_path = spec_dir / "seal.md"
+    if detail_status == "Sealed":
+        core = _read_seal_core(receipt_path) if receipt_path.is_file() else None
+        pinned = str((core or {}).get("pinned_commit") or "").strip()
+        if not pinned:
+            return verdict(
+                detail_status, False, "seal-receipt-invalid", "/speckit.seal",
+                EXIT_INPUT_ERROR,
+                [_condition(
+                    "seal-receipt-invalid",
+                    "the claimed status pair reads `Sealed` but %s is missing or carries "
+                    "no readable machine core with a pinned commit"
+                    % _rel_path(repo, receipt_path),
+                    "restore the seal receipt (git history keeps the previous one) or "
+                    "run the audit correction and seal again",
+                    "rerun the archive lane after the receipt is readable")])
+        return verdict(detail_status, True, "sealed", "seal.md", EXIT_OK, [])
+
+    if detail_status == "Completed":
+        if _gate_ruling_present(spec_dir, status):
+            return verdict(detail_status, True, "legacy-completed-ruled", "seal.md",
+                           EXIT_OK, [])
+        return verdict(
+            detail_status, False, "legacy-completed-unruled", "/speckit.seal",
+            EXIT_REFUSED,
+            [_condition(
+                "legacy-completed-unruled",
+                "the status pair reads the legacy value `Completed`; no C-044 literal "
+                "`- **User waiver**:` ruling naming this feature exists on both "
+                "carriers (%s code segment and %s `## Latest Review`)"
+                % (_rel_path(repo, spec_dir / "review.md"),
+                   _rel_path(repo, status["detail_path"])),
+                "record the user's literal `- **User waiver**:` line naming this feature "
+                "on both carriers, or keep the row out of the archive; seal does not "
+                "accept `Completed` as a from state",
+                "rerun the archive lane after the ruling is recorded")])
+
+    return verdict(
+        detail_status, False, "not-sealed", "/speckit.seal", EXIT_REFUSED,
+        [_condition(
+            "not-sealed",
+            "the claimed status pair reads %r; only a `Sealed` spec is admitted to "
+            "archive" % detail_status,
+            "run /speckit.seal on this spec, or keep it out of the archive",
+            "rerun the archive lane once the status pair reads Sealed")])
 
 
 HANDLERS = {
