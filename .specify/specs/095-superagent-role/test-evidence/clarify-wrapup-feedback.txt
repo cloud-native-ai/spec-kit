@@ -1,0 +1,9 @@
+{
+  "id": "20261110T062057Z-speckit-clarify",
+  "path": ".specify/memory/feedback/20261110T062057Z-speckit-clarify.md",
+  "duplicate": false,
+  "count_since_submission": 397,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
