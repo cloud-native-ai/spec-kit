@@ -7,10 +7,10 @@ All entities below are **projections over existing carriers** (FR-003, FR-025, F
 | Field | Domain | Notes |
 |-------|--------|-------|
 | `role` | `superagent` \| `subagent` (machine identifiers, [[STR-001]]) | Relative to one dispatch edge; never an entity type |
-| role set | subset of `{superagent, subagent}` | Output as a **set**; the both-roles machine marker is `dual-role` ([[STR-002]]) |
+| role set | subset of `{superagent, subagent}` | Output as a **set**; the both-roles machine marker is `dual-role` ([[STR-002]]), carried as the independent output key `role_set_marker` (§ 4) — never a member of the set |
 | owner | `.specify/shared/definitions/superagent-definitions.md` ([[STR-004]]) | This model only fixes the field names the engine consumes |
 
-Validation: a role is decided **only** by edge endpoints (FR-001). Records that classify by executor type, model or prompt wording are a defect; the contract test's type-based-classification mutation must turn red. `dual-role` is a set-state marker that appears only in role-set **output**: it is never a third role value and never a carrier declaration value. The dispatch-duty grant is a separate declaration (`dispatch_duty`, § 2), not a role claim.
+Validation: a role is decided **only** by edge endpoints (FR-001). Records that classify by executor type, model or prompt wording are a defect; the contract test's type-based-classification mutation must turn red. `dual-role` is a set-state marker that appears only in role-set **output**: it is never a third role value and never a carrier declaration value; in engine output it is the independent `role_set_marker` key (§ 4), never a member of the `roles` array. The dispatch-duty grant is a separate declaration (`dispatch_duty`, § 2), not a role claim.
 
 ## 2. Role Edge (record kind `role-edge`, [[STR-005]])
 
@@ -58,9 +58,10 @@ A row declaring `role = superagent` for an executor is an **explicit superagent 
 | `id` | string | Identity resolution above |
 | `parent` | string \| null | Its incoming edge's parent (roots: null) |
 | `roles` | set | Derived: `superagent` iff it parents ≥1 edge; `subagent` iff it is a child on ≥1 edge |
+| `role_set_marker` | `"dual-role"` \| null | The [[STR-002]] literal iff `roles` holds both members, else `null`; a projection of `roles` that never contradicts it; engine output key (contract C-3) |
 | `depth` | integer \| null | Shortest distance from a root; `null` when a cycle makes it unresolvable |
 | `sources` | list of `{carrier, path, line}` | Carriers where this executor was observed (union over its edge records); an engine output key (contract C-3) |
-| `state` / `last_activity` / `age` / `stale` | enum / timestamp / duration / boolean | **Digest-view fields, not engine output keys**: the engine emits `id` / `parent` / `roles` / `depth` / `sources`; the digest renders these from its existing sources (artifact triplet `.status`, spine stage verdict, report outcome, watch model) |
+| `state` / `last_activity` / `age` / `stale` | enum / timestamp / duration / boolean | **Digest-view fields, not engine output keys**: the engine emits `id` / `parent` / `roles` / `role_set_marker` / `depth` / `sources`; the digest renders these from its existing sources (artifact triplet `.status`, spine stage verdict, report outcome, watch model) |
 
 ## 5. Violation (closed four-kind set)
 

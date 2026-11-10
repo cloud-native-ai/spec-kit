@@ -33,7 +33,8 @@
 
 Required keys: `schema_version` (integer, currently `1`), `action`, `inputs`, `roots`, `executors`, `edges`, `violations`, `conflicts`, `summary`.
 `summary` keys: `edges`, `executors`, `violations`, `conflicts` (integers taken from the emitted arrays, never computed separately).
-`executors[]` keys: `id`, `parent`, `roles` (array, set semantics), `depth`, `sources`.
+`executors[]` keys: `id`, `parent`, `roles` (array, set semantics), `role_set_marker`, `depth`, `sources`.
+`role_set_marker`: the [[STR-002]] literal `dual-role` iff `roles` holds both `superagent` and `subagent`, else `null` — a projection of `roles` that never contradicts it; never a third role value, never a member of the `roles` array, never a carrier declaration value.
 `edges[]` keys: `parent`, `child`, `attempt`, `role_declaration`, `dispatch_duty` (`granted` \| `not-granted`), `depth`, `source` (`carrier`, `path`, `line`).
 `violations[]` keys: `kind` ∈ closed set of C-5, `subjects`, `paths`.
 `conflicts[]` keys: `field`, `paths` (exactly ≥2 paths), `edge` (`{parent, child, attempt}` — the edge identity the conflict belongs to, so multi-edge reports stay attributable).
@@ -42,7 +43,7 @@ Required keys: `schema_version` (integer, currently `1`), `action`, `inputs`, `r
 
 ## C-4. `query` output
 
-Required keys: `schema_version`, `action`, `edge_exists` (boolean), `edge` (object or null), `parent` (`{id, roles, depth}`), `child` (`{id, roles, depth}`), `violations` (only those whose `subjects` include either queried identity). The two unresolvable-identity behaviours are distinct and MUST NOT be conflated (FR-006): a **record-side** unresolvable parent is the `dangling-parent` violation of C-5 (exit `1`); an **unknown queried identity** (the `--parent` / `--child` argument itself cannot be resolved) is a `2` (named input error), not `edge_exists: false` — absence of an edge between two *known* identities is `false`.
+Required keys: `schema_version`, `action`, `edge_exists` (boolean), `edge` (object or null), `parent` (`{id, roles, role_set_marker, depth}`), `child` (`{id, roles, role_set_marker, depth}`), `violations` (only those whose `subjects` include either queried identity). The two unresolvable-identity behaviours are distinct and MUST NOT be conflated (FR-006): a **record-side** unresolvable parent is the `dangling-parent` violation of C-5 (exit `1`); an **unknown queried identity** (the `--parent` / `--child` argument itself cannot be resolved) is a `2` (named input error), not `edge_exists: false` — absence of an edge between two *known* identities is `false`.
 
 ## C-5. Violations (closed four-kind set)
 
@@ -74,7 +75,7 @@ python3 scripts/python/role-edge-check.py --action report --state-dir tests/fixt
 python3 scripts/python/role-edge-check.py --action query --parent root --child A --state-dir tests/fixtures/superagent-role/root-a-b/state --teams-dir tests/fixtures/superagent-role/root-a-b/teams --logs-dir tests/fixtures/superagent-role/root-a-b/logs --registry-dir tests/fixtures/superagent-role/root-a-b/registry
 ```
 
-Expected (pinned by the contract test, not assumed here): `--help` exits 0; the `report` run exits `0` with `summary.edges == 2`, `executors` containing `A` with `roles: ["subagent","superagent"]` and `depth: 1`, `B` with `roles: ["subagent"]` and `depth: 2`; the `query` run exits `0` with `edge_exists: true`.
+Expected (pinned by the contract test, not assumed here): `--help` exits 0; the `report` run exits `0` with `summary.edges == 2`, `executors` containing `A` with `roles: ["subagent","superagent"]`, `role_set_marker: "dual-role"` and `depth: 1`, `B` with `roles: ["subagent"]`, `role_set_marker: null` and `depth: 2` (the root likewise `role_set_marker: null`); the `query` run exits `0` with `edge_exists: true` and the `child` object carrying the same `role_set_marker` value as `report`.
 
 ## C-11. Guarding tests
 

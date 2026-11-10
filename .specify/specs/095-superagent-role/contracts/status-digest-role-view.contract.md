@@ -8,9 +8,9 @@
 
 ## C-2. Entry fields (FR-029)
 
-Every rendered executor entry carries: `id` (identity), `parent` (parent-edge identity), `roles` (role set; both-roles rendered via the `dual-role` marker), `depth`, `state`, `last_activity` + `age`, `stale`. Table columns and JSON keys share these names; the table may localize labels but MUST NOT invent a second vocabulary.
+Every rendered executor entry carries: `id` (identity), `parent` (parent-edge identity), `roles` (role set), `role_set_marker` (the both-roles marker: [[STR-002]] `dual-role` iff the set holds both members, passed through from the engine model, never re-derived), `depth`, `state`, `last_activity` + `age`, `stale`. Table columns and JSON keys share these names; the table may localize labels but MUST NOT invent a second vocabulary.
 
-**Schema by source type** (the merged set is a union, not a re-keying): an entry that originates from a line-registry row keeps its existing keys unchanged (`line_id`, `last_activity_at`, … — C-6) and **gains** `parent` / `roles` / `depth`; an executor row that originates outside the line registry (team member, fan-out child, driver stage) uses the role-view names `id` / `last_activity` for the two fields whose legacy names are line-specific, and states `project_dir` / `branch` / `stage` as `null` where the source type does not carry them. The two field families never mix inside one entry.
+**Schema by source type** (the merged set is a union, not a re-keying): an entry that originates from a line-registry row keeps its existing keys unchanged (`line_id`, `last_activity_at`, … — C-6) and **gains** `parent` / `roles` / `role_set_marker` / `depth`; an executor row that originates outside the line registry (team member, fan-out child, driver stage) uses the role-view names `id` / `last_activity` for the two fields whose legacy names are line-specific, and states `project_dir` / `branch` / `stage` as `null` where the source type does not carry them. The two field families never mix inside one entry.
 
 ## C-3. Bounded output (existing semantics, unchanged)
 
@@ -25,11 +25,11 @@ One digest read renders a parent row plus one row per child for an N-child fan-o
 
 ## C-5. Field provenance
 
-`parent` / `roles` / `depth` come from the role-edge evaluation (same run); `state` / `last_activity` / `stale` keep their existing sources (artifact triplet, status spine, watch model). The digest MUST NOT derive any of these from conversation memory or process scans.
+`parent` / `roles` / `role_set_marker` / `depth` come from the role-edge evaluation (same run, passed through unchanged); `state` / `last_activity` / `stale` keep their existing sources (artifact triplet, status spine, watch model). The digest MUST NOT derive any of these from conversation memory or process scans.
 
 ## C-6. JSON shape
 
-Existing keys (`registry_dir`, `generated_at`, `cap`, `stale_bound_seconds`, `entries`, `all_entries`, `omitted`, `profile`, `state_summary`, efficiency block) keep their names and meanings. `entries[]` gain `parent`, `roles`, `depth`; rows that come from the line registry keep `line_id` / `last_activity_at` (C-2 governs which family a row uses). `--format table` remains the default; `--format json` remains available.
+Existing keys (`registry_dir`, `generated_at`, `cap`, `stale_bound_seconds`, `entries`, `all_entries`, `omitted`, `profile`, `state_summary`, efficiency block) keep their names and meanings. `entries[]` gain `parent`, `roles`, `role_set_marker`, `depth`; rows that come from the line registry keep `line_id` / `last_activity_at` (C-2 governs which family a row uses). `--format table` remains the default; `--format json` remains available.
 
 ## C-7. Guarding tests
 

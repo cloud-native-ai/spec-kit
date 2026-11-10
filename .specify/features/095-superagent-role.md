@@ -17,7 +17,7 @@
 
 - 实现按 `plan.md` § Work Packages 的 P1–P6 包推进；定义 owner 先行（阻塞全部用户故事），镜像按文件级 `sync-mirrors.py --only` 同步（基线 428 行 DIFF-class，只要求被触及的镜像对无 NEW drift）。
 - 身份转变注入是派发载荷内的封闭九项指针清单；既有派发前自检按 `role-transition` 标识 + 九项 item-id 句柄逐项判定，缺任一即阻断（`data-model.md` § 7）。
-- 违例集封闭四类；已授予派发职责由独立的 `dispatch_duty` 声明承载，不是 superagent 主张——已授权未派发不得被判违例；`dual-role` 只是角色集输出标记、不作载体声明值（`data-model.md` § 5）。
+- 违例集封闭四类；已授予派发职责由独立的 `dispatch_duty` 声明承载，不是 superagent 主张——已授权未派发不得被判违例；`dual-role` 只是角色集输出标记（引擎输出键 `role_set_marker`，`data-model.md` § 4/§ 5）、不作载体声明值。
 - instructions 新增段 ≤600 B，超限时只允许缩为纯指针行，不抬预算（A7）；`test_fast_fail_discipline.py` 的 section-count pin 与模板段同提交升降。
 - 测试执行唯一入口 `scripts/bash/run-tests.sh`；完成门判据是「相对 implement 起点基线零新增失败」（FR-036）。
 - 本节其余实现细节随 `/speckit.implement` 落笔（按阶段落笔惯例）。
