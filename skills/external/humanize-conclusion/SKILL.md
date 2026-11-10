@@ -26,6 +26,9 @@ classification: external
 
 # humanize-conclusion
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Overview
 
 本技能有两个分支：**运行模式（缺省）**——交给它一条指令，它派发恰好一个会话级临时执行体跑完，再结合动作输出/证据、项目治理与会话上下文，写出**一份五节的人读报告**；**内容模式（显式 `--file` / `--inline`）**——把给定内容、结论或外部文档改写到**读起来像有经验的真人作者所写**，而事实层一个不动。命令侧（`/speckit.humanize`）只做薄入口与输入接线。

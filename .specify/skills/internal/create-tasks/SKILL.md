@@ -7,6 +7,9 @@ skill_id: "<SKILL:.specify/skills/internal/create-tasks/SKILL.md>"
 
 # create-tasks
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 Turn the feature's design artifacts into an **actionable, dependency-ordered `tasks.md`** — tasks organized by user story so each story is independently implementable and testable, every row in the strict checklist format, tests decided by the Constitution rather than a fixed default, and every structural rule machine-checked by the validator before the report. The generated tasks.md must be immediately executable: each task specific enough that an LLM can complete it without additional context.

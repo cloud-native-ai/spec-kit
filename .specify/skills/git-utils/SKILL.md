@@ -8,6 +8,8 @@ classification: external
 
 # git-utils
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## Overview
 
 统一的 **git 工作区治理**技能——一个调谐（Reconcile）家族覆盖四个作用域（由原 git-workflow / git-fleet / git-server-init / git-submodule-edit 四技能合并而来，内容无损、形式按本技能惯例重表达）：

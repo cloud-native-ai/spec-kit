@@ -7,6 +7,8 @@ classification: external
 
 > **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 依赖、任何宿主 agent 可直接加载；内容编排 spec-kit 的 SDD 流程（语义耦合显式声明：指挥子代理执行 `/speckit.*`），不构成运行时依赖。
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## What This Skill Does
 
 把经多项目验证的「无人值守 SDD 驱动」固化为可执行手册：宿主 agent（无需安装 spec-kit）对每条项目线执行「断点探测 → 阶段派发 → 统一监听 → 独立校验 → 续环」，直到 review 完成并合并收尾。自迭代、独立校验、卡死处置三条硬需求内置于本手册；监听语义（等待/监控/轮询）的唯一权威落点是 `references/watch-model.md`。

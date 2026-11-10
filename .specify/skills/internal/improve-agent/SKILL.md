@@ -7,6 +7,9 @@ classification: internal
 
 # improve-agent
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 Improve **an existing single-agent artifact** based on evidence from real usage — user feedback, failure cases, behavioral drift, or observed inefficiencies. Targets include role templates, the shared supervision snippet, generated agents, and execution configs. The result is a targeted update that fixes the identified issues while preserving the artifact's established structure. To adjust or optimize a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.

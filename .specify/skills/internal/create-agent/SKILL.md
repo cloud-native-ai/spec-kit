@@ -7,6 +7,9 @@ classification: internal
 
 # create-agent
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 Author a **single agent artifact** for the Spec Kit agent system — a **capacity** template, a capacity-scoped **supervisor**, a **custom** `.agent.md`, or a **project-custom** agent. This skill is the single authoring engine invoked by `/speckit.agents` for single-agent work; the command gathers project context and delegates here rather than rendering templates inline. Multi-agent teams (organizing/running several agents) are out of scope — see `/speckit.team` and the `create-team` skill.

@@ -32,6 +32,9 @@ classification: external
 
 # 统一绘图入口（draw-diagram）
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 语义建模在先、引擎选择在后：把任何绘图请求转换为逻辑图模型（LDM），再交由唯一最合适的**内置引擎层**
 渲染。**前门层不渲染任何图**，也不维护任何引擎细节；引擎细节全部归 `references/types/<engine>/` 自有。
 

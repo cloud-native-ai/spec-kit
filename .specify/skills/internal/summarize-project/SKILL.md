@@ -9,6 +9,9 @@ classification: internal
 
 # 项目总结呈现技能
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 以**一个自包含的交付目录**（SpecKit 项目默认 `.specify/project/summary/`，非 SpecKit 项目默认 `docs/project-summary/`）呈现项目现状。报告是**派生产物**：只读事实源、不修改任何管理工件，重复运行**刷新**整个目录（保留 `## 附注` 节）。
 
 ```

@@ -7,6 +7,9 @@ classification: internal
 
 # memory-recall
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Overview
 Search the project memory store and surface the most relevant entries so the current Spec Kit task can build on past decisions, preferences, and working state. This is the *retrieval* half of the memory system; `memory-record` is the capture half. Retrieval uses a plain local JSON index and keyword/tag scoring — there is no vector store.
 

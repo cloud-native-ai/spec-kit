@@ -7,6 +7,8 @@ classification: external
 
 > **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 运行时依赖、任何宿主 agent 可直接加载；其内容编排 spec-kit 框架的安装与首批内容建设（语义耦合在此显式声明），该耦合只体现在它指挥宿主 agent 在目标项目执行 `specify init` / 少量 `/speckit.*` bootstrap 命令，不构成本 skill 的运行时依赖。**三技能软协同**：本 skill = 一次性 bootstrap（init/refresh + constitution + 首次 feature/docs/goal/agents/team）；`sdd-house-keeping` = bootstrap 之后的周期性调协、强化、验证、记录回收与候选清单；`sdd-loop-driver` = SDD 开发阶段循环。三者各自可独立运行，互不强依赖。
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## What This Skill Does
 
 把「让一个项目进入 spec-kit 框架的可用基线」固化为 **bootstrap 程序**：先做确定性盘点定缺口，再安装/刷新，随后完成 constitution 与首批内容，最后把周期性维护 handoff 给 `sdd-house-keeping`。本 skill **不执行**周期性 reconcile/strengthen/verify/report，也不执行任何破坏性清理；这些归 house-keeping 的 H1–H5。

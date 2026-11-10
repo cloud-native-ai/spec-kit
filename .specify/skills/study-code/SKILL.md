@@ -9,6 +9,8 @@ classification: external
 
 五步固定流程，逐步落盘，最终交付一份可索引报告。每一步的产物都写到 `$STUDY_DIR`（见 § Workspace），最终报告与证据归档到 `$STUDY_ARCHIVE`。
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## Workspace & inputs
 
 - **目标**：`owner/repo`、GitHub/GitLab/Gitee URL 或本地路径；缺省 = 当前工作区仓库。

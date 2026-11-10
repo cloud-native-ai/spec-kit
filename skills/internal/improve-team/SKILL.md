@@ -7,6 +7,9 @@ classification: internal
 
 # improve-team
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 Adjust and optimize an **existing** agent team. `improve-team` is the team-domain analogue of `improve-agent`, completing the create → improve lifecycle for teams. It loads a persisted team, makes **targeted, evidence-based, structure-preserving** edits (never a broad rewrite), re-persists the team, and reports what changed and why. The multi-agent Conceptual Model it operates against is defined once in `../create-team/references/conceptual-model.md`; the team **goal** concept in `../create-team/references/goal.md`.

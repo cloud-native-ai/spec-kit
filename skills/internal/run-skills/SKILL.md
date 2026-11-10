@@ -7,6 +7,9 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 # run-skills — 运行未注册技能的统一入口
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 给定一个技能标识(名称或规范路径),定位其 `SKILL.md` 并**遵照该文件正文执行**这个技能,把技能自身的产出转述给调用方。run-skills 是「internal 技能不被 agent 发现」规则(`.specify/skills.md`)的**具名例外**——入口自身必须可被 agent 直呼,才能运行其他不可直呼的技能;例外条款与多宿主降级路径见该指南。概念语义真源:词汇表条目「技能分类标注 (Skill Classification)」与 goal `.specify/goal/command-logic-as-classified-skills/goal.md`。

@@ -26,6 +26,15 @@ Every execution body carries the obligation in three **separately checkable** pa
 2. **Dispatch concurrently when allowed (能并发则并发)** — the **default is concurrent**: whenever the body's class, the units' independence, file-level write-domain disjointness, a legal process carrier (see § Three Execution Modes) and the budget allow, the units run concurrently. Concurrency is never an optional enhancement that a body may simply decline.
 3. **…and otherwise name the reason and record the reading (串行须具名理由并记读数)** — a serial result MUST carry a reason code from the closed vocabulary plus that code's declared evidence form (a bare `.` is never evidence), and every advancing unit records the `requested` / `effective` / `effective_reason` triple, with the literal `not_evaluated` wherever the intervals are absent — never `0` and never an estimate. A serial shape with no code is `code-required`; a record with one or two of the three fields is `reading-incomplete`; a concurrent pattern carrying serial codes (or a serial pattern carrying none) is `form-reason-inconsistent`.
 
+**Pre-action assessment (动作前评估 — the obligation's execution face).** Before the first real action, the body
+runs one assessment and records its outcome: (a) the unit **class** (the class fact, or
+`concurrency-check.py classify --repo .`); (b) the legal **carrier** (`concurrency-check.py capability` — the
+external fork/subprocess carriers are the concurrency mechanisms); (c) the **partition** — the duty's units at
+the body's grain. Two or more independent units with disjoint file-level write domains and a legal carrier make
+the shape **concurrent**; otherwise it is serial with a reason code and that code's declared evidence form. The
+outcome IS the `requested` / `effective` / `effective_reason` reading: no user instruction is needed to enable
+concurrency (it is the default), and a body that skips the assessment is `obligation-incomplete`.
+
 The grain decides what a "unit" is; the obligation is the same statement at every grain. The examples below are illustrations, not a second rule set:
 
 | Grain | Unit | The grain's own pointer |

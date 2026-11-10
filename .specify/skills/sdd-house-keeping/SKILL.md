@@ -7,6 +7,8 @@ classification: external
 
 > **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 运行时依赖，任何宿主 agent 可直接加载；其内容编排目标项目的治理与维护命令（语义耦合在此显式声明），该耦合只体现在它指挥宿主 agent 在目标项目执行 `/speckit.*`，不构成本 skill 的运行时依赖。**与 sdd-project-setup 是软协同**：setup 负责一次性 bootstrap，本 skill 负责 bootstrap 之后的周期性维护；本 skill 不安装/初始化项目，setup 也不依赖本 skill 才能完成 bootstrap。**与 sdd-loop-driver 是软协同**：loop-driver 负责 SDD 开发阶段推进，本 skill 不推进任何阶段。
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## What This Skill Does
 
 把一个已经初始化的目标项目维持在框架预期的最佳状态：先做确定性盘点定缺口，再按固定次序调协治理/文档/特性/指令，随后按需强化，最后验证并产出候选工作清单。周期维护的核心增量是**记录消费回收**：调用目标项目的 `/speckit.sanitize --lane retention`，把 exec-quant / feedback / session 原始记录按「消费 → 回执 → 回收」处理；没有回执不删除，open feedback 与 unsettled run-determination 永不回收。

@@ -7,6 +7,9 @@ classification: internal
 
 # self-improvement
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 Execute the Self-Improvement Loop — **why（当前问题是什么）→ what（哪些方面需要提升）→ how（如何提升）** — for exactly **one** resolved Execution Subject. This skill is the runnable carrier delegated by `/speckit.improve`; the command resolves the subject and stays a thin entry-plus-delegation shell. Goal anchor (Constitution Principle XIII): the Better-Harness goal model in `.specify/shared/guidelines/better-harness.md`.

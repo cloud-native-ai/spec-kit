@@ -8,6 +8,9 @@ classification: internal
 
 # code-review
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Overview
 
 以 **git-delta 为核心渲染工具** 的命令行 Code Review 工作流，覆盖 **提交前 → 审查中 → 反馈后 → 合入后** 四阶段闭环。核心理念：**git-delta 负责"看得舒服"，脚本负责"记得下来"，Markdown 负责"传得出去"；审查判断由人/LLM 完成**。

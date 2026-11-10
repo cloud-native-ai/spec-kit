@@ -7,6 +7,9 @@ skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"
 
 # run-team — 团队运行(从 /speckit.team run 提取)
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 执行一个已建团队的完整运行流程,承接 `/speckit.team` run 语义的全部程序性义务——五查预检经引擎唯一判定、目标重述、双结构渲染、present & execute、按 pattern 编排派发、运行报告(每次运行强制);每条义务以同等强度落于本技能对应节。概念语义:团队 = goal + Static Structure(Role × Stage × Type)+ Dynamic Structure(四种协作模式),真源 `skills/internal/create-team/references/conceptual-model.md`;Goal–Team 绑定与 Target 语义真源 `.specify/shared/definitions/goal-definitions.md`。单代理操作归 `/speckit.agents`;create/modify 语义归 create-team / improve-team。

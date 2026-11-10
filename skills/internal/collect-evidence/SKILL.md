@@ -7,6 +7,9 @@ classification: internal
 
 # collect-evidence
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
+
 ## Goal
 
 为任意目标单元(技能/命令/整仓)执行一次**证据采集编排**,产出统一规范化的 `findings.json` 证据(七态 evidenceState、五泳道、脱敏),并如实申明观察边界。本技能是公共证据层的对话入口:**只采集、只呈现、只申明边界——不解读证据、不提优化建议**(证据层中立红线)。
