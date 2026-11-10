@@ -159,6 +159,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | /speckit.instructions | execution | mixed-oracle |  | 指令文本由读者判、符号链接由脚本判；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
 | /speckit.interview | execution | mixed-oracle |  | 目标产物因对象而异、ledger 由引擎传播且收敛须用户确认；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
 | /speckit.measure | execution | behavior-oracle |  | 交付一份只读测量报告；窗口、选择、截断与退出码由 measure.py 复算判定 |
+| /speckit.migrate | execution | behavior-oracle |  | 交付一次收尾迁移的差异计划与归档式收敛结果；干跑零写入、apply 后重跑 clean、归档可找回均可由引擎复算判定 |
 | /speckit.plan | execution | behavior-oracle |  | 交付设计产物；由 pre-analyze 检查与下游 tasks 消费判定 |
 | /speckit.requirements | execution | behavior-oracle |  | 交付需求规格；由 validator 与下游流程消费判定 |
 | /speckit.research | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |

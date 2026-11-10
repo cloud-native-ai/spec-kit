@@ -1,0 +1,86 @@
+# 097 pkg06-us4-template — US4 等价与分发验证读数（T040 / SC-009）
+
+- captured: 2026-11-10T15:17Z
+- cwd: `.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command`（branch `097-speckit-migrate-command`）
+- 类别四元组（本包）：`flow_class=execution`；`source=declaration`；`marker=`（空）；`error=-`
+- 完整套件输出：`.specify/.tmp/pkg06-us4-suite.txt`
+
+## 1. 目标套件（T040 行级命令）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/integration/test_migrate_us4_equivalence.py -q`
+- 退出码: `0`
+- 真实输出（逐字）:
+
+```text
+....................                                                     [100%]
+20 passed in 15.24s
+```
+
+- 构成：模板结构契约 10（T033）+ 装配面契约 7（T039）+ 等价性集成 3（T034）。
+
+## 2. 等价性（T034 / FR-002、FR-025）
+
+- **dry-run**：模板声明命令入口（`specify migrate --format json`，从模板 bash 围栏提取）与直连 CLI 入口（`migrate --workspace <ws> --format json`）在同一夹具上 `items` 与 `summary` 逐项相同，`outcome=planned`；两入口执行前后树哈希不变（零写入）。
+- **apply**：两个同源夹具分别经两入口，`outcome=applied`、回执 `status=completed`，逐项 `(dimension, target, disposition, status)` 集合相同；路径集经 run-id 归一化（`<run-id>`）后两树一致，无额外文件；两树均含 `.specify/archive/migrate/`。
+- **变异**：模板末尾内联一条检查命令（写 `inline-check.txt`）后，同一「零写入」断言转红（`pytest.raises(AssertionError)` 证明），且行尾断言证明变异已真实生效——守卫有判别力。
+
+## 3. 分发面计数（实测，2026-11-10）
+
+| 量 | 期望 | 实测 | 复算命令 |
+|----|------|------|----------|
+| `templates/commands/*.md` | 30 | **30** | `ls templates/commands/*.md \| wc -l` |
+| `.github/prompts/*.prompt.md` | 30 | **30** | `ls .github/prompts/*.prompt.md \| wc -l` |
+| `.claude/commands/speckit.*.md` | 30 | **30** | 同上 |
+| `.qoder/commands/speckit.*.md` | 30 | **30** | 同上 |
+| `.opencode/command/speckit.*.md` | 30 | **30** | 同上 |
+| `docs/reference/commands/*.md` | 28 | **28** | `ls docs/reference/commands/*.md \| wc -l` |
+| `COMMAND_BASELINE` 长度 | 30 | **30** | `test_migration_distribution.py:131` `assert len(COMMAND_BASELINE) == 30` |
+| flow-class 台账单元 | 86 | **86**（findings `[]`，exit 0） | `flow-class-check.py --action check --format json` |
+| `.specify/templates/commands/migrate.md` | 缺席（退役面） | **缺席** | T039 `test_retired_mirror_face_carries_no_migrate_copy` |
+
+## 4. regen / mirror 读数
+
+- `python3 scripts/python/regen-command-copies.py --check` → 退出码 `0`，`OK: all per-tool command copies match the source templates.`
+- `python3 scripts/python/sync-mirrors.py --check` → 退出码 `0`；`shared/ == .specify/shared/ (111 files, byte-identical)`（含本包更新的 `flow-class-definitions.md` 对，`diff -q` 一致）。
+
+## 5. 产物哈希（sha256）
+
+```text
+fffa254ecb7c7118d1e615b548dbcf50a4fcd175a899ffcae8119e0b1dc8b44e  templates/commands/migrate.md
+f8db8e0ce5a4113ca9611a7ec64e7f696bf86ad76f24a0944e73a2081ef949c9  .github/prompts/speckit.migrate.prompt.md
+f8db8e0ce5a4113ca9611a7ec64e7f696bf86ad76f24a0944e73a2081ef949c9  .claude/commands/speckit.migrate.md
+ed0a5d46c7c7ec61690c34f5f61ad21a26ba05dfc3284d9e7ae26b0b40c5dd86  .qoder/commands/speckit.migrate.md
+f8db8e0ce5a4113ca9611a7ec64e7f696bf86ad76f24a0944e73a2081ef949c9  .opencode/command/speckit.migrate.md
+e1ad24c85b62ed34edd4a4ba0e109cee968deda38cb3c1ebb3fb667cc8380be9  docs/reference/commands/migrate.md
+db9fd5fd19972e7728d5d1eb9b65fe66ce6673ba1016eb7709a62946f647053c  tests/contract/test_migrate_template.py
+103d79951422ad8a457d31bc5161b2dcc8eff8e20d8100c157819c626b15e3e2  tests/contract/test_migrate_distribution_assembly.py
+39e1b0744ce503bf400df9189011ccd02213c7b5f3cd47b315f6184e35d7f622  tests/integration/test_migrate_us4_equivalence.py
+```
+
+（`.qoder` 副本按生成器约定比其余三份多一段 `description` frontmatter，故哈希不同；三份非 Qoder 副本逐字节相同，由同一个 `generate_commands` 代码路径产出。）
+
+## 6. 跨面归因（新增模板触发的 roster 计数点）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/integration/test_migrate_us4_equivalence.py tests/contract/test_migration_distribution.py tests/contract/test_feedback_command_classification.py tests/contract/test_docs_step_injection.py tests/contract/test_feedback_step_reference_form.py tests/contract/test_flow_class_ledger.py tests/contract/test_expression_compatibility.py tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_delegation_classes.py tests/contract/test_concurrency_coverage.py tests/contract/test_command_family.py tests/contract/test_qoder_command_frontmatter.py tests/contract/test_shipped_surface_client_neutrality.py tests/contract/test_dogfooding_practice.py tests/contract/test_glossary_mechanism.py -q --names-out .specify/.tmp/pkg06-affected-failed.txt`
+- 读数: `12 failed, 549 passed`；相对实现入口基线 `NEW=0`（12 名全部存在于 `implement-entry-baseline-suite.txt` 的失败名清单；比较命令 `comm -13`，完整名单 `.specify/.tmp/pkg06-affected-failed.txt`）。
+- 基线内失败示例（与 `migrate.md` 无关）：`test_qoder_command_frontmatter.py::test_every_template_has_short_description`（research.md 的既有 78 字符 short-description）、`test_expression_compatibility.py::test_c5_wiring_surface_is_closed`（既有 `feedback.md` / `create-team` 的引擎引用）。
+
+## 7. 随包集成修复（fast-fail 披露：按记录意图修复，非新裁定）
+
+新增命令模板会移动若干**其他特性的 roster 计数钉**；这些钉的既有约定是「dated stale-pin update」。本包按同一形态修复，全部带日期注记：
+
+| 面 | 修改 | 依据 |
+|----|------|------|
+| `shared/definitions/flow-class-definitions.md`（+ 镜像） | 台账新增 `/speckit.migrate`（execution / behavior-oracle，空 neutral） | 台账行集 = 仓库单元清单（C-5 双向相等）；新增模板必须同趟登记 |
+| `.specify/specs/027-feedback-mechanism/contracts/command-classification.md` | 分类表 +`migrate` = **Simple**（Result 25/5）；`## Classification table (30 commands)` | 027 契约自带三判据：无自有 `scripts/` 引擎、无下游流程消费、只消费调用方工作区——与 `humanize`（thin wrapper）同型；同时是 T035 不要求 `## Wrap-up` 的唯一一致分类 |
+| `tests/contract/test_feedback_command_classification.py` | 25 complex / 5 simple 计数钉 | 同上 |
+| `tests/contract/test_humanize_command_surface.py` | WC-16 approved additions +`migrate.md`、29→30；C-09 Result 钉 4→5 simple | 同 027 契约 |
+| `tests/contract/test_expression_compatibility.py` | `FROZEN_COMMANDS` +`migrate` | 069a C-1「零*非预期*新增」口径的 sanctioned addition |
+| `tests/contract/test_flow_class_ledger.py` | 台账行 85→86、units 85→86、扫描文件 85→86、命令 29→30 | flow-class 台账登记 |
+| `tests/contract/test_delegation_classes.py` | `commands_scanned` 29→30 | 模板面无 skill 路径引用，边图不增边 |
+| `tests/contract/test_expression_gate_wiring.py` | 模板计数 29→30 | wiring 普查跟随清单 |
+
+## 8. 判定
+
+- T040 行级命令退出码 `0`，20 passed；SC-009 的五个装配面（源模板 / 四副本 / Qoder frontmatter / 命令文档 / 冻结基线）与退役面、regen 检查全部有实测读数。
+- 本包目标面全绿；跨面 18 文件面相对基线零 NEW 失败。

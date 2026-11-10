@@ -186,3 +186,43 @@ E       assert None == '20261110T145903Z-a964a807'
   `load_migrate_resume_state()`（扫描最近 `status=running` 回执）+
   `migrate_resume_archive_entry()` / `_migrate_resume_complete_write()`
   （按旧回执自身 `archives[].archiveTo` 判断，目标缺失则只补写、不二次搬移，C-7）。
+
+---
+
+## pkg06-us4-template（T033–T040）
+
+---
+### § T033 + T034 — `tests/contract/test_migrate_template.py` + `tests/integration/test_migrate_us4_equivalence.py`（red-first）
+
+- 日期: 2026-11-10
+- 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_template.py tests/integration/test_migrate_us4_equivalence.py -q --names-out .specify/.tmp/pkg06-red-us4-names.txt`
+- 退出码: `1`（失败名清单 `.specify/.tmp/pkg06-red-us4-names.txt`，12 条）
+- 真实输出（决定性节选，逐字粘贴）:
+
+```text
+E       AssertionError: templates/commands/migrate.md is missing — T035 authors the projection
+E       AssertionError: templates/commands/migrate.md is missing — the template entry has no declared commands to run (T035 authors it)
+...
+FAILED tests/contract/test_migrate_template.py::test_frontmatter_carries_exactly_two_keys
+FAILED tests/contract/test_migrate_template.py::test_required_sections_are_present_as_headings
+FAILED tests/contract/test_migrate_template.py::test_template_declares_the_two_delegated_commands
+FAILED tests/contract/test_migrate_template.py::test_template_carries_no_implementation_symbol
+FAILED tests/contract/test_migrate_template.py::test_template_has_no_inspection_code_fence
+FAILED tests/contract/test_migrate_template.py::test_template_passes_no_confirmation_class_flag
+FAILED tests/contract/test_migrate_template.py::test_outcome_and_exit_code_table_is_restated_verbatim
+FAILED tests/contract/test_migrate_template.py::test_receipt_and_archive_pointers_are_named
+FAILED tests/contract/test_migrate_template.py::test_boundary_names_the_init_repair_entry
+FAILED tests/integration/test_migrate_us4_equivalence.py::test_template_dry_run_matches_the_direct_cli_plan
+FAILED tests/integration/test_migrate_us4_equivalence.py::test_template_apply_matches_the_direct_cli_result
+FAILED tests/integration/test_migrate_us4_equivalence.py::test_mutation_template_inlining_an_inspection_command_turns_equivalence_red
+12 failed, 1 passed in 10.99s
+```
+
+- 红判据: 12 条失败全部为「被测载体尚不存在」——`templates/commands/migrate.md`
+  缺失，契约断言在 `_read_template()` / `_template_text()` 的前置断言上失败，等价性
+  断言在「无声明命令可执行」上失败，无一条来自断言自身缺陷。唯一通过项是
+  `test_qoder_frontmatter_is_covered_by_the_generic_contract`（只钉通用契约测试存在，
+  不触碰新模板），符合预期。T035 落地后同一命令转绿（读数见
+  `test-evidence/us4-equivalence.txt`）。
+
+---

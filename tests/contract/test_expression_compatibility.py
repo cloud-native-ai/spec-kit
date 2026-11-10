@@ -103,6 +103,8 @@ WIRING_SKILLS = (
 # `/speckit.measure` (`measure.md`, the read-only measurement report). The guard's clause
 # ("zero *unintended* new / renamed / deleted commands") is unchanged; the two sanctioned
 # additions are enumerated here so a third one still goes red.
+# 2026-11-10 (Feature 097): 29 -> 30. FR-021 adds `/speckit.migrate` (`migrate.md`, the
+# one-shot closeout command), enumerated here on the same terms.
 FROZEN_COMMANDS = (
     "agents",
     "analyze",
@@ -121,6 +123,7 @@ FROZEN_COMMANDS = (
     "instructions",
     "interview",
     "measure",
+    "migrate",
     "plan",
     "requirements",
     "research",
