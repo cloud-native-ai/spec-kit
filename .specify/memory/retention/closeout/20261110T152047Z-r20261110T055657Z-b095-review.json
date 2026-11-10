@@ -1,0 +1,68 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T055657Z-b095-review",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261110T151908Z-run-determination-speckit-review-r20261110t055657z-b095-revi.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/session/20261110T151908Z-run-determination-skill-review-sdd-process-r20261110t055657z.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/session/20261110T151908Z-run-determination-skill-review-feature-quality-r20261110t055.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/session/20261110T151908Z-run-determination-skill-code-review-r20261110t055657z-b095-r.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T151913790212Z-31aa1b16.json",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T151914121269Z-b8ad7403.json",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T151914451830Z-cd1dedfb.json",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T151914784483Z-43e68f87.json",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T151928Z-speckit-review.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T151929Z-skill-review-sdd-process.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T151935Z-skill-review-feature-quality.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T151937Z-skill-code-review.md",
+      "action": "committed",
+      "commit": "2c5ecfb80"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-10T15:20:47Z"
+}
