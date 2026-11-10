@@ -11,10 +11,11 @@ import os
 import re
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 import pytest
+
+from fixtures.line_fixtures import wait_until
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNER = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "stage-runner.sh"
@@ -123,10 +124,8 @@ def test_local_nohup_survives_parent_exit(tmp_path):
                             timeout=30)
     assert parent.returncode == 0, parent.stderr
     status_path = state / "status-demo-plan"
-    deadline = time.time() + 30
-    while time.time() < deadline and not status_path.exists():
-        time.sleep(0.2)
-    assert status_path.exists(), "detached runner did not finish after parent exit"
+    assert wait_until(lambda: status_path.exists(), timeout=30, interval=0.2), (
+        "detached runner did not finish after parent exit")
     status = _status(state)
     assert status.get("exit") == "0"
     assert status.get("sentinel") == "1"

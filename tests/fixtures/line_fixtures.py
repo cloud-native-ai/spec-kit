@@ -393,7 +393,13 @@ def teardown_stage(stage: dict) -> None:
                 pass
 
 
-def wait_until(predicate, timeout: float = 5.0, interval: float = 0.05) -> bool:
+def wait_until(predicate, timeout: float = 30, interval: float = 0.05) -> bool:
+    """Poll ``predicate`` until it holds; ``False`` on the explicit deadline.
+
+    FR-026 default: a 30 s deadline and a polling interval <= 0.2 s; polling
+    happens only while the predicate is false, and a caller treats ``False`` as
+    a named failure — never a skip, xfail or retry (098 event-wait C-006/C-007).
+    """
     deadline = time.time() + timeout
     while time.time() < deadline:
         if predicate():

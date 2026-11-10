@@ -1,0 +1,85 @@
+# T042 — event-wait mutation drills EW-M1…EW-M5
+
+- date: 2026-11-10
+- owner of the legs: `contracts/event-wait.contract.md` § E
+- guard under drill: `tests/contract/test_event_wait_contract.py` (committed; the tracked
+  tree was never mutated)
+- method: every leg runs on a throwaway minimal harness under
+  `.specify/.tmp/wp6/mutations/` (gitignored scratch, not retained) — a copy of the guard,
+  the six scope files, `tests/fixtures/line_fixtures.py`, the two exemption files, the
+  contract file the guard derives its scope from, and a `pytest.ini` registering the
+  `contract` marker. The harness is green before any mutation (validity control), and each
+  leg mutates exactly one thing in its own copy.
+
+## Harness control (pristine copy green)
+
+- Command: `cd .specify/.tmp/wp6/mutations/harness && python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `0`; `8 passed in 0.14s`.
+
+## EW-M1 — reintroduce one `time.sleep` in a scope file (must fail C-002)
+
+- Mutation in the copy's `tests/contract/test_client_metrics.py`: a
+  `time.sleep(0.01)` line inserted into a helper body.
+- Command: `python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `1`; `1 failed, 7 passed in 0.15s`:
+  ```text
+  E  AssertionError: C-002: synchronization `time.sleep` MUST be zero in the scope files; each hit names file and line:
+  E      tests/contract/test_client_metrics.py:152
+  FAILED tests/contract/test_event_wait_contract.py::test_c002_the_scope_files_carry_zero_synchronization_sleep
+  ```
+
+## EW-M2 — raise the wait interval above 0.2 s (must fail C-009/C-007)
+
+- Mutation in the copy's `tests/fixtures/line_fixtures.py`: the helper default
+  `interval: float = 0.05` → `0.3`.
+- Command: `python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `1`; `1 failed, 7 passed in 0.15s`:
+  ```text
+  E  AssertionError: C-007: the polling interval MUST be <= 0.2 s, got 0.3
+  E  assert 0.3 <= 0.2
+  FAILED tests/contract/test_event_wait_contract.py::test_c006_c007_the_helper_defaults_are_thirty_seconds_and_a_small_interval
+  ```
+
+## EW-M3 — convert a timeout into `pytest.skip` (must fail C-006)
+
+- Mutation in the copy's `tests/contract/test_line_envelope_contract.py`: the first
+  heartbeat wait's `assert` becomes `if not wait_until(...): pytest.skip(...)`.
+- Command: `python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `1`; `2 failed, 6 passed in 0.16s`:
+  ```text
+  E  AssertionError: C-009 adopted wait call sites:
+  E      tests/contract/test_line_envelope_contract.py:308: the wait result MUST be asserted at the call site (C-006)
+  FAILED tests/contract/test_event_wait_contract.py::test_c009_adopted_wait_call_sites_assert_a_deadline_and_a_small_interval
+  E  AssertionError: C-006/FR-021: a timeout MUST surface as a named failure, never as skip/xfail:
+  E      tests/contract/test_line_envelope_contract.py:312
+  FAILED tests/contract/test_event_wait_contract.py::test_c006_a_timeout_is_never_converted_to_skip_or_xfail
+  ```
+
+## EW-M4 — put a fixed sleep back as a "shorter" grace (must fail C-008/C-002)
+
+- Mutation in the copy's `tests/integration/test_session_kill_reattach.py`: a
+  `time.sleep(0.1)` inserted at the former SIGHUP-grace position (a *shorter* sleep, the
+  exact repair C-008 forbids).
+- Command: `python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `1`; `1 failed, 7 passed in 0.15s`:
+  ```text
+  E  AssertionError: C-002: synchronization `time.sleep` MUST be zero in the scope files; each hit names file and line:
+  E      tests/integration/test_session_kill_reattach.py:172
+  FAILED tests/contract/test_event_wait_contract.py::test_c002_the_scope_files_carry_zero_synchronization_sleep
+  ```
+
+## EW-M5 — remove the injected clock from an ordering assertion (must fail C-004)
+
+- Mutation in the copy's `tests/contract/test_client_metrics.py`: one entry-creating
+  `pointer_entry` call loses its `now=` keyword (the injected clock removed, falling back
+  to real elapsed time).
+- Command: `python3 -m pytest tests/contract/test_event_wait_contract.py -q`
+- Exit `1`; `1 failed, 7 passed in 0.15s`:
+  ```text
+  E  AssertionError: C-004: every entry-creating pointer_entry call MUST carry the injected clock (`now=`), so ordering never depends on real elapsed time; missing at:
+  E      tests/contract/test_client_metrics.py:690
+  FAILED tests/contract/test_event_wait_contract.py::test_c004_entry_creation_uses_the_injected_clock
+  ```
+
+Anomaly line: none — all five legs reddened exactly the clause they target, the harness
+control stayed green, and no leg required a repair to the committed guard.

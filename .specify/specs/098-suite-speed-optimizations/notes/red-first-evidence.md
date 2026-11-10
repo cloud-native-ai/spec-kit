@@ -216,3 +216,63 @@ E  fixture 'scan_cache' not found
 
 Anomaly line: none in this record — every failure is the expected red of the guard against
 the tree before its subject exists; no in-passing repair was applied to the guard.
+
+## WP-6 / T031 — `tests/contract/test_event_wait_contract.py` (event-wait C-001…C-010)
+
+- Date: 2026-11-10
+- Tree state at the red run: the guard file is the only change on disk — the six scope
+  files still carry their pre-change sleeps, `wait_until` still defaults to `timeout=5.0`,
+  `pointer_entry` has no injected-clock parameter, and `test_sdd_loop_efficiency_runner.py`
+  still polls inline.
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_event_wait_contract.py -q`
+- Exit code: `1`
+- Collected: `8` cases; `5` failed, `3` passed.
+- Full run-time log: `.specify/.tmp/wp6/red-run2.log` (this worktree; scratch, not retained).
+- First red run (`.specify/.tmp/wp6/red-run.log`): same five cases plus `test_c003`, whose
+  only defect was the guard's own line-wrapped reason comparison — a guard-side defect
+  repaired in passing before this record (whitespace-normalised reason match); the red
+  inventory below is the post-repair reading.
+
+Failing cases (the red this record owns):
+
+```text
+FAILED tests/contract/test_event_wait_contract.py::test_c002_the_scope_files_carry_zero_synchronization_sleep
+FAILED tests/contract/test_event_wait_contract.py::test_c006_c007_the_helper_defaults_are_thirty_seconds_and_a_small_interval
+FAILED tests/contract/test_event_wait_contract.py::test_c009_adopted_wait_call_sites_assert_a_deadline_and_a_small_interval
+FAILED tests/contract/test_event_wait_contract.py::test_c006_no_inline_polling_loop_in_the_scope_files
+FAILED tests/contract/test_event_wait_contract.py::test_c004_entry_creation_uses_the_injected_clock
+```
+
+Decisive excerpts (each names its missing subject; the sleep scan names all 16 sites):
+
+```text
+# C-002 — the pre-change sleep inventory, file and line (16 hits, 6 files)
+tests/contract/test_client_metrics.py:338   :391   :394   :400   :432   :458   :463   :671
+tests/integration/test_sdd_loop_efficiency_runner.py:128
+tests/integration/test_session_kill_reattach.py:173 :291
+tests/contract/test_line_envelope_contract.py:303 :310
+tests/contract/test_feedback_probe_cli.py:277
+tests/contract/test_store_state_protocol.py:325 :332
+
+# C-006/C-007 — the shared default is the measured pre-change 5.0, not the enacted 30 s
+E  AssertionError: C-006/C-007: wait_until's default deadline is the enacted 30 s, got 5.0
+
+# C-006 — the inline poll the shared helper must replace
+E  tests/integration/test_sdd_loop_efficiency_runner.py:127
+
+# C-009 — two adopted call sites assert without a named failure message
+E  tests/integration/test_session_kill_reattach.py:202: the assert MUST carry a named failure message (C-006)
+E  tests/integration/test_session_kill_reattach.py:274: the assert MUST carry a named failure message (C-006)
+
+# C-004 — 17 pointer_entry call sites carry no injected clock
+E  tests/contract/test_client_metrics.py:243 :267 :337 :341 :393 :397 :435 :457 :462 :469
+   :501 :528 :552 :621 :644 :670 :673
+```
+
+The three green-by-construction cases are the clause-derived scope identity (C-001), the
+closed exemption registry (C-003, already truthful) and the zero skip/xfail scan (C-006);
+their discriminating power comes from the EW-M1…EW-M5 mutation legs (T042).
+
+Anomaly line: one in-passing repair — the guard's C-003 reason comparison originally
+matched against raw clause text and read a line-wrap as a wording drift; it now compares
+whitespace-normalised text. No product file was touched.

@@ -158,21 +158,21 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T031 [US4] Author the event-wait contract cases in `tests/contract/test_event_wait_contract.py`: the AST zero-synchronization-sleep scan over the event-wait C-001 scope files (naming file and line), the `wait_until` default assertions (`timeout == 30` — the enacted default, red against the measured pre-change 5.0 — `interval <= 0.2`), and the per-line exemption registry; record the red run in `notes/red-first-evidence.md`. [green: contracts/event-wait.contract.md#C-001] [green: contracts/event-wait.contract.md#C-003]
+- [X] T031 [US4] Author the event-wait contract cases in `tests/contract/test_event_wait_contract.py`: the AST zero-synchronization-sleep scan over the event-wait C-001 scope files (naming file and line), the `wait_until` default assertions (`timeout == 30` — the enacted default, red against the measured pre-change 5.0 — `interval <= 0.2`), and the per-line exemption registry; record the red run in `notes/red-first-evidence.md`. [green: contracts/event-wait.contract.md#C-001] [green: contracts/event-wait.contract.md#C-003]
 
 ### Implementation for User Story 4
 
-- [ ] T032 [US4] [blockedBy: T031] Add the optional `--now <YYYY-MM-DDTHH:MM:SSZ>` injected clock to `scripts/python/feedback-utils.py`, read by `now_iso()` (`:125`) and `timestamp_id()` (`:129`), documented in `--help`, default-off byte-identical, an unparsable value exits non-zero with a named error.
-- [ ] T033 [US4] [blockedBy: T032] Regenerate the `scripts/` mirror pair with `python3 scripts/python/sync-mirrors.py --write --only scripts` and verify `--check` reports no NEW drift on `feedback-utils.py`.
-- [ ] T034 [US4] [blockedBy: T032] Convert the eight ordering sleeps in `tests/contract/test_client_metrics.py` (lines 338, 391, 394, 400, 432, 458, 463, 671) to `--now`-injected timestamps plus explicit `os.utime` owner-file mtimes, keeping the assertion set unchanged (event-wait C-005). [green: contracts/event-wait.contract.md#C-004] [green: contracts/event-wait.contract.md#C-005]
-- [ ] T035 [US4] [P] [blockedBy: T032] Replace the ordering sleep in `tests/contract/test_feedback_probe_cli.py` with the injected clock.
-- [ ] T036 [US4] [P] [blockedBy: T032] Replace the two ordering sleeps in `tests/contract/test_store_state_protocol.py` with the injected clock.
-- [ ] T037 [US4] Align the `wait_until` defaults in `tests/fixtures/line_fixtures.py:396` to `timeout=30` and `interval<=0.2`. [green: contracts/event-wait.contract.md#C-006] [green: contracts/event-wait.contract.md#C-007]
-- [ ] T038 [US4] [blockedBy: T037] Replace the inline poll in `tests/integration/test_sdd_loop_efficiency_runner.py` with the shared `wait_until` (explicit 30 s deadline, 0.2 s interval, named failure on timeout).
-- [ ] T039 [US4] [P] [blockedBy: T037] Replace the SIGHUP grace and post-exit residue waits in `tests/integration/test_session_kill_reattach.py` with event predicates over the observable file state.
-- [ ] T040 [US4] [P] [blockedBy: T037] Replace the heartbeat first-write and advance waits in `tests/contract/test_line_envelope_contract.py` with event predicates. [green: contracts/event-wait.contract.md#C-008]
-- [ ] T041 [US4] [blockedBy: T033, T034, T035, T036, T038, T039, T040] Run the guard and the six scope files green; record the `test_client_metrics.py` before/after wall pair (event-wait C-010) against `notes/pre-change-measurements.md` in `test-evidence/event-wait-green.txt`. [green: contracts/event-wait.contract.md#C-002] [green: contracts/event-wait.contract.md#C-009] [green: contracts/event-wait.contract.md#C-010]
-- [ ] T042 [US4] [blockedBy: T041] Execute mutation drills EW-M1…EW-M5 on throwaway copies and record each red output in `test-evidence/event-wait-mutations.txt`.
+- [X] T032 [US4] [blockedBy: T031] Add the optional `--now <YYYY-MM-DDTHH:MM:SSZ>` injected clock to `scripts/python/feedback-utils.py`, read by `now_iso()` (`:125`) and `timestamp_id()` (`:129`), documented in `--help`, default-off byte-identical, an unparsable value exits non-zero with a named error.
+- [X] T033 [US4] [blockedBy: T032] Regenerate the `scripts/` mirror pair with `python3 scripts/python/sync-mirrors.py --write --only scripts` and verify `--check` reports no NEW drift on `feedback-utils.py`.
+- [X] T034 [US4] [blockedBy: T032] Convert the eight ordering sleeps in `tests/contract/test_client_metrics.py` (lines 338, 391, 394, 400, 432, 458, 463, 671) to `--now`-injected timestamps plus explicit `os.utime` owner-file mtimes, keeping the assertion set unchanged (event-wait C-005). [green: contracts/event-wait.contract.md#C-004] [green: contracts/event-wait.contract.md#C-005]
+- [X] T035 [US4] [P] [blockedBy: T032] Replace the ordering sleep in `tests/contract/test_feedback_probe_cli.py` with the injected clock.
+- [X] T036 [US4] [P] [blockedBy: T032] Replace the two ordering sleeps in `tests/contract/test_store_state_protocol.py` with the injected clock.
+- [X] T037 [US4] Align the `wait_until` defaults in `tests/fixtures/line_fixtures.py:396` to `timeout=30` and `interval<=0.2`. [green: contracts/event-wait.contract.md#C-006] [green: contracts/event-wait.contract.md#C-007]
+- [X] T038 [US4] [blockedBy: T037] Replace the inline poll in `tests/integration/test_sdd_loop_efficiency_runner.py` with the shared `wait_until` (explicit 30 s deadline, 0.2 s interval, named failure on timeout).
+- [X] T039 [US4] [P] [blockedBy: T037] Replace the SIGHUP grace and post-exit residue waits in `tests/integration/test_session_kill_reattach.py` with event predicates over the observable file state.
+- [X] T040 [US4] [P] [blockedBy: T037] Replace the heartbeat first-write and advance waits in `tests/contract/test_line_envelope_contract.py` with event predicates. [green: contracts/event-wait.contract.md#C-008]
+- [X] T041 [US4] [blockedBy: T033, T034, T035, T036, T038, T039, T040] Run the guard and the six scope files green; record the `test_client_metrics.py` before/after wall pair (event-wait C-010) against `notes/pre-change-measurements.md` in `test-evidence/event-wait-green.txt`. [green: contracts/event-wait.contract.md#C-002] [green: contracts/event-wait.contract.md#C-009] [green: contracts/event-wait.contract.md#C-010]
+- [X] T042 [US4] [blockedBy: T041] Execute mutation drills EW-M1…EW-M5 on throwaway copies and record each red output in `test-evidence/event-wait-mutations.txt`.
 
 **Checkpoint**: US4's independent criterion is the scan plus the green six-file run; the wall pair is directional evidence, never an assertion.
 

@@ -42,8 +42,8 @@ command surfaces that carry the digest's metric readings (T022).
 from __future__ import annotations
 
 import json
+import os
 import re
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -123,9 +123,13 @@ def write_record(project: ClientProject, spec_name: str, run_stamp: str,
 
 
 def pointer_entry(project: ClientProject, unit: str, run_id: str,
-                  record_rel: str) -> Dict:
+                  record_rel: str, *, now: str) -> Dict:
     """Create one external pointer entry exactly in the capture payload shape
-    (C-15 closed field set), via the engine's record action."""
+    (C-15 closed field set), via the engine's record action.
+
+    ``now`` is the injected clock stamp (C-004): the entry's ``created`` stamp and
+    id derive from it, never from the real clock, so entry ordering is
+    deterministic without a fixed sleep."""
     payload = "\n".join([
         f"record={record_rel}",
         "triage=run",
@@ -138,9 +142,19 @@ def pointer_entry(project: ClientProject, unit: str, run_id: str,
         "--unit-id", unit, "--unit-type", "custom-unit", "--run-id", run_id,
         "--review", payload, "--points", "captured: one pointer entry",
         "--workspace-root", str(project.path), "--format", "json",
+        "--now", now,
     )
     assert run.ok, run.describe()
     return run.json_stdout()
+
+
+def utime_at(project: ClientProject, relative_path: str, at: datetime) -> None:
+    """Pin an owner file's mtime explicitly — closure evidence compares mtime
+    against the entry's ``created``; real elapsed time is never the ordering
+    source (C-004)."""
+    target = project.path / relative_path
+    stamp_epoch = at.timestamp()
+    os.utime(target, (stamp_epoch, stamp_epoch))
 
 
 def entry_id_listing(project: ClientProject, unit: Optional[str] = None) -> List[Dict]:
@@ -240,7 +254,7 @@ def test_c40_capture_happens_per_qualifying_run_via_existing_fifth_step():
             project, "run-a", iso(now),
             [("blocking", "src/app.py", "defect one")],
         )
-        pointer_entry(project, UNIT, iso(now), record_rel)
+        pointer_entry(project, UNIT, iso(now), record_rel, now=iso(now))
         assert len(entry_id_listing(project, UNIT)) == 1
 
 
@@ -264,7 +278,8 @@ def test_c41_records_before_arming_are_excluded_never_backfilled():
             project, "post-arming", iso(now + timedelta(minutes=5)),
             [("blocking", "src/app.py", "post-arming defect")],
         )
-        pointer_entry(project, UNIT, iso(now + timedelta(minutes=5)), new_rel)
+        pointer_entry(project, UNIT, iso(now + timedelta(minutes=5)), new_rel,
+                      now=iso(now))
         payload = client_metrics(project, "--unit", UNIT)
         coverage = metric(payload, "capture_coverage")
         assert coverage["status"] == "evaluated", coverage
@@ -332,16 +347,19 @@ def test_c43_four_metrics_with_explicit_numerator_denominator_and_values():
     with make_client_project() as project:
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
-        rel_a = write_record(project, "m-a", iso(now + timedelta(minutes=5)),
+        a_at = now + timedelta(minutes=5)
+        rel_a = write_record(project, "m-a", iso(a_at),
                              [("blocking", "src/app.py", "defect A")])
-        entry_a = pointer_entry(project, UNIT, iso(now + timedelta(minutes=5)), rel_a)
-        time.sleep(1.1)                       # deterministic entry ordering
-        rel_b = write_record(project, "m-b", iso(now + timedelta(minutes=6)),
+        entry_a = pointer_entry(project, UNIT, iso(a_at), rel_a, now=iso(a_at))
+        b_at = now + timedelta(minutes=6)
+        rel_b = write_record(project, "m-b", iso(b_at),
                              [("blocking", "src/app.py", "defect A again")])
-        entry_b = pointer_entry(project, UNIT, iso(now + timedelta(minutes=6)), rel_b)
-        # Entry A is routed (carried) and its owner file changed after creation.
+        entry_b = pointer_entry(project, UNIT, iso(b_at), rel_b, now=iso(b_at))
+        # Entry A is routed (carried) and its owner file changed after creation;
+        # that mtime is pinned explicitly (C-004), never produced by a sleep.
         add_backlog_row(project, entry_a["id"])
         project.write("src/app.py", "def f():\n    return 2\n")
+        utime_at(project, "src/app.py", a_at + timedelta(seconds=30))
         payload = client_metrics(project, "--unit", UNIT)
         assert set(payload["metrics"]) == {
             "capture_coverage", "into_loop_ratio", "closure_ratio",
@@ -386,19 +404,20 @@ def test_c44_closure_counts_only_owner_file_change_evidence():
     with make_client_project() as project:
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
-        # Owner file exists but predates both entries (no change evidence).
+        # Owner file exists but predates both entries (no change evidence);
+        # its mtime is pinned explicitly (C-004), never produced by a sleep.
         project.write("src/app.py", "def f():\n    return 1\n")
-        time.sleep(1.1)
+        utime_at(project, "src/app.py", now - timedelta(minutes=1))
         rel_a = write_record(project, "c-a", iso(now), [("nitpick", "src/app.py", "n")])
-        entry_a = pointer_entry(project, UNIT, iso(now), rel_a)
-        time.sleep(1.1)
-        rel_b = write_record(project, "c-b", iso(now + timedelta(minutes=1)),
+        entry_a = pointer_entry(project, UNIT, iso(now), rel_a, now=iso(now))
+        b_at = now + timedelta(minutes=1)
+        rel_b = write_record(project, "c-b", iso(b_at),
                              [("nitpick", "src/other.py", "n")])
-        entry_b = pointer_entry(project, UNIT, iso(now + timedelta(minutes=1)), rel_b)
+        entry_b = pointer_entry(project, UNIT, iso(b_at), rel_b, now=iso(b_at))
         # Entry A: carried row + owner file changed after creation → closed.
         add_backlog_row(project, entry_a["id"])
-        time.sleep(1.1)
         project.write("src/app.py", "def f():\n    return 2\n")
+        utime_at(project, "src/app.py", now + timedelta(seconds=30))
         # Entry B: disposed `processed` with NO backlog row — a routing mark
         # alone must never count as into-loop or closure evidence.
         run = project.run_engine(
@@ -429,10 +448,10 @@ def test_c44_carried_row_with_missing_or_unchanged_owner_file_is_not_closed():
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
         project.write("src/app.py", "def f():\n    return 1\n")
-        time.sleep(1.1)
+        utime_at(project, "src/app.py", now - timedelta(minutes=1))
         rel = write_record(project, "c-missing", iso(now),
                            [("nitpick", "src/never.py", "n")])
-        entry = pointer_entry(project, UNIT, iso(now), rel)
+        entry = pointer_entry(project, UNIT, iso(now), rel, now=iso(now))
         add_backlog_row(project, entry["id"], owner="`src/does-not-exist.py`")
         payload = client_metrics(project, "--unit", UNIT)
         into_loop = metric(payload, "into_loop_ratio")
@@ -454,19 +473,19 @@ def test_c45_repeat_finding_rate_is_a_proxy_labeled_coarse():
         now = datetime.now(timezone.utc)
         rel_a = write_record(project, "p-a", iso(now),
                              [("blocking", "src/app.py", "dup defect")])
-        pointer_entry(project, UNIT, iso(now), rel_a)
-        time.sleep(1.1)
+        pointer_entry(project, UNIT, iso(now), rel_a, now=iso(now))
         # Same unit, same (file, severity) pair → the later entry repeats.
-        rel_b = write_record(project, "p-b", iso(now + timedelta(minutes=1)),
+        b_at = now + timedelta(minutes=1)
+        rel_b = write_record(project, "p-b", iso(b_at),
                              [("blocking", "src/app.py", "dup defect again")])
-        pointer_entry(project, UNIT, iso(now + timedelta(minutes=1)), rel_b)
-        time.sleep(1.1)
+        pointer_entry(project, UNIT, iso(b_at), rel_b, now=iso(b_at))
         # A different unit's entry with the same pair must NOT count (pairs
         # compare within the same unit only).
         project.arm(OTHER_UNIT)
-        rel_c = write_record(project, "p-c", iso(now + timedelta(minutes=2)),
+        c_at = now + timedelta(minutes=2)
+        rel_c = write_record(project, "p-c", iso(c_at),
                              [("blocking", "src/app.py", "other unit")])
-        pointer_entry(project, OTHER_UNIT, iso(now + timedelta(minutes=2)), rel_c)
+        pointer_entry(project, OTHER_UNIT, iso(c_at), rel_c, now=iso(c_at))
         payload = client_metrics(project)          # no unit filter: all units
         repeat = metric(payload, "repeat_finding_rate")
         assert repeat["proxy"] is True, (
@@ -498,7 +517,7 @@ def test_c46_readings_identical_across_reports_and_store_tree_unchanged():
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
         rel = write_record(project, "rb", iso(now), [("nitpick", "src/a.py", "n")])
-        entry = pointer_entry(project, UNIT, iso(now), rel)
+        entry = pointer_entry(project, UNIT, iso(now), rel, now=iso(now))
         add_backlog_row(project, entry["id"])
         project.write("src/a.py", "x = 2\n")
         before_paths = tree_paths(project)
@@ -525,7 +544,7 @@ def test_c46_action_has_no_write_point_even_against_a_read_only_store():
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
         rel = write_record(project, "ro", iso(now), [("nitpick", "src/a.py", "n")])
-        pointer_entry(project, UNIT, iso(now), rel)
+        pointer_entry(project, UNIT, iso(now), rel, now=iso(now))
         project.feedback_dir.chmod(0o555)
         try:
             run = project.run_engine(
@@ -549,7 +568,7 @@ def test_c47_engine_action_is_the_machine_readable_derivation():
         project.arm(UNIT)
         now = datetime.now(timezone.utc)
         rel = write_record(project, "pf", iso(now), [("praise", "src/a.py", "ok")])
-        pointer_entry(project, UNIT, iso(now), rel)
+        pointer_entry(project, UNIT, iso(now), rel, now=iso(now))
         run_out = client_metrics(project, "--unit", UNIT)
         source = ENGINE_SRC.read_text(encoding="utf-8")
         assert '"client-metrics"' in re.search(
@@ -618,7 +637,7 @@ def test_c48_capture_coverage_not_evaluated_when_no_record_qualifies():
         write_record(project, "ancient", iso(now - timedelta(hours=3)),
                      [("nitpick", "src/old.py", "old")])
         new_rel = write_record(project, "fresh", iso(now), [("nitpick", "src/a.py", "n")])
-        pointer_entry(project, UNIT, iso(now), new_rel)
+        pointer_entry(project, UNIT, iso(now), new_rel, now=iso(now))
         # Remove the qualifying record from disk: the captured run's record is
         # gone → numerator defined over qualifying record stamps only.
         (project.path / ".specify/specs/fresh/code-review.md").unlink()
@@ -641,7 +660,8 @@ def test_c49_boundary_is_first_external_entry_and_exclusion_is_disclosed():
         # capture) — the boundary rule excludes it from the coverage base.
         early_rel = write_record(project, "skew", iso(now - timedelta(seconds=90)),
                                  [("blocking", "src/app.py", "skew")])
-        pointer_entry(project, UNIT, iso(now - timedelta(seconds=90)), early_rel)
+        pointer_entry(project, UNIT, iso(now - timedelta(seconds=90)), early_rel,
+                      now=iso(now))
         payload = client_metrics(project, "--unit", UNIT)
         coverage = metric(payload, "capture_coverage")
         assert coverage["status"] == "not-evaluated", (
@@ -667,11 +687,11 @@ def test_c50_unreadable_record_excluded_from_repeat_rate_only():
         now = datetime.now(timezone.utc)
         rel_ok = write_record(project, "u-ok", iso(now),
                               [("blocking", "src/app.py", "live")])
-        entry_ok = pointer_entry(project, UNIT, iso(now), rel_ok)
-        time.sleep(1.1)
+        entry_ok = pointer_entry(project, UNIT, iso(now), rel_ok, now=iso(now))
         # This entry points at a record that does not exist.
         pointer_entry(project, UNIT, iso(now + timedelta(minutes=1)),
-                      ".specify/specs/gone/code-review.md")
+                      ".specify/specs/gone/code-review.md",
+                      now=iso(now + timedelta(minutes=1)))
         add_backlog_row(project, entry_ok["id"])
         payload = client_metrics(project, "--unit", UNIT)
         repeat = metric(payload, "repeat_finding_rate")
