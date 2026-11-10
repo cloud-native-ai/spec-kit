@@ -1,0 +1,23 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T081104Z-b096",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261110T091102Z-run-determination-skill-create-tasks-r20261110t081104z-b096.md",
+      "action": "included",
+      "commit": "a015ea90f"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T091112631876Z-9937cadd.json",
+      "action": "included",
+      "commit": "a015ea90f"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T091120Z-skill-create-tasks.md",
+      "action": "included",
+      "commit": "a015ea90f"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
