@@ -79,3 +79,13 @@ $ bash scripts/bash/run-tests.sh tests/contract/test_anchor_layout_migrate.py te
 59 passed in 6.61s
 exit=0
 ```
+
+## T-002 判别证据实测（2026-11-10）
+
+```text
+$ python3 - (rewrite_paths 对照，src 加入 sys.path)
+mirror==source: True
+mirror==rewrite(source): False
+```
+
+含义：本仓 `.specify/` 镜像为 sync-mirrors 字节形态；统一参照树（init 投影形态）会在本仓把已同步镜像误报为漂移 → 框架源模式委托既有检查器的选择成立。

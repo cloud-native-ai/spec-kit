@@ -7,10 +7,13 @@
 ## 场景 0 — 准备一个真实项目（前置条件，已实测）
 
 ```bash
+mkdir -p ~/tmp/speckit-migrate-quickstart
+cd ~/tmp/speckit-migrate-quickstart
 specify init demo --ai claude --script sh --no-git --ignore-agent-tools
+echo $?
 ```
 
-实测（2026-11-10）：退出 0；生成 `demo/.specify/`（含根锚点 `constitution.md`、`features.md`、`tools.md`、`scripts/`、`skills/`、`shared/`、`templates/`、`agents/`、`workflow/`）与 `.specify/source.json`。
+实测（2026-11-10，在 `~/tmp/speckit-migrate-quickstart/` 内执行）：退出 0；`demo/.specify/` 含 `agents constitution.md features features.md memory scripts shared skills source.json templates tools.md workflow`，`.specify/source.json` 存在。该临时树已由文末清理步骤删除（本页只在删除前主张其内容）。
 
 ## 场景 1 — 已最新：干跑即 clean（未执行，测试钉住）
 
@@ -58,7 +61,7 @@ echo $?
 
 ## 场景 4 — 冲突与中断（未执行，测试钉住）
 
-**冲突**：锚点迁移目标已被占用且内容不等价 → 计划与回执以 `refuse` 指名两个候选（现状文件、期望目标），不覆盖；该次运行退出 3。
+**冲突**：锚点迁移目标已被占用且内容不等价。干跑 `specify migrate --workspace legacy-demo` 以 **`planned`（退出 1）** 列出该 `refuse` 项并指名两个候选（现状文件、期望目标）；随后 `specify migrate --workspace legacy-demo --apply` 拒绝覆盖、结局 `blocked`、**退出 3**。不覆盖、不择一胜出。
 
 **中断续跑**：在「对象已归档、目标尚未写入」处中断应用；再次执行 `specify migrate --workspace legacy-demo --apply` 时报告中断阶段（回执 `status=running` 与 `resumedFrom`），完成收尾，归档对象不被二次搬移（计数与存在性断言）。
 

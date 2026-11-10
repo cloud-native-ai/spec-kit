@@ -6,7 +6,7 @@
 
 ## Summary
 
-新增 `specify migrate` 子命令与 `/speckit.migrate` 运行期模板，把「install → init → migrate」第三步做成一次性收尾：以**当前已安装版本**的声明与资产为期望态，对 `.specify/` 工作区做只读五维探测（模板与生成物、锚点布局、兼容链接、镜像一致性、迁移残留），产出逐项差异计划（默认零写入干跑），经双键确认后按 FR-014 六值处置收敛，凡移动/替换/移除一律 archive-not-delete 并留下逐运行回执。跨版本为一次直达（N→N+k，无中间版本步骤）；失败语义按 FR-017 为前向续跑 + 逐项归档找回，不提供全局回滚。
+新增 `specify migrate` 子命令与 `/speckit.migrate` 运行期模板，把「install → init → migrate」第三步做成一次性收尾：以**当前已安装版本**的声明与资产为期望态，对 `.specify/` 工作区做只读五维探测（维度 token 与语义 owner：`data-model.md` E-8 / requirements FR-007，本计划不复述清单），产出逐项差异计划（默认零写入干跑），经双键确认后按 FR-014 六值处置收敛，凡移动/替换/移除一律 archive-not-delete 并留下逐运行回执。跨版本为一次直达（N→N+k，无中间版本步骤）；失败语义按 FR-017 为前向续跑 + 逐项归档找回，不提供全局回滚。
 
 技术路线是**组合既有引擎，不做第二套迁移逻辑**：客户端工作区的期望态由 init 的同一复制机制投影到临时参照树（`copy_local_templates` + `rewrite_paths` + `generate_commands`）；五维探测分别消费 `sanitize-utils.py` 的只读检查器（链接/残留/平铺重复）、`anchor-layout-migrate.py` 的 check/apply（锚点布局）、`sync-mirrors.py --check` 与 `regen-command-copies.py --check`（框架源工作区的镜像与生成副本）、init 的 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills` 决策（退役与平铺收敛）。`/speckit.sanitize` 保持周期性治理定位，其 Migration lane 声明在同一变更内改为「周期复检兜底」。
 
@@ -66,9 +66,9 @@
 - **decision**: 期望态由「把当前安装版本的资产经 init 的同一复制机制投影到临时参照树」得到，差异对照只做文件集合与字节比较。
 - **antithesis**: 逐文件期望内容计算——直接调用 `rewrite_paths` 与 `generate_commands` 在内存中逐文件生成期望内容再比较；当工作区资产规模大、干跑频繁、且每个投影面都能被稳定地单文件调用时它更优——干跑无需整树复制，冷启动延迟更低。
 - **binding_constraints**:
-  - pole_a: 期望态只能来自当前已安装版本的资产与声明，投影语义不得出现第二份实现。
-  - pole_b: 干跑必须零写入且确定性，命令延迟不能随实现方式膨胀到不可用。
-- **discriminating_evidence**: 在同一纯旧版夹具上分别以两种实现产出一份计划，比较五维差异项清单是否逐项一致；结果二值：一致 / 不一致。不一致即证明某一实现漏掉了 init 的某个投影面。
+  - pole_a: 正确性——投影语义（路径改写、命令生成）必须只有一份实现，任何比较器都不得复制它。
+  - pole_b: 成本——干跑应避免与资产规模成正比的整树复制，最好保持纯读取。
+- **discriminating_evidence**: 在同一旧版夹具上，用一次性脚本按 `rewrite_paths(source)` 逐文件生成期望内容，与参照树中的同名文件逐字节比对；结果二值：全等 / 存在不等。存在不等即证明参照树漏掉了某个投影面（或逐文件方案多引入了第二语义）。
 - **expected_sacrifice**: SC-001 Source ↓ 每次干跑付出一次与工作区资产同量级的临时树复制，冷启动延迟高于内存内逐文件比较。
 - **revision_trigger**: 干跑在典型夹具上连续两次超过 30 s，或参照树复制成为测试预算的主要开销 → 重开，改为逐文件期望内容计算并补投影面清单测试。
 
@@ -77,9 +77,9 @@
 - **decision**: 检测到框架源树（`skills/external/` 存在，与 sanitize 既有 guard 同源）时，镜像与生成副本维度直接消费 `sync-mirrors.py --check` 与 `regen-command-copies.py --check`；客户端工作区才用 init 参照树比较。
 - **antithesis**: 单一参照树比较器用于所有工作区；当仓库自身 `.specify/` 也以 init 投影形态维护（而非 sync-mirrors 字节形态）时它更优——一份比较语义、无模式分支。
 - **binding_constraints**:
-  - pole_a: 同一份 `.specify/` 不得同时被两套镜像语义判为期望；本仓的字节形态由 sync-mirrors 拥有。
-  - pole_b: 客户端项目没有框架源树，必须仍能收敛其 `.specify/` 镜像与生成副本。
-- **discriminating_evidence**: 在本仓库根执行 `specify migrate` 干跑；结果二值：委托模式下镜像/副本维度为 clean（与 `research.md` R-8 的 exit 0 基线一致） / 统一参照树模式报出 rewrite 形态差异。
+  - pole_a: 正确性——本仓 `.specify/` 的字节形态（含投影块）由 sync-mirrors 拥有，参考物不得把它判成漂移。
+  - pole_b: 证据面——收敛路径应尽量单一，使每个模式都享有同等的逐维度变异实测覆盖。
+- **discriminating_evidence**: 取本仓一对已同步镜像（`shared/definitions/framework-map.md` 与 `.specify/shared/definitions/framework-map.md`），判定 `mirror == rewrite_paths(source)`；结果二值：相等 / 不等。实测（2026-11-10，`test-evidence/plan-gates.txt`）：`mirror == source` 为真而 `mirror == rewrite_paths(source)` 为假——落在「不等」分支，即统一参照树会在本仓误报漂移，委托模式是该事实下唯一不自相矛盾的选择。
 - **expected_sacrifice**: SC-003 Source ↓ 三类验收夹具均为客户端形态，框架源模式的收敛正确性交由 sync-mirrors/regen 既有契约测试兜底，migrate 侧不为该模式新增逐维度变异实测。
 - **revision_trigger**: 若出现一次「委托检查器判 clean 而参照树比较判漂移」且参照树一侧被证明正确 → 重开，评估把本仓 `.specify/` 迁移为 init 投影形态。
 
@@ -151,9 +151,9 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 | WP | 内容 | FR |
 |----|------|-----|
 | WP01 | `specify migrate` 子命令面：4 个选项、前置条件、结局→退出码、`--help` 零副作用、未声明选项拒绝、stdout text/json 包络 | FR-001, FR-003, FR-019, FR-022 |
-| WP02 | 参照树构建：工作区形态识别（框架源 vs 客户端）、按已安装资产运行 init 复制机制到临时树、工具/脚本变体探测、失败清理 | FR-005, FR-006, FR-007 |
+| WP02 | 工作区形态识别与客户端参照树：`framework-source` 判定（`skills/external/`，与 sanitize guard 同源）、按已安装资产运行 init 复制机制到临时树（仅客户端模式）、工具/脚本变体探测、失败清理 | FR-005, FR-006, FR-007 |
 | WP03 | 五维规划器：模板与生成物、锚点布局、兼容链接、镜像一致性、迁移残留；稳定排序、按 target 去重、逐项「维度/当前态/期望态/拟处置/依据路径」 | FR-006, FR-007, FR-008 |
-| WP04 | 处置分类与安全门：六值域映射（引用 FR-014）、破坏桶（移动/替换/归档/移除）、双键确认、非交互 blocked、冲突 refuse、平台降级 refuse | FR-014, FR-015, FR-016 |
+| WP04 | 处置分类与安全门：六值域映射（引用 FR-014）、破坏桶分类（判据与清单 owner = `.specify/shared/guidelines/confirmation-gates.md`）、双键确认、非交互 blocked、冲突 refuse、平台降级 refuse | FR-014, FR-015, FR-016 |
 | WP05 | 执行器：write/replace/archive 逐项执行、归档布局、锚点引擎 apply 委托、平铺移动、链接与副本写、幂等与中断续跑、引擎写模式委托 | FR-009, FR-010, FR-011, FR-016, FR-017 |
 | WP06 | 回执：apply 落盘 `.specify/memory/migrate/receipts/<run-id>.json`、干跑只走 stdout、逐项状态、恢复路径、并发两写者不同路径 | FR-018 |
 | WP07 | init 决策/执行拆分：从 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills` 提出纯决策函数，两入口共享；等价性测试 | FR-009 |
@@ -169,7 +169,7 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 
 | ID | Premise | Evidence | Status | Decision |
 |----|---------|----------|--------|----------|
-| EP-001 | CPython `>=3.8` 的文件系统/路径语义足以完成差异枚举、归档移动、回执写入与只读探测 | `pyproject.toml` `requires-python`；本阶段全部读数在同一解释器上实测（`research.md` R-8） | verified | — |
+| EP-001 | CPython `>=3.8` 的文件系统/路径语义足以完成差异枚举、归档移动、回执写入与只读探测 | `pyproject.toml` `requires-python` 声明 + 本阶段读数在同一解释器实测（本环境 CPython 3.11；3.8 运行时兼容由项目既有支持契约承担，本阶段未在该版本实测，`research.md` R-8） | verified | — |
 | EP-002 | Typer 的模块级 `@app.command()` 注册形态可直接新增子命令，且未声明选项由框架拒绝（exit 2） | `src/specify_cli/__init__.py:2785-2791,3330-3380`；`specify --help` 实测仅 init/check/render-agents | verified | — |
 | EP-003 | pytest 运行器（`scripts/bash/run-tests.sh`）可执行本特性的 contract/integration/unit 子集 | 实测 `bash scripts/bash/run-tests.sh tests/contract/test_anchor_layout_migrate.py -q` → 3 passed（2026-11-10，默认并行形态）；`test-evidence/plan-gates.txt` | verified | — |
 | EP-004 | 既有引擎可进程内导入或按 CLI 动作只读消费，且继续满足接口契约 | `research.md` R-2；`anchor-layout-migrate.py --help`、`regen --check`、`sync-mirrors --check` 实测 exit 0 | verified | — |
@@ -178,7 +178,9 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 
 ## Inherited Blockers
 
-**Dependency set: none** — 本特性不依赖任何携带未结记录的依赖特性；被消费的 init / sanitize / anchor-layout / sync-mirrors / regen 面均为已落地的框架能力（`research.md` R-2/R-3/R-8），不以 feature 依赖身份进入本表。
+**Dependency set: none**
+
+本特性不依赖任何携带未结记录的依赖特性；被消费的 init / sanitize / anchor-layout / sync-mirrors / regen 面均为已落地的框架能力（`research.md` R-2/R-3/R-8），不以 feature 依赖身份进入本表。
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|

@@ -6,7 +6,7 @@
 
 ## C-1 维度集合与顺序
 
-`dimension ∈ {templates-generated, anchor-layout, compat-links, mirror-consistency, migration-residue}`，语义边界 owner = FR-007；顺序即上列顺序，参与稳定排序。维度集合是封闭集，扩维须修订 requirements。
+`dimension` 的 machine token 与顺序归 `data-model.md` E-8（唯一 owner）；语义边界 owner = FR-007。维度集合是封闭集，扩维须修订 requirements；契约与实现 MUST 引用 E-8，不得另行维护 token 清单。
 
 ## C-2 期望态读取（不另立来源）
 
@@ -47,6 +47,7 @@
 - 目录级忽略：`__pycache__`、`node_modules`、`.DS_Store`（沿用 `COPY_TREE_IGNORE_NAMES`）；`.specify/skills/**/site/` 为调用方运行时数据，不比较。
 - 项目自有面不比较：`.specify/memory/**`、`.specify/agents/instances|execution/**`、锚点文件、`tools.md`、`workflow/git.md`、`.specify/source.json`、`.specify/.gitignore`、用户自建技能。
 - 参照树在 `tempfile.TemporaryDirectory` 中构建并清理；不写工作区。
+- 降级事实：可判对象的降级（如平台无符号链接）以 `refuse` item 表达并阻止 clean；无可判对象的降级（如无工具命令目录）只记入计划与回执 `notes`（`command-copies: no tool surface detected`），MUST 可见，不得被静默当作「已检查且无差异」。
 
 ## C-5 复用边界（禁止第二实现）
 
@@ -57,6 +58,8 @@
 | 残留/链接检查 | `sanitize-utils.py` 检查器 | 进程内导入调用 | 禁止 `--action collect`；禁止读写 `.specify/memory/sanitize/` |
 | 锚点布局 | `anchor-layout-migrate.py` check/apply | CLI 动作调用 | 源码检查：无布局判定/移动实现 |
 | 兼容链接修复 | 声明：`sanitize-utils.COMPAT_SYMLINKS` + `COMPAT_SYMLINK_EXPECTATIONS`（与 `shared/workflow/symlink-model.md` 同源）；目录级链接动作复用 `ensure_specify_symlink` | 指令文件链接按声明目标创建符号链接（无既有 Python 动作；`generate-instructions.sh` 的 `ln -sf` 集合与声明同源） | 链接名单与目标一律从 sanitize 声明导入；源码检查：migrate 段内不得出现第二份链接名单 |
+
+链接修复的职责说明：`/speckit.sanitize` 对链接发现只给 `delegate`（修复交给 `/speckit.instructions`）；migrate 的职责是一次性收尾，按同一份声明直接创建/修复链接，不复制任何检查实现。二者是同一维度在不同职责下的两种消费，不构成第二套检查。
 | 镜像与生成副本（框架源） | `sync-mirrors.py --check`、`regen-command-copies.py --check` | 探测：子进程只读；写：镜像对以计划项源路径为 `--only` 前缀调用 `--write`（未确认项不进入该批），命令副本由 `generate_commands` 写入各工具目录（与 init 同一生成器；`regen --check` 只作探测与回验） | 禁止第二份镜像对清单；镜像对从 `sync-mirrors.MIRROR_PAIRS` 导入 |
 | goal/team 档案迁移 | `/speckit.goal` `migrate-archive` | 只输出 E-9 静止指针 | 计划/回执无该类 item；SC-007 测试 |
 | 周期治理（保留期、pending 台账、重排） | `/speckit.sanitize` | 不消费、不写 | migrate 计划不含 dead-reference / index-inconsistency 维度 |
@@ -74,7 +77,7 @@
 - 回执：`.specify/memory/migrate/receipts/<run-id>.json`，逐运行一文一件；apply 开始时写 `status=running`，逐项更新 `items[].status` 与 `archives[]`，收束写 `completed`。两并发运行产生不同 `run-id` 路径（单元测试钉住）。
 - 干跑回执只走输出流，零落盘。
 - 幂等：apply 后重跑为 `clean` 且零写入。
-- 续跑：启动时扫描本工作区回执，若存在 `status=running` 的最近回执，则报告中断阶段并在新回执 `resumedFrom` 记录；逐项判断 `archiveTo` 已存在且目标缺失 → 直接完成写入（不二次归档）；目标已等于期望 → 记 `converged`。
+- 续跑（承重）：启动时扫描本工作区回执，若存在 `status=running` 的最近回执，则报告中断阶段（计划 `notes` + 新回执 `resumedFrom`）。逐项判断以**该旧回执自己的记录**为准，绝不以新运行自己计算的路径推断：旧回执 `items[].status=done` 且目标已等于期望 → 记 `converged`；旧回执 `archives[]` 条目存在、其 `archiveTo`（搬迁类为 `to`）已存在而目标缺失 → 直接完成写入，不二次归档/搬迁；新归档只落新 run-id 且仅限旧回执未覆盖的项。
 - 不提供全局回滚/undo；失败语义为前向续跑 + 逐项按 `recover` 找回（FR-017）。
 - 框架源模式的执行细节：投影文件（`PROJECTED_FILES` 行）只经 `sync-mirrors.py --write` 写入（不得用裸拷贝覆盖 bridge/guard 块）；严格镜像对的孤儿先归档，再由 `--only` 限定批次确认其余项均已收敛；命令副本写完后以 `regen-command-copies.py --check` 回验退出 0。
 

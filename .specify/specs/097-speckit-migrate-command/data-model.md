@@ -23,7 +23,7 @@
 | `mechanism` | enum | 执行机制：`copy` \| `replace` \| `archive` \| `relocate` \| `symlink` \| `anchor-engine` \| `mirror-engine` \| `none` |
 | `evidence` | string[] | 依据路径：owner 文件/检查器/引擎路径（FR-006 的「依据路径」） |
 | `archiveTo` | string \| null | 归档目标（`.specify/archive/migrate/<run-id>/<rel>`）；无归档时 null |
-| `status` | enum | `planned` \| `done` \| `skipped` \| `refused` \| `blocked` \| `failed` |
+| `status` | enum | `planned` \| `done` \| `refused` \| `blocked` \| `failed`（`converged` 项不进入计划，见 E-2；不设 `skipped`——跳过即违约 I-4） |
 | `reason` | string \| null | `refused` / `blocked` / `failed` 时必须非空 |
 
 **验证规则**
@@ -42,6 +42,7 @@
 | `workspaceKind` | enum | `framework-source` \| `client`（判定：`skills/external/` 存在性与 sanitize 既有 guard 同源） |
 | `items` | DiffItem[] | 见 E-1 |
 | `summary` | object | `{total, byDimension: {<dimension>: n}, byDisposition: {<disposition>: n}}` |
+| `notes` | string[] | 降级事实（`command-copies: no tool surface detected` 等）。可判对象存在的降级（如平台无符号链接）以 `refuse` item 表达并阻止 clean；无可判对象的降级只作可见提示，不阻止 clean，但 MUST 出现在输出与回执 |
 | `pointers` | Pointer[] | 见 E-9；FR-013 的静止责任方指针，恒定出现，不探测、不处置 |
 
 **状态转移**：Plan 本身无状态机；`dry-run` 计划只存在于内存与输出流，`apply` 计划随 E-4 回执固化。
@@ -63,23 +64,30 @@
 | `outcome` | enum | `clean` \| `planned` \| `applied` \| `blocked`（见 E-5） |
 | `exitCode` | int | 与 outcome 一一对应（E-5） |
 | `items` | DiffItem[] | 逐项处置与最终 status |
-| `archives` | ArchiveEntry[] | 见 E-4；`refused` / `blocked` 项不产生条目 |
-| `recover` | string[] | 人类可读的恢复路径说明，逐归档条目一条 |
+| `archives` | ArchiveEntry[] | 见 E-4；替换/移除/搬迁类均产生条目；`refused` / `blocked` 项不产生条目 |
+| `recover` | string[] | 人类可读的恢复路径说明，逐归档/搬迁条目一条 |
+| `notes` | string[] | 同 E-2 的降级事实 |
 | `pointers` | Pointer[] | 同 E-2；回执同样承载静止指针（FR-013） |
 
 **验证规则**
 - 并发安全：两个并发运行产生不同 `runId` → 不同文件路径；运行期内只改本运行自己的文件，不触碰其他回执。
-- 恢复路径可枚举：每个 `archives[]` 条目都能在 `archiveTo` 找到对象（存在性断言由测试执行）。
+- 恢复路径可枚举：每个 `archives[]` 条目都能在 `archiveTo` 找到对象（`change=relocated` 的对象位于新位置）；存在性断言由测试执行。
 - 干跑回执 `status=completed`、`outcome=planned`（或 `clean`）、`archives=[]`。
+- **FR-018 解释记录**：干跑受 FR-006「零写入」绝对约束，回执以输出流形态（`receipt` 字段）承载全部字段，落盘仅发生于 apply；前置条件/输入错误（`error`）按 FR-003「零文件创建」不产回执。两处均在此记录为对 FR-018 的确定性解释。
+- **续跑键**：新运行不按自己计算的 `archiveTo` 判断既有归档（run-id 不同），而是读取最近 `status=running` 回执中逐项的 `archiveTo` 与 `items[].status`（见契约 `migrate-engine.md` C-7）。
 
 ## E-4 ArchiveEntry — 归档条目
 
 | 字段 | 类型 | 约束 |
 |------|------|------|
-| `path` | string | 被处置对象的工作区相对路径 |
-| `archiveTo` | string | `.specify/archive/migrate/<run-id>/<rel>`；`<rel>` 保留对象在原根下的相对布局（`.specify/` 前缀剥离，与 sanitize archive 布局同构） |
-| `change` | enum | `replaced` \| `archived` \| `removed-stale` |
-| `digest` | string | 归档前对象的 `sha256`（目录对象取 M树式清单哈希，见实现说明） |
+| `path` | string | 被处置对象的工作区相对路径（搬迁时为源路径） |
+| `archiveTo` | string | 归档：`.specify/archive/migrate/<run-id>/<rel>`；搬迁：目标规范位置（`to`）。两者都是「找回入口」 |
+| `change` | enum | `replaced` \| `archived` \| `removed-stale` \| `relocated` |
+| `digest` | string | 处置前对象的 `sha256`（目录对象取清单式哈希，见实现说明） |
+
+**续跑与恢复**
+- `relocated`：对象内容在新位置；`recover` 说明回迁方式（把 `archiveTo` 移回 `path`）。续跑时若 `archiveTo` 存在且 `path` 缺失 → 视为搬迁已完成，不重复移动。
+- 归档类条目（`replaced` / `archived` / `removed-stale`）：续跑只认**产生该条目的回执**（`status=running` 的最近回执）里的 `archiveTo`，不得用新运行自己的 run-id 路径推断。
 
 ## E-5 RunOutcome — 运行结局与退出码
 
@@ -105,15 +113,15 @@
 - 构建条件：`workspaceKind=client`。框架源工作区的资产维度由工作区自身引擎直接回答（契约 `migrate-engine.md` C-2），不建参照树。
 - 位置：`tempfile.TemporaryDirectory(prefix="specify-migrate-")`，同一次运行内创建、`finally` 清理；不写工作区（干跑零写入的前提）。
 - 内容：`copy_local_templates(reference_root, <detected assistant>, <detected script variant>)` 产出的 `.specify/` 投影 + 每个已探测工具目录的 `generate_commands` 产物。
-- 工具探测：`_ASSISTANT_COMMAND_DIRS` 与工作区实际存在目录的交集；为空则不产出命令副本维度项。
+- 工具探测：`_ASSISTANT_COMMAND_DIRS` 与工作区实际存在目录的交集；为空时在计划 `notes` 记录 `command-copies: no tool surface detected`（无可判对象，作可见提示，不伪装成「已检查且无差异」）。
 - 脚本变体探测：现有生成副本中出现 `.ps1` 引用 → `ps`，否则 `sh`。
 
 ## E-8 维度 token 与来源映射（仅映射，不复制检查清单）| dimension | 检查来源（owner 路径） | 处置来源 |
 |-----------|------------------------|----------|
-| `templates-generated` | 参照树对照（`.specify/templates` 除 commands、`.specify/skills`、`.specify/agents/templates`、各工具命令副本）；框架源模式追加 `regen-command-copies.py --check` | 缺失→`write`；存在且不等→`replace`；退役命令副本→`archive` |
+| `templates-generated` | 客户端：参照树对照 `.specify/templates`（除 commands）、`.specify/skills`、`.specify/agents/templates`、各工具命令副本；框架源：`sync-mirrors.py --check` 的 templates / skills / agents 三个镜像对 + `regen-command-copies.py --check`（命令副本）。框架源模式**不**建参照树 | 缺失→`write`；存在且不等→`replace`；退役命令副本→`archive` |
 | `anchor-layout` | `anchor-layout-migrate.py --action check`（`plan()` 的 `move` / `refuse-existing-target`） | `move`→`archive`（`mechanism=relocate`）；`refuse-existing-target`→`refuse` |
 | `compat-links` | `sanitize-utils.check_broken_symlinks`（含 `COMPAT_SYMLINK_EXPECTATIONS` 的所属工具期望） | 缺失/断链→`write`（`mechanism=symlink`）；普通文件占位→`replace`；平台不支持→`refuse` |
-| `mirror-consistency` | 客户端：参照树对照 `.specify/scripts`、`.specify/shared`；框架源：`sync-mirrors.py --check` 的 MISS/DIFF/ORPHAN | MISS→`write`；DIFF→`replace`；strict ORPHAN→`archive`；非 strict 额外文件不动 |
+| `mirror-consistency` | 客户端：参照树对照 `.specify/scripts`、`.specify/shared`；框架源：`sync-mirrors.py --check` 的 scripts / shared 两个镜像对（MISS/DIFF/ORPHAN） | MISS→`write`；DIFF→`replace`；strict ORPHAN→`archive`；非 strict 额外文件不动 |
 | `migration-residue` | `sanitize-utils.check_legacy_install_residue` + `check_flat_internal_duplicates` + init 决策函数（退役资产、平铺内部技能） | 残留→`archive`；平铺→嵌套存在则 `archive`，不存在则 `archive`（`mechanism=relocate`） |
 
 ## E-9 Pointer — 静止责任方指针（FR-013）

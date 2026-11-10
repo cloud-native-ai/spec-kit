@@ -51,6 +51,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
   "exitCode": 0,
   "items": [],
   "summary": {"total": 0, "byDimension": {}, "byDisposition": {}},
+  "notes": [],
   "pointers": [],
   "receipt": {},
   "receiptPath": ".specify/memory/migrate/receipts/<run-id>.json | null"
