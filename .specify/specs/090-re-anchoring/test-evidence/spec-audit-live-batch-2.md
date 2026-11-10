@@ -227,6 +227,10 @@ Details cell `.specify/features/044-reduce-confirmation-flows.md` **exists** and
 8. `tasks.md:129` -> `shared/skills` prose label, not a path.
 9. `requirements.md:34` -> `skills/commands` prose label (pre-layout skills wording), not a path.
 
+**Verdict**: **BROKEN** — 1 missing named guard (`tests/integration/test_context_injection.py` /
+`TestRoleSpecificContext`), 1 retired-by-design, 4 anchor-move renames, 3 prose labels; the bound registry
+row resolves.
+
 `.specify/agents/.backups/` (`plan.md`) is a runtime-created backup directory, not a missing
 artifact — noted, not counted dead.
 

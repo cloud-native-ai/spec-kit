@@ -140,7 +140,9 @@
 
 **Anchor-move refs**: `plan.md:27` constitution; `plan.md:41` `features/` dir; `plan.md:159` `features.md`; `contracts/command-surface.md:16` `features/062.md`; `requirements.md:26` `glossary.md`; `review.md:219` `register.md` → all under `.specify/` now.
 
-**Verdict: BROKEN** — stale skill path (rename); behaviour surface and guards intact.
+**Verdict**: **BROKEN** — stale skill path (rename); behaviour surface and guards intact.
+
+**Verdict (080-humanize-run-output)**: **BROKEN** — the extension criterion cites the pre-rename skill path; its behaviour surface and guards are intact; the anchor-move and stale-skill refs are the only defects.
 
 ---
 

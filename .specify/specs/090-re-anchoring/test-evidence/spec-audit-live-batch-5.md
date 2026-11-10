@@ -76,7 +76,7 @@ Census vocabulary used below:
 
 **Rename-moved**: `.specify/memory/constitution.md` (plan:29) -> `.specify/constitution.md`; `.specify/memory/features.md` and `.specify/memory/features/032.md` (plan:34) -> `.specify/features.md`, `.specify/features/032-dogfooding-practice.md`.
 
-**Verdict: INTACT** — template, mirror, generator, guard and registry all resolve; only the registry filename slug is misleading (flagged in Anomaly).
+**Verdict**: **INTACT** — template, mirror, generator, guard and registry all resolve; only the registry filename slug is misleading (flagged in Anomaly).
 
 ## 043-init-commit-stamp
 
@@ -150,7 +150,7 @@ Census vocabulary used below:
 
 **Rename-moved**: `.specify/memory/glossary.md` (requirements:37) -> `.specify/glossary.md`.
 
-**Verdict: INTACT** — owner docs, mirrors, engine, gates and guards all resolve; archived slice paths are retrievable in the archive.
+**Verdict**: **INTACT** — owner docs, mirrors, engine, gates and guards all resolve; archived slice paths are retrievable in the archive.
 
 ## 079-bilingual-expression
 
@@ -172,7 +172,7 @@ Census vocabulary used below:
 
 **Rename-moved**: `.specify/memory/constitution.md` (plan:34) -> `.specify/constitution.md`; `.specify/memory/features.md` (tasks:6) -> `.specify/features.md`; `.specify/memory/features/079.md` (feature-ref:3) -> `.specify/features/079-bilingual-expression.md`; `.specify/memory/glossary.md` (quickstart:64) -> `.specify/glossary.md`; `.specify/memory/register.md` (tasks:221) -> `.specify/register.md`.
 
-**Verdict: INTACT** — owner doc, checker, mirrors, ambient section, fixtures and 16-leg guard all resolve; only temp-root references are intentionally gone.
+**Verdict**: **INTACT** — owner doc, checker, mirrors, ambient section, fixtures and 16-leg guard all resolve; only temp-root references are intentionally gone.
 
 ## 091-auto-git-closeout
 
