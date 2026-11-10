@@ -683,9 +683,12 @@ _ORDER_RE = re.compile(r"-?\d+")
 
 # kind=engine action closure = the REAL argparse choices / action constants of
 # the engine scripts sitting next to this file (source copy and .specify mirror
-# each resolve their own siblings — never a hand-copied list).
+# each resolve their own siblings — never a hand-copied list). The contract's
+# "other engines" clause (contracts/engine-action-sets.md) is exactly this list:
+# a new engine joins the union by being named here (git-workflow-observe.py is
+# the git-utils situation hook's engine, 056 phase-2 subscription).
 _ENGINE_SIBLINGS = ("feedback-utils.py", "run-determination.py", "probe-utils.py",
-                    "trigger-utils.py", "exec-quant.py")
+                    "trigger-utils.py", "exec-quant.py", "git-workflow-observe.py")
 
 
 def _engine_action_union() -> set:

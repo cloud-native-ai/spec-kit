@@ -256,7 +256,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded (single-test debugging included, e.g. `bash scripts/bash/run-tests.sh tests/contract/test_x.py -q`); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry. The suite carries the `contract` and `integration` markers — select them by passing `-m <marker>` through the runner.
 - **Key Directories**:
   - `src/specify_cli/`: single-module Typer CLI.
-  - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, tools/skills).
+  - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, `workflow/`, tools/skills).
   - `scripts/bash/`, `scripts/python/`: workflow scripts mirrored from `.specify/scripts/`; never call `/speckit.*` as a shell command.
   - `skills/`, `agents/`: installed skills and agent definitions, mirrored to `.specify/`.
   - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`, `fixtures/` (declarative fixture sets, one directory per feature — e.g. `fixtures/acceptance-hardening/`).

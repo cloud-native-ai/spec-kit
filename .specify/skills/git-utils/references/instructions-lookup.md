@@ -5,6 +5,7 @@
 ## 目标文件
 
 - 固定路径：`${SKILL_WORKDIR}/.specify/workflow/git.md`；文件不存在时用 `${SKILL_HOME}/assets/git-workflow-block.md` 渲染整文件创建。
+- `specify init` 会在目标缺失时先用骨架模板播种该文件（`None yet.` 占位块，见 [observe-hook.md](./observe-hook.md)）；Bootstrap 照常按「只替换标记之间内容」填充，区别仅在于文件头来自骨架模板。
 - 不要对 instructions 别名（`CLAUDE.md` / `AGENTS.md` / `QODER.md` 等）做任何写入。
 
 ## 写入规则

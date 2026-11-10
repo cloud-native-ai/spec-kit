@@ -25,3 +25,16 @@ developers and the framework's unattended mechanisms. Do not edit it by hand.
 - **Closeout remotes**: `github`, `gitlab`, `gitee`（同一 fork 的三处镜像；`origin` 只读上游按角色排除，不得出现在此列表；显式空列表 empty 或未填 absent 即 "no pushable remote"，推送步退化为 skipped 并在报告说明原因）
 - **Last updated**: 2026-11-09
 <!-- GIT_WORKFLOW_END -->
+
+<!-- GIT_OBSERVED_START -->
+## Observed facts (machine, dated)
+
+- **Observed at**: 2026-11-10T02:33:38Z
+- **Trunk**: `master` (declared; present locally)
+- **Remotes**: `gitee`, `github`, `gitlab`, `origin`
+- **Remotes vs declaration**: declared-but-missing: none; present-but-undeclared: none
+- **Feature-branch naming**: no dominant numbered convention — 0/1 non-declared local branches are digit-prefixed (e.g. `rename-anchors`)
+- **Closeout declaration**: present
+
+These are machine observations, not declarations: the workflow model and branch declarations above change only through the `git-utils` skill's Bootstrap flow with user confirmation.
+<!-- GIT_OBSERVED_END -->

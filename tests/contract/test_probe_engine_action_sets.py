@@ -17,8 +17,8 @@ updated in the same change.
 
 Also owns [C2] rule 5 for the registry side: every kind=engine Handler action
 must hit the REAL engine action union (feedback-utils + run-determination ACTIONS
-+ probe-utils), parsed from the argparse/constant literals — never a hand-copied
-list.
++ probe-utils + the git-utils situation hook's observer), parsed from the
+argparse/constant literals — never a hand-copied list.
 """
 from __future__ import annotations
 
@@ -32,6 +32,7 @@ FEEDBACK_SCRIPT = ROOT / "scripts" / "python" / "feedback-utils.py"
 PROBE_SCRIPT = ROOT / "scripts" / "python" / "probe-utils.py"
 RUNDET_SCRIPT = ROOT / "scripts" / "python" / "run-determination.py"
 EXECQUANT_SCRIPT = ROOT / "scripts" / "python" / "exec-quant.py"
+GITOBSERVE_SCRIPT = ROOT / "scripts" / "python" / "git-workflow-observe.py"
 
 FEEDBACK_ALLOWED = {
     "record", "status", "list", "dispose", "mark-submitted", "reindex",
@@ -126,6 +127,15 @@ def test_exec_quant_action_set_exact() -> None:
     )
 
 
+def test_git_workflow_observe_action_set_exact() -> None:
+    """The git-utils situation hook's engine — exact-pinned both ways like its siblings."""
+    assert GITOBSERVE_SCRIPT.is_file(), "git-workflow-observe.py missing — hook engine not implemented"
+    got = _action_choices(GITOBSERVE_SCRIPT)
+    assert got == {"observe"}, (
+        f"git-workflow-observe.py --action set drifted: {sorted(got)}"
+    )
+
+
 def _registered_engine_actions() -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
     headers: list[str] | None = None
@@ -161,6 +171,8 @@ def test_registered_engine_actions_hit_real_engine_union() -> None:
         union |= _action_choices(PROBE_SCRIPT)
     if EXECQUANT_SCRIPT.is_file():
         union |= _execquant_actions()
+    if GITOBSERVE_SCRIPT.is_file():
+        union |= _action_choices(GITOBSERVE_SCRIPT)
     registered = _registered_engine_actions()
     assert registered, "no kind=engine Handler rows registered"
     for hid, action in registered:

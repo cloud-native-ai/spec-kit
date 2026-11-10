@@ -20,6 +20,12 @@ Design boundaries that are contractually enforced, not stylistic:
     (C-21); no flow name is hard-coded here — they are seed data.
   * No network capability is imported (C-19); state is project-local.
   * Without --probe, no artifact file is opened (C-13).
+  * Phase-2 situation dispatch (056 registry subscription): once the turn's
+    telemetry and state are durable, the kind=engine handlers subscribed at
+    `@point:situation` are invoked as their own published engine scripts —
+    registry declarations, never a slash command or skill, so C-21's
+    boundary holds. The dispatcher skips its own action set (no recursion) and
+    is non-blocking: failures become notes, never exit codes.
 
 Usage:
   python3 trigger-utils.py --action <action> [options]
@@ -59,6 +65,9 @@ SEED_CANDIDATES = (
     Path("templates") / "proactive-trigger-seed.json",
 )
 FEEDBACK_ENGINE = Path(".specify") / "scripts" / "python" / "feedback-utils.py"
+PROBE_ENGINE_SIBLING = "probe-utils.py"
+PROBE_REGISTRY_RELPATH = Path(".specify") / "shared" / "definitions" / "probe-definitions.md"
+HANDLER_TIMEOUT_SECONDS = 60
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -809,6 +818,71 @@ def next_event_id(events: list) -> str:
     return f"{stamp}-{seq:02d}"
 
 
+def _resolve_owner_script(root: Path, owner: str):
+    """`behavior_owner` as an executable script: framework-source face first, then
+    the runtime face (downstream projects only carry `.specify/`)."""
+    for candidate in (root / owner, root / ".specify" / owner):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def dispatch_situation_handlers(root: Path) -> list:
+    """Phase-2 `@point:situation` dispatch (056 registry subscription).
+
+    The registry's Handler/HandlerBinding rows are the subscription; this engine is
+    the situation point's dispatcher. After the telemetry row is durably written,
+    every kind=engine handler subscribed at `@point:situation` is invoked as its own
+    published engine script — except a handler whose action belongs to THIS engine's
+    own closed set (that is the situation assess handler itself; skipping it keeps
+    the dispatch non-recursive).
+
+    Non-blocking: every failure (registry absent, query failure, handler crash,
+    timeout) is recorded as a note — the assess exit code and telemetry are never
+    affected. This is also where C-21's "the engine never executes a flow" boundary
+    stays intact: dispatch targets are registry-declared engines, never a
+    slash command or skill."""
+    notes: list = []
+    registry = root / PROBE_REGISTRY_RELPATH
+    probe = Path(__file__).resolve().parent / PROBE_ENGINE_SIBLING
+    if not registry.is_file() or not probe.is_file():
+        return notes
+    try:
+        query = subprocess.run(
+            [sys.executable, str(probe), "--action", "handlers",
+             "--point", "situation", "--kind", "engine", "--format", "json",
+             "--workspace-root", str(root)],
+            capture_output=True, text=True, timeout=HANDLER_TIMEOUT_SECONDS)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return [f"situation-handler query failed: {type(exc).__name__}"]
+    if query.returncode != 0:
+        return [f"situation-handler query rc={query.returncode}"]
+    try:
+        handlers = json.loads(query.stdout).get("handlers", [])
+    except ValueError:
+        return ["situation-handler query returned non-JSON"]
+    for handler in handlers:
+        action = str(handler.get("action", "")).strip("`")
+        owner = str(handler.get("behavior_owner", ""))
+        handler_id = str(handler.get("handler_id", "?"))
+        if not action or action in ACTIONS:
+            continue  # h-situation-assess is this dispatcher itself
+        script = _resolve_owner_script(root, owner)
+        if script is None:
+            notes.append(f"situation-handler {handler_id}: owner not found ({owner})")
+            continue
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(script), "--action", action],
+                cwd=str(root), capture_output=True, text=True,
+                timeout=HANDLER_TIMEOUT_SECONDS)
+            state = "ok" if proc.returncode == 0 else f"rc={proc.returncode}"
+        except (OSError, subprocess.SubprocessError) as exc:
+            state = f"failed ({type(exc).__name__})"
+        notes.append(f"situation-handler {handler_id}: {state}")
+    return notes
+
+
 def action_assess(root: Path, args) -> tuple:
     errors, warnings, notes, semantic = [], [], [], []
     signals = list(args.signal or [])
@@ -924,6 +998,10 @@ def action_assess(root: Path, args) -> tuple:
             "suggested": True, "ts": row["ts"],
         }
     write_index_atomic(root, state)
+
+    # 056 phase-2: the situation point's engine handlers run after the turn's own
+    # telemetry and state are durable (non-blocking; failures land in notes only).
+    notes.extend(dispatch_situation_handlers(root))
 
     rendered = json.dumps(payload, ensure_ascii=False, indent=2)
     if len(rendered) > PAYLOAD_MAX_CHARS or len(rendered.splitlines()) > PAYLOAD_MAX_LINES:

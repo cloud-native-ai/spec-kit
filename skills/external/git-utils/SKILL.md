@@ -275,6 +275,8 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 ## Git Workflow 块维护
 
 - **创建**：Bootstrap 调谐（Setup）Step 1.4 用 `${SKILL_HOME}/assets/git-workflow-block.md` 渲染 `${SKILL_WORKDIR}/.specify/workflow/git.md`（文件级模板）。
+- **初始化播种**：`specify init` 从框架模板 `templates/workflow/git.md` 在目标缺失时生成 `.specify/workflow/git.md`（`None yet.` 占位块）；已存在的文件永不覆盖——之后由 Bootstrap 填充。
+- **观测钩子（probe + handler）**：注册表行 `h-git-workflow-observe`（engine · action `observe` · `@point:situation` · scope `all`）——情境评估引擎在每回合 assess 后派发 `.specify/scripts/python/git-workflow-observe.py --action observe`，它只刷新托管块之后的 `Observed facts (machine, dated)` 小节（`GIT_OBSERVED` 标记间）；声明只经 Bootstrap + 用户确认变更。机制细节：[observe-hook.md](./references/observe-hook.md)。
 - **更新**：分支改名或 tracking 变化时改对应表格单元并刷新 `Last updated`；新增异常经验追加到 [troubleshooting.md](./references/troubleshooting.md)。
 - **数据源**：`.specify/workflow/git.md` 的 Git Workflow 托管块是后续所有操作的**唯一**分支名数据源；各分支的 `.gitexcludes` 是排除规则的数据源。`.specify/instructions.md` 只保留指向本文件的指针——操作规程留在本技能与其 references 中，避免第二个数据源。
 - **概念**：该块声明的是 **Spec Kit 框架下**的 git workflow——人类开发者与无人值守机制共同遵循；它不是某位开发者个人 git 习惯的记录，也不随个人偏好任意改写。
@@ -294,6 +296,7 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ### References (`${SKILL_HOME}/references/`)
 - `instructions-lookup.md` — 状态文件 `.specify/workflow/git.md` 定位/创建规则与 Git Workflow 托管块写入规则。
+- `observe-hook.md` — 观测钩子（probe + handler）与初始化模板：注册表行、`observe` 动作面、观测小节语义、永不触碰声明的边界。
 - `gitexcludes-subroutine.md` — `.gitexcludes` 通用排除子程序详细实现。
 - `bootstrap-commands.md` — Bootstrap 调谐（Phase 0-1）命令序列：迁移、分支检测/创建、`.gitexcludes` 初始化。
 - `health-check-commands.md` — 全维度体检（Phase 2）命令序列：结构/同步/排除检查、维护报告模板。

@@ -2328,6 +2328,17 @@ def copy_local_templates(
                         (specify_dir / "templates").mkdir(exist_ok=True)
                         shutil.copy2(item, specify_dir / "templates" / item.name)
 
+        # Seed the git workflow state file from its initial policy template. Create-only:
+        # an existing file is this project's declared policy (owned afterwards by the
+        # git-utils skill's Bootstrap and observation flows) and is never overwritten.
+        workflow_template = resource_path / "templates" / "workflow" / "git.md"
+        workflow_state = specify_dir / "workflow" / "git.md"
+        if workflow_template.is_file() and not workflow_state.exists():
+            if tracker:
+                tracker.start("local-templates", "seeding workflow/git.md")
+            workflow_state.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(workflow_template, workflow_state)
+
         # Handle AI assistant specific command files using the same logic as release script
         if (resource_path / "templates" / "commands").exists():
             if tracker:
