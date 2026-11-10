@@ -1,0 +1,38 @@
+{
+  "claimed_status": "Ready for Review",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/features/086-efficient-test-execution.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 9,
+    "total": 9,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh --workers 4 tests/contract/test_suite_tier_contract.py tests/contract/test_parallel_consistency_contract.py tests/contract/test_scan_cache_contract.py tests/contract/test_event_wait_contract.py tests/contract/test_inprocess_conversion_contract.py tests/contract/test_run_tests_runner_contract.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/098-suite-speed-optimizations/test-evidence/verification-smoke-098.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs/098-suite-speed-optimizations",
+  "tasks": {
+    "closed": 61,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
