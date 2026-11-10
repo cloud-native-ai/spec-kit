@@ -105,3 +105,44 @@ E       assert 'No such option' in "Usage: specify [OPTIONS] COMMAND [ARGS].....
 - 红判据: 14 条失败全部为「被测行为尚不存在」——`specify migrate` 子命令未注册（框架以 “No such command 'migrate'” 退出 2）、结局映射常量与交互判定接缝不存在（AttributeError）；无一条来自断言自身缺陷。实现后同两文件全绿（`test-evidence/us1-converge.txt`）。
 
 ---
+
+## pkg04-us2-safety（T023–T028）
+
+---
+### § T023 — `tests/integration/test_migrate_us2_safety.py`（red-first）
+
+- 日期: 2026-11-10
+- 命令: `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q`
+- 退出码: `1`（完整读数 `.specify/.tmp/pkg04/red-suite.txt`）
+- 真实输出（决定性节选，逐字粘贴）:
+
+```text
+E       AttributeError: <module 'specify_cli' ...> has no attribute 'migrate_symlink_supported'   (×8, test-side probe monkeypatch)
+E       AttributeError: module 'specify_cli' has no attribute 'migrate_symlink_supported'         (×1, zero-write probe call)
+E       AttributeError: module 'specify_cli' has no attribute 'MIGRATE_DESTRUCTIVE_CRITERIA_POINTER' (×1, destructive classifier)
+...
+10 failed, 1 passed in 10.73s
+```
+
+- 红判据: 10 条失败全部为「被测行为尚不存在」——破坏性判据 owner 指针常量与
+  `migrate_symlink_supported` 平台探测未实现（AttributeError），无一条来自断言自身缺陷。
+  唯一通过项是 `test_mutation_weakening_to_existence_only_would_miss_content_corruption`
+  （只消费 pkg03 已交付的比较面，不触碰新增接缝），符合预期。
+
+---
+### § T024–T027 — 安全层实现（green readings）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q`
+- 退出码: `0` → `11 passed in 13.78s`（`test-evidence/us2-safety.txt`）
+- 实现落点: `MIGRATE_DESTRUCTIVE_CRITERIA_POINTER` + `migrate_is_destructive()`（owner 指针
+  `.specify/shared/guidelines/confirmation-gates.md`，双键两条路径统一经该判据）；
+  `migrate_symlink_supported()` 零写入探测 + `make_platform_refuse_item()`（compat-links
+  规划期接入，`platform-no-symlink` 原因）；归档/恢复枚举与用户内容保护沿用 pkg03 执行器，
+  由本包套件逐项实测（9/9 归档存在且摘要一致；用户文件逐字节不变）。
+
+---
+### § 相邻套件回归（pkg04 实现后）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py -q`
+- 退出码: `0` → `47 passed in 22.00s`（`.specify/.tmp/pkg04/regression.txt`）
+- 引擎契约的五类源码守卫在本包新增代码上保持 clean（owner 指针不是第二份清单）。

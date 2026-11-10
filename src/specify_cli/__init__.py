@@ -2876,6 +2876,18 @@ def make_blocked_item(
     )
 
 
+def make_platform_refuse_item(dimension, target, *, current, expected):
+    """A platform-degradation refusal: this host cannot create symlinks."""
+    reason = (
+        "platform-no-symlink — existing candidate: "
+        f"{current}; expected candidate: {expected}; "
+        "this host cannot create symbolic links"
+    )
+    return MigrateItem(
+        dimension, target, current, expected, "refuse", reason=reason
+    )
+
+
 def _migrate_item_sort_key(item: MigrateItem):
     return (
         _MIGRATE_DIMENSION_INDEX[item.dimension],
@@ -3187,10 +3199,29 @@ MIGRATE_OUTCOME_EXIT_CODES = {
 }
 MIGRATE_INPUT_ERROR_EXIT = 2
 
-# Dispositions whose execution needs the second key (FR-015). The destructive
-# criteria themselves stay owned by shared/guidelines/confirmation-gates.md;
-# the safety package refines this classifier against that owner.
+# Destructive-criteria owner (pointer only — the owner's list is never restated
+# here). The classifier below is the executable projection of that owner onto
+# the FR-014 disposition domain.
+MIGRATE_DESTRUCTIVE_CRITERIA_POINTER = (
+    ".specify/shared/guidelines/confirmation-gates.md"
+)
+
+# Dispositions whose execution needs the second key (FR-015): `archive` moves
+# or removes an existing object and `replace` overwrites existing content —
+# both sit in the owner's destructive bucket. `write` creates a missing object
+# and stays reversible.
 MIGRATE_DESTRUCTIVE_DISPOSITIONS = ("archive", "replace")
+
+
+def migrate_is_destructive(item) -> bool:
+    """Whether executing this item is a destructive/irreversible action.
+
+    The criteria themselves are owned by
+    ``.specify/shared/guidelines/confirmation-gates.md``; this function is the
+    executable projection of that owner onto the FR-014 disposition domain.
+    """
+    return item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
+
 
 # E-9: a constant, non-probed pointer. goal/team archive migration stays owned
 # by /speckit.goal `migrate-archive`; this command never detects or disposes it.
@@ -3231,6 +3262,24 @@ def migrate_interactive_terminal() -> bool:
     try:
         return bool(sys.stdin.isatty())
     except (AttributeError, ValueError, OSError):
+        return False
+
+
+def migrate_symlink_supported() -> bool:
+    """Zero-write probe: can this host create symlinks at all?
+
+    Probes inside a system temporary directory; the workspace is never touched,
+    so a dry-run keeps its zero-write invariant even when the probe fails.
+    """
+    if not hasattr(os, "symlink"):
+        return False
+    try:
+        with tempfile.TemporaryDirectory(
+            prefix="specify-migrate-link-probe-"
+        ) as probe:
+            os.symlink("target", str(Path(probe) / "link"))
+        return True
+    except OSError:
         return False
 
 
@@ -3642,6 +3691,7 @@ def _migrate_plan_compat_links(ctx):
     items = []
     skipped = []
     evidence = ["scripts/python/sanitize-utils.py#check_broken_symlinks"]
+    symlink_supported = None
     for finding in engine.check_broken_symlinks(ctx.workspace):
         target = finding["target"]
         link = ctx.workspace / target
@@ -3652,6 +3702,15 @@ def _migrate_plan_compat_links(ctx):
             continue
         link_target = os.path.relpath(resolved, start=link.parent)
         expected = f"symlink -> {expected_target}"
+        if symlink_supported is None:
+            symlink_supported = migrate_symlink_supported()
+        if not symlink_supported:
+            items.append(
+                make_platform_refuse_item(
+                    "compat-links", target, current=target, expected=expected
+                )
+            )
+            continue
         if link.is_symlink() and not link.exists():
             item = MigrateItem(
                 "compat-links", target, "symlink-broken", expected,
@@ -4061,8 +4120,7 @@ def _migrate_second_key(plan):
     destructive = [
         item
         for item in plan.items
-        if item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
-        and item.status == "planned"
+        if migrate_is_destructive(item) and item.status == "planned"
     ]
     if not destructive:
         return True
@@ -4090,10 +4148,7 @@ def _migrate_second_key(plan):
 def _migrate_block_destructive(plan):
     items = []
     for item in plan.items:
-        if (
-            item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
-            and item.status == "planned"
-        ):
+        if migrate_is_destructive(item) and item.status == "planned":
             items.append(
                 make_blocked_item(
                     item.dimension,

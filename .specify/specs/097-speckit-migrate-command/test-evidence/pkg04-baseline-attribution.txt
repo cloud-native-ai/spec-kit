@@ -1,0 +1,46 @@
+# 097 pkg04-us2-safety — 全量套件失败名归因（相对实现入口基线）
+# captured: 2026-11-10T14:35Z
+# command: bash scripts/bash/run-tests.sh --names-out .specify/specs/097-speckit-migrate-command/test-evidence/pkg04-full-failed.txt -q
+# exit: 1（仓库既有失败集；本特性子集全绿）
+
+## 读数
+
+- pkg04 失败名清单: 276 条（`test-evidence/pkg04-full-failed.txt`）
+- 实现入口基线: 278 条（`implement-entry-baseline-suite.txt` 的 FAILED 行去重）
+- 相对入口基线: NEW 3 / FIXED 5
+- 相对 pkg03 清单: NEW 3 / FIXED 4
+
+## 新增名（全部位于既有非确定性 trigger 家族）
+
+```text
+tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+tests/contract/test_trigger_engine.py::test_c12_resolution_is_repeatable
+tests/contract/test_trigger_engine.py::test_c23_rows_and_turns_are_distinct
+```
+
+（相对 pkg03 的 NEW 集为 `test_c12_resolution_is_repeatable` /
+`test_c23_escalation_pct_and_budget_flag` / `test_c23_rows_and_turns_are_distinct`；
+两个比较面本身在 trigger 家族内随运行漂移。）
+
+## 家族非确定性实测（同一源码连续两次运行）
+
+命令: `bash scripts/bash/run-tests.sh tests/contract/test_trigger_engine.py --names-out ... -q`（连续两次）
+
+- run1: 32 条失败名；run2: 33 条失败名
+- 两次运行相差 7 个名（对称差；例如 run1 含
+  `test_c10_undeclared_flag_exits_usage` / `test_c11_out_of_range_vocabulary_exits_invalid`，
+  run2 不含而同族另有 `test_c13_no_artifact_opened_without_probe` /
+  `test_rules_action_lists_expected_columns`），与 pkg02 归因记录的入口基线内
+  trigger 家族行为一致（入口基线已含 59 条该家族红）。
+
+## 结论
+
+- 3 条 NEW 全部落在 `test_trigger_engine.py`（连续同源重跑即漂移），不构成
+  pkg04 可归因的新失败。
+- 本特性相关套件（US1 + US2 + 引擎契约 + CLI 表面 + planner/receipts 单元）
+  在 pkg04 上是 47 passed / 11 passed（`test-evidence/us2-safety.txt`、
+  `.specify/.tmp/pkg04/regression.txt`），`validate-tasks.py` 0 error(s) / 0 warning(s)。
+- 两个与本次实现无因果的临时失败已按根因消除：`test_isomorphism_map.py` 因本包
+  测量的 fixture 暂存于 `.specify/.tmp/pkg04/` 被仓库级扫描命中（测后删除后转绿）；
+  `test_script_interface_contract.py::test_c20...` 因新测试文件未入 git index
+  （`git add` 后转绿，与 pkg02 同因）。
