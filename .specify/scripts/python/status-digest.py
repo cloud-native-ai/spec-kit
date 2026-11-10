@@ -1144,9 +1144,12 @@ def read_executors(workspace, entries, now):
             continue
         fields = {}
         for line in text.splitlines():
-            key, _, value = line.strip().partition("=")
-            if key and value:
-                fields.setdefault(key, value)
+            # A pid record is one line of space-separated key=value pairs (``pid=… at=… line=… stage=…``),
+            # not one pair per line: split on whitespace so ``pid`` keeps its digits only.
+            for token in line.split():
+                key, _, value = token.partition("=")
+                if key and value:
+                    fields.setdefault(key, value)
         pid = fields.get("pid", "")
         line_id = fields.get("line", "")
         entry = by_line.get(line_id)

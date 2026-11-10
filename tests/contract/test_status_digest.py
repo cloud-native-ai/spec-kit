@@ -387,6 +387,48 @@ def _fixture_tree(tmp_path: Path):
     return workspace, registry, entry, sorted(str(p) for p in triplet.values())
 
 
+def test_an_alive_pid_file_becomes_the_executor_row(tmp_path):
+    """Executor-primary (2026-11-10): a live pid-<line>-<stage> record renders as that line's executor row."""
+    import os
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    state_dir = workspace / ".specify" / "state"
+    state_dir.mkdir(parents=True)
+    (state_dir / ("pid-%s-analyze" % entry["line_id"])).write_text(
+        "pid=%d start=0 at=1794290000 line=%s stage=analyze event=pid\n"
+        % (os.getpid(), entry["line_id"]),
+        encoding="utf-8",
+    )
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    rows = _rows(proc.stdout)
+    assert len(rows) == 1, rows
+    assert "fork(" in rows[0] and ("pid %d" % os.getpid()) in rows[0], rows[0]
+    assert "/speckit.analyze" in rows[0], rows[0]
+
+
+def test_closed_lines_do_not_occupy_the_digest(tmp_path):
+    """Reader contract (2026-11-10): closed lines are history — the digest never renders them."""
+    import json
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    closed = dict(entry, state="closed")
+    (registry / (entry["line_id"] + ".json")).write_text(
+        json.dumps(closed, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+    )
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 3, "an all-closed view is the explicit nothing-running answer; got %r" % (proc,)
+    assert proc.stdout.strip() == "nothing-running", proc.stdout
+
+
 def test_c42_over_a_fixture_registry_the_script_reads_the_entry_and_its_three_triplet_paths(tmp_path):
     """C-42: the entry's declared triplet paths are the reading's activity input — nothing else is opened."""
     import json
