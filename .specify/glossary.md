@@ -191,3 +191,5 @@
 | 处置 (Disposition) | disposition, archive / supersede / correct / exempt | Non-Disposable 条目必须落入的封闭四值处置;「留在原处什么都不做」不是处置。取值与桥映射见 `shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposition Bridge | user | confirmed |
 | 回顾面 (Review Surface) | review surface, 回顾范围 | 回顾的对象范围:当前 git HEAD 工作树里 `.specify/` 下的十个历史根,**不含** git 历史。成员声明于 `shared/declarations/facts/non-disposable-review-surface.yaml` | user | confirmed |
 | 豁免 (Exemption) | exemption, 显式豁免 | 唯一一种「不修也能留」的处置:必带理由与到期条件(`expiry_kind` / `expiry_value` / `expiry_recheck`),到期即重新成为未处置。语义见 `shared/definitions/non-disposable-definitions.md` § Exemption | user | confirmed |
+| 测试档位 | 缺省档, 全量档, test tier, 分档 | 规范 runner 的测试选择档位：缺省档排除 slow 标记（供日常/PR 循环），全量档包含全部测试（供每日与 SDD 两槽位预算）；两档的收集集合差恰等于 slow 集合，排除条数必须披露；载体为 scripts/bash/run-tests.sh，判据见 .specify/specs/098-suite-speed-optimizations/requirements.md（需求 098） | auto | proposed |
+| 慢档标记 | slow marker, slow 标记, 慢档 | pytest marker（名 slow），用于标记需要拉起/等待/终止外部进程或队列的 integration 测试与少数全语料扫描型 contract 测试；成员判据与逐条理由取证见 .specify/specs/098-suite-speed-optimizations/requirements.md（需求 098），不是普通单测的成批标慢 | auto | proposed |
