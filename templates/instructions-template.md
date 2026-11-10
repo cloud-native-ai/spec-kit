@@ -271,6 +271,10 @@ The `.specify/` layout is a **map, not a manual** — *what* exists and *where* 
 
 Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
 
+## Super Agent (相对逻辑角色)
+
+Super agent is the parent-side relative logical role on a dispatch edge — not a fourth layer, entity type or runtime; the role model is owned by `.specify/shared/definitions/superagent-definitions.md`. A dispatch granting dispatch duty physically carries the `role-transition` injection list.
+
 ## Spec Kit Runtime & Symlink Model
 
 `.specify/instructions.md` is the single source of truth for project-level AI instructions; compatibility files (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, `.github/copilot-instructions.md`) and the `.github/skills` alias are **symlinks** into `.specify/`. Edit through canonical paths — never recreate a link by hand (that severs it and the tool silently diverges); repair with `/speckit.instructions`.

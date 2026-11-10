@@ -262,4 +262,68 @@ FAILED tests/contract/test_status_digest_roles.py::test_c2_executor_rows_outside
 13 failed, 5 passed in 6.19s
 ```
 
+### Instance 6 — T040 instructions pointer section contract (red-first)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_instructions_budget_superagent_section.py -q`
+- Exit status: **1**
+- Red state: the section `## Super Agent (相对逻辑角色)` does not exist in
+  `templates/instructions-template.md` yet (T042 adds it), so every leg that reads the section
+  fails on its own "section missing" assertion — never on an import error. The budget leg
+  (`test_generated_size_stays_under_the_script_owned_budget`) is green at authoring time: it
+  guards T043's generated file afterwards and its being green is the pre-change measurement,
+  not a weakened red.
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_instructions_budget_superagent_section.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+
+
+    def test_live_file_carries_the_section():
+        """C-5: the generator-produced live file carries the section in the same position."""
+        live = LIVE.read_text(encoding="utf-8")
+        headings = re.findall(r"(?m)^## .+$", live)
+>       assert HEADING in headings, (
+            "the live .specify/instructions.md does not carry the section — run "
+            "bash scripts/bash/generate-instructions.sh after syncing the template mirror"
+        )
+E       AssertionError: the live .specify/instructions.md does not carry the section — run bash scripts/bash/generate-instructions.sh after syncing the template mirror
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_instructions_budget_superagent_section.py::test_section_sits_between_the_two_fixed_neighbours
+FAILED tests/contract/test_instructions_budget_superagent_section.py::test_section_is_pointer_form
+FAILED tests/contract/test_instructions_budget_superagent_section.py::test_pointer_check_is_not_blind
+FAILED tests/contract/test_instructions_budget_superagent_section.py::test_live_file_carries_the_section
+4 failed, 1 passed in 6.92s
+```
+
+### Instance 7 — T041 zero-second-mechanism audit (red-first)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_superagent_zero_mechanism.py -q`
+- Exit status: **1**
+- Red state: five of the six C-3 legs are green against the already-landed P1–P4 sources
+  (inventory, registry, renderer, dispatcher, read-only judgement); the owner-rules leg is red
+  because its surface scan requires the template pointer section T042 has not added yet. The
+  green-by-construction legs are the guards this package must not break; the seeded mutations
+  inside each leg prove they are not blind.
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_superagent_zero_mechanism.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+
+
+    def _section(text: str, heading: str) -> str:
+        parts = re.split(r"(?m)^(## .+)$", text)
+        sections = {parts[i]: parts[i] + parts[i + 1] for i in range(1, len(parts) - 1, 2)}
+>       assert heading in sections, f"section {heading!r} is missing from the subject file"
+E       AssertionError: section '## Super Agent (相对逻辑角色)' is missing from the subject file
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_superagent_zero_mechanism.py::test_c3_6_owner_rules_not_copied
+1 failed, 5 passed in 6.16s
+```
+
 
