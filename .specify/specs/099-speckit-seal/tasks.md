@@ -129,8 +129,8 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [X] T013 [P] 更新 `scripts/python/non-disposable-check.py` 的状态×裁决表，使 `Sealed` 行被判定而不是落到范围之外（FR-001、C-025）。
 - [X] T014 按 `manage-constitution` 流程收敛宪法生命周期叙述：`templates/constitution-template.md` 与 `.specify/constitution.md` 的终态表述同批改说 `Sealed`（schema owner 为准），版本号与 amend 日期同步（FR-002、FR-003、C-027、[blockedBy: T006]）。
 - [X] T015 投影并核对镜像：`python3 scripts/python/sync-mirrors.py --write` 后 `python3 scripts/python/sync-mirrors.py --check`，确认相对 T001 基线在 `shared/`、`templates/`、`skills/internal/`、`scripts/` 零新增漂移（FR-021、plan § Mirror Obligations、[blockedBy: T006,T007,T008,T009,T010,T011,T012,T013,T014]）。
-- [ ] T016 写红先引擎契约测试 `tests/contract/test_seal_engine_contract.py`，覆盖 C-001…C-010（四动作封闭集、三值退出码、`--help`/`--version` 零副作用、未声明选项非零拒绝、选项面封闭、两阶段声明、stdout-only 拒绝、写路径白名单），红输出记入 `notes/red-first-evidence.md`（FR-021、FR-025、[blockedBy: T001]）。
-- [ ] T017 实现 `scripts/python/seal-utils.py` 骨架：argparse + `script_interface_cli` 守卫（`--help`/`--version` 零副作用、未声明选项 exit 2）、四动作派发封闭集、三值退出码域、`--json` 稳定负载、写路径白名单常量、C-009 的字面 `.specify` 组件守卫（禁止向上找最近 `.specify` 的启发式）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-021、C-001…C-010、[blockedBy: T016]）。
+- [X] T016 写红先引擎契约测试 `tests/contract/test_seal_engine_contract.py`，覆盖 C-001…C-010（四动作封闭集、三值退出码、`--help`/`--version` 零副作用、未声明选项非零拒绝、选项面封闭、两阶段声明、stdout-only 拒绝、写路径白名单），红输出记入 `notes/red-first-evidence.md`（FR-021、FR-025、[blockedBy: T001]）。
+- [X] T017 实现 `scripts/python/seal-utils.py` 骨架：argparse + `script_interface_cli` 守卫（`--help`/`--version` 零副作用、未声明选项 exit 2）、四动作派发封闭集、三值退出码域、`--json` 稳定负载、写路径白名单常量、C-009 的字面 `.specify` 组件守卫（禁止向上找最近 `.specify` 的启发式）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-021、C-001…C-010、[blockedBy: T016]）。
 
 **Checkpoint**: 状态域七面同批识别且漂移守卫可红；引擎骨架满足接口契约。
 

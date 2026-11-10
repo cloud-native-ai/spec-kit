@@ -231,3 +231,80 @@ FAILED tests/contract/test_sealed_status_domain.py::test_schema_owner_defines_se
 ```
 
 **读数**：10/10 红，逐腿点名 7 个 C-029 surface + schema owner + non-disposable 引擎表 + closure completion-claim 家族；红由「面尚未携带 `Sealed`」引起（消息逐条给出实测成员表），不是解析崩溃。
+
+## 2. T016 红先引擎契约测试 `tests/contract/test_seal_engine_contract.py`
+
+**采集点**：T016 落地、`scripts/python/seal-utils.py`（T017）创建之前（工作树仅新增该测试文件）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q
+```
+
+**退出码**：1（31 errors —— 31/31 用例全部在 `engine` fixture 处红，无一条是解析/收集错误）。
+
+**完整 stdout/stderr（verbatim 头部 + 首块 + 完整 summary；其余 30 块与首块除用例名与 worker 外逐字相同，故显式省略）**：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE                                          [100%]
+==================================== ERRORS ====================================
+_________ ERROR at setup of test_c010_json_and_human_renderings_agree __________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.fixture(scope="module")
+    def engine() -> Path:
+>       assert ENGINE.is_file(), (
+            "engine missing: scripts/python/seal-utils.py has not landed (T017); "
+            "this is the expected red-first reading for T016"
+        )
+E       AssertionError: engine missing: scripts/python/seal-utils.py has not landed (T017); this is the expected red-first reading for T016
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/scripts/python/seal-utils.py').is_file
+
+tests/contract/test_seal_engine_contract.py:96: AssertionError
+
+[… 29 个同构 fixture-setup 块省略：每块都是同一断言 `engine missing: scripts/python/seal-utils.py has not landed (T017)`，仅用例名与 worker 行不同 …]
+
+=========================== short test summary info ============================
+ERROR tests/contract/test_seal_engine_contract.py::test_c010_json_and_human_renderings_agree
+ERROR tests/contract/test_seal_engine_contract.py::test_c003_undeclared_option_is_rejected_before_any_action[argv1]
+ERROR tests/contract/test_seal_engine_contract.py::test_c003_help_answers_zero_side_effect_and_carries_four_labels
+ERROR tests/contract/test_seal_engine_contract.py::test_c002_every_invocation_family_stays_inside_the_domain
+ERROR tests/contract/test_seal_engine_contract.py::test_c006_read_only_actions_persist_nothing
+ERROR tests/contract/test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source
+ERROR tests/contract/test_seal_engine_contract.py::test_c009_an_ancestor_specify_is_not_the_mirror_signal
+ERROR tests/contract/test_seal_engine_contract.py::test_c009_mirror_copy_refuses_write_actions
+ERROR tests/contract/test_seal_engine_contract.py::test_c009_spec_dir_shape_is_not_a_numeric_prefix
+ERROR tests/contract/test_seal_engine_contract.py::test_c010_json_payload_keeps_non_ascii_readable
+ERROR tests/contract/test_seal_engine_contract.py::test_c005_read_only_and_write_actions_partition_the_closed_set
+ERROR tests/contract/test_seal_engine_contract.py::test_c009_spec_dir_must_exist_and_contain_requirements
+ERROR tests/contract/test_seal_engine_contract.py::test_c003_undeclared_option_is_rejected_before_any_action[argv0]
+ERROR tests/contract/test_seal_engine_contract.py::test_c006_refusal_report_is_rerun_stable
+ERROR tests/contract/test_seal_engine_contract.py::test_c004_spec_dir_is_required_with_no_default
+ERROR tests/contract/test_seal_engine_contract.py::test_c006_read_only_reports_go_to_stdout_only
+ERROR tests/contract/test_seal_engine_contract.py::test_c003_version_answers_one_line_identity_zero_side_effect
+ERROR tests/contract/test_seal_engine_contract.py::test_c004_option_surface_is_closed
+ERROR tests/contract/test_seal_engine_contract.py::test_c009_read_actions_are_not_refused_by_the_mirror_guard
+ERROR tests/contract/test_seal_engine_contract.py::test_fr021_engine_is_stdlib_only
+ERROR tests/contract/test_seal_engine_contract.py::test_c001_undeclared_action_is_rejected_with_exit_two_and_echoes_name
+ERROR tests/contract/test_seal_engine_contract.py::test_c003_undeclared_option_is_rejected_before_any_action[argv2]
+ERROR tests/contract/test_seal_engine_contract.py::test_c008_write_path_allowlist_is_declared_and_closed
+ERROR tests/contract/test_seal_engine_contract.py::test_c007_engine_declares_no_lock_file_concurrency
+ERROR tests/contract/test_seal_engine_contract.py::test_c005_seal_declares_evaluate_before_apply
+ERROR tests/contract/test_seal_engine_contract.py::test_c002_exit_code_domain_is_exactly_three_values
+ERROR tests/contract/test_seal_engine_contract.py::test_c001_dispatch_table_covers_exactly_the_four
+ERROR tests/contract/test_seal_engine_contract.py::test_c001_action_set_is_exactly_the_four
+ERROR tests/contract/test_seal_engine_contract.py::test_c004_no_bypass_flags_exist
+ERROR tests/contract/test_seal_engine_contract.py::test_c004_missing_spec_dir_exits_two
+ERROR tests/contract/test_seal_engine_contract.py::test_c010_json_payload_is_canonical_and_matches_the_exit_code
+31 errors in 8.39s
+```
+
+**读数**：31/31 红，全部落在同一 `engine` fixture 的 `ENGINE.is_file()` 断言上（红由「引擎尚不存在」引起，不是语法/收集失败）；用例面覆盖 C-001…C-010 + FR-021 stdlib-only 附加腿。
