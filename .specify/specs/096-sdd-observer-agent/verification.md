@@ -7,6 +7,14 @@
   `test-evidence/review-repair-r1-closure-acceptance.txt` (`verdict: accept`, exit 0) and
   the recorded statuses are the ones that verdict justifies — no status was changed after it ran.
 
+  Status narrative (2026-11-11, review-repair r2 / review finding F7): the checker was
+  rerun on the edited tree with explicit carrier paths (`--feature-detail
+  .specify/features/096.md --feature-registry .specify/features.md`) — `verdict: accept`,
+  exit 0, `final_path` pass 4 / total 4, `reasons: []`
+  (`test-evidence/review-repair-r2-closure-acceptance.txt`). The registry status flip
+  `Planned → Implemented` was written only after that verdict; no SC status row was
+  changed by the flip.
+
   Implement-entry base (env-probe.txt): `c9b86e7fa4d216dde4c7c772ac7cc92a61cd90cd`.
   Smoke evidence: `test-evidence/review-repair-r1-smoke.txt` (one runner invocation, exit 0).
 -->

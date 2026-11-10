@@ -35,7 +35,7 @@ The feature adds **one agent template, one declaration fact, one stdlib engine, 
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/constitution.md` (v1.19.0) in file order; annotations carried verbatim (Principle VII is NON-NEGOTIABLE).
+Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/constitution.md` (v1.19.1) in file order; annotations carried verbatim (Principle VII is NON-NEGOTIABLE).
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -144,6 +144,7 @@ Five decisions clear the owner's load-bearing threshold (user-mandated shape, cr
 │   ├── journal-engine.contract.md         # C-01…C-13
 │   └── observer-verification.contract.md  # C-01…C-10
 ├── feature-ref.md       # Phase 1 — delivery surface, FR/SC maps, overlap adjudication
+├── verification.md      # Implement close — one SC status row per criterion + smoke record (GATE-4 input)
 ├── test-evidence/       # gate readings and baseline captures
 └── tasks.md             # Phase 2 (/speckit.tasks — not created here)
 ```

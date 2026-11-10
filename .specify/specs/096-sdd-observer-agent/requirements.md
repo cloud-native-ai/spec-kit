@@ -178,7 +178,7 @@ observer 进程被杀、启动报错或窗口意外结束，SDD 线照常推进�
 - **专用观察实例（Observer Instance）**: 绑定到一条 SDD 线的 Agent Instance，承载该线的观察职责与身份（`line_id` / `run_id` / spec key）；可被多次执行复用，跨线不共享。
 - **观察执行（Observer Execution）**: 一次有界的 live run — 启动于线启动或阶段边界，结算于窗口结束或线终态；其运行产物遵循既有 artifact triplet 与存储布局。
 - **观察记录（journal）**: 线级、单文件、追加式的持久制品，落在 `.specify/specs/<NNN-slug>/journal.md`；由引擎写入，随线收束提交。
-- **记录条目（Journal Entry）**: 封闭结构的单条事实投影，承载八类信息；不存在评价 / 建议 / 因果推断字段。
+- **记录条目（Journal Entry）**: 封闭结构的单条事实投影，承载九类信息（类别见 FR-011）；不存在评价 / 建议 / 因果推断字段。
 - **事件类（Event Class）**: 条目所表示的可观测里程碑的封闭取值；字面量由 journal 格式 owner 唯一拥有。
 - **载体事实（Carrier Fact）**: 状态脊字段、完成哨兵行、checkpoint、提交、driver 正证据四件套状态与 exec 记录等可复核事实；是条目的唯一来源。
 - **观察缺口（Observer Gap）**: 一段没有被任何 observer 执行覆盖的时间窗口的显式记录；不是推断出来的事件。

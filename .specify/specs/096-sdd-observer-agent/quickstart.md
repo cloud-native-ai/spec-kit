@@ -1,6 +1,6 @@
 # Quickstart — 096-sdd-observer-agent
 
-Seven walk-through scenarios. Every command is shown with its **premises**; a command whose subject does not exist yet is marked per example and pinned to the contract clause + test module that will assert it, per the Post-Generation Quality Gate's per-example rule. Commands that exist today were executed in this plan run and their readings are in `test-evidence/`.
+Seven walk-through scenarios. Every command is shown with its **premises** and pinned to the contract clause + test module that asserts it, per the Post-Generation Quality Gate's per-example rule. Commands marked *runs today* were executed in the plan run (readings in `test-evidence/`); since implementation landed (2026-11-10) the remaining scenarios are executable as well — their readings live in `test-evidence/` and the contract tests named per example.
 
 ## S-0 — Inspect the shipped surfaces (runs today)
 
@@ -10,7 +10,7 @@ ls skills/external/sdd-loop-driver/references/observer-lifecycle.md
 ls shared/declarations/facts/journal-format.yaml scripts/python/journal-utils.py
 ```
 
-Premises: these paths are **created by implementation** (see `feature-ref.md`). Until then each `ls` fails — that is the expected reading before the feature lands. Pinned by `tests/contract/test_sdd_observer_agent.py` (role surface) and `tests/contract/test_journal_engine.py` (engine surface).
+Premises: these paths are delivered by implementation (see `feature-ref.md`); they exist on the implemented tree (2026-11-10). Pinned by `tests/contract/test_sdd_observer_agent.py` (role surface) and `tests/contract/test_journal_engine.py` (engine surface).
 
 ## S-1 — Enable the observer on a line (driver behavior, template-pinned)
 
@@ -22,7 +22,7 @@ observer: on          # default; off records state: disabled and must be disclos
 
 Premises: the driver skill text carries the switch and the startup step (`contracts/observer-lifecycle.contract.md` C-01/C-02); the driver is an LLM procedure, so the assertion surface is the SKILL.md text plus the spine fixture — not an executable driver. Pinned by `tests/contract/test_sdd_observer_lifecycle.py`.
 
-Expected reading after implementation: the state spine gains one section
+Expected reading (implemented 2026-11-10): the state spine gains one section
 
 ```text
 ## Observer Record — 2026-11-10T09:00:00Z
@@ -47,7 +47,7 @@ python3 scripts/python/journal-utils.py --action append \
   --execution-label L1--R1--observer
 ```
 
-Premises: engine actions and flags as specified in `contracts/journal-engine.contract.md` C-01/C-03; the spine fixture carries the shapes § Execution Premises EP-006 records. Not executable before implementation; pinned by `tests/contract/test_journal_engine.py` (append + idempotency + gap). Expected reading: exit `0`, header written once, one row per newly derivable event, `seq` continuing.
+Premises: engine actions and flags as specified in `contracts/journal-engine.contract.md` C-01/C-03; the spine fixture carries the shapes § Execution Premises EP-006 records. Executable on the implemented tree; pinned by `tests/contract/test_journal_engine.py` (append + idempotency + gap). Expected reading: exit `0`, header written once, one row per newly derivable event, `seq` continuing.
 
 ## S-3 — Validate the journal (engine, fixture-backed)
 
@@ -99,4 +99,4 @@ python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py --spec-dir .spe
 bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_journal_engine.py -q
 ```
 
-Premises: the first two were run in this plan (readings in `test-evidence/plan-gates-baseline.txt`); the third is the post-implementation suite — before implementation it fails on missing modules, which is the expected red-first reading. The digest boundary check is `test_sdd_observer_lifecycle.py` (SC-006 baseline comparison under `test-evidence/`).
+Premises: the first two were run in this plan (readings in `test-evidence/plan-gates-baseline.txt`); the third is the feature suite, which passes on the implemented tree (evidence: `test-evidence/review-repair-r1-smoke.txt`, exit 0). The digest boundary check is `test_sdd_observer_lifecycle.py` (SC-006 baseline comparison under `test-evidence/`).
