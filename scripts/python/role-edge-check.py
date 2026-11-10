@@ -375,32 +375,35 @@ def _scan_triplets(logs_dir: Path) -> dict:
 
 def _parse_registry(registry_dir) -> tuple:
     if registry_dir is None:
-        return [], "absent", 0
+        return [], "absent", [], []
     directory = Path(registry_dir)
     if not directory.is_dir():
-        return [], "absent", 0
+        return [], "absent", [], []
     entries = []
-    unreadable = 0
+    unreadable = []
+    payloads = []
     for path in sorted(directory.glob("*.json")):
         try:
             text = path.read_text(encoding="utf-8")
         except OSError:
-            unreadable += 1
+            unreadable.append(str(path))
             continue
         try:
             payload = json.loads(text)
         except json.JSONDecodeError:
-            unreadable += 1
+            unreadable.append(str(path))
             continue
         if not isinstance(payload, dict):
-            unreadable += 1
+            unreadable.append(str(path))
             continue
+        # The parsed payload rides the same read: the digest's legacy line rows derive from it, so the registry
+        # root is read once and both views (line rows, role cross-check) consume that one pass.
+        payloads.append({"path": str(path), "payload": payload})
         line_id = payload.get("line_id")
         if not isinstance(line_id, str) or not line_id:
-            unreadable += 1
             continue
         entries.append({"path": str(path), "line_id": line_id})
-    return entries, "present", unreadable
+    return entries, "present", unreadable, payloads
 
 
 def _parse_dispatch_records(state_dir: Path, triplet_labels) -> tuple:
@@ -493,7 +496,7 @@ def read_carrier_inputs(*, state_dir, teams_dir, logs_dir, registry_dir=None) ->
             )
 
     resolved_registry = registry_dir if registry_dir is not None else _default_registry_dir()
-    registry_entries, registry_state, registry_unreadable = _parse_registry(
+    registry_entries, registry_state, registry_unreadable, registry_payloads = _parse_registry(
         resolved_registry
     )
     triplets = _scan_triplets(logs_path)
@@ -522,6 +525,9 @@ def read_carrier_inputs(*, state_dir, teams_dir, logs_dir, registry_dir=None) ->
         "line_ids": sorted(line_ids),
         "run_ids": sorted({spine["run_id"] for spine in spines.values()}),
         "registry_entries": registry_entries,
+        # The same read's parsed payloads, consumed by ``status-digest.py`` for its legacy line rows — one
+        # registry read feeds both the role cross-check and the line projection (digest contract C-1).
+        "registry_payloads": registry_payloads,
         "triplets": sorted(triplets),
         "carrier_rows": {
             CARRIER_TEAM: len(team_rows),
@@ -529,7 +535,8 @@ def read_carrier_inputs(*, state_dir, teams_dir, logs_dir, registry_dir=None) ->
             CARRIER_RUN_AGENT: len(dispatch_rows),
         },
         "notes": {
-            "registry_unreadable": registry_unreadable,
+            "registry_unreadable": len(registry_unreadable),
+            "registry_unreadable_paths": registry_unreadable,
             "unconfirmed_dispatch_records": unconfirmed,
         },
     }

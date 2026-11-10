@@ -17,7 +17,7 @@
 | SC-006 | final | **pass** | `test-evidence/status-digest-roles-readings.txt` | role fields (parent / roles / marker / depth) beside existing fields in table and JSON; live renders captured 2026-11-10T14:01:52Z; `omitted` / `nothing-running` (exit 3) / stale unchanged; one materialization per run and no second renderer, both structurally pinned; 74 passed (18 new legs + existing digest contract) |
 | SC-007 | final | **pass** | `test-evidence/instructions-budget.txt` | generator `BUDGET:` ends `within` — 38,301 B / 38,400 B budget, 99 B headroom; one per-section row for `## Super Agent (相对逻辑角色)` between the two fixed anchors; section is 333 B (target ≤600 B, no budget literal, no copied rules); size-budget 13 + section-propagation 6 + a7 pin 1 all passed |
 | SC-008 | supporting | **pass** | `test-evidence/zero-mechanism-readings.txt` | six C-3 legs (no new persistence root / registry / second renderer / second dispatcher / read-only judgement face / no copied owner rules) 6 passed with in-leg seeded mutations; `test_fast_fail_discipline.py -k i14` 1 passed |
-| SC-009 | supporting | **pass** | `test-evidence/zero-mechanism-readings.txt`, `test-evidence/closure-suite-comparison.txt`, `test-evidence/closure-suite.txt` | targeted baseline-matched selection: zero NEW failures (39 passed + 1 pre-existing red named and exempted). Closure full suite: 233 failures vs the reconstructed baseline's 303; `comm -13` yields **2 names, both adjudicated as environment-owned and outside this feature's write domain** (root-owned `.specify/.tmp/script-interface-*` scratch dated 10:42–10:51, and other lines' `.specify/.tmp/sdd-loop/worktrees/` copies) — per SC-009 they are named, never claimed green; zero NEW failures attributable to this feature. Relaxation drill: the anti-nesting payload mutation red |
+| SC-009 | supporting | **pass** | `test-evidence/zero-mechanism-readings.txt`, `test-evidence/review-repair-closure-suite-comparison.txt`, `test-evidence/review-repair-closure-suite.txt`, `test-evidence/review-repair-suite.txt` | targeted baseline-matched selection: zero NEW failures (39 passed + 1 pre-existing red named and exempted). Per-module guard health (review F2): at the reconstructed baseline the two digest modules read 18 failed / 23 passed — 17 of those names are also red at the range base `b3da3a26d` (inherited from the pre-range master-side redesign), 1 was introduced in-range by `c2f199955` and is refused as inherited; repaired and re-measured **41 passed, exit 0**. Post-repair closure full suite: **215 failed / 8415 passed / 2 skipped in 47.75s** vs the reconstructed baseline's 303; `comm -13` yields the same **2 names, both environment-owned** (root-owned `.specify/.tmp/script-interface-*` scratch dated 10:42–10:51, and other lines' `.specify/.tmp/sdd-loop/worktrees/` copies) — per SC-009 they are named, never claimed green; zero NEW failures attributable to this feature. Relaxation drill: the anti-nesting payload mutation red |
 | SC-010 | supporting | **pass** | `observation-appendix.md`, `test-evidence/observation-appendix-check.txt` | 14 rows for the 14 existing slices (080–091, 093, 094; 092 absent): 6 `exercised` with resolvable machine-record paths, 8 `not-observed` with reasons; the mechanical check exits 0 on the tracked appendix and exits 1 on the `notes/` mutation copy (one `not-observed` row marked `exercised`) |
 
 ## Existing-test disposition ledger (T048)
@@ -31,15 +31,32 @@
 | keep | `tests/contract/test_nested_run_report.py` | no edit; the module runs with one pre-existing red (`test_attribution_is_observational_so_the_goal_field_set_is_unchanged`, a `binding_block` Goal-field drift present before P1) — named and exempted, never claimed green |
 | remove | — | none; no asserted fact was deleted |
 
-**Setup-package disposition (discovered at close-out)**: T001's implement-start baseline was never captured; it is closed under `implement.md` § Baseline pre-flight's first-capture fallback — the baseline was reconstructed at the P1 parent commit with provenance (`notes/baseline-provenance.md`) and is T051's comparison base. T002 was executed late at P6 (re-measurement appended to `notes/pre-change-measurements.md` §8). T003 is the single deferred row (see `deferred_tasks=` above).
+**Setup-package disposition (discovered at close-out)**: T001's implement-start baseline was never captured; it is closed under `implement.md` § Baseline pre-flight's first-capture fallback — the baseline was reconstructed at the P1 parent commit with provenance (`notes/baseline-provenance.md`) and is T051's comparison base. T002 was executed late at P6 (re-measurement appended to `notes/pre-change-measurements.md` §8). T003 was the single deferred row; it was resolved on 2026-11-10 by the review-repair r1 round (dated archive first, then re-freeze in place — see `deferred_tasks=` below).
 
 **Docs disposition**: `shared/guidelines/better-harness.md` unchanged (clarify Q6 ruling, overrides the brief's literal wording); `agent-definitions.md` / `subagent-definitions.md` / `framework-map.md` gained pointer lines only.
 
-`deferred_tasks=T003` — the implement-start clause-coverage re-freeze was not executed; the tasks-frozen baseline (642 lines, `base-sha 2c8da54c0`) remains the artifact cited by the analyze reports, and overwriting it at close-out would break those citations; lift it by re-freezing at the next implement pre-flight.
+`deferred_tasks=none` — T003 was resolved on 2026-11-10 (review-repair r1): the tasks-frozen baseline was first copied to the dated archive `notes/coverage-baseline-2026-11-10-tasks-frozen.txt` (642 lines, `base-sha 2c8da54c0`) so the analyze reports' citations stay resolvable, then re-frozen in place at the implement pre-flight position (`coverage-baseline.txt`, 642 lines, `base-sha d54b1c012`). No `[~]` row remains in `tasks.md`.
 
 ## Feature-list review (T054)
 
-Feature 095 stays **`Planned`** in `.specify/features.md` — the tasks stage maintains `Planned` and this close-out performs no status flip; the task breakdown exposed no new or invalidated Feature, and no `.specify/features.md` edit was made by this package (requirements.md § Related Feature; constitution Principle II).
+Feature 095 is **`Implemented`** in `.specify/features.md` (and `**Status**: Implemented` in `.specify/features/095-superagent-role.md`). The implementation plan (T054) projected the implement-stage Feature Integration as `Planned → Implemented`; the P6 close-out performed no status flip, which review F1 raised as a P0 — the flip landed in the review-repair r1 round after the four conjunctive conditions were re-verified: zero open tasks (T003 resolved by archive-then-refreeze), an `SC-NNN_status=` row per criterion, every `final`-path criterion `pass`, and the smoke record `pass` (requirements.md § Related Feature; constitution Principle II). The task breakdown exposed no new or invalidated Feature.
+
+## 跨线提交（review F3）
+
+代码段 delta `b3da3a26d..6c48e9c25` 内的 7 个无 095 任务行的提交与 1 个用户裁定修订，逐个登记出处。判据：提交信息内的指令标记 / 访谈台账行 / 可复核的 diff 载体；没有独立留存件的用户指令以提交信息本身为唯一载体，并如实标注。
+
+| Commit | Subject | 出处类别 | 证据 |
+|---|---|---|---|
+| `dddd09773` | feat(status): redesign the digest to reader columns | 用户指令（digest 阅读器改版） | 提交正文含路由裁决 `direct (direct-conditions-all-hold)`；同族改版 `c2f199955` 明写 `Second reader revision (user directive)`；diff：`scripts/python/status-digest.py`、`.specify/scripts/python/status-digest.py`、`tests/contract/test_status_digest.py` |
+| `c2f199955` | feat(status): executor-primary digest — closed lines hidden, one row per live agent execution | 用户指令（提交正文 `Second reader revision (user directive)`） | `git show c2f199955 --format=%b`；同一 diff 面 |
+| `48d78d1a5` | fix(status): parse the one-line pid record as space-separated key=value pairs | 用户指令的后续修复（同一改版序列） | 提交正文（单行 pid 记录解析）+ 随提交的两个回归测试 |
+| `9c39b8e06` | fix(status): one row per execution — runner/CLI-child dedupe and live-executor silence rule | 用户指令的后续修复（同一改版序列） | 提交正文（runner/CLI 子进程去重）+ 随提交的真实子进程回归测试 |
+| `6d13938aa` | feat(gates): analyze gate self-repairs in unattended SDD runs | D-POLICY-ANALYZE 访谈裁定 | `.specify/memory/session/interview-blocked-stalled-lines-2026-11-10.md` 行 `D-POLICY-ANALYZE`（✅ 2026-11-10，exit gate 确认）；`shared/guidelines/confirmation-gates.md` 与 driver `dispatch-recipes.md` diff |
+| `57d364074` | chore(harness): .specify/state is runtime — ignored, untracked, and the ignore set is framework-maintained | state-runtime 指令 | 提交正文（状态脊是运行时：忽略、退索引、忽略集随框架维护）；`.specify/.gitignore` + `templates/gitignore-specify-template` + `.specify/instructions.md` diff |
+| `343ad1e1e` | docs(coaching): record the /speckit.status coaching run | 用户指令（coaching 运行记录） | `.specify/memory/coaching/20261110T065243Z-speckit-status/` 四件产物（expectation / observation / deviations / improvement-plan）+ exec-quant / feedback 记录 |
+| `dd7cbbab4` | docs(constitution): amend Principle VII's Pre-Status-Flip carrier to verification.md (1.19.0 → 1.19.1) | 用户裁定（constitution amendment） | 提交正文 `user ruling 2026-11-10`；`.specify/constitution.md` 的版本行与 Principle VII 行；本行指针已补入 `plan.md` D-1（review-repair r1） |
+
+后果与改进项：这些提交使 delta 不是特性作用域（实现段 scope fail 的来源）。18 个红守卫中 17 个在范围基线 `b3da3a26d` 即红（继承自范围前的 master 侧 digest 重构），1 个由 `c2f199955` 引入（逐条读数见 `notes/baseline-provenance.md` § Per-module guard health）。**行级提交守卫**（特性线活跃期间，无行 id 的提交被拒绝或显式登记为跨线提交）作为后续框架改进项记录在状态脊 § 框架观察 `FO-095-11`，不阻塞本线。
 
 ## Machine-readable record
 
@@ -94,8 +111,8 @@ SC-008_value=six C-3 legs 6 passed with seeded mutations; i14 1 passed
 SC-008_note=see § Success criteria row SC-008
 
 SC-009_status=pass
-SC-009_value=closure 233 vs baseline 303; comm -13 = 2 names, both environment-owned and named; zero NEW attributable to this feature
-SC-009_note=see § Success criteria row SC-009 and test-evidence/closure-suite-comparison.txt
+SC-009_value=closure post-repair 215 failed / 8415 passed vs baseline 303; comm -13 = 2 environment-owned names; repaired digest modules 41 passed (18 baseline reds: 17 inherited, 1 in-range); zero NEW attributable
+SC-009_note=see § Success criteria row SC-009 and test-evidence/review-repair-closure-suite-comparison.txt
 
 SC-010_status=pass
 SC-010_value=14 rows (6 exercised / 8 not-observed); check exit 0; mutation copy exit 1

@@ -190,11 +190,18 @@ def _report(workspace: Path, registry: Path | None, *extra):
 
 
 def _entry_rows(rendered: str) -> list:
-    """The rendered entry rows (every line that is not the header / completion / omitted summary)."""
+    """The rendered table body rows — one per entry (the digest's reader contract renders a table)."""
+    lines = rendered.splitlines()
+    sep = next((i for i, line in enumerate(lines) if line and set(line.replace(" ", "")) == {"-"}), None)
+    if sep is None:
+        return []
     rows = []
-    for line in rendered.splitlines():
-        if line.startswith("line_id="):
-            rows.append(line)
+    for line in lines[sep + 1:]:
+        if not line.strip():
+            break
+        if line.startswith(("最近完成：", "另有 ", "store=", "omitted=", "last_completion=")):
+            break
+        rows.append(line)
     return rows
 
 
@@ -327,7 +334,10 @@ def test_c63_the_digest_never_exceeds_its_cap_and_the_line_never_grows_the_unit_
     assert capped.returncode == 0, capped.stderr
     rows = _entry_rows(capped.stdout)
     assert len(rows) == 2, "the cap bounds the entry set; got %r" % rows
-    assert "omitted=" in capped.stdout
+    # The truncation is declared on the render's own summary line, never inferred from the row count alone.
+    assert "另有 1 条未显示" in capped.stdout, (
+        "the truncated render must state its omitted count; got %r" % capped.stdout
+    )
 
     total = 0
     for row in rows:
@@ -420,7 +430,7 @@ def test_c64_a_tight_bound_withdraws_tokens_and_invocations_from_every_unit_toge
             assert "invocations=" not in tail, (
                 "C-64: a tight bound withdraws invocations from EVERY unit on the render; got %r" % row
             )
-    omitted = [line for line in tight.stdout.splitlines() if line.startswith("omitted=")]
+    omitted = [line for line in tight.stdout.splitlines() if line.startswith("另有 ")]
     assert omitted, "C-64: the withdrawal is named in the render's existing omitted summary; got %r" % tight.stdout
     assert "tokens" in omitted[-1], (
         "the omitted summary names the withdrawn quantity; got %r" % omitted[-1]
@@ -528,9 +538,16 @@ def test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_els
     assert _no_measurements_literal() in absent.stdout, (
         "C-68: an absent store renders the explicit 'no measurements' state; got %r" % absent.stdout
     )
+    state_lines = [line for line in absent.stdout.splitlines() if _no_measurements_literal() in line]
+    assert len(state_lines) == 1 and state_lines[0].startswith("store="), (
+        "C-68: the availability is ONE explicit summary line, never a per-row marker; got %r" % state_lines
+    )
     assert _count_marker(absent.stdout) == 0, (
         "C-68: 'no measurements' is the store-availability state, not a per-unit marker; got %r"
         % absent.stdout
+    )
+    assert len(_entry_rows(absent.stdout)) == 2, (
+        "C-68: the state changes no entry row — both fixture entries still render; got %r" % absent.stdout
     )
 
 
@@ -571,8 +588,8 @@ def test_c68_the_entry_set_is_identical_to_a_render_without_the_dimension(tmp_pa
     def strip_element(text: str):
         kept = []
         for line in text.splitlines():
-            # The render's clock is its own line and is not a bound C-68 protects: the comparison is field-level.
-            if line.startswith("generated_at="):
+            # The render's clock-bearing header line is not a bound C-68 protects: the comparison is field-level.
+            if line.startswith("generated_at=") or "生成于" in line:
                 continue
             line = re.sub(r"\s*efficiency=([^|]*)$", "", line)
             line = re.sub(r"\s\s+", " ", line).rstrip()

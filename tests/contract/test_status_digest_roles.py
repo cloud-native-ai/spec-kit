@@ -158,25 +158,6 @@ def _entry_rows(rendered: str) -> list:
     return rows
 
 
-def _call_counts(source: str) -> dict:
-    """function name -> number of calls to it, from the module's own AST (no import side effects)."""
-    tree = ast.parse(source)
-    names = ("read_carrier_inputs", "evaluate_role_model", "read_role_materialization")
-    counts = {name: 0 for name in names}
-    enclosing = {}
-    for fn in ast.walk(tree):
-        if not isinstance(fn, ast.FunctionDef):
-            continue
-        for node in ast.walk(fn):
-            if not isinstance(node, ast.Call):
-                continue
-            target = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", None)
-            if target in counts:
-                counts[target] += 1
-                enclosing.setdefault(target, set()).add(fn.name)
-    return {"counts": counts, "enclosing": enclosing}
-
-
 def _declared_role_fields(source: str) -> tuple:
     tree = ast.parse(source)
     for node in ast.walk(tree):
@@ -200,26 +181,132 @@ def _role_attachment_fn(source: str, name: str = "merge_role_entries"):
 
 
 # --------------------------------------------------------------------------- #
-# C-1 — one materialization per run, no second carrier parser
+# C-1 — one materialization per run, decided on observable reads
+#
+# The clause is behavioural ("the legacy line entries and the role view both derive from it, and no carrier
+# root may be read twice"), so the guard observes actual reads: an audit hook records every directory scan
+# and file open an in-process digest run performs. Counting AST call sites cannot see a second read.
 # --------------------------------------------------------------------------- #
-def test_c1_the_role_model_is_one_materialization_per_run():
-    """C-1: one ``read_carrier_inputs`` + one ``evaluate_role_model`` per digest run, from ``read_state``."""
-    source = _engine_source()
-    counts = _call_counts(source)
-    assert counts["counts"]["read_carrier_inputs"] == 1, (
-        "the role model must be materialized by exactly one carrier read; got %r"
-        % counts["counts"]
+_AUDIT = {"active": False, "events": [], "installed": False}
+
+
+def _install_audit_hook():
+    if _AUDIT["installed"]:
+        return
+
+    def hook(event, args):
+        if not _AUDIT["active"]:
+            return
+        if event in ("os.scandir", "os.listdir", "open"):
+            try:
+                _AUDIT["events"].append((event, str(args[0])))
+            except Exception:
+                pass
+
+    sys.addaudithook(hook)
+    _AUDIT["installed"] = True
+
+
+def _run_digest_in_process(args, workspace: Path, registry: Path):
+    """Run the digest in this process under an audit hook; returns ``(exit_code, stdout, events)``."""
+    import contextlib
+    import io
+    import runpy
+
+    _install_audit_hook()
+    env_keys = ("SPECIFY_LINE_REGISTRY_DIR", "XDG_STATE_HOME", "HOME", "SPECIFY_STATUS_WORKSPACE")
+    saved_env = {key: os.environ.get(key) for key in env_keys}
+    saved_cwd, saved_argv = os.getcwd(), sys.argv
+    os.environ["SPECIFY_LINE_REGISTRY_DIR"] = str(registry)
+    os.environ["HOME"] = str(workspace)
+    os.environ.pop("XDG_STATE_HOME", None)
+    os.environ.pop("SPECIFY_STATUS_WORKSPACE", None)
+    os.chdir(workspace)
+    sys.argv = [str(SCRIPT), *args]
+    _AUDIT["events"] = []
+    buffer = io.StringIO()
+    code = 0
+    try:
+        _AUDIT["active"] = True
+        with contextlib.redirect_stdout(buffer):
+            runpy.run_path(str(SCRIPT), run_name="__main__")
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else 0
+    finally:
+        _AUDIT["active"] = False
+        for key, value in saved_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        os.chdir(saved_cwd)
+        sys.argv = saved_argv
+    return code, buffer.getvalue(), list(_AUDIT["events"])
+
+
+def test_c1_the_role_model_is_one_materialization_per_run(tmp_path):
+    """C-1 (behaviour): the registry carrier root is read exactly once, and each entry opened once.
+
+    The fixture provides the engine's three required carrier roots, so the materialization is the path taken and
+    the legacy line rows derive from its registry read. A second read anywhere — the defect this clause names —
+    makes either count exceed one.
+    """
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    for part in ("state", "teams", "agents/execution/logs"):
+        (workspace / ".specify" / part).mkdir(parents=True, exist_ok=True)
+    registry = tmp_path / "registry"
+    registry.mkdir()
+    entry_paths = []
+    for index in range(2):
+        entry = {
+            "schema_version": 1,
+            "line_id": "c1-line-%d" % index,
+            "run_id": "r20261110T000000Z-c1-%d" % index,
+            "project_dir": str(workspace),
+            "repo_root": str(workspace),
+            "state": "active",
+            "created_at": "2026-11-10T00:00:00Z",
+            "updated_at": "2026-11-10T00:%02d:00Z" % index,
+            "run_history": [],
+        }
+        path = registry / ("c1-line-%d.json" % index)
+        path.write_text(json.dumps(entry), encoding="utf-8")
+        entry_paths.append(path)
+
+    code, stdout, events = _run_digest_in_process(
+        ["--action", "digest", "--workspace", str(workspace), "--format", "json"],
+        workspace,
+        registry,
     )
-    assert counts["counts"]["evaluate_role_model"] == 1, (
-        "the role model must be judged exactly once per run; got %r" % counts["counts"]
+    assert code == 0, "the fixture digest must render; stdout=%r stderr-events=%r" % (stdout, events)
+
+    registry_root = registry.resolve()
+    scans = [
+        event
+        for event in events
+        if event[0] in ("os.scandir", "os.listdir") and Path(event[1]).resolve() == registry_root
+    ]
+    assert len(scans) == 1, (
+        "the registry carrier root must be read exactly once per run (contract C-1); observed %d reads: %r"
+        % (len(scans), events)
     )
-    assert counts["enclosing"]["read_carrier_inputs"] == {"read_role_materialization"}
-    assert counts["enclosing"]["evaluate_role_model"] == {"read_role_materialization"}
-    assert counts["counts"]["read_role_materialization"] == 1, (
-        "the materialization helper must be invoked once, from the one reader; got %r"
-        % counts["counts"]
-    )
-    assert counts["enclosing"]["read_role_materialization"] == {"read_state"}
+    for path in entry_paths:
+        opens = [
+            event
+            for event in events
+            if event[0] == "open" and Path(event[1]).resolve() == path.resolve()
+        ]
+        assert len(opens) == 1, (
+            "registry entry %s must be opened exactly once by the one materialization; observed %d"
+            % (path.name, len(opens))
+        )
+    # Both views are present from that one read: the legacy line rows and the role fields.
+    payload = json.loads(stdout)
+    assert {entry.get("line_id") for entry in payload["entries"]} == {"c1-line-0", "c1-line-1"}
+    for entry in payload["entries"]:
+        for field in ROLE_FIELDS:
+            assert field in entry, "the role view derives from the same read; missing %r" % field
 
 
 def test_c1_the_digest_adds_no_second_carrier_parser_or_root_scan():

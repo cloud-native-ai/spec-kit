@@ -1,0 +1,114 @@
+# Mutation drills — review-repair r1 (2026-11-10)
+
+## Drill A — C-1 behaviour guard: seed a second registry read in read_state
+mutation: add '_read_registry_entries(registry_dir)' after the materialization branch
+command: bash scripts/bash/run-tests.sh tests/contract/test_status_digest_roles.py -q -k c1_the_role_model
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_status_digest_roles.py -q -k c1_the_role_model
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_c1_the_role_model_is_one_materialization_per_run _____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0')
+
+    def test_c1_the_role_model_is_one_materialization_per_run(tmp_path):
+        """C-1 (behaviour): the registry carrier root is read exactly once, and each entry opened once.
+    
+        The fixture provides the engine's three required carrier roots, so the materialization is the path taken and
+        the legacy line rows derive from its registry read. A second read anywhere — the defect this clause names —
+        makes either count exceed one.
+        """
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        for part in ("state", "teams", "agents/execution/logs"):
+            (workspace / ".specify" / part).mkdir(parents=True, exist_ok=True)
+        registry = tmp_path / "registry"
+        registry.mkdir()
+        entry_paths = []
+        for index in range(2):
+            entry = {
+                "schema_version": 1,
+                "line_id": "c1-line-%d" % index,
+                "run_id": "r20261110T000000Z-c1-%d" % index,
+                "project_dir": str(workspace),
+                "repo_root": str(workspace),
+                "state": "active",
+                "created_at": "2026-11-10T00:00:00Z",
+                "updated_at": "2026-11-10T00:%02d:00Z" % index,
+                "run_history": [],
+            }
+            path = registry / ("c1-line-%d.json" % index)
+            path.write_text(json.dumps(entry), encoding="utf-8")
+            entry_paths.append(path)
+    
+        code, stdout, events = _run_digest_in_process(
+            ["--action", "digest", "--workspace", str(workspace), "--format", "json"],
+            workspace,
+            registry,
+        )
+        assert code == 0, "the fixture digest must render; stdout=%r stderr-events=%r" % (stdout, events)
+    
+        registry_root = registry.resolve()
+        scans = [
+            event
+            for event in events
+            if event[0] in ("os.scandir", "os.listdir") and Path(event[1]).resolve() == registry_root
+        ]
+>       assert len(scans) == 1, (
+            "the registry carrier root must be read exactly once per run (contract C-1); observed %d reads: %r"
+            % (len(scans), events)
+        )
+E       AssertionError: the registry carrier root must be read exactly once per run (contract C-1); observed 2 reads: [('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py'), ('open', '/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/line-registry.py'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/__pycache__/role-edge-check.cpython-311.pyc'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry'), ('open', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry/c1-line-0.json'), ('open', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry/c1-line-1.json'), ('os.listdir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/agents/execution/logs'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/state'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/teams'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/state'), ('os.listdir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/state'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry'), ('open', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry/c1-line-0.json'), ('open', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry/c1-line-1.json'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/__pycache__/exec-quant.cpython-311.pyc'), ('os.listdir', '/storage/project/cloud-native-ai/spec-kit/scripts/python'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/__pycache__/declaration_reader.cpython-311.pyc'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/__pycache__/script_interface_cli.cpython-311.pyc'), ('os.scandir', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/arc-verdict-mapping.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/concurrency-class.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/concurrency-contract.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/concurrency-slot-and-reserve.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/coordinator-dispatch-verdict.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/decomposition-coverage.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/driver-completion-sentinels.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/driver-gate-roster.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/driver-stage-artifacts.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/driver-stage-sequence.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/effective-concurrency.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/evidence-lanes.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/evidence-seven-states.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/executor-enumeration-roots.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/expression-gate-faces.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/expression-stage-operator-table.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/feedback-prompt-threshold.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/flow-class-basis.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/flow-class-classes.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/flow-class-document-types.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/flow-class-ledger-columns.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/flow-class-neutral-categories.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/goal-team-command-family.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/goal-team-handoff-threshold.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/history-manifest-schema.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/memory-retention-thresholds.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/memory-types.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/non-disposable-review-surface.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/probe-class-values.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/probe-object-binding-map.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/quant-record-schema.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/serial-reason.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/success-criterion-path-values.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/shared/declarations/facts/trigger-state-schema.yaml'), ('open', '/storage/project/cloud-native-ai/spec-kit/scripts/python/exec-quant.py'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/workspace/.specify/state')]
+E       assert 2 == 1
+E        +  where 2 = len([('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry'), ('os.scandir', '/tmp/pytest-of-agent/pytest-7421/popen-gw0/test_c1_the_role_model_is_one_0/registry')])
+
+tests/contract/test_status_digest_roles.py:290: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_status_digest_roles.py::test_c1_the_role_model_is_one_materialization_per_run
+1 failed in 6.19s
+
+## Drill B — C-68 explicit store-availability state: remove the 'store=' footer line
+command: bash scripts/bash/run-tests.sh tests/contract/test_efficiency_element.py -q -k c68_a_nonexistent
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_efficiency_element.py -q -k c68_a_nonexistent
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else _
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7423/popen-gw0/test_c68_a_nonexistent_store_r0')
+
+    def test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else(tmp_path):
+        """C-68: an absent store renders the explicit state; the entry set, ordering and bounds are unchanged."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for index in range(2):
+            _write_entry(registry, _entry("t055-absent-%d" % index, workspace))
+    
+        absent = _digest(workspace, registry, "--cap", "5")
+        assert absent.returncode == 0, absent.stderr
+>       assert _no_measurements_literal() in absent.stdout, (
+            "C-68: an absent store renders the explicit 'no measurements' state; got %r" % absent.stdout
+        )
+E       AssertionError: C-68: an absent store renders the explicit 'no measurements' state; got '状态摘要 · 生成于 2026-11-10T15:36:23.749123Z（UTC）· 最多 5 条 · 注册目录 /tmp/pytest-of-agent/pytest-7423/popen-gw0/test_c68_a_nonexistent_store_r0/registry\n\n执行体             所属 spec      父边  角色  深度  在做什么                  状态                      已执行时间\n-----------------  -------------  ----  ----  ----  ------------------------  ------------------------  ----------\n—（无存活执行体）  t055-absent-0  -     -     -     /speckit.implement: 实现  活跃（静默 4 天 6 小时）  -\n—（无存活执行体）  t055-absent-1  -     -     -     /speckit.implement: 实现  活跃（静默 4 天 6 小时）  -\n'
+E       assert 'no measurements' in '状态摘要 · 生成于 2026-11-10T15:36:23.749123Z（UTC）· 最多 5 条 · 注册目录 /tmp/pytest-of-agent/pytest-7423/popen-gw0/test_c68_a_none...ment: 实现  活跃（静默 4 天 6 小时）  -\n—（无存活执行体）  t055-absent-1  -     -     -     /speckit.implement: 实现  活跃（静默 4 天 6 小时）  -\n'
+E        +  where 'no measurements' = _no_measurements_literal()
+E        +  and   '状态摘要 · 生成于 2026-11-10T15:36:23.749123Z（UTC）· 最多 5 条 · 注册目录 /tmp/pytest-of-agent/pytest-7423/popen-gw0/test_c68_a_none...ment: 实现  活跃（静默 4 天 6 小时）  -\n—（无存活执行体）  t055-absent-1  -     -     -     /speckit.implement: 实现  活跃（静默 4 天 6 小时）  -\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/status-dige...（静默 4 天 6 小时）  -\n—（无存活执行体）  t055-absent-1  -     -     -     /speckit.implement: 实现  活跃（静默 4 天 6 小时）  -\n', stderr='').stdout
+
+tests/contract/test_efficiency_element.py:538: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_efficiency_element.py::test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else
+1 failed in 6.20s
+
+## Restoration
+source restored from .specify/.tmp/095-digest-pristine.py; md5sum -c -> OK; zero 'seeded mutation' markers remain.

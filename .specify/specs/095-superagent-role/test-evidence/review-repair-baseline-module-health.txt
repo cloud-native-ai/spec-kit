@@ -1,0 +1,700 @@
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_status_digest_unit.py tests/contract/test_efficiency_element.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.........F........F...FFF.FF..FFFFFFFFFFF                                [100%]
+=================================== FAILURES ===================================
+_ test_c70_neither_delivered_script_names_a_schema_version_field_slot_or_quality_subkey _
+[gw39] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c70_neither_delivered_script_names_a_schema_version_field_slot_or_quality_subkey():
+        """C-70 / C-71: the record's schema is reached by path through the engine; no delivered script re-spells it.
+    
+        The scan is an AST scan over the **string literals** of the delivered scripts: a literal naming a schema
+        version, a ``quality`` sub-key or a closed vocabulary member would be a second definition of the declaration
+        owner's fact. Comments and docstrings are excluded (a docstring names the owner's path, which is the legal
+        reference form); only executable string literals are judged.
+        """
+        delivered = [
+            Path("scripts") / "python" / "status-digest.py",
+            Path("scripts") / "python" / "measure.py",
+        ]
+        #: The declaration owner's own vocabulary members, read from it rather than re-spelled here (C-71).
+        declaration = (REPO_ROOT / "shared" / "declarations" / "facts" / "quant-record-schema.yaml").read_text(
+            encoding="utf-8"
+        )
+        vocabulary = set(re.findall(r"^\s+-\s+([a-z][a-z-]+)\s*$", declaration, re.M))
+    
+        offenders = []
+        for rel in delivered:
+            path = REPO_ROOT / rel
+            assert path.is_file(), "a delivered script is missing: %s" % rel
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            docstrings = set()
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    body = getattr(node, "body", [])
+                    if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant):
+                        docstrings.add(id(body[0].value))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
+                    continue
+                if id(node) in docstrings:
+                    continue
+                text = node.value
+                if "schema_version" in text or "quality." in text or "elapsed_ms" in text:
+                    offenders.append((rel.as_posix(), text, node.lineno))
+                elif text in vocabulary and len(text) > 3:
+                    offenders.append((rel.as_posix(), text, node.lineno))
+>       assert not offenders, (
+            "C-70/C-71: a delivered script re-spells the declaration owner's fact instead of reaching it by path: %r"
+            % (offenders,)
+        )
+E       AssertionError: C-70/C-71: a delivered script re-spells the declaration owner's fact instead of reaching it by path: [('scripts/python/status-digest.py', 'agent', 1116)]
+E       assert not [('scripts/python/status-digest.py', 'agent', 1116)]
+
+tests/contract/test_efficiency_element.py:673: AssertionError
+_ test_c63_a_status_line_and_a_digest_over_one_store_carry_equal_element_counts _
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw29/test_c63_a_status_line_and_a_d0')
+
+    def test_c63_a_status_line_and_a_digest_over_one_store_carry_equal_element_counts(tmp_path):
+        """C-63: the line names its emitting step, the digest names this run's steps — one element each, equal sets."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(registry, _entry("t055-line-a", workspace))
+        # The record is placed inside the run the registry entry names, so the digest's "this run's steps" population
+        # is the run the fixture states — the store supplies quantities for the surface's own step set and never
+        # widens it (C-63, FR-024: the line is the emitting step alone).
+        _write_store(
+            workspace,
+            [_store_record("/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                           elapsed={"value": 253000, "provenance": "carried"},
+                           run_id="r20261106T000000Z-t055-line-a")],
+        )
+    
+        digest = _digest(workspace, registry)
+        assert digest.returncode == 0, digest.stderr
+        rows = _entry_rows(digest.stdout)
+>       assert len(rows) == 1, "the fixture registry lists exactly one entry; got %r" % rows
+E       AssertionError: the fixture registry lists exactly one entry; got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_efficiency_element.py:282: AssertionError
+____ test_c42_agent_activity_is_packed_where_the_entry_declares_its_triplet ____
+[gw25] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw25/test_c42_agent_activity_is_pac0')
+
+    def test_c42_agent_activity_is_packed_where_the_entry_declares_its_triplet(tmp_path):
+        """E5's ``agent_activity``: the per-entry activity renders only where the entry declares triplet paths."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        triplet = {}
+        for key, suffix in (
+            ("status_path", ".status"),
+            ("log_path", ".live.log"),
+            ("heartbeat_path", ".heartbeat"),
+        ):
+            path = tmp_path / ("t027-triplet" + suffix)
+            path.write_text("x\n", encoding="utf-8")
+            triplet[key] = str(path)
+        _write_entry(registry, _entry("t027-with-triplet", workspace, **triplet))
+        _write_entry(registry, _entry("t027-without-triplet", workspace,
+                                      updated_at="2026-11-06T01:00:00Z"))
+    
+        proc = _digest(workspace, registry, "--cap", "5")
+    
+        by_id = {}
+        for line in proc.stdout.splitlines():
+            if line.startswith("line_id="):
+                by_id[line.split("line_id=", 1)[1].split(" ", 1)[0]] = line
+>       assert "activity=" in by_id["t027-with-triplet"], (
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "an entry that declares its triplet renders the packed agent activity; got %r"
+            % by_id["t027-with-triplet"]
+        )
+E       KeyError: 't027-with-triplet'
+
+tests/unit/test_status_digest_unit.py:872: KeyError
+_____ test_c42_only_entries_of_the_current_workspace_are_listed_or_counted _____
+[gw24] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw24/test_c42_only_entries_of_the_c0')
+
+    def test_c42_only_entries_of_the_current_workspace_are_listed_or_counted(tmp_path):
+        """FR-011's workspace rule: another project's entry is neither rendered nor counted against the cap."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        other = tmp_path / "another-project"
+        other.mkdir()
+        registry = _registry(tmp_path)
+        for index in range(3):
+            _write_entry(
+                registry,
+                _entry("t027-mine-%02d" % index, workspace, updated_at="2026-11-06T0%d:00:00Z" % index),
+            )
+        _write_entry(registry, _entry("t027-theirs-00", other, updated_at="2026-11-06T09:00:00Z"))
+    
+        proc = _digest(workspace, registry, "--cap", "5")
+    
+        rendered = [
+            ln.split("line_id=", 1)[1].split(" ", 1)[0]
+            for ln in proc.stdout.splitlines()
+            if ln.startswith("line_id=")
+        ]
+>       assert rendered == ["t027-mine-02", "t027-mine-01", "t027-mine-00"], (
+            "only this workspace's lines are listed; got %r" % (rendered,)
+        )
+E       AssertionError: only this workspace's lines are listed; got []
+E       assert [] == ['t027-mine-0...t027-mine-00']
+E         
+E         Right contains 3 more items, first extra item: 't027-mine-02'
+E         Use -v to get more diff
+
+tests/unit/test_status_digest_unit.py:839: AssertionError
+_ test_c64_a_tight_bound_withdraws_tokens_and_invocations_from_every_unit_together _
+[gw32] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw32/test_c64_a_tight_bound_withdra0')
+
+    def test_c64_a_tight_bound_withdraws_tokens_and_invocations_from_every_unit_together(tmp_path):
+        """C-64: degradation is all-or-nothing per render, and the withdrawn quantity is named in the omitted summary."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for line_id in ("t055-tight-a", "t055-tight-b"):
+            _write_entry(registry, _entry(line_id, workspace))
+        _write_store(
+            workspace,
+            [
+                _store_record(
+                    "/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                    elapsed={"value": 1000, "provenance": "measured"},
+                    tokens={"value": 1200, "provenance": "measured"},
+                    invocations={"value": 3, "provenance": "measured"},
+                ),
+                _store_record(
+                    "/speckit.tasks", "command", "2026-11-06T09:01:00Z",
+                    elapsed={"value": 2000, "provenance": "measured"},
+                    tokens={"value": 900, "provenance": "measured"},
+                    invocations={"value": 2, "provenance": "measured"},
+                ),
+            ],
+        )
+    
+        tight = _digest(workspace, registry, "--cap", "2", "--element-bound", "60")
+        assert tight.returncode == 0, tight.stderr
+        rows = _entry_rows(tight.stdout)
+>       assert len(rows) == 2, rows
+E       AssertionError: []
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/contract/test_efficiency_element.py:411: AssertionError
+________________ test_c44_every_rendered_entry_carries_its_age _________________
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw20/test_c44_every_rendered_entry_0')
+
+    def test_c44_every_rendered_entry_carries_its_age(tmp_path):
+        """Contract C-44: per-entry age is always rendered, stale or not."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(registry, _entry("t027-aged-line", workspace, updated_at="2026-11-06T00:00:00Z"))
+    
+        proc = _digest(workspace, registry, "--cap", "5")
+    
+        entry_lines = [ln for ln in proc.stdout.splitlines() if ln.startswith("line_id=")]
+>       assert entry_lines, "the single-entry registry must render one entry; got:\n%s" % proc.stdout
+E       AssertionError: the single-entry registry must render one entry; got:
+E         状态摘要 · 生成于 2026-11-10T15:33:04.127260Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw20/test_c44_every_rendered_entry_0/registry
+E         
+E         线路            状态  阶段  已静默          标记            最近步骤与消耗
+E         --------------  ----  ----  --------------  --------------  --------------
+E         t027-aged-line  活跃  —     111 小时 33 分  活跃中；已静默  无运行记录
+E         未找到运行记录存储，本页无法给出消耗读数
+E         
+E       assert []
+
+tests/unit/test_status_digest_unit.py:762: AssertionError
+_ test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else _
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw35/test_c68_a_nonexistent_store_r0')
+
+    def test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else(tmp_path):
+        """C-68: an absent store renders the explicit state; the entry set, ordering and bounds are unchanged."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for index in range(2):
+            _write_entry(registry, _entry("t055-absent-%d" % index, workspace))
+    
+        absent = _digest(workspace, registry, "--cap", "5")
+        assert absent.returncode == 0, absent.stderr
+>       assert _no_measurements_literal() in absent.stdout, (
+            "C-68: an absent store renders the explicit 'no measurements' state; got %r" % absent.stdout
+        )
+E       AssertionError: C-68: an absent store renders the explicit 'no measurements' state; got '状态摘要 · 生成于 2026-11-10T15:33:04.148537Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw35/test_c68_a_nonexistent_store_r0/registry\n\n线路           状态  阶段       已静默          标记            最近步骤与消耗\n-------------  ----  ---------  --------------  --------------  --------------\nt055-absent-0  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\nt055-absent-1  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n'
+E       assert 'no measurements' in '状态摘要 · 生成于 2026-11-10T15:33:04.148537Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/p...lement  102 小时 33 分  活跃中；已静默  无运行记录\nt055-absent-1  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n'
+E        +  where 'no measurements' = _no_measurements_literal()
+E        +  and   '状态摘要 · 生成于 2026-11-10T15:33:04.148537Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/p...lement  102 小时 33 分  活跃中；已静默  无运行记录\nt055-absent-1  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/095-base-b3d...小时 33 分  活跃中；已静默  无运行记录\nt055-absent-1  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n', stderr='').stdout
+
+tests/contract/test_efficiency_element.py:528: AssertionError
+__ test_c44_an_entry_older_than_the_stale_bound_is_marked_stale_with_its_age ___
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw19/test_c44_an_entry_older_than_t0')
+
+    def test_c44_an_entry_older_than_the_stale_bound_is_marked_stale_with_its_age(tmp_path):
+        """Contract C-44: an entry past the bound is marked stale AND shows the age it is stale by."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(
+            registry,
+            _entry("t027-fresh-line", workspace, updated_at="2026-11-06T00:00:00Z"),
+        )
+        fresh = tmp_path / "fresh.status"
+        fresh.write_text("working\n", encoding="utf-8")
+        old = tmp_path / "old.status"
+        old.write_text("working\n", encoding="utf-8")
+        # The bound is measured against the newest triplet mtime too, so the stale entry's triplet is aged explicitly.
+        ancient = time.time() - 5000
+        os.utime(old, (ancient, ancient))
+        _write_entry(registry, _entry("t027-fresh-triplet", workspace, status_path=str(fresh)))
+        _write_entry(registry, _entry("t027-stale-triplet", workspace, status_path=str(old)))
+    
+        proc = _digest(workspace, registry, "--cap", "5", "--stale-bound", "900")
+    
+        by_id = {}
+        for line in proc.stdout.splitlines():
+            if line.startswith("line_id="):
+                by_id[line.split("line_id=", 1)[1].split(" ", 1)[0]] = line
+    
+>       stale_line = by_id["t027-stale-triplet"]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 't027-stale-triplet'
+
+tests/unit/test_status_digest_unit.py:743: KeyError
+_ test_c63_the_digest_never_exceeds_its_cap_and_the_line_never_grows_the_unit_set _
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw30/test_c63_the_digest_never_exce0')
+
+    def test_c63_the_digest_never_exceeds_its_cap_and_the_line_never_grows_the_unit_set(tmp_path):
+        """C-63: the element introduces no unit — the digest stops at its cap, the line lists what it already lists."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for index in range(3):
+            _write_entry(registry, _entry("t055-line-%d" % index, workspace))
+        _write_store(
+            workspace,
+            [
+                _store_record("/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                              elapsed={"value": 1000, "provenance": "carried"}),
+                _store_record("/speckit.tasks", "command", "2026-11-06T09:01:00Z",
+                              elapsed={"value": 2000, "provenance": "carried"}),
+                _store_record("skill:draw-diagram", "skill", "2026-11-06T09:02:00Z",
+                              elapsed={"value": 3000, "provenance": "measured"}),
+            ],
+        )
+    
+        capped = _digest(workspace, registry, "--cap", "2")
+        assert capped.returncode == 0, capped.stderr
+        rows = _entry_rows(capped.stdout)
+>       assert len(rows) == 2, "the cap bounds the entry set; got %r" % rows
+E       AssertionError: the cap bounds the entry set; got []
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/contract/test_efficiency_element.py:329: AssertionError
+__ test_c68_an_empty_store_renders_no_measurements_with_the_same_exit_status ___
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw36/test_c68_an_empty_store_render0')
+
+    def test_c68_an_empty_store_renders_no_measurements_with_the_same_exit_status(tmp_path):
+        """C-68: an empty store answers exactly as an absent one — never an error, never a changed exit status."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(registry, _entry("t055-empty", workspace))
+        (workspace / ".specify" / "memory" / "exec-quant" / "records").mkdir(parents=True)
+    
+        empty = _digest(workspace, registry)
+        assert empty.returncode == 0, empty.stderr
+>       assert _no_measurements_literal() in empty.stdout, (
+            "C-68: an empty store renders the same explicit state; got %r" % empty.stdout
+        )
+E       AssertionError: C-68: an empty store renders the same explicit state; got '状态摘要 · 生成于 2026-11-10T15:33:04.131118Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw36/test_c68_an_empty_store_render0/registry\n\n线路        状态  阶段       已静默          标记            最近步骤与消耗\n----------  ----  ---------  --------------  --------------  --------------\nt055-empty  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n'
+E       assert 'no measurements' in '状态摘要 · 生成于 2026-11-10T15:33:04.131118Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...------  --------------  --------------\nt055-empty  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n'
+E        +  where 'no measurements' = _no_measurements_literal()
+E        +  and   '状态摘要 · 生成于 2026-11-10T15:33:04.131118Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...------  --------------  --------------\nt055-empty  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/095-base-b3d...----------  --------------\nt055-empty  活跃  implement  102 小时 33 分  活跃中；已静默  无运行记录\n未找到运行记录存储，本页无法给出消耗读数\n', stderr='').stdout
+
+tests/contract/test_efficiency_element.py:547: AssertionError
+_____ test_c43_the_cap_default_is_declared_and_overridable_per_invocation ______
+[gw28] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw28/test_c43_the_cap_default_is_de0')
+
+    def test_c43_the_cap_default_is_declared_and_overridable_per_invocation(tmp_path):
+        """Contract C-43: a declared default in the script, replaceable by ``--cap`` without a source edit."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _twelve_entry_registry(tmp_path, workspace)
+    
+        default_render = _digest(workspace, registry)
+        declared = re.search(r"\bcap=([0-9]+)\b", default_render.stdout)
+>       assert declared, "the digest renders the cap in force; got:\n%s" % default_render.stdout
+E       AssertionError: the digest renders the cap in force; got:
+E         状态摘要 · 生成于 2026-11-10T15:33:04.174613Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw28/test_c43_the_cap_default_is_de0/registry
+E         
+E         线路          状态     阶段  已静默          标记            最近步骤与消耗
+E         ------------  -------  ----  --------------  --------------  --------------
+E         t027-line-02  活跃     —     109 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-01  活跃     —     110 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-00  活跃     —     111 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-09  blocked  —     102 小时 33 分  已静默          无运行记录
+E         t027-line-08  blocked  —     103 小时 33 分  已静默          无运行记录
+E         t027-line-07  blocked  —     104 小时 33 分  已静默          无运行记录
+E         t027-line-06  blocked  —     105 小时 33 分  已静默          无运行记录
+E         t027-line-05  blocked  —     106 小时 33 分  已静默          无运行记录
+E         t027-line-04  blocked  —     107 小时 33 分  已静默          无运行记录
+E         t027-line-03  blocked  —     108 小时 33 分  已静默          无运行记录
+E         t027-line-11  blocked  —     110 小时 33 分  已静默          无运行记录
+E         t027-line-10  blocked  —     111 小时 33 分  已静默          无运行记录
+E         未找到运行记录存储，本页无法给出消耗读数
+E         
+E       assert None
+
+tests/unit/test_status_digest_unit.py:940: AssertionError
+_____________ test_c42_the_most_recent_completion_is_rendered_once _____________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw26/test_c42_the_most_recent_compl0')
+
+    def test_c42_the_most_recent_completion_is_rendered_once(tmp_path):
+        """E5's ``last_completion``: the single most recent completed entry is named, and only once."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(registry, _entry("t027-completed-old", workspace, state="closed",
+                                      updated_at="2026-11-05T00:00:00Z"))
+        _write_entry(registry, _entry("t027-completed-new", workspace, state="closed",
+                                      updated_at="2026-11-06T00:00:00Z"))
+        _write_entry(registry, _entry("t027-still-open", workspace, updated_at="2026-11-06T01:00:00Z"))
+    
+        proc = _digest(workspace, registry, "--cap", "5")
+    
+        completion_lines = [ln for ln in proc.stdout.splitlines() if "last_completion" in ln]
+>       assert len(completion_lines) == 1, (
+            "the digest names exactly one most recent completion; got %r" % (completion_lines,)
+        )
+E       AssertionError: the digest names exactly one most recent completion; got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/unit/test_status_digest_unit.py:896: AssertionError
+_ test_c43_a_twelve_entry_fixture_under_cap_five_renders_five_and_omitted_seven _
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw16/test_c43_a_twelve_entry_fixtur0')
+
+    def test_c43_a_twelve_entry_fixture_under_cap_five_renders_five_and_omitted_seven(tmp_path):
+        """Contract C-43: the cap bounds the render and the omitted count is stated, never inferred."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _twelve_entry_registry(tmp_path, workspace)
+    
+        proc = _digest(workspace, registry, "--cap", "5")
+    
+        assert proc.returncode in DIGEST_EXIT_STATUSES, (
+            "the digest exit status must be one of %r (contract C-45); got %s"
+            % (DIGEST_EXIT_STATUSES, proc.returncode)
+        )
+        entry_lines = [ln for ln in proc.stdout.splitlines() if ln.startswith("line_id=")]
+>       assert len(entry_lines) == 5, (
+            "a 12-entry registry under --cap 5 renders exactly 5 entries; got %d:\n%s"
+            % (len(entry_lines), proc.stdout)
+        )
+E       AssertionError: a 12-entry registry under --cap 5 renders exactly 5 entries; got 0:
+E         状态摘要 · 生成于 2026-11-10T15:33:04.171181Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw16/test_c43_a_twelve_entry_fixtur0/registry
+E         
+E         线路          状态     阶段  已静默          标记            最近步骤与消耗
+E         ------------  -------  ----  --------------  --------------  --------------
+E         t027-line-02  活跃     —     109 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-01  活跃     —     110 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-00  活跃     —     111 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-09  blocked  —     102 小时 33 分  已静默          无运行记录
+E         t027-line-08  blocked  —     103 小时 33 分  已静默          无运行记录
+E         另有 7 条未显示
+E         未找到运行记录存储，本页无法给出消耗读数
+E         
+E       assert 0 == 5
+E        +  where 0 = len([])
+
+tests/unit/test_status_digest_unit.py:647: AssertionError
+_ test_c43_ordering_puts_active_lines_first_then_descending_activity_with_line_id_ties _
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw18/test_c43_ordering_puts_active_0')
+
+    def test_c43_ordering_puts_active_lines_first_then_descending_activity_with_line_id_ties(tmp_path):
+        """Contract C-43: active first, then descending last activity, ties by ``line_id`` ascending."""
+        constants = _load_engine_constants()
+        active_state = sorted(constants["ACTIVE_STATES"])[0]
+        idle_states = sorted(constants["STATE_VALUES"] - constants["ACTIVE_STATES"])
+        idle_state = idle_states[0]
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        # Two idle entries share one timestamp, so only the tie-break can order them; the active entry is the oldest of
+        # all three and must still come first.
+        _write_entry(
+            registry,
+            _entry("t027-b-oldest-active", workspace, state=active_state,
+                   updated_at="2026-11-06T00:00:00Z"),
+        )
+        _write_entry(
+            registry,
+            _entry("t027-z-tie", workspace, state=idle_state, updated_at="2026-11-06T05:00:00Z"),
+        )
+        _write_entry(
+            registry,
+            _entry("t027-a-tie", workspace, state=idle_state, updated_at="2026-11-06T05:00:00Z"),
+        )
+    
+        proc = _digest(workspace, registry, "--cap", "3")
+    
+        order = [
+            ln.split("line_id=", 1)[1].split(" ", 1)[0]
+            for ln in proc.stdout.splitlines()
+            if ln.startswith("line_id=")
+        ]
+>       assert order == ["t027-b-oldest-active", "t027-a-tie", "t027-z-tie"], (
+            "the declared total ordering is active lines first, then descending last activity, ties by line_id"
+            " ascending; got %r" % (order,)
+        )
+E       AssertionError: the declared total ordering is active lines first, then descending last activity, ties by line_id ascending; got []
+E       assert [] == ['t027-b-olde... 't027-z-tie']
+E         
+E         Right contains 3 more items, first extra item: 't027-b-oldest-active'
+E         Use -v to get more diff
+
+tests/unit/test_status_digest_unit.py:711: AssertionError
+_ test_c64_a_valued_and_a_not_evaluated_record_render_the_marker_and_never_zero _
+[gw33] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw33/test_c64_a_valued_and_a_not_ev0')
+
+    def test_c64_a_valued_and_a_not_evaluated_record_render_the_marker_and_never_zero(tmp_path):
+        """C-64 / FR-023: a not-evaluated quantity renders the marker on its own step's element; ``0`` never appears.
+    
+        The line is the emitting step alone (FR-024): its one element carries the valued record's quantities and no
+        elapsed marker. The digest names this run's / the most recent steps — here both fixture steps — so the
+        not-evaluated record's step renders the marker beside its neighbour's number, never a zero and never an
+        omission.
+        """
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for line_id in ("t055-mixed-a", "t055-mixed-b"):
+            _write_entry(registry, _entry(line_id, workspace))
+        _write_store(
+            workspace,
+            [
+                _store_record("/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                              elapsed={"value": 253000, "provenance": "carried"}),
+                _store_record("/speckit.tasks", "command", "2026-11-06T09:01:00Z"),
+            ],
+        )
+    
+        line = _report(workspace, registry)
+        assert line.returncode == 0, line.stderr
+        line_elements = _elements(line.stdout)
+        assert len(line_elements) == 1, (
+            "FR-024: the status line is the emitting step alone — exactly one element; got %r" % line.stdout
+        )
+        assert line_elements[0][0] == "/speckit.plan", (
+            "the line's element is the step the flow named; got %r" % (line_elements,)
+        )
+    
+        digest = _digest(workspace, registry, "--cap", "5")
+        assert digest.returncode == 0, digest.stderr
+        rows = _entry_rows(digest.stdout)
+        digest_elements = [element for row in rows for element in _elements(row)]
+>       assert len(digest_elements) == 2, (
+            "the digest names both of the run's steps and carries one element each; got %r" % rows
+        )
+E       AssertionError: the digest names both of the run's steps and carries one element each; got []
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/contract/test_efficiency_element.py:466: AssertionError
+__________ test_c43_two_renders_over_one_registry_are_byte_identical ___________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw17/test_c43_two_renders_over_one_0')
+
+    def test_c43_two_renders_over_one_registry_are_byte_identical(tmp_path):
+        """Contract C-43: the ordering is total, so the same registry yields the same first-N set."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _twelve_entry_registry(tmp_path, workspace)
+    
+        first = _digest(workspace, registry, "--cap", "5")
+        second = _digest(workspace, registry, "--cap", "5")
+    
+        def body(proc):
+            # `generated_at` is the reading's own clock, so it is the one field two runs cannot share. Every rendered
+            # entry row and the omitted line are what determinism is about.
+            return [ln for ln in proc.stdout.splitlines() if not ln.startswith("generated_at=")]
+    
+>       assert body(first) == body(second), (
+            "two renders over one registry must be byte-identical below the clock line;\nfirst:\n%s\nsecond:\n%s"
+            % (first.stdout, second.stdout)
+        )
+E       AssertionError: two renders over one registry must be byte-identical below the clock line;
+E         first:
+E         状态摘要 · 生成于 2026-11-10T15:33:04.169676Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw17/test_c43_two_renders_over_one_0/registry
+E         
+E         线路          状态     阶段  已静默          标记            最近步骤与消耗
+E         ------------  -------  ----  --------------  --------------  --------------
+E         t027-line-02  活跃     —     109 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-01  活跃     —     110 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-00  活跃     —     111 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-09  blocked  —     102 小时 33 分  已静默          无运行记录
+E         t027-line-08  blocked  —     103 小时 33 分  已静默          无运行记录
+E         另有 7 条未显示
+E         未找到运行记录存储，本页无法给出消耗读数
+E         
+E         second:
+E         状态摘要 · 生成于 2026-11-10T15:33:04.257242Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw17/test_c43_two_renders_over_one_0/registry
+E         
+E         线路          状态     阶段  已静默          标记            最近步骤与消耗
+E         ------------  -------  ----  --------------  --------------  --------------
+E         t027-line-02  活跃     —     109 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-01  活跃     —     110 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-00  活跃     —     111 小时 33 分  活跃中；已静默  无运行记录
+E         t027-line-09  blocked  —     102 小时 33 分  已静默          无运行记录
+E         t027-line-08  blocked  —     103 小时 33 分  已静默          无运行记录
+E         另有 7 条未显示
+E         未找到运行记录存储，本页无法给出消耗读数
+E         
+E       assert ['状态摘要 · 生成于 ...  无运行记录', ...] == ['状态摘要 · 生成于 ...  无运行记录', ...]
+E         
+E         At index 0 diff: '状态摘要 · 生成于 2026-11-10T15:33:04.169676Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw17/test_c43_two_renders_over_one_0/registry' != '状态摘要 · 生成于 2026-11-10T15:33:04.257242Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw17/test_c43_two_renders_over_one_0/registry'
+E         Use -v to get more diff
+
+tests/unit/test_status_digest_unit.py:673: AssertionError
+_ test_c71_the_not_evaluated_marker_is_real_and_stable_across_the_two_surfaces _
+[gw40] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw40/test_c71_the_not_evaluated_mar0')
+
+    def test_c71_the_not_evaluated_marker_is_real_and_stable_across_the_two_surfaces(tmp_path):
+        """C-71: both surfaces render the *same* marker — one literal, two hosts, read from the owner by anchor."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        _write_entry(registry, _entry("t055-marker", workspace))
+        # The record sits inside the run the registry entry names, so the digest's step set includes its step.
+        _write_store(workspace, [_store_record("/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                                               run_id="r20261106T000000Z-t055-marker")])
+    
+        digest = _digest(workspace, registry)
+        line = _report(workspace, registry)
+        assert digest.returncode == 0, digest.stderr
+        assert line.returncode == 0, line.stderr
+        marker = _marker_literal()
+>       assert marker in digest.stdout.lower(), (
+            "C-71: the digest renders the owner's marker verbatim; got %r expected %r"
+            % (digest.stdout, marker)
+        )
+E       AssertionError: C-71: the digest renders the owner's marker verbatim; got '状态摘要 · 生成于 2026-11-10T15:33:04.125077Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw40/test_c71_the_not_evaluated_mar0/registry\n\n线路         状态  阶段       已静默          标记            最近步骤与消耗\n-----------  ----  ---------  --------------  --------------  ------------------------------------------------------------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n' expected 'not-evaluated'
+E       assert 'not-evaluated' in '状态摘要 · 生成于 2026-11-10t15:33:04.125077z（utc）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...---------------------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n'
+E        +  where '状态摘要 · 生成于 2026-11-10t15:33:04.125077z（utc）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...---------------------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n' = <built-in method lower of str object at 0x5579857f5cb0>()
+E        +    where <built-in method lower of str object at 0x5579857f5cb0> = '状态摘要 · 生成于 2026-11-10T15:33:04.125077Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...---------------------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n'.lower
+E        +      where '状态摘要 · 生成于 2026-11-10T15:33:04.125077Z（UTC）· 最多 20 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/...---------------------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/095-base-b3d...---------\nt055-marker  活跃  implement  102 小时 33 分  活跃中；已静默  步骤 /speckit.plan · 耗时 未测量 · 令牌 未测量 · 调用 未测量\n', stderr='').stdout
+
+tests/contract/test_efficiency_element.py:694: AssertionError
+____ test_c68_the_entry_set_is_identical_to_a_render_without_the_dimension _____
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7418/popen-gw37/test_c68_the_entry_set_is_iden0')
+
+    def test_c68_the_entry_set_is_identical_to_a_render_without_the_dimension(tmp_path):
+        """C-68: apart from the element's own text, the entry set is byte-identical to a store-less render."""
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        registry = _registry(tmp_path)
+        for index in range(3):
+            _write_entry(registry, _entry("t055-identical-%d" % index, workspace))
+        _write_store(
+            workspace,
+            [_store_record("/speckit.plan", "command", "2026-11-06T09:00:00Z",
+                           elapsed={"value": 253000, "provenance": "carried"})],
+        )
+    
+        with_store = _digest(workspace, registry, "--cap", "5")
+        assert with_store.returncode == 0, with_store.stderr
+        without = _digest_with_the_store_hidden(workspace, registry, "--cap", "5")
+    
+        # The element is *content* of an entry: removing exactly the element's own field group from each row must give
+        # back the store-less render byte for byte — every other field, the ordering, the cap and the summary survive.
+        def strip_element(text: str):
+            kept = []
+            for line in text.splitlines():
+                # The render's clock is its own line and is not a bound C-68 protects: the comparison is field-level.
+                if line.startswith("generated_at="):
+                    continue
+                line = re.sub(r"\s*efficiency=([^|]*)$", "", line)
+                line = re.sub(r"\s\s+", " ", line).rstrip()
+                kept.append(line)
+            return kept
+    
+        got = strip_element(with_store.stdout)
+        expected = strip_element(without)
+        # The only permitted difference is the store-availability statement the present store replaces (C-68).
+        got = [line for line in got if not re.search(r"(?i)no measurements", line)]
+        expected = [line for line in expected if not re.search(r"(?i)no measurements", line)]
+>       assert got == expected, (
+            "C-68: with the element removed the render must be unchanged; got %r expected %r" % (got, expected)
+        )
+E       AssertionError: C-68: with the element removed the render must be unchanged; got ['状态摘要 · 生成于 2026-11-10T15:33:04.131029Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw37/test_c68_the_entry_set_is_iden0/registry', '', '线路 状态 阶段 已静默 标记 最近步骤与消耗', '---------------- ---- --------- -------------- -------------- -----------------------------------------------------------------------', 't055-identical-0 活跃 implement 102 小时 33 分 活跃中；已静默 步骤 /speckit.plan · 耗时 253000ms(carried) · 令牌 未测量 · 调用 未测量', 't055-identical-1 活跃 implement 102 小时 33 分 活跃中；已静默 无运行记录', 't055-identical-2 活跃 implement 102 小时 33 分 活跃中；已静默 无运行记录'] expected ['状态摘要 · 生成于 2026-11-10T15:33:04.272523Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw37/test_c68_the_entry_set_is_iden0/registry', '', '线路 状态 阶段 已静默 标记 最近步骤与消耗', '---------------- ---- --------- -------------- -------------- --------------', 't055-identical-0 活跃 implement 102 小时 33 分 活跃中；已静默 无运行记录', 't055-identical-1 活跃 implement 102 小时 33 分 活跃中；已静默 无运行记录', 't055-identical-2 活跃 implement 102 小时 33 分 活跃中；已静默 无运行记录', '未找到运行记录存储，本页无法给出消耗读数']
+E       assert ['状态摘要 · 生成于 ...默 无运行记录', ...] == ['状态摘要 · 生成于 ...默 无运行记录', ...]
+E         
+E         At index 0 diff: '状态摘要 · 生成于 2026-11-10T15:33:04.131029Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw37/test_c68_the_entry_set_is_iden0/registry' != '状态摘要 · 生成于 2026-11-10T15:33:04.272523Z（UTC）· 最多 5 条 · 静默阈值 15 分钟 · long-run · 注册目录 /tmp/pytest-of-agent/pytest-7418/popen-gw37/test_c68_the_entry_set_is_iden0/registry'
+E         Right contains one more item: '未找到运行记录存储，本页无法给出消耗读数'
+E         Use -v to get more diff
+
+tests/contract/test_efficiency_element.py:587: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_efficiency_element.py::test_c70_neither_delivered_script_names_a_schema_version_field_slot_or_quality_subkey
+FAILED tests/contract/test_efficiency_element.py::test_c63_a_status_line_and_a_digest_over_one_store_carry_equal_element_counts
+FAILED tests/unit/test_status_digest_unit.py::test_c42_agent_activity_is_packed_where_the_entry_declares_its_triplet
+FAILED tests/unit/test_status_digest_unit.py::test_c42_only_entries_of_the_current_workspace_are_listed_or_counted
+FAILED tests/contract/test_efficiency_element.py::test_c64_a_tight_bound_withdraws_tokens_and_invocations_from_every_unit_together
+FAILED tests/unit/test_status_digest_unit.py::test_c44_every_rendered_entry_carries_its_age
+FAILED tests/contract/test_efficiency_element.py::test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else
+FAILED tests/unit/test_status_digest_unit.py::test_c44_an_entry_older_than_the_stale_bound_is_marked_stale_with_its_age
+FAILED tests/contract/test_efficiency_element.py::test_c63_the_digest_never_exceeds_its_cap_and_the_line_never_grows_the_unit_set
+FAILED tests/contract/test_efficiency_element.py::test_c68_an_empty_store_renders_no_measurements_with_the_same_exit_status
+FAILED tests/unit/test_status_digest_unit.py::test_c43_the_cap_default_is_declared_and_overridable_per_invocation
+FAILED tests/unit/test_status_digest_unit.py::test_c42_the_most_recent_completion_is_rendered_once
+FAILED tests/unit/test_status_digest_unit.py::test_c43_a_twelve_entry_fixture_under_cap_five_renders_five_and_omitted_seven
+FAILED tests/unit/test_status_digest_unit.py::test_c43_ordering_puts_active_lines_first_then_descending_activity_with_line_id_ties
+FAILED tests/contract/test_efficiency_element.py::test_c64_a_valued_and_a_not_evaluated_record_render_the_marker_and_never_zero
+FAILED tests/unit/test_status_digest_unit.py::test_c43_two_renders_over_one_registry_are_byte_identical
+FAILED tests/contract/test_efficiency_element.py::test_c71_the_not_evaluated_marker_is_real_and_stable_across_the_two_surfaces
+FAILED tests/contract/test_efficiency_element.py::test_c68_the_entry_set_is_identical_to_a_render_without_the_dimension
+18 failed, 23 passed in 6.32s

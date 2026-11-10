@@ -844,19 +844,22 @@ def load_role_engine():
 def read_role_materialization(workspace: Path, registry_dir: Path):
     """The ONE role-model materialization: one carrier read, one judgement (contract C-1).
 
-    Returns ``(model, error)``. An unavailable materialization is not a digest input error: the four role fields
-    render as empty and the digest's own reading is untouched. The engine's required carrier roots need not exist in
-    a project that never ran a team or a driver (the degrade face recorded for analyze W2-15).
+    Returns ``(model, inputs, error)``. ``inputs`` is the engine's parsed snapshot, whose ``registry_payloads``
+    carries the registry entries this same read parsed — :func:`read_state` derives the legacy line entries from
+    it, so the registry root is read once and both views derive from that one pass. An unavailable materialization
+    is not a digest input error: the four role fields render as empty and the digest's own reading is untouched.
+    The engine's required carrier roots need not exist in a project that never ran a team or a driver (the degrade
+    face recorded for analyze W2-15).
     """
     engine = load_role_engine()
     if engine is None:
-        return None, "role engine unreadable: %s" % ROLE_ENGINE
+        return None, None, "role engine unreadable: %s" % ROLE_ENGINE
     roots = {key: str(Path(workspace).joinpath(*parts)) for key, parts in ROLE_CARRIER_ROOTS}
     try:
         inputs = engine.read_carrier_inputs(registry_dir=str(registry_dir), **roots)
-        return engine.evaluate_role_model(inputs), None
+        return engine.evaluate_role_model(inputs), inputs, None
     except engine.RoleEdgeInputError as exc:
-        return None, "role model unavailable: %s" % exc
+        return None, None, "role model unavailable: %s" % exc
 
 
 def _role_record(index: dict, item: dict):
@@ -986,6 +989,30 @@ def _is_history_entry(item) -> bool:
     return state in LIFECYCLE_TERMINAL_STATES
 
 
+def _read_registry_entries(registry_dir: Path):
+    """The fallback single registry read, used only when the role materialization is unavailable.
+
+    Returns ``(entries, error)``. The reading is the same one :func:`read_state` takes on the normal path; the
+    fallback exists because a digest without carrier roots must still list its lines, never because two readers
+    are allowed (contract C-1 — one registry read per run, on either path).
+    """
+    try:
+        paths = sorted(registry_dir.glob("*.json"))
+    except OSError as exc:
+        return None, "registry directory is unreadable: %s (%s)" % (registry_dir, exc)
+    entries = []
+    for path in paths:
+        try:
+            with path.open("r", encoding="utf-8") as handle:
+                entry = json.load(handle)
+        except (OSError, ValueError) as exc:
+            return None, "unparsable registry entry %s: %s" % (path, exc)
+        if not isinstance(entry, dict):
+            return None, "unparsable registry entry %s: not a JSON object" % path
+        entries.append(entry)
+    return entries, None
+
+
 # ---------------------------------------------------------------- reader: the whole state
 def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
     """Read the registry once and return the projection every action consumes.
@@ -994,6 +1021,11 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
     single reading: ``registry_dir``, ``entries`` (already workspace-filtered, ordered and capped), ``all_entries``,
     ``omitted``, ``cap``, ``stale_bound_seconds``, ``generated_at``, ``vocabulary``, ``now``, and the efficiency
     projection with its render-wide depth decision (contracts C-63…C-68).
+
+    Contract C-1's single state-read pass: the role materialization is taken first, and the legacy line entries are
+    derived from the SAME registry read it performed (``registry_payloads``). When the materialization is unavailable
+    (a project without the engine's carrier roots), one fallback read supplies the legacy entries — still exactly one
+    registry read per run, never two.
 
     ``element_bound`` is this surface's declared element width in characters (``None`` = not binding); the depth
     decision is taken here, once per reading, so the surfaces never disagree about how deep an element may be.
@@ -1009,22 +1041,22 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
     if not registry_dir.is_dir():
         return None, "registry directory is unreadable: %s" % registry_dir
 
-    try:
-        paths = sorted(registry_dir.glob("*.json"))
-    except OSError as exc:
-        return None, "registry directory is unreadable: %s (%s)" % (registry_dir, exc)
-
-    active_states = vocabulary.get("active_states") or set()
-    raw = []
-    for path in paths:
-        try:
-            with path.open("r", encoding="utf-8") as handle:
-                entry = json.load(handle)
-        except (OSError, ValueError) as exc:
-            return None, "unparsable registry entry %s: %s" % (path, exc)
-        if not isinstance(entry, dict):
-            return None, "unparsable registry entry %s: not a JSON object" % path
-        raw.append(entry)
+    # The role view (contract C-1): ONE materialization per run, and its carrier read is this digest's single
+    # state-read pass — the legacy line entries below derive from the registry payloads that read returned.
+    role_model, role_inputs, _role_error = read_role_materialization(workspace, registry_dir)
+    if role_inputs is not None and "registry_payloads" in role_inputs:
+        unreadable = role_inputs.get("notes", {}).get("registry_unreadable_paths") or []
+        if unreadable:
+            return None, "unparsable registry entry %s" % unreadable[0]
+        raw = [
+            item["payload"]
+            for item in role_inputs.get("registry_payloads") or []
+            if isinstance(item, dict) and isinstance(item.get("payload"), dict)
+        ]
+    else:
+        raw, registry_error = _read_registry_entries(registry_dir)
+        if registry_error:
+            return None, registry_error
 
     # Workspace rule (FR-011): only entries whose project_dir is this workspace are listed, and only they count
     # against the cap. An entry of another project is not rendered and carries no label of its own.
@@ -1044,14 +1076,14 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
         return False
 
     scoped = [e for e in raw if in_workspace(e)]
+    active_states = vocabulary.get("active_states") or set()
     projected = [project_entry(e, now, stale_bound) for e in scoped]
     for item in projected:
         item["is_active"] = item.get("state") in active_states
 
-    # The role view (contract C-1): ONE materialization per run. The legacy line rows gain the four role fields and
+    # Both views derive from the one materialization above: the legacy line rows gain the four role fields and
     # the model's executors outside the registry become rows of their own; an unavailable materialization renders the
     # fields empty and changes nothing else about this reading.
-    role_model, _role_error = read_role_materialization(workspace, registry_dir)
     merged = projected + merge_role_entries(projected, role_model, workspace, now, stale_bound)
 
     # Deterministic order (contract C-43): active executors first, then descending last-activity time, ties by
@@ -1169,82 +1201,6 @@ def last_completion(state):
     if not finished:
         return None
     return max(finished, key=lambda item: _parse_iso(item["last_activity_at"]).timestamp())
-
-
-def render_digest(state) -> str:
-    """Render the bounded summary, derived from the one reading (contracts C-42, C-43, C-44, C-45).
-
-    Shape, top to bottom: the reading header (the clock, the cap and stale bound in force, the profile), one row per
-    entry — each carrying its age always, and its stale marker with that age when the bound is exceeded — the packed
-    per-entry activity where the entry declares its triplet, the single most recent completion, and the
-    ``omitted=<n>`` line when the cap truncated the set. The empty set renders the literal ``nothing-running`` and
-    nothing else (C-45): an empty header would be an empty page wearing a title.
-    """
-    if not state["entries"]:
-        return NOTHING_RUNNING
-
-    efficiency = state.get("efficiency") or {}
-    depth = efficiency.get("depth")
-    lines = [
-        "generated_at=%s cap=%d stale_bound=%s profile=%s registry=%s"
-        % (
-            state["generated_at"],
-            state["cap"],
-            format_duration(state["stale_bound_seconds"]),
-            profile_in_force(state),
-            state["registry_dir"],
-        )
-    ]
-    elements = efficiency.get("elements") or []
-    for position, item in enumerate(state["entries"]):
-        parts = [
-            "line_id=%s" % (item["line_id"] or DASH),
-            "run_id=%s" % (item["run_id"] or DASH),
-            "state=%s" % (item["state"] or DASH),
-            "stage=%s" % item["stage"],
-            "age=%s" % item["age"],
-            "stale=%s" % ("yes" if item["stale"] else "no"),
-            "active=%s" % ("yes" if item["is_active"] else "no"),
-        ]
-        activity = item.get("line_activity")
-        if activity:
-            # The E3 pack rendered inline: label, the state the triplet's exit record shows, and the same age the row
-            # already carries — one reading, one clock (C-41).
-            parts.append(
-                "%slabel=%s,state=%s,age=%s"
-                % (ACTIVITY_FIELD, activity["label"] or DASH, activity["state"], activity["age"])
-            )
-        if item["stale"]:
-            # A stale entry's data is never presented as current (C-44): the marker carries the age it is stale by,
-            # so a reader cannot mistake the row for live state.
-            parts.append(
-                "note=last activity %s ago, beyond the %s stale bound"
-                % (item["age"], format_duration(item["stale_bound_seconds"]))
-            )
-        # The efficiency dimension (contracts C-63…C-68) is CONTENT of this render: one element per step the digest
-        # names, placed on the row whose position it occupies — no extra line, no extra entry, no second cadence. It
-        # is projected from the one reading ``read_state`` already took; a row beyond the step set is left untouched,
-        # because the store supplies quantities for steps and never widens the set (C-63).
-        if efficiency.get("available") and position < len(elements):
-            parts.append(render_element(elements[position], depth))
-        lines.append(" ".join(parts))
-
-    completion = last_completion(state)
-    if completion is not None:
-        lines.append(
-            "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
-        )
-    # C-64's withdrawn quantities are named in this render's EXISTING omitted summary — one statement for the whole
-    # render, never one per step. The summary line exists whether or not the cap truncated the set, so a render that
-    # lost depth and a render that lost entries are both readable from their own line.
-    withheld = efficiency.get("withheld") or ""
-    if state["omitted"] or withheld:
-        lines.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
-    # The store-availability state is a property of the whole render, not of one row (C-68): it is stated once, on
-    # its own summary line, and changes nothing else — same units, same content floor, same ordering, same bound.
-    if not efficiency.get("available"):
-        lines.append("store=%s" % efficiency_vocabulary()["no_measurements"])
-    return "\n".join(lines)
 
 
 def _human_duration(age: str) -> str:
@@ -1472,6 +1428,12 @@ def render_digest_table(state) -> str:
     child, driver stage) is one row of its own carrying the same role columns — contract C-2's second field
     family. Presentation only over the same reading (C-41); the empty view renders the ``nothing-running``
     literal (C-45).
+
+    The dimension and summary semantics of the pre-revision renderer are carried here as content, never by a
+    second renderer: the packed activity where the entry declares its triplet, the single most recent
+    completion, the render-wide truncation/withdrawal summary, the explicit store-availability state (C-68)
+    and one efficiency element per step the digest names (C-63) — appended to the entry's row after the
+    aligned columns, so the element never changes the columns' own geometry.
     """
     visible = state["entries"]
     if not visible:
@@ -1487,9 +1449,28 @@ def render_digest_table(state) -> str:
         state["cap"],
         state["registry_dir"],
     )
+    efficiency = state.get("efficiency") or {}
+    elements = efficiency.get("elements") or []
+    depth = efficiency.get("depth")
     row_count = 8
     rows = []
-    for item in visible:
+    row_entry_positions = []
+
+    def activity_cell(stage, item):
+        cell = _activity_of(stage, item)
+        pack = item.get("line_activity")
+        if pack:
+            # E5's packed per-entry activity (C-42): rendered where the entry declares its triplet, never invented.
+            cell = "%s  %slabel=%s,state=%s,age=%s" % (
+                cell,
+                ACTIVITY_FIELD,
+                pack["label"] or DASH,
+                pack["state"],
+                pack["age"],
+            )
+        return cell
+
+    for position, item in enumerate(visible):
         if "line_id" not in item:
             rows.append(
                 (
@@ -1503,6 +1484,7 @@ def render_digest_table(state) -> str:
                     DASH,
                 )
             )
+            row_entry_positions.append(position)
             continue
         line_id = item["line_id"] or DASH
         state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
@@ -1522,11 +1504,12 @@ def render_digest_table(state) -> str:
                     _parent_cell(item),
                     _roles_cell(item),
                     _depth_cell(item),
-                    _activity_of(None, item),
+                    activity_cell(None, item),
                     state_word,
                     _elapsed_cell(item, now, False),
                 )
             )
+            row_entry_positions.append(position)
             continue
         for ex in line_executors:
             if ex.get("started_epoch") and now:
@@ -1542,11 +1525,12 @@ def render_digest_table(state) -> str:
                     _parent_cell(item),
                     _roles_cell(item),
                     _depth_cell(item),
-                    _activity_of(ex.get("stage"), item),
+                    activity_cell(ex.get("stage"), item),
                     state_word,
                     elapsed,
                 )
             )
+            row_entry_positions.append(position)
     import unicodedata
 
     def display_width(text):
@@ -1563,13 +1547,29 @@ def render_digest_table(state) -> str:
         return "  ".join(cells).rstrip()
 
     lines = [header, "", fmt_row(head), fmt_row(tuple("-" * w for w in widths))]
-    lines.extend(fmt_row(r) for r in rows)
-    efficiency = state.get("efficiency") or {}
+    for row, position in zip(rows, row_entry_positions):
+        rendered = fmt_row(row)
+        # The efficiency dimension (contracts C-63…C-68) is CONTENT of the entry's row: one element per step the
+        # digest names, placed on the entry whose position it occupies — no extra line, no extra entry. It sits
+        # after the aligned columns so the element never re-shapes them (C-68's "changes nothing else").
+        if efficiency.get("available") and position < len(elements):
+            rendered = "%s  %s" % (rendered, render_element(elements[position], depth))
+        lines.append(rendered)
+    completion = last_completion(state)
+    if completion is not None:
+        lines.append(
+            "最近完成：last_completion=line_id=%s age=%s"
+            % (completion["line_id"], completion["age"])
+        )
     withheld = efficiency.get("withheld") or ""
     if state["omitted"] or withheld:
         lines.append(
             "另有 %d 条未显示%s" % (state["omitted"], ("，" + withheld) if withheld else "")
         )
+    # The store-availability state is a property of the whole render, not of one row (C-68): it is stated once, on
+    # its own summary line, and changes nothing else — same entries, same ordering, same bounds.
+    if not efficiency.get("available"):
+        lines.append("store=%s" % efficiency_vocabulary()["no_measurements"])
     return "\n".join(lines)
 
 

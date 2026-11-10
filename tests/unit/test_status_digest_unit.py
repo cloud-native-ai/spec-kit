@@ -34,7 +34,6 @@ import ast
 import importlib.util
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -311,7 +310,9 @@ def test_projected_state_is_a_member_of_the_engine_state_set(tmp_path):
     """Floor-style: every state the engine can hold projects as a member of ``STATE_VALUES``.
 
     The assertion is membership, not equality against a test-local list — a new engine value must flow through this
-    test without an edit, and a projection that invents its own vocabulary must fail it.
+    test without an edit, and a projection that invents its own vocabulary must fail it. Under the executor-primary
+    reader revision a line in the engine's end state (``closed``) is history: it leaves the capped ``entries`` view
+    but stays in ``all_entries``, so both faces are read here.
     """
     constants = _load_engine_constants()
     workspace = tmp_path / "workspace"
@@ -323,18 +324,28 @@ def test_projected_state_is_a_member_of_the_engine_state_set(tmp_path):
         _write_entry(registry, _entry(line_id, workspace, state=state))
         projected.append((line_id, state))
 
-    proc = _run(
-        ["--action", "digest", "--format", "json", "--cap", str(len(projected))],
-        cwd=workspace,
-        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    proc = _digest(
+        workspace,
+        registry,
+        "--format",
+        "json",
+        "--cap",
+        str(len(projected)),
     )
 
     assert proc.returncode == 0, "digest failed: rc=%s stderr=%r" % (proc.returncode, proc.stderr)
-    entries = _json_stdout(proc)["entries"]
-    assert {e["line_id"] for e in entries} == {lid for lid, _ in projected}, (
-        "every state entry must be projected; got %r" % ([e["line_id"] for e in entries],)
+    payload = _json_stdout(proc)
+    all_ids = {entry.get("line_id") for entry in payload["all_entries"]}
+    assert all_ids == {lid for lid, _ in projected}, (
+        "every state entry must be projected into the full reading; got %r" % (sorted(all_ids),)
     )
-    for entry in entries:
+    visible_ids = {entry.get("line_id") for entry in payload["entries"]}
+    hidden_ids = {lid for lid, state in projected if state == "closed"}
+    assert visible_ids == {lid for lid, _ in projected} - hidden_ids, (
+        "only the engine's end state is history; every other state stays in the capped view; got %r"
+        % (sorted(visible_ids),)
+    )
+    for entry in payload["all_entries"]:
         assert entry["state"] in constants["STATE_VALUES"], (
             "projected state %r is not a member of the engine's STATE_VALUES %r"
             % (entry["state"], sorted(constants["STATE_VALUES"]))
@@ -570,34 +581,14 @@ def test_no_process_spawn_in_source():
 #: Contract C-45: `digest` exits 0 (a digest was rendered), 3 (nothing active) or 2 (input error). Closed.
 DIGEST_EXIT_STATUSES = (0, 2, 3)
 
-#: The literal C-45 fixes for the empty-set rendering, and the one C-43 fixes for a truncated set.
+#: The literal C-45 fixes for the empty-set rendering.
 NOTHING_RUNNING = "nothing-running"
-OMITTED_PREFIX = "omitted="
 
 
 def _registry(tmp_path: Path, name: str = "registry") -> Path:
     path = tmp_path / name
     path.mkdir(parents=True, exist_ok=True)
     return path
-
-
-def _age_seconds(entry_line: str) -> int:
-    """Read the ``age=`` field of one rendered digest entry back into seconds.
-
-    The renderer's human form (``45s`` / ``2m05s`` / ``3h04m``) is the only shape the digest promises, so the test
-    parses that form rather than demanding a machine-only one — a second machine field would be a second rendering
-    of the same fact.
-    """
-    match = re.search(r"\bage=([0-9]+(?:h[0-9]{2}m|m[0-9]{2}s|s))\b", entry_line)
-    assert match, "a digest entry must always render its age; got %r" % entry_line
-    text = match.group(1)
-    if text.endswith("s") and "m" not in text:
-        return int(text[:-1])
-    if text.endswith("s"):
-        minutes, _, seconds = text[:-1].partition("m")
-        return int(minutes) * 60 + int(seconds)
-    hours, _, minutes = text[:-1].partition("h")
-    return int(hours) * 3600 + int(minutes[:-1]) * 60
 
 
 def _digest(workspace: Path, registry: Path | None, *extra, home: Path | None = None):
@@ -632,24 +623,28 @@ def _twelve_entry_registry(tmp_path: Path, workspace: Path) -> Path:
 
 
 def test_c43_a_twelve_entry_fixture_under_cap_five_renders_five_and_omitted_seven(tmp_path):
-    """Contract C-43: the cap bounds the render and the omitted count is stated, never inferred."""
+    """Contract C-43: the cap bounds the render and the omitted count is stated, never inferred.
+
+    The digest's declared surfaces are the table (default) and JSON (C-6); the bounded facts below are read from
+    the JSON surface, whose ``entries`` / ``omitted`` keys keep the C-43 meanings under the reader revision.
+    """
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     registry = _twelve_entry_registry(tmp_path, workspace)
 
-    proc = _digest(workspace, registry, "--cap", "5")
+    proc = _digest(workspace, registry, "--cap", "5", "--format", "json")
 
     assert proc.returncode in DIGEST_EXIT_STATUSES, (
         "the digest exit status must be one of %r (contract C-45); got %s"
         % (DIGEST_EXIT_STATUSES, proc.returncode)
     )
-    entry_lines = [ln for ln in proc.stdout.splitlines() if ln.startswith("line_id=")]
-    assert len(entry_lines) == 5, (
-        "a 12-entry registry under --cap 5 renders exactly 5 entries; got %d:\n%s"
-        % (len(entry_lines), proc.stdout)
+    payload = _json_stdout(proc)
+    assert len(payload["entries"]) == 5, (
+        "a 12-entry registry under --cap 5 renders exactly 5 entries; got %d"
+        % len(payload["entries"])
     )
-    assert "omitted=7" in proc.stdout, (
-        "the truncated render must state omitted=7; got:\n%s" % proc.stdout
+    assert payload["omitted"] == 7, (
+        "the truncated render must state omitted=7; got %r" % (payload["omitted"],)
     )
     assert proc.returncode == 0, (
         "a rendered digest exits 0 (contract C-45); got %s" % proc.returncode
@@ -662,17 +657,16 @@ def test_c43_two_renders_over_one_registry_are_byte_identical(tmp_path):
     workspace.mkdir()
     registry = _twelve_entry_registry(tmp_path, workspace)
 
-    first = _digest(workspace, registry, "--cap", "5")
-    second = _digest(workspace, registry, "--cap", "5")
+    first = _json_stdout(_digest(workspace, registry, "--cap", "5", "--format", "json"))
+    second = _json_stdout(_digest(workspace, registry, "--cap", "5", "--format", "json"))
 
-    def body(proc):
-        # `generated_at` is the reading's own clock, so it is the one field two runs cannot share. Every rendered
-        # entry row and the omitted line are what determinism is about.
-        return [ln for ln in proc.stdout.splitlines() if not ln.startswith("generated_at=")]
-
-    assert body(first) == body(second), (
-        "two renders over one registry must be byte-identical below the clock line;\nfirst:\n%s\nsecond:\n%s"
-        % (first.stdout, second.stdout)
+    # `generated_at` is the reading's own clock, so it is the one field two runs cannot share. Every rendered
+    # entry, the omitted count and the ordering are what determinism is about.
+    first.pop("generated_at", None)
+    second.pop("generated_at", None)
+    assert first == second, (
+        "two readings over one registry must be identical below the clock;\nfirst:\n%r\nsecond:\n%r"
+        % (first, second)
     )
 
 
@@ -701,13 +695,9 @@ def test_c43_ordering_puts_active_lines_first_then_descending_activity_with_line
         _entry("t027-a-tie", workspace, state=idle_state, updated_at="2026-11-06T05:00:00Z"),
     )
 
-    proc = _digest(workspace, registry, "--cap", "3")
+    proc = _digest(workspace, registry, "--cap", "3", "--format", "json")
 
-    order = [
-        ln.split("line_id=", 1)[1].split(" ", 1)[0]
-        for ln in proc.stdout.splitlines()
-        if ln.startswith("line_id=")
-    ]
+    order = [entry.get("line_id") for entry in _json_stdout(proc)["entries"]]
     assert order == ["t027-b-oldest-active", "t027-a-tie", "t027-z-tie"], (
         "the declared total ordering is active lines first, then descending last activity, ties by line_id"
         " ascending; got %r" % (order,)
@@ -733,35 +723,38 @@ def test_c44_an_entry_older_than_the_stale_bound_is_marked_stale_with_its_age(tm
     _write_entry(registry, _entry("t027-fresh-triplet", workspace, status_path=str(fresh)))
     _write_entry(registry, _entry("t027-stale-triplet", workspace, status_path=str(old)))
 
-    proc = _digest(workspace, registry, "--cap", "5", "--stale-bound", "900")
-
-    by_id = {}
-    for line in proc.stdout.splitlines():
-        if line.startswith("line_id="):
-            by_id[line.split("line_id=", 1)[1].split(" ", 1)[0]] = line
-
-    stale_line = by_id["t027-stale-triplet"]
-    assert "stale=yes" in stale_line, (
-        "an entry older than the declared stale bound must be marked stale; got %r" % stale_line
+    proc = _digest(
+        workspace, registry, "--cap", "5", "--stale-bound", "900", "--format", "json"
     )
-    assert _age_seconds(stale_line) > 900, (
-        "the stale marker must be accompanied by the age it is stale by; got %r" % stale_line
+
+    by_id = {entry.get("line_id"): entry for entry in _json_stdout(proc)["entries"]}
+    stale_entry = by_id["t027-stale-triplet"]
+    assert stale_entry["stale"] is True, (
+        "an entry older than the declared stale bound must be marked stale; got %r" % stale_entry
+    )
+    assert stale_entry["age_seconds"] > 900, (
+        "the stale marker must be accompanied by the age it is stale by; got %r" % stale_entry
     )
 
 
 def test_c44_every_rendered_entry_carries_its_age(tmp_path):
-    """Contract C-44: per-entry age is always rendered, stale or not."""
+    """Contract C-44: per-entry age is always present, stale or not."""
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     registry = _registry(tmp_path)
     _write_entry(registry, _entry("t027-aged-line", workspace, updated_at="2026-11-06T00:00:00Z"))
 
-    proc = _digest(workspace, registry, "--cap", "5")
+    proc = _digest(workspace, registry, "--cap", "5", "--format", "json")
 
-    entry_lines = [ln for ln in proc.stdout.splitlines() if ln.startswith("line_id=")]
-    assert entry_lines, "the single-entry registry must render one entry; got:\n%s" % proc.stdout
-    for line in entry_lines:
-        assert "age=" in line, "every entry renders its age; got %r" % line
+    entries = _json_stdout(proc)["entries"]
+    assert entries, "the single-entry registry must project one entry; got %r" % entries
+    for entry in entries:
+        assert entry.get("age") and entry["age"] != "-", (
+            "every entry carries its age; got %r" % entry
+        )
+        assert entry.get("age_seconds") is not None, (
+            "the age is a measured quantity, never an unparsed absence; got %r" % entry
+        )
 
 
 def test_c45_an_empty_registry_renders_nothing_running_with_status_three(tmp_path):
@@ -829,19 +822,16 @@ def test_c42_only_entries_of_the_current_workspace_are_listed_or_counted(tmp_pat
         )
     _write_entry(registry, _entry("t027-theirs-00", other, updated_at="2026-11-06T09:00:00Z"))
 
-    proc = _digest(workspace, registry, "--cap", "5")
+    proc = _digest(workspace, registry, "--cap", "5", "--format", "json")
 
-    rendered = [
-        ln.split("line_id=", 1)[1].split(" ", 1)[0]
-        for ln in proc.stdout.splitlines()
-        if ln.startswith("line_id=")
-    ]
+    payload = _json_stdout(proc)
+    rendered = [entry.get("line_id") for entry in payload["entries"]]
     assert rendered == ["t027-mine-02", "t027-mine-01", "t027-mine-00"], (
         "only this workspace's lines are listed; got %r" % (rendered,)
     )
-    assert OMITTED_PREFIX not in proc.stdout, (
-        "an out-of-workspace entry is never counted against the cap, so nothing is omitted here; got:\n%s"
-        % proc.stdout
+    assert payload["omitted"] == 0, (
+        "an out-of-workspace entry is never counted against the cap, so nothing is omitted here; got %r"
+        % (payload["omitted"],)
     )
 
 
@@ -863,18 +853,15 @@ def test_c42_agent_activity_is_packed_where_the_entry_declares_its_triplet(tmp_p
     _write_entry(registry, _entry("t027-without-triplet", workspace,
                                   updated_at="2026-11-06T01:00:00Z"))
 
-    proc = _digest(workspace, registry, "--cap", "5")
+    proc = _digest(workspace, registry, "--cap", "5", "--format", "json")
 
-    by_id = {}
-    for line in proc.stdout.splitlines():
-        if line.startswith("line_id="):
-            by_id[line.split("line_id=", 1)[1].split(" ", 1)[0]] = line
-    assert "activity=" in by_id["t027-with-triplet"], (
-        "an entry that declares its triplet renders the packed agent activity; got %r"
+    by_id = {entry.get("line_id"): entry for entry in _json_stdout(proc)["entries"]}
+    assert by_id["t027-with-triplet"].get("line_activity"), (
+        "an entry that declares its triplet carries the packed agent activity; got %r"
         % by_id["t027-with-triplet"]
     )
-    assert "activity=" not in by_id["t027-without-triplet"], (
-        "an entry that declares no triplet renders the '-' projection, not invented activity; got %r"
+    assert by_id["t027-without-triplet"].get("line_activity") is None, (
+        "an entry that declares no triplet projects no activity, not invented activity; got %r"
         % by_id["t027-without-triplet"]
     )
 
@@ -935,15 +922,15 @@ def test_c43_the_cap_default_is_declared_and_overridable_per_invocation(tmp_path
     workspace.mkdir()
     registry = _twelve_entry_registry(tmp_path, workspace)
 
-    default_render = _digest(workspace, registry)
-    declared = re.search(r"\bcap=([0-9]+)\b", default_render.stdout)
-    assert declared, "the digest renders the cap in force; got:\n%s" % default_render.stdout
-    assert int(declared.group(1)) > 0, "the declared cap is a positive integer"
-
-    override = _digest(workspace, registry, "--cap", "2")
-    assert "cap=2" in override.stdout, (
-        "--cap replaces the declared default for that invocation; got:\n%s" % override.stdout
+    default_read = _json_stdout(_digest(workspace, registry, "--format", "json"))
+    assert isinstance(default_read["cap"], int) and default_read["cap"] > 0, (
+        "the reading carries the cap in force; got %r" % (default_read["cap"],)
     )
-    assert len([ln for ln in override.stdout.splitlines() if ln.startswith("line_id=")]) == 2, (
-        "the override bounds the render to two entries; got:\n%s" % override.stdout
+
+    override = _json_stdout(_digest(workspace, registry, "--cap", "2", "--format", "json"))
+    assert override["cap"] == 2, (
+        "--cap replaces the declared default for that invocation; got %r" % (override["cap"],)
+    )
+    assert len(override["entries"]) == 2, (
+        "the override bounds the render to two entries; got %d" % len(override["entries"])
     )

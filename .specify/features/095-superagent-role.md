@@ -1,5 +1,12 @@
 # 095 — Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
 
+**Feature ID**: 095
+**Name**: Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
+**Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
+**Status**: Implemented
+**Created**: 2026-11-10
+**Last Updated**: 2026-11-10
+
 ## Overview
 
 框架里 super agent 事实上早已存在（交互 session、team 协调会话、SDD 驱动者、派发者），但只以「主 session / 编排者 / supervisor / driver / 派发方」等分散措辞出现：没有归一化定义、没有 super↔sub 协议、没有「身份转变时注入什么」的清单，也没有把并发、状态同步、状态跟踪与可视化接到同一张关系模型上。本特性把 super agent 正式定义为**派发边上的相对逻辑角色**（不是实体类型；同一执行体可在不同边上同时是 subagent 与 superagent），交付「定义 + 协议 + 身份转变注入清单 + 既有载体的投影接线」，并以三个真实形态验收：桌面端 Qoder 经 SSH 驱动远端 qodercli、本地 qodercli 编排一个 team、team 成员并发扇出 10 个 subagent 并自行汇总。本运行同时作为 080–094 机制实际效果的观测（FR-038）。
@@ -12,7 +19,8 @@
   - **Implementation segment**: `blocked` — the delta carries 7 non-095 commits plus a user-ruling amendment (scope), and 18 existing guards are red from in-range commits (regression); the 095 packages themselves re-measure green (smoke `85 passed`, exit 0). Smoke triple: command from `verification.md`, exit 0, evidence `.specify/specs/095-superagent-role/test-evidence/smoke-six-modules.txt`.
   - **Code segment**: `blocked` — 2 `blocking` entries in the current record (18 red guards from the in-range digest redesign; the C-68 "no measurements" state removed with its guard weakened), 6 `important`, 5 `suggestion`, 1 `praise`; coverage receipt 313 changed / 13 judged / 300 skipped / 0 gap; client capture skipped (framework hat).
   - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 7 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 7; claimed status `Planned`; ARC verdict `agree`; no fixed item.
-  - **Status transition `Implemented → Ready for Review`: refused (`blocking-unresolved`)** — the current code record carries 2 `blocking` entries (condition c); `deferred_tasks=T003` is unresolved and unwaived (condition a); and the claimed status is `Planned` because the implement-owned `Planned → Implemented` flip never landed, so the transition has no legal source state. No user waiver exists; the status is left unchanged at `Planned`.
+  - **Status transition `Implemented → Ready for Review`: refused (`blocking-unresolved`)** — the current code record carries 2 `blocking` entries (condition c); `deferred_tasks=T003` is unresolved and unwaived (condition a); and the claimed status was `Planned` because the implement-owned `Planned → Implemented` flip never landed, so the transition had no legal source state. No user waiver exists; the status was left unchanged at `Planned` at review time.
+  - **Review-repair r1 (2026-11-10)**: the missed implement Feature Integration flip is landed — the registry row and this file now read `Implemented` (the four conjunctive conditions hold; `T003` resolved by archive-then-refreeze). The two `blocking` causes (in-range digest-redesign regressions and the dropped C-68 state) are repaired and re-measured green; the record still carrying the entries is superseded only by the next code-segment run, so a re-review is required before the transition is re-judged.
 
 ## Key Changes（planned）
 

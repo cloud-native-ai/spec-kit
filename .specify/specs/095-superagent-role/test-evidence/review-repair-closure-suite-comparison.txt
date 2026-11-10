@@ -1,0 +1,65 @@
+# Review-repair r1 — affected-suite and closure-suite readings (2026-11-10)
+
+## 1) Affected guards (review code-segment blocking-1 / blocking-2)
+
+Command: `bash scripts/bash/run-tests.sh tests/unit/test_status_digest_unit.py tests/contract/test_efficiency_element.py -q`
+- Pre-repair (HEAD `6c48e9c25`): exit 1 — **18 failed, 23 passed**
+- Post-repair: exit 0 — **41 passed** → `review-repair-suite.txt`
+
+## 2) Related contract modules
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_status_digest_roles.py tests/contract/test_role_edge_engine.py tests/contract/test_status_digest.py tests/contract/test_superagent_zero_mechanism.py -q`
+- Reading: exit 0 — **105 passed** → `review-repair-guards.txt`
+
+## 3) Baseline attribution (review F2)
+
+Command at the range base `b3da3a26d` (throwaway worktree `.specify/.tmp/095-base-b3da`):
+`bash scripts/bash/run-tests.sh tests/unit/test_status_digest_unit.py tests/contract/test_efficiency_element.py -q`
+- exit 1 — **18 failed, 23 passed** → `review-repair-baseline-module-health.txt` (full capture)
+
+Command at the reconstruction tree `c671e168a` (the two module files are unchanged in `c671e168a..HEAD`,
+so this equals the pre-repair HEAD reading):
+- exit 1 — **18 failed, 23 passed**
+
+Name-level comparison of the two red sets:
+- **17 names red at BOTH trees** — red before the review range; attributable to the master-side digest redesign
+  (`9ac56bf10`, `fb5125eae`, ancestors of the range base), not to Feature 095 → legitimately `inherited`.
+- **1 name red only at HEAD** — `tests/unit/test_status_digest_unit.py::test_projected_state_is_a_member_of_the_engine_state_set`,
+  introduced inside the range by the executor-primary revision `c2f199955` → **refused as `inherited`**.
+- **1 name red only at the range base** — `tests/contract/test_efficiency_element.py::test_c70_neither_delivered_script_names_a_schema_version_field_slot_or_quality_subkey`,
+  fixed inside the range.
+
+Rule applied from this run on: a failure is classified `inherited` only when it is also red at the range base;
+a red that first appears inside the range is attributed to the in-range commit that caused it.
+
+## 4) Closure full suite (T051 re-run, post-repair)
+
+Command: `bash scripts/bash/run-tests.sh --names-out .specify/.tmp/095-repair2-names.txt`
+- Reading: exit 1 — **215 failed, 8415 passed, 2 skipped in 47.75s** → `review-repair-closure-suite.txt`;
+  names capture is byte-for-byte `review-repair-closure-suite-names.txt` (215 entries). The suite log's final line
+  names the `.specify/.tmp` path, not the committed copy (same disclosure as `closure-suite-comparison.txt` §5).
+- Baseline: `notes/baseline-failed-names.txt` (303 entries).
+
+```
+$ LC_ALL=C comm -13 <(sort notes/baseline-failed-names.txt) <(sort review-repair-closure-suite-names.txt)   # NEW failures
+tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_historical_face_is_not_empty
+tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership
+NEW_COUNT=2
+```
+
+Both NEW names are the same environment-owned names adjudicated in `test-evidence/closure-suite-comparison.txt` §3
+(root-owned `.specify/.tmp/script-interface-*` scratch; other lines' `.specify/.tmp/sdd-loop/worktrees/` copies) —
+outside this feature's write domain, named and never claimed green.
+
+Delta to the pre-repair closure reading (233 failed / 8397 passed): **18 failures cleared** by the repaired guards
+(233 → 215); no NEW failure appeared.
+
+## 5) Mutation drills (the repaired clauses can go red)
+
+- **A — C-1 behaviour guard**: seeding one extra registry read in `read_state` turns
+  `test_c1_the_role_model_is_one_materialization_per_run` red with `observed 2 reads`.
+- **B — C-68 explicit state**: removing the `store=` footer line turns
+  `test_c68_a_nonexistent_store_renders_no_measurements_and_changes_nothing_else` red (explicit state absent).
+
+Raw outputs: `review-repair-mutation-drills.txt`. Both drills restored the source byte-for-byte (md5 verified)
+before the final readings; zero seeded markers remain in `scripts/python/status-digest.py`.
