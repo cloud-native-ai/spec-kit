@@ -1,0 +1,10 @@
+RUN_SKILL=r20261110T072013Z-b095-skill ELAPSED_MS=715000
+unit: skill:create-checklist   run: r20261110T072013Z-b095-skill
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261110T072013Z-b095-skill clean=false findings=4
+persisted: .specify/memory/session/20261110T072037Z-run-determination-skill-create-checklist-r20261110t072013z-b.md
+settled previous run 093-checklist-skill-a1: not_evaluated

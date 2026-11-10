@@ -1,0 +1,23 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T055657Z-b095",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261110T062041Z-run-determination-speckit-clarify-r20261110t055657z-b095.md",
+      "action": "included",
+      "commit": "99586eb6534693e87cec3ddca0f362555b6ba84a"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T062049963005Z-0faa0f26.json",
+      "action": "included",
+      "commit": "99586eb6534693e87cec3ddca0f362555b6ba84a"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T062057Z-speckit-clarify.md",
+      "action": "included",
+      "commit": "99586eb6534693e87cec3ddca0f362555b6ba84a"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-10T06:21:34Z"
+}

@@ -191,3 +191,4 @@
 | 处置 (Disposition) | disposition, archive / supersede / correct / exempt | Non-Disposable 条目必须落入的封闭四值处置;「留在原处什么都不做」不是处置。取值与桥映射见 `shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposition Bridge | user | confirmed |
 | 回顾面 (Review Surface) | review surface, 回顾范围 | 回顾的对象范围:当前 git HEAD 工作树里 `.specify/` 下的十个历史根,**不含** git 历史。成员声明于 `shared/declarations/facts/non-disposable-review-surface.yaml` | user | confirmed |
 | 豁免 (Exemption) | exemption, 显式豁免 | 唯一一种「不修也能留」的处置:必带理由与到期条件(`expiry_kind` / `expiry_value` / `expiry_recheck`),到期即重新成为未处置。语义见 `shared/definitions/non-disposable-definitions.md` § Exemption | user | confirmed |
+| Super Agent | super agent, superagent, super-agent, 超级代理 | 相对的逻辑角色:一条派发边上创建子执行体的一端为 super agent(A),被创建的一端为 subagent(B);同一执行体可在不同边上同时具备两种角色(dual-role),不是实体类型、不新增 Agent 分类层级;定义 owner 由特性 095 新增(shared/definitions/superagent-definitions.md),边、深度与协议以该 owner 为准 | auto | proposed |

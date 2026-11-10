@@ -1,0 +1,8 @@
+unit: /speckit.analyze   run: r20261110T055657Z-b095-merge
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261110T055657Z-b095-merge clean=false findings=4
+persisted: .specify/memory/session/20261110T074653Z-run-determination-speckit-analyze-r20261110t055657z-b095-mer.md

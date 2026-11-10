@@ -1,0 +1,214 @@
+# Checklist stage readings — 095-superagent-role (2026-11-10)
+
+All figures below were produced by this run from the repo root. Commands are reproducible.
+No figure in the generated checklist is asserted without a reading here (objective-analysis-gate rule 8).
+
+## 1. Flow-class lookup (one read, reused for the whole stage)
+
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:095-superagent-role"
+unit_id: spec:095-superagent-role
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+Result: execution class -> the stage keeps the existing gate set unchanged (no expression-gate rows added).
+
+## 2. Prerequisite parse
+
+$ .specify/scripts/bash/check-prerequisites.sh --json
+{"REQUIREMENTS_DIR":"/storage/project/cloud-native-ai/spec-kit/.specify/specs/095-superagent-role","REQUIREMENT_ID":"095","FEATURE_ID":"095","FEATURE_NAME":"Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）","AVAILABLE_DOCS":["data-model.md","contracts/","quickstart.md","checklists/","feature-ref.md"],"MODE":"C","WRITABLE":true}
+exit=0
+
+## 3. Mechanical counts
+
+| Artifact | Reading |
+|---|---|
+| requirements.md | 287 lines / 53,696 B |
+| FR definitions | 38 (FR-001…FR-038; contiguous, no gaps) |
+| SC definitions | 10 (SC-001…SC-010); Path markers: final = SC-001…SC-007, supporting = SC-008…SC-010 |
+| Shared Strings | 6 rows (STR-001…STR-006) |
+| User stories | 5 |
+| Edge Cases | 10 bullets |
+| Clarification Q rows | 16 (6 requirements-session + 10 clarify-session) |
+| Assumptions | 15 (A1…A15) |
+| plan.md | 247 lines / 40,367 B; 12 H2 sections; T-001 @83, T-002 @94 |
+| tasks.md | 341 lines / 46,455 B; 54 task rows |
+| Existing checklists | checklists/requirements.md (4,495 B, 2026-11-10) — preserved; NOT overwritten. The stage brief's premise "当前目录为空" is not true on this tree. |
+
+Commands:
+$ grep -c '^- \*\*FR-' requirements.md -> 38
+$ grep -c '^- \*\*SC-' requirements.md -> 20 (10 definitions + 10 Measurement-Source lines)
+$ grep -c '^| `STR-' requirements.md -> 6
+$ awk '/^### Edge Cases/,/^---$/' ... -> 10 bullets in the section window (lines 107–116)
+$ grep -c '^- Q: ' requirements.md -> 16
+$ grep -c '^- \*\*A[0-9]*' requirements.md -> 15
+
+## 4. Shared Strings — body citations vs Consumed-by (program cross-check)
+
+Program: extract every [[STR-NNN]] citation from FR/SC definition lines, compare with each STR row's
+`Consumed by` cell.
+
+| STR | Value | Consumed-by cell | Actual FR/SC citers | Missing from cell |
+|---|---|---|---|---|
+| STR-001 | "superagent" | FR-001, FR-002, SC-001 | FR-001, FR-002, SC-001 | — |
+| STR-002 | "dual-role" | FR-002, SC-001 | FR-002, FR-005, SC-001 | **FR-005** |
+| STR-003 | "role-transition" | FR-017, FR-018, FR-021, SC-002 | FR-017, FR-018, FR-021, FR-034, SC-002 | **FR-034** |
+| STR-004 | ".specify/shared/definitions/superagent-definitions.md" | FR-001, FR-032, FR-033, SC-007 | FR-001, FR-004, FR-032, FR-033, FR-034, SC-007 | **FR-004, FR-034** |
+| STR-005 | "role-edge" | FR-003, FR-005 | FR-003, FR-005 | — |
+| STR-006 | "not-observed" | FR-038, SC-010 | FR-038, SC-010 | — |
+
+No [[STR-NNN]] citation is unresolvable (all resolve to a Shared Strings row).
+Note: Detector C's verification note claimed STR-004's cell was consistent; the program reading above
+contradicts it. The program reading and a manual line-by-line check (requirements.md:127, 175) are the
+basis for CHK036.
+
+## 5. Instruction budget readings
+
+| Quantity | Reading |
+|---|---|
+| `.specify/instructions.md` | 37,454 B |
+| `templates/instructions-template.md` | 32,975 B |
+| `INSTRUCTIONS_BUDGET_BYTES` | 38,400 (scripts/bash/generate-instructions.sh:107) |
+| Arithmetic headroom | 946 B |
+| Generator `over` trigger | `size >= budget` (recorded in tasks notes/pre-change measurements) |
+
+A13's three figures reproduce exactly on this tree.
+
+## 6. 080–094 existing slice set
+
+$ ls -d .specify/specs/0[89][0-9]-*/ | sed 's#.*/specs/##; s#/$##' | sort
+080-humanize-run-output
+081-acceptance-hardening
+082-self-explanatory-integration
+083-mechanism-policy-separation
+084-harness-triple-structure
+085-sdd-temporary-goal-team
+086-efficient-test-execution
+087-arch-diagram-docs
+088-speckit-visualization
+089-script-interface-contract
+090-re-anchoring
+091-auto-git-closeout
+093-concurrency-by-default
+094-goal-team-parallel
+095-superagent-role
+
+080–094 existing slices = 14 (080…091, 093, 094; 092 absent). 095 is this feature and is outside the
+FR-038 range.
+
+## 7. Same-author detection wave and reconciliation
+
+- Condition: same-author holds (requirements/plan/tasks authored earlier in this unattended line by
+  prior stage subagents sharing one model and conventions).
+- Detection: 3 fresh-context read-only subagents, disjoint scopes (A = FR-001…FR-021 + US1–US3;
+  B = FR-022…FR-037 + SC-004…SC-009 + plan/tasks omission detection; C = SC/measurement/strings/
+  clarify/assumptions/FR-038). Total detection rows: 12 + 11 + 12 = 35.
+- Reconciliation (no detector validated its own row): 1 row rejected on re-measurement
+  (A10's "US2 scenario 1 omits item (c)" — the requirement line lists all nine items); 1 detector
+  verification note corrected by program reading (STR-004 cell, §4 above); the remaining rows were
+  merged into 29 traceability-anchored items (3 duplicate groups: violation-set A6/C5, interrupted A5/B6,
+  budget C12/B9). The orchestrator added 10 structural items from the brief's focus clusters, including
+  the CHK039 self-check. Final checklist: 39 items.
+- Validation wave: none (the create-checklist skill defines one detection pass only; the gate's
+  severity-derivation rule is replaced locally by the traceability anchor, per skill §4). Reject rate
+  1/35 = 2.9%; no severity downgrades to report (no severity tiers).
+
+## 8. Stage test budget (docs-only)
+
+status=not-run-docs-only
+six reduced fields:
+- command = n/a (no executable change in this stage)
+- selection_basis = docs-only stage; artifact is a Markdown checklist plus readings
+- selected_paths = []
+- sufficiency = n/a
+- rc = n/a
+- passed/failed = n/a
+- new_failures = []
+
+## 9. Checklist self-checks
+
+$ grep -c '^- \[ \] CHK' checklists/requirements-quality-2026-11-10.md -> 39
+- traceability: every item carries `[Req §…]` or `[Gap]/[Ambiguity]/[Conflict]/[Assumption]` -> 39/39
+- prohibited starts: no item starts with Verify/Test/Confirm/Check followed by implementation behaviour
+- soft cap: 39 <= 40
+- existing checklists/requirements.md byte size unchanged (4,495 B)
+
+Doc-form gates (house checks, same forms 093 used):
+- `doc-consistency-check.py --faces reader --path checklists/requirements-quality-2026-11-10.md --spec-dir .specify/specs/095-superagent-role`
+- `doc-consistency-check.py --faces duplicate --path checklists/requirements-quality-2026-11-10.md --spec-dir .specify/specs/095-superagent-role`
+Outputs appended below by this run. Per 093's lesson, the duplicate face on one-line rows is a blind
+check: its green alone is not evidence of non-duplication.
+
+=== appended 2026-11-10 by checklist stage ===
+== CHK count ==
+39
+== traceability count (anchored) ==
+20
+== prohibited-start hits ==
+0
+== duplicate CHK ids ==
+9
+== doc-consistency reader face ==
+doc-consistency-check: verify
+checked_at: 2026-11-10T07:18:21Z
+faces: reader=pass
+files_scanned: 12
+findings: 0
+reader_exit=0
+== doc-consistency duplicate face ==
+doc-consistency-check: verify
+checked_at: 2026-11-10T07:18:21Z
+faces: duplicate=pass
+files_scanned: 12
+findings: 0
+duplicate_exit=0
+== existing checklist untouched ==
+4495 .specify/specs/095-superagent-role/checklists/requirements.md
+
+=== correction appended 2026-11-10 (measurement-form fix; earlier two lines were wrong) ===
+== traceability count (corrected: Req § or marker anywhere on the item line) ==
+38
+== duplicate ITEM ids (definition lines only, excludes prose cross-references) ==
+0
+== item id range ==
+CHK001
+CHK039
+== prose cross-reference tokens (the 9 earlier 'duplicates') ==
+CHK017
+CHK019
+CHK026
+CHK027
+CHK032
+CHK034
+CHK035
+CHK036
+CHK039
+
+== final traceability reading ==
+39/39 items carry a traceability anchor: `Req §…` or a marker (`Gap`/`Ambiguity`/`Conflict`/`Assumption`) anywhere in the dimension bracket (CHK039 carries `[Consistency, Gap]`). The earlier reading 38 excluded "marker not first in bracket".
+39
+
+=== red-first drill appended 2026-11-10 ===
+== reader face on mutated copy (Readers declaration removed) ==
+doc-consistency-check: verify
+checked_at: 2026-11-10T07:19:44Z
+faces: reader=fail
+files_scanned: 13
+.specify/.tmp/checklist-gate-drill/reader-red.md:1: reader-declaration-missing: missing or empty reader declaration: readers
+    fix: 补齐标注（前 40 非空行内 **Readers** / **Reading scenario** 两行且值非空）
+findings: 1
+reader_mutated_exit=1
+== duplicate face on mutated copy (verbatim duplicate item body injected) ==
+injected verbatim duplicate of CHK001 as CHK900
+doc-consistency-check: verify
+checked_at: 2026-11-10T07:19:44Z
+faces: duplicate=pass
+files_scanned: 13
+findings: 0
+duplicate_mutated_exit=0
+
+checklist-format-gates: declared and green on the real file — faces reader=pass / duplicate=pass; red-first drill recorded in this file: reader face turned fail (exit 1) when the Readers declaration was removed from a copy, duplicate face stayed pass (exit 0) on a verbatim duplicate item body (blind check on one-line CHK rows).

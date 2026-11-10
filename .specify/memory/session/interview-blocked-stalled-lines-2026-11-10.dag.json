@@ -1,0 +1,128 @@
+{
+  "ledger": ".specify/memory/session/interview-blocked-stalled-lines-2026-11-10.md",
+  "target": ".specify/state/{095,096,097,098}-*-u5-handoff.md + .specify/state/074-goal-team-sdd-unification.md",
+  "mode": "informal",
+  "branches": [
+    "095 | 096 | 097 | 098 | 074 (五条线相互独立)"
+  ],
+  "started": "2026-11-10",
+  "decisions": [
+    {
+      "id": "D-095",
+      "question": "095 处置:4 条已验 HIGH 与线的去向",
+      "dependsOn": [],
+      "branch": "095",
+      "status": "settled",
+      "decision": "重启该线",
+      "span": "095-u5-handoff.md §4 处置记录",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-10 19:18:05"
+    },
+    {
+      "id": "D-096",
+      "question": "096 处置:1C+3H 与线的去向",
+      "dependsOn": [],
+      "branch": "096",
+      "status": "settled",
+      "decision": "按建议修复：处置 1C+3H 后重开 analyze 一次",
+      "span": "096-u5-handoff.md §4",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-10 19:18:05"
+    },
+    {
+      "id": "D-097",
+      "question": "097 处置:3 条已验 HIGH 与线的去向",
+      "dependsOn": [],
+      "branch": "097",
+      "status": "settled",
+      "decision": "按建议修复：处置 3H 后重开 analyze 一次",
+      "span": "097-u5-handoff.md §4",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-10 19:18:05"
+    },
+    {
+      "id": "D-098",
+      "question": "098 处置:SC-004 目标重定",
+      "dependsOn": [],
+      "branch": "098",
+      "status": "settled",
+      "decision": "按建议修复：重定 SC-004 判据后重开 analyze 一次",
+      "span": "098-u5-handoff.md §4",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-10 19:18:06"
+    },
+    {
+      "id": "D-074",
+      "question": "074 停滞条目的关闭与父级收口",
+      "dependsOn": [],
+      "branch": "074",
+      "status": "settled",
+      "decision": "将 074a/074b 回合到 074；SDD 流程新增 split+merge 流程；注册表条目在合并后关闭",
+      "span": "074 spine §U5 处置；framework split+merge",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-10 19:18:06"
+    },
+    {
+      "id": "D-095-R",
+      "question": "095 重启的具体形态(从哪个阶段、修复范围)",
+      "dependsOn": [
+        "D-095"
+      ],
+      "branch": "095",
+      "status": "settled",
+      "decision": "授权按建议修复 095 的 4 条 HIGH 并重开 analyze 一次",
+      "span": "095-u5-handoff.md §5",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-10 19:49:44"
+    },
+    {
+      "id": "D-074-R1",
+      "question": "074a/074b 回合到 074 的具体含义与产物",
+      "dependsOn": [
+        "D-074"
+      ],
+      "branch": "074",
+      "status": "settled",
+      "decision": "分片产出合并回写父级：各分片同名输出件(tasks.md 等)合并回 074，含编号重排/语义对齐/词汇表对齐；所有输出件走同一流程；最终确认在 /speckit.seal",
+      "span": "074 spine §访谈裁定；父级输出件",
+      "supersededBy": null,
+      "round": 2,
+      "updated": "2026-11-10 19:30:42"
+    },
+    {
+      "id": "D-074-R2",
+      "question": "split+merge 流程在 SDD 中的落点与形态",
+      "dependsOn": [
+        "D-074"
+      ],
+      "branch": "074",
+      "status": "settled",
+      "decision": "新增 /speckit.seal 命令：按 review 结论封装 spec；sealed 是 Ready for Review 之后的最终态，sealed 后可归档",
+      "span": "074 spine §访谈裁定；新命令 spec",
+      "supersededBy": null,
+      "round": 2,
+      "updated": "2026-11-10 19:26:53"
+    },
+    {
+      "id": "D-POLICY-ANALYZE",
+      "question": "无人值守 SDD 的 analyze 门应自主修复而非中断",
+      "dependsOn": [
+        "D-095-R"
+      ],
+      "branch": "policy",
+      "status": "settled",
+      "decision": "退出确认：用户确认全部理解并以最大可行并发度执行(2026-11-10)",
+      "span": "台账 exit gate",
+      "supersededBy": null,
+      "round": 4,
+      "updated": "2026-11-10 20:12:34"
+    }
+  ],
+  "retractions": []
+}

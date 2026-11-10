@@ -1,0 +1,283 @@
+# Role-edge engine readings — 095 P2 (T018)
+
+- Date: 2026-11-10
+- Engine: `scripts/python/role-edge-check.py` · mirror: `.specify/scripts/python/role-edge-check.py`
+- Fixtures: `tests/fixtures/superagent-role/root-a-b/`
+- Runner: `bash scripts/bash/run-tests.sh` (single entry; parallel default)
+
+## 1. Contract module through the single runner (green)
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_edge_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....................                                                    [100%]
+21 passed in 6.21s
+```
+
+Legs exercised by that run: CLI surface (help/version/undeclared option), required-vs-optional
+root split, report schema, query schema and both unresolvable-identity behaviours, the four
+violation fixtures in isolation, conflict rows naming both paths and the edge identity, strict
+input (bad value and bad row shape), explicit empty-set summary, zero-write AST scan, fixture
+byte-identity, determinism (JSON and text), importable-interface equivalence, mirror parity, and
+the three mutation drills (type-based classification red; injected violation red; unbacked
+`superagent` claim red while `dispatch_duty: granted` without children stays green).
+
+## 2. C-10 example 1 — `python3 scripts/python/role-edge-check.py --help` (exit 0)
+
+```text
+usage: role-edge-check.py [-h] [--version] [--action {report,query}]
+                          [--parent PARENT] [--child CHILD]
+                          [--state-dir STATE_DIR] [--teams-dir TEAMS_DIR]
+                          [--logs-dir LOGS_DIR] [--registry-dir REGISTRY_DIR]
+                          [--format {json,text}]
+
+Read-only role-edge judgement over existing run records: edge existence, per-edge roles, role sets, depth and the closed four violation kinds.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --action {report,query}
+  --parent PARENT       query: parent identity
+  --child CHILD         query: child identity
+  --state-dir STATE_DIR
+  --teams-dir TEAMS_DIR
+  --logs-dir LOGS_DIR
+  --registry-dir REGISTRY_DIR
+                        line-registry cross-check root (default: the owning
+                        engine's resolution)
+  --format {json,text}
+
+Side effects: read-only; no file is written and no temporary file is created.
+Exit codes: 0 judged clean (an empty edge set is explicitly summarized); 1 violations found; 2 unreadable or malformed input.
+```
+
+## 3. C-10 example 2 — `--action report` over the clean chain (exit 0)
+
+```json
+{
+  "schema_version": 1,
+  "action": "report",
+  "inputs": {
+    "state_dir": "tests/fixtures/superagent-role/root-a-b/state",
+    "teams_dir": "tests/fixtures/superagent-role/root-a-b/teams",
+    "logs_dir": "tests/fixtures/superagent-role/root-a-b/logs",
+    "registry_dir": "tests/fixtures/superagent-role/root-a-b/registry",
+    "registry": "present",
+    "dispatch_store": "tests/fixtures/superagent-role/root-a-b/memory/exec-quant/records",
+    "dispatch_store_present": false,
+    "spines": 1,
+    "registry_entries": 1,
+    "triplets": 2,
+    "carrier_rows": {
+      "team-report": 1,
+      "driver-spine": 1,
+      "run-agent-label": 0
+    },
+    "registry_unreadable": 0,
+    "unconfirmed_dispatch_records": 0
+  },
+  "roots": [
+    "root"
+  ],
+  "executors": [
+    {
+      "id": "A",
+      "parent": "root",
+      "roles": [
+        "subagent",
+        "superagent"
+      ],
+      "role_set_marker": "dual-role",
+      "depth": 1,
+      "sources": [
+        {
+          "carrier": "driver-spine",
+          "path": "tests/fixtures/superagent-role/root-a-b/state/prompt-B-s1.md.meta.json",
+          "line": null
+        },
+        {
+          "carrier": "team-report",
+          "path": "tests/fixtures/superagent-role/root-a-b/teams/demo-team/runs/20261110T000000Z-report.md",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "parent": "A",
+      "roles": [
+        "subagent"
+      ],
+      "role_set_marker": null,
+      "depth": 2,
+      "sources": [
+        {
+          "carrier": "driver-spine",
+          "path": "tests/fixtures/superagent-role/root-a-b/state/prompt-B-s1.md.meta.json",
+          "line": null
+        }
+      ]
+    },
+    {
+      "id": "root",
+      "parent": null,
+      "roles": [
+        "superagent"
+      ],
+      "role_set_marker": null,
+      "depth": 0,
+      "sources": [
+        {
+          "carrier": "team-report",
+          "path": "tests/fixtures/superagent-role/root-a-b/teams/demo-team/runs/20261110T000000Z-report.md",
+          "line": 7
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "parent": "A",
+      "child": "B",
+      "attempt": "1",
+      "role_declaration": "subagent",
+      "dispatch_duty": "not-granted",
+      "depth": 2,
+      "source": {
+        "carrier": "driver-spine",
+        "path": "tests/fixtures/superagent-role/root-a-b/state/prompt-B-s1.md.meta.json",
+        "line": null
+      }
+    },
+    {
+      "parent": "root",
+      "child": "A",
+      "attempt": "1",
+      "role_declaration": "superagent",
+      "dispatch_duty": "granted",
+      "depth": 1,
+      "source": {
+        "carrier": "team-report",
+        "path": "tests/fixtures/superagent-role/root-a-b/teams/demo-team/runs/20261110T000000Z-report.md",
+        "line": 7
+      }
+    }
+  ],
+  "violations": [],
+  "conflicts": [],
+  "summary": {
+    "edges": 2,
+    "executors": 3,
+    "violations": 0,
+    "conflicts": 0
+  }
+}
+```
+
+Reading: `summary.edges=2`, `summary.executors=3`, `summary.violations=0`,
+`summary.conflicts=0`; A `roles=[subagent,superagent]` / `role_set_marker=dual-role` /
+`depth=1`; B `roles=[subagent]` / `role_set_marker=null` / `depth=2`; the root's marker is
+`null` and its depth 0.
+
+## 4. C-10 example 3 — `--action query --parent root --child A` (exit 0)
+
+```json
+{
+  "schema_version": 1,
+  "action": "query",
+  "edge_exists": true,
+  "edge": {
+    "parent": "root",
+    "child": "A",
+    "attempt": "1",
+    "role_declaration": "superagent",
+    "dispatch_duty": "granted",
+    "depth": 1,
+    "source": {
+      "carrier": "team-report",
+      "path": "tests/fixtures/superagent-role/root-a-b/teams/demo-team/runs/20261110T000000Z-report.md",
+      "line": 7
+    }
+  },
+  "parent": {
+    "id": "root",
+    "roles": [
+      "superagent"
+    ],
+    "role_set_marker": null,
+    "depth": 0
+  },
+  "child": {
+    "id": "A",
+    "roles": [
+      "subagent",
+      "superagent"
+    ],
+    "role_set_marker": "dual-role",
+    "depth": 1
+  },
+  "violations": []
+}
+```
+
+Reading: `edge_exists=true`; `child.role_set_marker=dual-role` matches the report value;
+`parent.depth=0`.
+
+## 5. Engine-interface identity and mirror pair
+
+```text
+role-edge-check.py 0.0.22
+```
+
+```text
+python3 scripts/python/sync-mirrors.py --check --only scripts/python/role-edge-check.py
+scope --only: scripts/python/role-edge-check.py
+ok    scripts/ == .specify/scripts/ (1 files, byte-identical)
+(exit 0)
+```
+
+## 6. Exit statuses (captured beside the outputs)
+
+```text
+help_exit=0
+report_exit=0
+query_exit=0
+version_exit=0
+```
+
+## 7. Script interface contract (Constitution XXI) — GATE-5 probe
+
+```text
+python3 .specify/scripts/python/script-interface-check.py --files scripts/python/role-edge-check.py
+projection-mismatch: .specify/scripts/python/script_interface_cli.py is not `scripts/python/script_interface_cli.py + python-version-bridge`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/python/sync-mirrors.py is not `scripts/python/sync-mirrors.py + python-version-bridge`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/python/script-interface-check.py is not `scripts/python/script-interface-check.py + python-version-bridge`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/bash/check-prerequisites.sh is not `scripts/bash/check-prerequisites.sh + bash-version-guard`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/bash/generate-instructions.sh is not `scripts/bash/generate-instructions.sh + bash-version-guard`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/bash/run-tests.sh is not `scripts/bash/run-tests.sh + bash-version-guard`: the mirror is not `source + declared projection`
+candidates=1 applicable=1 exempt=1 violations=0
+```
+
+The new engine's own verdict is `candidates=1 applicable=1 exempt=1 violations=0` — it
+answers `-h` / `--help` (four labels), prints one `role-edge-check.py <version>` line read
+from pyproject.toml at run time, and rejects undeclared options before acting.
+The run's exit 1 comes from six pre-existing `projection-mismatch` findings on mirror copies
+that were already dirty before this feature (`.specify/scripts/python/{script_interface_cli,
+sync-mirrors,script-interface-check}.py` and three `.specify/scripts/bash/` scripts); none of
+them belongs to this feature's write domain, and this run neither edits nor reverts them.
+
+## 8. Mirror parity suite reading (FR-036 name-level awareness)
+
+```text
+bash scripts/bash/run-tests.sh tests/contract/test_mirror_parity_suite.py -q
+6 failed, 848 passed in 6.53s   (exit 1)
+bash scripts/bash/run-tests.sh tests/contract/test_mirror_parity_suite.py -q -k role
+1 passed in 6.32s   (exit 0 — the new engine pair)
+```
+
+The six failures are the same pre-existing dirty pairs named in § 7; the new
+`scripts/python/role-edge-check.py` ↔ `.specify/scripts/python/role-edge-check.py` pair is
+byte-identical and passes. No NEW drift is introduced by this package.

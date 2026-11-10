@@ -1,0 +1,59 @@
+# Concurrency-invariant evidence — 095 P3 (T028, SC-004)
+
+- Date: 2026-11-10
+- Branch: `095-superagent-role`
+- Scope: register that this feature **moved no reservation and added no capacity mechanism**.
+  The whole change-set audit (the six C-3 assertions of
+  `contracts/harness-landing.contract.md`) is **T041's** job — this file only registers the
+  existing concurrency contracts as green and the owner page's concurrency face as pointer-only.
+
+## 1. Existing concurrency contract selection (green)
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_concurrency_units.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_concurrency_dispatch_capability.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.........................................                                [100%]
+41 passed in 6.66s
+```
+
+Exit status: **0**. The slot + reserve arithmetic, the named serial-reason domain and the
+dispatch-capability routing stay with their existing owners (`subagent-definitions.md` § The
+Concurrency Obligation, `shared/declarations/facts/concurrency-*.yaml`); this feature
+references them and restates none of them.
+
+## 2. Owner page concurrency face is pointer-only (T004 discipline)
+
+`bash scripts/bash/run-tests.sh tests/contract/test_superagent_definitions.py::test_pointer_only_discipline -q`
+→ exit **0**, `1 passed in 6.52s` (the leg includes `The Concurrency Obligation` in its
+POINTER_OWNERS set).
+
+Readings from `shared/definitions/superagent-definitions.md` (grep, this run):
+
+- item (d) `concurrency-budget-ref` — "the available concurrency budget and the existing
+  slot/reserve facts, by pointer to their owners" (no numbers);
+- § Zero Second Mechanism — "Gaining the superagent role grants no new capacity: slots and
+  reserves stay with the existing concurrency facts, and nesting does not amplify them.";
+- owner list — concurrency rules reach `subagent-definitions.md` § The Concurrency
+  Obligation and the concurrency facts under `shared/declarations/facts/`.
+
+Numeric-literal scan over the owner page: `grep -nE "[0-9]" … | grep -inE "slot|reserve|concurren|容量"`
+→ no match (exit 1). No slot count, reserve count or ceiling literal is copied onto the owner page.
+
+## 3. P3 change set touches no concurrency mechanism
+
+P3 paths (11 files, verified with `git status --porcelain`):
+
+- sources: `skills/internal/run-agent/SKILL.md`, `skills/internal/create-team/SKILL.md`,
+  `skills/internal/create-team/references/patterns.md`, `skills/external/sdd-loop-driver/SKILL.md`,
+  `skills/external/sdd-loop-driver/references/stage-prompts.md`;
+- mirrors: the five `.specify/skills/…` counterparts;
+- tests/fixtures: `tests/contract/test_role_transition_payload.py`,
+  `tests/fixtures/superagent-role/payload/` ×4, `tests/contract/test_fast_fail_discipline.py` (i13 count).
+
+No path under `shared/declarations/facts/`, no concurrency engine
+(`scripts/python/concurrency-check.py`, `scripts/python/exec-quant.py`), no reservation store and
+no scheduler/queue file appears in the P3 change set. No reservation was moved and no capacity
+mechanism was added; the selection above is green on unchanged code.

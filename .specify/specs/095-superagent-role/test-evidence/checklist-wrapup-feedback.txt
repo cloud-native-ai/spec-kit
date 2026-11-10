@@ -1,0 +1,9 @@
+{
+  "id": "20261110T072029Z-speckit-checklist",
+  "path": ".specify/memory/feedback/20261110T072029Z-speckit-checklist.md",
+  "duplicate": false,
+  "count_since_submission": 402,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

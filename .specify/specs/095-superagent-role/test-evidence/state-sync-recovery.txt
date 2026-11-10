@@ -1,0 +1,79 @@
+# State-sync / recovery readings — 095 P4 (T039, SC-005 registration)
+
+Run: `r20261110T055657Z-b095` · package P4 · date 2026-11-10 · executor: main session
+Owner of the role model: `.specify/shared/definitions/superagent-definitions.md` § State Synchronization & Recovery
+Contract: `.specify/specs/095-superagent-role/contracts/status-digest-role-view.contract.md` (C-3, C-5)
+
+This file registers the SC-005 evidence. It restates no owner rule: each item below is reached by
+path, and the only new readings are the two existing test modules plus the interrupted fixture's
+digest render.
+
+## 1. Interrupted fixture reading (parent stopped, child still appears running)
+
+Fixture: `tests/fixtures/superagent-role/interrupted/` (T035) — status spine with
+`spine_state: stalled` and `run_id: r-fixture-root`; a team mapping row `child-1 → r-fixture-root`;
+`child-1.status` with **no** `exit=` record; `child-1.jsonl`. The reading below copies the fixture
+into a scratch workspace, points the registry entry at it, ages the child's artifact triplet by
+3,600 s (the fixture carries no mtimes in git — the test applies them), and runs the digest twice.
+
+```bash
+# scratch under .specify/.tmp/p4/int-ws (sanctioned temp root), registry under .specify/.tmp/p4/int-reg
+SPECIFY_LINE_REGISTRY_DIR=$PWD/.specify/.tmp/p4/int-reg \
+  python3 scripts/python/status-digest.py --action digest --workspace $PWD/.specify/.tmp/p4/int-ws
+# exit 0
+
+状态摘要 · 生成于 2026-11-10T14:02:34.851147Z（UTC）· 最多 20 条 · 注册目录 /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/p4/int-reg
+
+执行体             所属 spec  父边            角色        深度  在做什么  状态                                已执行时间
+-----------------  ---------  --------------  ----------  ----  --------  ----------------------------------  ------------
+child-1            -          r-fixture-root  subagent    1     -         已中断（静默 1 小时 0 分，需关注）  -
+—（无存活执行体）  demo-line  -               superagent  0     -         已停滞（静默 14 小时 2 分）         14 小时 2 分
+
+# --format json, the two rows, verbatim:
+{"age": "1h00m", "age_seconds": 3600, "branch": null, "depth": 1, "id": "child-1", "is_active": false, "last_activity": "2026-11-10T13:02:34.815835Z", "parent": "r-fixture-root", "project_dir": null, "role_set_marker": null, "roles": ["subagent"], "sources": [{"carrier": "team-report", "line": 7, "path": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/p4/int-ws/.specify/teams/interrupted-team/runs/20261110T000000Z-report.md"}], "stage": null, "stale": true, "stale_bound_seconds": 900, "state": "interrupted"}
+{"age": "14h02m", "age_seconds": 50554, "branch": "-", "cli": "qodercli", "cli_pid": null, "created_at": "2026-11-10T00:00:00Z", "depth": 0, "is_active": false, "last_activity_at": "2026-11-10T00:00:00Z", "last_event": "stage-interrupted", "line_activity": null, "line_id": "demo-line", "parent": null, "project_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/p4/int-ws", "role_set_marker": null, "roles": ["superagent"], "run_id": "r-fixture-root", "runner_pid": null, "stage": "-", "stale": true, "stale_bound_seconds": 900, "state": "stalled", "triplet": {"heartbeat_path": "-", "log_path": "-", "status_path": "-"}, "updated_at": "2026-11-10T00:00:00Z", "worktree_path": "-"}
+```
+
+Assertions registered:
+
+1. **Never completed** — `state == "interrupted"`, `stale == true`, `age_seconds >= 900`; the table
+   renders `已中断（…，需关注）` and never `已完成` for the child. Pinned by
+   `tests/contract/test_status_digest_roles.py::test_the_interrupted_child_renders_stale_interrupted_and_never_completed`.
+2. **Stale attempt's return not consumable** — the digest consumes only the existing liveness facts
+   (the artifact triplet's exit record and mtimes); it does not read, consume or replay any return.
+   The consumption rule and its attribution values are owned by
+   `skills/external/sdd-loop-driver/references/watch-model.md` § 11 — referenced here, not restated.
+3. **Resume re-validation stays with the existing authorization owner** — no resume path is added by
+   this feature: authorization stays `sdd-route.py --action authorize`; recovery/re-entry stays the
+   driver's existing mechanisms, whose `recover` refusal envelope (`owner=065c`) is pinned green by
+   `tests/contract/test_loop_state_contract.py` (reading below).
+4. **Bounded wait / slow-vs-stalled thresholds stay with `watch-model.md`** — the digest adds no
+   threshold; its only bound is the existing `DEFAULT_STALE_BOUND_SECONDS` (owner: this constant,
+   contract 088 C-47), and the interrupted mark is a *state* derived from that existing bound, not a
+   new timer.
+5. **No conversation-memory / process-scan derivation of role or edge state** — the role fields are
+   model pass-through (`test_c5_the_both_roles_marker_is_passed_through_never_re_derived`,
+   `test_c5_role_fields_are_attached_without_process_state`); the executor state is derived only from
+   the artifact triplet's exit record and file mtimes (`_executor_state` / `_executor_last_activity`).
+   The pre-existing pid liveness read (`read_executors`) remains the host-event layer's legacy face
+   and feeds no role field.
+
+## 2. Existing governance / recovery contract readings (T039)
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_sdd_invocation_governance.py tests/contract/test_loop_state_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+# 52 passed in 8.98s
+# exit 0
+```
+
+Both modules are green unchanged; this feature adds no gate, no resume path and no wait threshold to
+them.
+
+## 3. Derivation-layer map (pointer form)
+
+The three fact layers the digest's state derives from are owned by `data-model.md` § 10 /
+`superagent-definitions.md` § State Synchronization & Recovery: state layer (spine / registry),
+assignment layer (artifact triplet `.status`, return record, run report), host-event layer (watch
+model pid / heartbeat / liveness). The digest reads exactly the first two for executor state and
+mtimes; the third enters only through the pre-existing executor-liveness projection.

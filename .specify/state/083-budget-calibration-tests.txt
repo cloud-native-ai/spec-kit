@@ -1,6 +1,0 @@
-# test runner: .venv/bin/python -m pytest -q tests/unit/test_admission_check.py tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_sdd_loop_driver_skill.py tests/unit/test_loop_state_engine.py tests/contract/test_loop_state_contract.py
-........................................................................ [ 32%]
-........................................................................ [ 65%]
-........................................................................ [ 98%]
-...                                                                      [100%]
-219 passed in 81.33s (0:01:21)

@@ -114,6 +114,12 @@ executing agent **before** it stops.
 | 自主执行 (autonomous) — the interactive default | the user is present, and the agent proceeds without asking on reversible work |
 | 小心谨慎 (cautious) | the user declared that reversible functional changes also need a look first |
 
+**Analyze-gate exception (unattended SDD runs, 2026-11-10 user ruling)**: in an unattended SDD run, an
+analyze gate's CRITICAL/HIGH findings are repaired and re-analyzed autonomously — per the round's recorded
+dispositions — instead of stopping for user confirmation. That repair→re-analyze loop is bounded by the stall
+rules (stage deadline, retry ceiling, budget), which remain the only interruption. Interactive runs keep the
+stop-and-ask behaviour; the driver's loop rule cites this clause rather than restating it.
+
 **Axis 2 — the finding's impact scope (read from the change the fix would make):**
 
 | Scope | Meaning |

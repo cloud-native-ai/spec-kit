@@ -1,0 +1,109 @@
+# Observation appendix — mechanical check readings (T047, 2026-11-10)
+
+Checker source (verbatim; run copy at `.specify/.tmp/095-appendix-check.py`, reproduced here so the reading is replayable):
+
+```python
+#!/usr/bin/env python3
+"""T047 check: one row per existing 080-094 slice; every exercised row's cited paths resolve.
+
+Usage: python3 095-appendix-check.py <appendix.md> [--spec-root .specify/specs]
+Exit 0 = check holds; 1 = violation(s); 2 = input error.
+Row grammar: `| <NNN> | claim | <exercised|not-observed> ... | `path` ... | record ... |`
+"""
+import re
+import sys
+from pathlib import Path
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print("usage: 095-appendix-check.py <appendix.md> [--spec-root DIR]", file=sys.stderr)
+        return 2
+    appendix = Path(sys.argv[1])
+    spec_root = Path(sys.argv[sys.argv.index("--spec-root") + 1]) if "--spec-root" in sys.argv else Path(".specify/specs")
+    if not appendix.is_file():
+        print(f"ERROR: appendix not found: {appendix}", file=sys.stderr)
+        return 2
+    if not spec_root.is_dir():
+        print(f"ERROR: spec root not found: {spec_root}", file=sys.stderr)
+        return 2
+
+    existing = sorted(p.name[:3] for p in spec_root.iterdir()
+                      if p.is_dir() and re.fullmatch(r"0(8|9)\d-.*", p.name) and p.name[:3] <= "094")
+    fields = ("first", "claim", "status", "evidence", "record")
+    errors: list[str] = []
+    rows: list[dict[str, str]] = []
+    for line in appendix.read_text(encoding="utf-8").splitlines():
+        if not re.match(r"^\|\s*0(?:8|9)\d\s*\|", line):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 5:
+            errors.append(f"malformed row (expected >=5 cells): {line[:80]}")
+            continue
+        row = dict(zip(fields, cells))
+        rows.append(row)
+        if not re.fullmatch(r"0(8|9)\d", row["first"]):
+            errors.append(f"row id not a slice id: {row['first']!r}")
+        status = "exercised" if "exercised" in row["status"] and "not-observed" not in row["status"] else (
+            "not-observed" if "not-observed" in row["status"] else None)
+        if status is None:
+            errors.append(f"slice {row['first']}: observation cell carries neither literal: {row['status'][:60]!r}")
+            continue
+        row["_status"] = status
+
+    ids = [r["first"] for r in rows]
+    for s in existing:
+        n = ids.count(s)
+        if n != 1:
+            errors.append(f"slice {s}: expected exactly one row, found {n}")
+    for s in sorted(set(ids) - set(existing)):
+        errors.append(f"row id {s}: no such slice directory under {spec_root}")
+
+    for row in rows:
+        if row.get("_status") != "exercised":
+            continue
+        paths = [t for t in re.findall(r"`([^`]+)`", row["evidence"]) if "/" in t and " " not in t]
+        if not paths:
+            errors.append(f"slice {row['first']}: exercised but carries no resolvable evidence path")
+            continue
+        for p in paths:
+            if not Path(p).exists():
+                errors.append(f"slice {row['first']}: cited path does not resolve: {p}")
+
+    print(f"existing slices ({len(existing)}): {' '.join(existing)}")
+    print(f"rows parsed: {len(rows)} | exercised: {sum(1 for r in rows if r.get('_status') == 'exercised')} | "
+          f"not-observed: {sum(1 for r in rows if r.get('_status') == 'not-observed')}")
+    if errors:
+        for e in errors:
+            print(f"FAIL: {e}")
+        print(f"VERDICT: fail ({len(errors)} violation(s))")
+        return 1
+    print("VERDICT: pass (one row per existing slice; every exercised evidence path resolves)")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+## 1) real appendix (tracked file, never edited by the drill)
+$ python3 .specify/.tmp/095-appendix-check.py .specify/specs/095-superagent-role/observation-appendix.md
+existing slices (14): 080 081 082 083 084 085 086 087 088 089 090 091 093 094
+rows parsed: 14 | exercised: 6 | not-observed: 8
+VERDICT: pass (one row per existing slice; every exercised evidence path resolves)
+EXIT=0
+
+## 2) mutation drill — one not-observed row (080) marked exercised in a copy under notes/
+$ cp .specify/specs/095-superagent-role/observation-appendix.md .specify/specs/095-superagent-role/notes/observation-appendix-mutation.md
+$ python3 - <<PY  # replace the 080 row status literal not-observed -> exercised in the copy
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+AssertionError
+$ python3 .specify/.tmp/095-appendix-check.py .specify/specs/095-superagent-role/notes/observation-appendix-mutation.md
+existing slices (14): 080 081 082 083 084 085 086 087 088 089 090 091 093 094
+rows parsed: 14 | exercised: 7 | not-observed: 7
+FAIL: slice 080: exercised but carries no resolvable evidence path
+VERDICT: fail (1 violation(s))
+EXIT=1
+
+## 3) Drill scratch removal
+
+The mutated copy (`notes/observation-appendix-mutation.md`) is drill scratch and was removed after the reading above; it is recreated verbatim by the two commands in §2. The tracked appendix was never edited by the drill.

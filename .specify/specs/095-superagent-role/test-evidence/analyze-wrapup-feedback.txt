@@ -1,0 +1,9 @@
+{
+  "id": "20261110T074703Z-speckit-analyze",
+  "path": ".specify/memory/feedback/20261110T074703Z-speckit-analyze.md",
+  "duplicate": false,
+  "count_since_submission": 407,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

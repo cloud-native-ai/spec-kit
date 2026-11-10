@@ -82,6 +82,8 @@ First activation: declare the summary mechanism has activated and the cadence no
 ## Nested SDD Runs
 ```
 
+`## Execution Detail` MUST 内含派发映射表 —— 每个被派发的执行体一行,列恰为 `label` | `role` | `dispatch_duty` | `workspace` | `parent`。`role` 取值恰为 `subagent` / `superagent`(`dual-role` 从不出现在该列);`dispatch_duty` 取值恰为 `granted` / `not-granted`。列与行形态由本节拥有;角色语义与值域归 `.specify/shared/definitions/superagent-definitions.md` § The Relative Role / § Role Edges(按指针)。不得为此新增顶层段 —— 映射表是 `## Execution Detail` 的必备内容。
+
 ### Verification(必填段,本节为该口径的唯一真源)
 
 `## Verification` 是**必填**段:run 报告的验证结论 MUST 是**可复算的口径**,不是散文自评 —— 有界 pattern(parallel / serial / iteration)与 continuous 一律适用,continuous 的独立验证者纪律(`references/operating-loops.md` §6)叠加在本节之上,不替代它。三条口径:

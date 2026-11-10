@@ -1,0 +1,144 @@
+# Role-transition payload readings — 095 P3 (T019–T027)
+
+- Date: 2026-11-10
+- Branch: `095-superagent-role`
+- Scope: `contracts/role-transition-payload.contract.md` (C-2 / C-3 / C-4 / C-5 / C-6 / C-11 /
+  C-13); the five wiring surfaces and their runtime mirrors; `tests/fixtures/superagent-role/payload/`
+  (4 files); `tests/contract/test_role_transition_payload.py` (21 legs); `test_i13` count 7 → 8.
+- Runner: `bash scripts/bash/run-tests.sh` (single entry; parallel default).
+
+## 1. T020 red-first — the six surface legs fail before wiring
+
+Reproduction note: the red state below was captured in a **scratch git worktree** at commit
+`dd7cbbab4` (pre-P3 HEAD) with only the new test module and the payload fixtures copied in, so
+the five wiring surfaces stood unchanged. Command:
+
+`bash scripts/bash/run-tests.sh tests/contract/test_role_transition_payload.py -q`
+
+Exit status: **1**.
+
+```text
+_________________ test_team_report_mapping_table_is_mandatory __________________
+    def test_team_report_mapping_table_is_mandatory():
+        """`## Execution Detail` must carry the five-column dispatch mapping table."""
+        text = _read(TEAM_SKILL[0])
+        section = _section(text, "### Report contract", "### Verification")
+        assert "## Execution Detail" in section
+>       assert "每个被派发的执行体一行" in section, "one row per dispatched executor is not required"
+E       AssertionError: one row per dispatched executor is not required
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_role_transition_payload.py::test_driver_pointer_line_root_superagent
+FAILED tests/contract/test_role_transition_payload.py::test_driver_envelope_names_sidecar_and_role_edge
+FAILED tests/contract/test_role_transition_payload.py::test_run_agent_pointer_item_and_self_check_extension
+FAILED tests/contract/test_role_transition_payload.py::test_seven_downlink_fields_on_each_wired_surface[driver envelope role_edge object-<lambda>]
+FAILED tests/contract/test_role_transition_payload.py::test_seven_downlink_fields_on_each_wired_surface[team Per-Agent Payload role_fields row-<lambda>]
+FAILED tests/contract/test_role_transition_payload.py::test_team_report_mapping_table_is_mandatory
+6 failed, 15 passed in 7.02s
+```
+
+Honest note on the first red attempt in the working tree: it reported 7 failed because
+`test_return_contract_five_items` compared the phrase `explicit anomaly line` against a
+line-wrapped occurrence in run-agent's existing text. That was a test-side whitespace defect;
+it was repaired (normalized comparison) **before** any surface was wired, and the reproduction
+above uses the corrected module. No surface edit preceded the red run.
+
+## 2. T019 fixture set (names its own carriers)
+
+| Fixture | Purpose |
+|---------|---------|
+| `tests/fixtures/superagent-role/payload/role-transition-complete.md` | the payload carrying the `role-transition` marker + all nine item-id slugs |
+| `tests/fixtures/superagent-role/payload/role-transition-missing-item.md` | one item deleted; the self-check must block it (the deleted slug is deliberately never named in the file) |
+| `tests/fixtures/superagent-role/payload/role-transition-skill-load.md` | complete payload + a skill-load instruction; anti-nesting must turn red while the substring self-check passes |
+| `tests/fixtures/superagent-role/payload/role-fields.md` | named carrier of the seven downlink role fields block (analyze W3-10 disposition: the carrier is now explicit) |
+
+## 3. T021–T025 surface edits (fields / pointers only)
+
+| Row | File (source + mirror) | Change |
+|-----|------------------------|--------|
+| T021 | `skills/internal/run-agent/SKILL.md` | one `role-transition` pointer bullet (closed nine-item list reached by pointer to `superagent-definitions.md` § Role-Transition Injection) + one self-check extension bullet (identifier **and each of its nine item-id slugs**; identifier alone insufficient; payload-construction defect blocks) |
+| T022 | `skills/internal/create-team/references/patterns.md` | `role_fields` row added to the Per-Agent Payload table (seven fields named, semantics by reference; `dual-role` excluded) — same task raised `test_i13` 7 → 8 |
+| T023 | `skills/internal/create-team/SKILL.md` | `## Execution Detail` must contain the `label | role | dispatch_duty | workspace | parent` mapping table; no new top-level section |
+| T024 | `skills/external/sdd-loop-driver/SKILL.md` | one Driver Topology pointer line: root super agent, `role_edge` seven fields, no new gate |
+| T025 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | envelope sidecar `prompt-<line>-<stage>.md.meta.json` gains the `role_edge` object (seven fields) |
+
+## 4. T026 — file-scoped mirror sync
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/run-agent/SKILL.md
+scope --only: skills/internal/run-agent/SKILL.md
+DIFF .specify/skills/internal/run-agent/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/create-team/SKILL.md
+DIFF .specify/skills/internal/create-team/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/create-team/references/patterns.md
+DIFF .specify/skills/internal/create-team/references/patterns.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver/SKILL.md
+DIFF .specify/skills/sdd-loop-driver/SKILL.md
+sync  skills/external/ -> .specify/skills/ (1 files)
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver/references/stage-prompts.md
+DIFF .specify/skills/sdd-loop-driver/references/stage-prompts.md
+sync  skills/external/ -> .specify/skills/ (1 files)
+EXIT=0
+```
+
+Scoped pair check after the sync:
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/run-agent/SKILL.md --only skills/internal/create-team/SKILL.md --only skills/internal/create-team/references/patterns.md --only skills/external/sdd-loop-driver/SKILL.md --only skills/external/sdd-loop-driver/references/stage-prompts.md
+ok    skills/external/ == .specify/skills/ (2 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (3 files, byte-identical)
+EXIT=0
+```
+
+Pre-edit measurement of the same five pairs (2026-11-10, before any P3 edit): `ok    skills/external/ == .specify/skills/ (2 files, byte-identical)` / `ok    skills/internal/ == .specify/skills/internal/ (3 files, byte-identical)`, exit 0 — no pre-existing drift on these pairs, and no normalization side effect.
+
+## 5. T027 — green readings
+
+Payload contract module:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_transition_payload.py -q
+bringing up nodes...
+bringing up nodes...
+
+.....................                                                    [100%]
+21 passed in 6.16s
+```
+
+`test_i13` / `test_i14` (the T022 count change and its neighbour):
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_fast_fail_discipline.py -q -k 'i13 or i14'
+..                                                                       [100%]
+2 passed in 6.18s
+```
+
+Mutation readings — all exercised inside the 21 green legs:
+
+- delete-one: the one-item-deleted fixture misses **exactly one** item-id slug (`test_self_check_blocks_a_missing_item`);
+- identifier alone insufficient: a marker-only payload reports **all nine** slugs; a markerless payload reports the identifier (`test_identifier_alone_is_insufficient`);
+- anti-nesting: the complete payload is clean; the skill-load fixture trips **exactly** `skill-load`; synthetic driver-skill / loop-logic / full-manual variants each turn the check red (`test_anti_nesting_red_lines`);
+- dual-role duties: dropping `explicit anomaly line` from the five-duty carrier turns the predicate red while the superagent grant statement remains (`test_dual_role_duties_intact_mutation`).
+
+## 6. Collateral guard selection (no NEW failures from P3)
+
+Command (targeted set covering every edited file's existing guards):
+
+```text
+bash scripts/bash/run-tests.sh tests/contract/test_nested_run_report.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_wrapup_accounting.py tests/contract/test_coaching_reporting_duty.py tests/contract/test_lifecycle_detach_reattach.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_workspace_isolation_contract.py tests/contract/test_compile_embeds.py tests/contract/test_mirror_parity_suite.py tests/contract/test_non_regression_070.py -q
+13 failed, 993 passed in 7.66s   (exit 1)
+```
+
+A/B at pre-P3 HEAD (`dd7cbbab4`, scratch worktree, same command): `9 failed, 852 passed`.
+The same failure modules appear at HEAD: `test_compile_embeds.py` ×4, `test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead` and `::test_lc_10_11_12_snapshot_branches`, `test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged` (pre-existing `binding_block` goal-field drift).
+
+The only failure-set difference is `test_mirror_parity_suite.py`: in this working tree the six
+**pre-existing dirty** projected script mirrors fail raw byte-identity
+(`.specify/scripts/{bash/check-prerequisites.sh,bash/generate-instructions.sh,bash/run-tests.sh,python/script-interface-check.py,python/script_interface_cli.py,python/sync-mirrors.py}`, all listed as ` M` before P3); in the clean worktree the two pre-existing out-of-sync template mirrors fail instead. No failure subject is one of the five P3-wired surfaces, and no P3 path appears in any failure name. Pre-existing failures are named here, never claimed green.

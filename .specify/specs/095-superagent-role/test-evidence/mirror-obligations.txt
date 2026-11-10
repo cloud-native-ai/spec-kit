@@ -1,0 +1,94 @@
+# Mirror Obligations verification — T050 (2026-11-10)
+
+Owner of the row set: `plan.md` § Mirror Obligations (10 source rows covering 12 files). This record maps each row to its write task and verify task and captures the pair checks.
+
+## 1) Row → task map (10 rows / 12 files)
+
+| # | Source file | Write task | Verify task | Pair check |
+|---|---|---|---|---|
+| 1 | `shared/definitions/superagent-definitions.md` (new) | T009 | T010 | ok |
+| 2 | `shared/definitions/agent-definitions.md` | T009 | T010 | ok |
+| 3 | `shared/definitions/subagent-definitions.md` | T009 | T010 | ok |
+| 4 | `shared/definitions/framework-map.md` | T009 | T010 | ok |
+| 5 | `templates/instructions-template.md` | T043 | T044 | ok |
+| 6 | `scripts/python/role-edge-check.py` (new) | T017 | T018 | ok |
+| 7 | `scripts/python/status-digest.py` | T037 | T038 | ok |
+| 8 | `skills/internal/run-agent/SKILL.md` | T026 | T027 | ok |
+| 9 | `skills/internal/create-team/SKILL.md` + `references/patterns.md` | T026 | T027 | ok |
+| 10 | `skills/external/sdd-loop-driver/SKILL.md` + `references/stage-prompts.md` | T026 | T027 | ok |
+
+Every row carries both a write task and a verify task; every pair is additionally pinned by `tests/contract/test_mirror_parity_suite.py` (parametrized from `sync-mirrors.py`'s MIRROR_PAIRS).
+
+## 2) File-scoped pair checks (12 files; verbatim last lines)
+```
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/superagent-definitions.md
+ok    shared/ == .specify/shared/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/agent-definitions.md
+ok    shared/ == .specify/shared/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/subagent-definitions.md
+ok    shared/ == .specify/shared/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/framework-map.md
+ok    shared/ == .specify/shared/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only templates/instructions-template.md
+ok    templates/ == .specify/templates/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only scripts/python/role-edge-check.py
+ok    scripts/ == .specify/scripts/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only scripts/python/status-digest.py
+ok    scripts/ == .specify/scripts/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/run-agent/SKILL.md
+ok    skills/internal/ == .specify/skills/internal/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/create-team/SKILL.md
+ok    skills/internal/ == .specify/skills/internal/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/create-team/references/patterns.md
+ok    skills/internal/ == .specify/skills/internal/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver/SKILL.md
+ok    skills/external/ == .specify/skills/ (1 files, byte-identical)
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver/references/stage-prompts.md
+ok    skills/external/ == .specify/skills/ (1 files, byte-identical)
+```
+
+## 3) Full-tree check vs the recorded baseline (verbatim, complete output)
+```
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (135 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+DIFF[projected] .specify/scripts/bash/check-prerequisites.sh
+DIFF[projected] .specify/scripts/bash/generate-instructions.sh
+DIFF[projected] .specify/scripts/bash/run-tests.sh
+DIFF[projected] .specify/scripts/python/script-interface-check.py
+DIFF[projected] .specify/scripts/python/script_interface_cli.py
+DIFF[projected] .specify/scripts/python/sync-mirrors.py
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (112 files, byte-identical)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+```
+
+Reading: 19 output lines / **6 DIFF-class**, all six the pre-existing `DIFF[projected]` pairs declared by the sync engine — each is followed by its own `projected[...]: ok` line in the same run; there are **0 plain `DIFF`** lines; `shared/` reports 112 files byte-identical. No NEW drift on any pair this spec touches.
+
+Baseline premise note: the tasks-stage file recorded a 428 DIFF-class / 437-line tree-wide baseline. At P1 start the check already measured 19 lines / 6 DIFF-class on this tree (`definitions-readings.txt` §4: 'the frozen 428 premise is void on this tree'); today's reading is identical in shape and count — the same six declared projection pairs. The binding criterion — no NEW drift on the pairs this spec touches — holds.
+
+## 4) No per-tool command copies regenerated
+```
+$ git log --name-only --format="" c671e168a..HEAD | grep -cE "commands/"
+0
+$ git status --porcelain templates/commands/ | wc -l
+0
+$ git status --porcelain .qoder/commands/ | wc -l
+0
+```
+No `/speckit.*` command file changed anywhere in this feature's commits; the retired `.specify/templates/commands/` mirror does not exist and was not recreated; the check's first line states `OK: all per-tool command copies match the source templates.` and no `regen-command-copies.py` invocation occurred in this feature.
+
+## 5) Mirror-parity suite in the closure run
+```
+$ grep -cE "superagent-definitions|agent-definitions|subagent-definitions|framework-map|instructions-template|role-edge-check|status-digest\.py|run-agent|create-team|sdd-loop-driver" test-evidence/closure-suite-names.txt
+0
+```
+The closure suite's FAILED names contain only the six pre-existing projected pairs of §3; no pair from the 12 touched files appears.

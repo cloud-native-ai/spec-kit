@@ -1,0 +1,30 @@
+# Analyze repair gate re-runs (095-superagent-role) — 2026-11-10
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/095-superagent-role/requirements.md
+file: .specify/specs/095-superagent-role/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 288 lines, 48 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/095-superagent-role --stage requirements --repo .
+{"stage": "requirements", "decision": "pass", ... ], "summary": {"errors": 0, "advisories": 70, "waived": 0, "fr": 38, "sc": 10, "tasks": 54, "clauses": 0, "files": 12}, "checked_at": "2026-11-10T07:56:39Z"}pre-analyze-check: stage=requirements decision=pass errors=0 advisories=70 waived=0
+exit=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/095-superagent-role --stage plan --repo .
+{"stage": "plan", "decision": "pass", ... ], "summary": {"errors": 0, "advisories": 70, "waived": 0, "fr": 38, "sc": 10, "tasks": 54, "clauses": 0, "files": 12}, "checked_at": "2026-11-10T07:56:40Z"}pre-analyze-check: stage=plan decision=pass errors=0 advisories=70 waived=0
+exit=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/095-superagent-role --stage tasks --repo .
+{"stage": "tasks", "decision": "pass", ... ], "summary": {"errors": 0, "advisories": 70, "waived": 0, "fr": 38, "sc": 10, "tasks": 54, "clauses": 0, "files": 12}, "checked_at": "2026-11-10T07:56:40Z"}pre-analyze-check: stage=tasks decision=pass errors=0 advisories=70 waived=0
+exit=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/095-superagent-role/requirements.md --tasks .specify/specs/095-superagent-role/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 38, "task_count": 54, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T07:56:40Z"}
+exit=0

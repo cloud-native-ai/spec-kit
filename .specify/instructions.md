@@ -111,6 +111,8 @@ Before creating or changing a machine-managed store, ask: **if two branches run 
 
 Agent-created scratch MUST use a sanctioned temp root already matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
 
+**`.specify/.gitignore` is framework-owned and tracks the framework's evolution**: it carries the runtime-ignore set (`.tmp/`, `state/`, generated stores), and whenever the framework adds a new runtime directory the corresponding rule MUST land in the same change — in the source template `templates/gitignore-specify-template` and in this project's installed copy together, so client projects receive it on the next init refresh. A runtime directory that exists but is unignored is a defect, not a preference.
+
 ## Script Interface Contract
 
 Every functional, non-read-only script answers `-h` / `--help` and `--version` without acting and rejects an undeclared option; pytest modules, pure libraries and read-only scripts are outside the required set (read-only: recommended, optional). The rule binds framework, downstream and third-party functional scripts alike; its full definition is owned by `.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not restated.
@@ -285,6 +287,10 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/memory/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
 
 Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
+
+## Super Agent (相对逻辑角色)
+
+Super agent is the parent-side relative logical role on a dispatch edge — not a fourth layer, entity type or runtime; the role model is owned by `.specify/shared/definitions/superagent-definitions.md`. A dispatch granting dispatch duty physically carries the `role-transition` injection list.
 
 ## Spec Kit Runtime & Symlink Model
 

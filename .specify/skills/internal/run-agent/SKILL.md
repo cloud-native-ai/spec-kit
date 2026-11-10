@@ -119,6 +119,16 @@ conclusions MUST NOT be consumed. Found missing **before** dispatch → repair i
 disclose at wrap-up; found **after** dispatch → fast fail, because the agent already ran
 ungoverned and editing the prompt cannot undo that.
 
+- **`role-transition` pointer item（授职派发）**: when this dispatch grants dispatch duty
+  (`dispatch_duty: granted`), the payload MUST carry the `role-transition` injection — the
+  stable identifier plus the closed nine-item pointer list owned by
+  `.specify/shared/definitions/superagent-definitions.md` § Role-Transition Injection. The
+  items travel as pointers; no rule text is copied into the payload.
+- **Self-check extension（逐项判定）**: the existing pre-dispatch self-check above is extended
+  to require the `role-transition` identifier **and each of its nine item-id slugs** — the
+  identifier alone is insufficient. A missing identifier or slug is a payload-construction
+  defect and blocks the dispatch before it starts.
+
 **Anti-nesting obligation (反嵌套，派发前拦截)**: the outgoing prompt MUST NOT reference any
 driver/loop skill (e.g. `sdd-loop-driver`), MUST NOT instruct the subagent to load any skill,
 and MUST NOT contain loop logic — the loader of a driver manual is the driver itself, and a

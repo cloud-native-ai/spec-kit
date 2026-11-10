@@ -1,0 +1,10 @@
+{
+  "kind": "speckit.exec-quant",
+  "schema_version": 2,
+  "unit_id": "agent:remote-builder",
+  "unit_type": "agent",
+  "run_id": "remote--20261110T000000Z--worker",
+  "run_id_resolution": "explicit",
+  "collected_at": "2026-11-10T00:00:00Z",
+  "truncated": []
+}

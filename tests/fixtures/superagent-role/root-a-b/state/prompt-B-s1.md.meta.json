@@ -1,0 +1,13 @@
+{
+  "line_id": "B",
+  "stage": "s1",
+  "role_edge": {
+    "parent_identity": "A",
+    "child_label": "B",
+    "role_declaration": "subagent",
+    "dispatch_duty": "not-granted",
+    "depth_position": 2,
+    "authority_ref": "none",
+    "return_channel": "structured return + evidence pointer"
+  }
+}

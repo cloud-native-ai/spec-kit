@@ -1,0 +1,8 @@
+unit: /speckit.plan   run: r20261110T064443Z-b095
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (source_unavailable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261110T064443Z-b095 clean=false findings=4
+persisted: .specify/memory/session/20261110T064451Z-run-determination-speckit-plan-r20261110t064443z-b095.md

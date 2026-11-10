@@ -1,0 +1,43 @@
+# Closure acceptance re-run with explicit carriers (review-repair r1, 2026-11-10)
+command: python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/095-superagent-role --feature-detail .specify/features/095-superagent-role.md --feature-registry .specify/features.md --json
+
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/features/095-superagent-role.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 7,
+    "total": 7,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/contract/test_role_edge_engine.py tests/contract/test_role_transition_payload.py tests/contract/test_status_digest_roles.py tests/contract/test_superagent_definitions.py tests/contract/test_instructions_budget_superagent_section.py tests/contract/test_superagent_zero_mechanism.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/095-superagent-role/test-evidence/smoke-six-modules.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/095-superagent-role",
+  "tasks": {
+    "closed": 54,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+
+exit=0

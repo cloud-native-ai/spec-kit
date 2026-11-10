@@ -1,0 +1,48 @@
+# Concurrency wave machine readings — 093 observation (095 P6, 2026-11-10)
+
+## 1) Round-1 analyze wave — driver pid records (verbatim)
+--- .specify/state/pid-095-superagent-role-analyze-w1
+pid=2193304 start=2323166983 at=1794295408 line=095-superagent-role stage=analyze-w1 event=pid
+
+--- .specify/state/pid-095-superagent-role-analyze-w2
+pid=2193309 start=2323166984 at=1794295408 line=095-superagent-role stage=analyze-w2 event=pid
+
+--- .specify/state/pid-095-superagent-role-analyze-w3
+pid=2193314 start=2323166984 at=1794295408 line=095-superagent-role stage=analyze-w3 event=pid
+
+start epoch 1794295408 = 2026-11-10T07:23:28Z (all three identical)
+
+## 2) Round-2 analyze wave — driver pid records (verbatim)
+--- .specify/state/pid-095-superagent-role-analyze2-w1
+pid=3855868 start=2323377753 at=1794297516 line=095-superagent-role stage=analyze2-w1 event=pid
+
+--- .specify/state/pid-095-superagent-role-analyze2-w2
+pid=3855873 start=2323377754 at=1794297516 line=095-superagent-role stage=analyze2-w2 event=pid
+
+--- .specify/state/pid-095-superagent-role-analyze2-w3
+pid=3855878 start=2323377754 at=1794297516 line=095-superagent-role stage=analyze2-w3 event=pid
+
+start epoch 1794297516 = 2026-11-10T07:58:36Z (all three identical)
+
+## 3) run-determination records produced by each wave (file names, verbatim; mtimes are the workers' own completion records)
+-- round 1:
+20261110T073136Z-run-determination-speckit-analyze-r20261110t055657z-b095-w1.md
+20261110T073354Z-run-determination-speckit-analyze-r20261110t073257z-b095.md
+20261110T073607Z-run-determination-speckit-analyze-r20261110t055657z-b095.md
+-- round 2:
+20261110T080438Z-run-determination-speckit-analyze-r20261110t080102z-b095-r2w.md
+20261110T080529Z-run-determination-speckit-analyze-r20261110t055657z-b095-r2w.md
+20261110T080800Z-run-determination-speckit-analyze-r20261110t055657z-b095-r2w.md
+
+## 4) wave status records — round 2 (verbatim)
+--- .specify/state/status-095-superagent-role-analyze2-w1
+exit=0 at=1794298135 sentinel=1 line=095-superagent-role stage=analyze2-w1 event=status progress=stream detached=yes
+
+--- .specify/state/status-095-superagent-role-analyze2-w2
+exit=0 at=1794297961 sentinel=1 line=095-superagent-role stage=analyze2-w2 event=status progress=stream detached=yes
+
+--- .specify/state/status-095-superagent-role-analyze2-w3
+exit=0 at=1794297906 sentinel=1 line=095-superagent-role stage=analyze2-w3 event=status progress=stream detached=yes
+
+## 5) reading
+Both waves show three worker PIDs starting on one identical epoch with three separate completion records and no serialization between them — the three units of each wave ran concurrently (stage reading: requested=24, effective=3, verifier_reserve=1).

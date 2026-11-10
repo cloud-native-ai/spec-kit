@@ -1,0 +1,141 @@
+# Digest role-view readings — 095 P4 (T037 / T038)
+
+Run: `r20261110T055657Z-b095` · package P4 (T034–T039) · date 2026-11-10 · executor: main session
+Contract: `.specify/specs/095-superagent-role/contracts/status-digest-role-view.contract.md` (C-1…C-8)
+Owner of the role model: `.specify/shared/definitions/superagent-definitions.md`
+
+## 1. Mirror sync and pair parity (T037)
+
+```bash
+python3 scripts/python/sync-mirrors.py --write --only scripts/python/status-digest.py
+# scope --only: scripts/python/status-digest.py
+# DIFF .specify/scripts/python/status-digest.py
+# sync  scripts/ -> .specify/scripts/ (1 files)
+# exit 0
+
+python3 scripts/python/sync-mirrors.py --check --only scripts/python/status-digest.py
+# scope --only: scripts/python/status-digest.py
+# ok    scripts/ == .specify/scripts/ (1 files, byte-identical)
+# exit 0
+
+cmp scripts/python/status-digest.py .specify/scripts/python/status-digest.py
+# exit 0 (PAIR-IDENTICAL)
+```
+
+Both files are 135,152 B; the pair is byte-identical and the mirror renders the same role view
+(pinned by `tests/contract/test_status_digest_roles.py::test_the_mirror_renders_the_same_role_view`).
+
+## 2. Quickstart scenario 2 — live table render (T037)
+
+Command (the quickstart's first form, through the runtime mirror):
+
+```bash
+python3 .specify/scripts/python/status-digest.py --action digest
+```
+
+Exit **0**. Output, verbatim (2026-11-10T14:01:52Z; live workspace):
+
+```text
+状态摘要 · 生成于 2026-11-10T14:01:52.027384Z（UTC）· 最多 20 条 · 注册目录 /home/agent/.local/state/spec-kit/lines
+
+执行体                                        所属 spec                      父边                    角色        深度  在做什么                           状态                          已执行时间
+--------------------------------------------  -----------------------------  ----------------------  ----------  ----  ---------------------------------  ----------------------------  ------------
+099-speckit-seal-analyze                      -                              r20261110T121314Z-b099  subagent    1     -                                  运行中                        -
+095-superagent-role-implement-p4              -                              r20261110T055657Z-b095  subagent    1     -                                  运行中                        -
+098-suite-speed-optimizations-implement-wp1b  -                              r20261110T081104Z-b098  subagent    1     -                                  运行中                        -
+096-sdd-observer-agent-implement-wp01         -                              r20261110T081104Z-b096  subagent    1     -                                  运行中                        -
+097-speckit-migrate-command-implement-pkg03   -                              r20261110T081104Z-b097  subagent    1     -                                  运行中                        -
+fork(qodercli, pid 2063939)                   096-sdd-observer-agent         -                       superagent  0     /speckit.implement: 实现（wp01）   活跃                          13 分
+fork(qodercli, pid 2393162)                   097-speckit-migrate-command    -                       superagent  0     /speckit.implement: 实现（pkg03）  活跃                          7 分
+fork(qodercli, pid 2673606)                   098-suite-speed-optimizations  -                       superagent  0     /speckit.implement: 实现（wp1b）   活跃                          4 秒
+fork(qodercli, pid 2121759)                   095-superagent-role            -                       superagent  0     /speckit.implement: 实现（p4）     活跃                          12 分
+fork(qodercli, pid 2570246)                   099-speckit-seal               -                       superagent  0     /speckit.analyze: 一致性分析       活跃                          3 分
+—（无存活执行体）                             074-goal-team-sdd-unification  -                       -           -     /speckit.requirements: 需求撰写    已停滞（静默 12 天 21 小时）  13 天 0 小时
+```
+
+Reading: the five live executor rows answer identity / 所属 spec / parent edge / role set / depth /
+activity / state / elapsed; the five running stage children are the role-edge rows of the same read
+(their `parent` is the line's spine `run_id`), and the idle line keeps one row. No second surface
+was needed.
+
+## 3. Quickstart scenario 2 — live JSON render (T037)
+
+```bash
+python3 .specify/scripts/python/status-digest.py --action digest --format json
+```
+
+Exit **0**; full output 136,077 B (captured at run time; reproducible by the pinned command). Bounded
+projection of the one run — top-level keys, and every `entries` row (the capped view):
+
+```text
+TOP-LEVEL KEYS: ['all_entries', 'cap', 'efficiency', 'entries', 'executors', 'generated_at',
+                 'omitted', 'profile', 'registry_dir', 'stale_bound_seconds', 'state_summary', 'workspace']
+entries: 11  all_entries: 111  omitted: 0  state_summary: active  profile: long-run
+exec  099-speckit-seal-analyze                      parent=r20261110T121314Z-b099  roles=['subagent']            marker=None  depth=1  state=running  stale=False  age=0s
+exec  095-superagent-role-implement-p4              parent=r20261110T055657Z-b095  roles=['subagent']            marker=None  depth=1  state=running  stale=False  age=1s
+exec  098-suite-speed-optimizations-implement-wp1b  parent=r20261110T081104Z-b098  roles=['subagent']            marker=None  depth=1  state=running  stale=False  age=1s
+exec  096-sdd-observer-agent-implement-wp01         parent=r20261110T081104Z-b096  roles=['subagent']            marker=None  depth=1  state=running  stale=False  age=3s
+exec  097-speckit-migrate-command-implement-pkg03   parent=r20261110T081104Z-b097  roles=['subagent']            marker=None  depth=1  state=running  stale=False  age=10s
+line  096-sdd-observer-agent                        parent=None                    roles=['superagent']          marker=None  depth=0  state=active   stale=False  age=8m01s
+line  097-speckit-migrate-command                   parent=None                    roles=['superagent']          marker=None  depth=0  state=active   stale=False  age=8m01s
+line  098-suite-speed-optimizations                 parent=None                    roles=['superagent']          marker=None  depth=0  state=active   stale=False  age=8m01s
+line  095-superagent-role                           parent=None                    roles=['superagent']          marker=None  depth=0  state=active   stale=False  age=8m18s
+line  099-speckit-seal                              parent=None                    roles=['superagent']          marker=None  depth=0  state=active   stale=True   age=1h48m
+line  074-goal-team-sdd-unification                 parent=None                    roles=[]                      marker=None  depth=None  state=stalled  stale=True   age=309h53m
+```
+
+Reading: existing keys keep their names and meanings; every row carries `parent` / `roles` /
+`role_set_marker` / `depth` beside its family's existing fields (line rows keep `line_id` /
+`last_activity_at`; executor rows use `id` / `last_activity` with `project_dir` / `branch` / `stage`
+null). The long `all_entries` tail is the uncapped set (closed lines plus lifecycle-terminal
+executor rows — history that never occupies the capped view).
+
+## 4. T038 — runner readings
+
+Commands (both through the single runner):
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_status_digest_roles.py tests/contract/test_status_digest.py -q
+# 74 passed in 6.54s · exit 0
+```
+
+That is the new module (18 legs, incl. the five mutation/structural drills and the mirror-parity
+leg) plus every existing digest contract leg.
+
+Supplementary reading (not a T038 requirement): `tests/unit/test_status_digest_unit.py` carries 10
+**pre-existing** failures on this tree — the same ten names fail at HEAD `9c39b8e06` in a scratch
+worktree with zero difference (they assert the retired `line_id=` text renderer and `cap=` spelling
+of the 2026-11-10 reader redesign, not the role view). They are named and exempted here; no leg of
+this feature claims them green.
+
+```text
+# mine (working tree, 3 files):            10 failed, 93 passed
+# HEAD 9c39b8e06 (unit module alone):      10 failed, 19 passed
+# comm -3 of the sorted FAILED-name lists: empty (identical names)
+```
+
+## 5. Degrade face (analyze W2-15 disposition)
+
+The engine requires its three carrier roots; a project that never ran a team or a driver may lack
+`.specify/teams` / `.specify/agents/execution/logs`. Decision taken at P4: the digest degrades — the
+four role fields render empty (`parent=None`, `roles=[]`, `role_set_marker=None`, `depth=None`) and
+the digest's own reading (registry, cap, `omitted`, `nothing-running`, stale) is untouched. Pinned by
+`test_without_carrier_roots_the_role_fields_render_as_empty_not_missing`. The alternative the finding
+named (make the engine's teams/logs roots optional-empty) is an engine-contract change and is **not**
+taken here.
+
+## 6. Bounded-read discipline (C-1)
+
+One `read_carrier_inputs` + one `evaluate_role_model` per digest run, both inside
+`read_role_materialization`, called once from `read_state`. The digest adds no carrier parser
+(no team-table / sidecar / `role_edge` reader) and scans exactly two roots of its own: the legacy
+registry `*.json` scan and the legacy `pid-*` state scan. Structural pins:
+`test_c1_the_role_model_is_one_materialization_per_run`,
+`test_c1_the_digest_adds_no_second_carrier_parser_or_root_scan`.
+
+**Disclosed limit (contract seam, not silently repaired)**: the legacy registry scan above and the
+engine's own registry cross-check parse both open the same registry directory. Collapsing them would
+require the engine's importable interface to hand back the full entry payloads (it returns only
+`path` + `line_id`), i.e. an engine-contract change that is outside this package's write domain. The
+role-view layer itself holds C-1's one-materialization rule (one call each, no second parser); the
+double registry pass remains, named here for the review round rather than hidden.

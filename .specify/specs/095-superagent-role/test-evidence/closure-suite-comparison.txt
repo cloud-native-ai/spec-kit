@@ -1,0 +1,34 @@
+# Closure full-suite comparison — T051 (2026-11-10)
+
+Runner entry (single entry, parallel default): `bash scripts/bash/run-tests.sh --names-out <path>`.
+
+## 1) Captures
+- Closure run: exit 1, 233 failed / 8397 passed / 2 skipped in 45.28s; capture `test-evidence/closure-suite.txt`, names `test-evidence/closure-suite-names.txt` (233 entries).
+- Baseline: exit 1, 303 failed; capture provenance `notes/baseline-provenance.md`; names `notes/baseline-failed-names.txt` (303 entries).
+
+Provenance disclosure (first capture): the implement-start baseline artifact (T001) is absent on disk. Per `.specify/templates/commands/implement.md` § Baseline pre-flight, a missing baseline is a first capture with provenance recorded. The baseline was reconstructed at the P1 parent commit `c671e168a` in a throwaway worktree plus the 29 pre-existing dirty tracked files (see `notes/baseline-provenance.md`).
+
+## 2) Comparison (names only)
+```
+$ comm -13 <(sort notes/baseline-failed-names.txt) <(sort test-evidence/closure-suite-names.txt)   # NEW failures
+tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_historical_face_is_not_empty
+tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership
+NEW_COUNT=2
+
+$ comm -23 <(sort notes/baseline-failed-names.txt) <(sort test-evidence/closure-suite-names.txt) | wc -l   # baseline-only failures
+72
+```
+
+## 3) Adjudication of the two NEW names (both OUTSIDE this feature's write domain)
+
+1. `tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_historical_face_is_not_empty` — the test greps the whole repo and fails on `grep` exit 2, caused by root-owned, unreadable files under `.specify/.tmp/script-interface-*` probe scratch. Measured: those directories are dated 2026-11-10 10:42–10:51, i.e. they predate this feature's first commit (P1 at 20:53) and were not created or modified by 095. The reconstructed base worktree did not carry `.specify/.tmp`, which is why the name is absent from the baseline list.
+2. `tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership` — the claimants are `flow-class-definitions.md` copies inside `.specify/.tmp/sdd-loop/worktrees/` belonging to other lines (096 at 16:46, 097 at 20:43, 099 at 20:44 — all before P1; trunk-amend 21:35 and 098 21:54 inside the implement window but inside those lines' own worktree directories). 095 created no worktree under that root. Same baseline-worktree blindness applies (`.specify/.tmp` is untracked and was not copied).
+
+Neither name is produced by a file this feature wrote. Zero NEW failures attributable to Feature 095 vs the reconstructed baseline.
+
+## 4) First-capture lesson (disclosed, not hidden)
+The first closure capture wrote its stdout and names list inside `.specify/specs/095-superagent-role/test-evidence/` while the suite was running. Two corpus-invariance tests (`test_clause_coverage.py::test_c20_...`, `test_non_disposable_contract.py::test_t089_...`) failed because the growing capture file sat inside the scanned corpus; they passed on the clean re-run with the capture redirected to `.specify/.tmp/`. The clean re-run is the record above.
+
+## 5) Capture provenance (path forms)
+
+The closure run wrote its names list to `.specify/.tmp/095-closure2-names.txt` (outside the scanned corpus); the committed copy is byte-for-byte `test-evidence/closure-suite-names.txt` (233 entries), and the suite log in `test-evidence/closure-suite.txt` is the runner's verbatim stdout/stderr — its final line therefore names the `.specify/.tmp` path, not the committed copy.

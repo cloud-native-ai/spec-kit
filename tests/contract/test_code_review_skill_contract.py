@@ -12,8 +12,8 @@ Group shape (the US2 band is the part that turns green first):
   default trunk), the closed trunk-identification order with a negative case for
   each heuristic it forbids, the head rule (explicit ``--head``, else ``HEAD``
   read once and fixed for the run), the first-add instrument (never
-  ``git log -1``), the refusal of a branch-name default, the four-step
-  non-interactive enumeration read as four and not three, the single record
+  ``git log -1``), the refusal of a branch-name default, the five-step
+  non-interactive enumeration read as five and not four, the single record
   header form, record creation and its archive rotation, and the code-path
   predicate behind the applicability triage in both directions plus the empty
   delta. Green points: T011 (``base``/``triage``) and T012 (``start``); T013 runs
@@ -515,35 +515,35 @@ def test_us2_the_feature_tier_never_derives_from_the_latest_commit_over_the_spec
 
 
 # --------------------------------------------------------------------------- #
-# US2 band — C-17: the four-step non-interactive path
+# US2 band — C-17: the non-interactive path, five steps since the code-review skill's C-10 revision
 # --------------------------------------------------------------------------- #
 
-def test_us2_the_non_interactive_path_is_four_steps_read_as_four(repo: ReviewGitRepo):
+def test_us2_the_non_interactive_path_is_five_steps_read_as_five(repo: ReviewGitRepo):
     run = repo.run_script("--help")
     assert run.returncode == 0, run.describe()
     help_text = _plain(run.stdout)
 
-    steps = re.findall(r"(?m)^\s*([1-4])\.\s+(\S+)", help_text)
-    assert [word for _n, word in steps] == ["base", "start", "note", "receipt"], (
-        "the non-interactive path MUST be enumerated as four steps in this order — "
+    steps = re.findall(r"(?m)^\s*([1-5])\.\s+(\S+)", help_text)
+    assert [word for _n, word in steps] == ["base", "start", "note", "receipt", "capture"], (
+        "the non-interactive path MUST be enumerated as five steps in this order — "
         "base resolution, record creation/rotation, opinion capture, receipt and "
-        f"verdict; found {steps!r}"
+        f"verdict, client capture; found {steps!r}"
     )
-    assert re.search(r"(?i)four steps", help_text), (
-        "the enumeration MUST be readable as four, not three (C-17)"
+    assert re.search(r"(?i)five steps", help_text), (
+        "the enumeration MUST be readable as five, not four (code-review skill C-10)"
     )
     assert re.search(r"(?i)rotat", help_text), (
         "record creation and rotation is a REQUIRED step from the second run on — "
-        "calling it out is what makes the enumeration four rather than three"
+        "calling it out is part of what makes the enumeration readable"
     )
-    for subcommand in ("base", "start", "note"):
+    for subcommand in ("base", "start", "note", "capture"):
         assert re.search(rf"(?m)^\s+{subcommand}\s", help_text), (
             f"step {subcommand!r} MUST be documented as a subcommand, not only as a "
             "numbered line"
         )
     # `receipt` (step 4) gets its COMMANDS entry with its implementation (T015); the
-    # four-step declaration above is what C-17 requires of this file, and group 4
-    # (`test_coverage_receipt.py`) owns its behaviour.
+    # five-step declaration above is what the code-review skill's C-10 requires of this
+    # file, and group 4 (`test_coverage_receipt.py`) owns its behaviour.
 
 
 def test_us2_base_start_and_note_complete_without_a_prompt_or_a_tty(repo: ReviewGitRepo):

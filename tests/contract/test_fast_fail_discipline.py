@@ -747,9 +747,17 @@ def test_a7_section_counts_20_to_21_and_21_to_22():
     self-detecting, so the delta pairing below is stated explicitly: a change that
     adds or removes a `##` section MUST raise or lower `TPL_EXPECTED` /
     `LIVE_EXPECTED` in the same commit.
+
+    Stale-pin repair + bump (2026-11-10, Feature 095 T042): the measured tree was
+    already at 36/37 before this feature — cf808600a added the
+    `## Agent Anti-Patterns (agent 反模式)` section without the same-commit bump, so
+    the old 35/36 pin was red at HEAD. T042 adds the `## Super Agent (相对逻辑角色)`
+    ambient section, so the correct bump from the measured tree is 36 -> 37 template
+    and 37 -> 38 live (the task row's 35 -> 36 / 36 -> 37 arithmetic had read the
+    stale pin, not the tree). Both corrections land in the section's own commit.
     """
-    TPL_EXPECTED = 35  # .specify/specs/090-re-anchoring: +1 ambient section (on top of 089's 34)
-    LIVE_EXPECTED = 36  # the reconcile carries that same section into the live file
+    TPL_EXPECTED = 37  # 095 T042: +1 ambient section on top of the un-bumped Agent Anti-Patterns section
+    LIVE_EXPECTED = 38  # the reconcile carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
     assert tpl == TPL_EXPECTED, (
@@ -1632,7 +1640,8 @@ def test_i13_channel_three_payload_sixth_field_row():
 
     Row budget: 5 original + `fast_fail_clause` (C-13) + `incremental_landing`
     (serial stage granularity — the landing form a dispatch carries, without
-    which "incremental landing" stays an undecidable sentence in the brief).
+    which "incremental landing" stays an undecidable sentence in the brief) +
+    `role_fields` (095 T022 — the seven downlink role fields, by reference).
     """
     text = _text(TEAM_PATTERNS)
     m = re.search(r"Per-Agent Payload:(.*?)Context Isolation Rules:", text, re.S)
@@ -1642,7 +1651,10 @@ def test_i13_channel_three_payload_sixth_field_row():
     assert "incremental_landing" in rows, (
         f"the payload table lacks incremental_landing; rows are {rows}"
     )
-    assert len(rows) == 7, f"C-13: the payload table has {len(rows)} field rows; expected 7 (5 before + fast_fail_clause + incremental_landing)"
+    assert "role_fields" in rows, (
+        f"the payload table lacks role_fields (095 T022); rows are {rows}"
+    )
+    assert len(rows) == 8, f"C-13: the payload table has {len(rows)} field rows; expected 8 (5 before + fast_fail_clause + incremental_landing + role_fields)"
     tail = text[text.index("Context Isolation Rules:"):]
     assert DOC_REL in tail[:2000] or "fast-fail" in m.group(1), (
         "C-13: the new field row does not point at the clause owner"

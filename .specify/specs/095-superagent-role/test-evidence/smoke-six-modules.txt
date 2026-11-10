@@ -1,0 +1,9 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_edge_engine.py tests/contract/test_role_transition_payload.py tests/contract/test_status_digest_roles.py tests/contract/test_superagent_definitions.py tests/contract/test_instructions_budget_superagent_section.py tests/contract/test_superagent_zero_mechanism.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed in 6.34s
+EXIT=0 DURATION=8s

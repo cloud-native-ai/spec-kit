@@ -1,0 +1,84 @@
+# Zero-second-mechanism readings — T045 (2026-11-10)
+
+## 1) the six C-3 assertions (module)
+$ bash scripts/bash/run-tests.sh tests/contract/test_superagent_zero_mechanism.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_superagent_zero_mechanism.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+......                                                                   [100%]
+6 passed in 6.16s
+
+## 2) targeted selection — i14
+$ bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k 'i14'
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_fast_fail_discipline.py -q -k i14
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.18s
+
+## 3) baseline-matched selection (same selection as the first capture)
+$ bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py::test_i14_context_isolation_rules_unchanged tests/contract/test_sdd_invocation_governance.py tests/contract/test_nested_run_report.py -q --names-out .specify/specs/095-superagent-role/test-evidence/zero-mechanism-current-names.txt
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_fast_fail_discipline.py::test_i14_context_isolation_rules_unchanged tests/contract/test_sdd_invocation_governance.py tests/contract/test_nested_run_report.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+............................F...........                                 [100%]
+=================================== FAILURES ===================================
+_____ test_attribution_is_observational_so_the_goal_field_set_is_unchanged _____
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6621/popen-gw37/test_attribution_is_observatio0')
+
+    def test_attribution_is_observational_so_the_goal_field_set_is_unchanged(tmp_path):
+        """SC-002's instrument: append the supervisor's row, re-parse the Goal, compare."""
+        project = build(tmp_path / "project")
+        engine = _goal_engine()
+    
+        before = engine.parse_goal(project.goal_path)
+>       assert set(before) == GOAL_FIELD_SET, (
+            "the pre-run Goal field set differs from the frozen 12-key set; a new Goal field "
+            f"would appear here (C-26 / SC-002): {sorted(set(before) ^ GOAL_FIELD_SET)}"
+        )
+E       AssertionError: the pre-run Goal field set differs from the frozen 12-key set; a new Goal field would appear here (C-26 / SC-002): ['binding_block']
+E       assert {'binding_blo...history', ...} == {'boundaries'...jective', ...}
+E         
+E         Extra items in the left set:
+E         'binding_block'
+E         Use -v to get more diff
+
+tests/contract/test_nested_run_report.py:503: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged
+1 failed, 39 passed in 6.35s
+# failed-name list written: .specify/specs/095-superagent-role/test-evidence/zero-mechanism-current-names.txt (1 entries) passes=1
+
+## 4) baseline comparison (comm -13: names only in current, i.e. NEW failures)
+$ comm -13 test-evidence/zero-mechanism-baseline-names.txt test-evidence/zero-mechanism-current-names.txt
+
+NEW_FAILURE_COUNT=0
+
+## 5) baseline provenance (disclosed, not silent)
+
+- The implement-start full-suite baseline (T001's `--names-out` artifact) is NOT on disk:
+  no `baseline-*` file exists under the spec directory or its `notes/` directory, and the
+  Setup package (T001–T003) left no capture. Per `.specify/templates/commands/implement.md`
+  § baseline pre-flight, a missing baseline file is a FIRST CAPTURE with provenance recorded.
+- First capture: `test-evidence/zero-mechanism-baseline-names.txt`, taken at P5 start
+  (2026-11-10, before any P5 edit) on exactly the selection re-run in §3.
+- Result: baseline has 1 failure, current has the same 1 failure, `comm -13` is empty →
+  zero NEW failures attributable to P5.
+- The pre-existing red, named and EXEMPTED (never claimed green):
+  `tests/contract/test_nested_run_report.py::test_attribution_is_observational_so_the_goal_field_set_is_unchanged`
+  — a pre-run Goal field (`binding_block`) outside the frozen 12-key set, present before this package.
+
+## 6) readings summary
+
+- zero-mechanism module: 6 passed (six C-3 legs, seeded mutations inside each leg).
+- `test_fast_fail_discipline.py -k i14`: 1 passed.
+- baseline-matched selection: 39 passed, 1 pre-existing failure exempted.
+- NEW_FAILURE_COUNT=0.

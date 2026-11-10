@@ -1,0 +1,9 @@
+{
+  "id": "20261110T070329Z-speckit-tasks",
+  "path": ".specify/memory/feedback/20261110T070329Z-speckit-tasks.md",
+  "duplicate": false,
+  "count_since_submission": 401,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

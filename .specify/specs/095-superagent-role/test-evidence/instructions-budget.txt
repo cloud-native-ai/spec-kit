@@ -1,0 +1,93 @@
+[info] Generating tool JSON manifests...
+[info] Backing up existing instructions to .specify/instructions.md-2026-11-10-221343
+[info] Existing instructions kept as the refresh base (not overwritten).
+[info] Injected missing template section(s): Super Agent (相对逻辑角色)
+[info] The /speckit.instructions command reconciles each section against current
+[info] project state and the latest template, and can recover content dropped by
+[info] older versions from the .specify/instructions.md-* backup history.
+[info] Instructions size: 38301 B (budget 38400 B, 99 B headroom). Section table, largest first:
+| section                                         | live B | tmpl B | delta | placeholder | project-owned |
+|-------------------------------------------------|--------|--------|-------|-------------|---------------|
+| Documentation Map                               | 4952   | 2705   | +2247 | yes         | no            |
+| Tech Stack & Resources                          | 2115   | 854    | +1261 | yes         | no            |
+| Fast Fail Discipline                            | 1993   | 1993   | 0     | no          | no            |
+| Progress Reporting Discipline                   | 1644   | 1644   | 0     | no          | no            |
+| User-Facing Comprehension                       | 1353   | 1353   | 0     | no          | no            |
+| Run Determination                               | 1351   | 1351   | 0     | no          | no            |
+| Concurrent Development Safety (并发开发安全)          | 1337   | 1337   | 0     | no          | no            |
+| Test Execution Efficiency (测试执行效率)              | 1328   | 1328   | 0     | no          | no            |
+| Two Hats: Framework Source vs Client Runtime    | 1315   | 1315   | 0     | no          | no            |
+| Ask, Record, Repeat                             | 1281   | 1281   | 0     | no          | no            |
+| Proactive Flow Trigger                          | 1129   | 1129   | 0     | no          | no            |
+| SDD Routing Decision (SDD 分流裁决)                 | 1124   | 1124   | 0     | no          | no            |
+| Task Complexity Rubric                          | 996    | 996    | 0     | no          | no            |
+| Suggested Tooling Scope (High-Level)            | 995    | 995    | 0     | no          | no            |
+| Re-Anchoring (不忘初心 · 温故而知新)                     | 976    | 648    | +328  | no          | no            |
+| One Source Of Truth                             | 967    | 967    | 0     | no          | no            |
+| Fact, Correctness & Logic Checks (Input Sanity) | 955    | 955    | 0     | no          | no            |
+| Temporary Directory Discipline                  | 929    | 929    | 0     | no          | no            |
+| Single-Run Evidence Discipline                  | 901    | 901    | 0     | no          | no            |
+| Token Efficiency Discipline                     | 880    | 880    | 0     | no          | no            |
+| Dogfooding Practice                             | 810    | 810    | 0     | no          | no            |
+| ID Register (编号登记)                              | 807    | 807    | 0     | no          | no            |
+| Git Workflow                                    | 683    | 683    | 0     | no          | no            |
+| Agent Anti-Patterns (agent 反模式)                 | 678    | 678    | 0     | yes         | no            |
+| Recurring Operational Lessons                   | 646    | 0      | +646  | no          | yes           |
+| Root-Cause Problem Solving                      | 637    | 637    | 0     | no          | no            |
+| Self-Explanatory Structure (不言自明)               | 618    | 618    | 0     | no          | no            |
+| Spec Kit Framework Map                          | 551    | 551    | 0     | no          | no            |
+| Spec Kit Runtime & Symlink Model                | 541    | 541    | 0     | no          | no            |
+| Grounded Naming                                 | 518    | 518    | 0     | no          | no            |
+| Script Interface Contract                       | 488    | 488    | 0     | no          | no            |
+| Skills & Tools                                  | 468    | 469    | -1    | no          | no            |
+| Closed-Set Claims (封闭清单声明)                      | 456    | 456    | 0     | no          | no            |
+| Project Overview                                | 436    | 236    | +200  | yes         | no            |
+| AI Tool Compatibility                           | 374    | 228    | +146  | no          | no            |
+| Bilingual Expression (双语表述)                     | 372    | 372    | 0     | no          | no            |
+| Knowledge Recording & Promotion                 | 364    | 691    | -327  | no          | no            |
+| Super Agent (相对逻辑角色)                            | 333    | 333    | 0     | no          | no            |
+[info] Ensured project glossary at .specify/glossary.md (non-destructive)
+[info] Updating symlinks for AI tools...
+[success] Instructions generated/updated at .specify/instructions.md
+
+## T044 verify readings — 2026-11-10
+
+### 1) section contract module
+$ bash scripts/bash/run-tests.sh tests/contract/test_instructions_budget_superagent_section.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_instructions_budget_superagent_section.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....                                                                    [100%]
+5 passed in 6.16s
+
+### 2) existing size budget module
+$ bash scripts/bash/run-tests.sh tests/contract/test_instructions_size_budget.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_instructions_size_budget.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.............                                                            [100%]
+13 passed in 10.25s
+
+### 3) existing section propagation module
+$ bash scripts/bash/run-tests.sh tests/contract/test_instructions_section_propagation.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_instructions_section_propagation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+......                                                                   [100%]
+6 passed in 8.81s
+
+### 4) section-count pins (a7)
+$ bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k 'a7_section_counts'
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_fast_fail_discipline.py -q -k a7_section_counts
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.20s

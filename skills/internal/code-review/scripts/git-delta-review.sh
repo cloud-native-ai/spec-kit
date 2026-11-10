@@ -84,12 +84,16 @@ usage() {
               --skip-with-reason <glob> --reason <reason>  (可重复; 理由取自法定五值)
               写出记录内定界的 name=value 块并打印同一块; 四项计数只由它产出
               退出码关闭于 0/1/2: 0 完整, 1 覆盖缺口, 2 不可评估 (不写块)
+    capture   客户采集 (非交互路径第 5 步)
+              --review-file <code-review.md> --triage <run|not-applicable|not-evaluated> [--unit <custom:owner/name>]
+              每次运行至多一条指针条目; 未采集情形存储零条目并打印五值披露行; 恒退出 0
 
-  NON-INTERACTIVE PATH (four steps, in this order — four, never three):
+  NON-INTERACTIVE PATH (five steps, in this order — five, never four):
     1. base      resolve the range: base= head= base_source=
     2. start     record creation and rotation (required from the second run on)
     3. note      append opinions (repeatable, one call per opinion)
     4. receipt   coverage receipt and the summary verdict
+    5. capture   client-channel capture of this run's finding pointers (skipped with a disclosed reason; never a code defect)
   No step prompts; no step needs a terminal. Step 2 is a step of its own: skipping
   it turns the unattended path into an agent hand-writing the record.
 
@@ -662,7 +666,7 @@ cmd_report() {
 #
 # 三个子命令落在本脚本这一既有实体上 (contracts/code-review-skill.md C-30),
 # 不引入新引擎、常驻进程或依赖。它们构成非交互评审路径的前三步
-# (第四步 receipt 与汇总裁决由覆盖率回执承担), 见 --help 的 FOUR-STEP 段。
+# (第四步 receipt 与汇总裁决由覆盖率回执承担), 见 --help 的 FIVE-STEP 段。
 # ══════════════════════════════════════════════════════════════
 
 SPEC_DIR=""             # --spec <feature-dir>
@@ -1587,12 +1591,16 @@ usage() {
               --skip-with-reason <glob> --reason <reason>  (可重复; 理由取自法定五值)
               写出记录内定界的 name=value 块并打印同一块; 四项计数只由它产出
               退出码关闭于 0/1/2: 0 完整, 1 覆盖缺口, 2 不可评估 (不写块)
+    capture   客户采集 (非交互路径第 5 步)
+              --review-file <code-review.md> --triage <run|not-applicable|not-evaluated> [--unit <custom:owner/name>]
+              每次运行至多一条指针条目; 未采集情形存储零条目并打印五值披露行; 恒退出 0
 
-  NON-INTERACTIVE PATH (four steps, in this order — four, never three):
+  NON-INTERACTIVE PATH (five steps, in this order — five, never four):
     1. base      resolve the range: base= head= base_source=
     2. start     record creation and rotation (required from the second run on)
     3. note      append opinions (repeatable, one call per opinion)
     4. receipt   coverage receipt and the summary verdict
+    5. capture   client-channel capture of this run's finding pointers (skipped with a disclosed reason; never a code defect)
   No step prompts; no step needs a terminal. Step 2 is a step of its own: skipping
   it turns the unattended path into an agent hand-writing the record.
 

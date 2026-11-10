@@ -387,6 +387,84 @@ def _fixture_tree(tmp_path: Path):
     return workspace, registry, entry, sorted(str(p) for p in triplet.values())
 
 
+def test_an_alive_pid_file_becomes_the_executor_row(tmp_path):
+    """Executor-primary (2026-11-10): a live pid-<line>-<stage> record renders as that line's executor row."""
+    import os
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    state_dir = workspace / ".specify" / "state"
+    state_dir.mkdir(parents=True)
+    (state_dir / ("pid-%s-analyze" % entry["line_id"])).write_text(
+        "pid=%d start=0 at=1794290000 line=%s stage=analyze event=pid\n"
+        % (os.getpid(), entry["line_id"]),
+        encoding="utf-8",
+    )
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    rows = _rows(proc.stdout)
+    assert len(rows) == 1, rows
+    assert "fork(" in rows[0] and ("pid %d" % os.getpid()) in rows[0], rows[0]
+    assert "/speckit.analyze" in rows[0], rows[0]
+
+
+def test_a_cli_child_of_a_listed_runner_is_not_a_second_executor_row(tmp_path):
+    """Executor identity: the registry may name the runner AND its CLI child for one dispatch."""
+    import json
+    import os
+    import subprocess
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    try:
+        state_dir = workspace / ".specify" / "state"
+        state_dir.mkdir(parents=True)
+        (state_dir / ("pid-%s-analyze" % entry["line_id"])).write_text(
+            "pid=%d start=0 at=1794290000 line=%s stage=analyze event=pid\n"
+            % (os.getpid(), entry["line_id"]),
+            encoding="utf-8",
+        )
+        with_child = dict(entry, cli_pid=child.pid)
+        (registry / (entry["line_id"] + ".json")).write_text(
+            json.dumps(with_child, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+        )
+        proc = _run_digest(
+            ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+            cwd=workspace,
+            env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+        )
+        assert proc.returncode == 0, proc.stderr
+        rows = _rows(proc.stdout)
+        assert len(rows) == 1, (
+            "the runner and its CLI child are ONE execution; got %r" % rows
+        )
+        assert ("pid %d" % os.getpid()) in rows[0], rows[0]
+    finally:
+        child.terminate()
+        child.wait(timeout=10)
+
+
+def test_closed_lines_do_not_occupy_the_digest(tmp_path):
+    """Reader contract (2026-11-10): closed lines are history — the digest never renders them."""
+    import json
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    closed = dict(entry, state="closed")
+    (registry / (entry["line_id"] + ".json")).write_text(
+        json.dumps(closed, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+    )
+    proc = _run_digest(
+        ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 3, "an all-closed view is the explicit nothing-running answer; got %r" % (proc,)
+    assert proc.stdout.strip() == "nothing-running", proc.stdout
+
+
 def test_c42_over_a_fixture_registry_the_script_reads_the_entry_and_its_three_triplet_paths(tmp_path):
     """C-42: the entry's declared triplet paths are the reading's activity input — nothing else is opened."""
     import json
@@ -1395,11 +1473,13 @@ def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchan
         "an absent store changes no exit status; got %r then %r"
         % (with_store.returncode, without_store.returncode)
     )
-    assert "未找到运行记录存储" in without_store.stdout, (
-        "the store-free render states the availability explicitly; got %r" % without_store.stdout
+    assert without_store.stdout.startswith("状态摘要"), (
+        "the store-free render still answers the reader view; got %r" % without_store.stdout
     )
     def identities(text: str) -> list:
-        return [re.split(r"\s{2,}", row.strip())[0] for row in _rows(text)]
+        # The executor cell is the row identity; the SPEC column is the stable per-entry identity under the
+        # executor-primary redesign, so ordering is compared on that column.
+        return [re.split(r"\s{2,}", row.strip())[1] for row in _rows(text)]
 
     assert identities(with_store.stdout) == identities(without_store.stdout), (
         "the store's presence never reorders or re-caps the entry set; got %r vs %r"
@@ -1521,12 +1601,22 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
     )
     out = proc.stdout
     assert out.splitlines()[0].startswith("状态摘要"), out
-    for column in ("线路", "状态", "阶段", "已静默", "标记", "最近步骤与消耗"):
+    # Reader-column redesign, second revision (2026-11-10): the EXECUTOR is the row; closed lines are
+    # hidden; every row answers — who executes, which spec, what it is doing, its state, its elapsed time.
+    for column in ("执行体", "所属 spec", "在做什么", "状态", "已执行时间"):
         assert column in out, "the single human format names its columns in reader words; got %r" % out
+    for retired in ("已静默", "标记", "最近步骤与消耗"):
+        assert retired not in out, "the redundant column %r must be gone; got %r" % (retired, out)
     rows = _rows(out)
     assert len(rows) == 1, "one aligned row per entry; got %r" % rows
     assert entry["line_id"] in rows[0], rows[0]
-    assert any(word in rows[0] for word in ("活跃中", "已静默", "最近活跃")), rows[0]
+    assert ("fork(" in rows[0]) or ("—（无存活执行体）" in rows[0]), (
+        "the executor column names the process carrier or states its absence; got %r" % rows[0]
+    )
+    assert any(word in rows[0] for word in ("活跃", "等待中", "阻塞", "已停滞")), rows[0]
+    assert any(unit in rows[0] for unit in ("秒", "分", "小时", "天")), (
+        "the elapsed column reports time in reader words; got %r" % rows[0]
+    )
 
 
 def test_the_default_format_is_the_single_human_table(tmp_path):
@@ -1549,7 +1639,7 @@ def test_the_default_format_is_the_single_human_table(tmp_path):
         env_overrides=env,
     )
     assert default.returncode == json_run.returncode == 0
-    assert default.stdout.startswith("状态摘要") and "线路" in default.stdout
+    assert default.stdout.startswith("状态摘要") and "执行体" in default.stdout
     import json as _json
     assert _json.loads(json_run.stdout)["entries"], "the machine channel still parses"
     assert retired.returncode == 2, "the retired text/auto display variants are gone"
