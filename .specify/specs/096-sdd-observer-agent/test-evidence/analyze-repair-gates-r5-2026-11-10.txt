@@ -1,0 +1,725 @@
+==============================================================
+## validate-requirements
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/096-sdd-observer-agent/requirements.md
+file: .specify/specs/096-sdd-observer-agent/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 254 lines, 30 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+EXIT: 0
+
+==============================================================
+## pre-analyze --stage requirements
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements --spec-dir .specify/specs/096-sdd-observer-agent --repo .
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 126, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 142, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 150, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 201, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 234, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 248, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 26, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 58, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: .specify/shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 176, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 244, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 245, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 124, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 125, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 139, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 161, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/tamper_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 162, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 163, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 169, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 170, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 186, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 187, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 192, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 210, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 211, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 231, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/dual_line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 232, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 233, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 373, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 381, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 13, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 23, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 50, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 83, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 92, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 36, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 44, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 66, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 15, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 22, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 23, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 25, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 27, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 29, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 31, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 32, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 34, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 37, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 85, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 97, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/journal-format.contract.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-lifecycle.contract.md", "line": 3, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 3, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-verification.contract.md", "line": 7, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}], "summary": {"errors": 0, "advisories": 82, "waived": 0, "fr": 23, "sc": 7, "tasks": 47, "clauses": 0, "files": 14}, "checked_at": "2026-11-10T12:48:47Z"}pre-analyze-check: stage=requirements decision=pass errors=0 advisories=82 waived=0
+
+EXIT: 0
+
+==============================================================
+## pre-analyze --stage plan
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/096-sdd-observer-agent --repo .
+{"stage": "plan", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 126, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 142, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 150, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 201, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 234, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 248, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 26, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 58, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: .specify/shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 176, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 244, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 245, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 124, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 125, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 139, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 161, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/tamper_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 162, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 163, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 169, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 170, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 186, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 187, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 192, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 210, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 211, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 231, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/dual_line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 232, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 233, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 373, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 381, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 13, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 23, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 50, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 83, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 92, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 36, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 44, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 66, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 15, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 22, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 23, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 25, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 27, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 29, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 31, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 32, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 34, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 37, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 85, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 97, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/journal-format.contract.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-lifecycle.contract.md", "line": 3, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 3, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-verification.contract.md", "line": 7, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}], "summary": {"errors": 0, "advisories": 82, "waived": 0, "fr": 23, "sc": 7, "tasks": 47, "clauses": 0, "files": 14}, "checked_at": "2026-11-10T12:48:47Z"}pre-analyze-check: stage=plan decision=pass errors=0 advisories=82 waived=0
+
+EXIT: 0
+
+==============================================================
+## pre-analyze --stage tasks
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --spec-dir .specify/specs/096-sdd-observer-agent --repo .
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 126, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 142, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 150, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 201, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 234, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 248, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 26, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 58, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 174, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 175, "message": "path does not exist under the repo: .specify/shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 176, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 178, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 243, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 244, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 245, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 93, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 94, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 95, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 124, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 125, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 139, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 161, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/tamper_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 162, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 163, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 169, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 170, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 186, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/failure_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 187, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 192, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 210, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 211, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 231, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/dual_line_builder.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 232, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 233, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 373, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 381, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 9, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 13, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 13, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 23, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 50, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 83, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 92, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 36, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 44, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 66, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 15, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 22, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 23, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 25, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 27, "message": "path does not exist under the repo: .specify/scripts/python/journal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 29, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 31, "message": "path does not exist under the repo: .specify/skills/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 32, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_agent.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: tests/contract/test_sdd_observer_lifecycle.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 34, "message": "path does not exist under the repo: tests/contract/test_journal_engine.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 37, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 85, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 97, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/journal-format.contract.md", "line": 3, "message": "path does not exist under the repo: shared/declarations/facts/journal-format.yaml"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-lifecycle.contract.md", "line": 3, "message": "path does not exist under the repo: skills/external/sdd-loop-driver/references/observer-lifecycle.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 3, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: agents/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-role.contract.md", "line": 7, "message": "path does not exist under the repo: .specify/agents/templates/sdd-observer.agent.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/observer-verification.contract.md", "line": 7, "message": "path does not exist under the repo: tests/fixtures/sdd-observer/"}], "summary": {"errors": 0, "advisories": 82, "waived": 0, "fr": 23, "sc": 7, "tasks": 47, "clauses": 0, "files": 14}, "checked_at": "2026-11-10T12:48:47Z"}pre-analyze-check: stage=tasks decision=pass errors=0 advisories=82 waived=0
+
+EXIT: 0
+
+==============================================================
+## decomposition --mode tasks
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/096-sdd-observer-agent/requirements.md --tasks .specify/specs/096-sdd-observer-agent/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 23, "task_count": 47, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T12:48:47Z"}
+EXIT: 0
+
+==============================================================
+## supporting: validate-tasks
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md
+WARN  139: green-path-divergence: T008 (line 139) and T016 (line 162) both write tests/contract/test_journal_engine.py but claim different green points (['contracts/observer-verification.contract.md#C-01'] vs ['contracts/observer-verification.contract.md#C-07']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  162: green-cross-phase: T016 (line 162, `## Phase 4: User Story 2 - 记录只有事实与证据指针，评价与建议无处可写 (Priority: `, order 15) claims contracts/observer-verification.contract.md#C-07 while the later T024 (line 187, `## Phase 5: User Story 3 - 观察者掉线不阻塞开发线，缺口仍被点名 (Priority: P1)`, order 24) claims #C-03 — the clause order runs backwards against the row order, so T016 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  191: green-cross-phase: T025 (line 191, `## Phase 5: User Story 3 - 观察者掉线不阻塞开发线，缺口仍被点名 (Priority: P1)`, order 25) claims contracts/observer-role.contract.md#C-10 while the later T041 (line 248, `## Phase 8: Polish & Cross-Cutting Concerns`, order 41) claims #C-01 — the clause order runs backwards against the row order, so T025 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  210: green-cross-phase: T031 (line 210, `## Phase 6: User Story 4 - 只读且边界一致：不新造状态面、汇报面或可见性通道 (Priorit`, order 31) claims contracts/observer-verification.contract.md#C-06 while the later T036 (line 231, `## Phase 7: User Story 5 - 一 spec 一专用实例，可选内部 subagent (Prior`, order 36) claims #C-05 — the clause order runs backwards against the row order, so T031 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+PASS (with warnings): .specify/specs/096-sdd-observer-agent/tasks.md — 0 error(s), 4 warning(s)
+EXIT: 0
+
+==============================================================
+## supporting: account-clause-coverage
+$ python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/096-sdd-observer-agent --corpus-root .specify/specs
+spec-dir: .specify/specs/096-sdd-observer-agent
+corpus:   .specify/specs/*/contracts/*
+owner forms (shared/definitions/contract-clause-definitions.md): md-bold-closed, md-bold-paren, md-heading, yaml-openapi, yaml-assertions; md-none named
+scanned 291 files: parsed 184 + named-unparseable 107 == 291  [relational sentinel OK]
+  per form (counts owned by notes/clause-form-census.md, re-derive, never restate): md-bold-closed 123 files/1604 clauses; md-bold-paren 4 files/45 clauses; md-heading 51 files/391 clauses; yaml-openapi 6 files/30 clauses; yaml-assertions 1 files/6 clauses; md-none 106 files/0 clauses
+  zero-clause-but-parseable (parse doubt): 1
+  .yaml: parsed 7 / total 7 / named 0
+named-unparseable: 107 (use --list-named to expand)
+clause universe: 2057 distinct names over 184 parsed files (2076 ids extracted)
+  collapsed: 19 extracted ids share a name with another in the same file, so the distinct-name denominator is smaller than the id count — the owner's yaml-openapi form names a clause by its HTTP method key, which one file may declare under several paths. Reported, never absorbed; qualifying those ids is research.md A-8, not this run's call.
+
+== clause coverage (universe: contract files per the owner's forms; claimed: tasks.md [green:] declarations) ==
+claimed clauses (this feature): 58
+baseline: .specify/specs/096-sdd-observer-agent/coverage-baseline.txt (640 names)
+baseline-internal existing uncovered: 640
+UNCOVERED: 006-add-qoder-support/contracts/qoder-support.openapi.yaml#get
+UNCOVERED: 006-add-qoder-support/contracts/qoder-support.openapi.yaml#post
+UNCOVERED: 009-claude-code-support/contracts/claude-code-support.openapi.yaml#get
+UNCOVERED: 009-claude-code-support/contracts/claude-code-support.openapi.yaml#post
+UNCOVERED: 012-skill-home-workdir/contracts/skill-home-workdir-template.openapi.yaml#post
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#mirror-parity
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#no-mandatory-tool-manifests
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#no-refresh-tools-in-script
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#no-tool-discovery-step
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#no-tool-manifest-in-checklist
+UNCOVERED: 013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml#no-tool-template-boilerplate
+UNCOVERED: 016-refactor-tools-command/contracts/tools-command.openapi.yaml#get
+UNCOVERED: 016-refactor-tools-command/contracts/tools-command.openapi.yaml#patch
+UNCOVERED: 016-refactor-tools-command/contracts/tools-command.openapi.yaml#post
+UNCOVERED: 018-cli-priority-support/contracts/cli-priority-support.openapi.yaml#get
+UNCOVERED: 018-cli-priority-support/contracts/cli-priority-support.openapi.yaml#post
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-1
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-2
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-3
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-4
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-5
+UNCOVERED: 020-speckit-todo-command/contracts/search-todo-cli.md#C-6
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-001
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-002
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-003
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-004
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-005
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-006
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-007
+UNCOVERED: 021-agent-specific-config/contracts/agent-specific-config.contract.md#C-008
+UNCOVERED: 025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md#C-1
+UNCOVERED: 025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md#C-2
+UNCOVERED: 025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md#C-3
+UNCOVERED: 025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md#C-4
+UNCOVERED: 025-agent-skill-enablement/contracts/agent-skill-enablement-contract.md#C-5
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-1
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-2
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-3
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-4
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-5
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-file-format.md#C-6
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-protocol.md#C-1
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-protocol.md#C-2
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-protocol.md#C-3
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-protocol.md#C-4
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-protocol.md#C-5
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-1
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-2
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-3
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-4
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-5
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-6
+UNCOVERED: 029-glossary-mechanism/contracts/glossary-utils-cli.md#C-7
+UNCOVERED: 029-glossary-mechanism/contracts/instruction-init.md#C-1
+UNCOVERED: 029-glossary-mechanism/contracts/instruction-init.md#C-2
+UNCOVERED: 029-glossary-mechanism/contracts/instruction-init.md#C-3
+UNCOVERED: 029-glossary-mechanism/contracts/instruction-init.md#C-4
+UNCOVERED: 029-glossary-mechanism/contracts/instruction-init.md#C-5
+UNCOVERED: 030-summarize-project/contracts/visual-reporting-skills.openapi.yaml#get
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-1
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-10
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-2
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-3
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-4
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-5
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-6
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-7
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-8
+UNCOVERED: 031-task-complexity-rubric/contracts/rubric-section.md#C-9
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-1
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-2
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-3
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-4
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-5
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-6
+UNCOVERED: 032-dogfooding-practice/contracts/dogfooding-artifacts.md#C-7
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-1
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-10
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-11
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-12
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-13
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-14
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-15
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-16
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-17
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-18
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-2
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-3
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-4
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-5
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-6
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-7
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-8
+UNCOVERED: 033-docs-command/contracts/docs-command-template.md#C-9
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-1
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-2
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-3
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-4
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-5
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-6
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-7
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-8
+UNCOVERED: 033-docs-command/contracts/docs-step-injection.md#C-9
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-1
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-10
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-11
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-12
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-2
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-3
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-4
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-5
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-6
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-7
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-8
+UNCOVERED: 033-docs-command/contracts/docs-utils-cli.md#C-9
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-1
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-2
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-3
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-4
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-5
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-6
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-7
+UNCOVERED: 040-agent-metadata-portability/contracts/neutral-metadata-schema.md#C-8
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-1
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-2
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-3
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-4
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-5
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-6
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-7
+UNCOVERED: 041-refactor-feedback-probe/contracts/engine-cli.md#C-8
+UNCOVERED: 041-refactor-feedback-probe/contracts/entry-schema.md#C-1
+UNCOVERED: 041-refactor-feedback-probe/contracts/entry-schema.md#C-2
+UNCOVERED: 041-refactor-feedback-probe/contracts/entry-schema.md#C-3
+UNCOVERED: 041-refactor-feedback-probe/contracts/entry-schema.md#C-4
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-1
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-2
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-3
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-4
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-5
+UNCOVERED: 041-refactor-feedback-probe/contracts/feedback-command.md#C-6
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-1
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-2
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-3
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-4
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-5
+UNCOVERED: 041-refactor-feedback-probe/contracts/probe-registry.md#C-6
+UNCOVERED: 042-goal-team-creation/contracts/creation-territory-disjoint.contract.md#C-1
+UNCOVERED: 042-goal-team-creation/contracts/creation-territory-disjoint.contract.md#C-2
+UNCOVERED: 042-goal-team-creation/contracts/creation-territory-disjoint.contract.md#C-3
+UNCOVERED: 042-goal-team-creation/contracts/creation-territory-disjoint.contract.md#C-4
+UNCOVERED: 042-goal-team-creation/contracts/decomposition-proposal.contract.md#C-1
+UNCOVERED: 042-goal-team-creation/contracts/decomposition-proposal.contract.md#C-2
+UNCOVERED: 042-goal-team-creation/contracts/decomposition-proposal.contract.md#C-3
+UNCOVERED: 042-goal-team-creation/contracts/decomposition-proposal.contract.md#C-4
+UNCOVERED: 042-goal-team-creation/contracts/decomposition-proposal.contract.md#C-5
+UNCOVERED: 042-goal-team-creation/contracts/focus-target-resolution.contract.md#C-1
+UNCOVERED: 042-goal-team-creation/contracts/focus-target-resolution.contract.md#C-2
+UNCOVERED: 042-goal-team-creation/contracts/focus-target-resolution.contract.md#C-3
+UNCOVERED: 042-goal-team-creation/contracts/focus-target-resolution.contract.md#C-4
+UNCOVERED: 042-goal-team-creation/contracts/goal-based-create.contract.md#C-1
+UNCOVERED: 042-goal-team-creation/contracts/goal-based-create.contract.md#C-2
+UNCOVERED: 042-goal-team-creation/contracts/goal-based-create.contract.md#C-3
+UNCOVERED: 042-goal-team-creation/contracts/goal-based-create.contract.md#C-4
+UNCOVERED: 042-goal-team-creation/contracts/goal-based-create.contract.md#C-5
+UNCOVERED: 043-init-commit-stamp/contracts/build-embedding.contract.md#C-1
+UNCOVERED: 043-init-commit-stamp/contracts/build-embedding.contract.md#C-2
+UNCOVERED: 043-init-commit-stamp/contracts/build-embedding.contract.md#C-3
+UNCOVERED: 043-init-commit-stamp/contracts/build-embedding.contract.md#C-4
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-resolution.contract.md#C-1
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-resolution.contract.md#C-2
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-resolution.contract.md#C-3
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-write.contract.md#C-1
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-write.contract.md#C-2
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-write.contract.md#C-3
+UNCOVERED: 043-init-commit-stamp/contracts/source-stamp-write.contract.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-1
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-2
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-3
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-5
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-6
+UNCOVERED: 044-reduce-confirmation-flows/contracts/confirmation-taxonomy-contract.md#C-7
+UNCOVERED: 044-reduce-confirmation-flows/contracts/execution-report-contract.md#C-1
+UNCOVERED: 044-reduce-confirmation-flows/contracts/execution-report-contract.md#C-2
+UNCOVERED: 044-reduce-confirmation-flows/contracts/execution-report-contract.md#C-3
+UNCOVERED: 044-reduce-confirmation-flows/contracts/execution-report-contract.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/execution-report-contract.md#C-5
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-probe-protocol.md#C-1
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-probe-protocol.md#C-2
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-probe-protocol.md#C-3
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-probe-protocol.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-1
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-2
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-3
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-5
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-6
+UNCOVERED: 044-reduce-confirmation-flows/contracts/gate-scanner-contract.md#C-7
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-1
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-2
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-3
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-4
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-5
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-6
+UNCOVERED: 044-reduce-confirmation-flows/contracts/team-flow-contract.md#C-7
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-1
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-10
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-2
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-3
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-4
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-5
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-6
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-7
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-8
+UNCOVERED: 047-feedback-introspection/contracts/command-mode.md#C-9
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-1
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-10
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-11
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-12
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-13
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-14
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-15
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-2
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-3
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-4
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-5
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-6
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-7
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-8
+UNCOVERED: 047-feedback-introspection/contracts/engine-cli.md#C-9
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-1
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-10
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-11
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-12
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-2
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-3
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-4
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-5
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-6
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-7
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-8
+UNCOVERED: 047-feedback-introspection/contracts/introspection-report.md#C-9
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-1
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-10
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-11
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-12
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-13
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-14
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-15
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-16
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-2
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-3
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-4
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-5
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-6
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-7
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-8
+UNCOVERED: 050-proactive-flow-trigger/contracts/discipline-doc.md#C-9
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-1
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-10
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-2
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-3
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-4
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-5
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-6
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-7
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-8
+UNCOVERED: 050-proactive-flow-trigger/contracts/seed-derivation.md#C-9
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-1
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-10
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-11
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-12
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-13
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-14
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-15
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-16
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-17
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-18
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-19
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-2
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-20
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-21
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-22
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-23
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-3
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-4
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-5
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-6
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-7
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-8
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-engine.md#C-9
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-1
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-10
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-11
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-12
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-2
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-3
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-4
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-5
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-6
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-7
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-8
+UNCOVERED: 050-proactive-flow-trigger/contracts/trigger-section.md#C-9
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-1
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-10
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-11
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-2
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-3
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-4
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-5
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-6
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-7
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-8
+UNCOVERED: 051-user-facing-comprehension/contracts/ambient-section.md#C-9
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-1
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-10
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-11
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-12
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-13
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-2
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-3
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-4
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-5
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-6
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-7
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-8
+UNCOVERED: 051-user-facing-comprehension/contracts/constitution-export.md#C-9
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-1
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-10
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-11
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-12
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-13
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-14
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-15
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-16
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-17
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-18
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-2
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-3
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-4
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-5
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-6
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-7
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-8
+UNCOVERED: 051-user-facing-comprehension/contracts/discipline-doc.md#C-9
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-1
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-2
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-3
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-4
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-5
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-6
+UNCOVERED: 051-user-facing-comprehension/contracts/gate-neutrality.md#C-7
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-1
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-10
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-11
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-12
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-13
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-14
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-2
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-3
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-4
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-5
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-6
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-7
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-8
+UNCOVERED: 051-user-facing-comprehension/contracts/surface-pointers.md#C-9
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-1
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-10
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-11
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-12
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-13
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-14
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-15
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-16
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-17
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-18
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-19
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-2
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-3
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-4
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-5
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-6
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-7
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-8
+UNCOVERED: 052-fast-fail-principle/contracts/ambient-section.md#C-9
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-1
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-10
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-11
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-12
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-13
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-14
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-15
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-16
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-17
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-18
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-19
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-2
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-20
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-21
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-22
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-23
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-3
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-4
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-5
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-6
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-7
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-8
+UNCOVERED: 052-fast-fail-principle/contracts/constitution-export.md#C-9
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-1
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-10
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-11
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-12
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-13
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-14
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-15
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-16
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-17
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-18
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-19
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-2
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-20
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-21
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-22
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-3
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-4
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-5
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-6
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-7
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-8
+UNCOVERED: 052-fast-fail-principle/contracts/discipline-doc.md#C-9
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-1
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-10
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-11
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-12
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-13
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-14
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-15
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-16
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-17
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-18
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-19
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-2
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-20
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-21
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-22
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-23
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-24
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-25
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-26
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-3
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-4
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-5
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-6
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-7
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-8
+UNCOVERED: 052-fast-fail-principle/contracts/dispatch-injection.md#C-9
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-1
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-10
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-11
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-12
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-13
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-14
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-15
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-16
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-17
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-2
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-3
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-4
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-5
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-6
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-7
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-8
+UNCOVERED: 052-fast-fail-principle/contracts/gate-neutrality.md#C-9
+UNCOVERED: 058-sdd-loop-driver/contracts/distribution-and-docs.md#C-20
+UNCOVERED: 058-sdd-loop-driver/contracts/distribution-and-docs.md#C-21
+UNCOVERED: 058-sdd-loop-driver/contracts/distribution-and-docs.md#C-22
+UNCOVERED: 058-sdd-loop-driver/contracts/skill-structure.md#C-13
+UNCOVERED: 058-sdd-loop-driver/contracts/skill-structure.md#C-14
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-01
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-02
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-03
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-04
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-05
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-06
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-07
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-08
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-09
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-10
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-11
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-12
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-13
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-14
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-15
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-16
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-17
+UNCOVERED: 081-acceptance-hardening/contracts/closure-acceptance-check.contract.md#C-18
+UNCOVERED: 082-self-explanatory-integration/contracts/constitution-double-landing.contract.md#C-20
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-001
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-002
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-003
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-004
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-005
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-006
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-007
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-008
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-009
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-010
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-011
+UNCOVERED: 084-harness-triple-structure/contracts/declaration-schema.contract.md#C-012
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-013
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-014
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-015
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-016
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-017
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-018
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-019
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-020
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-021
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-022
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-023
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-024
+UNCOVERED: 084-harness-triple-structure/contracts/distribution-and-mirror.contract.md#C-025
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-026
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-027
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-028
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-029
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-030
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-031
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-032
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-033
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-034
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-035
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-036
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-037
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-038
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-039
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-040
+UNCOVERED: 084-harness-triple-structure/contracts/harness-triple-check.contract.md#C-041
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-042
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-043
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-044
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-045
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-046
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-047
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-048
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-049
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-050
+UNCOVERED: 084-harness-triple-structure/contracts/migration-batches.contract.md#C-051
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-052
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-053
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-054
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-055
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-056
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-057
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-058
+UNCOVERED: 084-harness-triple-structure/contracts/shared-reader.contract.md#C-059
+UNCOVERED: 085-sdd-temporary-goal-team/contracts/checkpoint-and-agents.md#C-014
+UNCOVERED: 088-speckit-visualization/contracts/efficiency-element.contract.md#C-65
+UNCOVERED: 088-speckit-visualization/contracts/efficiency-element.contract.md#C-69
+UNCOVERED: 088-speckit-visualization/contracts/efficiency-element.contract.md#C-70
+UNCOVERED: 088-speckit-visualization/contracts/efficiency-element.contract.md#C-71
+UNCOVERED: 088-speckit-visualization/contracts/measure-report.contract.md#C-60
+UNCOVERED: 088-speckit-visualization/contracts/ownership-map.contract.md#C-48
+UNCOVERED: 088-speckit-visualization/contracts/reporter-seat.contract.md#C-14
+UNCOVERED: 088-speckit-visualization/contracts/reporter-seat.contract.md#C-18
+UNCOVERED: 088-speckit-visualization/contracts/reporter-seat.contract.md#C-21
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-02
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-03
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-05
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-06
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-07
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-08
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-09
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-10
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-11
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-12
+UNCOVERED: 088-speckit-visualization/contracts/reporting-obligations.contract.md#C-13
+UNCOVERED: 088-speckit-visualization/contracts/status-digest.contract.md#C-72
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-23
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-30
+UNCOVERED: 088-speckit-visualization/contracts/supervision-report.contract.md#C-36
+UNCOVERED: 088-speckit-visualization/contracts/supervision-report.contract.md#C-38
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-004
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-005
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-006
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-007
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-008
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-009
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-010
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-012
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-017
+UNCOVERED: 093-concurrency-by-default/contracts/declaration-facts.contract.md#C-018
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-041
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-044
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-045
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-047
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-048
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-049
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-050
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-051
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-052
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-053
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-054
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-055
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-056
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-057
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-058
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-059
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-060
+UNCOVERED: 093-concurrency-by-default/contracts/executor-obligations.contract.md#C-062
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-080
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-081
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-083
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-085
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-086
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-087
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-088
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-089
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-090
+UNCOVERED: 093-concurrency-by-default/contracts/existing-semantics-disposal.contract.md#C-091
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-064
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-065
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-066
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-069
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-071
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-073
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-074
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-075
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-076
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-077
+UNCOVERED: 093-concurrency-by-default/contracts/high-order-executors.contract.md#C-078
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-026
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-027
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-029
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-034
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-037
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-038
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-039
+UNCOVERED: 093-concurrency-by-default/contracts/judgement-engine.contract.md#C-040
+uncovered beyond baseline: 0
+
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 23
+FR claimed: 23
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 58, scanned files 291, clause universe 2057, FR universe 23
+  [clause-uncovered] pass (640) — 640 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 23 of 23 FRs cited from citation groups
+  [clause-unparsable] fail (107) — 107 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 640 names; 640 uncovered items are baseline-internal and do not block
+0 error(s), 1 warning(s)
+status: ok
+EXIT: 0
