@@ -1,0 +1,53 @@
+# Plan-stage verification record — 098 (same-author delegated review)
+
+**Date**: 2026-11-10
+**Gate applied**: `.specify/shared/workflow/objective-analysis-gate.md` (same-author detection delegated
+to fresh-context read-only subagents; detection and validation kept disjoint).
+
+## Same-author condition
+
+Held: `plan.md` and the Phase 1 artifacts were authored in this session by the requesting agent across
+multiple passes. Two detection subagents were dispatched with disjoint scopes; one validation subagent
+(which had produced none of the findings) then validated the repairs.
+
+## Detection round
+
+| scope | artifacts | findings | severities |
+|-------|-----------|----------|------------|
+| A | `plan.md` vs constitution / decision-tension owner / acceptance-hardening / template | 8 | High 1, Medium 6, Low 1 |
+| B | `contracts/*`, `data-model.md`, `quickstart.md`, `feature-ref.md` vs `requirements.md`, the 086 contract, `sync-mirrors.py`, disk | 10 | High 4, Medium 3, Low 3 |
+
+**Downgrade rate**: not applicable in this round — validation was run after the repairs, not on the raw
+detection set (detection itself derived severities from each finding's propagation surface).
+
+## Repairs (all 18 findings, all corrections within the recorded intent)
+
+1. WP-6 now regenerates the `scripts/` mirror after the `feedback-utils.py` edit (ordering defect).
+2. Constitution rows carry the 22 principle names verbatim; every Evidence cell cites a resolving path.
+3. Decision tensions T-001…T-003 rewritten so the chosen option genuinely sacrifices one pole.
+4. EP-002 evidence points at `session-fixture-probe.txt`; EP-004 at `overlap-check-plan.txt`.
+5. Quickstart S-0.4/S-0.5/S-0.6 match their transcripts; the polluted run is preserved separately as
+   `corpus-write-hazard.txt` and disclosed as S-0.7.
+6. FR-011/SC-001 gained a carrier (TS-15) and SC-004/SC-005 gained one (TS-16 + quickstart S-12/S-13).
+7. TS-11 now judges emptiness on the combined two-pass result and keeps C-012 exit-5 semantics.
+8. WP-4/WP-8 name write surfaces; WP-8 target groups enumerated and numbered 1–9.
+9. `feature-ref.md` rows 24/25 marked `(new)`; overlap adjudication recorded with its evidence path.
+10. `data-model.md` E-5 field renamed to `timeout` (matching the helper).
+11. Execution Record switched to the `dependency-edge` reason with predecessor pointers.
+
+## Validation round (disjoint from detection)
+
+- Principle names verbatim: 0 mismatches across 22 rows.
+- `validate-decision-tensions.py`: 0 errors, 0 warnings, 3 records; all three pole pairs now genuine.
+- `pre-analyze-check.py --stage plan`: pass, errors=0, advisories=0, clauses=68, fr=27, sc=11.
+- Carrier matrix: every FR-001…FR-027 and SC-001…SC-011 has a carrier (none missing).
+- Counts: 68 clauses (16+9+12+11+10+10), 14 quickstart sections, 26 feature-ref rows, 9 work packages
+  (each ≤10 items).
+- Residual issues found by validation and then repaired: a duplicate WP-8 item number (renumbered 1–9)
+  and the missing `test-evidence/plan-verification.txt` (this file).
+
+## Residual risk
+
+The detection set is bounded by the two declared scopes; artifacts not named there were not re-read by a
+fresh context. The plan-stage gates above were re-run after the repairs; `/speckit.analyze` remains the
+next independent check.

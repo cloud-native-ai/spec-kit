@@ -1,0 +1,3 @@
+requested: 24
+effective_reason: "dependency-edge: U2 blocked on U1, U3 on U2, U4 on U3, U5 on U4, U6 on U5; each predecessor's completion is the named artifact pointer; host-native fan-out is not a carrier and is not counted"
+pattern: serial
