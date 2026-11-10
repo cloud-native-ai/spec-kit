@@ -12,7 +12,7 @@ This index tracks all functional and non-functional features managed within the 
   separately when adding a feature row; recompute on every write.
 
   Reference shell expression a human can paste to verify:
-      awk -F'|' '/^\| [0-9]{3} \|/ {n++} END{print n}' .specify/memory/features.md
+      awk -F'|' '/^\| [0-9]{3} \|/ {n++} END{print n}' .specify/features.md
 -->
 
 **Total Features**: [FEATURE_COUNT] _(auto-derived; recompute on every edit — see comment above)_

@@ -627,7 +627,7 @@ ALLOWED_POST_BASELINE_CHANGES = {
     # sources gain their declared 072 segments — the two command templates and
     # two skill bodies named in C-56's edit surface. Compatibility plan +
     # non-precedential declaration: .specify/specs/072-client-self-improvement/
-    # notes/compatibility-plan-c61.md and .specify/memory/features/072.md. Each
+    # notes/compatibility-plan-c61.md and .specify/features/072-client-self-improvement.md. Each
     # drift is pinned by a Feature 072 contract suite, cited per entry; this
     # records the drift, it does not authorize any other.
     "templates/commands/feedback.md": {

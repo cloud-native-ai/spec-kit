@@ -7,10 +7,10 @@ This document defines the standard feature tracking integration used by SDD life
 Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.checklist`, `/speckit.review`) automatically integrates with the feature tracking system:
 
 1. **Detect feature context**:
-   - If `.specify/memory/features.md` exists, detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
+   - If `.specify/features.md` exists, detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
    - Extract the feature ID from the directory name
 
-2. **Update feature entry** in `.specify/memory/features.md`:
+2. **Update feature entry** in `.specify/features.md`:
    - Apply the command-specific status transition (see Status State Machine below)
    - Keep the specification path unchanged
    - Update the "Last Updated" date
@@ -20,8 +20,8 @@ Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit
    - Check whether the current work introduces new Features or deprecates/merges existing ones
    - Ensure functional/non-functional Feature classification remains consistent
    - If changes are discovered, synchronously update:
-     - `.specify/memory/features/<ID>.md`
-     - `.specify/memory/features.md`
+     - `.specify/features/<ID>.md`
+     - `.specify/features.md`
    - Record "key changes / notes" in the Feature detail
 
 ## Status State Machine
@@ -64,7 +64,7 @@ Before advancing to `Implemented`:
 `/speckit.requirements` initializes `Related Feature` with `Need clarification`; `/speckit.clarify` Mode A applies these rules to scan, bind, or create:
 
 1. **Scan for existing Feature**:
-   - Search by context: Scan `memory/features/*.md` and `memory/features.md`
+   - Search by context: Scan `.specify/features/*.md` and `.specify/features.md`
    - Search by ID: Check `SPECIFY_FEATURE` env, git branch name, numeric prefix in BRANCH_NAME
    - **Binding-precedent heuristic**: for each candidate Feature, check its sibling specs (prior spec directories already bound to it, e.g. via its detail file's Related Files/history). A Feature whose siblings repeatedly absorbed similar work is strong evidence for **bind**; a candidate with no topical siblings is evidence for **create**. Surface the precedent when recommending bind-vs-create.
 
@@ -74,7 +74,7 @@ Before advancing to `Implemented`:
 
 3. **Integration responsibilities**:
    - Ensure corresponding Feature entry exists
-   - Update `memory/features.md`: set Status to the transition owned by `/speckit.requirements` (§ Status State Machine — the requirements phase lands `Draft`, never `Planned`), update Spec Path, refresh date
+   - Update `.specify/features.md`: set Status to the transition owned by `/speckit.requirements` (§ Status State Machine — the requirements phase lands `Draft`, never `Planned`), update Spec Path, refresh date
    - The index is **hand-maintained**: no script regenerates it, so the `Total Features` header and the rows MUST be edited together in the same pass — a header edited alone, or rows edited without it, leaves the file self-inconsistent while still looking well-formed
    - Never create duplicate Feature IDs
 

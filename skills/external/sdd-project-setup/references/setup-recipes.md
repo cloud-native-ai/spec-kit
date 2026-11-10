@@ -18,11 +18,11 @@
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|
-| const | `.specify/memory/constitution.md` 存在 | 合法基线 |
-| feat | `.specify/memory/features.md` + `features/` 目录 | 特性注册表 |
-| gloss | `.specify/memory/glossary.md` | 项目词汇锚 |
+| const | `.specify/constitution.md` 存在 | 合法基线 |
+| feat | `.specify/features.md` + `features/` 目录 | 特性注册表 |
+| gloss | `.specify/glossary.md` | 项目词汇锚 |
 | fb | `.specify/memory/feedback/` 目录 | 反馈库 |
-| reg | `.specify/memory/register.md` | ID 登记 |
+| reg | `.specify/register.md` | ID 登记 |
 | kb | `.specify/memory/knowledge/` | 长期知识库 |
 | session | `.specify/memory/session/` | 会话记忆 |
 | tools | `.specify/memory/tools.md` + `tools/` | 工具注册表 |

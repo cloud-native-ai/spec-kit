@@ -653,7 +653,7 @@ def test_c18_implementation_cites_the_registered_glossary_term():
     src = VALIDATOR.read_text(encoding="utf-8")
     assert GLOSSARY_TERM in src, (
         f"the collision check mechanizes the registered term {GLOSSARY_TERM!r} "
-        "(`.specify/memory/glossary.md`); FR-018 forbids coining a second name for "
+        "(`.specify/glossary.md`); FR-018 forbids coining a second name for "
         "the same failure mode"
     )
 

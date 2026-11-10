@@ -4,7 +4,7 @@
 One completed run reaches wrap-up; this engine evaluates four measured
 quantities for it — token 消耗, 耗时, 制品正确性 and 满意度 — and emits exactly
 one ``run_determination`` record. The record *is* the 改点 (owner:
-``.specify/memory/glossary.md`` → `改点`): an observation sensor inside the
+``.specify/glossary.md`` → `改点`): an observation sensor inside the
 improve flow, never a feedback entry and never an intervention ledger.
 
 Program-First (``shared/guidelines/token-efficiency.md`` § 程序优先) is the whole
@@ -36,7 +36,7 @@ Deliberately reached by reference, never restated here:
 * The four feedback red lines and the never-solicit line — owned by
   ``shared/workflow/feedback-step.md`` § Positioning & Red Lines.
 * The name-level baseline form, red-first evidence, mutation drill and the
-  anti-vacuity sentinel — owned by ``.specify/memory/glossary.md``.
+  anti-vacuity sentinel — owned by ``.specify/glossary.md``.
 * Which agent CLIs have a resolvable session store, and which do not — owned by
   ``STORE_RESOLVERS`` / ``UNSUPPORTED_TOOL_HINTS`` in
   ``scripts/python/history-utils.py``.

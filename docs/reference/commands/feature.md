@@ -39,14 +39,14 @@ The command operates in three modes based on input:
    - For runtime code projects: applies the DFX Catalog (Testability, Observability, Reliability, Security, Performance, etc.)
    - Creates future features with `Draft` status (max 8–12 per run)
 
-4. **Allocate new IDs** — Sequential three-digit `FEATURE_ID` by scanning `.specify/memory/features/`.
+4. **Allocate new IDs** — Sequential three-digit `FEATURE_ID` by scanning `.specify/features/`.
 
 5. **Instantiate or update feature detail files** — From `feature-details-template.md`:
    - Replaces all placeholders
    - Sets status (Draft / Planned / Implemented / Ready for Review / Completed)
    - Sets creation and last-updated dates
 
-6. **Update feature index** — Ensures `.specify/memory/features.md` table has all features with correct columns. Auto-derives `FEATURE_COUNT` from the table row count.
+6. **Update feature index** — Ensures `.specify/features.md` table has all features with correct columns. Auto-derives `FEATURE_COUNT` from the table row count.
 
 7. **Sync README feature list** — Generates or replaces a "Feature List" section split into Functional and Non-functional features.
 
@@ -56,8 +56,8 @@ The command operates in three modes based on input:
 
 | Artifact | Location |
 |----------|----------|
-| Feature detail files | `.specify/memory/features/<ID>.md` |
-| Feature index | `.specify/memory/features.md` |
+| Feature detail files | `.specify/features/<ID>.md` |
+| Feature index | `.specify/features.md` |
 | README feature list | `README.md` |
 
 ## Feature Statuses

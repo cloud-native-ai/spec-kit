@@ -49,7 +49,7 @@ def test_documentation_map_has_glossary_row():
     for rel in ("templates/instructions-template.md",
                 ".specify/templates/instructions-template.md"):
         text = read(ROOT / rel)
-        assert "`.specify/memory/glossary.md`" in text, f"Glossary row missing in {rel}"
+        assert "`.specify/glossary.md`" in text, f"Glossary row missing in {rel}"
         assert "| **Glossary** |" in text, f"Glossary Documentation Map row missing in {rel}"
 
 
@@ -129,7 +129,7 @@ def test_init_is_non_destructive_roundtrip(tmp_path: Path):
     (tmp_path / "templates" / "glossary-template.md").write_text(
         read(ROOT / "templates" / "glossary-template.md"), encoding="utf-8"
     )
-    (tmp_path / ".specify" / "memory").mkdir(parents=True)
+    (tmp_path / ".specify").mkdir(parents=True)
 
     def run(*args):
         cp = subprocess.run(

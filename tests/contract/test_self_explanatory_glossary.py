@@ -29,7 +29,7 @@ The canonical string is ``STR-003`` and the owner path is ``STR-002``; both live
 ``requirements.md`` § Shared Strings. The retired name is asserted in the variants cell of the same
 row, which is the one place C-30 permits it.
 
-Red-first provenance (Constitution IV): the entry landed in ``.specify/memory/glossary.md`` during
+Red-first provenance (Constitution IV): the entry landed in ``.specify/glossary.md`` during
 the plan stage and the write was executed by the engine (``--action add``), so this module's green is
 not a red-first capture. Its red leg is the mutation recorded by T045/T051: a second canonical row
 carrying the retired name turns ``test_c30_...`` red by row index. The pairing is transcribed in
@@ -50,7 +50,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-STORE = ROOT / ".specify" / "memory" / "glossary.md"
+STORE = ROOT / ".specify" / "glossary.md"
 ENGINE = ROOT / "scripts" / "python" / "glossary-utils.py"
 
 # `STR-003` — the ratified canonical form, with its bracket language.

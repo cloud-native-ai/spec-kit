@@ -1,6 +1,6 @@
 # Governance projection — glossary（摘要投影桩）
 
-- source: `.specify/memory/glossary.md`
+- source: `.specify/glossary.md`
 - projection: 术语行投影（摘要优先，不整文件注入）
 - status: read
 - primary_language: zh

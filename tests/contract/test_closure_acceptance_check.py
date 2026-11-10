@@ -436,7 +436,7 @@ def test_the_seven_templates_are_read_from_the_declaring_specification():
 # C-02 / C-04 / C-10 / C-11 / C-12 — the read-only audit mode (081d, T011/T013)
 #
 # The mode's input is a repository root (`--repo`), not a spec directory: it enumerates the
-# `Implemented`-family rows of `<root>/.specify/memory/features.md` and judges each against the
+# `Implemented`-family rows of `<root>/.specify/features.md` and judges each against the
 # spec directory that row's own `Spec Path` cell names. `audit-history` is the corpus's only
 # audit-root case — a registry plus `.specify/specs/<key>/` directories inside the case — which is
 # exactly the shape that makes the mode's zero-write assertion testable (a flat spec-dir case
@@ -587,7 +587,7 @@ def test_audit_exit_two_is_reserved_for_missing_or_unparsable_input(tmp_path):
     assert proc.returncode == 2, proc.stdout + proc.stderr
 
     empty_root = tmp_path / "empty-repo"
-    (empty_root / ".specify" / "memory").mkdir(parents=True)
+    (empty_root / ".specify").mkdir(parents=True)
     proc = _run_audit("--repo", str(empty_root))
     assert proc.returncode == 2, proc.stdout + proc.stderr
     assert "features.md" in proc.stderr, (
@@ -595,8 +595,8 @@ def test_audit_exit_two_is_reserved_for_missing_or_unparsable_input(tmp_path):
     )
 
     unparsable = tmp_path / "unparsable-repo"
-    (unparsable / ".specify" / "memory").mkdir(parents=True)
-    (unparsable / ".specify" / "memory" / "features.md").write_text(
+    (unparsable / ".specify").mkdir(parents=True)
+    (unparsable / ".specify" / "features.md").write_text(
         "| ID | Name |\n|----|------|\n| 901 | no Status column |", encoding="utf-8"
     )
     proc = _run_audit("--repo", str(unparsable))
@@ -613,7 +613,7 @@ def test_audit_skips_a_row_whose_spec_path_names_nothing_without_leaving_the_mod
     """
     case = tmp_path / "audit-history"
     shutil.copytree(AUDIT_ROOT, case)
-    registry = case / ".specify" / "memory" / "features.md"
+    registry = case / ".specify" / "features.md"
     registry.write_text(
         registry.read_text(encoding="utf-8").replace(
             ".specify/specs/901-audit-blocked/requirements.md", "-"

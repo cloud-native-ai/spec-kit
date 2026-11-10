@@ -1,0 +1,88 @@
+# Feature Detail: 客户项目的持续反馈与自我提升（Client-Project Feedback & Self-Improvement）
+
+**Feature ID**: 072
+**Name**: 客户项目的持续反馈与自我提升
+**Description**: 把此前只服务于 spec-kit 自身的 feedback 与 improve 机制扩散到客户项目：代码评审发现自动采集进客户项目自己的反馈通道（指针形态、零正文搬运、永不外流），客户发现就地消化并各自落到既有的后续载体上，客户工件作为执行主体复用 SI-0…SI-9 的改进循环，四处闭环度量即读即建，框架侧红线与既有闭合面原样保留。
+**Status**: Ready for Review
+**Created**: 2026-10-27
+**Last Updated**: 2026-10-27（review 阶段（无人值守，`/speckit.review` 两段组合）：过程段 `review.md` 落盘——P0 0 / P1 1 / P2 3（F1 冻结守护 pin 无机制化漂移通道 → REC-072-01；F2 C-56 白名单硬编码子树 → REC-072-02；F3 feedback 模板 bullet 内容型三重复 → REC-072-03；F4 plan 冻结致 requirements 头状态滞留 Draft → REC-072-04），REC-072-01…04 同提交登记 `register.md`；代码段 triage=run、base `8ab5e5a9`（feature-first-commit）/ head `5336c057`、changed 111 / judged 28 / skipped 83 / gap 0、段裁决 `not-evaluated`（合法跳过不计覆盖信用，同 071 形态）、门禁 `allow`（0 blocking / 0 important；1 suggestion / 1 question / 1 praise 落 `code-review.md`）、capture 第五步框架帽 `skipped` 行披露（零条目，exit 0）；简报披露项裁决：(a) part1b probe 目录两面可达修复=接受（负例测试本次复跑绿）、(b) 8b C-56 白名单扩面=接受（根因立 F2）、(c) C-61 兼容计划=接受（一次性、不为例外先例，根因立 F1）、(d) 两条基线失败 `test_shipped_surface_client_neutrality`/`neutrality_budget` 确认为 064/066/067/070 预存中立性债（∈ T002 基线，非本特性缺陷）、(e) quickstart S3–S8 六场实跑无 partial（`notes/quickstart-run.md`）；review 定向集六新套件+邻接守护 112 用例全绿。门禁三条件（无 `[~]`、评审证据产出、当前记录零 blocking）齐备 ⇒ 状态 **Implemented → Ready for Review**。plan 约束零触碰（无 PLAN-EDIT）。）
+**Last Updated**: 2026-10-27（implement part 8 Polish T027–T029：镜像收尾 `--write`/`--check` 六对全 ok、命令副本 OK（T001 既录的 loop-playbook.md 漂移随同步消解，无新增漂移）；quickstart S3–S8 在客户夹具实跑落 `notes/quickstart-run.md`（S8 实跑引擎可观测面，聊天指令面由契约钉住——假设已记录）；`validate-tasks.py` 0 error/0 warning、29/29 `[X]`；定向核验 590 用例 588 passed / 2 failed，两失败名 ∈ T002 基线 26 名（零 NEW）；`verification.md` SC-001…SC-007 各一条状态行齐备。tasks 零 `[ ]` ⇒ 状态机推进 `Planned → Implemented`。PLAN-EDIT 无。）
+**Last Updated**: 2026-10-27（tasks 阶段：`tasks.md` 落地 29 行；同作者条件按 gate 回退直读披露。注：本头部 Status 原滞留 `Draft`，与登记表及本节 Status Tracking 的 `Planned` 不一致，属 plan 阶段遗漏的簿记对齐，本阶段就地更正并在此披露）
+**Last Updated**: 2026-10-27（requirements 阶段：建立本 Feature 并在本阶段绑定；`requirements.md` 29 FR 定义行 / 7 SC / 6 用户故事 / 10 Shared Strings；确定性校验 `validate-requirements.py` exit 0（`status: ok`，0 error / 0 warning，scanned 300 lines）；大特性拆解门 `decomposition-check.py --mode plan` → `decision=proceed`（fr_count=29 / ceiling=30）；`pre-analyze-check.py --stage requirements` → `decision=pass`（errors=0，advisory 全部指向 `feedback/probes/` 目录——该目录由反馈引擎在首次探针注入时惰性创建，本仓当前不存在，属预期测量：规格侧 1 条，质量清单同样点名该路径后共 2 条）；质量清单 16/16；简报的 Q1–Q10 已逐条裁决于规格 `## Clarifications`。两处流程偏离按 Assumptions 记录：脚手架脚本的分支切换被抑制（编号仍由脚本派生）、特性绑定提前到 requirements 阶段）
+
+## Overview
+
+此前所有 feedback 与 improve 机制的服务对象都是**框架自身**：反馈条目记录的是使用 Spec Kit 的模板、命令、技能时的摩擦，改进循环的主体是框架的单元，代码评审的发现被明确规定"不得作为反馈条目投递"，只能留在 `code-review.md` 里。对客户项目而言，这套机制是一份"给别人提意见"的工具，而项目**自己**的缺陷与改进项没有任何通道——评审发现靠人读，改进靠人记。
+
+本特性把这条回路接到客户项目自身，并且刻意只用**既有零件**：同一个反馈存储（按 `kind`/`slice`/`custom:` 单元分区，记录一文一件不变）、同一条就地消化路径、同一套 SI-0…SI-9 改进步骤、同一批后续载体（todo Park 模式 / 新需求规格 / 改进循环主体）。没有第二个引擎、第二套台账、第二套评分，也没有新增 `/speckit.*` 命令。
+
+真正的难点不是"把发现写下来"，而是三处诚实性：其一，采集必须发生（用户诉求是"必须进入通道"），因此它被放进代码段非交互路径的确定性步骤里，而不是交给"某人记得跑一次"；其二，"没采集"必须与"没发现"在文本上可区分，因此引擎 fail-closed 的每一种情形都有一个具名的披露字面量；其三，"持续自我提升有效吗"必须有可复算的答案，因此四条度量的零分母一律报"未评估"，而不是报一个漂亮的百分比。
+
+边界：不重写历史记录、不回填既有特性、不新增依赖/外部服务/常驻进程、不新增命令、零自动传输；客户条目与框架条目一样永不随包。
+
+## Latest Review
+
+- 2026-10-27 `/speckit.review`（无人值守，两段固定顺序组合）：**过程段** `review.md` 落盘——4 findings = P0 0 / P1 1 / P2 3；P1 F1：冻结守护断言（引擎动作闭集 pin、C-5 冻结哈希）没有机制化的计划授权漂移通道，072 在 implement 期两度支付一次性兼容计划成本（`notes/compatibility-plan-c61.md`），立 REC-072-01（declared-drift 登记件）；P2 F2：C-56 编辑面白名单硬编码 `.specify/skills/internal/` 子树、与 `sync-mirrors.py` MIRROR_PAIRS 两份清单漂移，part 8b 被迫后补提交（REC-072-02）；P2 F3：`templates/commands/feedback.md` Path A bullet 从指针形退化为内容形、载体闭集与呈报事实三处重复（REC-072-03）；P2 F4：plan 约束冻结致 `requirements.md` 头状态滞留 `Draft`（REC-072-04）。REC-072-01…04 同提交登记 `register.md`。**代码段** triage=run（`base --spec` 解析 `8ab5e5a9..5336c057`，base_source=feature-first-commit；记录与回执以显式 `--since/--head` 钉住区间，规避脚本 `GIT_BASE` 默认漂移）；记录 `.specify/specs/072-client-self-improvement/code-review.md`（首跑，archive=none）；回执 changed 111 / judged 28 / skipped 83（legal：`non-code-file` 49 + `generated` 34）/ gap 0 ⇒ 段裁决 `not-evaluated`（跳过不计覆盖信用，C-37，与 071 同形态）；门禁 `report --summary --file` = **allow**（exit 0：0 blocking / 0 important，1 suggestion / 1 question / 1 praise——suggestion= capture `--unit` 语法正则严于引擎 `_CUSTOM_UNIT_RE` 且注释自称「同源」不符实；question= C-19「恒退出 0」与用法错误 exit 2 的张力；praise= 两顶帽子夹具与目录两面修复的负例测试）。**capture 第五步**实跑：框架帽 `skipped` 行（依据=根级框架源目录，owner 引句，不混五值闭集，零条目，exit 0）——客户路径采集已由 T028 在夹具实跑覆盖。**简报披露项裁决**：(a) part1b probe catalog 两面可达修复=接受（纠正级，负例 `test_catalog_unreachable_when_both_faces_missing` 本次复跑绿）；(b) part 8b C-56 白名单扩面=接受（纠正级，根因立 F2）；(c) C-61 兼容计划=接受（契约自带逃逸条款内的一次性处置，声明不为例外先例；根因立 F1）；(d) `test_shipped_surface_client_neutrality` / `test_neutrality_budget` 两条失败 ∈ T002 基线 26 名（064/066/067/070 预存中立性债），review 定向复跑（六新套件 + 邻接守护 112 用例）全绿，归因成立、不在本特性修复；(e) quickstart S3–S8 六场夹具实跑成功、三种未采集披露实跑命中、无 partial，`notes/quickstart-run.md` 为证。**状态**：门禁三条件（零 `[~]` 任务 / 评审证据产出 / 当前记录零 blocking）齐备 ⇒ **Implemented → Ready for Review**（本段即推进留痕）。plan 约束零触碰（无 PLAN-EDIT）。
+- 2026-10-27 `/speckit.implement` part 8（无人值守，Polish T027–T029，implement 收官）：**T027 镜像收尾**——`sync-mirrors.py --write` 后 `--check` 六对镜像（templates/skills external/skills internal/agents/scripts/shared）全 ok；`regen-command-copies.py` regen 后 `--check` = OK（该脚本无 `--write` 旗标，regen = 无参调用，证据留档）；判词 = 相对 T001 测量无新增漂移——T001 既录的 `loop-playbook.md` 漂移（plan § Mirror Obligations 记录在案）随本行线前序 part 的同步已消解，check 输出为全零漂移，判词满足；本 part 未触碰探针注册面，无 compile→regen→sync 义务。证据 `test-evidence/t027-sync-mirrors-write.txt`、`t027-mirror-checks.txt`。**T028 quickstart S3–S8 夹具实跑**——六个一次性客户夹具内逐场景真实执行（probe-inject 武装；triage→start→note→receipt→capture 全链路 + 幂等复采 + 六项计数复算；三种未采集具名披露实跑命中 `client-channel-unarmed`/`client-unit-ambiguous`/`no-capture-object`；package `excluded_external=1` 且排除后 zip=null 零产物；client-metrics 四指标实读；run-determination 对 custom 主体 fail-closed 实跑 persisted=false、工作树零变更），命令/退出码/输出/拆卸步骤逐字落 `notes/quickstart-run.md`；plan 属主 `quickstart.md` 未改写（PLAN-EDIT 无——豁免措辞为计划期时点记录，假设已记录于 notes 头部）。**T029 收官**——`tasks.md` 29/29 `[X]`（`validate-tasks.py` 0 error/0 warning）；`verification.md` 落 SC-001…SC-007 七条状态行 + 九条证据绑定（含 sha256）；**最终定向核验** = 六新套件 + 邻接守护 22 文件 590 用例：588 passed / 2 failed，失败名 `test_shipped_surface_client_neutrality` / `test_neutrality_budget` 均 ∈ T002 基线 26 名（comm -13 为空，零 NEW；全量 closure 留 driver review 后执行，E2/closure 槽未消费）；E3 行记于 verification.md notes。状态机：`tasks.md` 零 `[ ]` + verification.md 齐备 ⇒ **Planned → Implemented**（本段即推进留痕）。纠正披露：part 8 发现 part 7 镜像同步的 `loop-playbook.md` 运行时副本未随 part 7 提交（工作树滞留），属本特性线的镜像产出，随 T027 收口一并提交。
+- 2026-10-27 `/speckit.implement` part 7（无人值守，US6 T023–T026 守护网）：红线/闭合面/夹具/守护网四组清扫断言落新套件 `tests/contract/test_client_guard_sweep.py`（25 用例：C-51 四红线逐字 + 客户条目同等覆盖；C-52 依赖文件冻结 + 新增 import 仅 stdlib + 触及面网络/常驻进程词法扫描为零；C-53 记录轮转/回执字母表与字段块/报告 2.1 字段闭集/收尾六步/三单元普查逐字；C-55 无新增 `/speckit.*` 命令与入口面——模板与四工具副本无 A/D、脚本 dispatch 恰增 `capture`、反馈引擎 action 闭集恰增 `client-metrics`、新增长选项 ⊆ {--format, --review-file, --triage, --unit}；C-56 全部变更路径可归入声明编辑面且运行时投影必有源变更随行；C-57 两条既有负向断言逐字、守护套件 def 计数 ≥ 161/16/10/18、072 分发文案零新增中立性违规——就地纠正四处本特性自己在分发面写下的特性编号/规格键引用（dogfooding.md、self-improvement SKILL.md、code-review SKILL.md、git-delta-review.sh 注释各一处，镜像随 sync-mirrors 再同步）；C-58 五组行为全部在夹具内执行的结构断言 + 框架仓自证永远走框架分支；C-59 五框架源目录逐参数化 vendored 客户仓全部走框架分支：零外部条目、`skipped` 行带 hat owner 引句、不混五值闭集；C-60 无既有反馈条目/评审报告被改删（git --diff-filter=MD 为空）、遗留单体 index.json 对本特性只读动作字节不动且不退役；C-62 新引擎/存储/台账零新增、反馈引擎新增函数 ⊆ 度量面白名单）。T026 定向运行（1554 passed）相对 T002 基线的两条新失败名经 C-61 逃逸条款解决：书面兼容计划落 `notes/compatibility-plan-c61.md`（`test_dogfooding_practice.py` 动作闭集同批增 `client-metrics`；`test_expression_compatibility.py` C-5 用自带 ALLOWED_POST_BASELINE_CHANGES 机制为四个声明编辑面具名漂移 + 每文件 markers 复断言）——**不为例外先例**，C-61 永不被引用为第二次例外的基础。夹具自检 21/21。纠正披露：part 7 发现 part 3–6 落盘的分发文案含特性编号/规格键（守护网首次全量扫描发现），已按 C-57 就地中性化， Neutrality 守护剩余违规全部为先存 064/066/067/070 债。状态保持 `Planned`（implement 未零 `[ ]`）。
+- 2026-10-27 `/speckit.tasks`（无人值守）：产出 `tasks.md` 29 行（T001–T029），按六个用户故事分组（US1–US4 P1、US5–US6 P2），MVP = US1+US2；Tests Mode ON（宪法 IV + Principle VII template-only 门两层）。测试优先布局：五个新契约测试组（`test_client_{capture,armed_state,package_exclusion,improve_loop,metrics}.py`）全部红先行，四字段失败记录落 `notes/red-first-evidence.md`；共享夹具 `tests/fixtures/client_project.py`（客户夹具 + 框架帽孪生，T003）先行。守护义务写进行：071 六套件（161 测试）、expression-compat C-5 冻结哈希、review-p1 循环、feedback/probe 族只增不减（T026）。62/62 条款由 13 行 `[green:]` 认领，分区表随行序升序。阶段门实测（`test-evidence/tasks-*`）：`validate-tasks.py` 0 error/0 warning；`decomposition-check --mode tasks` proceed（29≤30 / 29≤40）；`pre-analyze-check --stage tasks` pass errors=0（52 advisories 全部预期——五计划测试文件、夹具、`docs/reference/commands/improve.md`（plan 同步面生成期实测缺失，由 T018 新建）、plan 阶段既录集合、Format 节 2 条非具体 blockedBy 文档词元）；`account-clause-coverage.py` status=ok claimed=62 beyond-baseline=0 FR 29/29。覆盖基线按引擎时机复核（正文 delta=0，plan 阶段冻结后不重冻）。docs-only 预算：未跑任何套件，E2/closure 槽未动；E3 行记 `test-evidence/tasks.jsonl`。状态保持 `Planned`。解读记录：简报"073/071 的六个套件"按 071 六个套件落地（无 Feature 073）。
+- 2026-10-27 `/speckit.requirements`（无人值守）：建立本 Feature 并在本阶段绑定；`requirements.md` 29 个 FR 定义行 / 7 个 SC / 6 个用户故事 / 10 行 Shared Strings。确定性检查：`validate-requirements.py` exit 0（`status: ok`，0 error / 0 warning，scanned 300 lines）；`decomposition-check.py --mode plan` → `decision=proceed`（fr_count=29 / ceiling=30）；`pre-analyze-check.py --stage requirements` → `decision=pass`（errors=0 / advisories=1，唯一 advisory 为 `feedback/probes/` 目录缺失——该目录由反馈引擎在首次注入外部探针时惰性创建）；质量清单 16/16。简报的问题清单已在规格 `## Clarifications` 逐条裁决（Q1 复用同一存储按 `kind`/`slice`/`custom:` 分区；Q2 评审运行内自动采集、单条指针形态；Q3 复用 SI-0…SI-9 且 why 段对 `custom:` 主体如实披露未评估；Q4 持续 = 每次运行采集 + 既有非阻塞提示 + 显式触发；Q5 帽子判据沿用 owner、单元命名强制 `custom:` 并纠正 Loop B 的 `skill:` 配方；Q6 四条红线逐条保留、客户侧只在同一存储的外部分区增强；Q7 四条指标即读即建、零分母报未评估；Q8 不新增命令、三处既有入口分担；Q9 框架源唯一编辑面 + 模拟客户项目夹具验证；Q10 守住前序特性闭合面、只做一处显式修订、遗留建议项保持开放）。两处流程偏离按 Assumptions 记录：脚手架脚本的分支切换被抑制（阶段子代理不得切分支，编号仍由脚本派生）、特性绑定提前到 requirements 阶段。
+
+## Key Changes
+
+1. **采集入口是确定性步骤，不是提醒**：代码段非交互路径由四步改为五步，第五步用已经产出的确定性输入（记录路径、适用性、按严重度的计数）拼装一条客户条目；这是本特性对前序特性闭合面的唯一修订，理由与代价写在规格里。
+2. **指针形态而非副本**：客户条目只携带记录路径、适用性取值、按严重度抄自汇总命令的计数与运行标识，不携带意见正文、逐文件裁决或变更文件总数——存储不随代码库规模增长，且"读条目的人知道去哪份记录看细节"。
+3. **武装态是一个显式三值事实**：已武装 / 未武装 / 歧义，解析顺序封闭（显式单元 > 唯一外部探针 > 其余）；因为没有对应探针对象时引擎会拒绝记录，"自动就绪"是自埋的静默失败。
+4. **"没采集"与"没发现"可区分**：四种未采集情形各有具名披露字面量，零条目、不填 0、不改写门禁判决、不阻断运行。
+5. **客户发现就地消化，载体闭集**：沿用既有消化路径，每条条目恰好落到三种既有载体之一（todo Park 模式 / 新需求规格 / 改进循环主体），不新增第四种，不指派两个。
+6. **改进循环复用而不是新建**：客户工件走同一套 SI-0…SI-9；why 段对 `custom:` 主体明写"运行判定历史未评估"（引擎的来源契约对非命令/技能主体 fail closed），改用客户通道与证据车道，不发明来源、不伪造历史。
+7. **持续性不是调度**：每次合格运行采集 + 既有非阻塞阈值提示 + 显式触发；不加守护进程、不加定时器、不加新的阻塞确认。
+8. **有效性可复算且不编造**：捕获覆盖、进入回路、闭环、重复四条指标即读即建，闭环只认"被指派的 owner 文件确有变更证据"，零分母报"未评估"，不合成评分。
+9. **红线与闭合面原样**：框架反馈四条红线、前一特性的记录形态/回执/门禁/收尾步骤集合/三单元普查全部保留；客户条目与框架条目一样永不随包、永不外发。
+
+## Implementation Notes
+
+- 框架源是唯一编辑面（`skills/`、`templates/`、`shared/`、`scripts/`、`docs/`、`tests/`）；`.specify/` 运行时副本与各工具命令副本由既有再生成/镜像同步脚本产出，不手改；若触及探针注册面则先重编译再同步。
+- 客户单元命名强制 `custom:<owner>/<name>` + `custom-unit` 类型：`skill:<name>` 在客户项目里要么找不到探针对象（记录被拒），要么被解析成框架内部单元（条目被上送）。既有 Dogfooding Loop B 的这一处操作建议需要同批改写并说明理由。
+- 引擎事实：`feedback-utils.py` 在探针注册表可用时为每条记录解析探针归属，解析不到即拒绝（exit 2）；打包侧自动排除 `kind: external` 并只回报 `excluded_external` 计数。`run-determination.py` 的持久化来源契约只接受命令与技能两种单元形态，因此 `custom:` 主体的运行判定记录会 `persisted: false`——客户循环的 why 段必须如实披露，而不是绕过。
+- 客户侧验证必须在"没有根级框架源目录"的夹具项目里跑：在框架仓自测会走另一条分支（帽子判定为框架项目），使整条客户路径永不执行——这是本特性最容易被"全绿自测"欺骗的地方。
+- 既有守护不得削弱：客户中立（分发表的表面不得引用框架项目的规格键/特性编号）、帽子判据按框架源目录而非运行时镜像、客户侧反馈不得被路由上送。新增断言只增不减。
+- probe 注册面预期不改（采集不是收尾步骤，而是代码段内部的一步）；如果落地时确有注册变更，按既有顺序重编译。
+
+## Future Evolution Suggestions
+
+- 观察若干次真实客户项目运行后，再评估是否值得为客户侧条目提供一个可被 `/speckit.analyze` 消费的稳定摘要形态（当前刻意保持指针形态）。
+- 若"运行判定历史不可得"在实践里长期成为客户循环的瓶颈，应由运行判定引擎的 owner 评估是否加宽其持久化来源契约，而不是在客户侧另造一套历史。
+- 重复发现率目前是粗代理（位置 + 严重度）；等真实数据出现后，再决定是否值得为同一问题引入稳定标识，避免现在造一个无法回溯的身份族。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/072-client-self-improvement.md
+
+## Status Tracking
+
+- **Draft**: `requirements.md` 存在并通过确定性校验与拆解门，Feature 已登记。
+- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 齐备且宪法检查无未论证的 Fail。
+- **Implemented**: `tasks.md` 零 `[ ]` 行（全 `[X]` 或 `[~]`），`verification.md` 为每条 SC 记录状态行。
+- **Ready for Review**: 延后任务全部解决或显式豁免，且评审证据已产出（含代码段裁决与覆盖率回执）。
+- **Completed**: 最终验收。
+
+### Canonical Status State Machine (single source of truth)
+
+转换表的权威版本在 `templates/feature-details-template.md` § Canonical Status State Machine；本节不复制其判据，只指出本特性的状态当前位置。
+
+当前：`Ready for Review`（`Draft → Planned` 由 `/speckit.plan` 于 2026-10-27 完成；`Planned → Implemented` 由 `/speckit.implement` part 8 于 2026-10-27 完成；`Implemented → Ready for Review` 由 `/speckit.review` 于 2026-10-27 完成——门禁三条件：tasks 29/29 全 `[X]` 零 `[~]`、过程报告与代码段记录产出、当前 `code-review.md` 零 `blocking` 条目（门禁判据 owner：`templates/feature-details-template.md` § Canonical Status State Machine，本行不复制其措辞））。
+
+计划阶段落地的事实（细节以 `.specify/specs/072-client-self-improvement/` 制品为准）：
+
+- 完整设计制品齐备：`plan.md`（宪法 16 行全 Pass，同作者条件因环境无子代理派发能力按 gate 回退直读并逐行披露）、`research.md` R1–R12、`data-model.md` E1–E10 / V1–V33、六份契约 C-1…C-62、`quickstart.md` S1–S8、`feature-ref.md`。
+- 计划级裁决七条已记录（`feature-ref.md` § 5）：运行标识取记录头日期戳；计数机读面为 `report --summary --format json`（可选，既有形态不动）；参数字面量 `--client-unit`；框架帽披露走 `skipped: <帽子依据句>` 不混入五值闭集；度量载体为既有反馈引擎只读 `client-metrics` 动作；闭环/重复口径机械化（owner 文件 mtime 晚于条目 created；(文件,严重度) 对从所指记录抽取）；夹具为客户夹具 + 框架帽孪生双向覆盖。
+- 阶段门实测：`pre-analyze-check.py --stage plan` decision=pass errors=0；`clause_extract.py` 六文件全 `md-bold-closed`；`account-clause-coverage.py` FR lane 29/29 claimed；镜像基线 1 处既有漂移（loop-playbook.md）记录在案，判据 = 本特性触及对无新增漂移。
+- 引擎有界新增两处（C-62）：`git-delta-review.sh` 的 `capture` 子命令 + `report --summary --format json`；`feedback-utils.py` 的只读 `client-metrics` 动作。命令/引擎/台账/评分/依赖零新增。
+
+计划阶段的关键设计落点（细节归规格制品，此处只记索引）：
+
+- 交付面（预期）：`skills/internal/code-review/`（非交互路径第五步 + 采集与披露规则）、`skills/internal/manage-feedback/`（客户侧消化、载体闭集、武装态呈报）、`skills/internal/self-improvement/`（客户主体的 why 段与披露）、`templates/commands/{review,feedback,improve}.md`、`shared/` owner 文档（Dogfooding、自我提升定义/流程、反馈步骤）、`docs/reference/` 对应参考页、`tests/` 契约测试（含模拟客户项目夹具）。
+- 最容易做错的三处已写成条款：采集必须与"没发现"在文本上可区分；客户条目永不随包且不得与框架条目双重归属；客户侧行为只能在模拟客户项目里被验证。
+- 与前序特性的接口只有一处：代码段非交互路径的步骤枚举（四步 → 五步）。其余闭合面（记录形态与轮转、回执字母表与字段块、代码段小节封闭清单、收尾步骤集合、三单元普查）一律引用、不复制。

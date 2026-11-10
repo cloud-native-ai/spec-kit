@@ -35,7 +35,7 @@ TEAM_NAME = re.compile(r"\bdraw-plantuml-optimizer\b")
 
 LIVE_ROOTS = ("skills", "templates", "shared", "docs", "src")
 LIVE_FILES = (".specify/instructions.md", ".specify/shared",
-              ".specify/memory/knowledge", ".specify/memory/glossary.md")
+              ".specify/memory/knowledge", ".specify/glossary.md")
 
 # Dated records and generated artifacts: true statements about their own time, or
 # machine-owned output that is regenerated rather than edited.

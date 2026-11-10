@@ -166,7 +166,7 @@ source `scripts/python/run-determination.py`) owns the record schema, every valu
 the program branches on, the routing-bit derivation (`derive_trigger_feedback`) and the
 CLI flag set. No invocation is written out here on purpose: the parser generates the
 engine's own `--help`, so a flag list copied into prose could only drift. The record *is*
-the 改点 — term owner `.specify/memory/glossary.md`. The four red lines and the
+the 改点 — term owner `.specify/glossary.md`. The four red lines and the
 never-solicit rule at the top of this file govern everything below unchanged and are not
 restated here.
 

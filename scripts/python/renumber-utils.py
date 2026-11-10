@@ -50,8 +50,8 @@ SCAN_ROOTS = (".specify", "scripts", "templates", "skills", "agents", "shared",
               "src", "docs", "tests")
 SPECS_REL = ".specify/specs"
 MEMORY_REL = ".specify/memory"
-REGISTER_REL = ".specify/memory/register.md"
-FEATURES_REL = ".specify/memory/features.md"
+REGISTER_REL = ".specify/register.md"
+FEATURES_REL = ".specify/features.md"
 
 EXCLUDED_PREFIXES = (
     ".specify/history/",

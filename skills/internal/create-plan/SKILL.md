@@ -64,7 +64,7 @@ BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g
 
 ### Step 3 — Load context
 
-Read FEATURE_SPEC, `.specify/memory/constitution.md`, and processed `$ARGUMENTS` context.
+Read FEATURE_SPEC, `.specify/constitution.md`, and processed `$ARGUMENTS` context.
 Load the IMPL_PLAN template (already copied).
 
 - Check if `SPECS_DIR/research.md` exists. If so, read it.
@@ -87,7 +87,7 @@ Follow the structure in the IMPL_PLAN template to:
   - Incorporate relevant background information from `$ARGUMENTS`
   - Incorporate findings from `research.md` if available
 - Fill Constitution Check section by **dynamically deriving** the principle table from
-  `.specify/memory/constitution.md`:
+  `.specify/constitution.md`:
   1. Parse every heading matching `### <numeral>. <name>` (Roman or Arabic) in the order
      they appear.
   2. Preserve any `(NON-NEGOTIABLE)` / `(MANDATORY)` annotation verbatim in the row
@@ -148,14 +148,14 @@ path, and generated artifacts.
 
 The `/speckit.plan` command automatically integrates with the feature tracking system:
 
-- If a `.specify/memory/features.md` file exists, this skill will:
+- If a `.specify/features.md` file exists, this skill will:
   - Detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
   - Extract the feature ID from the directory name
-  - Update the corresponding feature entry in `.specify/memory/features.md`:
+  - Update the corresponding feature entry in `.specify/features.md`:
     - **Bound-but-unregistered Feature**: if the spec's `Related Feature` names a Feature
       ID that has NO row yet in `features.md` (e.g. the binding was decided at
       `/speckit.clarify` but never registered), first CREATE the row and the
-      `.specify/memory/features/<ID>.md` detail from
+      `.specify/features/<ID>.md` detail from
       `.specify/templates/feature-details-template.md` — then advance status. Do not
       leave the create-vs-advance branch implicit or skip registration because the ID is
       already written into the spec.
@@ -165,15 +165,15 @@ The `/speckit.plan` command automatically integrates with the feature tracking s
       owned by `/speckit.implement`.
     - Keep the specification path unchanged
     - Update the "Last Updated" date
-  - Automatically stage the changes to `.specify/memory/features.md` for git commit
+  - Automatically stage the changes to `.specify/features.md` for git commit
 
 In addition, **the plan phase MUST review the Feature list**:
 
 - Check whether this plan introduces new Features or deprecates/merges existing Features.
 - Ensure functional/non-functional Feature classification remains consistent.
 - If there are changes, the following must be updated synchronously:
-  - `.specify/memory/features/<ID>.md`
-  - `.specify/memory/features.md`
+  - `.specify/features/<ID>.md`
+  - `.specify/features.md`
 - Record the "key changes / notes" corresponding to this plan in the Feature detail.
 
 This integration ensures that all feature planning activities are properly tracked and
@@ -186,9 +186,9 @@ linked to their corresponding entries in the project's feature index.
    - **Project Docs**: consult `README.md` and pull `docs/` content as targeted excerpts
      for the areas this plan touches — do NOT read all files in `docs/` wholesale.
    - **Feature Memory**: project the feature index with
-     `grep -E '^\| [0-9]{3}' .specify/memory/features.md` (ID/name/status rows) and read
+     `grep -E '^\| [0-9]{3}' .specify/features.md` (ID/name/status rows) and read
      ONLY the detail file(s) of the bound/related Feature(s) under
-     `.specify/memory/features/` — do NOT read the whole directory; escalate per the
+     `.specify/features/` — do NOT read the whole directory; escalate per the
      discipline doc's ladder when a row genuinely needs more depth.
    - **Codebase exploration pass**: before filling the template, run a dedicated
      exploration pass (use an Explore subagent when available) over the code the plan

@@ -55,7 +55,7 @@ from typing import Any, Dict, List, Optional, Tuple
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 OWNER_DOC_REL = "shared/guidelines/bilingual-expression.md"
-GLOSSARY_REL = ".specify/memory/glossary.md"
+GLOSSARY_REL = ".specify/glossary.md"
 GLOSSARY_UTILS_REL = "scripts/python/glossary-utils.py"
 E6_REL = ".specify/specs/079-bilingual-expression/test-evidence/us10-e6-legacy-divergence.txt"
 

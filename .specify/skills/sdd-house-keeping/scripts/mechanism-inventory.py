@@ -93,11 +93,11 @@ def main() -> int:
 
     matrix = {
         "specify_dir": os.path.isdir(sp),
-        "const": exists("memory/constitution.md"),
-        "feat": exists("memory/features.md") and os.path.isdir(os.path.join(sp, "memory/features")),
-        "gloss": exists("memory/glossary.md"),
+        "const": exists("constitution.md"),
+        "feat": exists("features.md") and os.path.isdir(os.path.join(sp, "features")),
+        "gloss": exists("glossary.md"),
         "fb": os.path.isdir(os.path.join(sp, "memory/feedback")),
-        "reg": exists("memory/register.md"),
+        "reg": exists("register.md"),
         "kb": os.path.isdir(os.path.join(sp, "memory/knowledge")),
         "session": os.path.isdir(os.path.join(sp, "memory/session")),
         "tools": exists("memory/tools.md"),

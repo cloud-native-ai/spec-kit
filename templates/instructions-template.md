@@ -10,9 +10,9 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | List of project features |
-| **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (see `.specify/shared/workflow/glossary.md`) |
+| **Constitution** | `.specify/constitution.md` | Single source of truth for principles | Coding standards, architectural rules, constraints |
+| **Feature Index** | `.specify/features.md` | Feature roadmap status | List of project features |
+| **Glossary** | `.specify/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (see `.specify/shared/workflow/glossary.md`) |
 | **Development** | `CONTRIBUTING.md` *(default — drop this row when absent, or repoint to the project's real dev guide)* | Setup and Guidelines | Setup, testing, and pull request guidelines |
 | **Readme** | `README.md` or `README` | basic information of project | {TODO} |
 | **Project Documents** | `docs/` | High-level architecture | Architecture and design documentation |
@@ -228,7 +228,7 @@ Every non-derivable takeaway from a run MUST be recorded before wrap-up; normati
 
 ## ID Register (编号登记)
 
-Every durable identifier — decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session.
+Every durable identifier — decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session.
 
 - **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate decision content.
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.

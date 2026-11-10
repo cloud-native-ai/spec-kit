@@ -1,0 +1,68 @@
+# Feature Detail: Token Efficiency Discipline
+
+**Feature ID**: 040  
+**Name**: Token Efficiency Discipline  
+**Description**: Framework-wide LLM token-efficiency discipline: program-first (fixed-rule text/data judgments go to deterministic scripts, not the LLM), summary-first (machine-managed data files are never injected whole into LLM context; routine access consumes digests/projections/excerpts with an escalation ladder), and consumption observation (feedback-step carries a token-efficiency self-assessment with a stable `token-efficiency` marker for later aggregation and improve-* consumption).  
+**Status**: Implemented  
+**Created**: 2026-08-02  
+**Last Updated**: 2026-09-17
+
+## Overview
+
+As commands, skills, and flows multiply, the volume of content injected into LLM context per run (and the resulting token spend plus context pollution) becomes a framework-level quality attribute. This feature establishes token efficiency as a durable discipline via a single-source convention document (ambient-referenced from instructions), authoring-template gates for new units, summary/query output modes on data engines, a one-time compliance audit of existing units (top 5 violations remediated in-scope, rest backlogged), and a feedback-carried observation loop (qualitative/proxy metrics only — no fabricated token counts).
+
+## Latest Review
+
+Registered from `/speckit.clarify` binding for spec 035-token-efficiency (2026-08-02). No prior Feature covered token efficiency; 028 Feedback Mechanism is the carrier for the observation story only, not the owner.
+
+## Key Changes
+
+1. Single-source token-efficiency discipline doc (program-first / summary-first / consumption observation) with decision boundaries, exceptions, escalation ladder, small-file threshold.
+2. Authoring gates: skill/command/agent creation and improvement templates carry token-efficiency check items.
+3. Data engines gain summary/filter/query output modes so routine flows never need raw dumps.
+4. Existing-unit audit with violations inventory; top 5 remediated with before/after injected-volume comparison.
+5. feedback-step gains a token-efficiency self-assessment dimension with stable `token-efficiency` marker; clean runs add no entry.
+
+## Implementation Notes
+
+- Landing level is the framework itself; downstream projects inherit via `.specify/` install.
+- No new monitoring subsystem: the existing Feedback mechanism (028) is the observation carrier; evidence feedback lane (038) surfaces recurrence.
+- Exact token counts are not uniformly observable across the eight supported AI CLIs — assessments use qualitative descriptions or lines/bytes proxies for same-flow before/after comparison only.
+- All artifacts follow the canonical → mirror sync model (sync-mirrors.py, `diff -rq`).
+
+## Future Evolution Suggestions
+
+- Elevate the discipline to a Constitution principle via `/speckit.constitution` once proven.
+- Backlogged (non-top-5) audit findings remediated in later iterations.
+- Revisit proxy metrics if agent CLIs begin exposing per-run token usage.
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/040-agent-metadata-portability.md
+- Requirements Spec: .specify/specs/035-token-efficiency/requirements.md
+
+## Status Tracking
+
+- **Draft**: Feature registered and bound to spec 035.
+- **Planned**: Discipline doc scope, audit method, and remediation targets planned (2026-08-02).
+- **Implemented**: Discipline doc + 5 authoring gates + list --contains + top-5 remediation + Reflect self-assessment landed; 30/30 tasks, 60 contract tests green (2026-08-02). (current)
+- **Ready for Review**: SC-001…SC-005 verified.
+- **Completed**: Discipline observed in routine runs; backlog handed to later iterations.
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/035-token-efficiency/requirements.md
+
+### 反向交叉引用:Feature 051(2026-09-17)
+
+**Feature 051 面向用户可理解性纪律**(`.specify/specs/051-user-facing-comprehension/`)在 `/speckit.clarify` 绑定时判定为**新建 Feature 而非绑入 040**,但把 040 记为**最接近的结构先例**并消费其两项既有形态。040 的能力范围与 Status(**Implemented**)均不变——本条只是承接关系记录,不是 040 的扩展切片。
+
+051 从 040 复用的两处:
+
+1. **"全局阈值 + 场景显式覆盖(声明处生效、不回写本节)"形态** —— `shared/guidelines/token-efficiency.md:38` 的小文件阈值先例被 051 直接用作**读者基准**的裁定形状:一条全局基准读者 + 界面类只在其真源文档处声明更严覆盖、MUST NOT 回写真源纪律文档(051 FR-037)。051 第二轮澄清在"全局一套 + 按类覆盖 / 11 类各自定义 / 单一基准不允许覆盖"三者中取前者,依据正是这个先例已在 040 验证可行。
+2. **观察标记形态** —— 040 的 `token-efficiency` 稳定字面量标记(供 `feedback-utils.py --action list --contains` 检索聚合、干净运行不追加空洞条目)被 051 沿用为 `user-facing-comprehension` 标记(051 FR-036)。
+
+**对 040 自身 backlog 的一处提示**:本文件 `## Future Evolution Suggestions` 第 1 条("Elevate the discipline to a Constitution principle via `/speckit.constitution` once proven")今天仍待办——token 效率纪律**尚未**成为宪章原则,也不在随包分发的 `templates/constitution-template.md` 中。051 建立的正是这条导出通道(宪章模板新增原则 **且** 宪章命令 `MUST include` 清单新增对应条目的**双落点**,并把"每条原则 MUST 双落点"一般化为契约守卫)。⇒ 040 若要落地该建议,MUST 同时改两个落点:051 的研究实测到 **Principle XIV(One Source of Truth)只落了活动宪章、从未回流模板**,导致没有任何下游项目收到它——051 同批修复该缺口,并以其为双落点守卫的首个受测样本。
+
+- 2026-11-09 consolidation: spec dir(s) archived to `.specify/archive/specs/` — 054-agent-registration-wiring (see `.specify/archive/specs/CONSOLIDATION-LEDGER.md`).

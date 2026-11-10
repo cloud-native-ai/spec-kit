@@ -203,7 +203,7 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 | # | 对象 | 从哪读 | 什么让它红 |
 |---|------|--------|-----------|
-| O1 | 注册表行 | `.specify/memory/features.md` | 该行的状态与闭环裁决矛盾（见下表） |
+| O1 | 注册表行 | `.specify/features.md` | 该行的状态与闭环裁决矛盾（见下表） |
 | O2 | 验证记录的机器可读块 | `<spec-dir>/verification.md` | 缺逐条判据的机器可读块，或缺任一 smoke 字段 |
 | O3 | 任务结构与决定张力结构 | `<spec-dir>/tasks.md`、`<spec-dir>/plan.md` | 一个用户故事标签出现在非故事相位；或一条决定张力记录不携带 owner 的六字段形态 |
 | O4 | （独立一条，C-804）`requirements.md` 的 `**Path**:` 标记 | `<spec-dir>/requirements.md` | 由 `validate-requirements.py` 的 `path-marker` 判，**不**由本类判 |
@@ -232,7 +232,7 @@ A6 的义务恰是**不作断言**：它会要求引擎把需求侧读数作为 
 | `Relocated` | **不是活行**——按名排除，报 `count: 0` 并记录理由 | 同左 |
 
 **`Relocated` 按名排除**：一行搬迁走的记录没有自己的活规格目录，也就没有可比的闭环裁决。引擎 MUST 为该状态
-报 `count: 0` **并**给出理由，MUST NOT 把它折进"一致"列当作默认值。它不是假设：`.specify/memory/features.md`
+报 `count: 0` **并**给出理由，MUST NOT 把它折进"一致"列当作默认值。它不是假设：`.specify/features.md`
 今天恰有**一行**（`048`）携带该状态，因此这条排除需要规则，而不是一句顺带提及。
 
 **reason code 的归属**：闭环引擎只有**一个**与状态相关的 code（`status-claims-implemented-but-blocked`），
@@ -454,7 +454,7 @@ N 个互相无关的载体"的通道。
 | 权威文件的特性编号 | `requirements.md` 头部的 `**Feature ID**` |
 | 任务 / 契约头部的编号 | `tasks.md` 的 `**Requirement ID**` 与 `**Related Feature**`；契约文件头部的 `**Feature**:` |
 | 团队目录名与 slug | `<spec-dir>/team/<NNN-slug>/` 的目录名与其 `name:` / `slug:` 行 |
-| 特性引用文件的绑定行与注册表行 | `feature-ref.md` 的绑定行；`.specify/memory/features.md` 的该特性行 |
+| 特性引用文件的绑定行与注册表行 | `feature-ref.md` 的绑定行；`.specify/features.md` 的该特性行 |
 
 不一致 MUST 报红并点名 file:line（团队目录形态点名该目录）。
 
@@ -616,7 +616,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 |---|------|------|-----------|
 | 1 | 镜像基线 | `python3 scripts/python/sync-mirrors.py --check` | 改动后若把镜像漂移报成"新发现"，其实是改动前就有 |
 | 2 | 指令面字节数 | `wc -c .specify/instructions.md` | 预算读数必须在改动前后同一把尺子下比较 |
-| 3 | 两处宪法计数 pin | `grep -c '^### ' .specify/memory/constitution.md` 与 `.specify/templates/constitution-template.md` | 本次不新增原则；两个数若不等于改动前，说明洞开了未授权范围 |
+| 3 | 两处宪法计数 pin | `grep -c '^### ' .specify/constitution.md` 与 `.specify/templates/constitution-template.md` | 本次不新增原则；两个数若不等于改动前，说明洞开了未授权范围 |
 | 4 | 工作树形态 | `git status --porcelain` | 既有脏文件不算本特性的产出，MUST NOT 被提交或还原 |
 
 四项读数 MUST 落在 `test-evidence/` 的**当次运行证据文件**里（C-408 的第 (i) 段），与改动后的同四项读数并排；

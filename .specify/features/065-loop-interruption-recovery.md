@@ -1,0 +1,101 @@
+# Feature Detail: SDD 循环中断感知与状态恢复（Loop Interruption Awareness & Recovery）
+
+**Feature ID**: 065
+**Name**: SDD 循环中断感知与状态恢复
+**Description**: 在无人值守 SDD 循环中，为驱动者提供确定性的状态感知、中断检测与状态恢复：只读聚合状态脊、四件套、watchbeat、阶段产物、git 提交与 watcher 判定；识别八类中断形态；按判定执行 resume / retry / stop；并把驱动者生命周期约束固化为可校验规则。
+**Status**: Planned
+**Created**: 2026-10-21
+**Last Updated**: 2026-10-22
+
+## Overview
+
+实测事故（xuanji-doc 线 015）暴露的不是单阶段执行能力不足，而是驱动侧缺少统一的状态感知与恢复程序：plan 阶段派发后未在同一回合启动 watcher，Mac 休眠导致会话挂起；qodercli 以 `exit=1` 退出且无哨兵，plan 全套产物齐全但未提交；循环静默停摆约 13 小时，状态脊未落 `stalled` / `reentry-required`，恢复只能人工逐一检查 pid/status/log/heartbeat/产物与 git 提交。
+
+本 Feature 在 Feature 058 的 U0–U6、每线状态脊、阶段哨兵与 watcher 判定之上增加四层增量：A 只读状态聚合入口（`loop-state.py snapshot`）；B 八类中断形态检测与驱动者生命周期校验（`check-spine`）；C 按判定执行 `resume / retry / stop` 的恢复程序；D watchbeat 驱动者存在标记与同线恢复锁。它不改变 watcher 判定、不改各 `/speckit.*` 命令内部流程、不引入常驻服务或新运行时依赖。
+
+## Latest Review
+
+2026-10-21 `/speckit.requirements` 创建规格：52 FR / 10 SC / 5 user stories / 10 key entities / 5 shared strings；`validate-requirements.py` 0 error / 0 warning；质量清单 16/16；源简报逐字归档为 dated record。
+
+2026-10-21 `/speckit.clarify`（Mode A，无人值守）完成：5 项裁决（Feature 新建绑定；三动作 CLI；derived `loop_state` 映射与阈值 owner；salvage 显式记录；统一 JSON/退出码/并发锁/机读段契约）已写回 requirements；validator 仍 0/0；`pre-analyze-check --stage requirements` pass（唯一 advisory 为本文件缺失，已由本次落盘关闭）；`overlap-check.py` 返回 `clear`（当前特性尚未声明共享交付面，note 见脚本输出）。**Plan 入口前置门实测**：`decomposition-check.py --mode plan` 返回 `split-required`（52 FR > 30，exit 1），plan 派发被阻断，须先写拆分记录并确认 `proposed_slices[]`；切片建议与实测证据见 `notes/decomposition-gate.md`。
+
+2026-10-21 `/speckit.plan`（切片 `065a-state-awareness`）完成：产出 `plan.md`、`research.md`（13 条裁决）、`data-model.md`（13 个实体）、4 份契约（60 条：CLI 18 / 信封 14 / 中断与动作 17 / 产物映射 11）、`quickstart.md`（3 项基线检查 + 7 个 planned 场景）与 `feature-ref.md`。`pre-analyze-check.py --stage plan` = `pass`（errors=0，advisories=19 均为尚未创建的交付物路径）；Constitution Check 16/16 Pass（两次 fresh-context 只读评审后修正了状态/值分层、watcher 归属三态、产物映射 owner 对、动作优先级引用等缺陷）。本切片只读实现 `snapshot` / `--probe` / `--self-test` 与共享信封/退出码；`recover`、`check-spine`、并发锁及 `heartbeat-stalled` / `lifecycle-spine-violation` 判定留在 065b/065c。Feature 状态 Draft→Planned；与切片 requirements「不得改写注册状态」一句的差异已在 `plan.md` §Disclosed Deviations 显式披露。
+
+2026-10-21 `/speckit.clarify`（切片 A，Mode A override，无人值守）完成：切片 A `066-loop-state-awareness-a` 绑定到本 Feature（Draft），不新建 Feature ID/行；5 项裁决——verdict 优先级（watcher/probe 逐字优先于 Registry-spine-missing 的 UNKNOWN+stop）、未派发谓词与启动宽限期锚点、快照有效阈值/重试/attempt/哨兵/probe schema/watchbeat 路径/salvage 输入契约、输出字段闭域与 stale 归属动作、Feature 绑定——已写回切片 requirements 与 `Snapshot Field Contract`；切片 validator 0/0、pre-analyze pass、decomposition-check `proceed`（25 FR ≤ 30）。切片规格见 `.specify/archive/specs/066-loop-state-awareness-a/requirements.md`。
+
+2026-10-21 `/speckit.plan`（切片 `066-loop-state-awareness-a`）完成：产出 `plan.md`、`research.md`（20 条裁决）、`data-model.md`（12 个实体 / 61 条验证规则）、4 份契约（92 条：CLI 20 / 快照 schema 30 / 感知规则 30 / 兼容与测试 12）、`quickstart.md`（8 个自包含场景 + 已执行的 plan-time 基线）与 `feature-ref.md`。`pre-analyze-check.py --stage plan` = `pass`（errors=0，37 条 advisory：预期的新增实现路径缺失 + 既有外部 clause 提示）；Constitution Check 16/16 Pass（两次 fresh-context 只读评审核验并修正了 `--no-sentinel` D4/D5、`legacy-stale`、stale-run 守卫、watchbeat 写入义务、`recover` 信封、Feature 状态声明与 065a/066 双切片身份）。本切片只读实现 `snapshot` / `--probe` / `--self-test` 与共享信封/退出码；八类中断形态（含 `heartbeat-stalled` 与 `lifecycle-spine-violation`）作为注释形态纳入 FR-009，`recover`、`check-spine` 执行与恢复锁留在后续切片。066 是当前上游简报指定的切片 A 执行基座，已跟踪的 065a 计划保留为历史；Feature 状态保持 Planned（无状态回退）。
+
+2026-10-21 `/speckit.tasks`（切片 `065a-state-awareness`）完成：`tasks.md` 落盘 30 条任务（Setup 2 / Foundational 2 / US1 15 / US2 6 / Polish 5）；`validate-tasks.py` 0 error / 0 warning；`decomposition-check.py --mode tasks` 返回 `proceed`（25 FR / 30 tasks）；4 份契约的 60 条条款已改为规范 `C-N` 形态并由任务行完整认领，`account-clause-coverage.py` 报 claimed clauses 60、FR 25/25。Feature 状态保持 `Planned`。**当前活动执行基线**：用户 2026-10-21 决定「拆三片，先 065a」；`065a-state-awareness` 是当前活动执行基线，`065b-interruption-lifecycle` / `065c-recovery` 依次排队；`066-loop-state-awareness-a` 记录为并行早期切分尝试（其历史条目保留，不删除，不以其替代 065a 的当前基线地位）。
+
+2026-10-22 **065a slice implementation-complete with test waiver**（implement 段收口记录）：`065a-state-awareness` 任务 30/30 `[X]`、`[~]`/deferred = 0；确定性门（GATE-1/2/4/5/6/7 与条款认领 claimed 60、FR 25/25）实跑通过，**GATE-3 `waived/void`** —— 用户 2026-10-22 显式豁免测试（原文在 `verification.md` § Test waiver），DoD-4 未声称达成。26 个用例 **not re-run**：last observed 26 failed before T015–T018 implementation (commit 35aa0192); not re-run after T015–T018; current red/green is not evaluated；SC-006 与 T027 NEW 失败数记 not-evaluated（不是 0）。**状态保持 `Planned`**：065a 只是 active slice，065b（watchbeat 写入 / heartbeat-stalled / lifecycle-spine-violation）与 065c（`recover` / salvage 落盘 / 物理隔离）依次排队，本记录不是状态转换，不写 Implemented。证据 owner：`.specify/specs/065a-state-awareness/verification.md`（T028/T030）；评审结论 `PASS WITH WAIVER`、0 P0，见 `.specify/specs/065a-state-awareness/review.md`。
+
+## Key Changes
+
+1. 新增 `loop-state.py` 三动作引擎：`snapshot`（只读聚合）、`recover`（默认 dry-run、`--apply` 落地）、`check-spine`（状态脊校验），外加 `--self-test`；Python 3 标准库、零外部依赖。
+2. 八类中断形态：`unwatched / dead-no-exit-record / deadline-overrun-live / heartbeat-stalled / artifacts-without-completion / stale-signal / lifecycle-spine-violation / remote-unreachable`；每类带证据指针与落脊建议，多条并存时按确定性优先级裁决。
+3. 恢复动作封闭集 `none / watch / verify / resume / retry / stop`：resume 只补提交并交回 U4；retry 原子隔离旧信号后允许下一次派发；stop 写 `stalled` 并生成四要素上送件，不杀进程、不删 worktree。
+4. watchbeat 驱动者存在标记（每窗口开始/返回原子覆盖），只证明驱动者存在，不参与完成/存活判定；同线 `recover --apply` 使用独立原子锁，后到者返回 `locked`。
+5. 状态脊有界机读段（`<!-- loop-state:begin -->` … `<!-- loop-state:end -->`、`spine_schema: v1`、`spine_` 前缀键）与 `check-spine` 校验器；legacy 状态脊降级求值，缺字段记 `unknown`，不猜测。
+6. 驱动者生命周期硬规则：U2 派发与首个 U3 监听窗口 MUST 在同一回合启动；退出前 MUST 落 `stalled` / `reentry-required` 并显式上报；静默退出不是合法输出。
+
+## Implementation Notes
+
+- 不改变 `watch-target.sh` 的判定状态机、信号优先级、退出码与 `--self-test`；watch 域判定唯一 owner 仍是 058 的 `watch-model.md` 与脚本。
+- 不改变 064 的 Registry / lease / reservation / ownership 语义；只读消费 Registry，机读段禁用裸 `state:` 键以避免改变 `line-registry.py` 对首个 `state[:=]` 行的既有读取。
+- 不改变 063 的 fast lane / 两槽位测试预算 / plan 只小修 / stream-json 规则；只引用其 plan-owned 产物集合与阶段基线提交。
+- 不改变各 `/speckit.*` 命令内部流程、三段骨架、哨兵字面量、确认门与 fast-fail 纪律。
+- 默认 dry-run、幂等、隔离而非删除、先写后动；不自动 push/merge/kill、不删除日志/信号/worktree。
+- 框架源为 `skills/external/sdd-loop-driver/`；`.specify/skills/sdd-loop-driver/` 为生成镜像，必须经 `sync-mirrors.py` 再生成并通过一致性检查。
+- `recover` 的退出码统一为 0（求值/应用成功）/1（拒绝、校验失败、并发锁）/2（参数或输入错误）；不得复用 watcher 的 10–16 判定退出码。
+
+## Future Evolution Suggestions
+
+- 按 decomposition gate 的切片建议拆分后，逐切片推进完整 SDD 链，并在每个切片收口时复核本 Feature 的跨切片边界。
+- 将 derived `loop_state` 映射与 watcher 同名判定的一致性纳入契约测试，防止两套词表漂移。
+- 评估把恢复记录接入既有 feedback/probe 机制，形成跨线的中断模式统计，但不得新增常驻采集服务。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/065-loop-interruption-recovery.md
+- Specification: .specify/specs/065-loop-interruption-recovery/requirements.md
+- Slice 065a Specification: .specify/specs/065a-state-awareness/requirements.md
+- Slice 065a Plan: .specify/specs/065a-state-awareness/plan.md
+- Quality Checklist: .specify/specs/065-loop-interruption-recovery/checklists/requirements.md
+- Source Brief Snapshot: .specify/specs/065-loop-interruption-recovery/notes/source-requirement.md
+- Decomposition Gate Record: .specify/specs/065-loop-interruption-recovery/notes/decomposition-gate.md
+
+## Status Tracking
+
+- **Draft**: requirements.md 已通过 validator（0 error / 0 warning）与质量清单 16/16；Related Feature 已新建并绑定（2026-10-21 clarify）。Plan 入口前置 decomposition gate 返回 `split-required`（52 FR > 30），待拆分记录确认后才可派发 plan。切片 A（066）requirements 已于 2026-10-21 clarify 并绑定；Feature 状态由同日 065a plan 推进为 Planned，066 clarify 本身不改变状态。
+- **Planned**: plan.md、data-model.md、contracts/、quickstart.md 就绪，Constitution Check 无未辩护 Fail。**2026-10-21 达成（切片 065a-state-awareness）**：设计件落盘，`pre-analyze-check --stage plan` pass（errors=0），Constitution Check 16/16。**同日切片 066-loop-state-awareness-a plan 也落盘**，pre-analyze pass（errors=0），Constitution Check 16/16；066 为当日早先记录的切片 A 执行基座。**2026-10-21 tasks 阶段记录**：065a `tasks.md` 完成（30 tasks、`validate-tasks.py` 0 error/0 warning、`decomposition-check.py --mode tasks` decision=proceed）；据用户当日「拆三片，先 065a」决定，065a 为当前活动执行基线，065b/065c 依次排队；066 记录为并行早期切分尝试（历史保留，不删除）。状态保持 Planned。
+- **2026-10-22 066 archived**: 066-loop-state-awareness-a 明确标记为 historical/不再推进（`notes/historical.md` + requirements/plan/feature-ref 顶部 banner）；其 analyze gate（2 CRITICAL + 8 HIGH）不再作为阻塞项，active 分析仅对 065a-state-awareness 运行。
+- **Implemented**: tasks.md 全闭合 + verification.md 覆盖全部 SC。
+- **Ready for Review**: 延期任务已解决或显式豁免，评审证据产出。
+- **Completed**: 人工终验。
+
+### Canonical Status State Machine (single source of truth)
+
+见 `templates/feature-details-template.md` § Canonical Status State Machine——本文件不复制其转换表。
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/065-loop-interruption-recovery/requirements.md
+  Quality Checklist: .specify/specs/065-loop-interruption-recovery/checklists/requirements.md
+- Slice 065a Specification: .specify/specs/065a-state-awareness/requirements.md
+  Quality Checklist: .specify/specs/065a-state-awareness/checklists/requirements.md
+  Plan: .specify/specs/065a-state-awareness/plan.md
+  Tasks: .specify/specs/065a-state-awareness/tasks.md（2026-10-21 tasks 阶段；当前活动执行基线）
+  Bind: 2026-10-21 `/speckit.plan`（共享 Feature 065；切片目录独立）
+- Historical Slice (archived 2026-10-22): .specify/specs/066-loop-state-awareness-a/requirements.md
+  Quality Checklist: .specify/specs/066-loop-state-awareness-a/checklists/requirements.md
+  Parent FR Mapping: .specify/specs/066-loop-state-awareness-a/notes/parent-fr-mapping.md
+  Plan: .specify/specs/066-loop-state-awareness-a/plan.md
+  Bind: 2026-10-21 `/speckit.clarify`（共享 Feature 065）；2026-10-22 **archived** — 065a 为 active 执行基线，066 不再实施/分析（见 `notes/historical.md`）
+- Cross-reference: Feature 058 无人值守 SDD 循环驱动机制——U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由 058 拥有；065 只增加观测、恢复与生命周期校验。
+- Cross-reference: Feature 064 Subagent 并发归属、CLI 能力档案与生命周期解耦——Line Registry / lease / reservation / ownership 仍由 064 拥有；065 只读 Registry 作为证据来源。
+- Cross-reference: Feature 063 SDD 循环效率优化——fast lane / 两槽位测试预算 / plan 只小修 / stream-json 仍由 063 拥有；065 只消费 plan-owned 产物集合与阶段基线提交。
+
+**Bind（2026-10-21，`/speckit.clarify` Mode A）**：新建 Feature 065 并绑定本规格为 Draft。核验依据：入口声明 065；065 在 058 的循环机制之上增加独立的状态感知/中断检测/恢复引擎与测试矩阵，属于新增能力域；绑定先例 063（绑定 058 的演化特性）与 064（在 058 之上新建）并存，065 取 064 的新建形态。058 的 Related Specifications 同步增加反向交叉引用。
+
+- 2026-11-09 consolidation: spec dir(s) archived to `.specify/archive/specs/` — 066-loop-state-awareness-a (see `.specify/archive/specs/CONSOLIDATION-LEDGER.md`).

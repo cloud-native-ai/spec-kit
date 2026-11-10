@@ -4,7 +4,7 @@ The ruling this file pins (recorded in `notes/analyze-findings.md` § 2 and regi
 F-093-004): a `[green: <contract>#<clause>]` attribution is a **red-first marker** — the
 row that first turns that clause green. A claimed clause belongs to exactly one row, and
 a feature MAY claim a strict subset of its contract clauses; the clause partition
-(条款分区, `.specify/memory/glossary.md`) is scoped to claimed clauses. The tag's
+(条款分区, `.specify/glossary.md`) is scoped to claimed clauses. The tag's
 definition stays in `templates/tasks-template.md`; this file guards the *validator's
 description* of it from re-acquiring the totality reading the ruling rejected.
 

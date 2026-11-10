@@ -38,7 +38,7 @@ delegation only.
   clear message if a required artifact is missing (tell the user which command to run).
 - **Argument**: free text is **supplemental analysis focus areas**, not standalone
   instructions.
-- **Constitution authority**: `.specify/memory/constitution.md` is non-negotiable in this
+- **Constitution authority**: `.specify/constitution.md` is non-negotiable in this
   scope. A constitution conflict is automatically **CRITICAL** and is resolved by adjusting
   spec/plan/tasks — never by diluting, reinterpreting, or silently ignoring the principle.
   If a principle itself must change, that happens in a separate explicit constitution
@@ -54,9 +54,9 @@ Run the command's declared prerequisite script once from repo root; parse JSON f
 `REQUIREMENTS_DIR` and `AVAILABLE_DOCS`; derive absolute `SPEC` / `PLAN` / `TASKS` paths.
 Abort if a required file is missing. Then derive feature-lookup context (best effort, no
 write): `REQUIREMENTS_KEY` = basename of the requirements dir; `FEATURE_INDEX` =
-`.specify/memory/features.md` (if present); `FEATURE_DETAILS_DIR` =
-`.specify/memory/features/` (if present) — the index rows live in `features.md`, the
-matching detail file at `features/<ID>.md`, and the install-shipped sample at
+`.specify/features.md` (if present); `FEATURE_DETAILS_DIR` =
+`.specify/features/` (if present) — the index rows live in `features.md`, the
+matching detail file at `features/<NNN>-<slug>.md`, and the install-shipped sample at
 `features/*.md`.
 
 Identify the most likely bound feature in this order: (1) explicit references inside
@@ -76,7 +76,7 @@ Load only the minimal necessary context — never the whole artifacts:
 | `tasks.md` | Task IDs, descriptions, phase grouping, `[P]` markers, referenced file paths |
 | `checklists/*.md` | Item text, checked state (`- [ ]` / `- [X]`), and tags — `[Gap]` in particular |
 | feature registry | Index rows (ID, Name, Description, Status, Details link, Last Updated); the matching detail file; its spec-linkage fields |
-| constitution | `.specify/memory/constitution.md` for principle validation |
+| constitution | `.specify/constitution.md` for principle validation |
 
 ### 3. Coverage accounting (fixed read-only step)
 

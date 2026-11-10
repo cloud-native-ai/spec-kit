@@ -11,7 +11,7 @@ The quality gate defaults to the closure checker (`closure-acceptance-check.py`,
 carries a feature's whole slice set, so this step judges once per line and never
 per slice merge; slice merges are the review gate's. The spec directory is read
 from the registry row, never inferred from the branch: the line's `branch` yields
-the feature id (its leading three digits), `.specify/memory/features.md` under the
+the feature id (its leading three digits), `.specify/features.md` under the
 line's worktree yields the `Spec Path` cell for that id, and the directory is that
 cell joined to the worktree (the gate runs with `cwd` = the worktree). A branch
 without a feature id, a missing registry row, an empty or `-` `Spec Path` cell and
@@ -45,7 +45,7 @@ EXIT_FAILED = 3
 SKILL_SCRIPTS = Path(__file__).resolve().parent
 
 CHECKER_REL = "scripts/python/closure-acceptance-check.py"
-FEATURES_REL = Path(".specify") / "memory" / "features.md"
+FEATURES_REL = Path(".specify") / "features.md"
 FEATURE_ID_RE = re.compile(r"^(\d{3})")
 #: Cells that carry no content; a dash is how the registry spells "nothing here".
 EMPTY_CELLS = ("", "-", "--", "—", "–")

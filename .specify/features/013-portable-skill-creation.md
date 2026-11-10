@@ -1,0 +1,136 @@
+# Feature Detail: Skills Command
+
+**Feature ID**: 013  
+**Name**: Skills Command  
+**Description**: Manage extensible skills/tools.  
+**Status**: Implemented  
+**Created**: 2026-02-10  
+**Last Updated**: 2026-07-26
+
+## Overview
+
+The Skills Command defines how Spec Kit creates, installs, describes, and reuses skills and related tool artifacts. It serves as the parent feature for deterministic identification, installation layout, and cross-tool compatibility behaviors that keep project-level skills reusable across assistant surfaces.
+
+## Latest Review
+
+Completed implementation for requirements iteration `008-create-skills-skill`: extracted creation playbook into `create-skills`, refactored `/speckit.skills` into orchestration-only routing, added quality checklist resources, and validated prompt-asset contract tests.
+
+## Key Changes
+
+1. Established the long-lived feature entry for managing extensible skills and related tool artifacts.
+2. Added deterministic `tool_id` and `skill_id` generation/persistence based on canonical workspace-relative paths.
+3. Implemented ID-first resolution with explicit conflict blocking and safe fallback to fuzzy discovery.
+4. Added incremental backfill behavior for historical tool/skill artifacts during refresh/update flows.
+5. Expanded contract/integration/unit tests and updated docs/prompts/templates to keep runtime behavior and guidance consistent.
+6. Started a new requirements iteration to move project-level skill installation from tool-specific directories into `.specify/skills/`, while preserving compatibility through linked entry points.
+7. Generated planning-phase artifacts for `007-skill-install-layout` (`plan.md`, `data-model.md`, `contracts/skill-install-layout.openapi.yaml`, `quickstart.md`) to drive implementation and task decomposition.
+8. Generated implementation task breakdown for `007-skill-install-layout` (`tasks.md`) with explicit MVP-first sequencing and migration/rollback verification gates.
+9. Delivered script-level layout refactor in both runtime and mirrored `.specify` script sets, including compatibility entrypoint creation (symlink-first, placeholder fallback), legacy directory migration with backup guardrails, and conflict error-code output.
+10. Added targeted regression coverage in `tests/contracts/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`, and `tests/unit/test_skills_utils_layout.py`; validated alongside existing resource-id and create-skill suites.
+11. Added a new requirements slice for delegating missing-Skill creation to `create-skills` and existing-Skill refinement to `improve-skills` from the skills command.
+12. Generated planning-phase artifacts for `008-create-skills-skill` (`plan.md`, `research.md`, `data-model.md`, `contracts/create-skills-workflow.openapi.yaml`, `quickstart.md`, `feature-ref.md`) to drive implementation and task decomposition.
+13. Generated implementation task breakdown for `008-create-skills-skill` (`tasks.md`) with MVP-first extraction, command routing refactor, quality-preservation checks, and regression validation tasks.
+14. Completed `008-create-skills-skill` implementation by adding `skills/create-skills/SKILL.md`, mirroring `.specify/skills/create-skills/`, creating `references/skill-creation-quality-checklist.md`, updating `.specify/instructions.md` Skills registry, and validating with `tests/contract/test_create_skills_prompt_assets.py`.
+15. Started a new requirements iteration `012-skill-home-workdir` to introduce two named, agent-engine-agnostic path variables in the `/speckit.skills` orchestration template: `SKILL_HOME` (the resolved real on-disk Skill directory, source of truth for Skill-owned resource references) and `SKILL_WORKDIR` (the runtime working directory of Skill-invoked processes, source of truth for user-facing path references), with downstream propagation to `create-skills`/`improve-skills` and a documented migration mapping from legacy `./` and `SKILL_ROOT` idioms.
+16. Generated planning-phase artifacts for `012-skill-home-workdir` (`plan.md`, `research.md`, `data-model.md`, `contracts/skill-home-workdir-template.openapi.yaml`, `quickstart.md`, `feature-ref.md`). Locked in the portable `cd … && pwd -P` script self-locate idiom (no GNU coreutils dependency), confirmed `SKILL_HOME` supersedes `SKILL_ROOT` everywhere in scope (FR-008 / SC-006), defined the four-file edit set (`templates/commands/skills.md`, `skills/create-skills/SKILL.md` + mirror, `skills/improve-skills/SKILL.md` + mirror), and authored a structural OpenAPI contract that a new CI test (`tests/contract/test_skill_home_workdir_template.py`) will assert in lock-step with the documentation edits.
+17. Generated implementation task breakdown for `012-skill-home-workdir` (`tasks.md`) with 22 tasks across 6 phases: Setup (T001 — test file skeleton), Foundational (T002 — shared assertion fixtures), US1 MVP (T003–T007 — `${SKILL_HOME}` in template + create-skills SKILL.md + mirror), US2 MVP (T008–T010 — `${SKILL_WORKDIR}` + Paired Example in template), US3 P2 (T011–T015 — Migration Mapping + improve-skills legacy-idiom detection + mirror), and Polish (T016–T022 — residual `SKILL_ROOT` grep, SC-003 symlink-layout verification, SC-004 six-Skill regression smoke, quickstart end-to-end, mirror byte-equivalence final check, Feature Index update). TDD ordering enforced via explicit `pytest -m contract` fail/pass checkpoints (T003A/T007, T008A/T010, T011A/T015) before and after each story's implementation tasks.
+18. Completed `012-skill-home-workdir` implementation. Added `${SKILL_HOME}` / `${SKILL_WORKDIR}` convention to `templates/commands/skills.md` (new sections: Path Conventions, Computation Idioms, Paired Example, Migration Mapping, Non-shell Agents, Nested Invocations), renamed `SKILL_ROOT` → `SKILL_HOME` in `skills/create-skills/SKILL.md` and its `.specify/skills/` mirror with adoption sentences for both variables, added legacy-idiom detection to `skills/improve-skills/SKILL.md` and its mirror, and added structural contract test `tests/contract/test_skill_home_workdir_template.py` (22 assertions, all passing) covering FR-001 through FR-016 and SC-005/SC-006 plus the Nested-Invocations edge case resolution (F2 remediation). SC-003 verified empirically: a canary Skill invoked via both `.specify/skills/<name>/` and `.github/skills/<name>/` symlink resolved `${SKILL_HOME}` to the same canonical path. SC-004 verified structurally: 4 unedited Skills (analysis-project, draw-d3js, draw-echarts, draw-plantuml) have zero git diff from HEAD; 2 edited Skills (create-skills, improve-skills) have byte-equivalent mirrors. Real LLM-driven Skill execution remains the operator's final SC-004 confirmation. F5 (deleted-cwd `pwd -P` returning empty) empirically observed during T018 cleanup but deferred to a follow-up iteration per analyze-phase prioritization.
+19. Started a new requirements iteration `013-portable-skill-creation` to remove environment-specific tool-discovery logic from the skill creation workflow, making created skills portable across environments where tool manifests or `refresh-tools.sh` may not be available. Scope covers `templates/commands/skills.md`, `skills/create-skills/SKILL.md`, `templates/skills-template.md`, `scripts/bash/create-new-skill.sh`, and the quality checklist.
+20. Generated planning-phase artifacts for `013-portable-skill-creation` (`plan.md`, `data-model.md`, `contracts/portable-skill-creation.openapi.yaml`, `quickstart.md`, `feature-ref.md`). Identified 7 changes across 4 primary files + 2 mirrors + 1 quality checklist + 1 script, with TDD ordering (tests first).
+21. Generated implementation task breakdown for `013-portable-skill-creation` (`tasks.md`) with 41 tasks across 7 phases: Setup (T001), Foundational contract tests (T002–T011), US1 P1 create-skills workflow (T012–T016), US2 P1 skill template (T017–T019), US3 P2 orchestration template (T020–T024), US4 P3 script behavior (T025–T031), and Polish (T032–T041). All 4 user stories edit different files — fully parallelizable after foundational tests are written.
+22. Completed `013-portable-skill-creation` implementation. Removed `refresh_tools_for_target()` function and all call sites from `scripts/bash/create-new-skill.sh`. Removed Step 3 ("Obtain available tools information") from `skills/create-skills/SKILL.md` and renumbered remaining steps. Removed "### Tools" subsection and renamed "Available Tools & Resources" → "Resources" in `templates/skills-template.md`. Removed `tools/` from directory layout and Step 6 ("Tool manifests") from modernization checklist in `templates/commands/skills.md`. Updated quality checklist and `improve-skills/SKILL.md` to remove tool-manifest validation references. Added 9 contract tests in `tests/contract/test_portable_skill_creation.py` (all passing). Updated `test_create_skills_prompt_assets.py` to remove `./tools/` from expected patterns. All mirrors synced. 234 tests pass, 4 pre-existing failures unrelated to this change.
+
+23. Started a new requirements iteration `017-consolidate-draft-skills` to consolidate 9 draft skills from `draft/skills/` into 3 formal skills: `document-utils` (merging docx-utils, pdf-utils, pptx-utils, theme-creator, xlsx-utils), `database-utils` (merging mysql-utils, postgres-utils; adding ClickHouse/PostgreSQL-protocol and Apache Doris/SelectDB/MySQL-protocol support), and `browser-utils` (merging playwright-utils, web-test). Draft skills to be removed after consolidation.
+24. Generated planning-phase artifacts for `017-consolidate-draft-skills` (`plan.md`, `data-model.md`, `contracts/skill-format.md`, `quickstart.md`, `feature-ref.md`). Key design decisions: shared `scripts/office/` deduplication across document formats, unified database query dispatcher with protocol field in connections config, language-separated browser scripts (JS under `scripts/js/`, Python under `scripts/python/`).
+25. Generated implementation task breakdown for `017-consolidate-draft-skills` (`tasks.md`) with 50 tasks across 6 phases: Setup (T001–T003), US1 P1 document-utils (T004–T019), US2 P1 database-utils (T020–T032), US3 P1 browser-utils (T033–T042), US4 P2 draft removal (T043–T044), Polish (T045–T050). All 3 P1 user stories are fully parallelizable (independent skills, different directories).
+26. Completed `017-consolidate-draft-skills` implementation. Created 3 formal skills: `document-utils` (1,469-line SKILL.md, 89 files merging 5 drafts with shared office scripts deduplicated), `database-utils` (unified query dispatcher with protocol detection supporting MySQL/PostgreSQL/ClickHouse/Doris, 9 files), `browser-utils` (dual JS/Python SKILL.md with decision tree, 8 files). All skills mirrored to `.specify/skills/`, byte-equivalence verified. All 9 draft skill directories removed. All 50 tasks closed.
+27. Started a new requirements iteration `030-summarize-project` to create the `summarize-project` skill for visual project summarization and reporting: it delegates chart rendering to the `draw-plantuml` skill — WBS (`@startwbs`) for hierarchical work decomposition and Gantt (`@startgantt`) for milestones/schedules — so external stakeholders can grasp project progress at a glance. Feature binding resolved via `/speckit.clarify` (bound to 013 per skill-lifecycle precedent).
+28. Scope-extended iteration `030-summarize-project` at planning time per user directive into a dual-workstream requirement: (A) create `skills/summarize-project/` (new), (B) enhance `skills/analysis-project/` with UML diagramming actions for primary report views (structure/flow/deployment) while preserving its existing workflow and Mermaid secondary sketches. Generated planning-phase artifacts (`plan.md`, `data-model.md`, `contracts/visual-reporting-skills.openapi.yaml`, `quickstart.md`, `feature-ref.md`); key decisions locked: delegation-not-duplication to `draw-plantuml`, five-step reporting workflow with two-chart consistency rule (FR-009), four injection points in analysis-project SKILL.md, structural contract tests first (Red-Green) under `tests/contract/`.
+29. Re-clarified iteration `030-summarize-project` (Mode A′ user-directed requirement re-clarification): resolved 4 decisions — summary report default location `docs/project-summary/` (FR-010), analysis UML figures under `docs/figures/` (FR-019), strict UML-primary/Mermaid-secondary split (FR-018), `activity` as behavior-flow alternative (FR-017) — cascaded into requirements/data-model/contracts/plan/quickstart.
+30. Generated implementation task breakdown for `030-summarize-project` (`tasks.md`): 38 tasks across 7 phases — Setup (T001–T002), Foundational test infrastructure (T003–T004), US1 P1 summary report MVP (T005–T014A, 11 tasks), US2 P2 progress/milestones (T015–T018A, 5 tasks), US4 P2 analysis-project UML enhancement (T019–T026A, 9 tasks), US3 P3 scope/audience adaptation (T027–T029A, 4 tasks), Polish (T030–T034). Tests Mode ON (Principle IV); Red-Green checkpoints per story; WS-A chain (US1→US2→US3) sequential on shared files, WS-B (US4) parallelizable; dry-run verification tasks (T014A/T018A/T026A/T029A) marked as deferral-eligible with registration discipline.
+31. Completed `030-summarize-project` implementation: created `skills/summarize-project/` (five-step workflow SKILL.md + references/reporting-playbook.md, no scripts/ — full delegation to draw-plantuml) and enhanced `skills/analysis-project/` (4 injection points + references/uml-visualization-guide.md with view→type mapping incl. activity alternative). Added 36 structural contract tests (`test_summarize_project_prompt_assets.py` 21, `test_analysis_project_uml_assets.py` 15) all green; full contract suite 52F/440P vs baseline 53F/403P = 0 new failures. Dry-run artifacts produced and verified: `docs/project-summary/` (full-lifecycle WBS+Gantt HTML report), `docs/project-summary/executive/` (Q3-scoped, executive-granularity variant), and a delegation smoke render in `docs/figures/` — all cleaned post-verification per user policy (test files deleted after testing). Registry updated (22 skills) + mirrors byte-equivalent. T026A deferred ([~] full analysis-project E2E); verification.md records SC-001/003/004/007 pass, SC-002 partial, SC-005/006 deferred. US2/US3 content was front-loaded into initial SKILL.md/playbook authoring and verified by later assertion sets.
+32. Evolved `summarize-project` into `manage-project` (lightweight project management, per user goal 2026-07-25): one Markdown management document (default `.specify/project/project.md`) is the single source of truth covering the four PM elements — background (text), milestones (milestone-only `@startgantt` view + tracking table with achieved/pending/at-risk), main work (WBS `@startwbs`), progress tracking (Gantt with three-state semantics + current-date reference). Charts are text-form: PlantUML source embedded in ```plantuml blocks (editable/diffable); rendering validation delegated to draw-plantuml; repeat runs update incrementally (update mode preserves user edits). Six-step workflow replaces the five-step reporting flow; `references/reporting-playbook.md` → `references/management-playbook.md` (adds §1 document skeleton + §2 update-mode rules). Contract tests renamed to `test_manage_project_prompt_assets.py` (incl. legacy-removal and stale-registry-row guards); registry row and skills list updated; mirrors byte-equivalent.
+33. Upgraded `manage-project` via improve-skills (user direction 2026-07-25) from a document manager into a project-management framework: added a basic agile management loop (requirement → feature → task/staffing → testcase → evaluation, iterated) as the process backbone with a `## 迭代记录` append-only iteration log in the document skeleton and a new Step 7 (iteration evaluation drives next-cycle inputs); loop stages anchor to existing spec-kit artifacts (requirements.md / features.md+features/<ID>.md / tasks.md / tests+checklists+verification.md / review+feedback) with non-spec-kit fallbacks — anchors only, never content copies; reserved integration extension points (Jira / CI-CD / SCM via a per-stage source convention, explicit no-implementation red line). Also codified two dogfood-run regressions (deterministic `today is N days after start` anchoring; milestones copied verbatim into the progress gantt at generation time) and a canonical block-extraction+render command in playbook §7. Contract tests 27→32 green; spec-kit instance doc `.specify/project/project.md` gained iteration row 1 (spec 032 loop).
+34. Refactored `manage-project` into `visualize-project` via improve-skills (user direction 2026-07-25): spec-kit itself already covers the PM input side (requirements/features/tasks modules), so the management positioning overlapped the framework; the skill is repositioned as a read-only **presentation/output tool** that produces a derived visual status report (overview, requirements & features, WBS functional decomposition, milestone view, task-progress Gantt) — the agile management loop, iteration log, and integration extension seams were dropped. Added SpecKit auto-detection: projects with `.specify/` structure use its artifacts (specs/*/requirements.md, specs/*/tasks.md, .specify/features.md) as primary sources; non-SpecKit projects fall back to code structure, README/docs, external documents, and git history (inputs not limited to code). Deterministic source detection codified into `skills/internal/summarize-project/scripts/detect-project-sources.py` (JSON output, replaces the old no-scripts constraint); `references/management-playbook.md` → `references/visualization-playbook.md` (derived-report refresh semantics replace incremental update-mode rules); report default `.specify/project/visualization.md` (SpecKit) / `docs/project-visualization.md` (non-SpecKit). `manage-project` added to `_OBSOLETE_SKILLS` cleanup manifest; contract tests renamed to `test_visualize_project_prompt_assets.py`; registry row and skills list (22 total) updated; mirrors byte-equivalent.
+35. Renamed `visualize-project` back to `summarize-project` via improve-skills (user direction 2026-07-26): the report pairs **textual summary** (overview narrative, feature prose) **with visual charts**, so "summarize" names the skill more accurately than "visualize" — this also returns the skill to its original spec-030 name. Pure rename + framing edit, no positioning change: frontmatter/description reframed as "文本综述与可视化图表并重", `references/visualization-playbook.md` → `references/reporting-playbook.md`, report defaults → `.specify/project/summary.md` (SpecKit) / `docs/project-summary.md` (non-SpecKit), detect-script output updated, `visualize-project` added to `_OBSOLETE_SKILLS` alongside `manage-project`, contract tests renamed to `test_summarize_project_prompt_assets.py` (adds legacy-visualize guards + stale-row guards for both predecessor names), registry row and skills list updated; mirrors byte-equivalent.
+
+## Implementation Notes
+
+- This feature spans both `/speckit.skills` and `/speckit.tools` flows when they create or reference reusable artifacts.
+- The current enhancement assumes canonical IDs are expressed as workspace-relative paths so they are human-readable and stable within the repository.
+- Historical artifacts may be upgraded incrementally when they are next refreshed or rewritten.
+- The current installation-layout iteration treats `.specify/skills/` as the single project-level source of truth and frames `.github/skills/` plus other tool-specific roots as compatibility surfaces.
+- The current create-skills iteration preserves `/speckit.skills` as the explicit orchestration entrypoint while moving reusable Skill-authoring knowledge into a dedicated Skill.
+
+## Future Evolution Suggestions
+
+- Extend deterministic IDs to other reusable artifact types if exact reference flows prove valuable.
+- Add telemetry or review hooks to compare ambiguous discovery versus exact-ID resolution success rates.
+- Consider compatibility guidance for renamed or moved artifacts if repository refactors become common.
+- Consider expanding the compatibility-entry abstraction so newly supported assistant tools can reuse the same installation contract without additional one-off path logic.
+
+## Related Files
+
+- Cross-reference: Feature 048 Browser Utils Skill(浏览器自动化能力本体;本 Feature 仅覆盖技能管理编排,不含各技能能力内容)
+- Latest Specification: .specify/specs/030-summarize-project/requirements.md
+- Latest Quality Checklist: .specify/specs/030-summarize-project/checklists/requirements.md
+- Historical Specification: .specify/specs/017-consolidate-draft-skills/requirements.md
+- Historical Quality Checklist: .specify/specs/017-consolidate-draft-skills/checklists/requirements.md
+- Historical Specification: .specify/specs/013-portable-skill-creation/requirements.md
+- Historical Quality Checklist: .specify/specs/013-portable-skill-creation/checklists/requirements.md
+- Latest Plan: .specify/specs/030-summarize-project/plan.md
+- Latest Data Model: .specify/specs/030-summarize-project/data-model.md
+- Latest Contract: .specify/specs/030-summarize-project/contracts/visual-reporting-skills.openapi.yaml
+- Latest Quickstart: .specify/specs/030-summarize-project/quickstart.md
+- Latest Feature Reference: .specify/specs/030-summarize-project/feature-ref.md
+- Historical Plan: .specify/specs/013-portable-skill-creation/plan.md
+- Historical Data Model: .specify/specs/013-portable-skill-creation/data-model.md
+- Historical Contract: .specify/specs/013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml
+- Historical Quickstart: .specify/specs/013-portable-skill-creation/quickstart.md
+- Historical Feature Reference: .specify/specs/013-portable-skill-creation/feature-ref.md
+- Latest Tasks: .specify/specs/013-portable-skill-creation/tasks.md
+- Historical Specification: .specify/specs/012-skill-home-workdir/requirements.md
+- Historical Plan: .specify/specs/012-skill-home-workdir/plan.md
+- Latest Research: .specify/specs/012-skill-home-workdir/research.md
+- Latest Data Model: .specify/specs/012-skill-home-workdir/data-model.md
+- Latest Contract: .specify/specs/012-skill-home-workdir/contracts/skill-home-workdir-template.openapi.yaml
+- Latest Quickstart: .specify/specs/012-skill-home-workdir/quickstart.md
+- Latest Feature Reference: .specify/specs/012-skill-home-workdir/feature-ref.md
+- Latest Quality Checklist: .specify/specs/012-skill-home-workdir/checklists/requirements.md
+- Latest Tasks: .specify/specs/012-skill-home-workdir/tasks.md
+- Historical Specification: .specify/specs/008-create-skills-skill/requirements.md
+- Latest Quality Checklist: .specify/specs/008-create-skills-skill/checklists/requirements.md
+- Latest Plan: .specify/specs/008-create-skills-skill/plan.md
+- Latest Research: .specify/specs/008-create-skills-skill/research.md
+- Latest Data Model: .specify/specs/008-create-skills-skill/data-model.md
+- Latest Contract: .specify/specs/008-create-skills-skill/contracts/create-skills-workflow.openapi.yaml
+- Latest Quickstart: .specify/specs/008-create-skills-skill/quickstart.md
+- Latest Feature Reference: .specify/specs/008-create-skills-skill/feature-ref.md
+- Latest Tasks: .specify/specs/008-create-skills-skill/tasks.md
+- Historical Specification: .specify/specs/007-skill-install-layout/requirements.md
+- Historical Quality Checklist: .specify/specs/007-skill-install-layout/checklists/requirements.md
+- Historical Plan: .specify/specs/007-skill-install-layout/plan.md
+- Historical Data Model: .specify/specs/007-skill-install-layout/data-model.md
+- Historical Contract: .specify/specs/007-skill-install-layout/contracts/skill-install-layout.openapi.yaml
+- Historical Quickstart: .specify/specs/007-skill-install-layout/quickstart.md
+- Historical Tasks: .specify/specs/007-skill-install-layout/tasks.md
+- Historical Tasks: .specify/specs/005-tool-skill-ids/tasks.md
+- Historical Plan: .specify/specs/005-tool-skill-ids/plan.md
+- Historical Data Model: .specify/specs/005-tool-skill-ids/data-model.md
+- Historical Contract: .specify/specs/005-tool-skill-ids/contracts/deterministic-resource-ids.openapi.yaml
+- Historical Quickstart: .specify/specs/005-tool-skill-ids/quickstart.md
+- Historical Specification: .specify/specs/005-tool-skill-ids/requirements.md
+- Historical Specification: .specify/specs/013-013-skills-command/requirements.md
+- Feature Index: .specify/.specify/features.md
+- Feature Detail: .specify/.specify/features/013-portable-skill-creation.md
+- Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——新增 run-skills 承载 /speckit.skills 缺失的 run 语义；modify 族仍由 improve-skills/merge-skills/think-skills 承载，无新 modify 技能。
+
+## Status Tracking
+
+- **Draft**: Concept defined.
+- **Planned**: Spec approved.
+- **Implemented**: Code written.
+- **Ready for Review**: Tests passing.
+- **Completed**: Merged and available.
+
+- 2026-11-09 consolidation: spec dir(s) archived to `.specify/archive/specs/` — 007-skill-install-layout, 008-create-skills-skill, 017-consolidate-draft-skills (see `.specify/archive/specs/CONSOLIDATION-LEDGER.md`).

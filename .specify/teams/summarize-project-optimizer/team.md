@@ -89,7 +89,7 @@ binding:
 **北极星（可验证）**：反复迭代优化 `skills/summarize-project` 技能定义，使其生成的项目总结报告达到用户预期——**文本综述与可视化图表并重**、可溯源、单文件自包含，外部读者一眼看清项目结构与进度。
 
 - **优化对象（target）**：`skills/summarize-project/`（SKILL.md + references/ 六份层文档）——迭代真正修改的东西。
-- **基准（benchmark）**：spec-kit 项目自身（`.specify/` 工件：specs/*/requirements.md、tasks.md、memory/features.md 等）——不动的输入，每代由它重新生成被评分的报告。
+- **基准（benchmark）**：spec-kit 项目自身（`.specify/` 工件：specs/*/requirements.md、tasks.md、.specify/features.md 等）——不动的输入，每代由它重新生成被评分的报告。
 - **达标条件（每轮）**：加权评分 ≥ **0.85**，权重为 `图表质量 0.40 / 内容忠实 0.25 / 叙述质量 0.20 / 一致合规 0.15`。
 - **优先级约束**：**图表质量权重最高**——当前技能的主要短板在可视化效果（WBS/甘特/里程碑图的清晰与美观）。
 - **优化分类**：持续优化 + 淘汰（elimination）策略。单次 run 到阈值/上限即停；作为可复用团队多轮 re-run 逐代累积改进。改进落在 `skills/summarize-project/` 并双写同步 `.specify/skills/summarize-project/`。

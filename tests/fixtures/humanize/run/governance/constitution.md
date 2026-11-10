@@ -1,6 +1,6 @@
 # Governance projection — constitution（摘要投影桩）
 
-- source: `.specify/memory/constitution.md`
+- source: `.specify/constitution.md`
 - projection: 相关段落摘录（摘要优先，不整文件注入）
 - status: read
 - primary_language: zh

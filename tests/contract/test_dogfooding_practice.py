@@ -14,7 +14,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CONSTITUTION = ROOT / ".specify" / "memory" / "constitution.md"
+CONSTITUTION = ROOT / ".specify" / "constitution.md"
 SRC = ROOT / "templates" / "instructions-template.md"
 MIRROR = ROOT / ".specify" / "templates" / "instructions-template.md"
 DOC = ROOT / "shared" / "guidelines" / "dogfooding.md"
@@ -118,7 +118,7 @@ SECTION_HEADING = "## Dogfooding Practice"
 # red-lines-and-surfaces.md C-62 — the sole authorized engine face besides the
 # review script's capture/--format json). Compatibility plan + non-precedential
 # declaration: .specify/specs/072-client-self-improvement/notes/
-# compatibility-plan-c61.md and .specify/memory/features/072.md. The pin still
+# compatibility-plan-c61.md and .specify/features/072-client-self-improvement.md. The pin still
 # fails on any OTHER unannounced action.
 FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest", "ingest-exec-quant", "client-metrics"}
 PROBE_ENGINE_ACTIONS = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}

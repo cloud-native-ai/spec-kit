@@ -43,7 +43,7 @@ class TestIdempotence:
         [
             "skills/external/demo/SKILL.md",
             "skills/internal/demo/SKILL.md",
-            "memory/constitution.md",
+            "memory/session/note.md",
             ".specify/skills/external/demo/SKILL.md",
         ],
     )

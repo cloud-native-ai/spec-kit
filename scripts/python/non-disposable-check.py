@@ -105,7 +105,7 @@ REVIEW_SURFACE_FACT = "non-disposable-review-surface"
 CLOSURE_CHECKER = "closure-acceptance-check.py"
 
 #: The registry a status claim is read from.
-FEATURES_REL = ".specify/memory/features.md"
+FEATURES_REL = ".specify/features.md"
 
 #: The owner page — the class set is read from it, never from a literal here (C-101).
 OWNER_PAGE_REL = "shared/definitions/non-disposable-definitions.md"
@@ -859,7 +859,7 @@ def class_orphan_path(root: Path, candidates):
 FEATURE_REF_ID_RE = re.compile(r"^\|\s*Feature ID\s*\|\s*(\d{3})\s*\|", re.MULTILINE)
 TEAM_NAME_RE = re.compile(r"^(?:name|slug|team_name)\s*:\s*(.+)$", re.MULTILINE)
 TEAM_ID_RE = re.compile(r"\b(\d{3})\b")
-FEATURE_REF_PATH_RE = re.compile(r"\.specify/memory/features/(\d{3})\.md")
+FEATURE_REF_PATH_RE = re.compile(r"\.specify/(?:memory/)?features/(\d{3})(?:-[a-z0-9-]+)?\.md")
 
 
 def class_renumber_live_binding(root: Path, candidates):

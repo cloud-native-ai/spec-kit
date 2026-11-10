@@ -19,6 +19,7 @@ reads the framework runtime scripts tree.
 import argparse
 import json
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -170,7 +171,7 @@ def criterion_a(requirements_text, tasks_text):
 
 
 def criterion_b(paths):
-    hit = [path for path in paths if path == ".specify/memory/constitution.md"]
+    hit = [path for path in paths if path == ".specify/constitution.md"]
     return not hit, ("constitution touched: %s" % hit if hit
                      else "constitution untouched in base..HEAD + worktree")
 
@@ -250,8 +251,10 @@ def criterion_f(project, requirements_text):
     if not match:
         return False, "Related Feature binding not declared"
     feature_id = match.group(1)
-    registry = os.path.join(project, ".specify", "memory", "features.md")
-    detail = os.path.join(project, ".specify", "memory", "features", feature_id + ".md")
+    registry = os.path.join(project, ".specify", "features.md")
+    details_root = pathlib.Path(project, ".specify", "features")
+    details = sorted(details_root.glob(feature_id + "-*.md"))
+    detail = details[0] if details else details_root / (feature_id + "-<slug>.md")
     if not os.path.isfile(registry):
         return False, "feature registry missing: %s" % registry
     if feature_id not in read_file(registry):

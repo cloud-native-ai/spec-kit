@@ -27,7 +27,7 @@ template keeps entry, input wiring, and lifecycle delegation only.
   command template owns the User Input wiring.
 - **Glossary anchoring (runs first)**: apply the glossary protocol in
   `.specify/shared/workflow/glossary.md`, reading the project glossary at
-  `.specify/memory/glossary.md` (ambient via the Documentation Map). That file owns
+  `.specify/glossary.md` (ambient via the Documentation Map). That file owns
   every rule of this step — input correction and anchoring, progressive enrichment at
   wrap-up, conflict detection, manual edits and user precedence — and this skill
   restates none of them. Step 5.5's concept-name handling leans on the file's

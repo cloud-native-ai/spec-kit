@@ -2,7 +2,7 @@
 
 Guards the house pattern:
   * ``shared/guidelines/directory-governance.md`` — owner (+ runtime mirror)
-  * ``templates/constitution-template.md`` / ``.specify/memory/constitution.md`` — principle
+  * ``templates/constitution-template.md`` / ``.specify/constitution.md`` — principle
   * ``skills/internal/manage-constitution/SKILL.md`` — generator MUST-include entry
   * ``templates/instructions-template.md`` (+ mirror + live) — ambient pointer
 
@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OWNER = ROOT / "shared" / "guidelines" / "directory-governance.md"
 OWNER_MIRROR = ROOT / ".specify" / "shared" / "guidelines" / "directory-governance.md"
 TEMPLATE = ROOT / "templates" / "constitution-template.md"
-LIVE = ROOT / ".specify" / "memory" / "constitution.md"
+LIVE = ROOT / ".specify" / "constitution.md"
 SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
 INSTR_TEMPLATE = ROOT / "templates" / "instructions-template.md"
 INSTR_MIRROR = ROOT / ".specify" / "templates" / "instructions-template.md"
@@ -172,7 +172,7 @@ def test_remote_capable_skills_bind_target_governance(path: Path):
     assert "目标项目治理优先" in body, (
         "a skill that can act on a remote target must bind the target's governance"
     )
-    assert ".specify/memory/constitution.md" in body
+    assert ".specify/constitution.md" in body
     assert ".specify/instructions.md" in body
     assert re.search(r"MUST NOT[^。\n]*ad-hoc 目录|ad-hoc 目录[^。\n]*MUST NOT", body), (
         "the skill must forbid ad-hoc directory creation in the target repository"

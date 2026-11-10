@@ -208,7 +208,7 @@ Independent **Targets** are advanced **concurrently by default**: when two or mo
 | **Goal–Team Binding** | One-way `goal_slug` reference, N teams : 1 Goal, identity-only | here |
 | **Team Goal** | A team's reference to the Project-level Goal it serves | here; declared in `.specify/teams/<slug>/team.md` |
 | **Requirement** | Feature-bound spec of testable clauses (FR/SC) driving plan → tasks → implement → verification | `.specify/specs/<ID>-<slug>/requirements.md`; `/speckit.requirements` |
-| **Feature** | Long-lived capability entry in the feature index | `.specify/memory/features.md` |
+| **Feature** | Long-lived capability entry in the feature index | `.specify/features.md` |
 | **Success Criteria (SC-xxx)** | Per-feature measurable outcomes — authority limited to their Feature | requirements spec of that Feature |
 | **Team** | Multi-agent structure organized around (exactly one) Goal; its own concept side is the team owner's | `skills/internal/create-team/references/conceptual-model.md` |
 | **Target** (this document) | Run-assignable sub-outcome (scope slice) under exactly one Goal — an annex to the definition, unordered, authored via `/speckit.goal` | here; persisted in that Goal's `goal.md` (`## Targets`) |

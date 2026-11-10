@@ -244,7 +244,7 @@ Please share the contents of this document with the spec-kit framework developer
 | [REQUIREMENT_ID] | Sequential three-digit requirement identifier from branch name (e.g., 023) |
 | [REQUIREMENT_NAME] | Short human-readable name of the requirement/specification |
 | [REQUIREMENTS_KEY] | Combined ID + slug used as spec directory name (e.g., 023-cross-platform-build) |
-| [FEATURE_ID] | Sequential three-digit feature identifier from `.specify/memory/features.md` (e.g., 021) |
+| [FEATURE_ID] | Sequential three-digit feature identifier from `.specify/features.md` (e.g., 021) |
 | [FEATURE_NAME] | Short human-readable name of the parent feature |
 | [REPO_NAME] | Repository basename (`basename "$(git rev-parse --show-toplevel)"`) |
 | [REPO_URL] | Repository origin URL (https form preferred), or `(no remote configured)` |

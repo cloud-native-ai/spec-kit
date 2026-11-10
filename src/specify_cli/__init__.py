@@ -1562,6 +1562,17 @@ def rewrite_paths(content: str) -> str:
     """
     import re
 
+    # Project anchors live at the `.specify/` root, not under `memory/`
+    # (2026-11-10 anchor-layout move): claim their source-form refs before the
+    # generic `memory/` prefix rule can.
+    for anchor in ("features.md", "constitution.md", "glossary.md", "register.md", "tools.md"):
+        content = re.sub(
+            rf"(?<![\w./-])memory/{re.escape(anchor)}",
+            rf".specify/{anchor}",
+            content,
+        )
+    content = re.sub(r"(?<![\w./-])memory/features/", ".specify/features/", content)
+
     # Only rewrite a segment that STARTS a path reference. The lookbehind rejects
     # any preceding path character, which covers both an existing `.specify/`
     # prefix and nested references such as `skills/<name>/templates/`.
@@ -2248,12 +2259,13 @@ def copy_local_templates(
             memory_dest = specify_dir / "memory"
             memory_dest.mkdir(exist_ok=True)
 
-            # Specific files to handle
+            # Project anchors live at the `.specify/` root, not under `memory/`
+            # (2026-11-10 anchor-layout move); only the store subdirectories stay.
             memory_files = ["constitution.md", "features.md"]
 
             for filename in memory_files:
                 src_file = memory_src / filename
-                dest_file = memory_dest / filename
+                dest_file = specify_dir / filename
 
                 if src_file.exists():
                     if tracker:
@@ -3189,7 +3201,7 @@ def init(
             )
             raise typer.Exit(1)
         # Ensure the features directory exists under .specify/memory for downstream workflows
-        features_dir = project_path / ".specify" / "memory" / "features"
+        features_dir = project_path / ".specify" / "features"
         try:
             features_dir.mkdir(parents=True, exist_ok=True)
             tracker.complete("features-dir", f"created {features_dir}")

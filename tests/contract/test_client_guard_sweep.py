@@ -494,12 +494,12 @@ def test_c56_changed_paths_stay_on_the_declared_edit_surface():
         # ID register is updated by review's REC-registration duty (071/063
         # obligations) — a legitimate project record, not a hand edit of
         # framework sources. Narrow exact entry; do NOT widen .specify/memory/.
-        ".specify/memory/register.md",
+        ".specify/register.md",
     }
     allowed_prefixes = (
         "docs/reference/commands/",   # command reference docs (C-56)
         ".specify/specs/072-client-self-improvement/",   # this feature's spec artifacts
-        ".specify/memory/features",    # feature registry rows (072 line + detail)
+        ".specify/features",    # feature registry rows (072 line + detail)
         ".specify/memory/exec-quant/records/",   # dogfooding loop records (new entries only)
         ".specify/memory/session/",                # dogfooding loop records (new entries only)
         ".specify/memory/feedback/",               # dogfooding loop records (new entries only)
@@ -551,7 +551,7 @@ def test_c57_shipped_text_adds_no_fresh_neutrality_violation():
                 re.compile(r"\b(?:req|requirement)\s+\d{3}\b", re.IGNORECASE),
                 re.compile(r"\bFeature\s+\d{3}\b"),
                 re.compile(r"\.specify/specs/\d{3}-"),
-                re.compile(r"\.specify/memory/features/\d{3}"),
+                re.compile(r"\.specify/features/\d{3}"),
             ):
                 if pattern.search(text):
                     violations.setdefault(rel, []).append(pattern.pattern)

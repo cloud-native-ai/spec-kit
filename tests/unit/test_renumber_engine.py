@@ -43,7 +43,7 @@ FEATURES_MD = """# Features
 
 | ID | Feature Name | Brief | Status | Feature Details | Spec Path | Last Updated |
 |----|--------------|-------|--------|-----------------|-----------|--------------|
-| 001 | Alpha | first | Draft | .specify/memory/features/001.md | .specify/specs/001-alpha/requirements.md | 2026-01-01 |
+| 001 | Alpha | first | Draft | .specify/features/001-unify-command-handoffs.md | .specify/specs/001-alpha/requirements.md | 2026-01-01 |
 """
 
 REGISTER_MD = """# ID Register (编号登记册)
@@ -72,8 +72,8 @@ def ws(tmp_path: Path) -> Path:
           "# Tasks\n\n- [ ] T001 first task\n- [ ] T001 duplicated task\n")
     write(tmp_path, ".specify/specs/001-alpha/checklist.md",
           "# Checklist\n\n- [ ] CHK001 first check\n- [ ] CHK001 duplicated check\n")
-    write(tmp_path, ".specify/memory/features.md", FEATURES_MD)
-    write(tmp_path, ".specify/memory/register.md", REGISTER_MD)
+    write(tmp_path, ".specify/features.md", FEATURES_MD)
+    write(tmp_path, ".specify/register.md", REGISTER_MD)
     write(tmp_path, "docs/guide.md", "Run the 001-beta workflow.\n")
     write(tmp_path, ".specify/memory/feedback/20260101T000000Z-note.md",
           "Dated record mentions 001-beta on purpose.\n")
@@ -178,13 +178,13 @@ def test_apply_renames_rewrites_and_verifies(ws):
     assert (ws / ".specify/specs/003-beta").is_dir()
     assert not (ws / ".specify/specs/001-beta").exists()
     assert "003-beta" in (ws / "docs/guide.md").read_text(encoding="utf-8")
-    features = (ws / ".specify/memory/features.md").read_text(encoding="utf-8")
+    features = (ws / ".specify/features.md").read_text(encoding="utf-8")
     assert ".specify/specs/001-alpha/requirements.md" in features
     ledger = json.loads(Path(result["ledger"]).read_text(encoding="utf-8"))
     assert ledger["verification"]["unresolved"] == []
     assert ledger["verification"]["resolved"] == result["groups"]
     # Duplicate repair renumbers the later definition only — the kept one stays.
-    register = (ws / ".specify/memory/register.md").read_text(encoding="utf-8")
+    register = (ws / ".specify/register.md").read_text(encoding="utf-8")
     assert register.count("REC-001-01") == 1
     assert "REC-001-04" in register
     tasks = (ws / ".specify/specs/001-alpha/tasks.md").read_text(encoding="utf-8")
@@ -245,7 +245,7 @@ def test_apply_subset_leaves_unselected_groups_pending(ws):
                   "--groups", spec["group_id"])
     assert result["ok"], result
     assert (ws / ".specify/specs/003-beta").is_dir()
-    register = (ws / ".specify/memory/register.md").read_text(encoding="utf-8")
+    register = (ws / ".specify/register.md").read_text(encoding="utf-8")
     assert register.count("REC-001-01") == 2, "the unselected register group is untouched"
     families = groups_by_family(call(ws, "--action", "scan"))
     assert "spec-number" not in families

@@ -75,7 +75,7 @@
 ## 命名空间
 
 - `flow_class` 是本分类的机器键：台账列头、JSON 键、CLI 参数统一用它；裸 `execution` MUST NOT 充当键名。
-- `execution` 与既有 **Agent Execution**（Agent 三层分类法第三层，概念见 `shared/definitions/agent-definitions.md`，词汇表见 `.specify/memory/glossary.md` 的 `Agent Execution` 行）**同词异义**：前者描述「流程主交付物的验收 oracle」，后者描述「Agent 模板 / 实例 / 执行」三层的第三层。
+- `execution` 与既有 **Agent Execution**（Agent 三层分类法第三层，概念见 `shared/definitions/agent-definitions.md`，词汇表见 `.specify/glossary.md` 的 `Agent Execution` 行）**同词异义**：前者描述「流程主交付物的验收 oracle」，后者描述「Agent 模板 / 实例 / 执行」三层的第三层。
 - 读法约束：`execution` 只有在 `flow_class` 语境下（本文件判据、台账列、`lookup` 输出）才读作本分类；出现在 `.specify/agents/execution/`、`execution-config.py` 等既有名称中时 MUST NOT 读作本分类。
 - 词汇表侧的同词消歧行（`流程分类 (Flow Class)` / `执行类流程` / `表达类流程`）以本文件为 owner 指针；本文件不复述词汇表的同音 / 易混词列。
 

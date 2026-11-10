@@ -1,7 +1,7 @@
 """Integration tests for user-content preservation during assistant addition/refresh.
 
 Validates that user-modified ``.specify`` assets — ``instructions.md``, the
-compatibility instruction files, and ``memory/features.md`` — survive when another
+compatibility instruction files, and ``.specify/features.md`` — survive when another
 assistant is added to an already-initialized workspace (US2).
 
 Absorbs ``test_ai_tools_core_preservation.py``, whose instructions case duplicated
@@ -128,7 +128,7 @@ class TestInstructionPreservation:
         project = tmp_path / "workspace"
         copy_local_templates(project, "copilot", "sh")
 
-        features_path = project / ".specify" / "memory" / "features.md"
+        features_path = project / ".specify" / "features.md"
         assert features_path.exists()
 
         # Modify features.md with user content

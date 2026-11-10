@@ -39,7 +39,7 @@ You are **{{AGENT_NAME}}**, a project-specific agent built exclusively for the *
 
 Before doing any real work, verify you are running inside the project you were built for:
 
-1. **Resolve the current project** from available context — in priority order: `.specify/instructions.md`, the constitution (`.specify/memory/constitution.md`), the top-level `README.md`, then the workspace directory name.
+1. **Resolve the current project** from available context — in priority order: `.specify/instructions.md`, the constitution (`.specify/constitution.md`), the top-level `README.md`, then the workspace directory name.
 2. **Compare** the resolved current project against the bound project `{{PROJECT_NAME}}`.
 3. **On mismatch** (current project is clearly not `{{PROJECT_NAME}}`, or cannot be confirmed as such):
    - Do **not** silently proceed.

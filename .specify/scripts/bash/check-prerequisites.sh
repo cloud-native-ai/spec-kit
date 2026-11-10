@@ -260,7 +260,7 @@ EOF
         if $JSON_MODE; then
             # Minimal JSON paths payload (no validation performed)
             # Note: REQUIREMENT_ID is extracted from branch name, not FEATURE_ID
-            # Feature metadata must be retrieved from .specify/memory/features.md
+            # Feature metadata must be retrieved from .specify/features.md
             printf '{"REPO_ROOT":"%s","BRANCH":"%s","REQUIREMENT_ID":"%s","REQUIREMENTS_DIR":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","MODE":"%s","WRITABLE":%s}\n' \
                 "$REPO_ROOT" "$CURRENT_BRANCH" "$REQUIREMENT_ID" "$REQUIREMENTS_DIR" "$FEATURE_ID" "$FEATURE_NAME" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$MODE" "$WRITABLE"
         else

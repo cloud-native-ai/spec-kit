@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Glossary-as-a-file engine for Spec Kit.
 
-Manages the single project-wide glossary at ``.specify/memory/glossary.md`` —
+Manages the single project-wide glossary at ``.specify/glossary.md`` —
 a human-readable Markdown table anchoring project vocabulary and correcting
 voice/dictated input (homophones, easily-confused words). Patterned on
 ``feedback-utils.py`` / ``memory-utils.py``: plain Markdown, stdlib only.
@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-GLOSSARY_PATH = Path(".specify") / "memory" / "glossary.md"
+GLOSSARY_PATH = Path(".specify") / "glossary.md"
 DEFAULT_TEMPLATE = Path("templates") / "glossary-template.md"
 TABLE_HEADER_RE = re.compile(r"^\|\s*Canonical\s*\|\s*Variants\s*\|", re.IGNORECASE)
 SEPARATOR_RE = re.compile(r"^\|[\s:|-]+\|?\s*$")

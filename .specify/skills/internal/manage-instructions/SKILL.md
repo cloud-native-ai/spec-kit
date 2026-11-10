@@ -111,7 +111,7 @@ unrelated sections untouched.
 Ensure the single project-wide glossary exists and seed it with observed domain terms
 (protocol owner: `.specify/shared/workflow/glossary.md`):
 
-- The setup script creates `.specify/memory/glossary.md` from
+- The setup script creates `.specify/glossary.md` from
   `.specify/templates/glossary-template.md` **only if absent** (non-destructive — never
   overwrite or discard an existing glossary; user-authored entries are authoritative).
 - Propose **project-specific** terms observed from the constitution, `features.md`, feature
@@ -131,7 +131,7 @@ Classify failures before deciding to stop:
 - **Critical (must stop and report)**:
   - `.specify/instructions.md` cannot be created or written.
   - Required root metadata exists but is unreadable (for example
-    `.specify/memory/constitution.md`).
+    `.specify/constitution.md`).
   - Permission denied on required paths.
 - **Warning (continue with fallback)**:
   - `{SCRIPT}` exits non-zero but required directories/files already exist.
@@ -235,8 +235,8 @@ projects damaged before the non-destructive fix.)
 - Read `README.md` to understand the project's purpose and existing features.
 - Inspect configuration files (`pyproject.toml`, `package.json`, `pom.xml`, `Makefile`, etc.)
   to determine the tech stack.
-- Check `.specify/memory/constitution.md` (if exists) to identify any mandated project rules.
-- Check `.specify/memory/features.md` (if exists) for feature status reference.
+- Check `.specify/constitution.md` (if exists) to identify any mandated project rules.
+- Check `.specify/features.md` (if exists) for feature status reference.
 - **Recall face — existing delegation**: prior project memory is retrieved by the native
   `memory-recall` skill (`skills/internal/memory-recall/SKILL.md`), which stays at command
   level and is not restated here. Its recalled conventions, user preferences, durable

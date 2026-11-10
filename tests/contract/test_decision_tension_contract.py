@@ -1767,7 +1767,7 @@ class TestScenarioEADRReferenceSlot:
 # positive control, so an emptied A3 list cannot turn the zero-hit scan vacuously green.
 
 DISTRIBUTION_TREES = ("shared", "templates", "skills")
-FEATURE_DETAIL = ROOT / ".specify" / "memory" / "features" / "076.md"
+FEATURE_DETAIL = ROOT / ".specify" / "features" / "076-decision-tension-contract.md"
 REQUIREMENTS = SPEC_DIR / "requirements.md"
 
 # The alias list is PARSED out of the spec's A3 (the owner). This literal tuple is the drift
@@ -1858,7 +1858,7 @@ class TestScenarioFTerminologyZeroHit:
             "A3 must keep declaring a two-place whitelist; a widened whitelist is a contract "
             "change, not a wording tweak"
         )
-        assert ".specify/memory/features/076.md" in line, (
+        assert ".specify/features/076-decision-tension-contract.md" in line, (
             "A3 must keep naming the feature-detail appendix as the second whitelisted place"
         )
 

@@ -134,7 +134,7 @@ A feedback entry records friction of the framework itself — a missing renderer
 
 ## Next Steps
 
-- Register every `REC-…` id coined in the report in `.specify/memory/register.md` in the same commit as the report
+- Register every `REC-…` id coined in the report in `.specify/register.md` in the same commit as the report
 - Apply improvements to spec-kit templates, command prompts, and scripts
 - Optionally iterate on [`/speckit.requirements`](requirements.md) or [`/speckit.plan`](plan.md) to fix current-spec findings
 - Optionally run [`/speckit.analyze`](analyze.md) to validate consistency after revisions

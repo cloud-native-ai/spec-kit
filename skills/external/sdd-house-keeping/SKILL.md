@@ -100,7 +100,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 
 ## Hard Requirements
 
-1. **目标项目治理优先**：执行任何命令前先读目标项目的 `.specify/memory/constitution.md` 与 `.specify/instructions.md`；遵守其目录/命名/临时目录纪律；MUST NOT 覆盖、绕过或删改治理内容；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根。目标项目尚无治理文档时交回 setup，不凭空自造。
+1. **目标项目治理优先**：执行任何命令前先读目标项目的 `.specify/constitution.md` 与 `.specify/instructions.md`；遵守其目录/命名/临时目录纪律；MUST NOT 覆盖、绕过或删改治理内容；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根。目标项目尚无治理文档时交回 setup，不凭空自造。
 2. **盘点先于处置**：H2/H3 的任何动作之前必须先完成 H1 的**两个**盘点；禁止凭印象判定项目状态。
 3. **按缺口调协、不整建**：只执行 H1 判定缺失的项；不存在的机制不预建；未处理项必须出现在未处理清单。
 4. **幂等收敛**：稳定态上重复执行零结构写、零内容重建；每项动作前以本次 H1 为凭据，禁止凭上次运行的记忆跳过或重做。

@@ -4,7 +4,7 @@
 
 ## What it is
 
-- **One file per project**: `.specify/memory/glossary.md` — a human-readable Markdown table beside `constitution.md` and `features.md`.
+- **One file per project**: `.specify/glossary.md` — a human-readable Markdown table beside `constitution.md` and `features.md`.
 - **Ambient**: referenced from the Documentation Map in `.specify/instructions.md`, so every `/speckit.*` command loads it as context (the same way the constitution is ambient).
 - **Framework-native**: it is a documentation/prompt artifact, not a runtime service. Correction and conflict *judgment* are AI-agent behaviors; the `scripts/python/glossary-utils.py` engine only performs deterministic file operations and structural conflict detection.
 

@@ -47,7 +47,7 @@ Checks performed:
                   feature MAY claim a strict subset of its contract clauses, so
                   unclaimed clauses are admissible and every claim resolves once
                   (warning; the clause partition, 条款分区 (Clause Partition),
-                  `.specify/memory/glossary.md`, is scoped to claimed clauses)
+                  `.specify/glossary.md`, is scoped to claimed clauses)
   green-path-divergence  one TEST path is claimed green by two rows at two
                   different green points, so the pair cannot each be the row that
                   turns that file green (warning; scoped to test paths because an
@@ -501,7 +501,7 @@ def validate(path: Path, claims_out: list | None = None):
 
         # one clause claimed by two rows: a claimed clause belongs to one row, while
         # a feature MAY claim a strict subset of its contract clauses — the clause
-        # partition (条款分区 (Clause Partition), `.specify/memory/glossary.md`) is
+        # partition (条款分区 (Clause Partition), `.specify/glossary.md`) is
         # scoped to the clauses a feature actually claims
         first_claim = {}
         for claim in sorted(resolved, key=lambda c: c["order"]):
@@ -516,7 +516,7 @@ def validate(path: Path, claims_out: list | None = None):
                 f"claim {claim['contract_file']}#{claim['clause_id']} — a claimed clause "
                 f"belongs to one row; a feature MAY claim a strict subset of its contract "
                 f"clauses, so keep one claim and drop the other (条款分区 (Clause Partition) "
-                f"is scoped to claimed clauses, .specify/memory/glossary.md) rather than "
+                f"is scoped to claimed clauses, .specify/glossary.md) rather than "
                 f"silencing the conflict"
             )
 

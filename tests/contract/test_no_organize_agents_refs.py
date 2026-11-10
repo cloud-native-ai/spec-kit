@@ -14,8 +14,8 @@ Deliberately excluded (with rationale, so the certified scope matches SC-004):
     assertions (like this one). Structural scenario data under tests/scenarios/
     IS scanned because it encodes live routing tables.
   - Append-only HISTORICAL RECORDS, analogous to the "historical spec archives"
-    SC-004 explicitly excludes: .specify/specs/*, .specify/memory/features.md,
-    .specify/memory/features/**, .specify/memory/session/**,
+    SC-004 explicitly excludes: .specify/specs/*, .specify/features.md,
+    .specify/features/**, .specify/memory/session/**,
     .specify/memory/knowledge/**. These legitimately describe the rename as
     provenance ("create-team (renamed from organize-agents)").
   - The .specify/skills/ runtime mirror — covered instead by the dedicated
@@ -45,8 +45,8 @@ EXTRA_DIRS = ["tests/scenarios", ".specify/memory"]
 # the same reason SC-004 excludes historical spec archives.
 HISTORICAL_RECORD_PREFIXES = (
     ".specify/specs/",
-    ".specify/memory/features.md",
-    ".specify/memory/features/",
+    ".specify/features.md",
+    ".specify/features/",
     ".specify/memory/session/",
     ".specify/memory/knowledge/",
 )

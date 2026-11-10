@@ -1,6 +1,6 @@
 # Governance projection — Feature 注册表（行投影桩）
 
-- source: `.specify/memory/features.md`
+- source: `.specify/features.md`
 - projection: 注册表行投影（只取行，不整文件注入）
 - status: read
 - primary_language: zh

@@ -1,0 +1,58 @@
+# Feature Detail: Task Complexity Rubric
+
+**Feature ID**: 032  
+**Name**: Task Complexity Rubric  
+**Description**: Embed a technology-agnostic Task Complexity Rubric in the generated project instructions document (`.specify/instructions.md`) that maps observable task signals → complexity tiers → prescribed thinking depth, so an AI agent calibrates effort (avoiding both under-thinking complex tasks and over-thinking trivial ones) to balance efficiency and quality.  
+**Status**: Implemented  
+**Created**: 2026-07-20  
+**Last Updated**: 2026-07-20 (implemented — `## Task Complexity Rubric` added to both instructions-template mirrors (byte-identical); contract test 10/10 C-1…C-10; full suite +10 passed, zero new failures vs baseline; SC-001/002/005 pass, SC-003/004 & T013 deferred)
+
+## Overview
+
+AI coding agents currently apply an undifferentiated amount of reasoning to every task, spending too little on genuinely complex, high-stakes changes (a quality risk) and too much on trivial ones (an efficiency waste). This feature introduces a **Task Complexity Rubric** — a small, project-neutral decision table shipped inside the agent-facing instructions document. The rubric enumerates observable signals (scope/size, uncertainty/novelty, blast radius/reversibility, cross-cutting impact), classifies a task into one of a few clearly labeled complexity tiers, and prescribes a corresponding thinking-depth level expressed as concrete agent behavior (extent of exploration, whether explicit planning is expected, level of verification). It includes a tie-breaking rule (default to the higher tier when signals conflict), a safe default tier for under-specified tasks, and an explicit statement of the efficiency-versus-quality trade-off the agent is calibrating.
+
+Delivery is entirely through the `/speckit.instructions` command and the shared instructions template: fresh instructions documents include the rubric, existing documents gain it non-destructively (user-authored content and any user-customized rubric are preserved). This mirrors how other cross-cutting agent-behavior mechanisms — Glossary (031) and Feedback (028) — are their own features though wired through existing commands.
+
+## Latest Review
+
+Not yet reviewed. Spec (031-task-complexity-rubric) created and clarified 2026-07-20: feature binding resolved to a new Feature 032 (distinct agent-behavior calibration mechanism delivered via the instructions doc, rather than an enhancement folded into the Instructions Command feature 008). Requirements quality checklist: all 16 items pass; no `[NEEDS CLARIFICATION]` markers. Plan generated 2026-07-20 (Phase 0 inlined; Phase 1 artifacts: data-model.md, contracts/rubric-section.md, quickstart.md, feature-ref.md). Constitution Check: all gates pass; Principle IV is a justified Partial (template-only feature). Tasks generated 2026-07-20 (tasks.md: 13 tasks across Setup/Foundational/US1–US3/Polish, Tests Mode ON as Layer-1 structural assertions; status stays Planned per the state machine — task breakdown exposed no new features). Implemented 2026-07-20: the `## Task Complexity Rubric` section was added to both `templates/` and `.specify/templates/instructions-template.md` (byte-identical mirror); `tests/contract/test_task_complexity_rubric.py` passes 10/10 (C-1…C-10); fresh-render presence (SC-001) and fixture-refresh additive/user-precedence (SC-002) verified; full suite = 720 passed / 106 failed / 13 errors / 1 skipped (+10 passed, zero new failures vs baseline). SC-003/SC-004 (reviewer/LLM-benchmark agreement) and T013 (live-repo dogfood) are deferred; no changes to `templates/commands/instructions.md` or per-tool mirrors were needed.
+
+## Key Changes (planned)
+
+1. Add a stable **`## Task Complexity Rubric`** section to `templates/instructions-template.md` (dual-written to `.specify/templates/instructions-template.md`).
+2. Extend the `/speckit.instructions` flow so the rubric is included in freshly generated instructions and inserted non-destructively into existing ones, honoring user-customized rubrics (user precedence).
+3. Technology-agnostic, project-neutral rubric content so it is valid for every project the toolkit generates.
+4. Acceptance evidence: presence check on fresh generation, additive-only diff on refresh, and reviewer/agent agreement on tier assignment and prescribed depth.
+
+## Implementation Notes
+
+- Documentation/prompt-framework capability (Constitution Principle IX): the rubric is guidance shaping agent effort, not a runtime gate — it never blocks or fails a task.
+- Template neutrality (recurring lesson): the rubric belongs in the shared, project-agnostic template, NOT in spec-kit-specific instruction prose.
+- Mirror-sync discipline: `templates/` ↔ `.specify/templates/` must be dual-written; per-tool runtime command copies updated separately if the command template changes.
+- Non-destructive refresh: insertion must preserve every existing user-authored section byte-for-byte and must not overwrite a user-customized rubric.
+- Exact tier count/labels and the precise "thinking depth" vocabulary are design decisions deferred to `/speckit.plan`.
+
+## Future Evolution Suggestions
+
+- Optionally map tiers to explicit per-agent reasoning-effort keywords for tools that recognize them, while keeping the behavioral prescriptions as the portable baseline.
+- Lightweight self-check prompt so an agent can state its chosen tier at task start for observability.
+- Feed rubric outcomes into the feedback mechanism (028) to tune tier signals over time.
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/032-dogfooding-practice.md
+- 反向交叉引用: **050 Proactive Flow Trigger**(需求 050,registered 2026-09-07)——050 在归属判定时以本 Feature 为**决定性先例**:两者投递载体完全相同(嵌入 `.specify/instructions.md` 的行为指令、经 `/speckit.instructions` 非破坏投递),而本 Feature 当初自成 Feature 而非绑 008 Instructions Command,据此确立「以指令段形式嵌入是**投递事实、非归属事实**」,050 故亦新建而非绑 008/032。另:050 的 US4「规则依采纳/拒绝证据调优」与本 Feature Future Evolution 第 3 项(把 rubric 结果喂回 028 以调优 tier 信号)形状同构,均为"行为指令 + 证据回路",未来若收敛出共用机制宜合并考虑。
+
+## Status Tracking
+
+- **Draft**: Feature row first added to `.specify/memory/features.md`.
+- **Planned**: `plan.md` (and any design artifacts) exist for spec 031-task-complexity-rubric; Constitution Check has no unjustified Fail rows.
+- **Implemented**: `tasks.md` has zero `[ ]` rows AND `verification.md` records a pass/deferred status for every Success Criterion (SC-001…SC-005). *(current state)*
+- **Ready for Review**: All deferred tasks resolved/waived and review evidence produced.
+- **Completed**: Final acceptance / merged.
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/031-task-complexity-rubric/requirements.md
+  Quality Checklist: .specify/specs/031-task-complexity-rubric/checklists/requirements.md

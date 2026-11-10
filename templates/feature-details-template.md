@@ -48,8 +48,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/memory/features/[FEATURE_ID].md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/[FEATURE_SLUG].md
 
 ## Status Tracking
 
@@ -68,7 +68,7 @@ Owner of the schemas projected here: `shared/workflow/acceptance-hardening.md` Â
 
 | From | To | Owner Command | Trigger / Definition of Done |
 |------|------|----------------|------------------------------|
-| (n/a) | Draft | `/speckit.feature` | Feature row first added to `.specify/memory/features.md`. |
+| (n/a) | Draft | `/speckit.feature` | Feature row first added to `.specify/features.md`. |
 | Draft | Planned | `/speckit.plan` | `plan.md`, `data-model.md`, `contracts/`, and `quickstart.md` exist for the requirement bound to this feature; Constitution Check has no unjustified Fail rows. |
 | Planned | Implemented | `/speckit.implement` | **Four conjunctive conditions, all required** â€” stated in full in the block below. Three of four is `Blocked`, never a partial pass. |
 | Planned | Blocked | `/speckit.implement` | The tasks are closed and at least one `final`-path criterion is not `pass`. This is the honest landing when the work that could be done is done and the feature is still not acceptable. |

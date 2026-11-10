@@ -46,7 +46,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 
 ## Glossary
 
-Apply the glossary protocol in `.specify/shared/workflow/glossary.md`, reading the project glossary at `.specify/memory/glossary.md` (ambient via the Documentation Map). That file owns every rule of this step and this section restates none of them: input correction and anchoring, **including the constraint-side reading of a registered term** (§1); progressive enrichment at wrap-up (§2); conflict detection and which writes proceed directly (§3); manual edits and user precedence (§4).
+Apply the glossary protocol in `.specify/shared/workflow/glossary.md`, reading the project glossary at `.specify/glossary.md` (ambient via the Documentation Map). That file owns every rule of this step and this section restates none of them: input correction and anchoring, **including the constraint-side reading of a registered term** (§1); progressive enrichment at wrap-up (§2); conflict detection and which writes proceed directly (§3); manual edits and user precedence (§4).
 
 ## Delegation
 
@@ -75,6 +75,6 @@ At wrap-up, **before** the Feedback and Documentation steps, commit the artifact
 
 ## Handoffs
 
-**Before**: Optional `/speckit.feature` to ensure feature registry is up to date — **recommended whenever `.specify/memory/features.md` is absent or still a placeholder**, otherwise `/speckit.clarify` has to bootstrap the registry mid-run while binding the Feature.
+**Before**: Optional `/speckit.feature` to ensure feature registry is up to date — **recommended whenever `.specify/features.md` is absent or still a placeholder**, otherwise `/speckit.clarify` has to bootstrap the registry mid-run while binding the Feature.
 
 **After**: If spec has `[NEEDS CLARIFICATION]` or `Related Feature: Need clarification` → `/speckit.clarify`. Otherwise → `/speckit.plan`.

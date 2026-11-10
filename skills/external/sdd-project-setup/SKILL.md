@@ -71,7 +71,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 7. **运行时与 CLI 就绪先于 init**：S2 执行 specify init 前 MUST 完成 CLI 层——python 解析阶梯三级全缺 → **报错退出，绝不自动安装 Python**；CLI 安装链三源全败 → 报告缺口并停止；两者都不得静默跳过 init 或手工伪造 `.specify/`。
 8. **预算超限交给 house-keeping**：S2 刷新报告的 `BUDGET ... over` 不由 setup 实现 R3；原样交给 house-keeping H2，不得静默转述告警或删除项目内容。
 9. **本地 fork 承载**：入口未给环境信息时，目标解析与执行都按本地拓扑；治理命令的派发 MUST 缺省使用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`），异构 agent MUST 使用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
-10. **目标项目治理优先（本地与远端同规）**：bootstrap 任何目标项目之前，MUST 先读取目标项目既有的宪法（`.specify/memory/constitution.md`）与指令（`.specify/instructions.md` 及其兼容符号链接），并在全部动作中遵守其原则、目录规范、命名规则与临时目录纪律；MUST NOT 覆盖、绕过或删改这些治理内容。目标项目尚无治理文档时，按框架模板生成（constitution / instructions），MUST NOT 凭空自造规则。
+10. **目标项目治理优先（本地与远端同规）**：bootstrap 任何目标项目之前，MUST 先读取目标项目既有的宪法（`.specify/constitution.md`）与指令（`.specify/instructions.md` 及其兼容符号链接），并在全部动作中遵守其原则、目录规范、命名规则与临时目录纪律；MUST NOT 覆盖、绕过或删改这些治理内容。目标项目尚无治理文档时，按框架模板生成（constitution / instructions），MUST NOT 凭空自造规则。
 11. **目录创建限于规范落点**：bootstrap 的目录创建 MUST 限于框架既有落点（`specify init` 产物、`.specify/.tmp/`、目标项目治理文档声明的目录）；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根；临时数据按目标项目纪律（无则框架 `temp-directory-discipline`）落位，并在首次写入前确认 `.gitignore` 覆盖。
 12. **Bootstrap 后 handoff**：S2.5 完成后，周期性调协、强化、验证、记录回收与候选清单 MUST handoff 给 `sdd-house-keeping`；本 skill MUST NOT 复制其 H1–H5 执行细则。目标项目已初始化且本次只需维护时，直接加载 `sdd-house-keeping`，不重跑 `specify init`。
 13. **无破坏性动作**：本 skill MUST NOT 执行 `/speckit.sanitize`、retention apply 或任何删除/归档；破坏性门归 house-keeping 调用的 sanitize。setup 只做可逆的安装/刷新/内容初始化。

@@ -15,7 +15,7 @@ statement:
   allowed_values:
     - allow
     - forbid
-  authority: .specify/memory/register.md#F-093-003
+  authority: .specify/register.md#F-093-003
   consequence:
     allow: coordinators gain a dispatch tool and FR-021(a) becomes satisfiable for them
     forbid: dispatch responsibility belongs to the driver or main agent and FR-021(b) is required

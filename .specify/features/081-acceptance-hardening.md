@@ -1,0 +1,85 @@
+# Feature Detail: 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
+
+**Feature ID**: 081
+**Name**: 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
+**Description**: 把「Implemented」从「任务勾完 + 每条 SC 有一行状态」收紧为「每条 final 路径 SC 为 pass + 一条确定性最小 smoke test 记录在案」，把「本能力由某仓提供」收紧为一张可验收的运行时栈／依赖所有权表与一张执行前提／继承 blocker 表，把 `/speckit.review` 从「只回顾 SDD 流程」扩展为「过程 + 产物 + 实现 + 代码 + Acceptance Reality Check」，并让 implement／review／driver closure-merge 三处共享同一个确定性判定脚本。
+**Status**: Completed
+**Created**: 2026-11-01
+**Last Updated**: 2026-11-04
+
+## Overview
+
+`/speckit.implement` 当前的 `Planned → Implemented` 判据是「`tasks.md` 零 `[ ]` + 每条 SC 有一行状态」。这条判据没有阈值：一行 `partial`、`deferred` 或 `unknown` 也满足它，于是「全部任务勾完、但主用户旅程一次都没真跑通」的切片仍然可以翻成 `Implemented`，而后继特性把那个状态当作已验证的前提引用。第二条漏法是**运行时所有权**：「本能力由某仓／某线提供」这样的散文可以顶替任何验收责任，已知的负面实测结论也可以被降级成「范围外」一行搁置。本特性就是在这两处各加一条可机械判定的阈值，并让 review 真的能看见阈值被绕过的地方。
+
+它来自一次事故形态（本仓以 **026 形态**代称，见规格 § Assumptions A11——该编号在本仓不可核验，规范内容以规格内联重述为准）：任务全关、每条 SC 都有状态行、但所有 final 路径 SC 都是 `blocked`／`deferred`，特性仍被计为 `Implemented`；同一事故里运行时能力只以散文声明归属，没有表行、没有 pin、没有联合验收。本特性把这两条都写成「缺席即阻断」。
+
+四条用户故事（细节与 SC 归规格制品，此处只记索引）：
+
+- **US1（P1）** final 路径没通过就不叫实现了，且必须有 smoke test：`Blocked` 成为一等特性状态，`Planned → Implemented` 变成四条件合取，`blocked` 进入 verification 词表并带测量阶梯，`closure-acceptance-check.py` 成为 implement／review／driver closure-merge 三处共享的唯一判定来源。
+- **US2（P1）** 运行时所有权与已知坏前提必须被继承：requirements 的 § Runtime Stack & Dependency Ownership、plan 的 § Execution Premises 与 § Inherited Blockers 成为结构化一等产物，四类确定性缺陷在 U4 阻断。
+- **US3（P1）** review 既审流程也审产物与实现：组合由「恰好两段」改为四段加一次确定性判定（过程 → 产物 → 实现 → 代码 → ARC），并把 `Implemented → Ready for Review` 的第四个合取条件挂到同一个判定上。
+- **US4（P2）** 词表、注册表、迁移、文档与镜像一起对齐：`Blocked` 进三处词表 owner、`--audit-existing` 只读审计、逐工具副本与镜像重生成、CHANGELOG 与 owner 指针收口。
+
+关键裁决（详见规格 § Assumptions A1–A13 与 § Clarifications § Session 2026-11-03）：
+
+- **Flow Class = `execution`**（behavior-oracle）：主交付物是确定性脚本、门禁条款与命令模板，缺陷最先在机器面暴露。`flow-class-check.py --action lookup --unit-id "spec:081-acceptance-hardening"` → `execution` / `source: declaration`／exit 0。
+- **review 终态 = 四段 + 一次确定性判定**，固定顺序。`code-review` 按 FR-014 明文不得被替换，故不是三段；ARC 是确定性判定而不是段。
+- **`Path` 只有 SC-001／SC-002 标 `final`**；SC-006 显式**不**升级——把它记为 final 会让 081 自己的 implement 门禁依赖一个只能在 review 阶段产生的测量，叠加 `Blocked → Ready for Review` 非法后自锁。
+- **运行时栈表三外一内**：CPython／pytest／`git` 记 `signed-contract`（本仓只消费），只有 `specify init` 记 `in-scope`。pytest 与 git 的 pin 由采集基线时记录的 `--version` 原文提供，本仓此前没有任何版本声明。
+- **绑定新建 Feature 081**：复核 026／055／062／071／077／079 后无归属（依据 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules）。
+
+## Latest Review
+
+- **2026-11-03 081d review（`/speckit.review` 四段 + ARC，只读 + review-fix）**：process / artifact / implementation / code + ARC；P0=0，P1=3（实现阶段代做了 `Implemented → Ready for Review` 翻转；SC-009 两处矛盾陈述；detail 当前位仍是 `Draft`），P2=3。P1 已修：翻转改由 review 在两条记录齐备后执行、SC-009 备注改为日期化记录、detail 当前位改为 `Ready for Review`。ARC 读 `accept`（final_path 2/2 pass，无 reason），code 段 25/25 回执、0 blocking；Feature 现为 `Ready for Review`。
+- **2026-11-03 review（`/speckit.review`，只读 + review-fix）**：过程 + 代码 + 产物/实现 + ARC；P0=1（081 门禁行被放进 077 wiring card，剥卡不可检出）、P1=5（DoD-2 红跑声明、词表覆盖 1/3、`final_path` 三键 vs 六桶、verification 手写计数、081d 载体写成已存在）、P2=9。P0/P1 已在 `0277b00f` 修复：两行移回语义归属并重测 strip 基线、加 `templates/commands/implement.md` 断言；`final_path` 统一六桶（含 `partial`）；DoD-2/SC-003/verification 计数/081d 载体同步；F12/F13/F14 记录。定向 152 passed；最终 post-review-fix 全量 39F / 7025P / 7S，`head−baseline` 0 new；Feature 仍 `Blocked`。
+- **2026-11-03 implement（081a，unattended）**：T001–T024 收口；`closure-acceptance-check.py` + 7 套夹具 + 状态机/verification/tasks owner + implement Step 9 接线 + smoke（两次 exit 0/0）落地；`verification.md` 记录 **SC-001 blocked（1/3 调用点）、SC-002 partial**，closure checker 返回 `block` / exit 1 / `zero-final-path-pass`；状态 `Planned → Blocked`（**不是 Implemented**）。T022 已关闭（clean full-suite：39F / 7023P / 7S，head−baseline 0 new；此前的 mirror-parity flake 归因于并发提交 90de4d7f），T024 延后到 081d（WC-14 冻结 C-5 验证套件）。基线 39 failed / 6970 passed / 7 skipped；五个冻结 pin 守卫通过；mirror/regen `--check` 0。
+- **2026-11-03 plan**（`/speckit.plan`，unattended）：plan.md / data-model.md / 5 contracts / quickstart.md / research.md / feature-ref.md 落盘；18/18 Constitution Check；D1–D10 与 T-001..T-005 记录；plan 入口 baseline 实测 39 failed / 6970 passed / 7 skipped in 596.80s；D10 判定自然任务 ≈52 > 40，按 US1–US4 切 081a–081d；plan 阶段确定性门 pre-analyze pass（65 条 planned-path advisories）、decision-tensions 6/6、两份 `--check` exit 0。本阶段因 plan 子代理 120-turn limit 由驱动者补完证据并提交 `ea058fae`；状态 `Draft → Planned` 由本次校正补记（GW-15）。
+- **2026-11-03 clarify**（Mode A，无人值守，零提问）：逐条裁决 A1–A10 并补 A11–A13——A1 ratified（类别由头部声明解析实测）、A2 superseded（本阶段已新建 Feature 081）、**A3 revised**（review 组合由「两段」改为「四段 + 一次判定」，逐段判定对象／顺序理由／职责边界成文，owner 文本改写写成 plan／implement 义务而非本阶段改源）、A4 ratified 并收紧（标记须为 SC 定义行最后一个 token；两处既有解析器容差已取证）、A5 ratified（四处 `blocked` 字面分属四个 owner）、**A6 revised**（八项线状态处置 + 用词更正：该文件无 `revival` 符号，恢复路径名 `promote-waiting`／`ownership-check`）、A7 ratified、**A8 revised 收窄**（原「U0–U6 全冻结」与 FR-017 冲突，改为阶段骨架冻结、closure/merge 判定与线状态集是唯一例外）、A9／A10 ratified、A11 新增（026 是本仓不可核验的外部事故代称，规范内容以规格内联重述为准）、A12 新增（不新增第三套严重度词汇；方法论载体由 plan 定）、A13 新增（plan 两张表与 tasks § Environment Prerequisites 不叠位）。运行时栈表四行全部重判 Form（3 `signed-contract` / 1 `in-scope`），`in-scope` 判据补进 FR-009，pin 采集补进 FR-023。门禁实跑：`validate-requirements.py` `status: ok`（五项全 pass，0 error／0 warning，268 行、34 定义行、17 shared strings——FR 25／SC 9 计数不变）、`pre-analyze-check.py --stage requirements` `decision=pass`（errors=0）、`flow-class-check.py --action lookup` exit 0、`overlap-check.py` `decision=clear`。
+
+## Key Changes
+
+1. **final 路径阈值**：每条 SC 定义行带 `Path: final|supporting` 行内标记；`Planned → Implemented` 变为四条件合取（零 `[ ]` + 每 SC 有状态行 + 每条 final 路径 SC 为 `pass` + smoke 为 `pass`）。
+2. **`Blocked` 一等状态**：四条转移写入状态机 owner，`Implemented → Blocked` 仅作审计纠正且须引用证据；`blocked` 进入 verification 词表并带五项测量阶梯字段（有可用 reduced measurement 却记 `no` 即判非法）。
+3. **确定性 smoke test**：每个 `execution` 特性恰有一条最小可复现命令 + 命令原文／退出码／证据路径三件；跑不起来即 `Blocked`。081 自己的 smoke 覆盖 `specify init`、正／负夹具过 checker、`regen-command-copies.py --check` 三件事。
+4. **单一判定来源**：`scripts/python/closure-acceptance-check.py`（只读、stdlib-only、无模型判断，退出码 0／1／2）产出 `accept|block` + 封闭原因集里的命名原因 + final 路径三计数，被 implement／review／driver closure-merge 三处调用。
+5. **运行时所有权与前提成为结构化产物**：§ Runtime Stack & Dependency Ownership（`in-scope|signed-contract|user-waived`）、§ Execution Premises（`verified|unverified|falsified` + `Decision`）、§ Inherited Blockers（依赖特性的 deferred 记录逐条处置），四类缺陷在 U4 阻断。
+6. **review 组合扩张**：过程 → 产物 → 实现 → 代码 → Acceptance Reality Check，四段各自成文、各自定级、互不代答；`Implemented → Ready for Review` 增加第四个合取条件。
+7. **落地卫生**：`Blocked` 进三处词表 owner、never-regress 的窄例外、`--audit-existing` 只读审计（零写入、退出码只反映输入有效性）、逐工具副本与镜像重生成 `--check` exit 0、CHANGELOG 与各 owner 指针收口到唯一 schema owner `shared/workflow/acceptance-hardening.md`。
+
+## Implementation Notes
+
+- **Two Hats**：本特性改的是框架源（`templates/`、`shared/`、`skills/`、`scripts/`）；`.specify/` 同名文件是生成镜像，修复方式是重生成而不是手改（承载 FR-024，`--check` 双证）。clarify 阶段只写规格与注册表，`templates/commands/review.md` § Composition 的 owner 文本改写是 plan／implement 的义务。
+- **零散文行**：运行时栈表每一行都必须可机械判（Form／契约路径／pin／联合验收）；「外部依赖存在」本身不是缺陷，「只写成散文」才是。
+- **不新增第二套门禁**：四类确定性发现落在既有 `pre-analyze-check.py` 或同层 checker 上；`Blocked` 的判定源只有一个脚本，三处调用点共享它。
+- **不新增第三套严重度词汇**：产物段与实现段用 `P0/P1/P2`，代码段用自己的六级，ARC 固定 P0，两族之间无映射表、无转换、无统一分数。
+- **冻结集**：阶段序列、阶段哨兵、watcher 语义、test-budget 槽位、U0–U6 阶段骨架冻结；唯一例外是 closure/merge 判定来源与线状态集（见 A8）。历史状态与历史 verification 记录不回写，审计只读。
+- **诚实性不削弱**：`partial`／`deferred` 仍是合法状态，本特性只加阈值、不删状态；`expression` 类特性不受「必须有 final SC」的下限约束，也不被迫编造一条。
+
+## Future Evolution Suggestions
+
+- 当 081 稳定后，考虑把 `Blocked` 的解除条件（blocker 解除的证据形态）也做成确定性检查，避免「解除」长期靠叙述。
+- 若 review 的产物段与实现段在实践中出现方法论重叠，再评估是否合并为一个段（当前分开是为了不把两个判定对象塞进同一个段）。
+- `HOLDING_STATES` 目前在 `line-registry.py` 内定义后未被引用；本次只声明语义不变，是否删除或接线留待 driver 的独立维护。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/081-acceptance-hardening.md
+- Requirements: .specify/specs/081-acceptance-hardening/requirements.md
+- Quality Checklist: .specify/specs/081-acceptance-hardening/checklists/requirements.md
+- Test Evidence: .specify/specs/081-acceptance-hardening/test-evidence/
+- **Forward cross-reference（只引用，不改本特性状态）**: Feature **084**（`Harness 三重结构`）按 `.specify/specs/084-harness-triple-structure/requirements.md` 的 A8(a) 裁定，把本特性 § Closure Verdict「Input contract — the `Path` marker」的**取值域** `{final, supporting}` 迁入声明层 `shared/declarations/` 并在此留指针；本特性的判定散文、拒绝消息模板、退出码语义与 `tests/contract/test_requirements_checker.py`／`test_checker_form.py` 的既有断言 MUST 逐字不变（该硬约束写在 084 的 FR-018 与 SC-006）。同一裁定的另一半 A8(b) 判定：本特性 `validate-requirements.py` docstring 的六个检查项标签集**不迁**（迁出会迫使改写本特性的验收测试断言）。
+
+## Status Tracking
+
+- **Draft**: `requirements.md` 存在并通过确定性校验与拆解门（`validate-requirements.py` `status: ok`、`pre-analyze-check.py --stage requirements` `decision=pass`），Feature 已登记。
+- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 齐备且宪法检查无未论证的 Fail。
+- **Implemented**: `tasks.md` 零 `[ ]` 行，`verification.md` 为每条 SC 记录状态行，**且每条 `final` 路径 SC（SC-001／SC-002）为 `pass`、本条特性的 smoke 记录齐备**——后两条是本特性自己定义的判据。
+- **Ready for Review**: 延后任务全部解决或显式豁免，评审证据已产出，当前 `code-review.md` 无 `blocking`，且不存在处于 `blocked`／`deferred`／`fail` 的 `final` 路径 SC（第四条件由本特性新增，允许显式用户豁免）。
+- **Completed**: 最终验收。
+
+### Canonical Status State Machine (single source of truth)
+
+转换表的权威版本在 `templates/feature-details-template.md` § Canonical Status State Machine；本节不复制其判据，只指出本特性的状态当前位置。
+
+当前：`Completed`（2026-11-04 用户最终验收；081d 收口，081a–081d 的四条转移已写入该 owner，本文件只引用、不复述）。

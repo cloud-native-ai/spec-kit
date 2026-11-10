@@ -62,9 +62,9 @@ chooses to proceed read-only, batch all integrations into ONE write attempt at t
 instead of the per-answer saves the mode's integration rules call for.
 
 **Load common context (summary-first — see
-`.specify/shared/guidelines/token-efficiency.md`)**: project `.specify/memory/features.md`
+`.specify/shared/guidelines/token-efficiency.md`)**: project `.specify/features.md`
 via `grep -E '^\| [0-9]{3}'` index rows; read `research.md` (if exists); pull
-`.specify/memory/constitution.md`, `README.md`, and `docs/` content only as targeted
+`.specify/constitution.md`, `README.md`, and `docs/` content only as targeted
 excerpts when a candidate question actually requires them — never wholesale.
 
 **Load mode-specific context** (see taxonomy reference).

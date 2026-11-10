@@ -35,7 +35,7 @@ when, why, and how to call it.
   request the missing intent — do NOT guess silently.
 - **Precondition**: the probe registry installed by project initialization
   (`/speckit.instructions`); without it the engine has no probe truth source to read.
-- **Glossary**: consult the project glossary (`.specify/memory/glossary.md`) and apply
+- **Glossary**: consult the project glossary (`.specify/glossary.md`) and apply
   the protocol in `.specify/shared/workflow/glossary.md` before acting: correct
   recorded homophone/confusable variants; propose new terms at wrap-up with user
   confirmation.

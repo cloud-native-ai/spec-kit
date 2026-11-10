@@ -80,11 +80,11 @@ def check_instructions(project: Path):
 
 
 def check_features(project: Path):
-    mem = project / ".specify" / "memory"
-    registry = mem / "features.md"
-    details = mem / "features"
+    spec = project / ".specify"
+    registry = spec / "features.md"
+    details = spec / "features"
     if not registry.is_file():
-        return {"status": GAP, "detail": "missing .specify/memory/features.md"}
+        return {"status": GAP, "detail": "missing .specify/features.md"}
     rows = count_feature_rows(registry)
     files = sorted(p.stem for p in details.glob("*.md")) if details.is_dir() else []
     marker = total_marker(registry)
@@ -126,10 +126,11 @@ def check_goals(project: Path):
 
 
 def check_advisory(project: Path):
-    mem = project / ".specify" / "memory"
+    spec = project / ".specify"
+    mem = spec / "memory"
     out = {}
-    for key, path in (("glossary", mem / "glossary.md"),
-                      ("register", mem / "register.md"),
+    for key, path in (("glossary", spec / "glossary.md"),
+                      ("register", spec / "register.md"),
                       ("knowledge", mem / "knowledge")):
         out[key] = {"status": OK if path.exists() else GAP,
                     "detail": rel(project, path) if path.exists() else "absent"}

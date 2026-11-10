@@ -46,7 +46,7 @@ Spec Kit 的独立价值在于：**它把 SDD 方法论、项目骨架、AI 命�
 
 ### 1.4 项目存在的独特定位
 
-项目核心哲学由宪法固化：规格驱动、Feature 中心、意图优先、测试优先、AI Agent 标准、持续质量以及 spec → plan → tasks → implement 工作流：[.specify/memory/constitution.md](../../.specify/memory/constitution.md#L18-L91)。Feature Index 又将能力长期化，目前记录 20 个功能项：[.specify/memory/features.md](../../.specify/memory/features.md#L1-L29)。
+项目核心哲学由宪法固化：规格驱动、Feature 中心、意图优先、测试优先、AI Agent 标准、持续质量以及 spec → plan → tasks → implement 工作流：[.specify/constitution.md](../../.specify/constitution.md#L18-L91)。Feature Index 又将能力长期化，目前记录 20 个功能项：[.specify/features.md](../../.specify/features.md#L1-L29)。
 
 这说明 Spec Kit 不是一个“CLI 命令集合”，而是一个**把 AI 协作过程产品化的工作流内核**。
 
@@ -80,7 +80,7 @@ flowchart TD
     CLI --> PKG[打包资源\nmemory/scripts/templates/skills]
     CLI --> RUNTIME[.specify 运行时目录]
 
-    RUNTIME --> MEM[memory\nconstitution/features]
+    RUNTIME --> MEM[features/constitution/glossary/register\n+ memory/ 存储]
     RUNTIME --> TPL[templates\n产物模板 + 命令模板]
     RUNTIME --> SCRIPTS[scripts/bash\n工作流执行层]
     RUNTIME --> SKILLS[skills\n可复用能力]
@@ -262,7 +262,7 @@ flowchart TD
     F --> H[/speckit.tasks 生成 tasks.md]
     H --> I[check-prerequisites.sh]
     I --> J[/speckit.implement]
-    D --> L[.specify/memory/features.md]
+    D --> L[.specify/features.md]
     F --> L
     H --> L
 ```
@@ -447,7 +447,7 @@ flowchart TD
 
 ### 8.6 中优先级：版本治理需要更清晰
 
-Feature Index、Constitution、Git tags、`pyproject.toml` 版本都在表达“当前状态”，但它们之间的同步关系不够明确。宪法要求语义化版本和 breaking changes 记录：[.specify/memory/constitution.md](../../.specify/memory/constitution.md#L76-L83)，但当前包版本与 Git tag 显示出不同节奏。
+Feature Index、Constitution、Git tags、`pyproject.toml` 版本都在表达“当前状态”，但它们之间的同步关系不够明确。宪法要求语义化版本和 breaking changes 记录：[.specify/constitution.md](../../.specify/constitution.md#L76-L83)，但当前包版本与 Git tag 显示出不同节奏。
 
 **建议**：在 release checklist 中加入：包版本、tag、README 安装说明、instructions version 的一致性检查。
 

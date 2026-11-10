@@ -697,7 +697,7 @@ def test_t115_a_path_outside_the_confirmed_design_rows_is_a_violation():
     """C-410: the same reading as C-407's execute rule, not a second one."""
     confirmed_rows = {GROUP_A + "/carrier.md"}
     assert _execute_violations([GROUP_A + "/carrier.md"], confirmed_rows) == []
-    for outside in (".specify/memory/features.md", GROUP_B + "/other.md", "skills/x/SKILL.md"):
+    for outside in (".specify/features.md", GROUP_B + "/other.md", "skills/x/SKILL.md"):
         assert _execute_violations([outside], confirmed_rows) == [outside]
     seam_rule = _clause("C-410")
     assert "not named in a confirmed design row is a violation" in seam_rule

@@ -21,8 +21,8 @@ class TestInitializationResultSummary:
 
     def test_add_reused(self):
         s = InitializationResultSummary()
-        s.add_reused(".specify/memory/features.md")
-        assert ".specify/memory/features.md" in s.reused
+        s.add_reused(".specify/features.md")
+        assert ".specify/features.md" in s.reused
 
     def test_add_skipped(self):
         s = InitializationResultSummary()

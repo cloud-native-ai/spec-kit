@@ -16,7 +16,7 @@ and carry lessons forward.
 
 | Layer | Location | Role |
 |-------|----------|------|
-| Governance | `.specify/memory/constitution.md` — Principle XIII *Better-Harness Orientation* | Binding statement: improvement units reference the goal model and obey evidence discipline |
+| Governance | `.specify/constitution.md` — Principle XIII *Better-Harness Orientation* | Binding statement: improvement units reference the goal model and obey evidence discipline |
 | Canonical goal model | `.specify/shared/guidelines/better-harness.md` | Single source of truth: harness definition, feedforward/feedback loop, five-dimension model, evidence red lines, improvement tracks |
 | Feedback mechanism | `.specify/shared/workflow/feedback-step.md` § Goal anchor | Feedback strengthens the **Learning Capture** dimension |
 | Evidence layer | `.specify/shared/workflow/evidence-step.md` (positioning) | The evidence red lines are the goal model's evidence discipline |

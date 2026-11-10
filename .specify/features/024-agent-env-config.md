@@ -1,0 +1,50 @@
+# Feature Detail: Specification Workspace Versioning
+
+**Feature ID**: 024  
+**Name**: Specification Workspace Versioning  
+**Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
+**Status**: Draft  
+**Created**: 2026-06-05  
+**Last Updated**: 2026-06-05
+
+## Overview
+
+The `.specify/` workspace is the runtime home for all generated artifacts — instructions, memory, skills, scripts, specs, and templates. As the CLI evolves, workspace structure changes (new directories, renamed files, moved content) can break existing projects. This feature covers introducing a workspace version marker and migration tooling so projects can safely upgrade across CLI releases without manual intervention.
+
+## Latest Review
+
+Gap identified during project-intrinsic analysis. The CLI version is tracked in `pyproject.toml` but the workspace structure has no independent version. Changes like the skills layout migration (007-skill-install-layout) were handled ad-hoc with backup guardrails rather than through a versioned migration system.
+
+## Key Changes
+
+1. Add a `.specify/version` marker file tracking the workspace schema version.
+2. Define a migration registry mapping workspace versions to required structural changes.
+3. Implement a `specify upgrade` (or equivalent) command that applies pending migrations.
+4. Add rollback/backup behavior for failed migrations.
+
+## Implementation Notes
+
+- Workspace version is distinct from CLI version — a CLI release may or may not change workspace structure.
+- Migrations must be idempotent (safe to re-run on an already-migrated workspace).
+- The existing skill-install-layout migration (symlink-first, backup guardrails) is a precedent for the pattern.
+- Must not require internet connectivity for local workspace migrations.
+
+## Future Evolution Suggestions
+
+- Support workspace "profiles" for different team configurations.
+- Add dry-run mode for migrations to preview changes before applying.
+- Consider workspace health checks as part of `/speckit.checklist`.
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/024-agent-env-config.md
+- Cross-referenced Feature: .specify/memory/features/045.md (Framework Source Provenance, Draft 2026-08-17) — the source/provenance axis, orthogonal to this schema-version axis; its stamp must NOT take this Feature's envisioned `.specify/version` marker path.
+
+## Status Tracking
+
+- **Draft**: Gap identified; no workspace versioning exists.
+- **Planned**: Version schema and migration registry designed.
+- **Implemented**: Version marker and upgrade command functional.
+- **Ready for Review**: Migration tests pass; existing workspaces upgradable.
+- **Completed**: Workspace versioning is the standard upgrade path across CLI releases.

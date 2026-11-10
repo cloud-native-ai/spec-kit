@@ -1,0 +1,97 @@
+# Feature Detail: Agents Command
+
+**Feature ID**: 019  
+**Name**: Agents Command  
+**Description**: Create or refine custom AI agents (.agent.md) for workspace-specific workflows.  
+**Status**: Implemented  
+**Created**: 2026-02-27  
+**Last Updated**: 2026-07-02
+
+## Overview
+
+The Agents Command enables users to create and manage custom AI agents as reusable configuration files (.agent.md) in the `.github/agents/` directory. These agents can be invoked directly as commands or used as subagents in complex workflows, providing extensibility beyond the built-in Speckit commands. This feature supports both explicit agent creation with user-provided specifications and context-aware agent generation when no arguments are provided.
+
+## Latest Review
+
+Implementation planning completed for `/speckit.agents` with clarified behavior contracts, data model, and quickstart validation.
+Task decomposition completed in `.specify/archive/specs/003-speckit-agents-command/tasks.md`, organized by US1/US2/US3 with MVP-first sequencing.
+New spec `014-agent-framework-refactor` refactors the agent workflow to use `.specify/agents/` as canonical directory with symlink bridging, shared references, and `specify init` bundling.
+
+## Key Changes
+
+1. Implement agent file creation in `.github/agents/` directory with proper naming conventions (kebab-case)
+2. Support both explicit agent specifications and context-inferred agent generation with confidence-based handling
+3. Include comprehensive validation for YAML frontmatter correctness, provider whitelist compliance, and tool-workflow consistency
+4. Provide example prompts for agent invocation and usage guidance
+5. Enable agent updates and refinements with same-name overwrite semantics
+6. Added plan artifacts for spec `003-speckit-agents-command` (`plan.md`, `data-model.md`, `contracts/agents-command.openapi.yaml`, `quickstart.md`)
+7. Locked clarified defaults: same-name overwrite, low-confidence intent halt, auto-create `.github/agents/`, contradiction blocking, least-privilege tools
+8. Added executable task breakdown for Setup/Foundational/US1/US2/US3/Polish phases with explicit dependencies and parallel markers
+9. Implemented three-tier validation system: YAML syntax, approved providers only (GitHub Copilot/Qwen Code/opencode), and tools-workflow alignment
+10. Added comprehensive quickstart validation steps covering all user stories and edge cases
+11. Spec 014: Refactored canonical directory from `.github/agents/` to `.specify/agents/` with directory-level symlink bridging to tool-specific paths
+12. Spec 014: Added shared `references/` directory for cross-agent reference materials
+13. Spec 014: Added `specify init` bundled agent installation mirroring the skills installation flow
+14. Spec 014: Generalized symlink helper to support both skills and agents
+
+## Implementation Notes
+
+- Agent files must use kebab-case naming based on display names or roles
+- YAML frontmatter must include description, tool permissions, and invocation metadata
+- Agents should follow single responsibility principle with narrowly focused roles
+- System should handle cases where `.github/agents/` directory doesn't exist
+- Quality validation should prevent saving agents with contradictory constraints
+- Canonical agent directory is `.specify/agents/` — tool-specific directories are directory-level symlinks
+- `ensure_specify_symlink()` is a generalized module-level function handling both skills and agents symlinks
+- `specify init` copies bundled agents from the package's `agents/` directory to `.specify/agents/`
+- Workspace files (`AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md`) are created by `/speckit.agents` on first run, not by init
+
+## Latest Evolution
+
+Spec 022 (eei-agent-triad): Adds the Executor-Evaluator-Improver (EEI) triad dimension to the role-based agent architecture. Within any role, work is decomposed into three independent subagents: Executor (performs tasks), Evaluator (scores output with configurable dimensions), and Improver (modifies executor's environment and prompt). Proven in a K8s diagram optimization session (score 49→91 over 17 rounds). Key innovations: context isolation between triad members, dual-target improvement (environment + executor prompt), dotted/solid line visual distinction for control/data signals.
+
+**Spec 022 implementation (2026-07-02)**: Delivered 4 new templates — `agent-subrole-executor-template.md`, `agent-subrole-evaluator-template.md`, `agent-subrole-improver-template.md` (role-agnostic via `{{AGENT_NAME}}` placeholders), and `agent-triad-orchestration-template.md` (loop scaffold with threshold/regression stopping conditions and iteration-history table). Updated create-agent (Triad Mode) and improve-agent (Triad Refinement) skills. Added `docs/eei-triad-pattern.md` reference guide. Contract/integration test tasks (T008, T013) deferred — no runtime code to pytest; validation is structural + reference-session-based. All 6 SCs pass or partial (SC-001 convergence-rate pending live usage data).
+
+**Spec 022 amendment (2026-07-02, IMPLEMENTED)**: Refactor unifying the role-based and EEI dimensions (tasks T032–T057). Delivered: (1) role agents are role-scoped **supervisors** by default (`supervisor: true` + `role-scope:` in all 6 `agent-role-*` templates; OQ-1 default-on); (2) a single-source snippet `skills/internal/create-agent/templates/agent-supervision-delegation.md` inlined by create-agent at generation (OQ-2 compose-in-skill, no copy/drift); (3) `create-agent`/`improve-agent` generalized to a **capability matrix** (role · supervisor · triad · custom) with `AgentAuthoringRequest` intake and target classify/route; (4) `/speckit.agents` Mode A/B **delegate** to the skills (Delegation Model; contract R1). New artifacts: `contracts/agent-authoring-contract.md`; `RoleSupervisor`/`AgentAuthoringRequest` entities in `data-model.md`; supervisor scenario + Amendment Validation Checklist in `quickstart.md`; `skills/internal/create-agent/templates/agent-supervision-delegation.md`. Also mirrored the previously-missing `agent-subrole-*`/`agent-triad-orchestration` templates to `.specify/templates/` (review F4). OQ-1/OQ-2 resolved via `/speckit.clarify`. Follow-up: update `contracts/agent-authoring-contract.md` R2 (superseded dormant-default) and `plan.md` Open Questions on the next `/speckit.plan` regen.
+
+Previous: Spec 015 (role-based-agents): Refactors the agent template approach from capability-based to role-based (Requirements Analyst, System Designer, etc.).
+
+Spec 023 (agent-framework-redesign, Implemented 2026-07-10): Redesigns the Agent framework around a single conceptual model — **Role × Stage × Type** with **Team** (static Role×Stage matrix) and **Loop** (dynamic iteration) structures — keeping `/speckit.agents` as the sole entry (create-agent/organize-agents delegation). Unifies terminology (**SubRole→Stage**, **improver→optimizer**), merges Meta-Coordinator + Team Supervisor into a single **Team Supervisor** (Meta role), canonicalizes templates under `skills/create-agent/templates/` (removing stale `.specify/templates/agent-*` duplicates), migrates persisted agents under `.specify/agents/`, extends persistent-agent tool config to all supported tools, and regenerates `docs/agents`. Also folds in a cross-project research deliverable mining `/cws_work/*` siblings (FR-021). Plan artifacts: `plan.md`, `data-model.md`, `contracts/{conceptual-model,agents-command,template-migration}-contract.md`, `quickstart.md`, `feature-ref.md`.
+
+## Future Evolution Suggestions
+
+- Add support for agent versioning and dependency management
+- Implement agent testing framework for validation
+- Add agent discovery and recommendation features
+- Support agent composition and orchestration patterns
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/019-agents-command.md
+- Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——其 US3 对 /speckit.agents 路由表做接线核查（run/create/refine 三行到既有 agent 技能），不新建 agent 系技能。
+
+## Status Tracking
+
+- **Draft**: Initial specification created and validated
+- **Planned**: Feature detailed in index and ready for implementation planning
+- **Implemented**: Core functionality working with basic agent creation and validation
+- **Ready for Review**: Full implementation complete with comprehensive testing
+- **Completed**: Feature fully integrated, documented, and stable in production
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/003-speckit-agents-command/requirements.md
+  Quality Checklist: .specify/specs/003-speckit-agents-command/checklists/requirements.md
+- Plan: .specify/specs/003-speckit-agents-command/plan.md
+- Data Model: .specify/specs/003-speckit-agents-command/data-model.md
+- Contracts: .specify/specs/003-speckit-agents-command/contracts/agents-command.openapi.yaml
+- Quickstart: .specify/specs/003-speckit-agents-command/quickstart.md
+- Specification: .specify/specs/014-agent-framework-refactor/requirements.md
+  Quality Checklist: .specify/specs/014-agent-framework-refactor/checklists/requirements.md
+- Specification: .specify/specs/015-role-based-agents/requirements.md
+  Quality Checklist: .specify/specs/015-role-based-agents/checklists/requirements.md
+- Specification: .specify/specs/022-eei-agent-triad/requirements.md
+  Quality Checklist: .specify/specs/022-eei-agent-triad/checklists/requirements.md
+
+- 2026-11-09 consolidation: spec dir(s) archived to `.specify/archive/specs/` — 003-speckit-agents-command, 022-eei-agent-triad (see `.specify/archive/specs/CONSOLIDATION-LEDGER.md`).
