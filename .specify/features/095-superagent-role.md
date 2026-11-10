@@ -4,6 +4,16 @@
 
 框架里 super agent 事实上早已存在（交互 session、team 协调会话、SDD 驱动者、派发者），但只以「主 session / 编排者 / supervisor / driver / 派发方」等分散措辞出现：没有归一化定义、没有 super↔sub 协议、没有「身份转变时注入什么」的清单，也没有把并发、状态同步、状态跟踪与可视化接到同一张关系模型上。本特性把 super agent 正式定义为**派发边上的相对逻辑角色**（不是实体类型；同一执行体可在不同边上同时是 subagent 与 superagent），交付「定义 + 协议 + 身份转变注入清单 + 既有载体的投影接线」，并以三个真实形态验收：桌面端 Qoder 经 SSH 驱动远端 qodercli、本地 qodercli 编排一个 team、team 成员并发扇出 10 个 subagent 并自行汇总。本运行同时作为 080–094 机制实际效果的观测（FR-038）。
 
+## Latest Review
+
+- **2026-11-10 — `/speckit.review` (run `r20261110T055657Z-b095-review`)** — Report: `.specify/specs/095-superagent-role/review.md`; code record: `.specify/specs/095-superagent-role/code-review.md`.
+  - **Process segment**: `blocked` at the P0 level — 1 P0 (the implement stage never landed its owned `Planned → Implemented` transition although the closure checker returned `accept`), 3 P1 and 8 P2 findings; the P0 was confirmed by an independent read-only validator.
+  - **Artifact segment**: `blocked` — coverage 11/11, no missing member; P1 findings: the digest contract C-1 "no carrier root may be read twice" clause is unimplemented and unguarded, the bound feature detail carries no `**Status**` field or `## Latest Review` section, and `verification.md` vs `tasks.md` disagree on the implement-stage status obligation.
+  - **Implementation segment**: `blocked` — the delta carries 7 non-095 commits plus a user-ruling amendment (scope), and 18 existing guards are red from in-range commits (regression); the 095 packages themselves re-measure green (smoke `85 passed`, exit 0). Smoke triple: command from `verification.md`, exit 0, evidence `.specify/specs/095-superagent-role/test-evidence/smoke-six-modules.txt`.
+  - **Code segment**: `blocked` — 2 `blocking` entries in the current record (18 red guards from the in-range digest redesign; the C-68 "no measurements" state removed with its guard weakened), 6 `important`, 5 `suggestion`, 1 `praise`; coverage receipt 313 changed / 13 judged / 300 skipped / 0 gap; client capture skipped (framework hat).
+  - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 7 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 7; claimed status `Planned`; ARC verdict `agree`; no fixed item.
+  - **Status transition `Implemented → Ready for Review`: refused (`blocking-unresolved`)** — the current code record carries 2 `blocking` entries (condition c); `deferred_tasks=T003` is unresolved and unwaived (condition a); and the claimed status is `Planned` because the implement-owned `Planned → Implemented` flip never landed, so the transition has no legal source state. No user waiver exists; the status is left unchanged at `Planned`.
+
 ## Key Changes（planned）
 
 1. 新增定义 owner `shared/definitions/superagent-definitions.md`（[[STR-004]]）：角色定义、边谓词、深度、super↔sub 协议（下行 / 上行 / 分类 / 等待 / 尝试 / 授权 / 终止）、九项身份转变注入、状态同步与恢复映射、可视化映射、零第二机制边界、术语边界。
