@@ -1,0 +1,43 @@
+checklist stage readings — 097-speckit-migrate-command — 2026-11-10
+unit: /speckit.checklist (skill:internal/create-checklist)  run_id: r20261110T081104Z-b097
+
+== program readings (authoritative artifacts, measured this run) ==
+requirements.md : 236 lines / 35235 bytes
+plan.md         : 202 lines / 23639 bytes
+tasks.md        : 380 lines / 51508 bytes
+data-model.md   : 143 lines / 12457 bytes
+FR definitions  : 25  (grep -c '^- \*\*FR-')
+SC definitions  : 9   (18 matching lines = 9 defs + 9 Measurement Source rows)
+Shared Strings  : 4   (STR-001…STR-004)
+task rows       : 48  (grep -c '^- \[ \] T[0-9]')
+feature binding : .specify/features/024-specification-workspace-versioning.md
+
+== flow class lookup (command gate) ==
+python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:097-speckit-migrate-command"
+-> flow_class: execution | flow_type: - | source: declaration | marker: null | neutral: false
+-> expression-class gate row not applicable; existing gate set kept verbatim.
+
+== same-author detection (objective-analysis-gate.md) ==
+condition: holds — requirements/plan/tasks authored by prior stage agents of this unattended SDD line (same model/conventions).
+dispatch: 3 fresh-context read-only detectors (Agent/Explore), disjoint scopes:
+  A = US1–US4, Edge Cases, FR-001…FR-013 (+ plan T-001/T-002, engine contract for gap-finding)
+  B = FR-014…FR-019, FR-024, SC-001…SC-005 (+ data-model E-3/E-5, migrate-cli contract)
+  C = FR-020…FR-025, SC-003…SC-009, Measurement Sources, Shared Strings, Clarifications, Assumptions (+ tasks.md)
+raw findings: 30 rows (10/10/10).
+verification (rule 4, quote-back to requirements):
+  - 1 row refuted by the quoted text: "flat-internal residue owned twice" — FR-005 says 「框架资产刷新与退役处置」, FR-010 says 「确定性检查」, i.e. disposition vs detection split, not dual ownership. Dropped.
+  - 1 row split into two entries (interruption-point enumeration vs workspace changed between runs).
+  - 2 overlap groups merged across detectors (source-version recording; lane/pointer measurability).
+  rejection rate: 1/30 = 3.3%.
+
+== generated checklist ==
+path: .specify/specs/097-speckit-migrate-command/checklists/requirements-quality-2026-11-10.md
+items: 39 (CHK001…CHK039)
+traceability: 39/39 = 100% (every item carries [Req §…] and/or [Gap]/[Ambiguity]/[Conflict])
+soft cap: 39 <= 40
+per-section: 5 / 9 / 3 / 7 / 6 / 6 / 3
+depth: Standard | audience: Reviewer | intent questions skipped (pre-answered by $ARGUMENTS)
+
+== concurrency reading ==
+requested: 3 detection units | effective: 3 (parallel, read-only)
+generation: 1 write territory -> serial (serial-reason: single-unit, unit set = {checklist artifact})
