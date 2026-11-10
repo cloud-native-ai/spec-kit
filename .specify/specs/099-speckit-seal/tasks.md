@@ -153,13 +153,13 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for User Story 2 (apply face, MANDATORY) ⚠️
 
-- [ ] T021 [US2] 写红先契约测试 `tests/contract/test_seal_merge_apply.py`：`merge/create/keep` 动作结果（含目录型候选的文件级单位与同名三态）、dated-record 指针纳入（无父级副本、原件字节不变）、全部引用改写为合并后 ID、拆前行 `supersede` 处置、恰一行 `**Merged into**:` 分片标注、`merge-manifest.json` schema（稳定键序、自摘要、`checks`）、dated-record 哈希稳定、合并后 fixture 父级的 `validate-requirements.py` / `validate-tasks.py` exit 0，红输出记入 `notes/red-first-evidence.md`（FR-018、FR-019、SC-004、[blockedBy: T020]）。
-- [ ] T022 [US2] 写红先集成测试 `tests/integration/test_seal_merge_determinism.py`：两次运行 sha256 名单逐字节一致、`merge-apply` 重跑零 diff、把任一排序键改为「返回时刻」的变异转红，红输出记入 `notes/red-first-evidence.md`（FR-013、SC-003、[blockedBy: T020]）。
+- [X] T021 [US2] 写红先契约测试 `tests/contract/test_seal_merge_apply.py`：`merge/create/keep` 动作结果（含目录型候选的文件级单位与同名三态）、dated-record 指针纳入（无父级副本、原件字节不变）、全部引用改写为合并后 ID、拆前行 `supersede` 处置、恰一行 `**Merged into**:` 分片标注、`merge-manifest.json` schema（稳定键序、自摘要、`checks`）、dated-record 哈希稳定、合并后 fixture 父级的 `validate-requirements.py` / `validate-tasks.py` exit 0，红输出记入 `notes/red-first-evidence.md`（FR-018、FR-019、SC-004、[blockedBy: T020]）。
+- [X] T022 [US2] 写红先集成测试 `tests/integration/test_seal_merge_determinism.py`：两次运行 sha256 名单逐字节一致、`merge-apply` 重跑零 diff、把任一排序键改为「返回时刻」的变异转红，红输出记入 `notes/red-first-evidence.md`（FR-013、SC-003、[blockedBy: T020]）。
 
 ### Implementation for User Story 2 (merge-apply)
 
-- [ ] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物（目录型候选按文件级单位；dated-record 文件只写指针视图、不复制原件）、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正（含未声明登记处的引用检出）、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。
-- [ ] T024 [US2] 用既有验证器证成合并产物：对合并后的 fixture 父级运行 `python3 scripts/python/validate-requirements.py` 与 `python3 scripts/python/validate-tasks.py`（均 exit 0），并扫描 ID 连续、重复 ID、悬空引用与未勾选行计数，读数记入 `test-evidence/merge-apply-checks.txt`（FR-014、SC-004、[blockedBy: T023]）。
+- [X] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物（目录型候选按文件级单位；dated-record 文件只写指针视图、不复制原件）、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正（含未声明登记处的引用检出）、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。
+- [X] T024 [US2] 用既有验证器证成合并产物：对合并后的 fixture 父级运行 `python3 scripts/python/validate-requirements.py` 与 `python3 scripts/python/validate-tasks.py`（均 exit 0），并扫描 ID 连续、重复 ID、悬空引用与未勾选行计数，读数记入 `test-evidence/merge-apply-checks.txt`（FR-014、SC-004、[blockedBy: T023]）。
 
 **Checkpoint**: 合并回写在夹具上确定性成立，冲突显式且阻断。
 

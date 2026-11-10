@@ -371,3 +371,146 @@ FAILED tests/contract/test_seal_merge_plan.py::test_merge_plan_is_rerun_stable
 ```
 
 **读数**：18/18 红、无一静默通过；红因「动作体缺失」而非语法/收集错误。用例面覆盖 C-011…C-018 的 plan 面，外加 C-001（只读零写盘）、C-002/C-010（退出码与 verdict 一致）与 C-006（stdout-only、重跑稳定）的守护腿。夹具覆盖三种树：干净双片（`split-pair/`）、逐类冲突注入（`conflict-injections/`）、出厂文档引用（`factory-doc/`）。
+
+## 4. T021 红先契约测试 `tests/contract/test_seal_merge_apply.py`
+
+**采集点**：P4 两个测试文件落地之后、T023 `merge-apply` 动作体落地之前（工作树仅新增该测试与 `test_seal_merge_determinism.py`；引擎仍是 P2/P3 形态，`merge-apply` 走 `_pending`）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_seal_merge_apply.py -q
+```
+
+**退出码**：1（14 failed）。
+
+**完整 stdout/stderr（verbatim；`-n auto --dist load` 使失败块顺序非确定）**：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_merge_apply.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+__________ test_requirements_merge_rewrites_ids_and_keeps_parent_text __________
+[gw…] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7821/popen-gw…/test_requirements_merge_rew0')
+
+    def test_requirements_merge_rewrites_ids_and_keeps_parent_text(tmp_path):
+        repo = _copy_fixture("split-pair", tmp_path / "repo")
+        _run_apply(repo)
+        text = (_spec(repo) / "requirements.md").read_text(encoding="utf-8")
+>       assert "- **FR-001**: Parent alpha requirement, owned by the parent." in text, (
+            "C-016: a mapped entry keeps the parent phrasing (localization)"
+        )
+E       AssertionError: C-016: a mapped entry keeps the parent phrasing (localization)
+
+[… 11 个同构失败块省略：动作体未实现使 `read_text()` 指向尚未生成的父级产物（`merge-manifest.json` /
+`verification.md` / 合并后的 `requirements.md` 等）或 `apply` 键不存在；另 2 个失败为退出码断言
+（`assert 2 == 0` ×2，`_pending` 统一返回 2；其中 validator/hash-stability 两例的失败消息把该原因
+逐字写为 “the … assertion is only meaningful on a completed merge; exit=2 … not-implemented”）…]
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_merge_apply.py::test_requirements_merge_rewrites_ids_and_keeps_parent_text
+FAILED tests/contract/test_seal_merge_apply.py::test_tasks_merge_supersedes_pre_split_rows
+FAILED tests/contract/test_seal_merge_apply.py::test_merged_parent_passes_the_existing_validators
+FAILED tests/contract/test_seal_merge_apply.py::test_prose_artifacts_append_unique_sections_with_source_markers
+FAILED tests/contract/test_seal_merge_apply.py::test_factory_doc_reference_is_repointed_and_recorded
+FAILED tests/contract/test_seal_merge_apply.py::test_contract_merge_appends_clauses_and_creates_slice_only_file
+FAILED tests/contract/test_seal_merge_apply.py::test_open_conflicts_refuse_and_write_nothing
+FAILED tests/contract/test_seal_merge_apply.py::test_dated_records_are_hash_stable_across_the_run
+FAILED tests/contract/test_seal_merge_apply.py::test_unclosed_slice_tasks_refuse_and_write_nothing
+FAILED tests/contract/test_seal_merge_apply.py::test_each_slice_carries_exactly_one_merged_into_line
+FAILED tests/contract/test_seal_merge_apply.py::test_clean_split_pair_applies_with_exit_zero
+FAILED tests/contract/test_seal_merge_apply.py::test_directory_candidates_merge_and_create_at_file_level
+FAILED tests/contract/test_seal_merge_apply.py::test_manifest_schema_is_stable_and_self_digested
+FAILED tests/contract/test_seal_merge_apply.py::test_pointer_views_and_dated_record_pointer_inclusions
+14 failed in 6.50s
+```
+
+**读数**：14/14 红、无一静默通过。首次运行时 `test_merged_parent_passes_the_existing_validators` 与
+`test_dated_records_are_hash_stable_across_the_run` 因未先断言 apply 成功而真空通过（对未合并夹具校验 /
+零写入前后恒等），已补 `assert proc.returncode == 0` 前置断言后转红——绿必须来自合并产物本身。用例面覆盖
+C-013…C-023 的 apply 面：动作三态（merge/create/keep）、dated-record 指针纳入与原件字节不变、引用改写、
+拆前行 supersede、恰一行 `**Merged into**:`、manifest schema/自摘要/`checks`、既有验证器证成，以及两条
+零持久化拒绝腿（开放冲突、分片未闭合）。
+
+## 5. T022 红先集成测试 `tests/integration/test_seal_merge_determinism.py`
+
+**采集点**：同 T021（动作体未实现期，`merge-apply` 走 `_pending`）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/integration/test_seal_merge_determinism.py -q
+```
+
+**退出码**：1（3 failed）。
+
+**完整 stdout/stderr（verbatim）**：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_seal_merge_determinism.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_return_time_sort_key_mutation_turns_the_comparison_red __________
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7820/popen-gw16/test_return_time_sort_key_muta0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f15eebdf710>
+
+    def test_return_time_sort_key_mutation_turns_the_comparison_red(tmp_path, monkeypatch):
+        """Inject the canonical mutation: an ordering key that reads the return time.
+
+        The comparison used by the determinism tests is the per-file sha256 map. If a
+        sort key were replaced with ``time.time()``, two runs would disagree; this
+        test proves the comparison reports that disagreement (i.e. the guard is not
+        vacuous), rather than only asserting that today's engine is deterministic.
+        """
+        module = _load_engine()
+        real_classify = module._classify_artifacts
+
+        def time_keyed(repo, spec_dir, slices):
+            rows = real_classify(repo, spec_dir, slices)
+            stamp = time.time()
+            for row in rows:
+                row["order_stamp"] = stamp
+            return sorted(rows, key=lambda row: row["order_stamp"])
+
+        monkeypatch.setattr(module, "_classify_artifacts", time_keyed)
+
+        first = _copy_fixture(tmp_path / "first")
+>       _run_engine_in_process(module, first)
+
+tests/integration/test_seal_merge_determinism.py:169:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+module = <module 'seal_utils_determinism' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/scripts/python/seal-utils.py'>
+repo = PosixPath('/tmp/pytest-of-agent/pytest-7820/popen-gw16/test_return_time_sort_key_muta0/first')
+
+    def _run_engine_in_process(module, repo: Path) -> str:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+…
+E       AssertionError: in-process apply exited 2: '{\n  "action": "merge-apply",\n  "conditions": [\n    {\n      "code": "not-implemented",\n      "evidence": "the merge-apply action body is not implemented on this skeleton",\n      "fix_path": "run the action once its implementing work package lands",\n      "rerun": "rerun the same command after the action body is implemented"\n    }\n  ],\n  "exit_code": 2,\n  "spec_dir": "/tmp/pytest-of-agent/pytest-7820/popen-gw16/test_return_time_sort_key_muta0/first/.specify/specs/099-fixture-parent",\n  "verdict": "error"\n}\n'
+
+[… 2 个同构失败块省略：`test_two_fresh_runs_are_byte_identical` 与 `test_rerun_in_place_is_zero_diff`
+均因 `merge-apply` 返回 `exit 2 / not-implemented` 而在退出码断言处失败…]
+
+=========================== short test summary info ============================
+FAILED tests/integration/test_seal_merge_determinism.py::test_return_time_sort_key_mutation_turns_the_comparison_red
+FAILED tests/integration/test_seal_merge_determinism.py::test_rerun_in_place_is_zero_diff
+FAILED tests/integration/test_seal_merge_determinism.py::test_two_fresh_runs_are_byte_identical
+3 failed in 6.19s
+```
+
+**读数**：3/3 红。两条确定性腿（两次全新运行逐字节一致、成功重跑零 diff）与「返回时刻排序键」变异腿
+（同一 sha256 快照比较在注入时间键后必须报告差异，并附未变异引擎仍逐字节一致的对照断言）都因动作体缺失
+而红，红因是「动作体未实现」而非收集/语法错误。

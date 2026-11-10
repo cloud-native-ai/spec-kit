@@ -1,0 +1,178 @@
+# T024 — merge-apply artifact validation (099-speckit-seal)
+
+**Date**: 2026-11-11
+**Fixture**: `tests/fixtures/seal/split-pair` (clean two-slice merge; parent `099-fixture-parent`)
+**Work tree**: `.specify/.tmp/seal-merge-apply-check/repo` (sanctioned scratch, removed after capture)
+**Engine**: `scripts/python/seal-utils.py` (`merge-apply`)
+
+## 1. merge-apply
+
+**Command (verbatim)**:
+
+```bash
+python3 scripts/python/seal-utils.py --action merge-apply --spec-dir .specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent --repo .specify/.tmp/seal-merge-apply-check/repo --json
+```
+
+**Exit code**: 0
+
+**Output (verbatim)**:
+
+```json
+{
+  "action": "merge-apply",
+  "apply": {
+    "checks": {
+      "dangling_refs": 0,
+      "dated_record_hashes_stable": true,
+      "duplicate_ids": 0,
+      "id_continuity": "pass",
+      "open_rows": 0
+    },
+    "dispositions": 1,
+    "factory_doc_resolutions": 0,
+    "idempotent": false,
+    "manifest": ".specify/specs/099-fixture-parent/merge-manifest.json",
+    "slices": [
+      "099a-fixture-alpha",
+      "099b-fixture-beta"
+    ],
+    "writes": [
+      ".specify/specs/099-fixture-parent/checklists/plan-review.md",
+      ".specify/specs/099-fixture-parent/checklists/requirements.md",
+      ".specify/specs/099-fixture-parent/checkpoints/cp-2026-11-05.txt",
+      ".specify/specs/099-fixture-parent/code-review.md",
+      ".specify/specs/099-fixture-parent/contracts/core.contract.md",
+      ".specify/specs/099-fixture-parent/contracts/extra-alpha.md",
+      ".specify/specs/099-fixture-parent/data-model.md",
+      ".specify/specs/099-fixture-parent/merge-manifest.json",
+      ".specify/specs/099-fixture-parent/plan.md",
+      ".specify/specs/099-fixture-parent/requirements.md",
+      ".specify/specs/099-fixture-parent/review.md",
+      ".specify/specs/099-fixture-parent/tasks.md",
+      ".specify/specs/099-fixture-parent/test-evidence/run-2026-11-02.txt",
+      ".specify/specs/099-fixture-parent/verification.md",
+      ".specify/specs/099a-fixture-alpha/requirements.md",
+      ".specify/specs/099b-fixture-beta/requirements.md"
+    ]
+  },
+  "conditions": [],
+  "exit_code": 0,
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent",
+  "verdict": "ok"
+}
+```
+
+## 2. validate-requirements.py
+
+**Command (verbatim)**:
+
+```bash
+python3 scripts/python/validate-requirements.py .specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent/requirements.md --json
+```
+
+**Exit code**: 0
+
+**Output (verbatim)**:
+
+```json
+{
+  "file": ".specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent/requirements.md",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "id-contiguous",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "doc-order",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "ref-resolvable",
+      "status": "fail",
+      "count": 3
+    },
+    {
+      "label": "marker-count",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "dup-id",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "path-marker",
+      "status": "pass",
+      "count": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 3,
+  "scanned": {
+    "lines": 26,
+    "definition_rows": 5,
+    "shared_strings": 3
+  }
+}
+```
+
+Note: `ref-resolvable` reports `status: fail, count: 3` with `errors: 0, warnings: 3` — the three
+findings are the checker severity-`warning` class (a shared string defined but never cited as
+`[[STR-NNN]]`); the artifact verdict is `status: ok` and the exit code is 0.
+
+## 3. validate-tasks.py
+
+**Command (verbatim)**:
+
+```bash
+python3 scripts/python/validate-tasks.py .specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent/tasks.md --json
+```
+
+**Exit code**: 0
+
+**Output (verbatim)**:
+
+```json
+{
+  "file": ".specify/.tmp/seal-merge-apply-check/repo/.specify/specs/099-fixture-parent/tasks.md",
+  "errors": [],
+  "warnings": [],
+  "status": "PASS",
+  "green_claims": []
+}
+```
+
+## 4. ID scans (continuity / duplicates / dangling / open rows)
+
+**Command (verbatim, heredoc body)**:
+
+```bash
+python3 - <repo> <<PY
+# scans the merged parent requirements/tasks/contracts/data-model: per-family ID
+# continuity (clause ids are unique per contract file only), duplicate ids, dangling
+# FR/SC/[[STR]] references and unchecked active task rows
+PY
+```
+
+**Exit code**: 0
+
+**Output (verbatim)**:
+
+```text
+FR_ids=[1, 2, 3, 4]
+SC_ids=[1]
+STR_ids=[1, 2, 3]
+TASK_ids=[1, 2, 3, 4, 5]
+ENTITY_ids=[1]
+CLAUSE_ids[core.contract.md]=[1, 2, 3]
+CLAUSE_ids[extra-alpha.md]=[1]
+id_contiguous=True
+duplicate_ids=0
+dangling_refs=0
+unchecked_task_rows=0
+SCAN=PASS
+```

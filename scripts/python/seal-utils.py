@@ -28,6 +28,7 @@ Contract: `.specify/specs/099-speckit-seal/contracts/seal-engine.contract.md` (C
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -84,8 +85,9 @@ def _import_guard():
     if here not in sys.path:
         sys.path.insert(0, here)
     try:
-        from script_interface_cli import add_version_argument, configure_parser, guard_argv
-        return configure_parser, guard_argv, add_version_argument
+        from script_interface_cli import (add_version_argument, configure_parser,
+                                          guard_argv, version_text)
+        return configure_parser, guard_argv, add_version_argument, version_text
     except ImportError:  # a bare copy without the helper still runs its actions
         def _configure(parser, **_kwargs):
             return parser
@@ -96,10 +98,13 @@ def _import_guard():
         def _add_version(parser):
             return parser
 
-        return _configure, _guard, _add_version
+        def _version_text(script_name, _start=None):
+            return "%s %s" % (Path(script_name).name, "unknown")
+
+        return _configure, _guard, _add_version, _version_text
 
 
-_sig_configure, _sig_guard, _sig_add_version = _import_guard()
+_sig_configure, _sig_guard, _sig_add_version, _sig_version_text = _import_guard()
 
 
 # ---------------------------------------------------------------------------
@@ -142,6 +147,18 @@ def render(payload: Dict[str, Any], as_json: bool) -> None:
         print("  factory_doc_refs: %d" % len(plan["factory_doc_refs"]))
         print("  conflicts: %d open" % len(
             [item for item in plan["conflicts"] if item.get("status") == "open"]))
+    applied = payload.get("apply")
+    if isinstance(applied, dict):
+        print("  manifest: %s" % applied["manifest"])
+        print("  idempotent: %s" % ("yes" if applied["idempotent"] else "no"))
+        print("  slices: %s" % (", ".join(applied["slices"]) or "-"))
+        print("  writes: %d" % len(applied["writes"]))
+        checks = applied.get("checks", {})
+        print("  checks: id_continuity=%s open_rows=%s duplicate_ids=%s "
+              "dangling_refs=%s dated_records_stable=%s" % (
+                  checks.get("id_continuity", "-"), checks.get("open_rows", "-"),
+                  checks.get("duplicate_ids", "-"), checks.get("dangling_refs", "-"),
+                  checks.get("dated_record_hashes_stable", "-")))
     for condition in payload["conditions"]:
         print("  - %s: %s" % (condition["code"], condition["evidence"]))
         print("    fix: %s" % condition["fix_path"])
@@ -1073,8 +1090,795 @@ def action_merge_plan(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[st
     return payload, code
 
 
+# ---------------------------------------------------------------------------
+# Merge-apply surface (C-013 … C-023): deterministic writes into the parent
+# ---------------------------------------------------------------------------
+
+MANIFEST_NAME = "merge-manifest.json"
+SUPERSEDE_HEADING = "## Superseded pre-split record"
+MERGE_APPENDIX_HEADING = "## Merged from slices"
+POINTER_BEGIN = "<!-- begin: merge-apply aggregated pointer view (generated) -->"
+POINTER_END = "<!-- end: merge-apply aggregated pointer view -->"
+SLICE_STATUS_RE = re.compile(r"^(SC-\d{3}|FR-\d{3})_status=(.*)$")
+_ID_TOKEN_RE = re.compile(r"\b(?:STR-\d{3}|FR-\d{3}|SC-\d{3}|C-\d{3}|T\d{3}|E\d+)\b")
+_MERGED_INTO_RE = re.compile(r"^\*\*Merged into\*\*:\s*(.+?)\s*$")
+_TASK_ANY_RE = re.compile(r"^-\s+\[(.)\]\s+T\d{3}\b")
+
+
+def _ensure_newline(text: str) -> str:
+    stripped = text.rstrip("\n")
+    return stripped + "\n" if stripped else ""
+
+
+def _slice_rewrite_map(id_maps: Dict[str, list], slug: str,
+                       contract_file: Optional[str] = None) -> Dict[str, str]:
+    mapping: Dict[str, str] = {}
+    for family in ("FR", "SC", "STR", "T", "E"):
+        for entry in id_maps.get(family, []):
+            if entry["slice"] == slug:
+                mapping[entry["slice_id"]] = entry["parent_id"]
+    for entry in id_maps.get("C", []):
+        if entry["slice"] == slug and (contract_file is None
+                                       or entry.get("file") == contract_file):
+            mapping[entry["slice_id"]] = entry["parent_id"]
+    return mapping
+
+
+def _rewrite_ids(text: str, mapping: Dict[str, str]) -> str:
+    if not mapping:
+        return text
+
+    def _replace(match):
+        return mapping.get(match.group(0), match.group(0))
+
+    return _ID_TOKEN_RE.sub(_replace, text)
+
+
+def _raw_definition_line(text: str, slice_id: str) -> Optional[str]:
+    for line in text.splitlines():
+        match = re.match(r"^-\s+\*\*(FR|SC)-(\d{3})\*\*", line)
+        if match and "%s-%s" % (match.group(1), match.group(2)) == slice_id:
+            return line
+    return None
+
+
+def _h2_sections(text: str):
+    sections = []
+    current = None
+    for line in text.splitlines():
+        if re.match(r"^##\s+", line):
+            current = [re.sub(r"^##\s+", "", line).strip(), []]
+            sections.append(current)
+        elif current is not None:
+            current[1].append(line)
+    return [(heading, body) for heading, body in sections]
+
+
+def _demote_heading(line: str) -> str:
+    return "#" + line if re.match(r"^#{1,6}\s", line) else line
+
+
+def _summary_line(text: str) -> str:
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped[:1] in ("-", "*"):
+            stripped = stripped.lstrip("-*").strip()
+        return stripped
+    return "(no summary line)"
+
+
+def _write_if_changed(path: Path, content: str, written: list, repo: Path) -> bool:
+    data = content.encode("utf-8")
+    if path.is_file() and path.read_bytes() == data:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    written.append(_rel_path(repo, path))
+    return True
+
+
+def _engine_version() -> str:
+    try:
+        return _sig_version_text(ENGINE_NAME).rsplit(" ", 1)[-1]
+    except (OSError, ValueError):
+        return "unknown"
+
+
+def _dated_files(ordered) -> list:
+    paths = []
+    for item in ordered:
+        base = item["path"]
+        for name in ("review.md", "code-review.md", "verification.md"):
+            if (base / name).is_file():
+                paths.append(base / name)
+        for dirname in DATED_RECORD_DIRS:
+            if (base / dirname).is_dir():
+                paths.extend(sorted(p for p in (base / dirname).rglob("*") if p.is_file()))
+    return sorted(set(paths), key=lambda item: str(item))
+
+
+def _dated_snapshot(ordered) -> Dict[str, str]:
+    return {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in _dated_files(ordered)}
+
+
+def _open_task_rows(text: str) -> list:
+    rows = []
+    for line_no, line in enumerate(text.splitlines(), 1):
+        match = _TASK_ROW_RE.match(line)
+        if match and match.group(1) in (" ", ">"):
+            rows.append({"line": line_no, "text": line, "id": match.group(2)})
+    return rows
+
+
+def _deferred_recorded(item, task_id: str) -> bool:
+    verification = item["path"] / "verification.md"
+    if not verification.is_file():
+        return False
+    return any("deferred_tasks=" in line and task_id in line
+               for line in _read_text(verification).splitlines())
+
+
+def _unclosed_slice_rows(repo: Path, ordered) -> list:
+    findings = []
+    for item in ordered:
+        tasks_path = item["path"] / "tasks.md"
+        if not tasks_path.is_file():
+            continue
+        for line_no, line in enumerate(_read_text(tasks_path).splitlines(), 1):
+            match = _TASK_ROW_RE.match(line)
+            if not match:
+                continue
+            state = match.group(1)
+            if state in (" ", ">"):
+                findings.append((_rel_path(repo, tasks_path), line_no, match.group(2), state))
+            elif state == "~" and not _deferred_recorded(item, match.group(2)):
+                findings.append((_rel_path(repo, tasks_path), line_no, match.group(2), state))
+    return findings
+
+
+# --- per-artifact content builders -----------------------------------------
+
+def _prose_content(repo, spec_dir, name, action, ordered, id_maps):
+    parent_path = spec_dir / name
+    parent_text = _read_text(parent_path) if parent_path.is_file() else ""
+    contributors = [item for item in ordered if (item["path"] / name).is_file()]
+    blocks = []
+    for item in contributors:
+        mapping = _slice_rewrite_map(id_maps, item["slug"])
+        body = _rewrite_ids(_read_text(item["path"] / name), mapping).rstrip("\n")
+        blocks.append("<!-- merged from %s (source: %s) -->\n\n%s" % (
+            item["slug"], _rel_path(repo, item["path"] / name), body))
+    if action == "create" or not parent_text:
+        if not blocks:
+            return None
+        return _ensure_newline("\n\n".join(blocks))
+    parent_headings = {heading for heading, _ in _h2_sections(parent_text)}
+    appendix = []
+    for item in contributors:
+        mapping = _slice_rewrite_map(id_maps, item["slug"])
+        slice_text = _rewrite_ids(_read_text(item["path"] / name), mapping)
+        unique = [(heading, body) for heading, body in _h2_sections(slice_text)
+                  if heading not in parent_headings]
+        if not unique:
+            continue
+        block = ["<!-- source: %s -->" % item["slug"], ""]
+        for heading, body in unique:
+            block.append(_demote_heading("## " + heading))
+            block.append("")
+            lines = list(body)
+            while lines and not lines[-1].strip():
+                lines.pop()
+            block.extend(_demote_heading(line) for line in lines)
+            block.append("")
+        appendix.append("\n".join(block).rstrip("\n"))
+    if not appendix:
+        return None
+    return _ensure_newline(parent_text) + "\n" + MERGE_APPENDIX_HEADING + "\n\n" \
+        + "\n\n".join(appendix) + "\n"
+
+
+def _requirements_content(repo, spec_dir, action, ordered, id_maps):
+    parent_path = spec_dir / "requirements.md"
+    if not parent_path.is_file():
+        return _prose_content(repo, spec_dir, "requirements.md", action, ordered, id_maps)
+    parent_text = _read_text(parent_path)
+    lines = parent_text.splitlines()
+    anchors: Dict[int, list] = {}
+    for family in ("FR", "SC"):
+        appended_lines = []
+        for entry in id_maps.get(family, []):
+            if entry["kind"] != "appended":
+                continue
+            item = next(i for i in ordered if i["slug"] == entry["slice"])
+            raw = _raw_definition_line(item["text"], entry["slice_id"])
+            if raw is None:
+                continue
+            appended_lines.append(_rewrite_ids(
+                raw, _slice_rewrite_map(id_maps, entry["slice"])))
+        if not appended_lines:
+            continue
+        anchor = max((index for index, line in enumerate(lines)
+                      if re.match(r"^-\s+\*\*%s-\d{3}\*\*" % family, line)),
+                     default=len(lines))
+        anchors.setdefault(anchor, []).extend(appended_lines)
+    string_rows = []
+    for entry in id_maps.get("STR", []):
+        if entry["kind"] != "appended":
+            continue
+        item = next(i for i in ordered if i["slug"] == entry["slice"])
+        record = _parse_shared_strings(item["text"]).get(entry["slice_id"])
+        if record is None:
+            continue
+        string_rows.append("| `%s` | `\"%s\"` | appended from %s by merge |" % (
+            entry["parent_id"], record["literal"], entry["slice"]))
+    if string_rows:
+        body, start = _section(parent_text, r"Shared Strings")
+        if body is not None:
+            offsets = [offset for offset, line in enumerate(body) if line.startswith("|")]
+            if offsets:
+                anchor = start + 1 + max(offsets)
+            else:
+                anchor = start + len(body)
+            anchors.setdefault(anchor, []).extend(string_rows)
+        else:
+            anchors.setdefault(len(lines), []).extend(
+                ["", "## Shared Strings", "",
+                 "| String ID | Value (verbatim) | Consumed by |",
+                 "|-----------|------------------|-------------|"] + string_rows)
+    if not anchors:
+        return None
+    out = []
+    for index, line in enumerate(lines):
+        out.append(line)
+        out.extend(anchors.get(index, []))
+    out.extend(anchors.get(len(lines), []))
+    return _ensure_newline("\n".join(out))
+
+
+def _tasks_content(repo, spec_dir, action, ordered, id_maps, carriers):
+    parent_path = spec_dir / "tasks.md"
+    parent_text = _read_text(parent_path) if parent_path.is_file() else ""
+    kept = []
+    for line in parent_text.splitlines():
+        match = _TASK_ROW_RE.match(line)
+        if match and match.group(1) in (" ", ">"):
+            continue
+        kept.append(line)
+    appended = []
+    for item in ordered:
+        tasks_path = item["path"] / "tasks.md"
+        if not tasks_path.is_file():
+            continue
+        mapping = _slice_rewrite_map(id_maps, item["slug"])
+        for line in _read_text(tasks_path).splitlines():
+            if _TASK_ROW_RE.match(line):
+                appended.append(_rewrite_ids(line, mapping))
+    anchor_rows = [index for index, line in enumerate(kept) if _TASK_ROW_RE.match(line)]
+    insert_at = anchor_rows[-1] + 1 if anchor_rows else len(kept)
+    out = kept[:insert_at] + appended + kept[insert_at:]
+    superseded = _open_task_rows(parent_text)
+    if superseded:
+        carrier_note = ", ".join(carriers) if carriers else "-"
+        block = ["", SUPERSEDE_HEADING, ""]
+        for row in superseded:
+            block.append("> " + row["text"])
+            block.append(">")
+            block.append("> superseded: tasks.md:%d (original position); superseded_by: "
+                         "%s line 0 (whole-file fact); carriers: %s" % (
+                             row["line"], MANIFEST_NAME, carrier_note))
+            block.append("")
+        out.extend(block)
+    if not appended and not superseded and action == "keep":
+        return None
+    return _ensure_newline("\n".join(out))
+
+
+def _contract_content(repo, spec_dir, fname, action, ordered, id_maps):
+    unit = "contracts/" + fname
+    parent_path = spec_dir / "contracts" / fname
+    contributors = [item for item in ordered
+                    if (item["path"] / "contracts" / fname).is_file()]
+    if action == "create" or not parent_path.is_file():
+        blocks = []
+        for item in contributors:
+            mapping = _slice_rewrite_map(id_maps, item["slug"], contract_file=unit)
+            body = _rewrite_ids(
+                _read_text(item["path"] / "contracts" / fname), mapping).rstrip("\n")
+            blocks.append("<!-- merged from %s (source: %s) -->\n\n%s" % (
+                item["slug"], _rel_path(repo, item["path"] / "contracts" / fname), body))
+        return _ensure_newline("\n\n".join(blocks)) if blocks else None
+    parent_text = _read_text(parent_path)
+    appended = []
+    for item in contributors:
+        mapping = _slice_rewrite_map(id_maps, item["slug"], contract_file=unit)
+        for entry in id_maps.get("C", []):
+            if entry["slice"] != item["slug"] or entry.get("file") != unit:
+                continue
+            if entry["kind"] != "appended":
+                continue
+            raw = next((line for line in
+                        _read_text(item["path"] / "contracts" / fname).splitlines()
+                        if re.match(r"^\*\*%s\*\*" % re.escape(entry["slice_id"]), line)),
+                       None)
+            if raw is not None:
+                appended.append(_rewrite_ids(raw, mapping))
+    if not appended:
+        return None
+    return _ensure_newline(parent_text) + "\n" + "\n".join(appended) + "\n"
+
+
+def _data_model_content(repo, spec_dir, action, ordered, id_maps):
+    parent_path = spec_dir / "data-model.md"
+    if action == "create" or not parent_path.is_file():
+        return _prose_content(repo, spec_dir, "data-model.md", action, ordered, id_maps)
+    parent_text = _read_text(parent_path)
+    lines = parent_text.splitlines()
+    appended = []
+    for entry in id_maps.get("E", []):
+        if entry["kind"] != "appended":
+            continue
+        item = next(i for i in ordered if i["slug"] == entry["slice"])
+        mapping = _slice_rewrite_map(id_maps, entry["slice"])
+        for line in _read_text(item["path"] / "data-model.md").splitlines():
+            match = re.match(r"^\|\s*(E\d+)\s*\|", line)
+            if match and match.group(1) == entry["slice_id"]:
+                appended.append(_rewrite_ids(line, mapping))
+    if not appended:
+        return None
+    rows = [index for index, line in enumerate(lines) if re.match(r"^\|\s*E\d+\s*\|", line)]
+    insert_at = rows[-1] + 1 if rows else len(lines)
+    out = lines[:insert_at] + appended + lines[insert_at:]
+    return _ensure_newline("\n".join(out))
+
+
+def _dated_pointer_view(repo, row):
+    blocks = []
+    for rel in row.get("pointer", {}).get("paths", []):
+        path = repo / rel
+        if not path.is_file():
+            continue
+        summary = next((line.strip() for line in _read_text(path).splitlines()
+                        if line.strip()), "(empty record)")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        blocks.append("summary: %s\npointer: %s\nsha256: %s" % (summary, rel, digest))
+    return _ensure_newline("\n\n".join(blocks)) if blocks else None
+
+
+def _directory_file_content(repo, spec_dir, dirname, fname, action, row,
+                            ordered, id_maps):
+    if row.get("pointer_view"):
+        return _dated_pointer_view(repo, row)
+    parent_path = spec_dir / dirname / fname
+    contributors = [item for item in ordered
+                    if (item["path"] / dirname / fname).is_file()]
+    blocks = []
+    for item in contributors:
+        mapping = _slice_rewrite_map(id_maps, item["slug"])
+        body = _rewrite_ids(
+            _read_text(item["path"] / dirname / fname), mapping).rstrip("\n")
+        blocks.append("<!-- merged from %s (source: %s) -->\n\n%s" % (
+            item["slug"], _rel_path(repo, item["path"] / dirname / fname), body))
+    if action == "create" or not parent_path.is_file():
+        return _ensure_newline("\n\n".join(blocks)) if blocks else None
+    if not blocks:
+        return None
+    return _ensure_newline(_read_text(parent_path).rstrip("\n") + "\n\n"
+                           + "\n\n".join(blocks))
+
+
+def _pointer_view_block(repo, name, ordered, id_maps):
+    if name == "verification.md":
+        lines = []
+        for item in ordered:
+            path = item["path"] / "verification.md"
+            if not path.is_file():
+                continue
+            mapping = _slice_rewrite_map(id_maps, item["slug"])
+            for line in _read_text(path).splitlines():
+                match = SLICE_STATUS_RE.match(re.sub(r"^[-*]\s+", "", line.strip()))
+                if not match:
+                    continue
+                parent_id = mapping.get(match.group(1), match.group(1))
+                lines.append("%s_status=%s" % (parent_id, match.group(2).strip()))
+                lines.append("%s_note=%s (%s local row %s)" % (
+                    parent_id, _rel_path(repo, path), item["slug"], match.group(1)))
+        return lines or ["(no slice verification records in this merge)"]
+    lines = []
+    for item in ordered:
+        path = item["path"] / name
+        if not path.is_file():
+            continue
+        lines.append("- %s: %s — %s" % (
+            item["slug"], _rel_path(repo, path), _summary_line(_read_text(path))))
+    return lines or ["- (no slice %s records in this merge)" % name]
+
+
+def _pointer_view_content(repo, spec_dir, name, action, ordered, id_maps):
+    block = _pointer_view_block(repo, name, ordered, id_maps)
+    parent_path = spec_dir / name
+    parent_text = _read_text(parent_path) if parent_path.is_file() else ""
+    if action == "create" or not parent_text:
+        title = {"verification.md": "# Verification — aggregated pointer view",
+                 "review.md": "# Review — aggregated pointer view",
+                 "code-review.md": "# Code review — aggregated pointer view"}[name]
+        return _ensure_newline("%s (%s)\n\n%s\n" % (
+            title, spec_dir.name, "\n".join(block)))
+    generated = POINTER_BEGIN + "\n" + "\n".join(block) + "\n" + POINTER_END
+    if POINTER_BEGIN in parent_text and POINTER_END in parent_text:
+        prefix, _, rest = parent_text.partition(POINTER_BEGIN)
+        _, _, suffix = rest.partition(POINTER_END)
+        return _ensure_newline(prefix + generated + suffix)
+    return _ensure_newline(parent_text) + "\n" + generated + "\n"
+
+
+def _artifact_content(repo, spec_dir, row, ordered, id_maps, carriers):
+    name, action = row["name"], row["action"]
+    if "/" in name:
+        dirname, fname = name.split("/", 1)
+        if dirname == "contracts":
+            return _contract_content(repo, spec_dir, fname, action, ordered, id_maps)
+        return _directory_file_content(repo, spec_dir, dirname, fname, action, row,
+                                       ordered, id_maps)
+    if name == "requirements.md":
+        return _requirements_content(repo, spec_dir, action, ordered, id_maps)
+    if name == "tasks.md":
+        return _tasks_content(repo, spec_dir, action, ordered, id_maps, carriers)
+    if name in POINTER_VIEW_CANDIDATES:
+        return _pointer_view_content(repo, spec_dir, name, action, ordered, id_maps)
+    if name == "data-model.md":
+        return _data_model_content(repo, spec_dir, action, ordered, id_maps)
+    if name in ("plan.md", "research.md", "quickstart.md", "feature-ref.md"):
+        return _prose_content(repo, spec_dir, name, action, ordered, id_maps)
+    return None
+
+
+# --- the merge state, the slice marker and factory-doc rewrites -------------
+
+def _slice_marker_content(spec_dir: Path, item) -> Optional[str]:
+    path = item["path"] / "requirements.md"
+    text = _read_text(path)
+    if any(line.startswith("**Merged into**:") for line in text.splitlines()):
+        return None
+    marker = "**Merged into**: .specify/specs/%s（%s）" % (spec_dir.name, MANIFEST_NAME)
+    lines = text.split("\n")
+    status = next((index for index, line in enumerate(lines)
+                   if line.startswith("**Status**:")), None)
+    if status is not None:
+        insert_at = status + 1
+    else:
+        insert_at = next((index for index, line in enumerate(lines)
+                          if re.match(r"^##\s+", line)), len(lines))
+    lines.insert(insert_at, marker)
+    return "\n".join(lines)
+
+
+def _factory_writes(repo: Path, plan):
+    grouped: Dict[str, list] = {}
+    for ref in plan.get("factory_doc_refs", []):
+        if ref.get("status") != "resolved":
+            continue
+        if (ref.get("resolution") or {}).get("kind") != "repoint":
+            continue
+        grouped.setdefault(ref["path"], []).append(ref)
+    writes, resolutions = [], []
+    for rel, refs in sorted(grouped.items()):
+        path = repo / rel
+        if not path.is_file():
+            continue
+        lines = _read_text(path).split("\n")
+        for ref in sorted(refs, key=lambda item: item["line"]):
+            index = ref["line"] - 1
+            if index < 0 or index >= len(lines):
+                continue
+            before = lines[index]
+            after = before.replace("[[%s]]" % ref["token"],
+                                   "[[%s]]" % ref["parent_id"])
+            if after == before:
+                continue
+            lines[index] = after
+            resolutions.append({"path": rel, "line": ref["line"], "before": before,
+                                "after": after, "kind": "repoint"})
+        writes.append((path, "\n".join(lines)))
+    return writes, resolutions
+
+
+def _merge_state(spec_dir: Path, ordered):
+    manifest_path = spec_dir / MANIFEST_NAME
+    manifest = None
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except ValueError:
+            manifest = None
+    marks = []
+    for item in ordered:
+        found = [match.group(1) for line in
+                 _read_text(item["path"] / "requirements.md").splitlines()
+                 if (match := _MERGED_INTO_RE.match(line))]
+        if len(found) > 1 or (found and spec_dir.name not in found[0]):
+            raise ValueError(
+                "slice %s carries an unusable `**Merged into**` marker" % item["slug"])
+        marks.append(bool(found))
+    if any(marks) and not all(marks):
+        raise ValueError("some slices are marked merged and others are not; "
+                         "partial merge state cannot be merged again deterministically")
+    if ordered:
+        completed = all(marks)
+        if completed and (manifest is None or manifest.get("spec") != spec_dir.name):
+            raise ValueError("slices are marked merged but %s is missing or foreign"
+                             % MANIFEST_NAME)
+        return completed, manifest
+    return manifest is not None, manifest
+
+
+# --- the manifest and its post-merge checks --------------------------------
+
+def _continuous(numbers) -> bool:
+    values = sorted(set(numbers))
+    return not values or values == list(range(1, values[-1] + 1))
+
+
+def _scan_merged_checks(spec_dir: Path, dated_stable: bool) -> Dict[str, Any]:
+    requirements = _read_text(spec_dir / "requirements.md")
+    defs: Dict[str, list] = {"FR": [], "SC": []}
+    for line in requirements.splitlines():
+        match = re.match(r"^-\s+\*\*(FR|SC)-(\d{3})\*\*", line)
+        if match:
+            defs[match.group(1)].append(int(match.group(2)))
+    strings = _parse_shared_strings(requirements)
+    string_numbers = [int(string_id.split("-")[1]) for string_id in strings]
+    continuity = (_continuous(defs["FR"]) and _continuous(defs["SC"])
+                  and _continuous(string_numbers))
+    duplicates = sum(len(values) - len(set(values)) for values in defs.values())
+    duplicates += len(string_numbers) - len(set(string_numbers))
+
+    tasks_path = spec_dir / "tasks.md"
+    tasks_text = _read_text(tasks_path) if tasks_path.is_file() else ""
+    task_numbers, open_rows = [], 0
+    for line in tasks_text.splitlines():
+        match = _TASK_ROW_RE.match(line)
+        if not match:
+            continue
+        task_numbers.append(int(match.group(2)[1:]))
+        if match.group(1) in (" ", ">"):
+            open_rows += 1
+    continuity = continuity and _continuous(task_numbers)
+    duplicates += len(task_numbers) - len(set(task_numbers))
+
+    texts = [requirements, tasks_text]
+    contracts_dir = spec_dir / "contracts"
+    if contracts_dir.is_dir():
+        for contract in sorted(contracts_dir.glob("*.md")):
+            texts.append(_read_text(contract))
+            clause_numbers = [int(clause["id"].split("-")[1])
+                              for clause in _contract_clauses(contract)]
+            continuity = continuity and _continuous(clause_numbers)
+            duplicates += len(clause_numbers) - len(set(clause_numbers))
+    model_path = spec_dir / "data-model.md"
+    if model_path.is_file():
+        texts.append(_read_text(model_path))
+        entity_numbers = [int(entity["id"][1:]) for entity in _entity_rows(model_path)]
+        continuity = continuity and _continuous(entity_numbers)
+        duplicates += len(entity_numbers) - len(set(entity_numbers))
+
+    defined_fr = set(defs["FR"])
+    defined_sc = set(defs["SC"])
+    dangling = 0
+    for text in texts:
+        for line in text.splitlines():
+            for match in re.finditer(r"\bFR-(\d{3})\b", line):
+                if int(match.group(1)) not in defined_fr:
+                    dangling += 1
+            for match in re.finditer(r"\bSC-(\d{3})\b", line):
+                if int(match.group(1)) not in defined_sc:
+                    dangling += 1
+            for match in _STR_REF_RE.finditer(line):
+                if match.group(1) not in strings:
+                    dangling += 1
+    return {
+        "id_continuity": "pass" if continuity else "fail",
+        "duplicate_ids": duplicates,
+        "dangling_refs": dangling,
+        "open_rows": open_rows,
+        "dated_record_hashes_stable": dated_stable,
+    }
+
+
+def _manifest_document(repo: Path, spec_dir: Path, plan, dispositions,
+                       resolutions, checks) -> Dict[str, Any]:
+    artifacts = []
+    for row in plan["artifacts"]:
+        entry = dict(row)
+        entry["checks"] = {}
+        if row["name"] == "requirements.md":
+            entry["checks"] = {"id_continuity": checks["id_continuity"],
+                               "duplicate_ids": checks["duplicate_ids"],
+                               "dangling_refs": checks["dangling_refs"]}
+        elif row["name"] == "tasks.md":
+            entry["checks"] = {"open_rows": checks["open_rows"]}
+        artifacts.append(entry)
+    merge = {"status": "merged"}
+    if not plan["slices"]:
+        merge = {
+            "status": "not-applicable",
+            "basis": "the slice set is empty: no directory in `.specify/specs/` "
+                     "satisfies both the name-family and parent-declaration conditions",
+        }
+    return {
+        "schema_version": 1,
+        "spec": spec_dir.name,
+        "merge": merge,
+        "generated_by": {
+            "engine": ENGINE_NAME,
+            "version": _engine_version(),
+            "command": "%s --action merge-apply --spec-dir %s" % (
+                ENGINE_NAME, _rel_path(repo, spec_dir)),
+        },
+        "slices": plan["slices"],
+        "artifacts": artifacts,
+        "factory_doc_resolutions": resolutions,
+        "id_maps": plan["id_maps"],
+        "conflicts": [],
+        "dispositions": dispositions,
+        "checks": checks,
+    }
+
+
+def _apply_merge(repo: Path, spec_dir: Path, plan, ordered) -> Dict[str, Any]:
+    id_maps = plan["id_maps"]
+    carriers = [entry["carrier_tasks"] for entry in plan["slices"]
+                if entry.get("carrier_tasks")]
+    dated_before = _dated_snapshot(ordered)
+    parent_tasks = spec_dir / "tasks.md"
+    superseded_rows = (_open_task_rows(_read_text(parent_tasks))
+                       if plan["slices"] and parent_tasks.is_file() else [])
+    written: list = []
+
+    outputs = []
+    for row in plan["artifacts"]:
+        if row["action"] in ("keep", "not-applicable"):
+            continue
+        content = _artifact_content(repo, spec_dir, row, ordered, id_maps, carriers)
+        if content is not None:
+            outputs.append((spec_dir / row["name"], content))
+    for item in ordered:
+        content = _slice_marker_content(spec_dir, item)
+        if content is not None:
+            outputs.append((item["path"] / "requirements.md", content))
+    factory_writes, resolutions = _factory_writes(repo, plan)
+
+    for path, content in outputs + factory_writes:
+        _write_if_changed(path, content, written, repo)
+
+    dated_stable = _dated_snapshot(ordered) == dated_before
+    if not dated_stable:
+        raise ValueError("a slice dated record changed during the run; "
+                         "merge-apply must never rewrite measurements")
+    checks = _scan_merged_checks(spec_dir, dated_stable)
+    dispositions = []
+    for row in superseded_rows:
+        dispositions.append({
+            "disposition": "supersede",
+            "superseded": {"path": _rel_path(repo, parent_tasks), "line": row["line"]},
+            "superseded_by": {"path": MANIFEST_NAME, "line": 0},
+            "evidence": carriers,
+            "guard_status": "replaced",
+        })
+    document = _manifest_document(repo, spec_dir, plan, dispositions, resolutions, checks)
+    canonical = json.dumps(document, separators=(",", ":"), sort_keys=True,
+                           ensure_ascii=False)
+    document["digest"] = "sha256:" + hashlib.sha256(
+        canonical.encode("utf-8")).hexdigest()
+    manifest_path = spec_dir / MANIFEST_NAME
+    _write_if_changed(manifest_path,
+                      json.dumps(document, indent=2, sort_keys=True,
+                                 ensure_ascii=False) + "\n",
+                      written, repo)
+    return {
+        "manifest": _rel_path(repo, manifest_path),
+        "idempotent": False,
+        "slices": [item["slug"] for item in ordered],
+        "writes": sorted(written),
+        "dispositions": len(dispositions),
+        "factory_doc_resolutions": len(resolutions),
+        "checks": checks,
+    }
+
+
 def action_merge_apply(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
-    return _pending("merge-apply", spec_dir)
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    try:
+        plan = _build_plan(repo, spec_dir)
+    except (OSError, ValueError, StopIteration) as exc:
+        return _payload(
+            "merge-apply", spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "merge-apply-error",
+                "the merge plan cannot be derived from this tree: %s" % exc,
+                "repair the named input (spec tree, split record or registries)",
+                "rerun the same command after the input is repaired",
+            )],
+        ), EXIT_INPUT_ERROR
+    open_conflicts = [c for c in plan["conflicts"] if c["status"] == "open"]
+    if open_conflicts:
+        conditions = [
+            _condition(
+                item["code"],
+                "%s %s: %s <<>> %s" % (
+                    item["artifact"], item["unit"],
+                    item["side_a"].get("excerpt", ""), item["side_b"].get("excerpt", "")),
+                "; ".join(item["candidates"]),
+                "resolve the named records, then rerun merge-apply",
+            ) for item in open_conflicts
+        ]
+        payload = _payload("merge-apply", spec_dir, "refused", EXIT_REFUSED, conditions)
+        payload["plan"] = plan
+        return payload, EXIT_REFUSED
+
+    slices, _excluded = _discover_slices(spec_dir)
+    ordered = _derive_order(repo, spec_dir.name, slices)
+
+    unclosed = _unclosed_slice_rows(repo, ordered)
+    if unclosed:
+        conditions = [
+            _condition(
+                "slice-unclosed",
+                "%s:%d %s is not closed (state `- [%s]`)" % (path, line, task_id, state),
+                "close the slice task, or record its `deferred_tasks=` entry in the "
+                "slice verification.md",
+                "rerun merge-apply after the slice is closed",
+            ) for path, line, task_id, state in unclosed
+        ]
+        return _payload("merge-apply", spec_dir, "refused", EXIT_REFUSED,
+                        conditions), EXIT_REFUSED
+
+    try:
+        completed, manifest = _merge_state(spec_dir, ordered)
+    except ValueError as exc:
+        return _payload(
+            "merge-apply", spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "merge-state-inconsistent",
+                str(exc),
+                "inspect the slice markers and merge-manifest.json; restore one "
+                "coherent state before rerunning",
+                "rerun merge-apply after the merged state is repaired",
+            )],
+        ), EXIT_INPUT_ERROR
+
+    if completed:
+        manifest = manifest if isinstance(manifest, dict) else {}
+        payload = _payload("merge-apply", spec_dir, "ok", EXIT_OK, [])
+        payload["apply"] = {
+            "manifest": _rel_path(repo, spec_dir / MANIFEST_NAME),
+            "idempotent": True,
+            "slices": [item["slug"] for item in ordered],
+            "writes": [],
+            "dispositions": len(manifest.get("dispositions", [])),
+            "factory_doc_resolutions": len(manifest.get("factory_doc_resolutions", [])),
+            "checks": manifest.get("checks", {}),
+        }
+        return payload, EXIT_OK
+
+    try:
+        summary = _apply_merge(repo, spec_dir, plan, ordered)
+    except (OSError, ValueError, StopIteration) as exc:
+        return _payload(
+            "merge-apply", spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "merge-write-failed",
+                "the merge could not be written deterministically: %s" % exc,
+                "repair the named write failure, then rerun; the engine never "
+                "rewrites a dated record",
+                "rerun merge-apply after the failure is repaired",
+            )],
+        ), EXIT_INPUT_ERROR
+    payload = _payload("merge-apply", spec_dir, "ok", EXIT_OK, [])
+    payload["apply"] = summary
+    return payload, EXIT_OK
 
 
 def evaluate_seal(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
