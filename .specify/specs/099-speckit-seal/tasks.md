@@ -22,7 +22,7 @@
 | 4 用户故事 1（P1） | `seal` 判定（只读阶段）与两阶段原子写入 | T025–T029 | US1、SC-001 / SC-002 |
 | 5 用户故事 4（P2） | `archive-gate` 单 owner、归档 lane 接线、命令面三件套、边界审计 | T030–T038 | US4、SC-007 / SC-008 |
 | 6 用户故事 3（P1） | 074 真实回合：split → merge-back → seal，五项输入逐条处置 | T039–T044 | US3、SC-006 |
-| 7 Polish | 全量测试对照、镜像复核、quickstart、`verification.md`、注册表收尾 | T045–T050 | SC-001…SC-009 的 Measurement Sources |
+| 7 Polish | 全量测试对照、镜像复核、quickstart、`verification.md`、注册表收尾 | T045–T051 | SC-001…SC-009 的 Measurement Sources |
 
 **MVP scope**: US1、US2、US3 均为 P1 且缺一不可独立成值——只合并不封装则 spec 永无终态（US1 缺失），只封装不合并则 074 这类分片父级无法通过前置条件（US2 缺失），两者齐备却无真实回合则验收停在夹具上（US3 缺失）。按模板 MVP 规则，MVP 覆盖**全部三条 P1 故事**（Phase 3–4 与 Phase 6）。US4（P2）约束实现形态而非新增用户能力，与 MVP 同批交付但排在其边界被引用之后（Phase 5）。
 
@@ -36,7 +36,7 @@
 | P4 | `merge-apply` 确定性写面 | T021–T024 | 4 |
 | P5 | `seal` 判定与两阶段写入 | T025–T029 | 5 |
 | P6 | `archive-gate` 与既有 lane 接线 | T030–T034 | 5 |
-| P7 | 命令面与名册装配 | T035–T038 | 4 |
+| P7 | 命令面与名册装配 | T035–T038, T051 | 5 |
 | P8 | 074 真实回合 | T039–T044 | 6 |
 | P9 | 收尾验证与记录 | T045–T050 | 6 |
 
@@ -53,6 +53,7 @@
 - DoD-7: **零新增重复机制** — 引擎动作表无 move/delete/archive/push/scheduler；状态值域单 owner；无第二注册表/台账/并行 spec 树（FR-024、SC-008、C-008、C-036）。Check: `bash scripts/bash/run-tests.sh tests/contract/test_seal_boundaries.py tests/contract/test_seal_archive_gate.py -q` 全绿。
 - DoD-8: **镜像与副本生成** — `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 零新增漂移（相对 T001 冻结基线）（FR-021、plan § Mirror Obligations）。Check: GATE-2。
 - DoD-9: **final 判据全 pass 且有 smoke 记录** — `verification.md` 每条 SC 一行状态，`**Path**: final` 判据均为 `pass`，smoke 三键齐备（GATE-4）。Check: GATE-4。
+- DoD-10: **命令参考页落地** — `docs/reference/commands/seal.md` 存在，四个动作与退出码只按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复制封闭集（FR-021、plan § Project Structure）。Check: `test -s docs/reference/commands/seal.md`。
 
 **DoD Status**: pending
 
@@ -237,6 +238,7 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [ ] T048 写 `.specify/specs/099-speckit-seal/verification.md`：SC-001…SC-009 每条一行 `SC-NNN_status=`（词汇 owner：`shared/workflow/acceptance-hardening.md` § Verification Vocabulary），并给出 smoke 记录三键（`smoke_command=`、`smoke_exit_code=0`、`smoke_evidence_path=` 指向 `notes/quickstart-run.md`）；任一 `final` 判据非 `pass` 即 GATE-4 不通过（SC-001…SC-009、GATE-4、[blockedBy: T045,T046,T047]）。
 - [ ] T049 对 Feature 099 执行 Feature Integration reconcile（`manage-features` 流程）：`.specify/features/099-speckit-seal.md` 与 `.specify/features.md` 行同步为实现阶段状态并追加实现/评审记录；确认 tasks 阶段的特性清单复核未暴露新增或失效 Feature（plan § Phase 1 summary：已有 099 行，无合并/废弃/改名）（FR-024、SC-008、[blockedBy: T048]）。
 - [ ] T050 覆盖基线终局对照：`python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal` 确认相对 T002 冻结的 `coverage-baseline.txt` 零新增未覆盖名，读数记入 `test-evidence/coverage-final.txt`（FR-025、SC-008、[blockedBy: T049]）。
+- [ ] T051 [P] 写命令参考页 `docs/reference/commands/seal.md`（执行流、产物与用法；四个动作与退出码按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复述封闭集），属项目文档面、不扩张 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py` 的三件套边界（FR-021、plan § Project Structure、[blockedBy: T038]）。
 
 **Checkpoint**: 全部 SC 有落点，门禁全绿，验收记录齐备。
 
@@ -337,7 +339,7 @@ Generated from this file's own task rows (each FR appears inline in at least one
 | FR-018 | T021, T023, T040 |
 | FR-019 | T021, T023, T027, T040, T041 |
 | FR-020 | T023, T034 |
-| FR-021 | T016, T017, T035, T036, T037, T038 |
+| FR-021 | T016, T017, T035, T036, T037, T038, T051 |
 | FR-022 | T032, T033, T034 |
 | FR-023 | T030, T031, T032, T033 |
 | FR-024 | T034, T049 |
