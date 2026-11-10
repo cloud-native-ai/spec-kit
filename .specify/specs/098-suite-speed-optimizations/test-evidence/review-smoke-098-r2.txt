@@ -1,0 +1,9 @@
+# test runner: python3 -m pytest -n 4 --dist load -m "not slow" tests/contract/test_suite_tier_contract.py tests/contract/test_parallel_consistency_contract.py tests/contract/test_scan_cache_contract.py tests/contract/test_event_wait_contract.py tests/contract/test_inprocess_conversion_contract.py tests/contract/test_run_tests_runner_contract.py -q
+# test runner: mode=parallel workers=4 dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 83%]
+..............                                                           [100%]
+86 passed in 35.36s
+exit=0 wall=37.342435013
