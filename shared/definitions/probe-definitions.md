@@ -231,6 +231,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-git-workflow-observe | engine | observe | non-blocking | 20 | scripts/python/git-workflow-observe.py |
 | h-team-phase-summary | agent | Summary Refresh (all patterns) | non-blocking | 20 | skills/internal/create-team/SKILL.md |
 | h-gate-evidence | gate | 门控观察协议 (Gate Observation Protocol) | non-blocking | 30 | shared/guidelines/confirmation-gates.md |
+| h-decision-gate | gate | Decision gate (two-axis classification) | non-blocking | 40 | shared/guidelines/confirmation-gates.md |
 
 ## HandlerBinding
 
@@ -244,6 +245,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-situation-assess | @point:situation | all | 050 情境评估:每回合环境评估与建议遥测(trigger-utils.py assess);非单元编译面,声明性订阅 |
 | h-git-workflow-observe | @point:situation | all | git-utils 作用域 A:情境评估回合刷新 `.specify/workflow/git.md` 的机器观测小节(观测非声明;声明只经 Bootstrap + 用户确认变更) |
 | h-team-phase-summary | @point:phase-boundary | skill-create-team-wrapup | 036 团队阶段边界总结:create-team 驱动的团队执行流在阶段边界刷新 goal 级总结 |
+| h-decision-gate | @point:confirm-gate | all | 决策门:每次向用户中断前按两轴定级(授权级别 × 影响范围)判定自动修复或询问(2026-11-10 用户裁定) |
 | h-gate-evidence | @point:confirm-gate | gate-create-docs-tiered-disposition | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-create-docs-write-plan | 044 门控必要性证据(逐 gate Object) |
 | h-gate-evidence | @point:confirm-gate | gate-create-team-agent-reuse | 044 门控必要性证据(逐 gate Object) |

@@ -19,6 +19,13 @@ if [ -f "$SCRIPT_DIR/script-interface.sh" ]; then
     script_interface_guard guard "$@"
 fi
 
+ensure_gitignore_pattern() {
+  local pattern="$1" file="$2"
+  [ -f "$file" ] || return 0
+  grep -qxF -- "$pattern" "$file" && return 0
+  gitignore_add_pattern "$pattern" "$file"
+}
+
 main() {
 
     # Load common helpers for Unicode support and shared functions
@@ -109,7 +116,7 @@ INSTRUCTIONS_BUDGET_BYTES=38400
       "$SCRIPT_DIR/refresh-tools.sh" --system --json > "$TOOLS_DIR/system.json"
       "$SCRIPT_DIR/refresh-tools.sh" --shell --json > "$TOOLS_DIR/shell.json"
       "$SCRIPT_DIR/refresh-tools.sh" --project --json > "$TOOLS_DIR/project.json"
-      gitignore_add_pattern ".specify/tools/*.json" "$REPO_ROOT/.gitignore"
+      ensure_gitignore_pattern ".specify/tools/*.json" "$REPO_ROOT/.gitignore"
     else
       log warning "refresh-tools.sh not found, skipping tool JSON manifest generation."
     fi
@@ -260,7 +267,7 @@ PYEOF
       log info "Backing up existing instructions to $BACKUP_FILE"
       cp "$TARGET_FILE" "$BACKUP_FILE"
       # Keep the accumulating local backups out of version control.
-      gitignore_add_pattern ".specify/instructions.md-*" "$REPO_ROOT/.gitignore"
+      ensure_gitignore_pattern ".specify/instructions.md-*" "$REPO_ROOT/.gitignore"
 
       log info "Existing instructions kept as the refresh base (not overwritten)."
 

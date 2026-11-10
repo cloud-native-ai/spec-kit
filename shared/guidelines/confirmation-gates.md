@@ -99,3 +99,42 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
 2. 记录失败 MUST NOT 使宿主流程失败——报告警告后继续;
 3. gate 对象的锚点是门控点位的单行指针 `> Gate probe: <object_id> — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).`,不参与 wrap-up embed 对账;
 4. 指针措辞 MUST NOT 命中 `scan-confirmation-gates.py` 的阻塞模式(不得新增扫描器门控计数)。
+
+## Decision gate (two-axis classification)
+
+Every interruption of a run for the user is a **decision gate** and MUST pass this classification first — a
+finding the matrix routes to auto-fix is never presented as a question. Both axes are classified by the
+executing agent **before** it stops.
+
+**Axis 1 — the agent's authorization level (held for this run, declared at entry):**
+
+| Level | Meaning |
+|---|---|
+| 无人值守 (unattended) | no user is available: the agent decides everything, records every decision, and an irreversible action stops with a blocked report — never a silent approval request |
+| 自主执行 (autonomous) — the interactive default | the user is present, and the agent proceeds without asking on reversible work |
+| 小心谨慎 (cautious) | the user declared that reversible functional changes also need a look first |
+
+**Axis 2 — the finding's impact scope (read from the change the fix would make):**
+
+| Scope | Meaning |
+|---|---|
+| 架构级 (architecture) | a contract, interface, constitution-level convention, stage chain, or an owner document's rules |
+| 功能级 (functional) | behaviour, spec semantics, data integrity, or a machine-managed store's content (e.g. a mass rename/repair) |
+| 小缺陷 (minor) | formatting, path/reference hygiene, idempotency, duplicate lines, a generator's local guard |
+
+**The matrix — auto-fix (+ disclose) versus ask:**
+
+| Level × Scope | 架构级 | 功能级 | 小缺陷 |
+|---|---|---|---|
+| 无人值守 | fix with a decision record; irreversible → blocked report | fix + record | fix + disclose |
+| 自主执行 | **ask** | fix + disclose | fix + disclose |
+| 小心谨慎 | ask | ask | fix + disclose |
+
+The destructive/irreversible list in this document outranks the matrix: an irreversible action always stops.
+
+**Calibration cases (2026-11-10, autonomous level):** the 47/89 feature-detail slug/content mismatch
+(functional → fix + disclose) and the duplicated `.gitignore` append from `generate-instructions.sh`
+(minor → fix + disclose); neither is a user question.
+
+**Record:** an auto-fixed gate records both classified axes, what changed and the revert path; an asked gate
+presents the same classification so the user sees why the gate fired.
