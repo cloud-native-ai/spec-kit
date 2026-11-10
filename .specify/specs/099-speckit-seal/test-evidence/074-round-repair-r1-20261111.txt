@@ -1,0 +1,53 @@
+# 074 回合重跑 — review-repair r1（分片 P0 判定读取原始记录后）
+
+captured_at: 2026-11-11T02:56Z
+target: .specify/specs/074-goal-team-sdd-unification/
+engine: scripts/python/seal-utils.py @ 99af8cb3b + r1 working-tree repair
+dirty_spec_tree_at_run: 0 (clean; `git status --porcelain -- .specify/specs/074-goal-team-sdd-unification` empty before and after)
+seal_md_created: no (refusal zero persistence)
+prior_round: 074-round-rerun-20261111.txt（P8b 读数，未改写）
+
+=== RUN 1 ===
+$ python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification/ --repo .
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - p0-unresolved: 074b-nested-governance:F1 (line 115 of .specify/specs/074b-nested-governance/review.md) has neither a resolvable `- **Fix**:` pointer nor a user waiver on both carriers
+    fix: fix the finding and record the fix pointer, or record the user's literal `- **User waiver**:` line on the review's code segment and the feature detail's `## Latest Review`
+    rerun: rerun seal after the P0 is disposed
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+exit: 2
+
+=== RUN 2 ===
+$ python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification/ --repo .
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - p0-unresolved: 074b-nested-governance:F1 (line 115 of .specify/specs/074b-nested-governance/review.md) has neither a resolvable `- **Fix**:` pointer nor a user waiver on both carriers
+    fix: fix the finding and record the fix pointer, or record the user's literal `- **User waiver**:` line on the review's code segment and the feature detail's `## Latest Review`
+    rerun: rerun seal after the P0 is disposed
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+exit: 2
+
+--- 重跑一致性 ---
+两个 RUN 的 refusal 列表逐字节相同（`diff` 除 RUN 编号外零差异；引擎确定性重算）。
+writes: 0；`git status --porcelain -- .specify/specs/074-goal-team-sdd-unification` 运行前后均为空；`seal.md` 未创建。
+
+--- 回合裁决（本次只读重跑复核 FR-027(d)；其余四项以 074-round-rerun-20261111.txt 为准，未重判） ---
+FR-027(a): unchanged（resolved — 父 requirements.md 的 8 条 SC 行各带恰一个行尾 `**Path**: final`；本轮 seal 因 closure 输入的 § Runtime Stack 缺失而阻断，不涉及 Path 面）
+FR-027(b): unchanged（resolved — 声明映射核验通过：074a 本地 STR-010→父 STR-011；074b 本地 STR-004/005/006/007→父 STR-007/008/009/010）
+FR-027(c): unchanged（resolved — 18 个源引用 / 36 条冲突按 C-018 `recheck-clean` 处置）
+FR-027(d): blocked — **本轮起由引擎自己点名**：`p0-unresolved` 直接引用 `.specify/specs/074b-nested-governance/review.md:115` 的 F1（限定名 `074b-nested-governance:F1`）；该 P0 只有驱动者叙述豁免，无 `- **Fix**:` 可解析指向、无 C-044 两载体用户豁免。r1 之前引擎唯一的条件是 `closure-input-defect`，P0 仅靠人工裁决段点名——该缺口即 F1，本文件是其修复后的实测。
+FR-027(e): unchanged（resolved — 父 tasks.md 的 57 条拆前记录按 C-022 处置，合并后父 tasks.md 未勾选行 = 0）
+额外阻断 B2: blocked — `closure-input-defect` 持续：闭包判定器 exit 2，`requirements.md carries no § Runtime Stack & Dependency Ownership`（074 早于该门禁）
+终态: blocked（exit 2）——非 Sealed；具名阻断 = FR-027(d)（`p0-unresolved`）+ B2（`closure-input-defect`），无第三态、无静默默认
+
+--- 与 P8b 回合读数的差异（有意为之） ---
+P8b（pre-r1）: 唯一引擎条件 = `closure-input-defect`；P0 F1 只在回合记录的人工裁决段出现。
+r1（post-fix）: 引擎新增 `p0-unresolved`，点名 `074b-nested-governance:F1`（review.md:115）。阻断清单因此多一条，这是修复的目标行为；阻断态重跑在同一引擎下仍逐字节一致。

@@ -32,7 +32,9 @@ dated record（C-020）：MUST NOT 复制或改写原件；同名时父级文件
 指针，仅分片有时以父级指针视图（汇总行 + 指针）`create`，分片原件字节不变。**必选下限**：`tasks.md` 无论
 是否产出都必须被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席新建）、父 `review.md`
 （分片 review 记录的汇总指针视图，缺席新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，
-缺席新建）与 `merge-manifest.json` MUST 产出。其余候选按实际产出枚举：两侧皆有 → `merge`；仅分片有 →
+缺席新建）与 `merge-manifest.json` MUST 产出。该汇总指针视图（逐分片汇总行 + 指针）不承载 finding 块，
+且**不改变 seal 的 P0 / `blocking` 判定读取面**——判定 MUST 读取各分片原始 `review.md` / `code-review.md`
+（waiver 形态见 `records-and-boundaries.contract.md` C-044）。其余候选按实际产出枚举：两侧皆有 → `merge`；仅分片有 →
 `create`；仅父级有 → `keep`（并接受同一套对齐检查）；两侧皆无 → `not-applicable`。MUST NOT 为单个输出件
 发明第二套合并流程；输出件差异只体现在其声明的 ID 家族与结构单元上。
 

@@ -1,0 +1,27 @@
+# T050 覆盖基线复跑 — review-repair r1（supersede-aware 认领后）
+
+captured_at: 2026-11-11T02:58Z
+engine: scripts/python/account-clause-coverage.py @ 99af8cb3b + r1 working-tree repair
+owner: shared/workflow/acceptance-hardening.md § Superseded pre-split records retain their claims
+commands:
+  A) python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal --json
+  B) python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074-goal-team-sdd-unification --json
+
+## A — T050 replay（相对 T002 冻结的 099 coverage-baseline.txt，640 names）
+status=ok (exit 0)
+claimed_clauses_this_feature=45 (45/45)
+fr_claimed=28/28 (uncovered 0)
+uncovered_beyond_baseline=0        # pre-r1 读数 67（test-evidence/coverage-final.txt 保持未改）
+any 074-* name beyond baseline=[]  # 67 条具名残留全部消失：C-022 引用行内的 [green:] 认领现被计入
+payload: test-evidence/t050-replay-repair-r1-20261111.json
+
+## B — 074 车道（父级自身 baseline 视角）
+claimed(074)=144 = 77（合并后父 tasks.md 活跃行的认领）+ 67（Superseded pre-split record 引用行的保留认领）
+074-goal-team-sdd-unification/* still uncovered=[]（0）
+074-* beyond its own baseline=[]（0）
+exit=1 的原因是 074 的旧 baseline 之后落地的其他 spec 名（161 条，与本特性无关）；074 自身无残留。
+
+## 判读
+- 与 T050 选项一（「接受具名残留」）的关系：r1 按 review F3 采取引擎侧根因修复，67 条不再读作未覆盖；
+  coverage-final.txt 与 t050-rerun-20261111.* 是 dated record，保留原样，不复写。
+- 反证：红绿对照见 test-evidence/f3-supersede-claims-20261111.txt（同一夹具：修复前 claimed=0 / uncovered=3，修复后 claimed=3 / uncovered=[]）。

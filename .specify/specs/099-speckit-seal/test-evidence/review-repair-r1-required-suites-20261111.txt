@@ -1,0 +1,38 @@
+# review-repair r1 — required suite reruns
+date_utc=2026-11-10T18:55:51Z
+
+=== test_seal_seal.py ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_seal.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.........................                                                [100%]
+25 passed in 6.51s
+
+=== test_seal_074_round.py ===
+command=bash scripts/bash/run-tests.sh tests/integration/test_seal_074_round.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_seal_074_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....                                                                    [100%]
+5 passed in 6.31s
+
+=== account-clause-coverage.py ===
+command=python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal --json
+status=ok claimed=45 uncovered_beyond_baseline=0 fr=28/28
+command=python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074-goal-team-sdd-unification --json
+claimed(074)=144 074_names_still_uncovered=0
+
+=== mirror parity for the repaired files ===
+scope --only: scripts/python/seal-utils.py, scripts/python/validate-tasks.py, scripts/python/account-clause-coverage.py, shared/workflow/acceptance-hardening.md
+ok    scripts/ == .specify/scripts/ (3 files, byte-identical)
+ok    shared/ == .specify/shared/ (1 files, byte-identical)
+
+=== full seal family (contract + integration) ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py tests/contract/test_seal_engine_contract.py tests/contract/test_seal_merge_apply.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_archive_gate.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_sealed_status_domain.py tests/integration/test_seal_merge_determinism.py tests/integration/test_seal_074_round.py -q
+137 passed in 8.47s
+(133 at P8b + 4 new slice-P0/blocking tests = 137; exit 0)

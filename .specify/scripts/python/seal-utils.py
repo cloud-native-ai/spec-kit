@@ -2186,8 +2186,16 @@ def _carrier_waiver(text: str, section_pattern: str, finding_id: str) -> bool:
     return False
 
 
-def _p0_findings(repo: Path, review_text: str, detail_text: str):
-    """Every P0 finding with its disposition form; C-044 decides 'disposed'."""
+def _p0_findings(repo: Path, review_text: str, detail_text: str, carrier: Path,
+                 review_label: str = ""):
+    """Every P0 finding with its disposition form; C-044 decides 'disposed'.
+
+    `carrier` names the record the finding block was read from and `review_label`
+    qualifies the finding id when it comes from a slice record (``<slug>:F1``).
+    A split parent's merged `review.md` is a pointer view carrying no finding
+    block, so the judgment MUST read the original slice records as well; the
+    user-waiver carrier for a slice finding is that slice record's code section.
+    """
     findings = []
     for block in _finding_blocks(review_text):
         if not any(SEAL_P0_LINE_RE.match(line) for _line_no, line in block["body"]):
@@ -2202,8 +2210,9 @@ def _p0_findings(repo: Path, review_text: str, detail_text: str):
         by_waiver = (_carrier_waiver(review_text, r"Code Segment", block["id"])
                      and _carrier_waiver(detail_text, r"Latest Review", block["id"]))
         form = "fix" if by_fix else ("user-waiver" if by_waiver else None)
-        findings.append({"finding": block["id"], "line": block["line"],
-                         "resolved": form is not None, "form": form})
+        findings.append({"finding": "%s%s" % (review_label, block["id"]),
+                         "line": block["line"], "resolved": form is not None,
+                         "form": form, "carrier": carrier})
     return findings
 
 
@@ -2572,36 +2581,68 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
             "produce the code review through /speckit.review",
             "rerun seal after code-review.md is present"))
 
-    summary = _review_summary(review_text) if review_text else {"P0": 0, "P1": 0,
-                                                               "P2": 0}
+    # A split parent's merged review/code-review views are pointer views and carry
+    # no finding block (C-013/C-021); the judgment therefore reads the original
+    # slice records as well — the pointer view never narrows the reading surface.
+    slices, _excluded = _discover_slices(spec_dir)
+    ordered = _derive_order(repo, spec_dir.name, slices) if slices else []
+    review_records = [(review_path, review_text)]
+    code_review_records = [(code_review_path, code_review_text)]
+    for item in ordered:
+        slice_review = item["path"] / "review.md"
+        if slice_review.is_file():
+            review_records.append((slice_review, _read_text(slice_review)))
+        slice_code_review = item["path"] / "code-review.md"
+        if slice_code_review.is_file():
+            code_review_records.append(
+                (slice_code_review, _read_text(slice_code_review)))
+
     detail_text = _read_text(status["detail_path"]) \
         if status["detail_path"].is_file() else ""
-    p0_findings = _p0_findings(repo, review_text, detail_text)
+    p0_findings, summary_sources = [], []
+    for record_path, record_text in review_records:
+        label = "" if record_path == review_path else "%s:" % record_path.parent.name
+        record_findings = _p0_findings(repo, record_text, detail_text,
+                                       record_path, label)
+        p0_findings.extend(record_findings)
+        summary_sources.append((record_path,
+                                _review_summary(record_text) if record_text
+                                else {"P0": 0, "P1": 0, "P2": 0},
+                                len(record_findings)))
+    summary = {key: sum(source[key] for _path, source, _parsed in summary_sources)
+               for key in ("P0", "P1", "P2")}
     unresolved = [entry for entry in p0_findings if not entry["resolved"]]
-    unaccounted = max(0, summary["P0"] - len(p0_findings))
+    unaccounted = sum(max(0, source["P0"] - parsed)
+                      for _path, source, parsed in summary_sources)
     for entry in unresolved:
         conditions.append(_condition(
             "p0-unresolved",
-            "%s (line %d) has neither a resolvable `- **Fix**:` pointer nor a user "
-            "waiver on both carriers" % (entry["finding"], entry["line"]),
+            "%s (line %d of %s) has neither a resolvable `- **Fix**:` pointer nor "
+            "a user waiver on both carriers"
+            % (entry["finding"], entry["line"], _rel_path(repo, entry["carrier"])),
             "fix the finding and record the fix pointer, or record the user's "
             "literal `- **User waiver**:` line on the review's code segment and "
             "the feature detail's `## Latest Review`",
             "rerun seal after the P0 is disposed"))
-    if unaccounted:
-        conditions.append(_condition(
-            "p0-unresolved",
-            "the findings summary reports %d P0 finding(s) but only %d P0 finding "
-            "block(s) are parseable" % (summary["P0"], len(p0_findings)),
-            "make every P0 finding carry a `- **Severity**: P0` block",
-            "rerun seal after the findings are repaired"))
+    for record_path, record_summary, parsed in summary_sources:
+        missing = max(0, record_summary["P0"] - parsed)
+        if missing:
+            conditions.append(_condition(
+                "p0-unresolved",
+                "the findings summary of %s reports %d P0 finding(s) but only %d "
+                "P0 finding block(s) are parseable"
+                % (_rel_path(repo, record_path), record_summary["P0"], parsed),
+                "make every P0 finding carry a `- **Severity**: P0` block",
+                "rerun seal after the findings are repaired"))
 
-    blocking_entries = [line for line in code_review_text.splitlines()
+    blocking_entries = [(record_path, line) for record_path, record_text
+                        in code_review_records for line in record_text.splitlines()
                         if BLOCKING_HEADING_RE.match(line)]
-    for line in blocking_entries:
+    for record_path, line in blocking_entries:
         conditions.append(_condition(
             "code-review-blocking",
-            "a blocking code-review entry remains: %s" % line.strip(),
+            "a blocking code-review entry remains in %s: %s"
+            % (_rel_path(repo, record_path), line.strip()),
             "resolve the blocking entry in the current code-review record",
             "rerun seal after the code review carries no blocking entry"))
 
@@ -2637,6 +2678,13 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
 
     slices, _excluded = _discover_slices(spec_dir)
     ordered = _derive_order(repo, spec_dir.name, slices) if slices else []
+    review_paths = [_rel_path(repo, review_path),
+                    _rel_path(repo, code_review_path)]
+    for item in ordered:
+        for name in ("review.md", "code-review.md"):
+            path = item["path"] / name
+            if path.is_file():
+                review_paths.append(_rel_path(repo, path))
     merge_info, merge_conditions = _merge_assessment(repo, spec_dir, slices, ordered)
     conditions.extend(merge_conditions)
     for path, line_no, task_id, task_state in _unclosed_slice_rows(repo, ordered):
@@ -2690,7 +2738,7 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
     waiver_entries = [
         {"finding": entry["finding"], "form": "user-waiver",
          "source": "%s (code segment); %s (## Latest Review)"
-                   % (_rel_path(repo, review_path),
+                   % (_rel_path(repo, entry["carrier"]),
                       _rel_path(repo, status["detail_path"]))}
         for entry in p0_findings if entry["form"] == "user-waiver"]
     merge_block = {"manifest": merge_info["manifest"], "slices": merge_info["slices"],
@@ -2703,8 +2751,7 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
         "from_status": "Ready for Review",
         "to_status": "Sealed",
         "review": {
-            "paths": [_rel_path(repo, review_path),
-                      _rel_path(repo, code_review_path)],
+            "paths": review_paths,
             "counts": {"p0_unresolved": len(unresolved) + unaccounted,
                        "p1": summary["P1"], "p2": summary["P2"],
                        "blocking": len(blocking_entries)},

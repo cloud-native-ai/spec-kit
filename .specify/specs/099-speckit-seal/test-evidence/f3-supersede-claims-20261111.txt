@@ -1,0 +1,17 @@
+# review-repair r1 — F3 red/green on the supersede-claim reading
+date_utc=2026-11-10T18:51:58Z
+fixture=.specify/.tmp/review-repair-r1/corpus (hermetic: 3 clauses, each claimed only inside a C-022 quoted record)
+
+=== BEFORE (mirror engine copy, pre-fix: quoted-row claims invisible) ===
+exit=1
+status: uncovered
+claimed: 0
+uncovered: ['001-alpha/contracts/c.md#C-1', '001-alpha/contracts/c.md#C-2', '001-alpha/contracts/c.md#C-3']
+delta: ['001-alpha/contracts/c.md#C-1', '001-alpha/contracts/c.md#C-2', '001-alpha/contracts/c.md#C-3']
+
+=== AFTER (canonical engine, fixed: superseded claims retained) ===
+exit=0
+status: ok
+claimed: 3
+uncovered: []
+delta: []

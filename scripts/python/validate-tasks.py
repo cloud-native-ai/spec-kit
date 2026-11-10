@@ -81,6 +81,13 @@ PHASE_HEADING = re.compile(r"^##\s+Phase\b(.*)$", re.IGNORECASE)
 USER_STORY_PHASE = re.compile(r"User Story", re.IGNORECASE)
 DOD_HEADING = re.compile(r"^##\s+Definition of Done\b", re.IGNORECASE)
 NEXT_H2 = re.compile(r"^##\s")
+# C-022's supersede rendering keeps disposed pre-split rows as `> ` quoted records
+# under this heading. The quotation removes them from the current plan (no open-row,
+# blockedBy, [P] or phase checks), while their `[green:]` claims stay the named
+# attribution of clauses delivered by the slices: coverage accounting counts them,
+# so a split merge never turns a fully claimed parent contract into a residual.
+SUPERSEDED_HEADING = re.compile(r"^##\s+Superseded pre-split record\s*$", re.IGNORECASE)
+SUPERSEDED_ROW = re.compile(r"^>\s*- \[([ xX>~])\]\s+(\S+)(.*)$")
 PARALLEL_MARKER = re.compile(r"(?<!\S)\[P\](?!\S)")
 # path-like tokens: contains a slash, or a filename with a common extension
 PATH_TOKEN = re.compile(
@@ -262,11 +269,13 @@ def validate(path: Path, claims_out: list | None = None):
 
     tasks = {}          # id -> {line, phase, parallel, write_paths, pointer_paths, order}
     claims = []         # parsed [green:] attributions, in row order
+    superseded_claims = []   # retained claims from the C-022 quoted records
     claim_view = None   # fence-blanked + code-span-stripped lines, built on first need
     order = 0
     phase_name = None
     phase_is_story = False
     in_dod = False
+    in_superseded = False
     prev_was_task = False
 
     for lineno, line in enumerate(lines, start=1):
@@ -283,6 +292,36 @@ def validate(path: Path, claims_out: list | None = None):
                     f"{lineno}: dod-format: checkbox syntax inside Definition of Done "
                     f"(use `- DoD-N:` prefix): {line.strip()[:80]}"
                 )
+        if SUPERSEDED_HEADING.match(line):
+            in_superseded, phase_name, phase_is_story = True, None, False
+            prev_was_task = False
+            continue
+        if in_superseded:
+            if re.match(r"^##\s", line):
+                in_superseded = False
+                # fall through: this H2 is handled by the ordinary section tracking
+            else:
+                m_sup = SUPERSEDED_ROW.match(line)
+                if m_sup and "[green:" in line:
+                    if claim_view is None:
+                        extractor = _clause_extract()
+                        claim_view = [
+                            extractor.strip_code_spans(text)
+                            for text in extractor.strip_fences(lines)
+                        ]
+                    row_claims, _rest = _strip_claims(
+                        claim_view[lineno - 1], m_sup.group(3))
+                    for contract_file, clause_id in row_claims:
+                        superseded_claims.append({
+                            "contract_file": contract_file,
+                            "clause_id": clause_id,
+                            "task_id": m_sup.group(2),
+                            "phase": "Superseded pre-split record",
+                            "line": lineno,
+                            "order": order,
+                        })
+                prev_was_task = False
+                continue
         m_phase = PHASE_HEADING.match(line)
         if m_phase:
             phase_name = m_phase.group(0).strip()
@@ -380,6 +419,11 @@ def validate(path: Path, claims_out: list | None = None):
 
     if not tasks:
         errors.append(f"0: no task rows found in {path} (expected `- [ ] T<NNN> ...` lines)")
+        if claims_out is not None:
+            # A file whose rows are ALL superseded still carries its retained claims.
+            claims_out.extend({
+                k: claim[k] for k in ("contract_file", "clause_id", "task_id", "phase")
+            } for claim in superseded_claims)
         return errors, warnings
 
     # --- blockedBy resolvability -----------------------------------------
@@ -551,9 +595,12 @@ def validate(path: Path, claims_out: list | None = None):
                     )
 
     if claims_out is not None:
+        # Superseded pre-split records are history, so their claims skip the four
+        # green-* checks above; they are still the named attribution of delivered
+        # clauses, so coverage accounting (account-clause-coverage.py) receives them.
         claims_out.extend({
             k: claim[k] for k in ("contract_file", "clause_id", "task_id", "phase")
-        } for claim in claims)
+        } for claim in claims + superseded_claims)
 
     # stable file order: each entry starts with "<lineno>: "
     errors.sort(key=lambda e: int(e.split(":", 1)[0]))

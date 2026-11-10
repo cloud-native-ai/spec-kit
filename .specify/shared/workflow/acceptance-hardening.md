@@ -193,6 +193,18 @@ For every `final`-path criterion, GATE-4 requires a `pass` status **and** a pres
 explicit user waiver naming the criterion. The carrier is `templates/tasks-template.md`; the condition set is
 this section's.
 
+### Superseded pre-split records retain their claims
+
+A split merge disposes a parent's pre-split task rows by `supersede`: the row survives as a `> ` quoted
+record, which removes it from the **current** plan (it is not an open row and owes no blockedBy, `[P]` or
+phase obligation) but MUST NOT void the row's `[green: <contract>#<clause>]` declarations. A `[green:]`
+declaration inside a `## Superseded pre-split record` block is a **retained claim** and coverage accounting
+MUST count it exactly like a current row's claim, because the clause's delivery was carried by the slices
+the record names. The opposite reading turns every split merge's fully claimed parent contracts into an
+uncovered residual — an accounting artifact, never a delivery gap. `scripts/python/validate-tasks.py`
+parses these claims (the one implementation of the mention/fence rules) and supplies them to
+`scripts/python/account-clause-coverage.py`; the block is never re-validated as a current plan.
+
 ### The A13 boundary — three carriers, one fact each
 
 Three tables look alike and judge different things. The same fact MUST live in exactly one of them, and the

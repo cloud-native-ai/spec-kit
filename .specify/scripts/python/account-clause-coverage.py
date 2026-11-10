@@ -13,7 +13,10 @@ different owners and so do their claimed subsets:
                 (`shared/definitions/contract-clause-definitions.md`); per-form counts are
                 owned by that spec's `notes/clause-form-census.md` and are NOT restated here
                 claimed   the `[green: <contract>#<clause>]` declarations on that spec's own
-                tasks.md rows, parsed by validate-tasks.py so the mention/fence rules have
+                tasks.md rows — including the retained declarations inside a C-022
+                `Superseded pre-split record` block (owner: `shared/workflow/
+                acceptance-hardening.md` § Superseded pre-split records retain their
+                claims) — parsed by validate-tasks.py so the mention/fence rules have
                 one implementation
   FR lane       universe  the `FR-nnn` definition rows of that spec's requirements.md, read
                 outside fenced blocks and inline code spans

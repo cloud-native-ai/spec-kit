@@ -1,0 +1,80 @@
+# review-repair r1 — affected suites (post-fix)
+date_utc=2026-11-10T18:54:18Z
+worktree_head=99af8cb3b + r1 working-tree repair
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py tests/contract/test_seal_engine_contract.py tests/contract/test_clause_coverage.py tests/contract/test_validate_tasks_green_semantics.py tests/contract/test_validate_tasks_parallel_safety.py tests/contract/test_green_point_claim.py tests/integration/test_seal_074_round.py -q
+
+pre-existing reds (measured at HEAD 99af8cb3b in a clean snapshot: /tmp/pre-099-r1):
+  - test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document — gate total 28 vs pinned 27 (HEAD reading 28)
+  - test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census — yaml-openapi 30 vs census pin 39 (HEAD reading 30)
+  (a third failure during the first capture, test_c20, was this evidence redirect itself writing under .specify/specs — rerun below with capture outside the tree: passes)
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_seal.py tests/contract/test_seal_engine_contract.py tests/contract/test_clause_coverage.py tests/contract/test_validate_tasks_green_semantics.py tests/contract/test_validate_tasks_parallel_safety.py tests/contract/test_green_point_claim.py tests/integration/test_seal_074_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 44%]
+........................................................................ [ 88%]
+......F..........F.                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+[gw60] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c5_gate_budget_is_unchanged_by_the_owner_document():
+        r = subprocess.run(
+            [sys.executable, str(SCRIPTS / "scan-confirmation-gates.py"), "--summary"],
+            capture_output=True, text=True, cwd=str(ROOT),
+        )
+        assert r.returncode == 0, r.stdout + r.stderr
+        m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
+        v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)
+        assert m and v, r.stdout
+>       assert int(m.group(1)) == GATE_TOTAL, (
+            f"the owner document sits in shared/, i.e. inside the scanned surface, and the "
+            f"integer headroom is 0: total moved to {m.group(1)}"
+        )
+E       AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 28
+E       assert 28 == 27
+E        +  where 28 = int('28')
+E        +    where '28' = <built-in method group of re.Match object at 0x7ff8b2892f80>(1)
+E        +      where <built-in method group of re.Match object at 0x7ff8b2892f80> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+tests/contract/test_clause_coverage.py:292: AssertionError
+__ test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census ___
+[gw66] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census():
+        mod = _load()
+        src = ACCOUNTANT.read_text(encoding="utf-8")
+        assert "clause_extract" in src, (
+            "FR-026: both lanes must share one extractor; a private second parser here is "
+            "the drift the owner document exists to prevent"
+        )
+        assert not re.search(r"['\"]operations:['\"]", src), (
+            "MUST NOT probe for a literal `operations:` key — no file in the corpus has one, "
+            "so such a probe silently classifies every OpenAPI contract as something else"
+        )
+        # the census owns this number; pinned here as a drift detector on the excl-053 basis
+        # (this feature adds no .yaml contract, so the whole-tree value is the same 39)
+        p = _payload(["--spec-dir", str(SPEC_053), "--corpus-root", str(ROOT / ".specify" / "specs"),
+                      "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+>       assert p["scanned"]["per_form"]["yaml-openapi"]["clauses"] == OPENAPI_OPERATIONS_EXCL_053, (
+            f"OpenAPI operation total moved off the census value; re-derive "
+            f"notes/clause-form-census.md and move this pin in the same commit: {p['scanned']['per_form']}"
+        )
+E       AssertionError: OpenAPI operation total moved off the census value; re-derive notes/clause-form-census.md and move this pin in the same commit: {'md-bold-closed': {'files': 132, 'clauses': 1726}, 'md-bold-paren': {'files': 4, 'clauses': 45}, 'md-heading': {'files': 46, 'clauses': 333}, 'yaml-openapi': {'files': 6, 'clauses': 30}, 'yaml-assertions': {'files': 1, 'clauses': 6}, 'md-none': {'files': 106, 'clauses': 0}}
+E       assert 30 == 39
+
+tests/contract/test_clause_coverage.py:442: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+2 failed, 161 passed in 18.00s
+
+--- HEAD-snapshot proof of the two pre-existing reds ---
+command=(in /tmp/pre-099-r1, git archive HEAD) python3 -m pytest tests/contract/test_clause_coverage.py -q -k "c5_gate_budget or c10_openapi"
+tests/contract/test_clause_coverage.py:442: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+2 failed, 42 deselected in 6.10s

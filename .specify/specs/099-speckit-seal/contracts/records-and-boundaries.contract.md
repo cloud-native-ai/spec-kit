@@ -116,6 +116,8 @@ Glossary、Wrap-up、Handoffs）、`skills/internal/seal-artifact/SKILL.md`（�
 `## Latest Review` 各存在一条以字面 `- **User waiver**:` 起头、点名该 finding 的行（会话裁定须由代理把用户
 原话记入两处后方可计数；单一载体不计数）。
 驱动者/协调者/代理的确认、`显式豁免（P0 waiver）` 一类叙述、以及「无人反对」MUST NOT 计为用户豁免。
+拆分 spec 的分片 P0，其 review 载体是该分片**原始** `review.md` 的 code 小节（合并父级指针视图不承载
+finding，也不承载 waiver）；特性详情载体不变。
 
 (FR-006, FR-027)
 

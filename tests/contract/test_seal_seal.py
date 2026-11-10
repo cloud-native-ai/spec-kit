@@ -180,6 +180,45 @@ def _write_p0(repo: Path, spec_slug: str, waiver_carrier: str = "") -> None:
         detail.write_text(detail_text, encoding="utf-8")
 
 
+def _write_slice_p0(repo: Path, parent_slug: str, slice_slug: str,
+                    review_waiver: bool = False, detail_waiver: bool = False) -> None:
+    """Inject one P0 into the slice's original review record only.
+
+    The merge-generated parent `review.md` is a pointer view: it carries no finding
+    block and is never edited here — exactly the shape the split-parent P0 hole
+    reported. The optional C-044 user-waiver line lands on the slice review's code
+    segment and/or the parent feature detail's `## Latest Review`.
+    """
+    slice_dir = repo / ".specify" / "specs" / slice_slug
+    review = slice_dir / "review.md"
+    text = review.read_text(encoding="utf-8")
+    text = text.replace("| P0 | 0 |", "| P0 | 1 |")
+    if "### F1 —" not in text:
+        text = text.replace(
+            "\n## 3. Findings",
+            "\n## 2.1 Code Segment (Verdict and Pointers)\n\n"
+            "| Field | Value |\n|-------|-------|\n"
+            "| Segment verdict | `blocked` |\n\n"
+            "## 3. Findings", 1)
+        text = text.rstrip("\n") + (
+            "\n\n### F1 — A P0 raised in the slice review\n\n"
+            "- **Severity**: P0\n"
+            "- **Category**: Automation / Scripts\n"
+            "- **Why it's a problem**: the fixture needs one slice-local P0.\n"
+            "- **Waiver**: 显式豁免（P0 waiver）— the driver confirmed; this "
+            "narrative never counts.\n")
+    if review_waiver and USER_WAIVER not in text:
+        text = text.replace("\n## 3. Findings",
+                            "\n" + USER_WAIVER + "\n\n## 3. Findings", 1)
+    review.write_text(text, encoding="utf-8")
+    if detail_waiver:
+        detail = repo / ".specify" / "specs" / parent_slug / "feature-detail.md"
+        detail_text = detail.read_text(encoding="utf-8")
+        if USER_WAIVER not in detail_text:
+            detail_text = detail_text.rstrip("\n") + "\n" + USER_WAIVER + "\n"
+        detail.write_text(detail_text, encoding="utf-8")
+
+
 # ---------------------------------------------------------------------------
 # C-005 / C-032 / C-033 — the success path and the receipt
 # ---------------------------------------------------------------------------
@@ -451,6 +490,82 @@ def test_user_waiver_needs_both_carriers(tmp_path):
     assert core["waivers"][0]["form"] == "user-waiver"
     assert "review.md" in core["waivers"][0]["source"]
     assert "feature-detail.md" in core["waivers"][0]["source"]
+
+
+# ---------------------------------------------------------------------------
+# F1 — the split parent's P0/blocking gates read the ORIGINAL slice records
+#
+# The merged parent `review.md`/`code-review.md` are pointer views (C-013/C-021):
+# they carry no finding block. A gate that reads only the parent view is vacuous,
+# so a slice P0 with a driver-recorded waiver would seal silently.
+# ---------------------------------------------------------------------------
+
+def test_a_split_parent_refuses_an_unwaived_slice_p0(tmp_path):
+    repo = _copy_fixture("merged-clean", tmp_path / "repo")
+    _write_slice_p0(repo, MERGED, SLICE)
+    _commit(repo)
+    before = _snapshot(repo / ".specify" / "specs")
+    proc, payload = _seal(repo, MERGED)
+    assert proc.returncode == 1, (
+        "a slice P0 whose only waiver is a driver narrative MUST refuse seal; "
+        f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+    unresolved = [c for c in payload["conditions"] if c["code"] == "p0-unresolved"]
+    assert unresolved, (
+        "F1: the pointer view carries no finding block, so the gate MUST follow it "
+        "to the slice's original review record and name the P0; got %s"
+        % sorted(_context_codes(payload)))
+    assert any(SLICE in c["evidence"] and "F1" in c["evidence"] for c in unresolved), (
+        "F1/C-044: the refusal names the slice and the finding, not the parent view")
+    assert _snapshot(repo / ".specify" / "specs") == before, (
+        "C-006: the refusal writes nothing")
+
+
+def test_a_split_parent_seals_when_the_slice_p0_carries_the_user_waiver(tmp_path):
+    repo = _copy_fixture("merged-clean", tmp_path / "repo")
+    _write_slice_p0(repo, MERGED, SLICE, review_waiver=True, detail_waiver=True)
+    _commit(repo)
+    proc, payload = _seal(repo, MERGED)
+    assert proc.returncode == 0, (
+        "C-044: the literal `- **User waiver**:` line on the slice review's code "
+        "segment AND the feature detail disposes of the slice P0; "
+        f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+    core = _receipt_core(repo / ".specify" / "specs" / MERGED)
+    assert core["review"]["counts"]["p0_unresolved"] == 0
+    slice_review = ".specify/specs/%s/review.md" % SLICE
+    assert slice_review in core["review"]["paths"], (
+        "FR-010: the receipt references every review record the judgment read")
+    waivers = [entry for entry in core["waivers"]
+               if entry["finding"] == "%s:F1" % SLICE]
+    assert waivers and slice_review in waivers[0]["source"], (
+        "F1: the waiver entry names the slice record as its review carrier")
+    assert "feature-detail.md" in waivers[0]["source"]
+
+
+def test_a_slice_p0_waiver_needs_the_slice_review_carrier(tmp_path):
+    repo = _copy_fixture("merged-clean", tmp_path / "repo")
+    _write_slice_p0(repo, MERGED, SLICE, detail_waiver=True)
+    _commit(repo)
+    proc, payload = _seal(repo, MERGED)
+    assert proc.returncode == 1, (
+        "C-044: a single waiver carrier never disposes of a slice P0; "
+        f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+    assert "p0-unresolved" in _context_codes(payload)
+
+
+def test_a_slice_code_review_blocking_entry_refuses(tmp_path):
+    repo = _copy_fixture("seal-refusals/slice-unclosed", tmp_path / "repo")
+    slice_dir = repo / ".specify" / "specs" / "099a-fixture-open"
+    (slice_dir / "code-review.md").write_text(
+        "# Code Review Report — slice\n\n"
+        "### 🔴 [BLOCKING] scripts/a.py (Line 1)\n\n"
+        "> A blocking entry recorded only in the slice's original code review.\n",
+        encoding="utf-8")
+    _commit(repo)
+    proc, payload = _seal(repo, CLEAN)
+    assert proc.returncode == 1
+    assert "code-review-blocking" in _context_codes(payload), (
+        "FR-006: the split parent's blocking gate reads the slice's original "
+        "code-review record; got %s" % sorted(_context_codes(payload)))
 
 
 # ---------------------------------------------------------------------------
