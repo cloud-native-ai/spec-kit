@@ -1,0 +1,32 @@
+# T033 — post-implementation digest field set vs the frozen baseline (SC-006)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T033) · SC-006
+
+Same command as T003 (`test-evidence/digest-fieldset-baseline.txt`), key names only.
+
+## Capture
+
+```bash
+python3 scripts/python/status-digest.py --action digest --format json --workspace .
+```
+
+Exit status: 0 (raw JSON kept at `.specify/.tmp/096/digest-current.json`, sanctioned scratch root).
+
+## Comparison against `test-evidence/digest-fieldset-baseline.txt`
+
+```text
+baseline top-level keys: 10 | current: 10
+baseline all_entries row keys: 15 | current: 15 | entries: 1
+added top-level: []
+missing top-level: []
+added row keys: []
+missing row keys: []
+delta: EMPTY
+current top-level: ['all_entries', 'cap', 'efficiency', 'entries', 'generated_at', 'omitted', 'profile', 'registry_dir', 'stale_bound_seconds', 'state_summary']
+```
+
+Reading: the digest field set is **unchanged** — zero added and zero missing keys at both
+levels (top-level and `all_entries[]`), so no observer/journal field was introduced into
+`/speckit.status`. The in-process comparison also lives in
+`tests/contract/test_sdd_observer_lifecycle.py::test_digest_field_set_matches_the_frozen_baseline`.

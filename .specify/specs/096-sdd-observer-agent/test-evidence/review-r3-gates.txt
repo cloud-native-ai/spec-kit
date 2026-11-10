@@ -1,0 +1,60 @@
+# review round 3 — artifact-segment gate readings
+# captured: 2026-11-10T16:11:05Z  tree: 15fd648c5 + working tree
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/096-sdd-observer-agent/requirements.md
+file: .specify/specs/096-sdd-observer-agent/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 254 lines, 30 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+# exit=0
+
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md
+WARN  157: green-path-divergence: T008 (line 157) and T016 (line 180) both write tests/contract/test_journal_engine.py but claim different green points (['contracts/observer-verification.contract.md#C-01'] vs ['contracts/observer-verification.contract.md#C-07']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  180: green-cross-phase: T016 (line 180, `## Phase 4: User Story 2 - 记录只有事实与证据指针，评价与建议无处可写 (Priority: `, order 15) claims contracts/observer-verification.contract.md#C-07 while the later T024 (line 205, `## Phase 5: User Story 3 - 观察者掉线不阻塞开发线，缺口仍被点名 (Priority: P1)`, order 24) claims #C-03 — the clause order runs backwards against the row order, so T016 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  209: green-cross-phase: T025 (line 209, `## Phase 5: User Story 3 - 观察者掉线不阻塞开发线，缺口仍被点名 (Priority: P1)`, order 25) claims contracts/observer-role.contract.md#C-10 while the later T041 (line 266, `## Phase 8: Polish & Cross-Cutting Concerns`, order 41) claims #C-01 — the clause order runs backwards against the row order, so T025 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  228: green-cross-phase: T031 (line 228, `## Phase 6: User Story 4 - 只读且边界一致：不新造状态面、汇报面或可见性通道 (Priorit`, order 31) claims contracts/observer-verification.contract.md#C-06 while the later T036 (line 249, `## Phase 7: User Story 5 - 一 spec 一专用实例，可选内部 subagent (Prior`, order 36) claims #C-05 — the clause order runs backwards against the row order, so T031 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+PASS (with warnings): .specify/specs/096-sdd-observer-agent/tasks.md — 0 error(s), 4 warning(s)
+# exit=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --spec-dir .specify/specs/096-sdd-observer-agent --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=6 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 150, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 249, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 399, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "data-model.md", "line": 13, "message": "path does not exist under the repo: .specify/agents/execution/logs/"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 66, "message": "path does not exist under the repo: templates/commands/x.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 97, "message": "path does not exist under the repo: templates/commands/x.md"}], "summary": {"errors": 0, "advisories": 6, "waived": 0, "fr": 23, "sc": 7, "tasks": 47, "clauses": 0, "files": 14}, "checked_at": "2026-11-10T16:11:05Z"}
+# exit=0
+
+$ grep -cE "^- \\[[ >]\\] T[0-9]{3} " tasks.md
+0
+# exit=1
+
+$ grep -rn "由框架级统一裁定|under framework-level adjudication|v1\.19\.0|承载八类" spec + features
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:54:| 3 | plan 完成 | `79a650f45`；plan.md:38 以 v1.19.0 渲染 Constitution Check | none（版本 pin 见 F5） |
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:61:| 10 | **宪法修订 v1.19.0 → v1.19.1** | `34ea3eb76`；Sync Impact Report: "Version change: 1.19.0 → 1.19.1 (PATCH; carrier correction, 2026-11-10)" | **deviation**：运行中修订治理文档 |
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:119:| P2 | .specify/specs/096-sdd-observer-agent/requirements.md | 181 | none | **AF-3** — Key Entities「记录条目」仍写「承载八类信息」，与 FR-011:142 的九类矛盾（W13-02 历轮 carried over）；改为九类并引用 FR-011。 |
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:120:| P2 | .specify/specs/096-sdd-observer-agent/plan.md | 38 | none | **AF-4** — Constitution Check 渲染注记仍写 `(v1.19.0)`，实际宪法为 v1.19.1（W13-20）；更新版本 pin。 |
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:121:| P2 | .specify/specs/096-sdd-observer-agent/tasks.md | 33 | none | **AF-5** — GATE-4 披露句仍称 `verification.log` 字面「由框架级统一裁定」，该裁定已于 v1.19.1 完成（W13-19；同句在 :379）；把「待裁定」改为「已裁定为 verification.md」。 |
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:235:- **Proposed fix**: add a plan-stage gate row — "every record carrier this plan names is (a) committable under the repository's ignore rules and (b) read by a named machine consumer" — and render the Constitution Check against the live version (the v1.19.0 pin is a symptom).
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:245:  Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/constitution.md` (v1.19.0) in file order
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:249:  宪法 VII 的 `verification.log` 字面由框架级统一裁定（反馈已登记：…）
+.specify/specs/096-sdd-observer-agent/review-096-sdd-observer-agent.md:252:- **Why it's a problem**: the amendment already happened; the plan still pins v1.19.0 and the tasks still describe the carrier question as awaiting a ruling. The carrier instruction in the same sentences is still correct, so this is drift, not a behavior defect — but it is exactly the kind of stale fact that makes later readers distrust the artifacts.
+.specify/specs/096-sdd-observer-agent/review.md:58:| 3 | plan 完成 | `79a650f45`；plan.md:38 以 v1.19.0 渲染 Constitution Check | none（版本 pin 见 F5） |
+.specify/specs/096-sdd-observer-agent/review.md:65:| 10 | **宪法修订 v1.19.0 → v1.19.1** | `34ea3eb76`；Sync Impact Report: "Version change: 1.19.0 → 1.19.1 (PATCH; carrier correction, 2026-11-10)" | **deviation**：运行中修订治理文档（见 F4） |
+.specify/specs/096-sdd-observer-agent/review.md:125:| P2 | .specify/specs/096-sdd-observer-agent/requirements.md | 181 | none | **AF-3** — Key Entities「记录条目」仍写「承载八类信息」，与 FR-011:142 的「九类」矛盾（历轮 carried over）；改为九类并引用 FR-011。 |
+.specify/specs/096-sdd-observer-agent/review.md:126:| P2 | .specify/specs/096-sdd-observer-agent/plan.md | 38 | none | **AF-4** — Constitution Check 渲染注记仍写 `(v1.19.0)`，实际宪法为 v1.19.1；更新版本 pin。 |
+.specify/specs/096-sdd-observer-agent/review.md:127:| P2 | .specify/specs/096-sdd-observer-agent/tasks.md | 33 | none | **AF-5** — GATE-4 披露句仍称 `verification.log` 字面「由框架级统一裁定」，该裁定已于 v1.19.1 完成；改为「已裁定为 verification.md（commit 34ea3eb76）」。 |
+.specify/specs/096-sdd-observer-agent/review.md:266:- **Proposed fix**: add a plan-stage gate row — "every record carrier this plan names is (a) committable under the repository's ignore rules and (b) read by a named machine consumer" — and render the Constitution Check against the live version (the v1.19.0 pin is a symptom).
+.specify/specs/096-sdd-observer-agent/review.md:276:  Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/constitution.md` (v1.19.0) in file order
+.specify/specs/096-sdd-observer-agent/review.md:280:  Disclosure: 宪法 VII 的 `verification.log` 字面由框架级统一裁定（反馈已登记：`.specify/memory/feedback/20261110T124821Z-skill-sdd-loop-driver.md`），本线按框架链执行（唯一载体 `verification.md` …）
+.specify/specs/096-sdd-observer-agent/review.md:283:- **Why it's a problem**: the amendment already happened (v1.19.1, commit `34ea3eb76`); the plan still pins v1.19.0 and the tasks still describe the carrier question as awaiting a ruling. The carrier instruction in the same sentence is still correct, so this is drift, not a behavior defect — but it is exactly the kind of stale fact that makes later readers distrust the artifacts.
+# exit=0
+
+# --- capture correction (in-passing, disclosed at wrap-up) ---
+# The residue grep above was scoped to the whole spec directory and therefore matched the
+# historical review records (review.md / review-096-*.md), where the stale strings are quoted
+# as evidence by design. Re-run scoped to the required artifacts only:
+$ grep -rn '由框架级统一裁定|under framework-level adjudication|v1\.19\.0|承载八类' requirements.md plan.md tasks.md quickstart.md verification.md .specify/features.md .specify/features/096.md (executed from the spec dir for the first five; repo-relative for the last two)
+# result: no match (exit 1, expected) — residue cleared from the artifacts; the only matches are inside review records (history).

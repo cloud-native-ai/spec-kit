@@ -1,0 +1,17 @@
+# analyze round 2 — decision tensions validator
+# cmd: python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/096-sdd-observer-agent
+# date: 2026-11-10T10:14:31Z
+
+spec: .specify/specs/096-sdd-observer-agent
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 277 lines, 5 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+
+EXIT=0

@@ -1,0 +1,39 @@
+# journal-format.yaml — harness-triple-check reading (T006)
+
+Capture: 2026-11-10, worktree 096-sdd-observer-agent (wp01).
+
+## Pre-edit reading (measured before the fact file landed)
+
+`python3 scripts/python/harness-triple-check.py --action verify --repo .` → exit 1, declarations 34, findings 4:
+
+```text
+finding: unclassified-candidate: shared/workflow/execution-topology.md
+finding: unclassified-candidate: skills/external/study-online/SKILL.md
+finding: unclassified-candidate: skills/internal/create-team/SKILL.md
+finding: unclassified-candidate: skills/internal/study-kb/SKILL.md
+```
+
+The tasks row describes this baseline as "4 advisory unclassified candidates, exit 0"; the measured exit is 1 because the engine counts its four advisory findings as findings. The row's criterion ("gains no NEW finding") is what this file evidences; the exit-code literal in the row is a drafting slip and is not inherited.
+
+## Post-edit reading (fact + engine present)
+
+```text
+# harness-triple-check — verify
+declarations: 35
+candidates: 89
+consistency-declarations-to-carriers: 48/52
+consistency-carriers-to-declarations: 16/264
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 4
+finding: unclassified-candidate: shared/workflow/execution-topology.md
+finding: unclassified-candidate: skills/external/study-online/SKILL.md
+finding: unclassified-candidate: skills/internal/create-team/SKILL.md
+finding: unclassified-candidate: skills/internal/study-kb/SKILL.md
+exit=1
+```
+
+## Delta
+
+- declarations: 34 → 35 (journal-format.yaml), candidates unchanged at 89
+- findings: identical four unclassified-candidate rows, zero NEW; exit stays 1 for the same reason as the baseline
+- consistency-declarations-to-carriers: 47/52 → 48/52 (the engine now carries the read point the fact declares)

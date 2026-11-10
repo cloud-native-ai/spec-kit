@@ -76,6 +76,7 @@ FACTORY_PRESETS = (
     ROOT / "agents" / "sdd-clarify-analyzer.agent.md",
     ROOT / "agents" / "sdd-implement-coordinator.agent.md",
     ROOT / "agents" / "sdd-implement-executor.agent.md",
+    ROOT / "agents" / "sdd-observer.agent.md",  # 096: observation-only seat, still a dispatched subagent
     ROOT / "agents" / "sdd-plan-coordinator.agent.md",
     ROOT / "agents" / "sdd-plan-executor.agent.md",
     ROOT / "agents" / "sdd-requirement-analyzer.agent.md",
@@ -1576,7 +1577,7 @@ def test_i9_channel_two_skill_authoring_requirement():
 def test_i10_channel_two_factory_presets_byte_equal():
     """C-10: every framework agent preset carries exactly one pair, byte-identical to the owner."""
     owner = _clause_interval(_text(DOC))
-    assert len(FACTORY_PRESETS) == 17, f"C-10: expected 17 framework agent presets, the constant holds {len(FACTORY_PRESETS)}"  # 087: + reporter
+    assert len(FACTORY_PRESETS) == 18, f"C-10: expected 18 framework agent presets, the constant holds {len(FACTORY_PRESETS)}"  # 087: + reporter; 096: + sdd-observer
     assert sorted(ROOT.glob("agents/*.agent.md")) == sorted(FACTORY_PRESETS), (
         "C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately"
     )
@@ -1630,7 +1631,7 @@ def test_i12_channel_two_bounded_set():
     assert len(own_source) > 1000, "C-12 sentinel: this module read as near-empty, so the scan is blind"
     assert "FACTORY_PRESETS" in own_source, "C-12 sentinel: the bounded enumeration constant is gone"
     bounded = list(FACTORY_PRESETS) + [AGENTS_CMD, CREATE_AGENT_SKILL]
-    assert len(bounded) == 19, f"C-12: the bounded set should be 17 presets + 2 authoring texts, got {len(bounded)}"  # 084: stage-specific agent set replaces the generic template; 087: + reporter
+    assert len(bounded) == 20, f"C-12: the bounded set should be 18 presets + 2 authoring texts, got {len(bounded)}"  # 084: stage-specific agent set replaces the generic template; 087: + reporter; 096: + sdd-observer
     for p in bounded:
         assert p.is_file(), f"C-12: a member of the bounded set does not exist: {p.relative_to(ROOT)}"
 

@@ -1,0 +1,21 @@
+# us3-non-blocking — US3 slice green reading (T029)
+
+Package: `wp03-driver-lifecycle`; captures SC-003's non-blocking slice through the one runner.
+Captured: 2026-11-10, line worktree `096-sdd-observer-agent` (implement-entry base `2aef87f040939b03adcd6cd7e9e88c724a07beaa`).
+
+Command: bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q
+Exit status: 0
+
+```text
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+.........................................                                [100%]
+41 passed in 6.23s
+.                                                                        [100%]
+1 passed, 41 deselected in 17.38s
+EXIT=0
+```

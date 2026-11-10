@@ -1,0 +1,8 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py -q -k coverage or append or idempotent or header
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.25s
+exit=0

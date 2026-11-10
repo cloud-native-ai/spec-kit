@@ -1,0 +1,17 @@
+{
+  "conflict": false,
+  "kind": null,
+  "collidesWith": []
+}
+{
+  "conflict": false,
+  "kind": null,
+  "collidesWith": []
+}
+--- 观察记录 (Journal) EXIT=0
+{
+  "conflict": false,
+  "kind": null,
+  "collidesWith": []
+}
+--- 观察缺口 (Observer Gap) EXIT=0

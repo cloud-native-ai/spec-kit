@@ -1,0 +1,32 @@
+# T022 — gap drill (SC-007)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T022) · SC-007
+
+Command:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q -k "gap_drill" -v
+```
+
+Exit status: 0
+
+```text
+192 workers [1 item]
+
+.                                                                        [100%]
+============================== 1 passed in 6.59s ===============================
+```
+
+Covered case:
+
+```text
+test_journal_engine.py::test_gap_drill_emits_exactly_one_window_row
+```
+
+Reading: after an execution settles, a later restart (spine `started_at` 60 s after the
+last `observed_at`) appends exactly one `observer-gap` row whose `event_at` is the window
+start and whose `observed_at` is the window end; no inferred event fills the window; the
+journal still passes `check` (exit 0). The drill has teeth: a copied engine with the
+gap-writing path removed produces no gap row and `check` exits 1 with V-17 — so the green
+comes from the gap derivation, not from the fixture.

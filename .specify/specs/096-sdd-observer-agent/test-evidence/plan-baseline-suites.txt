@@ -1,0 +1,30 @@
+## baseline: driver-skill + fast-fail preset guards (pre-edit)
+bringing up nodes...
+
+.........................                                                [100%]
+25 passed in 6.18s
+.                                                                        [100%]
+1 passed, 25 deselected in 17.17s
+## baseline: fast-fail preset guards
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.22s
+## render command surface
+                                                                                
+ Narrow render-only entry: delegates to the same pipeline `specify init` uses   
+ (real files, render manifest, legacy symlink replacement) without any other    
+ init side effects.                                                             
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ *  --ai          TEXT  Render agent definitions for this tool's registration │
+│                        surface: qoder, claude, copilot, opencode             │
+│                        [required]                                            │
+│    --help              Show this message and exit.                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+## git sample
+4494963a8079f6d5f7a7386e36673d0b9fd16ba1 2026-11-10T16:37:48+08:00 chore(096-sdd-observer-agent): close-out receipt for run r20261110T081104Z-b096
+rev-parse ok

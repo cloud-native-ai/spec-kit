@@ -1,0 +1,38 @@
+# T035 — US4 slice through the one runner (SC-006)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T035) · SC-006
+
+Command (the US4 independent test):
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py -q
+```
+
+Exit status: 0
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+................................                                         [100%]
+32 passed in 6.20s
+```
+
+This is the same run that turned the T031/T032 boundary extensions green; T033 changes no
+code (evidence only), so the reading is the current one (single-run evidence: not re-run).
+
+Covered assertions (T031/T032 additions):
+
+- template side (`test_sdd_observer_agent.py`): exactly two write surfaces, the defect
+  sentence for spine/stage-artifact/registry/glossary writes, a doctored-grant teeth check,
+  the no-seat role face and the no-value-field rule;
+- driver/digest side (`test_sdd_observer_lifecycle.py`): observer rides only the existing
+  `--sub-flow <label>=<triplet-dir>` projection and its three-segment label matches
+  `SUPERVISION_LABEL_PATTERN`; `status-digest.py` carries no `observer`/`journal` token;
+  the four boundary carriers are unchanged against the implement-entry base
+  `c9b86e7fa4d216dde4c7c772ac7cc92a61cd90cd`; the declared artifact map and the
+  `loop-state.py` fallback table stage keys equal the stage sequence; the obligations page
+  keeps `## 十一 · 零新增机制`; the journal is not a stage artifact or U4 condition.

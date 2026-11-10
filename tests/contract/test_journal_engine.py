@@ -1,0 +1,605 @@
+"""Contract tests for the journal engine (Feature 096).
+
+Contracts: `contracts/journal-engine.contract.md` C-01…C-13 and
+`contracts/journal-format.contract.md` C-01…C-12. Every spelling the test needs is read from
+`shared/declarations/facts/journal-format.yaml` through the declaration reader — the module pins
+no second copy. The line fixture is built by `tests/fixtures/sdd-observer/line_builder.py` under
+`tmp_path`; every engine call is a real subprocess invocation of `scripts/python/journal-utils.py`.
+"""
+from __future__ import annotations
+
+import calendar
+import fcntl
+import importlib.util
+import os
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.contract
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ENGINE = REPO_ROOT / "scripts" / "python" / "journal-utils.py"
+READER = REPO_ROOT / "scripts" / "python" / "declaration_reader.py"
+FIXTURES = REPO_ROOT / "tests" / "fixtures" / "sdd-observer"
+SKILL_MD = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
+
+ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+#: T013's mutation drills: the coverage test itself must go red under each.
+MUTATION = os.environ.get("SDD_OBSERVER_MUTATION", "")
+
+
+def _load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def line_builder():
+    return _load_module("sdd_observer_line_builder", FIXTURES / "line_builder.py")
+
+
+def tamper_builder():
+    return _load_module("sdd_observer_tamper_builder", FIXTURES / "tamper_builder.py")
+
+
+def dual_line_builder():
+    return _load_module("sdd_observer_dual_line_builder", FIXTURES / "dual_line_builder.py")
+
+
+def journal_format(repo: Path = REPO_ROOT) -> dict:
+    reader = _load_module("sdd_observer_declaration_reader", READER)
+    fact = reader.load_fact(str(repo), "journal-format")
+    return fact["body"]["statement"]
+
+
+def declared_stages(repo: Path = REPO_ROOT):
+    return line_builder().declared_stages(repo)
+
+
+def _plus_seconds(iso_text, seconds):
+    epoch = calendar.timegm(time.strptime(iso_text, "%Y-%m-%dT%H:%M:%SZ"))
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(epoch + seconds))
+
+
+def run_engine(args, cwd=None, env=None):
+    return subprocess.run(
+        [sys.executable, str(ENGINE), *[str(arg) for arg in args]],
+        capture_output=True, text=True, cwd=cwd, env=env, timeout=120,
+    )
+
+
+def append(fixture, *extra, engine=None, env=None):
+    command = [
+        "--action", "append",
+        "--spec-dir", fixture["spec_dir"],
+        "--spine", fixture["spine"],
+        "--state-dir", fixture["state_dir"],
+        "--repo", fixture["root"],
+        "--line-id", fixture["line_id"],
+        "--run-id", fixture["run_id"],
+        "--execution-label", fixture["execution_label"],
+    ]
+    if engine is None:
+        return run_engine(command + list(extra), env=env)
+    return subprocess.run(
+        [sys.executable, str(engine), *[str(arg) for arg in command + list(extra)]],
+        capture_output=True, text=True, env=env, timeout=120,
+    )
+
+
+def check(fixture):
+    return run_engine(["--action", "check", "--spec-dir", fixture["spec_dir"], "--repo", fixture["root"]])
+
+
+def split_cells(line: str):
+    body = line.strip()
+    if body.startswith("|"):
+        body = body[1:]
+    if body.endswith("|") and not body.endswith("\\|"):
+        body = body[:-1]
+    cells, current, index = [], [], 0
+    while index < len(body):
+        char = body[index]
+        if char == "\\" and index + 1 < len(body) and body[index + 1] == "|":
+            current.append("|")
+            index += 2
+            continue
+        if char == "|":
+            cells.append("".join(current).strip())
+            current = []
+            index += 1
+            continue
+        current.append(char)
+        index += 1
+    cells.append("".join(current).strip())
+    return cells
+
+
+def parse_journal(path: Path):
+    lines = path.read_text(encoding="utf-8").splitlines()
+    result = {"title": lines[0] if lines else "", "header": {}, "header_cells": [],
+              "separator": "", "rows": [], "body_lines": []}
+    index = 1
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if not stripped:
+            index += 1
+            continue
+        if stripped.startswith("|"):
+            break
+        if stripped.startswith("- ") and ":" in stripped:
+            key, _, value = stripped[2:].partition(":")
+            result["header"][key.strip()] = value.strip()
+        index += 1
+    if index < len(lines):
+        result["header_cells"] = split_cells(lines[index])
+        index += 1
+    if index < len(lines):
+        result["separator"] = lines[index].strip()
+        index += 1
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if not stripped or not stripped.startswith("|"):
+            break
+        result["rows"].append({"line_no": index + 1, "cells": split_cells(lines[index]),
+                               "text": lines[index]})
+        index += 1
+    result["body_lines"] = lines[index:]
+    return result
+
+
+def row_values(parsed):
+    columns = journal_format()["entry_columns"]
+    return [dict(zip(columns, row["cells"])) for row in parsed["rows"]]
+
+
+def _fresh_line(tmp_path, **overrides):
+    return line_builder().build_line(tmp_path, **overrides)
+
+
+# --------------------------------------------------------------------------- #
+# US1 — the trajectory: coverage, header, table, seq, placeholders, idempotency
+# --------------------------------------------------------------------------- #
+
+def test_header_carries_five_declared_keys(tmp_path):
+    statement = journal_format()
+    fixture = _fresh_line(tmp_path)
+    result = append(fixture)
+    assert result.returncode == 0, result.stderr
+    parsed = parse_journal(fixture["journal"])
+    assert parsed["title"] == statement["title_template"].replace("<spec-key>", fixture["spec_key"])
+    assert list(parsed["header"]) == statement["header_keys"]
+    assert parsed["header"]["line_id"] == fixture["line_id"]
+    assert parsed["header"]["run_id"] == fixture["run_id"]
+    assert parsed["header"]["spec"] == fixture["spec_key"]
+    assert parsed["header"]["observer_instance"] == "sdd-observer-" + fixture["line_id"]
+    assert ISO_RE.match(parsed["header"]["created_at"])
+
+
+def test_body_has_exactly_one_nine_column_table(tmp_path):
+    statement = journal_format()
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    parsed = parse_journal(fixture["journal"])
+    assert parsed["header_cells"] == statement["entry_columns"]
+    assert re.match(r"^\|(\s*:?-{3,}:?\s*\|)+$", parsed["separator"])
+    assert parsed["rows"], "the fixture line must produce at least one row"
+    for row in parsed["rows"]:
+        assert len(row["cells"]) == len(statement["entry_columns"]), row["line_no"]
+
+
+def test_seq_continues_in_file_order(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    rows = row_values(parse_journal(fixture["journal"]))
+    assert [int(row["seq"]) for row in rows] == list(range(1, len(rows) + 1))
+
+
+def test_missing_values_use_declared_placeholder(tmp_path):
+    placeholder = journal_format()["missing_placeholder"]
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    rows = row_values(parse_journal(fixture["journal"]))
+    line_level = [row for row in rows if row["event"] in ("line-start", "observer-start", "commit")]
+    assert line_level, "line-level events must be projected"
+    for row in line_level:
+        assert row["stage"] == placeholder
+    starts = [row for row in rows if row["event"] == "stage-start"]
+    assert starts, "every declared stage must carry a stage-start row"
+    for row in starts:
+        assert row["command"] == placeholder
+        assert row["artifact"] == placeholder
+        assert row["exit"] == placeholder
+
+
+def test_stage_coverage_over_declared_sequence(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    stages = declared_stages()
+    if MUTATION == "delete-journal":
+        fixture["journal"].unlink()
+    elif MUTATION.startswith("drop-stage-end:"):
+        dropped = MUTATION.split(":", 1)[1]
+        kept = []
+        for line in fixture["journal"].read_text(encoding="utf-8").splitlines(keepends=True):
+            cells = split_cells(line) if line.strip().startswith("|") else []
+            if len(cells) == 9 and cells[3] == dropped and cells[4] == "stage-end":
+                continue
+            kept.append(line)
+        fixture["journal"].write_text("".join(kept), encoding="utf-8")
+    if not fixture["journal"].is_file():
+        pytest.fail("journal is absent: the coverage assertion has no subject")
+    rows = row_values(parse_journal(fixture["journal"]))
+    for stage in stages:
+        assert any(row["stage"] == stage and row["event"] == "stage-start" for row in rows), \
+            "stage %s has no stage-start row" % stage
+        assert any(row["stage"] == stage and row["event"] == "stage-end" for row in rows), \
+            "zero-failure fixture: stage %s has no stage-end row" % stage
+
+
+def test_append_idempotent_on_unchanged_carriers(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    first = fixture["journal"].read_bytes()
+    second = append(fixture)
+    assert second.returncode == 0, second.stderr
+    assert fixture["journal"].read_bytes() == first
+
+
+def owner_record_block():
+    """The record-section block exactly as the shape owner prints it (indentation included)."""
+    text = SKILL_MD.read_text(encoding="utf-8")
+    section_start = text.find("## SDD Observer（")
+    assert section_start != -1, "SKILL.md lacks the § SDD Observer section"
+    heading = text.find("## Observer Record —", section_start)
+    assert heading != -1, "the owner section carries no record-section block"
+    fence_start = text.rfind("```", section_start, heading)
+    fence_end = text.find("```", heading)
+    assert fence_start != -1 and fence_end != -1, "the owner record block is not fenced"
+    block = text[fence_start:fence_end].splitlines()[1:]
+    while block and not block[-1].strip():
+        block.pop()
+    return block
+
+
+def _owner_record_lines(fixture, started_at):
+    replacements = {
+        "<YYYY-MM-DDTHH:MM:SSZ>": started_at,
+        "- state: started | failed | disabled | closed": "- state: started",
+        "- line_id: <value>": "- line_id: %s" % fixture["line_id"],
+        "- run_id: <value>": "- run_id: %s" % fixture["run_id"],
+        "- spec: <NNN-slug>": "- spec: %s" % fixture["spec_key"],
+        "- instance: <instance slug>": "- instance: sdd-observer-%s" % fixture["line_id"],
+        "- execution_label: <label or ->": "- execution_label: %s" % fixture["execution_label"],
+        "- started_at: <UTC ISO-8601 or ->": "- started_at: %s" % started_at,
+        "- reason: <one line or ->": "- reason: -",
+    }
+    rendered = []
+    for line in owner_record_block():
+        for template, value in replacements.items():
+            line = line.replace(template, value)
+        assert "<" not in line and ">" not in line, (
+            "the owner block changed shape; re-pin this drill: %r" % line
+        )
+        rendered.append(line)
+    return rendered
+
+
+def test_owner_literal_record_block_is_accepted(tmp_path):
+    """The owner prints the section inside an indented fenced block; a verbatim copy must parse."""
+    fixture = _fresh_line(tmp_path)
+    block = owner_record_block()
+    assert block[0] != block[0].lstrip(), (
+        "the owner block no longer indents its heading; this drill has lost its subject"
+    )
+    started_at = line_builder().utc(fixture["start_epoch"] + 30)
+    spine_text = fixture["spine"].read_text(encoding="utf-8")
+    cut = spine_text.find("## Observer Record —")
+    assert cut != -1, "the fixture spine carries no record section to replace"
+    fixture["spine"].write_text(spine_text[:cut].rstrip() + "\n", encoding="utf-8")
+    with fixture["spine"].open("a", encoding="utf-8") as handle:
+        handle.write("\n" + "\n".join(_owner_record_lines(fixture, started_at)) + "\n")
+
+    result = append(fixture)
+    assert result.returncode == 0, result.stderr
+    rows = row_values(parse_journal(fixture["journal"]))
+    assert any(row["event"] == "observer-start" for row in rows), [row["event"] for row in rows]
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+
+def test_cli_answers_help_version_and_rejects_unknown(tmp_path):
+    help_result = run_engine(["--help"])
+    assert help_result.returncode == 0
+    assert "side-effects:" in help_result.stdout and "exit-codes:" in help_result.stdout
+    version_result = run_engine(["--version"])
+    assert version_result.returncode == 0
+    assert version_result.stdout.strip().startswith("journal-utils.py ")
+    bogus = run_engine(["--bogus-option"])
+    assert bogus.returncode != 0
+
+
+# --------------------------------------------------------------------------- #
+# US2 — five tamper drills, the gap drill and persistent-pointer resolution
+# --------------------------------------------------------------------------- #
+
+def _clean_journal(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    return fixture
+
+
+def _row_line_of_last_data_row(fixture):
+    rows = parse_journal(fixture["journal"])["rows"]
+    assert rows
+    return rows[-1]["line_no"]
+
+
+@pytest.mark.parametrize("variant,code", [
+    ("ten-column", "V-11"),
+    ("unknown-event", "V-5"),
+    ("free-narrative", "V-12"),
+    ("forged-pointer", "V-10"),
+    ("unresolvable-commit", "V-10"),
+])
+def test_tamper_drills_turn_check_red(tmp_path, variant, code):
+    fixture = _clean_journal(tmp_path)
+    last_line = _row_line_of_last_data_row(fixture)
+    original = fixture["journal"].read_text(encoding="utf-8")
+    fixture["journal"].write_text(tamper_builder().tamper(original, variant), encoding="utf-8")
+    result = check(fixture)
+    assert result.returncode == 1, (variant, result.stdout, result.stderr)
+    assert code in result.stdout, (variant, result.stdout)
+    if variant == "free-narrative":
+        narrative_line = len(fixture["journal"].read_text(encoding="utf-8").splitlines())
+        assert ":%d" % narrative_line in result.stdout
+    else:
+        assert ":%d" % last_line in result.stdout, (variant, result.stdout)
+
+
+def test_anomaly_before_sentinel_is_recorded(tmp_path):
+    """An ANOMALY line followed by the completion sentinel still projects (FR-012 / US1 AS2)."""
+    fixture = _fresh_line(tmp_path)
+    stage = declared_stages()[0]
+    log_path = fixture["state_dir"] / ("log-%s-%s.log" % (fixture["line_id"], stage))
+    sentinel = line_builder().sentinel_for(stage)
+    log_path.write_text(
+        "\n".join(["stage %s started" % stage, "stage %s working" % stage,
+                   "ANOMALY: probe fault in stage %s" % stage, sentinel]) + "\n",
+        encoding="utf-8")
+
+    assert append(fixture).returncode == 0
+    rows = row_values(parse_journal(fixture["journal"]))
+    anomalies = [row for row in rows if row["event"] == "anomaly"]
+    assert len(anomalies) == 1, [row["event"] for row in rows]
+    assert anomalies[0]["stage"] == stage
+    assert "runtime:log:" in anomalies[0]["evidence"]
+    verdicts = [row for row in rows if row["event"] == "stage-verdict" and row["stage"] == stage]
+    assert len(verdicts) == 1, "the sentinel must still project the stage verdict"
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+
+def test_gap_drill_emits_exactly_one_window_row(tmp_path):
+    fixture = _clean_journal(tmp_path)
+    rows = row_values(parse_journal(fixture["journal"]))
+    first_observed = rows[-1]["observed_at"]
+
+    restarted_at = _plus_seconds(first_observed, 60)
+    restart_label = fixture["execution_label"] + "-restart"
+    line_builder().append_observer_record(
+        fixture["spine"], fixture["line_id"], fixture["run_id"], fixture["spec_key"],
+        restart_label, restarted_at)
+    fixture["execution_label"] = restart_label
+    second = append(fixture)
+    assert second.returncode == 0, second.stderr
+
+    rows = row_values(parse_journal(fixture["journal"]))
+    gaps = [row for row in rows if row["event"] == "observer-gap"]
+    assert len(gaps) == 1, [row["event"] for row in rows]
+    assert gaps[0]["event_at"] == first_observed
+    newest = max(row["observed_at"] for row in rows)
+    assert gaps[0]["observed_at"] == newest
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+    # The drill has teeth: removing the gap-writing path from a copied engine yields no gap row.
+    source = ENGINE.read_text(encoding="utf-8")
+    marker = "        candidates.extend(_gap_candidates(journal, record, args, repo, fmt))\n"
+    assert marker in source, "the gap-writing path marker moved; update the drill"
+    mutated_engine = tmp_path / "journal-utils-mutated.py"
+    mutated_engine.write_text(source.replace(marker, "", 1), encoding="utf-8")
+    mutated_fixture = _fresh_line(tmp_path / "mutated")
+    assert append(mutated_fixture).returncode == 0
+    mutated_last = row_values(parse_journal(mutated_fixture["journal"]))[-1]["observed_at"]
+    mutated_restart = _plus_seconds(mutated_last, 60)
+    mutated_label = mutated_fixture["execution_label"] + "-restart"
+    line_builder().append_observer_record(
+        mutated_fixture["spine"], mutated_fixture["line_id"], mutated_fixture["run_id"],
+        mutated_fixture["spec_key"], mutated_label, mutated_restart)
+    mutated_fixture["execution_label"] = mutated_label
+    mutated_env = dict(os.environ)
+    mutated_env["PYTHONPATH"] = str((REPO_ROOT / "scripts" / "python")) + os.pathsep + \
+        mutated_env.get("PYTHONPATH", "")
+    assert append(mutated_fixture, engine=mutated_engine, env=mutated_env).returncode == 0
+    mutated_events = [row["event"] for row in row_values(parse_journal(mutated_fixture["journal"]))]
+    assert "observer-gap" not in mutated_events
+    mutated_check = check(mutated_fixture)
+    assert mutated_check.returncode == 1, mutated_check.stdout
+    assert "V-17" in mutated_check.stdout
+
+
+def test_final_writes_line_terminal_and_observer_settle(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    before = [row["event"] for row in row_values(parse_journal(fixture["journal"]))]
+    assert "line-terminal" not in before and "observer-settle" not in before
+    assert append(fixture, "--final").returncode == 0
+    events = [row["event"] for row in row_values(parse_journal(fixture["journal"]))]
+    assert events.count("line-terminal") == 1
+    assert events.count("observer-settle") == 1
+    assert append(fixture, "--final").returncode == 0
+    again = [row["event"] for row in row_values(parse_journal(fixture["journal"]))]
+    assert again.count("line-terminal") == 1 and again.count("observer-settle") == 1
+
+
+def test_persistent_pointers_resolve(tmp_path):
+    fixture = _clean_journal(tmp_path)
+    before = fixture["journal"].read_bytes()
+    result = check(fixture)
+    assert result.returncode == 0, result.stdout
+    assert fixture["journal"].read_bytes() == before, "check must be strictly read-only"
+    pointers = []
+    for line in fixture["journal"].read_text(encoding="utf-8").splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = split_cells(line)
+        if len(cells) != len(journal_format()["entry_columns"]):
+            continue
+        for chunk in cells[-1].split("; "):
+            if chunk.startswith("persistent:"):
+                pointers.append(chunk)
+    assert pointers
+    for chunk in pointers:
+        _, kind, target = chunk.split(":", 2)
+        target = target.split("#", 1)[0]
+        if kind == "commit":
+            resolved = subprocess.run(
+                ["git", "-C", str(fixture["root"]), "cat-file", "-e", target + "^{commit}"],
+                capture_output=True, text=True)
+            assert resolved.returncode == 0, chunk
+        else:
+            assert (fixture["root"] / target).exists(), chunk
+
+
+# --------------------------------------------------------------------------- #
+# US5 — first-row ordering, dual-line isolation and the single-writer refusal
+# --------------------------------------------------------------------------- #
+
+STAGE_CARRIER_PREFIXES = ("pid-", "status-", "log-", "heartbeat-", "prompt-")
+
+
+def _withhold_stage_carriers(fixture, stash):
+    """Move every stage carrier aside, leaving a line that has not started a stage yet."""
+    stash.mkdir(parents=True, exist_ok=True)
+    moved = []
+    for path in sorted(fixture["state_dir"].iterdir()):
+        if path.name.startswith(STAGE_CARRIER_PREFIXES):
+            target = stash / path.name
+            path.rename(target)
+            moved.append((path, target))
+    checkpoints = fixture["spec_dir"] / "checkpoints"
+    if checkpoints.is_dir():
+        target = stash / "checkpoints"
+        checkpoints.rename(target)
+        moved.append((checkpoints, target))
+    return moved
+
+
+def _restore_carriers(moved):
+    for original, stashed in moved:
+        stashed.rename(original)
+
+
+def test_first_journal_row_precedes_first_stage_completion(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    moved = _withhold_stage_carriers(fixture, tmp_path / "withheld")
+    try:
+        first = append(fixture)
+        assert first.returncode == 0, first.stderr
+        # `observed_at` is the engine clock in whole seconds; cross a second boundary so the
+        # second append (the stage completions) is provably later than the first row.
+        time.sleep(1.05)
+    finally:
+        _restore_carriers(moved)
+    second = append(fixture)
+    assert second.returncode == 0, second.stderr
+
+    rows = row_values(parse_journal(fixture["journal"]))
+    first_row = rows[0]
+    completions = [row for row in rows if row["event"] == "stage-end"]
+    assert first_row["event"] in ("line-start", "observer-start"), \
+        [row["event"] for row in rows[:3]]
+    assert completions, "the zero-failure fixture must project stage completions"
+    first_completion = completions[0]
+    assert int(first_row["seq"]) < int(first_completion["seq"]), (
+        "file order is the authority: the first journal row must precede the first stage-end row"
+    )
+    assert first_row["observed_at"] < first_completion["observed_at"], (
+        "the observer's first entry must be observed before the first stage completes"
+    )
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+
+def test_dual_line_isolation(tmp_path):
+    first, second = dual_line_builder().build_dual(tmp_path)
+    for fixture in (first, second):
+        assert append(fixture).returncode == 0
+
+    journals = {first["journal"], second["journal"]}
+    assert len(journals) == 2, "two parallel lines must produce two distinct journals"
+    assert all(journal.is_file() for journal in journals)
+
+    identities = [parse_journal(fixture["journal"])["header"]["observer_instance"]
+                  for fixture in (first, second)]
+    assert identities[0] == "sdd-observer-" + first["line_id"]
+    assert identities[1] == "sdd-observer-" + second["line_id"]
+    assert identities[0] != identities[1], "two parallel lines must have two instance identities"
+
+    surfaces = [(fixture["spec_dir"], fixture["spine"], fixture["state_dir"],
+                 fixture["journal"], fixture["triplet_dir"]) for fixture in (first, second)]
+    assert set(surfaces[0]).isdisjoint(set(surfaces[1])), "the two lines share a path"
+
+    for fixture in (first, second):
+        text = fixture["journal"].read_text(encoding="utf-8")
+        other = second if fixture is first else first
+        assert ("line_id: %s" % fixture["line_id"]) in text
+        assert ("line_id: %s" % other["line_id"]) not in text
+        clean = check(fixture)
+        assert clean.returncode == 0, clean.stdout
+
+
+def test_same_line_second_writer_exits_three(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    before = fixture["journal"].read_bytes()
+    with open(fixture["journal"], "a+", encoding="utf-8") as holder:
+        fcntl.flock(holder.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            refused = append(fixture)
+        finally:
+            fcntl.flock(holder.fileno(), fcntl.LOCK_UN)
+    assert refused.returncode == 3, (refused.stdout, refused.stderr)
+    assert "concurrent-writer-refused" in refused.stdout
+    assert fixture["journal"].read_bytes() == before, "a refused writer must write nothing"
+
+    # The drill has teeth: with the flock call replaced by a no-op in a copied engine, the
+    # same held lock is not refused — so exit 3 comes from the protocol, not from the fixture.
+    # (Deleting the line would leave `try:` with no body: an IndentationError, not a probe.)
+    source = ENGINE.read_text(encoding="utf-8")
+    marker = "            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)\n"
+    assert marker in source, "the single-writer marker moved; update the drill"
+    mutated_engine = tmp_path / "journal-utils-mutated.py"
+    mutated_engine.write_text(source.replace(marker, "            pass\n", 1), encoding="utf-8")
+    mutated_fixture = _fresh_line(tmp_path / "mutated")
+    assert append(mutated_fixture).returncode == 0
+    mutated_env = dict(os.environ)
+    mutated_env["PYTHONPATH"] = str((REPO_ROOT / "scripts" / "python")) + os.pathsep + \
+        mutated_env.get("PYTHONPATH", "")
+    with open(mutated_fixture["journal"], "a+", encoding="utf-8") as holder:
+        fcntl.flock(holder.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            unrefused = append(mutated_fixture, engine=mutated_engine, env=mutated_env)
+        finally:
+            fcntl.flock(holder.fileno(), fcntl.LOCK_UN)
+    assert unrefused.returncode == 0, (unrefused.stdout, unrefused.stderr)
+    assert "concurrent-writer-refused" not in unrefused.stdout
+

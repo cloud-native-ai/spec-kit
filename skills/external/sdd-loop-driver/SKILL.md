@@ -179,6 +179,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
 - `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。
 - `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门（owner：efficiency-model §5–§7）。
+- `references/observer-lifecycle.md` — 观察者派发简报模板、引擎调用循环、缺口与失败语义；生命周期条款与记录节形状的 owner 是本文件 § SDD Observer。
 - **目标项目治理文档**（运行时读取，经 ssh 同样适用）：目标项目的 `constitution`（`.specify/constitution.md`）与 `instructions`（`.specify/instructions.md`，含 `AGENTS.md` / `QODER.md` / `CLAUDE.md` 兼容符号链接）；两者不随本技能分发，缺失时按 Hard Requirement 10 处置。
 
 ## Boundary
@@ -214,6 +215,60 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **U4/U5 观测后更新**：实际行为与 `known` 不符、`unknown` 获得已验证值、或新版本/平台行为首次出现时，先写状态脊 `cli_observations`，再更新档案 provenance，再记录恰好一条 `cli-profile:<cli>` 反馈；无新事实零反馈。
 - **派发资格**：仍由 `CAPABILITY_MATRIX`（`scripts/python/execution-config.py`）**唯一**拥有；档案只记录观测，冲突时资格以矩阵为准。
 - 档案更新不得改变哨兵、watcher 判定/退出码、确认门、阶段 deadline 或测试预算；当前阶段使用 U2 记录的形态。
+
+## SDD Observer（观察者：启动、记录节与收束）
+
+观察者是每条 driver 驱动的 SDD 线上的第三方记录者：它只记录载体上发生了什么，不参与推进、不评价、不建议、不推断。机制总量 = 一个专用实例、一份线级 journal（路径 `.specify/specs/<NNN-slug>/journal.md`）、若干有界执行窗口；不引入调度器、守护进程、第二注册表或第二状态面。派发简报、引擎调用与缺口/失败语义的 owner 是 `references/observer-lifecycle.md`；本节拥有生命周期条款与状态脊记录节的形状。
+
+### 入口开关与启动时点
+
+- U0 入口声明接受 `observer: on|off`，缺省 `on`。`off` 由 driver 写入状态脊观察者记录节（`state: disabled` + 原因），并在既有 U6 收束报告中披露——关闭是「已记录的未观测」，MUST NOT 表现为静默缺失。
+- 启动时点：line 已登记且状态脊已建立之后、首个阶段的 U2 派发之前（首个阶段提示词发出前）。机械判据恰为：状态脊存在 + line 已登记 + U2 尚未派发。启动步骤属于 driver，MUST NOT 下放到任一 stage 命令内部。
+- 启动尝试与结果（`started` / `failed` / `disabled`）由 driver 写入状态脊观察者记录节；失败附一行原因。
+
+### 专用实例与身份
+
+- 每条线恰好一个 Observer Instance（实例层），identity 由 `line_id` 与 spec key 派生；实例 slug 为 `sdd-observer-<line_id>`。一条线一个实例、多次执行复用；不同线 MUST NOT 共享实例或 journal。
+- 实例由 driver 的启动步骤经既有 `create-agent` 委派创建；任一 stage 命令 MUST NOT 自行创建 observer 实例。
+- observer MUST NOT 注册为写线（不属 `root` / `coordinator` / `agent-write` 封闭写角色集）、不占工作树、不进入集成队列。
+
+### 状态脊观察者记录节（本节拥有形状）
+
+driver 以追加式小节写入状态脊；小节只追加、latest wins，observer 自身 MUST NOT 写状态脊。键与顺序恰为：
+
+```text
+  ## Observer Record — <YYYY-MM-DDTHH:MM:SSZ>
+  - state: started | failed | disabled | closed
+  - line_id: <value>
+  - run_id: <value>
+  - spec: <NNN-slug>
+  - instance: <instance slug>
+  - execution_label: <label or ->
+  - started_at: <UTC ISO-8601 or ->
+  - reason: <one line or ->
+```
+
+### 有界执行与重启
+
+- observer Execution 经既有 `run-agent` 派发落地；承载 MUST 是 external 模态的 fork（同族子进程经 `stage-runner.sh`）或 subprocess（异构 agent 自身 CLI 的子进程）；native 与 virtual 模态 MUST NOT 承载。执行 label 走既有三段约定 `<line_id>--<run_stamp>--observer`，可见性经既有 triplet 目录呈现（driver 以既有 `--sub-flow <label>=<triplet-dir>` 语义传入监督投影）。
+- 每次执行是有界窗口：边界取既有派发 turn budget 与阶段 deadline，不引入新定时器。同一线同一时刻至多一个未结算执行：上一个 `.status` 未结算时 driver MUST NOT 派发下一个；journal 引擎以单写者 flock 拒绝第二个并发 writer。
+- 执行在线终止前结束（失败、停滞、窗口到期）时，driver MAY 在下一阶段边界从同一实例再次启动；重启追加同一 journal，并由引擎为未覆盖窗口写一条 `observer-gap`。重启 MUST NOT 改变任何阶段的重试次数、超时判定或完成哨兵判定。
+
+### 线终态收束
+
+- 最后一个声明阶段之后、外层收尾之前，driver 启动一次终态收束执行：经 `journal-utils.py --action append --final` 追加 `line-terminal` 与 `observer-settle`，并为仍开着的窗口写一条起止具名的 `observer-gap`。`state: closed` 由 driver 在收束执行结算后写入观察者记录节。
+- 收束执行无法启动或失败时：driver 在观察者记录节记录 `state: failed` + 原因，U6 收束报告点名未闭合窗口的起止；journal MUST NOT 被改写成假闭合。
+
+### 非阻塞（披露是唯一的收束义务）
+
+- observer 的存在、缺失、健康、结论与 journal 内容 MUST NOT 成为任何阶段推进（U4）、checkpoint、review 或合并的门。
+- 失败只做两件事：写入状态脊观察者记录节，并在既有 U6 收束报告披露。披露是唯一的收束义务；observer 不发出用户可见的汇报、提问或审批请求。
+- observer 的可见性只经既有 supervision 投影呈现，MUST NOT 新增字段、行或小节。
+
+### 适用范围
+
+- 适用于 driver 驱动的 SDD 线，含团队内调用的嵌套运行：一条线一个 observer、一份 journal。嵌套运行拥有自己的 observer，内层 observer MUST NOT 观察外层团队运行。
+- 非 SDD 的 `/speckit.*` 命令运行与不承载 SDD 线的 team 运行 MUST NOT 产生 observer 或 journal。
 
 ## Wrap-up
 

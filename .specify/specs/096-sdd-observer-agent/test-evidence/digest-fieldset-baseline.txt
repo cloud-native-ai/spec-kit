@@ -1,0 +1,30 @@
+# digest-fieldset-baseline: SC-006 status-digest field set captured before the first implementation edit — key names only, no timestamps or ages
+# command: python3 scripts/python/status-digest.py --action digest --format json --workspace .
+# capture: 2026-11-10 (implement entry, worktree 096-sdd-observer-agent, base c9b86e7fa4d2)
+## top-level
+all_entries
+cap
+efficiency
+entries
+generated_at
+omitted
+profile
+registry_dir
+stale_bound_seconds
+state_summary
+## all_entries[] row keys
+age
+age_seconds
+branch
+is_active
+last_activity_at
+line_activity
+line_id
+project_dir
+run_id
+stage
+stale
+stale_bound_seconds
+state
+triplet
+updated_at

@@ -1,0 +1,15 @@
+# command: bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q
+# started_utc: 2026-11-10T15:53:02Z
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 93%]
+.....                                                                    [100%]
+77 passed in 7.87s
+.                                                                        [100%]
+1 passed, 77 deselected in 16.28s
+# exit_code: 0
+# duration_s: 26

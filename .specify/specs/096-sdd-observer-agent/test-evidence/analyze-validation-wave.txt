@@ -1,0 +1,79 @@
+# analyze validation wave — C/H independent read-only validators（096-sdd-observer-agent）
+
+- **Date**: 2026-11-10 | **Run**: r20261110T081104Z-b096 | **Round**: 1
+- **Carrier**: `.specify/skills/internal/create-team/scripts/dispatch.sh`（subprocess carrier / Recipe 7），`qodercli 1.1.85`
+- **CLI flags**: `-p --output-format stream-json --permission-mode auto --tools Read Grep Glob Bash --no-session-persistence`
+- **Briefs**: `.specify/.tmp/096-analyze-validators/brief-<ID>.md`（temporary, git-ignored; each brief = finding id/category/claim/severity + evidence locations only, no detection reasoning, no other findings）
+- **Raw streams**: `.specify/.tmp/096-analyze-validators/logs/validate-<ID>.{jsonl,live.log,status}`（temporary; distilled below）
+- **Read-only proof**: `git status --porcelain` after the wave equals the pre-wave reading modulo this run's own evidence files — no validator wrote to the repository; every validator `.status` records `exit=0`.
+
+## Wave summary
+
+| ID | Sent | Verdict | Final severity |
+|----|------|---------|----------------|
+| W1-01 | HIGH | downgrade | MEDIUM |
+| W1-02 | HIGH | confirm | HIGH |
+| W1-03 | HIGH | reject | —（Appendix A） |
+| W3-01 | HIGH | confirm | HIGH |
+| W3-04 | HIGH | confirm | HIGH |
+| E-01 | HIGH | confirm | HIGH |
+
+sent=6 · confirm=4 · downgrade=1 · reject=0→1（W1-03） · downgrade rate = 1/6 ≈ 16.7% · reject rate = 1/6 ≈ 16.7%
+
+## Verdict blocks (verbatim from each validator's final message)
+
+### W1-01 — downgrade → MEDIUM
+
+```
+verdict: downgrade
+proposed_severity: MEDIUM
+evidence_supported: requirements.md:142 (FR-011) states entries carry exactly nine information classes and enumerates nine fields; requirements.md:181 (Key Entities) says the same Journal Entry carries eight; checklists/2026-11-10-observer-requirements-quality.md:72 records the 八/九 contradiction (CHK018), and CHK018 at line 36 remains unchecked — so "same artifact, two counts on one closed field set, recorded but unconverged" is substantiated. requirements.md:234 additionally records the clarified decision as nine, confirming :181 is a stale count.
+evidence_not_supported: The HIGH severity is not substantiated: no downstream artifact inherits the eight-count — plan.md:14, data-model.md:55/146/155, contracts/journal-format.contract.md:19 and tasks.md:133/135/139 all carry nine fields/columns consistent with FR-011 — so under the analyze-artifacts severity rule (propagation surface `none` → capped at MEDIUM; 071 analyze-report:50 precedent) this is a stale-summary/terminology defect, not a propagating conflicting requirement. I could not observe any current artifact outside requirements.md:181 that states eight.
+VALIDATOR-DONE
+```
+
+### W1-02 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: requirements.md:191 makes failure-line coverage depend on `observer-gap` naming for stages lacking start entries; :197 requires the next observer execution or line close-out to output an `observer-gap` entry naming window start/end; :137 (FR-009) permits a state-spine reason to replace the journal close-out entry; :144 (FR-013) defines gap end by the next execution's first entry, presupposing a subsequent execution and naming no close-out writer; :146 (FR-015) authorizes only the observer Execution to write via the engine; :111 permits no journal at all when the line fails before observer start; and :157 (FR-020) caps the close-out obligation at disclosure satisfied by one recorded reason. Together these substantiate that the failure-line acceptance criteria require journal artifacts no FR obligates anyone to write at close-out.
+evidence_not_supported: SC-001:191 does not literally require every stage to be named by `observer-gap` — it is a disjunction with stage-start entries (gap naming is mandatory only for unobserved stages); SC-007:197 says the next observer execution *or* close-out must output the gap entry, so close-out is the fallback, not an unconditional duty. The claim also asserts absence of an FR-backed writing obligation only within requirements.md — whether plan-stage or driver-skill text later assigns a close-out writer was not examined.
+VALIDATOR-DONE
+```
+
+### W1-03 — reject → Appendix A
+
+```
+verdict: reject
+proposed_severity: n/a (only applicable to downgrade)
+evidence_supported: requirements.md:196 matches the quoted claim verbatim — SC-006 is a containment claim over a machine-produced surface (`/speckit.status` digest field set, empty allowed-delta set "零新增字段、行与小节") anchored to "本特性第一个实现提交之前的一次实测采集"; and requirements.md:206 (SC-006 Source) names only a "前后对比记录（零新增）" with no file path or capture command, so within requirements.md alone the baseline is not pinned to a persisted artifact or spelled-out procedure.
+evidence_not_supported: The categorical assertions "无持久位置"、"无复现采集规则"、"验收不可复现" are contradicted by artifacts that pre-date the analysis (tasks.md mtime 17:09; findings 17:28): tasks.md:110 (T003) captures the SC-006 baseline into the fixed path `.specify/specs/096-sdd-observer-agent/test-evidence/digest-fieldset-baseline.txt` via the re-runnable command `python3 scripts/python/status-digest.py --action digest --format json --workspace .` with a declared comparison unit (sorted top-level keys plus `all_entries[]` row keys, timestamps/ages excluded); tasks.md:212 (T033) re-captures with the same command and compares against that file; tasks.md:22 (DoD-6) makes the empty delta against that file a completion gate; plan.md:126 (T-005) names the same baseline-vs-post reading as the binary discriminating evidence; the command and options exist (scripts/python/status-digest.py:2279-2282). Per `.specify/shared/guidelines/closed-set-claims.md` element 1 the baseline referent/acquisition is named, so the claim is not void, and the do-not-flag entry in `.specify/skills/internal/analyze-artifacts/references/detection-and-severity.md` treats a containment claim naming its baseline referent and comparison unit as legitimate — so the HIGH "untestable acceptance criterion" rationale fails. Only the narrow observation that the SC/SC-Source text does not inline the path or command survives, which is a presentational omission, not a non-reproducible acceptance.
+VALIDATOR-DONE
+```
+
+### W3-01 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: tasks.md:93-94 assigns T037 to wp01-journal-core (rows T006–T017, T036–T037) and T020 to wp02-observer-definition (rows T018–T020, T031, T038); wp01's Edge cell "after Setup + Foundational" records no wp02/T020 predecessor. tasks.md:232 records T037 [blockedBy: T020,T036], a hard cross-package dependency from a wp01 row onto a wp02 row, and tasks.md:267-268 confirms the row intent ("US5 … after US2's template (T020)"). tasks.md:100 declares wp01 → wp02 → wp03 → wp04, permits only wp02/wp03 concurrency "after wp01", and names "the one forward edge" as T031→T029, omitting T037→T020; tasks.md:337 repeats the same "wp01 first" strategy. Hence the two narrative orderings cannot be executed literally (wp01 must finish before wp02 begins, yet T037 needs T020), and the Edge column fails to record the wp01←wp02 edge that line 89 says is package-edge territory: the three declarations plus row-level blockedBy are mutually unsatisfiable.
+evidence_not_supported: No observed execution deadlock — this is a static document inconsistency, and "按字面执行会死锁" is a derivation, not a recorded event. The Edge column taken alone does not deadlock ("wp02 after T006" permits wp02 to start concurrently with wp01), so "none can hold" holds only at the set level, not as "each of the three is individually impossible." I did not check plan.md or other planning artifacts for an override of this package map; the verdict is bounded to the cited tasks.md locations.
+VALIDATOR-DONE
+```
+
+### W3-04 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: tasks.md:11 directs all red-first captures into the single `.specify/specs/096-sdd-observer-agent/notes/red-first-evidence.md`; tasks.md:108 (T001) creates exactly that one file with per-run entries inside it; tasks.md:139/162/163/187/232 (T008, T016, T037; T018; T024) append red runs to that same file, and the package map tasks.md:93-95 assigns T008/T016/T037 to wp01, T018 to wp02, T024 to wp03; tasks.md:100 explicitly permits wp02 and wp03 to run concurrently, while tasks.md:98 acknowledges `notes/` is an append-only sink shared by several packages. AGENTS.md:101-108 makes per-entry files a MUST for append-only observations including "evidence" and states the exact test: two simultaneous writers on one path means the layout is wrong. The file is tracked (not git-ignored), so both branch-level and same-worktree agent-flow concurrency apply. The claim as stated is fully supported.
+evidence_not_supported: The cited artifacts establish a design-level violation, not an observed one: they show wp02/wp03 MAY run concurrently (permission, not a guaranteed schedule), and no actual merge conflict, lost append or race outcome is recorded anywhere cited. "All red-first evidence" is supported by the global directive at tasks.md:11, but only five rows name the file explicitly, so other captures are covered by the directive rather than by row-level evidence. It is also not shown whether implement-stage dispatch will use separate worktrees/branches or a shared worktree; both fall under the rule's "parallel branches and agent flows" wording, but the actual execution topology is not in evidence. The classification of a human-readable markdown evidence note as a "machine-managed store" is an interpretive step, though the rule's own enumeration of "evidence" supports it.
+VALIDATOR-DONE
+```
+
+### E-01 — confirm HIGH（合并波新发现）
+
+```
+verdict: confirm
+evidence_supported: GATE-9 (tasks.md:38) and T047 (tasks.md:254) require `account-clause-coverage.py` exit 0 with 0 uncovered names beyond `coverage-baseline.txt`. § Green Attribution (tasks.md:354-363) deliberately leaves exactly four clauses unclaimed (`observer-role.contract.md#C-01`, `observer-verification.contract.md#C-03`, `#C-05`, `#C-07`), and those names never appear as `[green:]` claims elsewhere in tasks.md. The re-run accountant exits 1 and prints exactly those four names as `BEYOND-BASELINE`; the baseline header (coverage-baseline.txt:2) and the script's freeze logic (account-clause-coverage.py:311-313) show this spec's own clauses can never be baseline-exempted. All five contract pages cite FRs only on the page-level `Requirements:` line (line 3), clause bodies carry zero `(FR-nnn)` parentheticals, and `clause_citations` over the five files yields 0 FR-bearing groups across 58 clauses; the accountant reports 0 of 23 FRs claimed, a blocking condition independent of the clause lane (account-clause-coverage.py:357). Thus, on the artifacts as checked out, GATE-9/T047 cannot pass.
+evidence_not_supported: The claim does not name a repair row, and none exists — tasks.md contains no task that would add FR citation groups to clause bodies (T005 re-freezes a baseline that excludes this spec; T047 is the gate itself), so the confirmation covers the current artifact set only; whether a future revision of tasks.md or the five contracts could make the gate pass is outside the cited evidence. The run also fails an additional `clause-unparsable` check (107 named files, 1 positive-form parse doubt) and emits 1 warning, which the claim does not mention and which are not needed for its conclusion.
+VALIDATOR-DONE
+```

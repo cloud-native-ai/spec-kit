@@ -1,0 +1,66 @@
+# T022 — objectivity red legs (SC-002 / SC-004)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T022) · SC-002, SC-004
+
+The objectivity claim is structural: three tamper fixtures each make `check` exit 1 naming
+the touched row, and the template pins the prohibition verbatim.
+
+## A) Three structural tamper drills
+
+Command:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q -k "tamper_drills" -v
+```
+
+Exit status: 0
+
+```text
+192 workers [5 items]
+
+.....                                                                    [100%]
+============================== 5 passed in 7.37s ===============================
+```
+
+Covered cases (`--collect-only` ids):
+
+```text
+test_journal_engine.py::test_tamper_drills_turn_check_red[ten-column-V-11]
+test_journal_engine.py::test_tamper_drills_turn_check_red[unknown-event-V-5]
+test_journal_engine.py::test_tamper_drills_turn_check_red[free-narrative-V-12]
+test_journal_engine.py::test_tamper_drills_turn_check_red[forged-pointer-V-10]
+test_journal_engine.py::test_tamper_drills_turn_check_red[unresolvable-commit-V-10]
+```
+
+Each case: a clean journal passes `check` (exit 0), the tampered copy exits 1 with the
+expected rule code and the touched line named. (a) a tenth column `recommendation` → V-11;
+(b) an event literal outside the closed set → V-5; (c) a free narrative paragraph → V-12;
+(d) a forged persistent path pointer → V-10; (e) an unresolvable commit pointer → V-10.
+
+## B) Verbatim objectivity prohibition (template side)
+
+Command:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py -q -k "objectivity" -v
+```
+
+Exit status: 0
+
+```text
+192 workers [1 item]
+
+.                                                                        [100%]
+============================== 1 passed in 6.19s ===============================
+```
+
+Covered case:
+
+```text
+test_sdd_observer_agent.py::test_objectivity_prohibition_is_verbatim
+```
+
+Reading: the template carries 「不评价、不建议、不推断」 verbatim, declares entries
+deterministic projections of carrier facts, and names every prohibited field class
+(`evaluation`, `suggestion`, `causal inference`, `severity`, `recommendation`).

@@ -1,0 +1,192 @@
+# wp02-observer-definition — execution evidence
+
+Package: `wp02-observer-definition` (rows T018, T019, T020, T037, T038)
+Captured: 2026-11-10, line worktree `096-sdd-observer-agent`
+Base at capture: `df35f3e76916237f2ef693fba0ac07a564a5d97c`
+
+## T018 — observer agent contract module, red while the template was absent
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 1 — 7 failed, every failure `missing observer template: agents/sdd-observer.agent.md`.
+Full capture: `notes/red-first-evidence-wp02.md` § T018.
+
+## T019 + T038 — observer agent template and its contract module
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 0
+
+```text
+.........                                                                [100%]
+9 passed in 6.40s
+```
+
+Covers `contracts/observer-role.contract.md` C-02…C-08 (neutral frontmatter, role face, verbatim
+「不评价、不建议、不推断」, read domain / write surface, three-layer binding, internal-subagent
+bounds, forbidden capabilities, byte-identical fast-fail clause) plus the C-09 instance-identity
+face (slug from `line_id`, `create-agent` at the driver's startup step, no stage-command
+creation).
+
+## T037 — journal engine US5 extension
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q`
+Exit status: 0
+
+```text
+..................                                                       [100%]
+18 passed in 7.35s
+```
+
+New assertions: first-journal-row ordering (two-phase fixture: first append before any stage
+carrier, second append after a 1.05 s clock boundary; strict `observed_at` precedence), dual-line
+isolation (two journals, two `sdd-observer-<line_id>` identities, disjoint path set, each journal
+carries only its own line id), same-line second-writer refusal (exit `3` +
+`concurrent-writer-refused`, journal byte-unchanged) with a flock-removal teeth leg.
+No red-first leg exists for this row: the observed behavior landed in `wp01-journal-core` and
+tasks.md § Tests line 11 exempts appended assertions over an already-authored module
+(disclosure recorded in `notes/red-first-evidence-wp02.md` § T037).
+
+## T020 — fast-fail preset enumeration 17 → 18 / 19 → 20
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10"`
+Exit status: 0
+
+```text
+.                                                                        [100%]
+1 passed in 7.57s
+```
+
+`FACTORY_PRESETS` gained `agents/sdd-observer.agent.md` (comment: `096`), the i10 count moved
+17 → 18, and the C-12 bounded count moved 19 → 20 (`18 presets + 2 authoring texts`).
+
+Intermediate reading (declared, not a wp02 failure):
+`bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10 or i11"`
+→ exit 1, `1 failed, 1 passed in 9.95s`; i11 fails on
+`AssertionError: C-11: missing mirror .specify/agents/templates/sdd-observer.agent.md`.
+The mirror and the four render copies are T041/T042 (wp04) products by the declared package
+order (T041 is `[blockedBy: T010,T017,T019,T025,T027]`); DoD-5/GATE-2 close i11 there.
+`python3 scripts/python/sync-mirrors.py --check` currently lists MISS for all three source
+additions made by wp01/wp02 (`journal-format.yaml`, `journal-utils.py`, `sdd-observer.agent.md`)
+— the same declared intermediate state.
+
+## Package combined reading
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 0
+
+```text
+...........................                                              [100%]
+27 passed in 7.59s
+```
+
+## Package files
+
+| Row | Path | sha256 (first 16) |
+|-----|------|-------------------|
+| T018/T038 | `tests/contract/test_sdd_observer_agent.py` | `7e6b70cfebe3d3a3` |
+| T019 | `agents/sdd-observer.agent.md` | `287335c2357f4c2e` |
+| T020 | `tests/contract/test_fast_fail_discipline.py` (modified) | see commit |
+| T037 | `tests/contract/test_journal_engine.py` (modified) | see commit |
+| T018/T037 | `notes/red-first-evidence-wp02.md` (modified) | see commit |
+
+## Correction after commit `9903ff6c1` (2026-11-10, wp02 executor re-run)
+
+### T037 teeth leg was vacuous; the drill is now fixed and re-read
+
+The first tightened run of `test_same_line_second_writer_exits_three` exited 1: deleting the
+`fcntl.flock` line from the copied engine left `try:` with an empty body, so the mutated engine
+never ran — the drill would have "passed" against a non-executing probe (the old `!= 3` assertion
+also accepted a crash).
+
+```text
+  File ".../journal-utils-mutated.py", line 725
+    except OSError:
+    ^
+IndentationError: expected an indented block after 'try' statement on line 724
+=========================== short test summary info ============================
+FAILED tests/contract/test_journal_engine.py::test_same_line_second_writer_exits_three
+1 failed, 17 passed in 7.34s
+exit=1
+```
+
+The mutation now replaces the call with a no-op (`source.replace(marker, "            pass\n", 1)`)
+and the probe asserts `unrefused.returncode == 0`, so a crash can no longer read as "not refused".
+Corrected reading:
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q`
+Exit status: 0
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..................                                                       [100%]
+18 passed in 7.35s
+exit=0
+```
+
+### T020 full guard reading (i10 + i12)
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10 or i12"`
+Exit status: 0
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_fast_fail_discipline.py -q -k i10 or i12
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.18s
+exit=0
+```
+
+### Neighboring guards — regression classification (wp02-affected surfaces)
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_neutral_vocabulary_scan.py tests/contract/test_concurrency_high_order.py tests/contract/test_shipped_surface_client_neutrality.py -q`
+Exit status: 1 — `15 passed, 1 failed`; the failure is a PRE-EXISTING failed id, not caused by wp02.
+
+- `test_shipped_surface_has_no_framework_runtime_references` already failed at the
+  implement-entry base: its fresh violations come from Features 090/092/093/094 files whose
+  blamed commits predate `c9b86e7fa` (e.g. `shared/declarations/contract.yaml:75` → `eb515227e1`,
+  2026-11-09). One row in the same already-failing test comes from wp01's
+  `shared/declarations/facts/journal-format.yaml:1` ("Feature 096") — carried to wp04's GATE-1
+  classification; it does not make a new failed id.
+- `agents/sdd-observer.agent.md` contributes no violation (grep against the four
+  `BANNED_PATTERNS` returns no match), and `test_neutral_vocabulary_scan.py` /
+  `test_concurrency_high_order.py` are green in the same run.
+
+```text
+...............F                                                         [100%]
+=================================== FAILURES ===================================
+___________ test_shipped_surface_has_no_framework_runtime_references ___________
+E       AssertionError: shipped (client-visible) files reference the framework project's own runtime artifacts; rewrite from the client-project perspective:
+E         shared/declarations/contract.yaml:75: # Feature 094, contract `contracts/command-family-and-declarations.md` C-83 / C-84 / C-85
+E         shared/declarations/facts/goal-team-command-family.yaml:1: # Feature 094, contract `contracts/command-family-and-declarations.md` C-76 / C-77 / C-78;
+E         shared/declarations/facts/non-disposable-review-surface.yaml:1: # Feature 092 (non-disposable), plan row 2 of the seven-face landing; contract
+E         shared/declarations/facts/goal-team-handoff-threshold.yaml:1: # Feature 094, contract `contracts/command-family-and-declarations.md` C-79 / C-80 / C-81;
+E         shared/declarations/facts/concurrency-contract.yaml:65: disposal_surface: .specify/specs/093-concurrency-by-default/contracts/existing-semantics-d
+E         shared/declarations/facts/journal-format.yaml:1: # Feature 096 (contracts/journal-format.contract.md C-01).
+E         shared/definitions/non-disposable-definitions.md:6: > `.specify/specs/090-re-anchoring/` 拥有，本节只记录这条归属事实。
+E         shared/definitions/non-disposable-definitions.md:39: | 条目的字段集、状态机、豁免字段形状、证据文件形状 | `.specify/specs/092-non-disposable/data-model.md`（E-1…E-9） |
+E         shared/definitions/non-disposable-definitions.md:48: | 档 II 移交的**行**（语料编号 → 承接特性 → 落地面） | `.specify/specs/092-non-disposable/plan.md` § Shift L
+E         shared/definitions/non-disposable-definitions.md:134: A–H 语料从未专门查找留存措辞，因此**没有任何一条语料命中本类**（`.specify/specs/092-non-disposable/plan.md`
+E         shared/definitions/non-disposable-definitions.md:490: 一条条目 = 一次回顾产出的、由一次处置关闭的单元。**字段集**由 `.specify/specs/092-non-disposable/data-model.md`
+E         shared/definitions/non-disposable-definitions.md:637: `.specify/specs/092-non-disposable/plan.md` § Shift List 拥有（C-805），本节只给指针、不复述第二个字面副本。
+E         shared/definitions/harness-triple-definitions.md:53: > **本节的提法与被引文的关系（092 handoff: D3 — 只在此处解释一次，改提法只改这里）**：「归 yaml 的判据 = 机器消费 ∧ 跨面」这条合取命名（下称「合
+E         shared/definitions/subagent-definitions.md:102: **Owner**: this section owns the definition behind the shared string `"dispatch-capability
+E         skills/internal/create-team/references/handoff-contract-template.md:4: `contracts/handoff-contract.md` C-53…C-70 in `.specify/specs/094-goal-team-parallel/`.
+=========================== short test summary info ============================
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+1 failed, 15 passed in 6.51s
+exit=1
+```
+
+### Final artifact fingerprints
+
+- `agents/sdd-observer.agent.md` = `287335c2357f4c2ef36ab79eb90ce57dcc4e206b6aed98e218adab763cdea5fc`
+- `tests/contract/test_sdd_observer_agent.py` = `7e6b70cfebe3d3a39f0497ba9a8b1744a35902bba762ea176c2177a517af0392`
+- `tests/contract/test_journal_engine.py` (post-fix) = `5b0fcbae06bdbda52529fd121336810d2089a95c0519e01207c5d0702e0edc47`
+- `tests/contract/test_fast_fail_discipline.py` = `77e61d9f9d4015b4f643e1d51009a516b55cf0a522a7298ca8eb94de05cc8985`
+- Fast-fail clause interval: 801 bytes, sha256 `f013d9ee2bf4e7ec7815e51189cef5be334e20c4fed86e9e31582b9a1bd5029e` in both owner and template (byte-identical).

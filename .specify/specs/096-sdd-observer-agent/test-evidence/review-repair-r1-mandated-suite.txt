@@ -1,0 +1,12 @@
+# review-repair r1 — mandated affected-suite rerun
+# captured: 2026-11-10T15:47:48Z  tree: 86f3a546a
+$ bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_lifecycle.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_lifecycle.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.........................................                                [100%]
+41 passed in 7.48s
+
+# exit=0 elapsed=8s

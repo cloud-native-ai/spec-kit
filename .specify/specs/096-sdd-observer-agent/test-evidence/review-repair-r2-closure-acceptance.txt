@@ -1,0 +1,84 @@
+# review-repair r2 — closure acceptance check (F7 status flip)
+# captured: 2026-11-10T16:05:45Z  tree: 0d0b3c2f5 + review-repair r2 working tree
+# step 1 (pre-flip, claimed_status: Planned) was run on the same edited tree before the status write; step 2 (below) is the post-flip reading with explicit carrier paths.
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/096-sdd-observer-agent --feature-detail .specify/features/096.md --feature-registry .specify/features.md --json
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent/.specify/features/096.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 4,
+    "total": 4,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-smoke.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent/.specify/specs/096-sdd-observer-agent",
+  "tasks": {
+    "closed": 47,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+# exit=0
+
+# step 1 payload (recorded verbatim from the pre-flip run on the same edited tree, before any status write)
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent/.specify/features/096.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 4,
+    "total": 4,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-smoke.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent/.specify/specs/096-sdd-observer-agent",
+  "tasks": {
+    "closed": 47,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+# exit=0

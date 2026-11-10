@@ -1,0 +1,68 @@
+# Premises re-measured at implement entry (T004)
+
+Capture: 2026-11-10 · worktree `.specify/.tmp/sdd-loop/worktrees/096-sdd-observer-agent` · base `c9b86e7fa4d2`
+Source of quantities: tasks.md § Premises measured at generation time (2026-11-10).
+Every row: quantity · generation-time value · entry value · delta · re-derivation command.
+
+| # | Quantity | Generation | Entry | Delta | Re-derivation |
+|---|---|---|---|---|---|
+| 1 | FR definitions | 23 | **23** | 0 | `grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/096-sdd-observer-agent/requirements.md` → `23` (exit 0) |
+| 2 | SC definitions | 7 | **7** | 0 | `grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/096-sdd-observer-agent/requirements.md` → `7` (exit 0) |
+| 3 | Contract clauses | 58 = 13+13+12+10+10 | **58** = 13+13+12+10+10 | 0 | `grep -cE '^## C-[0-9]+' .specify/specs/096-sdd-observer-agent/contracts/*.md` → journal-engine 13, journal-format 13, observer-lifecycle 12, observer-role 10, observer-verification 10 (exit 0) |
+| 4 | Declaration fact files on disk | 34 | **34** | 0 | `ls shared/declarations/facts/*.yaml \| wc -l` → `34` (exit 0) |
+| 5 | Shipped agent presets | 17 | **17** | 0 | `grep -c 'ROOT / "agents"' tests/contract/test_fast_fail_discipline.py` → `17` (exit 0) |
+| 6 | Fast-fail bounded set | 19 (assert at line 1624) | **19** (assert at **line 1625**) | bound value 0; **assertion line 1624 → 1625 (+1)** | `grep -n 'assert len(bounded) == 19' tests/contract/test_fast_fail_discipline.py` → `1625:    assert len(bounded) == 19, ...` (exit 0) |
+| 7 | Driver skill H2 sections | 14 | **14** | 0 | `grep -c '^## ' skills/external/sdd-loop-driver/SKILL.md` → `14` (exit 0) |
+| 8 | Driver mirror list | 9 | **9** | 0 | `sed -n '/^MIRROR_FILES = \[/,/^\]/p' tests/contract/test_sdd_loop_driver_skill.py \| grep -c '    "'` → `9` (exit 0) |
+| 9 | Declared stage sequence | 8 | **8** | 0 | `sed -n '/^statement:/,/^consumers:/p' shared/declarations/facts/driver-stage-sequence.yaml \| grep -c '^  - '` → `8` (exit 0) |
+| 10 | `status-digest.py` observer tokens | 0 | **0** | 0 | `grep -c "observer" scripts/python/status-digest.py` → `0` (exit 1 = no match, count 0; expected) |
+| 11 | `status-digest.py` journal tokens | 0 | **0** | 0 | `grep -c "journal" scripts/python/status-digest.py` → `0` (exit 1 = no match, count 0; expected) |
+
+## Delta disposition
+
+- Row 6 carries the only drift: the `assert len(bounded) == 19` line moved from 1624 to 1625. The constrained quantity (the bounded set size, 19) is unchanged; no task row names the line number (§ premise table line is the only occurrence), so no row inherits a stale value. The bound remains `19 = 17 presets + 2 authoring texts`.
+- All other rows measured identical to generation time; no value is silently inherited.
+
+## Raw capture
+
+```text
+== P1 FR definitions ==
+23
+exit=0
+== P2 SC definitions ==
+7
+exit=0
+== P3 Contract clauses per file ==
+.specify/specs/096-sdd-observer-agent/contracts/journal-engine.contract.md:13
+.specify/specs/096-sdd-observer-agent/contracts/journal-format.contract.md:13
+.specify/specs/096-sdd-observer-agent/contracts/observer-lifecycle.contract.md:12
+.specify/specs/096-sdd-observer-agent/contracts/observer-role.contract.md:10
+.specify/specs/096-sdd-observer-agent/contracts/observer-verification.contract.md:10
+exit=0
+== P3 total ==
+58
+== P4 Declaration fact files ==
+34
+exit=0
+== P5 Shipped agent presets ==
+17
+exit=0
+== P6 Fast-fail bounded set ==
+1625:    assert len(bounded) == 19, f"C-12: the bounded set should be 17 presets + 2 authoring texts, got {len(bounded)}"  # 084: stage-specific agent set replaces the generic template; 087: + reporter
+exit=0
+== P7 Driver skill H2 sections ==
+14
+exit=0
+== P8 Driver mirror list ==
+9
+exit=0
+== P9 Declared stage sequence ==
+8
+exit=0
+== P10 observer tokens ==
+0
+exit=1
+== P11 journal tokens ==
+0
+exit=1
+```

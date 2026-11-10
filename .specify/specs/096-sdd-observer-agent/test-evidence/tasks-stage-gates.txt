@@ -1,0 +1,100 @@
+# T047 — tasks-stage structural gates and Completion Gate readings
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, HEAD `3fd3c41f6`
+Package: `wp04-release-and-evidence` (T047) · SC-001, SC-006
+
+## T047 required readings
+
+### 1) `validate-tasks.py`
+
+```bash
+python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md
+```
+
+Exit status: 0
+
+```text
+PASS (with warnings): .specify/specs/096-sdd-observer-agent/tasks.md — 0 error(s), 4 warning(s)
+```
+
+The four warnings are exactly the disclosed set in `tasks.md` § Green Attribution:
+
+```text
+WARN 139: green-path-divergence: T008/T016 test_journal_engine.py, different green points (C-01 vs C-07)
+WARN 162: green-cross-phase: T016→T024 (observer-verification C-07 → C-03)
+WARN 191: green-cross-phase: T025→T041 (observer-role C-10 → C-01)
+WARN 210: green-cross-phase: T031→T036 (observer-verification C-06 → C-05)
+```
+
+### 2) `pre-analyze-check.py --stage tasks`
+
+```bash
+python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks \
+  --spec-dir .specify/specs/096-sdd-observer-agent --repo .
+```
+
+Exit status: 0
+
+```text
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=6 waived=0
+{"summary": {"errors": 0, "advisories": 6, "waived": 0, "fr": 23, "sc": 7, "tasks": 47, "clauses": 0, "files": 14}}
+```
+
+The 6 advisories are `missing-path` for surfaces this feature documents but does not
+create (`.specify/agents/execution/logs/`, `templates/commands/x.md`) — expected and
+non-blocking per GATE-7.
+
+### 3) Contract coverage (`account-clause-coverage.py`)
+
+```bash
+python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/096-sdd-observer-agent \
+  --corpus-root .specify/specs
+```
+
+Exit status: 0
+
+```text
+claimed clauses (this feature): 58
+uncovered beyond baseline: 0
+FR uncovered: 0
+  [clause-uncovered] pass (640) — 640 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 23 of 23 FRs cited from citation groups
+  [coverage-baseline-delta] pass (0) — baseline holds 640 names
+status: ok
+```
+
+### 4) journal-format C-13 boundary
+
+Machine check over the declared mapping and the `loop-state.py` literal (the same parse
+the T032 test uses):
+
+```text
+stage keys: ['analyze', 'checklist', 'clarify', 'implement', 'plan', 'requirements', 'review', 'tasks']
+journal-in-artifact-sets: []
+verdict: PASS
+```
+
+The journal appears in no stage's `artifacts` / `owned_paths` — not in
+`STAGE_ARTIFACTS`, not in any U4 completion condition.
+
+## Completion Gate readings
+
+| Gate | Reading | Verdict |
+|------|---------|---------|
+| GATE-1 | full suite `--names-out` re-run on the clean tree (T043); baseline reconstructed at implement-entry `c9b86e7fa`; `comm -13 base current` = 11 ids, every one attributed in `full-suite.txt` § C (trigger suite, pre-existing; base-tree targeted runs reproduced both deterministic ones) | **pass (0 NEW attributable)** |
+| GATE-2 | `sync-mirrors.py --check` exit 0 (127 scripts / 112 shared byte-identical, projected pairs ok); four render copies exist and carry the fast-fail clause (`render-verify.txt`) | **pass** |
+| GATE-3 | `grep -cE '^- \[[ >]\] T[0-9]{3} ' tasks.md` → `0` | **pass** |
+| GATE-4 | `verification.md` absent — the Pre-Status-Flip record belongs to the closure stage (constitution § VII / acceptance-hardening § Gates; GATE-4's own condition owners). No task row writes it; DoD-7 remains open with that owner | **deferred to closure (disclosed)** |
+| GATE-5 | `validate-tasks.py` exit 0, 0 errors; all 4 warnings appear in § Green Attribution | **pass** |
+| GATE-6 | `journal-utils.py --help` exit 0; `--version` exit 0 (`journal-utils.py 0.0.22`); `--bogus-option` exit 2 | **pass** |
+| GATE-7 | `pre-analyze-check --stage tasks` decision `pass`, 0 errors (6 expected advisories) | **pass** |
+| GATE-8 | `grep -cE 'observer\|journal' scripts/python/status-digest.py` → `0`; `git diff --name-only c9b86e7fa..HEAD -- <4 carrier paths>` prints nothing | **pass** |
+| GATE-9 | coverage exit 0; 0 uncovered beyond the frozen baseline; 0 `UNCOVERED-FR` names (23/23 cited) | **pass** |
+
+Scratch-path discipline for GATE-1: `git check-ignore -q .specify/.tmp` → yes; the
+scratch comparison files live under `.specify/.tmp/096/`, never the bare OS temp dir.
+
+## Final state
+
+- 47/47 task rows closed (`- [X]`), zero `[ ]` / `[>]`.
+- The SC map's last pending pointer (`tasks-stage-gates.txt`) is this file.

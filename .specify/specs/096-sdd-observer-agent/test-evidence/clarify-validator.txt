@@ -1,0 +1,16 @@
+# clarify (pre-plan) — validator evidence
+# date: 2026-11-10T08:36:35Z
+# command: python3 scripts/python/validate-requirements.py .specify/specs/096-sdd-observer-agent/requirements.md
+file: .specify/specs/096-sdd-observer-agent/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 254 lines, 30 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+# append-only: Q-row count = 11 (requirements session 6 + clarify session 5)
+# placeholders: 'Need clarification' = 0; '八阶段' = 0

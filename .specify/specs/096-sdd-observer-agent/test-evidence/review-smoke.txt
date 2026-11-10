@@ -1,0 +1,22 @@
+# Review smoke — 096-sdd-observer-agent (segment B, 2026-11-10)
+
+- base/head: `b3da3a26dfba209057f65c2b17962b9516812c39`..`ed4dd1e6b43336e84a6de41d2c24f13c6a64fb35`
+- command (verbatim): `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q`
+
+## Full output
+
+```text
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py tests/contract/test_sdd_observer_lifecycle.py tests/contract/test_sdd_loop_driver_skill.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+75 passed in 7.46s
+.                                                                        [100%]
+1 passed, 75 deselected in 18.92s
+```
+
+Exit status: 0
