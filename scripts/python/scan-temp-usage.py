@@ -51,11 +51,15 @@ ALLOWLIST = {
         "jar discovery path, not agent-created scratch",
 }
 
+# A sanctioned root masks the WHOLE path token, not just its prefix: an allowed root may contain a nested
+# ``tmp/`` segment (the driver's ``.specify/.tmp/sdd-loop/tmp/<line>/`` convention), and masking only the
+# prefix let that inner segment trip the bare-temp check — a false positive against the framework's own root.
+_PATH_TAIL = r"[^\s`'\"()（）,，;；]*"
 SANCTIONED_FORMS = (
-    re.compile(r"~/tmp(?:/|\b|$)"),
-    re.compile(r"\$HOME/tmp(?:/|\b|$)"),
-    re.compile(r"\$\{HOME\}/tmp(?:/|\b|$)"),
-    re.compile(r"\.specify/\.tmp(?:/|\b|$)"),
+    re.compile(r"~/tmp" + _PATH_TAIL),
+    re.compile(r"\$HOME/tmp" + _PATH_TAIL),
+    re.compile(r"\$\{HOME\}/tmp" + _PATH_TAIL),
+    re.compile(r"\.specify/\.tmp" + _PATH_TAIL),
 )
 BARE_TMP_RE = re.compile(r"(?<!~)/tmp\b")
 VAR_TMP_RE = re.compile(r"/var/tmp\b")

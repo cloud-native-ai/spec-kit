@@ -76,7 +76,13 @@ fi
 case "$SHARDS" in ''|*[!0-9]*) echo "error: -n needs a positive integer" >&2; exit 2 ;; esac
 [ "$SHARDS" -ge 1 ] || { echo "error: -n needs a positive integer" >&2; exit 2; }
 
-WORK="$(mktemp -d "${TMPDIR:-/var/tmp}/run-tests-shards.XXXXXX")" || exit 2
+# Shard scratch lives under the workspace's sanctioned temp root (.specify/.tmp/, gitignored), never
+# in bare system temp — same discipline the agent rules apply to agent-created scratch.
+REPO_ROOT_FOR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+WORK_BASE="$REPO_ROOT_FOR_TMP/.specify/.tmp/test-shards"
+mkdir -p "$WORK_BASE" || exit 2
+WORK="$WORK_BASE/run.$$"
+mkdir -p "$WORK" || exit 2
 cleanup() { rm -rf "$WORK"; }
 trap cleanup EXIT
 

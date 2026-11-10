@@ -99,6 +99,8 @@ Before creating or changing a machine-managed store, ask: **if two branches run 
 
 Agent-created scratch MUST use a sanctioned temp root already matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
 
+**`.specify/.gitignore` is framework-owned and tracks the framework's evolution**: it carries the runtime-ignore set (`.tmp/`, `state/`, generated stores), and whenever the framework adds a new runtime directory the corresponding rule MUST land in the same change — in the source template `templates/gitignore-specify-template` and in this project's installed copy together, so client projects receive it on the next init refresh. A runtime directory that exists but is unignored is a defect, not a preference.
+
 ## Script Interface Contract
 
 Every functional, non-read-only script answers `-h` / `--help` and `--version` without acting and rejects an undeclared option; pytest modules, pure libraries and read-only scripts are outside the required set (read-only: recommended, optional). The rule binds framework, downstream and third-party functional scripts alike; its full definition is owned by `.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not restated.
