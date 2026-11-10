@@ -34,10 +34,19 @@
   - Feature 085 SDD Temporary Goal/Team — SDD 临时 goal/team 与多 agent 并发；本特性引用其并发与席位事实
   - Feature 093 Concurrency by Default — 并发默认形态与派发能力；本特性的并发一问完全归其 owner
 
+## Plan Notes（2026-11-10，plan 阶段）
+
+- **判定面落点已固定**：新增独立只读引擎 `scripts/python/role-edge-check.py`（动作 `report` / `query`，零写点，`--help/--version` + 未声明选项拒绝），不并入 `line-registry.py` / `loop-state.py` / `status-digest.py`（两轴分离；决策张力 T-001）。
+- **边记录形态**：`role-edge` 投影三载体 —— team 运行报告 `## Execution Detail` 的 `label | role | workspace | parent` 映射表、driver stage envelope sidecar 的 `role_edge` 六字段、`run-agent` 派发记录 + 三元组；违例四类封闭（self-dispatch / dangling-parent / unbacked-role-claim / depth-inconsistent）。
+- **注入形态**：`role-transition` 九项为封闭指针清单，物理存在、由既有派发前自检按子串判定（决策张力 T-002）。
+- **harness 落点**：instructions 模板新增 `## Super Agent (相对逻辑角色)` 段，目标 ≤600 B（实测余量 946 B），超限只允许缩为一纯指针行；`better-harness.md` 不改（clarify 裁定；brief 该行与之冲突，以需求为准）。
+- **任务边界**：P1 定义 owner + 指针行 / P2 判定引擎 / P3 协议与注入接线 / P4 digest 角色视图 / P5 harness 落点 / P6 收尾（080–094 观测附录 + 既有测试处置），均 ≤16 任务。
+- **镜象基线**：实测 428 条既有 drift、`.specify/shared/` 100 个既有脏文件（路径前缀改写，与本特性无关）；实现只按文件级 `--only` 同步被触及的对，其余脏文件不提交、不还原。
+
 ## Status Criteria
 
-- **Draft**（当前）: 规格已创建并完成 clarify；等待 plan。
-- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 存在，Constitution Check 无未论证 Fail。
+- **Draft**: 规格已创建并完成 clarify。
+- **Planned**（当前）: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 存在，Constitution Check 无未论证 Fail。
 - **Implemented**: 任务清零、每条 SC 有状态行、所有 `final` 路径 SC 为 pass、smoke 记录 pass。
 - **Blocked**: 任务已关但至少一条 `final` 路径 SC 非 pass；或闭包判定 `block`。
 - **Ready for Review**: review 证据齐、`code-review.md` 无 blocking、无未豁免的 `final` 路径非 pass。
