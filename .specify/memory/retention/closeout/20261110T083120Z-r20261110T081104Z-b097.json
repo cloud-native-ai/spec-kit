@@ -1,0 +1,38 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T081104Z-b097",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261110T082837Z-run-determination-speckit-requirements-r20261110t081104z-b09.md",
+      "action": "included",
+      "commit": "5b0bdc539"
+    },
+    {
+      "path": ".specify/memory/session/20261110T082845Z-run-determination-skill-create-requirements-r20261110t081104.md",
+      "action": "included",
+      "commit": "5b0bdc539"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T082839436644Z-53d14cf3.json",
+      "action": "included",
+      "commit": "5b0bdc539"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T082846141283Z-405b4d90.json",
+      "action": "included",
+      "commit": "5b0bdc539"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T082853Z-speckit-requirements.md",
+      "action": "included",
+      "commit": "5b0bdc539"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T082855Z-skill-create-requirements.md",
+      "action": "included",
+      "commit": "5b0bdc539"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-10T08:31:20Z"
+}
