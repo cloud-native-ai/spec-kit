@@ -1,0 +1,93 @@
+# SC-001 deletion mutations — the coverage test must turn red under each
+
+Mutation A: journal deleted after append
+Command: `SDD_OBSERVER_MUTATION=delete-journal bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q -k "stage_coverage"`
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py -q -k stage_coverage
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_stage_coverage_over_declared_sequence __________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6340/popen-gw0/test_stage_coverage_over_decla0')
+
+    def test_stage_coverage_over_declared_sequence(tmp_path):
+        fixture = _fresh_line(tmp_path)
+        assert append(fixture).returncode == 0
+        stages = declared_stages()
+        if MUTATION == "delete-journal":
+            fixture["journal"].unlink()
+        elif MUTATION.startswith("drop-stage-end:"):
+            dropped = MUTATION.split(":", 1)[1]
+            kept = []
+            for line in fixture["journal"].read_text(encoding="utf-8").splitlines(keepends=True):
+                cells = split_cells(line) if line.strip().startswith("|") else []
+                if len(cells) == 9 and cells[3] == dropped and cells[4] == "stage-end":
+                    continue
+                kept.append(line)
+            fixture["journal"].write_text("".join(kept), encoding="utf-8")
+        if not fixture["journal"].is_file():
+>           pytest.fail("journal is absent: the coverage assertion has no subject")
+E           Failed: journal is absent: the coverage assertion has no subject
+
+tests/contract/test_journal_engine.py:226: Failed
+=========================== short test summary info ============================
+FAILED tests/contract/test_journal_engine.py::test_stage_coverage_over_declared_sequence
+1 failed in 6.20s
+exit=1
+```
+
+Mutation B: one stage's stage-end row removed after append
+Command: `SDD_OBSERVER_MUTATION=drop-stage-end:plan bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q -k "stage_coverage"`
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py -q -k stage_coverage
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_stage_coverage_over_declared_sequence __________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6341/popen-gw0/test_stage_coverage_over_decla0')
+
+    def test_stage_coverage_over_declared_sequence(tmp_path):
+        fixture = _fresh_line(tmp_path)
+        assert append(fixture).returncode == 0
+        stages = declared_stages()
+        if MUTATION == "delete-journal":
+            fixture["journal"].unlink()
+        elif MUTATION.startswith("drop-stage-end:"):
+            dropped = MUTATION.split(":", 1)[1]
+            kept = []
+            for line in fixture["journal"].read_text(encoding="utf-8").splitlines(keepends=True):
+                cells = split_cells(line) if line.strip().startswith("|") else []
+                if len(cells) == 9 and cells[3] == dropped and cells[4] == "stage-end":
+                    continue
+                kept.append(line)
+            fixture["journal"].write_text("".join(kept), encoding="utf-8")
+        if not fixture["journal"].is_file():
+            pytest.fail("journal is absent: the coverage assertion has no subject")
+        rows = row_values(parse_journal(fixture["journal"]))
+        for stage in stages:
+            assert any(row["stage"] == stage and row["event"] == "stage-start" for row in rows), \
+                "stage %s has no stage-start row" % stage
+>           assert any(row["stage"] == stage and row["event"] == "stage-end" for row in rows), \
+                "zero-failure fixture: stage %s has no stage-end row" % stage
+E           AssertionError: zero-failure fixture: stage plan has no stage-end row
+E           assert False
+E            +  where False = any(<generator object test_stage_coverage_over_declared_sequence.<locals>.<genexpr> at 0x7f2e474bece0>)
+
+tests/contract/test_journal_engine.py:231: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_journal_engine.py::test_stage_coverage_over_declared_sequence
+1 failed in 6.23s
+exit=1
+```
