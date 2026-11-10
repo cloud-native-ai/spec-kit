@@ -1,0 +1,40 @@
+# Checklist stage evidence — 098-suite-speed-optimizations
+stage: checklist
+date: 2026-11-10
+
+flow-class lookup (one read before category-dependent acts):
+  command: python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:098-suite-speed-optimizations"
+  output: flow_class=execution flow_type=- source=declaration marker=null neutral=false (exit 0)
+  effect: non-expression class — existing gate set kept verbatim (no added blocking items or required sections)
+
+prerequisites:
+  command: .specify/scripts/bash/check-prerequisites.sh --json (exit 0)
+  REQUIREMENTS_DIR=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs/098-suite-speed-optimizations
+  MODE=C  WRITABLE=true  REQUIREMENT_ID=098  FEATURE_ID=086
+  AVAILABLE_DOCS=research.md,data-model.md,contracts/,quickstart.md,checklists/,feature-ref.md
+
+artifact: .specify/specs/098-suite-speed-optimizations/checklists/suite-speed-2026-11-10.md
+  new file (never overwrote the existing checklists/requirements.md)
+  items: 34 (CHK001…CHK034); traceability: 34/34 carry a requirement reference or an explicit gap/ambiguity/conflict/assumption/consistency marker
+  soft cap 40 respected
+
+focus clusters (from the stage task, pre-answering intent clarification):
+  1. 五条优化各自的可判据保持（不得缩小选择 / 跳过 / flaky / 重试）
+  2. slow marker 成员判定
+  3. 会话缓存失效
+  4. 注入时钟
+  5. 进程内直调边界的可判定性
+  6. 086 契约兼容
+depth: Standard (default)  audience: Reviewer (default)
+
+gap-finding inputs: requirements.md (authority), plan.md / tasks.md / contracts/ / data-model.md (gap-finding only)
+key findings recorded as checklist items (not repaired here):
+  - FR-024 excluded-count equality vs tier=caller excluded_slow=0 (CHK010)
+  - FR-024 "--full 收集集合回到全量" vs FR-009 caller -m ownership (CHK011)
+  - SC-009 "同一断言集合全绿" vs FR-027 CliRunner-equivalent assertions (CHK026)
+  - FR-027 keep-class enumeration missing copy-topology used by the design (CHK028)
+  - "宣告 flaky" present in Overview but absent from FR-021 / SC-010 detection (CHK001)
+
+same-author gate: not fired — the analyzed artifacts predate this session (authored by the requirements/clarify/plan/tasks stage runs; commits 4c359241b, fc4a469dc, 1990e4ea0)
+docs-sync evaluation: 无需记录 — feature-scoped checklist; no project documentation surface changed
+feature status: no transition — Feature 086 is already `Ready for Review` (not `Implemented`)
