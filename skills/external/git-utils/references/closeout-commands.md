@@ -62,6 +62,12 @@ Four inputs, all read from the block plus the repository, none hardcoded per pro
 Branch **names** are a fifth input and are read the same way the rest of the skill reads them: the
 model-specific declaration rows (`Trunk`, `Feature branch convention`, the three-tier role table).
 
+- **Record-only runs (no requirement number)** — a run that produced records but carries no numbered
+  requirement (a status/feedback self-run, a maintenance pass) has no `NNN` for the declared convention.
+  Its presentation MUST offer the deterministic default `run-<run_id>` (the run's own stamp) instead of
+  leaving `<feature-branch>` as an open input; any other name remains the user's choice, and the `ask`
+  strategy still gates the step.
+
 ## Deriving the sequence
 
 A sequence is derived **per invocation** from the declared model. A hardcoded per-project sequence is
