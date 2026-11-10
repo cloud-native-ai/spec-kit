@@ -4,7 +4,7 @@
 
 ## C-1. Downlink role fields (FR-008)
 
-Every governed dispatch payload carries six fields (shape in `data-model.md` § 6): `parent_identity`, `child_label`, `role_declaration`, `depth_position`, `authority_ref`, `return_channel`. The four pre-existing injections keep travelling by pointer to their owners; this contract adds fields only.
+Every governed dispatch payload carries seven fields (shape in `data-model.md` § 6): `parent_identity`, `child_label`, `role_declaration` (`subagent` \| `superagent`), `dispatch_duty` (`granted` \| `not-granted`), `depth_position`, `authority_ref`, `return_channel`. The role claim and the grant are separate fields: `role_declaration` never takes `dual-role` (the set marker is output-only), and the grant is never inferred from the role value. The four pre-existing injections keep travelling by pointer to their owners; this contract adds fields only.
 
 ## C-2. Role-transition injection ([[STR-003]])
 
@@ -51,10 +51,10 @@ Edge end (`completed` / `failed` / `cancelled`) is written into the edge's exist
 | Surface | Change (fields/pointers only) |
 |---------|------------------------------|
 | `skills/internal/run-agent/SKILL.md` — "Dispatch-time injection (mandatory)" block | Add the [[STR-003]] pointer item (one bullet): when dispatch duty is granted, the payload carries the closed nine-item list |
-| `skills/internal/create-team/references/patterns.md` — Per-Agent Payload table | Add a `role_fields` row (six fields by reference) |
-| `skills/internal/create-team/SKILL.md` — Report contract | Add the mandatory dispatch mapping table `label \| role \| workspace \| parent` inside `## Execution Detail` |
+| `skills/internal/create-team/references/patterns.md` — Per-Agent Payload table | Add a `role_fields` row (seven fields by reference) |
+| `skills/internal/create-team/SKILL.md` — Report contract | Add the mandatory dispatch mapping table `label \| role \| dispatch_duty \| workspace \| parent` inside `## Execution Detail` |
 | `skills/external/sdd-loop-driver/SKILL.md` — Driver Topology / U0.5 | One pointer line: the driver is the root super agent; stage dispatch payloads carry the role fields; execution stays with the existing pre-dispatch self-check and U4 — no new gate |
-| `skills/external/sdd-loop-driver/references/stage-prompts.md` — envelope sidecar | Add the `role_edge` object (six fields) |
+| `skills/external/sdd-loop-driver/references/stage-prompts.md` — envelope sidecar | Add the `role_edge` object (seven fields) |
 
 No stage sequence, sentinel, gate or dispatcher changes.
 
@@ -64,4 +64,4 @@ No stage sequence, sentinel, gate or dispatcher changes.
 
 ## C-13. Guarding tests
 
-`tests/contract/test_role_transition_payload.py`: nine-item presence (item-id slugs); delete-one → self-check blocks; anti-nesting red; six downlink fields present in each wired surface; return-contract five items; aggregate per-child attribution; dual-role duties intact (mutation: grant superagent and drop an upload duty → red). `tests/contract/test_superagent_definitions.py` pins the four message-class tokens against the owner page and the no-progress-forwarding rule's presence there.
+`tests/contract/test_role_transition_payload.py`: nine-item presence (item-id slugs); delete-one → self-check blocks; anti-nesting red; seven downlink fields present in each wired surface; return-contract five items; aggregate per-child attribution; dual-role duties intact (mutation: grant superagent and drop an upload duty → red). `tests/contract/test_superagent_definitions.py` pins the four message-class tokens against the owner page and the no-progress-forwarding rule's presence there.

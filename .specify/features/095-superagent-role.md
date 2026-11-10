@@ -17,7 +17,7 @@
 
 - 实现按 `plan.md` § Work Packages 的 P1–P6 包推进；定义 owner 先行（阻塞全部用户故事），镜像按文件级 `sync-mirrors.py --only` 同步（基线 428 行 DIFF-class，只要求被触及的镜像对无 NEW drift）。
 - 身份转变注入是派发载荷内的封闭九项指针清单；既有派发前自检按 `role-transition` 标识 + 九项 item-id 句柄逐项判定，缺任一即阻断（`data-model.md` § 7）。
-- 违例集封闭四类；`dual-role` 声明表示已授予派发职责，不是 superagent 主张——已授权未派发不得被判违例（`data-model.md` § 5）。
+- 违例集封闭四类；已授予派发职责由独立的 `dispatch_duty` 声明承载，不是 superagent 主张——已授权未派发不得被判违例；`dual-role` 只是角色集输出标记、不作载体声明值（`data-model.md` § 5）。
 - instructions 新增段 ≤600 B，超限时只允许缩为纯指针行，不抬预算（A7）；`test_fast_fail_discipline.py` 的 section-count pin 与模板段同提交升降。
 - 测试执行唯一入口 `scripts/bash/run-tests.sh`；完成门判据是「相对 implement 起点基线零新增失败」（FR-036）。
 - 本节其余实现细节随 `/speckit.implement` 落笔（按阶段落笔惯例）。
@@ -46,7 +46,7 @@
 ## Plan Notes（2026-11-10，plan 阶段）
 
 - **判定面落点已固定**：新增独立只读引擎 `scripts/python/role-edge-check.py`（动作 `report` / `query`，零写点，`--help/--version` + 未声明选项拒绝），不并入 `line-registry.py` / `loop-state.py` / `status-digest.py`（两轴分离；决策张力 T-001）。
-- **边记录形态**：`role-edge` 投影三载体 —— team 运行报告 `## Execution Detail` 的 `label | role | workspace | parent` 映射表、driver stage envelope sidecar 的 `role_edge` 六字段、`run-agent` 派发记录 + 三元组；违例四类封闭（self-dispatch / dangling-parent / unbacked-role-claim / depth-inconsistent）。
+- **边记录形态**：`role-edge` 投影三载体 —— team 运行报告 `## Execution Detail` 的 `label | role | dispatch_duty | workspace | parent` 映射表、driver stage envelope sidecar 的 `role_edge` 七字段、`run-agent` 派发记录 + 三元组；违例四类封闭（self-dispatch / dangling-parent / unbacked-role-claim / depth-inconsistent）。
 - **注入形态**：`role-transition` 九项为封闭指针清单，物理存在、由既有派发前自检按子串判定（决策张力 T-002）。
 - **harness 落点**：instructions 模板新增 `## Super Agent (相对逻辑角色)` 段，目标 ≤600 B（实测余量 946 B），超限只允许缩为一纯指针行；`better-harness.md` 不改（clarify 裁定；brief 该行与之冲突，以需求为准）。
 - **任务边界**：P1 定义 owner + 指针行 / P2 判定引擎 / P3 协议与注入接线 / P4 digest 角色视图 / P5 harness 落点 / P6 收尾（080–094 观测附录 + 既有测试处置），均 ≤16 任务。

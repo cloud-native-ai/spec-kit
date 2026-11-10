@@ -26,7 +26,7 @@
 
 ### User Story 1 - 相对角色与角色边可判定 (Priority: P1)
 
-一个维护者把任意两个执行体交给框架，能得到四个答案：二者之间是否存在派发边；在每条边上谁是 super agent、谁是 subagent；每个执行体的角色集（含同时兼具两者的情形）与深度；以及违例（自派发、悬空父、没有任何边却声称 superagent 角色）。答案只来自既有运行记录，不来自阅读对话或猜测。
+一个维护者把任意两个执行体交给框架，能得到四个答案：二者之间是否存在派发边；在每条边上谁是 super agent、谁是 subagent；每个执行体的角色集（含同时兼具两者的情形）与深度；以及违例（自派发、悬空父、没有任何边却声称 superagent 角色、深度不一致）。答案只来自既有运行记录，不来自阅读对话或猜测。
 
 **Why this priority**: 相对性是本特性的定义约束。如果角色不能被判定，场景 3 的「同时是两者」就无法验收，「super agent」也会退化为另一个实体类型。
 
@@ -125,13 +125,13 @@
 - **FR-002**: 边的判定谓词 MUST 可机器判定且与记录一致：一条有向边 `P → C` 存在，当且仅当 P 的一次派发产生了 C 的一次执行；同一次派发 MUST 恰好对应一条边；角色词表以 [[STR-001]] 为 super agent 的机器标识；在同一执行体上角色是**集合**（成员为 `subagent` 与 `superagent`；[[STR-002]] 是两角色同时具备时的集合形态机读标记，MUST NOT 被读作第三个角色取值），MUST NOT 被压成单一类型；自派发（P = C）MUST 被判为违例。
 - **FR-003**: 边 MUST 有唯一机读记录形态（record kind [[STR-005]]）：父执行体身份、子执行体身份、派发尝试标识，以及这些字段所在的既有载体。字段 MUST 解析到既有载体：子身份 MUST 使用既有派发 label（team/dispatch 约定、`run-agent` 的 label，或 stage-runner 的 line+stage 产物命名）；父身份 MUST 是其自身被派发时的 label，根执行体 MUST 使用其既有的运行标识（状态脊 `run_id` 或 line registry `line_id`，无运行标识时使用 owner 文档声明的根标记）。本特性 MUST NOT 新建 registry、状态存储或第二份状态脊。边的来源以父侧派发记录为优先载体（team 派发映射行、驱动状态脊的 line+stage、`run-agent` 的 label），其余载体只作交叉核对；同一字段在两处载体冲突时 MUST 报 conflict 并点名两处路径，MUST NOT 静默择一。
 - **FR-004**: 深度 MUST 可判定：根执行体深度为 0，任一执行体的深度等于从其根沿边计数的最短距离，且 MUST 与派发记录一起可复核。深度规则 MUST 与既有治理相容并只引用不复述：SDD 调用链的深度 2 许可链、每成员至多一个运行、virtual 模态不得承载，均由 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation 拥有；本特性 MUST NOT 放宽其中任何一条，也 MUST NOT 把角色深度当作第二份授权规则。[[STR-004]] MUST 用一句话讲清角色深度（无上限）与许可链深度 2（仅约束 SDD 承载链）的关系；两条轴正交，MUST NOT 互相改写。
-- **FR-005**: 框架 MUST 提供一个确定性的只读判定面（引擎动作），输入是既有运行记录（边记录形态 [[STR-005]]），输出 MUST 可回答：两个身份之间是否存在边；每个执行体在各边上的角色集；其深度；以及违例。违例集 MUST 封闭于四类（机读 kind：`self-dispatch`、`dangling-parent`、`unbacked-role-claim`、`depth-inconsistent`；谓词 owner 为 `data-model.md` § 5）：自派发、悬空父、无对应边的角色声明，以及**深度不一致**——记录声明的深度位置与从根计算的最短距离不符，或环使深度不可解析；角色深度本身无上限（FR-004），第四类 MUST NOT 被读作深度上限规则。「无对应边的角色声明」的声明载体是既有派发/运行记录中的**显式 `superagent` 角色断言**（team 派发映射行的 `role` 列或 stage envelope 的 `role_edge` 声明取值为 `superagent`）；`dual-role` 声明只表示已授予派发职责，不是 superagent 断言——已授权但尚未/无需派发的执行体 MUST NOT 被判违例。角色集 MUST 以集合形态输出（[[STR-002]] 是集合形态的机读标记）；判定入口 MUST 是该可执行引擎动作，文档程序或人工阅读不构成判定入口。判定面 MUST 只读（零写点）、MUST 满足宪法 XXI 的脚本接口契约、MUST NOT 引入任何存储；不可读或缺失输入 MUST 以具名错误失败，MUST NOT 静默返回空集或按通过处理。该判定面 MUST 由契约测试守护：注入一条违例时转红。
+- **FR-005**: 框架 MUST 提供一个确定性的只读判定面（引擎动作），输入是既有运行记录（边记录形态 [[STR-005]]），输出 MUST 可回答：两个身份之间是否存在边；每个执行体在各边上的角色集；其深度；以及违例。违例集 MUST 封闭于四类（机读 kind：`self-dispatch`、`dangling-parent`、`unbacked-role-claim`、`depth-inconsistent`；谓词 owner 为 `data-model.md` § 5）：自派发、悬空父、无对应边的角色声明，以及**深度不一致**——记录声明的深度位置与从根计算的最短距离不符，或环使深度不可解析；角色深度本身无上限（FR-004），第四类 MUST NOT 被读作深度上限规则。「无对应边的角色声明」的声明载体是既有派发/运行记录中的**显式 `superagent` 角色断言**（team 派发映射行的 `role` 列或 stage envelope 的 `role_edge` 声明取值为 `superagent`；`superagent` 是载体声明域的合法取值，MUST NOT 被判 malformed）；**已授予派发职责由独立的 `dispatch_duty` 声明字段承载（取值 `granted` / `not-granted`），不是 superagent 断言**——已授权但尚未/无需派发的执行体 MUST NOT 被判违例；[[STR-002]] 只是角色集输出中「两角色同时具备」的集合形态机读标记，MUST NOT 作为任何载体声明字段的取值。角色集 MUST 以集合形态输出；判定入口 MUST 是该可执行引擎动作，文档程序或人工阅读不构成判定入口。判定面 MUST 只读（零写点）、MUST 满足宪法 XXI 的脚本接口契约、MUST NOT 引入任何存储；不可读或缺失输入 MUST 以具名错误失败，MUST NOT 静默返回空集或按通过处理。该判定面 MUST 由契约测试守护：注入一条违例时转红。
 - **FR-006**: 判定结果 MUST 与既有运行记录逐条可核对：角色查询里的父/子身份 MUST 能在状态脊、line registry 条目、artifact triplet 或 run report 的派发映射表中解析。两种机器行为 MUST 由同一引擎按此边界实现，MUST NOT 混同：**记录中的一侧无法解析** MUST 报悬空（`dangling-parent` 违例，判定面退出 1）并点名两侧路径；**`query` 以无法解析的身份作为查询参数** MUST 以具名输入错误退出 2（输入错误，不是悬空违例）。MUST NOT 用对话摘要补建关系。
 - **FR-007**: 相对性 MUST 由三个真实形态的验收覆盖，且 MUST NOT 被解释成实体种类：(a) 桌面端 Qoder 经 SSH 启动远端 qodercli——桌面端是 super agent、远端执行是 subagent；(b) 本地 qodercli 运行一个 team——qodercli 是 super agent、team 成员是 subagent；(c) team 成员并发扇出 10 个 subagent 并自行汇总——该成员在父边上是 subagent、在 10 条子边上是 super agent。三个形态 MUST 各有夹具或可复核的实测记录；任一形态的角色方向被反转时对应验收转红。
 
 #### B. super↔sub 协议
 
-- **FR-008**: 下行派发 MUST 在既有派发载荷通道内携带角色与身份字段：父执行体身份、子派发 label、角色声明（本边上是 subagent；是否被授予 superagent 职责）、深度位置、授权依据的引用、结果契约与回传通道；既有四项注入（快速失败子句、并发义务、汇报义务、re-anchoring 锚摘要）MUST 继续按原 owner 注入且只以指针携带，MUST NOT 复制其规则文本；载荷 MUST NOT 指示子代理加载任何技能、MUST NOT 引用驱动技能或包含循环逻辑（反嵌套义务不变）。
+- **FR-008**: 下行派发 MUST 在既有派发载荷通道内携带角色与身份字段：父执行体身份、子派发 label、角色声明（本边为 subagent；`superagent` 取值是 FR-005 的显式角色断言）、派发职责授予声明（独立的 `dispatch_duty` 字段，取值 `granted` / `not-granted`）、深度位置、授权依据的引用、结果契约与回传通道；既有四项注入（快速失败子句、并发义务、汇报义务、re-anchoring 锚摘要）MUST 继续按原 owner 注入且只以指针携带，MUST NOT 复制其规则文本；载荷 MUST NOT 指示子代理加载任何技能、MUST NOT 引用驱动技能或包含循环逻辑（反嵌套义务不变）。
 - **FR-009**: 上行回传 MUST 携带：结果或交付物路径、证据指针、显式异常行（无异常也须明说）、并发读数三元组、返回执行体的身份；任一必备项缺失即 incomplete return，父 MUST NOT 消费其结论、MUST NOT 代填缺失字段；异常行缺失或为空同判 incomplete。
 - **FR-010**: 边内消息 MUST 按目的归入一个封闭分类集（owner 文档单点声明，最少区分 ack、answer、result、attention-escalation 四类）；未被归类的「进度」叙述 MUST NOT 作为消息沿边向上转发，子执行体的活动性 MUST 由既有 liveness 载体现。本特性 MUST NOT 新建注意力机制、通道或通知服务。
 - **FR-011**: super agent 对人类的汇报 MUST 继续完全由 `.specify/shared/guidelines/reporting-obligations.md` 拥有（节奏、四要素、非周期触发、reporter 席位、零新增机制）；边内抑制与面向人的汇报是两个流，MUST NOT 互相替代：边内不转发进度 MUST NOT 被读作可以向人少报或缓报。
@@ -165,7 +165,7 @@
 #### F. 状态跟踪与可视化
 
 - **FR-029**: 既有 on-demand digest / status 投影 MUST 增加角色-边视图：对每条活动执行体输出身份、父边身份、角色集、深度、状态、最近活动与距今时长、stale 标记；条目 MUST 有界并在截断时声明被省略条数，空集 MUST 渲染既有 `nothing-running` 状态；MUST 与既有 digest 共享同一次状态读取与同一个渲染器，MUST NOT 新建仪表盘、第二 parser 或第二 renderer。
-- **FR-030**: 每执行体 liveness MUST 复用既有 artifact triplet；team 与驱动的运行报告 MUST 维护派发映射表（label → 角色 → 工作区），状态行 MUST 携带既有归属（结构 slug + 运行戳）；本特性 MUST NOT 新增观测面或第二份映射。
+- **FR-030**: 每执行体 liveness MUST 复用既有 artifact triplet；team 与驱动的运行报告 MUST 维护派发映射表（label → 角色 → 派发职责 → 工作区 → 父身份），状态行 MUST 携带既有归属（结构 slug + 运行戳）；本特性 MUST NOT 新增观测面或第二份映射。
 - **FR-031**: 一个父执行体对 N 个子执行体的扇出形状 MUST 在同一次 digest 读取中呈现（父一行 + 逐子状态），MUST NOT 为角色视图另建 parser 或第二渲染面。
 
 #### G. harness 落点与零重复
@@ -194,7 +194,7 @@
 
 ### Key Entities *(include if requirement involves data)*
 
-- **角色（Role）**: `superagent` / `subagent` 两个相对分类（集合成员）——派发边端点的相对分类；两角色同时具备时以 [[STR-002]] 标记其集合形态，`dual-role` 不是第三个角色取值；不是实体属性，不进入 Agent 三层分类法。
+- **角色（Role）**: `superagent` / `subagent` 两个相对分类（集合成员）——派发边端点的相对分类；两角色同时具备时以 [[STR-002]] 在角色集输出中标记其集合形态；`dual-role` 不是第三个角色取值，也 MUST NOT 作为载体声明字段的取值（已授予派发职责由独立的 `dispatch_duty` 声明承载）；不是实体属性，不进入 Agent 三层分类法。
 - **角色边（Role edge）**: 一次派发产生的有向关系 `P → C`；承载父身份、子身份、派发尝试标识与解析载体；是所有角色、深度与状态视图的坐标系。
 - **根执行体（Root execution）**: 直接持有用户会话的执行体；深度 0，永不作为 subagent；根身份取其既有运行标识或 owner 文档声明的根标记。
 - **角色深度（Role depth）**: 从根沿边计数到该执行体的最短距离；与既有 SDD 治理的深度限制互相引用而不互相替代。
@@ -207,7 +207,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 相对角色判定成立：root→A→B 夹具得到 A 的双角色（`subagent` 与 `superagent` 两个集合成员同时输出，机读标记 [[STR-002]]）与深度 1、B 的 subagent 与深度 2，super agent 的机器标识为 [[STR-001]]；自派发、悬空父、无边角色声明、深度不一致四类违例各自判红；把判定改为按执行体类型时测试转红。 **Path**: final
+- **SC-001**: 相对角色判定成立：root→A→B 夹具得到 A 的双角色（`subagent` 与 `superagent` 两个集合成员同时输出，以 [[STR-002]] 标记该集合形态；该标记只出现在角色集输出，不作任何载体声明字段的取值）与深度 1、B 的 subagent 与深度 2，super agent 的机器标识为 [[STR-001]]；自派发、悬空父、无边角色声明、深度不一致四类违例各自判红；把判定改为按执行体类型时测试转红。 **Path**: final
 - **SC-002**: 身份转变注入完整且被强制：授予派发权的载荷含 [[STR-003]] 的九项，删去任一项时派发前自检阻断；双重角色执行体的上行回传仍含回传契约、异常行与并发读数；缺项被当作完整成功时测试转红。 **Path**: final
 - **SC-003**: 三个真实形态端到端成立：SSH 远端、本地 team、10-child 扇出三个夹具各产出可解析的边记录与角色视图，方向与深度正确；反转任一场景的角色方向或把 team 成员判为仅 subagent 时测试转红。 **Path**: final
 - **SC-004**: 并发不变量成立：交错派发夹具中无双重占用最后一槽（预留先于派发）；读数三元组逐 grain 记录；嵌套不放大容量；可用量低于 2 时降级带预算理由码；把预留移到派发之后时测试转红。 **Path**: final
@@ -215,12 +215,12 @@
 - **SC-006**: 可视化单渲染成立：digest 输出含身份、父边、角色、深度、状态、age、stale，截断含 omitted、空集为 `nothing-running`；删去任一字段或新增第二 renderer 时测试转红。 **Path**: final
 - **SC-007**: harness 落点成立：instructions 生成文件在预算内（生成器报告 under），模板段为指针形态且 [[STR-004]] 路径存在；把预算数值写入模板或该段复制规则文本时测试转红。 **Path**: final
 - **SC-008**: 零第二机制成立：变更集审计显示无新增持久化根、registry 或报告渲染器；新增判定面无写点；并发、汇报与授权的 owner 未被复制规则文本；注入第二 store 时结构断言转红。 **Path**: supporting
-- **SC-009**: 既有规则不削弱：反嵌套、深度 2 许可链、每成员一运行、virtual 不得承载的既有契约测试全绿；放宽任一禁令时对应测试转红。 **Path**: supporting
+- **SC-009**: 既有规则不削弱：反嵌套、深度 2 许可链、每成员一运行、virtual 不得承载的既有契约测试**相对 implement 起点全量失败名单基线零新增失败**——与 FR-036 同一完成门判据；基线既有的红 MUST 逐条点名并声明不属于本特性写域，MUST NOT 被声称「全绿」；放宽任一禁令时对应测试转红。 **Path**: supporting
 - **SC-010**: 080–094 观测附录成立：每个存在切片的 `exercised` 行都有可解析证据路径，[[STR-006]] 行显式；无证据的行不得标 `exercised`；附录不得取代本特性验收；把未观测行标成 `exercised` 时检查转红。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 角色判定夹具与只读判定面的实测输出（边集、角色集、深度、违例三类），加上「按类型判定」的合成变异实测；记录到 `test-evidence/`。
+- **SC-001 Source**: 角色判定夹具与只读判定面的实测输出（边集、角色集、深度、违例四类：`self-dispatch` / `dangling-parent` / `unbacked-role-claim` / `depth-inconsistent`），加上「按类型判定」的合成变异实测；记录到 `test-evidence/`。
 - **SC-002 Source**: 派发载荷夹具：九项逐项存在性断言、删项后派发前自检的阻断实测、双重角色上行回传的四项断言；记录到 `test-evidence/`。
 - **SC-003 Source**: 三个形态夹具的运行记录（边清单、角色方向、深度、远端产物路径），远端形态按既有 external-dispatch recipes 记录；反转方向的合成变异实测。
 - **SC-004 Source**: 交错派发夹具的时序与预留记录、读数三元组、嵌套容量读数、低于 2 槽的降级记录；把预留后移的合成变异实测。
@@ -228,7 +228,7 @@
 - **SC-006 Source**: digest 实读输出（字段清单、omitted、`nothing-running`、stale），与第二 renderer 的结构断言。
 - **SC-007 Source**: `scripts/bash/generate-instructions.sh` 的预算报告表（live B / tmpl B / status），模板段字节与指针断言；预算数值写入模板的合成变异实测。
 - **SC-008 Source**: 变更集结构审计（新增持久化根计数、registry 计数、renderer 计数、判定面写点计数）和对应变异实测，记录到 `test-evidence/`。
-- **SC-009 Source**: 既有反嵌套 / 深度 / 成员运行上限 / virtual 承载的契约测试执行读数，加上放宽禁令的合成变异实测。
+- **SC-009 Source**: 既有反嵌套 / 深度 / 成员运行上限 / virtual 承载的契约测试执行读数，与 implement 起点全量失败名单基线逐条比对（零新增失败；基线既有红点名豁免），加上放宽禁令的合成变异实测。
 - **SC-010 Source**: 观测附录逐行检查：切片存在性、`exercised` 行的证据路径可解析、[[STR-006]] 行显式；无证据行标为 `exercised` 的合成变异实测。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*

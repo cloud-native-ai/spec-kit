@@ -62,7 +62,7 @@ When the same field of one edge disagrees between two carriers, the engine emits
 
 ## C-9. Input formats
 
-Only the three carrier forms in `data-model.md` § 2.1 are parsed. Unknown rows inside a known table are `2` (malformed record), not silently skipped.
+Only the three carrier forms in `data-model.md` § 2.1 are parsed. Declared-role values are `subagent` / `superagent` and `dispatch_duty` values are `granted` / `not-granted` — a `superagent` role claim is a known value judged by C-5 (never malformed), so `unbacked-role-claim` is reachable and singly classified. Unknown rows or values outside these declared domains inside a known table are `2` (malformed record), not silently skipped.
 
 ## C-10. Command examples
 
