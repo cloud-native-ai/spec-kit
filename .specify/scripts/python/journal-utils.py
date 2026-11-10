@@ -199,6 +199,15 @@ def _last_nonempty(text):
     return last
 
 
+def _last_anomaly(text):
+    """The log's last `ANOMALY:` line — it survives a later completion sentinel."""
+    last = None
+    for line in text.splitlines():
+        if line.strip().startswith("ANOMALY:"):
+            last = line.strip()
+    return last
+
+
 def _field(line, name):
     match = re.search(r"(?:^|\s)%s=(\S+)" % re.escape(name), line or "")
     return match.group(1) if match else None
@@ -215,17 +224,20 @@ def read_spine(path):
     lines = text.splitlines()
     sections, current = [], None
     for line in lines:
-        heading = OBSERVER_HEADING_RE.match(line)
+        stripped = line.strip()
+        # The shape owner (SKILL.md § SDD Observer) prints the section inside an indented
+        # fenced block; a verbatim copy is legal, so leading whitespace never decides a heading.
+        heading = OBSERVER_HEADING_RE.match(stripped)
         if heading:
-            current = {"anchor": line.strip()[3:].strip(),
+            current = {"anchor": stripped[3:].strip(),
                        "timestamp": heading.group(1).strip(), "fields": {}}
             sections.append(current)
             continue
-        if line.startswith("## "):
+        if stripped.startswith("## "):
             current = None
             continue
         if current is not None:
-            item = re.match(r"^-\s+([A-Za-z_]+):\s*(.*)$", line.strip())
+            item = re.match(r"^-\s+([A-Za-z_]+):\s*(.*)$", stripped)
             if item:
                 current["fields"][item.group(1)] = item.group(2).strip()
     attempts = re.findall(r"attempts[:：]\s*(\d+)", text)
@@ -326,7 +338,6 @@ class Journal:
         self.repo = Path(repo)
         self.fmt = fmt
         self.text = ""
-        self.title = ""
         self.header = {}
         self.rows = []
         self.findings = []
@@ -343,7 +354,6 @@ class Journal:
             self.findings.append(("V-1", 1))
             self.findings.append(("V-2", 1))
             return
-        self.title = lines[0]
         index = 1
         while index < len(lines):
             stripped = lines[index].strip()
@@ -619,7 +629,7 @@ def _project_candidates(spine_state, record, args, repo, spec_dir, state_dir, fm
                                    event_at=epoch_to_iso(status.get("at")) or placeholder,
                                    stage=stage, exit_code=status.get("exit") or placeholder))
 
-        if last_line.startswith("ANOMALY:"):
+        if _last_anomaly(log_text or "") is not None:
             evidence = pointer("runtime", "log", rel(log_path, repo))
             if status_text:
                 evidence += "; " + pointer("runtime", "status", rel(status_path, repo))

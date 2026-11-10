@@ -1,0 +1,14 @@
+# review-repair r1 — red/green probe (IM-1 anomaly / IM-2 indented owner block)
+# captured: 2026-11-10T15:47:29Z  tree: 86f3a546a
+# pre-fix engine: git show HEAD:scripts/python/journal-utils.py -> .specify/.tmp/096-repair/journal-utils-prefix.py (its sibling declaration_reader.py / script_interface_cli.py copied beside it, C-11)
+# both scenarios use the owner-literal (indented) record as the ONLY record section
+
+$ python3 probe.py . .specify/.tmp/096-repair/journal-utils-prefix.py
+{"scenario": "anomaly-before-sentinel", "exit": 0, "anomaly_rows": 0, "stage_verdict_rows": 8, "stderr": ""}
+{"scenario": "owner-literal-block", "heading_indented": true, "exit": 2, "stderr": "journal-utils: identity-mismatch: no observer record section"}
+# exit=0
+
+$ python3 probe.py . scripts/python/journal-utils.py
+{"scenario": "anomaly-before-sentinel", "exit": 0, "anomaly_rows": 1, "stage_verdict_rows": 8, "stderr": ""}
+{"scenario": "owner-literal-block", "heading_indented": true, "exit": 0, "stderr": ""}
+# exit=0

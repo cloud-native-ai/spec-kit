@@ -86,7 +86,7 @@ No field carries evaluation, suggestion, causal inference, severity or recommend
 | `stage-verdict` | the completion evidence of a stage (sentinel + exit record) was observed | `status-*` + last non-empty line of `log-*.log` | 0 |
 | `checkpoint` | a checkpoint file appeared | `checkpoints/<NN>-<stage>.md` | 1 |
 | `commit` | a git commit appeared | `git log` over the observation window | 1 |
-| `anomaly` | a stage log's last non-empty line is `ANOMALY: …` | `log-*.log` (+ `status-*` if present) | 0 |
+| `anomaly` | the stage log's last `ANOMALY:` line, even when a completion sentinel follows it | `log-*.log` (+ `status-*` if present) | 0 |
 | `stall` | the spine records a stalled line | state spine `卡死状态: stalled` | 1 |
 | `retry` | the same stage started a new attempt (new pid `start` token) | the two `pid-*` envelopes | 0 |
 | `dispatch` | a dispatch meta file appeared | `prompt-<line>-<stage>.md.meta.json` | 0 |

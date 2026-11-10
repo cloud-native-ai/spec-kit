@@ -26,6 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "journal-utils.py"
 READER = REPO_ROOT / "scripts" / "python" / "declaration_reader.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "sdd-observer"
+SKILL_MD = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
 
 ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
@@ -252,6 +253,68 @@ def test_append_idempotent_on_unchanged_carriers(tmp_path):
     assert fixture["journal"].read_bytes() == first
 
 
+def owner_record_block():
+    """The record-section block exactly as the shape owner prints it (indentation included)."""
+    text = SKILL_MD.read_text(encoding="utf-8")
+    section_start = text.find("## SDD Observer（")
+    assert section_start != -1, "SKILL.md lacks the § SDD Observer section"
+    heading = text.find("## Observer Record —", section_start)
+    assert heading != -1, "the owner section carries no record-section block"
+    fence_start = text.rfind("```", section_start, heading)
+    fence_end = text.find("```", heading)
+    assert fence_start != -1 and fence_end != -1, "the owner record block is not fenced"
+    block = text[fence_start:fence_end].splitlines()[1:]
+    while block and not block[-1].strip():
+        block.pop()
+    return block
+
+
+def _owner_record_lines(fixture, started_at):
+    replacements = {
+        "<YYYY-MM-DDTHH:MM:SSZ>": started_at,
+        "- state: started | failed | disabled | closed": "- state: started",
+        "- line_id: <value>": "- line_id: %s" % fixture["line_id"],
+        "- run_id: <value>": "- run_id: %s" % fixture["run_id"],
+        "- spec: <NNN-slug>": "- spec: %s" % fixture["spec_key"],
+        "- instance: <instance slug>": "- instance: sdd-observer-%s" % fixture["line_id"],
+        "- execution_label: <label or ->": "- execution_label: %s" % fixture["execution_label"],
+        "- started_at: <UTC ISO-8601 or ->": "- started_at: %s" % started_at,
+        "- reason: <one line or ->": "- reason: -",
+    }
+    rendered = []
+    for line in owner_record_block():
+        for template, value in replacements.items():
+            line = line.replace(template, value)
+        assert "<" not in line and ">" not in line, (
+            "the owner block changed shape; re-pin this drill: %r" % line
+        )
+        rendered.append(line)
+    return rendered
+
+
+def test_owner_literal_record_block_is_accepted(tmp_path):
+    """The owner prints the section inside an indented fenced block; a verbatim copy must parse."""
+    fixture = _fresh_line(tmp_path)
+    block = owner_record_block()
+    assert block[0] != block[0].lstrip(), (
+        "the owner block no longer indents its heading; this drill has lost its subject"
+    )
+    started_at = line_builder().utc(fixture["start_epoch"] + 30)
+    spine_text = fixture["spine"].read_text(encoding="utf-8")
+    cut = spine_text.find("## Observer Record —")
+    assert cut != -1, "the fixture spine carries no record section to replace"
+    fixture["spine"].write_text(spine_text[:cut].rstrip() + "\n", encoding="utf-8")
+    with fixture["spine"].open("a", encoding="utf-8") as handle:
+        handle.write("\n" + "\n".join(_owner_record_lines(fixture, started_at)) + "\n")
+
+    result = append(fixture)
+    assert result.returncode == 0, result.stderr
+    rows = row_values(parse_journal(fixture["journal"]))
+    assert any(row["event"] == "observer-start" for row in rows), [row["event"] for row in rows]
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+
 def test_cli_answers_help_version_and_rejects_unknown(tmp_path):
     help_result = run_engine(["--help"])
     assert help_result.returncode == 0
@@ -299,6 +362,29 @@ def test_tamper_drills_turn_check_red(tmp_path, variant, code):
         assert ":%d" % narrative_line in result.stdout
     else:
         assert ":%d" % last_line in result.stdout, (variant, result.stdout)
+
+
+def test_anomaly_before_sentinel_is_recorded(tmp_path):
+    """An ANOMALY line followed by the completion sentinel still projects (FR-012 / US1 AS2)."""
+    fixture = _fresh_line(tmp_path)
+    stage = declared_stages()[0]
+    log_path = fixture["state_dir"] / ("log-%s-%s.log" % (fixture["line_id"], stage))
+    sentinel = line_builder().sentinel_for(stage)
+    log_path.write_text(
+        "\n".join(["stage %s started" % stage, "stage %s working" % stage,
+                   "ANOMALY: probe fault in stage %s" % stage, sentinel]) + "\n",
+        encoding="utf-8")
+
+    assert append(fixture).returncode == 0
+    rows = row_values(parse_journal(fixture["journal"]))
+    anomalies = [row for row in rows if row["event"] == "anomaly"]
+    assert len(anomalies) == 1, [row["event"] for row in rows]
+    assert anomalies[0]["stage"] == stage
+    assert "runtime:log:" in anomalies[0]["evidence"]
+    verdicts = [row for row in rows if row["event"] == "stage-verdict" and row["stage"] == stage]
+    assert len(verdicts) == 1, "the sentinel must still project the stage verdict"
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
 
 
 def test_gap_drill_emits_exactly_one_window_row(tmp_path):
