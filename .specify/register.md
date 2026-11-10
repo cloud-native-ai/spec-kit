@@ -171,6 +171,12 @@
 | REC-086-W1 | 在 `shared/workflow/acceptance-hardening.md` § Inherited Blockers 写明「`inherited` 行按载体是否可解析来判」,并镜像进 `closure-acceptance-check.py --help` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W1(F9、F6) | open |
 | REC-086-W2 | `templates/feature-details-template.md` § Canonical Status State Machine 禁止任何形式的预测性状态写入(哪怕瞬时),预期值改落 checkpoint 的 `observations:` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W2(F6) | open |
 | REC-086-D1 | owner 指南指针每面一种路径形态:出厂文本取运行时形态、在声明规格里重钉 `STR-003`、owner 文件自身头部一致 | `.specify/specs/086-efficient-test-execution/review.md` § 5.5 REC-D1(F10、F11) | open |
+| REC-098-01 | 两槽位 baseline 行不得被排到最后一个工作包:任务分解须让 implement-start baseline 先于任何行为变更包(如所有 WP 行 `blockedBy` 该行) | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.1 REC-098-01(F3、A3、I3) | open |
+| REC-098-02 | review 在缺少 `verification.md` / closure verdict 时必须 fast-fail:implement 收口是 review 的硬前置,不得在缺失证据面上产出四段评审 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.2 REC-098-02(F1、A1、I1) | open |
+| REC-098-03 | 驱动状态脊在每个阶段 U2/U3/U4 必须落盘;review 派发时脊的阶段不是 implement 收口即 fast-fail 并点名陈旧字段 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.2 REC-098-03(F2、F4) | open |
+| REC-098-04 | `git-delta-review.sh receipt` 的 skip selector 必须先于二进制的行数测量生效;二进制证据可按法定 `binary` 理由跳过并产出真实回执块 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.3 REC-098-04(F6) | open |
+| REC-098-05 | 评审门须在 final-path 判据的最新同树测量与判据矛盾时拒绝转移;证据记录不得以更弱的「0 new names」读数替代声明的「双向 comm 为空」 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.4 REC-098-05(A2、I2) | open |
+| REC-098-06 | implement 的 scope audit 必须枚举 `base..head` 中无任务行对应的提交并要求记录的 user ruling(register D 行或拆分提交) | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.5 REC-098-06(F7) | open |
 | F-1 (089) | Feature 089 的 `scripts/python/` 文件数争议（requirements 曾记 38，树实测 37） | `.specify/specs/089-script-interface-contract/feature-ref.md` § 7 F-1 | closed 2026-11-06（requirements 已改为 37，`argparse` 计数 36→35） |
 | D-1 (092) | 处置词汇不合并：`archive/supersede/correct/exempt` 与 `sanitize-utils.py` 的 `delete/archive/repair/delegate/dismiss` 各为封闭集，建两张映射表 + 一条裁决规则 + 不可映射项处置 | `.specify/archive/specs/092-non-disposable/requirements.md` § Clarifications 会话条目 D-1（落地于 `shared/definitions/non-disposable-definitions.md` § Disposition Bridge） | open（实现期落地） |
 | D-2 (092) | 不落宪法原则：判据取目标逐字内容，Non-Disposable 以手段而非项目级原则落地，七面同批落地且 owner 唯一 | 同上 D-2（七面见 `plan.md` § Landing Checklist） | open（实现期落地；是否补原则由 OI-4 另行裁定） |
