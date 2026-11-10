@@ -214,7 +214,7 @@ Findings that shaped the design (all measured on this tree, 2026-11-10):
 
 ## Work Packages (task boundaries for /speckit.tasks)
 
-Six packages, each with disjoint write domain, ordered by dependency. Target ≤ 16 tasks per package.
+Six packages, each with disjoint write domain, ordered by dependency. Target ≤ 16 work items per package.
 
 | Package | Scope (write domain) | Depends on | Paired verification |
 |---------|----------------------|------------|---------------------|
