@@ -1,0 +1,41 @@
+# T050 复跑 — 覆盖基线终局对照（P9b，2026-11-11）
+captured_at_utc=2026-11-10T18:18:15Z（payload 文件 mtime，即本次运行完成时刻）
+captured_at_local=2026-11-11T02:18:15+0800
+engine=python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal --json
+exit=1
+duration_s=5.40
+stderr=empty
+payload=test-evidence/t050-rerun-20261111.json（本次运行的完整 JSON 记录）
+baseline=.specify/specs/099-speckit-seal/coverage-baseline.txt（640 names）
+baseline_sha256=26da52464b5558c568be9c0a203648f6cc7d2a8ee242d9627033eab8bdb840f0
+
+## Reading（从 payload 直读，未手算）
+
+status=uncovered
+clause lane: universe 2121, this-spec claimed 45, uncovered 707 = 640 baseline-internal + 67 beyond the frozen baseline
+fr lane: universe 28, claimed 28, uncovered 0
+warnings=1（clause-unparsable: 107 个文件在 owner forms 下无 clause id，其中 1 个声明了 positive form——既有解析疑虑，非本 spec 新增）
+checks: clause-uncovered fail(707) / fr-uncovered pass(0) / clause-unparsable fail(107) / coverage-baseline-delta fail(67)
+
+## 残留 67 名 — 按文件（与 coverage-final.txt 的 16/13/16/8/14 一致）
+
+  16  074-goal-team-sdd-unification/contracts/authorization-and-probe.md
+  13  074-goal-team-sdd-unification/contracts/diffusion-and-compat.md
+  16  074-goal-team-sdd-unification/contracts/nested-invocation.md
+   8  074-goal-team-sdd-unification/contracts/report-and-attribution.md
+  14  074-goal-team-sdd-unification/contracts/route-decision.md
+（payload 的 `clause.uncovered_beyond_baseline` 不含任何 074-* 以外的名字）
+
+## 逐名对照：残留 67 vs 回合前父 tasks 的认领集
+
+source=`git show 3f2a05cba:.specify/specs/074-goal-team-sdd-unification/tasks.md`
+pre-round `[green:]` 原始出现 68 处 = 67 条五份父契约的实认领（16/13/16/8/14）+ 1 处行格式图例 `<contract>#<clause>`（该文件第 54 行的格式说明，不是认领）
+comparison（名称先按引擎同名形式限定为 `<spec-key>/<contract>#<clause>`）:
+  LC_ALL=C comm -13 <pre-round-claims> <residual-names>  → 0 行（NEW uncovered = 0）
+  LC_ALL=C comm -23 <pre-round-claims> <residual-names>  → 0 行（67 条实认领全部仍在残留集中）
+  LC_ALL=C comm -12                                      → 67 行（交集）
+结论：残留集与回合前父级认领集逐名相同（67/67），零 NEW uncovered。
+
+## Disposition（选项一：接受具名残留）
+
+零新增=相对回合前父级认领集无新名；67 条具名残留为 C-022 强制保留拆前行的必然后果——回合按 merge-back C-022 把父级 57 条拆前行以 `> ` 引用保留为记录，其 green 认领随之失效，父契约文件被合并 `keep` 留在语料中且无活跃认领者；本 spec 自身条款 45/45 与 FR 28/28 均无缺口。该处置与用户 D-074-R1 merge-back 裁定一致（选项二「重开 C-022」与该裁定冲突，不采用）。

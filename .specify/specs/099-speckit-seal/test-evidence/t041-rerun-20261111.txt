@@ -1,0 +1,53 @@
+# T041 复跑 — 074 父级回合后置校验（P9b，2026-11-11）
+captured_at_utc=2026-11-10T18:18:03Z
+captured_at_local=2026-11-11T02:18:03+0800
+context=P8b 已修复 merge 引擎的 B3/B4 输出缺陷；本复跑用于消除 T041 的 `[~]` 依据（合并后父 tasks.md 的 43 errors）
+
+## 1. validate-tasks — PASS（0 error / 2 warning）
+
+command=`python3 .specify/scripts/python/validate-tasks.py .specify/specs/074-goal-team-sdd-unification/tasks.md`
+exit=0
+duration_s=0.06
+stderr=empty
+open_rows(`^- \[ \]`)=0
+superseded_quote_rows(`^> - \[ \]`)=57
+closed_rows(`^- \[X\]`)=58
+reading: 43 errors（33 story-labels + 10 green-dangling）已归零；2 warnings 为分片任务行原样合并带来的既有 parallel-safe / green-path-divergence，非本轮新增。
+
+full stdout:
+```
+WARN  307: parallel-safe: [P] tasks T003 (line 307) and T035 (line 347) both WRITE ['specify/scripts/python/account-clause-coverage.py'] in phase `## Phase 1: Setup (Shared Infrastructure)` — [P] requires different write targets; drop [P] from one row or re-target it, never by deleting the cited path
+WARN  333: green-path-divergence: T025 (line 333) and T049 (line 364) both write tests/contract/test_sdd_invocation_governance.py but claim different green points (['contracts/hierarchy-and-authorization.md#C-015', 'contracts/hierarchy-and-authorization.md#C-016'] vs ['contracts/compat-and-safety.md#C-001', 'contracts/compat-and-safety.md#C-002']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+PASS (with warnings): .specify/specs/074-goal-team-sdd-unification/tasks.md — 0 error(s), 2 warning(s)
+```
+
+## 2. validate-requirements — PASS
+
+command=`python3 .specify/scripts/python/validate-requirements.py .specify/specs/074-goal-team-sdd-unification/requirements.md`
+exit=0
+duration_s=0.05
+
+full stdout:
+```
+file: .specify/specs/074-goal-team-sdd-unification/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 528 lines, 36 definition rows, 11 shared strings
+0 error(s), 0 warning(s)
+```
+
+## 3. 两片 dated record 哈希 — 无漂移
+
+command=`sha256sum -c .specify/specs/099-speckit-seal/test-evidence/074-dated-record-hashes-rerun-before.txt`
+exit=0
+result=47/47 `: OK`，0 non-OK
+meaning: 47 份 dated record 当前哈希与 P8b 回合前快照逐条一致；「运行前后哈希一致」的回合内读数仍由 `074-merge-checks-rerun-20261111.txt` §3 承载，本检查证明其后无漂移。
+
+## Verdict
+
+T041 的延后依据（43 errors）不再成立：validate-tasks 0 error、validate-requirements 0 error、dated record 无漂移。历史回合读数见 `074-merge-checks-rerun-20261111.txt`。
