@@ -20,7 +20,7 @@
 - DoD-6: Quickstart S-1…S-13 are executed and their real output (with teardown) is recorded in `notes/quickstart-run.md`
 - DoD-7: The two-slot test budget stays exactly two budget slots: slot 1 `baseline` at implement start, slot 2 `closure` after review; no third full run is added for measurement. The closure stage additionally runs its same-tree `--full --serial` validation run (T061): it consumes no budget slot, is not a measurement, and is required by the parallel-consistency comparison (requirements A14, parallel-consistency C-007)
 
-**DoD Status**: pending — 60/61 rows closed; T061 is the named deferred closure row and SC-003/SC-005 are `partial` in `verification.md` until its slots run (DoD-5, DoD-7). The close-out record is `verification.md` (review-repair r1, 2026-11-11).
+**DoD Status**: met — 61/61 rows closed; T061 executed at the closure stage (2026-11-11), SC-003/SC-005 are `pass` in `verification.md`, and `deferred_tasks=` is empty. The close-out record is `verification.md`; the closure reading is `test-evidence/closure.txt` (review-repair r2, 2026-11-11).
 
 ## Completion Gate
 
@@ -218,9 +218,9 @@ Every count below was produced by the command shown, run in this worktree on 202
 - [X] T058 [P] Run the SC-011 interface evidence (S-11: `--help` lists `--full`, `--version` answers one line, an undeclared option exits non-zero) and record `test-evidence/interface-evidence.txt`.
 - [X] T059 [P] Write the `test-evidence/` index linking every SC-001…SC-011 to its evidence path(s), including this feature's coverage baseline and the closure records.
 - [X] T060 Run quickstart scenarios S-1…S-13 and record the real output (with teardown) in `notes/quickstart-run.md`; land run-time output outside `.specify/specs` and copy afterwards (corpus-write hazard).
-- [~] T061 [blockedBy: T054, T060] Closure-stage row, executed by the driver after review (slot 2 of 2; handoff to the `closure` stage): run `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt`, compare by name with `comm -13` against `baseline-failed.txt`, run the same-tree `--full --serial` validation run with the bidirectional name comparison, and record the full-tier wall ratio against the slot-1 baseline in `test-evidence/closure.txt` [green: contracts/parallel-consistency.contract.md#C-007] [green: contracts/parallel-consistency.contract.md#C-008] <!-- deferred: driver closure stage after review; slot 2 of 2 — not an implement-stage run -->
+- [X] T061 [blockedBy: T054, T060] Closure-stage row, executed by the driver after review (slot 2 of 2; handoff to the `closure` stage): run `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt`, compare by name with `comm -13` against `baseline-failed.txt`, run the same-tree `--full --serial` validation run with the bidirectional name comparison, and record the full-tier wall ratio against the slot-1 baseline in `test-evidence/closure.txt` [green: contracts/parallel-consistency.contract.md#C-007] [green: contracts/parallel-consistency.contract.md#C-008] — executed 2026-11-11: parallel 223 / serial 223 names, both `comm` directions empty; 70.62 s / 76.52 s = 92.3 %
 
-**Checkpoint**: All evidence lands; the closure-stage row remains `[~]` until the driver's closure stage executes it.
+**Checkpoint**: All evidence lands; T061 was executed at the closure stage (2026-11-11) and the row is closed.
 
 ---
 
@@ -404,4 +404,4 @@ The repair round executed the plan-owned remedy: every clause id in the six cont
 - Two-slot budget: exactly two budget-slot full runs — slot 1 `baseline` at implement start (T003), slot 2 `closure` after review (T061). The closure stage adds one same-tree `--full --serial` validation run (T061) as validation evidence: it consumes no slot and no SC-004/SC-005 wall-clock reading (requirements A14); every other run in this file is a targeted run or a collection.
 - Pre-existing failures are compared by name, never by count: `test_c5_gate_budget_is_unchanged_by_the_owner_document` and `test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census` appear on both sides of every full-run comparison (research B-4).
 - `[P]` means different write targets and no incomplete dependency; when in doubt, sequence with `[blockedBy:]` rather than assume disjointness.
-- Prefer `[~]` over leaving a row `[ ]`: T061 is the only `[~]` row and it is a deliberate handoff to the driver's closure stage.
+- Prefer `[~]` over leaving a row `[ ]` when a row is a deliberate later-stage handoff; after the closure stage executed T061 (2026-11-11) no `[~]` row remains.

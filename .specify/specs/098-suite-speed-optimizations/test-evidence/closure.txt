@@ -1,0 +1,110 @@
+# T061 — closure-stage record (098-suite-speed-optimizations)
+
+- Authority: `tasks.md` T061 and GATE-1; `contracts/parallel-consistency.contract.md` C-007/C-008;
+  `requirements.md` SC-003/SC-005, FR-003/FR-010/FR-020, A14.
+- Date: 2026-11-11. Host: the slot-1 baseline host. Runner: `scripts/bash/run-tests.sh` (both arms).
+- Measured tree: HEAD `c4f7c8bd1` plus the isolation fix in `tests/integration/test_trigger_tuning.py`
+  and `tests/integration/test_trigger_promotion.py` (landed by the commit carrying this record).
+  Both attempt-2 runs below executed on this one tree with no edits between them.
+- Budget: this is slot 2 of 2 (`closure`). The same-tree `--full --serial` run is validation
+  evidence: it consumes no budget slot and is not an SC-004/SC-005 wall reading (A14).
+- Corpus-write hazard: every run-time log and name list was written outside `.specify/specs`
+  first and copied here afterwards (nothing was written under `.specify/specs` while a run was
+  in flight).
+
+## 1. Slot 2 — full-tier parallel run (the SC-003/SC-005 record)
+
+- Command: `bash scripts/bash/run-tests.sh --full --names-out <scratch>/final-failed-repaired.txt`
+- Exit `1`; wall **70.62 s** (`date +%s.%N` around the invocation).
+- pytest summary: `223 failed, 8363 passed, 2 skipped, 576 warnings in 46.99s`
+- Serial-exception pass: `1 passed, 8588 deselected, 3 warnings in 17.89s`
+- Mode line: `# test runner: mode=parallel workers=auto dist=load passes=2 tier=full excluded_slow=0`
+- `--names-out` counting line, verbatim:
+  `# failed-name list written: .specify/.tmp/closure-t061/final-failed-repaired.txt (223 entries) passes=2`
+- Name list: `final-failed.txt` (spec root), 223 entries,
+  sha256 `1f85ac90a2280530fab46d6dff5aa6b880723f944b7b5a1d8d351a9ca14dc293`.
+- Complete stdout/stderr: `test-evidence/run-logs/closure-parallel-full.log.gz`.
+
+## 2. Same-tree serial validation run
+
+- Command: `bash scripts/bash/run-tests.sh --full --serial --names-out <scratch>/serial-failed-repaired.txt`
+- Exit `1`; wall **708.13 s**.
+- pytest summary: `223 failed, 8364 passed, 2 skipped, 3 warnings in 705.97s (0:11:45)`
+- Mode line: `# test runner: mode=serial reason=explicit tier=full excluded_slow=0`
+- `--names-out` counting line, verbatim:
+  `# failed-name list written: .specify/.tmp/closure-t061/serial-failed-repaired.txt (223 entries) passes=1`
+- Name list: `test-evidence/closure-serial-failed.txt`, 223 entries,
+  sha256 `1f85ac90a2280530fab46d6dff5aa6b880723f944b7b5a1d8d351a9ca14dc293`.
+- Complete stdout/stderr: `test-evidence/run-logs/closure-serial-full.log.gz`.
+
+## 3. Bidirectional name comparison (SC-003, C-002)
+
+- `comm -13 final-failed.txt closure-serial-failed.txt` → **0** lines (no serial-only names).
+- `comm -23 final-failed.txt closure-serial-failed.txt` → **0** lines (no parallel-only names).
+- `cmp` over the two lists: byte-identical (223 == 223).
+- Reading: the full tier's parallel and serial failure NAMES are equal in both directions on one
+  tree (C-002/C-003); the same-tree bidirectional difference is empty. SC-003 holds.
+
+## 4. Name comparison against the slot-1 baseline (SC-005, GATE-1)
+
+- Recorded slot-1 baseline list: `baseline-failed.txt` (287 names,
+  sha256 `1887c9cf7556ad419b0d652eeb3c5443497068031df4beb7b15af4159199da44`).
+- `comm -13 baseline-failed.txt final-failed.txt` → **0** lines: zero new failure names (GATE-1 empty).
+- `comm -23 baseline-failed.txt final-failed.txt` → **64** lines: removals only (includes the 31
+  isolation failures repaired in §5, plus the 33 removals already recorded at review-repair r1).
+- Wall clause: `70.62 / 76.52 = 0.9229` → **92.3 % ≤ 110 %**. The 76.52 s referent is the rebuilt
+  pre-change baseline at the implement-entry commit `af73f65f1` (`notes/pre-change-measurements.md`
+  § 7); both slots are full-tier `--names-out` runs, so SC-005's two-slot completeness holds.
+- Rebuilt-pre-change name disclosure (not the slot-1 comparison, which is empty): `comm -13`
+  against `test-evidence/review-repair-prechange-failed.txt` (279 names) = **3** names;
+  `comm -23` = 59. All three are present in the recorded slot-1 baseline and are worktree-state
+  artifacts of the long-lived implement tree, not source changes:
+  - `tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store`
+    — runtime feedback records under `.specify/memory/feedback/` written by earlier implement
+    runs of this line contain `flow_class` lines; the test scans that store.
+  - `tests/contract/test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill` —
+    a generated `skills/external/create-pages/scripts/__pycache__/scaffold-hugo.cpython-311.pyc`
+    (runtime bytecode, not a source file).
+  - `tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership` — the
+    stale WP-9 scratch tree `.specify/.tmp/wp9/before-tree/` (a repo copy made at WP-9 to derive
+    the baseline id set); the test scans every `.md` under the worktree.
+- Anti-metric disclosure: the attempt-1 wall 71.82 s would read 93.9 %; it is superseded by the
+  repaired-tree reading above and is not used as SC-005's wall.
+
+## 5. Attempt 1 (superseded diagnostic) and the isolation repair
+
+- Attempt 1 (pre-repair tree): parallel exit `1`, wall **71.82 s**, `254 failed, 8332 passed,
+  2 skipped, 576 warnings in 48.22s`, 254 names
+  (`test-evidence/closure-prerepair-parallel-failed.txt`, sha256 `9d01ba48…13cedaa`);
+  serial exit `1`, wall **717.18 s**, `249 failed, 8338 passed, 2 skipped, 3 warnings in 715.03s`,
+  249 names (`test-evidence/closure-prerepair-serial-failed.txt`, sha256 `6dd88969…e717db5`).
+  `comm -13` = 0; `comm -23` = **5** — five parallel-only names, all
+  `tests/integration/test_trigger_tuning.py`.
+- Root cause (measured, not guessed): the engine's C-7 resolution order is
+  `--workspace` > engine self-location > nearest `.specify` CWD ancestor > CWD. This worktree is
+  nested under the parent repository's `.specify/.tmp/`, so engine self-location wins and resolves
+  to the **parent repo**. Probe (read-only `status` action from a scratch cwd):
+  `workspaceRoot=/storage/project/cloud-native-ai/spec-kit`. The tuning and promotion helpers ran
+  the engine without `--workspace`, so the tests shared the parent repo's trigger store: the 18
+  promotion tests read a fixture `index.json` that was never written (`FileNotFoundError`) and the
+  tuning tests raced on shared state under xdist (parallel-only names).
+- Repair (C-004's isolation-defect path; the same repair review-repair r1 applied to
+  `tests/contract/test_trigger_engine.py`): pass `--workspace <cwd>` unless the call already
+  names one. Files: `tests/integration/test_trigger_tuning.py`,
+  `tests/integration/test_trigger_promotion.py`. No assertion was weakened, no test removed or
+  narrowed, no skip/xfail/retry introduced (the SC-010 forbidden-means set).
+- Targeted green: `bash scripts/bash/run-tests.sh --workers 8 <both files> -q` → exit 0,
+  `38 passed in 3.46s`; `bash scripts/bash/run-tests.sh --serial <both files> -q` → exit 0,
+  `38 passed in 16.74s` (`test-evidence/closure-isolation-fix.txt`).
+- Slot 2 was then re-taken on the repaired tree (sections 1–3). Attempt 1's readings are retained
+  above as the diagnostic that found the defect; they are not used as any SC-004/SC-005 wall.
+
+## 6. Gate readings and disposition
+
+- GATE-1: `comm -13 baseline-failed.txt final-failed.txt` is empty → **pass**.
+- GATE-3: no `[ ]` or `[>]` rows remain (T061 closed by this record's commit).
+- GATE-4: SC-003/SC-005 are `pass` in `verification.md`; the smoke triple is present and valid.
+- Closure judgement: `closure-acceptance-check.py` run over this tree; the payload is archived at
+  `test-evidence/review-repair-r2-closure-payload.json` and the verdict is copied verbatim into
+  `verification.md` § Closure verdict (invocation and exit code:
+  `test-evidence/review-repair-r2-closure-verdict.txt`).

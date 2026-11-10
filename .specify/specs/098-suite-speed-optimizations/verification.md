@@ -4,7 +4,8 @@
   Shape: `templates/verification-log-template.md` (declared carrier; vocabulary owner:
   `shared/workflow/acceptance-hardening.md` § Verification Vocabulary). The KEY=VALUE block is
   the record; the closure judgement reads `SC-NNN_status=` rows and nothing else.
-  Populated by the implement close-out (review-repair r1, 2026-11-11).
+  Populated by the implement close-out (review-repair r1, 2026-11-11); the closure-stage legs
+  (review-repair r2, 2026-11-11) filled SC-003/SC-005 and cleared `deferred_tasks=`.
 -->
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changes the tree) --
@@ -16,6 +17,7 @@ baseline_full_collection_ids=8543
 baseline_full_suite_wall_s=76.52
 baseline_full_suite_failed_names=279
 baseline_full_failed_names_file=test-evidence/review-repair-prechange-failed.txt
+baseline_measured_tree=af73f65f1 (implement-entry; the rebuilt pre-change referent that produced the 76.52 s / 279-name reading — notes/pre-change-measurements.md § 7)
 
 # -- /speckit.implement results --
 
@@ -24,6 +26,10 @@ post_change_commit=b9e5a35a2 (measured tree = run-start HEAD + review-repair r1 
 post_change_full_collection_ids=8589
 post_change_full_suite_wall_s=70.73
 post_change_full_suite_failed_names=254
+post_change_measured_tree=f129eb801 (the review-repair r1 working tree; run-start HEAD b9e5a35a2 + r1 edits, committed as f129eb801)
+closure_full_suite_wall_s=70.62
+closure_full_suite_failed_names=223
+closure_measured_tree=c4f7c8bd1 + the isolation fix in tests/integration/test_trigger_{tuning,promotion}.py (landed by this record's commit)
 
 # -- Smoke test record (exactly one per feature) --
 # End-to-end over the feature's main flow: the five 098 contract files plus the 086 runner
@@ -45,9 +51,19 @@ evidence_path=.specify/specs/098-suite-speed-optimizations/test-evidence/review-
 evidence_sha256=796be3a822a4d6f71379fe260071b5ab58914fbf12d960efabe20bbd2ee1e6fe
 verdict=pass
 
+sample_id=SC-003
+evidence_path=.specify/specs/098-suite-speed-optimizations/test-evidence/closure.txt
+evidence_sha256=7c504ef8cf368fdec161a03df65a77c1de39df092c5f191e6d855de16216438d
+verdict=pass
+
 sample_id=SC-004
 evidence_path=.specify/specs/098-suite-speed-optimizations/test-evidence/tier-measurements.txt
 evidence_sha256=8ceadf02cdefbce82b02bdfdfeb26465c531f99a37b944fdb2e4c7bcfc884af9
+verdict=pass
+
+sample_id=SC-005
+evidence_path=.specify/specs/098-suite-speed-optimizations/test-evidence/closure.txt
+evidence_sha256=7c504ef8cf368fdec161a03df65a77c1de39df092c5f191e6d855de16216438d
 verdict=pass
 
 sample_id=SC-006
@@ -82,8 +98,8 @@ verdict=pass
 
 # -- Success Criteria evaluation --
 # status set (closed): pass | fail | partial | blocked | deferred | unknown
-# SC-003 / SC-005 are `partial`: their measurable half is recorded, the two-slot closure leg
-# (T061) has not run. Five ladder fields on each.
+# All nine final-path criteria are `pass` after the closure stage executed T061 (slot 2);
+# SC-010/SC-011 are supporting-path.
 
 SC-001_status=pass
 SC-001_value=pre-change full-tier collection = 8543 ids (b3da3a26d, re-derived); final = 8589 ids; removed 0, added 46 = the five new contract files; disposed list recorded
@@ -93,27 +109,17 @@ SC-002_status=pass
 SC-002_value=tests/contract same-tree arms: parallel 137 names / serial 137 names; comm -13 = 0, comm -23 = 0; runs 175.76 s / 557.04 s, tier=fast excluded_slow=5 both
 SC-002_note=serial-only names repaired at the root (engine C-7 self-location defeated the pytest fixture in this nested worktree); evidence test-evidence/review-repair-r1-sc002-comm.txt + notes/quickstart-run.md § S-4 repair r1
 
-SC-003_status=partial
-SC-003_value=full-tier parallel list exists (254 names, final-tree run); the same-tree `--full --serial` comparison run is T061's closure leg and has not been executed
-SC-003_note=the criterion's own reading is the full-tier bidirectional comparison; only the subset analogue (SC-002) is measured today
-SC-003_blocked_at=2026-11-11 — closure-stage reading not yet taken (T061 deferred by the driver's stage order)
-SC-003_reduced_measurement=tests/contract subset (SC-002): parallel 137 / serial 137 names, comm -13 = 0 and comm -23 = 0 on the final tree
-SC-003_reduced_measurement_run=yes
-SC-003_why_reduced_insufficient=parallel-consistency C-008 forbids reporting a verified subset as full-suite safety; the subset comparison cannot stand in for the full-tier bidirectional comparison the criterion names
-SC-003_unblock=execute T061: `--full --serial` same-tree validation run, names compared bidirectionally with the full parallel list
+SC-003_status=pass
+SC-003_value=full-tier same-tree comparison: parallel 223 names / serial 223 names, comm -13 = 0 and comm -23 = 0 (lists byte-identical); the first attempt (254/249 names) exposed a 5-name parallel-only isolation defect, repaired at the root in two trigger test helpers and re-measured on the repaired tree
+SC-003_note=closure-stage T061; names final-failed.txt (sha256 1f85ac90…) + test-evidence/closure-serial-failed.txt; root-cause record test-evidence/closure-isolation-fix.txt; commands, exits, walls in test-evidence/closure.txt
 
 SC-004_status=pass
 SC-004_value=default parallel 73.42 s vs same-selection serial 692.15 s = 10.6 % ≤ 50 %; selection equality proven by the two --collect-only readings (8582 ids each)
 SC-004_note=scope disclosure and anti-measurement recorded; evidence test-evidence/tier-measurements.txt (T056)
 
-SC-005_status=partial
-SC-005_value=rebuilt pre-change baseline 76.52 s vs final tree 70.73 s = 92.4 % ≤ 110 %; the slot-2 closure leg (full-tier names + new-name comparison) has not run
-SC-005_note=wall clause holds with a genuine pre-change referent (implement-entry tree af73f65f1); two-slot completeness remains T061's
-SC-005_blocked_at=2026-11-11 — slot 2 (`closure`, T061) not yet executed
-SC-005_reduced_measurement=pre-change baseline → final tree full-tier wall pair (76.52 s → 70.73 s, 92.4 %) plus name disclosure (1 new name vs the recorded slot-1 baseline, isolated-green)
-SC-005_reduced_measurement_run=yes
-SC-005_why_reduced_insufficient=the criterion also requires both slots executed with full-tier `--names-out` lists; a wall ratio alone does not evidence slot 2 or its name comparison
-SC-005_unblock=execute T061 (slot 2): full-tier run, `comm -13` against baseline-failed.txt, and the same-tree serial validation run
+SC-005_status=pass
+SC-005_value=slot-2 full-parallel wall 70.62 s vs rebuilt pre-change baseline 76.52 s = 92.3 % ≤ 110 %; both slots full-tier with --names-out lists; comm -13 baseline-failed.txt → final-failed.txt = 0 new names (64 removals); vs the rebuilt pre-change list comm -13 = 3, all three present in the slot-1 list (worktree-state artifacts, disclosed)
+SC-005_note=closure-stage T061 (slot 2 of 2); the attempt-1 wall 71.82 s is superseded by the repaired-tree reading; evidence test-evidence/closure.txt
 
 SC-006_status=pass
 SC-006_value=default-tier disclosure `tier=fast excluded_slow=<measured>`; fast = full − slow set exactly; three caller fixtures and the registry↔collection guard green; mutation drills red
@@ -146,17 +152,21 @@ SC-011_note=supporting path; evidence test-evidence/interface-evidence.txt, tier
 RS-004_joint_acceptance=pass
 
 # -- Deferred tasks (mirrors `[~]` rows in tasks.md) --
+# None: the closure stage executed T061 (2026-11-11); 61/61 rows are `[X]`.
 
-deferred_tasks=T061 — driver closure stage after review; slot 2 of 2, not an implement-stage run
-deferred_reason_summary=T061 is the closure-stage row by design: slot 2 runs after review, outside implement, and carries SC-003's full-tier bidirectional comparison, SC-005's slot-2 names list, and the closure `comm -13`
+deferred_tasks=
+deferred_reason_summary=
 
 # -- Free-form notes --
 
-notes=Close-out populated by review-repair r1 on 2026-11-11 (review F1/A1/I1); the closure verdict below was executed over the tree this record describes and is copied verbatim; SC-003/SC-005 are partial because their two-slot closure legs are T061's.
+notes=Close-out populated by review-repair r1 on 2026-11-11 (review F1/A1/I1); the closure stage (review-repair r2) executed T061, and the closure verdict below was executed over the tree this record describes and is copied verbatim; SC-003/SC-005 are pass with their closure readings in test-evidence/closure.txt.
 
 Prose (not part of the record): no status above was written to make the checker pass. SC-003 and
-SC-005 carry the five ladder fields because their measurable halves are recorded while the
-closure-stage legs (T061) remain deferred by the driver's stage order. The pre-change baseline
+SC-005 became `pass` only after the closure stage's two runs landed (the full-tier parallel slot
+plus the same-tree `--full --serial` validation run; evidence `test-evidence/closure.txt`). The
+first slot-2 attempt exposed a five-name parallel-only isolation defect; it was repaired at the
+root (an explicit `--workspace` in two trigger test helpers, the review-repair r1 precedent) and
+slot 2 was re-taken on the repaired tree — that reading is the record. The pre-change baseline
 (76.52 s) was rebuilt on a throwaway worktree at the implement-entry commit `af73f65f1`; the
 superseded post-WP-8 slot-1 reading remains in `notes/pre-change-measurements.md` §1 with its
 disclosure intact.
@@ -167,22 +177,23 @@ disclosure intact.
 Invocation (claim carrier = the bound feature's detail; 098 has no registry row by the
 clarify binding "不新建、不改号"):
 
-`python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/098-suite-speed-optimizations --feature-detail .specify/features/086-efficient-test-execution.md --json`
+`python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/098-suite-speed-optimizations --feature-detail .specify/features/086-efficient-test-execution.md --json --json-out .specify/specs/098-suite-speed-optimizations/test-evidence/review-repair-r2-closure-payload.json`
 
-exit `1`; record (field-for-field from the payload, `test-evidence/review-repair-r1-closure-payload.json`):
+exit `0`; record (field-for-field from the payload, `test-evidence/review-repair-r2-closure-payload.json`):
 
-- verdict: `block`
-- reasons: `final-path-not-pass` → `SC-003`; `final-path-not-pass` → `SC-005`;
-  `status-claims-implemented-but-blocked`
-- final_path: pass 7 · partial 2 · fail 0 · blocked 0 · deferred 0 · unknown 0 · total 9
+- verdict: `accept`
+- reasons: `[]` (empty)
+- final_path: pass 9 · partial 0 · fail 0 · blocked 0 · deferred 0 · unknown 0 · total 9
 - completion conditions: no_open_rows=true · status_row_per_criterion=true ·
-  every_final_path_pass=false · smoke_record_pass=true
-- tasks: closed 60 · deferred 1 · open 0 · in_progress 0
+  every_final_path_pass=true · smoke_record_pass=true
+- tasks: closed 61 · deferred 0 · open 0 · in_progress 0
 - smoke: present=true · records=1 · exit_code=0 · evidence_exists=true
 
-Reading: the record exists and names exactly the two closure-stage criteria (SC-003/SC-005,
-slot 2 = T061) that have not run yet. The bare invocation without `--feature-detail` exits 2
-with "no registry row for 098-suite-speed-optimizations" — a resolution fact of the
-follow-up-spec binding, recorded in `test-evidence/review-repair-r1-closure-verdict.txt`.
+Reading: the closure stage executed T061 (slot 2) and its same-tree serial validation run
+(`test-evidence/closure.txt`); all nine final-path criteria are `pass` and no deferred row
+remains. The bare invocation without `--feature-detail` exits 2 with "no registry row for
+098-suite-speed-optimizations" — a resolution fact of the follow-up-spec binding, recorded in
+`test-evidence/review-repair-r2-closure-verdict.txt`. The superseded r1 `block` record stays
+archived at `test-evidence/review-repair-r1-closure-verdict.txt` + `-payload.json`.
 <!-- closure-verdict:end -->
 

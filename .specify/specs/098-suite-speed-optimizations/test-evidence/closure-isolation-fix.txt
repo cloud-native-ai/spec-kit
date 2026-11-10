@@ -1,0 +1,32 @@
+# T061 isolation-fix evidence — 2026-11-11
+# Purpose: the attempt-1 parallel-only names (5, all test_trigger_tuning.py) and the 18
+# promotion failures share one root cause — engine C-7 self-location resolves to the parent
+# repo from this nested worktree, defeating the pytest fixture workspace.
+
+## Engine workspace resolution probe (read-only status action, scratch cwd)
+$ cd .specify/.tmp/closure-t061/probe && python3 /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/scripts/python/trigger-utils.py --action status --format json
+{
+  "ok": true,
+  "action": "status",
+  "workspaceRoot": "/storage/project/cloud-native-ai/spec-kit",
+  "generatedAt": "2026-11-10T19:36:45Z",
+  "errors": [],
+
+## Targeted green — parallel
+$ bash scripts/bash/run-tests.sh --workers 8 tests/integration/test_trigger_tuning.py tests/integration/test_trigger_promotion.py -q
+# test runner: python3 -m pytest -n 8 --dist load -m "not slow" tests/integration/test_trigger_tuning.py tests/integration/test_trigger_promotion.py -q
+# test runner: mode=parallel workers=8 dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+......................................                                   [100%]
+38 passed in 3.46s
+rc=0 wall=5.20s
+
+## Targeted green — serial
+$ bash scripts/bash/run-tests.sh --serial tests/integration/test_trigger_tuning.py tests/integration/test_trigger_promotion.py -q
+# test runner: python3 -m pytest -n0 -m "not slow" tests/integration/test_trigger_tuning.py tests/integration/test_trigger_promotion.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+......................................                                   [100%]
+38 passed in 16.74s
+rc=0 wall=18.08s
