@@ -1,0 +1,80 @@
+# P7 evidence — command surface & roster assembly (099-speckit-seal)
+# date: 2026-11-11 (UTC 2026-11-10T16:58:42Z)
+
+## flow-class census (after T036 registrations)
+{
+  "action": "check",
+  "checked_at": "2026-11-10T16:58:42Z",
+  "repo": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal",
+  "units": 87,
+  "inventory": {
+    "commands": 30,
+    "skills": 57,
+    "floors": {
+      "commands": 27,
+      "skills": 51
+    }
+  },
+  "coverage": {
+    "ledger_rows": 87,
+    "inventory_units": 87,
+    "matched": 87,
+    "gaps": 0,
+    "parse_errors": 0,
+    "floor": 39
+  },
+  "red_kind": "clean",
+  "findings": [],
+  "error": null
+}
+exit=0
+
+## lookups
+{
+  "action": "lookup",
+  "checked_at": "2026-11-10T16:58:42Z",
+  "unit_id": "/speckit.seal",
+  "flow_class": "execution",
+  "source": "ledger",
+  "marker": null,
+  "basis": "behavior-oracle",
+  "neutral": false,
+  "error": null
+}
+{
+  "action": "lookup",
+  "checked_at": "2026-11-10T16:58:42Z",
+  "unit_id": "skill:seal-artifact",
+  "flow_class": "execution",
+  "source": "ledger",
+  "marker": null,
+  "basis": "behavior-oracle",
+  "neutral": false,
+  "error": null
+}
+
+## probe registry
+Probe registry valid: 11 classes, 126 internal + 0 external objects
+exit=0
+
+## compiled wrap-up faces
+compile-embeds --check: 83 units, zero drift
+exit=0
+
+## propagation checks
+OK: all per-tool command copies match the source templates.
+regen_exit=0
+sync_exit=0
+
+## generated copies
+present: .claude/commands/speckit.seal.md (5604 bytes) sha256=1b01d66f6c5a0f628830c1c1b6ba1390301b89fbe3b8d6ef2dbb86048dbb3783
+present: .github/prompts/speckit.seal.prompt.md (5604 bytes) sha256=1b01d66f6c5a0f628830c1c1b6ba1390301b89fbe3b8d6ef2dbb86048dbb3783
+present: .opencode/command/speckit.seal.md (5604 bytes) sha256=1b01d66f6c5a0f628830c1c1b6ba1390301b89fbe3b8d6ef2dbb86048dbb3783
+present: .qoder/commands/speckit.seal.md (5696 bytes) sha256=4543f0aa77fcb3ce50f6ecc5aab546a0b7e1f9c3c1565415b67b5c23709b522e
+mirror byte-identical: skills/internal/seal-artifact/SKILL.md sha256=011b39b86f37fa47448d3d5a70fcd06559d070772b1217768a85605c381f96ef
+mirror byte-identical: flow-class-definitions.md sha256=de4580f24314c89fb14eff88a31c85ae071fe8fb78f3ddc5749a37c1d1876fec
+mirror byte-identical: probe-definitions.md sha256=375ab5dc1284448b77e358493b5a958bb2388ba890be77f8dc1389ea266ade40
+
+## task file structure
+PASS: .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 0 warning(s)
+validate_tasks_exit=0

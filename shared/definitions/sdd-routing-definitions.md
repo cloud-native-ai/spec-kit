@@ -5,7 +5,7 @@
 | # | 事实 | 本文件落点 |
 |---|------|-----------|
 | F-1 | 五项声明输入的封闭取值域 | § Inputs |
-| F-2 | 三值裁决表（`[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]`） | § Verdict table |
+| F-2 | 三值裁决表（`sdd` / `direct` / `adjudicate`） | § Verdict table |
 | F-3 | 固定优先级 | § Precedence |
 | F-4 | 理由码词表（封闭） | § Reason codes |
 
@@ -13,7 +13,7 @@
 
 **机读面**: 唯一的读取者是只读 stdlib 引擎 `scripts/python/sdd-route.py`（动作 `route` / `authorize` / `golden`）。它在运行时解析本文件，MUST NOT 自带第二份取值域、裁决表、优先级或理由码；引擎的接口与退出码归 `contracts/routing-decision.md` C-28 所有。
 
-**字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是本特性切片的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。
+**字面量登记处**: `[[STR-001]]` … `[[STR-011]]` 的取值与语义 owner 是合并后的父规格 `.specify/specs/074-goal-team-sdd-unification/requirements.md` § Shared Strings（原切片登记处为其被合并前的投影）；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。
 
 **不在本文件（只给指针，不复述）**:
 
@@ -25,7 +25,7 @@
 | 驱动的阶段名册、状态脊、哨兵、U0–U6 | `skills/external/sdd-loop-driver/SKILL.md` |
 | 反嵌套义务与其派发前探针 | `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation；`skills/internal/run-agent/SKILL.md` |
 | 中立元数据键集（`[[STR-001]]` 的取值域与缺省） | `src/specify_cli/__init__.py` `NEUTRAL_AGENT_METADATA_KEYS` |
-| `team.md` frontmatter schema（`[[STR-010]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |
+| `team.md` frontmatter schema（`[[STR-011]]` 块映射） | `skills/internal/create-team/references/create-mode.md` § Persisted `team.md` schema |
 
 ## Hierarchy
 
@@ -68,7 +68,7 @@
 - **引导与维护不同于开发流程**：`sdd-project-setup` 与 `sdd-house-keeping` 是框架的引导与维护路径，它们各自有既定职责，MUST NOT 被读作「轻量的 SDD 运行」，也 MUST NOT 取代开发流程。
 - **只有驱动构成 SDD 调用**：在嵌套入口契约下（`skills/external/sdd-loop-driver/references/nested-invocation.md`），只有 `sdd-loop-driver` 的调用算作一次 SDD 调用。
 - **无 `.specify/` 结构的目标项目走引导路径**：当一次被分流为 SDD 的变更落到尚无 `.specify/` 结构的目标项目时，路由是**引导路径**（`sdd-project-setup`），MUST NOT 把 SDD 分流降级为直接修改——降级会让该变更永久失去工件链与 handoff，而这两件正是它被分流为 SDD 的原因。
-- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-010]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。
+- **引导与维护派发子代理时适用同一有效授权谓词**：当 `sdd-project-setup` 或 `sdd-house-keeping` 派发子代理时，该派发与一次 SDD 调用适用**同一个**有效授权谓词——同一个键 `[[STR-001]]` 的两个半边（Agent 定义能力 AND 席位策略，席位侧载体为 `[[STR-011]]` 块映射），按 (team, seat) 解析，可执行形态是 `python3 scripts/python/sdd-route.py --action authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。
 
 ## Inputs
 

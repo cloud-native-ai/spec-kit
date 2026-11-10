@@ -1117,3 +1117,33 @@ def test_c7_both_sides_name_the_accountants_same_default_path(tmp_path):
     payload = _payload([str(spec), "--corpus-root", str(corpus)], expect=2)
     assert payload["status"] == "baseline-missing"
     assert not (spec / mod.BASELINE_NAME).exists()
+
+
+def test_superseded_pre_split_rows_retain_their_claims(tmp_path):
+    """C-022: a `> ` quoted pre-split record keeps its `[green:]` claim for accounting.
+
+    Owner: `shared/workflow/acceptance-hardening.md` § Superseded pre-split records
+    retain their claims. The quotation removes the row from the current plan, never
+    the clause from the claimed set — otherwise every split merge re-opens a fully
+    claimed parent contract as an uncovered residual.
+    """
+    corpus = tmp_path / "corpus"
+    corpus.mkdir()
+    spec = _spec_dir(corpus, "001-alpha", claims=())  # no current-row claims
+    tasks = spec / "tasks.md"
+    rows = "\n".join(
+        f"> - [ ] T{i + 4:03d} Pin clause {c} [green: contracts/c.md#{c}]\n>\n"
+        "> superseded: tasks.md:%d (original position); superseded_by: "
+        "merge-manifest.json line 0 (whole-file fact); carriers: 001a-beta/tasks.md"
+        % (10 + i) for i, c in enumerate(("C-1", "C-2", "C-3")))
+    tasks.write_text(
+        tasks.read_text(encoding="utf-8")
+        + "\n## Superseded pre-split record\n\n" + rows + "\n",
+        encoding="utf-8")
+    _freeze(_load(), spec, corpus)
+    payload = _payload(["--spec-dir", str(spec), "--corpus-root", str(corpus)])
+    assert payload["status"] == "ok", (
+        "the superseded rows' claims MUST be counted; uncovered=%r"
+        % payload["clause"]["uncovered"])
+    assert payload["clause"]["claimed"] == 3
+    assert payload["clause"]["uncovered"] == []

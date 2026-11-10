@@ -98,9 +98,9 @@ Stage 级批量判定的实读证据下限由 `references/patterns.md` § Serial
 
 每个 run 报告 MUST 在既有必填段之后**末尾追加**一个嵌套段,标题字面量逐字为 `## Nested SDD Runs`(不得改写、不得改变标题层级、不得并入其它段)。该段对**每次运行**强制 —— 有界 pattern(parallel / serial / iteration)与 continuous 一律适用,与该次运行是否真的发生过嵌套 SDD 调用无关。既有必填段的名称、次序与内容义务逐字不变;MUST NOT 省略该段,省略即判违约。
 
-- **每次调用一行**: 一行恰好五个字段 —— `outcome`、`artifact paths`、`evidence paths`、`routing-verdict reference`、`anomalies`。`outcome` 取自三值封闭集 `[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]`;第四值、自由文本或空值一律非法。
+- **每次调用一行**: 一行恰好五个字段 —— `outcome`、`artifact paths`、`evidence paths`、`routing-verdict reference`、`anomalies`。`outcome` 取自三值封闭集 `completed` / `blocked` / `failed`;第四值、自由文本或空值一律非法。
 - **无嵌套调用**: MUST 在段内显式声明「本次无嵌套 SDD 调用」,不是省略整段 —— 即便正确内容本是 none,省略仍是违约。
-- **路径以路径携带**: artifact / evidence 只写路径,段内 MUST NOT 内联工件正文;`[[STR-005]]` / `[[STR-006]]` 的嵌套运行 MUST NOT 改写成成功语气 —— 它们原样上抛。
+- **路径以路径携带**: artifact / evidence 只写路径,段内 MUST NOT 内联工件正文;`blocked` / `failed` 的嵌套运行 MUST NOT 改写成成功语气 —— 它们原样上抛。
 - **routing-verdict reference**: 指向 `074a` 在 Agent 执行证据里记录的那条裁决(`scripts/python/sdd-route.py` 是该记录的产生者),段内只承载**引用**:MUST NOT 复制输入集、裁决表或理由码词表,MUST NOT 重算。记录不可定位时记 `missing`,外层 MUST NOT 重算或补写。
 - **handoff 字段集按引用读取**: 封闭字段集归 `skills/external/sdd-loop-driver/references/nested-invocation.md`;交接未携带的字段按缺失记录,MUST NOT 用调用方叙述补齐;交接缺 integration identity 即为 incomplete handoff,外层 MUST NOT 据此报成功。
 - **与 `## Verification` 并列**: 嵌套段是 `## Verification` 的**同级段**,不是替代 —— 嵌套运行自己的验证证据不解除外层运行的验证义务,外层运行的验证标准照旧适用。

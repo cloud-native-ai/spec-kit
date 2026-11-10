@@ -1,0 +1,25 @@
+# Review round 2 — code-segment receipt and gate verdict
+captured_at=2026-11-11 (head 55dd6d61d)
+record=.specify/specs/099-speckit-seal/code-review.md
+archive=.specify/specs/099-speckit-seal/code-review-20261110T190504Z.md
+command=git-delta-review.sh receipt --spec .specify/specs/099-speckit-seal --review-file <record> <485 per-file selectors>
+changed_files=485
+judged_files=5
+skipped_files=480
+gap_files=0
+lines_added=97491
+lines_deleted=319
+blocking_entries=0
+verdict=not-evaluated
+uncommitted_scope=2
+
+command=git-delta-review.sh report --summary --format json --file <record>
+{"record":".specify/specs/099-speckit-seal/code-review.md","counts":{"blocking":0,"important":1,"suggestion":2,"nitpick":0,"question":0,"praise":2},"blocking_entries":0,"gate":"allow"} (exit 0)
+
+judged-this-run files (5):
+  scripts/python/seal-utils.py
+  scripts/python/validate-tasks.py
+  scripts/python/account-clause-coverage.py
+  tests/contract/test_clause_coverage.py
+  tests/contract/test_seal_seal.py
+skip classes: generated (agent copies + .specify mirrors), non-code-file (docs/spec/records), size-guard-focus-not-reviewed (code files outside this round's repair focus; pass-1 record archived).

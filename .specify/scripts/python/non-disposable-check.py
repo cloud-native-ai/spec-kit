@@ -117,8 +117,9 @@ STATES = ("open", "unevaluated", "unconfirmed", "disposed", "exempt")
 #: only the ordering the report stabilises on.
 DISPOSITION_ORDER = ("archive", "supersede", "correct", "exempt")
 
-#: Claimed statuses that assert the feature is already implemented (C-202).
-COMPLETION_CLAIMS = ("Implemented", "Ready for Review")
+#: Claimed statuses that assert the feature is already implemented (C-202). `Sealed` asserts every
+#: final-path criterion passed, so it belongs to the same family (099 plan § Disclosed Rulings 3).
+COMPLETION_CLAIMS = ("Implemented", "Ready for Review", "Sealed")
 
 #: Registry statuses that have no live spec directory of their own (C-802's named exclusion).
 RELOCATED_STATUS = "Relocated"
@@ -495,6 +496,8 @@ def contradiction(status: str, verdict: str):
         ("Implemented", "block"): True,
         ("Ready for Review", "accept"): False,
         ("Ready for Review", "block"): True,
+        ("Sealed", "accept"): False,
+        ("Sealed", "block"): True,
         ("Blocked", "accept"): True,
         ("Blocked", "block"): False,
         ("Completed", "accept"): False,

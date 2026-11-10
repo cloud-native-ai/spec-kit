@@ -1,0 +1,78 @@
+# 074 回合 — T041 后置校验读数
+
+captured_at: 2026-11-10T17:14:03Z
+
+## 1. validate-tasks — FAIL（43 errors / 2 warnings）
+
+command: `python3 scripts/python/validate-tasks.py .specify/specs/074-goal-team-sdd-unification/tasks.md`
+exit: 1
+未勾选行（`^- \[ \]`）: 0
+Superseded 块引用行（`^> - \[ \]`）: 57（块内 57 条 `superseded:` 元数据行）
+闭合行（`^- \[X\]`）: 58
+
+错误分布（全量见下方附录）：
+- 33 × story-labels：分片任务行被 merge-apply 追加在最后一条保留任务行之后（父文件无闭合行 → 追加点落在文末 `## Assumptions & Clarifications` 之下，`<no phase>`），带 `[USn]` 的行在非故事阶段被拒。
+- 10 × green-dangling：T037–T040 声明的 `contracts/report-and-attribution.md#C-21…C-30` 在合并后的父文件中不存在——引擎的条款正则假定三位 ID（`^\*\*(C-\d{3})\*\*`），074 的 1–2 位条款（`**C-21**`）未被识别，分片独有条款未被追加（内容丢失，C-018）。
+- 2 warnings：parallel-safe（T003/T035 同写者）与 green-path-divergence（T025/T049 同测试文件不同 green 点）——均来自分片任务行的原样合并，非本轮新增内容。
+
+## 2. validate-requirements — PASS
+
+command: `python3 scripts/python/validate-requirements.py .specify/specs/074-goal-team-sdd-unification/requirements.md`
+exit: 0（0 error / 0 warning；528 lines / 36 definition rows / 11 shared strings）
+
+## 3. dated record 哈希 — PASS（运行前后逐字节一致）
+
+文件数: 47（两片 `review.md` / `code-review.md` / `verification.md` + `test-evidence/` 与 `checkpoints/` 全部文件）
+before: `074-dated-record-hashes-before.txt`
+after: 与 before `diff` 为空（同一 47 条 sha256 行）
+
+## 附录 — validate-tasks 全量输出
+
+```
+WARN  304: parallel-safe: [P] tasks T003 (line 304) and T035 (line 336) both WRITE ['specify/scripts/python/account-clause-coverage.py'] in phase `<no phase>` — [P] requires different write targets; drop [P] from one row or re-target it, never by deleting the cited path
+WARN  326: green-path-divergence: T025 (line 326) and T049 (line 350) both write tests/contract/test_sdd_invocation_governance.py but claim different green points (['contracts/hierarchy-and-authorization.md#C-15', 'contracts/hierarchy-and-authorization.md#C-16'] vs ['contracts/compat-and-safety.md#C-1', 'contracts/compat-and-safety.md#C-2']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+ERROR 307: story-labels: T006 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 308: story-labels: T007 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 309: story-labels: T008 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 310: story-labels: T009 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 311: story-labels: T010 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 312: story-labels: T011 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 313: story-labels: T012 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 314: story-labels: T013 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 315: story-labels: T014 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 316: story-labels: T015 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 317: story-labels: T016 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 318: story-labels: T017 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 319: story-labels: T018 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 320: story-labels: T019 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 321: story-labels: T020 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 322: story-labels: T021 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 323: story-labels: T022 in NON-story phase `<no phase>` must not carry any [US...] marker: [US3]
+ERROR 324: story-labels: T023 in NON-story phase `<no phase>` must not carry any [US...] marker: [US3]
+ERROR 325: story-labels: T024 in NON-story phase `<no phase>` must not carry any [US...] marker: [US3]
+ERROR 326: story-labels: T025 in NON-story phase `<no phase>` must not carry any [US...] marker: [US3]
+ERROR 337: story-labels: T036 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 338: story-labels: T037 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 338: green-dangling: T037 declares contracts/report-and-attribution.md#C-21 but that file contains no clause C-21 — name a clause id the file declares
+ERROR 338: green-dangling: T037 declares contracts/report-and-attribution.md#C-22 but that file contains no clause C-22 — name a clause id the file declares
+ERROR 338: green-dangling: T037 declares contracts/report-and-attribution.md#C-23 but that file contains no clause C-23 — name a clause id the file declares
+ERROR 339: story-labels: T038 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 339: green-dangling: T038 declares contracts/report-and-attribution.md#C-24 but that file contains no clause C-24 — name a clause id the file declares
+ERROR 339: green-dangling: T038 declares contracts/report-and-attribution.md#C-25 but that file contains no clause C-25 — name a clause id the file declares
+ERROR 339: green-dangling: T038 declares contracts/report-and-attribution.md#C-26 but that file contains no clause C-26 — name a clause id the file declares
+ERROR 340: story-labels: T039 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 340: green-dangling: T039 declares contracts/report-and-attribution.md#C-27 but that file contains no clause C-27 — name a clause id the file declares
+ERROR 340: green-dangling: T039 declares contracts/report-and-attribution.md#C-28 but that file contains no clause C-28 — name a clause id the file declares
+ERROR 340: green-dangling: T039 declares contracts/report-and-attribution.md#C-29 but that file contains no clause C-29 — name a clause id the file declares
+ERROR 341: story-labels: T040 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 341: green-dangling: T040 declares contracts/report-and-attribution.md#C-30 but that file contains no clause C-30 — name a clause id the file declares
+ERROR 342: story-labels: T041 in NON-story phase `<no phase>` must not carry any [US...] marker: [US1]
+ERROR 343: story-labels: T042 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 344: story-labels: T043 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 345: story-labels: T044 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 346: story-labels: T045 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 347: story-labels: T046 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 348: story-labels: T047 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+ERROR 349: story-labels: T048 in NON-story phase `<no phase>` must not carry any [US...] marker: [US2]
+FAIL: .specify/specs/074-goal-team-sdd-unification/tasks.md — 43 error(s), 2 warning(s)
+```

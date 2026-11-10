@@ -1,0 +1,49 @@
+# Review round 2 — required suite readings (099-speckit-seal)
+captured_at=2026-11-11 (review round 2, head 55dd6d61d)
+
+=== new F1 tests (slice P0 / slice code-review blocking) ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py -q -k "slice_p0 or slice_code_review"
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 7.32s
+
+=== seal family (10 files: contract + integration) ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py tests/contract/test_seal_engine_contract.py tests/contract/test_seal_merge_apply.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_archive_gate.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_sealed_status_domain.py tests/integration/test_seal_merge_determinism.py tests/integration/test_seal_074_round.py -q
+
+........................................................................ [ 52%]
+.................................................................        [100%]
+137 passed in 8.34s
+
+=== clause-coverage contract suite ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_clause_coverage.py -q
+
+tests/contract/test_clause_coverage.py:442: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+2 failed, 43 passed in 18.68s
+(both failures are enumerated in baseline-failed.txt: they are the feature-entry baseline reds, not regressions)
+
+=== validate-tasks related suites ===
+command=bash scripts/bash/run-tests.sh tests/contract/test_validate_tasks_green_semantics.py tests/contract/test_validate_tasks_parallel_safety.py tests/contract/test_green_point_claim.py -q
+bringing up nodes...
+
+.........................................................                [100%]
+57 passed in 6.31s
+
+=== validators ===
+command=python3 scripts/python/validate-tasks.py .specify/specs/099-speckit-seal/tasks.md
+WARN  208: green-cross-phase: T038 (line 208, `## Phase 5: User Story 4 - 边界清晰且零新增重复机制 (Priority: P2)`, order 38) claims contracts/records-and-boundaries.contract.md#C-041 while the later T042 (line 223, `## Phase 6: User Story 3 - 为 074 的回合提供可执行流程并留下可复现裁决 (Priorit`, order 42) claims #C-038 — the clause order runs backwards against the row order, so T038 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+PASS (with warnings): .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 4 warning(s)
+command=python3 scripts/python/validate-requirements.py .specify/specs/099-speckit-seal/requirements.md
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+
+=== clause coverage (099 lane) ===
+command=python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal --json
+status=ok claimed=45 uncovered_beyond_baseline=0 fr=28/28 (exit 0)
+
+=== mirrors / command copies ===
+python3 scripts/python/sync-mirrors.py --check -> ok shared/ == .specify/shared/ (111 files, byte-identical), exit 0
+python3 scripts/python/regen-command-copies.py --check -> OK: all per-tool command copies match the source templates, exit 0

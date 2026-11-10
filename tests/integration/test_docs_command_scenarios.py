@@ -708,7 +708,12 @@ def test_c019_no_new_command_no_new_tier():
     """
     # 2026-11-07: the merged trunk carries Feature 088's two sanctioned command templates
     # (status.md, measure.md). This feature's delta check still rejects every other addition.
-    sanctioned_later_commands = {"templates/commands/status.md", "templates/commands/measure.md"}
+    # 2026-11-11: Feature 099's `/speckit.seal` template (seal.md) is sanctioned the same way.
+    sanctioned_later_commands = {
+        "templates/commands/status.md",
+        "templates/commands/measure.md",
+        "templates/commands/seal.md",
+    }
     added = [
         rel
         for rel in changed_paths("templates/commands")

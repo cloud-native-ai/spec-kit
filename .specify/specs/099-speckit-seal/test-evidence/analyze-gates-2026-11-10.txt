@@ -1,0 +1,169 @@
+accountant_exit=2
+=== Analyze stage deterministic checks — 2026-11-10 (run r20261110T121314Z-b099) ===
+
+--- 1) account-clause-coverage.py (full JSON: analyze-coverage-2026-11-10.json) ---
+{
+  "baseline_present": false,
+  "checks": [
+    {
+      "count": 685,
+      "detail": "685 uncovered, 685 beyond the frozen baseline",
+      "label": "clause-uncovered",
+      "status": "fail"
+    },
+    {
+      "count": 0,
+      "detail": "28 of 28 FRs cited from citation groups",
+      "label": "fr-uncovered",
+      "status": "pass"
+    },
+    {
+      "count": 107,
+      "detail": "107 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt and is never read as zero-and-covered",
+      "label": "clause-unparsable",
+      "status": "fail"
+    },
+    {
+      "count": 685,
+      "detail": "baseline holds 0 names; 0 uncovered items are baseline-internal and do not block",
+      "label": "coverage-baseline-delta",
+      "status": "fail"
+    }
+  ],
+  "errors": 686,
+  "fr": {
+    "claimed": 28,
+    "uncovered": [],
+    "universe": 28
+  },
+  "problems": [
+    "frozen baseline not found: .specify/specs/099-speckit-seal/coverage-baseline.txt — an absent baseline is NOT an empty exemption list, so this run cannot judge the delta; freeze it with `account-clause-coverage.py .specify/specs/099-speckit-seal --freeze > .specify/specs/099-speckit-seal/coverage-baseline.txt`"
+  ],
+  "scanned_summary": {
+    "named_unparseable": 107,
+    "parsed": 183,
+    "total": 290
+  },
+  "status": "baseline-missing",
+  "warnings": 1
+}
+accountant_exit=2 (baseline-missing; see above)
+
+--- 2) validate-requirements.py ---
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+validate_requirements_exit=0
+
+--- 3) validate-tasks.py ---
+PASS: .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 0 warning(s)
+validate_tasks_exit=0
+
+--- 4) validate-decision-tensions.py --spec plan ---
+{
+  "spec": ".specify/specs/099-speckit-seal",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 333,
+    "records": 6
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 0
+  },
+  "findings": []
+}
+dtr_exit=0
+
+--- 5) pre-analyze-check.py --stage tasks ---
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 82, "message": "non-concrete blockedBy token 'Txxx'"}, {"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 82, "message": "non-concrete blockedBy token 'Tyyy'"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 153, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 153, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 240, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 71, "message": "path does not exist under the repo: skills/internal/seal-artifact/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 71, "message": "path does not exist under the repo: tests/fixtures/seal/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 207, "message": "path does not exist under the repo: tests/fixtures/seal/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 220, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 220, "message": "path does not exist under the repo: .specify/templates/commands/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 221, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 221, "message": "path does not exist under the repo: .specify/skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 222, "message": "path does not exist under the repo: .specify/scripts/python/seal-utils.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 236, "message": "path does not exist under the repo: .specify/skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 304, "message": "path does not exist under the repo: tests/contract/test_seal_engine_contract.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 305, "message": "path does not exist under the repo: tests/fixtures/seal/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 305, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 306, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 306, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 307, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 307, "message": "path does not exist under the repo: tests/contract/test_seal_concurrency_and_readonly.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 308, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 309, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 309, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 309, "message": "path does not exist under the repo: docs/reference/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 310, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 311, "message": "path does not exist under the repo: tests/contract/test_seal_boundaries.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 48, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 56, "message": "path does not exist under the repo: docs/reference/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 91, "message": "path does not exist under the repo: .specify/templates/commands/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 116, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 132, "message": "path does not exist under the repo: tests/contract/test_seal_engine_contract.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 143, "message": "path does not exist under the repo: tests/fixtures/seal/split-pair/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 147, "message": "path does not exist under the repo: tests/fixtures/seal/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 148, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 156, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 157, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 172, "message": "path does not exist under the repo: tests/fixtures/seal/single-spec/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 176, "message": "path does not exist under the repo: tests/fixtures/seal/single-spec/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 176, "message": "path does not exist under the repo: tests/fixtures/seal/seal-refusals/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 177, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 178, "message": "path does not exist under the repo: tests/contract/test_seal_concurrency_and_readonly.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 197, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 204, "message": "path does not exist under the repo: tests/contract/test_seal_boundaries.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 205, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 206, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 223, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 241, "message": "path does not exist under the repo: docs/reference/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 241, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 241, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 355, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 355, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 356, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 357, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 358, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 359, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 360, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 361, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 362, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 362, "message": "path does not exist under the repo: tests/contract/test_seal_boundaries.py"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 363, "message": "path does not exist under the repo: tests/contract/test_seal_concurrency_and_readonly.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 68, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 69, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 75, "message": "path does not exist under the repo: tests/fixtures/seal/split-pair/"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 95, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 95, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 115, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 132, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 146, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 176, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 188, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 210, "message": "path does not exist under the repo: .specify/memory/session/interview-blocked-stalled-lines-2026-11-10.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 6, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 6, "message": "path does not exist under the repo: skills/internal/seal-artifact/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 68, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 68, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 69, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 70, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 71, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 72, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 73, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 74, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 75, "message": "path does not exist under the repo: tests/contract/test_seal_boundaries.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 75, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 76, "message": "path does not exist under the repo: tests/contract/test_seal_concurrency_and_readonly.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 92, "message": "path does not exist under the repo: tests/fixtures/seal/"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 80, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 81, "message": "path does not exist under the repo: skills/internal/seal-artifact/SKILL.md"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 124, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 124, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 125, "message": "path does not exist under the repo: tests/contract/test_seal_seal.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 126, "message": "path does not exist under the repo: tests/integration/test_seal_merge_determinism.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 127, "message": "path does not exist under the repo: tests/contract/test_seal_merge_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 128, "message": "path does not exist under the repo: tests/contract/test_seal_merge_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 129, "message": "path does not exist under the repo: tests/integration/test_seal_074_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 130, "message": "path does not exist under the repo: tests/contract/test_seal_archive_gate.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 131, "message": "path does not exist under the repo: tests/contract/test_sealed_status_domain.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 131, "message": "path does not exist under the repo: tests/contract/test_seal_boundaries.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/records-and-boundaries.contract.md", "line": 132, "message": "path does not exist under the repo: tests/contract/test_seal_concurrency_and_readonly.py"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 37, "message": "path does not exist under the repo: templates/commands/seal.md"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 40, "message": "path does not exist under the repo: templates/commands/seal.md"}], "summary": {"errors": 0, "advisories": 101, "waived": 0, "fr": 28, "sc": 9, "tasks": 51, "clauses": 0, "files": 13}, "checked_at": "2026-11-10T14:05:22Z"}
+pre_analyze_exit=0
+
+--- 6) 074 acceptance-case baseline readings (reproduced this run) ---
+parent_open_rows (grep -cE '^- \[ \]' .specify/specs/074-goal-team-sdd-unification/tasks.md): 57
+parent_closed_rows: 0
+074a_closed_rows: 32
+074a_open_rows: 0
+074b_closed_rows: 26
+074b_open_rows: 0
+parent_review_present: no
+parent_code_review_present: no
+parent_verification_lines: 41
+parent_verification_sc_status_rows: 8
+parent_requirements_path_markers: 0
+074b_verification_sc_status_rows: 2
+verification_landed_by_commit: 91726a64171c3fcbb265ae0cacabb5ed5390c176
+split_record_proposed_slices: 1 occurrence(s); order 074a -> 074b confirmed at .specify/state/074-goal-team-sdd-unification.md:134-138
+driver_p0_waiver_row: .specify/features/074-goal-team-sdd-unification.md:40 (P0 waiver recorded by driver, not user-authored)
+create_team_slice_local_str_refs: 2 line(s) at :99,:101
+
+--- 7) feature registry / detail linkage readings ---
+102:| 099 | Speckit Seal（/speckit.seal：按 review 封装 spec 与分片合并回写） | 按 review 结论封装 spec：`Sealed` 是 `Ready for Review` 之后的终态、是归档准入的唯一状态；承载 split + merge 回写流程——分片同名输出件按声明顺序并回父级（编号重排/语义对齐/词汇表对齐/冲突显式呈现），074 回合为首个真实验收。 | Planned | .specify/features/099-speckit-seal.md | .specify/specs/099-speckit-seal/requirements.md | 2026-11-10 planned via /speckit.plan — plan.md（22 项 Constitution 全 Pass）+ research.md(R-01…R-20) + data-model.md(14 实体) + contracts(4 页 45 条款 C-001…C-045) + quickstart.md(9 走查，S-1 已实跑) + feature-ref.md（FR 28/28、SC 9/9）；6 条 decision-tension(T-001…T-006)、12 条 Execution Premise 全 verified、Dependency set none；9 个工作包（每包 ≤16 行） |
+4:**Total Features**: 90
+6:**Status**: Planned
+
+## Latest Review
+
+尚未评审——当前阶段为 plan（2026-11-10）。
+
+registry_status_note_is_plan_stage: 11
+
+--- 8) same-name artifact inventory across the 074 triple (for C-03/F-01) ---
+checklists/requirements.md => 074-goal-team-sdd-unification 074a-authorized-routing 074b-nested-governance 
+checklists/readiness-2026-10-29.md => 074a-authorized-routing 074b-nested-governance 
+test-evidence/plan-stage-checks.md => 074-goal-team-sdd-unification 074a-authorized-routing 074b-nested-governance 
+test-evidence/tasks-stage-checks.md => 074-goal-team-sdd-unification 074a-authorized-routing 074b-nested-governance 
+test-evidence/targeted-set-v1-baseline.txt => 074-goal-team-sdd-unification 074a-authorized-routing 074b-nested-governance 
+contracts/nested-invocation.md => 074-goal-team-sdd-unification 074a-authorized-routing 
+contracts/report-and-attribution.md => 074-goal-team-sdd-unification 074b-nested-governance 
+
+--- 9) checklist unchecked item count ---
+quality_checklist_unchecked: 40
+requirements_checklist_unchecked: 0

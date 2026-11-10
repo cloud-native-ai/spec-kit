@@ -1,0 +1,35 @@
+# T045 — 全量套件读数（GATE-1）
+
+date_utc=2026-11-10T18:06:26Z
+baseline_list=baseline-failed.txt (280 entries; implementation entry, 2026-11-10T15:07:43Z..15:08:59Z, evidence test-evidence/baseline-full-suite-20261110T150720Z.txt)
+definitive_run=test-evidence/final-suite-serial-20261111.txt (bash scripts/bash/run-tests.sh --serial --names-out ...; 2026-11-10T17:52:29Z..18:05:06Z)
+definitive_summary=268 failed, 8415 passed, 2 skipped in 754.77s; names_out=268 entries; suite_exit_code=1 (baseline reds)
+
+## GATE-1 comparison (same locale-collated sort as the runner's sort -u)
+$ comm -13 baseline-failed.txt test-evidence/final-failed.txt
+(empty above = zero NEW failure names)
+new_failure_count=0
+fixed_count=12
+$ comm -23 baseline-failed.txt test-evidence/final-failed.txt
+tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+tests/contract/test_isomorphism_map.py::test_no_second_map_or_boundary_table_exists
+tests/contract/test_non_disposable_contract.py::test_t089_a_full_run_is_byte_identical_on_git_status
+tests/contract/test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation
+tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+tests/contract/test_trigger_engine.py::test_c12_v1_6_most_specific_wins
+tests/contract/test_trigger_engine.py::test_c13_probe_returns_summaries_only
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+tests/integration/test_trigger_tuning.py::test_high_decline_rate_yields_a_suppress_proposal
+tests/integration/test_trigger_tuning.py::test_repeated_tune_is_idempotent_in_proposal_count
+tests/integration/test_trigger_tuning.py::test_tune_alone_changes_nothing
+tests/integration/test_trigger_tuning.py::test_tune_apply_requires_a_reason
+
+## Why the definitive run is the serial form (disclosed)
+- The default parallel form was executed first (sample preserved as test-evidence/final-failed-parallel-sample-20261111.txt, 286 entries, transcript test-evidence/final-suite-20261111.txt).
+- 14 names sat outside the baseline in that sample, all attributed:
+  (a) 8 pin drifts caused by this feature's legitimate surface growth (new command seal.md, new skill internal/seal-artifact, compile census 81->83, 027 complex count 25->26, and the two sanctioned-command deltas). Each pin was updated with a dated stale-pin comment and re-verified green (8 passed) BEFORE the definitive run: tests/contract/test_expression_compatibility.py, tests/contract/test_run_skills_wiring.py, tests/contract/test_skill_layer_visibility_guards.py, tests/contract/test_humanize_command_surface.py, tests/contract/test_script_interface_contract.py, tests/integration/test_docs_command_scenarios.py.
+  (b) 6 parallel-only names (5 trigger-engine/promotion tests + 1 sync-mirrors mirror test). Root cause is the documented nested-worktree self-location trap: scripts/python/trigger-utils.py resolve_root(None) returns the MAIN repo root from this .specify-nested worktree (measured), so ws-based trigger tests share one live store and interfere under concurrent workers; the same failure family is present in the baseline (60 trigger names at implementation entry) and rotates by run (two serial trigger-only runs measured 50 and 47 failures, both strict subsets of the baseline).
+- The serial form is a complete, first-class run of the same selection (run-tests.sh header: serial is complete, never degraded). Both serial trigger-only reruns were baseline subsets (comm -13 empty), and the definitive serial full run shows zero new names.
+
+## Disclosed deltas after the definitive run
+- The run happened before verification.md, the tasks.md [green:] claim additions, the feature-status flip and the final-suite/coverage evidence files landed. Only seal module tests reference this spec, and none of them parse its tasks.md/verification.md; a targeted post-flip re-check of the registry/status-sensitive tests is recorded in test-evidence/post-flip-targeted.txt.

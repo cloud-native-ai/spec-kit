@@ -1,0 +1,17 @@
+# P9b 闭包复跑 — closure-acceptance-check（2026-11-11）
+captured_at_utc=2026-11-10T18:19:47Z
+command=`python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/099-speckit-seal --repo . --json`
+exit=0
+duration_s=0.06
+stderr=empty
+payload=test-evidence/closure-verdict-099-p9b.json（完整 --json 负载，本文件读数全部直读该 payload）
+
+## Reading
+
+verdict=accept
+claimed_status=Implemented
+completion_conditions: every_final_path_pass=true, no_open_rows=true, smoke_record_pass=true, status_row_per_criterion=true
+final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+tasks: closed=51 deferred=0 in_progress=0 open=0
+reasons=[]
+smoke: command=`bash scripts/bash/run-tests.sh tests/integration/test_seal_074_round.py -q`, exit_code=0, evidence_path=.specify/specs/099-speckit-seal/notes/quickstart-run.md, records=1

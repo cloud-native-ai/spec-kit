@@ -1,0 +1,6 @@
+seal-utils.py merge-apply: ok (exit 0)
+  manifest: .specify/specs/074-goal-team-sdd-unification/merge-manifest.json
+  idempotent: no
+  slices: 074a-authorized-routing, 074b-nested-governance
+  writes: 73
+  checks: id_continuity=pass open_rows=0 duplicate_ids=0 dangling_refs=0 dated_records_stable=True

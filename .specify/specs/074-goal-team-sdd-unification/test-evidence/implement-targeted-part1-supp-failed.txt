@@ -1,0 +1,3 @@
+<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part1-supp-failed.txt) -->
+
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target

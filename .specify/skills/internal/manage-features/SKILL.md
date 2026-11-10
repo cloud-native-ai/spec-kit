@@ -61,14 +61,16 @@ Three binding rules of the application:
   `Last Updated` on unchanged rows. Unchanged rows stay byte-identical.
 - **Archive-not-delete**: never remove a feature row or detail file because the
   capability disappeared from the code — keep the row and mark its status/description
-  accordingly (history is part of the registry's value).
+  accordingly (history is part of the registry's value). Writing an archive pointer onto
+  a row additionally passes the admission gate (see § Boundaries) — pointer only, never
+  a local decision.
 - **Never regress status**: registry convergence must not move a feature's status
-  backward (e.g. Implemented → Draft) without explicit user confirmation. One narrow
-  exception exists, taken by pointer: `Implemented → Blocked` is legal only as an audit
-  correction that cites the evidence making the earlier claim false — the exception's
-  criteria and its one legal shape are owned by
+  backward (e.g. Implemented → Draft) without explicit user confirmation. Narrow
+  exceptions exist, taken by pointer: `Implemented → Blocked` and
+  `Sealed → Ready for Review` are legal only as audit corrections that cite the evidence
+  making the earlier claim false — the exceptions' criteria and their legal shape are owned by
   `.specify/templates/feature-details-template.md` § Canonical Status State Machine
-  ("Never regress — one narrow exception"), and this rule copies none of them.
+  ("Never regress — two narrow audit corrections"), and this rule copies none of them.
   > Gate probe: gate-feature-status-regression — after the user decision, record firing
   > evidence per `.specify/shared/guidelines/confirmation-gates.md` §门控观察协议
   > (non-blocking).
@@ -126,7 +128,7 @@ Three binding rules of the application:
 
 - Feature names: 2–5 words
 - Index table: single header row, all columns, aligned pipes
-- Status vocabulary: `Draft` | `Planned` | `Implemented` | `Blocked` | `Ready for Review` | `Completed`
+- Status vocabulary: `Draft` | `Planned` | `Implemented` | `Blocked` | `Ready for Review` | `Sealed` | `Completed`
 - Feature detail links: `.specify/features/[FEATURE_ID].md`
 - Do NOT modify templates; only instantiate copies
 
@@ -143,6 +145,15 @@ Three binding rules of the application:
 - **Templates are read-only inputs** (`.specify/templates/feature-details-template.md`,
   `.specify/templates/feature-index-template.md`): instantiate copies, never edit the
   template files themselves.
+- **Archive-pointer admission is queried, never decided here**: writing an archive
+  pointer onto a feature row (the `Relocated` form — the row is retained while its
+  capability is absorbed elsewhere, e.g. "merged into <NNN>") is an archive action.
+  Before writing the row, query the single admission owner:
+  `python3 .specify/scripts/python/seal-utils.py --action archive-gate --spec-dir .specify/specs/<target> --json`.
+  Exit `0` → the pointer may be written. Exit `1` (refused) or Exit `2`
+  (input/environment error) → refuse by name: surface the engine's verdict and `reason`
+  and the `/speckit.seal` pointer, and leave the row unchanged. Registry reconcile stays
+  with this skill; the admission criterion is never re-implemented here.
 
 ## Wrap-up
 

@@ -1,0 +1,84 @@
+seal-utils.py merge-apply: ok (exit 0)
+  manifest: .specify/specs/074-goal-team-sdd-unification/merge-manifest.json
+  idempotent: no
+  slices: 074a-authorized-routing, 074b-nested-governance
+  writes: 75
+  dispositions: 57
+  factory_doc_resolutions: 0
+  checks: id_continuity=pass open_rows=0 duplicate_ids=0 dangling_refs=0 dated_records_stable=True
+  written files:
+    .specify/specs/074-goal-team-sdd-unification/checklists/readiness-2026-10-29.md
+    .specify/specs/074-goal-team-sdd-unification/checklists/recheck-2026-10-29-implement-start.md
+    .specify/specs/074-goal-team-sdd-unification/checklists/requirements.md
+    .specify/specs/074-goal-team-sdd-unification/code-review.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/bootstrap-and-maintenance.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/compat-and-safety.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/diffusion.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/hierarchy-and-authorization.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/nested-invocation.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/report-and-attribution.md
+    .specify/specs/074-goal-team-sdd-unification/contracts/routing-decision.md
+    .specify/specs/074-goal-team-sdd-unification/feature-ref.md
+    .specify/specs/074-goal-team-sdd-unification/merge-manifest.json
+    .specify/specs/074-goal-team-sdd-unification/notes/closure-full-run-2.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/closure-full-run-3.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/closure-full-run.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/full-baseline-run.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/golden-rows.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/golden-run1.json
+    .specify/specs/074-goal-team-sdd-unification/notes/golden-run2.json
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t016-demo.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t016.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t017.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t021.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t025-targeted.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/green-t025.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/part5-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/part5-regression.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/pre-change-file-sets.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/pre-change-measurements.md
+    .specify/specs/074-goal-team-sdd-unification/notes/quickstart-run.md
+    .specify/specs/074-goal-team-sdd-unification/notes/red-first-evidence.md
+    .specify/specs/074-goal-team-sdd-unification/notes/red-t005.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/red-t007.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/red-t012.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/red-t018.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/red-t022.txt
+    .specify/specs/074-goal-team-sdd-unification/notes/targeted-set-v1-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/plan.md
+    .specify/specs/074-goal-team-sdd-unification/quickstart.md
+    .specify/specs/074-goal-team-sdd-unification/research.md
+    .specify/specs/074-goal-team-sdd-unification/review.md
+    .specify/specs/074-goal-team-sdd-unification/tasks.md
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/analyze-fix-checks.md
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/analyze.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/checklist-stage-checks.md
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/checklist.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/clarify.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/compat-baseline-nodeids.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/containment-post-change-collect.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/containment-post-change-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-baseline-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part1-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part1-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part1-supp-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part1-supp-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part2-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part2-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part2-supp-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part2-supp-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part3-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part3-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part4-failed.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement-targeted-part4-run.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/implement.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/plan-stage-checks.md
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/plan.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/requirements-checks.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/review.jsonl
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/targeted-set-v1-baseline.txt
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/tasks-stage-checks.md
+    .specify/specs/074-goal-team-sdd-unification/test-evidence/tasks.jsonl
+    .specify/specs/074-goal-team-sdd-unification/verification.md
+    .specify/specs/074a-authorized-routing/requirements.md
+    .specify/specs/074b-nested-governance/requirements.md

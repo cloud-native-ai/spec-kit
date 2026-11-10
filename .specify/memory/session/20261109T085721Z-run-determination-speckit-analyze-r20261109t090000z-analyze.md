@@ -21,7 +21,7 @@ summary: "/speckit.analyze run=r20261109T090000Z-analyze-repair2 token=not_evalu
   "feature": "092-goal-team-parallel",
   "feature_id": "092",
   "determined_at": "2026-11-09T08:57:21Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T14:07:06Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -94,7 +94,7 @@ summary: "/speckit.analyze run=r20261109T090000Z-analyze-repair2 token=not_evalu
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -181,8 +181,8 @@ summary: "/speckit.analyze run=r20261109T090000Z-analyze-repair2 token=not_evalu
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -212,7 +212,7 @@ summary: "/speckit.analyze run=r20261109T090000Z-analyze-repair2 token=not_evalu
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

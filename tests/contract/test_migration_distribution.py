@@ -98,14 +98,17 @@ ENGINE_REF = "flow-class-check.py"
 # 2026-11-10 (Feature 097): 29 -> 30 command templates. `/speckit.migrate` (FR-021) is
 # the one-shot closeout command; it ships through the same `templates` payload and its
 # four per-tool copies are regenerated in the same change.
+# 2026-11-11 (Feature 099): 30 -> 31 commands and 56 -> 57 skills. `/speckit.seal`
+# and `skill:seal-artifact` (FR-021/C-041) ship inside the same staged payload, so
+# both rosters and both pinned lengths move together again.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
         "implement", "improve", "instructions", "interview", "measure",
         "migrate", "plan",
-        "requirements", "research", "review", "sanitize", "session", "skills",
-        "status", "tasks", "team", "todo", "tools",
+        "requirements", "research", "review", "sanitize", "seal", "session",
+        "skills", "status", "tasks", "team", "todo", "tools",
     }
 )
 SKILL_BASELINE = frozenset(
@@ -124,12 +127,12 @@ SKILL_BASELINE = frozenset(
         "memory-recall", "memory-record", "research-feature",
         "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
-        "run-team", "sanitize-materials", "self-improvement", "study-code",
+        "run-team", "sanitize-materials", "seal-artifact", "self-improvement", "study-code",
         "study-online", "study-kb", "summarize-project",
     }
 )
-assert len(COMMAND_BASELINE) == 30
-assert len(SKILL_BASELINE) == 56
+assert len(COMMAND_BASELINE) == 31
+assert len(SKILL_BASELINE) == 57
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

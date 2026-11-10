@@ -1,0 +1,5 @@
+<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part2-supp-failed.txt) -->
+
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc

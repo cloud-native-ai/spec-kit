@@ -98,3 +98,17 @@ check is a field-presence test over the handoff block, not a prose reading (FR-0
 | C-41 | FR-017 | SC-003 | `run-team` / `create-team` report duty |
 | C-43 | FR-027 | SC-005 | Feature 070 stage-team preset (unchanged) |
 | C-45 | FR-025 | — | `sdd-project-setup` (named as the setup path) |
+
+**C-047** (父 C-31): `sdd-loop-driver` supports an invoked-from-team entry form accepting exactly six
+**C-048** (父 C-32): Entry validation fails closed on each of these conditions, naming the condition: a
+**C-049** (父 C-34): A nested run ends at review completion — after the driver's existing
+**C-050** (父 C-35): The handoff carries a closed field set: the outcome, the stages reached, the
+**C-051** (父 C-36): The outcome takes exactly one of three values — [[STR-007]], [[STR-008]],
+**C-052** (父 C-37): The integration identity is exactly four facts — line id, branch, worktree path,
+**C-053** (父 C-38): A nested run MUST NOT merge and MUST NOT push. The outer layer adjudicates
+**C-054** (父 C-39): A nested run registers with the existing line registry and the existing
+**C-055** (父 C-40): On stall, timeout, or budget exhaustion the nested run stops, persists its state
+**C-056** (父 C-41): The invoking Agent includes the nested run's handoff in its own result and in the
+**C-057** (父 C-42; delivered under `../requirements.md` § Cross-Slice Design Attribution D-3): the
+**C-058** (父 C-46): A handoff without its integration identity leaves the outer layer unable to
+**C-059** (父 C-64, FR-018 facet): No second registry, ledger, state spine, ownership model, or

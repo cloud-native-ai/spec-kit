@@ -72,8 +72,10 @@ EXISTING_SECTIONS = (
 )
 EXISTING_SECTION_LIST_LINE = "## " + " ## ".join(EXISTING_SECTIONS)
 
-#: `[[STR-004]]` / `[[STR-005]]` / `[[STR-006]]` — the closed outcome set.
-OUTCOME_STRINGS = ("STR-004", "STR-005", "STR-006")
+#: The closed outcome set, as verbatim literals: the 074 merge (099 round) repointed the
+#: report contract from 074b-local `[[STR-004]]`/`[[STR-005]]`/`[[STR-006]]` to the merged
+#: parent's values (`completed` / `blocked` / `failed`).
+OUTCOME_STRINGS = ("completed", "blocked", "failed")
 
 #: C-22's five per-invocation fields, as the contract must name them.
 PER_INVOCATION_FIELDS = (
@@ -341,8 +343,8 @@ def test_per_invocation_row_carries_five_fields_and_the_closed_outcome_set():
             f"the section MUST list the per-invocation field {field!r} (C-22)"
         )
     for string_id in OUTCOME_STRINGS:
-        assert f"[[{string_id}]]" in body, (
-            f"the outcome MUST be drawn from the closed three-value set; [[{string_id}]] "
+        assert f"`{string_id}`" in body, (
+            f"the outcome MUST be drawn from the closed three-value set; {string_id!r} "
             f"is not named (C-22)"
         )
     assert re.search(r"三值|three values|封闭集|closed set", body), (
@@ -356,8 +358,8 @@ def test_per_invocation_row_carries_five_fields_and_the_closed_outcome_set():
 def test_blocked_and_failed_are_carried_through_never_dressed_as_success():
     body = _subsection()
     for string_id in OUTCOME_STRINGS[1:]:
-        assert f"[[{string_id}]]" in body, (
-            f"the section MUST name [[{string_id}]] as an outcome it carries through (C-22)"
+        assert f"`{string_id}`" in body, (
+            f"the section MUST name {string_id!r} as an outcome it carries through (C-22)"
         )
     assert re.search(r"MUST NOT[^。.]{0,40}改写成成功|不得[^。.]{0,20}改写", body), (
         "a blocked or failed run MUST NOT be rewritten into a successful-sounding sentence "

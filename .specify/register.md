@@ -219,3 +219,9 @@
 | REC-095-08 | 095 review P2: pre-analyze gate 接受「定位符 + 注记」（取首 token），并豁免 `per package` / `每包` 的 count-claim 读法 | `.specify/specs/095-superagent-role/review.md` §5.3（源 F9/F10） | open |
 | REC-095-09 | 095 review P1: feature 创建流程实例化完整详情头字段（含 `**Status**`）与 `## Latest Review`；closure checker 的显式输入错误点名缺失字段 | `.specify/specs/095-superagent-role/review.md` §5.1（源 F12） | open |
 | REC-095-10 | 095 review round-2 P2: 修复轮改写确定性守卫时，记录的绿色读数须携带重复次数（或冻结时钟）；单次采样不构成确定性证据 | `.specify/specs/095-superagent-role/review.md` §5.3（源 N1） | open |
+| REC-099-1 | 分片父级的 seal P0 判据必须读原始切片记录：合并视图携带 P0/blocking 汇总或引擎沿指针读取，并补分片夹具断言 `p0-unresolved` exit 1 | `.specify/specs/099-speckit-seal/review.md` § 5.2 REC-099-1（F1、F2） | resolved（2026-11-11 review round 2；review-repair r1 `55dd6d61d`；证据 `test-evidence/f1-red-first-20261111.txt`、`test-evidence/review-r2-074-replay-20261111.txt`） |
+| REC-099-2 | C-022 的 supersede 记录须保留其 `[green:]` 认领，供覆盖会计消费，消除 67 名拆分残留 | `.specify/specs/099-speckit-seal/review.md` § 5.3 REC-099-2（F3） | resolved（2026-11-11 review round 2；review-repair r1 `55dd6d61d`；证据 `test-evidence/f3-supersede-claims-20261111.txt`、`test-evidence/t050-replay-repair-r1-20261111.txt`） |
+| REC-099-3 | 刷新 099 状态载体叙述：P9b 后的延后披露、plan 回合写面指向 C-023、P8b 套件读数 133 | `.specify/specs/099-speckit-seal/review.md` § 5.4 REC-099-3（F4、F5、F6） | open |
+| REC-099-4 | 驱动状态脊随阶段推进（或将 U0 块标为快照并指向 line registry）；带外用户裁定修订登记为特性行 | `.specify/specs/099-speckit-seal/review.md` § 5.3 REC-099-4（F7、F8） | open |
+| REC-099-5 | seal 批量写入在途中失败时恢复当前文件（或写前登记为已写），并补故障注入用例 | `.specify/specs/099-speckit-seal/review.md` § 5.2 REC-099-5（F9） | open |
+| REC-099-6 | tasks 阶段收口须处置每条 `green-cross-phase` 警告（重切分区或记录有意顺序） | `.specify/specs/099-speckit-seal/review.md` § 5.1 REC-099-6（F10） | open |

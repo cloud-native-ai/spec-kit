@@ -1,0 +1,518 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFFFFFF                                                  [100%]
+=================================== FAILURES ===================================
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[from-status-invalid-from-status-invalid-1] _
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'from-status-invalid', code = 'from-status-invalid', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw4/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: from-status-invalid exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw4/test_refusal_fixtures_name_the0/from-status-invalid/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor..._fixtures_name_the0/from-status-invalid/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+_______________ test_a_slice_directory_is_never_the_seal_subject _______________
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw16/test_a_slice_directory_is_neve0')
+
+    def test_a_slice_directory_is_never_the_seal_subject(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        requirements = repo / ".specify" / "specs" / CLEAN / "requirements.md"
+        requirements.write_text(
+            requirements.read_text(encoding="utf-8")
+            + "\n**Parent spec**: `099-fixture-clean-parent`\n", encoding="utf-8")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw16/test_a_slice_directory_is_neve0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:393: AssertionError
+_____________________ test_user_waiver_needs_both_carriers _____________________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw17/test_user_waiver_needs_both_ca0')
+
+    def test_user_waiver_needs_both_carriers(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _write_p0(repo, CLEAN, waiver_carrier="")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw17/test_user_waiver_needs_both_ca0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:407: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[conflict-open-conflict-open-1] _
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'conflict-open', code = 'conflict-open', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw8/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: conflict-open exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "spec-dir-invalid", "evidence": "not a spec directory (missing, or carries no requirements.md): /tmp/pytest-of-agent/pytest-7875/popen-gw8/test_refusal_fixtures_name_the0/conflict-open/repo/.specify/specs/099-fixture-clean", "fix_path": "pass --spec-dir pointing at a directory that contains requirements.md", "rerun": "rerun the same command with a corrected --spec-dir"}], "exit_code": 2, "spec_dir": null, "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...th a corrected --spec-dir"\n    }\n  ],\n  "exit_code": 2,\n  "spec_dir": null,\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[three-minus-one-closure-refused-1] _
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'three-minus-one', code = 'closure-refused', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw10/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: three-minus-one exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw10/test_refusal_fixtures_name_the0/three-minus-one/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...usal_fixtures_name_the0/three-minus-one/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+___________________ test_reseal_is_idempotent_already_sealed ___________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw2/test_reseal_is_idempotent_alre0')
+
+    def test_reseal_is_idempotent_already_sealed(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        first, _payload = _seal(repo, CLEAN)
+>       assert first.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw2/test_reseal_is_idempotent_alre0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:269: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-refused-closure-refused-1] _
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'closure-refused', code = 'closure-refused', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw6/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: closure-refused exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw6/test_refusal_fixtures_name_the0/closure-refused/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...usal_fixtures_name_the0/closure-refused/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+_______________ test_dirty_spec_tree_refuses_and_names_the_path ________________
+[gw22] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw22/test_dirty_spec_tree_refuses_a0')
+
+    def test_dirty_spec_tree_refuses_and_names_the_path(tmp_path):
+        repo = tmp_path / "repo"
+        shutil.copytree(FIXTURES / "seal-refusals" / "dirty-spec-tree", repo)
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        plan = spec_dir / "plan.md"
+        plan.write_text(plan.read_text(encoding="utf-8") + "\nAn uncommitted local edit.\n",
+                        encoding="utf-8")
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1, (
+            "C-039: an uncommitted change under the parent spec tree MUST refuse the seal")
+E       AssertionError: C-039: an uncommitted change under the parent spec tree MUST refuse the seal
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw22/test_dirty_spec_tree_refuses_a0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_concurrency_and_readonly.py:196: AssertionError
+___________________ test_code_review_blocking_entry_refuses ____________________
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw14/test_code_review_blocking_entr0')
+
+    def test_code_review_blocking_entry_refuses(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        code_review = spec_dir / "code-review.md"
+        code_review.write_text(
+            code_review.read_text(encoding="utf-8")
+            + "\n### 🔴 [BLOCKING] .specify/specs/099-fixture-clean/plan.md (Line 5)\n\n"
+              "> The fixture injects one blocking entry.\n",
+            encoding="utf-8")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw14/test_code_review_blocking_entr0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:371: AssertionError
+____________ test_review_and_measurement_files_stay_byte_identical _____________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw21/test_review_and_measurement_fi0')
+
+    def test_review_and_measurement_files_stay_byte_identical(tmp_path):
+        repo = tmp_path / "repo"
+        shutil.copytree(FIXTURES / "merged-clean", repo)
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / MERGED
+        slice_dir = repo / ".specify" / "specs" / SLICE
+        watched = {
+            spec_dir: ("review.md", "code-review.md", "merge-manifest.json"),
+            slice_dir: (
+                "review.md",
+                "verification.md",
+                "test-evidence/run-2026-11-05.txt",
+            ),
+        }
+        before = {str(root): _hashes(root, names) for root, names in watched.items()}
+        proc, payload = _seal(repo, MERGED)
+>       assert proc.returncode == 0, (
+            f"the merged fixture MUST seal; exit={proc.returncode} payload={payload}")
+E       AssertionError: the merged fixture MUST seal; exit=2 payload={'action': 'seal', 'conditions': [{'code': 'not-implemented', 'evidence': 'the seal action body is not implemented on this skeleton', 'fix_path': 'run the action once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}], 'exit_code': 2, 'spec_dir': '/tmp/pytest-of-agent/pytest-7875/popen-gw21/test_review_and_measurement_fi0/repo/.specify/specs/099-fixture-merged', 'verdict': 'error'}
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw21/test_review_and_measurement_fi0/repo/.specify/specs/099-fixture-merged",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_concurrency_and_readonly.py:175: AssertionError
+______________________ test_missing_review_record_refuses ______________________
+[gw15] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw15/test_missing_review_record_ref0')
+
+    def test_missing_review_record_refuses(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        (repo / ".specify" / "specs" / CLEAN / "review.md").unlink()
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw15/test_missing_review_record_ref0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:380: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-input-defect-closure-input-defect-2] _
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'closure-input-defect', code = 'closure-input-defect', exit_code = 2
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw7/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+        assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+        assert payload["exit_code"] == exit_code
+        assert payload["verdict"] == ("error" if exit_code == 2 else "refused")
+>       assert code in _context_codes(payload), (
+            f"C-042: {case} MUST be named {code!r}; got {sorted(_context_codes(payload))}")
+E       AssertionError: C-042: closure-input-defect MUST be named 'closure-input-defect'; got ['not-implemented']
+E       assert 'closure-input-defect' in {'not-implemented'}
+E        +  where {'not-implemented'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'not-implemented', 'evidence': 'the seal action body is not implemented on ...pytest-7875/popen-gw7/test_refusal_fixtures_name_the0/closure-input-defect/repo/.specify/specs/099-fixture-clean', ...})
+
+tests/contract/test_seal_seal.py:327: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[slice-unclosed-slice-unclosed-1] _
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'slice-unclosed', code = 'slice-unclosed', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw9/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: slice-unclosed exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw9/test_refusal_fixtures_name_the0/slice-unclosed/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...fusal_fixtures_name_the0/slice-unclosed/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[state-drift-state-drift-2] _
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'state-drift', code = 'state-drift', exit_code = 2
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw11/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+        assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+        assert payload["exit_code"] == exit_code
+        assert payload["verdict"] == ("error" if exit_code == 2 else "refused")
+>       assert code in _context_codes(payload), (
+            f"C-042: {case} MUST be named {code!r}; got {sorted(_context_codes(payload))}")
+E       AssertionError: C-042: state-drift MUST be named 'state-drift'; got ['not-implemented']
+E       assert 'state-drift' in {'not-implemented'}
+E        +  where {'not-implemented'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'not-implemented', 'evidence': 'the seal action body is not implemented on ...f-agent/pytest-7875/popen-gw11/test_refusal_fixtures_name_the0/state-drift/repo/.specify/specs/099-fixture-clean', ...})
+
+tests/contract/test_seal_seal.py:327: AssertionError
+_______________ test_merged_spec_seals_with_a_complete_manifest ________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw1/test_merged_spec_seals_with_a_0')
+
+    def test_merged_spec_seals_with_a_complete_manifest(tmp_path):
+        repo = _copy_fixture("merged-clean", tmp_path / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / MERGED
+        manifest_before = (spec_dir / "merge-manifest.json").read_bytes()
+        proc, payload = _seal(repo, MERGED)
+>       assert proc.returncode == 0, (
+            f"a merged spec MUST seal when the manifest is complete; exit={proc.returncode} "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}"
+        )
+E       AssertionError: a merged spec MUST seal when the manifest is complete; exit=2 payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw1/test_merged_spec_seals_with_a_0/repo/.specify/specs/099-fixture-merged", "verdict": "error"}
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw1/test_merged_spec_seals_with_a_0/repo/.specify/specs/099-fixture-merged",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:251: AssertionError
+_______________ test_closure_input_defect_is_not_read_as_accept ________________
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw19/test_closure_input_defect_is_n0')
+
+    def test_closure_input_defect_is_not_read_as_accept(tmp_path):
+        repo = _copy_fixture("seal-refusals/closure-input-defect", tmp_path / "repo")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+        assert proc.returncode == 2, (
+            "FR-007/DoD-5: a closure-engine input defect (exit 2) is reported as exit 2, "
+            "never read as accept")
+        assert payload["verdict"] == "error"
+>       assert "closure-input-defect" in _context_codes(payload)
+E       AssertionError: assert 'closure-input-defect' in {'not-implemented'}
+E        +  where {'not-implemented'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'not-implemented', 'evidence': 'the seal action body is not implemented on ...tmp/pytest-of-agent/pytest-7875/popen-gw19/test_closure_input_defect_is_n0/repo/.specify/specs/099-fixture-clean', ...})
+
+tests/contract/test_seal_seal.py:466: AssertionError
+_ test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[p0-unresolved-p0-unresolved-1] _
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+case = 'p0-unresolved', code = 'p0-unresolved', exit_code = 1
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw5/test_refusal_fixtures_name_the0')
+
+    @pytest.mark.parametrize("case,code,exit_code", REFUSALS)
+    def test_refusal_fixtures_name_the_closed_codes_and_persist_nothing(
+            case, code, exit_code, tmp_path):
+        repo = _copy_fixture("seal-refusals/%s" % case, tmp_path / case / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        before = _snapshot(spec_dir)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == exit_code, (
+            f"C-042: {case} exits {exit_code}; got {proc.returncode}; "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-042: p0-unresolved exits 1; got 2; payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw5/test_refusal_fixtures_name_the0/p0-unresolved/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...efusal_fixtures_name_the0/p0-unresolved/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:322: AssertionError
+____________________ test_write_failure_restores_the_batch _____________________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw18/test_write_failure_restores_th0')
+
+    @pytest.mark.skipif(os.geteuid() == 0, reason="root ignores file permission bits")
+    def test_write_failure_restores_the_batch(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        detail = spec_dir / "feature-detail.md"
+        registry = spec_dir / "feature-registry.md"
+        registry_before = registry.read_bytes()
+        detail.chmod(0o444)
+        try:
+            proc, payload = _seal(repo, CLEAN)
+        finally:
+            detail.chmod(0o644)
+        assert proc.returncode == 2, (
+            "C-005/C-038: a write failure ends at exit 2, never a half-sealed state")
+        assert payload["verdict"] == "error"
+>       assert "seal-write-failed" in _context_codes(payload)
+E       AssertionError: assert 'seal-write-failed' in {'not-implemented'}
+E        +  where {'not-implemented'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'not-implemented', 'evidence': 'the seal action body is not implemented on ...tmp/pytest-of-agent/pytest-7875/popen-gw18/test_write_failure_restores_th0/repo/.specify/specs/099-fixture-clean', ...})
+
+tests/contract/test_seal_seal.py:451: AssertionError
+___________________ test_parallel_seals_write_disjoint_paths ___________________
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw20/test_parallel_seals_write_disj0')
+
+    def test_parallel_seals_write_disjoint_paths(tmp_path):
+        repo = tmp_path / "repo"
+        shutil.copytree(FIXTURES / "single-spec", repo)
+        specs = repo / ".specify" / "specs"
+        base = specs / CLEAN
+        writers = []
+        for suffix in ("a", "b"):
+            slug = "099-fixture-clean-%s" % suffix
+            target = specs / slug
+            shutil.copytree(base, target)
+            for path in target.rglob("*"):
+                if path.is_file():
+                    path.write_text(
+                        path.read_text(encoding="utf-8").replace(CLEAN, slug),
+                        encoding="utf-8")
+            writers.append(slug)
+        shutil.rmtree(base)
+        _commit(repo)
+        spec_dirs = [specs / slug for slug in writers]
+        before = _snapshot(repo, skip_dirs=spec_dirs)
+    
+        processes = [
+            subprocess.Popen(_seal_argv(repo, slug), cwd=str(repo),
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             text=True, encoding="utf-8")
+            for slug in writers
+        ]
+        outputs = [process.communicate() for process in processes]
+        for process, (stdout, stderr) in zip(processes, outputs):
+>           assert process.returncode == 0, (
+                "C-037: two seals of different specs MUST both succeed; "
+                f"exit={process.returncode} stderr={stderr[-500:]!r}")
+E           AssertionError: C-037: two seals of different specs MUST both succeed; exit=2 stderr=''
+E           assert 2 == 0
+E            +  where 2 = <Popen: returncode: 2 args: ['/usr/local/bin/python3', '/storage/project/clo...>.returncode
+
+tests/contract/test_seal_concurrency_and_readonly.py:137: AssertionError
+___________ test_slice_unclosed_also_names_the_missing_merge_record ____________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw12/test_slice_unclosed_also_names0')
+
+    def test_slice_unclosed_also_names_the_missing_merge_record(tmp_path):
+        repo = _copy_fixture("seal-refusals/slice-unclosed", tmp_path / "repo")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw12/test_slice_unclosed_also_names0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:343: AssertionError
+___________ test_supersedes_is_recorded_when_the_receipt_is_replaced ___________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw3/test_supersedes_is_recorded_wh0')
+
+    def test_supersedes_is_recorded_when_the_receipt_is_replaced(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _commit(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        first, _payload = _seal(repo, CLEAN)
+>       assert first.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw3/test_supersedes_is_recorded_wh0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:287: AssertionError
+_____________________ test_refusal_report_is_rerun_stable ______________________
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw13/test_refusal_report_is_rerun_s0')
+
+    def test_refusal_report_is_rerun_stable(tmp_path):
+        repo = _copy_fixture("seal-refusals/closure-refused", tmp_path / "repo")
+        _commit(repo)
+        first, _ = _seal(repo, CLEAN)
+        second, _payload = _seal(repo, CLEAN)
+>       assert first.returncode == second.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw13/test_refusal_report_is_rerun_s0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:355: AssertionError
+__________ test_clean_single_spec_seals_and_writes_the_three_surfaces __________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7875/popen-gw0/test_clean_single_spec_seals_a0')
+
+    def test_clean_single_spec_seals_and_writes_the_three_surfaces(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        head = _commit(repo)
+        closure = _closure_accept(repo, CLEAN)
+        proc, payload = _seal(repo, CLEAN)
+>       assert proc.returncode == 0, (
+            f"a clean Ready-for-Review spec MUST seal; exit={proc.returncode} "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:900]}"
+        )
+E       AssertionError: a clean Ready-for-Review spec MUST seal; exit=2 payload={"action": "seal", "conditions": [{"code": "not-implemented", "evidence": "the seal action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7875/popen-gw0/test_clean_single_spec_seals_a0/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw0/test_clean_single_spec_seals_a0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:192: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[from-status-invalid-from-status-invalid-1]
+FAILED tests/contract/test_seal_seal.py::test_a_slice_directory_is_never_the_seal_subject
+FAILED tests/contract/test_seal_seal.py::test_user_waiver_needs_both_carriers
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[conflict-open-conflict-open-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[three-minus-one-closure-refused-1]
+FAILED tests/contract/test_seal_seal.py::test_reseal_is_idempotent_already_sealed
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-refused-closure-refused-1]
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_dirty_spec_tree_refuses_and_names_the_path
+FAILED tests/contract/test_seal_seal.py::test_code_review_blocking_entry_refuses
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_review_and_measurement_files_stay_byte_identical
+FAILED tests/contract/test_seal_seal.py::test_missing_review_record_refuses
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-input-defect-closure-input-defect-2]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[slice-unclosed-slice-unclosed-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[state-drift-state-drift-2]
+FAILED tests/contract/test_seal_seal.py::test_merged_spec_seals_with_a_complete_manifest
+FAILED tests/contract/test_seal_seal.py::test_closure_input_defect_is_not_read_as_accept
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[p0-unresolved-p0-unresolved-1]
+FAILED tests/contract/test_seal_seal.py::test_write_failure_restores_the_batch
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_parallel_seals_write_disjoint_paths
+FAILED tests/contract/test_seal_seal.py::test_slice_unclosed_also_names_the_missing_merge_record
+FAILED tests/contract/test_seal_seal.py::test_supersedes_is_recorded_when_the_receipt_is_replaced
+FAILED tests/contract/test_seal_seal.py::test_refusal_report_is_rerun_stable
+FAILED tests/contract/test_seal_seal.py::test_clean_single_spec_seals_and_writes_the_three_surfaces
+23 failed in 6.26s

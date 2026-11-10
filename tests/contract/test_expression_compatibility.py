@@ -105,6 +105,9 @@ WIRING_SKILLS = (
 # additions are enumerated here so a third one still goes red.
 # 2026-11-10 (Feature 097): 29 -> 30. FR-021 adds `/speckit.migrate` (`migrate.md`, the
 # one-shot closeout command), enumerated here on the same terms.
+# 2026-11-11 (Feature 099): 30 -> 31. FR-021 adds `/speckit.seal` (`seal.md`, the
+# review-conclusion seal and merge-back command). Same clause, same guard: only the
+# sanctioned addition is enumerated.
 FROZEN_COMMANDS = (
     "agents",
     "analyze",
@@ -129,6 +132,7 @@ FROZEN_COMMANDS = (
     "research",
     "review",
     "sanitize",
+    "seal",
     "session",
     "skills",
     "status",
@@ -160,6 +164,9 @@ FROZEN_COMMANDS = (
 # `sdd-project-setup` (fixed `-o RemoteCommand=none`, quoting, stdin script push,
 # `su` wrapping, exit-code propagation). It names no engine and no owner document
 # in C-5's closed wiring surface, so only the roster moves.
+# 2026-11-11 (Feature 099): 56 -> 57 = 18 external + 39 internal; the new unit is
+# `internal/seal-artifact`, the `/speckit.seal` internal skill. It names the engine by
+# path only and adds no C-5 wiring token, so only the roster moves.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -213,6 +220,7 @@ FROZEN_SKILLS = (
     "internal/run-skills",
     "internal/run-team",
     "internal/sanitize-materials",
+    "internal/seal-artifact",
     "internal/self-improvement",
     "internal/study-kb",
     "external/study-code",

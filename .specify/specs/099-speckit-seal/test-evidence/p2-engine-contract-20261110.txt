@@ -1,0 +1,168 @@
+# P2 (T016–T017) evidence — engine skeleton and CLI contract
+
+Collected 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal`
+(branch `099-speckit-seal`, base `93843c567`). Red-first readings: `notes/red-first-evidence.md` § 2.
+Every test command goes through the single runner `scripts/bash/run-tests.sh`.
+
+## 1. Red-first reading (T016, before the engine existed)
+
+See `notes/red-first-evidence.md` § 2 — command verbatim, exit 1, 31/31 errors, every one on the
+`engine` fixture assertion `engine missing: scripts/python/seal-utils.py has not landed (T017)`.
+No syntax/collection error and no silently-green leg (every test depends on the engine fixture).
+
+## 2. Engine contract suite green (T017)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...............................                                          [100%]
+31 passed in 6.81s
+```
+
+EXIT=0 — 31/31 green. Coverage map (C-001…C-010; FR-021 supplementary leg):
+
+| Clause | Legs |
+|--------|------|
+| C-001 | action set exactly four; dispatch table exactly four; undeclared action exits 2 and echoes its name (zero writes) |
+| C-002 | exit constants exactly 0/1/2; `sys.exit(<literal>)` scan inside the domain; six invocation families all inside the domain |
+| C-003 | `--help` zero-side-effect + four labels; `--version` one-line identity + zero side effect; undeclared option rejected (incl. `--version --bogus` and a token after bare `--`) |
+| C-004 | option surface closed; `--spec-dir` required with no default; missing `--spec-dir` exits 2; no `--force` / `--no-verify` / `--waive` |
+| C-005 | read-only/write action partition declared; `seal` calls `evaluate_seal` before `apply_seal`; the judgment phase carries no write call |
+| C-006 | read-only reports stdout-only; read-only actions persist nothing; refusal report rerun-stable (mirror-copy path) |
+| C-007 | no lock-file concurrency (no fcntl/filelock/portalocker import, no lock identifiers) |
+| C-008 | write-path allowlist closed (5 entries); no move/delete/rename call; no `push`/`mv`/`rm` shell-out; no `sched` |
+| C-009 | mirror copy refuses write actions with `mirror-copy`; read actions run from the mirror; an ancestor `.specify` component alone is NOT the signal; spec-dir shape = requirements.md only (no `^\d{3}-` prefix) |
+| C-010 | `--json` canonical (indent=2, sort_keys=True, ensure_ascii=False); verdict↔exit↔payload consistency; human and JSON renderings carry the same condition codes; non-ASCII stays readable |
+| FR-021 | stdlib-only import roots (plus the mirrored `script_interface_cli` guard) |
+
+## 3. Script-interface contract probe (the new engine is a governed script)
+
+$ python3 scripts/python/script-interface-check.py --files scripts/python/seal-utils.py --json
+
+```text
+EXIT=0
+"mode": "subset", "applicable": 1, "exempt": 1, "violations": 0
+candidates[0].path   = scripts/python/seal-utils.py
+candidates[0].probe  = ran            basis = marker-fired
+candidates[0].evidence = "… | -h exit=0 --help exit=0 same_body=True
+  labels=exit-codes,options,side-effects,usage | --version exit=0 lines=1
+  observed='0.0.22' framework='0.0.22' | unknown exit=2 known-first exit=2
+  after-'--' exit=2 rescue=rejected | the four flag runs left the tree
+  fingerprint identical …"
+help=True  help_content={usage,options,side-effects,exit-codes}=true
+version='seal-utils.py 0.0.22'  unknown_rejected=True  zero_side_effect=True
+findings=[]
+```
+
+(`exempt=1` is `tests/contract/test_seal_engine_contract.py` — a pytest module, outside the applicable set.)
+
+## 4. Mirror projection (T017 close-out)
+
+$ python3 scripts/python/sync-mirrors.py --write
+
+```text
+Regenerated command copies for 4 tools.
+MISS  .specify/scripts/python/seal-utils.py
+sync  scripts/ -> .specify/scripts/ (1 files)
+projected[bash-version-guard] … ok (×3)
+projected[python-version-bridge] … ok (×3)
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+```
+
+EXIT=0.
+
+$ python3 scripts/python/sync-mirrors.py --check
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (135 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (127 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+```
+
+EXIT=0 — `scripts/` reads 127 files vs the T001 baseline 126: exactly +1, the new engine; zero NEW
+drift on every other pair.
+
+$ python3 scripts/python/regen-command-copies.py --check
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+EXIT=0.
+
+## 5. Related guard suites (regression ring around the new script and mirror)
+
+| Command (targets) | Reading |
+|-------------------|---------|
+| `tests/contract/test_script_interface_contract.py` | 92 passed, 1 skipped in 8.43s (EXIT=0) |
+| `tests/contract/test_mirror_parity_suite.py` | 853 passed in 7.01s (EXIT=0) |
+| `tests/contract/test_mirror_root_guard.py` | 4 passed in 6.42s (EXIT=0) |
+| `tests/contract/test_sync_mirrors_only.py` | 3 passed in 6.22s (EXIT=0) |
+| `tests/unit/test_sync_mirrors_resilience.py` | 3 passed in 6.51s (EXIT=0) |
+| `tests/unit/test_script_interface_cli.py` | 30 passed in 6.28s (EXIT=0) |
+
+## 6. Full-suite baseline comparison (GATE-1 mechanism, early reading)
+
+$ bash scripts/bash/run-tests.sh --names-out /tmp/p2-current-failed.txt
+
+```text
+# failed-name list written: /tmp/p2-current-failed.txt (274 entries) passes=2
+```
+
+$ LC_ALL=en_US.UTF-8 comm -13 .specify/specs/099-speckit-seal/baseline-failed.txt /tmp/p2-current-failed.txt
+
+```text
+tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+tests/contract/test_trigger_engine.py::test_c23_escalation_pct_and_budget_flag
+tests/contract/test_trigger_engine.py::test_c23_rows_and_turns_are_distinct
+```
+
+Second run (same command, names to `/tmp/p2-current-failed-2.txt`): 276 entries; the new-vs-baseline
+names are `test_trigger_engine.py::test_c11_malformed_rule_id_exits_invalid` plus the two `test_c23_*`
+names; `test_c35` is green. Triage:
+
+| Name | Disposition |
+|------|-------------|
+| `test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind` | Transient of the parallel mega-run: it shells `sync-mirrors.py --check` against the live tree while sibling workers are writing; it passes standalone (`1 passed in 6.68s`) and is green in the second full run. No P2 surface is read by it. |
+| `test_trigger_engine.py::test_c11/c23_*` | Pre-existing flaky family: the baseline already carries 27 `test_trigger_engine.py` + 18 `test_trigger_promotion.py` failures, and consecutive runs produce the same batch size with a changing name set (P1 evidence § 4.1 recorded the same behaviour). No P2 surface is read by these tests. |
+
+Reverse delta (baseline names green now) is 7 names, dominated by the same trigger family plus two
+independent baseline names — the same flipping signature, not a P2 regression. **Zero failures are
+attributable to this package.**
+
+## 7. Counts
+
+| Measure | Reading |
+|---------|---------|
+| Rows closed in this package | 2 (T016, T017) |
+| New contract tests | 31 legs covering C-001…C-010 (+ FR-021 stdlib-only) |
+| Red-first reading | 31/31 red, all on the missing-engine fixture |
+| Green reading | 31/31 pass |
+| Engine files | 1 source + 1 mirror, byte-identical (same sha256) |
+| Mirror drift vs T001 baseline | zero new; `scripts/` 126 → 127 (+1 = this engine) |
+| New test failures vs baseline | zero attributable (trigger-family flakiness only) |
+
+## 8. Artifact hashes (sha256, final)
+
+```text
+99b38f624c7f5d7fac3ecb7508a5c386fa96d01e984d9134d603a57ba04832ae  scripts/python/seal-utils.py
+99b38f624c7f5d7fac3ecb7508a5c386fa96d01e984d9134d603a57ba04832ae  .specify/scripts/python/seal-utils.py
+dd86c8d6e371a329f5c7b6e1845cc0849b5a91026b259aa09ce25295ec69ccf6  tests/contract/test_seal_engine_contract.py
+37109a411b9fa257a337845598fe2ccceb0aed5093e81d26c98cb55edc7ced08  .specify/specs/099-speckit-seal/notes/red-first-evidence.md
+2dad321825a671491f44917807be20f82e3484abe384edf47b6129906a49c779  .specify/specs/099-speckit-seal/tasks.md
+```

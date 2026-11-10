@@ -1,0 +1,32 @@
+{
+  "action": "check",
+  "checked_at": "2026-11-10T16:52:33Z",
+  "repo": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal",
+  "units": 86,
+  "inventory": {
+    "commands": 30,
+    "skills": 56,
+    "floors": {
+      "commands": 27,
+      "skills": 51
+    }
+  },
+  "coverage": {
+    "ledger_rows": 85,
+    "inventory_units": 86,
+    "matched": 85,
+    "gaps": 1,
+    "parse_errors": 0,
+    "floor": 39
+  },
+  "red_kind": "gap",
+  "findings": [
+    {
+      "kind": "missing",
+      "unit_id": "/speckit.seal",
+      "message": "inventory unit has no ledger row"
+    }
+  ],
+  "error": null
+}
+EXIT=1

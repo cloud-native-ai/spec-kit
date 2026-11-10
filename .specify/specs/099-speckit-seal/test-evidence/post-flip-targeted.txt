@@ -1,0 +1,346 @@
+# Post-flip targeted re-check (registry/status/closure-sensitive set)
+date_utc=2026-11-10T18:08:30Z
+$ bash scripts/bash/run-tests.sh <targeted set> -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_registry_completeness.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py tests/contract/test_status_gate_owner.py tests/contract/test_sealed_status_domain.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_seal.py tests/contract/test_seal_archive_gate.py tests/contract/test_closure_acceptance_check.py tests/contract/test_flow_class_spec_declaration.py tests/contract/test_non_disposable_check.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 28%]
+................................................F...FFF..FF...........F. [ 57%]
+................F.F........................................F............ [ 86%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+_ test_audit_skips_a_row_whose_spec_path_names_nothing_without_leaving_the_mode _
+[gw140] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8713/popen-gw140/test_audit_skips_a_row_whose_s0')
+
+    def test_audit_skips_a_row_whose_spec_path_names_nothing_without_leaving_the_mode(tmp_path):
+        """A registry row that claims `Implemented` but names no spec dir is reported, not obeyed.
+    
+        The real registry carries such rows (a feature implemented before the `Spec Path` column
+        existed). Turning one into an input error would end the audit of an entire repository over a
+        fact about a single row; silently skipping it would be the false green C-02 exists to remove.
+        The audit reports the row as not judged, with the reason, and keeps exit 0.
+        """
+        case = tmp_path / "audit-history"
+        shutil.copytree(AUDIT_ROOT, case)
+        registry = case / ".specify" / "features.md"
+        registry.write_text(
+>           registry.read_text(encoding="utf-8").replace(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ".specify/specs/901-audit-blocked/requirements.md", "-"
+            ),
+            encoding="utf-8",
+        )
+
+tests/contract/test_closure_acceptance_check.py:618: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-8713/popen-gw140/test_audit_skips_a_row_whose_s0/audit-history/.specify/features.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-8713/popen-gw140/test_audit_skips_a_row_whose_s0/audit-history/.specify/features.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_feature_detail_stores_no_class_value ___________________
+[gw159] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_feature_detail_stores_no_class_value():
+>       text = FEATURE_DETAIL.read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_flow_class_spec_declaration.py:453: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/memory/features/077.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/memory/features/077.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________ test_c103_every_entry_carries_a_recheckable_reading[corpus-a1] ________
+[gw25] linux -- Python 3.11.11 /usr/local/bin/python3
+
+fixture = 'corpus-a1'
+
+    @pytest.mark.parametrize("fixture", sorted(EXPECTED))
+    def test_c103_every_entry_carries_a_recheckable_reading(fixture):
+        """C-103: ``path``, a 1-based ``line`` (or ``0`` for a file-level fact) and evidence refs."""
+        tree = FIXTURES / fixture
+        _, report = _report(fixture)
+        expected_classes = {row[0] for row in EXPECTED[fixture]}
+>       assert expected_classes <= set(_categories_of(report)), (
+            "%s did not reproduce %r — the tree reports %r"
+            % (fixture, sorted(expected_classes), sorted(set(_categories_of(report)))))
+E       AssertionError: corpus-a1 did not reproduce ['status-unreadable'] — the tree reports ['orphan-path']
+E       assert {'status-unreadable'} <= {'orphan-path'}
+E         
+E         Extra items in the left set:
+E         'status-unreadable'
+
+tests/contract/test_non_disposable_check.py:564: AssertionError
+____________________ test_feature_index_has_no_class_column ____________________
+[gw158] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_feature_index_has_no_class_column():
+>       text = FEATURE_INDEX.read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_flow_class_spec_declaration.py:440: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/memory/features.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/memory/features.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________ test_c203_missing_field_names_are_read_from_the_owner_page __________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8713/popen-gw42/test_c203_missing_field_names_0')
+
+    def test_c203_missing_field_names_are_read_from_the_owner_page(tmp_path):
+        """C-203: the absent block / smoke fields are named, the names read from the owner (C-205).
+    
+        The field names are the owner page's, never an engine-local list. The leg empties the
+        verification record down to its status table, leaving exactly the machine-readable block
+        and the smoke fields absent, and asserts the engine names them.
+        """
+        tree = _copy("corpus-a1", tmp_path)
+        record = tree / ".specify" / "specs" / "901-fixture" / "verification.md"
+        record.write_text("# Verification — 901-fixture\n\n| SC | Path | Status | Evidence |\n"
+                          "|----|------|--------|----------|\n"
+                          "| SC-001 | final | **pass** | the fixture is its own evidence |\n",
+                          encoding="utf-8")
+        proc = _run("--json", "--declaration", str(SURFACE), root=tree)
+        report = json.loads(proc.stdout)
+>       entries = [entry for entry in _one(report, "status-unreadable")
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   if entry["path"].endswith("verification.md")]
+
+tests/contract/test_non_disposable_check.py:666: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+report = {'action': 'judge', 'classes': {'deferral-marker': {'count': 0, 'roots': ['.specify/specs', '.specify/memory', 'tests'...surface.yaml', 'declaration_status': 'ok', 'excluded': [{'path': 'tests', 'reason': 'declared-but-absent'}], ...}, ...}
+category = 'status-unreadable'
+
+    def _one(report, category):
+        found = [entry for entry in report["entries"] if entry["category"] == category]
+>       assert found, "no %r entry in %r" % (category, sorted(set(_categories_of(report))))
+E       AssertionError: no 'status-unreadable' entry in ['orphan-path']
+E       assert []
+
+tests/contract/test_non_disposable_check.py:170: AssertionError
+____________ test_c105_status_unreadable_reads_the_closure_verdict _____________
+[gw41] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c105_status_unreadable_reads_the_closure_verdict():
+        """C-105: a registry status disagreeing with the verdict → red, naming the feature."""
+        _, report = _report("corpus-a1")
+>       entries = _one(report, "status-unreadable")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_non_disposable_check.py:641: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+report = {'action': 'judge', 'classes': {'deferral-marker': {'count': 0, 'roots': ['.specify/specs', '.specify/memory', 'tests'...surface.yaml', 'declaration_status': 'ok', 'excluded': [{'path': 'tests', 'reason': 'declared-but-absent'}], ...}, ...}
+category = 'status-unreadable'
+
+    def _one(report, category):
+        found = [entry for entry in report["entries"] if entry["category"] == category]
+>       assert found, "no %r entry in %r" % (category, sorted(set(_categories_of(report))))
+E       AssertionError: no 'status-unreadable' entry in ['orphan-path']
+E       assert []
+
+tests/contract/test_non_disposable_check.py:170: AssertionError
+________ test_c103_every_entry_carries_a_recheckable_reading[corpus-x] _________
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+fixture = 'corpus-x'
+
+    @pytest.mark.parametrize("fixture", sorted(EXPECTED))
+    def test_c103_every_entry_carries_a_recheckable_reading(fixture):
+        """C-103: ``path``, a 1-based ``line`` (or ``0`` for a file-level fact) and evidence refs."""
+        tree = FIXTURES / fixture
+        _, report = _report(fixture)
+        expected_classes = {row[0] for row in EXPECTED[fixture]}
+>       assert expected_classes <= set(_categories_of(report)), (
+            "%s did not reproduce %r — the tree reports %r"
+            % (fixture, sorted(expected_classes), sorted(set(_categories_of(report)))))
+E       AssertionError: corpus-x did not reproduce ['status-unreadable'] — the tree reports ['orphan-path']
+E       assert {'status-unreadable'} <= {'orphan-path'}
+E         
+E         Extra items in the left set:
+E         'status-unreadable'
+
+tests/contract/test_non_disposable_check.py:564: AssertionError
+_ test_audit_reports_the_affected_feature_with_claim_verdict_and_every_reason __
+[gw136] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_audit_reports_the_affected_feature_with_claim_verdict_and_every_reason():
+        """C-12: the list is readable without re-running the checker.
+    
+        901 is the case's would-become-`Blocked` subject: its claim (`Implemented`) exceeds its
+        evidence under the new rules, so the report carries the claimed status, the computed verdict
+        and **every** reason — the zero-pass refusal and the claim-exceeds-evidence refusal, both —
+        rather than a count or a single representative line.
+        """
+>       proc, payload = _run_audit_json("--repo", str(AUDIT_ROOT))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_closure_acceptance_check.py:530: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('--repo', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/tests/fixtures/acceptance-hardening/audit-history')
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...it-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)\n')
+@py_assert1 = ''
+@py_assert3 = <built-in method strip of str object at 0x7f1006d76a60>
+
+    def _run_audit_json(*args):
+        proc = _run_audit("--json", *args)
+>       assert proc.stdout.strip(), "no audit payload on stdout:\n%s\n%s" % (proc.stdout, proc.stderr)
+E       AssertionError: no audit payload on stdout:
+E         
+E         closure-acceptance-check: input error: audit registry not found: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/tests/fixtures/acceptance-hardening/audit-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)
+E         
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f1006d76a60>()
+E        +    where <built-in method strip of str object at 0x7f1006d76a60> = ''.strip
+E        +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...it-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)\n').stdout
+
+tests/contract/test_closure_acceptance_check.py:466: AssertionError
+_ test_audit_reports_only_affected_features_and_exits_zero_despite_the_finding _
+[gw137] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_audit_reports_only_affected_features_and_exits_zero_despite_the_finding():
+        """C-10: findings do not change the exit code — 0 whenever the inputs parse.
+    
+        902 is the case's unaffected subject: the same `Implemented` claim, but with the evidence the
+        rules demand, so the audit judges it `accept`. An audit that reported every enumerated row, or
+        one that turned a finding into a non-zero exit, would be a verdict engine wearing an audit's
+        name — the mode's exit code reflects input validity only.
+        """
+>       proc, payload = _run_audit_json("--repo", str(AUDIT_ROOT))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_closure_acceptance_check.py:555: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('--repo', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/tests/fixtures/acceptance-hardening/audit-history')
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...it-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)\n')
+@py_assert1 = ''
+@py_assert3 = <built-in method strip of str object at 0x7faed87f8a60>
+
+    def _run_audit_json(*args):
+        proc = _run_audit("--json", *args)
+>       assert proc.stdout.strip(), "no audit payload on stdout:\n%s\n%s" % (proc.stdout, proc.stderr)
+E       AssertionError: no audit payload on stdout:
+E         
+E         closure-acceptance-check: input error: audit registry not found: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/tests/fixtures/acceptance-hardening/audit-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)
+E         
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7faed87f8a60>()
+E        +    where <built-in method strip of str object at 0x7faed87f8a60> = ''.strip
+E        +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...it-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)\n').stdout
+
+tests/contract/test_closure_acceptance_check.py:466: AssertionError
+__________________________ test_audit_writes_nothing ___________________________
+[gw135] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8713/popen-gw135/test_audit_writes_nothing0')
+
+    def test_audit_writes_nothing(tmp_path):
+        """C-11, under the contract's own test name: the audit reports and writes nothing.
+    
+        Two subjects, because neither alone proves the whole claim. The **fixture copy** under
+        `tmp_path` is a tree an implementation actually could modify — a recursive content hash before
+        and after the run fails the moment the audit caches, locks, or rewrites anything under the
+        root it reads. The **`git status --porcelain`** pair is C-11's named verification, observed
+        over the repository this test runs in: it is attributed to the tree it actually observes (the
+        checkout), which is why the copy lives outside it — the fixture and the status read never
+        share a root, so neither assertion silently stands in for the other.
+        """
+        case = tmp_path / "audit-history"
+        shutil.copytree(AUDIT_ROOT, case)
+        before_hash = _tree_hash(case)
+        before_status = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=str(ROOT), capture_output=True, text=True
+        ).stdout
+    
+        proc = _run_audit("--repo", str(case))
+    
+        after_hash = _tree_hash(case)
+        after_status = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=str(ROOT), capture_output=True, text=True
+        ).stdout
+    
+>       assert proc.returncode == 0, proc.stdout + proc.stderr
+E       AssertionError: closure-acceptance-check: input error: audit registry not found: /tmp/pytest-of-agent/pytest-8713/popen-gw135/test_audit_writes_nothing0/audit-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...it-history/.specify/features.md (--audit-existing reads <root>/.specify/features.md under the root given by --repo)\n').returncode
+
+tests/contract/test_closure_acceptance_check.py:511: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_closure_acceptance_check.py::test_audit_skips_a_row_whose_spec_path_names_nothing_without_leaving_the_mode
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_detail_stores_no_class_value
+FAILED tests/contract/test_non_disposable_check.py::test_c103_every_entry_carries_a_recheckable_reading[corpus-a1]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_feature_index_has_no_class_column
+FAILED tests/contract/test_non_disposable_check.py::test_c203_missing_field_names_are_read_from_the_owner_page
+FAILED tests/contract/test_non_disposable_check.py::test_c105_status_unreadable_reads_the_closure_verdict
+FAILED tests/contract/test_non_disposable_check.py::test_c103_every_entry_carries_a_recheckable_reading[corpus-x]
+FAILED tests/contract/test_closure_acceptance_check.py::test_audit_reports_the_affected_feature_with_claim_verdict_and_every_reason
+FAILED tests/contract/test_closure_acceptance_check.py::test_audit_reports_only_affected_features_and_exits_zero_despite_the_finding
+FAILED tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing
+10 failed, 239 passed in 35.06s
+targeted_exit=1
+
+# Attribution of the 10 failed names
+$ comm -13 baseline-failed.txt <post-flip failed names>
+(empty = every failed name is a baseline member; the same 10 names are also in the definitive serial list test-evidence/final-failed.txt)
+post_flip_new_names=0

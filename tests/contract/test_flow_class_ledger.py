@@ -278,9 +278,11 @@ def test_no_second_classification_data_file():
 # C-4 / C-5 / C-6 — ledger shape, cardinality, and bidirectional coverage
 # --------------------------------------------------------------------------- #
 def test_ledger_has_79_rows_covering_inventory_bidirectionally():
-    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 rows —
-    # `/speckit.migrate` joins the inventory and the ledger together
-    # (29 -> 30 commands, 56 skills unchanged).
+    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 rows — `/speckit.migrate`
+    # joins the inventory and the ledger together.
+    # Stale-pin update (2026-11-11, Feature 099): 86 -> 88 rows — /speckit.seal
+    # (templates/commands/seal.md) and skill:seal-artifact (skills/internal/
+    # seal-artifact) join the merged inventory (31 commands, 57 skills).
     # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 rows —
     # skill:study-online and skill:study-kb join the inventory and the ledger
     # together (54 -> 56 skills, 29 commands unchanged).
@@ -301,8 +303,8 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
     # the 069a id under which this pin was first measured; the assertion is the
     # same shape: ledger rows == inventory, bidirectionally.
     rows = _ledger_rows()
-    assert len(rows) == 86, (
-        "ledger must carry exactly 86 rows (30 commands + 56 skills); got %d" % len(rows)
+    assert len(rows) == 88, (
+        "ledger must carry exactly 88 rows (31 commands + 57 skills); got %d" % len(rows)
     )
     ids = [row["unit_id"] for row in rows]
     assert len(set(ids)) == len(ids), (
@@ -316,15 +318,15 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
         )
     commands = {unit for unit in ids if unit.startswith("/speckit.")}
     skills = {unit for unit in ids if unit.startswith("skill:")}
-    assert len(commands) == 30, "expected 30 command units, got %d" % len(commands)
-    assert len(skills) == 56, "expected 56 skill units, got %d" % len(skills)
+    assert len(commands) == 31, "expected 31 command units, got %d" % len(commands)
+    assert len(skills) == 57, "expected 57 skill units, got %d" % len(skills)
     inventory_commands, inventory_skills = _inventory()
-    assert len(inventory_commands) == 30, (
-        "inventory self-check: expected 30 templates/commands/*.md, got %d"
+    assert len(inventory_commands) == 31, (
+        "inventory self-check: expected 31 templates/commands/*.md, got %d"
         % len(inventory_commands)
     )
-    assert len(inventory_skills) == 56, (
-        "inventory self-check: expected 56 skills/{external,internal}/*/SKILL.md, got %d"
+    assert len(inventory_skills) == 57, (
+        "inventory self-check: expected 57 skills/{external,internal}/*/SKILL.md, got %d"
         % len(inventory_skills)
     )
     expected = inventory_commands | inventory_skills
@@ -365,8 +367,9 @@ def test_first_batch_members_are_registered_as_expression():
 
 
 def test_check_reports_79_units_and_zero_gaps():
-    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 scanned units,
-    # the same census movement as the ledger-row pin above (`migrate.md`).
+    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 scanned units (migrate.md).
+    # Stale-pin update (2026-11-11, Feature 099): 86 -> 88 scanned units, the same
+    # census movement as the ledger-row pin above (/speckit.seal + seal-artifact).
     # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 scanned units,
     # the same census movement as the ledger-row pin above.
     # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 scanned units, the same
@@ -384,8 +387,8 @@ def test_check_reports_79_units_and_zero_gaps():
     )
     assert record.get("action") == "check"
     assert record.get("findings") == []
-    assert record.get("units") == 86, (
-        "check must report 86 scanned units; got %r" % record.get("units")
+    assert record.get("units") == 88, (
+        "check must report 88 scanned units; got %r" % record.get("units")
     )
     assert ISO_Z_RE.match(str(record.get("checked_at", ""))), (
         "checked_at must be ISO-8601 Z; got %r" % record.get("checked_at")
@@ -533,8 +536,9 @@ def test_change_log_row_form():
 # C-9 — no class-key assignment in templates or skills (wiring reads the owner)
 # --------------------------------------------------------------------------- #
 def test_templates_and_skills_never_assign_class_key():
-    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 files — `migrate.md`
-    # joins the scanned inventory.
+    # Stale-pin update (2026-11-10, Feature 097): 85 -> 86 files (migrate.md).
+    # Stale-pin update (2026-11-11, Feature 099): 86 -> 88 files — seal.md and the
+    # seal-artifact skill join the merged inventory (31 templates + 57 skills).
     # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 files —
     # the study-online and study-kb skills join the scanned inventory.
     # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 files, the same census
@@ -546,8 +550,8 @@ def test_templates_and_skills_never_assign_class_key():
     # same census movement as the two pins above (the new review-feature-quality
     # skill is also scanned for the forbidden literals below).
     paths = sorted(COMMANDS_DIR.glob("*.md")) + sorted(SKILLS_DIR.glob("*/*/SKILL.md"))
-    assert len(paths) == 86, (
-        "expected 30 templates + 56 skills, got %d files" % len(paths)
+    assert len(paths) == 88, (
+        "expected 31 templates + 57 skills, got %d files" % len(paths)
     )
     problems: list[str] = []
     for path in paths:

@@ -21,7 +21,7 @@ summary: "/speckit.clarify run=093-clarify-a1 token=not_evaluated elapsed=not_ev
   "feature": "093-concurrency-by-default",
   "feature_id": "093",
   "determined_at": "2026-11-09T07:54:28Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T12:32:55Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ summary: "/speckit.clarify run=093-clarify-a1 token=not_evaluated elapsed=not_ev
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -163,8 +163,8 @@ summary: "/speckit.clarify run=093-clarify-a1 token=not_evaluated elapsed=not_ev
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -194,7 +194,7 @@ summary: "/speckit.clarify run=093-clarify-a1 token=not_evaluated elapsed=not_ev
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

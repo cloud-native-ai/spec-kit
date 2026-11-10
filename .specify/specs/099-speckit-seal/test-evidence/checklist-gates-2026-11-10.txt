@@ -1,0 +1,19 @@
+# checklist gate readings — 099-speckit-seal — 2026-11-10T13:51:59Z
+## validate-requirements.py on 099
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+## closure-acceptance-check.py on 074 parent
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md:392 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+EXIT=2
+## closure-acceptance-check.py on 074b slice
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074b-nested-governance/requirements.md:210 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+EXIT=2

@@ -196,3 +196,7 @@
 | 观察记录 (Journal) | journal, journal.md, 观察日志 | 一条 SDD 线的追加式观察记录,落在 .specify/specs/<NNN-slug>/journal.md,一条线一份;条目是既有载体事实(状态脊/哨兵/checkpoint/git/执行四件套)的确定性投影,结构封闭、无评价/建议字段;随线收束提交 | auto | proposed |
 | 观察缺口 (Observer Gap) | observer-gap, 观察盲区 | 一段没有被任何 observer 执行覆盖的时间窗口的显式记录(事件类 observer-gap);不是推断出来的事件,也不是静默缺失;由下一次观察执行或线收束披露 | auto | proposed |
 | 一次性收尾迁移 (One-Shot Migration) | speckit.migrate, migrate, 迁移收尾, 收尾迁移 | 在 specify install + init 之后把新旧混杂的 .specify 收敛为当前已安装版本期望态的一次性收尾入口；与 /speckit.sanitize 的周期性治理分工（需求 097） | auto | proposed |
+| Merge-Back（合并回写） | merge-back, 合并回写 | 把分片交付的 spec 同名输出件按声明顺序确定性地并回父 spec 的流程；编号重排、语义对齐与词汇表对齐同走一条流程，无法归并的差异进入冲突清单并阻断封装（需求 099） | auto | proposed |
+| Merge Manifest（合并清单） | merge manifest, 合并清单 | 一次合并回写的归属记录：分片集合与顺序依据、逐输出件动作、ID 映射、冲突与处置、合并后校验；固定文件名 merge-manifest.json，落父 spec 目录，每 spec 一文件（需求 099） | auto | proposed |
+| Seal Record（封装回执） | 封装回执 | 按 spec 一份的最终封装回执文件 seal.md：判定时刻与钉住提交、review 与闭包回执引用、合并清单指针、豁免与引擎身份；只承载当前回执，重封装原子替换并写 supersedes（需求 099） | auto | proposed |
+| Slice（分片 spec） | 分片 | 名字族命中 <父编号><字母>-<slug> 且 requirements.md 显式声明父规格的 spec 目录；是合并来源、不是封装主体，合并后保留为 dated record 并获得一行 Merged into 标注（需求 099） | auto | proposed |

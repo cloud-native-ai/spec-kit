@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_scan_confirmation_gates.py tests/contract/test_skill_reference_matrix.py tests/contract/test_self_explanatory_distribution.py tests/contract/test_user_facing_comprehension_pointers.py tests/contract/test_todo_in_context_wiring.py tests/contract/test_portable_skill_creation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.................................................                        [100%]
+49 passed in 18.54s

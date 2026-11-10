@@ -193,7 +193,7 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 | 读的是谁的域 | 所有者 |
 |-------------|--------|
-| 注册表状态值域（`Draft` / `Planned` / `Implemented` / `Blocked` / `Ready for Review` / `Completed` / `Relocated`） | `shared/workflow/feature-integration.md` § Status State Machine；载体声明在 `templates/feature-details-template.md` § Canonical Status State Machine |
+| 注册表状态值域（`Draft` / `Planned` / `Implemented` / `Blocked` / `Ready for Review` / `Sealed` / `Completed` / `Relocated`） | `shared/workflow/feature-integration.md` § Status State Machine；载体声明在 `templates/feature-details-template.md` § Canonical Status State Machine |
 | 闭环裁决（`accept` / `block`）与 7 个 reason code | `shared/workflow/acceptance-hardening.md` § Closure Verdict；实现于 `scripts/python/closure-acceptance-check.py` 的 `ARC_VERDICTS` / `REASON_CODES` |
 | 验证词表与 smoke 字段名（`SC-NNN_status=` / `smoke_command` / `smoke_exit_code` / `smoke_evidence_path`） | `shared/workflow/acceptance-hardening.md` § Verification Vocabulary |
 | 决定张力记录的六字段形态 | `shared/guidelines/decision-tension.md`；判据于 `scripts/python/validate-decision-tensions.py` |
@@ -227,6 +227,7 @@ A6 的义务恰是**不作断言**：它会要求引擎把需求侧读数作为 
 | `Planned` | **✗ 矛盾**（语料 A3：`090` 读 `Planned`，闭环为 `accept`） | 一致——计划中的特性被阻断是正当的 |
 | `Implemented` | 一致 | **✗ 矛盾**——reason code `status-claims-implemented-but-blocked` |
 | `Ready for Review` | 一致 | **✗ 矛盾**——reason code `status-claims-implemented-but-blocked` |
+| `Sealed` | 一致 | **✗ 矛盾**——reason code `status-claims-implemented-but-blocked`（封装即声明全部 final 判据已过） |
 | `Blocked` | **✗ 矛盾**——注册表记了一个检查器看不见的阻断 | 一致，且为绿 |
 | `Completed` | 一致 | **✗ 矛盾**——闭环为 `block` 的已完成特性 |
 | `Relocated` | **不是活行**——按名排除，报 `count: 0` 并记录理由 | 同左 |
@@ -236,7 +237,7 @@ A6 的义务恰是**不作断言**：它会要求引擎把需求侧读数作为 
 今天恰有**一行**（`048`）携带该状态，因此这条排除需要规则，而不是一句顺带提及。
 
 **reason code 的归属**：闭环引擎只有**一个**与状态相关的 code（`status-claims-implemented-but-blocked`），
-且只对两个**完成声明**格（`Implemented` / `Ready for Review`）发出。其余 ✗ 格（`Draft` / `Planned` / `Blocked` /
+且只对三个**完成声明**格（`Implemented` / `Ready for Review` / `Sealed`）发出。其余 ✗ 格（`Draft` / `Planned` / `Blocked` /
 `Completed`）在闭环集合里没有 code，也 MUST NOT 得到一个发明出来的 code：引擎以**空** `reasons` 列表发出，
 把两侧读数（注册表行、检查器调用身份）放进条目自己的 `evidence_refs`。为它们新造第二个 code 被 C-205 禁止——
 一个需要新词汇词的状态读数，是一次 owner-page 问题，不是一个引擎字符串。

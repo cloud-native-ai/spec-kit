@@ -1,0 +1,112 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_feedback_command_classification.py tests/contract/test_docs_step_injection.py tests/contract/test_migration_distribution.py tests/contract/test_humanize_command_surface.py::test_wc16_command_roster_unchanged -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..............................................................F......... [ 85%]
+....F...FFF.                                                             [100%]
+=================================== FAILURES ===================================
+___________________ test_table_covers_every_command_template ___________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_table_covers_every_command_template():
+        """Zero-gap coverage, both directions, with a non-zero floor."""
+        stems = template_stems()
+        assert len(stems) >= MIN_COMMANDS, (
+            f"only {len(stems)} command templates found — the glob looks broken, which would "
+            f"let 'no unlisted command' pass without any command being counted"
+        )
+>       assert set(TABLE) == stems, (
+            f"table/template drift — unlisted templates: {sorted(stems - set(TABLE))}; "
+            f"rows with no template: {sorted(set(TABLE) - stems)}"
+        )
+E       AssertionError: table/template drift — unlisted templates: ['seal']; rows with no template: []
+E       assert {'agents', 'a...'derive', ...} == {'agents', 'a...'derive', ...}
+E         
+E         Extra items in the right set:
+E         'seal'
+E         Use -v to get more diff
+
+tests/contract/test_feedback_command_classification.py:108: AssertionError
+______________ test_complex_set_equals_measured_feedback_carriers ______________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_complex_set_equals_measured_feedback_carriers():
+        """Tie the classification to the templates: complex == carries the compiled wrap-up face."""
+>       assert set(COMPLEX_COMMANDS) == measured_feedback_carriers()
+E       AssertionError: assert {'analyze', '...eedback', ...} == {'analyze', '...eedback', ...}
+E         
+E         Extra items in the right set:
+E         'seal'
+E         Use -v to get more diff
+
+tests/contract/test_feedback_command_classification.py:117: AssertionError
+_________________ test_skill_name_set_matches_frozen_baseline __________________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_skill_name_set_matches_frozen_baseline() -> None:
+        names = {
+            path.parent.name
+            for path in SKILLS_DIR.rglob("SKILL.md")
+            if path.parent.parent.name in {"external", "internal"}
+        }
+>       assert names == SKILL_BASELINE, (
+            "skills file-name set changed: "
+            f"unexpected={sorted(names - SKILL_BASELINE)} "
+            f"missing={sorted(SKILL_BASELINE - names)}"
+        )
+E       AssertionError: skills file-name set changed: unexpected=['seal-artifact'] missing=[]
+E       assert {'analyze-art...vidence', ...} == frozenset({'a...idence', ...})
+E         
+E         Extra items in the left set:
+E         'seal-artifact'
+E         Use -v to get more diff
+
+tests/contract/test_migration_distribution.py:281: AssertionError
+______________________ test_wc16_command_roster_unchanged ______________________
+[gw83] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_wc16_command_roster_unchanged():
+        live = {p.name for p in (REPO_ROOT / "templates" / "commands").glob("*.md")}
+        base = {Path(n).name for n in _git_tracked(BASELINE_COMMIT, "templates/commands/")}
+        assert base, "the baseline tree lists no command templates"
+        # 2026-11-06: Feature 087 (FR-022 / FR-026) adds two command templates by design;
+        # they are the only sanctioned post-baseline additions to this roster.
+        approved_additions = {"status.md", "measure.md"}
+>       assert live == base | approved_additions, (
+            f"command roster drifted — added: {sorted(live - base - approved_additions)}; "
+            f"removed: {sorted(base - live)} (WC-16)"
+        )
+E       AssertionError: command roster drifted — added: ['seal.md']; removed: [] (WC-16)
+E       assert {'agents.md',...rive.md', ...} == {'agents.md',...rive.md', ...}
+E         
+E         Extra items in the left set:
+E         'seal.md'
+E         Use -v to get more diff
+
+tests/contract/test_humanize_command_surface.py:1888: AssertionError
+____________ test_command_template_name_set_matches_frozen_baseline ____________
+[gw67] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_command_template_name_set_matches_frozen_baseline() -> None:
+        names = {path.stem for path in COMMANDS_DIR.glob("*.md")}
+>       assert names == COMMAND_BASELINE, (
+            "templates/commands file-name set changed: "
+            f"unexpected={sorted(names - COMMAND_BASELINE)} "
+            f"missing={sorted(COMMAND_BASELINE - names)}"
+        )
+E       AssertionError: templates/commands file-name set changed: unexpected=['seal'] missing=[]
+E       assert {'agents', 'a...'derive', ...} == frozenset({'a...derive', ...})
+E         
+E         Extra items in the left set:
+E         'seal'
+E         Use -v to get more diff
+
+tests/contract/test_migration_distribution.py:268: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_feedback_command_classification.py::test_table_covers_every_command_template
+FAILED tests/contract/test_feedback_command_classification.py::test_complex_set_equals_measured_feedback_carriers
+FAILED tests/contract/test_migration_distribution.py::test_skill_name_set_matches_frozen_baseline
+FAILED tests/contract/test_humanize_command_surface.py::test_wc16_command_roster_unchanged
+FAILED tests/contract/test_migration_distribution.py::test_command_template_name_set_matches_frozen_baseline
+5 failed, 79 passed in 6.32s

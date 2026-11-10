@@ -1,0 +1,116 @@
+# P6 (T030–T034) evidence — archive gate, lane wiring and the boundary audit
+
+Collected 2026-11-11 in
+`/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal`
+(branch `099-speckit-seal`, package base `2939a408d`). Red-first reading:
+`notes/red-first-evidence.md` § 8; the full red capture is
+`test-evidence/p6-red-first-20261111.txt`. Every test command goes through the single
+runner `scripts/bash/run-tests.sh`.
+
+## 1. What landed
+
+| Row | Artifact |
+|-----|----------|
+| T030 | `tests/contract/test_seal_archive_gate.py`（14 tests：Sealed 放行、非 Sealed 具名拒绝 + `/speckit.seal` 指针、遗留 `Completed` 无裁定拒绝、两载体裁定放行、单载体不放行、`state-drift` exit 2、Sealed 无回执 exit 2、只读与重跑稳定、规范 JSON、T032/T033 接线断言、单一 owner 扫描 + 复制注入转红、裁定词表守卫） |
+| T031 | `scripts/python/seal-utils.py` `action_archive_gate`：E11 `gate` 负载（`target/status/allowed/reason/pointer/exit` 六键封闭）、封闭理由集（`sealed` / `legacy-completed-ruled` / `not-sealed` / `legacy-completed-unruled` / `state-drift` / `seal-receipt-invalid`）、状态对与回执同源读取、C-044 两载体裁定判定；随后 `sync-mirrors.py --write`，`--check` exit 0 |
+| T032 | `skills/internal/sanitize-materials/SKILL.md` § Stage 5 新增 `#### Archive admission gate (spec retirement)`：退休/归档 spec 入选清理计划前查询 `--action archive-gate`；`Exit 1`/`Exit 2` 具名拒绝并指回 `/speckit.seal`；引擎不可执行按错误处理，绝不「未查询即允许」 |
+| T033 | `skills/internal/manage-features/SKILL.md` § Boundaries 新增 `Archive-pointer admission` 一条：`Relocated` 归档指针写入前先查询门禁；reconcile 仍归本技能，准入判据绝不在本地复算；`Archive-not-delete` 规则加指针句 |
+| T034 | `tests/contract/test_seal_boundaries.py`（12 tests：动作表封闭且无破坏动作、只读 git 动词封闭、无调度器/守护进程构造、转移箭头/转移表行/七值域单 owner、注册表与台账单文件、单一 spec 树、写面逐 spec 单文件、目录↔注册表差异全分类、审计 dump）；读数落 `test-evidence/boundaries-audit.txt` |
+
+## 2. Red-first reading (T030, before the `archive-gate` body existed)
+
+See `notes/red-first-evidence.md` § 8 — command verbatim, exit 1, 10/14 red. The eight
+verdict legs failed on the skeleton's `not-implemented` payload (exit 2); the two wiring
+legs failed on the missing gate step; 4 guard/audit legs were green at red time and are
+recorded as such.
+
+## 3. Green runs (T031–T034) — verbatim
+
+### 3.1 P6 suites
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_gate.py tests/contract/test_seal_boundaries.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_archive_gate.py tests/contract/test_seal_boundaries.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..........................                                               [100%]
+26 passed in 8.04s
+```
+
+EXIT=0 — 26/26 green（gate 14 + boundaries 12）。
+
+### 3.2 P2/P5 seal family stays green (surface and write contracts not regressed)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_engine_contract.py tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+......................................................                   [100%]
+54 passed in 6.64s
+```
+
+EXIT=0 — 54/54 green（引擎契约 31 + seal 20 + 并发只读 3）。
+
+### 3.3 Adjacent regression (P1 status guards + P3/P4 merge suites)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 72%]
+............................                                             [100%]
+100 passed in 6.43s
+```
+
+EXIT=0 — 100/100 green。
+
+## 4. Boundary audit readings
+
+Full dump: `test-evidence/boundaries-audit.txt`（`SEAL_BOUNDARIES_AUDIT=<path>` 驱动同一
+测试模块产出）。摘要：动作表 4 值、只读 `merge-plan`/`archive-gate`、写 `merge-apply`/`seal`；
+git 动词封闭为 `cat-file`/`rev-parse`/`status`；零调度器导入；转移箭头仅 owner + 集成协议行；
+转移表行仅特性详情模板；七值域机器枚举 4 处全在 C-025 声明 carrier 内；注册表单文件
+（`memory/features.md` 为出厂占位）；台账单文件 `.specify/register.md`；spec 树恰两处
+（live + archive）；目录↔注册表差异逐条具名（live 未登记 067/075/080、archived 未登记
+054/066、detail-only 9 行），孤儿分片 0；seal 引入的共享可变聚合 0。
+
+## 5. Mirror projections
+
+$ python3 scripts/python/sync-mirrors.py --write   → 1 file synced (scripts/ → .specify/scripts/)，技能镜像随批投影
+$ python3 scripts/python/sync-mirrors.py --check   → EXIT=0
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (135 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (127 files, byte-identical)
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+```
+
+## 6. Disclosed rulings (P6 scope)
+
+1. **E11 的 `pointer` 闭域**：`seal.md`（放行：准入证据是封装回执）与 `/speckit.seal`
+   （拒绝/输入错误：修复入口）。遗留 `Completed` + 裁定放行时 `reason` 具名
+   `legacy-completed-ruled`，`pointer` 仍取闭域内的 `seal.md`（该行没有回执，`reason`
+   承载「裁定替代回执」的语义；E11 的闭域不加第三值）。
+2. **Sealed 但回执缺失/不可读 → exit 2 `seal-receipt-invalid`**：FR-023 要求门禁同时查询
+   封装记录与状态；状态声称已封装而记录不存在是输入缺陷，不读作放行，也与 P5 的同名牌
+   一致。
+3. **遗留 `Completed` 的裁定命名对象**：C-044 字面行在 `review.md` code 小节与详情
+   `## Latest Review` 两处点名**该特性**（spec slug 或其数字前缀）而非 finding（遗留行没有
+   当前 finding）；单载体不计数。
+4. **T034 为回归例外行**（tasks.md § Within Each User Story）：落在其消费对象 T031 之后，
+   不要求红先；审计差异以具名清单（dated pin）分类，任何新增未解释的目录/行都会使它转红。

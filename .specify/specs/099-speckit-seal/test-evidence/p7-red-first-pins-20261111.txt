@@ -1,0 +1,97 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_flow_class_ledger.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....FF..F.                                                              [100%]
+=================================== FAILURES ===================================
+__________ test_ledger_has_79_rows_covering_inventory_bidirectionally __________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ledger_has_79_rows_covering_inventory_bidirectionally():
+        # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 rows —
+        # skill:study-online and skill:study-kb join the inventory and the ledger
+        # together (54 -> 56 skills, 29 commands unchanged).
+        # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 rows. Two command templates (and
+        # their two ledger rows) joined the framework inventory — `templates/commands/status.md`
+        # (first slice, c0fd01ac) and `templates/commands/measure.md` (second slice, 70df8130) —
+        # so the command count moved 27 -> 29 while the 54-skill count is unchanged. Ledger rows
+        # and inventory grew together; the bidirectional equality below is the assertion that
+        # matters, the pinned number is only its dated reading.
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 rows. The
+        # new external unit `ssh-utils` registers `skill:ssh-utils` in the owner's
+        # ledger, so the inventory and the ledger grow together (54 skills, 27
+        # commands unchanged). The earlier 081c note still holds below.
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 rows. The new
+        # skill `skills/internal/review-feature-quality/` registered
+        # `skill:review-feature-quality` in the owner's ledger, so the inventory and
+        # the ledger grew together (53 skills, 27 commands unchanged). The name keeps
+        # the 069a id under which this pin was first measured; the assertion is the
+        # same shape: ledger rows == inventory, bidirectionally.
+        rows = _ledger_rows()
+>       assert len(rows) == 85, (
+            "ledger must carry exactly 85 rows (29 commands + 56 skills); got %d" % len(rows)
+        )
+E       AssertionError: ledger must carry exactly 85 rows (29 commands + 56 skills); got 87
+E       assert 87 == 85
+E        +  where 87 = len([{'_line': 15, 'basis': 'behavior-oracle', 'flow_class': 'execution', 'neutral': '', ...}, {'_line': 16, 'basis': 'beh...on', 'neutral': '', ...}, {'_line': 20, 'basis': 'reader-oracle', 'flow_class': 'expression', 'neutral': '', ...}, ...])
+
+tests/contract/test_flow_class_ledger.py:301: AssertionError
+_______________ test_templates_and_skills_never_assign_class_key _______________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_templates_and_skills_never_assign_class_key():
+        # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 files —
+        # the study-online and study-kb skills join the scanned inventory.
+        # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 files, the same census
+        # movement as the pins above (the two new command templates are scanned here too).
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 files, the
+        # same census movement as the pins above (the new ssh-utils skill joins the
+        # scanned inventory).
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 files, the
+        # same census movement as the two pins above (the new review-feature-quality
+        # skill is also scanned for the forbidden literals below).
+        paths = sorted(COMMANDS_DIR.glob("*.md")) + sorted(SKILLS_DIR.glob("*/*/SKILL.md"))
+>       assert len(paths) == 85, (
+            "expected 29 templates + 56 skills, got %d files" % len(paths)
+        )
+E       AssertionError: expected 29 templates + 56 skills, got 87 files
+E       assert 87 == 85
+E        +  where 87 = len([PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/templates/comm...project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/templates/commands/derive.md'), ...])
+
+tests/contract/test_flow_class_ledger.py:542: AssertionError
+__________________ test_check_reports_79_units_and_zero_gaps ___________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_check_reports_79_units_and_zero_gaps():
+        # Stale-pin update (2026-11-10, research/study fusion): 83 -> 85 scanned units,
+        # the same census movement as the ledger-row pin above.
+        # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 scanned units, the same
+        # census movement as the ledger-row pin above (`status.md` + `measure.md`).
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 scanned
+        # units, the same census movement as the ledger-row pin above.
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 scanned
+        # units, the same census movement as the ledger-row pin above.
+        # No --repo: C-5 requires the engine to resolve the repository root itself.
+        proc = _run("--action", "check", "--format", "json")
+        record = _json(proc)
+        assert proc.returncode == 0, (
+            "check must exit 0 on a gap-free ledger; findings=%r stderr=%r"
+            % (record.get("findings"), proc.stderr)
+        )
+        assert record.get("action") == "check"
+        assert record.get("findings") == []
+>       assert record.get("units") == 85, (
+            "check must report 85 scanned units; got %r" % record.get("units")
+        )
+E       AssertionError: check must report 85 scanned units; got 87
+E       assert 87 == 85
+E        +  where 87 = <built-in method get of dict object at 0x7f48ed1dda80>('units')
+E        +    where <built-in method get of dict object at 0x7f48ed1dda80> = {'action': 'check', 'checked_at': '2026-11-10T16:53:57Z', 'coverage': {'floor': 39, 'gaps': 0, 'inventory_units': 87, 'ledger_rows': 87, ...}, 'error': None, ...}.get
+
+tests/contract/test_flow_class_ledger.py:382: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_flow_class_ledger.py::test_ledger_has_79_rows_covering_inventory_bidirectionally
+FAILED tests/contract/test_flow_class_ledger.py::test_templates_and_skills_never_assign_class_key
+FAILED tests/contract/test_flow_class_ledger.py::test_check_reports_79_units_and_zero_gaps
+3 failed, 8 passed in 6.29s

@@ -1,0 +1,104 @@
+# review-repair r1 — F1 red-first (unfixed engine)
+date_utc=2026-11-10T18:48:02Z
+engine=scripts/python/seal-utils.py @ 99af8cb3b (pre-fix)
+command=bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py -q -k "slice_p0 or slice_code_review"
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_seal.py -q -k slice_p0 or slice_code_review
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_a_split_parent_refuses_an_unwaived_slice_p0 _______________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8964/popen-gw0/test_a_split_parent_refuses_an0')
+
+    def test_a_split_parent_refuses_an_unwaived_slice_p0(tmp_path):
+        repo = _copy_fixture("merged-clean", tmp_path / "repo")
+        _write_slice_p0(repo, MERGED, SLICE)
+        _commit(repo)
+        before = _snapshot(repo / ".specify" / "specs")
+        proc, payload = _seal(repo, MERGED)
+>       assert proc.returncode == 1, (
+            "a slice P0 whose only waiver is a driver narrative MUST refuse seal; "
+            f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: a slice P0 whose only waiver is a driver narrative MUST refuse seal; exit=0 payload={"action": "seal", "conditions": [], "exit_code": 0, "seal": {"from_status": "Ready for Review", "outcome": "sealed", "receipt": ".specify/specs/099-fixture-merged/seal.md", "to_status": "Sealed", "writes": [".specify/specs/099-fixture-merged/feature-registry.md", ".specify/specs/099-fixture-merged/feature-detail.md", ".specify/specs/099-fixture-merged/seal.md"]}, "spec_dir": "/tmp/pytest-of-agent/pytest-8964/popen-gw0/test_a_split_parent_refuses_an0/repo/.specify/specs/099-fixture-merged", "verdict": "ok"}
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...popen-gw0/test_a_split_parent_refuses_an0/repo/.specify/specs/099-fixture-merged",\n  "verdict": "ok"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:509: AssertionError
+____________ test_a_slice_p0_waiver_needs_the_slice_review_carrier _____________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8964/popen-gw2/test_a_slice_p0_waiver_needs_t0')
+
+    def test_a_slice_p0_waiver_needs_the_slice_review_carrier(tmp_path):
+        repo = _copy_fixture("merged-clean", tmp_path / "repo")
+        _write_slice_p0(repo, MERGED, SLICE, detail_waiver=True)
+        _commit(repo)
+        proc, payload = _seal(repo, MERGED)
+>       assert proc.returncode == 1, (
+            "C-044: a single waiver carrier never disposes of a slice P0; "
+            f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+E       AssertionError: C-044: a single waiver carrier never disposes of a slice P0; exit=0 payload={"action": "seal", "conditions": [], "exit_code": 0, "seal": {"from_status": "Ready for Review", "outcome": "sealed", "receipt": ".specify/specs/099-fixture-merged/seal.md", "to_status": "Sealed", "writes": [".specify/specs/099-fixture-merged/feature-registry.md", ".specify/specs/099-fixture-merged/feature-detail.md", ".specify/specs/099-fixture-merged/seal.md"]}, "spec_dir": "/tmp/pytest-of-agent/pytest-8964/popen-gw2/test_a_slice_p0_waiver_needs_t0/repo/.specify/specs/099-fixture-merged", "verdict": "ok"}
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...popen-gw2/test_a_slice_p0_waiver_needs_t0/repo/.specify/specs/099-fixture-merged",\n  "verdict": "ok"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_seal.py:549: AssertionError
+_____ test_a_split_parent_seals_when_the_slice_p0_carries_the_user_waiver ______
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8964/popen-gw1/test_a_split_parent_seals_when0')
+
+    def test_a_split_parent_seals_when_the_slice_p0_carries_the_user_waiver(tmp_path):
+        repo = _copy_fixture("merged-clean", tmp_path / "repo")
+        _write_slice_p0(repo, MERGED, SLICE, review_waiver=True, detail_waiver=True)
+        _commit(repo)
+        proc, payload = _seal(repo, MERGED)
+        assert proc.returncode == 0, (
+            "C-044: the literal `- **User waiver**:` line on the slice review's code "
+            "segment AND the feature detail disposes of the slice P0; "
+            f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}")
+        core = _receipt_core(repo / ".specify" / "specs" / MERGED)
+        assert core["review"]["counts"]["p0_unresolved"] == 0
+        slice_review = ".specify/specs/%s/review.md" % SLICE
+>       assert slice_review in core["review"]["paths"], (
+            "FR-010: the receipt references every review record the judgment read")
+E       AssertionError: FR-010: the receipt references every review record the judgment read
+E       assert '.specify/specs/099a-fixture-slice/review.md' in ['.specify/specs/099-fixture-merged/review.md', '.specify/specs/099-fixture-merged/code-review.md']
+
+tests/contract/test_seal_seal.py:535: AssertionError
+_______________ test_a_slice_code_review_blocking_entry_refuses ________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8964/popen-gw3/test_a_slice_code_review_block0')
+
+    def test_a_slice_code_review_blocking_entry_refuses(tmp_path):
+        repo = _copy_fixture("seal-refusals/slice-unclosed", tmp_path / "repo")
+        slice_dir = repo / ".specify" / "specs" / "099a-fixture-open"
+        (slice_dir / "code-review.md").write_text(
+            "# Code Review Report — slice\n\n"
+            "### 🔴 [BLOCKING] scripts/a.py (Line 1)\n\n"
+            "> A blocking entry recorded only in the slice's original code review.\n",
+            encoding="utf-8")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+        assert proc.returncode == 1
+>       assert "code-review-blocking" in _context_codes(payload), (
+            "FR-006: the split parent's blocking gate reads the slice's original "
+            "code-review record; got %s" % sorted(_context_codes(payload)))
+E       AssertionError: FR-006: the split parent's blocking gate reads the slice's original code-review record; got ['merge-incomplete', 'slice-unclosed']
+E       assert 'code-review-blocking' in {'merge-incomplete', 'slice-unclosed'}
+E        +  where {'merge-incomplete', 'slice-unclosed'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'merge-incomplete', 'evidence': '1 slice(s) are present (099a-fixture-open)...1, 'seal': {'from_status': 'Ready for Review', 'outcome': 'refused', 'receipt': None, 'to_status': 'Sealed', ...}, ...})
+
+tests/contract/test_seal_seal.py:566: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_seal.py::test_a_split_parent_refuses_an_unwaived_slice_p0
+FAILED tests/contract/test_seal_seal.py::test_a_slice_p0_waiver_needs_the_slice_review_carrier
+FAILED tests/contract/test_seal_seal.py::test_a_split_parent_seals_when_the_slice_p0_carries_the_user_waiver
+FAILED tests/contract/test_seal_seal.py::test_a_slice_code_review_blocking_entry_refuses
+4 failed in 6.31s
+
+run_exit=1

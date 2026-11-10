@@ -7,7 +7,7 @@
 **机器键**: `flow_class`（[[STR-003]]）。**取值域的成员与次序不在本文件**——它们由声明层
 `shared/declarations/facts/flow-class-classes.yaml#/statement`（`kind: closed-set`，有序：成员 0 是未声明单元的缺省类别）
 单一拥有；父规格 069 的 `[[STR-001]]` / `[[STR-002]]` 登记的是这两个字面量的语义，本节只引用语义、不重列取值。
-四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
+四个共享字面量（`execution` / `expression` / `flow_class` / `未声明·按默认`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
 清单规模（实测 2026-10-30：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。
@@ -165,6 +165,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | /speckit.research | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |
 | /speckit.review | execution | behavior-oracle |  | 交付评审结论；findings 逐条对回阶段记录与制品 |
 | /speckit.sanitize | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| /speckit.seal | execution | behavior-oracle |  | 交付合并回写与封装终态；由引擎裁决与状态面写入判定 |
 | /speckit.session | execution | behavior-oracle |  | 交付会话导出目录；文件集与清单可校验 |
 | /speckit.skills | execution | behavior-oracle |  | 交付技能实体；以再运行与校验判定 |
 | /speckit.status | execution | behavior-oracle |  | 交付一次状态读取的三个渲染面（摘要 / 守卫裁决 / 单行状态）；条目集、有界与退出码由脚本复算判定 |
@@ -223,6 +224,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:run-skills | execution | behavior-oracle |  | 交付技能运行结果；以实际执行判定 |
 | skill:run-team | execution | behavior-oracle |  | 交付团队运行报告；以运行结果判定 |
 | skill:sanitize-materials | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
+| skill:seal-artifact | execution | behavior-oracle |  | 交付一次合并回写与封装运行；判定全部由 seal 引擎给出 |
 | skill:self-improvement | execution | behavior-oracle |  | 交付改进点与运行记录；由引擎记录判定 |
 | skill:study-code | expression | reader-oracle |  | 交付架构分析报告；报告是否读懂由读者判定 |
 | skill:study-kb | expression | reader-oracle |  | 交付知识库调查报告；结论由读者对照知识库路径与现役复核判定 |

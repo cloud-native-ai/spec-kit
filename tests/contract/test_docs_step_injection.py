@@ -57,6 +57,11 @@ SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 # unit, so this dict cannot outlive the defect it documents.
 DOCS_STEP_EXCLUDED = {
     "history": "no-documentation-section",
+    # 2026-11-11 (Feature 099): seal carries the compiled wrap-up face and no
+    # docs-sync HandlerBinding, so its compiled section has no Docs Sync Eval line —
+    # the same measured reason as history. Subscribe the binding (and recompile the
+    # global fingerprint) to move it into COMPLEX_COMMANDS.
+    "seal": "no-documentation-section",
 }
 
 # Anti-vacuity sentinel: an empty or truncated scope list would make every

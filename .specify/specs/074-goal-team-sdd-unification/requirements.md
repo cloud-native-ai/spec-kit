@@ -389,29 +389,29 @@ vocabulary is unchanged.
 
 ### Measurable Outcomes
 
-- **SC-001**: In a fixture team with one authorized and one unauthorized seat, the same
+- **SC-001**: In a fixture team with one authorized and one unauthorized seat, the same **Path**: final
   SDD-routed duty starts exactly one nested run from the authorized seat and is blocked before
   dispatch for the unauthorized seat, with the failing authorization half named in both
   records.
-- **SC-002**: The routing engine returns the documented verdict and reason code for every row
+- **SC-002**: The routing engine returns the documented verdict and reason code for every row **Path**: final
   of a golden case table covering feature, maintenance, cross-cutting, irreversible, ambiguous,
   conflicting, and bounded definition-correction changes; ambiguous and conflicting rows expect
   [[STR-006]], and the bounded definition-correction row expects [[STR-005]] only when all
   FR-010 conditions hold. Repeated evaluation of identical inputs returns identical verdicts.
-- **SC-003**: A nested run reaches review, produces the complete SDD artifact chain, performs
+- **SC-003**: A nested run reaches review, produces the complete SDD artifact chain, performs **Path**: final
   zero merge and zero push, and the team run report's nested section cites every artifact and
   evidence path.
-- **SC-004**: Stage executors cannot start an SDD run, and every dispatch prompt that names a
+- **SC-004**: Stage executors cannot start an SDD run, and every dispatch prompt that names a **Path**: final
   driver without satisfying all three authorization conditions is blocked before dispatch;
   all pre-existing anti-nesting contract tests remain green for non-authorized paths.
-- **SC-005**: Relative to the pre-change case set captured at the baseline commit named in the
+- **SC-005**: Relative to the pre-change case set captured at the baseline commit named in the **Path**: final
   verification record, the post-change team, Agent, and standalone-driver contract suites have
   a superset case set, and every pre-change case returns the same verdict.
-- **SC-006**: No second registry, ledger, state spine, ownership model, or integration queue is
+- **SC-006**: No second registry, ledger, state spine, ownership model, or integration queue is **Path**: final
   introduced; the nested run's records resolve to the existing line and state artifacts.
-- **SC-007**: Every ambiguous or conflicting input set produces [[STR-006]] and never
+- **SC-007**: Every ambiguous or conflicting input set produces [[STR-006]] and never **Path**: final
   [[STR-005]]; the property holds across all cases in the golden table.
-- **SC-008**: Relative to the goal fixture captured before the nested run, the post-run parsed
+- **SC-008**: Relative to the goal fixture captured before the nested run, the post-run parsed **Path**: final
   Goal field set is identical, and any Target attribution resolves only through the existing
   ledger reference.
 

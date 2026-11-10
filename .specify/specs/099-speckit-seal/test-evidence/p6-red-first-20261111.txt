@@ -1,0 +1,246 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_archive_gate.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.FF..FFFFFFFF.                                                           [100%]
+=================================== FAILURES ===================================
+___ test_manage_features_queries_the_gate_before_writing_an_archive_pointer ____
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_manage_features_queries_the_gate_before_writing_an_archive_pointer():
+        text = _flat(MANAGE_FEATURES_SKILL.read_text(encoding="utf-8"))
+>       assert "Archive-pointer admission" in text, (
+            "T033: the `Relocated` archive-pointer form MUST carry its own gate step"
+        )
+E       AssertionError: T033: the `Relocated` archive-pointer form MUST carry its own gate step
+E       assert 'Archive-pointer admission' in '--- name: manage-features description: Maintain and refresh the project feature registry — the feature index (`.speci...edded step points here)" 6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step" '
+
+tests/contract/test_seal_archive_gate.py:469: AssertionError
+_______ test_sanitize_materials_queries_the_gate_before_retiring_a_spec ________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_sanitize_materials_queries_the_gate_before_retiring_a_spec():
+        text = _flat(SANITIZE_SKILL.read_text(encoding="utf-8"))
+>       assert "Archive admission gate" in text, (
+            "T032: the sanitize archive lane MUST carry the admission-gate step as its own "
+            "named step before a spec is retired or archived"
+        )
+E       AssertionError: T032: the sanitize archive lane MUST carry the admission-gate step as its own named step before a spec is retired or archived
+E       assert 'Archive admission gate' in '--- name: sanitize-materials description: Framework material hygiene governance for the Spec Kit workspace — scan fra...edded step points here)" 6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step" '
+
+tests/contract/test_seal_archive_gate.py:449: AssertionError
+________ test_legacy_completed_with_the_two_carrier_ruling_is_admitted _________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw3/test_legacy_completed_with_the0')
+
+    def test_legacy_completed_with_the_two_carrier_ruling_is_admitted(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        _set_status(spec_dir, "Completed")
+        _add_ruling(spec_dir, carriers=("review", "detail"))
+    
+        proc, payload = _gate(repo)
+    
+>       assert proc.returncode == 0, (
+            "FR-023: a legacy `Completed` row carrying the user's explicit ruling on both "
+            f"carriers MUST be admitted; exit={proc.returncode} "
+            f"payload={json.dumps(payload, ensure_ascii=False)[:800]}"
+        )
+E       AssertionError: FR-023: a legacy `Completed` row carrying the user's explicit ruling on both carriers MUST be admitted; exit=2 payload={"action": "archive-gate", "conditions": [{"code": "not-implemented", "evidence": "the archive-gate action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7908/popen-gw3/test_legacy_completed_with_the0/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw3/test_legacy_completed_with_the0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:340: AssertionError
+____________ test_a_single_carrier_ruling_never_admits_a_legacy_row ____________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw4/test_a_single_carrier_ruling_n0')
+
+    def test_a_single_carrier_ruling_never_admits_a_legacy_row(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        _set_status(spec_dir, "Completed")
+        _add_ruling(spec_dir, carriers=("review",))
+    
+        proc, payload = _gate(repo)
+    
+>       assert proc.returncode == 1, (
+            "C-044: a waiver on a single carrier does not count; the legacy row stays refused"
+        )
+E       AssertionError: C-044: a waiver on a single carrier does not count; the legacy row stays refused
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw4/test_a_single_carrier_ruling_n0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:359: AssertionError
+_______ test_ready_for_review_is_refused_by_name_and_points_back_to_seal _______
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw1/test_ready_for_review_is_refus0')
+
+    def test_ready_for_review_is_refused_by_name_and_points_back_to_seal(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+    
+        proc, payload = _gate(repo)
+    
+>       assert proc.returncode == 1, (
+            f"C-030: a non-Sealed spec MUST be refused with exit 1; exit={proc.returncode}"
+        )
+E       AssertionError: C-030: a non-Sealed spec MUST be refused with exit 1; exit=2
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw1/test_ready_for_review_is_refus0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:290: AssertionError
+________ test_legacy_completed_without_a_user_ruling_is_refused_by_name ________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw2/test_legacy_completed_without_0')
+
+    def test_legacy_completed_without_a_user_ruling_is_refused_by_name(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        _set_status(spec_dir, "Completed")
+    
+        proc, payload = _gate(repo)
+    
+>       assert proc.returncode == 1, (
+            f"C-030: a legacy `Completed` row without a user ruling MUST be refused; "
+            f"exit={proc.returncode}"
+        )
+E       AssertionError: C-030: a legacy `Completed` row without a user ruling MUST be refused; exit=2
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw2/test_legacy_completed_without_0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:316: AssertionError
+__________ test_state_drift_is_an_input_error_not_a_one_sided_reading __________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw5/test_state_drift_is_an_input_e0')
+
+    def test_state_drift_is_an_input_error_not_a_one_sided_reading(tmp_path):
+        repo = _copy_fixture("seal-refusals", tmp_path / "refusals")
+        repo = repo / "state-drift"
+    
+        proc, payload = _gate(repo)
+    
+        assert proc.returncode == 2, (
+            f"C-031: a drifting status pair MUST exit 2; exit={proc.returncode}"
+        )
+        assert payload["verdict"] == "error"
+>       gate = _gate_block(payload)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_gate.py:377: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'action': 'archive-gate', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-gate action body is not...gent/pytest-7908/popen-gw5/test_state_drift_is_an_input_e0/refusals/state-drift/.specify/specs/099-fixture-clean', ...}
+
+    def _gate_block(payload: dict) -> dict:
+>       assert isinstance(payload.get("gate"), dict), (
+            "E11: the archive-gate payload MUST carry its verdict block under `gate`; "
+            f"got keys {sorted(payload)}"
+        )
+E       AssertionError: E11: the archive-gate payload MUST carry its verdict block under `gate`; got keys ['action', 'conditions', 'exit_code', 'spec_dir', 'verdict']
+E       assert False
+E        +  where False = isinstance(None, dict)
+E        +    where None = <built-in method get of dict object at 0x7fac91d5dc80>('gate')
+E        +      where <built-in method get of dict object at 0x7fac91d5dc80> = {'action': 'archive-gate', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-gate action body is not...gent/pytest-7908/popen-gw5/test_state_drift_is_an_input_e0/refusals/state-drift/.specify/specs/099-fixture-clean', ...}.get
+
+tests/contract/test_seal_archive_gate.py:140: AssertionError
+_______________ test_archive_gate_is_read_only_and_rerun_stable ________________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw7/test_archive_gate_is_read_only0')
+
+    def test_archive_gate_is_read_only_and_rerun_stable(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        before = _snapshot(repo)
+    
+        first = subprocess.run(
+            [sys.executable, str(ENGINE), "--action", "archive-gate",
+             "--spec-dir", str(repo / ".specify" / "specs" / CLEAN),
+             "--repo", str(repo), "--json"],
+            cwd=str(repo), capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+        second = subprocess.run(
+            [sys.executable, str(ENGINE), "--action", "archive-gate",
+             "--spec-dir", str(repo / ".specify" / "specs" / CLEAN),
+             "--repo", str(repo), "--json"],
+            cwd=str(repo), capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+    
+>       assert first.returncode == second.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw7/test_archive_gate_is_read_only0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:422: AssertionError
+________ test_sealed_pair_without_a_readable_receipt_is_an_input_error _________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw6/test_sealed_pair_without_a_rea0')
+
+    def test_sealed_pair_without_a_readable_receipt_is_an_input_error(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _seal_clean(repo)
+        spec_dir = repo / ".specify" / "specs" / CLEAN
+        (spec_dir / "seal.md").unlink()
+    
+        proc, payload = _gate(repo)
+    
+        assert proc.returncode == 2, (
+            "FR-023: the gate queries the seal record as well as the status; a `Sealed` row "
+            f"without a readable receipt is an input defect; exit={proc.returncode}"
+        )
+>       gate = _gate_block(payload)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_gate.py:399: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'action': 'archive-gate', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-gate action body is not.../tmp/pytest-of-agent/pytest-7908/popen-gw6/test_sealed_pair_without_a_rea0/repo/.specify/specs/099-fixture-clean', ...}
+
+    def _gate_block(payload: dict) -> dict:
+>       assert isinstance(payload.get("gate"), dict), (
+            "E11: the archive-gate payload MUST carry its verdict block under `gate`; "
+            f"got keys {sorted(payload)}"
+        )
+E       AssertionError: E11: the archive-gate payload MUST carry its verdict block under `gate`; got keys ['action', 'conditions', 'exit_code', 'spec_dir', 'verdict']
+E       assert False
+E        +  where False = isinstance(None, dict)
+E        +    where None = <built-in method get of dict object at 0x7fd4bd0d7b00>('gate')
+E        +      where <built-in method get of dict object at 0x7fd4bd0d7b00> = {'action': 'archive-gate', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-gate action body is not.../tmp/pytest-of-agent/pytest-7908/popen-gw6/test_sealed_pair_without_a_rea0/repo/.specify/specs/099-fixture-clean', ...}.get
+
+tests/contract/test_seal_archive_gate.py:140: AssertionError
+____________ test_sealed_spec_is_admitted_and_points_at_the_receipt ____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7908/popen-gw0/test_sealed_spec_is_admitted_a0')
+
+    def test_sealed_spec_is_admitted_and_points_at_the_receipt(tmp_path):
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        _seal_clean(repo)
+    
+        proc, payload = _gate(repo)
+    
+>       assert proc.returncode == 0, (
+            "C-030: a `Sealed` spec MUST be admitted; "
+            f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:800]}"
+        )
+E       AssertionError: C-030: a `Sealed` spec MUST be admitted; exit=2 payload={"action": "archive-gate", "conditions": [{"code": "not-implemented", "evidence": "the archive-gate action body is not implemented on this skeleton", "fix_path": "run the action once its implementing work package lands", "rerun": "rerun the same command after the action body is implemented"}], "exit_code": 2, "spec_dir": "/tmp/pytest-of-agent/pytest-7908/popen-gw0/test_sealed_spec_is_admitted_a0/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw0/test_sealed_spec_is_admitted_a0/repo/.specify/specs/099-fixture-clean",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_gate.py:267: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_archive_gate.py::test_manage_features_queries_the_gate_before_writing_an_archive_pointer
+FAILED tests/contract/test_seal_archive_gate.py::test_sanitize_materials_queries_the_gate_before_retiring_a_spec
+FAILED tests/contract/test_seal_archive_gate.py::test_legacy_completed_with_the_two_carrier_ruling_is_admitted
+FAILED tests/contract/test_seal_archive_gate.py::test_a_single_carrier_ruling_never_admits_a_legacy_row
+FAILED tests/contract/test_seal_archive_gate.py::test_ready_for_review_is_refused_by_name_and_points_back_to_seal
+FAILED tests/contract/test_seal_archive_gate.py::test_legacy_completed_without_a_user_ruling_is_refused_by_name
+FAILED tests/contract/test_seal_archive_gate.py::test_state_drift_is_an_input_error_not_a_one_sided_reading
+FAILED tests/contract/test_seal_archive_gate.py::test_archive_gate_is_read_only_and_rerun_stable
+FAILED tests/contract/test_seal_archive_gate.py::test_sealed_pair_without_a_readable_receipt_is_an_input_error
+FAILED tests/contract/test_seal_archive_gate.py::test_sealed_spec_is_admitted_and_points_at_the_receipt
+10 failed, 4 passed in 6.32s

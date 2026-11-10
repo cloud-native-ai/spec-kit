@@ -1,0 +1,127 @@
+# P5 (T025–T029) evidence — fixtures, the `seal` judgment/write pair and its contracts
+
+Collected 2026-11-11 in
+`/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal`
+(branch `099-speckit-seal`, package base `a9eb3f990`). Red-first reading:
+`notes/red-first-evidence.md` § 6; the full red capture is
+`test-evidence/p5-red-first-20261111.txt`. Every test command goes through the single
+runner `scripts/bash/run-tests.sh`.
+
+## 1. What landed
+
+| Row | Artifact |
+|-----|----------|
+| T025 | `tests/fixtures/seal/single-spec/`（干净单体：review 干净、SC 行带 `**Path**`、注册表+详情同处 Ready for Review）、`tests/fixtures/seal/merged-clean/`（父级 + 最小分片 + 真实 `merge-apply` 产出的清单）、`tests/fixtures/seal/seal-refusals/` 九目录（八类拒绝 + 三缺一） |
+| T026 | `tests/contract/test_seal_seal.py`（20 tests：主路径、merged 成功、幂等、`supersedes`、八类拒绝逐码、三缺一、C-044 两载体豁免、原子恢复、closure 输入缺陷、review-missing、blocking、切片主体） |
+| T027 | `tests/contract/test_seal_concurrency_and_readonly.py`（3 tests：并行写者路径互异、review/测量字节不变、脏树拒绝并指名） |
+| T028 | `scripts/python/seal-utils.py` `evaluate_seal`：状态对同源读取（不一致→`state-drift` exit 2）、review/P0（C-044 两载体字面 `- **User waiver**:` 才计）、`blocking` 扫描（复用 `^### .*\[BLOCKING\]`）、闭包子进程七键逐字复制（exit 2→`closure-input-defect`）、manifest 完成度（逐分片×逐输出件、`not-applicable` 必须带 `basis`）、分片闭合、`git status --porcelain -- <parent-spec-dir>` 脏树、stdout-only 稳定拒绝清单 |
+| T029 | `apply_seal`：同批写 `feature-registry.md`（Status+Last Updated）→ `feature-detail.md`（Status + `## Latest Review` 追加）→ `seal.md`（封闭字段集；重封装写 `supersedes`），任一失败按原字节恢复本批已写文件并以 exit 2 收场；随后 `sync-mirrors.py --write`，`--check` exit 0 |
+
+## 2. Red-first reading (T026/T027, before the `seal` body existed)
+
+See `notes/red-first-evidence.md` § 6 — command verbatim, exit 1, 23/23 red, every
+failure the skeleton's `not-implemented` payload (exit 2), no collection error.
+
+## 3. Green runs (T028/T029) — verbatim
+
+### 3.1 P5 contract suites
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.......................                                                  [100%]
+23 passed in 6.52s
+```
+
+EXIT=0 — 23/23 green.
+
+### 3.2 P2 engine contract suite stays green (surface contract not regressed)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...............................                                          [100%]
+31 passed in 6.61s
+```
+
+EXIT=0 — 31/31 green（含 C-005 两阶段声明：`evaluate_seal` 子树零写调用、调用顺序
+evaluate → apply）。
+
+### 3.3 Adjacent regression (P1–P4 sealed surfaces + status domain)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py tests/integration/test_seal_merge_determinism.py tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_engine_contract.py tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py tests/integration/test_seal_merge_determinism.py tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 45%]
+........................................................................ [ 91%]
+.............                                                            [100%]
+157 passed in 6.88s
+```
+
+EXIT=0 — 157/157 green。
+
+### 3.4 Mirror projection
+
+$ python3 scripts/python/sync-mirrors.py --write   → EXIT=0
+$ python3 scripts/python/sync-mirrors.py --check   → EXIT=0
+
+```text
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+```
+
+## 4. Counts and hashes
+
+| Object | Reading |
+|--------|---------|
+| P5 tests | 23（`test_seal_seal.py` 20 + `test_seal_concurrency_and_readonly.py` 3）；红 23 → 绿 23 |
+| Refusal matrix | 八类 + 三缺一：exit 1 ×6（from-status-invalid / p0-unresolved / closure-refused / conflict-open / slice-unclosed / three-minus-one）；exit 2 ×2（closure-input-defect / state-drift）；另 review-missing、code-review-blocking、slice-not-sealable 三个变异腿同 exit 1 |
+| Successful seals | 干净单体（`merged.status=not-applicable` + basis）与 merged 分片（`merged` + manifest 指针）；幂等重跑 `already-sealed` 零写；审计更正后重封装写 `supersedes` |
+| Fixture tree | 113 files；`find … | sort | xargs sha256sum | sha256sum` = `e3027498de20bb98c7e3112e612f6b8497ef42f81a4ecf2cfec877abc8ef72da` |
+| `scripts/python/seal-utils.py` | sha256 `f09e86787bda369199c32caaa0fa686f3834fd095c053cb5b8ab88f779657876` |
+| `.specify/scripts/python/seal-utils.py` | sha256 `f09e86787bda369199c32caaa0fa686f3834fd095c053cb5b8ab88f779657876`（与源逐字节一致） |
+| `tests/contract/test_seal_seal.py` | sha256 `60f3e1f71a607e5573332a02ba5cedfcf62120aa52c22091d4fe9580037c28ee` |
+| `tests/contract/test_seal_concurrency_and_readonly.py` | sha256 `38836321bd58eab53d16d6aa0a67e7048383b73b9dca9cb7994cf7778c7e5a45` |
+| Red capture | `test-evidence/p5-red-first-20261111.txt`，518 行，sha256 `5b40d82473afc425d34069a0fb673dafa6ac4dd27f9ddff72f90bce1e40eaf7a` |
+
+## 5. Disclosed rulings (P5 scope)
+
+1. **`closure-input-defect` 的退出码**：tasks.md DoD-5 明确「`state-drift`/`closure-input-defect`
+   走 exit 2」，C-002 也把不可解析输入归 exit 2；quickstart S-5 的「前七类 exit=1」一句与其冲突，
+   本包按 tasks.md（行级权威）实现为 exit 2，测试同断言。quickstart 的措辞留给 P9 文档收尾核对。
+2. **写入批次的删除禁区**：C-008 的静态审计禁止引擎删除/改名文件，因此批次以
+   `registry → detail → seal.md` 排序，唯一可能新建的 `seal.md` 最后写；失败回滚只复原既有文件的
+   原字节，任何时刻都不会出现「状态已写而回执半写」的组合。原子恢复测试用只读 detail 文件触发。
+3. **P0 的两种处置形态**：C-044(a) 的「可解析的修复指向」按字面 `- **Fix**:` 行判定，其内容须含
+   存在的仓内路径或 `git cat-file -e` 可解析的提交；`- **Proposed fix**`、驱动者口吻的
+   `显式豁免（P0 waiver）` 叙述一律不计（074b 的实测形态即后者，P8 回合会再次消费该判定）。
+
+### 3.5 Script-interface contract (the edited engine across the whole tree)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_script_interface_contract.py -q
+
+```text
+........................s............................................... [ 77%]
+.....................                                                    [100%]
+92 passed, 1 skipped in 8.15s
+```
+
+EXIT=0 — 92 passed。先前一次未提交工作树上的 `candidate-not-collected`（两个新测试文件尚未被
+`git ls-files` 收录）不是缺陷：`git add` 后同一测试全绿，两个测试文件按 `tests/` 前缀获得豁免基据。

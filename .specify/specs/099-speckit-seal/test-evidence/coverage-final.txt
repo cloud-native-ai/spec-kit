@@ -1,0 +1,29 @@
+# T050 — 覆盖基线终局对照（相对 T002 冻结的 coverage-baseline.txt）
+
+date_utc=2026-11-10T18:07:24Z
+engine=python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal
+baseline=.specify/specs/099-speckit-seal/coverage-baseline.txt (640 names; freeze excludes this spec's own contracts by design — T002)
+
+## Reading
+status=uncovered (exit 1)
+claimed_clauses_this_feature=45 (45/45 contract clauses claimed by [green:] declarations in tasks.md; the tasks artifact lacked them and P9 repaired that omission — validate-tasks: 0 error, 4 green-cross-phase warnings, non-blocking and disclosed)
+fr_claimed=28/28 (uncovered 0)
+uncovered_beyond_baseline=67
+new_uncovered_from_this_specs_own_contracts=0
+
+## The 67 residual names — all five 074 parent pre-split contracts, per-file counts
+  074-goal-team-sdd-unification/contracts/authorization-and-probe.md  16
+  074-goal-team-sdd-unification/contracts/diffusion-and-compat.md  13
+  074-goal-team-sdd-unification/contracts/nested-invocation.md  16
+  074-goal-team-sdd-unification/contracts/report-and-attribution.md  8
+  074-goal-team-sdd-unification/contracts/route-decision.md  14
+  (verification: the JSON payload lists no residual name outside 074-*)
+
+## Attribution (measured, not asserted)
+- Pre-round, the 074 parent tasks.md claimed exactly these names: git show 3f2a05cba:.specify/specs/074-goal-team-sdd-unification/tasks.md -> [green:] per file = 16/13/16/8/14 = 67. They were covered at baseline time and therefore absent from the frozen baseline (a covered name cannot be in an uncovered-name baseline).
+- The round then rendered the 57 pre-split rows as a quote block per merge-back C-022 (the contract mandates the '> ' prefix so the task-row regex no longer matches), and validate-tasks parses the merged tasks.md as 77 active claims — all pointing at the slice contract files (created by the merge), zero at the five parent files.
+- So the 67 are the C-022-mandated consequence of the 074 round's supersede disposition: the parent's pre-split green claims became dated records, and the parent contract files (kept by the merge) remain in the corpus without an active claimant. This is the round output's property, not a gap in this spec's own contract claims (0 residual).
+- Nothing in scope can restore the 67: re-claiming them would fabricate a delivering row (the pre-split rows are superseded), and re-freezing the baseline to absorb them is the 'freeze at the first green run' anti-pattern the accountant's header forbids.
+
+## Disposition recorded by T050
+- T050 is deferred [~]: its literal zero-delta check cannot be met after the contracted round; the residual is named and attributed here, and the user decides between accepting the named residual (SC-006 already allows extra named blockers beyond the five) or re-opening the merge disposition (C-022 vs the clause-claim model).
