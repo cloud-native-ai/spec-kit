@@ -12,7 +12,7 @@
 **Feature ID**: 081
 **Feature Name**: 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
 
-**Binding basis**: `/speckit.clarify` Mode A 按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 扫描候选人后判定无归属，新建 Feature 081；详情落在 `.specify/memory/features/081.md`，索引行由 `.specify/memory/features.md` 承载（`Total Features` 与行数同趟重算）。候选人复核与 ID 取值的裁决见 `## Clarifications` § Session 2026-11-03。
+**Binding basis**: `/speckit.clarify` Mode A 按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 扫描候选人后判定无归属，新建 Feature 081；详情落在 `.specify/features/081-acceptance-hardening.md`，索引行由 `.specify/features.md` 承载（`Total Features` 与行数同趟重算）。候选人复核与 ID 取值的裁决见 `## Clarifications` § Session 2026-11-03。
 
 ## Assumptions（clarify 阶段逐条裁决；每条给出裁决、证据与对产物的影响）
 

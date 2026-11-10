@@ -1,8 +1,7 @@
 # Contract: Budget Ledger Parallel-Flag Recognition (C-017…C-020)
 
 Owner of the propositions below: this contract. Implementation owner:
-`skills/external/sdd-loop-driver/scripts/audit-test-budget.py` (+ `.specify/skills/external/sdd-loop-driver/
-scripts/audit-test-budget.py`, byte-identical mirror).
+`skills/external/sdd-loop-driver/scripts/audit-test-budget.py` (+ `.specify/skills/sdd-loop-driver/scripts/audit-test-budget.py`, byte-identical mirror).
 
 **Inherited, not restated**: the two-slot test budget, the ledger fence, the slot value domain and the
 selection-budget procedure are owned by `skills/external/sdd-loop-driver/references/efficiency-model.md` and

@@ -88,7 +88,7 @@
 
 **实测修正后**(六对组合逐一验证):`[fast-fail]` / `fast-fail-clause` / `ANOMALY:` / `shared/guidelines/fast-fail.md` **两两互不为子串**,零违规。`[fast-fail]` 在框架目录(`templates shared skills scripts tests agents src docs`)**零命中**。
 
-**与房子先例的形态偏离(记录理由)**:两处先例用**裸**记号——`token-efficiency`(`shared/guidelines/token-efficiency.md:54`)、`user-facing-comprehension`(`user-facing-comprehension.md:124`)。本特性取带定界形态,因为它同时满足两点:FR-063 的互斥要求(定界正是 FR-063 自己建议的 remedy),以及可读性(读者在反馈条目里能认出纪律名)。**附带观察**:那两处裸记号其实有同一潜在碰撞——其纪律路径都包含其标记字面量,故提到路径即被计为观察。该缺陷属上游、不属本特性修复范围,已记入 `features/052.md` › Future Evolution Suggestions。
+**与房子先例的形态偏离(记录理由)**:两处先例用**裸**记号——`token-efficiency`(`shared/guidelines/token-efficiency.md:54`)、`user-facing-comprehension`(`user-facing-comprehension.md:124`)。本特性取带定界形态,因为它同时满足两点:FR-063 的互斥要求(定界正是 FR-063 自己建议的 remedy),以及可读性(读者在反馈条目里能认出纪律名)。**附带观察**:那两处裸记号其实有同一潜在碰撞——其纪律路径都包含其标记字面量,故提到路径即被计为观察。该缺陷属上游、不属本特性修复范围,已记入 `.specify/features/052-fast-fail-principle.md` › Future Evolution Suggestions。
 
 **被拒方案**:改用与纪律名无关的裸记号(如 `ff-triage`,实测同样零命中)。它更贴近先例形态,但牺牲可读性,且并未比定界方案更安全。
 
@@ -106,7 +106,7 @@
 
 **裁定**:活动宪章版本 `1.12.0` → **`1.13.0`**(MINOR,因新增原则),沿用 3 段形态。`test_constitution_double_landing.py:68` 的 `MIN_VERSION = (1, 12)` 同批上调为 `(1, 13)`(该钉子是**下限**语义,`:423` 用 `>=`,故 1.13.0 本就不会转红;上调是为把下限推到本特性之后)。
 
-**上游分歧(检测子代理上送、经我复核成立)**:`templates/commands/constitution.md:64-70` 要求 4 段 `x.y.z.ddd` 形态(`:66` MINOR = `x.y+1.0.0`、`:69` 有 `ddd` 重置规则),但活动宪章 `:254` 是 3 段 `1.12.0`,051 的修订亦为 3 段(`1.11.0 → 1.12.0`,见其 Sync Impact Report `:3`),且守卫 `:420` 只解析 `(\d+)\.(\d+)` 两段。**取 3 段**:它是唯一与仓库实况及守卫解析口径一致的读法。分歧本身属上游缺陷(命令模板与实况不符),不在本特性修复范围,已记入 `features/052.md`。
+**上游分歧(检测子代理上送、经我复核成立)**:`templates/commands/constitution.md:64-70` 要求 4 段 `x.y.z.ddd` 形态(`:66` MINOR = `x.y+1.0.0`、`:69` 有 `ddd` 重置规则),但活动宪章 `:254` 是 3 段 `1.12.0`,051 的修订亦为 3 段(`1.11.0 → 1.12.0`,见其 Sync Impact Report `:3`),且守卫 `:420` 只解析 `(\d+)\.(\d+)` 两段。**取 3 段**:它是唯一与仓库实况及守卫解析口径一致的读法。分歧本身属上游缺陷(命令模板与实况不符),不在本特性修复范围,已记入 `.specify/features/052-fast-fail-principle.md`。
 
 **双落点四个钉子实测**(改前):`TEMPLATE_COUNT = 13`(`:65`,相等断言 `:202`)、`LIVE_COUNT = 15`(`:66`,相等断言 `:408`)、`COMMAND_COUNT = 7`(`:67`,相等断言 `:255`)、`MIN_VERSION = (1, 12)`(`:68`)。改后 MUST 为 **14 / 16 / 8 / (1, 13)**。原则数独立重算已核对:模板 `### I.`–`### XIII.` = 13、活动 `### I.`–`### XV.` = 15、命令 `MUST include` 在 `:77,87,91,100,111,126,137` = 7 ✓。
 

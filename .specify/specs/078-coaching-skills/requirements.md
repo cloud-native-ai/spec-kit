@@ -43,7 +43,7 @@
 - **A6（观测通道与缺省）**：宿主能看到子代理事件时以**宿主事件**为主（字段标 [[STR-011]]）；看不到时子代理 MUST 回传结构化记录（逐步动作、工具调用、产物、耗时、状态变化，字段标 [[STR-012]]）；两通道都有时字段级冲突以宿主事件为准。两者都拿不到的步骤以 [[STR-006]] 标注为观测缺口，**不得编造**；缺口不计入效率评分，但必须在报告中计数与点名。
 - **A7（两个新概念无既有 owner）**：本文定义的「结果—正确性」与「过程—效率」在框架内无既有 owner；本文是它们的首个定义点，plan/contracts 可细化但 MUST NOT 另立第二份定义。它们与 `run-determination` 的四量（token 消耗/耗时/制品正确性/满意度）不是同一组概念：后者描述一次运行的判定，前者描述「Trainee 相对预期」的偏差。
 - **A8（旧项目升级）**：旧目录名进入 `_OBSOLETE_SKILLS` 后，`specify init` 的加性 copytree 会留下旧目录，清理步骤 MUST 删除该**实体目录**，但 MUST NOT 删除用户自建的同名**符号链接**（既有清理纪律：符号链接可能是用户别名）。
-- **A9（历史不改写）**：不改写的边界是**本特性 `078-coaching-skills` 自己的产物目录之外的既有记录**——其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、`features/<其他ID>.md`、reviews、eval-baseline、按 `skill:think-skills` 归档的 run/feedback 记录均为 dated record，不改写、不回填。本特性自身的产物（`.specify/specs/078-coaching-skills/**`、`.specify/memory/features/078.md` 与本特性新写入的 run/feedback 记录）不属历史记录，MUST 可正常改写与重跑；新名的 run 从空历史开始（不继承旧名 run 记录）。
+- **A9（历史不改写）**：不改写的边界是**本特性 `078-coaching-skills` 自己的产物目录之外的既有记录**——其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、`features/<其他ID>.md`、reviews、eval-baseline、按 `skill:think-skills` 归档的 run/feedback 记录均为 dated record，不改写、不回填。本特性自身的产物（`.specify/specs/078-coaching-skills/**`、`.specify/features/078-coaching-skills.md` 与本特性新写入的 run/feedback 记录）不属历史记录，MUST 可正常改写与重跑；新名的 run 从空历史开始（不继承旧名 run 记录）。
 - **A10（封闭清单判据）**：「活接线面」是封闭集——本特性开始前实测 19 个需手改源文件，加上实现期由既有漂移守卫（`LEGACY_SKILL_NAMES` 必须与 CLI `_OBSOLETE_SKILLS` 一致）被迫追加的第 20 个注册表消费面 `scripts/python/sanitize-utils.py`，共 **20 个需手改源文件**（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src `_OBSOLETE_SKILLS` 1、sanitize `LEGACY_SKILL_NAMES` 1、docs 2、contract tests 4），加上由它们再生成的派生面；SC-006 / SC-008 的零残留与零漂移判据以该封闭集为参照，历史记录不在集合内（A9）。**允许差异集恰为一项**：`_OBSOLETE_SKILLS` 中保留旧名的那一行（FR-020 要求它必须存在）；除此之外空集。`sanitize-utils.py` 中的旧名条目位于 `OBSOLETE-ASSET-REGISTRY` 移除清单块内、在计数前被剥离，属删除用注册表镜像而非活引用，因此不扩大允许差异集。
 - **A11（零新增门禁）**：门控预算整数余量当前为 0（既有 owner 记载），本特性 MUST NOT 在扫描面新增任何命中 `BLOCKING_PATTERNS` 的文案；判定单位是 `git diff` 的**新增行**而非总量（总量相等允许「加一门、删一门」的规避）。技能流程中的「暂停询问」措辞 MUST 按既有门禁纪律书写，且不得以确认门形态表达。
 
@@ -164,7 +164,7 @@
 - **FR-021**: 派生面（`.specify/skills/**`、命令副本、渲染后的宿主 agents、编译的 `## Wrap-up`、probe-map）MUST 由既有再生成入口产出，MUST NOT 手改。
 - **FR-022**: 全部活接线引用（`agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md`、四个 `create-agent` 角色模板、`run-skills` 的 modify 族说明、docs 两处）MUST 更新为新名；活接线面 MUST NOT 残留 [[STR-002]]。
 - **FR-023**: 四个冻结基线测试 MUST 显式更新并注明日期与理由；MUST NOT 静默改计数，更新后的计数 MUST 与目录实测一致。
-- **FR-024**: **本特性 `078-coaching-skills` 产物目录之外的**既有记录（其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、其他 `features/<ID>.md`、reviews、eval-baseline、按旧 unit id 归档的 run/feedback 记录）MUST NOT 被改写或回填；反过来，本特性自身产物（`.specify/specs/078-coaching-skills/**`、`.specify/memory/features/078.md`）不属历史记录，MUST 可正常改写与重跑，MUST NOT 以「历史不改写」为由拒绝更新。
+- **FR-024**: **本特性 `078-coaching-skills` 产物目录之外的**既有记录（其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、其他 `features/<ID>.md`、reviews、eval-baseline、按旧 unit id 归档的 run/feedback 记录）MUST NOT 被改写或回填；反过来，本特性自身产物（`.specify/specs/078-coaching-skills/**`、`.specify/features/078-coaching-skills.md`）不属历史记录，MUST 可正常改写与重跑，MUST NOT 以「历史不改写」为由拒绝更新。
 
 #### F. 治理
 

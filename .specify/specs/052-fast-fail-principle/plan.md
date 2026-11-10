@@ -38,7 +38,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`,15 principles enumerated in source order — no hard-coded list, no inheritance from a prior spec's plan):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`,15 principles enumerated in source order — no hard-coded list, no inheritance from a prior spec's plan):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -176,13 +176,13 @@ src/specify_cli/                   # 不改动
 
 **本计划是否引入新 Feature、废弃或合并既有 Feature?**
 
-- **引入新 Feature:无。** Feature 052 已于 clarify 轮创建并登记(索引行 + `features/052.md` + 051 的反向交叉引用),本轮只推进其状态 `Draft → Planned`。
+- **引入新 Feature:无。** Feature 052 已于 clarify 轮创建并登记(索引行 + `.specify/features/052-fast-fail-principle.md` + 051 的反向交叉引用),本轮只推进其状态 `Draft → Planned`。
 - **废弃 / 合并既有 Feature:无。** 五个被消费的 Feature(028 / 040 / 046 / 051 / 032)能力范围均不变。
 - **跨 Feature 交付效应 2 项**(归属在对方、052 为交付方,均需在 `features/<ID>.md` 留痕):
   1. **Feature 051**:D-4 把 `shared/guidelines/fast-fail.md` 登记进其类 ⑪ 的规则真源列,并上调其 `test_user_facing_comprehension_doc.py:400` 的 C-14 钉子 8 → 9。这是**显式列出的跨纪律改动**(FR-024 要求),已在其类映射表中使类 ⑪ 的规则拥有者完整可发现(读者顺表能找到四要素与封闭处置集,不再只看到 `confirmation-gates.md` 的三要素)。
   2. **Feature 050**:门控预算 `total = 23` 的相等钉子由 `test_proactive_trigger_section.py:352` 持有;本特性以设计规避使其**不变**,故不产生交付效应,但**依赖**该钉子继续成立——已记入 052 的约束面。
 - **功能 / 非功能分类是否仍一致?** 一致。Feature 052 属**框架纪律类**(与 031 / 032 / 040 / 046 / 050 / 051 同类),非用户可见能力类;其索引行的描述与详情文件的 Status Tracking 均按此归类。
-- **上游缺陷 4 项(检出但不修,归属在各自拥有者)**:`feature-integration.md` 的死指针 `memory/feature-index.md` 与状态自相矛盾;其他常驻章节沿用的"刷新指令即恢复镜像副本"假承诺句式(`generate-instructions.sh` 实测无镜像同步);`反空转哨兵` / `反空真哨兵` 词形不一致;`agent-definitions.md:50` 称 "seven shipped role agents" 而实测 `agents/*.agent.md` 为 **2**。另附本轮新检出 2 项:两处裸观察标记(`token-efficiency`、`user-facing-comprehension`)与其纪律路径存在同类子串碰撞;`templates/commands/constitution.md:64-70` 要求 4 段版本号而活动宪章与守卫解析口径均为 3 段/2 段。6 项均已记入 `features/052.md` › Future Evolution Suggestions。
+- **上游缺陷 4 项(检出但不修,归属在各自拥有者)**:`feature-integration.md` 的死指针 `memory/feature-index.md` 与状态自相矛盾;其他常驻章节沿用的"刷新指令即恢复镜像副本"假承诺句式(`generate-instructions.sh` 实测无镜像同步);`反空转哨兵` / `反空真哨兵` 词形不一致;`agent-definitions.md:50` 称 "seven shipped role agents" 而实测 `agents/*.agent.md` 为 **2**。另附本轮新检出 2 项:两处裸观察标记(`token-efficiency`、`user-facing-comprehension`)与其纪律路径存在同类子串碰撞;`templates/commands/constitution.md:64-70` 要求 4 段版本号而活动宪章与守卫解析口径均为 3 段/2 段。6 项均已记入 `.specify/features/052-fast-fail-principle.md` › Future Evolution Suggestions。
 
 ## Phase 0: Research Review
 

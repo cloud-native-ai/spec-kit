@@ -14,7 +14,7 @@
 
 **C-2** [制品类] 该 action MUST 一次调用输出团队 run 前置**五项**检查的 verdict;五项的 `name` 为 goal-binding / dangling / target-terminal / cross-goal / goal-terminal。判据:`--json` 输出的 `checks` 数组长度为 **5**,五项 `name` 集合相等。(FR-029、FR-031)
 
-**C-3** [制品类] 该 action MUST **零写入**:任何一次调用都 MUST NOT 修改 `.specify/goal/` 或 `.specify/teams/` 下的任何文件。判据:调用前后两个目录的**字节校验和**相等(SC-007 Source 的取证形态);既有只读动作的写入点扫描已证读路径不达任何写入函数(8 个写入点 `:465`/`:466`/`:487`/`:506`/`:524`/`:569`/`:599`/`:756` 全在写动作上)。(FR-034)
+**C-3** [制品类] 该 action MUST **零写入**:任何一次调用都 MUST NOT 修改 `.specify/anchoring/` 或 `.specify/teams/` 下的任何文件。判据:调用前后两个目录的**字节校验和**相等(SC-007 Source 的取证形态);既有只读动作的写入点扫描已证读路径不达任何写入函数(8 个写入点 `:465`/`:466`/`:487`/`:506`/`:524`/`:569`/`:599`/`:756` 全在写动作上)。(FR-034)
 
 **C-4** [制品类] 该 action 的 `--help` 行 MUST 以 `read:` 起首。判据:`tests/contract/test_goal_definition.py:245-257` 的 `line.split()[1].startswith(("read","write"))` 对 `run-checks` 成立。(FR-034、D-12)
 
@@ -76,4 +76,4 @@
 
 **C-27** [制品类] 描述同五项检查的其余散文面 MUST 与新增的调用形式一致,不得留下第二套判据:`skills/internal/create-team/references/execution-guide.md:27,30`、`skills/internal/create-team/references/goal.md:45`、`docs/reference/commands/team.md:68,70`,以及 `team.md` 的 4 个逐工具副本(`.claude/commands/speckit.team.md:105`、`.github/prompts/speckit.team.prompt.md:105`、`.opencode/command/speckit.team.md:105`、`.qoder/commands/speckit.team.md:108`)。判据:逐工具副本经 `regen-command-copies.py` 再生后与源一致。(FR-029、D-17)
 
-**C-28** [行为类] SC-007 的取证实验 MUST 在临时仓库副本里做,真实 goal 与团队定义 MUST NOT 被改动;若只能在真实树上验证,则 MUST 只跑只读路径并记录 C-3 的校验和不变作为证据。实测约束:`.specify/goal/` 下**只有 1 个** goal(`draw-two-layer-structure`),`.specify/teams/` 下 6 个团队目录,只有前者与一个 goal 定义绑定——故「对一个 goal 已终态的真实团队跑」这一支可能**无真实样本可用**,此时 MUST 记为不可得并说明, MUST NOT 编造。(SC-007、SC-007 Source、D-14)
+**C-28** [行为类] SC-007 的取证实验 MUST 在临时仓库副本里做,真实 goal 与团队定义 MUST NOT 被改动;若只能在真实树上验证,则 MUST 只跑只读路径并记录 C-3 的校验和不变作为证据。实测约束:`.specify/anchoring/` 下**只有 1 个** goal(`draw-two-layer-structure`),`.specify/teams/` 下 6 个团队目录,只有前者与一个 goal 定义绑定——故「对一个 goal 已终态的真实团队跑」这一支可能**无真实样本可用**,此时 MUST 记为不可得并说明, MUST NOT 编造。(SC-007、SC-007 Source、D-14)

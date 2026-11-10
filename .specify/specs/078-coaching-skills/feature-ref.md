@@ -8,8 +8,8 @@
 |-------|-------|
 | Feature ID | 078 |
 | Feature name | Coaching Skills（教练技能） |
-| Feature index row | `.specify/memory/features.md` |
-| Feature detail | `.specify/memory/features/078.md` |
+| Feature index row | `.specify/features.md` |
+| Feature detail | `.specify/features/078-coaching-skills.md` |
 | Spec | `.specify/specs/078-coaching-skills/requirements.md` |
 | Status before this plan | Draft |
 | Status after this plan | Planned |

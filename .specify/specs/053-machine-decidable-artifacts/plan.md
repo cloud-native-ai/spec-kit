@@ -46,12 +46,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance**(rendered from `.specify/memory/constitution.md`,**版本 1.13.0**,动态枚举 `### <numeral>. <name>` 得 **16** 项,按出现序;实测无 `(NON-NEGOTIABLE)` / `(MANDATORY)` 标注出现在**标题**上,Principle VII 的 `**Workflow Gates (NON-NEGOTIABLE)**` 是其**正文内**的子标题,故按模板要求逐字保留在证据列而非行标签):
+**Core Principles Compliance**(rendered from `.specify/constitution.md`,**版本 1.13.0**,动态枚举 `### <numeral>. <name>` 得 **16** 项,按出现序;实测无 `(NON-NEGOTIABLE)` / `(MANDATORY)` 标注出现在**标题**上,Principle VII 的 `**Workflow Gates (NON-NEGOTIABLE)**` 是其**正文内**的子标题,故按模板要求逐字保留在证据列而非行标签):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `feature-ref.md` 的 FR→条款映射 **48 / 48**(未覆盖 0)、SC→条款 **12 / 12**(未覆盖 0),两张表由脚本反向索引生成而非手写;`plan.md` 的每条决策可回溯到一条 FR 或一次用户裁定 |
-| II | Feature-Centric Development | ✅ Pass | `plan.md:4` 的 `Requirement → Feature` 戳记;`.specify/memory/features.md` 第 053 行与 `.specify/memory/features/053.md` 均在场;状态为 `Draft`,由本命令推进为 `Planned`(§ Feature Integration) |
+| II | Feature-Centric Development | ✅ Pass | `plan.md:4` 的 `Requirement → Feature` 戳记;`.specify/features.md` 第 053 行与 `.specify/features/053-machine-decidable-artifacts.md` 均在场;状态为 `Draft`,由本命令推进为 `Planned`(§ Feature Integration) |
 | III | Intent-Driven Development | ✅ Pass | `plan.md` § Summary 先讲动机与范围边界再讲技术路径;`research.md` 的 D-1/D-2/D-3 各带一个显式「被拒方案」段,说明为何不取另一条路 |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | **本特性不适用 Principle VII 的 template-only 豁免**(它交付真实可执行 Python,已由委托评分独立确认):7 份契约 / **182** 条条款,其中 `checker-form.md` C-15…C-21 规定每个新检查项都有逆样本、C-19 反空真哨兵、C-20 变异演练、C-22…C-28 规定标签集与退出码表分别被钉且无零守卫检查器;`feature-ref.md` § 交付面清单含 4 组新建测试 |
 | V | AI Agent Integration Standards | ✅ Pass | `plan.md` § Mirror Obligations 逐对点名 `templates/commands/` 的 **4** 个逐工具副本目录并给出 `regen-command-copies.py --check` 判据;不新增/删除任何受支持 agent |
@@ -62,7 +62,7 @@
 | X | Documentation Naming & Location Conventions | ✅ Pass | 新 owner 文档取 `shared/definitions/contract-clause-definitions.md`,与该目录既有 **8** 份 `*-definitions.md` 同体例(该目录共 9 个文件,`framework-map.md` 不匹配该模式——初版误写 9,已订正);无大写专名新登记;基线文件落在 spec 目录内 |
 | XI | Dogfooding (Self-Application) | ✅ Pass | 机制侧自举:FR-014 移除 `clarify-taxonomy.md` 的过渡 awk 副本而不是手改;两顶帽子:`plan.md` § Mirror Obligations 明写镜像由 `sync-mirrors.py` 生成、MUST NOT 手改。**最强的一处自举**:本特性自己的 7 份契约就在覆盖核算的扫描面内,故其 182 条条款 MUST 被本特性自己的 `tasks.md` 逐条 green-claim,MUST NOT 被 FR-027 的基线豁免 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 第一轮评分判 ❌ Fail(`.specify/memory/tools/goal-utils.py.md:39` 只列 6 个 subcommand 而二进制实有 9 个,053 再加第 10 个 `run-checks` 与 `EXIT_BLOCKED = 5`,而该 Tool 记录不在任何交付面里);已订正——`feature-ref.md` § 交付面清单新增一行,要求同一提交内把该记录订正到 10 个 action 并补退出码表 |
-| XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 第一轮评分判 ⚠ Partial(全套制品对 better-harness 零引用);已订正——`.specify/memory/features/053.md` § Implementation Notes 新增归因行(强化 Agent Work Loop 的**验证/证据**维度,属 Operationalize 轨),只给指针不复写其维度表 |
+| XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 第一轮评分判 ⚠ Partial(全套制品对 better-harness 零引用);已订正——`.specify/features/053-machine-decidable-artifacts.md` § Implementation Notes 新增归因行(强化 Agent Work Loop 的**验证/证据**维度,属 Operationalize 轨),只给指针不复写其维度表 |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass(见 Gates Status 的限定) | 第一轮判 ❌ **Fail(CRITICAL)**、第二轮仍判 ❌ Fail;两轮共查出 5 处活跃重复,已全部订正为引用:(a) 镜像义务表曾在 4 处重复且**已分叉**(D-17 的 11 行漏了 `templates/commands/team.md`,plan.md 是 12 行)→ D-17 改为引用、`plan.md` § Mirror Obligations 为唯一拥有者;(b) 条款普查计数在 ~10 处被当作当前现实复写 → `notes/clause-form-census.md` 为唯一拥有者,其余全部改为引用,且**只有改前基线可作字面量**;(c) SC-006 的反空真哨兵原为字面 `110`,而本特性自己的契约就在扫描面内 → 改为关系式(见下 § 订正记录 1);(d) `plan.md` 复写交付面行数 → 改为只在带导出命令的度量表里出现;(e) `feature-ref.md` 的 SC 表曾抄录规格的度量来源原文 → 改为引用该节 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 第一轮判 ⚠ Partial(全套制品对该纪律零引用;新 owner 文档无指针义务;新检查器的 verdict **词汇**无任何约束,只钉了数字尾行形态);已订正——`clause-coverage.md` C-1 要求新 owner 文档携 canonical 指针且禁止复写其界面类表,`checker-form.md` C-33 约束 verdict 消息词汇(点名文件与行号、违反的规则、下一步),并明确 MUST NOT 向该封闭集新增类别(⑪ 失败如实报告已覆盖) |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | `plan.md` § Constitution Check 记录同作者委托与必须的异常回传行;`research.md` § 上送与披露 逐条给出 A-1…A-6 的处置(A-1/A-2 作为**裁定**上送未就地修、A-3 记为 MUST NOT 而未改上游、A-4/A-5/A-6 订正);编排者自己的两处缺陷(探针设计错误、假测量)已披露并推广成规则(`checker-form.md` C-21) |

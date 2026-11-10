@@ -10,9 +10,9 @@
 |---|---|
 | Feature ID | **053** |
 | Feature Name | 机器可判定的制品命题(Machine-Decidable Artifact Propositions) |
-| 绑定判定 | **新建**而非绑定(2026-09-24 `/speckit.clarify` 经用户裁定);决定性先例 `.specify/memory/features/040.md` 记录的 051 判新建,沿用 052 的「投递载体 ≠ 归属事实」 |
-| 索引行 | `.specify/memory/features.md` 第 053 行,Status `Draft`(`/speckit.plan` 推进为 `Planned`) |
-| 详情文件 | `.specify/memory/features/053.md` |
+| 绑定判定 | **新建**而非绑定(2026-09-24 `/speckit.clarify` 经用户裁定);决定性先例 `.specify/features/040-agent-metadata-portability.md` 记录的 051 判新建,沿用 052 的「投递载体 ≠ 归属事实」 |
+| 索引行 | `.specify/features.md` 第 053 行,Status `Draft`(`/speckit.plan` 推进为 `Planned`) |
+| 详情文件 | `.specify/features/053-machine-decidable-artifacts.md` |
 | 规格 | `requirements.md` —— 48 FR / 12 SC / 10 STR / 5 user stories(P1×2、P2×2、P3×1)/ 8 Key Entities / 10 Edge Cases / 0 活动标记 |
 | 契约条款引用形态 | `<contract-file> C-N`(与 `.specify/specs/052-fast-fail-principle/feature-ref.md:21` 同一约定) |
 
@@ -150,8 +150,8 @@
 | 改既有文档 | `docs/reference/commands/requirements.md`、`docs/reference/commands/tasks.md`、`docs/reference/commands/team.md`(后者 `:68,70` 已被 `contracts/run-checks.md` C-27 点名要求与新调用形式一致) | Principle VI(可观测面文档);本轮委托评分查出的 ⚠ Partial —— 义务已写进契约却无落点行 |
 | 改既有文档 | `skills/internal/create-team/references/execution-guide.md:27,30`、`skills/internal/create-team/references/goal.md:45`(描述同五项检查的散文面) | `contracts/run-checks.md` C-27; Principle VI |
 | 新建 owner 文档的可理解性接线 | `shared/definitions/contract-clause-definitions.md` 的新增节 MUST 携一行指向 `.specify/shared/guidelines/user-facing-comprehension.md` 的 canonical 指针,且新检查器 verdict 消息的**词汇**MUST 受该纪律约束(不只受 `checker-form.md` C-8 的数字尾行形态约束) | Principle XV;本轮委托评分查出的 ⚠ Partial |
-| Better-Harness 归因 | 本特性强化的是 Agent Work Loop 的**验证/证据**维度(把「代理声明已核验」换成「程序给出会红的判定」),归因行落在 `.specify/memory/features/053.md` § Implementation Notes | Principle XIII(`docs/concepts/better-harness.md`);本轮委托评分查出的 ⚠ Partial |
+| Better-Harness 归因 | 本特性强化的是 Agent Work Loop 的**验证/证据**维度(把「代理声明已核验」换成「程序给出会红的判定」),归因行落在 `.specify/features/053-machine-decidable-artifacts.md` § Implementation Notes | Principle XIII(`docs/concepts/better-harness.md`);本轮委托评分查出的 ⚠ Partial |
 
 ## 交叉引用(消费关系,不构成归属)
 
-见 `.specify/memory/features/053.md` § 交叉引用——本 Feature 消费 032 / 040 / 041 / 046 / 051 / 052 / 028 的既有权威,均只引用不改写;其中对 052 的 `clarify-taxonomy.md` 过渡副本是**偿还债务**(FR-014),不是改写其真源。
+见 `.specify/features/053-machine-decidable-artifacts.md` § 交叉引用——本 Feature 消费 032 / 040 / 041 / 046 / 051 / 052 / 028 的既有权威,均只引用不改写;其中对 052 的 `clarify-taxonomy.md` 过渡副本是**偿还债务**(FR-014),不是改写其真源。

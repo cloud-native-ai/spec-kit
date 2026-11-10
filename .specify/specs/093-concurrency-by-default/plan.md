@@ -55,12 +55,12 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`, 22 principles in document order):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`, 22 principles in document order):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling here cites FR ids; `feature-ref.md` § 1 maps 36/36 FR — 35 via contract clauses and FR-036 via its guard test (`tests/contract/test_test_entry_guard.py`). |
-| II | Feature-Centric Development | ✅ Pass | Feature 093 row and `.specify/memory/features/093.md` advance `Draft → Planned` in this stage; no new Feature invented; the four related Features (064/070/086/092) are dispositioned, never renumbered. |
+| II | Feature-Centric Development | ✅ Pass | Feature 093 row and `.specify/features/093-concurrency-by-default.md` advance `Draft → Planned` in this stage; no new Feature invented; the four related Features (064/070/086/092) are dispositioned, never renumbered. |
 | III | Intent-Driven Development | ✅ Pass | The five load-bearing choices carry named antitheses and reopening conditions in § Decision Tensions T-001…T-005, each traced to the user's verbatim brief. |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Tests Mode ON; every SC and every FR group names a red-first module in `contracts/executor-obligations.contract.md` C-060; the 092-shaped fixture must be red before the fix and green after (SC-005). |
 | V | AI Agent Integration Standards | ✅ Pass | No change to `AGENT_CONFIG` / `_ASSISTANT_TIERS`; the 17 agent definitions keep their neutral frontmatter schema — only the *judgement* of `capability-tools` is added, never a new key. |
@@ -287,10 +287,10 @@ the carrier's eligibility rule: `shared/workflow/acceptance-hardening.md` § Inh
 
 **Dependency artifacts (declared, never implied)** — the checker reads only the paths in this block:
 
-- `064`: `.specify/memory/features/064.md`, `.specify/specs/064-subagent-concurrency/verification.md`
-- `070`: `.specify/memory/features/070.md`, `.specify/specs/070-subagent-task-teams/verification.md`
-- `086`: `.specify/memory/features/086.md`, `.specify/specs/086-efficient-test-execution/verification.md`
-- `092`: `.specify/memory/features/092.md`, `.specify/specs/092-goal-team-parallel/verification.md`
+- `064`: `.specify/features/064-subagent-concurrency.md`, `.specify/specs/064-subagent-concurrency/verification.md`
+- `070`: `.specify/features/070-subagent-task-teams.md`, `.specify/specs/070-subagent-task-teams/verification.md`
+- `086`: `.specify/features/086-efficient-test-execution.md`, `.specify/specs/086-efficient-test-execution/verification.md`
+- `094`: `.specify/features/094-goal-team-parallel.md`, `.specify/specs/094-goal-team-parallel/verification.md`
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|

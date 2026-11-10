@@ -26,7 +26,7 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
 
 > **notation alias（记号别名，读法一次说清）**：本文件的 `[D-nnn]` 是**契约条款代码**——
 > `[D-013]` 读作 `diagram-obligation.contract.md` 的 `C-013`，`[D-001]` 读作该文件的 `C-001`。
-> 它**不是** `.specify/memory/register.md` 的残差记录 ID：同名记号 `D-001` / `D-001-a` 在那本登记册里
+> 它**不是** `.specify/register.md` 的残差记录 ID：同名记号 `D-001` / `D-001-a` 在那本登记册里
 > 是「本特性显式未覆盖的语义面」的记录号（`plan.md` § Residual Risk 的 `D-001`），与契约条款是**两个
 > 不同的命名空间**。两种记号在本特性的工件里并存，判据只有一条：带方括号的 `[D-nnn]` 是契约条款，
 > 不带方括号的 `D-nnn` 是残差记录。实现者若把 `[D-001]` 读成 register 的 `D-001`，会把「`C-001` 的命令面」

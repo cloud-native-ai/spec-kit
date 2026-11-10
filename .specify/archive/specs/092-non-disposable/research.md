@@ -213,9 +213,9 @@ reversible; **no disposition deletes** (FR-034, FR-058).
 
 | Gate | Invocation | What it reads |
 |------|-----------|---------------|
-| plan entry | `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/092-non-disposable --repo .` | this spec's artifacts + the section shapes the stage owes |
-| decomposition | `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/092-non-disposable/requirements.md` | `^- \*\*FR-NNN\*\*:` rows vs the FR ceiling (measured 65 ≤ 120) |
-| decision tensions | `python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/092-non-disposable --json` | one record per `### T-NNN` heading under `## Decision Tensions`, six fields, `expected_sacrifice` bound to exactly one `**SC-NNN Source**` entry in `requirements.md` § Measurement Sources |
+| plan entry | `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/archive/specs/092-non-disposable --repo .` | this spec's artifacts + the section shapes the stage owes |
+| decomposition | `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/archive/specs/092-non-disposable/requirements.md` | `^- \*\*FR-NNN\*\*:` rows vs the FR ceiling (measured 65 ≤ 120) |
+| decision tensions | `python3 scripts/python/validate-decision-tensions.py --spec .specify/archive/specs/092-non-disposable --json` | one record per `### T-NNN` heading under `## Decision Tensions`, six fields, `expected_sacrifice` bound to exactly one `**SC-NNN Source**` entry in `requirements.md` § Measurement Sources |
 
 `decomposition-check.py` measures **the requirements artifact only**; it has no argument for a package plan.
 Therefore this plan's implement-side package proposal (§ Implement Package Proposal) is a design deliverable for

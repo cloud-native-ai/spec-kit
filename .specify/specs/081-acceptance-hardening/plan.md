@@ -239,8 +239,8 @@ Owner of this table's shape, its `Disposition` domain (`resolved | inherited | n
 | IB-008 | `077:SC-008_status` | not-applicable | — | — | 077 verification.md line 101；该 SC 度量表达类试点线在真实项目上的文档门禁表现；081 是 `execution` 类，不消费该测量 |
 
 **Dependency artifacts (declared, never implied)**: the checker reads only the paths in this block, never arbitrary backticked `.md` tokens elsewhere in the section.
-- `071`: `.specify/memory/features/071.md`, `.specify/specs/071-review-code-integration/verification.md`
-- `077`: `.specify/memory/features/077.md`, `.specify/specs/077-doc-sdd-integration/verification.md`
+- `071`: `.specify/features/071-review-code-integration.md`, `.specify/specs/071-review-code-integration/verification.md`
+- `077`: `.specify/features/077-doc-sdd-integration.md`, `.specify/specs/077-doc-sdd-integration/verification.md`
 
 **Readings**: 8 records, 5 dispositions. All five extracted rows carry a disposition (5/5, none undisposed). Of the three `inherited` rows **2 resolve in this slice** (IB-006, IB-007) and **1 reads `inherited-later`** (IB-004, carrier in 081c). The three zero-row sources (IB-001, IB-002, IB-005) carry no disposition because there is no row to dispose — treating them as `resolved` rows would be exactly the invented-locator defect the join key exists to prevent. So the settled count in this slice is **7 of 8 records** with **1 disclosed as `inherited-later`** — not an unresolved blocker, and not a resolved carrier.
 

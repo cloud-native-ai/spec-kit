@@ -19,7 +19,7 @@
 
 ## 活动宪章
 
-**C-4** `.specify/memory/constitution.md` MUST 新增对应原则,编号为 **XVI**(接在既有 XV 之后)。〔改前实测:活动宪章原则 I–XV 共 **15** 条,`### XV.` 在 `:168`〕
+**C-4** `.specify/constitution.md` MUST 新增对应原则,编号为 **XVI**(接在既有 XV 之后)。〔改前实测:活动宪章原则 I–XV 共 **15** 条,`### XV.` 在 `:168`〕
 
 **C-5** 活动宪章版本 MUST 由 `1.12.0` 按 **MINOR** 递增至 **`1.13.0`**,`**Last Amended**` MUST 更新。〔改前实测:`:254` `**Version**: 1.12.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-09-18`〕
 
@@ -70,7 +70,7 @@
 
 **C-21** 该表的 `reader_baseline_override` 列 MUST **不变**(类 ⑪ 该列为 `—`),故 `test_c18a_override_registry_has_at_most_two_entries`(`:489`,上限 2)不受影响。本条 MUST 被显式核验而非假定。
 
-**C-22** **这是本特性对 Feature 051 拥有制品的唯一改动**,MUST 作为一次**显式列出的跨纪律改动**处理(FR-024):在 `plan.md` › Feature List Review、`feature-ref.md`、以及 `features/051.md` 与 `features/052.md` 双方的交叉引用中各留痕一次;MUST NOT 默默发生。
+**C-22** **这是本特性对 Feature 051 拥有制品的唯一改动**,MUST 作为一次**显式列出的跨纪律改动**处理(FR-024):在 `plan.md` › Feature List Review、`feature-ref.md`、以及 `.specify/features/051-user-facing-comprehension.md` 与 `.specify/features/052-fast-fail-principle.md` 双方的交叉引用中各留痕一次;MUST NOT 默默发生。
 
 **C-23** 分工边界 MUST 在真源文档中载明:上送件的**四要素内容下限**归本纪律,类 ⑪ 的**措辞与上下文规则**仍归其既有拥有者;本纪律的真源文档 MUST NOT 成为类 ⑪ 的第二规则真源(FR-024)。
 

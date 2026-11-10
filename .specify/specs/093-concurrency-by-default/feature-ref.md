@@ -3,7 +3,7 @@
 **Feature**: default subagent concurrency across every execution body (skills, commands, goal, team, loop)
 **Spec directory**: `.specify/specs/093-concurrency-by-default/`
 **Binding**: `spec:093-concurrency-by-default`; `flow_class=execution; source=declaration; marker=; error=-`
-**Requirement → Feature**: `093-concurrency-by-default` → **Feature 093** (`.specify/memory/features/093.md`)
+**Requirement → Feature**: `093-concurrency-by-default` → **Feature 093** (`.specify/features/093-concurrency-by-default.md`)
 **Authority**: `requirements.md` (36 FR, 12 SC, 15 clarify rulings + 3 dated user rulings of 2026-11-09) owns intent; `contracts/*` own conformance;
 `plan.md` owns design. This page restates no rule — it maps.
 

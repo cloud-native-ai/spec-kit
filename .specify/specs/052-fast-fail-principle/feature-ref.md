@@ -3,8 +3,8 @@
 **Date**: 2026-09-23  
 **Requirement**: `052-fast-fail-principle`  
 **Bound Feature**: **052** 快速失败纪律(Fast Fail)  
-**Feature Detail**: `.specify/memory/features/052.md`  
-**Index Row**: `.specify/memory/features.md` — 由 `/speckit.clarify`(2026-09-22)创建,`Total Features` 51 → **52**(手工编辑;`update-feature-index.sh` 与 `AGENTS.md` 对其行为的描述矛盾,属上游缺陷,051 亦全程手工编辑)
+**Feature Detail**: `.specify/features/052-fast-fail-principle.md`  
+**Index Row**: `.specify/features.md` — 由 `/speckit.clarify`(2026-09-22)创建,`Total Features` 51 → **52**(手工编辑;`update-feature-index.sh` 与 `AGENTS.md` 对其行为的描述矛盾,属上游缺陷,051 亦全程手工编辑)
 
 ## 绑定摘要
 
@@ -12,7 +12,7 @@
 
 **状态推进**: `Draft` → **`Planned`**(本轮 `/speckit.plan` 推进;MUST NOT 落 `Implemented`,该转换归 `/speckit.implement`)。
 
-**状态取值的上游分歧**:`feature-integration.md:33` 状态机规定 `/speckit.requirements` → `Draft`,而 `:68` 整合职责规定 `keep Status at least Planned`。clarify 轮取更具体的一方(状态机逐命令列出了该行)记为 `Draft`;本轮按状态机 `Draft → Planned` 推进。该矛盾属上游拥有者文档缺陷,已记入 `features/052.md` › Future Evolution Suggestions,MUST NOT 由本特性顺手改写。
+**状态取值的上游分歧**:`feature-integration.md:33` 状态机规定 `/speckit.requirements` → `Draft`,而 `:68` 整合职责规定 `keep Status at least Planned`。clarify 轮取更具体的一方(状态机逐命令列出了该行)记为 `Draft`;本轮按状态机 `Draft → Planned` 推进。该矛盾属上游拥有者文档缺陷,已记入 `.specify/features/052-fast-fail-principle.md` › Future Evolution Suggestions,MUST NOT 由本特性顺手改写。
 
 ---
 
@@ -159,7 +159,7 @@ grep -oE '^\| FR-[0-9]{3} \|' feature-ref.md | sort -u | wc -l   # → 78
 | 活动指令文件 | `.specify/instructions.md` | 再生;4 条兼容性符号链接(`AGENTS.md` / `CLAUDE.md` / `QODER.md` / `.github/copilot-instructions.md`)指向它,MUST NOT 手工重建 |
 | 宪章模板原则 XIV | `templates/constitution-template.md` | 镜像由 `sync-mirrors.py` 产出 |
 | 宪章命令条目 | `templates/commands/constitution.md` | 4 棵按工具树由 `regen-command-copies.py` 再生 |
-| 活动宪章原则 XVI | `.specify/memory/constitution.md` + Sync Impact Report + 版本 1.13.0 | 手写(活动宪章不是镜像) |
+| 活动宪章原则 XVI | `.specify/constitution.md` + Sync Impact Report + 版本 1.13.0 | 手写(活动宪章不是镜像) |
 | 通道二命令侧 | `templates/commands/agents.md` Run Mode | 4 棵按工具树再生 |
 | 通道二技能侧 | `skills/internal/create-agent/SKILL.md` 创作契约 | `.specify/skills/` 镜像 |
 | 通道二制品 | `agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md` | `.specify/agents/templates/` 镜像 + 3 棵按工具 agent 树渲染 |

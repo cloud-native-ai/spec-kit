@@ -12,14 +12,14 @@ preservation assertion, the parallel-safety disposition and the evidence shape f
 ## A. Preservation of the 085 surface
 
 - **C-041**: No commit of this feature MAY modify, delete or rewrite any file under
-  `.specify/specs/085-sdd-temporary-goal-team/` or `.specify/goal/` or `.specify/teams/`, with exactly one
+  `.specify/specs/085-sdd-temporary-goal-team/` or `.specify/anchoring/` or `.specify/teams/`, with exactly one
   narrow carve-out: the SC-010 status / value / note / blocked_at lines of
   `.specify/specs/085-sdd-temporary-goal-team/verification.md` MAY be updated, and only those lines — every
   other line of that file and every other 085 path MUST stay byte-identical (FR-027, FR-030). The carve-out
   is authorized by FR-030 and is the only 085 write this feature makes; `requirements.md` FR-027 states it,
   and `plan.md` R-8 / WP-C2 / the temporary Team's `forbidden` territory carry the same narrow wording. The
   check is mechanical and two-part: (a) `git diff -U0 --name-only <stage-base>..<closure-commit> --
-  .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams` MUST name at most
+  .specify/specs/085-sdd-temporary-goal-team .specify/anchoring .specify/teams` MUST name at most
   `verification.md`; (b) `git diff -U0 <stage-base>..<closure-commit> --
   .specify/specs/085-sdd-temporary-goal-team/verification.md` MUST contain only hunks whose added and removed
   lines each match `^SC-010_(status|value|note|blocked_at)=`. Any other 085 path in (a), or any hunk in (b)
@@ -69,7 +69,7 @@ preservation assertion, the parallel-safety disposition and the evidence shape f
 
 ## D. Records
 
-- **C-052**: `.specify/memory/features/086.md` and the `086` row of `.specify/memory/features.md` MUST reach
+- **C-052**: `.specify/features/086-efficient-test-execution.md` and the `086` row of `.specify/features.md` MUST reach
   `Planned` in the plan stage and subsequently reflect `Implemented`/`Blocked` per
   `shared/workflow/acceptance-hardening.md`; `CHANGELOG.md` MUST carry one entry describing the runner
   default change, the new principle and the dev-side dependency in user-visible terms, pointing at the owner

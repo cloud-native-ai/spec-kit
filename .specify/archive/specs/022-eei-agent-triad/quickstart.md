@@ -142,7 +142,7 @@ After running a triad loop, verify:
 Structural validation for the 2026-07-02 amendment (no runtime code — verified by inspecting the templates/skills/command):
 
 **G1 — Role supervisors (T036)**
-- [ ] Each of the 6 `templates/agent-role-*-template.md` carries `supervisor: true` (default-on, OQ-1) and a `role-scope:` matching its slug
+- [ ] Each of the 6 `skills/internal/create-agent/templates/agent-capacity-*-template.md` carries `supervisor: true` (default-on, OQ-1) and a `role-scope:` matching its slug
 - [ ] The shared section lives ONLY in `skills/internal/create-agent/templates/agent-supervision-delegation.md` (not copied into role templates, OQ-2)
 - [ ] `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` exposes a `{{ROLE_SCOPE}}` binding
 

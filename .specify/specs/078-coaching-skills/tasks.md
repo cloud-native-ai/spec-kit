@@ -3,7 +3,7 @@
 **Requirement ID**: 078
 **Requirement Key**: `078-coaching-skills`
 **Branch**: `078-coaching-skills`（本阶段禁止切换或新建分支；不 push）
-**Related Feature**: Feature 078 — Coaching Skills（教练技能）, status `Planned`（tasks 阶段不推进状态机；`Planned → Implemented` 归 `/speckit.implement`，活状态只在 `.specify/memory/features.md` 的 078 行）
+**Related Feature**: Feature 078 — Coaching Skills（教练技能）, status `Planned`（tasks 阶段不推进状态机；`Planned → Implemented` 归 `/speckit.implement`，活状态只在 `.specify/features.md` 的 078 行）
 **Input**: Design documents from `.specify/specs/078-coaching-skills/`
 **Prerequisites**: `plan.md`（required）、`requirements.md`（required；29 FR / 9 SC / 4 用户故事 / 17 Shared Strings）、`data-model.md`（8 实体 + 4 状态机）、`contracts/`（5 份文件 / 38 条款，全部 `md-heading` 形）、`quickstart.md`（5 场景）、`feature-ref.md`
 

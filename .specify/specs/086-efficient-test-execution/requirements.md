@@ -105,7 +105,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 本次 086 运行，**When** 检查 spec 目录，**Then** `goal/` 与 `team/` 按 085 的时机与 schema 落地，临时 Team 绑定到临时 Goal，且全局 `.specify/goal/**` 与 `.specify/teams/**` 未被写入。
+1. **Given** 本次 086 运行，**When** 检查 spec 目录，**Then** `goal/` 与 `team/` 按 085 的时机与 schema 落地，临时 Team 绑定到临时 Goal，且全局 `.specify/anchoring/**` 与 `.specify/teams/**` 未被写入。
 2. **Given** 一次阶段派发，**When** 检查运行证据，**Then** 该阶段记录了 requested/effective 并发与具名理由，且至少一个阶段实际并发派发数大于一。
 3. **Given** 本特性全部改动，**When** 跑 085 的契约与集成测试，**Then** 无新增失败；085 的 goal/team/checkpoints/contracts 与历史记录字节未变。
 4. **Given** 本次运行结束，**When** 评估 085 SC-010，**Then** 只有在证据完整（全阶段链 + LLM 阶段 agent + 并发 + checkpoints）时才记 `pass`，否则保持 `partial` 并写明缺口。
@@ -231,7 +231,7 @@
 
 - **SC-001 Source**: 同一棵树、同一 selection、同一 `--names-out` 口径下的两次运行（串行基线 / 默认并发闭合运行）；墙钟取自两次运行的框架摘要行，40% 上限按 `1031.48 s × 0.4 = 412.59 s` 判定并把实测秒数与比值一并记录，失败名清单取自 `--names-out` 文件，差集用 `comm -13` / `comm -23` 双向计算；两者命令、退出码、清单、墙钟与差集落在 `.specify/specs/086-efficient-test-execution/test-evidence/`。
 - **SC-002 Source**: 对出厂模板与 live 文件的确定性检索（原则名册、常驻章节计数）与既有计数守卫测试的实际运行结果。
-- **SC-003 Source**: 在临时目录执行 CLI 初始化后，在生成的 `.specify/memory/constitution.md` 与 `.specify/instructions.md` 中检索原则标题与 owner 指南路径；记录命令、退出码与命中行。
+- **SC-003 Source**: 在临时目录执行 CLI 初始化后，在生成的 `.specify/constitution.md` 与 `.specify/instructions.md` 中检索原则标题与 owner 指南路径；记录命令、退出码与命中行。
 - **SC-004 Source**: 三次实跑的命令、退出码、stderr 头部与回退说明行、`--names-out` 条目数；嵌套场景另记"未派生第二个进程池"的判据（例如工作进程环境标识未被子运行继承或子运行显式串行）。
 - **SC-005 Source**: 台账解析器对构造命令与既有记录的运行结果（分类值 + 退出码），保存输入命令与判定输出。
 - **SC-006 Source**: 收口槽位的全量运行记录与同口径串行基线记录；两侧失败名清单与双向差集。
@@ -249,7 +249,7 @@
 | 运行器契约（RC-01…RC-08，串行默认/始终可跑） | `.specify/specs/067-loop-efficiency-hardening/contracts/runner-contract.md` | 067 的结论不改写；本特性在其授权的"后续记录的范围决策"位置上记录**采用并行的决策**，并保留"同一命令去掉并行参数仍是完整可跑运行" |
 | 两槽位测试预算、台账字段、定向选择程序 | `skills/external/sdd-loop-driver/references/efficiency-model.md` + `contracts/test-budget.md` | 只扩展台账解析器对并行参数的识别；不动槽位语义与 selection 算法 |
 | 测试执行效率原则的定义 | **新增** owner 指南 `shared/guidelines/test-execution-efficiency.md`（本特性创建） | 本特性创建并单一持有；constitution/instructions/CHANGELOG/文档站只持指针 |
-| 宪法原则名册与计数 | `.specify/memory/constitution.md` 与 `templates/constitution-template.md` | 各加一条并各自编号；计数守卫在同一变更更新 |
+| 宪法原则名册与计数 | `.specify/constitution.md` 与 `templates/constitution-template.md` | 各加一条并各自编号；计数守卫在同一变更更新 |
 | 指令常驻章节与字节预算 | `templates/instructions-template.md` 与 `.specify/instructions.md` | 各加一个章节；预算与计数更新 |
 | MUST-include 候选清单 | `skills/internal/manage-constitution/SKILL.md` | 增加一条 |
 | 临时 Goal/Team、阶段 agent、并发、checkpoint | `.specify/specs/085-sdd-temporary-goal-team/{requirements.md,plan.md,contracts/}` | 只使用与保留；不修改、不删除、不重写 |
@@ -288,7 +288,7 @@
 - **A16（台账解析器升级的增量边界）**：只扩展 `VALUE_FLAGS` 对四个并行开关的识别，不改槽位语义、selection 算法或既有行的分类结果；回归等价性由同目录单元测试守住（显式并行全量运行判为全量、开关取值不被当作路径、既有记录重放结果不变）。
 - **A17（085 保留与本次 dogfood 参数）**：`agent_concurrency_requested=24`；`effective` 按阶段 ready packages / verifier reserve / host capacity 重算（clarify 阶段为 2：1 executor + 1 verifier reserve），任何降级具名写入状态脊与 checkpoint；`write_isolation=worktree` 为本次临时 Team 运行的 opt-in，集成队列与每阶段 checkpoint 按 085 契约执行；085 的 goal/team/checkpoints/contracts 与历史只读。085 SC-010 只有在全阶段链、LLM 阶段 agent、并发与 checkpoints 证据完整时才可记 `pass`，否则保持 `partial` 并写明缺口。
 - **A18（特性生命周期）**：clarify 阶段保持 `Draft`；`Draft → Planned` 由 `/speckit.plan` 拥有，本阶段不提前翻转状态。
-- **A19（框架观察，本特性不修复）**：(a) requirements 阶段的 scaffold 曾短暂创建 `087-` 分支，随后清理并以正确的 `086` 分支重建；本特性不修改该脚本。登记位置有二且都可查：本节即为登记处，`.specify/memory/features.md` 的 086 行同时记下该观察；随后续框架工作（feature 目录 scaffold 脚本）认领，认领时在本条与索引行各补一行指针，本特性不新增 TODO 文件也不新建特性。(b) 宿主未暴露 085 的阶段 agent 类型，clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色；085 的 team/concurrency/checkpoint 机制仍被使用，此承载降级不记为 085 失败。
+- **A19（框架观察，本特性不修复）**：(a) requirements 阶段的 scaffold 曾短暂创建 `087-` 分支，随后清理并以正确的 `086` 分支重建；本特性不修改该脚本。登记位置有二且都可查：本节即为登记处，`.specify/features.md` 的 086 行同时记下该观察；随后续框架工作（feature 目录 scaffold 脚本）认领，认领时在本条与索引行各补一行指针，本特性不新增 TODO 文件也不新建特性。(b) 宿主未暴露 085 的阶段 agent 类型，clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色；085 的 team/concurrency/checkpoint 机制仍被使用，此承载降级不记为 085 失败。
 - **A20（run-derived SC 的测量环境）**：本特性的 SC-001、SC-004、SC-005、SC-006、SC-011 都是**运行导出**判据，其数值只有在声明的测量环境下才可复现。测量环境 MUST 包含两项：解释器由运行器解析（`SPECKIT_PYTHON` → `.venv/bin/python` → `python3` → `python`），且 `PYTHONPATH` MUST 被清除后运行规范命令，写作 `env -u PYTHONPATH bash scripts/bash/run-tests.sh …`（等价写法 `PYTHONPATH= bash …`）。依据是实测而非偏好：本宿主继承的 `PYTHONPATH` 指向宿主的无关站点目录，使 `.venv` 的 pytest 在加载 `platformdirs` 插件时以 `ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'` 直接失败，同一条命令加上 `env -u PYTHONPATH` 即 25 passed（`test-evidence/checklist-gates.txt` § 12，CHK036）。因此每一项 run-derived 证据 MUST 在记录中写出它是在哪个环境下取得的（含被清除的 `PYTHONPATH` 原值）；未声明环境的运行结果 MUST NOT 被用来支撑 SC-001/SC-004/SC-005/SC-006/SC-011。
 
 ## Out of Scope

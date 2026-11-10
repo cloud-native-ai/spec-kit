@@ -21,7 +21,7 @@ description: "Task list for Agent Framework Redesign"
 - DoD-3: Layer-2 structural validation passes — the three `tests/scenarios/multi-agent-orchestration/*` scenarios and the quickstart.md walkthrough
 - DoD-4: 0 live references to "SubRole"/"Subrole", "improver", and "Meta-Coordinator" (as a separate role) outside immutable history (SC-002, SC-009)
 - DoD-5: Source templates and installed `.specify/` mirrors are consistent (M7)
-- DoD-6: `docs/agents/*` and `docs/reference/commands/agents.md` are coherent with `docs/reference/agents/design.md` and the Role/Stage/Type + Team/Loop model (SC-007)
+- DoD-6: `docs/reference/agents/*` and `docs/reference/commands/agents.md` are coherent with `docs/reference/agents/design.md` and the Role/Stage/Type + Team/Loop model (SC-007)
 - DoD-7: FR-021 research deliverable exists and ≥1 redesign decision cites it (SC-008)
 - DoD-8: All success criteria SC-001…SC-009 validated via quickstart.md and recorded in verification.md
 
@@ -60,7 +60,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 
 **⚠️ CRITICAL**: No user story work may begin until this phase is complete. The guards MUST be authored to FAIL against the current (pre-migration) tree, establishing the TDD red state.
 
-- [X] T003 [P] Author deprecated-term guard test in `tests/unit/test_agent_deprecated_terms.py`: assert 0 live matches for `SubRole`/`Subrole`, `improver`, and `Meta-Coordinator` (as a role) across `skills/`, `templates/`, `docs/`, `tests/`, `.specify/agents/`, `.specify/skills/`, excluding immutable history (`.specify/specs/`, `CHANGELOG`, `draft/`, `.specify/memory/features/019.md`). Must FAIL now.
+- [X] T003 [P] Author deprecated-term guard test in `tests/unit/test_agent_deprecated_terms.py`: assert 0 live matches for `SubRole`/`Subrole`, `improver`, and `Meta-Coordinator` (as a role) across `skills/`, `templates/`, `docs/`, `tests/`, `.specify/agents/`, `.specify/skills/`, excluding immutable history (`.specify/specs/`, `CHANGELOG`, `draft/`, `.specify/features/019-agents-command.md`). Must FAIL now.
 - [X] T004 [P] Author reference-integrity guard test in `tests/unit/test_agent_reference_integrity.py`: assert no live reference resolves to a pre-migration path/name (`agent-subrole-*`, `agent-role-meta-coordinator-template.md`, `agent-team-supervisor-template.md`) and that every referenced `agent-*-template.md` path exists under `skills/internal/create-agent/templates/`. Must FAIL now.
 - [X] T005 Produce FR-021 cross-project research deliverable `.specify/specs/023-agent-framework-redesign/research.md`: dispatch one agent per in-scope `/cws_work/*` sibling (exclude `spec-kit`) via the `organize-agents` parallel pattern, mining agent-framework best practices; consolidate findings and ensure ≥1 concrete redesign decision in this spec cites it (SC-008).
 
@@ -109,7 +109,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 - [X] T017 [P] [US2] Add Role/Stage/Type + Team/Loop model headers to the 6 worker role templates in `skills/internal/create-agent/templates/agent-role-{requirements-analyst,system-designer,module-designer,test-engineer,qa-engineer,knowledge-manager}-template.md` (SC-005, C1/C6).
 - [X] T018 [US2] Refactor `skills/internal/create-agent/SKILL.md`: add the canonical Role/Stage/Type + Team/Loop model section, new stage/role names, canonical template location, and Team Supervisor merge; remove "SubRole"/"improver"/"Meta-Coordinator" (FR-003, FR-015, FR-016).
 - [X] T019 [P] [US2] Update `skills/internal/improve-agent/SKILL.md`: replace "improver"→"optimizer" and "SubRole"→"Stage" (FR-015).
-- [X] T020 [US2] Update `skills/organize-agents/SKILL.md`: collapse the Team Loop from 3 layers to 2 (Team Supervisor + Workers), merge Meta-Coordinator into Team Supervisor, and apply terminology substitution (FR-007, M3, D2).
+- [X] T020 [US2] Update `skills/internal/create-team/SKILL.md`: collapse the Team Loop from 3 layers to 2 (Team Supervisor + Workers), merge Meta-Coordinator into Team Supervisor, and apply terminology substitution (FR-007, M3, D2).
 
 **Checkpoint**: Model and terminology unified across templates and skills; guards from T003/T004 now pass for these files.
 
@@ -123,7 +123,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [X] T021 [P] [US3] Update Layer-2 scenario `tests/scenarios/multi-agent-orchestration/team-loop-scenario.md`: apply terminology substitution and the 2-layer (Team Supervisor + Workers) structure; remove Meta-Coordinator (FR-008/009, M3, M4). Must reflect target state before T024.
+- [X] T021 [P] [US3] Update Layer-2 scenario `tests/scenarios/multi-agent-orchestration/iteration-scenario.md`: apply terminology substitution and the 2-layer (Team Supervisor + Workers) structure; remove Meta-Coordinator (FR-008/009, M3, M4). Must reflect target state before T024.
 - [X] T022 [P] [US3] Update Layer-2 scenario `tests/scenarios/multi-agent-orchestration/parallel-dispatch-scenario.md`: Meta-Coordinator→Team Supervisor, terminology and model alignment.
 - [X] T023 [P] [US3] Update Layer-2 scenario `tests/scenarios/multi-agent-orchestration/serial-chain-scenario.md`: terminology and Role/Stage/Type alignment.
 
@@ -159,16 +159,16 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 
 ## Phase 7: User Story 5 - Consolidated Templates and Coherent Documentation (Priority: P3)
 
-**Goal**: All agent templates are canonical under the `create-agent` skill, installed mirrors are re-synced, legacy duplicates are removed, and `docs/agents` is coherent with `design.md`.
+**Goal**: All agent templates are canonical under the `create-agent` skill, installed mirrors are re-synced, legacy duplicates are removed, and `docs/reference/agents` is coherent with `design.md`.
 
-**Independent Test**: Confirm 0 `agent-*` templates remain in `.specify/templates/` and top-level `templates/`; installed mirror matches source; `docs/agents/*` uses unified terminology with no statements contradicting `design.md` (SC-003, SC-004, SC-007).
+**Independent Test**: Confirm 0 `agent-*` templates remain in `.specify/templates/` and top-level `templates/`; installed mirror matches source; `docs/reference/agents/*` uses unified terminology with no statements contradicting `design.md` (SC-003, SC-004, SC-007).
 
 ### Implementation for User Story 5
 
 - [X] T031 [US5] Remove stale `.specify/templates/agent-*` duplicates (`agent-role-*`, `agent-subrole-*`, `agent-supervision-delegation.md`, `agent-triad-orchestration-template.md`, and the `agent-{common,file,knowledge,plan,research}-template.md` set) after confirming no live references remain, so `ls .specify/templates/ | grep -i '^agent-'` returns none (FR-013, M1, D3).
-- [X] T032 [US5] Create/re-sync installed mirrors from source: `.specify/skills/internal/create-agent/**` (including the missing `templates/` subdir), `.specify/skills/internal/improve-agent/**`, and `.specify/skills/organize-agents/**`, so installed copies match the refactored source (M7, Constitution VI).
-- [X] T033 [P] [US5] Refactor `docs/agents/eei-triad-pattern.md` to the Role/Stage/Type + Team/Loop model and unified terminology (FR-017, SC-007).
-- [X] T034 [P] [US5] Refactor `docs/agents/multi-agent-orchestration.md`: Meta-Coordinator→merged Team Supervisor, terminology, and the three collaboration scenarios (FR-017, SC-007).
+- [X] T032 [US5] Create/re-sync installed mirrors from source: `.specify/skills/internal/create-agent/**` (including the missing `templates/` subdir), `.specify/skills/internal/improve-agent/**`, and `.specify/skills/internal/create-team/**`, so installed copies match the refactored source (M7, Constitution VI).
+- [X] T033 [P] [US5] Refactor `docs/reference/agents/quality-loop.md` to the Role/Stage/Type + Team/Loop model and unified terminology (FR-017, SC-007).
+- [X] T034 [P] [US5] Refactor `docs/reference/teams/orchestration.md`: Meta-Coordinator→merged Team Supervisor, terminology, and the three collaboration scenarios (FR-017, SC-007).
 - [X] T035 [US5] Reconcile `docs/reference/agents/design.md` so any remaining "SubRole"/"improver"/"Meta-Coordinator" mentions appear only as explicit historical/migration context, not as live model vocabulary; ensure it remains the authoritative, self-consistent model source (SC-007).
 - [X] T036 [US5] Fix any remaining broken references to old template paths or old stage names across `skills/`, `docs/`, `tests/`, and command templates so all references resolve (FR-016, SC-004).
 
@@ -183,7 +183,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 - [X] T037 [P] Run the deprecated-term and reference-integrity guards (`tests/unit/test_agent_deprecated_terms.py`, `tests/unit/test_agent_reference_integrity.py`) and confirm they now pass (Layer-1; SC-002, SC-004, SC-009).
 - [X] T038 Run the full `pytest -q` suite and the Layer-2 structural scenario validation (`tests/scenarios/**`); resolve any regressions (Constitution IV/VI).
 - [X] T039 [P] Execute the quickstart.md walkthrough end-to-end (§1–§7) and record SC-001…SC-009 outcomes in verification.md.
-- [X] T040 [P] Feature integration review: confirm no new/invalidated Features result from this breakdown; update `.specify/memory/features.md` `Last Updated` and confirm the Feature 019 spec-023 evolution note in `.specify/memory/features/019.md` (status stays `Implemented`, per Decision D4).
+- [X] T040 [P] Feature integration review: confirm no new/invalidated Features result from this breakdown; update `.specify/features.md` `Last Updated` and confirm the Feature 019 spec-023 evolution note in `.specify/features/019-agents-command.md` (status stays `Implemented`, per Decision D4).
 - [X] T041 Final terminology sweep: run the quickstart.md §1/§3 greps and confirm 0 live matches; append the final measured deltas (vs T001 baseline) to verification.md and flip **DoD Status** to `green` when all DoD-N are satisfied.
 
 ---
@@ -197,7 +197,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 - **User Stories (Phase 3–7)**: All depend on Foundational completion.
   - US1 (P1) and US2 (P1) are the core; US2 underpins US3/US4/US5 conceptually.
   - US3 (P2) depends on US2 terminology/merge (T014, T020) landing.
-  - US4 (P2) depends on US2 for the model expression migrated into persisted agents; shares `create-agent/SKILL.md` with US2 (T018→T029 ordering).
+  - US4 (P2) depends on US2 for the model expression migrated into persisted agents; shares `skills/internal/create-agent/SKILL.md` with US2 (T018→T029 ordering).
   - US5 (P3) depends on US2 renames/merge (T011–T020) and US3/US4 edits being complete before mirror re-sync (T032) and reference fixes (T036).
 - **Polish (Phase 8)**: Depends on all desired user stories.
 
@@ -228,7 +228,7 @@ Task: "Rename agent-subrole-improver-template.md → agent-stage-optimizer-templ
 Task: "Update agent-triad-orchestration-template.md (improver→optimizer, Stage/Type)"
 Task: "Update agent-supervision-delegation.md (terminology + merge)"
 Task: "Add model headers to the 6 agent-role-*-template.md worker roles"
-Task: "Update improve-agent/SKILL.md (improver→optimizer, subrole→stage)"
+Task: "Update skills/internal/improve-agent/SKILL.md (improver→optimizer, subrole→stage)"
 
 # Then run hubs sequentially: merge supervisor (T014) → create-agent SKILL (T018) → organize-agents SKILL (T020)
 ```
@@ -265,5 +265,5 @@ After Foundational: one developer drives US1 while another drives US2 (the conce
 - [P] tasks = different files, no dependencies on incomplete tasks.
 - [Story] label maps each task to its user story for traceability (Setup/Foundational/Polish carry no story label).
 - Tests Mode ON: guards (T003/T004) and story tests are authored to fail first, then made green by implementation.
-- Immutable history (`.specify/specs/*`, `CHANGELOG`, `draft/`, `features/019.md` narrative) is excluded from the zero-reference requirement (Decision D5).
+- Immutable history (`.specify/specs/*`, `CHANGELOG`, `draft/`, `.specify/features/019-agents-command.md` narrative) is excluded from the zero-reference requirement (Decision D5).
 - Deferral discipline: prefer `[~]` with a recorded reason over leaving a task `[ ]`.

@@ -75,7 +75,7 @@
 
 **C-24** [行为类] 该判据与本规格 SC-010 / SC-012 已采用的「冻结名字级基线 + `comm -13` 差集为空」**同形**,故不产生永久豁免清单、也不留下「同一检查器对两类 spec 给不同判定」的双标准。落地 MUST 复用同一习语,MUST NOT 另造第二种基线形态。(FR-027、D-10)
 
-**C-25** [行为类] 核算脚本 MUST NOT 复制 `scan-confirmation-gates.py --baseline` 的比较形态——它读基线的**顶层** `total` 而冻结值嵌在 `confirmationGates` 下,且退出码只反映 `violations`,故作为相等门不可用;该缺陷已记录两次(`.specify/memory/constitution.md:14` 后续 TODO (a);052 的 `contracts/gate-neutrality.md` + `verification.md:209`)而上游仍未修。(D-10、A-3)
+**C-25** [行为类] 核算脚本 MUST NOT 复制 `scan-confirmation-gates.py --baseline` 的比较形态——它读基线的**顶层** `total` 而冻结值嵌在 `confirmationGates` 下,且退出码只反映 `violations`,故作为相等门不可用;该缺陷已记录两次(`.specify/constitution.md:14` 后续 TODO (a);052 的 `contracts/gate-neutrality.md` + `verification.md:209`)而上游仍未修。(D-10、A-3)
 
 ## `.yaml` 的显式处置
 

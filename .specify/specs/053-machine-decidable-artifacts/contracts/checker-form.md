@@ -3,7 +3,7 @@
 **Requirement**: `053-machine-decidable-artifacts` → Feature 053  
 **Covers**: FR-001…FR-005(检查器形态与 Program-First 归属)、FR-039…FR-043(机器给出的绿:证据纪律)、FR-046(钉子)、FR-047(镜像安装)  
 **Clause form**: `**C-N**` 行首裸粗体(D-1 的 owner 文档将把它声明为规范形之一)。  
-**Class labeling**: 每条条款标注 **[制品类]**(断言落盘文本:文件存在、标题恰好一次、定界区间逐字节相等——可由契约测试机械断言)或 **[行为类]**(描述运行期动作,其中无制品可观测者只能由真源文档载明义务 + 评审强制 + 变异演练取证)。该二分取自 `.specify/memory/glossary.md` 已登记的「制品类/行为类条款 (Artifact-Class vs Behavior-Class Clause)」;MUST NOT 声称行为类条款「由守卫覆盖」。
+**Class labeling**: 每条条款标注 **[制品类]**(断言落盘文本:文件存在、标题恰好一次、定界区间逐字节相等——可由契约测试机械断言)或 **[行为类]**(描述运行期动作,其中无制品可观测者只能由真源文档载明义务 + 评审强制 + 变异演练取证)。该二分取自 `.specify/glossary.md` 已登记的「制品类/行为类条款 (Artifact-Class vs Behavior-Class Clause)」;MUST NOT 声称行为类条款「由守卫覆盖」。
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Purpose**: Validate the quality, clarity and completeness of the 086 requirements *after* the plan and tasks artifacts exist — gap-finding against the design artifacts, never grading them.
 **Created**: 2026-11-06
-**Feature (Requirement Scope)**: `.specify/memory/features/086.md` (bound by `/speckit.clarify` Mode A, 2026-11-06)
+**Feature (Requirement Scope)**: `.specify/features/086-efficient-test-execution.md` (bound by `/speckit.clarify` Mode A, 2026-11-06)
 **Requirements (What)**: [`../requirements.md`](../requirements.md)
 **Specifications (How, context only)**: [`../plan.md`](../plan.md), [`../tasks.md`](../tasks.md), [`../contracts/`](../contracts/), [`../quickstart.md`](../quickstart.md), [`../data-model.md`](../data-model.md)
 **Flow Class**: `execution` (`flow-class-check.py --action lookup` → `flow_class: execution`, `source: declaration`, exit 0) — the expression-class gate operator adds nothing here.

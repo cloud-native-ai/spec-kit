@@ -8,8 +8,8 @@
 | Feature name | Efficient Test Execution (Concurrent by Default) |
 | Requirement branch | `086-efficient-test-execution` |
 | Requirements | [`requirements.md`](requirements.md) |
-| Feature detail | `.specify/memory/features/086.md` |
-| Feature index row | `.specify/memory/features.md` (Draft → Planned, this stage) |
+| Feature detail | `.specify/features/086-efficient-test-execution.md` |
+| Feature index row | `.specify/features.md` (Draft → Planned, this stage) |
 | Flow class | execution |
 | FR / SC | 33 / 12 |
 
@@ -24,7 +24,7 @@ Every row below is a path this plan changes or creates, mapped to the requiremen
 | 3 | `shared/guidelines/test-execution-efficiency.md` (new) | The rule's only definition point (six sections) | FR-018 |
 | 4 | `.specify/shared/guidelines/test-execution-efficiency.md` | Mirror | FR-018 |
 | 5 | `templates/constitution-template.md` | `### XIX. Efficient Test Execution (Concurrent by Default)` | FR-019 |
-| 6 | `.specify/memory/constitution.md` | `### XX.` + version 1.17.0 + Sync Impact Report | FR-019 |
+| 6 | `.specify/constitution.md` | `### XX.` + version 1.17.0 + Sync Impact Report | FR-019 |
 | 7 | `templates/instructions-template.md` | `## Test Execution Efficiency (测试执行效率)` after `## Single-Run Evidence Discipline` | FR-020 |
 | 8 | `.specify/instructions.md` | Same section, produced by the generator | FR-020 |
 | 9 | `skills/internal/manage-constitution/SKILL.md` + mirror | MUST-include entry 12 | FR-021 |
@@ -38,7 +38,7 @@ Every row below is a path this plan changes or creates, mapped to the requiremen
 | 17 | `tests/contract/test_temp_goal_contract.py`, `test_temp_team_schema.py`, `test_checkpoint_protocol.py`, `tests/integration/test_temp_team_worktree_queue.py`, `tests/integration/test_checkpoint_rollback.py` | Re-run as the 085 preservation evidence (no edit planned; any needed change is disclosed) | FR-027, FR-029 |
 | 18 | `docs/contribute/dev-setup.md`, `CONTRIBUTING.md` | How to run the suite under the new default | FR-032 |
 | 19 | `CHANGELOG.md` | Entry | FR-031 |
-| 20 | `.specify/memory/features.md`, `.specify/memory/features/086.md` | Registry + detail; `Planned` this stage | FR-031 |
+| 20 | `.specify/features.md`, `.specify/features/086-efficient-test-execution.md` | Registry + detail; `Planned` this stage | FR-031 |
 | 21 | `test-evidence/` | Phase 0 baseline, plan gates, dogfood record, closure name diff | FR-014, FR-028, FR-033 |
 
 No new command, skill entry template, runtime service, schedule or store is created (FR-017).

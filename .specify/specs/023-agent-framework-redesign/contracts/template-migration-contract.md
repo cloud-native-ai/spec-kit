@@ -24,7 +24,7 @@ The optimizer template's internal `name`/`description` MUST NOT contain "improve
 
 ## M4. Terminology Substitution
 
-Across all live templates, skills, orchestration files, docs, and tests: "SubRole"/"Subrole" MUST be replaced by "Stage" and "improver" MUST be replaced by "optimizer" (FR-015). Immutable history (`draft/`, `CHANGELOG`, prior `.specify/specs/*`, historical narrative in `features/019.md`) is excluded (Decision D5).
+Across all live templates, skills, orchestration files, docs, and tests: "SubRole"/"Subrole" MUST be replaced by "Stage" and "improver" MUST be replaced by "optimizer" (FR-015). Immutable history (`draft/`, `CHANGELOG`, prior `.specify/specs/*`, historical narrative in `.specify/features/019-agents-command.md`) is excluded (Decision D5).
 
 ## M5. Reference Integrity
 
@@ -32,7 +32,7 @@ All references to template paths and stage names MUST resolve after migration. A
 
 ## M6. Persisted-Agent Migration
 
-Existing persisted agents under `.specify/agents/*.agent.md` (and `AGENTS.md`) MUST be migrated to the new model and terminology; 0 live persisted agents MUST retain deprecated concepts/terms (FR-020, SC-009).
+Existing persisted agents under `.specify/agents/{templates,instances}/*.agent.md` (and `AGENTS.md`) MUST be migrated to the new model and terminology; 0 live persisted agents MUST retain deprecated concepts/terms (FR-020, SC-009).
 
 ## M7. Installed-Mirror Sync
 

@@ -2,10 +2,10 @@
 
 **Purpose**: turn the spec's assumptions into measured facts before any design artifact is written. Every section
 below carries the reading it rests on; the command that produced it is named so a later reader re-measures instead
-of inheriting a number. **Inputs read** (summary-first): `requirements.md`; `.specify/memory/constitution.md`;
+of inheriting a number. **Inputs read** (summary-first): `requirements.md`; `.specify/constitution.md`;
 `shared/declarations/contract.yaml` + `shared/declarations/facts/`; `shared/definitions/subagent-definitions.md`;
 `shared/definitions/goal-definitions.md`; `skills/external/sdd-loop-driver/{SKILL.md,references/decomposition-model.md,templates/stage-team-preset.md,scripts/wp-gate.py}`; `skills/internal/create-team/**`; `agents/**`;
-`.specify/memory/features/093.md`; `specs/092-goal-team-parallel/notes/execution-lessons-2026-11-09.md`; the
+`.specify/features/093-concurrency-by-default.md`; `specs/094-goal-team-parallel/notes/execution-lessons-2026-11-09.md`; the
 design brief at `.specify/.tmp/sdd-loop/tmp/concurrency-by-default/design.md` (read from the main tree — the file
 lives outside the worktree by construction, so it was read where it sits and nothing was written there).
 

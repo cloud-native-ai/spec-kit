@@ -1,7 +1,7 @@
 # Implementation Plan: EEI Agent Triad
 
 **Branch**: `022-eei-agent-triad` | **Date**: 2026-07-02 | **Spec**: [requirements.md](requirements.md)
-**Input**: Specification from `.specify/specs/022-eei-agent-triad/requirements.md`
+**Input**: Specification from `.specify/archive/specs/022-eei-agent-triad/requirements.md`
 
 ## Summary
 
@@ -12,7 +12,7 @@ Add the Executor-Evaluator-Improver (EEI) triad pattern to the existing Role-Bas
 ## Technical Context
 
 **Language/Version**: N/A — this is a template/prompt engineering feature, not runtime code  
-**Primary Dependencies**: Existing agent template system (`templates/agent-role-*-template.md`), create-agent skill, improve-agent skill  
+**Primary Dependencies**: Existing agent template system (`skills/internal/create-agent/templates/agent-capacity-*-template.md`), create-agent skill, improve-agent skill  
 **Storage**: Filesystem — `.specify/agents/` directory for generated agents, `templates/` for templates  
 **Testing**: Contract tests verifying template rendering; integration test applying the triad to a sample task  
 **Target Platform**: All supported AI agents (Claude Code, Copilot, Qwen, opencode, Qoder)  
@@ -25,7 +25,7 @@ Add the Executor-Evaluator-Improver (EEI) triad pattern to the existing Role-Bas
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -44,7 +44,7 @@ Add the Executor-Evaluator-Improver (EEI) triad pattern to the existing Role-Bas
 ### Documentation (this spec)
 
 ```text
-.specify/specs/022-eei-agent-triad/
+.specify/archive/specs/022-eei-agent-triad/
 ├── requirements.md          # Feature specification
 ├── plan.md                  # This file
 ├── data-model.md            # Triad entity model
@@ -155,7 +155,7 @@ The 022 implementation created the four EEI templates and bolted a "Triad Mode" 
 | **Runtime mirror** | Any edited `templates/` or `skills/` file MUST be mirrored to `.specify/templates/` / `.specify/skills/` (addresses review finding F4) |
 | **NEEDS CLARIFICATION** | Whether Mode A should embed the triad in **every** role by default, or only when the role is flagged `supervisor: true` (see Open Question OQ-1 below) |
 
-### C. Constitution Check (re-derived from `.specify/memory/constitution.md` v1.2.0)
+### C. Constitution Check (re-derived from `.specify/constitution.md` v1.2.0)
 
 | # | Principle | Compliance | Evidence / Note |
 |---|-----------|------------|-----------------|
@@ -175,7 +175,7 @@ The 022 implementation created the four EEI templates and bolted a "Triad Mode" 
 
 - **D2 — Generalize `create-agent`** *(goals 2 & 4)*. Reframe its Goal from "role-based agent template" to *"author any agent artifact — role, supervisor (role+embedded triad), triad sub-role, orchestration prompt, or custom `.agent.md`"*. Replace the single linear workflow with an explicit **capability/mode matrix** (Role · Supervisor · Triad · Custom) that shares one validation+report tail. The existing "Triad Mode" becomes one row of that matrix; a new **Supervisor** capability composes a role template with the delegation section from D1.
 
-- **D3 — Generalize `improve-agent`** *(goals 2 & 4)*. Broaden the Input Contract target resolution from *only* `templates/agent-role-*` to any authored artifact: role template, `agent-subrole-*`, `agent-triad-orchestration-*`, or a generated `.specify/agents/*.agent.md`. Keep the existing "Triad Refinement" workflow as the triad-layer specialization; add a resolver step that classifies the target and routes to the matching refinement rules.
+- **D3 — Generalize `improve-agent`** *(goals 2 & 4)*. Broaden the Input Contract target resolution from *only* `templates/agent-role-*` to any authored artifact: role template, `agent-subrole-*`, `agent-triad-orchestration-*`, or a generated `.specify/agents/{templates,instances}/*.agent.md`. Keep the existing "Triad Refinement" workflow as the triad-layer specialization; add a resolver step that classifies the target and routes to the matching refinement rules.
 
 - **D4 — `/speckit.agents` delegates to the skills** *(goal 3)*. Refactor `templates/commands/agents.md` so Mode A and Mode B **call `create-agent`** as the authoring engine (and `improve-agent` for updates), passing gathered project context. The command retains responsibility for context-gathering, backup/preservation (FR-008/008a), symlink discoverability, and registry updates; it stops re-implementing template rendering. This makes the skills the single source of truth (closes G2).
 
@@ -194,7 +194,7 @@ skills/internal/improve-agent/SKILL.md           # generalize target resolution 
 
 .specify/templates/ , .specify/skills/  # mirror all of the above (runtime parity, review F4)
 
-.specify/specs/022-eei-agent-triad/
+.specify/archive/specs/022-eei-agent-triad/
 ├── plan.md                             # THIS amendment
 ├── data-model.md                       # + RoleSupervisor entity + Role↔Triad relationship
 ├── contracts/agent-authoring-contract.md  # NEW — skill invocation + advanced-agent request contract
@@ -234,9 +234,9 @@ Every edited source file mirrors to a runtime counterpart in the same change (co
 
 | Source | Runtime counterpart |
 |--------|---------------------|
-| `templates/agent-role-*-template.md` | `.specify/templates/agent-role-*-template.md` |
+| `skills/internal/create-agent/templates/agent-capacity-*-template.md` | `.specify/skills/internal/create-agent/templates/agent-capacity-*-template.md` |
 | `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` | `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` (was MISSING — created) |
-| `templates/agent-subrole-*-template.md` | `.specify/templates/agent-subrole-*-template.md` (was MISSING — created) |
+| `skills/internal/create-team/templates/agents/agent-stage-*-template.md` | `.specify/skills/internal/create-team/templates/agents/agent-stage-*-template.md` (was MISSING — created) |
 | `skills/internal/create-agent/templates/agent-supervision-delegation.md` (new) | `skills/internal/create-agent/templates/agent-supervision-delegation.md` |
 | `skills/internal/create-agent/SKILL.md` | `.specify/skills/internal/create-agent/SKILL.md` |
 | `skills/internal/improve-agent/SKILL.md` | `.specify/skills/internal/improve-agent/SKILL.md` |

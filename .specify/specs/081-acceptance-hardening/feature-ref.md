@@ -2,8 +2,8 @@
 
 **Requirement key**: `081-acceptance-hardening`
 **Bound Feature**: **Feature 081** — 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
-**Feature index row**: `.specify/memory/features.md` (row `| 081 |`, same-pass `Total Features` recomputation)
-**Feature detail**: `.specify/memory/features/081.md`
+**Feature index row**: `.specify/features.md` (row `| 081 |`, same-pass `Total Features` recomputation)
+**Feature detail**: `.specify/features/081-acceptance-hardening.md`
 **Binding basis**: `/speckit.clarify` Mode A on 2026-11-03 scanned the registry and found no owner — the pre-existing candidates (Feature 026 is "Agent Skill Enablement", 055 is storage-conflict, 062 is Humanize, 071 governs only the *existing two-segment* review composition, 077 governs document-stage gates, 079 governs bilingual expression) do not cover the combination "final-path threshold + smoke hard condition + one shared verdict across three call sites + artifact/implementation review". Decision: **create**, recorded in `requirements.md` § Clarifications § Session 2026-11-03 (including why the ID is 081 rather than the next empty slot).
 
 ## How this plan maps onto the Feature

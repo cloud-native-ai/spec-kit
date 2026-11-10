@@ -2,7 +2,7 @@
 
 **Purpose**: Validate the quality, clarity and completeness of the 086 requirements before `/speckit.clarify` and `/speckit.plan`.
 **Created**: 2026-11-06
-**Feature (Requirement Scope)**: `.specify/memory/features/086.md`（2026-11-06 `/speckit.clarify` Mode A 绑定）
+**Feature (Requirement Scope)**: `.specify/features/086-efficient-test-execution.md`（2026-11-06 `/speckit.clarify` Mode A 绑定）
 **Requirements (What)**: [`../requirements.md`](../requirements.md)
 
 ## Content Quality

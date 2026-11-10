@@ -16,9 +16,9 @@
 | 活动指令文件 `## ` 节数 | `grep -c '^## ' .specify/instructions.md` | **19** |
 | 三个锚点章节行号 | `grep -n '^## Token Efficiency…\|^## User-Facing…\|^## Dogfooding…'` | **66 / 74 / 86** |
 | 宪章模板原则数 | `grep -c '^### [IVX]*\. ' templates/constitution-template.md` | **13** |
-| 活动宪章原则数 | `grep -c '^### [IVX]*\. ' .specify/memory/constitution.md` | **15** |
+| 活动宪章原则数 | `grep -c '^### [IVX]*\. ' .specify/constitution.md` | **15** |
 | 命令 `MUST include` 条目数 | `grep -c 'MUST include' templates/commands/constitution.md` | **7** |
-| 活动宪章版本 | `grep -n '^\*\*Version\*\*' .specify/memory/constitution.md` | **1.12.0**(`:254`) |
+| 活动宪章版本 | `grep -n '^\*\*Version\*\*' .specify/constitution.md` | **1.12.0**(`:254`) |
 | 门控扫描 total | `python3 scripts/python/scan-confirmation-gates.py` | **23**(destructive 13 / governance_kept 10 / violations 0) |
 | `len(BLOCKING_PATTERNS)` | importlib 载入后取真 | **17** |
 | `len(POLICY_DOCS)` | 同上 | **2** |
@@ -93,9 +93,9 @@ grep -c 'shared/guidelines/fast-fail.md' templates/instructions-template.md
 ```bash
 cd /storage/project/cloud-native-ai/spec-kit
 grep -c '^### [IVX]*\. ' templates/constitution-template.md
-grep -c '^### [IVX]*\. ' .specify/memory/constitution.md
+grep -c '^### [IVX]*\. ' .specify/constitution.md
 grep -c 'MUST include' templates/commands/constitution.md
-grep -n '^\*\*Version\*\*' .specify/memory/constitution.md
+grep -n '^\*\*Version\*\*' .specify/constitution.md
 grep -n 'TEMPLATE_COUNT = \|LIVE_COUNT = \|COMMAND_COUNT = \|MIN_VERSION = ' tests/contract/test_constitution_double_landing.py
 grep -c 'Fast Fail' templates/constitution-template.md templates/commands/constitution.md
 ```
@@ -105,9 +105,9 @@ grep -c 'Fast Fail' templates/constitution-template.md templates/commands/consti
 ```bash
 cd /storage/project/cloud-native-ai/spec-kit
 grep -c '^### [IVX]*\. ' templates/constitution-template.md
-grep -c '^### [IVX]*\. ' .specify/memory/constitution.md
+grep -c '^### [IVX]*\. ' .specify/constitution.md
 grep -c 'MUST include' templates/commands/constitution.md
-grep -n '^\*\*Version\*\*' .specify/memory/constitution.md
+grep -n '^\*\*Version\*\*' .specify/constitution.md
 grep -c 'Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)' templates/constitution-template.md templates/commands/constitution.md
 awk '/^### XIV\./,/^## \[SECTION_2_NAME\]/' templates/constitution-template.md | awk 'length > 99 {n++} END {print "over-100-char lines:", n+0}'
 python3 -m pytest tests/contract/test_constitution_double_landing.py -q 2>&1 | tail -3
@@ -325,7 +325,7 @@ python3 -m pytest tests/contract/test_user_facing_comprehension_doc.py -q 2>&1 |
 ```
 **期望**:类 ⑪ 行的规则真源列**同时含** `confirmation-gates.md` 与 `fast-fail.md`;钉子上调为 **9**;`fast-fail.md` 在该文件命中 **1**;`reader_baseline_override` 列仍为 `—`(故 `test_c18a` 的上限 2 不受影响);pytest 全绿。
 
-> *这是本特性对 Feature 051 拥有制品的**唯一**改动,已由 `constitution-export.md` C-19…C-23 显式列为跨纪律改动并在四处留痕(plan.md › Feature List Review、feature-ref.md、`features/051.md`、`features/052.md`)。MUST NOT 默默发生。*
+> *这是本特性对 Feature 051 拥有制品的**唯一**改动,已由 `constitution-export.md` C-19…C-23 显式列为跨纪律改动并在四处留痕(plan.md › Feature List Review、feature-ref.md、`.specify/features/051-user-facing-comprehension.md`、`.specify/features/052-fast-fail-principle.md`)。MUST NOT 默默发生。*
 
 ---
 

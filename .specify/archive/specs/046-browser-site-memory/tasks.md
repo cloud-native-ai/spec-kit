@@ -20,7 +20,7 @@
 
 ## Completion Gate
 
-- GATE-1: 全套件零新增失败 vs 基线 — check: `pytest` 失败集与 `.specify/specs/046-browser-site-memory/baseline-failed.txt` 做集合差
+- GATE-1: 全套件零新增失败 vs 基线 — check: `pytest` 失败集与 `.specify/archive/specs/046-browser-site-memory/baseline-failed.txt` 做集合差
 - GATE-2: 技能镜像字节一致 — check: `python3 .specify/scripts/python/sync-mirrors.py --check`(skills 对)
 - GATE-3: wheel 不含 site/ — check: 植探针后 `python3 -m hatchling build -t wheel`,namelist 无 `specify_cli/skills/browser-utils/site/`
 - GATE-4: 无 `[ ]` / `[>]` 任务行残留 — check: `grep -cE '^- \[[ >]\]' tasks.md` 返回 0
@@ -28,7 +28,7 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [X] T001 运行全套件记录失败基线到 `.specify/specs/046-browser-site-memory/baseline-failed.txt`(pytest 全量,失败名单一行一个,用于 GATE-1 集合差)
+- [X] T001 运行全套件记录失败基线到 `.specify/archive/specs/046-browser-site-memory/baseline-failed.txt`(pytest 全量,失败名单一行一个,用于 GATE-1 集合差)
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
@@ -106,7 +106,7 @@
 
 - [X] T021 quickstart.md 三个走查 + 异常走查的全部 CLI 示例对真实引擎逐一执行验证(tmp skill-home),输出与契约信封一致(DoD-6) [blockedBy: T020]
 - [X] T022 运行全套件,失败集与 baseline-failed.txt 集合差为空(GATE-1);`sync-mirrors.py --check` 退出 0(GATE-2);wheel 探针构建复核(GATE-3) [blockedBy: T021] <!-- waiver: 范围化验收(用户批准 2026-08-24)——新增失败 14 个全部归因于并行 root 会话 create-pages 工作进行态(root-owned assets / 镜像未同步 / .migration-backups);本次改动的 2 个真实回归已修复转绿;046 自有镜像逐文件 diff -q 通过 -->
-- [X] T023 复核 plan.md Mirror Obligations 表逐行打勾;更新 `.specify/memory/features/048.md` Implementation Notes 补引擎/契约测试落点
+- [X] T023 复核 plan.md Mirror Obligations 表逐行打勾;更新 `.specify/features/048-derive-command.md` Implementation Notes 补引擎/契约测试落点
 
 ## Dependencies & Execution Order
 

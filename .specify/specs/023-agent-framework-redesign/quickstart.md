@@ -10,16 +10,16 @@ This walkthrough validates the refactor against the Success Criteria. Run from r
 # Expect 0 matches in LIVE files (exclude specs/CHANGELOG/draft)
 grep -rliE "subrole|improver" \
   --include="*.md" --include="*.py" --include="*.sh" . \
-  | grep -vE "/\.specify/specs/|CHANGELOG|/draft/|/features/019\.md"
+  | grep -vE "/\.specify/specs/|CHANGELOG|/draft/|/features/019-agents-command\.md"
 ```
 
-Expected: **no output**. `.specify/agents/*.agent.md` MUST NOT appear (SC-009).
+Expected: **no output**. `.specify/agents/{templates,instances}/*.agent.md` MUST NOT appear (SC-009).
 
 ## 2. Templates canonicalized (SC-003)
 
 ```bash
-ls skills/create-agent/templates/agent-stage-*.md        # 3 stage templates present
-ls skills/create-agent/templates/agent-role-team-supervisor-template.md  # merged supervisor
+ls skills/internal/create-team/templates/agents/agent-stage-*.md   # 3 stage templates present
+ls skills/internal/create-team/templates/agents/agent-team-supervisor-template.md  # merged supervisor
 ls templates/ | grep -iE "^agent-" || echo "OK: no agent-* in top-level templates/"
 ls .specify/templates/ | grep -iE "^agent-" || echo "OK: no stale agent-* in .specify/templates/"
 ```
@@ -32,7 +32,7 @@ Expected: stage/role templates present; **no** `agent-subrole-*`, `agent-role-me
 # No lingering references to old names anywhere live
 grep -rE "agent-subrole-|meta-coordinator" \
   skills/ templates/ docs/ tests/ .specify/agents/ .specify/skills/ \
-  | grep -viE "/features/019\.md" || echo "OK: no dangling old references"
+  | grep -viE "/features/019-agents-command\.md" || echo "OK: no dangling old references"
 pytest -q                    # existing suite + new deprecated-term guard must pass
 ```
 
@@ -57,7 +57,7 @@ ls .qoder/commands/ .github/prompts/ | grep -iE "agent" # only speckit.agents(.m
 
 ## 6. Docs coherent (SC-007)
 
-- Review `docs/agents/{design.md,eei-triad-pattern.md,multi-agent-orchestration.md}` and `docs/reference/commands/agents.md`: terminology unified, model consistent with `design.md`.
+- Review `docs/reference/agents/{design.md,quality-loop.md}`, `docs/reference/teams/orchestration.md`, and `docs/reference/commands/agents.md`: terminology unified, model consistent with `design.md`.
 
 ## 7. Cross-project research delivered (SC-008)
 

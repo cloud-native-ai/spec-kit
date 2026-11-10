@@ -5,7 +5,7 @@ the seven focus faces the driver named: the mechanism-not-slogan face, the four-
 closed-set carrier of the ten-directory review surface, the supersede/renumber protocols, the machine-readable status
 contract, the A–H tier split, and the team/concurrency reuse boundary.
 **Created**: 2026-11-09
-**Feature (Requirement Scope)**: `.specify/memory/features/092.md` (created in implement package P1; `feature-ref.md` is the interim pointer)
+**Feature (Requirement Scope)**: `.specify/features/092-non-disposable.md` (created in implement package P1; `feature-ref.md` is the interim pointer)
 **Requirements (What)**: [`../requirements.md`](../requirements.md)
 **Specifications (How, context only)**: [`../plan.md`](../plan.md), [`../tasks.md`](../tasks.md), [`../contracts/`](../contracts/),
 [`../notes/input-review-080-090.md`](../notes/input-review-080-090.md)

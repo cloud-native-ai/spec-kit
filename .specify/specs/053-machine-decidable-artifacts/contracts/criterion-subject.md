@@ -32,13 +32,13 @@
 
 **C-9** [行为类] C-8 的判据依据是**实测到的**枚举形态,不是猜测:本仓唯一真实的枚举型判据是 `.specify/anchoring/draw-two-layer-structure/goal.md:15`「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」,其 `## History` 直接证明了 US5 要消灭的脆弱性——同一条判据随成员集变化被反复改写(`:36` 前值「六个绘图技能(draw-diagram 与 draw-{d3js,echarts,excalidraw,mermaid,plantuml})」、`:37` 前值「七个绘图技能(… drawio …)」)。(FR-037、D-14)
 
-**C-10** [行为类] **诚实边界**:不带花括号的散文枚举(如「所有绘图技能」)与指代形同现时**检不出**——自由散文里的枚举不可机械判定。该边界 MUST 记入 owner 文档与本契约,MUST NOT 声称覆盖了它;声称覆盖了实际覆盖不到的东西正是 `.specify/memory/glossary.md`「制品类/行为类条款」条目所禁止的形态。(FR-037、D-14、V-32)
+**C-10** [行为类] **诚实边界**:不带花括号的散文枚举(如「所有绘图技能」)与指代形同现时**检不出**——自由散文里的枚举不可机械判定。该边界 MUST 记入 owner 文档与本契约,MUST NOT 声称覆盖了它;声称覆盖了实际覆盖不到的东西正是 `.specify/glossary.md`「制品类/行为类条款」条目所禁止的形态。(FR-037、D-14、V-32)
 
 ## 向后兼容
 
 **C-11** [制品类] 既有的**纯枚举**判据 MUST 保持完全一致的解析行为;本特性 MUST NOT 使任何既有 goal 失效或需要迁移才能继续解析。判据:SC-010 的名字级比对——落地前后对仓内**全部**既有 goal 定义跑一次解析,失败集合按**名字**比对为空(`comm -13` 形态),MUST NOT 按计数。(FR-038、SC-010)
 
-**C-12** [制品类] SC-010 的当前全集**只有 1 份** goal 定义(实测 `.specify/goal/` 下仅 `draw-two-layer-structure/goal.md`,4337 B),该数太小以致「比对为空」近乎空真,故 MUST 配反空真哨兵:至少断言被扫描的 goal 定义数 **≥ 1** 且解析器确实产出了成员集。(FR-038、FR-040、D-14)
+**C-12** [制品类] SC-010 的当前全集**只有 1 份** goal 定义(实测 `.specify/anchoring/` 下仅 `draw-two-layer-structure/goal.md`,4337 B),该数太小以致「比对为空」近乎空真,故 MUST 配反空真哨兵:至少断言被扫描的 goal 定义数 **≥ 1** 且解析器确实产出了成员集。(FR-038、FR-040、D-14)
 
 **C-13** [行为类] SC-009 的取证 MUST 使指代形的价值**直接可见**:对同一主体集合分别用指代形与成员枚举写两条判据,在目录里增删一个成员后,指代形导出的集合随之变化而枚举形不变,该差异在输出里可见。增删 MUST 在临时副本里做,MUST NOT 改动真实 skills 目录。(SC-009、SC-009 Source)
 

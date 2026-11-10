@@ -2,8 +2,8 @@
 
 **Requirement ID**: 022 (from branch name)
 **Requirement Key**: 022-eei-agent-triad
-**Related Feature**: 019 Agents Command (from .specify/memory/features.md)
-**Input**: Design documents from `.specify/specs/022-eei-agent-triad/`
+**Related Feature**: 019 Agents Command (from .specify/features.md)
+**Input**: Design documents from `.specify/archive/specs/022-eei-agent-triad/`
 **Prerequisites**: plan.md (required), requirements.md (required), data-model.md, contracts/triad-protocol.md, quickstart.md
 
 ## Clarifications
@@ -41,7 +41,7 @@
 
 **Goal**: Establish the project structure for EEI triad templates and documentation.
 
-- [X] T001 Review existing agent role templates to extract the common YAML frontmatter + Markdown structure pattern from `templates/agent-role-system-designer-template.md`
+- [X] T001 Review existing agent role templates to extract the common YAML frontmatter + Markdown structure pattern from `skills/internal/create-agent/templates/agent-capacity-system-designer-template.md`
 - [X] T002 Review existing create-agent skill to understand the template instantiation flow from `skills/internal/create-agent/SKILL.md`
 - [X] T003 Review existing improve-agent skill to understand the agent refinement flow from `skills/internal/improve-agent/SKILL.md`
 
@@ -49,9 +49,9 @@
 
 **Goal**: Create the base sub-role templates that all user stories depend on.
 
-- [X] T004 [P] Create Executor sub-role template at `templates/agent-subrole-executor-template.md` following the YAML frontmatter format of existing role templates. Must include: identity section (executor role definition), environment reading instructions (MUST re-read all referenced files each invocation per FR-004), output format (artifact paths + status), and context isolation rules (FR-003)
-- [X] T005 [P] Create Evaluator sub-role template at `templates/agent-subrole-evaluator-template.md`. Must include: identity section (evaluator role), structured scoring output format (per-dimension scores + weighted total + suggestions per FR-005), context isolation rules (receives ONLY artifacts, never executor prompt per contracts/triad-protocol.md), and configurable dimension placeholders (FR-008)
-- [X] T006 [P] Create Improver sub-role template at `templates/agent-subrole-improver-template.md`. Must include: identity section (improver role), dual-target improvement instructions (environment files + executor prompt per FR-006), workspace boundary constraints (FR-011), change documentation requirements (every change must have rationale), and structured output format (environment_changes + executor_adjustments per contracts/triad-protocol.md)
+- [X] T004 [P] Create Executor sub-role template at `skills/internal/create-team/templates/agents/agent-stage-executor-template.md` following the YAML frontmatter format of existing role templates. Must include: identity section (executor role definition), environment reading instructions (MUST re-read all referenced files each invocation per FR-004), output format (artifact paths + status), and context isolation rules (FR-003)
+- [X] T005 [P] Create Evaluator sub-role template at `skills/internal/create-team/templates/agents/agent-stage-evaluator-template.md`. Must include: identity section (evaluator role), structured scoring output format (per-dimension scores + weighted total + suggestions per FR-005), context isolation rules (receives ONLY artifacts, never executor prompt per contracts/triad-protocol.md), and configurable dimension placeholders (FR-008)
+- [X] T006 [P] Create Improver sub-role template at `skills/internal/create-team/templates/agents/agent-stage-optimizer-template.md`. Must include: identity section (improver role), dual-target improvement instructions (environment files + executor prompt per FR-006), workspace boundary constraints (FR-011), change documentation requirements (every change must have rationale), and structured output format (environment_changes + executor_adjustments per contracts/triad-protocol.md)
 - [X] T007 Create Orchestration prompt template at `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md`. Must include: loop scaffold (Executor→Evaluator→Improver→repeat), threshold checking logic, iteration history tracking (FR-007), stopping conditions (threshold met, max iterations, consecutive regressions per contracts/triad-protocol.md), and best-output preservation (FR-010)
 
 ## Phase 3: User Story 1 — Quality-Gated Iterative Task Execution (P1)
@@ -73,9 +73,9 @@
 
 **Independent Test**: Verify the evaluator's prompt never contains executor reasoning, and the executor re-reads files each iteration.
 
-- [X] T014 [US2] Add context isolation instructions to executor template at `templates/agent-subrole-executor-template.md` — explicit statement: "You MUST read all files listed in environment_paths at the start. You have no memory of previous iterations."
-- [X] T015 [US2] Add context isolation instructions to evaluator template at `templates/agent-subrole-evaluator-template.md` — explicit statement: "You receive ONLY the output artifacts. You do NOT know what prompt the executor used or what changes the improver made."
-- [X] T016 [US2] Add context isolation instructions to improver template at `templates/agent-subrole-improver-template.md` — explicit statement: "You receive ONLY the evaluator's feedback. You do NOT know the executor's internal reasoning."
+- [X] T014 [US2] Add context isolation instructions to executor template at `skills/internal/create-team/templates/agents/agent-stage-executor-template.md` — explicit statement: "You MUST read all files listed in environment_paths at the start. You have no memory of previous iterations."
+- [X] T015 [US2] Add context isolation instructions to evaluator template at `skills/internal/create-team/templates/agents/agent-stage-evaluator-template.md` — explicit statement: "You receive ONLY the output artifacts. You do NOT know what prompt the executor used or what changes the improver made."
+- [X] T016 [US2] Add context isolation instructions to improver template at `skills/internal/create-team/templates/agents/agent-stage-optimizer-template.md` — explicit statement: "You receive ONLY the evaluator's feedback. You do NOT know the executor's internal reasoning."
 - [X] T017 [US2] Add orchestrator context-passing rules to `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` — section specifying exactly what the orchestrator passes to each sub-agent (per contracts/triad-protocol.md Input tables)
 
 ## Phase 5: User Story 3 — Dual-Target Improvement (P2)
@@ -116,7 +116,7 @@
 - [X] T028 [P] Update improve-agent skill at `skills/internal/improve-agent/SKILL.md` to support triad refinement — add section for improving individual sub-role templates or the orchestration prompt based on loop execution feedback
 - [X] T029 [P] Create reference guide at `docs/eei-triad-pattern.md` documenting: pattern overview, when to use it, 3 usage examples (diagram drawing, code review, document writing per quickstart.md), key principles (context isolation, dual-target improvement, convergence tracking), and lessons learned from the K8s session
 - [X] T030 Verify composability: test that each of the 6 existing role templates (system-designer, module-designer, requirements-analyst, test-engineer, qa-engineer, knowledge-manager) can adopt the EEI triad by combining role template + sub-role templates (FR-012)
-- [X] T031 Update Feature 019 detail at `.specify/memory/features/019.md` with final implementation notes for the EEI triad spec
+- [X] T031 Update Feature 019 detail at `.specify/features/019-agents-command.md` with final implementation notes for the EEI triad spec
 
 ---
 
@@ -165,7 +165,7 @@ Phase 1 (Setup)
 
 ## Amendment Definition of Done (DoD)
 
-- DoD-8: Shared "Supervision & EEI Delegation" section authored once at `skills/internal/create-agent/templates/agent-supervision-delegation.md` (single source) and inlined by `create-agent` at generation — NOT copied into role templates; all 6 `templates/agent-role-*-template.md` carry supervision metadata (`supervisor: true` default per OQ-1 + `{{ROLE_SCOPE}}`), mirrored to `.specify/templates/`
+- DoD-8: Shared "Supervision & EEI Delegation" section authored once at `skills/internal/create-agent/templates/agent-supervision-delegation.md` (single source) and inlined by `create-agent` at generation — NOT copied into role templates; all 6 `skills/internal/create-agent/templates/agent-capacity-*-template.md` carry supervision metadata (`supervisor: true` default per OQ-1 + `{{ROLE_SCOPE}}`), mirrored to `.specify/templates/`
 - DoD-9: `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` supports `{{ROLE_SCOPE}}` binding + role-default scoring dimensions, and is mirrored to `.specify/templates/` (creating the previously-missing mirror, review F4)
 - DoD-10: `skills/internal/create-agent/SKILL.md` generalized to a capability matrix (role · supervisor · triad · custom) with a Supervisor capability and `AgentAuthoringRequest` handling per `contracts/agent-authoring-contract.md`; mirrored to `.specify/skills/`
 - DoD-11: `skills/internal/improve-agent/SKILL.md` target resolution generalized to role · sub-role · orchestration · custom `.agent.md` with a classify-and-route step; mirrored to `.specify/skills/`
@@ -181,7 +181,7 @@ Phase 1 (Setup)
 **Goal**: Resolve open questions and establish the mirror map before touching shared artifacts.
 
 - [X] T032 Resolve OQ-1 and OQ-2 — RESOLVED via `/speckit.clarify` (see § Clarifications → Session 2026-07-02): OQ-1 = default-on for all 6 roles; OQ-2 = compose in create-agent from single-source snippet. Follow-up: sync the decisions into `plan.md` § Plan Amendment → Open Questions and update `contracts/agent-authoring-contract.md` R2 on the next `/speckit.plan` regeneration
-- [X] T033 Confirm the runtime mirror map and record it in `.specify/specs/022-eei-agent-triad/plan.md`: `templates/agent-role-*` → `.specify/templates/agent-role-*`; `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` → `.specify/templates/` (currently MISSING); `skills/{create,improve}-agent/SKILL.md` → `.specify/skills/...`; `templates/commands/agents.md` → `.claude/commands/speckit.agents.md`
+- [X] T033 Confirm the runtime mirror map and record it in `.specify/archive/specs/022-eei-agent-triad/plan.md`: `skills/internal/create-agent/templates/agent-capacity-*` → `.specify/skills/internal/create-agent/templates/agent-capacity-*`; `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` → `.specify/templates/` (currently MISSING); `skills/internal/{create-agent,improve-agent}/SKILL.md` → `.specify/skills/internal/...`; `templates/commands/agents.md` → `.claude/commands/speckit.agents.md`
 
 ## Phase 10: Foundational (blocking prerequisites)
 
@@ -194,19 +194,19 @@ Phase 1 (Setup)
 
 **Independent Test**: A role agent generated via create-agent has the delegation snippet inlined and, being default-on (OQ-1), spawns a role-scoped EEI loop when invoked on a quality-gated task; setting `supervisor: false` opts out.
 
-- [X] T036 [G1] Structural validation: extend the Validation Checklist in `.specify/specs/022-eei-agent-triad/quickstart.md` to assert (a) every role template carries supervision metadata (`supervisor: true` default + `{{ROLE_SCOPE}}`), and (b) create-agent inlines the `agent-supervision-delegation.md` snippet at generation (structural; pytest N/A)
-- [X] T037 [P] [G1] Add supervision metadata (`supervisor: true` default per OQ-1, `{{ROLE_SCOPE}}=system-designer`) to `templates/agent-role-system-designer-template.md` so create-agent inlines the shared delegation snippet at generation (do NOT copy the section into the template, OQ-2); mirror to `.specify/templates/agent-role-system-designer-template.md`
-- [X] T038 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=requirements-analyst`) to `templates/agent-role-requirements-analyst-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
-- [X] T039 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=module-designer`) to `templates/agent-role-module-designer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
-- [X] T040 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=test-engineer`) to `templates/agent-role-test-engineer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
-- [X] T041 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=qa-engineer`) to `templates/agent-role-qa-engineer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
-- [X] T042 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=knowledge-manager`) to `templates/agent-role-knowledge-manager-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
+- [X] T036 [G1] Structural validation: extend the Validation Checklist in `.specify/archive/specs/022-eei-agent-triad/quickstart.md` to assert (a) every role template carries supervision metadata (`supervisor: true` default + `{{ROLE_SCOPE}}`), and (b) create-agent inlines the `agent-supervision-delegation.md` snippet at generation (structural; pytest N/A)
+- [X] T037 [P] [G1] Add supervision metadata (`supervisor: true` default per OQ-1, `{{ROLE_SCOPE}}=system-designer`) to `skills/internal/create-agent/templates/agent-capacity-system-designer-template.md` so create-agent inlines the shared delegation snippet at generation (do NOT copy the section into the template, OQ-2); mirror to `.specify/skills/internal/create-agent/templates/agent-capacity-system-designer-template.md`
+- [X] T038 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=requirements-analyst`) to `skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
+- [X] T039 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=module-designer`) to `skills/internal/create-agent/templates/agent-capacity-module-designer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
+- [X] T040 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=test-engineer`) to `skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
+- [X] T041 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=qa-engineer`) to `skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
+- [X] T042 [P] [G1] Add supervision metadata (`supervisor: true`, `{{ROLE_SCOPE}}=knowledge-manager`) to `skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md` (create-agent composes; no section copied); mirror to `.specify/templates/`
 
 ## Phase 12: User Story G2 — Generalize create-agent (Goals 2 & 4, D2 & D5)
 
 **Independent Test**: `create-agent` can author a role, a supervisor, a triad, and a custom agent from one capability matrix; a `kind: supervisor` request produces a role agent with the delegation section bound.
 
-- [X] T043 [G2] Structural validation: add a checklist to `.specify/specs/022-eei-agent-triad/quickstart.md` verifying `create-agent` exposes the 4-capability matrix and consumes every `AgentAuthoringRequest` field defined in `contracts/agent-authoring-contract.md`
+- [X] T043 [G2] Structural validation: add a checklist to `.specify/archive/specs/022-eei-agent-triad/quickstart.md` verifying `create-agent` exposes the 4-capability matrix and consumes every `AgentAuthoringRequest` field defined in `contracts/agent-authoring-contract.md`
 - [X] T044 [G2] Reframe `skills/internal/create-agent/SKILL.md` Goal from "role-based agent template" to general authoring, and restructure the workflow into a capability matrix (role · supervisor · triad · custom) sharing one validate+report tail; mirror to `.specify/skills/internal/create-agent/SKILL.md`
 - [X] T045 [G2] Add the **Supervisor** capability to `skills/internal/create-agent/SKILL.md` — at generation, inline the single-source snippet `skills/internal/create-agent/templates/agent-supervision-delegation.md` into the role agent and bind `{{ROLE_SCOPE}}` (D1, OQ-2), with supervision active by default (OQ-1); mirror to `.specify/skills/internal/create-agent/SKILL.md`
 - [X] T046 [G2] Add `AgentAuthoringRequest` intake handling (kind/role_slug/task/scoring_dimensions/threshold/paths/project_context) to `skills/internal/create-agent/SKILL.md` per `contracts/agent-authoring-contract.md` (D5); mirror to `.specify/skills/internal/create-agent/SKILL.md`
@@ -215,14 +215,14 @@ Phase 1 (Setup)
 
 **Independent Test**: `improve-agent` accepts a role template, an `agent-subrole-*`, an orchestration prompt, or a generated `.agent.md`, classifies it, and routes to the matching refinement rules.
 
-- [X] T047 [G3] Structural validation: add a checklist to `.specify/specs/022-eei-agent-triad/quickstart.md` verifying `improve-agent` documents all four target kinds and a classify/route step
-- [X] T048 [G3] Broaden the Input Contract in `skills/internal/improve-agent/SKILL.md` target resolution beyond `templates/agent-role-*` to role · sub-role · orchestration · custom `.specify/agents/*.agent.md`, and add a classify-then-route step ahead of the existing Triad Refinement workflow; mirror to `.specify/skills/internal/improve-agent/SKILL.md`
+- [X] T047 [G3] Structural validation: add a checklist to `.specify/archive/specs/022-eei-agent-triad/quickstart.md` verifying `improve-agent` documents all four target kinds and a classify/route step
+- [X] T048 [G3] Broaden the Input Contract in `skills/internal/improve-agent/SKILL.md` target resolution beyond `skills/internal/create-agent/templates/agent-capacity-*` to role · sub-role · orchestration · custom `.specify/agents/{templates,instances}/*.agent.md`, and add a classify-then-route step ahead of the existing Triad Refinement workflow; mirror to `.specify/skills/internal/improve-agent/SKILL.md`
 
 ## Phase 14: User Story G4 — /speckit.agents delegates to the skills (Goal 3, D4)
 
 **Independent Test**: `/speckit.agents` Mode A/B produce identical artifacts to today but by calling `create-agent`/`improve-agent`; no inline template-rendering remains (contract R1).
 
-- [X] T049 [G4] Structural validation: add a checklist to `.specify/specs/022-eei-agent-triad/quickstart.md` asserting `templates/commands/agents.md` Mode A/B invoke `create-agent`/`improve-agent` and contain no inline template-rendering block (contract R1)
+- [X] T049 [G4] Structural validation: add a checklist to `.specify/archive/specs/022-eei-agent-triad/quickstart.md` asserting `templates/commands/agents.md` Mode A/B invoke `create-agent`/`improve-agent` and contain no inline template-rendering block (contract R1)
 - [X] T050 [G4] Refactor `templates/commands/agents.md` Mode A to build an `AgentAuthoringRequest` and delegate to `create-agent`, while retaining context-gathering, backup/preservation (FR-008/008a), symlink discoverability, and registry updates; regenerate/mirror runtime `.claude/commands/speckit.agents.md`
 - [X] T051 [G4] Refactor `templates/commands/agents.md` Mode B to delegate custom creation to `create-agent` (kind=custom) and updates to `improve-agent`; regenerate/mirror runtime `.claude/commands/speckit.agents.md`
 - [X] T052 [G4] Wire the `kind: supervisor` path end-to-end in `templates/commands/agents.md` so `/speckit.agents` can generate a supervisor role agent per `quickstart.md` Scenario 4; regenerate/mirror `.claude/commands/speckit.agents.md`
@@ -232,8 +232,8 @@ Phase 1 (Setup)
 - [X] T053 [P] Update `docs/eei-triad-pattern.md` to document the supervisor pattern and the shared delegation section (link to `contracts/agent-authoring-contract.md`)
 - [X] T054 [P] Update `skills/internal/create-agent/SKILL.md` and `skills/internal/improve-agent/SKILL.md` YAML `description` fields to reflect general-purpose scope; mirror both to `.specify/skills/`
 - [X] T055 Verify runtime parity (DoD-13): confirm every edited `templates/`/`skills/` file has a matching `.specify/` counterpart and `.claude/commands/speckit.agents.md` matches `templates/commands/agents.md`
-- [X] T056 Composability check (DoD-8/DoD-12): generate a supervisor agent for each of the 6 roles via `/speckit.agents` → `create-agent` and confirm each renders a valid `.specify/agents/<role>.agent.md` with a bound `{{ROLE_SCOPE}}` (quickstart Scenario 4)
-- [X] T057 Update `.specify/memory/features/019.md` and `.specify/memory/features.md` with amendment implementation notes and flip the amendment status once T032–T056 are complete
+- [X] T056 Composability check (DoD-8/DoD-12): generate a supervisor agent for each of the 6 roles via `/speckit.agents` → `create-agent` and confirm each renders a valid `.specify/agents/templates/<role>.agent.md` with a bound `{{ROLE_SCOPE}}` (quickstart Scenario 4)
+- [X] T057 Update `.specify/features/019-agents-command.md` and `.specify/features.md` with amendment implementation notes and flip the amendment status once T032–T056 are complete
 
 ## Amendment Phase Dependencies
 

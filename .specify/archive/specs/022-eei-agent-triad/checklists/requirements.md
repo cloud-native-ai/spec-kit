@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-07-02
-**Feature**: [.specify/specs/022-eei-agent-triad/requirements.md](../requirements.md)
+**Feature**: [.specify/archive/specs/022-eei-agent-triad/requirements.md](../requirements.md)
 
 ## Content Quality
 

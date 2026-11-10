@@ -14,7 +14,7 @@
 
 **Language/Version**: Markdown（技能契约）+ Python 3.8+（既有确定性引擎；本特性不新增脚本）
 **Primary Dependencies**: 宿主原生子代理派发（主）/ `run-agent`（降级）/ `run-skills`（Trainee 解析语义）/ `improve-skills`（优化入口）/ `probe-utils.py`、`flow-class-check.py`、`sync-mirrors.py`、`regen-command-copies.py`、`specify render-agents`
-**Storage**: 文件即存储——运行产物落 `.specify/memory/coaching/<run-id>/`；注册表真源为 `shared/definitions/flow-class-definitions.md`、`shared/definitions/probe-definitions.md`、`.specify/memory/features.md`
+**Storage**: 文件即存储——运行产物落 `.specify/memory/coaching/<run-id>/`；注册表真源为 `shared/definitions/flow-class-definitions.md`、`shared/definitions/probe-definitions.md`、`.specify/features.md`
 **Testing**: `pytest`（contract 为主）；四个冻结基线测试显式更新；新增教练产物契约测试（夹具 Trainee）；确定性检查 `pre-analyze-check.py`、`flow-class-check.py --action check`、`probe-utils.py --action compile-embeds --check`、`sync-mirrors.py --check`、`regen-command-copies.py --check`、`scan-confirmation-gates.py`
 **Target Platform**: 任何支持 Spec Kit 的 agent 宿主；技能是提示词层，不依赖特定运行时
 **Project Type**: single（框架源码 + 自举运行时双帽）
@@ -26,12 +26,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`, 18 principles in file order):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`, 18 principles in file order):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `requirements.md` 的 FR/SC 逐条落进 `contracts/` 条款与 `data-model.md` 校验规则；FR→条款映射 owner 为本文件 § Phase 1（逐 FR 一行）；无需求外设计 |
-| II | Feature-Centric Development | ✅ Pass | Feature 078 已登记，本阶段把 `Draft` 推进到 `Planned` 并更新 `.specify/memory/features/078.md` |
+| II | Feature-Centric Development | ✅ Pass | Feature 078 已登记，本阶段把 `Draft` 推进到 `Planned` 并更新 `.specify/features/078-coaching-skills.md` |
 | III | Intent-Driven Development | ✅ Pass | Summary 与 `contracts/coaching-run.contract.md` 先给「what/why」，实现细节留到 tasks |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | 四个冻结测试与新增契约测试先于技能正文落地；夹具场景对 SC-001…SC-005 |
 | V | AI Agent Integration Standards | ✅ Pass | 不改 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；仅用 `specify render-agents --ai qoder` 再生成宿主副本 |

@@ -5,7 +5,7 @@
 
 ## Summary
 
-Refactor the Agent framework across **code and documentation** so a single conceptual model governs everything: each Agent is described by **Role × Stage × Type**, organized statically as a **Team** (Role × Stage matrix) and dynamically as a **Loop**. All agent operations stay behind the single `/speckit.agents` entry point (no new commands), which recognizes intent and delegates to the `create-agent` and `organize-agents` skills. The redesign unifies terminology (**SubRole → Stage**, **improver → optimizer**), merges **Meta-Coordinator + Team Supervisor → a single Team Supervisor (Meta role)**, consolidates templates under the `create-agent` skill (removing stale duplicates), migrates existing persisted agents, and regenerates `docs/agents`. It also folds in a cross-project research deliverable mining `/cws_work/*` sibling projects.
+Refactor the Agent framework across **code and documentation** so a single conceptual model governs everything: each Agent is described by **Role × Stage × Type**, organized statically as a **Team** (Role × Stage matrix) and dynamically as a **Loop**. All agent operations stay behind the single `/speckit.agents` entry point (no new commands), which recognizes intent and delegates to the `create-agent` and `organize-agents` skills. The redesign unifies terminology (**SubRole → Stage**, **improver → optimizer**), merges **Meta-Coordinator + Team Supervisor → a single Team Supervisor (Meta role)**, consolidates templates under the `create-agent` skill (removing stale duplicates), migrates existing persisted agents, and regenerates `docs/reference/agents`. It also folds in a cross-project research deliverable mining `/cws_work/*` sibling projects.
 
 ## Technical Context
 
@@ -23,12 +23,12 @@ Refactor the Agent framework across **code and documentation** so a single conce
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every change traces to FR-001…FR-021; plan derived from `requirements.md` |
-| II | Feature-Centric Development | ✅ Pass | Bound to Feature 019 (Agents Command); `feature-ref.md` + features/019.md evolution note updated |
+| II | Feature-Centric Development | ✅ Pass | Bound to Feature 019 (Agents Command); `feature-ref.md` + `.specify/features/019-agents-command.md` evolution note updated |
 | III | Intent-Driven Development | ✅ Pass | Conceptual model + contracts express what/why; `/speckit.agents` is intent-driven |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Contracts authored in Phase 1; tasks update pytest + scenario tests and add a deprecated-term guard before edits |
 | V | AI Agent Integration Standards | ✅ Pass | Approved-provider whitelist preserved; FR-012 covers all officially supported tools |
@@ -68,17 +68,17 @@ templates/commands/agents.md               # Single-entry /speckit.agents source
 skills/internal/create-agent/SKILL.md               # Authoring skill: add Role/Stage/Type model; new stage/role names
 skills/internal/create-agent/templates/             # Canonical template home: rename stages, merge supervisor, add model headers
 skills/internal/create-agent/references/            # Supporting references (terminology-aligned)
-skills/improve-agent/SKILL.md              # Terminology alignment (improver→optimizer, subrole→stage)
-skills/organize-agents/SKILL.md            # Team Loop: merge Supervisor+Meta-Coordinator→Team Supervisor; terminology
-docs/agents/                               # design.md (done), eei-triad-pattern.md, multi-agent-orchestration.md → model+terms
-docs/commands/agents.md                    # Command doc aligned to single-entry + model
+skills/internal/improve-agent/SKILL.md     # Terminology alignment (improver→optimizer, subrole→stage)
+skills/internal/create-team/SKILL.md       # Team Loop: merge Supervisor+Meta-Coordinator→Team Supervisor; terminology
+docs/reference/agents/                     # design.md (done), quality-loop.md; orchestration guide: docs/reference/teams/orchestration.md → model+terms
+docs/reference/commands/agents.md          # Command doc aligned to single-entry + model
 tests/scenarios/multi-agent-orchestration/ # team-loop/serial/parallel scenarios: terminology + supervisor merge
 tests/                                      # add deprecated-term / reference-integrity guard; update affected tests
 .specify/agents/                           # Migrate persisted role agents + AGENTS.md (FR-020)
 .specify/templates/                        # Remove stale agent-* duplicates (canonicalize to create-agent skill)
 .specify/skills/                           # Re-sync installed mirror of create-agent/improve-agent/organize-agents
-.specify/memory/features.md                # Feature 019 index update (Last Updated + note)
-.specify/memory/features/019.md            # Feature 019 evolution note for spec 023
+.specify/features.md                       # Feature 019 index update (Last Updated + note)
+.specify/features/019-agents-command.md    # Feature 019 evolution note for spec 023
 ```
 
 **Structure Decision**: This spec extends the existing **code-generator / framework** shape. It does NOT add top-level directories or a new command. The canonical template location is confirmed as `skills/internal/create-agent/templates/` (source) with its installed mirror `.specify/skills/internal/create-agent/templates/`; the legacy `.specify/templates/agent-*` duplicates are removed to eliminate the "scattered templates" problem. All work is rename/merge/terminology/model-doc plus persisted-agent migration and installed-mirror re-sync.
@@ -101,7 +101,7 @@ tests/                                      # add deprecated-term / reference-in
 - **D2 — Supervisor merge**: Merge `agent-role-meta-coordinator-template.md` + `agent-team-supervisor-template.md` → `agent-role-team-supervisor-template.md` (Meta role, Meta at all stages). Update `organize-agents` Team Loop to 2 layers (Team Supervisor + Workers). All references to "Meta-Coordinator" resolve to Team Supervisor.
 - **D3 — Canonical template location**: `skills/internal/create-agent/templates/` is the single source of truth; `.specify/skills/internal/create-agent/templates/` is its installed mirror. Legacy `.specify/templates/agent-*` files are removed. All references (command, skills, tests, docs) point to the canonical location.
 - **D4 — Feature status**: Feature 019 is already `Implemented`; this refactor is an evolution under it. **Do NOT regress status**. Keep `Implemented`, update `Last Updated`, and append a spec-023 evolution note (per feature-integration guidance, `/speckit.plan` never lands `Implemented`, and here it must not downgrade either).
-- **D5 — History exclusion**: `draft/`, `CHANGELOG`, prior `.specify/specs/*`, and historical narrative in `features/019.md` "Latest Evolution" are immutable history — excluded from the zero-reference requirement (SC-002). A new evolution note is additive.
+- **D5 — History exclusion**: `draft/`, `CHANGELOG`, prior `.specify/specs/*`, and historical narrative in `.specify/features/019-agents-command.md` "Latest Evolution" are immutable history — excluded from the zero-reference requirement (SC-002). A new evolution note is additive.
 
 ## Phase 1: Design & Contracts
 
@@ -114,7 +114,7 @@ tests/                                      # add deprecated-term / reference-in
 - `quickstart.md` — Executable validation walkthrough mapping to SC-001…SC-009.
 - `feature-ref.md` — Feature 019 linkage record.
 
-**Feature Integration**: Update `.specify/memory/features/019.md` (evolution note: spec 023 planned) and `.specify/memory/features.md` (Last Updated → 2026-07-10). Status stays `Implemented` per Decision D4.
+**Feature Integration**: Update `.specify/features/019-agents-command.md` (evolution note: spec 023 planned) and `.specify/features.md` (Last Updated → 2026-07-10). Status stays `Implemented` per Decision D4.
 
 ## Complexity Tracking
 

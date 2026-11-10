@@ -8,7 +8,7 @@
 |-------|-------|
 | Feature ID | 019 |
 | Feature Name | Agents Command |
-| Feature Detail | `.specify/memory/features/019.md` |
+| Feature Detail | `.specify/features/019-agents-command.md` |
 | Relationship | Evolution/refactor of the existing (Implemented) feature |
 | Status action | Keep `Implemented` (Decision D4 — do not regress); add spec-023 evolution note |
 
@@ -19,5 +19,5 @@ Spec 023 refactors the Agent framework that Feature 019 owns. Prior specs under 
 ## Feature Index Changes
 
 - No new Feature created; no Feature merged or deprecated.
-- `.specify/memory/features/019.md`: append spec-023 evolution note.
-- `.specify/memory/features.md`: update Feature 019 `Last Updated` → 2026-07-10.
+- `.specify/features/019-agents-command.md`: append spec-023 evolution note.
+- `.specify/features.md`: update Feature 019 `Last Updated` → 2026-07-10.

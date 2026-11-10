@@ -2,7 +2,7 @@
 
 **Branch**: `master` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
 **Requirement → Feature**: `092-non-disposable` → Feature 092 Non-Disposable（不可一次性处置）
-**Input**: Specification from `.specify/specs/092-non-disposable/requirements.md`（65 FR / 20 SC；clarify 2026-11-09 裁定 D-1…D-8；validate corpus `.specify/specs/092-non-disposable/notes/input-review-080-090.md`）
+**Input**: Specification from `.specify/archive/specs/092-non-disposable/requirements.md`（65 FR / 20 SC；clarify 2026-11-09 裁定 D-1…D-8；validate corpus `.specify/archive/specs/092-non-disposable/notes/input-review-080-090.md`）
 
 ## Summary
 
@@ -50,12 +50,12 @@ team 与并发。新增只有三件：一个只读引擎、一个事实声明文
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/memory/constitution.md` (v1.19.0, 22 principles), in file order. The feature deliberately adds **no** principle (D-2), so the roster below is the whole roster and none of its rows is this feature's own.
+Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/constitution.md` (v1.19.0, 22 principles), in file order. The feature deliberately adds **no** principle (D-2), so the roster below is the whole roster and none of its rows is this feature's own.
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design element cites an FR: engine → FR-010/011/039/061, seam → FR-029…FR-045, landing → FR-063. `contracts/` carries a per-clause FR citation group, not a header-only mapping. |
-| II | Feature-Centric Development | ✅ Pass | FR-063 落点 4: registry row + `.specify/memory/features/092.md` land in the same batch; status moves Draft → Planned at this stage (no regression: 092 has no Implemented history). |
+| II | Feature-Centric Development | ✅ Pass | FR-063 落点 4: registry row + `.specify/features/092-non-disposable.md` land in the same batch; status moves Draft → Planned at this stage (no regression: 092 has no Implemented history). |
 | III | Intent-Driven Development | ✅ Pass | The user's four-stage form, the ten-root review surface and the "no deferral" rule are recorded verbatim in the state spine's `goal_verbatim` and mapped one-to-one in § Summary; `T-001`/`T-002` keep the two places where "what" and "how" could drift apart. |
 | IV | Test-First & Contract-Driven Implementation | ⚠ Partial — see Complexity Tracking | FR-062 lands the guards in the existing `pytest -m contract` set with a mutation leg per closed set, but the guards can only be written after the engine exists (the engine *is* the subject). Row 1 of Complexity Tracking. |
 | V | AI Agent Integration Standards | ✅ Pass | No new agent CLI, no new provider, no change to `AGENT_CONFIG` / `_ASSISTANT_TIERS`. The semantic face runs on the existing native-subagent path. |
@@ -169,7 +169,7 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
 ### Documentation (this spec)
 
 ```text
-.specify/specs/092-non-disposable/
+.specify/archive/specs/092-non-disposable/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — 13 findings, each with its measurement
 ├── data-model.md        # Phase 1 output — entities, the entry state machine, the expiry model
@@ -197,10 +197,10 @@ skills/internal/manage-history/SKILL.md  # EDIT — the review / design / confir
 templates/instructions-template.md  # EDIT — ONE pointer line into the existing section (never a new `##`)
 .specify/instructions.md            # regenerated from the template by scripts/bash/generate-instructions.sh
                                     #   (AGENTS.md is a symlink to it and flows; never hand-edited)
-.specify/memory/glossary.md         # EDIT — four terms pointing at the owner page
-.specify/memory/features.md         # EDIT — the 092 row (Draft -> Planned at this stage)
-.specify/memory/features/092.md     # NEW — the feature detail (Overview / Key Changes / Notes / Related Files)
-.specify/memory/register.md         # EDIT — the D-1…D-8 decision registration rows (see § ID Register Duty)
+.specify/glossary.md         # EDIT — four terms pointing at the owner page
+.specify/features.md         # EDIT — the 092 row (Draft -> Planned at this stage)
+.specify/features/092-non-disposable.md     # NEW — the feature detail (Overview / Key Changes / Notes / Related Files)
+.specify/register.md         # EDIT — the D-1…D-8 decision registration rows (see § ID Register Duty)
 tests/contract/                     # + test_non_disposable_contract.py — the seven-face guard with mutation legs
                                     # EDIT test_expression_compatibility.py — the one ALLOWED_POST_BASELINE_CHANGES entry
                                     # EDIT test_sdd_loop_driver_reanchor.py — G1/G2/G3's repair legs live beside the
@@ -213,8 +213,8 @@ exists and is non-empty" reading has a complete subject:
 
 ```text
 .specify/specs/092-non-disposable/verification.md        # NEW — the SC status rows + smoke record
-.specify/specs/092-non-disposable/coverage-baseline.txt  # NEW — the frozen clause-lane baseline (T037)
-.specify/specs/092-non-disposable/notes/                 # NEW — pre-change measurements, the measurement corpus,
+.specify/archive/specs/092-non-disposable/coverage-baseline.txt  # NEW — the frozen clause-lane baseline (T037)
+.specify/archive/specs/092-non-disposable/notes/                 # NEW — pre-change measurements, the measurement corpus,
                                                          #   the quickstart run log
 .specify/specs/092-non-disposable/test-evidence/         # NEW — the gate readings and the shift/repair readings
 ```
@@ -312,7 +312,7 @@ authoritative count is `tasks.md` itself.
 
 | # | Package | Owns (territory) | Depends on | Read-only? |
 |---|---------|------------------|-----------|-----------|
-| P1 | **Owner + declaration + registration** — the rule owner page, the `closed-set` fact, the framework-map row, the glossary four terms, the registry row + detail, the register decision rows | `shared/definitions/non-disposable-definitions.md`, `shared/declarations/facts/non-disposable-review-surface.yaml`, `shared/definitions/framework-map.md`, `.specify/memory/{glossary,features,register}.md`, `.specify/memory/features/092.md` | — | no |
+| P1 | **Owner + declaration + registration** — the rule owner page, the `closed-set` fact, the framework-map row, the glossary four terms, the registry row + detail, the register decision rows | `shared/definitions/non-disposable-definitions.md`, `shared/declarations/facts/non-disposable-review-surface.yaml`, `shared/definitions/framework-map.md`, `.specify/{glossary,features,register}.md`, `.specify/features/092-non-disposable.md` | — | no |
 | P2 | **The deterministic engine** — `scripts/python/non-disposable-check.py` (8 classes, coverage declaration, `--scope`, `--json`, exit 0/1/2, zero write) | `scripts/python/non-disposable-check.py` | P1 (reads the fact + owner page) | no |
 | P3 | **The history seam** — `manage-history` steps 0/A/B, `templates/commands/history.md` delegation list, the per-tool copies, the `.tmp` confirm artifact, the four-segment evidence | `skills/internal/manage-history/SKILL.md`, `templates/commands/history.md`, the rendered command copies | P1, P2 | no |
 | P4 | **The three pointer faces** — one line each into `templates/instructions-template.md` (inside an existing section), the regenerated `.specify/instructions.md` + `AGENTS.md`, and the `manage-history` review pointer | `templates/instructions-template.md`, `.specify/instructions.md`, `AGENTS.md` | P3 (the pointer must point at something that exists) | no |
@@ -375,7 +375,7 @@ row count is a marker count.
 | 089-script-interface-contract | E4 | the `applicable + exempt == candidates` identity |
 | 087-arch-diagram-docs | E6 | Overview vs its own clarify ruling |
 | 080 / 077 / 079 / 069 / 069b / 082 (dated bodies) | F1, F3 | quoted ceiling/roster values where they are neither history nor the owner |
-| `.specify/memory/features.md` + `features/080.md` | F4 | feature-total arithmetic and 080's spec-dir registration |
+| `.specify/features.md` + `features/080.md` | F4 | feature-total arithmetic and 080's spec-dir registration |
 | 086-efficient-test-execution | H1 | the `.specify/skills/external/…` path literal |
 | 082 / 085 | H2 | the two nonexistent evidence paths |
 
@@ -452,7 +452,7 @@ changes / who receives it) · `SC` (the success criterion whose reading covers i
 
 ## ID Register Duty *(disclosed gap, owned by implement)*
 
-The clarify session coined eight durable decisions `D-1`…`D-8`, and `.specify/memory/register.md` — the **sole
+The clarify session coined eight durable decisions `D-1`…`D-8`, and `.specify/register.md` — the **sole
 sanctioned writer** of durable identifiers — carries no row for them. FR-063 落点 7 requires a register entry for
 this feature; the decision rows are the same obligation one level down. Measured (read-only) at this stage:
 
@@ -489,8 +489,8 @@ landing change — this is a **decision-free** deferral, not a silent one).
 |---|------|----------|---------------|
 | 1 | Owner page (NEW) | `shared/definitions/non-disposable-definitions.md` | exists, non-empty, declares what it owns, carries the two mapping tables, the adjudication rule, the `## Status Readability` section (closed status × verdict table) and the `## Relation to the Constitution` section FR-064(iv) requires — the last one is an obligation with no other home, and its absence reads as an omission to the next reader |
 | 2 | Declaration fact (NEW) | `shared/declarations/facts/non-disposable-review-surface.yaml` | loads through `declaration_reader.py`, `kind: closed-set`, the five required keys present, ten roots in the declared order |
-| 3 | Glossary (4 terms) | `.specify/memory/glossary.md` | `Non-Disposable` / `Disposition（处置）` / `Review Surface（回顾面）` / `Exemption（豁免）` each point at the owner page and restate none of its criteria |
-| 4 | Registry row + detail | `.specify/memory/features.md`, `.specify/memory/features/092.md` | row present, status `Planned`, detail carries the XI 边界 line |
+| 3 | Glossary (4 terms) | `.specify/glossary.md` | `Non-Disposable` / `Disposition（处置）` / `Review Surface（回顾面）` / `Exemption（豁免）` each point at the owner page and restate none of its criteria |
+| 4 | Registry row + detail | `.specify/features.md`, `.specify/features/092-non-disposable.md` | row present, status `Planned`, detail carries the XI 边界 line |
 | 5 | Existing guard | `tests/contract/test_non_disposable_contract.py` | the four `sanitize-utils.py` sets byte-unchanged; `test_constitution_double_landing.py` and `test_fast_fail_discipline.py` count pins unmoved; a mutation leg per closed set |
 | 6 | Three pointer faces | `templates/instructions-template.md` + `.specify/instructions.md` / `AGENTS.md`; `skills/internal/manage-history/SKILL.md` | one line each, appended **inside an existing section** — `test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22` pins the top-level `##` counts (its `TPL_EXPECTED` / `LIVE_EXPECTED` locals own the numbers) and MUST stay unchanged; `wc -c .specify/instructions.md` stays within `INSTRUCTIONS_BUDGET_BYTES` (measured headroom before the edit: 38,400 − 35,821 = 2,579 B) |
-| 7 | Decision record | `.specify/memory/register.md` + `shared/definitions/framework-map.md` row | one register row per the ID Register Duty above; the directory registration row in the existing table |
+| 7 | Decision record | `.specify/register.md` + `shared/definitions/framework-map.md` row | one register row per the ID Register Duty above; the directory registration row in the existing table |

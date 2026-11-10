@@ -14,7 +14,7 @@
 **Feature ID**: 087
 **Feature Name**: 架构图为核心的文档空间（Architecture-Diagram-Centric Documentation Space）
 
-**绑定结论**：绑定**新建 Feature 087**（`Draft`，2026-11-06 由本阶段按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 绑定并登记）；登记行与详情文件随本阶段落盘（`.specify/memory/features.md` 索引行 + `.specify/memory/features/087.md`）。**不**把本规格挂到任何既有 Feature 名下。绑定证据见 `## Clarifications` `### Session 2026-11-06` 的 Q1 行与下面的 reuse-first 复核表。
+**绑定结论**：绑定**新建 Feature 087**（`Draft`，2026-11-06 由本阶段按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 绑定并登记）；登记行与详情文件随本阶段落盘（`.specify/features.md` 索引行 + `.specify/features/087-arch-diagram-docs.md`）。**不**把本规格挂到任何既有 Feature 名下。绑定证据见 `## Clarifications` `### Session 2026-11-06` 的 Q1 行与下面的 reuse-first 复核表。
 
 **与直接前序的关系（只引用、不回写）**：Feature 037（Docs Command，`Implemented`）持有 `/speckit.docs` 命令本体、`create-docs` / `improve-docs` / `create-pages` 三个技能的归属划分与单一 reconcile 引擎；Feature 069（`Implemented`）持有「执行/表达」分类与文档型门禁；Feature 069a 与 Feature 077 持有文档型门禁的落地点与阶段命令接线。本特性**不重写**这些契约，只在其中做「配套图义务」类的**追加**（FR-001 的落点即 069a 的 W3 接线面）。这三个 Feature 的正文与状态 MUST NOT 因本特性改写或回退。
 
@@ -30,7 +30,7 @@
 
 **结论与理由**：037 打开的是文档空间的**结构**能力（分类法、期望态基线、调谐引擎），本特性打开的是文档空间的**内容形态**能力（每份正式文档是否配了能解释其所描述结构的架构图，以及如何机器判定）。二者分属不同能力域，且 037 已关闭：把本规格挂到它会重新解释一份已交付的契约。叠加第二条证据：本仓既有 `skills/external/draw-diagram/` 前门存在，但 `create-docs` / `improve-docs` / `templates/commands/docs.md` / `docs/concepts/documentation-model.md` 对 "diagram" 零命中——能力已存在而没有任何写入流程消费它，是一个**新**义务，不是既有义务的加固。故新建 087，并在 037 与 069a/077 的 owner 文件中只做**类条件追加**。
 
-**编号占用核对**：086 未被占用（`.specify/memory/features.md` 索引行与 `.specify/specs/` 目录均无 086）；本特性占用 087。
+**编号占用核对**：086 未被占用（`.specify/features.md` 索引行与 `.specify/specs/` 目录均无 086）；本特性占用 087。
 
 ## Overview
 

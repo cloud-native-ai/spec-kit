@@ -7,8 +7,8 @@ description: "Task list for Feature 092 Non-Disposable"
 
 **Requirement ID**: 092
 **Requirement Key**: 092-non-disposable
-**Related Feature**: 092 Non-Disposable（不可一次性处置） (from `.specify/memory/features.md`)
-**Input**: Design documents from `.specify/specs/092-non-disposable/`
+**Related Feature**: 092 Non-Disposable（不可一次性处置） (from `.specify/features.md`)
+**Input**: Design documents from `.specify/archive/specs/092-non-disposable/`
 **Prerequisites**: plan.md (required), requirements.md (required), research.md, data-model.md, contracts/, quickstart.md
 
 **Tests Mode**: ON — Constitution Principle IV "Test-First & Contract-Driven Implementation" plus Principle VII
@@ -26,11 +26,11 @@ packages P1–P8**, and each phase is independently verifiable through its own c
 
 - DoD-1: Every artifact in `plan.md` § Source Code (repository root) that this feature creates or edits exists and is non-empty, and every `.specify/` mirror is produced by `sync-mirrors.py`, never hand-written
 - DoD-2: The guard file `tests/contract/test_non_disposable_contract.py` is green under `pytest -m contract` and carries one mutation leg per closed set and per detection class — `detection-categories` C-106 (per class), `status-and-verification` C-207 (the substituted checker), `disposition` C-307 (no batch rewrite channel), `renumber-and-supersede` C-505 (both predicate legs), `detection-engine-cli` C-606 (a path duplicated across scopes) — each leg **observed red** before its green counts. `acceptance-readability` C-803's leg is the clash-vs-consistent pair: the clash fixture lands red on its cell **and** the consistent fixture lands green, which a guard that reddens every `Planned` row would fail
-- DoD-3: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/092-non-disposable/tasks.md` exits 0, and `account-clause-coverage.py --spec-dir .specify/specs/092-non-disposable` reports every one of the 62 clauses claimed (`0 error(s)`) with an empty FR lane (`FR uncovered: 0`)
+- DoD-3: `python3 .specify/scripts/python/validate-tasks.py .specify/archive/specs/092-non-disposable/tasks.md` exits 0, and `account-clause-coverage.py --spec-dir .specify/archive/specs/092-non-disposable` reports every one of the 62 clauses claimed (`0 error(s)`) with an empty FR lane (`FR uncovered: 0`)
 - DoD-4: Every 档 I corpus entry (19: A1–A6, B1–B5, C1–C4, G1–G3) is closed **by name** on a second engine reading, and every 档 II entry (15) reaches a receiving body — read as **12** handoff markers, one per `plan.md` § Shift List row, not 15 — while its body stays untouched by this feature's diff. The two counts differ on purpose: 19 / 15 count corpus entries, 12 counts receiving bodies (C-805, § Shift List count table)
 - DoD-5: `sanitize-utils.py`'s four closed sets are byte-unchanged; both constitution count pin guards are unmoved; `wc -c .specify/instructions.md` stays within `INSTRUCTIONS_BUDGET_BYTES`
 - DoD-6: `verification.md` carries a status row per success criterion (20) plus the smoke record, and `closure-acceptance-check.py` is the verdict that flips the status
-- DoD-7: The `D-1`…`D-8` decision rows are registered in `.specify/memory/register.md`, and the registry row for 092 sits at `Planned` with `.specify/memory/features/092.md` present
+- DoD-7: The `D-1`…`D-8` decision rows are registered in `.specify/register.md`, and the registry row for 092 sits at `Planned` with `.specify/features/092-non-disposable.md` present
 
 **DoD Status**: pending
 
@@ -38,9 +38,9 @@ packages P1–P8**, and each phase is independently verifiable through its own c
 
 - GATE-1: No NEW failure vs the recorded frozen baseline — check: `pytest -m contract` name list compared to the frozen failed node-id set by name (`comm -13` / `comm -23`), both directions empty; baseline owner: `/speckit.implement` step 6 `**Test runs**`
 - GATE-2: Every mirror obligation from `plan.md` § Mirror Obligations verified — check: `python3 scripts/python/sync-mirrors.py --check` reports no new drift on the pairs this spec touches, and `diff -q` on each byte-equal pair in `plan.md` § Mirror Obligations is empty
-- GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/specs/092-non-disposable/tasks.md` returns 0
+- GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/archive/specs/092-non-disposable/tasks.md` returns 0
 - GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `.specify/specs/092-non-disposable/verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (an existing non-empty path) are all present, unless an explicit user waiver names that criterion. Condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema
-- GATE-5: Every contract clause is claimed by exactly one row, and the FR lane is empty **by citation or by a named declaration** — check: `python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/092-non-disposable` exits 0 with an empty `UNCOVERED` list and `FR uncovered: 0`. The FR lane is **not** required to be empty by absence: the three process-grade FRs (FR-046, FR-050, FR-051) are closed by `contracts/acceptance-readability.contract.md` C-806's named declaration, and the remaining FRs by clause citation groups. A run that reaches `FR uncovered: 0` only by adding an empty citation to a clause has not met this gate — the closure must be either a real citation or the C-806 declaration, which names its three FRs explicitly
+- GATE-5: Every contract clause is claimed by exactly one row, and the FR lane is empty **by citation or by a named declaration** — check: `python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/archive/specs/092-non-disposable` exits 0 with an empty `UNCOVERED` list and `FR uncovered: 0`. The FR lane is **not** required to be empty by absence: the three process-grade FRs (FR-046, FR-050, FR-051) are closed by `contracts/acceptance-readability.contract.md` C-806's named declaration, and the remaining FRs by clause citation groups. A run that reaches `FR uncovered: 0` only by adding an empty citation to a clause has not met this gate — the closure must be either a real citation or the C-806 declaration, which names its three FRs explicitly
 - GATE-6: The closed sets this feature is forbidden to move are byte-unchanged — check: `pytest -m contract tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py` plus the four-set comparison asserted by the guard
 
 ## Environment Prerequisites
@@ -69,7 +69,7 @@ and are not restated here.
 
 Single project, framework self-hosting repository. `shared/`, `scripts/`, `templates/`, `skills/` are the framework
 **sources**; their `.specify/` counterparts are generated by `scripts/python/sync-mirrors.py` and MUST NOT be
-hand-edited. `.specify/memory/{glossary,features,register}.md` are single-copy live governance files.
+hand-edited. `.specify/{glossary,features,register}.md` are single-copy live governance files.
 
 ---
 
@@ -154,7 +154,7 @@ corpus A2 and F2 on this tree.
 - [ ] T059 Implement the `superseded-live`, `multi-owner`, `orphan-path` and `renumber-live-binding` classes in `scripts/python/non-disposable-check.py`, each naming both sides of the defect, with one class per entry (a two-class defect is two entries, never a joined class string)
 - [ ] T060 Implement the four state classes in `scripts/python/non-disposable-check.py`, including `deferral-marker`'s retention statement with no expiry condition
 - [ ] T061 Implement entry evidence emission in `scripts/python/non-disposable-check.py` — `path`, `line` (1-based, `0` reserved for file-level facts), and at least one resolvable `evidence_refs` element per entry (≥ 2 for a `semantic` entry), with a duplicate `entry_id` merged and `path` normalised per `declaration_reader.normalize_path`
-- [ ] T062 Implement the `multi-owner`, `orphan-path` and `renumber-live-binding` reproduction arms over the A–H corpus in `scripts/python/non-disposable-check.py`, and run the engine against the real tree to record the first coverage declaration (per-root counts, candidate total) into `.specify/specs/092-non-disposable/notes/quickstart-run.md`
+- [ ] T062 Implement the `multi-owner`, `orphan-path` and `renumber-live-binding` reproduction arms over the A–H corpus in `scripts/python/non-disposable-check.py`, and run the engine against the real tree to record the first coverage declaration (per-root counts, candidate total) into `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md`
 - [ ] T063 Implement the per-class zero-reporting arm in `scripts/python/non-disposable-check.py` — `count: 0` accompanied by the roots searched, never an omitted class
 - [ ] T064 Implement the unified `--json` and human projections of one in-memory run in `scripts/python/non-disposable-check.py` so every human-form count appears in the JSON
 - [ ] T065 Implement the mandatory coverage declaration as the first block of every report (roots in declared order with presence and count, candidate total, exclusions with reasons, missing roots, unregistered siblings, declaration path and status)
@@ -163,7 +163,7 @@ corpus A2 and F2 on this tree.
 - [ ] T068 Make the four reader questions answerable from the report alone in `scripts/python/non-disposable-check.py` (what was looked at, what was found, what is proposed, what is not done) [green: contracts/report-schema.contract.md#C-705]
 - [ ] T069 Generate `.specify/scripts/python/non-disposable-check.py` from `scripts/python/non-disposable-check.py` by running `python3 scripts/python/sync-mirrors.py`, and confirm the pair carries the projection marker and no new drift [green: contracts/report-schema.contract.md#C-706]
 - [ ] T070 Emit a `status-unreadable` entry's verdict and reason-code spelling verbatim, plus the checker-call identity, in the machine fields of every `--json` run, asserted on the corpus A2 reading [green: contracts/report-schema.contract.md#C-707]
-- [ ] T071 Verify the engine reproduces corpus A2 and `quickstart.md` § 2's two readings on this tree, recording exit codes and hit lines in `.specify/specs/092-non-disposable/notes/quickstart-run.md` [blockedBy: T062]
+- [ ] T071 Verify the engine reproduces corpus A2 and `quickstart.md` § 2's two readings on this tree, recording exit codes and hit lines in `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md` [blockedBy: T062]
 
 **Checkpoint P2**: the engine runs read-only, exits 0/1/2 meaning three different things, writes nothing, and its
 coverage declaration agrees with an independent enumeration over the ten roots.
@@ -187,7 +187,7 @@ required before any write; unconfirmed entries are visible; evidence lands one f
 - [ ] T155 In the execute segment of `skills/internal/manage-history/SKILL.md`, handle the archive disposition as `git mv` semantics with the source → archive mapping recorded, keeping the superseded text and showing a rename pair rather than a deletion [green: contracts/renumber-and-supersede.contract.md#C-507]
 - [ ] T080 Regenerate the per-tool command copies from `templates/commands/history.md` with `python3 scripts/python/regen-command-copies.py`, then confirm `pytest -m contract tests/contract/test_docs_command_template.py::test_c10_runtime_copies_exist_for_every_present_tool` is green [blockedBy: T079]
 - [ ] T081 Generate `.specify/skills/internal/manage-history/SKILL.md` from its source by running `python3 scripts/python/sync-mirrors.py`, confirm the pair is byte-identical, and register the two edited frozen sources in `tests/contract/test_expression_compatibility.py`'s `ALLOWED_POST_BASELINE_CHANGES` with markers **added by this change** and a reason naming Feature 092 [blockedBy: T072,T079]
-- [ ] T082 Run the `quickstart.md` § 8 seam walk against a copy tree and record the two snapshots' byte comparison, the confirmation reading and the four evidence segments in `.specify/specs/092-non-disposable/notes/quickstart-run.md` [blockedBy: T080]
+- [ ] T082 Run the `quickstart.md` § 8 seam walk against a copy tree and record the two snapshots' byte comparison, the confirmation reading and the four evidence segments in `.specify/archive/specs/092-non-disposable/notes/quickstart-run.md` [blockedBy: T080]
 
 **Checkpoint P3**: deleting the seam from either face makes the P5 guard go red; on a copy tree, review and design
 leave `git status --porcelain` byte-identical, and execute writes only after a confirmation.
@@ -268,14 +268,14 @@ assigns to 档 I, and every edit is a **record completion or a marker**, never a
 - [ ] T119 Record the **before** engine reading for the 档 I scope in `.specify/specs/092-non-disposable/test-evidence/repair-corpus.md` (`--json`, exit code, per-class counts) as the first evidence segment [blockedBy: T086]
 - [ ] T120 Repair A1 by completing `.specify/specs/089-script-interface-contract/verification.md` with the machine-readable per-criterion block and smoke fields, and reconciling its registry row against `closure-acceptance-check.py`'s verdict — the record's fields, not its conclusions, are what change
 - [ ] T121 Repair A2 by completing `.specify/specs/084-harness-triple-structure/verification.md` so its `unclassified` claim is taken from `harness-triple-check.py --action verify` rather than asserted
-- [ ] T122 Repair A3 by moving 090's registry row in `.specify/memory/features.md` from `Planned` to its closure-consistent value (closure verdict `accept`, 4/4 SC) [blockedBy: T038]
+- [ ] T122 Repair A3 by moving 090's registry row in `.specify/features.md` from `Planned` to its closure-consistent value (closure verdict `accept`, 4/4 SC) [blockedBy: T038]
 - [ ] T123 Repair A4 by completing the structural record of `.specify/specs/089-script-interface-contract/tasks.md` so its non-story-phase user-story labels and its status block agree
 - [ ] T124 Repair A5 by completing the decision-tension records of `.specify/specs/085-sdd-temporary-goal-team/plan.md` to the owner's six-field form [green: contracts/acceptance-readability.contract.md#C-806]
 - [ ] T125 Repair A6 by adding the post-081 common schema fields (`**Path**:` markers, `smoke_command`) to `.specify/specs/080-humanize-run-output/requirements.md` as a record completion [green: contracts/acceptance-readability.contract.md#C-807]
 - [ ] T126 Repair B1 by marking `C-016` in `.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md` superseded with a pointer to the 089 mirror-projection contract, keeping the old text, and retiring or replacing the `byte_identical` guard in `tests/contract/test_run_tests_runner_contract.py` in the same change
 - [ ] T127 Repair B2 by following the owner in `.specify/specs/085-sdd-temporary-goal-team/contracts/temporary-goal-team.md` — its **C-007** (the team path form `.specify/specs/<NNN-slug>/team/team.md`) and **C-008** (creation timing), not a paraphrased copy — and in `contracts/checkpoint-and-agents.md`'s **C-001** (the four-part checkpoint) — with markers and pointers, old text retained
 - [ ] T128 Repair B3 by marking `.specify/specs/067-*/contracts/runner-contract.md` "Serial is the default" superseded by 086's parallel default (marker + pointer, old text retained)
-- [ ] T129 Repair B4 by re-pointing the evidence path in `.specify/specs/088-*/efficiency-model.md` § evidence-path to the owner spelling that exists, retaining the original text inside the disposition record
+- [ ] T129 Repair B4 by re-pointing the evidence path in `skills/external/sdd-loop-driver/references/efficiency-model.md` § evidence-path to the owner spelling that exists, retaining the original text inside the disposition record
 - [ ] T130 Repair B5 by choosing one owner spelling for the two-slot evidence path and adding pointer rows for the other two spellings in the same disposition record
 - [ ] T131 Repair C1 by correcting the live bindings in `.specify/specs/089-script-interface-contract/requirements.md` (Feature ID), `089/tasks.md` (headers) and `089/feature-ref.md` (its binding lines) to 089
 - [ ] T132 Repair C2 by correcting the live instruction in `.specify/specs/089-script-interface-contract/tasks.md` so it names the 089 registry row and `features/089.md`, and by renaming `.specify/specs/089-script-interface-contract/team/086-script-interface-contract/` to the 089 slug with `git mv` semantics, correcting its `name:` line [blockedBy: T131]
@@ -320,11 +320,11 @@ the feature's reported zero excludes 档 II.
 - [ ] T147 Write `.specify/specs/092-non-disposable/verification.md` from `.specify/templates/verification-log-template.md` — one status row per success criterion (20), the smoke record, `deferred_tasks=`, and the engine reading behind each row
 - [ ] T148 Run the stage gates and paste the raw output into `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` — `validate-tasks.py`, `decomposition-check.py --mode tasks`, `account-clause-coverage.py --spec-dir`, and `pytest -m contract tests/contract/test_non_disposable_contract.py`
 - [ ] T149 Run the mirror verification and paste it into `.specify/specs/092-non-disposable/test-evidence/tasks-gates.txt` — `python3 scripts/python/sync-mirrors.py --check`, the `diff -q` readings for every byte-equal pair in `plan.md` § Mirror Obligations, and the `regen-command-copies.py` re-run result
-- [ ] T150 Run `closure-acceptance-check.py --spec-dir .specify/specs/092-non-disposable` and record its `verdict` and `reasons` verbatim in `verification.md`; the registry status flip is written only on `accept`
-- [ ] T151 Flip the 092 row of `.specify/memory/features.md` per the closure verdict and re-read the `Total Features` header in the same pass, appending a `(deferred: …)` suffix only if a `[~]` row exists [blockedBy: T147]
-- [ ] T152 Update `.specify/memory/features/092.md` § Latest Review and § Key Changes with this run's measured outcome [blockedBy: T151]
+- [ ] T150 Run `closure-acceptance-check.py --spec-dir .specify/archive/specs/092-non-disposable` and record its `verdict` and `reasons` verbatim in `verification.md`; the registry status flip is written only on `accept`
+- [ ] T151 Flip the 092 row of `.specify/features.md` per the closure verdict and re-read the `Total Features` header in the same pass, appending a `(deferred: …)` suffix only if a `[~]` row exists [blockedBy: T147]
+- [ ] T152 Update `.specify/features/092-non-disposable.md` § Latest Review and § Key Changes with this run's measured outcome [blockedBy: T151]
 - [ ] T153 Index the run's evidence files in `.specify/specs/092-non-disposable/test-evidence/INDEX.md` (one line per file, its producer row and its reading date)
-- [ ] T154 Register the run's own durable identifiers (any finding `F-…`, open item `OI-…`, recommendation `REC-…` coined after this stage, plus the `F-1 (092)` row for the post-freeze clause delta) in `.specify/memory/register.md`, in the pointer shape
+- [ ] T154 Register the run's own durable identifiers (any finding `F-…`, open item `OI-…`, recommendation `REC-…` coined after this stage, plus the `F-1 (092)` row for the post-freeze clause delta) in `.specify/register.md`, in the pointer shape
 
 **Checkpoint P8**: zero open rows remain, the closure verdict is recorded verbatim, and every gate reading is on
 disk with the command that produced it.

@@ -2,7 +2,7 @@
 
 **Purpose**: Validate the quality, clarity, completeness and internal consistency of the requirements for Feature 078 — the coaching loop (expectation → real execution → observation → improvement) plus the `think-skills` → `coaching-skills` rename and upgrade surface. Every item is a question about the requirement text, not about running the product.
 **Created**: 2026-10-30
-**Feature (Requirement Scope)**: `.specify/memory/features/078.md` (Feature 078 — Coaching Skills)
+**Feature (Requirement Scope)**: `.specify/features/078-coaching-skills.md` (Feature 078 — Coaching Skills)
 **Requirements (What)**: [../requirements.md](../requirements.md) — 29 FR / 9 SC / 4 user stories / 17 Shared Strings
 **Specifications (How, context only)**: [../plan.md](../plan.md), [../tasks.md](../tasks.md), [../contracts/](../contracts/), [../data-model.md](../data-model.md) — referenced only to expose gaps, ambiguities and conflicts in the requirements, never graded for their own quality.
 

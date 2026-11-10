@@ -29,7 +29,7 @@
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
-- [x] Related Feature resolved — **Feature 052 / 快速失败纪律(Fast Fail) / `Draft`**; registry obligations discharged (index row added, `features/052.md` created, reverse cross-reference written into `features/051.md`, `Total Features` 51 → 52)
+- [x] Related Feature resolved — **Feature 052 / 快速失败纪律(Fast Fail) / `Draft`**; registry obligations discharged (index row added, `.specify/features/052-fast-fail-principle.md` created, reverse cross-reference written into `.specify/features/051-user-facing-comprehension.md`, `Total Features` 51 → 52)
 
 ## Notes
 
@@ -59,7 +59,7 @@ Run 2 counted 62 FR / 14 SC / 10 STR / 6 stories / 28 acceptance / 17 edge cases
 Both were caught by counting the artifact after editing it, not by reading it — the exact discipline this feature specifies:
 
 1. **Three Shared Strings were defined but never cited** (`STR-011`/`STR-012`/`STR-013`). A pinned literal with no consumer is dead weight and would have shipped as an unassertable contract row. Now wired into FR-016, FR-017, FR-054 and FR-067; the check now runs in **both** directions (unresolved *and* uncited).
-2. **An entity count was asserted as 20 in two artifacts while the file held 19.** Corrected in both this spec's Clarifications log and `features/052.md`. A count written from memory rather than re-derived is the failure mode `SC-002` exists to make visible.
+2. **An entity count was asserted as 20 in two artifacts while the file held 19.** Corrected in both this spec's Clarifications log and `.specify/features/052-fast-fail-principle.md`. A count written from memory rather than re-derived is the failure mode `SC-002` exists to make visible.
 
 ### Judgement notes on the two "implementation details" items
 
@@ -77,4 +77,4 @@ Still open, and deliberately not decided here:
 1. **Injection clause size ceiling.** FR-048 requires the clause to be self-sufficient for the classification decision, which pulls against token efficiency on high-fan-out dispatches. The threshold is deliberately left to the truth-source doc as its single definition point — `/speckit.plan` must write actual clause text and therefore has to fix a figure.
 2. **Channel 3's landing point.** Sixth field in the Per-Agent Payload table vs. folded into `task_brief`'s content rule. FR-050 leaves it to `/speckit.plan` but requires that the guard be able to discriminate it.
 3. **SC-018-style cross-discipline edit.** FR-024 makes the fast-fail truth-source doc a *partial* rule source for surface class ⑪. Whether that requires a row edit in `user-facing-comprehension.md`'s class-mapping table must be settled in planning, and if it does, it must be listed as an explicit cross-discipline change rather than happening silently.
-4. **Four upstream defects found but deliberately not fixed here** (each outside this feature's blast radius; fixing them mid-clarify would itself violate FR-073's radius rule): `feature-integration.md`'s status contradiction and its dead `memory/feature-index.md` pointer; the false "refresh instructions restores the mirror copy" wording pattern that other ambient sections also carry; the `反空转哨兵` / `反空真哨兵` canonical-vs-source word-form mismatch; and `agent-definitions.md:50`'s "seven shipped role agents" (measured: 2). All four are recorded in `features/052.md` › Future Evolution Suggestions.
+4. **Four upstream defects found but deliberately not fixed here** (each outside this feature's blast radius; fixing them mid-clarify would itself violate FR-073's radius rule): `feature-integration.md`'s status contradiction and its dead `memory/feature-index.md` pointer; the false "refresh instructions restores the mirror copy" wording pattern that other ambient sections also carry; the `反空转哨兵` / `反空真哨兵` canonical-vs-source word-form mismatch; and `agent-definitions.md:50`'s "seven shipped role agents" (measured: 2). All four are recorded in `.specify/features/052-fast-fail-principle.md` › Future Evolution Suggestions.

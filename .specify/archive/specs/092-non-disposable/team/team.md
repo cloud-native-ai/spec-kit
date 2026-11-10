@@ -3,7 +3,7 @@ name: SDD Temporary Team 092
 slug: 092-non-disposable
 description: Run-scoped SDD team for Feature 092 — Non-Disposable; serial stage chain over tasks / implement / review with per-stage coordinator + executor seats, one independent verifier reserve, a reporter seat, and the checkpoint-03 concurrency decision (requested 24 / effective 24, implement ceiling 8).
 scope: spec
-spec_dir: .specify/specs/092-non-disposable
+spec_dir: .specify/archive/specs/092-non-disposable
 lifecycle_state: active
 goal: >-
   Deliver Feature 092 Non-Disposable through the remaining SDD stages: a review surface of exactly the ten
@@ -17,7 +17,7 @@ goal_slug: 092-non-disposable
 territory:
   write:
     # the spec's own artifacts: tasks / plan / evidence / checkpoints / team runs
-    - .specify/specs/092-non-disposable/**
+    - .specify/archive/specs/092-non-disposable/**
     # the line state spine (driver-owned)
     - .specify/state/092-non-disposable.md
     # P1 — owner page, declaration fact, framework-map registration row
@@ -25,10 +25,10 @@ territory:
     - shared/declarations/facts/non-disposable-review-surface.yaml
     - shared/definitions/framework-map.md
     # P1 — canonical registries (single-owner files, edited by the driver only)
-    - .specify/memory/glossary.md
-    - .specify/memory/features.md
-    - .specify/memory/features/092.md
-    - .specify/memory/register.md
+    - .specify/glossary.md
+    - .specify/features.md
+    - .specify/features/092-non-disposable.md
+    - .specify/register.md
     # P2 — the deterministic engine (framework source; the .specify/scripts mirror is generated)
     - scripts/python/non-disposable-check.py
     # P3 — the history seam
@@ -45,7 +45,7 @@ territory:
   forbidden:
     # 092 owns no global team or goal definition; the spec-local goal is engine-rendered only
     - .specify/teams/**
-    - .specify/goal/**
+    - .specify/anchoring/**
     # other features' bodies are NOT rewritten wholesale here; two narrow write faces are carved out below
     # (FR-056 / D-8): P6's 档 I record-completion repairs, and P7's one handoff marker per receiving body.
     # Everything not named in the carve-out stays forbidden, including 档 II bodies' own prose.
@@ -71,15 +71,15 @@ territory:
   # surface lands the marker (P7 cross-line write or the receiving body's own line) is a recorded decision,
   # not a correction. RECORDED (P1/T005): the P7 cross-line write face is chosen — P7 lands ONE marker line
   # per receiving body, and `forbidden` is narrowed to that one line for the twelve receiving rows
-  # (eleven receiving bodies + `.specify/memory/features.md`) named in plan.md § Shift List; every other byte of those bodies stays off-limits to P7. The receiving body's
+  # (eleven receiving bodies + `.specify/features.md`) named in plan.md § Shift List; every other byte of those bodies stays off-limits to P7. The receiving body's
   # own line is NOT used, because a marker landed by the receiving feature would be authored by a feature
   # that has not run yet, and the handoff would then be unverifiable at this feature's closure.
   write_carve_outs:
     - pkg: P6
-      paths: [.specify/specs/080-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/memory/features.md]
+      paths: [.specify/specs/080-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/features.md]
       scope: record completion only (missing field, marker, pointer) — no redesign, no prose rewrite
     - pkg: P7
-      paths: [.specify/specs/081-*/, .specify/specs/082-*/, .specify/specs/083-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/memory/features.md]
+      paths: [.specify/specs/081-*/, .specify/specs/082-*/, .specify/specs/083-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/features.md]
       scope: one handoff marker line per receiving body (C-805) — nothing else
   non_path:
     - { type: runtime, target: "host agent concurrency and the rendered agent registration surface (specify render-agents output)" }
@@ -144,7 +144,7 @@ members:
     role: reporter
     lifecycle: temporary
     reporting-territory:
-      read: [".specify/state/092-non-disposable.md", ".specify/specs/092-non-disposable/test-evidence/**", ".specify/specs/092-non-disposable/checkpoints/**", ".specify/specs/092-non-disposable/team/092-non-disposable/runs/**"]
+      read: [".specify/state/092-non-disposable.md", ".specify/specs/092-non-disposable/test-evidence/**", ".specify/archive/specs/092-non-disposable/checkpoints/**", ".specify/specs/092-non-disposable/team/092-non-disposable/runs/**"]
       write: [".specify/specs/092-non-disposable/test-evidence/reporter-092-non-disposable.live.log"]
     reporting-cadence: default
 config:
@@ -178,7 +178,7 @@ config:
 ## Goal
 
 Deliver the remaining stages of Feature 092 (Non-Disposable) through a spec-local temporary team. The goal
-definition is `.specify/specs/092-non-disposable/goal/092-non-disposable/goal.md`; this section is readability
+definition is `.specify/archive/specs/092-non-disposable/goal/092-non-disposable/goal.md`; this section is readability
 rendering only, and that definition is authoritative. The goal carries **no `## Targets` section**, so this
 roster declares **no `focus_target`** — there is no open Target to bind.
 
@@ -262,10 +262,10 @@ spec-local team, so run reports are written by the driver under `runs/` when a s
 
 - Subject: this persisted team definition; member executions are evidence.
 - Observe: completed run reports under `runs/` and the per-stage checkpoints under
-  `.specify/specs/092-non-disposable/checkpoints/`.
+  `.specify/archive/specs/092-non-disposable/checkpoints/`.
 - Improve: follow `.specify/shared/workflow/self-improvement-workflow.md`; route through `improve-team` (the
   checkpoint's single configuration proposal is the entry, cap one change per stage).
 - Boundary: preserve team authority, the verifier's independence, the stage sequence, the design-approval gate
-  and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/goal/**`.
+  and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/anchoring/**`.
 - Verify: validate now (`skills/internal/create-team/scripts/validate-roster.py`) and wait for a comparable
   later run before claiming improvement.

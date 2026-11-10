@@ -56,12 +56,12 @@ single-agent bottleneck (§ Execution Model).
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`, 22 principles in document order):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`, 22 principles in document order):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling cites FR ids; `contracts/` maps 43/43 FR in `feature-ref.md` § Delivery map. |
-| II | Feature-Centric Development | ✅ Pass | Feature 094 row created in `.specify/memory/features.md` and `.specify/memory/features/094.md`; this stage advances `Draft → Planned` only. |
+| II | Feature-Centric Development | ✅ Pass | Feature 094 row created in `.specify/features.md` and `.specify/features/094-goal-team-parallel.md`; this stage advances `Draft → Planned` only. |
 | III | Intent-Driven Development | ✅ Pass | The same-objective binding record and the peer model come from the user's verbatim brief; the two open variants are recorded as T-004 / T-005 with named antitheses. |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Tests Mode ON; every SC and every FR group has a red-first module named in `contracts/owner-rewrites-and-tests.md` X; § Complexity Tracking records the pre-implement baseline as a ruling, not as pre-written red. |
 | V | AI Agent Integration Standards | ✅ Pass | No agent roster or neutral-metadata-key change; the crew/handoff design consumes existing `team.md` seats untouched. |

@@ -99,7 +99,7 @@ The governance entity. Its normative body exists **once**.
 |-------|-------|--------------------------------------|
 | Rule body: why coverage is insufficient, efficiency as a quality attribute, parallel vs async vs neither, isolation preconditions, measurement, anti-patterns | `shared/guidelines/test-execution-efficiency.md` (`STR-003`, file name `STR-001`) | — |
 | Principle entry, template | `templates/constitution-template.md` § `### XIX. Efficient Test Execution (Concurrent by Default)` | pointer to `STR-003` |
-| Principle entry, live | `.specify/memory/constitution.md` § `### XX. Efficient Test Execution (Concurrent by Default)` | pointer to `STR-003` |
+| Principle entry, live | `.specify/constitution.md` § `### XX. Efficient Test Execution (Concurrent by Default)` | pointer to `STR-003` |
 | Ambient section, template | `templates/instructions-template.md` § `## Test Execution Efficiency (测试执行效率)` | summary + pointer |
 | Ambient section, live | `.specify/instructions.md` (generated) | summary + pointer |
 | Generator MUST-include entry | `skills/internal/manage-constitution/SKILL.md` (entry 12) | anchor sub-bullet + anchor path |
@@ -126,7 +126,7 @@ supplies values.
 | Field | Type | Source |
 |-------|------|--------|
 | `goal_slug` | string | `.specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md` |
-| `team_slug` | string | `.specify/specs/086-efficient-test-execution/team/**` (created by the driver after plan U4 per 085 C-008) |
+| `team_slug` | string | `.specify/teams/086-efficient-test-execution/**` (created by the driver after plan U4 per 085 C-008) |
 | `agent_concurrency_requested` | integer | `24` (A17) |
 | `agent_concurrency_effective` | integer per stage | Recomputed per stage; downgrades named |
 | `carrier` | string per stage | Host-native carrier identity (`SDD Requirements Executor` / `general-purpose` / `SDD Executor`) |

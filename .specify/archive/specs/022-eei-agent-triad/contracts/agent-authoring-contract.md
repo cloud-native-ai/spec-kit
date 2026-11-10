@@ -53,7 +53,7 @@
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| target | MUST | Path or identifier resolving to exactly one authored artifact: role template, `agent-subrole-*`, `agent-triad-orchestration-*`, or `.specify/agents/*.agent.md` |
+| target | MUST | Path or identifier resolving to exactly one authored artifact: role template, `agent-subrole-*`, `agent-triad-orchestration-*`, or `.specify/agents/{templates,instances}/*.agent.md` |
 | improvement_direction | MUST | What to change, with evidence |
 | iteration_history | SHOULD | For triad-layer refinement (score trajectory + change logs) |
 

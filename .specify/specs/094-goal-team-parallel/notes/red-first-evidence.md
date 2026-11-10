@@ -3,7 +3,7 @@
 Owner of the format: this file. Every red-first row appends one entry below the divider.
 Each entry carries the row id, the date, the exact command, the real (unfiltered) output
 excerpt, and the process exit status. A green reading that does not name the red reading it
-replaced is not evidence (Constitution IV; `shared/workflows/feedback-step.md`).
+replaced is not evidence (Constitution IV; `shared/workflow/feedback-step.md`).
 
 ## Entry format (copy this block; never invent a second shape)
 

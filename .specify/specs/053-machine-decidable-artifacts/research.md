@@ -68,7 +68,7 @@ $ grep -rn "import yaml\|yaml\." scripts/python/*.py
 
 **该裁定扩大了 FR-018 的范围,故按 `/speckit.plan` 的上游优先规则先改 `requirements.md` 再填本计划**:FR-018 已改写、US2 已增验收场景 6(正反两向)、`## Clarifications` 已按追加方式记入第 5 条 bullet。FR 仍 48、SC 仍 12,**编号未变故无需重编号**;清单已复验一次(16/16)。
 
-**为何不是编造**:该义务在框架里**已经存在**,只是仍以散文执行——`templates/commands/tasks.md:197` 原文「Add a self-check that flags any test path appearing in two verification rows with different green points」;而 `.specify/memory/glossary.md:134` 已登记的「条款分区 (Clause Partition)」条目本身即写明「生成期 MUST 机械核算分区的并集覆盖全部条款且无幻影记号」。US2 恰好在建它所需的全部解析数据:行级测试路径由既有 `_classify_paths`(`validate-tasks.py:94-112`)抽出,绿点由新 `[green:]` 声明抽出。边际成本 = 一个检查标签 + 一个逆样本 + 一个钉子条目。
+**为何不是编造**:该义务在框架里**已经存在**,只是仍以散文执行——`templates/commands/tasks.md:197` 原文「Add a self-check that flags any test path appearing in two verification rows with different green points」;而 `.specify/glossary.md:134` 已登记的「条款分区 (Clause Partition)」条目本身即写明「生成期 MUST 机械核算分区的并集覆盖全部条款且无幻影记号」。US2 恰好在建它所需的全部解析数据:行级测试路径由既有 `_classify_paths`(`validate-tasks.py:94-112`)抽出,绿点由新 `[green:]` 声明抽出。边际成本 = 一个检查标签 + 一个逆样本 + 一个钉子条目。
 
 ---
 
@@ -185,7 +185,7 @@ WARN 3: parallel-safe: … both WRITE ['contracts/x.md'] …      ← 假告警
 
 **依据(实测)**:`scripts/bash/run-tests.sh:22-24,29,35-43` 的 `--names-out <file>` 已确立该形态——`:41` `printf '%s\n' "$OUT" | grep "^FAILED" | sed 's/^FAILED //;s/ - .*//' | sort > "$NAMES_OUT"`,`:42` 向 stderr 印 `# failed-name list written: <file> (<N> entries)`,`:43` `exit "$STATUS"`(透传 pytest 自己的码)。该脚本**不**存基线、**不**跑 `comm`;`comm -13` 是文档化的消费者习语(`:23` 注释、`templates/tasks-template.md:80` 的 GATE-1)。核算脚本沿用同一分工:脚本产出**有序名字集**,比对留给 `comm`。
 
-**MUST NOT 抄的比较形态(实测缺陷,已被记录两次)**:`scan-confirmation-gates.py --baseline` 读基线的**顶层** `total`,而冻结值嵌在 `confirmationGates` 下,且其退出码只反映 `violations`——故它作为相等门不可用。该缺陷已记录在 `.specify/memory/constitution.md:14` 的后续 TODO (a) 与 `.specify/specs/052-fast-fail-principle/contracts/gate-neutrality.md` + `verification.md:209`,**上游仍未修**。本特性的核算脚本 MUST NOT 复制该形态。
+**MUST NOT 抄的比较形态(实测缺陷,已被记录两次)**:`scan-confirmation-gates.py --baseline` 读基线的**顶层** `total`,而冻结值嵌在 `confirmationGates` 下,且其退出码只反映 `violations`——故它作为相等门不可用。该缺陷已记录在 `.specify/constitution.md:14` 的后续 TODO (a) 与 `.specify/specs/052-fast-fail-principle/contracts/gate-neutrality.md` + `verification.md:209`,**上游仍未修**。本特性的核算脚本 MUST NOT 复制该形态。
 
 **无既有先例可复用**:`grep -rlniE "uncovered|未覆盖|差集|set difference|coverage" scripts/python/*.py scripts/bash/*.sh` → 只命中 `feedback-utils.py`(反馈存据的覆盖,无关)。真正的前身是**手写**的 `.specify/specs/052-fast-fail-principle/feature-ref.md`(173 行,含 `## FR → 契约条款映射` `:19`、`### 未由契约条款覆盖的 FR(7 条),各有其理由` `:112`、`## SC → 产出与度量映射` `:128`、`## 交付面清单` `:152`);全仓 **30** 份 spec 有 `feature-ref.md`。
 
@@ -318,7 +318,7 @@ def test_help_labels_every_action_read_or_write(capsys):
 ### 本轮子代理回传的显式异常行(逐条处置)
 
 - **A-1**(`shared/constants/clarify-taxonomy.md:95,104`):该处记录 `checklists/requirements.md`「carries derived counts (how many FR / SC / STR / Entity / Story rows)」且「the full count set」的 owner 是 `shared/guidelines/requirements-guidelines.md` § Create Spec Quality Checklist——但**该 owner 节(`:9-48`)不定义任何计数字段**,实测其为一个固定 16 项清单、无派生计数位。**处置:上送,未就地修**。这是一个 owner 指针悬挂,两种读法都成立(要么该节应定义计数集,要么指针应改指别处),属**裁定**;且它不在 053 的声明范围内。它对本特性的影响已如实记入:US1 的检查器**无法**从被声明的 owner 派生计数集,故 FR-013 的落点改为在 § Validation Process 写明「计数由检查器派生」,而不假称既有 owner 已定义计数。
-- **A-2**(`.specify/memory/features.md:36` vs `templates/commands/team.md:127`):两处对 goal **摘要存据目录**的记录互相冲突,且二者都未落盘(实测:前一条所指的目录不存在,`find .specify -maxdepth 4 -type d -name summary` → 空)。**本条刻意不复现任何一侧的路径字面量**:其中一侧正是 `tests/contract/test_goal_migration.py:19` 的 `OLD_PATH_NEEDLE` 禁止出现在任何 live-face 文件里的迁移前旧路径,而该守卫的豁免集(`HISTORICAL_PREFIXES` `:40`、`GUARD_FILES` `:55`)不覆盖 spec 制品——**复现它会让本文件自己成为该守卫的一个 offender**。本轮实测到了这一点:初版把两侧路径都抄了进来,`test_no_live_face_file_retains_the_old_path` 随即转红并逐字点名本文件;改为只给坐标后转绿。需要具体路径时按上面两个坐标去读原文。**处置:上送,未就地修**——需裁定哪条是真源,且超出 053 范围。对本特性无影响(053 不触及摘要存据)。
+- **A-2**(`.specify/features.md:36` vs `templates/commands/team.md:127`):两处对 goal **摘要存据目录**的记录互相冲突,且二者都未落盘(实测:前一条所指的目录不存在,`find .specify -maxdepth 4 -type d -name summary` → 空)。**本条刻意不复现任何一侧的路径字面量**:其中一侧正是 `tests/contract/test_goal_migration.py:19` 的 `OLD_PATH_NEEDLE` 禁止出现在任何 live-face 文件里的迁移前旧路径,而该守卫的豁免集(`HISTORICAL_PREFIXES` `:40`、`GUARD_FILES` `:55`)不覆盖 spec 制品——**复现它会让本文件自己成为该守卫的一个 offender**。本轮实测到了这一点:初版把两侧路径都抄了进来,`test_no_live_face_file_retains_the_old_path` 随即转红并逐字点名本文件;改为只给坐标后转绿。需要具体路径时按上面两个坐标去读原文。**处置:上送,未就地修**——需裁定哪条是真源,且超出 053 范围。对本特性无影响(053 不触及摘要存据)。
   **可推广的一类(举一反三)**:凡「某字面量禁止出现」型守卫,都会被一份**为了报告它而引用它**的文档打红——与 clarify 轮那个「为描述不可解析引用而裸写 `[[STR-014]]`,于是它自己成了一个不可解析引用」是同一类。判据:**报告一个被禁形态时 MUST 给坐标而不是给实例**;若确需实例, MUST 先确认该守卫的豁免集覆盖本文件,否则先扩豁免集(属上游裁定)或改为坐标引用。
 - **A-3**(`scan-confirmation-gates.py --baseline` 的比较形态):读基线**顶层** `total` 而冻结值嵌在 `confirmationGates` 下,退出码只反映 `violations`,故作为相等门不可用。已被记录两次(`constitution.md:14` 后续 TODO (a);052 的 `contracts/gate-neutrality.md` + `verification.md:209`)而**上游仍未修**。**处置:已记入 D-10 作为本特性的 MUST NOT**,不就地修上游。
 - **A-4**(子代理对 `.yaml` 形态的误判):探查子代理报「10 份 `.yaml` 全部是 OpenAPI」且判据为「无字面 `operations:` 键」。**编排者重导后证伪**:实为 9 份 OpenAPI + 1 份 `assertions[].id` 结构化断言(文件名恰为 `.openapi.yaml`),而 OpenAPI 的 operation 是 `paths:` 下的 HTTP 方法键、本就不是一个字面键名。**处置:已订正**,并回写进规格 FR-028(MUST NOT 以 `operations:` 键名作探测条件)。

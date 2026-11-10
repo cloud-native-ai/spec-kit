@@ -215,7 +215,7 @@
 - **V-31**:同一判据行内指代形与**花括号展开记号** `\{[^}]*,[^}]*\}` 同现即报冲突,MUST NOT 静默择一(FR-037、D-14)。
 - **V-32**(诚实边界):不带花括号的散文枚举(如「所有绘图技能」)与指代形同现时**检不出**。该边界 MUST 记入契约,MUST NOT 声称覆盖了它(D-14)。
 - **V-33**:既有的纯枚举判据 MUST 保持完全一致的解析行为;本特性 MUST NOT 使任何既有 goal 失效或需要迁移才能继续解析(FR-038)。
-- **V-34**:SC-010 的名字级比对当前全集只有 **1** 份 goal 定义(实测 `.specify/goal/` 下仅 `draw-two-layer-structure`),该数太小以致「比对为空」近乎空真,故 MUST 配反空真哨兵:至少断言被扫描的 goal 定义数 ≥ 1 且解析器确实产出了成员集(D-14、FR-040)。
+- **V-34**:SC-010 的名字级比对当前全集只有 **1** 份 goal 定义(实测 `.specify/anchoring/` 下仅 `draw-two-layer-structure`),该数太小以致「比对为空」近乎空真,故 MUST 配反空真哨兵:至少断言被扫描的 goal 定义数 ≥ 1 且解析器确实产出了成员集(D-14、FR-040)。
 
 **V-31 的实测依据**:`.specify/anchoring/draw-two-layer-structure/goal.md:15` 是本仓唯一真实的枚举型判据(「七个绘图技能(draw-diagram 与 draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml})…」),其 `## History` `:36`/`:37` 记录了同一条判据随成员集变化被反复改写(「六个绘图技能…」→「七个绘图技能…」)——这正是 US5 要消灭的脆弱性的**实证**。
 
@@ -241,7 +241,7 @@
 - **V-36**:五项里有一项自身抛异常时,MUST 把该条记为 `not-evaluated` 并**继续评估其余四项**,MUST NOT 让一项异常吞掉整份 verdict(边界情形)。
 - **V-37**:无 `--target` 时 MUST 先经 `resolve_effective_target` 解析有效 target;解析不出时 ②③④ 记 `not-evaluated`(无判定主体),①⑤ **仍 MUST 被评估**(只依赖团队与 goal 的绑定关系)(D-11)。
 - **V-38**:退出码 MUST 按 STR-007 `0=ok / 2=input-error / 3=not-found / 4=invalid / 5=blocked` 分档,即**沿用 `goal-utils.py:44-47` 既有四码原义**、`blocked` 取实测空闲的 5;MUST NOT 让同一个码在同一脚本里按 action 而有两种含义(FR-033、D-13)。
-- **V-39**:该 action MUST 零写入——任何一次调用都 MUST NOT 修改 `.specify/goal/` 或 `.specify/teams/` 下的任何文件(FR-034)。取证形态为调用前后的**字节校验和**对比(SC-007 Source)。
+- **V-39**:该 action MUST 零写入——任何一次调用都 MUST NOT 修改 `.specify/anchoring/` 或 `.specify/teams/` 下的任何文件(FR-034)。取证形态为调用前后的**字节校验和**对比(SC-007 Source)。
 - **V-40**:MUST 复用既有内部解析函数而不重写第二套文法(FR-030);`run-checks` 的 help 行 MUST 以 `read:` 起首(D-12)。
 
 ---

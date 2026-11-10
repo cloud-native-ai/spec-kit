@@ -52,7 +52,7 @@
 
 **C-17** [制品类] `green-clause-collision` 与 `green-path-divergence` MUST **分列**报出,MUST NOT 合并为一个计数;二者的判据不同(条款区间重叠 vs 测试路径共用且绿点不同),同一份 tasks.md 上可以各自独立触发。判据:构造一份只触发其一的制品,另一标签的命中数为 0。(FR-018、D-3、V-8)
 
-**C-18** [制品类] 实现处 MUST 引用 `.specify/memory/glossary.md` 已登记的术语「条款分区 (Clause Partition)」,MUST NOT 另造名词。判据:对脚本源或契约 grep 该术语命中数 ≥ 1。(FR-018)
+**C-18** [制品类] 实现处 MUST 引用 `.specify/glossary.md` 已登记的术语「条款分区 (Clause Partition)」,MUST NOT 另造名词。判据:对脚本源或契约 grep 该术语命中数 ≥ 1。(FR-018)
 
 **C-19** [行为类] C-16 机械化的是一项**已经存在**的散文义务:`templates/commands/tasks.md:197` 原文「Add a self-check that flags any test path appearing in two verification rows with different green points」;而 glossary 的「条款分区」条目本身即写明「生成期 MUST 机械核算分区的并集覆盖全部条款且无幻影记号」。落地后该散文自检 MAY 改为指向本检查,MUST NOT 同时保留两套判据。(FR-018、D-3)
 

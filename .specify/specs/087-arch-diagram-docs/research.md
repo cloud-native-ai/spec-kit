@@ -149,7 +149,7 @@ python3 .specify/scripts/python/doc-consistency-check.py --action structure \
 grep -n "WIRING_TEMPLATES\|WIRING_SKILLS" tests/contract/test_expression_compatibility.py
   -> WIRING_TEMPLATES = ("docs.md","humanize.md")；WIRING_SKILLS = ("skills/external/create-docs/SKILL.md",
      "skills/external/humanize/SKILL.md")
-grep -c "" .specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt  -> 74
+grep -c "" .specify/archive/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt  -> 74
 grep "  skills/external/improve-docs/SKILL.md$" ...pre-change-file-hashes.txt
   -> f77ec5f4…（与当前盘上文件同哈希 ⇒ 尚未漂移）
 ```

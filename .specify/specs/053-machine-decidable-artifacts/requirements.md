@@ -83,7 +83,7 @@
 2. **Given** 某条款的归属任务集中存在一个所处阶段**晚于**声明行的任务,**When** 跑检查器,**Then** 报 WARN 级「绿点跨阶段」,点名条款、涉及的行与阶段序,且 exit 码仍为 **0**——`validate-tasks.py` 的既有退出码表只有「无 ERROR → 0」「有 ERROR → 1」两档,警告不单独成档(该事实被 `tests/contract/test_validate_tasks_parallel_safety.py:353,356` 钉住)。
 3. **Given** 一条归属声明指向不存在的契约文件或不存在的条款 id,**When** 跑检查器,**Then** 报 ERROR(不可解析),exit 码 **1**,而不是 WARN 的 exit 0——悬空归属比跨阶段归属更严重,二者在退出码上即 1 vs 0 之别。
 4. **Given** 一行任务声明了归属但**未**声明文件路径,**When** 跑检查器,**Then** 既有的行形态检查 MUST NOT 因此误报;归属声明与路径声明是两个正交的面。
-5. **Given** 两份任务行认领**同一条款的同一区间**,**When** 跑检查器,**Then** 报 WARN 并点名两行——这与 `.specify/memory/glossary.md` 已登记的「条款分区 (Clause Partition)」是同一失效模式的两面:该术语讲的是「同一契约测试文件被多阶段核验行认领」,本检查把它机械化。
+5. **Given** 两份任务行认领**同一条款的同一区间**,**When** 跑检查器,**Then** 报 WARN 并点名两行——这与 `.specify/glossary.md` 已登记的「条款分区 (Clause Partition)」是同一失效模式的两面:该术语讲的是「同一契约测试文件被多阶段核验行认领」,本检查把它机械化。
 6. **Given** 两个核验行指向**同一份测试文件路径**、而各自的归属声明指向**不同的绿点**,**When** 跑检查器,**Then** 报 WARN 并点名两行与该路径;再对一份「同一路径、两行绿点相同」的副本跑,**Then** 零 WARN——正反两向都实测,证明该检查认的是**绿点分歧**而不是**路径共用**。本场景与场景 5 MUST 分列:场景 5 的判据是条款区间重叠,本场景的判据是测试路径共用且绿点不同,两者可以在同一份 tasks.md 上各自独立触发。
 
 ---
@@ -92,7 +92,7 @@
 
 `tasks.md` 今天可以自陈「107/107 条款已覆盖」而无人核对。本故事让覆盖成为一个**印出来的集合差**而不是一个声明的数字:脚本读契约与 tasks,把「每条条款、每条 FR」的全集减去**各自来源的**被认领子集(条款侧 = 某一行任务的 `[green:]`;FR 侧 = 某条条款的引用组,FR-026),印出未覆盖集;为空才算覆盖完整。前置条件是给契约的条款语法指定 owner——实测 110 份契约里只有 21 份用 `**C-N**` 形态,其余各异,没有 owner 就没有全集。
 
-**Why this priority**: P2 而非 P1,因为它依赖 US2 的声明面,且必须先解决条款语法的归属问题;而归属问题触及全仓每一份既有契约文件(总数由 `notes/clause-form-census.md` 拥有),是本特性里唯一可能引发大范围返工的一项。它的价值最高(直接消灭「自陈覆盖率」这一类**盲检**,见 `.specify/memory/glossary.md` 已登记的「盲检 (Blind Check)」),但落地顺序必须在 US1/US2 之后。
+**Why this priority**: P2 而非 P1,因为它依赖 US2 的声明面,且必须先解决条款语法的归属问题;而归属问题触及全仓每一份既有契约文件(总数由 `notes/clause-form-census.md` 拥有),是本特性里唯一可能引发大范围返工的一项。它的价值最高(直接消灭「自陈覆盖率」这一类**盲检**,见 `.specify/glossary.md` 已登记的「盲检 (Blind Check)」),但落地顺序必须在 US1/US2 之后。
 
 **Independent Test**: 在一个临时目录里搭一份最小 spec(一份 3 条款的契约 + 一份 tasks.md,其中 2 条被认领、1 条未被认领),跑核算脚本,确认它印出的未覆盖集恰为那 1 条、exit 非 0;再把第 3 条补上认领,确认未覆盖集为空、exit 0。两次运行的差集必须**按名字**比对,而不是按计数——计数相等会掩盖成员变化。
 
@@ -112,7 +112,7 @@
 
 **Why this priority**: P2。它不涉及制品间的命题,但它是「一个判定必须可一次调用取得」这一原则的实例:当五项检查要由调用方拼装时,拼装顺序错了不会报错,只会给出一个看似合理的绿。它自包含、风险低、收益明确,适合作为本特性的第二个 P2。
 
-**Independent Test**: 对一个真实的团队 slug 跑 `run-checks --json`,确认输出含五个 check 条目、每条带 id 与 name、顶层 verdict 与 blocked 字段齐备、退出码符合 [[STR-007]];再对一个 goal 已终态的团队跑,确认对应 check 的 verdict 为既有词表里的值、顶层 blocked 为真、退出码为阻塞档;最后对不存在的 slug 跑,确认退出码为输入错误档且**零写入**(前后 `.specify/goal/` 与 `.specify/teams/` 的字节校验和不变)。
+**Independent Test**: 对一个真实的团队 slug 跑 `run-checks --json`,确认输出含五个 check 条目、每条带 id 与 name、顶层 verdict 与 blocked 字段齐备、退出码符合 [[STR-007]];再对一个 goal 已终态的团队跑,确认对应 check 的 verdict 为既有词表里的值、顶层 blocked 为真、退出码为阻塞档;最后对不存在的 slug 跑,确认退出码为输入错误档且**零写入**(前后 `.specify/anchoring/` 与 `.specify/teams/` 的字节校验和不变)。
 
 **Acceptance Scenarios**:
 
@@ -120,7 +120,7 @@
 2. **Given** 某项检查因前置条件不成立而被短路,**When** 跑 `run-checks`,**Then** 该条的 verdict MUST 是 [[STR-004]],MUST NOT 是 `ok`——一个未被评估的检查报绿,正是本特性要消灭的形态。
 3. **Given** 未传 `--target`,**When** 跑 `run-checks`,**Then** 输出的 resolution 字段说明有效 target 是怎么解析出来的(来源与声明的 focus),使调用方不必自己重推。
 4. **Given** 团队定义文件不可解析或仓库根无法确定,**When** 跑 `run-checks`,**Then** 退出码为 [[STR-007]] 里对应的那一档,且与「检查判为阻塞」的档位可区分。
-5. **Given** 任何一次调用,**When** 它返回,**Then** `.specify/goal/` 与 `.specify/teams/` 下的文件字节未变(零写入是硬约束,不是惯例)。
+5. **Given** 任何一次调用,**When** 它返回,**Then** `.specify/anchoring/` 与 `.specify/teams/` 下的文件字节未变(零写入是硬约束,不是惯例)。
 
 ---
 
@@ -183,7 +183,7 @@
 - **FR-015**: tasks 模板 MUST 定义一个行内归属声明面,其字面形态为 [[STR-001]];一行任务 MAY 声明零到多条归属。
 - **FR-016**: `validate-tasks.py` MUST 把 [[STR-001]] 形态的声明解析为 `(契约文件, 条款 id, 任务 id, 所处阶段)` 四元组,并对指向不存在契约文件或不存在条款 id 的声明报 **ERROR**(悬空归属比跨阶段归属更严重)。
 - **FR-017**: `validate-tasks.py` MUST 增一项 **WARN** 级检查:某条款的归属任务集中存在所处阶段晚于声明行的任务时,报「绿点跨阶段」并点名条款、涉及行与阶段序。
-- **FR-018**: 归属声明的冲突检查 MUST 覆盖**两个**命题;二者相关但不是同一个检查,故 MUST **分列**报出,MUST NOT 合并为一条计数:(a) 两行任务认领**同一条款的同一区间**时报 WARN 并点名两行;(b) 同一**测试路径**出现在两个核验行、且两行的绿点不同时报 WARN 并点名两行与该路径。(b) 是把 `templates/commands/tasks.md:197` 已声明却仍靠散文执行的自检机械化——该处原文为「Add a self-check that flags any test path appearing in two verification rows with different green points」,而 `.specify/memory/glossary.md` 已登记的「条款分区 (Clause Partition)」条目本身即写明「生成期 MUST 机械核算分区的并集覆盖全部条款且无幻影记号」。本检查与该术语是同一失效模式的两面,MUST 在实现处引用该术语而不是另造名词。
+- **FR-018**: 归属声明的冲突检查 MUST 覆盖**两个**命题;二者相关但不是同一个检查,故 MUST **分列**报出,MUST NOT 合并为一条计数:(a) 两行任务认领**同一条款的同一区间**时报 WARN 并点名两行;(b) 同一**测试路径**出现在两个核验行、且两行的绿点不同时报 WARN 并点名两行与该路径。(b) 是把 `templates/commands/tasks.md:197` 已声明却仍靠散文执行的自检机械化——该处原文为「Add a self-check that flags any test path appearing in two verification rows with different green points」,而 `.specify/glossary.md` 已登记的「条款分区 (Clause Partition)」条目本身即写明「生成期 MUST 机械核算分区的并集覆盖全部条款且无幻影记号」。本检查与该术语是同一失效模式的两面,MUST 在实现处引用该术语而不是另造名词。
 - **FR-019**: 归属声明 MUST 与既有的行形态检查正交:一行只声明归属而不声明文件路径时,既有检查 MUST NOT 误报。
 - **FR-020**: 出现在**围栏代码块内**或**行内代码跨度内**的 [[STR-001]] 形态 MUST NOT 被当作真实归属声明解析——前者是**示例**,后者是**提及**,二者都不是声明;这与 FR-009 对引用所画的是同一条区分,故复用同一个代码跨度规则(CommonMark 的 N 反引号串)而非另立一个近似。**(2026-10-04 US2 落地时扩写**:原文只辖围栏代码块,而本特性自己的 T018 行必须**指名**该标记才能定义它——初版实现把那句里的 `` `[green: <contract>#<clause>]` `` 当成对文件名为 `<contract>` 的真实认领,报 `green-dangling` ERROR,于是本特性自己的 `tasks.md` 通不过自己的 GATE-7。一份不能提及自己标记的文档无法描述该标记,故按已记录的 FR-009 规则扩写,而非把该行改成回避字面量。**)
 - **FR-021**: 归属声明面 MUST 项目中立:MUST NOT 含本仓专有名词,其形态说明 MUST 落在 tasks 模板而非某个 spec 的散文里。
@@ -205,7 +205,7 @@
 - **FR-031**: 机读输出的每条 check MUST 含 `id`(1..5)、`name`(上述五个名字之一)、`verdict`、`message`;顶层 MUST 含 `team_slug`、`goal_slug`、`identity_kind`、`resolution`、`checks`、`verdict`、`blocked`。
 - **FR-032**: 单项检查的 verdict MUST 沿用既有词表 [[STR-006]];因前置条件不成立而被短路的检查 MUST 记为 [[STR-004]],MUST NOT 记为 `ok`。
 - **FR-033**: 退出码 MUST 按 [[STR-007]] 分档,且「检查判为阻塞」与「输入不合法」与「定义不可解析」三档互相可区分。`run-checks` 落在既有二进制内,故 MUST 复用该二进制已定义的 `EXIT_*` 常量原义,MUST NOT 让同一个码在同一脚本里按 action 而有两种含义;`blocked` 因此取 **5**(实测空闲)。既有调用方 `templates/commands/team.md:96,98` 按 0/2 分支,不受影响。
-- **FR-034**: 该 action MUST 零写入:任何一次调用都 MUST NOT 修改 `.specify/goal/` 或 `.specify/teams/` 下的任何文件。
+- **FR-034**: 该 action MUST 零写入:任何一次调用都 MUST NOT 修改 `.specify/anchoring/` 或 `.specify/teams/` 下的任何文件。
 
 #### goal 判据主体的指代形(US5)
 
@@ -251,7 +251,7 @@
 - **SC-004**: 悬空归属(指向不存在的契约文件或条款 id)被判为 ERROR 而非 WARN,且在退出码上可区分:悬空归属 exit **1**、仅跨阶段 WARN exit **0**(不新设第三档)。
 - **SC-005**: 覆盖核算以集合差表达:对一份 3 条款契约、2 条被认领的最小 spec,印出的未覆盖集恰为那 1 条且每行以 [[STR-009]] 起首;补上认领后未覆盖集为空且伴生量非零。两次运行按**名字**比对而非按计数。
 - **SC-006**: 条款语法有唯一 owner:owner 文档存在、声明其覆盖的形态、并被核算脚本引用;对全仓 `.specify/specs/*/contracts/` 跑一次只读扫描,输出「可按 owner 语法解析的文件数 / 逐个点名跳过的文件数 / **本次实扫总数**」三个数,且前两者之和**等于第三者**(反空真哨兵)。该哨兵 MUST 是**关系式**而不是一个字面总数——本特性自己的契约就在被扫描面内,任何写死的总数都会在其落盘那一刻自我证伪(实测:改前 110、本特性 7 份契约落盘后 117,差值恰为 +7)。
-- **SC-007**: [[STR-005]] 一次调用输出五条 check 且字段齐备;对一个 goal 已终态的真实团队跑,对应 check 的 verdict 属既有词表、顶层 blocked 为真;对不存在的 slug 跑,`.specify/goal/` 与 `.specify/teams/` 的字节校验和前后不变;两次的退出码按 [[STR-007]] 分别落在阻塞档与输入错误档。
+- **SC-007**: [[STR-005]] 一次调用输出五条 check 且字段齐备;对一个 goal 已终态的真实团队跑,对应 check 的 verdict 属既有词表、顶层 blocked 为真;对不存在的 slug 跑,`.specify/anchoring/` 与 `.specify/teams/` 的字节校验和前后不变;两次的退出码按 [[STR-007]] 分别落在阻塞档与输入错误档。
 - **SC-008**: 短路项不报绿:构造一个使某项检查前置条件不成立的团队,该条 verdict 为 [[STR-004]] 而非 `ok`,且其余四条仍被评估(不被异常吞掉)。
 - **SC-009**: 指代形的价值可被直接看见:对同一主体集合分别用指代形与成员枚举写两条判据,在目录里增删一个成员后,指代形导出的集合随之变化而枚举形不变——该差异在输出里可见。
 - **SC-010**: 向后兼容:本特性落地前后,对仓内**全部**既有 goal 定义跑一次解析,失败集合按名字比对为空(不是按计数比对)。
@@ -263,7 +263,7 @@
 - **SC-001 / SC-003 / SC-004 / SC-005 Source**: 检查器的实跑输出与退出码。取证形态:对真实制品只读跑一次贴出完整输出;对每份人为破坏的副本各跑一次贴出被点名的检查项与退出码。破坏副本 MUST 建在临时目录,MUST NOT 落在 `.specify/specs/` 下。采集时机:实现该故事的阶段收尾各一次。
 - **SC-002 Source**: `grep -c` 对 `shared/constants/clarify-taxonomy.md` 的两次计数(过渡式命中数应为 0、检查器路径命中数应 ≥1),配一条反空真哨兵(该文件非空且文档序不变量小节仍在场),使「0 因为已移除」与「0 因为整节丢失」可区分。
 - **SC-006 Source**: 核算脚本对 `.specify/specs/*/contracts/` 的一次只读全量扫描输出。基线值:逐形态的文件数与条款 id 数由 `notes/clause-form-census.md` **唯一拥有**(含分类命令、两个 as-of 值与自指修正说明),本节不复写。该基线 MUST 连同**当轮 owner 声明覆盖哪些形态**与 **as-of 提交**一起记录,否则「可解析文件数」在两个 owner 定义之间、以及两个时点之间都不可比。采集时机:owner 文档落地后一次、核算脚本落地后一次。
-- **SC-007 / SC-008 Source**: `run-checks --json` 的实跑输出与退出码,加 `.specify/goal/` 与 `.specify/teams/` 在调用前后的字节校验和对比。实验 MUST 在临时仓库副本里做,真实 goal 与团队定义 MUST NOT 被改动;若只能在真实树上验证,则 MUST 只跑只读路径并记录校验和不变作为证据。
+- **SC-007 / SC-008 Source**: `run-checks --json` 的实跑输出与退出码,加 `.specify/anchoring/` 与 `.specify/teams/` 在调用前后的字节校验和对比。实验 MUST 在临时仓库副本里做,真实 goal 与团队定义 MUST NOT 被改动;若只能在真实树上验证,则 MUST 只跑只读路径并记录校验和不变作为证据。
 - **SC-009 / SC-010 Source**: 解析器对两条判据的导出集合输出(增删成员前后各一次),以及对仓内全部既有 goal 定义的批量解析结果;SC-010 的比对 MUST 按失败**名字**集合(`comm -13` 形态),MUST NOT 按计数。
 - **SC-011 Source**: 本特性 `verification.md` 里的逆样本清单与变异演练记录,每项含:植入什么、哪条变红、如何复原、复原后的差异复核结果。演练临时产物的残留计数由一次 `find` 实测。
 - **FR-027 基线 Source**: 采集面与采集时机 MUST NOT 在此复写——采集面由 **FR-027 § 基线面** 唯一拥有(那份排除本特性自己 spec 目录的 excl-`<ID>` 语料,其两端值由 `notes/clause-form-census.md` 拥有),落盘与可读性约束由 `data-model.md` V-13 拥有,时机字段由 `data-model.md` E-3c 的 `frozen_at` 拥有。本节只留**方法**:一次只读扫描产出未覆盖项**名字集** → 冻结进本特性目录的一份基线文件 → 此后每轮 `comm -13 <baseline> <current>` 比对;基线缺失即非零退出(FR-027 § 基线面)。(2026-10-03 订正,来源 `/speckit.analyze` F-17:此行原复写「全仓 `.specify/specs/*/contracts/`」这一**修订前**采集面、并写「实现 US3 的阶段开工时一次」,而 `data-model.md` E-3c 说 `frozen_at` = 实现开工时刻、`tasks.md` T026 说首次全树运行时——三处三种时机,采集面与修订后的 FR-027 直接冲突。它不是旁注:`checklists/requirements.md` 的检查项把读者明确指向本行取采集方法。修法是依 one-source-of-truth 改为引用,而不是在这里再印一个值。)
@@ -302,7 +302,7 @@ Format: - Q: <question> → A: <answer>
 
 ### Session 2026-10-02
 
-- Q: (来自 `/speckit.plan` Phase 0)FR-018 的第二个 WARN 该检哪个命题——规格字面的「同条款同区间」,还是 `templates/commands/tasks.md:197` 已声明的「同一测试路径出现在两个核验行且绿点不同」? → A: **两者都机械化**。FR-018 据此改写为覆盖 (a)(b) 两个命题且 MUST 分列报出;US2 增验收场景 6(正反两向)。理由:该处散文自检与 `.specify/memory/glossary.md`「条款分区 (Clause Partition)」条目里的「生成期 MUST 机械核算」是同一义务,而 US2 恰好在建它所需的全部解析数据(行级测试路径由既有 `_classify_paths` 抽出、绿点由新 `[green:]` 声明抽出),边际成本仅一个检查标签 + 一个逆样本 + 一个钉子条目。**该裁定扩大了 FR-018 的范围,故按 `/speckit.plan` 的上游优先规则先改本文件再填计划模板;FR/SC 编号未变(仍 48 / 12),故无需重编号。**
+- Q: (来自 `/speckit.plan` Phase 0)FR-018 的第二个 WARN 该检哪个命题——规格字面的「同条款同区间」,还是 `templates/commands/tasks.md:197` 已声明的「同一测试路径出现在两个核验行且绿点不同」? → A: **两者都机械化**。FR-018 据此改写为覆盖 (a)(b) 两个命题且 MUST 分列报出;US2 增验收场景 6(正反两向)。理由:该处散文自检与 `.specify/glossary.md`「条款分区 (Clause Partition)」条目里的「生成期 MUST 机械核算」是同一义务,而 US2 恰好在建它所需的全部解析数据(行级测试路径由既有 `_classify_paths` 抽出、绿点由新 `[green:]` 声明抽出),边际成本仅一个检查标签 + 一个逆样本 + 一个钉子条目。**该裁定扩大了 FR-018 的范围,故按 `/speckit.plan` 的上游优先规则先改本文件再填计划模板;FR/SC 编号未变(仍 48 / 12),故无需重编号。**
 
 ### Session 2026-10-03
 

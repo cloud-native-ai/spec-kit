@@ -8,8 +8,8 @@
 | Feature name | 架构图为核心的文档空间（Architecture-Diagram-Centric Documentation Space） |
 | Requirement branch | `line/087-arch-diagram-docs` |
 | Requirements | [`requirements.md`](requirements.md) |
-| Feature detail | `.specify/memory/features/087.md` |
-| Feature index row | `.specify/memory/features.md` (Draft → Planned at this stage) |
+| Feature detail | `.specify/features/087-arch-diagram-docs.md` |
+| Feature index row | `.specify/features.md` (Draft → Planned at this stage) |
 | Flow class | execution（`flow-class-check.py --action lookup --unit-id "spec:087-arch-diagram-docs"`） |
 | FR / SC | 23 / 10 |
 | Runtime stack | RS-001…RS-007，全部 `Premises = EP-001` |

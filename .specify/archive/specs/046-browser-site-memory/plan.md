@@ -2,7 +2,7 @@
 
 **Branch**: `[046-browser-site-memory]` | **Date**: 2026-08-24 | **Spec**: [requirements.md](./requirements.md)
 **Requirement → Feature**: `046-browser-site-memory` → Feature 048 Browser Utils Skill
-**Input**: Specification from `.specify/specs/046-browser-site-memory/requirements.md`
+**Input**: Specification from `.specify/archive/specs/046-browser-site-memory/requirements.md`
 
 ## Summary
 
@@ -24,7 +24,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -63,7 +63,7 @@
 ### Documentation (this spec)
 
 ```text
-.specify/specs/046-browser-site-memory/
+.specify/archive/specs/046-browser-site-memory/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (R1 PoC / R2 hatchling 实证 / R3-R5 惯例与复用)
 ├── data-model.md        # Phase 1 output — 4 实体 + 状态机

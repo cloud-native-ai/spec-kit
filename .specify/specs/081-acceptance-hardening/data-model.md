@@ -145,7 +145,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 
 ## E-8 — Feature status `Blocked` (SM-1)
 
-**Carrier**: `templates/feature-details-template.md` § Canonical Status State Machine; the live value lives in `.specify/memory/features/<ID>.md` `**Status**` and in the `features.md` row.
+**Carrier**: `templates/feature-details-template.md` § Canonical Status State Machine; the live value lives in `.specify/features/<ID>-<slug>.md` `**Status**` and in the `features.md` row.
 **Parser**: `/speckit.implement`, `/speckit.review`, `manage-features`, the closure checker (claimed-status input).
 
 **Row set owner**: `shared/workflow/acceptance-hardening.md` § Feature Status ([[STR-017]]) owns the `From | To | Allowed | Condition` rows for `Draft` / `Planned` / `Blocked` / `Implemented` / `Ready for Review` / `Completed`, including the explicitly **illegal** `Blocked → Ready for Review` and the narrow `Implemented → Blocked` audit-correction row; `templates/feature-details-template.md` § Canonical Status State Machine is the carrier those rows must physically land in (FR-002 / FR-003 / FR-018). This section keeps only the entity boundary, its carrier and parser, and the two rules the checker reads below — the transition table MUST NOT be restated here (SC-009 ④ asserts **0** transition rows in this file; a restated row is an unguarded duplicate).

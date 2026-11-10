@@ -31,7 +31,7 @@ is reached by path; none is copied here.
 ## B. Constitution, both surfaces
 
 - **C-025**: `templates/constitution-template.md` MUST gain exactly one principle headed
-  `### XIX. Efficient Test Execution (Concurrent by Default)`; `.specify/memory/constitution.md` MUST gain
+  `### XIX. Efficient Test Execution (Concurrent by Default)`; `.specify/constitution.md` MUST gain
   exactly one principle headed `### XX. Efficient Test Execution (Concurrent by Default)`. The numerals come
   from each roster's own position; the titles are identical by set membership, not by numeral (FR-019).
 - **C-026**: Each principle block MUST satisfy the structural rules already in force for the roster:

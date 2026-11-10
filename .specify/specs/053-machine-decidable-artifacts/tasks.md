@@ -159,7 +159,7 @@ Single landing point for probe conclusions (re-probe on every rerun — never ca
 
 **Goal**: `goal-utils.py` gains action `run-checks` emitting the five-check JSON verdict in one call (FR-029…FR-034), reusing the existing EXIT_* constants' meanings with `blocked`=5, zero-write, first CLI exposure of `preview_target_check`/`resolve_effective_target`.
 
-**Independent Test**: one call → 5 checks with fields per C-9; checksum of `.specify/goal/`+`.specify/teams/` byte-equal before/after; blocked exit 5 / input-error 2 / unparsable 4 mutually distinguishable; no-target run yields ②③④ `not-evaluated` while ①⑤ evaluate.
+**Independent Test**: one call → 5 checks with fields per C-9; checksum of `.specify/anchoring/`+`.specify/teams/` byte-equal before/after; blocked exit 5 / input-error 2 / unparsable 4 mutually distinguishable; no-target run yields ②③④ `not-evaluated` while ①⑤ evaluate.
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 

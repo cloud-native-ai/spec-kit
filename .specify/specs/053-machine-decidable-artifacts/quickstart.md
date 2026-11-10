@@ -39,7 +39,7 @@ print(sum(c.values()), dict(c))
 PY
 
 # 1d goal 与 teams 的字节校验和(FR-034 / SC-007)
-find .specify/goal .specify/teams -type f | sort | xargs sha256sum | sha256sum
+find .specify/anchoring .specify/teams -type f | sort | xargs sha256sum | sha256sum
 ```
 
 **本轮真实输出**
@@ -277,7 +277,7 @@ grep -c 'sub.add_parser' scripts/python/goal-utils.py
 sed -n '44,47p' scripts/python/goal-utils.py
 grep -rn "EXIT_[A-Z_]* = 5" scripts/python/ ; echo "exit=$?"
 grep -rn "goal_utils.EXIT" tests/ ; echo "exit=$?"
-find .specify/goal .specify/teams -type f | sort | xargs sha256sum | sha256sum
+find .specify/anchoring .specify/teams -type f | sort | xargs sha256sum | sha256sum
 ```
 
 **本轮真实输出**
@@ -304,7 +304,7 @@ EXIT_OK = 0 / EXIT_INPUT_ERROR = 2 / EXIT_NOT_FOUND = 3 / EXIT_INVALID = 4
 
 ```bash
 python3 scripts/python/goal-utils.py run-checks <team-slug> --json; echo "EXIT=$?"
-find .specify/goal .specify/teams -type f | sort | xargs sha256sum | sha256sum   # MUST 与场景 1d 相等
+find .specify/anchoring .specify/teams -type f | sort | xargs sha256sum | sha256sum   # MUST 与场景 1d 相等
 ```
 
 顶层键为 `team_slug`/`goal_slug`/`identity_kind`/`resolution`/`checks`/`verdict`/`blocked`,`checks` 长度 **5**;校验和**逐字相等**(FR-034)。
@@ -336,7 +336,7 @@ sed -n '48p;292p;395p' tests/contract/test_trigger_engine.py
 US5 要消灭的脆弱性有**实证**(**改前可实跑**):
 
 ```bash
-sed -n '15p;36p;37p' .specify/goal/draw-two-layer-structure/goal.md | cut -c1-120
+sed -n '15p;36p;37p' .specify/anchoring/draw-two-layer-structure/goal.md | cut -c1-120
 grep -n "glob\|\*/\|directory-reference\|<dir>\|rglob\|iterdir" shared/definitions/goal-definitions.md; echo "exit=$?"
 ```
 

@@ -5,7 +5,7 @@ measurability, coverage, edge cases, non-functional obligations and dependency/a
 for the 087 specification, after the Clarifications Session 2026-11-06 rulings
 (A2 / A11 / A12 ratified, A4 / A7 / per-face `stale` criteria transferred to plan).
 **Created**: 2026-11-06
-**Feature (Requirement Scope)**: Feature 087 — `.specify/memory/features/087.md` (status `Planned`)
+**Feature (Requirement Scope)**: Feature 087 — `.specify/features/087-arch-diagram-docs.md` (status `Planned`)
 **Requirements (What)**: [../requirements.md](../requirements.md)
 **Specifications (How, context only)**: [../plan.md](../plan.md) · [../tasks.md](../tasks.md) — read **only** to expose gaps, ambiguities and traceability breaks in the requirements; no item below grades the plan or the tasks.
 

@@ -34,7 +34,7 @@
 | data-model.md | 199 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/data-model.md | 10 entities, 22 validation rules, 3 state machines |
 | quickstart.md | 196 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/quickstart.md | S-0 executed pre-flight plus S-1…S-8 scenarios |
 | verification.md | 90 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/verification.md | Flat `SC-NNN_status=` rows, two full-run slots, the single smoke record |
-| feature detail 086 | 139 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/memory/features/086.md | Claims `Implemented`; carries the disclosed limitations this review adjudicates |
+| feature detail 086 | 139 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/features/086-efficient-test-execution.md | Claims `Implemented`; carries the disclosed limitations this review adjudicates |
 | test-evidence/ (28 files) | — | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/test-evidence/ | Baseline, closure, mutation legs, dogfood, mirror parity, budget ledger |
 | checkpoints/ (12 files) | — | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/checkpoints/ | Per-stage 085 checkpoint records 01–12 |
 
@@ -54,7 +54,7 @@
 | 10 | Wave C1: serial marker, nested-run case, then a `--dist` guard repair | `05ae56ca`, `bf455401`, `018b0455` | Yes — the `--dist` caller guard (FR-004/FR-019 boundary) was found mid-wave and fixed as a new commit |
 | 11 | Wave C2 first attempt: sandbox `git worktree` **inside the repo root** contaminated the closure run | `test-evidence/closure-diff.txt` § Run ledger row 1: `21 failed, 7533 passed, 7 skipped in 271.72s` | Yes — a process defect by the feature's own executor; disclosed and re-run, no extra slot spent |
 | 12 | Wave C2 closure: clean re-run, 085 carve-out, verification log, nine gates, `Implemented` flip | `93e61050`, `d30bfadf`, `a0426644` | None |
-| 13 | Feature flipped to `Implemented` on the checker's `accept` verdict, contradicting a pre-written `Blocked` premise | `.specify/memory/features/086.md` § 当前状态裁定: "裁决前本文件与 `features.md` 曾按预期先写成 `Blocked`" | Yes — a prediction was written as a status before the verdict existed |
+| 13 | Feature flipped to `Implemented` on the checker's `accept` verdict, contradicting a pre-written `Blocked` premise | `.specify/features/086-efficient-test-execution.md` § 当前状态裁定: "裁决前本文件与 `features.md` 曾按预期先写成 `Blocked`" | Yes — a prediction was written as a status before the verdict existed |
 | 14 | `/speckit.review` (this run): four segments plus the Acceptance Reality Check | `code-review.md` coverage receipt: 113 changed / 113 judged / 0 skipped / 0 gap | None |
 
 ## 2. Findings Summary
@@ -172,7 +172,7 @@ No full suite was run by this review: the T047 closure slot already records the 
 
 | Field | Value | Source |
 |-------|-------|--------|
-| Claimed status (read, never written) | Implemented | `.specify/memory/features/086.md`, copied |
+| Claimed status (read, never written) | Implemented | `.specify/features/086-efficient-test-execution.md`, copied |
 | `final_path` record, copied verbatim (7/7) | pass 8 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 8 | `scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/086-efficient-test-execution --repo . --feature-detail .specify/memory/features/086.md --feature-registry .specify/memory/features.md --json`, never recomputed here |
 | Comparison verdict | agree | the checker returned `"verdict": "accept"` with `"reasons": []`, `"waived": []`, and all four completion conditions `true`; the claim `Implemented` agrees with that verdict, no `F-ACCEPTANCE` item fires |
 | Failed condition, on refusal | none — not a refusal | — |
@@ -271,7 +271,7 @@ No full suite was run by this review: the T047 closure slot already records the 
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/memory/features/086.md (`### 当前状态裁定`)
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/features/086-efficient-test-execution.md (`### 当前状态裁定`)
 
 - **Evidence** (verbatim quote):
 
@@ -415,7 +415,7 @@ No full suite was run by this review: the T047 closure slot already records the 
 
 ## 5. spec-kit / SDD Improvement Recommendations
 
-Nine ids, all registered in `.specify/memory/register.md` in the same commit as this report
+Nine ids, all registered in `.specify/register.md` in the same commit as this report
 (`REC-086-T1`, `REC-086-C1`, `REC-086-C2`, `REC-086-A1`, `REC-086-A2`, `REC-086-A3`,
 `REC-086-W1`, `REC-086-W2`, `REC-086-D1`). Each carries its one-line meaning, this report's
 section as the authority path, and status `open`; the register owns the row form, this section

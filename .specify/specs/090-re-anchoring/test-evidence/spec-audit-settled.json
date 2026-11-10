@@ -1,0 +1,1698 @@
+{
+ ".specify/specs/001-unify-command-handoffs": {
+  "kind": "live",
+  "refs": 6,
+  "alive": 6,
+  "moved": 6,
+  "dead": 0,
+  "dead_list": []
+ },
+ ".specify/specs/006-add-qoder-support": {
+  "kind": "live",
+  "refs": 32,
+  "alive": 22,
+  "moved": 22,
+  "dead": 10,
+  "dead_list": [
+   "tests/integration/test_qoder_distribution.py",
+   ".specify/memory/features/",
+   "tests/integration/test_qoder_refresh.py",
+   "tests/integration/test_qoder_init.py",
+   "tests/unit/test_qoder_support_matrix.py",
+   "tests/unit/test_qoder_support_surfaces.py",
+   "tests/unit/test_qoder_refresh_helpers.py",
+   "tests/contract/test_qoder_support_surfaces_contract.py",
+   "tests/contract/test_qoder_refresh_contract.py",
+   "tests/contract/test_qoder_init_contract.py"
+  ]
+ },
+ ".specify/specs/009-claude-code-support": {
+  "kind": "live",
+  "refs": 49,
+  "alive": 37,
+  "moved": 37,
+  "dead": 12,
+  "dead_list": [
+   "tests/integration/test_claude_init.py",
+   "tests/unit/test_claude_support_matrix.py",
+   "tests/contract/test_claude_init_contract.py",
+   "tests/contract/test_claude_refresh_contract.py",
+   "tests/artifacts",
+   "tests/contract/test_claude_support_surfaces_contract.py",
+   "tests/unit/test_claude_support_surfaces.py",
+   "docs/tests",
+   "tests/unit/test_claude_refresh_helpers.py",
+   "tests/unit/test_claude_distribution.py",
+   "tests/integration/test_claude_distribution.py",
+   "tests/contract/test_claude_support_contract.py"
+  ]
+ },
+ ".specify/specs/012-skill-home-workdir": {
+  "kind": "live",
+  "refs": 29,
+  "alive": 20,
+  "moved": 20,
+  "dead": 9,
+  "dead_list": [
+   "skills/my-skill/assets",
+   "skills/my-skill/assets/template.md",
+   ".specify/skills/foo/",
+   "scripts/init.sh",
+   "skills/my-skill/scripts/render.sh",
+   ".specify/skills/foo",
+   "tests/contract/test_skill_home_workdir_template.py",
+   "skills/my-skill/",
+   "scripts/references/assets"
+  ]
+ },
+ ".specify/specs/013-portable-skill-creation": {
+  "kind": "live",
+  "refs": 27,
+  "alive": 19,
+  "moved": 19,
+  "dead": 8,
+  "dead_list": [
+   ".specify/skills/custom-skill/tools/",
+   "skills/create-skills/SKILL.md",
+   "tests/contract/test_create_skills_prompt_assets.py",
+   ".specify/skills/my-new-skill/SKILL.md",
+   "skills/improve-skills/SKILL.md",
+   ".specify/skills/my-new-skill/",
+   ".specify/skills/portable-demo/",
+   "scripts/references/assets"
+  ]
+ },
+ ".specify/specs/016-refactor-tools-command": {
+  "kind": "live",
+  "refs": 28,
+  "alive": 21,
+  "moved": 21,
+  "dead": 7,
+  "dead_list": [
+   "scripts/bash/build-docs.sh",
+   "tests/contract/test_tools_modify.py",
+   ".specify/memory/tools/jq.md",
+   ".specify/memory/tools/build-docs.md",
+   "tests/contract/test_tools_preview.py",
+   "templates/tool-",
+   "tests/contract/test_tools_discover_draft.py"
+  ]
+ },
+ ".specify/specs/018-cli-priority-support": {
+  "kind": "live",
+  "refs": 49,
+  "alive": 37,
+  "moved": 37,
+  "dead": 12,
+  "dead_list": [
+   ".specify/scripts/bash/update-agent-context.sh",
+   "tests/integration/test_ai_tools_command_coverage.py",
+   "docs/menu",
+   "tests/integration/test_codex_init.py",
+   "tests/contract/test_ai_tools_support_surfaces.py",
+   "tests/contract/test_tier_ordering_contract.py",
+   "tests/integration/test_instructions_sync.py",
+   "tests/integration/test_tier_menu_ordering.py",
+   "tests/integration/test_deep_adaptation_multi_tool.py",
+   "scripts/bash/update-agent-context.sh",
+   "tests/contract/test_ai_tools_support_contract.py",
+   "tests/unit/test_command_template_variants.py"
+  ]
+ },
+ ".specify/specs/020-speckit-todo-command": {
+  "kind": "live",
+  "refs": 38,
+  "alive": 20,
+  "moved": 20,
+  "dead": 18,
+  "dead_list": [
+   "src/auth/endpoints/login.py",
+   "src/auth/middleware/session_validator.py",
+   "tests/auth/test_login.py",
+   "tests/auth/",
+   "docs/k8s-1.30-compatibility.md",
+   "tests/integration.rs",
+   ".specify/scripts/bash/search-todo.sh",
+   "tests/integration/test_speckit_todo_prompt.py",
+   "docs/deploy.md",
+   "src/foo.md",
+   "tests/integration/test_session_flow.py",
+   "src/auth/login.md",
+   "src/api.py",
+   "src/bad.md",
+   "docs/auth.md",
+   "tests/fixtures/todo-workspaces/oversized/backlog.md",
+   "docs/bar.md",
+   "src/broken.md"
+  ]
+ },
+ ".specify/specs/021-agent-specific-config": {
+  "kind": "live",
+  "refs": 47,
+  "alive": 32,
+  "moved": 32,
+  "dead": 15,
+  "dead_list": [
+   "skills/browser-utils/references/copilot-guide.md",
+   ".specify/memory/feedback/agents-claude-code-2026-06-25T14-30-00.md",
+   "skills/create-agent/SKILL.md",
+   "skills/improve-agent/references/",
+   "skills/improve-skills/references/",
+   "skills/improve-skills/SKILL.md",
+   "tests/contract/test_agent_specific_config_feedback.py",
+   "tests/contract/test_agent_specific_config_commands.py",
+   "skills/improve-agent/SKILL.md",
+   ".specify/memory/feedback/browser-utils-claude-code-2026-06-25T15-00-00.md",
+   "skills/browser-utils/references/claude-code-guide.md",
+   "skills/browser-utils/references/",
+   "skills/browser-utils",
+   "skills/create-agent/references/",
+   "skills/browser-utils/SKILL.md"
+  ]
+ },
+ ".specify/specs/023-agent-framework-redesign": {
+  "kind": "live",
+  "refs": 81,
+  "alive": 40,
+  "moved": 40,
+  "dead": 41,
+  "dead_list": [
+   "tests/scenarios/multi-agent-orchestration/team-loop-scenario.md",
+   "src/session_store.py",
+   "skills/internal/create-agent/templates/agent-subrole-evaluator-template.md",
+   "docs/agents/",
+   "skills/dispatching-parallel-agents/SKILL.md",
+   "docs/customization.md",
+   "docs/agents/multi-agent-orchestration.md",
+   "skills/create-agent/templates/agent-role-team-supervisor-template.md",
+   "src/agent_registry.py",
+   "skills/internal/create-agent/templates/agent-subrole-improver-template.md",
+   "skills/create-agent/templates/agent-stage-",
+   "skills/other",
+   "tests/unit/test_agent_reference_integrity.py",
+   "docs/agent-contract.md",
+   "docs/agent/coordinator-and-swarm.mdx",
+   ".specify/templates/agent-",
+   "src/coordinator/workerAgent.ts",
+   "src/skills/loadSkillsDir.ts",
+   "skills/improve-agent/SKILL.md",
+   "src/Task.ts"
+  ]
+ },
+ ".specify/specs/024-agent-env-config": {
+  "kind": "live",
+  "refs": 29,
+  "alive": 20,
+  "moved": 20,
+  "dead": 9,
+  "dead_list": [
+   "skills/agent-setup/references/",
+   ".specify/skills/agent-setup/",
+   "tests/docs",
+   ".specify/skills/agent-setup/scripts/config-agent.sh",
+   "docs/agent-tools/",
+   "skills/agent-setup/",
+   "skills/agent-setup",
+   "skills/agent-setup/SKILL.md",
+   ".specify/templates/examples/structure-"
+  ]
+ },
+ ".specify/specs/025-agent-skill-enablement": {
+  "kind": "live",
+  "refs": 28,
+  "alive": 19,
+  "moved": 19,
+  "dead": 9,
+  "dead_list": [
+   "skills/internal/create-agent/templates/agent-role-",
+   "skills/internal/create-agent/templates/agent-role-module-designer-template.md",
+   "skills/internal/create-agent/templates/agent-role-test-engineer-template.md",
+   "skills/internal/create-agent/templates/agent-role-qa-engineer-template.md",
+   "skills/internal/create-agent/templates/agent-role-system-designer-template.md",
+   "skills/internal/create-agent/templates/agent-role-ux-analyst-template.md",
+   "skills/internal/create-agent/templates/agent-role-knowledge-manager-template.md",
+   "docs/agents/",
+   "skills/internal/create-agent/templates/agent-role-requirements-analyst-template.md"
+  ]
+ },
+ ".specify/specs/027-feedback-mechanism": {
+  "kind": "live",
+  "refs": 74,
+  "alive": 68,
+  "moved": 68,
+  "dead": 6,
+  "dead_list": [
+   "skills/create-skills/SKILL.md",
+   ".specify/docs/target-structure.md",
+   "templates/skills/commands",
+   "skills/improve-skills/SKILL.md",
+   ".specify/memory/sanitize/cleanup-plan.json",
+   "scripts/CLI"
+  ]
+ },
+ ".specify/specs/028-sdd-workflow-refactor": {
+  "kind": "live",
+  "refs": 59,
+  "alive": 43,
+  "moved": 43,
+  "dead": 16,
+  "dead_list": [
+   "skills/commands",
+   ".specify/skills/sdd-workflow/references/",
+   "docs/summary/03-sdd-workflow-refactor-proposal.md",
+   "docs/commands/",
+   ".specify/skills/sdd-workflow",
+   ".specify/shared/workflow/x.md",
+   "docs/history",
+   "skills/sdd-workflow",
+   "skills/sdd-workflow/references/user-input-protocol.md",
+   "docs/agents/",
+   "shared/workflow/x.md",
+   ".specify/skills/sdd-workflow/",
+   "skills/sdd-workflow/references/",
+   "skills/sdd-workflow/",
+   "docs/skills/",
+   "docs/history/"
+  ]
+ },
+ ".specify/specs/029-glossary-mechanism": {
+  "kind": "live",
+  "refs": 36,
+  "alive": 34,
+  "moved": 34,
+  "dead": 2,
+  "dead_list": [
+   "docs/memory",
+   "docs/constitution/feature"
+  ]
+ },
+ ".specify/specs/030-summarize-project": {
+  "kind": "live",
+  "refs": 40,
+  "alive": 21,
+  "moved": 21,
+  "dead": 19,
+  "dead_list": [
+   "skills/analysis-project",
+   ".specify/skills/analysis-project",
+   "tests/contract/test_create_skills_prompt_assets.py",
+   "docs/overview.md",
+   "skills/analysis-project/SKILL.md",
+   "docs/project-summary/",
+   ".specify/skills/summarize-project",
+   "skills/analysis-project/",
+   "tests/contract/test_analysis_project_uml_assets.py",
+   "skills/draw-plantuml/",
+   ".specify/skills/analysis-project/",
+   "docs/project-summary/executive/",
+   ".specify/skills/summarize-project/",
+   "skills/summarize-project/",
+   "docs/figures/",
+   "tests/contract/conftest.py",
+   "docs/project-summary/gantt.png",
+   "docs/project-summary/index.html",
+   "skills/draw-plantuml/SKILL.md"
+  ]
+ },
+ ".specify/specs/031-task-complexity-rubric": {
+  "kind": "live",
+  "refs": 14,
+  "alive": 12,
+  "moved": 12,
+  "dead": 2,
+  "dead_list": [
+   "shared/irreversible",
+   "docs/feature"
+  ]
+ },
+ ".specify/specs/032-dogfooding-practice": {
+  "kind": "live",
+  "refs": 27,
+  "alive": 25,
+  "moved": 25,
+  "dead": 2,
+  "dead_list": [
+   ".specify/specs/032-dogfooding-practice/contracts/feedback-utils-extension.md",
+   "docs/skills/feedback.md"
+  ]
+ },
+ ".specify/specs/033-docs-command": {
+  "kind": "live",
+  "refs": 67,
+  "alive": 56,
+  "moved": 56,
+  "dead": 11,
+  "dead_list": [
+   "templates/agent-role-",
+   ".specify/docs/target-structure.md",
+   ".specify/docs/audit/",
+   "docs/README.md",
+   "docs/audit/",
+   "src/specify_cli/generate_commands",
+   ".specify/scripts/python/docs-utils.py",
+   "docs/plans/",
+   "docs/quickstart.md",
+   ".specify/docs/plans/",
+   ".specify/docs/audit/20260728T082822Z-docs-audit.md"
+  ]
+ },
+ ".specify/specs/034-evidence-infra": {
+  "kind": "live",
+  "refs": 62,
+  "alive": 58,
+  "moved": 58,
+  "dead": 4,
+  "dead_list": [
+   ".specify/memory/feedback/index.json",
+   ".specify/memory/evidence/index.json",
+   "scripts/agent-lint/",
+   ".specify/skills/draw-echarts/yuque-workspace/"
+  ]
+ },
+ ".specify/specs/035-token-efficiency": {
+  "kind": "live",
+  "refs": 82,
+  "alive": 71,
+  "moved": 71,
+  "dead": 11,
+  "dead_list": [
+   ".specify/memory/features/",
+   "tests/contract/test_token_efficiency_remediation_summary_first.py",
+   "skills/create-team/SKILL.md",
+   "tests/contract/test_token_efficiency_remediation_program_first.py",
+   "docs/-wholesale",
+   "tests/contract/test_token_efficiency_remediation_",
+   "skills/git-workflow",
+   "skills/create-agent/SKILL.md",
+   "skills/create-skills/references/skill-creation-quality-checklist.md",
+   "skills/create-tools/SKILL.md",
+   "skills/improve-skills/references/skill-quality-checklist.md"
+  ]
+ },
+ ".specify/specs/036-team-summary": {
+  "kind": "live",
+  "refs": 88,
+  "alive": 73,
+  "moved": 73,
+  "dead": 15,
+  "dead_list": [
+   "tests/contract/test_goal_identity.py",
+   "templates/teams/",
+   "skills/create-team/scripts/build-summary-input.py",
+   ".specify/project/summary/",
+   ".specify/goal",
+   ".specify/agents/execution/scripts/",
+   ".specify/project/gantt",
+   ".specify/project/wbs",
+   ".specify/project/milestones",
+   ".specify/agents/execution/logs/",
+   "skills/summarize-project/scripts",
+   ".specify/goal/",
+   "skills/summarize-project/scripts/validate-project-input.py",
+   ".specify/specs/.archive/026-agent-team-management/",
+   ".specify/teams/.work/"
+  ]
+ },
+ ".specify/specs/037-goal-registry": {
+  "kind": "live",
+  "refs": 92,
+  "alive": 77,
+  "moved": 77,
+  "dead": 15,
+  "dead_list": [
+   "tests/contract/test_goal_command_surface.py",
+   ".specify/goal/framework-stays-current/goal.md",
+   ".specify/project/goal/shared-harvest-goal",
+   "skills/create-team/scripts/build-summary-input.py",
+   ".specify/goal/framework-stays-current/",
+   ".specify/memory/features",
+   ".specify/goal",
+   ".specify/skills/create-team/",
+   "tests/integration/test_ai_tools_command_coverage.py",
+   ".specify/goal/shared-harvest-goal/summary",
+   ".specify/teams/goal-share-a/team.md",
+   ".specify/goal/",
+   ".specify/goal/shared-harvest-goal",
+   ".specify/teams/goal-share-b/team.md",
+   "tests/fixtures/teams/goal-share-"
+  ]
+ },
+ ".specify/specs/038-goal-target": {
+  "kind": "live",
+  "refs": 52,
+  "alive": 46,
+  "moved": 46,
+  "dead": 6,
+  "dead_list": [
+   "scripts/build-summary-input.py",
+   "tests/contract/test_goal_command_surface.py",
+   ".specify/goal/demo-goal/summary/",
+   ".specify/goal/demo-goal/goal.md",
+   ".specify/teams/demo-team/team.md",
+   "tests/contract/test_run_target_assignment.py"
+  ]
+ },
+ ".specify/specs/039-session-export": {
+  "kind": "live",
+  "refs": 29,
+  "alive": 22,
+  "moved": 22,
+  "dead": 7,
+  "dead_list": [
+   ".specify/skills/export-session/SKILL.md",
+   "skills/export-session/scripts/export.py",
+   "skills/export-session/SKILL.md",
+   "skills/export-session/",
+   "skills/export-session",
+   "scripts/export.py",
+   "tests/contract/test_export_skill_genericity.py"
+  ]
+ },
+ ".specify/specs/040-agent-metadata-portability": {
+  "kind": "live",
+  "refs": 66,
+  "alive": 61,
+  "moved": 61,
+  "dead": 5,
+  "dead_list": [
+   "skills/commands",
+   "skills/internal/create-agent/templates/agent-capacity-",
+   "tests/integration/test_context_injection.py",
+   "shared/skills",
+   "tests/contract/test_agents_symlink.py"
+  ]
+ },
+ ".specify/specs/041-refactor-feedback-probe": {
+  "kind": "live",
+  "refs": 41,
+  "alive": 37,
+  "moved": 37,
+  "dead": 4,
+  "dead_list": [
+   ".specify/memory/feedback/index.json",
+   ".specify/memory/feedback/probes/",
+   "tests/contract/test_feedback_probe_",
+   ".specify/memory/feedback/probes/ext-myteam-deploy-skill-wrapup.md"
+  ]
+ },
+ ".specify/specs/042-goal-team-creation": {
+  "kind": "live",
+  "refs": 52,
+  "alive": 45,
+  "moved": 45,
+  "dead": 7,
+  "dead_list": [
+   ".specify/goal/",
+   ".specify/goal/improve-harness/goal.md",
+   "tests/contract/test_run_target_assignment.py",
+   "skills/create-team/scripts/verify-territory-disjoint.py",
+   "tests/contract/test_targets_check.py",
+   ".specify/specs/042-",
+   "tests/contract/test_goal_team_creation.py"
+  ]
+ },
+ ".specify/specs/043-init-commit-stamp": {
+  "kind": "live",
+  "refs": 23,
+  "alive": 19,
+  "moved": 19,
+  "dead": 4,
+  "dead_list": [
+   "src/specify_cli/_source_commit.json",
+   "src/scripts/templates/.specify/scripts",
+   ".specify/version.json",
+   ".specify/version"
+  ]
+ },
+ ".specify/specs/044-reduce-confirmation-flows": {
+  "kind": "live",
+  "refs": 63,
+  "alive": 57,
+  "moved": 57,
+  "dead": 6,
+  "dead_list": [
+   "tests/contract/test_confirmation_gates_execution_report.py",
+   "skills/git-workflow",
+   "tests/contract/test_feedback_probe_",
+   "tests/contract/test_confirmation_gates_team_flow.py",
+   "tests/contract/test_confirmation_gates_taxonomy.py",
+   "skills/git-workflow/SKILL.md"
+  ]
+ },
+ ".specify/specs/045-sanitize-command": {
+  "kind": "live",
+  "refs": 78,
+  "alive": 64,
+  "moved": 64,
+  "dead": 14,
+  "dead_list": [
+   ".specify/memory/draft/",
+   "src//tests//.git/",
+   "tests/unit/test_sanitize_engine.py",
+   ".specify/memory/sanitize/findings.json",
+   ".specify/memory/sanitize/cleanup-plan.json",
+   ".specify/memory/todo/20260812-...md",
+   ".specify/memory/todo/20260812-evidence-session-backlog.md",
+   ".specify/memory/sanitize/",
+   ".specify/tools/",
+   "tests/fixtures/sanitize/sample",
+   ".specify/memory/todo/xxx.md",
+   "src/leak.py",
+   "templates/instances/execution",
+   "docs/git-workflow.md"
+  ]
+ },
+ ".specify/specs/047-feedback-introspection": {
+  "kind": "live",
+  "refs": 42,
+  "alive": 32,
+  "moved": 32,
+  "dead": 10,
+  "dead_list": [
+   ".specify/skills/browser-utils/SKILL.md",
+   ".specify/memory/feedback/index.json",
+   "tests/contract/test_feedback_command_introspect.py",
+   ".specify/skills/browser-utils/scripts/chrome_open_trust.sh",
+   "skills/improve-skills/SKILL.md",
+   "tests/contract/test_token_efficiency_remediation_summary_first.py",
+   "templates/scripts",
+   "templates/commands/x.md",
+   "templates/skills/SKILL-template.md",
+   ".specify/skills/browser-utils/references/trusted-browser-launch.md"
+  ]
+ },
+ ".specify/specs/048-derive-command": {
+  "kind": "live",
+  "refs": 84,
+  "alive": 77,
+  "moved": 77,
+  "dead": 7,
+  "dead_list": [
+   "tests/contract/test_goal_command_surface.py",
+   ".specify/specs/0NN-",
+   ".specify/goal/",
+   ".specify/memory/sanitize/",
+   ".specify/memory/features/0NN",
+   "tests/contract/test_derive_move_library.py",
+   "tests/contract/test_derive_model_enforcement.py"
+  ]
+ },
+ ".specify/specs/049-docs-reconcile": {
+  "kind": "live",
+  "refs": 62,
+  "alive": 49,
+  "moved": 49,
+  "dead": 13,
+  "dead_list": [
+   "tests/contract/test_docs_skill_pair.py",
+   "docs/tutorials/login-flow.md",
+   ".specify/docs/target-structure.md",
+   ".specify/docs/audit/",
+   "src/specify_cli/auth_flow.py",
+   "docs/audit/",
+   "docs/target-structure.md",
+   "docs/tutorials/index.md",
+   "scripts/python/docs-utils.py",
+   "docs/plans/",
+   "tests/contract/test_docs_action_routing.py",
+   "docs/git-workflow.md",
+   "tests/contract/test_docs_reconcile_orchestration.py"
+  ]
+ },
+ ".specify/specs/050-proactive-flow-trigger": {
+  "kind": "live",
+  "refs": 112,
+  "alive": 103,
+  "moved": 103,
+  "dead": 9,
+  "dead_list": [
+   ".specify/specs/050-",
+   ".specify/tools/",
+   "tests/contract/test_proactive_trigger_discipline_doc.py",
+   ".specify/specs/0",
+   ".specify/memory/feedback/index.json",
+   "tests/contract/test_confirmation_gates_execution_report.py",
+   ".specify/docs/target-structure.md",
+   ".specify/skills/.migration-backups/layout-int-",
+   "docs/git-workflow.md"
+  ]
+ },
+ ".specify/specs/051-user-facing-comprehension": {
+  "kind": "live",
+  "refs": 163,
+  "alive": 145,
+  "moved": 145,
+  "dead": 18,
+  "dead_list": [
+   "docs/public",
+   "shared/templates/skills-summarize-project/agents/scripts",
+   ".specify/.claude/.qoder/.github/.opencode",
+   "tests/contract/test_token_efficiency_remediation_summary_first.py",
+   "skills/feedback.md",
+   ".specify/instructions.md-2026-09-18-192435",
+   "shared/guidelines/user-facing-comprehension-v2.md",
+   "skills/summarize-project",
+   "tests/integration/test_team_create_flow.py",
+   "scripts/bash/update-feature-index.sh",
+   "skills/tools",
+   "skills/summarize-project/references/reporting-playbook.md",
+   "tests/contract/test_user_facing_comprehension_",
+   "skills/feedback",
+   "docs/public/",
+   "tests/contract/test_confirmation_gates_execution_report.py",
+   ".specify/skills/browser-utils/scripts/chrome_open_trust.sh",
+   ".specify/skills/.migration-backups/layout-int-"
+  ]
+ },
+ ".specify/specs/052-fast-fail-principle": {
+  "kind": "live",
+  "refs": 177,
+  "alive": 143,
+  "moved": 143,
+  "dead": 34,
+  "dead_list": [
+   ".specify/skills/improve-agent/SKILL.md",
+   ".specify/skills/git-fleet/SKILL.md",
+   ".specify/skills/manage-agents/SKILL.md",
+   ".specify/skills/improve-team/SKILL.md",
+   ".specify/skills/create-team/references/team-presets.md",
+   ".specify/skills/code-review/SKILL.md",
+   ".specify/skills/create-team/references/summary-mapping.md",
+   ".specify/skills/improve-tools/SKILL.md",
+   ".specify/skills/collect-evidence/SKILL.md",
+   "skills/create-team/references/patterns.md",
+   ".specify/skills/draw-d3js/SKILL.md",
+   ".specify/skills/git-workflow/SKILL.md",
+   ".specify/skills/create-team/references/operating-loops.md",
+   ".specify/skills/memory-recall/SKILL.md",
+   ".specify/skills/git-submodule-edit/SKILL.md",
+   ".specify/skills/think-skills/SKILL.md",
+   ".specify/skills/git-server-init/SKILL.md",
+   ".specify/skills/create-agent/SKILL.md",
+   ".specify/skills/create-team/SKILL.md",
+   ".specify/skills/draw-echarts/SKILL.md"
+  ]
+ },
+ ".specify/specs/053-machine-decidable-artifacts": {
+  "kind": "live",
+  "refs": 188,
+  "alive": 143,
+  "moved": 143,
+  "dead": 45,
+  "dead_list": [
+   "docs/public",
+   ".specify/skills/improve-agent/SKILL.md",
+   "docs/a.md",
+   ".specify/skills/git-fleet/SKILL.md",
+   "skills/draw-excalidraw",
+   ".specify/skills/manage-agents/SKILL.md",
+   ".specify/skills/code-review/SKILL.md",
+   ".specify/skills/create-team/references/summary-mapping.md",
+   ".specify/skills/improve-tools/SKILL.md",
+   ".specify/skills/collect-evidence/SKILL.md",
+   ".specify/goal",
+   "scripts/python/test",
+   ".specify/skills/git-workflow/SKILL.md",
+   ".specify/skills/create-team/references/operating-loops.md",
+   ".specify/skills/memory-recall/SKILL.md",
+   ".specify/skills/git-submodule-edit/SKILL.md",
+   ".specify/skills/think-skills/SKILL.md",
+   "skills/draw-echarts",
+   ".specify/specs/053-",
+   "tests/contract/test_x.py"
+  ]
+ },
+ ".specify/specs/055-conflict-free-stores": {
+  "kind": "live",
+  "refs": 6,
+  "alive": 5,
+  "moved": 5,
+  "dead": 1,
+  "dead_list": [
+   ".specify/memory/feedback/index.json"
+  ]
+ },
+ ".specify/specs/056-probe-handler-system": {
+  "kind": "live",
+  "refs": 80,
+  "alive": 76,
+  "moved": 76,
+  "dead": 4,
+  "dead_list": [
+   ".specify/memory/feedback/probes/",
+   "src/specify_cli.generate_commands",
+   ".specify/skills/external",
+   "docs/git-workflow.md"
+  ]
+ },
+ ".specify/specs/057-decompose-command-skills": {
+  "kind": "live",
+  "refs": 47,
+  "alive": 47,
+  "moved": 47,
+  "dead": 0,
+  "dead_list": []
+ },
+ ".specify/specs/058-sdd-loop-driver": {
+  "kind": "live",
+  "refs": 52,
+  "alive": 47,
+  "moved": 47,
+  "dead": 5,
+  "dead_list": [
+   ".specify/skills/git-workspace/scripts/git_fleet.py",
+   "tests/scripts/templates",
+   "templates/src/scripts",
+   "skills/external/git-workspace/SKILL.md",
+   ".specify/skills/git-workspace/SKILL.md"
+  ]
+ },
+ ".specify/specs/059-exec-quant-recording": {
+  "kind": "live",
+  "refs": 66,
+  "alive": 63,
+  "moved": 63,
+  "dead": 3,
+  "dead_list": [
+   ".specify/memory/feedback/packages/feedback-20261016T053231Z.zip",
+   ".specify/memory/feedback/packages/",
+   "tests/integration/test_feedback_"
+  ]
+ },
+ ".specify/specs/060-decompose-subagent-dispatch": {
+  "kind": "live",
+  "refs": 56,
+  "alive": 53,
+  "moved": 53,
+  "dead": 3,
+  "dead_list": [
+   ".specify/specs/060-decompose-subagent-dispatch/notes/quickstart-run.md",
+   ".specify/specs/060-",
+   ".specify/agents/templates/sdd-executor.agent.md"
+  ]
+ },
+ ".specify/specs/061-subagent-cli-config": {
+  "kind": "live",
+  "refs": 116,
+  "alive": 106,
+  "moved": 106,
+  "dead": 10,
+  "dead_list": [
+   "scripts/shared",
+   "skills/docs/init",
+   ".specify/agents/execution/logs/config-snapshots/72ae1cc218e8aca8.json",
+   ".specify/agents/execution/logs/",
+   "templates/instances/execution/",
+   ".specify/agents/execution/configs/sample-agent.yaml",
+   ".specify/agents/execution/logs",
+   "templates/internal",
+   ".specify/agents/execution/logs/061-line-state.md",
+   "skills/scripts/shared"
+  ]
+ },
+ ".specify/specs/062-humanize-command": {
+  "kind": "live",
+  "refs": 141,
+  "alive": 134,
+  "moved": 134,
+  "dead": 7,
+  "dead_list": [
+   ".specify/skills/humanize/",
+   ".specify/memory/features",
+   "templates/commands/scripts",
+   "skills/external/humanize",
+   "skills/external/humanize/",
+   ".specify/skills/humanize/SKILL.md",
+   "skills/external/humanize/SKILL.md"
+  ]
+ },
+ ".specify/specs/063-review-p1-governance": {
+  "kind": "live",
+  "refs": 122,
+  "alive": 114,
+  "moved": 114,
+  "dead": 8,
+  "dead_list": [
+   "templates/commands/scripts",
+   ".specify/templates/commands/analyze.md",
+   "docs/rec-target-a.md",
+   ".specify/specs/062-humanize-command/coverage-baseline.txt",
+   ".specify/specs/063-review-p1-governance/waivers.md",
+   "templates/skills/shared",
+   "templates/mechanism",
+   "docs/rec-target-b.md"
+  ]
+ },
+ ".specify/specs/064-subagent-concurrency": {
+  "kind": "live",
+  "refs": 112,
+  "alive": 104,
+  "moved": 104,
+  "dead": 8,
+  "dead_list": [
+   "tests/single-line",
+   ".specify/specs/075-sdd-loop-efficiency/contracts/cli-profiles.md",
+   ".specify/memory/feedback/entry.md",
+   "tests/baseline",
+   "docs/mirrors",
+   "scripts/integrate-lines.sh",
+   "tests/unit/test_cli_profile_record.py",
+   "src/a.py"
+  ]
+ },
+ ".specify/specs/065-loop-interruption-recovery": {
+  "kind": "live",
+  "refs": 48,
+  "alive": 44,
+  "moved": 44,
+  "dead": 4,
+  "dead_list": [
+   "tests/contract/test_sdd_loop_driver_state_awareness.py",
+   "tests/unit/test_loop_state.py",
+   "tests/integration/test_loop_state_interruption_matrix.py",
+   ".specify/specs/065-demo/plan.md"
+  ]
+ },
+ ".specify/specs/065a-state-awareness": {
+  "kind": "live",
+  "refs": 80,
+  "alive": 69,
+  "moved": 69,
+  "dead": 11,
+  "dead_list": [
+   ".specify/specs/demo/research.md",
+   ".specify/memory/features",
+   ".specify/specs/demo/contracts/",
+   ".specify/specs/demo/plan.md",
+   ".specify/specs/demo/quickstart.md",
+   ".specify/specs/demo/feature-ref.md",
+   "scripts/loop-state.py",
+   "docs/SKILL",
+   ".specify/specs/demo/data-model.md",
+   ".specify/specs/066-",
+   "docs/mirror/verification/gates"
+  ]
+ },
+ ".specify/specs/067-loop-efficiency-hardening": {
+  "kind": "live",
+  "refs": 62,
+  "alive": 56,
+  "moved": 56,
+  "dead": 6,
+  "dead_list": [
+   "docs/mirror/compat",
+   "tests/source/scripts/mirrors/registry/requirements/plan",
+   "tests/pyproject",
+   ".specify/specs/063-sdd-loop-efficiency/review.md",
+   ".specify/specs/063-sdd-loop-efficiency/contracts/test-budget.md",
+   ".specify/memory/features"
+  ]
+ },
+ ".specify/specs/068-exec-quant-feedback-channel": {
+  "kind": "live",
+  "refs": 336,
+  "alive": 328,
+  "moved": 328,
+  "dead": 8,
+  "dead_list": [
+   ".specify/skills/think-skills/SKILL.md",
+   "docs/skills/shared/template",
+   ".specify/memory/exec-quant/aggregated/cws-lib-python-",
+   "shared/docs",
+   ".specify/memory/exec-quant/aggregated/",
+   ".specify/skills/internal/study-project/references/uml-visualization-guide.md",
+   ".specify/specs/059-",
+   ".specify/memory/exec-quant/aggregated"
+  ]
+ },
+ ".specify/specs/069-execution-expression-sdd": {
+  "kind": "live",
+  "refs": 30,
+  "alive": 26,
+  "moved": 26,
+  "dead": 4,
+  "dead_list": [
+   ".specify/specs/069b-isomorphism-migration-metrics/notes/parent-fr-mapping.md",
+   ".specify/specs/069b-isomorphism-migration-metrics/requirements.md",
+   ".specify/specs/069-execution-expression-sdd/test-evidence/log-requirements-validate.log",
+   ".specify/specs/069b-isomorphism-migration-metrics"
+  ]
+ },
+ ".specify/specs/070-subagent-task-teams": {
+  "kind": "live",
+  "refs": 96,
+  "alive": 90,
+  "moved": 90,
+  "dead": 6,
+  "dead_list": [
+   "src/generated/",
+   "tests/red-first",
+   "tests/design",
+   "docs/skills",
+   ".specify/commands/",
+   "tests/contract/test_sdd_loop_driver_"
+  ]
+ },
+ ".specify/specs/071-review-code-integration": {
+  "kind": "live",
+  "refs": 253,
+  "alive": 239,
+  "moved": 239,
+  "dead": 14,
+  "dead_list": [
+   ".specify/specs/071-review-code-integration/code-review-20261027T084638Z.md",
+   ".specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt",
+   ".specify/specs/071-fixture-demo",
+   "scripts/git-delta-review.sh",
+   ".specify/goal/command-logic-as-classified-skills/summary/assets/wbs.png",
+   ".specify/specs/071-demo",
+   "src/fixture_demo.py",
+   "src/app.py",
+   ".specify/.tmp/quickstart-071/missing.md",
+   ".specify/.tmp/quickstart-071/",
+   "tests/docs",
+   "src/legacy/",
+   ".specify/teams/.work/",
+   "docs/template"
+  ]
+ },
+ ".specify/specs/072-client-self-improvement": {
+  "kind": "live",
+  "refs": 168,
+  "alive": 154,
+  "moved": 154,
+  "dead": 14,
+  "dead_list": [
+   "tests/contract/declared-drift.md",
+   "tests/contract/test_",
+   "tests/contract/test_client_",
+   ".specify/memory/feedback/probes/",
+   ".specify/specs/072-demo",
+   "templates/skills/shared/scripts/src/specify_cli",
+   ".specify/specs/072-demo/code-review.md",
+   "scripts/git-delta-review.sh",
+   "src/app.py",
+   ".specify/memory/feedback/20261027T124847Z-custom-myteam-review-loop.md",
+   "templates/skills/scripts",
+   "templates/skills/shared/scripts/src_specify_cli",
+   ".specify/memory/feedback/probes/ext-myteam-review-loop.md",
+   ".specify/memory/feedback/20261027T124845Z-custom-myteam-review-loop.md"
+  ]
+ },
+ ".specify/specs/073-record-retention-and-housekeeping": {
+  "kind": "live",
+  "refs": 6,
+  "alive": 6,
+  "moved": 6,
+  "dead": 0,
+  "dead_list": []
+ },
+ ".specify/specs/074-goal-team-sdd-unification": {
+  "kind": "live",
+  "refs": 101,
+  "alive": 96,
+  "moved": 96,
+  "dead": 5,
+  "dead_list": [
+   "skills/.../references/",
+   ".specify/specs/074-goal-team-sdd-unification/notes/pre-change-measurements.md",
+   ".specify/specs/074-goal-team-sdd-unification/notes/red-first-evidence.md",
+   ".specify/specs/074-goal-team-sdd-unification/notes/",
+   ".specify/specs/074-goal-team-sdd-unification/notes/quickstart-run.md"
+  ]
+ },
+ ".specify/specs/074a-authorized-routing": {
+  "kind": "live",
+  "refs": 221,
+  "alive": 215,
+  "moved": 215,
+  "dead": 6,
+  "dead_list": [
+   ".specify/goal/fixture-goal/goal.md",
+   ".specify/agents/instances/seat-allowed.agent.md",
+   ".specify/agents/instances/seat-forbidden.agent.md",
+   ".specify/memory/registers",
+   ".specify/agents/execution/20261029T000000Z-routing-verdict-d1.md",
+   ".specify/teams/fixture-team/team.md"
+  ]
+ },
+ ".specify/specs/074b-nested-governance": {
+  "kind": "live",
+  "refs": 212,
+  "alive": 203,
+  "moved": 203,
+  "dead": 9,
+  "dead_list": [
+   ".specify/.tmp/074b-goal-fixture",
+   ".specify/goal/command-logic-as-classified-skills/summary/assets/wbs.png",
+   ".specify/.tmp/containment-post-failed.txt",
+   ".specify/goal/",
+   ".specify/teams/demo-team",
+   "scripts/python/line-registry.py",
+   ".specify/teams/demo-team/items.jsonl",
+   "skills/inte...eam/SKILL.md",
+   ".specify/goal/demo-goal/goal.md"
+  ]
+ },
+ ".specify/specs/075-sdd-loop-efficiency": {
+  "kind": "live",
+  "refs": 112,
+  "alive": 106,
+  "moved": 106,
+  "dead": 6,
+  "dead_list": [
+   ".specify/memory/features/",
+   "tests/contracts",
+   ".specify/specs/012-medium/plan.md",
+   "scripts/contracts",
+   "tests/unit/test_cli_profile_record.py",
+   ".specify/scripts/python/validate-"
+  ]
+ },
+ ".specify/specs/076-decision-tension-contract": {
+  "kind": "live",
+  "refs": 209,
+  "alive": 205,
+  "moved": 205,
+  "dead": 4,
+  "dead_list": [
+   "tests/contract/test_",
+   ".specify/specs/shared/guidelines/decision-tension.md",
+   "tests/contract/test_decision_tension_",
+   "scripts/python/validate-"
+  ]
+ },
+ ".specify/specs/077-doc-sdd-integration": {
+  "kind": "live",
+  "refs": 229,
+  "alive": 220,
+  "moved": 220,
+  "dead": 9,
+  "dead_list": [
+   "tests/contract/test_",
+   ".specify/memory/features/069b.md",
+   ".specify/.tmp/sdd-loop/tmp/plan077",
+   ".specify/specs/fx-bad/requirements.md",
+   ".specify/specs/does-not-exist/requirements.md",
+   "docs/humanize",
+   ".specify/memory/features/069a.md",
+   "scripts/python/docs-structure-check.py",
+   "scripts/python/flow-class-spec-check.py"
+  ]
+ },
+ ".specify/specs/078-coaching-skills": {
+  "kind": "live",
+  "refs": 160,
+  "alive": 133,
+  "moved": 133,
+  "dead": 27,
+  "dead_list": [
+   "skills/external/think-skills/",
+   "skills/external/think-skills/SKILL.md",
+   "skills/external/think-skills/references/prompt-templates.md",
+   ".specify/.tmp/coaching-078/run1-work/work.md",
+   ".specify/skills/think-skills/references/prompt-templates.md",
+   ".specify/.tmp/coaching-078/run1-work/checklist.md",
+   "skills/internal/improve-skills/SKILL.md",
+   ".specify/skills/think-skills-alias",
+   ".specify/memory/coaching/20261030T101500Z-memory-recall",
+   ".specify/skills/think-skills/",
+   ".specify/memory/coaching/.optimization-claims/fixture-trainee",
+   ".specify/templates/commands/",
+   ".specify/memory/coaching/20261030T083250Z-fixture-trainee",
+   ".specify/skills/think-skills/SKILL.md",
+   ".specify/.tmp/coaching-degraded/.specify/memory/coaching/20261030T083352Z-fixture-trainee",
+   "tests/contract/test_coaching_",
+   ".specify/skills/internal/improve-skills/SKILL.md",
+   ".specify/.tmp/coaching-078/run1-events.jsonl",
+   ".specify/memory/coaching/20261030T083250Z-fixture-trainee/",
+   ".specify/memory/coaching/.optimization-claims/memory-recall"
+  ]
+ },
+ ".specify/specs/079-bilingual-expression": {
+  "kind": "live",
+  "refs": 172,
+  "alive": 167,
+  "moved": 167,
+  "dead": 5,
+  "dead_list": [
+   "shared/templates/scripts",
+   ".specify/goal/command-logic-as-classified-skills/summary/assets/wbs.png",
+   ".specify/.tmp/079-bilingual-expression/",
+   ".specify/state/079-bilingual-expression.md",
+   ".specify/.tmp/079-bilingual-expression/s4-pilot-t018"
+  ]
+ },
+ ".specify/specs/080-humanize-run-output": {
+  "kind": "live",
+  "refs": 140,
+  "alive": 122,
+  "moved": 122,
+  "dead": 18,
+  "dead_list": [
+   ".specify/memory/session/20261029T101833Z-...md",
+   ".specify/specs/080-humanize-run-output/code-review.md",
+   ".specify/skills/humanize/",
+   "skills/external/humanize/",
+   ".specify/.tmp/humanize/",
+   ".specify/.tmp/humanize/x.run",
+   "skills/external/humanize/references/run-mode.md",
+   ".specify/skills/humanize/references/",
+   ".specify/.tmp/humanize/no-such-dir/.report.tmp",
+   ".specify/.tmp/humanize/20261031T001000Z-s10001.run",
+   ".specify/specs/092-non-disposable/test-evidence/u08-report.txt",
+   ".specify/skills/humanize/SKILL.md",
+   "skills/external/humanize/references",
+   ".specify/state/080-humanize-run-output.md",
+   ".specify/.tmp/humanize/no-such-dir/report.md",
+   "skills/external/humanize/references/report-shape.md",
+   "skills/external/humanize/references/",
+   "skills/external/humanize/SKILL.md"
+  ]
+ },
+ ".specify/specs/081-acceptance-hardening": {
+  "kind": "live",
+  "refs": 272,
+  "alive": 250,
+  "moved": 250,
+  "dead": 22,
+  "dead_list": [
+   ".specify/.tmp/081a-head-failed-clean.txt",
+   ".specify/.tmp/081d-t001-probe",
+   ".specify/.tmp/probe-specB",
+   ".specify/.tmp/081a-head-failed.txt",
+   ".specify/memory/features/",
+   "src/services/",
+   ".specify/.tmp/081c-closure-verdict.json",
+   ".specify/memory/features/NNN.md",
+   ".specify/specs/081-acceptance-hardening/notes/analyze-081c",
+   ".specify/.tmp/probe-specA",
+   ".specify/.tmp/081b-closure-verdict.json",
+   "skills/internal/review-sdd-process/references/",
+   ".specify/specs/071",
+   ".specify/specs/077",
+   "docs/CHANGELOG",
+   ".specify/.tmp/review-081c-verdict.json",
+   "tests/contract/test_review_",
+   ".specify/.tmp/review-081b-verdict.json",
+   ".specify/.tmp/081a-head-failed-final.txt",
+   "scripts/external"
+  ]
+ },
+ ".specify/specs/082-self-explanatory-integration": {
+  "kind": "live",
+  "refs": 185,
+  "alive": 173,
+  "moved": 173,
+  "dead": 12,
+  "dead_list": [
+   ".specify/memory/session/interview-wangwenshengyi.md",
+   ".specify/.tmp/082-part8/red_legs.py",
+   ".specify/.tmp/082-part7/",
+   ".specify/instructions.md-2026-11-05-135949",
+   ".specify/.tmp/082-part5/m34.py",
+   ".specify/state/082-",
+   ".specify/.tmp/082-part7/m56.py",
+   "shared/definitions/removed-by-m6.md",
+   "shared/definitions/absent-by-construction.md",
+   ".specify/.tmp/082-part9/red_legs.py",
+   ".specify/instructions.md-",
+   ".specify/.tmp/082-part9/"
+  ]
+ },
+ ".specify/specs/083-mechanism-policy-separation": {
+  "kind": "live",
+  "refs": 393,
+  "alive": 383,
+  "moved": 383,
+  "dead": 10,
+  "dead_list": [
+   "tests/contract/test_mechanism_policy_",
+   "tests/contract/test_skill_reference_",
+   ".specify/specs/069",
+   "skills/external/humanize/SKILL.md",
+   "templates/commands/scripts",
+   "skills/external/foo",
+   ".specify/shared/definitions/skill-reference-definitions",
+   ".specify/memory/features/",
+   ".specify/agents/instances/sdd-requirements-executor.agent.md",
+   ".specify/agents/templates/sdd-executor.agent.md"
+  ]
+ },
+ ".specify/specs/084-harness-triple-structure": {
+  "kind": "live",
+  "refs": 448,
+  "alive": 431,
+  "moved": 431,
+  "dead": 17,
+  "dead_list": [
+   ".specify/.tmp/084-plan-probe/",
+   ".specify/.tmp/084-init/",
+   "templates/plan.md",
+   ".specify/.tmp/review-r3-causal/",
+   ".specify/.tmp/084-init",
+   ".specify/specs/084-harness-triple-structure/test-evidence/triple-verify.json",
+   "skills/external/humanize/",
+   ".specify/specs/084-harness-triple-structure/test-evidence/head-failed.txt",
+   "docs/CHANGELOG",
+   ".specify/.tmp/084-quickstart",
+   ".specify/.tmp/review-r4-declwins/",
+   "tests/contract/test_harness_triple_contract.py",
+   "skills/sdd-loop-driver/references/efficiency-model.md",
+   ".specify/memory/features/",
+   ".specify/scripts/python/x.py",
+   ".specify/.tmp/x",
+   ".specify/.tmp/review-r4-causal/"
+  ]
+ },
+ ".specify/specs/085-sdd-temporary-goal-team": {
+  "kind": "live",
+  "refs": 91,
+  "alive": 81,
+  "moved": 81,
+  "dead": 10,
+  "dead_list": [
+   "tests/contract/test_unified_turn_budget.py",
+   "src/dogfood0.txt",
+   "src/dogfood1.txt",
+   "tests/fixtures/temp_sdd_team.py",
+   ".specify/goal",
+   ".specify/specs/085-sdd-temporary-goal-team/checkpoints/closure.md",
+   ".specify/goal/",
+   ".specify/specs/085-sdd-temporary-goal-team/test-evidence/full-suite-pre-review-failed.txt",
+   ".specify/specs/085-sdd-temporary-goal-team/test-evidence/final-failed.txt",
+   "tests/contract/test_stage_seat_map.py"
+  ]
+ },
+ ".specify/specs/086-efficient-test-execution": {
+  "kind": "live",
+  "refs": 215,
+  "alive": 190,
+  "moved": 190,
+  "dead": 25,
+  "dead_list": [
+   "scripts/audit-test-budget.py",
+   ".specify/.tmp/086/baseline.log",
+   ".specify/goal",
+   ".specify/.tmp/086/s4-names.txt",
+   ".specify/.tmp/086/parallel-failed.txt",
+   ".specify/.tmp/086/isolation-probe.txt",
+   ".specify/.tmp/086/gate-scan-baseline.json",
+   "docs/serial",
+   ".specify/goal/",
+   ".specify/.tmp/086/baseline-failed.txt",
+   ".specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md",
+   ".specify/.tmp/086/s5-auto-names.txt",
+   ".specify/.tmp/086/s1-names.txt",
+   ".specify/.tmp/086/s2-names.txt",
+   ".specify/.tmp/086/analyze-coverage.json",
+   ".specify/.tmp/086/us1-parallel.txt",
+   ".specify/.tmp/086/s8-parallel.txt",
+   ".specify/.tmp/086/parallel.log",
+   ".specify/skills/external/sdd-loop-driver/",
+   ".specify/specs/086-efficient-test-execution/team/"
+  ]
+ },
+ ".specify/specs/087-arch-diagram-docs": {
+  "kind": "live",
+  "refs": 369,
+  "alive": 328,
+  "moved": 328,
+  "dead": 41,
+  "dead_list": [
+   ".specify/.tmp/space-stale-source.XXXXXX",
+   "docs/.speckit/",
+   "docs/assets/foo.png",
+   "docs/reference/diagrams/",
+   "docs/assets/foo.svg",
+   "scripts/docs-utils.py",
+   "skills/external/create-docs/quickstart.md",
+   "docs/.speckit/exemptions/",
+   "tests/fixtures/docs-obligation/orphan-rendered/.../20261106T090000Z-0870a1b2-diagram-trace.json",
+   "docs/concepts/foo.md",
+   ".specify/specs/087-",
+   "docs/assets/widget.mmd",
+   "skills/external/create-docs/contracts",
+   "docs/concepts/changelog-shaped.md",
+   "docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json",
+   "docs/assets/foo",
+   "docs/concepts/widget-overview.md",
+   "docs/.speckit/runs",
+   "scripts/tests",
+   ".specify/specs/087-arch-diagram-docs/goal/087-arch-diagram-docs/goal.md"
+  ]
+ },
+ ".specify/specs/088-speckit-visualization": {
+  "kind": "live",
+  "refs": 307,
+  "alive": 298,
+  "moved": 298,
+  "dead": 9,
+  "dead_list": [
+   ".specify/specs/088-speckit-visualization/goal/088-speckit-visualization/goal.md",
+   ".specify/teams/us1-compliant-fixture/",
+   ".specify/teams/us1-compliant-fixture/runs/status.live.log",
+   ".specify/goal/",
+   ".specify/specs/088-speckit-visualization/team/088-reporting-dogfood/team.md",
+   "scripts/validate-roster.py",
+   ".specify/specs/088-speckit-visualization/test-evidence/baseline-full-suite-20261106T063158Z.log",
+   "scripts/verify-territory-disjoint.py",
+   ".specify/templates/commands/"
+  ]
+ },
+ ".specify/specs/089-script-interface-contract": {
+  "kind": "live",
+  "refs": 154,
+  "alive": 144,
+  "moved": 144,
+  "dead": 10,
+  "dead_list": [
+   ".specify/specs/075-",
+   ".specify/.tmp/086-sandbox/",
+   ".specify/.tmp/sic.json",
+   ".specify/.tmp/sic-rule.json",
+   ".specify/specs/089-script-interface-contract/team/089-script-interface-contract/team.md",
+   ".specify/tools/",
+   ".specify/specs/089-script-interface-contract/test-evidence/T056-bash-backfill.txt",
+   ".specify/.tmp/086-probe/",
+   ".specify/specs/089-script-interface-contract/goal/script-interface-contract/goal.md",
+   ".specify/instructions.md-"
+  ]
+ },
+ ".specify/specs/090-re-anchoring": {
+  "kind": "live",
+  "refs": 183,
+  "alive": 166,
+  "moved": 166,
+  "dead": 17,
+  "dead_list": [
+   ".specify/specs/.archive/",
+   "tests/contract/test_build_profiles_invalid_target.py",
+   ".specify/specs/092-non-disposable",
+   ".specify/specs/092-non-disposable/test-evidence/shift-092.md",
+   ".specify/memory/sanitize/findings.json",
+   ".specify/specs/092-non-disposable/verification.md",
+   ".specify/specs/067-",
+   ".specify/specs/092-non-disposable/test-evidence/",
+   ".specify/specs/088-",
+   ".specify/memory/sanitize/",
+   ".specify/specs/090-re-anchoring/checkpoints/0N-",
+   ".specify/specs/092-non-disposable/test-evidence/INDEX.md",
+   ".specify/specs/092-non-disposable/",
+   ".specify/.tmp/086-",
+   ".specify/specs/089-script-interface-contract/team/086-script-interface-contract/",
+   ".specify/specs/092-non-disposable/test-evidence/repair-corpus.md",
+   ".specify/skills/external/"
+  ]
+ },
+ ".specify/specs/091-auto-git-closeout": {
+  "kind": "live",
+  "refs": 368,
+  "alive": 356,
+  "moved": 356,
+  "dead": 12,
+  "dead_list": [
+   "tests/fixtures/git-closeout/",
+   "shared/workflow/git.md",
+   ".specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md",
+   "skills/analyze/SKILL.md",
+   "tests/unit/test_compile_embeds.py",
+   ".specify/memory/retention/closeout/",
+   ".specify/skills/humanize/SKILL.md",
+   ".specify/skills/internal/study-project/SKILL.md",
+   "skills/git-utils/references/closeout-commands.md",
+   ".specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md",
+   "skills/internal/study-project/SKILL.md",
+   "skills/external/humanize/SKILL.md"
+  ]
+ },
+ ".specify/specs/093-concurrency-by-default": {
+  "kind": "live",
+  "refs": 256,
+  "alive": 206,
+  "moved": 206,
+  "dead": 50,
+  "dead_list": [
+   "shared/declarations/non-disposable-review-surface.yaml",
+   ".specify/.tmp/wp5/quickstart/serial-bad.yaml",
+   "src/generated/",
+   ".specify/.tmp/wp5/quickstart/cap-record.yaml",
+   ".specify/.tmp/sdd-loop/worktrees/093-wp2",
+   "src/generated/wp02.md",
+   ".specify/.tmp/sdd-loop/worktrees/093-wp5",
+   ".specify/.tmp/wp5/quickstart/reading-missing.json",
+   ".specify/memory/features",
+   ".specify/goal",
+   ".specify/specs/092-goal-team-parallel/verification.md",
+   ".specify/.tmp/wp5/quickstart/serial-empty.json",
+   ".specify/.tmp/sdd-loop/worktrees/093-enginefix",
+   ".specify/.tmp/sdd-loop/worktrees/093-wp4",
+   ".specify/.tmp/sdd-loop/worktrees/093-",
+   "skills/sdd-loop-driver/references/checkpoint-protocol.md",
+   "tests/contract/test_coaching_run_contract",
+   ".specify/.tmp/sdd-loop/worktrees/093-clarify",
+   ".specify/templates/commands/",
+   "scripts/wp-gate.py"
+  ]
+ },
+ ".specify/specs/094-goal-team-parallel": {
+  "kind": "live",
+  "refs": 262,
+  "alive": 210,
+  "moved": 210,
+  "dead": 52,
+  "dead_list": [
+   ".specify/.tmp/s094-",
+   ".specify/specs/094-goal-team-parallel/test-evidence/migration-applied.json",
+   ".specify/.tmp/s092",
+   ".specify/specs/094-goal-team-parallel/test-evidence/residual-before.json",
+   ".specify/.tmp/sdd-loop/worktrees/094-repairwave",
+   ".specify/specs/092-non-disposable/team/team.md",
+   ".specify/specs/088-speckit-visualization/team/088-reporting-dogfood/team.md",
+   ".specify/specs/092-non-disposable/notes/refactor-anchoring-merge.md",
+   ".specify/goal",
+   ".specify/specs/094-goal-team-parallel/team/094-goal-team-parallel/team.md",
+   ".specify/specs/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team/goal.md",
+   ".specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md",
+   ".specify/teams/demo-crew/team.md",
+   "scripts/territory-check.py",
+   ".specify/.tmp/sdd-loop/worktrees/094-repairwave/",
+   ".specify/.tmp/sdd-loop/forks/094-wp0",
+   ".specify/templates/commands/",
+   ".specify/specs/069b-isomorphism-migration-metrics",
+   ".specify/specs/088-speckit-visualization/goal/088-speckit-visualization/goal.md",
+   ".specify/specs/069b-isomorphism-migration-metrics/"
+  ]
+ },
+ ".specify/archive/specs/003-speckit-agents-command": {
+  "kind": "archived",
+  "refs": 14,
+  "alive": 13,
+  "moved": 13,
+  "dead": 1,
+  "dead_list": [
+   ".specify/memory/features/001..019.md"
+  ]
+ },
+ ".specify/archive/specs/007-skill-install-layout": {
+  "kind": "archived",
+  "refs": 28,
+  "alive": 25,
+  "moved": 25,
+  "dead": 3,
+  "dead_list": [
+   "docs/skills/vscode.md",
+   ".specify/memory/features/",
+   "tests/contracts"
+  ]
+ },
+ ".specify/archive/specs/008-create-skills-skill": {
+  "kind": "archived",
+  "refs": 27,
+  "alive": 23,
+  "moved": 23,
+  "dead": 4,
+  "dead_list": [
+   "tests/contracts/test_skill_install_layout_contract.py",
+   "tests/contract/test_create_new_skill_contract.py",
+   "tests/checks",
+   "tests/contract/test_create_skills_prompt_assets.py"
+  ]
+ },
+ ".specify/archive/specs/017-consolidate-draft-skills": {
+  "kind": "archived",
+  "refs": 49,
+  "alive": 31,
+  "moved": 31,
+  "dead": 18,
+  "dead_list": [
+   "scripts/pdf/",
+   "skills/browser-utils/",
+   "skills/browser-utils/scripts/js/",
+   "skills/tools",
+   "scripts/pptx/",
+   "scripts/docx/",
+   "scripts/office/",
+   "skills/browser-utils/examples/",
+   "skills/database-utils/",
+   ".specify/skills/browser-utils/",
+   "skills/browser-utils/LICENSE.txt",
+   "skills/external/database-utils/references/README.md",
+   "scripts/templates/",
+   "scripts/xlsx/",
+   "skills/browser-utils/references/playwright-api.md",
+   "skills/document-utils/",
+   "skills/browser-utils/scripts/python/with_server.py",
+   "skills/browser-utils/SKILL.md"
+  ]
+ },
+ ".specify/archive/specs/022-eei-agent-triad": {
+  "kind": "archived",
+  "refs": 57,
+  "alive": 28,
+  "moved": 28,
+  "dead": 29,
+  "dead_list": [
+   "templates/skills",
+   ".specify/templates/agent-role-",
+   ".specify/templates/agent-triad-",
+   "skills/create-agent/SKILL.md",
+   ".specify/templates/agent-subrole-",
+   "templates/agent-role-knowledge-manager-template.md",
+   "templates/agent-role-",
+   ".specify/templates/agent-role-system-designer-template.md",
+   "templates/agent-role-module-designer-template.md",
+   "templates/agent-role-test-engineer-template.md",
+   "templates/agent-subrole-",
+   "templates/agent-subrole-evaluator-template.md",
+   "tests/integration/test_eei_triad_loop.py",
+   ".specify/agents/system-designer.agent.md",
+   "templates/agent-subrole-executor-template.md",
+   "templates/prompts",
+   "scripts/bash/sync-runtime.sh",
+   "templates/agent-role-qa-engineer-template.md",
+   "skills/improve-agent/SKILL.md",
+   ".specify/skills/draw-plantuml/SKILL.md"
+  ]
+ },
+ ".specify/archive/specs/046-browser-site-memory": {
+  "kind": "archived",
+  "refs": 34,
+  "alive": 14,
+  "moved": 14,
+  "dead": 20,
+  "dead_list": [
+   "skills/browser-utils/scripts/js/run.js",
+   "skills/browser-utils/",
+   "skills/browser-utils/references/request-level-patterns.md",
+   "skills/browser-utils/scripts/site-memory.py",
+   ".specify/skills/browser-utils/site/probe.json",
+   "tests/contract/test_browser_site_exclusions.py",
+   "scripts/site-memory.py",
+   "skills/browser-utils/site/probe.json",
+   "tests/contract/test_browser_site_memory.py",
+   ".specify/skills/browser-utils",
+   ".specify/skills/browser-utils/",
+   ".specify/skills/browser-utils/site/",
+   "skills/browser-utils/scripts/",
+   "scripts/bridge/",
+   "skills/browser-utils/site/",
+   "scripts/bridge",
+   ".specify/skills/browser-utils/scripts/site-memory.py",
+   "skills/browser-utils/site/secret.json",
+   "skills/browser-utils/references/site-memory.md",
+   "skills/browser-utils/SKILL.md"
+  ]
+ },
+ ".specify/archive/specs/054-agent-registration-wiring": {
+  "kind": "archived",
+  "refs": 76,
+  "alive": 71,
+  "moved": 71,
+  "dead": 5,
+  "dead_list": [
+   ".specify/skills/create-agent/SKILL.md",
+   ".specify/memory/feedback/index.json",
+   "skills/create-agent/SKILL.md",
+   "skills/templates/src/shared/tests/docs",
+   "skills/create-agent/"
+  ]
+ },
+ ".specify/archive/specs/066-loop-state-awareness-a": {
+  "kind": "archived",
+  "refs": 63,
+  "alive": 58,
+  "moved": 58,
+  "dead": 5,
+  "dead_list": [
+   "tests/contract/test_sdd_loop_driver_state_awareness.py",
+   "skills/.../references/state-awareness.md",
+   "docs/mirror",
+   ".specify/memory/features",
+   "tests/integration/test_loop_state_snapshot_matrix.py"
+  ]
+ },
+ ".specify/archive/specs/069a-flow-classification-docs-gates": {
+  "kind": "archived",
+  "refs": 167,
+  "alive": 156,
+  "moved": 156,
+  "dead": 11,
+  "dead_list": [
+   "skills/internal/memory-",
+   "src/specify_cli.generate_commands",
+   "skills/external/humanize",
+   "skills/external/humanize/",
+   "scripts/python/flow-class-",
+   "docs/humanize",
+   "shared/scripts",
+   ".specify/skills/humanize/SKILL.md",
+   ".specify/skills/external/",
+   "skills/external/humanize/SKILL.md",
+   "scripts/CLI"
+  ]
+ },
+ ".specify/archive/specs/069b-isomorphism-migration-metrics": {
+  "kind": "archived",
+  "refs": 132,
+  "alive": 127,
+  "moved": 127,
+  "dead": 5,
+  "dead_list": [
+   ".specify/specs/069a-.../",
+   "scripts/python/flow-class-check",
+   "tests/test_adapter_contract.py",
+   "shared/definitions/isomorphism-map.md",
+   "skills/external/humanize/SKILL.md"
+  ]
+ },
+ ".specify/archive/specs/092-non-disposable": {
+  "kind": "archived",
+  "refs": 201,
+  "alive": 172,
+  "moved": 172,
+  "dead": 29,
+  "dead_list": [
+   ".specify/specs/069",
+   ".specify/specs/.archive/",
+   ".specify/memory/sanitize/findings.json",
+   ".specify/specs/087-",
+   ".specify/history/.work/probe",
+   ".specify/specs/067-",
+   ".specify/goal",
+   ".specify/specs/082-",
+   ".specify/.tmp/x.tmp",
+   ".specify/templates/commands/",
+   ".specify/specs/081-",
+   ".specify/.tmp/probe",
+   ".specify/history/.work/a.txt",
+   ".specify/specs/077-",
+   ".specify/specs/088-",
+   ".specify/goal/",
+   ".specify/specs/084-",
+   ".specify/memory/sanitize/",
+   ".specify/specs/083-",
+   ".specify/specs/090-"
+  ]
+ }
+}

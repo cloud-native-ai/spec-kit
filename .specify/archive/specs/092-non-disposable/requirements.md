@@ -23,7 +23,7 @@
 
 本特性引入 **Non-Disposable 理念**：任何过程与文档都不是用过即丢，历史是必读输入；同时把「过期 / 无用 / 延期」从一种**沉默的默认状态**变成一种**必须被处置的状态**——每种此类状态 MUST 落入一个封闭处置集（归档 / 取代 / 修正 / 显式豁免含到期条件），而「留在原处、什么都不做」不再是可选项。
 
-落点是 `/speckit.history`：它从「把会话蒸馏成主题文档」升级为「**回顾 → 设计 → 用户确认 → 执行**」的四段形态。回顾面不是 git 历史，而是**当前 HEAD 工作树里十个 `.specify/` 历史目录**；其中既有确定性的机械检出（可判定的结构/引用/计数命题），也有语义检出（取代关系、多 owner、延期措辞），后者由 team 的大并发 subagent 承担。修复 lane 消费 `.specify/specs/092-non-disposable/notes/input-review-080-090.md` 的 A–H 语料：这些检出必须能在本树上**复现**这些发现，并在修复 lane 跑完后把它们驱动到零。
+落点是 `/speckit.history`：它从「把会话蒸馏成主题文档」升级为「**回顾 → 设计 → 用户确认 → 执行**」的四段形态。回顾面不是 git 历史，而是**当前 HEAD 工作树里十个 `.specify/` 历史目录**；其中既有确定性的机械检出（可判定的结构/引用/计数命题），也有语义检出（取代关系、多 owner、延期措辞），后者由 team 的大并发 subagent 承担。修复 lane 消费 `.specify/archive/specs/092-non-disposable/notes/input-review-080-090.md` 的 A–H 语料：这些检出必须能在本树上**复现**这些发现，并在修复 lane 跑完后把它们驱动到零。
 
 本特性不新建第二套历史存储、第二个 `/speckit.history` 入口、第二套并发机制，也不把 A–H 修复做成一次性清理脚本；机制先于清单。
 
@@ -291,11 +291,11 @@
 - **FR-063**: Non-Disposable 的落点 MUST 是**下列七面同批落地**，且 owner 唯一（FR-001 的 `shared/definitions/non-disposable-definitions.md`，本仓投影 `.specify/shared/definitions/`）——**本特性 MUST NOT 新增宪法原则，MUST NOT 改动宪法模板与本仓宪法的原则名单**：
   1. **owner 文档**（新）：理念定义、封闭处置集与豁免形态、检测类别封闭集、三类状态的可观察定义与判定主体、回顾面定义、取代协议、重编号判据面、报告 schema、与历史存储 / sanitize 的边界（含「处置映射」一节的两张映射表与裁决规则）。
   2. **声明层**（新）：`shared/declarations/facts/` 下的回顾面根集合声明（`kind: closed-set`），经 `declaration_reader.py` 读取；若另需机器事实同样落该目录，MUST NOT 新造第四个声明目录。
-  3. **术语表**（本仓 `.specify/memory/glossary.md`）：四条术语条目——`Non-Disposable` / `Disposition（处置）` / `Review Surface（回顾面）` / `Exemption（豁免）`；每条指向 owner 文档，MUST NOT 复写其判据。
-  4. **特性注册表**（`.specify/memory/features.md` + `.specify/memory/features/092.md`）：本特性行与详情文件同步登记，含「与宪法 XI『机制修复』子条的边界」一行。
+  3. **术语表**（本仓 `.specify/glossary.md`）：四条术语条目——`Non-Disposable` / `Disposition（处置）` / `Review Surface（回顾面）` / `Exemption（豁免）`；每条指向 owner 文档，MUST NOT 复写其判据。
+  4. **特性注册表**（`.specify/features.md` + `.specify/features/092-non-disposable.md`）：本特性行与详情文件同步登记，含「与宪法 XI『机制修复』子条的边界」一行。
   5. **既有守卫**（零新增门禁步骤）：本特性的契约测试断言「owner 文档存在且非空、声明文件可被唯一读入口读出、术语表四条存在、三份历史面指针存在、`sanitize-utils.py` 的四个封闭集逐字未变」；两条宪法计数 pin（`test_constitution_double_landing.py` 的 template / live / mandate 三计数与 watchlist、`test_fast_fail_discipline.py` 的同批 pin）MUST **保持原值**。
   6. **三份历史面指针**（只在既有章节追加一行指针，不改其正文）：`templates/instructions-template.md` 与 `.specify/instructions.md` 各一行指向 owner 文档的常驻指针、`AGENTS.md`（经 `/speckit.instructions` 生成，随之流动）、`skills/internal/manage-history/SKILL.md` 的回顾段指针。MUST NOT 新增常驻顶级 `##` 章节——否则两条指令面计数 pin（模板 35 / 现网 36）抖动。
-  7. **决定台账**：`.specify/memory/register.md` 一条指向 owner 文档的条目；决定的记录形态归本次 clarify 会话条目，MUST NOT 在 requirements 之外再写第二份决定正文。
+  7. **决定台账**：`.specify/register.md` 一条指向 owner 文档的条目；决定的记录形态归本次 clarify 会话条目，MUST NOT 在 requirements 之外再写第二份决定正文。
 - **FR-064**: FR-063 的**连带义务**（由 clarify 显式认领，MUST NOT 留作隐含）：(i) 新增文件 MUST 在目录治理的既有登记处可见（`shared/definitions/framework-map.md` 或声明层的既有登记）；(ii) 落地点 5 的契约测试 MUST 在**被守物损坏时变红**，即至少一条变异腿；(iii) `AGENTS.md` 的指针 MUST 只经 `/speckit.instructions` 生成，MUST NOT 手改；(iv) owner 文档 MUST 留一节「与宪法的关系」，写明本次**未**新增原则及其理由，否则下一位读者会把「理念没有原则」读成遗漏。
 - **FR-065**: 若用户日后裁定**补一条宪法原则**（OI-4），届时 MUST 按宪法既有五处落点 + 三计数 pin + Sync Impact Report 的完整流程作为一次独立的 MINOR 修订执行；本特性的 FR/SC MUST NOT 预写其条号或 pin 数值。
 
@@ -385,7 +385,7 @@
 
 - **A1 — 特性类别判定**：本特性判为 `execution`（`Flow Type: -`）。验收 oracle 是「交付物被机器执行/解析/消费」：检出引擎、状态一致性检查、命令的四段形态与并发分片都以程序读数判定；其中可读性产物（报告、方案）虽为文档形态，其缺陷只在程序判定失效时暴露，故不判 `expression`。
 - **A2 — 复用/扩展 vs 新建（裁定，非待决项）**：只读调查（本阶段实测：`skills/internal/manage-history/SKILL.md` 123 行，六步工作流 + Safety Rules；`templates/commands/history.md` 52 行，仅保留入口与 wrap-up；`sanitize-utils.py` 的 `CATEGORIES` 六项 / `DISPOSITIONS` 五项 / `STATES` 三项；`closure-acceptance-check.py` 的七条封闭 reason set；`history-utils.py` 的 `MANIFEST_FACT = "history-manifest-schema"`；`account-clause-coverage.py` 的 `--freeze` 基线形态；`flow-class-check.py` / `workspace-guard.py` 的只读门形态）得出裁定：**扩展 `manage-history` 为回顾段的语义引擎；新建一个只读确定性检出引擎承载可判定部分；复用 `sanitize-utils.py` 仅作为材料卫生类别与台账词汇的既有 owner（不把语义过期塞进 sanitize）；复用 `closure-acceptance-check.py` 的裁决与 reason code；复用 `085` 的 team/并发机制**。理由：`manage-history` 已经是 `/speckit.history` 的唯一执行内核，新建第二个 history 入口会立刻制造本特性自己要消灭的「一事实两 owner」；而把语义过期塞进 sanitize 会让 sanitize 的封闭类别集与其契约漂移。**MUST NOT 建第二个 history 入口或第二套存储。**
-- **A3 — 理念落地为宪法原则（裁定）**：本理念中「不可一次性处置」的**规范性条款**（过期/无用/延期状态 MUST 有封闭处置、回顾 MUST 先于设计且执行 MUST 经用户确认、历史 MUST 以 HEAD 工作树为面且 MUST NOT 改写）MUST 成为一条新增宪法原则，按既有五处落点同批落地：`templates/constitution-template.md`、本仓 `.specify/memory/constitution.md`、`templates/instructions-template.md` + `.specify/instructions.md` 常驻段落、`skills/internal/manage-constitution/SKILL.md` 的 `MUST include` 清单、以及双落地守卫的计数 pin（`test_constitution_double_landing.py` 的 template / live / mandate 三计数 + watchlist，`test_fast_fail_discipline.py` 的同批 pin）。按本仓 v1.19.0（22 条）与既有修订记录（MINOR 递增、Sync Impact Report、Last Amended），新增一条为 MINOR 增量；**具体条号与 pin 数值由 plan/implement 阶段在提交时实测确定，本阶段 MUST NOT 预写数值**（预写就是第二个定义点）。模板与本仓的条号天然不同（`090` 已把该差异裁定为正当差异，不「修齐」）。
+- **A3 — 理念落地为宪法原则（裁定）**：本理念中「不可一次性处置」的**规范性条款**（过期/无用/延期状态 MUST 有封闭处置、回顾 MUST 先于设计且执行 MUST 经用户确认、历史 MUST 以 HEAD 工作树为面且 MUST NOT 改写）MUST 成为一条新增宪法原则，按既有五处落点同批落地：`templates/constitution-template.md`、本仓 `.specify/constitution.md`、`templates/instructions-template.md` + `.specify/instructions.md` 常驻段落、`skills/internal/manage-constitution/SKILL.md` 的 `MUST include` 清单、以及双落地守卫的计数 pin（`test_constitution_double_landing.py` 的 template / live / mandate 三计数 + watchlist，`test_fast_fail_discipline.py` 的同批 pin）。按本仓 v1.19.0（22 条）与既有修订记录（MINOR 递增、Sync Impact Report、Last Amended），新增一条为 MINOR 增量；**具体条号与 pin 数值由 plan/implement 阶段在提交时实测确定，本阶段 MUST NOT 预写数值**（预写就是第二个定义点）。模板与本仓的条号天然不同（`090` 已把该差异裁定为正当差异，不「修齐」）。
 - **A4 — 回顾面与 git 历史的分界**：回顾只读 HEAD 工作树。判据是「文件是否存在于当前工作树」；同一文本若只存在于 git 历史，不构成回顾输入，也不构成检出条目。「历史」在本特性中指**载体自身的记录属性**（日期化回顾、证据文件、状态脊、既往澄清文字），不是版本控制的历史。
 - **A5 — 十目录作为声明式根集合**：十个目录名 MUST 落在与既有事实声明层同构的声明文件中（`shared/declarations/facts/` 惯例），MUST NOT 在每个提示文本里各写一份；目录增删只改声明。
 - **A6 — 范围实测基线（参照物，不是阈值）**：requirements 阶段在仓库根实测 `.specify/` 十个历史目录合计 **4,345** 个文件：`archive` 66、`derive` 2、`goal` 55、`history` 7、`memory` 1,210、`project` 10、`review` 1、`specs` 2,893、`state` 27、`teams` 74；clarify 于 2026-11-09 复测为 **4,352**（`memory` 1,213、`specs` 2,897，其余不变），差值来自一次运行落盘，属基线漂移而非缺陷。其中 `.md` 约 2,500 份、证据类（`test-evidence/`、`.jsonl`/`.txt`/`.json`）约 1,850 份。该规模是「必须 team + 大并发」的量化依据；SC-014 的对照以测量时点为准，基线漂移不构成失败。
@@ -396,7 +396,7 @@
 - **A11 — 「零」的含义**：SC-001 的「复现」与 SC-010 的「归零」都按**条目名**比较（路径 + 行 + 类别），不按计数比较；计数只作为参照物在测量源中记录。
 - **A12 — 本阶段写入边界**：本阶段唯一写入对象是 `.specify/specs/092-non-disposable/requirements.md` 与本阶段门禁读数 `test-evidence/requirements-gates.txt`；MUST NOT 改动实现、模板、其它 spec 正文、状态脊以外的运行时文件；既有脏文件不提交不还原。
 - **A13 — 状态脊与注册冲突的披露**：本线状态脊的 `direction_contract.goal_verbatim` 记录了用户原话，其中**未**出现宪法原则/五处落点要求；本规格在 A3 与 FR-041 中把该要求落为可执行条款。这是本阶段的一处**扩展裁定**，不是对原话的改写；若与编排者的意图不符，应在 clarify 阶段裁定而不是由实现自行取舍。
-- **A14 — A–H 语料的权威位置**：语料是 `.specify/specs/092-non-disposable/notes/input-review-080-090.md`（日期化输入记录，拥有零规则）。本特性把它当作**验证用例集**消费，MUST NOT 把它改写成规格条文，也 MUST NOT 在它里面登记处置结果（处置结果归 Non-Disposable 报告与修复 lane 证据）。
+- **A14 — A–H 语料的权威位置**：语料是 `.specify/archive/specs/092-non-disposable/notes/input-review-080-090.md`（日期化输入记录，拥有零规则）。本特性把它当作**验证用例集**消费，MUST NOT 把它改写成规格条文，也 MUST NOT 在它里面登记处置结果（处置结果归 Non-Disposable 报告与修复 lane 证据）。
 
 ## A–H Corpus Mapping *(validation cases → FR/SC)*
 

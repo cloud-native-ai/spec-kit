@@ -29,7 +29,7 @@ them shows up as `status-unreadable`. Before this file the check read one object
 
 | # | Object | Read from | What makes it red |
 |---|--------|-----------|-------------------|
-| O1 | the registry row | `.specify/memory/features.md` | the row's status contradicts the closure verdict per **C-802** |
+| O1 | the registry row | `.specify/features.md` | the row's status contradicts the closure verdict per **C-802** |
 | O2 | the verification machine-block | `<spec-dir>/verification.md` | a per-criterion machine-readable block or a smoke field is absent (**C-203**) |
 | O3 | the tasks structure **and** the decision-tension structure | `<spec-dir>/tasks.md`, `<spec-dir>/plan.md` | a user-story label sits in a phase that is not a story phase, or a decision-tension record does not carry the owner's six-field form |
 
@@ -65,7 +65,7 @@ contradiction, and the engine MUST NOT invent a further reading (for example "st
 `Relocated` is the one excluded row and it is excluded by a **named** rule rather than by silence: a relocated row
 carries no live spec directory of its own, so there is no closure verdict to compare it against, and the engine MUST
 report `count: 0` for that status **with** the reason — never fold it into the agree column. `Relocated` is real, not
-hypothetical: **one** row in `.specify/memory/features.md` carries it today, which is why the exclusion needs a rule
+hypothetical: **one** row in `.specify/features.md` carries it today, which is why the exclusion needs a rule
 rather than a passing mention.
 
 **Reason-code assignment.** The closure engine owns exactly one status-related code,
