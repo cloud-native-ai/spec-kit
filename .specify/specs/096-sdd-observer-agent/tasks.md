@@ -8,7 +8,7 @@
 
 **Tests Mode**: ON — Constitution Principle IV "Test-First & Contract-Driven Implementation" is test-mandating (pure functions MUST have unit tests, critical flows MUST have automated regression coverage, cross-service/external contracts MUST have integration/contract tests); Principle VII is NON-NEGOTIABLE and its template-only gate applies on top, because the agent template and driver prose are structure-asserted rather than runtime-tested (plan A10 / Constitution Check row IV). This is an `execution`-class line (`flow-class-check.py --action lookup --unit-id spec:096-sdd-observer-agent` → `flow_class: execution`, read once this stage), so the runtime layers apply in addition to the template-only gate.
 
-**Tests**: MANDATORY. Red-first captures append to `.specify/specs/096-sdd-observer-agent/notes/red-first-evidence.md` (command, real output, exit status per entry); execution readings land in `.specify/specs/096-sdd-observer-agent/test-evidence/`. Guard rows come BEFORE the row that turns them green, except where a row's subject is an appended assertion over an already-authored module (a later row extends the same module without re-claiming a green point).
+**Tests**: MANDATORY. Red-first captures append to the writing package's own file — `notes/red-first-evidence-wp01.md`, `notes/red-first-evidence-wp02.md` or `notes/red-first-evidence-wp03.md` (one file per package, never one shared file; command, real output, exit status per entry); execution readings land in `.specify/specs/096-sdd-observer-agent/test-evidence/`. Guard rows come BEFORE the row that turns them green, except where a row's subject is an appended assertion over an already-authored module (a later row extends the same module without re-claiming a green point).
 
 **Organization**: grouped by the five user stories of `requirements.md` (US1–US3 Priority P1; US4–US5 Priority P2), with a Setup phase, a Foundational phase (the journal-format owner fact and the line fixture builder — every story reads them), and a Polish phase. All paths are repo-relative.
 
@@ -16,7 +16,7 @@
 
 - DoD-1: **FR lane** — every FR-001…FR-023 is quoted at line level by at least one task row. Check: `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --spec-dir .specify/specs/096-sdd-observer-agent --repo .` reports `decision: pass` with zero runtime-row findings naming an unquoted FR.
 - DoD-2: **SC lane** — every SC-001…SC-007 has at least one task row and a recorded evidence pointer under `test-evidence/` or `notes/` (§ SC → row trace).
-- DoD-3: **clause lane** — every `[green:]` claim resolves to a real contract and clause (`validate-tasks.py` zero `green-dangling`, zero `green-clause-collision`); the clauses deliberately left unclaimed are disclosed in § Green Attribution with the row/evidence that covers them.
+- DoD-3: **clause lane** — every `[green:]` claim resolves to a real contract and clause (`validate-tasks.py` zero `green-dangling`, zero `green-clause-collision`); all 58 clauses are claimed exactly once, and § Green Attribution records the claim map plus every mechanical warning it discloses.
 - DoD-4: **tests** — the new guard modules pass through the one runner (`bash scripts/bash/run-tests.sh`); the full-suite reading has zero NEW failed ids against the implement-entry baseline (owner of the baseline capture: `/speckit.implement` Step 0).
 - DoD-5: **mirrors and renders** — `python3 scripts/python/sync-mirrors.py --check` shows no NEW drift against the pre-edit baseline; the four per-tool agent copies exist and carry the fast-fail clause; `test_fast_fail_discipline.py -k "i10 or i11"` is green after the deliberate preset update.
 - DoD-6: **boundaries** — `scripts/python/status-digest.py` carries zero `observer` / `journal` tokens; the digest field-set delta against `test-evidence/digest-fieldset-baseline.txt` is empty; `shared/guidelines/reporting-obligations.md`, the `STAGE_ARTIFACTS` mapping and `shared/declarations/facts/driver-stage-sequence.yaml` are unmodified.
@@ -31,11 +31,11 @@
 - GATE-2: Every mirror obligation of plan.md § Mirror Obligations holds — check: `python3 scripts/python/sync-mirrors.py --check` reports no NEW drift against `test-evidence/plan-mirror-baseline.txt`, and the four render copies named in T042 exist and carry the fast-fail clause.
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\] T[0-9]{3} ' .specify/specs/096-sdd-observer-agent/tasks.md` returns 0.
 - GATE-4: Every `final`-path success criterion is `pass` and the feature's smoke record is present — check: in `.specify/specs/096-sdd-observer-agent/verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are present. Condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema.
-- GATE-5: Structure and attribution are silent — check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md` exits 0 with `0 error(s)`, and every remaining warning is the disclosed forward edge named in § Green Attribution.
+- GATE-5: Structure and attribution are silent — check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md` exits 0 with `0 error(s)`, and every remaining warning appears in § Green Attribution's disclosed-warnings table.
 - GATE-6: The script interface contract holds on the new engine — check: `python3 scripts/python/journal-utils.py --help` and `--version` exit 0, and `python3 scripts/python/journal-utils.py --bogus-option` exits non-zero rejecting the undeclared option.
 - GATE-7: The tasks-stage cross-artifact gate passes — check: `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --spec-dir .specify/specs/096-sdd-observer-agent --repo .` reports `decision: pass` (missing-path advisories for paths this feature creates are expected and do not block without `--strict`).
 - GATE-8: The carrier boundaries are untouched — check: `grep -cE 'observer|journal' scripts/python/status-digest.py` returns 0, and `git diff --name-only` contains neither `shared/guidelines/reporting-obligations.md` nor `shared/declarations/facts/driver-stage-sequence.yaml`.
-- GATE-9: The contract coverage baseline holds — check: `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/096-sdd-observer-agent --corpus-root .specify/specs` exits 0 with 0 uncovered names beyond `coverage-baseline.txt`.
+- GATE-9: The contract coverage baseline holds — check: `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/096-sdd-observer-agent --corpus-root .specify/specs` exits 0 with 0 uncovered names beyond `coverage-baseline.txt` and 0 `UNCOVERED-FR` names (every FR cited from a clause citation group).
 
 ## Environment Prerequisites
 
@@ -86,18 +86,18 @@ Every quantity below was measured this stage with the re-derivation command show
 
 ## Package Map (implement-stage dispatch boundary)
 
-Setup rows execute first in the main worktree (they freeze baselines and create landing points). The four packages below are the implement-stage dispatch units; row-level `[blockedBy:]` tags stay the ordering authority inside a package, package edges order between packages.
+Setup rows execute first in the main worktree (they freeze baselines and create landing points). The four packages below are the implement-stage dispatch units, executed strictly in the order declared below; row-level `[blockedBy:]` tags stay the ordering authority inside a package, package edges order between packages, and every cross-package row edge points to an earlier package.
 
-| Package | Rows | Write domain (owned paths) | Edge |
+| Package | Rows | Write domain (rows' write targets; a later package may extend an earlier package's module) | Edge |
 |---------|------|----------------------------|------|
-| `wp01-journal-core` | T006–T017, T036–T037 | `shared/declarations/facts/journal-format.yaml`, `tests/fixtures/sdd-observer/`, `scripts/python/journal-utils.py`, `tests/contract/test_journal_engine.py` | after Setup + Foundational |
-| `wp02-observer-definition` | T018–T020, T031, T038 | `agents/sdd-observer.agent.md`, `tests/contract/test_sdd_observer_agent.py`, `tests/contract/test_fast_fail_discipline.py` | after T006 |
-| `wp03-driver-lifecycle` | T023–T030, T032, T034 | `skills/external/sdd-loop-driver/SKILL.md`, `skills/external/sdd-loop-driver/references/observer-lifecycle.md`, `skills/external/sdd-loop-driver/references/stage-prompts.md`, `tests/contract/test_sdd_loop_driver_skill.py`, `tests/contract/test_sdd_observer_lifecycle.py`, `docs/reference/skills/sdd-loop-driver.md` | after T007 |
-| `wp04-release-and-evidence` | T021–T022, T033, T035, T039–T047 | generated mirrors + four render copies, `.specify/features.md`, `.specify/features/096.md`, `test-evidence/`, `notes/` | after wp01 + wp02 + wp03 |
+| `wp01-journal-core` | T006–T017, T036 | `shared/declarations/facts/journal-format.yaml`, `tests/fixtures/sdd-observer/`, `scripts/python/journal-utils.py`, `tests/contract/test_journal_engine.py` | after Setup (carries the Foundational rows T006–T007) |
+| `wp02-observer-definition` | T018–T020, T037–T038 | `agents/sdd-observer.agent.md`, `tests/contract/test_sdd_observer_agent.py`, `tests/contract/test_fast_fail_discipline.py`, `tests/contract/test_journal_engine.py` (T037 extends wp01's module) | after wp01 |
+| `wp03-driver-lifecycle` | T023–T030, T034 | `skills/external/sdd-loop-driver/SKILL.md`, `skills/external/sdd-loop-driver/references/observer-lifecycle.md`, `skills/external/sdd-loop-driver/references/stage-prompts.md`, `tests/contract/test_sdd_loop_driver_skill.py`, `tests/contract/test_sdd_observer_lifecycle.py`, `tests/fixtures/sdd-observer/failure_builder.py` (T023), `docs/reference/skills/sdd-loop-driver.md` | after wp02 |
+| `wp04-release-and-evidence` | T021–T022, T031–T033, T035, T039–T047 | generated mirrors + four render copies, `.specify/features.md`, `.specify/features/096.md`, `tests/contract/test_sdd_observer_agent.py` (T031 extends wp02's module), `tests/contract/test_sdd_observer_lifecycle.py` (T032 extends wp03's module), `test-evidence/`, `notes/` | after wp03 |
 
-**Partition check**: 14 + 5 + 10 + 13 = 42 packaged rows + 5 Setup rows = 47 total, one row per ID, no ID in two packages; the largest package holds 14 rows, under the 16-row planning target. `notes/` and `test-evidence/` are append-only sinks shared by several packages — a row that pastes a reading into one of them is not claiming a source file there.
+**Partition check**: 13 + 5 + 9 + 15 = 42 packaged rows + 5 Setup rows = 47 total, one row per ID, no ID in two packages; the largest package holds 15 rows, under the 16-row planning target. Evidence layout: the red-first captures use one file per package (`notes/red-first-evidence-wp01.md` / `-wp02.md` / `-wp03.md`), and every other evidence file is written by rows of exactly one package (Setup's `notes/pre-change-measurements.md` is written by the sequential T002/T005), so no two packages share an evidence path.
 
-**Declared integration order**: `wp01-journal-core → wp02-observer-definition → wp03-driver-lifecycle → wp04-release-and-evidence`. `wp02` and `wp03` write disjoint trees and MAY run concurrently after `wp01`; the one forward edge is T031 (`wp02`) waiting on T029 (`wp03`), declared at row level.
+**Declared integration order**: `wp01-journal-core → wp02-observer-definition → wp03-driver-lifecycle → wp04-release-and-evidence`, executed strictly in that order — no package pair runs concurrently. Every cross-package row edge points backwards: wp02 waits on wp01 (T018←T006, T037←T036), wp03 waits on wp01 (T023←T007) and is serialized after wp02 by this declared order, and wp04 waits on all three (T021←T017/T020, T031←T020/T029, T032←T020/T029, T035←T034, T039←T037/T038, T041←T010/T017/T019/T025/T027).
 
 ---
 
@@ -105,7 +105,7 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 
 **Purpose**: freeze every baseline the later rows compare against, re-probe the environment once, and create the fixed evidence landing points so no later row invents a path.
 
-- [ ] T001 Create the fixed evidence landing points under `.specify/specs/096-sdd-observer-agent/notes/`: `notes/red-first-evidence.md` (one entry per red-first run: command, real output, exit status), `notes/pre-change-measurements.md` (value, re-derivation command, capture date) and `notes/quickstart-run.md` (skeleton with teardown field).
+- [ ] T001 Create the fixed evidence landing points under `.specify/specs/096-sdd-observer-agent/notes/`: `notes/red-first-evidence-wp01.md`, `notes/red-first-evidence-wp02.md` and `notes/red-first-evidence-wp03.md` (one file per package — no shared single red-first file; one entry per red-first run: command, real output, exit status), `notes/pre-change-measurements.md` (value, re-derivation command, capture date) and `notes/quickstart-run.md` (skeleton with teardown field).
 - [ ] T002 [P] Re-capture the pre-edit baselines into `.specify/specs/096-sdd-observer-agent/notes/pre-change-measurements.md`: `python3 scripts/python/sync-mirrors.py --check` (expect exit 0), `bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py -q` (expect 25 passed) and `bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10 or i11"` (expect 2 passed), each with its real output [blockedBy: T001].
 - [ ] T003 [P] Capture the SC-006 status-digest field-set baseline before the first implementation edit into `.specify/specs/096-sdd-observer-agent/test-evidence/digest-fieldset-baseline.txt` from `python3 scripts/python/status-digest.py --action digest --format json --workspace .` (sorted top-level keys plus the `all_entries[]` row keys; no timestamps or ages) [blockedBy: T001].
 - [ ] T004 [P] Re-probe the environment named in § Environment Prerequisites at implement entry and record the readings in `.specify/specs/096-sdd-observer-agent/test-evidence/env-probe.txt`.
@@ -136,7 +136,7 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 
 ### Tests for User Story 1 (MANDATORY)
 
-- [ ] T008 [US1] Author the first slice of `tests/contract/test_journal_engine.py`: stage-coverage over the declared sequence, header five keys, single nine-column table, `seq` continuity in file order, `-` placeholders, append idempotency on unchanged carriers; confirm every case fails on the current tree and append the red runs to `notes/red-first-evidence.md` [green: contracts/observer-verification.contract.md#C-01] (FR-015, SC-001) [blockedBy: T006,T007]
+- [ ] T008 [US1] Author the first slice of `tests/contract/test_journal_engine.py`: stage-coverage over the declared sequence, header five keys, single nine-column table, `seq` continuity in file order, `-` placeholders, append idempotency on unchanged carriers; confirm every case fails on the current tree and append the red runs to `notes/red-first-evidence-wp01.md` [green: contracts/observer-verification.contract.md#C-01] (FR-015, SC-001) [blockedBy: T006,T007]
 
 ### Implementation for User Story 1
 
@@ -159,8 +159,8 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 ### Tests for User Story 2 (MANDATORY)
 
 - [ ] T014 [P] [US2] Author `tests/fixtures/sdd-observer/tamper_builder.py`: three structural tamper variants (a tenth column `recommendation`, an event literal `should-improve` outside the closed set, a free narrative paragraph) plus a forged-pointer journal and an unresolvable-commit journal [green: contracts/observer-verification.contract.md#C-02] [green: contracts/observer-verification.contract.md#C-04] (FR-014, SC-002, SC-004) [blockedBy: T007]
-- [ ] T016 [US2] Extend `tests/contract/test_journal_engine.py` with the five tamper drills, persistent-pointer resolution (`path exists` / `git cat-file -e` for commits) and free-narrative rejection; confirm each fails before its implementation and append the red runs to `notes/red-first-evidence.md` (FR-013, FR-014, SC-002, SC-004, SC-007) [blockedBy: T014]
-- [ ] T018 [US2] Author `tests/contract/test_sdd_observer_agent.py`: neutral frontmatter keys, the declared `observer` role face, the verbatim 「不评价、不建议、不推断」 sequence, read domain and write surface, three-layer binding, serial-subagent rule, forbidden capabilities and the byte-identical fast-fail clause; confirm the module fails while the template is absent and append the red run to `notes/red-first-evidence.md` (FR-001, FR-002, FR-016, FR-022, SC-004) [blockedBy: T006]
+- [ ] T016 [US2] Extend `tests/contract/test_journal_engine.py` with the five tamper drills, the gap drill (skip an observation window; assert exactly one `observer-gap` row naming the window start and end, and that removing the gap-writing path turns it red), persistent-pointer resolution (`path exists` / `git cat-file -e` for commits) and free-narrative rejection; confirm each fails before its implementation and append the red runs to `notes/red-first-evidence-wp01.md` [green: contracts/observer-verification.contract.md#C-07] (FR-013, FR-014, SC-002, SC-004, SC-007) [blockedBy: T014]
+- [ ] T018 [US2] Author `tests/contract/test_sdd_observer_agent.py`: neutral frontmatter keys, the declared `observer` role face, the verbatim 「不评价、不建议、不推断」 sequence, read domain and write surface, three-layer binding, serial-subagent rule, forbidden capabilities and the byte-identical fast-fail clause; confirm the module fails while the template is absent and append the red run to `notes/red-first-evidence-wp02.md` (FR-001, FR-002, FR-016, FR-022, SC-004) [blockedBy: T006]
 
 ### Implementation for User Story 2
 
@@ -184,7 +184,7 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 ### Tests for User Story 3 (MANDATORY)
 
 - [ ] T023 [P] [US3] Author `tests/fixtures/sdd-observer/failure_builder.py`: a start-failure fixture and a mid-run-kill fixture (unsettled / failed status envelope, spine observer record `state: failed` with a one-line reason), both under `tmp_path` (FR-009, FR-020, SC-003) [blockedBy: T007]
-- [ ] T024 [US3] Author `tests/contract/test_sdd_observer_lifecycle.py`: entry switch, startup point, spine record key set, restart-at-stage-boundary, terminal close, non-blocking predicate, the doctored-gate red leg and the digest boundary baseline comparison; confirm the non-blocking and close assertions fail before the driver text lands and append the red runs to `notes/red-first-evidence.md` (FR-003, FR-004, FR-005, FR-008, FR-009, FR-020, FR-023, SC-003, SC-006) [blockedBy: T023]
+- [ ] T024 [US3] Author `tests/contract/test_sdd_observer_lifecycle.py`: entry switch, startup point, spine record key set, restart-at-stage-boundary, terminal close, non-blocking predicate, the doctored-gate red leg and the digest boundary baseline comparison; confirm the non-blocking and close assertions fail before the driver text lands and append the red runs to `notes/red-first-evidence-wp03.md` [green: contracts/observer-verification.contract.md#C-03] (FR-003, FR-004, FR-005, FR-008, FR-009, FR-020, FR-023, SC-003, SC-006) [blockedBy: T023]
 
 ### Implementation for User Story 3
 
@@ -228,8 +228,8 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 
 ### Tests for User Story 5 (MANDATORY)
 
-- [ ] T036 [P] [US5] Author `tests/fixtures/sdd-observer/dual_line_builder.py`: two independent temp project roots, each with its own spec directory, state spine and state dir (FR-003, SC-005) [blockedBy: T007]
-- [ ] T037 [US5] Extend `tests/contract/test_journal_engine.py` with first-journal-row ordering, dual-line isolation (two journals, two identities, zero shared paths) and the same-line second-writer exit-3 assertion; append the red runs to `notes/red-first-evidence.md` (FR-003, FR-007, SC-005) [blockedBy: T020,T036]
+- [ ] T036 [P] [US5] Author `tests/fixtures/sdd-observer/dual_line_builder.py`: two independent temp project roots, each with its own spec directory, state spine and state dir [green: contracts/observer-verification.contract.md#C-05] (FR-003, SC-005) [blockedBy: T007]
+- [ ] T037 [US5] Extend `tests/contract/test_journal_engine.py` with first-journal-row ordering, dual-line isolation (two journals, two identities, zero shared paths) and the same-line second-writer exit-3 assertion; append the red runs to `notes/red-first-evidence-wp02.md` (FR-003, FR-007, SC-005) [blockedBy: T020,T036]
 - [ ] T038 [P] [US5] Extend `tests/contract/test_sdd_observer_agent.py` with the instance-identity and subagent capability audit: the instance slug derives from `line_id`, no stage command creates an instance, internal subagents are allowed but serial only, the host in-process path is BANNED as a concurrency carrier, and no driver/loop load or SDD run hosting is permitted [blockedBy: T020] (FR-003, FR-022, SC-005)
 
 ### Implementation for User Story 5
@@ -245,13 +245,13 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 
 **Purpose**: generate the mirrors and render copies, run the full suite as the one evidence opportunity, reconcile the feature registry, execute the quickstart end to end, and close the structural gates.
 
-- [ ] T041 Generate the framework mirrors and per-tool render copies: `python3 scripts/python/sync-mirrors.py --write` for the `agents/`, `shared/`, `scripts/` and `skills/external/` pairs, then `specify render-agents --ai qoder`, `--ai claude`, `--ai copilot` and `--ai opencode` [green: contracts/observer-verification.contract.md#C-08] (FR-001) [blockedBy: T010,T017,T019,T025,T027]
+- [ ] T041 Generate the framework mirrors and per-tool render copies: `python3 scripts/python/sync-mirrors.py --write` for the `agents/`, `shared/`, `scripts/` and `skills/external/` pairs, then `specify render-agents --ai qoder`, `--ai claude`, `--ai copilot` and `--ai opencode` [green: contracts/observer-role.contract.md#C-01] [green: contracts/observer-verification.contract.md#C-08] (FR-001) [blockedBy: T010,T017,T019,T025,T027]
 - [ ] T042 [P] Verify the generated surfaces: `python3 scripts/python/sync-mirrors.py --check` shows no NEW drift against `test-evidence/plan-mirror-baseline.txt`; `.specify/agents/templates/sdd-observer.agent.md` is byte-identical to the source; the four render copies exist and carry the fast-fail clause; record the readings in `.specify/specs/096-sdd-observer-agent/test-evidence/render-verify.txt` [blockedBy: T041] (FR-001)
 - [ ] T043 Run the full suite through the one runner with `bash scripts/bash/run-tests.sh --names-out .specify/specs/096-sdd-observer-agent/test-evidence/full-suite-names.txt`; classify every failed id against the implement-entry baseline and record the reading in `.specify/specs/096-sdd-observer-agent/test-evidence/full-suite.txt` [green: contracts/observer-verification.contract.md#C-09] [green: contracts/observer-verification.contract.md#C-10] (SC-001, SC-002, SC-003, SC-004, SC-005, SC-006, SC-007) [blockedBy: T035,T040,T042]
 - [ ] T044 [P] Reconcile the feature registry: refresh the `.specify/features.md` row 096 and `.specify/features/096.md` detail with the implemented artifact/test pointers and re-run the Feature Integration review — no new Feature is exposed by the task breakdown and no existing feature is invalidated [blockedBy: T043]
 - [ ] T045 [P] Execute quickstart S-0…S-7 end to end against the implemented tree, including the tamper drills and teardown, and record the real output in `.specify/specs/096-sdd-observer-agent/notes/quickstart-run.md` [blockedBy: T043] (SC-001, SC-002, SC-003, SC-004, SC-005, SC-006, SC-007)
 - [ ] T046 Record the SC → row → evidence trace in `.specify/specs/096-sdd-observer-agent/test-evidence/requirements-sc-map.txt`: one line per SC-001…SC-007 naming its task rows and the evidence path that discharges it [blockedBy: T045]
-- [ ] T047 Close the structural gates and record them in `.specify/specs/096-sdd-observer-agent/test-evidence/tasks-stage-gates.txt`: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md` exit 0, `pre-analyze-check.py --stage tasks` decision `pass`, `account-clause-coverage.py` 0 uncovered beyond the frozen baseline, and the journal-format C-13 boundary (journal absent from `STAGE_ARTIFACTS` and every stage required-artifact set) [green: contracts/journal-format.contract.md#C-13] [blockedBy: T046] (SC-001, SC-006)
+- [ ] T047 Close the structural gates and record them in `.specify/specs/096-sdd-observer-agent/test-evidence/tasks-stage-gates.txt`: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/096-sdd-observer-agent/tasks.md` exit 0, `pre-analyze-check.py --stage tasks` decision `pass`, `account-clause-coverage.py` exit 0 (0 uncovered beyond the frozen baseline and 0 uncited FRs), and the journal-format C-13 boundary (journal absent from `STAGE_ARTIFACTS` and every stage required-artifact set) [green: contracts/journal-format.contract.md#C-13] [blockedBy: T046] (SC-001, SC-006)
 
 ---
 
@@ -293,6 +293,8 @@ Setup rows execute first in the main worktree (they freeze baselines and create 
 - US5: T036 (dual-line fixture) and T038 (agent-test audit) run in parallel.
 - Polish: T042, T044 and T045 can start once their blockers are closed; T043 is the single full-suite run.
 
+These are same-phase `[P]` opportunities for a single executor; under package dispatch the package chain in § Package Map is strict.
+
 ---
 
 ## Parallel Example: Foundational + US2
@@ -333,8 +335,8 @@ Task: "T018 Author tests/contract/test_sdd_observer_agent.py"
 
 ### Parallel Team Strategy
 
-1. Setup + Foundational together (main worktree).
-2. After Foundational: `wp01-journal-core` first; `wp02-observer-definition` and `wp03-driver-lifecycle` can run concurrently (disjoint trees), with T031 waiting on T029.
+1. Setup rows first in the main worktree; the Foundational rows (T006–T007) open `wp01-journal-core`.
+2. Run `wp01-journal-core` → `wp02-observer-definition` → `wp03-driver-lifecycle` strictly in that order — each package waits for the previous one (wp02 needs wp01's T006/T036; wp03 is serialized after wp02 by the declared order so no package pair needs concurrent write access).
 3. `wp04-release-and-evidence` integrates last; its evidence rows are append-only sinks and never touch source files.
 
 ---
@@ -353,20 +355,26 @@ Task: "T018 Author tests/contract/test_sdd_observer_agent.py"
 
 ## Green Attribution
 
-Every `[green:]` claim resolves to exactly one row. The following clauses are deliberately **unclaimed** because the contract page's clause order and the delivery-phase order diverge; each is covered by the rows and evidence named below (a strict subset is admissible — `validate-tasks.py` reports unclaimed clauses as nothing):
+Every `[green:]` claim resolves to exactly one row, and every one of the 58 contract clauses (13 + 13 + 12 + 10 + 10) is claimed exactly once. The four clauses the first analyze round recorded as deliberately unclaimed (finding E-01) are now claimed by the rows that discharge them:
 
-| Clause | Covered by | Reason |
-|--------|-----------|--------|
-| `contracts/observer-role.contract.md#C-01` | T041, T042, `test-evidence/render-verify.txt` | the mirror/render completion lands after the template's clause block; claiming it would run the clause order backwards |
-| `contracts/observer-verification.contract.md#C-03` | T023, T024, T030, `test-evidence/sc003-non-blocking.txt` | non-blocking fixtures land in US3, after C-04's US2 claim |
-| `contracts/observer-verification.contract.md#C-05` | T036–T040, `test-evidence/dual-line-isolation.txt` | dual-line isolation lands in US5, after C-06's US4 claim |
-| `contracts/observer-verification.contract.md#C-07` | T015, T016, T022, `test-evidence/gap-drill.txt` | the gap drill lands in US2, before C-06's US4 claim |
+| Clause | Claimed by | Why this row turns it green |
+|--------|-----------|------------------------------|
+| `contracts/observer-role.contract.md#C-01` | T041 | the mirror and render generation is C-01's completion step; T042 only verifies it |
+| `contracts/observer-verification.contract.md#C-03` | T024 | the lifecycle test authors the non-blocking assertions and the doctored-gate red leg |
+| `contracts/observer-verification.contract.md#C-05` | T036 | the dual-line fixture is the artifact C-05 names (two journals, two identities, second writer refused) |
+| `contracts/observer-verification.contract.md#C-07` | T016 | the gap drill is authored in the journal-engine test extension |
 
-**Disclosed forward edge**: T031 (`wp02`) is blockedBy T029 (`wp03`); the package map declares it, so no reader infers a concurrent-safe pair.
+**Disclosed warnings** — `validate-tasks.py` exits 0; these are the only warnings it reports:
+
+| Warning | Rows involved | Why it stands |
+|---------|---------------|----------------|
+| `green-cross-phase` | T025→T041 in `contracts/observer-role.contract.md` (C-10 → C-01) | C-01's completion (mirror + render) necessarily lands after the template clause block; the claim sits on the row that turns it green, not on a row chosen to keep ordinals monotone |
+| `green-cross-phase` × 2 | T016→T024 and T031→T036 in `contracts/observer-verification.contract.md` | the page's clause order (C-03 before C-04, C-05 before C-06) does not follow the delivery order (SC-004 in US2, SC-003 in US3; SC-006 in US4, SC-005 in US5), so two adjacent claim pairs run backwards in clause ordinal; re-cutting the contract's clause partition is a plan-stage change |
+| `green-path-divergence` | T008/T016 in `tests/contract/test_journal_engine.py` (C-01 vs C-07) | two distinct slices of one test module; the file accumulates green points, and each row is the one that turns its own clause green |
 
 ## Notes
 
-- `[P]` rows write different files and depend on no incomplete row of the same phase; the append-only sinks `notes/` and `test-evidence/` are shared by several rows and are not source write targets.
+- `[P]` rows write different files and depend on no incomplete row of the same phase; the red-first captures use one file per package (`notes/red-first-evidence-wp01.md` / `-wp02.md` / `-wp03.md`), so no two packages share an evidence path, and the remaining `notes/` and `test-evidence/` files are write targets of a single row (Setup's `notes/pre-change-measurements.md` by the sequential T002/T005), not source write targets.
 - The journal-format fact is deliberately **not** registered in `shared/declarations/contract.yaml` (plan R-05): the 094 C-86 closed-set pin stays valid and the fact is read by file through `declaration_reader`.
 - No row adds a `/speckit.*` command, a skill directory, a scheduler, a daemon, a second registry, a second state store, a digest field, or an edit to any stage command template.
 - The observer execution artifacts land in the existing `.specify/agents/execution/logs/` layout; the journal references them as runtime-retention pointers and never copies their content.

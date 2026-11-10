@@ -134,14 +134,14 @@ observer 进程被杀、启动报错或窗口意外结束，SDD 线照常推进�
 - **FR-006**: observer Execution MUST 经既有派发机制落地（`run-agent` 派发治理 + 既有执行拓扑声明与可见性契约），承载 MUST 是 external 执行模态的两条合法进程承载之一——fork（同族 `qodercli` 子进程经 `stage-runner.sh`）或 subprocess（异构 agent 自身 CLI 的子进程）；native 与 virtual 模态 MUST NOT 承载 observer Execution 本身。本特性 MUST NOT 引入调度器、定时器服务、守护进程、常驻服务、第二注册表或第二状态脊。
 - **FR-007**: 生命周期 MUST 是有界执行窗口：observer 随线启动或阶段边界启动，随执行结算或线终态结束。同一条线在同一时刻 MUST 至多存在一个活的 observer Execution；前一个执行的 `.status` 未结算时 driver MUST NOT 派发下一个，且 journal 引擎 MUST 以单写者协议拒绝第二个并发 writer——journal 的并发写 MUST NOT 发生。
 - **FR-008**: 当 observer Execution 在线终止之前结束（失败、停滞、窗口到期），driver MAY 在下一阶段边界从同一专用实例再次启动；窗口边界取既有派发的 turn budget 与阶段 deadline，不引入新定时器；重启 MUST 追加到同一 journal，并按 FR-013 记录缺口。observer 的重启 MUST NOT 改变任何阶段的重试次数、超时判定或完成哨兵判定。
-- **FR-009**: 线到达终态时 observer 生命周期随之收束：journal MUST 以线终态条目收尾，或由 driver 在状态脊观察者记录节记录 observer 未能收尾的原因。observer 的结算 MUST NOT 改变线终态，也不阻塞 U4 校验或 U6 收尾。
+- **FR-009**: 线到达终态时 observer 生命周期随之收束：driver MUST 启动一次终态收束执行，由该执行经 journal 引擎（FR-015）追加线终态条目；若收束时仍存在未闭合的观测窗口，该执行 MUST 同时追加点名窗口起止的 `observer-gap`（[[STR-003]]）条目（窗口终点取该执行首条条目的观测时间，FR-013）。仅当终态收束执行无法启动或失败（含线在 observer 启动前即失败、按 Edge Cases 允许无 journal 的情形）时，journal MUST NOT 被改写，driver MUST 在状态脊观察者记录节记录 observer 未能收尾的原因，且既有 U6 收束报告 MUST 披露未闭合窗口的起止。observer 的结算 MUST NOT 改变线终态，也不阻塞 U4 校验或 U6 收尾。
 
 #### C. journal 制品与客观性
 
 - **FR-010**: journal 的落点 MUST 是 `.specify/specs/<NNN-slug>/journal.md`（[[STR-001]]），一条线一份；写入 MUST 为追加式，已写入条目 MUST NOT 被改写或删除；journal 头部 MUST 承载 `line_id`、`run_id`、spec key、实例 label 与 `created_at`（UTC），由 checker 校验。journal 可被中间阶段提交扫入且不要求单独提交，线收束提交 MUST 包含最终条目，使工作树清理后记录仍从版本历史可读；journal 写入失败时，失败取证落 observer 执行自身的 `.status` 退出记录与状态脊观察者记录节（journal 不作为自身失败的记录面）。本特性 MUST NOT 引入第二份记录文件或第二个记录存储。
 - **FR-011**: 条目结构 MUST 封闭：每个条目恰好承载九类信息——序号（引擎赋值、单调递增且与文件序一致）、观测时间（引擎时钟，UTC ISO-8601 秒级）、事件时间（载体提供时，否则 `-`）、阶段（线级与 observer 自身事件取 `-`）、事件类、命令（原文或 `-`）、产物路径（仓库相对或 `-`）、退出码（整数或 `-`）、证据指针（至少一个，并带留存类别）。同一秒内的多条条目以文件序为权威顺序。键名拼写与事件类字面量由 journal 格式 owner（`shared/declarations/facts/journal-format.yaml`）唯一拥有；本规格拥有信息面与封闭性要求，owner 拥有拼写面。
 - **FR-012**: 事件类 MUST 取一个封闭集合，覆盖可观测的 SDD 里程碑：线启动与线终态、阶段启动与阶段结束、阶段校验结论、checkpoint、提交、异常、停滞、重试、派发、产物写入，以及 observer 自身的启动、结算、缺口与错误。集合的增删 MUST 经 journal 格式 owner 修订；执行体 MUST NOT 就地发明条目或事件类。
-- **FR-013**: 客观性 MUST 由构造保证：条目是既有载体事实的确定性投影——观测输入限定为磁盘载体与仓库事实（状态脊、阶段日志与完成哨兵、checkpoint 文件、git 历史、driver 正证据四件套（`pid-*` / `status-*` / `log-*.log` / `heartbeat-*.log`）、exec 记录），MUST NOT 以 driver 的会话上下文或阶段提示词作为观测输入；observer MUST NOT 手工编写自由叙述条目；journal MUST NOT 存在承载评价、建议、因果推断、严重级或推荐的字段，字段集之外的键与集合之外的事件 MUST 被判红。未被观测的窗口 MUST 记为 `observer-gap`（[[STR-003]]），MUST NOT 以推断的事件填充；缺口窗口起点取上一条已写入条目的观测时间（无条目时取状态脊观察者记录节的启动时间），终点取下一次执行首条条目的观测时间。
+- **FR-013**: 客观性 MUST 由构造保证：条目是既有载体事实的确定性投影——观测输入限定为磁盘载体与仓库事实（状态脊、阶段日志与完成哨兵、checkpoint 文件、git 历史、driver 正证据四件套（`pid-*` / `status-*` / `log-*.log` / `heartbeat-*.log`）、exec 记录），MUST NOT 以 driver 的会话上下文或阶段提示词作为观测输入；observer MUST NOT 手工编写自由叙述条目；journal MUST NOT 存在承载评价、建议、因果推断、严重级或推荐的字段，字段集之外的键与集合之外的事件 MUST 被判红。未被观测的窗口 MUST 记为 `observer-gap`（[[STR-003]]），MUST NOT 以推断的事件填充；缺口窗口起点取上一条已写入条目的观测时间（无条目时取状态脊观察者记录节的启动时间），终点取下一次执行首条条目的观测时间（线终态时即 FR-009 的终态收束执行）。
 - **FR-014**: 证据纪律：每条条目 MUST 至少携带一个证据指针；指向持久载体的指针 MUST 在线收束时可解析，不可解析即缺陷；只存在于运行期的指针 MUST 被标记为运行期留存，且当同一事实存在持久载体时 MUST NOT 成为唯一条目证据。没有载体证据的事件 MUST NOT 被记录。
 - **FR-015**: MUST 存在一个确定性 journal 引擎（单一可执行面）：它把载体事实投影为封闭结构、校验结构 / 序号 / 文件序 / 指针可解析性，并拒绝未声明的键与事件；observer Execution MUST 经该引擎写入，而非手写条目。该引擎 MUST 遵守脚本接口契约（`-h` / `--help` / `--version` 零副作用应答，未声明选项非零拒绝）。
 
@@ -154,7 +154,7 @@ observer 进程被杀、启动报错或窗口意外结束，SDD 线照常推进�
 
 #### E. 非干涉、范围与内部子代理
 
-- **FR-020**: 非干涉：observer 的存在、缺失、健康、结论与 journal 内容 MUST NOT 成为任何阶段推进（U4）、checkpoint、review 或合并的门；observer 异常 MUST 由 driver 记录进状态脊观察者记录节并在既有 U6 收束报告中披露，但 MUST NOT 阻塞开发线；observer 自身 MUST NOT 发出用户可见的汇报、提问或审批请求（FR-018）。唯一的收束义务是披露（FR-009、FR-013、FR-023），且披露 MUST 由一条记录的原因满足。
+- **FR-020**: 非干涉：observer 的存在、缺失、健康、结论与 journal 内容 MUST NOT 成为任何阶段推进（U4）、checkpoint、review 或合并的门；observer 异常 MUST 由 driver 记录进状态脊观察者记录节并在既有 U6 收束报告中披露，但 MUST NOT 阻塞开发线；observer 自身 MUST NOT 发出用户可见的汇报、提问或审批请求（FR-018）。唯一的收束义务是披露（FR-009、FR-013、FR-023），且披露 MUST 由一条记录的原因满足；当 FR-009 的终态收束执行可用时，journal 侧的终态与缺口写入照常执行，披露与该写入互不替代。
 - **FR-021**: 适用范围内：本特性适用于 driver 驱动的 SDD 线（含团队内调用的嵌套运行），一条线一份 journal。非 SDD 的 `/speckit.*` 命令运行与不承载 SDD 线的 team 运行 MUST NOT 产生 observer 或 journal；嵌套运行拥有自己的 observer，内层 observer MUST NOT 观察外层团队运行。
 - **FR-022**: observer MAY 使用内部 subagent 承担自己的观察职责，但内部 subagent MUST 在 observer Execution 内串行执行、MUST NOT 作为并发承载（宿主内建 in-process 并发路径 BANNED），且继承 observer 的只读边界（FR-016）、读域（FR-013）与客观性结构（FR-011、FR-013）。observer MUST NOT 引用或加载 driver / 循环技能，MUST NOT 承载或启动 SDD 运行。
 - **FR-023**: 入口声明 MAY 关闭 observer，键为 `observer: on|off`（缺省 `on`）；关闭 MUST 由 driver 记录在状态脊观察者记录节（state=`disabled`）并在收束时披露。关闭的 observer 与掉线的 observer 同属「已记录的未观测」，MUST NOT 表现为静默缺失。
@@ -188,13 +188,13 @@ observer 进程被杀、启动报错或窗口意外结束，SDD 线照常推进�
 
 ### Measurable Outcomes
 
-- **SC-001**: 一条由 driver 夹具驱动、observer 启用且全程零 observer 失败的完整 SDD 线，在 `.specify/specs/<NNN-slug>/journal.md`（[[STR-001]]）产生记录，覆盖声明层阶段序列中的每一个阶段（阶段序列读声明层，不重述阶段清单）；对含 observer 失败或缺口的线，覆盖判据为「每个阶段至少有阶段开始条目，或被 `observer-gap`（[[STR-003]]）点名」；删除 journal、或删掉零失败夹具中任一阶段的阶段结束条目，使验收测试转红。 **Path**: final
+- **SC-001**: 一条由 driver 夹具驱动、observer 启用且全程零 observer 失败的完整 SDD 线，在 `.specify/specs/<NNN-slug>/journal.md`（[[STR-001]]）产生记录，覆盖声明层阶段序列中的每一个阶段（阶段序列读声明层，不重述阶段清单）；对含 observer 失败或缺口的线，覆盖判据为「每个阶段至少有阶段开始条目，或被 `observer-gap`（[[STR-003]]）点名」（收束侧缺口条目的写入义务：FR-009；缺口窗口定义：FR-013）；删除 journal、或删掉零失败夹具中任一阶段的阶段结束条目，使验收测试转红。 **Path**: final
 - **SC-002**: journal 中每条条目的持久证据指针在线收束时可解析；注入一条伪造或指向不存在路径的条目，使 checker 转红（变异实测记录在 `test-evidence/`）。 **Path**: final
 - **SC-003**: 非阻塞性成立：强制 observer 启动失败、以及在运行中杀死 observer，夹具中的开发线仍到达其终态，状态脊记录 observer 状态（失败 / 不可用）；把一个阶段门改为依赖 observer 存活时，该反例测试转红。 **Path**: final
 - **SC-004**: 客观性构造可判定：checker 拒绝 (a) 携带字段集之外键（如 recommendation）的条目、(b) 落在封闭集合之外的事件类、(c) 自由叙述条目——三份反例夹具各自转红；且 `sdd-observer`（[[STR-002]]）的定义文本逐字携带「不评价、不建议、不推断」禁令。 **Path**: final
 - **SC-005**: 启动时序与实例不变量：首个 journal 条目早于首个阶段完成条目；两条并行线产生两份不同 journal 与两个不同实例身份；同线第二个并发 observer 执行被拒绝或串行化。 **Path**: supporting
 - **SC-006**: 边界一致：observer 声明的写面恰为 journal 与自身运行产物，状态脊 / 阶段产物的写入数为零；`/speckit.status` 摘要契约与输出字段集以本特性第一个实现提交之前的一次实测采集为基线，允许的 delta 集合为空（零新增字段、行与小节），observer 仅以既有已派发 agent 语义出现。 **Path**: supporting
-- **SC-007**: 缺口披露：人为跳过一段观测窗口后，下一次 observer 执行或线收束 MUST 输出 `observer-gap`（[[STR-003]]）条目并点名窗口起止；移除缺口披露机制使该测试转红。 **Path**: supporting
+- **SC-007**: 缺口披露：人为跳过一段观测窗口后，下一次 observer 执行或线终态收束执行 MUST 输出 `observer-gap`（[[STR-003]]）条目并点名窗口起止（写入义务：FR-009；窗口定义：FR-013）；移除缺口披露机制使该测试转红。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
