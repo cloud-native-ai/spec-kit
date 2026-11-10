@@ -58,3 +58,108 @@ FAILED tests/contract/test_superagent_definitions.py::test_role_depth_vs_license
 FAILED tests/contract/test_superagent_definitions.py::test_owner_page_avoids_three_layer_marker_literal
 9 failed, 1 passed in 6.16s
 ```
+
+### Instance 2 — T011 role-edge engine contract (red-first)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_role_edge_engine.py -q`
+- Exit status: **1**
+- Red state: neither `scripts/python/role-edge-check.py` nor `tests/fixtures/superagent-role/`
+  exists yet. Every leg fails on its own named missing-artifact assertion (`engine missing` or
+  `fixture missing`) — no import or collection error. The module imports the engine lazily, so
+  the absence is reported as an assertion, not as a traceback at collection time.
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_edge_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFFF                                                     [100%]
+=================================== FAILURES ===================================
+_______________________ test_two_runs_are_byte_identical _______________________
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_two_runs_are_byte_identical():
+>       first = run_engine("--action", "report", *_roots("root-a-b"))
+                                                  ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_role_edge_engine.py:581:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/contract/test_role_edge_engine.py:112: in _roots
+    base = _fixture(name)
+           ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'root-a-b'
+
+    def _fixture(name: str) -> Path:
+        base = FIXTURE_ROOT / name
+>       assert base.is_dir(), f"fixture missing: tests/fixtures/superagent-role/{name}"
+E       AssertionError: fixture missing: tests/fixtures/superagent-role/root-a-b
+E       assert False
+E        +  where False = is_dir()
+E        +    where is_dir = PosixPath('/storage/project/cloud-native-ai/spec-kit/tests/fixtures/superagent-role/root-a-b').is_dir
+
+tests/contract/test_role_edge_engine.py:105: AssertionError
+... (the remaining legs fail on the same two named missing-artifact assertions;
+    full failure list below)
+=========================== short test summary info ============================
+FAILED tests/contract/test_role_edge_engine.py::test_two_runs_are_byte_identical
+FAILED tests/contract/test_role_edge_engine.py::test_engine_has_zero_write_points_in_source
+FAILED tests/contract/test_role_edge_engine.py::test_fixture_tree_is_byte_identical_after_a_run
+FAILED tests/contract/test_role_edge_engine.py::test_query_pair_and_unresolvable_identities
+FAILED tests/contract/test_role_edge_engine.py::test_dangling_parent_names_both_sides_and_the_path
+FAILED tests/contract/test_role_edge_engine.py::test_violation_fixtures_each_kind_in_isolation[violations/depth-cycle-depth-inconsistent]
+FAILED tests/contract/test_role_edge_engine.py::test_mutation_injected_violation_turns_red
+FAILED tests/contract/test_role_edge_engine.py::test_mutation_type_based_classification_turns_red
+FAILED tests/contract/test_role_edge_engine.py::test_help_version_and_undeclared_option
+FAILED tests/contract/test_role_edge_engine.py::test_malformed_row_shape_is_named_and_exits_two
+FAILED tests/contract/test_role_edge_engine.py::test_conflict_rows_name_both_paths_and_edge_identity
+FAILED tests/contract/test_role_edge_engine.py::test_importable_interface_matches_report
+FAILED tests/contract/test_role_edge_engine.py::test_unbacked_superagent_claim_red_and_granted_without_children_green
+FAILED tests/contract/test_role_edge_engine.py::test_required_roots_fatal_and_registry_optional
+FAILED tests/contract/test_role_edge_engine.py::test_violation_fixtures_each_kind_in_isolation[violations/dangling-parent-dangling-parent]
+FAILED tests/contract/test_role_edge_engine.py::test_violation_fixtures_each_kind_in_isolation[violations/self-dispatch-self-dispatch]
+FAILED tests/contract/test_role_edge_engine.py::test_violation_fixtures_each_kind_in_isolation[violations/unbacked-claim-unbacked-role-claim]
+FAILED tests/contract/test_role_edge_engine.py::test_report_schema_clean_chain
+FAILED tests/contract/test_role_edge_engine.py::test_malformed_value_is_named_and_exits_two
+FAILED tests/contract/test_role_edge_engine.py::test_empty_set_is_explicit_and_clean
+20 failed in 6.15s
+```
+
+### Instance 3 — T029 three-form cases (red-first, US3 fixtures absent)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_role_edge_engine.py -q`
+- Exit status: **1**
+- Red state: the US1 legs are already green (21 passed); the four appended US3 legs fail
+  only because `tests/fixtures/superagent-role/{local-team,remote-topology,fanout-10}/`
+  do not exist yet — each fails on the named `fixture missing` assertion.
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_edge_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..FFF.........F..........                                                [100%]
+=================================== FAILURES ===================================
+...
+name = 'fanout-10'
+
+    def _fixture(name: str) -> Path:
+        base = FIXTURE_ROOT / name
+>       assert base.is_dir(), f"fixture missing: tests/fixtures/superagent-role/{name}"
+E       AssertionError: fixture missing: tests/fixtures/superagent-role/fanout-10
+E        +  where False = is_dir()
+E        +    where is_dir = PosixPath('/storage/project/cloud-native-ai/spec-kit/tests/fixtures/superagent-role/fanout-10').is_dir
+
+tests/contract/test_role_edge_engine.py:105: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_role_edge_engine.py::test_three_forms_direction_reversal_turns_red
+FAILED tests/contract/test_role_edge_engine.py::test_three_forms_remote_topology
+FAILED tests/contract/test_role_edge_engine.py::test_three_forms_local_team
+FAILED tests/contract/test_role_edge_engine.py::test_three_forms_fanout_10 - ...
+4 failed, 21 passed in 6.21s
+```

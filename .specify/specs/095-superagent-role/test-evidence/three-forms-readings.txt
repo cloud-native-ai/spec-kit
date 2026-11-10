@@ -1,0 +1,99 @@
+# Three real forms — readings (095 P2 / T033)
+
+- Date: 2026-11-10
+- Engine: `scripts/python/role-edge-check.py` (mirror-pinned in the same module)
+- Fixtures: `tests/fixtures/superagent-role/{local-team,remote-topology,fanout-10}/`
+- Command shape per fixture: `python3 scripts/python/role-edge-check.py --action report
+  --state-dir <fixture>/state --teams-dir <fixture>/teams --logs-dir <fixture>/logs
+  --registry-dir <fixture>/registry`
+
+## 1. Contract module through the single runner (green, includes the US3 legs)
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_edge_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.........................                                                [100%]
+25 passed in 6.18s
+```
+
+## 2. Per-fixture report digest (measured; derived from the engine's own JSON)
+
+```text
+## local-team
+exit=0 edges=3 executors=4 violations=0 conflicts=0
+child-count-by-parent: root=3
+edge root -> alice | attempt=1 role=subagent duty=not-granted depth=1 carrier=team-report
+edge root -> bob | attempt=1 role=subagent duty=not-granted depth=1 carrier=team-report
+edge root -> carol | attempt=1 role=subagent duty=not-granted depth=1 carrier=team-report
+executor alice | roles=subagent | role_set_marker=null | depth=1 | parent=root
+executor bob | roles=subagent | role_set_marker=null | depth=1 | parent=root
+executor carol | roles=subagent | role_set_marker=null | depth=1 | parent=root
+executor root | roles=superagent | role_set_marker=null | depth=0 | parent=None
+
+## remote-topology
+exit=0 edges=1 executors=2 violations=0 conflicts=0
+child-count-by-parent: remote-builder=1
+edge remote-builder -> remote--20261110T000000Z--worker | attempt=1 role=subagent duty=not-granted depth=1 carrier=run-agent-label
+executor remote--20261110T000000Z--worker | roles=subagent | role_set_marker=null | depth=1 | parent=remote-builder
+executor remote-builder | roles=superagent | role_set_marker=null | depth=0 | parent=None
+
+## fanout-10
+exit=0 edges=11 executors=12 violations=0 conflicts=0
+child-count-by-parent: A=10, root=1
+edge A -> child-01 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-02 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-03 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-04 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-05 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-06 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-07 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-08 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-09 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge A -> child-10 | attempt=1 role=subagent duty=not-granted depth=2 carrier=team-report
+edge root -> A | attempt=1 role=superagent duty=granted depth=1 carrier=team-report
+executor A | roles=subagent,superagent | role_set_marker=dual-role | depth=1 | parent=root
+executor child-01 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-02 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-03 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-04 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-05 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-06 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-07 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-08 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-09 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor child-10 | roles=subagent | role_set_marker=null | depth=2 | parent=A
+executor root | roles=superagent | role_set_marker=null | depth=0 | parent=None
+
+## direction-reversal mutation (fanout-10 copy, A row becomes root<-A)
+exit=0 edges=11 violations=0
+executor A | roles=superagent | role_set_marker=null | depth=0 | parent=None
+executor child-01 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-02 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-03 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-04 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-05 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-06 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-07 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-08 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-09 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor child-10 | roles=subagent | role_set_marker=null | depth=1 | parent=A
+executor root | roles=subagent | role_set_marker=null | depth=1 | parent=A
+```
+
+Child counts: local-team root=3; remote-topology remote-builder=1; fanout-10 A=10
+(plus root=1). The fan-out's ten children all render at depth 2 and the member A carries
+`role_set_marker=dual-role` at depth 1 while remaining a subagent of root.
+
+## 3. Direction-reversal mutation (fanout-10 copy)
+
+The copy lives in the sanctioned temp root while measured; the tracked fixture is untouched.
+Mutation applied to `teams/fanout-team/runs/20261110T000000Z-report.md`:
+`| A | superagent | granted | work/A | root |` -> `| root | subagent | granted | work/root | A |`,
+with a registry entry `line_id=A` added to the copy so the new parent identity resolves.
+Reading: A becomes the root (depth 0) and root becomes its child (depth 1); the ten children
+move to depth 1. Under this reversal the pinned orientation assertions (root depth 0, A depth
+1) are red — direction is load-bearing, not incidental.
+
