@@ -212,8 +212,8 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 **Purpose**: Measurement records, forbidden-shortcut and interface evidence, quickstart execution and the closure-stage handoff.
 
-- [ ] T055 [P] Record the anti-measurement disclosure from the slot-1 baseline reading (the pre-change default had the marked set merged) in `test-evidence/tier-measurements.txt` — no additional full run (FR-020).
-- [ ] T056 [blockedBy: T003, T012] Measure the default-tier wall on the same host and day (S-13 leg 3, targeted measurement per A9 — not a budget slot) and record the ratio against the slot-1 baseline in `test-evidence/tier-measurements.txt`. [green: contracts/tier-selection.contract.md#C-016]
+- [ ] T055 [P] Record the scope-disclosure reading from the slot-1 baseline (the pre-change default had the marked set merged, so its wall is a full-selection reading) in `test-evidence/tier-measurements.txt` — the default-vs-full wall difference is a selection difference, not an efficiency claim; no additional full run (FR-020).
+- [ ] T056 [blockedBy: T003, T012] Measure the default tier's same-selection wall pair on the same host and day (S-13 legs 2–3: parallel vs `--serial`, tier unchanged; selection equality proven by the two `--collect-only` readings; targeted measurement per A9 — not a budget slot) and record both walls, their ratio, the excluded count and the default-vs-full raw walls as disclosure readings in `test-evidence/tier-measurements.txt`. [green: contracts/tier-selection.contract.md#C-016]
 - [ ] T057 Run the SC-010 forbidden-shortcut diff scan (decorator and in-function `skip`/`xfail` forms, conditional skips, retry-until-green loops, parametrize removals) and record `test-evidence/forbidden-shortcuts.txt` (FR-021).
 - [ ] T058 [P] Run the SC-011 interface evidence (S-11: `--help` lists `--full`, `--version` answers one line, an undeclared option exits non-zero) and record `test-evidence/interface-evidence.txt`.
 - [ ] T059 [P] Write the `test-evidence/` index linking every SC-001…SC-011 to its evidence path(s), including this feature's coverage baseline and the closure records.

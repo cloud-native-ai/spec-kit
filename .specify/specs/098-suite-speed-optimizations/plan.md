@@ -27,7 +27,7 @@ change to the two-slot count/timing/order.
 | # | Optimization | Criterion-preserving acceptance | Contract | SC |
 |---|--------------|----------------------------------|----------|----|
 | 1 | xdist verification | `tests/contract` first, then full tree at closure: same-tree default-parallel vs `--serial` `--names-out` lists, bidirectional `comm` empty; a non-parallel-safe fixture must turn the comparison red; missing-engine branch completes serially with `reason=no-xdist` | parallel-consistency C-001…C-012 | SC-002, SC-003 |
-| 2 | slow tier | default collection set = full collection set − marked set; excluded count derived by enumeration and disclosed; `--full` restores the full set; both slots run with `--full`; no test deleted or renamed | tier-selection C-001…C-016; slow-membership C-001…C-009 | SC-004, SC-005, SC-006, SC-010 |
+| 2 | slow tier | default collection set = full collection set − marked set; excluded count derived by enumeration and disclosed; `--full` restores the full set; both slots run with `--full`; no test deleted or renamed; the default-tier speed claim is measured only within one selection set (parallel vs `--serial`), never against the full baseline | tier-selection C-001…C-016; slow-membership C-001…C-009 | SC-004, SC-005, SC-006, SC-010 |
 | 3 | session scan cache | `build_count = 1` per worker with more than one consumer; same assertion set green; cross-session mutation drill turns the affected assertion red; mutable fixtures never share the cache | scan-cache C-001…C-011 | SC-007 |
 | 4 | sleep removal | zero synchronization `time.sleep` in scope (AST scan); every wait has an explicit deadline (default 30 s) and interval ≤ 0.2 s; timeout is a named failure, never skip/xfail/retry; same worker-count before/after wall pair | event-wait C-001…C-010 | SC-008 |
 | 5 | in-process conversion | manifest closed over the AST census; every keep row carries a boundary class; reverting a converted point turns the guard red and names it; same assertions green before/after | inprocess-conversion C-001…C-010 | SC-009 |
@@ -44,7 +44,7 @@ that list); the 098-specific detection increments are enforced by the SC-010 dif
 **Testing**: canonical runner `scripts/bash/run-tests.sh`; default `-n <effective> --dist load`; two-slot budget (baseline/closure)
 **Target Platform**: developer hosts (Linux/macOS); downstream Python 3.8 without xdist takes the `reason=no-xdist` serial branch
 **Project Type**: single repository — framework source plus its own client runtime (`.specify/`)
-**Performance Goals**: default tier wall ≤ 50 % of the implement-start full default-parallel baseline (SC-004); full tier ≤ 110 % of the same baseline (SC-005); `test_client_metrics.py` wall drops by the removed fixed waits at equal worker count; corpus pair builds once per worker
+**Performance Goals**: default-tier parallel wall ≤ 50 % of the same-selection `--serial` wall on the same tree, same host and day (SC-004 — the tier exclusion is a scope decision and earns no speed claim); full tier ≤ 110 % of the implement-start full default-parallel baseline (SC-005); `test_client_metrics.py` wall drops by the removed fixed waits at equal worker count; corpus pair builds once per worker
 **Constraints**: two-slot budget (no third full run for measurement); 086 C-001…C-016 unchanged; script interface contract; no CI workflow; no selection shrink
 **Scale/Scope**: 8543 collected tests; 6 contract files; 9 work packages; conversion manifest spans ~495 discovered `subprocess.run` sites (228 files) with a measured keep/convert split
 
@@ -75,7 +75,7 @@ that list); the 098-specific detection increments are enforced by the SC-010 dif
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `plan.md` § Project Structure adds no directory; `research.md` § Probe transcripts used the sanctioned `.specify/.tmp/` root |
 | XVIII | Grounded Naming | ✅ Pass | `plan.md` § Technical Context and `requirements.md` § Shared Strings carry [[STR-001…003]] verbatim; new test names follow siblings |
 | XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | `data-model.md` E-7 (tier + excluded count on the runner's own line) and E-2 registry columns |
-| XX | Efficient Test Execution (Concurrent by Default) | ✅ Pass | `plan.md` § Summary acceptance-preservation table and `contracts/*.md` mutation legs (no selection shrink, skip, or retry) |
+| XX | Efficient Test Execution (Concurrent by Default) | ✅ Pass | `contracts/*.md` mutation legs; `requirements.md` SC-004 same-selection measurement and SC-006 coverage-preservation guard; `contracts/tier-selection.contract.md` C-016 |
 | XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | `contracts/tier-selection.contract.md` C-005 and `contracts/event-wait.contract.md` C-004 (help-documented, zero-side-effect flags) |
 | XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | `plan.md` § Execution Record keeps the anchor and reading; `research.md` R-10 records the same-author delegation |
 
@@ -96,9 +96,9 @@ repository root); this section records three load-bearing decisions and nothing 
 - **antithesis**: 「缺省全量 + 显式 fast 档」——当维护者已习惯全量缺省、且 CI/本地循环不追求反馈速度时它更优：所有人默认拿到完整覆盖，无需记住一个开关。
 - **binding_constraints**:
   - pole_a: 缺省运行必须是完整覆盖——任何人无参数运行都不会少跑测试。
-  - pole_b: 日常反馈的缺省墙钟必须显著下降，否则本特性没有收益（SC-004）。
-- **discriminating_evidence**: 同一棵树、同主机同日、同一 runner 形态下运行缺省档与 `--full` 全量档并记录墙钟与收集集合：缺省档墙钟 ≤ 基线 50% 且收集集合 = 全量 − 慢档集合（判绿）；任一不成立或全量档新增失败名非零（判红）。
-- **expected_sacrifice**: SC-004 Source ↑ 缺省运行不再覆盖全量：未读披露的用户会漏跑慢档测试；两槽位显式全量与排除数披露是补偿，不消除该代价。
+  - pole_b: 日常反馈的缺省运行必须在同一选择集内显著快于其串行形态，否则本特性没有收益（SC-004）；提速不得来自排除条数。
+- **discriminating_evidence**: 同一棵树、同主机同日、同一 runner 形态下运行缺省档同选择集的并行与 `--serial` 两臂并记录墙钟与失败名单：缺省并行墙钟 ≤ 同选择集串行墙钟 50%，且缺省档收集集合 = 全量档 − 慢档集合、全量档新增失败名零（判绿）；任一不成立（判红）。
+- **expected_sacrifice**: SC-004 Source ↑ 缺省运行不再覆盖全量（范围代价，不是效率收益）：未读披露的用户会漏跑慢档测试；两槽位显式全量与排除数披露是补偿，不消除该代价。
 - **revision_trigger**: 下游项目把缺省档误当全量 ≥ 2 次（反馈登记），或 closure 出现一个可归因于缺省档漏跑的失败名 ≥ 1 → 重开，改为缺省全量并把 `fast` 做成显式档。
 
 ### T-002 — 注入时钟落在引擎可选 `--now` 参数

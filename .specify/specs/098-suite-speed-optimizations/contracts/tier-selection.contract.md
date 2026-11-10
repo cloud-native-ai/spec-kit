@@ -72,10 +72,14 @@ existing clauses.
   `--collect-only -q` reading, except for tests this feature adds and a per-test disposed list recorded in
   `test-evidence/`. Deleting or renaming an existing test MUST turn the guard red. The baseline is the
   implement-start baseline slot reading (FR-011, SC-001).
-- **C-016**: The tier wall-clock criterion MUST be measured as: default-tier wall ≤ 50 % of the
-  implement-start full default-parallel baseline, and full-tier wall ≤ 110 % of the same baseline, on the
-  same host, same day and same runner shape; the command, exit code, complete output and duration are
-  recorded, and an anti-measurement that re-merges the marked set into the default tier is recorded. No
+- **C-016**: The tier wall-clock criterion MUST be measured within one selection set: the default-tier
+  parallel run against the same tree's `--serial` run of the same tier (tier unchanged, C-007), on the same
+  host and day; the criterion is default-tier parallel wall ≤ 50 % of that same-selection serial wall, with
+  both arms' selections enumerable by id and equal. The tier selection difference MUST NOT be cashed in as a
+  speedup — the excluded count and the two tiers' raw walls are disclosure readings only. The full tier
+  stays bounded by ≤ 110 % of the implement-start full default-parallel baseline (SC-005). For each arm the
+  command, exit code, complete output and duration are recorded; an anti-measurement that re-merges the
+  marked set into the default tier is recorded as a selection-difference observation, not a regression. No
   third full run is added for measurement; permitted component measurements are targeted and recorded
   (FR-020, SC-004, SC-005).
 

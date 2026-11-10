@@ -175,13 +175,18 @@ the disposed list is written per test in `test-evidence/`.
 
 ```bash
 bash scripts/bash/run-tests.sh --names-out /tmp/base-full.txt -q           # baseline slot (full tier, by construction of the slot command)
+bash scripts/bash/run-tests.sh -q                                          # default tier, parallel arm
+bash scripts/bash/run-tests.sh --serial -q                                 # default tier, serial arm (same selection, tier unchanged)
+diff <(bash scripts/bash/run-tests.sh --collect-only -q) \
+     <(bash scripts/bash/run-tests.sh --serial --collect-only -q)          # both arms select the same ids
 bash scripts/bash/run-tests.sh --full --names-out /tmp/after-full.txt -q   # full tier after the change
-bash scripts/bash/run-tests.sh -q                                          # default tier after the change
-# record durations of all three; record the anti-measurement: default tier with the marked set re-merged
+# record durations of all four; the anti-measurement re-merges the marked set into the default tier
+# and its wall change is recorded as a selection-difference observation, never as a regression
 ```
 
-Proves SC-004 / SC-005 / tier-selection C-016: default-tier wall ≤ 50 % of baseline, full-tier wall ≤ 110 % of baseline,
-same host/day/shape; the anti-measurement shows the default tier regresses when marked tests are re-merged.
+Proves SC-004 / SC-005 / tier-selection C-016: default-parallel wall ≤ 50 % of the **same-selection serial**
+wall (same tree/host/day/shape, selections enumerable and equal); full-tier wall ≤ 110 % of the baseline;
+the default-vs-full wall difference is a scope disclosure reading, not an efficiency claim.
 **Run status at plan time**: not executable (default tier does not exist; the baseline slot is
 implement-start). Premises: the baseline slot command includes `--full` (WP-3); measurement uses
 `date`-based wall capture with command, exit code and complete output recorded; no third full run is added
