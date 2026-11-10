@@ -1,0 +1,33 @@
+# Review round 2 — 074 seal replay (read-only, two runs)
+captured_at=2026-11-11 (head 55dd6d61d)
+command=python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification/ --repo .
+
+=== RUN 1 ===
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - p0-unresolved: 074b-nested-governance:F1 (line 115 of .specify/specs/074b-nested-governance/review.md) has neither a resolvable `- **Fix**:` pointer nor a user waiver on both carriers
+    fix: fix the finding and record the fix pointer, or record the user's literal `- **User waiver**:` line on the review's code segment and the feature detail's `## Latest Review`
+    rerun: rerun seal after the P0 is disposed
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+
+=== RUN 2 (byte-identical to RUN 1) ===
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - p0-unresolved: 074b-nested-governance:F1 (line 115 of .specify/specs/074b-nested-governance/review.md) has neither a resolvable `- **Fix**:` pointer nor a user waiver on both carriers
+    fix: fix the finding and record the fix pointer, or record the user's literal `- **User waiver**:` line on the review's code segment and the feature detail's `## Latest Review`
+    rerun: rerun seal after the P0 is disposed
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+
+=== integrity readings ===
+writes: 0 in both runs; seal.md absent afterwards;
+074 parent + 074a + 074b file hash set: identical before/after (sha256sum diff empty);
+git status --porcelain over the three trees: empty;
+both runs exit 2; conditions: p0-unresolved (074b-nested-governance:F1 at review.md:115) + closure-input-defect (074 requirements lacks the Runtime Stack section).
