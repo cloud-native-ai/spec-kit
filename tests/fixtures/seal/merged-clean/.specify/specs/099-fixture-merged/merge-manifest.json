@@ -1,0 +1,303 @@
+{
+  "artifacts": [
+    {
+      "action": "merge",
+      "checks": {
+        "dangling_refs": 0,
+        "duplicate_ids": 0,
+        "id_continuity": "pass"
+      },
+      "name": "requirements.md",
+      "per_slice": [
+        {
+          "present": true,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [
+        "099a-fixture-slice"
+      ],
+      "unit": "file"
+    },
+    {
+      "action": "keep",
+      "checks": {},
+      "name": "plan.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "keep",
+      "checks": {
+        "open_rows": 0
+      },
+      "name": "tasks.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "absent on the parent and on every slice",
+      "checks": {},
+      "name": "data-model.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "no files on the parent or on any slice",
+      "checks": {},
+      "name": "contracts",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "directory"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "absent on the parent and on every slice",
+      "checks": {},
+      "name": "research.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "absent on the parent and on every slice",
+      "checks": {},
+      "name": "quickstart.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "absent on the parent and on every slice",
+      "checks": {},
+      "name": "feature-ref.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "merge",
+      "basis": "aggregated pointer view over the slice records (summary rows + pointers)",
+      "checks": {},
+      "name": "verification.md",
+      "per_slice": [
+        {
+          "present": true,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "pointer": {
+        "kind": "pointer-view",
+        "paths": [
+          ".specify/specs/099a-fixture-slice/verification.md"
+        ]
+      },
+      "pointer_view": true,
+      "sources": [
+        "099a-fixture-slice"
+      ],
+      "unit": "file"
+    },
+    {
+      "action": "merge",
+      "basis": "aggregated pointer view over the slice records (summary rows + pointers)",
+      "checks": {},
+      "name": "review.md",
+      "per_slice": [
+        {
+          "present": true,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "pointer": {
+        "kind": "pointer-view",
+        "paths": [
+          ".specify/specs/099a-fixture-slice/review.md"
+        ]
+      },
+      "pointer_view": true,
+      "sources": [
+        "099a-fixture-slice"
+      ],
+      "unit": "file"
+    },
+    {
+      "action": "merge",
+      "basis": "aggregated pointer view over the slice records (summary rows + pointers)",
+      "checks": {},
+      "name": "code-review.md",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "pointer": {
+        "kind": "pointer-view",
+        "paths": []
+      },
+      "pointer_view": true,
+      "sources": [],
+      "unit": "file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "no files on the parent or on any slice",
+      "checks": {},
+      "name": "checklists",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "directory"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "no files on the parent or on any slice",
+      "checks": {},
+      "name": "checkpoints",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "directory"
+    },
+    {
+      "action": "create",
+      "basis": "dated record: the parent pointer view carries a summary row and a pointer, never a copy",
+      "checks": {},
+      "name": "test-evidence/run-2026-11-05.txt",
+      "per_slice": [
+        {
+          "present": true,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "pointer": {
+        "kind": "pointer-view",
+        "paths": [
+          ".specify/specs/099a-fixture-slice/test-evidence/run-2026-11-05.txt"
+        ]
+      },
+      "pointer_view": true,
+      "sources": [
+        "099a-fixture-slice"
+      ],
+      "unit": "directory-file"
+    },
+    {
+      "action": "keep",
+      "checks": {},
+      "name": "test-evidence/smoke.txt",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "directory-file"
+    },
+    {
+      "action": "not-applicable",
+      "basis": "no files on the parent or on any slice",
+      "checks": {},
+      "name": "notes",
+      "per_slice": [
+        {
+          "present": false,
+          "slice": "099a-fixture-slice"
+        }
+      ],
+      "sources": [],
+      "unit": "directory"
+    }
+  ],
+  "checks": {
+    "dangling_refs": 0,
+    "dated_record_hashes_stable": true,
+    "duplicate_ids": 0,
+    "id_continuity": "pass",
+    "open_rows": 0
+  },
+  "conflicts": [],
+  "digest": "sha256:49143ea3cea96939515f5aa94636a2962476a23a446bfe1caaf3c1f406c805a9",
+  "dispositions": [],
+  "factory_doc_resolutions": [],
+  "generated_by": {
+    "command": "seal-utils.py --action merge-apply --spec-dir .specify/specs/099-fixture-merged",
+    "engine": "seal-utils.py",
+    "version": "0.0.22"
+  },
+  "id_maps": {
+    "C": [],
+    "E": [],
+    "FR": [],
+    "SC": [],
+    "STR": [],
+    "T": []
+  },
+  "merge": {
+    "status": "merged"
+  },
+  "schema_version": 1,
+  "slices": [
+    {
+      "carrier_tasks": null,
+      "order": 1,
+      "order_basis": "letter-order",
+      "order_source": "directory-name sort (no split record at .specify/state/099-fixture-merged.md)",
+      "retention": "pending-review",
+      "slug": "099a-fixture-slice"
+    }
+  ],
+  "spec": "099-fixture-merged"
+}

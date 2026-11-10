@@ -28,9 +28,11 @@ Contract: `.specify/specs/099-speckit-seal/contracts/seal-engine.contract.md` (C
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Tuple
@@ -159,6 +161,14 @@ def render(payload: Dict[str, Any], as_json: bool) -> None:
                   checks.get("id_continuity", "-"), checks.get("open_rows", "-"),
                   checks.get("duplicate_ids", "-"), checks.get("dangling_refs", "-"),
                   checks.get("dated_record_hashes_stable", "-")))
+    sealed = payload.get("seal")
+    if isinstance(sealed, dict):
+        print("  outcome: %s" % sealed.get("outcome", "-"))
+        if sealed.get("receipt"):
+            print("  receipt: %s" % sealed["receipt"])
+        print("  status: %s -> %s" % (sealed.get("from_status", "-"),
+                                      sealed.get("to_status", "-")))
+        print("  writes: %d" % len(sealed.get("writes") or []))
     for condition in payload["conditions"]:
         print("  - %s: %s" % (condition["code"], condition["evidence"]))
         print("    fix: %s" % condition["fix_path"])
@@ -1881,22 +1891,853 @@ def action_merge_apply(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[s
     return payload, EXIT_OK
 
 
-def evaluate_seal(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
+# ---------------------------------------------------------------------------
+# Seal surface (C-005 … C-010, C-032 … C-034, C-037 … C-042, C-044)
+# ---------------------------------------------------------------------------
+
+#: C-042: the closed refusal code set of the `seal` action.
+SEAL_REFUSAL_CODES = (
+    "from-status-invalid", "slice-not-sealable", "review-missing", "p0-unresolved",
+    "code-review-blocking", "closure-refused", "closure-input-defect",
+    "merge-incomplete", "conflict-open", "slice-unclosed", "dirty-spec-tree",
+)
+#: Exit 2 members: input or environment errors, never read as a pass (DoD-5).
+SEAL_EXIT2_CODES = ("state-drift", "closure-input-defect", "git-unavailable",
+                    "seal-receipt-invalid", "seal-write-failed")
+
+DETAIL_STATUS_RE = re.compile(r"(?m)^\*\*Status\*\*:\s*(.+?)\s*$")
+REGISTRY_SEPARATOR_RE = re.compile(r"^:?-+:?$")
+SEAL_P0_LINE_RE = re.compile(r"^\s*-\s+\*\*Severity\*\*:\s*P0\s*$")
+SEAL_FIX_RE = re.compile(r"^\s*-\s+\*\*Fix\*\*:\s*(.+)$")
+SEAL_USER_WAIVER_RE = re.compile(r"^\s*-\s+\*\*User waiver\*\*:\s*(.+)$")
+BLOCKING_HEADING_RE = re.compile(r"^### .*\[BLOCKING\]")
+FINAL_PATH_KEYS_SEAL = ("pass", "blocked", "deferred", "partial", "fail", "unknown",
+                        "total")
+
+DEFAULT_SLICES_BASIS = (
+    "the slice set is empty: no directory in `.specify/specs/` satisfies both the "
+    "name-family and the parent-declaration conditions"
+)
+SEAL_FIX_GUIDANCE = (
+    "repair the named input, commit the spec tree, then rerun seal"
+)
+
+
+def _first_line(text: str) -> str:
+    for line in (text or "").splitlines():
+        if line.strip():
+            return line.strip()
+    return ""
+
+
+def _resolve_override(raw: Optional[str]) -> Optional[Path]:
+    if not raw:
+        return None
+    path = Path(raw)
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path.resolve()
+
+
+def _carrier_paths(repo: Path, spec_dir: Path, args: argparse.Namespace):
+    """The two claimed-status carriers, resolved exactly like the closure engine.
+
+    `--feature-detail` / `--feature-registry` win; a spec-local carrier file is the
+    fixture form; otherwise the repository registry and `.specify/features/<key>.md`.
+    """
+    detail = _resolve_override(args.feature_detail)
+    if detail is None:
+        local = spec_dir / "feature-detail.md"
+        detail = local if local.is_file() else (
+            repo / ".specify" / "features" / ("%s.md" % spec_dir.name))
+    registry = _resolve_override(args.feature_registry)
+    if registry is None:
+        local = spec_dir / "feature-registry.md"
+        registry = local if local.is_file() else repo / ".specify" / "features.md"
+    return detail, registry
+
+
+def _detail_status(path: Path) -> Optional[str]:
+    if not path.is_file():
+        return None
+    match = DETAIL_STATUS_RE.search(_read_text(path))
+    return match.group(1).strip() if match else None
+
+
+def _registry_row(text: str, key: str) -> Optional[Dict[str, Any]]:
+    """The registry data row for `key`, located by header name, never by position."""
+    wanted = {key}
+    digits = re.match(r"^(\d+)", key)
+    if digits:
+        wanted.add(digits.group(1))
+    header = None
+    for index, line in enumerate(text.splitlines()):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            header = None
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if header is None:
+            lowered = [cell.casefold() for cell in cells]
+            if "id" in lowered:
+                header = {name: position for position, name in enumerate(lowered)}
+            continue
+        if cells and all(REGISTRY_SEPARATOR_RE.match(cell) for cell in cells if cell):
+            continue
+        if cells and cells[0] in wanted:
+            status_col = header.get("status") if header else None
+            if status_col is None or status_col >= len(cells):
+                status_col = 3 if len(cells) > 3 else None
+            updated_col = header.get("last updated") if header else None
+            if updated_col is not None and updated_col >= len(cells):
+                updated_col = None
+            return {"line": index, "cells": cells, "status_col": status_col,
+                    "updated_col": updated_col}
+    return None
+
+
+def _registry_cell(row: Optional[Dict[str, Any]], column: Optional[int]):
+    if row is None or column is None or column >= len(row["cells"]):
+        return None
+    return row["cells"][column]
+
+
+def _seal_state(repo: Path, spec_dir: Path, args: argparse.Namespace) -> Dict[str, Any]:
+    detail_path, registry_path = _carrier_paths(repo, spec_dir, args)
+    registry_text = _read_text(registry_path) if registry_path.is_file() else ""
+    row = _registry_row(registry_text, spec_dir.name) if registry_text else None
+    return {
+        "detail_path": detail_path,
+        "registry_path": registry_path,
+        "registry_text": registry_text,
+        "registry_row": row,
+        "detail_status": _detail_status(detail_path),
+        "registry_status": _registry_cell(row, row["status_col"] if row else None),
+    }
+
+
+def _run_git(repo: Path, arguments) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(repo)] + list(arguments),
+                          capture_output=True, text=True, encoding="utf-8",
+                          check=False)
+
+
+def _git_dirty_paths(repo: Path, spec_dir: Path):
+    proc = _run_git(repo, ["status", "--porcelain", "--", str(spec_dir)])
+    if proc.returncode != 0:
+        return None
+    paths = []
+    for line in proc.stdout.splitlines():
+        if not line.strip():
+            continue
+        entry = line[3:] if len(line) >= 3 else line.strip()
+        if " -> " in entry:
+            entry = entry.split(" -> ", 1)[1]
+        paths.append(entry.strip().strip('"'))
+    return paths
+
+
+def _heading_block(text: str, pattern: str) -> Optional[Dict[str, Any]]:
+    """The first heading (level 2–6) matching `pattern`, with its body and end index."""
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        match = re.match(r"^(#{2,6})\s+(.*)$", line)
+        if not match or not re.search(pattern, match.group(2)):
+            continue
+        level = len(match.group(1))
+        body = []
+        cursor = index + 1
+        while cursor < len(lines):
+            inner = re.match(r"^(#{2,6})\s+", lines[cursor])
+            if inner and len(inner.group(1)) <= level:
+                break
+            body.append((cursor + 1, lines[cursor]))
+            cursor += 1
+        return {"start": index + 1, "start_index": index, "end_index": cursor,
+                "level": level, "body": body}
+    return None
+
+
+def _review_summary(text: str) -> Dict[str, int]:
+    block = _heading_block(text, r"Findings Summary")
+    lines = [line for _line_no, line in block["body"]] if block else text.splitlines()
+    counts = {"P0": 0, "P1": 0, "P2": 0}
+    for line in lines:
+        match = re.match(r"^\|\s*(P0|P1|P2)\s*\|\s*(\d+)\s*\|", line)
+        if match:
+            counts[match.group(1)] = int(match.group(2))
+    return counts
+
+
+def _finding_blocks(text: str):
+    blocks = []
+    current = None
+    for index, line in enumerate(text.splitlines()):
+        heading = re.match(r"^###\s+(.*)$", line)
+        if heading:
+            if current is not None:
+                blocks.append(current)
+            title = heading.group(1).strip()
+            identifier = re.match(r"^(F\d+)\b", title)
+            current = {"id": identifier.group(1) if identifier else title,
+                       "title": title, "line": index + 1, "body": []}
+            continue
+        if current is None:
+            continue
+        if re.match(r"^##\s+", line):
+            blocks.append(current)
+            current = None
+            continue
+        current["body"].append((index + 1, line))
+    if current is not None:
+        blocks.append(current)
+    return blocks
+
+
+def _fix_pointer_resolves(repo: Path, text: str) -> bool:
+    """C-044(a): a path that exists or a commit that git can resolve."""
+    tokens = re.findall(r"`([^`]+)`", text)
+    tokens += re.findall(r"(?<![\w/.-])([0-9a-f]{7,40})(?![\w-])", text)
+    for token in tokens:
+        token = token.strip()
+        if not token:
+            continue
+        if "/" in token:
+            candidate = Path(token)
+            if not candidate.is_absolute():
+                candidate = repo / token
+            if candidate.exists():
+                return True
+        if re.fullmatch(r"[0-9a-f]{7,40}", token):
+            if _run_git(repo, ["cat-file", "-e",
+                               token + "^{commit}"]).returncode == 0:
+                return True
+    return False
+
+
+def _names_finding(line: str, finding_id: str) -> bool:
+    return re.search(r"(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_])"
+                     % re.escape(finding_id), line) is not None
+
+
+def _carrier_waiver(text: str, section_pattern: str, finding_id: str) -> bool:
+    block = _heading_block(text, section_pattern)
+    if block is None:
+        return False
+    for _line_no, line in block["body"]:
+        if SEAL_USER_WAIVER_RE.match(line) and _names_finding(line, finding_id):
+            return True
+    return False
+
+
+def _p0_findings(repo: Path, review_text: str, detail_text: str):
+    """Every P0 finding with its disposition form; C-044 decides 'disposed'."""
+    findings = []
+    for block in _finding_blocks(review_text):
+        if not any(SEAL_P0_LINE_RE.match(line) for _line_no, line in block["body"]):
+            continue
+        fix_text = ""
+        for _line_no, line in block["body"]:
+            match = SEAL_FIX_RE.match(line)
+            if match:
+                fix_text = match.group(1)
+                break
+        by_fix = bool(fix_text) and _fix_pointer_resolves(repo, fix_text)
+        by_waiver = (_carrier_waiver(review_text, r"Code Segment", block["id"])
+                     and _carrier_waiver(detail_text, r"Latest Review", block["id"]))
+        form = "fix" if by_fix else ("user-waiver" if by_waiver else None)
+        findings.append({"finding": block["id"], "line": block["line"],
+                         "resolved": form is not None, "form": form})
+    return findings
+
+
+def _run_closure(repo: Path, spec_dir: Path, detail_path: Path, registry_path: Path,
+                 args: argparse.Namespace) -> Dict[str, Any]:
+    engine = Path(__file__).resolve().parent / "closure-acceptance-check.py"
+    argv = [sys.executable, str(engine), "--spec-dir", str(spec_dir),
+            "--repo", str(repo), "--json"]
+    if args.feature_detail:
+        argv += ["--feature-detail", str(detail_path)]
+    if args.feature_registry:
+        argv += ["--feature-registry", str(registry_path)]
+    command = " ".join(argv[1:])
+    try:
+        proc = subprocess.run(argv, cwd=str(repo), capture_output=True, text=True,
+                              encoding="utf-8", check=False)
+    except OSError as exc:
+        return {"exit_code": None, "command": command, "payload": None,
+                "stderr": "%s: %s" % (type(exc).__name__, exc)}
+    payload = None
+    if proc.stdout.strip():
+        try:
+            payload = json.loads(proc.stdout)
+        except ValueError:
+            payload = None
+    return {"exit_code": proc.returncode, "command": command, "payload": payload,
+            "stderr": proc.stderr or ""}
+
+
+def _merge_assessment(repo: Path, spec_dir: Path, slices, ordered):
+    """FR-008 completeness from `merge-manifest.json`; names every unmet item."""
+    conditions = []
+    manifest_path = spec_dir / MANIFEST_NAME
+    rel_manifest = _rel_path(repo, manifest_path)
+    manifest = None
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(_read_text(manifest_path))
+        except ValueError:
+            manifest = "invalid"
+    if not isinstance(manifest, dict):
+        manifest = None if not manifest_path.is_file() else "invalid"
+    slice_slugs = [item["slug"] for item in ordered]
+    info = {"manifest": rel_manifest, "slices": slice_slugs,
+            "status": "not-applicable" if not slices else "merged", "basis": None}
+
+    if not slices:
+        if manifest is None:
+            info["manifest"] = None
+            info["basis"] = DEFAULT_SLICES_BASIS
+            return info, conditions
+        if manifest == "invalid":
+            conditions.append(_condition(
+                "merge-incomplete",
+                "%s is unparsable; the empty-slice decision cannot be read"
+                % rel_manifest,
+                SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+            return info, conditions
+        merge = manifest.get("merge") or {}
+        basis = str(merge.get("basis") or "").strip()
+        if merge.get("status") != "not-applicable" or not basis:
+            conditions.append(_condition(
+                "merge-incomplete",
+                "%s does not record `not-applicable` with a basis for the empty "
+                "slice set" % rel_manifest,
+                SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+            return info, conditions
+        info["basis"] = merge["basis"]
+        return info, conditions
+
+    if manifest is None:
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%d slice(s) are present (%s) but %s is absent"
+            % (len(slices), ",".join(slice_slugs), rel_manifest),
+            "run merge-apply against this parent before sealing; the manifest is "
+            "the completeness record",
+            "rerun seal after merge-apply has produced the manifest"))
+        return info, conditions
+    if manifest == "invalid":
+        conditions.append(_condition(
+            "merge-incomplete", "%s is unparsable" % rel_manifest,
+            SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+        return info, conditions
+    merge = manifest.get("merge") or {}
+    if manifest.get("spec") != spec_dir.name:
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%s names spec %r, not %r" % (rel_manifest, manifest.get("spec"),
+                                          spec_dir.name),
+            SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+    if merge.get("status") != "merged":
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%s records merge status %r while %d slice(s) are present"
+            % (rel_manifest, merge.get("status"), len(slices)),
+            SEAL_FIX_GUIDANCE, "rerun seal after the merge is completed"))
+    recorded_slugs = [entry.get("slug") for entry in manifest.get("slices") or []
+                      if isinstance(entry, dict)]
+    missing_slugs = [slug for slug in slice_slugs if slug not in recorded_slugs]
+    if missing_slugs:
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%s carries no slice record for %s"
+            % (rel_manifest, ",".join(missing_slugs)),
+            SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+    expected = _classify_artifacts(repo, spec_dir, ordered)
+    recorded = {row.get("name"): row for row in manifest.get("artifacts") or []
+                if isinstance(row, dict)}
+    uncovered = [row["name"] for row in expected if row["name"] not in recorded]
+    if uncovered:
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%s has no merge record for: %s" % (rel_manifest, ", ".join(uncovered)),
+            SEAL_FIX_GUIDANCE, "rerun seal after the manifest is repaired"))
+    gaps = []
+    for name, row in sorted(recorded.items()):
+        per_slice = {entry.get("slice") for entry in row.get("per_slice") or []
+                     if isinstance(entry, dict)}
+        missing = [slug for slug in slice_slugs if slug not in per_slice]
+        if missing:
+            gaps.append("%s lacks per_slice rows for %s" % (name, ",".join(missing)))
+        if row.get("action") == "not-applicable" \
+                and not str(row.get("basis") or "").strip():
+            gaps.append("%s is not-applicable without a basis" % name)
+    if gaps:
+        conditions.append(_condition(
+            "merge-incomplete", "; ".join(gaps), SEAL_FIX_GUIDANCE,
+            "rerun seal after the manifest is repaired"))
+    checks = manifest.get("checks") or {}
+    failed = []
+    if checks.get("id_continuity") != "pass":
+        failed.append("id_continuity=%r" % checks.get("id_continuity"))
+    if checks.get("duplicate_ids") != 0:
+        failed.append("duplicate_ids=%r" % checks.get("duplicate_ids"))
+    if checks.get("dangling_refs") != 0:
+        failed.append("dangling_refs=%r" % checks.get("dangling_refs"))
+    if checks.get("open_rows") != 0:
+        failed.append("open_rows=%r" % checks.get("open_rows"))
+    if checks.get("dated_record_hashes_stable") is not True:
+        failed.append("dated_record_hashes_stable=%r"
+                      % checks.get("dated_record_hashes_stable"))
+    if failed:
+        conditions.append(_condition(
+            "merge-incomplete",
+            "%s post-merge checks did not pass: %s" % (rel_manifest, ", ".join(failed)),
+            "repair the merged artifacts and run merge-apply again",
+            "rerun seal after the merged checks pass"))
+    for conflict in manifest.get("conflicts") or []:
+        if isinstance(conflict, dict) and conflict.get("status") == "open":
+            conditions.append(_condition(
+                "conflict-open",
+                "%s %s: %s" % (conflict.get("artifact"), conflict.get("unit"),
+                               conflict.get("id")),
+                "resolve the conflict and rerun merge-apply so the manifest "
+                "records the resolution",
+                "rerun seal after no conflict remains open"))
+    return info, conditions
+
+
+def _slice_parent_hint(spec_dir: Path) -> Optional[str]:
+    text = _read_text(spec_dir / "requirements.md")
+    field = re.search(r"(?m)^\*\*Parent spec\*\*:\s*(.+)$", text)
+    if field:
+        return field.group(1).strip().strip("`")
+    body = _heading_block(text, r"Parent Mapping")
+    if body is not None:
+        for _line_no, line in body["body"]:
+            match = re.search(r"\d{3}[a-z]*-[a-z0-9][a-z0-9-]*", line)
+            if match:
+                return match.group(0)
+        return "(declared via `## Parent Mapping`)"
+    return None
+
+
+def _read_seal_core(path: Path) -> Optional[Dict[str, Any]]:
+    text = _read_text(path)
+    blocks = re.findall(r"```json\n(.*?)\n```", text, re.S)
+    if len(blocks) != 1:
+        return None
+    try:
+        core = json.loads(blocks[0])
+    except ValueError:
+        return None
+    return core if isinstance(core, dict) else None
+
+
+def _replace_row_cells(line: str, updates: Dict[int, str]) -> str:
+    parts = line.split("|")
+    for column, value in updates.items():
+        position = column + 1
+        if position >= len(parts):
+            continue
+        cell = parts[position]
+        content = cell.strip()
+        leading = cell[:len(cell) - len(cell.lstrip())]
+        trailing = cell[len(cell.rstrip()):]
+        if not content:
+            leading = leading or " "
+            trailing = trailing or " "
+        parts[position] = leading + value + trailing
+    return "|".join(parts)
+
+
+def _registry_sealed_text(text: str, row: Dict[str, Any], date: str) -> str:
+    lines = text.split("\n")
+    updates = {row["status_col"]: "Sealed"}
+    if row["updated_col"] is not None:
+        updates[row["updated_col"]] = date
+    lines[row["line"]] = _replace_row_cells(lines[row["line"]], updates)
+    return _ensure_newline("\n".join(lines))
+
+
+def _detail_sealed_text(text: str, date: str, short_sha: str) -> str:
+    lines = text.split("\n")
+    for index, line in enumerate(lines):
+        if DETAIL_STATUS_RE.match(line):
+            lines[index] = "**Status**: Sealed"
+            break
+    entry = ("- %s — Sealed by /speckit.seal; receipt: seal.md (pinned %s)."
+             % (date, short_sha))
+    block = _heading_block("\n".join(lines), r"Latest Review")
+    if block is None:
+        lines.extend(["", "## Latest Review", "", entry])
+    else:
+        insert_at = block["end_index"]
+        while insert_at - 1 > block["start_index"] and not lines[insert_at - 1].strip():
+            insert_at -= 1
+        lines.insert(insert_at, entry)
+    return _ensure_newline("\n".join(lines))
+
+
+def _seal_receipt_text(spec_dir: Path, core: Dict[str, Any]) -> str:
+    return (
+        "# Seal Record — %s\n\n"
+        "> Generated by `/speckit.seal`. The machine-readable core below is the "
+        "closed field set; it references every measurement at its source and never "
+        "restates a second measurement.\n\n"
+        "```json\n%s\n```\n"
+        % (spec_dir.name, json.dumps(core, indent=2, sort_keys=True,
+                                     ensure_ascii=False))
+    )
+
+
+def _write_seal_batch(targets) -> Optional[str]:
+    """C-005: one batch; a failure restores the previous bytes of every written file.
+
+    The engine never deletes anything (C-008), so the receipt — the only file that
+    may be newly created — is written last: a failure leaves no status change and
+    no earlier receipt half-written.
+    """
+    originals: Dict[Path, Optional[bytes]] = {}
+    written = []
+    try:
+        for path, text in targets:
+            originals[path] = path.read_bytes() if path.is_file() else None
+            path.write_text(text, encoding="utf-8")
+            written.append(path)
+    except (OSError, UnicodeError) as exc:
+        for path in reversed(written):
+            previous = originals.get(path)
+            if previous is not None:
+                try:
+                    path.write_bytes(previous)
+                except OSError:
+                    pass
+        return ("%s: %s; every file this batch had already written was restored "
+                "to its previous bytes" % (type(exc).__name__, exc))
+    return None
+
+
+def _seal_error(spec_dir: Path, code: str, evidence: str,
+                fix_path: str) -> Tuple[Dict[str, Any], int, None]:
+    payload = _payload("seal", spec_dir, "error", EXIT_INPUT_ERROR,
+                       [_condition(code, evidence, fix_path,
+                                   "rerun seal after the named input is repaired")])
+    payload["seal"] = {"outcome": "error", "receipt": None, "from_status": None,
+                       "to_status": None, "writes": []}
+    return payload, EXIT_INPUT_ERROR, None
+
+
+def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
     """C-005 judgment phase: read-only; computes every precondition, writes nothing."""
-    return _pending("seal", spec_dir)
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    judged_at = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ")
+    judged_date = judged_at[:10]
+
+    hint = _slice_parent_hint(spec_dir)
+    if hint is not None:
+        payload = _payload(
+            "seal", spec_dir, "refused", EXIT_REFUSED,
+            [_condition(
+                "slice-not-sealable",
+                "%s declares a parent spec (%s); a slice directory is never the "
+                "seal subject" % (spec_dir.name, hint),
+                "run seal against the parent spec directory: %s" % hint,
+                "rerun with --spec-dir pointing at the parent spec")])
+        payload["seal"] = {"outcome": "refused", "receipt": None,
+                           "from_status": None, "to_status": None, "writes": []}
+        return payload, EXIT_REFUSED, None
+
+    status = _seal_state(repo, spec_dir, args)
+    detail_status = status["detail_status"]
+    registry_status = status["registry_status"]
+    if detail_status is None or registry_status is None \
+            or detail_status != registry_status:
+        return _seal_error(
+            spec_dir, "state-drift",
+            "the claimed status pair is inconsistent: detail=%r (%s); registry=%r (%s)"
+            % (detail_status, _rel_path(repo, status["detail_path"]),
+               registry_status, _rel_path(repo, status["registry_path"])),
+            "repair the status pair through the registry reconcile owner; seal "
+            "never picks one carrier over the other")
+
+    if detail_status == "Sealed":
+        receipt = spec_dir / "seal.md"
+        payload = _payload("seal", spec_dir, "ok", EXIT_OK, [])
+        payload["seal"] = {
+            "outcome": "already-sealed",
+            "receipt": _rel_path(repo, receipt) if receipt.is_file() else None,
+            "from_status": "Sealed", "to_status": "Sealed", "writes": [],
+        }
+        return payload, EXIT_OK, None
+
+    receipt_path = spec_dir / "seal.md"
+    supersedes = None
+    if receipt_path.is_file():
+        previous = _read_seal_core(receipt_path)
+        pinned = str((previous or {}).get("pinned_commit") or "").strip()
+        if not pinned:
+            return _seal_error(
+                spec_dir, "seal-receipt-invalid",
+                "%s exists but carries no readable machine core with a pinned commit"
+                % _rel_path(repo, receipt_path),
+                "repair or remove the unreadable receipt before resealing")
+        supersedes = pinned
+
+    conditions = []
+    if detail_status != "Ready for Review":
+        conditions.append(_condition(
+            "from-status-invalid",
+            "the claimed status pair reads %r; seal requires `Ready for Review` "
+            "(detail: %s; registry: %s)"
+            % (detail_status, _rel_path(repo, status["detail_path"]),
+               _rel_path(repo, status["registry_path"])),
+            "return the feature to `Ready for Review` through its owner flow, or "
+            "seal is not applicable",
+            "rerun seal once the status pair reads Ready for Review"))
+
+    review_path = spec_dir / "review.md"
+    code_review_path = spec_dir / "code-review.md"
+    review_text = _read_text(review_path) if review_path.is_file() else ""
+    code_review_text = _read_text(code_review_path) if code_review_path.is_file() else ""
+    if not review_path.is_file():
+        conditions.append(_condition(
+            "review-missing",
+            "the current review record is absent: %s" % _rel_path(repo, review_path),
+            "produce the review through /speckit.review",
+            "rerun seal after review.md is present"))
+    if not code_review_path.is_file():
+        conditions.append(_condition(
+            "review-missing",
+            "the current code-review record is absent: %s"
+            % _rel_path(repo, code_review_path),
+            "produce the code review through /speckit.review",
+            "rerun seal after code-review.md is present"))
+
+    summary = _review_summary(review_text) if review_text else {"P0": 0, "P1": 0,
+                                                               "P2": 0}
+    detail_text = _read_text(status["detail_path"]) \
+        if status["detail_path"].is_file() else ""
+    p0_findings = _p0_findings(repo, review_text, detail_text)
+    unresolved = [entry for entry in p0_findings if not entry["resolved"]]
+    unaccounted = max(0, summary["P0"] - len(p0_findings))
+    for entry in unresolved:
+        conditions.append(_condition(
+            "p0-unresolved",
+            "%s (line %d) has neither a resolvable `- **Fix**:` pointer nor a user "
+            "waiver on both carriers" % (entry["finding"], entry["line"]),
+            "fix the finding and record the fix pointer, or record the user's "
+            "literal `- **User waiver**:` line on the review's code segment and "
+            "the feature detail's `## Latest Review`",
+            "rerun seal after the P0 is disposed"))
+    if unaccounted:
+        conditions.append(_condition(
+            "p0-unresolved",
+            "the findings summary reports %d P0 finding(s) but only %d P0 finding "
+            "block(s) are parseable" % (summary["P0"], len(p0_findings)),
+            "make every P0 finding carry a `- **Severity**: P0` block",
+            "rerun seal after the findings are repaired"))
+
+    blocking_entries = [line for line in code_review_text.splitlines()
+                        if BLOCKING_HEADING_RE.match(line)]
+    for line in blocking_entries:
+        conditions.append(_condition(
+            "code-review-blocking",
+            "a blocking code-review entry remains: %s" % line.strip(),
+            "resolve the blocking entry in the current code-review record",
+            "rerun seal after the code review carries no blocking entry"))
+
+    closure = _run_closure(repo, spec_dir, status["detail_path"],
+                           status["registry_path"], args)
+    closure_payload = closure["payload"]
+    final_path = (closure_payload or {}).get("final_path")
+    closure_ok = (closure["exit_code"] == 0 and isinstance(closure_payload, dict)
+                  and closure_payload.get("verdict") == "accept"
+                  and isinstance(final_path, dict)
+                  and set(final_path) == set(FINAL_PATH_KEYS_SEAL))
+    if not closure_ok:
+        if closure["exit_code"] == 1 and isinstance(closure_payload, dict):
+            reasons = "; ".join(
+                "%s%s" % (reason.get("code"), ": " + str(reason.get("target"))
+                          if reason.get("target") else "")
+                for reason in closure_payload.get("reasons") or []) \
+                or "the closure engine reported block"
+            conditions.append(_condition(
+                "closure-refused",
+                "the closure verdict is block: %s" % reasons,
+                "repair the acceptance record named by the closure reasons",
+                "rerun seal after the closure verdict is accept"))
+        else:
+            detail = _first_line(closure.get("stderr")) or "no stderr captured"
+            conditions.append(_condition(
+                "closure-input-defect",
+                "the closure engine exited %r: %s"
+                % (closure["exit_code"], detail),
+                "repair the acceptance input (every SC carries exactly one trailing "
+                "`**Path**` marker and a status row), then rerun the closure engine",
+                "rerun seal after the closure engine reads its inputs"))
+
+    slices, _excluded = _discover_slices(spec_dir)
+    ordered = _derive_order(repo, spec_dir.name, slices) if slices else []
+    merge_info, merge_conditions = _merge_assessment(repo, spec_dir, slices, ordered)
+    conditions.extend(merge_conditions)
+    for path, line_no, task_id, task_state in _unclosed_slice_rows(repo, ordered):
+        conditions.append(_condition(
+            "slice-unclosed",
+            "%s:%d %s is not closed (state `- [%s]`)"
+            % (path, line_no, task_id, task_state),
+            "close the slice task, or record its `deferred_tasks=` entry in the "
+            "slice verification.md",
+            "rerun seal after the slice is closed"))
+
+    head = None
+    head_proc = _run_git(repo, ["rev-parse", "HEAD"])
+    if head_proc.returncode != 0:
+        conditions.append(_condition(
+            "git-unavailable",
+            "git cannot resolve HEAD under %s: %s"
+            % (repo, _first_line(head_proc.stderr)),
+            "run seal inside the repository that owns the spec tree",
+            "rerun seal from a valid git work tree"))
+    else:
+        head = head_proc.stdout.strip()
+    dirty = _git_dirty_paths(repo, spec_dir)
+    if dirty is None:
+        conditions.append(_condition(
+            "git-unavailable",
+            "git cannot read the status of %s" % _rel_path(repo, spec_dir),
+            "run seal inside the repository that owns the spec tree",
+            "rerun seal from a valid git work tree"))
+    elif dirty:
+        conditions.append(_condition(
+            "dirty-spec-tree",
+            "uncommitted paths under the parent spec tree: %s" % "; ".join(dirty),
+            "commit or revert the named paths; seal stamps only a settled tree",
+            "rerun seal after the parent spec tree is clean"))
+
+    exit_code = EXIT_OK
+    if conditions:
+        exit_code = EXIT_INPUT_ERROR if any(
+            condition["code"] in SEAL_EXIT2_CODES for condition in conditions) \
+            else EXIT_REFUSED
+    verdict = {EXIT_OK: "ok", EXIT_REFUSED: "refused",
+               EXIT_INPUT_ERROR: "error"}[exit_code]
+    if exit_code != EXIT_OK:
+        payload = _payload("seal", spec_dir, verdict, exit_code, conditions)
+        payload["seal"] = {"outcome": verdict, "receipt": None,
+                           "from_status": detail_status, "to_status": "Sealed",
+                           "writes": []}
+        return payload, exit_code, None
+
+    waiver_entries = [
+        {"finding": entry["finding"], "form": "user-waiver",
+         "source": "%s (code segment); %s (## Latest Review)"
+                   % (_rel_path(repo, review_path),
+                      _rel_path(repo, status["detail_path"]))}
+        for entry in p0_findings if entry["form"] == "user-waiver"]
+    merge_block = {"manifest": merge_info["manifest"], "slices": merge_info["slices"],
+                   "status": merge_info["status"]}
+    if merge_info["status"] == "not-applicable":
+        merge_block["basis"] = merge_info["basis"]
+    core = {
+        "judged_at": judged_at,
+        "pinned_commit": head,
+        "from_status": "Ready for Review",
+        "to_status": "Sealed",
+        "review": {
+            "paths": [_rel_path(repo, review_path),
+                      _rel_path(repo, code_review_path)],
+            "counts": {"p0_unresolved": len(unresolved) + unaccounted,
+                       "p1": summary["P1"], "p2": summary["P2"],
+                       "blocking": len(blocking_entries)},
+        },
+        "closure": {"exit_code": closure["exit_code"],
+                    "final_path": final_path,
+                    "command": closure["command"]},
+        "merge": merge_block,
+        "waivers": waiver_entries,
+        "engine": {"identity": ENGINE_NAME, "version": _engine_version(),
+                   "command": "%s --action seal --spec-dir %s --repo %s"
+                              % (ENGINE_NAME, _rel_path(repo, spec_dir),
+                                 _rel_path(repo, repo))},
+    }
+    if supersedes:
+        core["supersedes"] = supersedes
+    payload = _payload("seal", spec_dir, "ok", EXIT_OK, [])
+    payload["seal"] = {
+        "outcome": "sealed", "receipt": _rel_path(repo, receipt_path),
+        "from_status": "Ready for Review", "to_status": "Sealed", "writes": [],
+    }
+    evaluation = {
+        "repo": repo,
+        "payload": payload,
+        "receipt_text": _seal_receipt_text(spec_dir, core),
+        "registry": {"path": status["registry_path"],
+                     "row": status["registry_row"]},
+        "detail": {"path": status["detail_path"]},
+        "date": judged_date,
+        "short_sha": (head or "")[:12],
+    }
+    return payload, EXIT_OK, evaluation
 
 
 def apply_seal(args: argparse.Namespace, spec_dir: Path,
                evaluation: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
     """C-005 write phase: one atomic batch; only reached when judgment passed."""
-    return _pending("seal", spec_dir)
+    repo = evaluation["repo"]
+    registry_path = evaluation["registry"]["path"]
+    detail_path = evaluation["detail"]["path"]
+    registry_text = _read_text(registry_path)
+    detail_text = _read_text(detail_path)
+    row = _registry_row(registry_text, spec_dir.name)
+    if row is None or _registry_cell(row, row["status_col"]) != "Ready for Review" \
+            or _detail_status(detail_path) != "Ready for Review":
+        payload = _payload(
+            "seal", spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "state-drift",
+                "the claimed status pair changed between judgment and write",
+                "redo the judgment on the current tree",
+                "rerun seal")],
+        )
+        payload["seal"] = {"outcome": "error", "receipt": None,
+                           "from_status": None, "to_status": "Sealed", "writes": []}
+        return payload, EXIT_INPUT_ERROR
+    targets = [
+        (registry_path,
+         _registry_sealed_text(registry_text, row, evaluation["date"])),
+        (detail_path,
+         _detail_sealed_text(detail_text, evaluation["date"],
+                             evaluation["short_sha"])),
+        (spec_dir / "seal.md", evaluation["receipt_text"]),
+    ]
+    failure = _write_seal_batch(targets)
+    if failure is not None:
+        payload = _payload(
+            "seal", spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "seal-write-failed", failure,
+                "repair the named write failure; the batch is restored, so no "
+                "partial seal survives",
+                "rerun seal after the failure is repaired")])
+        payload["seal"] = {"outcome": "error", "receipt": None,
+                           "from_status": "Ready for Review", "to_status": "Sealed",
+                           "writes": []}
+        return payload, EXIT_INPUT_ERROR
+    payload = evaluation["payload"]
+    payload["seal"]["writes"] = [_rel_path(repo, path) for path, _text in targets]
+    return payload, EXIT_OK
 
 
 def action_seal(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
-    evaluation, code = evaluate_seal(args, spec_dir)
-    if evaluation["verdict"] != "ok":
+    evaluation, code, state = evaluate_seal(args, spec_dir)
+    if evaluation["verdict"] != "ok" or state is None:
         return evaluation, code
-    return apply_seal(args, spec_dir, evaluation)
+    if state["payload"]["seal"]["outcome"] == "already-sealed":
+        return evaluation, code
+    return apply_seal(args, spec_dir, state)
 
 
 def action_archive_gate(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[str, Any], int]:
@@ -1983,7 +2824,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         render(payload, args.json)
         return EXIT_INPUT_ERROR
 
-    payload, code = HANDLERS[args.action](args, spec_dir)
+    try:
+        payload, code = HANDLERS[args.action](args, spec_dir)
+    except (OSError, ValueError, StopIteration) as exc:
+        payload = _payload(
+            args.action, spec_dir, "error", EXIT_INPUT_ERROR,
+            [_condition(
+                "engine-input-error",
+                "the %s judgment cannot be derived from this tree: %s"
+                % (args.action, exc),
+                "repair the named input (spec tree, status carriers or merge record)",
+                "rerun the same command after the input is repaired",
+            )],
+        )
+        code = EXIT_INPUT_ERROR
     render(payload, args.json)
     return code
 

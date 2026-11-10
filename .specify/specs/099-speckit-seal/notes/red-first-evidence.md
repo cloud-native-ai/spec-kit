@@ -514,3 +514,59 @@ FAILED tests/integration/test_seal_merge_determinism.py::test_two_fresh_runs_are
 **读数**：3/3 红。两条确定性腿（两次全新运行逐字节一致、成功重跑零 diff）与「返回时刻排序键」变异腿
 （同一 sha256 快照比较在注入时间键后必须报告差异，并附未变异引擎仍逐字节一致的对照断言）都因动作体缺失
 而红，红因是「动作体未实现」而非收集/语法错误。
+
+## 6. T026 红先契约测试 `tests/contract/test_seal_seal.py` + T027 红先契约测试 `tests/contract/test_seal_concurrency_and_readonly.py`
+
+**采集点**：T025 夹具树落地之后、T028/T029 任何实现修改之前（工作树仅新增夹具与两个测试文件）。
+
+**命令（verbatim）**：
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py tests/contract/test_seal_concurrency_and_readonly.py -q
+```
+
+**退出码**：1（23 failed）。
+
+**完整 stdout/stderr（verbatim）**：全文捕获于
+`.specify/specs/099-speckit-seal/test-evidence/p5-red-first-20261111.txt`
+（sha256 `5b40d82473afc425d34069a0fb673dafa6ac4dd27f9ddff72f90bce1e40eaf7a`，518 行）。
+
+**读数**：23/23 红。全部失败同因——`seal` 动作体仍是骨架的 `_pending` 负载
+（`code: not-implemented`，exit 2），无收集错误、无语法错误、无一条在断言前被跳过。失败行清单：
+
+```text
+FAILED tests/contract/test_seal_seal.py::test_clean_single_spec_seals_and_writes_the_three_surfaces
+FAILED tests/contract/test_seal_seal.py::test_merged_spec_seals_with_a_complete_manifest
+FAILED tests/contract/test_seal_seal.py::test_reseal_is_idempotent_already_sealed
+FAILED tests/contract/test_seal_seal.py::test_supersedes_is_recorded_when_the_receipt_is_replaced
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[from-status-invalid-from-status-invalid-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[p0-unresolved-p0-unresolved-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-refused-closure-refused-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[closure-input-defect-closure-input-defect-2]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[conflict-open-conflict-open-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[slice-unclosed-slice-unclosed-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[three-minus-one-closure-refused-1]
+FAILED tests/contract/test_seal_seal.py::test_refusal_fixtures_name_the_closed_codes_and_persist_nothing[state-drift-state-drift-2]
+FAILED tests/contract/test_seal_seal.py::test_slice_unclosed_also_names_the_missing_merge_record
+FAILED tests/contract/test_seal_seal.py::test_refusal_report_is_rerun_stable
+FAILED tests/contract/test_seal_seal.py::test_code_review_blocking_entry_refuses
+FAILED tests/contract/test_seal_seal.py::test_missing_review_record_refuses
+FAILED tests/contract/test_seal_seal.py::test_a_slice_directory_is_never_the_seal_subject
+FAILED tests/contract/test_seal_seal.py::test_user_waiver_needs_both_carriers
+FAILED tests/contract/test_seal_seal.py::test_write_failure_restores_the_batch
+FAILED tests/contract/test_seal_seal.py::test_closure_input_defect_is_not_read_as_accept
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_parallel_seals_write_disjoint_paths
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_review_and_measurement_files_stay_byte_identical
+FAILED tests/contract/test_seal_concurrency_and_readonly.py::test_dirty_spec_tree_refuses_and_names_the_path
+```
+
+**追加披露（转绿过程中的就地修正，非测试语义变更）**：红读数之后、实现之前，夹具矩阵修正了两处
+输入缺陷，均由真实运行暴露：(a) `seal-refusals/closure-refused` 的 SC-002 原为 `**Path**: supporting`，
+闭包引擎只对 `final` 判据计 `every_final_path_pass`，故其 `fail` 不产生 block——改为 `final` 后该夹具
+以 exit 1 拒绝；(b) `seal-refusals/conflict-open` 的目标是父级 `099-fixture-merged`，拒绝矩阵因此增加
+「夹具 → spec slug」一列（其余七类仍指向 `099-fixture-clean`）。两处都只修正夹具输入，未改动任何断言语义。
+
+## 7. P5 绿读数（T028/T029 落地后）
+
+命令与读数落 `.specify/specs/099-speckit-seal/test-evidence/p5-seal-20261111.txt`（含 P2 引擎契约
+31 passed、P5 23 passed、相邻回归 157 passed 与镜像复核 exit 0）。
