@@ -1,0 +1,7 @@
+unit_id: spec:095-superagent-role
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false

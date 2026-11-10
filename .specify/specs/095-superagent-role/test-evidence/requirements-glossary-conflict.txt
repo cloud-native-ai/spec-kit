@@ -1,0 +1,5 @@
+{
+  "conflict": false,
+  "kind": null,
+  "collidesWith": []
+}

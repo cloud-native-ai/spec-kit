@@ -1,0 +1,13 @@
+file: .specify/specs/095-superagent-role/requirements.md
+status: error
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] fail (3)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 272 lines, 48 definition rows, 6 shared strings
+238: ref-resolvable: the `Consumed by` cell of STR-001 names FR-002, but that row does not cite [[STR-001]] — re-typing the literal instead of citing the id is the drift this check exists to catch
+238: ref-resolvable: the `Consumed by` cell of STR-001 names SC-001, but that row does not cite [[STR-001]] — re-typing the literal instead of citing the id is the drift this check exists to catch
+242: ref-resolvable: the `Consumed by` cell of STR-005 names FR-005, but that row does not cite [[STR-005]] — re-typing the literal instead of citing the id is the drift this check exists to catch
+3 error(s), 0 warning(s)
