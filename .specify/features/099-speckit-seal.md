@@ -3,9 +3,9 @@
 **Feature ID**: 099
 **Name**: Speckit Seal
 **Description**: 按 review 结论封装 spec；`Sealed` 是 `Ready for Review` 之后的终态与归档准入状态；承载分片同名输出件的合并回写（split + merge-back）。
-**Status**: Planned
+**Status**: Implemented
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-10
+**Last Updated**: 2026-11-11
 
 ## Overview
 
@@ -18,7 +18,7 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 
 ## Latest Review
 
-尚未评审——当前阶段为 plan（2026-11-10）。
+- **2026-11-11 `/speckit.implement`（P9 收尾，`Planned → Implemented`）**：P1–P8b 已闭合（状态域七面、四动作引擎、074 真实回合约 blocked——FR-027(d)+B2 具名，合法）；P9 完成全量套件零新增（serial 定版 268 failed / 8415 passed / 2 skipped，相对 280 条实现入口基线 `comm -13` 为空、12 条基线红转绿；并行样本的 14 条基线外红逐条归因并修复 8 条 pin 漂移，`test-evidence/final-suite.txt`）、镜像与命令副本零漂移（`test-evidence/final-mirror-checks.txt`）、quickstart S-1…S-9 实跑（`notes/quickstart-run.md`，smoke 命令 exit 0）、`verification.md` SC-001…SC-009 全 `pass`（final 6/6，闭包判定 accept，前后两份 payload 在 `test-evidence/closure-verdict-099*.json`）、条款覆盖 45/45（`test-evidence/coverage-final.txt`）。**披露**：T050 延后 `[~]`——074 回合按 merge-back C-022 强制把父级 57 条拆前行的 green 认领转为引用记录，遗留 67 条 074 父契约未覆盖名（逐名归因，非本 spec 契约缺口）；T041 保留 P8 的历史延后记录。仍未 `Sealed`：`Ready for Review → Sealed` 属 `/speckit.seal`（review 完成后）。
 
 ## Key Changes
 

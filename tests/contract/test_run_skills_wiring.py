@@ -172,13 +172,16 @@ def test_c9_compile_embeds_zero_drift_75_units():
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 75 -> 76 units — the
     # review-feature-quality skill ships its own compiled Wrap-up embed, so the
     # compile census grows by one while the zero-drift property is unchanged.
+    # Stale-pin update (2026-11-11, Feature 099): 81 -> 83 units — the `/speckit.seal`
+    # command template and the `seal-artifact` skill each ship a compiled Wrap-up
+    # embed, so the compile census grows by two while the zero-drift property is unchanged.
     out = subprocess.run(
         ["python3", "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"],
         cwd=REPO_ROOT, capture_output=True, text=True,
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "81 units" in combined, f"expected 81 units, got: {combined[-400:]}"
+    assert "83 units" in combined, f"expected 83 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"
@@ -215,7 +218,7 @@ def test_c12_no_duplicate_semantic_skill_dirs():
     assert external == sorted(BASELINE_EXTERNAL), (
         f"external layer changed unexpectedly: {set(external) ^ set(BASELINE_EXTERNAL)}"
     )
-    expected_internal = sorted(BASELINE_INTERNAL + ["run-skills", "run-team"])
+    expected_internal = sorted(BASELINE_INTERNAL + ["run-skills", "run-team", "seal-artifact"])
     assert internal == expected_internal, (
         f"internal layer delta unexpected: {set(internal) ^ set(expected_internal)}"
     )

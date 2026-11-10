@@ -4271,10 +4271,15 @@ def test_t078_no_command_gate_or_second_checker_was_added():
     """
     import subprocess
 
+    # 2026-11-11: the delta is read against this feature's base, so later features'
+    # sanctioned command templates land inside it. `templates/commands/seal.md` is
+    # Feature 099's `/speckit.seal` template; every other addition still goes red.
+    sanctioned_later_commands = {"templates/commands/seal.md"}
     commands = sorted(set(
         _git_paths("diff", "--name-only", "--diff-filter=A", f"{_feature_base()}...HEAD", "--",
                    COMMAND_SURFACE)
     ))
+    commands = [p for p in commands if p not in sanctioned_later_commands]
     assert not [p for p in commands if p.endswith(".md")], (
         f"C-32: no `/speckit.*` command was added; got {commands}"
     )

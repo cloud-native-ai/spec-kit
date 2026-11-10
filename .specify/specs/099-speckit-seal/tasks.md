@@ -55,7 +55,7 @@
 - DoD-9: **final 判据全 pass 且有 smoke 记录** — `verification.md` 每条 SC 一行状态，`**Path**: final` 判据均为 `pass`，smoke 三键齐备（GATE-4）。Check: GATE-4。
 - DoD-10: **命令参考页落地** — `docs/reference/commands/seal.md` 存在，四个动作与退出码只按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复制封闭集（FR-021、plan § Project Structure）。Check: `test -s docs/reference/commands/seal.md`。
 
-**DoD Status**: pending
+**DoD Status**: green
 
 ## Completion Gate
 
@@ -113,14 +113,14 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for Foundational
 
-- [X] T003 写红先漂移守卫 `tests/contract/test_sealed_status_domain.py`，覆盖 C-029 的七面（模板转移表状态集、模板 `[FEATURE_STATUS]` 行、索引模板词汇行、feature-integration 协议行、manage-features 词表、non-disposable 状态表、closure completion-claim 家族），运行 `bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py -q` 并把红输出与退出码记入 `.specify/specs/099-speckit-seal/notes/red-first-evidence.md`（FR-001、SC-008、[blockedBy: T001]）。
+- [X] T003 写红先漂移守卫 `tests/contract/test_sealed_status_domain.py`，覆盖 C-029 的七面（模板转移表状态集、模板 `[FEATURE_STATUS]` 行、索引模板词汇行、feature-integration 协议行、manage-features 词表、non-disposable 状态表、closure completion-claim 家族），运行 `bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py -q` 并把红输出与退出码记入 `.specify/specs/099-speckit-seal/notes/red-first-evidence.md`（FR-001、SC-008、[blockedBy: T001]）。 [green: contracts/status-sealed.contract.md#C-029]
 - [X] T004 [P] 把 `tests/contract/test_status_gate_owner.py` 的六状态 pin（415–426 行处的 stale-pin 约定）更新为含 `Sealed` 的七状态封闭集（FR-001、C-029）。
 - [X] T005 [P] 把 `tests/contract/test_acceptance_state_machine.py` 的六值 pin（`FEATURE_STATUS_VALUES`，92 行与 513 行）更新为七值集；保持 `tests/contract/test_acceptance_schema_ownership.py` 中「每个投影落在域内」的断言原样不变并在七值域下转绿（FR-001、C-029）。
 
 ### Implementation for Foundational
 
-- [X] T006 [P] 扩展状态 schema owner `shared/workflow/acceptance-hardening.md` § Feature Status：`Sealed`（[[STR-001]]）的值定义、术语表行，以及唯一转移 `Ready for Review → Sealed` 及其条件；不新增第二个值或第二条转移（FR-001、FR-002、C-024、C-025）。
-- [X] T007 [P] 在 `shared/workflow/feature-integration.md` § Status State Machine 增加 `/speckit.seal` 协议行（`Ready for Review → Sealed`，owner 命令 `/speckit.seal`），并把 `Ready for Review → Completed` 标注为对新工作关闭（FR-001、FR-002、FR-003、C-025、C-027）。
+- [X] T006 [P] 扩展状态 schema owner `shared/workflow/acceptance-hardening.md` § Feature Status：`Sealed`（[[STR-001]]）的值定义、术语表行，以及唯一转移 `Ready for Review → Sealed` 及其条件；不新增第二个值或第二条转移（FR-001、FR-002、C-024、C-025）。 [green: contracts/status-sealed.contract.md#C-024] [green: contracts/status-sealed.contract.md#C-025] [green: contracts/status-sealed.contract.md#C-026]
+- [X] T007 [P] 在 `shared/workflow/feature-integration.md` § Status State Machine 增加 `/speckit.seal` 协议行（`Ready for Review → Sealed`，owner 命令 `/speckit.seal`），并把 `Ready for Review → Completed` 标注为对新工作关闭（FR-001、FR-002、FR-003、C-025、C-027）。 [green: contracts/status-sealed.contract.md#C-027]
 - [X] T008 [P] 扩展 `shared/definitions/non-disposable-definitions.md`：注册表状态值域行（196 行）加入 `Sealed`，并在其后的 status×verdict 表补 `Sealed` 行（FR-001、C-025、C-029）。
 - [X] T009 [P] 更新 `templates/feature-details-template.md`：§ Canonical Status State Machine 的转移行、`**Status**` 词汇 bullet、`[FEATURE_STATUS]` 占位词汇行同批识别 `Sealed`（FR-001、C-025）。
 - [X] T010 [P] 更新 `templates/feature-index-template.md`：状态封闭词汇行加入 `Sealed`（FR-001、C-025）。
@@ -130,7 +130,7 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [X] T014 按 `manage-constitution` 流程收敛宪法生命周期叙述：`templates/constitution-template.md` 与 `.specify/constitution.md` 的终态表述同批改说 `Sealed`（schema owner 为准），版本号与 amend 日期同步（FR-002、FR-003、C-027、[blockedBy: T006]）。
 - [X] T015 投影并核对镜像：`python3 scripts/python/sync-mirrors.py --write` 后 `python3 scripts/python/sync-mirrors.py --check`，确认相对 T001 基线在 `shared/`、`templates/`、`skills/internal/`、`scripts/` 零新增漂移（FR-021、plan § Mirror Obligations、[blockedBy: T006,T007,T008,T009,T010,T011,T012,T013,T014]）。
 - [X] T016 写红先引擎契约测试 `tests/contract/test_seal_engine_contract.py`，覆盖 C-001…C-010（四动作封闭集、三值退出码、`--help`/`--version` 零副作用、未声明选项非零拒绝、选项面封闭、两阶段声明、stdout-only 拒绝、写路径白名单），红输出记入 `notes/red-first-evidence.md`（FR-021、FR-025、[blockedBy: T001]）。
-- [X] T017 实现 `scripts/python/seal-utils.py` 骨架：argparse + `script_interface_cli` 守卫（`--help`/`--version` 零副作用、未声明选项 exit 2）、四动作派发封闭集、三值退出码域、`--json` 稳定负载、写路径白名单常量、C-009 的字面 `.specify` 组件守卫（禁止向上找最近 `.specify` 的启发式）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-021、C-001…C-010、[blockedBy: T016]）。
+- [X] T017 实现 `scripts/python/seal-utils.py` 骨架：argparse + `script_interface_cli` 守卫（`--help`/`--version` 零副作用、未声明选项 exit 2）、四动作派发封闭集、三值退出码域、`--json` 稳定负载、写路径白名单常量、C-009 的字面 `.specify` 组件守卫（禁止向上找最近 `.specify` 的启发式）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-021、C-001…C-010、[blockedBy: T016]）。 [green: contracts/seal-engine.contract.md#C-001] [green: contracts/seal-engine.contract.md#C-002] [green: contracts/seal-engine.contract.md#C-003] [green: contracts/seal-engine.contract.md#C-004]
 
 **Checkpoint**: 状态域七面同批识别且漂移守卫可红；引擎骨架满足接口契约。
 
@@ -149,7 +149,7 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Implementation for User Story 2 (merge-plan)
 
-- [X] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作（目录型候选按文件级单位、dated-record 文件指针纳入）、token→注册表绑定检查、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。
+- [X] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作（目录型候选按文件级单位、dated-record 文件指针纳入）、token→注册表绑定检查、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。 [green: contracts/merge-back.contract.md#C-011] [green: contracts/merge-back.contract.md#C-012] [green: contracts/merge-back.contract.md#C-013] [green: contracts/merge-back.contract.md#C-014] [green: contracts/merge-back.contract.md#C-015] [green: contracts/merge-back.contract.md#C-016] [green: contracts/merge-back.contract.md#C-017] [green: contracts/merge-back.contract.md#C-018]
 
 ### Tests for User Story 2 (apply face, MANDATORY) ⚠️
 
@@ -158,7 +158,7 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Implementation for User Story 2 (merge-apply)
 
-- [X] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物（目录型候选按文件级单位；dated-record 文件只写指针视图、不复制原件）、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正（含未声明登记处的引用检出）、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。
+- [X] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物（目录型候选按文件级单位；dated-record 文件只写指针视图、不复制原件）、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正（含未声明登记处的引用检出）、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。 [green: contracts/merge-back.contract.md#C-019] [green: contracts/merge-back.contract.md#C-020] [green: contracts/merge-back.contract.md#C-021] [green: contracts/merge-back.contract.md#C-022] [green: contracts/merge-back.contract.md#C-023] [green: contracts/records-and-boundaries.contract.md#C-034]
 - [X] T024 [US2] 用既有验证器证成合并产物：对合并后的 fixture 父级运行 `python3 scripts/python/validate-requirements.py` 与 `python3 scripts/python/validate-tasks.py`（均 exit 0），并扫描 ID 连续、重复 ID、悬空引用与未勾选行计数，读数记入 `test-evidence/merge-apply-checks.txt`（FR-014、SC-004、[blockedBy: T023]）。
 
 **Checkpoint**: 合并回写在夹具上确定性成立，冲突显式且阻断。
@@ -179,8 +179,8 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Implementation for User Story 1
 
-- [X] T028 [US1] 在 `scripts/python/seal-utils.py` 实现 `seal` 只读判定段：状态对读取（与闭包引擎 `resolve_claimed_status` 同源；不一致/缺失 → `state-drift` exit 2）、review/P0 判定（C-044 两载体 `- **User waiver**:` 字面形式才计豁免）、`code-review.md` 的 `blocking` 扫描与 `review.md`/`code-review.md` 缺失判定（`review-missing`）、闭包子进程与七键回执逐字复制（exit 2 → `closure-input-defect`）、`merge-manifest.json` 完成度检查（`not-applicable` 须带 `basis`）与分片闭合判据（`slice-unclosed`：未勾选行计数 + `[~]` 的 `deferred_tasks=` 记录）、`git status --porcelain -- <parent-spec-dir>` 脏树探测、以及 stdout-only 且顺序稳定的拒绝报告（FR-004、FR-005、FR-006、FR-007、FR-008、FR-009、C-031、C-042、[blockedBy: T026,T027]）。
-- [X] T029 [US1] 实现 `seal` 写入段：同批原子写 `seal.md`（data-model § 3 封闭字段集，重封装写 `supersedes`）、注册表行（`Status` 与 `Last Updated`）与特性详情（`Status` 与 `## Latest Review` 追加），任一写入失败按原字节恢复本批已写文件并 exit 2；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-002、FR-004、FR-009、FR-010、C-005、C-032、C-033、C-034、[blockedBy: T028]）。
+- [X] T028 [US1] 在 `scripts/python/seal-utils.py` 实现 `seal` 只读判定段：状态对读取（与闭包引擎 `resolve_claimed_status` 同源；不一致/缺失 → `state-drift` exit 2）、review/P0 判定（C-044 两载体 `- **User waiver**:` 字面形式才计豁免）、`code-review.md` 的 `blocking` 扫描与 `review.md`/`code-review.md` 缺失判定（`review-missing`）、闭包子进程与七键回执逐字复制（exit 2 → `closure-input-defect`）、`merge-manifest.json` 完成度检查（`not-applicable` 须带 `basis`）与分片闭合判据（`slice-unclosed`：未勾选行计数 + `[~]` 的 `deferred_tasks=` 记录）、`git status --porcelain -- <parent-spec-dir>` 脏树探测、以及 stdout-only 且顺序稳定的拒绝报告（FR-004、FR-005、FR-006、FR-007、FR-008、FR-009、C-031、C-042、[blockedBy: T026,T027]）。 [green: contracts/seal-engine.contract.md#C-005] [green: contracts/seal-engine.contract.md#C-006] [green: contracts/seal-engine.contract.md#C-007] [green: contracts/records-and-boundaries.contract.md#C-039] [green: contracts/records-and-boundaries.contract.md#C-040] [green: contracts/records-and-boundaries.contract.md#C-042] [green: contracts/records-and-boundaries.contract.md#C-044]
+- [X] T029 [US1] 实现 `seal` 写入段：同批原子写 `seal.md`（data-model § 3 封闭字段集，重封装写 `supersedes`）、注册表行（`Status` 与 `Last Updated`）与特性详情（`Status` 与 `## Latest Review` 追加），任一写入失败按原字节恢复本批已写文件并 exit 2；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-002、FR-004、FR-009、FR-010、C-005、C-032、C-033、C-034、[blockedBy: T028]）。 [green: contracts/seal-engine.contract.md#C-008] [green: contracts/seal-engine.contract.md#C-009] [green: contracts/seal-engine.contract.md#C-010] [green: contracts/status-sealed.contract.md#C-028] [green: contracts/records-and-boundaries.contract.md#C-032] [green: contracts/records-and-boundaries.contract.md#C-033] [green: contracts/records-and-boundaries.contract.md#C-037]
 
 **Checkpoint**: 干净单体 spec 可封装；八类拒绝具名且零持久化；重跑幂等。
 
@@ -198,14 +198,14 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Implementation for User Story 4
 
-- [X] T031 [US4] 在 `scripts/python/seal-utils.py` 实现 `archive-gate` 只读动作（data-model E11 的裁决负载、准入判据唯一实现、引擎不可用时的读取错误透传）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-023、C-030、[blockedBy: T030]）。
+- [X] T031 [US4] 在 `scripts/python/seal-utils.py` 实现 `archive-gate` 只读动作（data-model E11 的裁决负载、准入判据唯一实现、引擎不可用时的读取错误透传）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-023、C-030、[blockedBy: T030]）。 [green: contracts/status-sealed.contract.md#C-030] [green: contracts/status-sealed.contract.md#C-031]
 - [X] T032 [P] [US4] 接线归档 lane：`skills/internal/sanitize-materials/SKILL.md` 在退休/归档 spec 或标归档指针前查询 `seal-utils.py --action archive-gate`；拒绝 `1`/`2` 时具名拒绝并指回 `/speckit.seal`，绝不退化为「未查询即允许」（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
 - [X] T033 [P] [US4] 接线注册表归档指针：`skills/internal/manage-features/SKILL.md` 的 `Relocated` 形态归档指针动作先查询 `archive-gate`；注册表 reconcile 本身仍归 manage-features（FR-022、FR-023、C-030、C-035、[blockedBy: T031]）。
-- [X] T034 [US4] 写边界审计测试 `tests/contract/test_seal_boundaries.py`：引擎动作表无 move/delete/archive/push/scheduler、状态值域单 owner、无第二套状态机/第二份注册表/第二份台账/并行 spec 树，目录与注册表差异审计干净；审计读数记入 `test-evidence/boundaries-audit.txt`（FR-020、FR-022、FR-024、SC-008、C-008、C-036、[blockedBy: T031]）。
+- [X] T034 [US4] 写边界审计测试 `tests/contract/test_seal_boundaries.py`：引擎动作表无 move/delete/archive/push/scheduler、状态值域单 owner、无第二套状态机/第二份注册表/第二份台账/并行 spec 树，目录与注册表差异审计干净；审计读数记入 `test-evidence/boundaries-audit.txt`（FR-020、FR-022、FR-024、SC-008、C-008、C-036、[blockedBy: T031]）。 [green: contracts/records-and-boundaries.contract.md#C-035] [green: contracts/records-and-boundaries.contract.md#C-036]
 - [X] T035 [US4] 写命令模板 `templates/commands/seal.md`：薄入口（User Input、Delegation 到 `seal-artifact`、Glossary、Wrap-up 探针嵌入、Handoffs），全部判定委派引擎，owner 按路径引用不复述（FR-021、C-041、[blockedBy: T031]）。
 - [X] T036 [US4] 写 internal 技能 `skills/internal/seal-artifact/SKILL.md`（只做编排与报告、不复算判定，命名先例 `clarify-artifact`），并在 `shared/definitions/flow-class-definitions.md` 登记 `/speckit.seal` 与 `skill:seal-artifact` 两行（`flow_class: execution`）、在 `shared/definitions/probe-definitions.md` 登记 wrap-up 探针条目（FR-021、C-041、[blockedBy: T035]）。
 - [X] T037 [US4] 更新名册/台账 pin：`tests/contract/test_flow_class_ledger.py` 的普查 pin —— 实测 2026-11-10 `flow-class-check.py --action check` 报告 85 units（29 个命令模板 + 56 个技能）；本特性落地后台账须报告 87（30 + 57），按文件内既有的 dated stale-pin 约定更新（FR-021、[blockedBy: T036]）。
-- [X] T038 [US4] 生成四个 per-tool 命令副本 `python3 scripts/python/regen-command-copies.py`（绝不手抄），技能经 `python3 scripts/python/sync-mirrors.py --write` 投影，并确认两条 `--check` 均 exit 0、零新增漂移（FR-021、C-041、[blockedBy: T037]）。
+- [X] T038 [US4] 生成四个 per-tool 命令副本 `python3 scripts/python/regen-command-copies.py`（绝不手抄），技能经 `python3 scripts/python/sync-mirrors.py --write` 投影，并确认两条 `--check` 均 exit 0、零新增漂移（FR-021、C-041、[blockedBy: T037]）。 [green: contracts/records-and-boundaries.contract.md#C-041]
 
 **Checkpoint**: 归档准入单 owner 可查询且被消费；命令三件套与副本齐备；边界静态可核验。
 
@@ -220,9 +220,9 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 - [X] T039 [US3] 对 074 运行 `merge-plan` 并逐条处置其报告的冲突（C-018 的 `recheck-clean`；含两组 STR 同号不同义的声明映射核验：074a 本地 `STR-010` → 父 `STR-011`，074b 本地 `STR-004`–`STR-007` → 父 `STR-007`–`STR-010`）:（a）出厂文档 `skills/internal/create-team/SKILL.md:99,101` 的 `[[STR-004]]`/`[[STR-005]]`/`[[STR-006]]` 是 074b 本地语义（`completed`/`blocked`/`failed`），存在性判定成立但合并后须重指向父级 `[[STR-007]]`/`[[STR-008]]`/`[[STR-009]]`（值同，实测 2026-11-10）或改用逐字字面量并记录；（b）为 074 父 `requirements.md` 每条 SC 行补恰一个行尾 `**Path**: final`（严格默认、逐条记录）——实测 2026-11-10 `grep -c '\*\*Path\*\*' .specify/specs/074-goal-team-sdd-unification/requirements.md` = 0（FR-016、FR-027(a)、FR-027(b)、FR-027(c)、SC-006、[blockedBy: T038]）。
 - [X] T040 [US3] 对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `merge-apply`：产出父级合并 `tasks.md`（拆前未勾选行按 C-022 以 `> ` 引用前缀保留进「Superseded pre-split record」块——实测 2026-11-10 父 `tasks.md` 未勾选行 57）、父 `verification.md` 聚合指针视图补齐（每条 SC 有状态行）、父 `review.md` 汇总指针视图（两片 review 记录的汇总，缺席新建）、父 `code-review.md` 汇总指针视图（两片 code-review 记录的汇总，缺席新建）、`merge-manifest.json`（逐输出件动作、目录候选文件级单元、dated-record 指针、`id_maps`、`dispositions`、`factory_doc_resolutions`、`checks`）与两片 `requirements.md` 的 `**Merged into**:` 标注（FR-012、FR-018、FR-019、FR-026、SC-006、[blockedBy: T039]）。
 - [~] T041 [US3] `[~]` 理由（2026-11-11）：校验已执行并留证；`validate-requirements.py` exit 0、dated-record 哈希一致，但 `validate-tasks.py` 对合并后父 tasks.md 报 43 errors——分片任务行落在无阶段标题区（33 story-labels）与 1–2 位条款未被引擎识别导致 10 green-dangling（见 `test-evidence/074-merge-checks.txt`、`test-evidence/074-round-20261110.txt` B3/B4）；根因在 merge 引擎输出面（P3/P4 写域），按 T-005 以具名阻断收口，不伪造 exit 0。 回合后置校验：`python3 scripts/python/validate-tasks.py .specify/specs/074-goal-team-sdd-unification/tasks.md` exit 0 且未勾选行为 0、`python3 scripts/python/validate-requirements.py .specify/specs/074-goal-team-sdd-unification/requirements.md` exit 0、两片 dated record（`review.md`/`code-review.md`/`verification.md`/`test-evidence/`）运行前后哈希一致，读数记入 `test-evidence/074-merge-checks.txt`（FR-019、SC-004、SC-009、[blockedBy: T040]）。
-- [X] T042 [US3] 写集成测试 `tests/integration/test_seal_074_round.py`：真实树只读 `merge-plan` 面断言（两片以 `order_basis: split-record` 被识别、冲突类别具名）与阻断态重跑一致性；测试 MUST NOT 改写 074 树（FR-026、FR-028、SC-006、[blockedBy: T041]）。
+- [X] T042 [US3] 写集成测试 `tests/integration/test_seal_074_round.py`：真实树只读 `merge-plan` 面断言（两片以 `order_basis: split-record` 被识别、冲突类别具名）与阻断态重跑一致性；测试 MUST NOT 改写 074 树（FR-026、FR-028、SC-006、[blockedBy: T041]）。 [green: contracts/records-and-boundaries.contract.md#C-038]
 - [X] T043 [US3] 先提交回合产物（074 父目录 + 两片标注 + 出厂文档修正），再对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `seal`，把完整 stdout 裁决捕获到 `test-evidence/074-round-20261110.txt`；终态 MUST 二值——`Sealed`（exit 0）或至少逐条覆盖 FR-027 五项实测输入、并逐条点名额外阻断的拒绝清单（exit 1；`state-drift` 为 exit 2）；重跑一次证明清单一致（FR-026、FR-027、FR-028、SC-006、plan § Decision Tensions T-005、[blockedBy: T042]）。
-- [X] T044 [US3] 把回合裁决写入既有承载（不建第三份台账）：`merge-manifest.json` 的 `conflicts[]`/`dispositions[]`、仅 `Sealed` 时的 `seal.md` `waivers[]`、被阻断时的 `test-evidence/074-round-20261110.txt`；FR-027 五项（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、074b P0 仅驱动者豁免、57 行拆前记录）逐项呈 `resolved`（证据指针）或 `blocked`（理由），五项之外阻断同样逐条落承载，无第三态、无静默默认（FR-027、C-043、[blockedBy: T043]）。
+- [X] T044 [US3] 把回合裁决写入既有承载（不建第三份台账）：`merge-manifest.json` 的 `conflicts[]`/`dispositions[]`、仅 `Sealed` 时的 `seal.md` `waivers[]`、被阻断时的 `test-evidence/074-round-20261110.txt`；FR-027 五项（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、074b P0 仅驱动者豁免、57 行拆前记录）逐项呈 `resolved`（证据指针）或 `blocked`（理由），五项之外阻断同样逐条落承载，无第三态、无静默默认（FR-027、C-043、[blockedBy: T043]）。 [green: contracts/records-and-boundaries.contract.md#C-043] [green: contracts/records-and-boundaries.contract.md#C-045]
 
 **Checkpoint**: 074 回合可执行、可复现、裁决完整（`Sealed` 或具名阻断）。
 
@@ -232,12 +232,12 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 **Purpose**: 全量对照、镜像复核、走查取证与验收记录收尾。
 
-- [ ] T045 [P] 跑全量套件并证明零新增失败：`bash scripts/bash/run-tests.sh --names-out .specify/specs/099-speckit-seal/test-evidence/final-failed.txt`，相对实现入口基线名单做 `comm -13` 比对，读数记入 `test-evidence/final-suite.txt`（FR-025、GATE-1、[blockedBy: T044]）。
-- [ ] T046 [P] 终局镜像复核：`python3 scripts/python/sync-mirrors.py --check` 与 `python3 scripts/python/regen-command-copies.py --check` 均 exit 0 且相对 T001 基线零新增漂移，读数记入 `test-evidence/final-mirror-checks.txt`（plan § Mirror Obligations、GATE-2、[blockedBy: T044]）。
-- [ ] T047 按 quickstart S-1…S-9 走查交付树（含 S-3/S-7 的重跑形态与 S-9 清理），把真实命令、输出与退出码记入 `.specify/specs/099-speckit-seal/notes/quickstart-run.md`——该文件是 GATE-4 的 smoke 证据（FR-026、SC-001…SC-006、[blockedBy: T044]）。
-- [ ] T048 写 `.specify/specs/099-speckit-seal/verification.md`：SC-001…SC-009 每条一行 `SC-NNN_status=`（词汇 owner：`shared/workflow/acceptance-hardening.md` § Verification Vocabulary），并给出 smoke 记录三键（`smoke_command=`、`smoke_exit_code=0`、`smoke_evidence_path=` 指向 `notes/quickstart-run.md`）；任一 `final` 判据非 `pass` 即 GATE-4 不通过（SC-001…SC-009、GATE-4、[blockedBy: T045,T046,T047]）。
-- [ ] T049 对 Feature 099 执行 Feature Integration reconcile（`manage-features` 流程）：`.specify/features/099-speckit-seal.md` 与 `.specify/features.md` 行同步为实现阶段状态并追加实现/评审记录；确认 tasks 阶段的特性清单复核未暴露新增或失效 Feature（plan § Phase 1 summary：已有 099 行，无合并/废弃/改名）（FR-024、SC-008、[blockedBy: T048]）。
-- [ ] T050 覆盖基线终局对照：`python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/099-speckit-seal` 确认相对 T002 冻结的 `coverage-baseline.txt` 零新增未覆盖名，读数记入 `test-evidence/coverage-final.txt`（FR-025、SC-008、[blockedBy: T049]）。
+- [X] T045 [P] 跑全量套件并证明零新增失败：`bash scripts/bash/run-tests.sh --names-out .specify/specs/099-speckit-seal/test-evidence/final-failed.txt`，相对实现入口基线名单做 `comm -13` 比对，读数记入 `test-evidence/final-suite.txt`（FR-025、GATE-1、[blockedBy: T044]）。
+- [X] T046 [P] 终局镜像复核：`python3 scripts/python/sync-mirrors.py --check` 与 `python3 scripts/python/regen-command-copies.py --check` 均 exit 0 且相对 T001 基线零新增漂移，读数记入 `test-evidence/final-mirror-checks.txt`（plan § Mirror Obligations、GATE-2、[blockedBy: T044]）。
+- [X] T047 按 quickstart S-1…S-9 走查交付树（含 S-3/S-7 的重跑形态与 S-9 清理），把真实命令、输出与退出码记入 `.specify/specs/099-speckit-seal/notes/quickstart-run.md`——该文件是 GATE-4 的 smoke 证据（FR-026、SC-001…SC-006、[blockedBy: T044]）。
+- [X] T048 写 `.specify/specs/099-speckit-seal/verification.md`：SC-001…SC-009 每条一行 `SC-NNN_status=`（词汇 owner：`shared/workflow/acceptance-hardening.md` § Verification Vocabulary），并给出 smoke 记录三键（`smoke_command=`、`smoke_exit_code=0`、`smoke_evidence_path=` 指向 `notes/quickstart-run.md`）；任一 `final` 判据非 `pass` 即 GATE-4 不通过（SC-001…SC-009、GATE-4、[blockedBy: T045,T046,T047]）。
+- [X] T049 对 Feature 099 执行 Feature Integration reconcile（`manage-features` 流程）：`.specify/features/099-speckit-seal.md` 与 `.specify/features.md` 行同步为实现阶段状态并追加实现/评审记录；确认 tasks 阶段的特性清单复核未暴露新增或失效 Feature（plan § Phase 1 summary：已有 099 行，无合并/废弃/改名）（FR-024、SC-008、[blockedBy: T048]）。
+- [~] T050 `[~]` 理由（2026-11-11）：对照已执行并留证（`test-evidence/coverage-final.txt`，account-clause-coverage exit 1）——本 spec 的 45/45 条款已由 `[green:]` 认领（delta 从 45 归零），但残留 67 条未覆盖名全部来自 074 父级五份拆前契约（16/13/16/8/14）：回合按 merge-back C-022 强制把父级 57 条拆前行以 `> ` 引用保留为记录，其 green 认领随之失效，而父契约文件被合并 `keep` 留在语料中且无活跃认领者；67 与回合前父 tasks 的认领集逐名相同（`git show 3f2a05cba:…/tasks.md`），是回合产物的具名后果、不是本 spec 契约缺口。零新增在 C-022 约束下不可达成（补认领会虚构交付行，重冻基线是会计引擎明令禁止的反模式），故延后由用户裁定：接受具名残留（SC-006 允许多出阻断逐条点名）或重开合并处置（C-022 与条款认领模型的冲突）。
 - [X] T051 [P] 写命令参考页 `docs/reference/commands/seal.md`（执行流、产物与用法；四个动作与退出码按指针指向引擎 `--help` 与 `contracts/seal-engine.contract.md`，不复述封闭集），属项目文档面、不扩张 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py` 的三件套边界（FR-021、plan § Project Structure、[blockedBy: T038]）。
 
 **Checkpoint**: 全部 SC 有落点，门禁全绿，验收记录齐备。

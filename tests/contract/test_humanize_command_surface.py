@@ -308,8 +308,10 @@ def test_c09_baseline_no_new_failures():
     # new command templates (`status`, `measure`) are Complex. The clause this row
     # guards is unchanged: humanize is Simple and the simple count is 4, so a
     # humanize reclassification still goes red here.
-    assert result and "25 complex" in result[0] and "4 simple" in result[0], (
-        "027 Result line must read 25 complex / 4 simple after humanize"
+    # 2026-11-11 (Feature 099): the Result line reads 26 complex / 4 simple — the
+    # `/speckit.seal` template joined the classification table (T037 roster assembly).
+    assert result and "26 complex" in result[0] and "4 simple" in result[0], (
+        "027 Result line must read 26 complex / 4 simple after humanize"
     )
     feedback_mod = _import_test_module("test_feedback_command_classification.py")
     assert "humanize" in feedback_mod.SIMPLE_COMMANDS, (
