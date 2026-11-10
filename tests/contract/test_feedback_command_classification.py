@@ -2,7 +2,7 @@
 
 Driven by ``contracts/command-classification.md``: every **complex** command
 template carries the feedback step; every **simple** template (``agents``,
-``constitution``, ``feature``, ``humanize``) does NOT.
+``constitution``, ``feature``, ``humanize``, ``migrate``) does NOT.
 
 Since the 2026-09-24 Known-Gap closure the two lists below are **derived from the
 contract table**, not hand-maintained beside it — the table is the operative
@@ -94,8 +94,10 @@ def test_classification_counts():
     # 2026-11-06 (Feature 087): 23 + 4 -> 25 + 4 — `/speckit.status` and `/speckit.measure`
     # join as Complex (each runs its own engine, produces a reading a downstream flow
     # consumes, and consumes a store). No simple->complex reclassification happened.
+    # 2026-11-10 (Feature 097): 25 + 4 -> 25 + 5 — `/speckit.migrate` joins as Simple
+    # (thin wrapper over the CLI subcommand; no own script, no downstream consumer).
     assert len(COMPLEX_COMMANDS) == 25
-    assert len(SIMPLE_COMMANDS) == 4
+    assert len(SIMPLE_COMMANDS) == 5
 
 
 def test_table_covers_every_command_template():

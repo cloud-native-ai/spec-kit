@@ -1,0 +1,52 @@
+# pkg02-foundation — full-suite failure-name attribution (2026-11-10)
+
+Baseline form and comparison method are owned by `/speckit.implement` step 6's
+`**Test runs**` bullet (name-level list via `--names-out`, compared with `comm`).
+This file records the readings and the controls that attribute the residual
+disagreement with the implement-entry baseline (`baseline-failed.txt`, 278
+names, captured in pkg01).
+
+## Readings
+
+| Reading | Command | Result |
+|---|---|---|
+| pkg02 suite (unit + contract + init regression) | `bash scripts/bash/run-tests.sh tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/contract/test_migrate_engine_contract.py tests/contract/test_cleanup_obsolete_assets.py tests/contract/test_flat_internal_skill_migration.py tests/contract/test_upgrade_end_state.py -q` | exit 0 — `46 passed` (`pkg02-foundation-suite.txt`) |
+| migrate engine contract suite alone | `bash scripts/bash/run-tests.sh tests/contract/test_migrate_engine_contract.py -q` | exit 0 — `15 passed` (`pkg02-engine-contract.txt`) |
+| full suite, post-stage (files in git index) | `bash scripts/bash/run-tests.sh --names-out .specify/specs/097-speckit-migrate-command/test-evidence/pkg02-full-failed.txt -q` | exit 1 — `277` failure-name entries (`pkg02-full-suite.txt`, `pkg02-full-failed.txt`) |
+| NEW names vs entry baseline | `comm -13 baseline-failed.txt pkg02-full-failed.txt` | `4` (`pkg02-new-failures.txt`); `5` baseline names flipped green |
+
+All four NEW names sit in `tests/contract/test_trigger_engine.py`
+(`test_c12_assess_resolves_a_unique_situation`, `test_c12_no_match_is_reported_not_invented`,
+`test_c12_v1_6_most_specific_wins`, `test_c22_codes_are_from_the_closed_set`).
+No NEW name exists outside that family.
+
+## Controls
+
+1. **Trigger family is nondeterministic on a fixed source.** Two consecutive
+   runs of the same file at the same source:
+   `bash scripts/bash/run-tests.sh --names-out ... tests/contract/test_trigger_engine.py -q`
+   → run 1 `29 failed` (exit 1), run 2 `31 failed` (exit 1); the failure-name
+   sets differ (`diff` shows names present in one run and absent in the other).
+   The entry baseline already carries 59 failures across the trigger files.
+2. **Pristine-source full run (same untracked tree, `HEAD` `__init__.py`).**
+   Full suite with `--names-out` → `306` entries (includes this package's new
+   red tests, which fail against pristine source by design). Excluding the
+   three new test files, the name diff against the implemented-source run is
+   `3` names only-in-current / `4` names only-in-pristine — every differing
+   name is inside `tests/contract/test_trigger_engine.py`. No non-trigger
+   difference exists between pristine and implemented source.
+3. **The one non-trigger disagreement was an index artifact.**
+   `tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root`
+   failed while the four new `*.py` files were untracked (the checker's
+   `candidate-not-collected` structural finding, exit 1); it reproduced on
+   pristine source with the same untracked tree. After `git add` (staged =
+   tracked for `git ls-files`), the same command is green:
+   `1 passed` (`pkg02-c20-post-stage.txt`).
+
+## Verdict
+
+Zero NEW failures are attributable to pkg02. The residual baseline
+disagreement is the pre-existing nondeterministic trigger family (control 1–2)
+plus its mirror-image of baseline names that flipped green; the only
+pkg02-related red was the untracked-index artifact, resolved by staging
+(control 3).

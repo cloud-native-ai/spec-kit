@@ -35,6 +35,7 @@ Thumbs.db
 
 # Project specific
 *.log
+# Constitution VII closure carriers are versioned records, not runtime logs
 .env*
 *.lock
 output/

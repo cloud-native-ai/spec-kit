@@ -1,0 +1,68 @@
+# 097 pkg05-us3-crossversion — US3 跨版本与续跑证据（T032 / SC-004 / SC-006）
+# command: bash scripts/bash/run-tests.sh tests/integration/test_migrate_us3_crossversion.py -q
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# captured: 2026-11-10T15:02:42Z
+# exit: 0
+
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_migrate_us3_crossversion.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....                                                                    [100%]
+5 passed in 19.73s
+
+# ---------------------------------------------------------------------------
+# 测量读数（同一 CLI 表面，measure 脚本 `.specify/.tmp/pkg05/measure.py`，
+# 逐字粘贴其输出；fixture 由 tests/fixtures/migrate-097/builders.py 与
+# `_build_multi_generation` 生成——第二代为同一批 owner 声明
+# _OBSOLETE_SKILLS / _OBSOLETE_COMMANDS / _OBSOLETE_TEMPLATES /
+# _OBSOLETE_SKILL_FILES / _FRAMEWORK_INTERNAL_SKILLS 构造；测量结束即删除）
+# ---------------------------------------------------------------------------
+
+MULTI dry exit=1 outcome=planned items=17 gen2=6/6
+MULTI apply exit=0 outcome=applied status=completed items-done=17/17 receipts=1 one-run=True
+MULTI source stampFile=.specify/source.json commit=f3b3a7a2d6d8 stamped=20261110T150216Z reason=None
+MULTI target cliVersion=0.0.22 origin=git commit=f3b3a7a2d6d8
+MULTI stamp-unchanged=True archives=15
+MULTI rerun exit=0 outcome=clean total=0
+INTERRUPT fixture old-run=20261110T150225Z-f5f646fd target=.specify/templates/plan-template.md archive=.specify/archive/migrate/20261110T150225Z-f5f646fd/templates/plan-template.md archive-exists=True target-missing=True
+INTERRUPT resume exit=0 outcome=applied resumedFrom-matches=True note='resume: interrupted apply 20261110T150225Z-f5f646fd (status=running) — recorded stage 11/11 items done, 9 archived object(s) kept; continuing from that receipt'
+INTERRUPT write target-exists=True bytes-match=True
+INTERRUPT archive kept=True entries-for-target=1 archiveTo-matches=True
+INTERRUPT old-receipt-untouched=True recover-eq-archives=True
+INTERRUPT rerun exit=0 outcome=clean
+MUT-remove exit=0 archive-at-old-path=False => resume-assertions-red=yes (the archived object was moved a second time)
+SCRATCH .specify/.tmp/pkg05/pkg05-measure-v0v_81os (removed after measurement)
+
+# ---------------------------------------------------------------------------
+# 读数解释
+# - MULTI（SC-004 / FR-020）：多代夹具干跑退出 1、17 项计划，第二代 6 个构造
+#   （2 个旧代技能目录、1 个旧命令副本、1 个旧模板、1 个旧技能内文件、1 个平铺重复）
+#   全部可见；一次 apply（退出 0、outcome=applied）17/17 项 done 后即收敛，
+#   回执目录中只有本次运行的 1 个文件（没有任何中间版本安装/运行步骤）。
+#   回执 source 逐字记录工作区 `.specify/source.json`（stampFile/commit/stampedAt，
+#   有 commit 时 reason=None），target 记录正在运行的 CLI 自身（cliVersion 0.0.22、
+#   origin=git、frameworkCommit 与 source 的 commit 同为当日 HEAD 前缀 f3b3a7a2d6d8）；
+#   源版本只作记录——apply 未重写 source.json（stamp-unchanged=True），apply 后
+#   重跑为 clean（total=0）。
+# - 源版本独立性（FR-020 / SC-004 变异）：套件以「有 stamp / 无 stamp」两棵树对照，
+#   断言 items、summary、outcome、exitCode、notes 全部逐字节相同；变异测试把
+#   migration-residue 规划器改为按 source.json 是否存在分叉后，同一断言转红
+#   （test_mutation_selecting_paths_by_source_version_turns_plan_identity_red）。
+# - INTERRUPT（SC-006 / C-7）：中断夹具按 quickstart 场景 4 复现——完整 apply 后
+#   删除已写目标、把该运行回执改回 status=running（归档条目保留）。第二次 apply
+#   退出 0、outcome=applied，resumedFrom 指向旧运行；notes 报告中断阶段
+#   （status=running、11/11 items done、9 个归档对象保留）；目标按期望内容补写
+#   （bytes-match=True）；旧归档仍在旧回执指名的路径上（archive-kept=True），
+#   该目标在新回执中恰好 1 条 archive 条目且 archiveTo 与旧回执一致
+#   （未按新 run-id 另开归档，entries-for-target=1）；旧回执文件逐字节未变
+#   （E-3：不触碰其他运行的回执）；recover 与 archives 等长；随后重跑 clean。
+# - MUT-remove（SC-006 转红能力，套件内以 pytest.raises(AssertionError) 钉住）：
+#   把续跑完成动作替换为「把已归档对象搬回目标再写」——旧归档路径随即消失，
+#   `_assert_resume_invariants` 的归档存在性断言转红（archive-at-old-path=False
+#   => resume-assertions-red=yes），证明「不二次搬移」不是声明而是可测量、可转红的断言。
+# - 红先读数（T029）：实现前同一套件 4 failed / 1 passed，失败全部来自尚不存在的
+#   回执 source/target 字段（KeyError stampFile）与续跑路径（resumedFrom=None、
+#   `_migrate_resume_complete_write` AttributeError）；唯一通过项是源版本变异测试
+#   （只消费 pkg03 已交付的计划面）。逐字读数见 notes/red-first-evidence.md § pkg05。

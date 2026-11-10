@@ -195,3 +195,4 @@
 | SDD 观察者 (sdd-observer) | sdd-observer, sdd observer, 观察者 | SDD 线的第三方只读观察角色:按现有三层 agent 模型(Template→Instance→Execution)落地,只观察、不参与执行/评价/评审/决策,只写该线的 journal 与自身运行产物;不注册写线、不占工作树;角色面与边界见 .specify/specs/096-sdd-observer-agent/requirements.md | auto | proposed |
 | 观察记录 (Journal) | journal, journal.md, 观察日志 | 一条 SDD 线的追加式观察记录,落在 .specify/specs/<NNN-slug>/journal.md,一条线一份;条目是既有载体事实(状态脊/哨兵/checkpoint/git/执行四件套)的确定性投影,结构封闭、无评价/建议字段;随线收束提交 | auto | proposed |
 | 观察缺口 (Observer Gap) | observer-gap, 观察盲区 | 一段没有被任何 observer 执行覆盖的时间窗口的显式记录(事件类 observer-gap);不是推断出来的事件,也不是静默缺失;由下一次观察执行或线收束披露 | auto | proposed |
+| 一次性收尾迁移 (One-Shot Migration) | speckit.migrate, migrate, 迁移收尾, 收尾迁移 | 在 specify install + init 之后把新旧混杂的 .specify 收敛为当前已安装版本期望态的一次性收尾入口；与 /speckit.sanitize 的周期性治理分工（需求 097） | auto | proposed |

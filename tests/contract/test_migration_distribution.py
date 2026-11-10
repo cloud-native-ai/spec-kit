@@ -95,11 +95,15 @@ ENGINE_REF = "flow-class-check.py"
 # `/speckit.measure` (FR-022/FR-026) ship as two more `templates/commands/*.md` files
 # inside the same staged payload, so the shipped-set census and the pinned length move
 # together; a missing one still fails here rather than only at runtime.
+# 2026-11-10 (Feature 097): 29 -> 30 command templates. `/speckit.migrate` (FR-021) is
+# the one-shot closeout command; it ships through the same `templates` payload and its
+# four per-tool copies are regenerated in the same change.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
-        "implement", "improve", "instructions", "interview", "measure", "plan",
+        "implement", "improve", "instructions", "interview", "measure",
+        "migrate", "plan",
         "requirements", "research", "review", "sanitize", "session", "skills",
         "status", "tasks", "team", "todo", "tools",
     }
@@ -124,7 +128,7 @@ SKILL_BASELINE = frozenset(
         "study-online", "study-kb", "summarize-project",
     }
 )
-assert len(COMMAND_BASELINE) == 29
+assert len(COMMAND_BASELINE) == 30
 assert len(SKILL_BASELINE) == 56
 
 # Contract C-2: the four payload classes and where the release package carries them.

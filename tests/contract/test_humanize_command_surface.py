@@ -308,8 +308,11 @@ def test_c09_baseline_no_new_failures():
     # new command templates (`status`, `measure`) are Complex. The clause this row
     # guards is unchanged: humanize is Simple and the simple count is 4, so a
     # humanize reclassification still goes red here.
-    assert result and "25 complex" in result[0] and "4 simple" in result[0], (
-        "027 Result line must read 25 complex / 4 simple after humanize"
+    # 2026-11-10 (Feature 097): the Result line reads 25 complex / 5 simple —
+    # `/speckit.migrate` joins the simple set. The guarded clause (humanize is
+    # Simple, a reclassification goes red) is unchanged.
+    assert result and "25 complex" in result[0] and "5 simple" in result[0], (
+        "027 Result line must read 25 complex / 5 simple after humanize"
     )
     feedback_mod = _import_test_module("test_feedback_command_classification.py")
     assert "humanize" in feedback_mod.SIMPLE_COMMANDS, (
@@ -1884,12 +1887,14 @@ def test_wc16_command_roster_unchanged():
     assert base, "the baseline tree lists no command templates"
     # 2026-11-06: Feature 087 (FR-022 / FR-026) adds two command templates by design;
     # they are the only sanctioned post-baseline additions to this roster.
-    approved_additions = {"status.md", "measure.md"}
+    # 2026-11-10: Feature 097 (FR-021) adds `/speckit.migrate` — the third sanctioned
+    # post-baseline addition, enumerated here so a fourth still goes red.
+    approved_additions = {"status.md", "measure.md", "migrate.md"}
     assert live == base | approved_additions, (
         f"command roster drifted — added: {sorted(live - base - approved_additions)}; "
         f"removed: {sorted(base - live)} (WC-16)"
     )
-    assert len(live) == 29, f"the roster must stay at 29 command templates, found {len(live)} (WC-16)"
+    assert len(live) == 30, f"the roster must stay at 30 command templates, found {len(live)} (WC-16)"
 
 
 def test_wc17_new_line_gate_zero():

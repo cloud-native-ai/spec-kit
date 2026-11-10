@@ -1,0 +1,88 @@
+# 097 pkg04-us2-safety — US2 安全证据（T028 / DoD-4 / SC-002 / SC-005 / SC-008）
+# command: bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# captured: 2026-11-10T14:26:22Z
+# exit: 0
+
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_migrate_us2_safety.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...........                                                              [100%]
+11 passed in 13.78s
+
+# ---------------------------------------------------------------------------
+# 测量读数（同一 CLI 表面，measure 脚本 `.specify/.tmp/pkg04/measure.py`，
+# 逐字粘贴其输出；fixture 由 tests/fixtures/migrate-097/builders.py 生成，
+# 测量结束即删除。destructive = 干跑计划中 disposition ∈ {archive, replace} 的项）
+# ---------------------------------------------------------------------------
+
+BLOCKED exit=3 outcome=blocked confirm-calls=0
+BLOCKED destructive=9 blocked=9 archives=0 archive-dir=False
+BLOCKED unchanged=True
+BLOCKED reversible-writes=2 executed=2
+BLOCKED user-content-bytes=True
+APPLY exit=0 outcome=applied confirm-calls=1 statuses=['done']
+APPLY archives=9 located=9 digest-match=9 recover=9
+APPLY hand-edited pre-sha=a3402e46a53d97888641ab2a5793edec31cdafd6ba2a3af25184e81209bd3b57 archived-sha=a3402e46a53d97888641ab2a5793edec31cdafd6ba2a3af25184e81209bd3b57 target-marker-gone=True
+APPLY user-content-bytes=True
+APPLY user-content-is-candidate=False
+CONFLICT dry exit=1 disposition=refuse status=refused
+CONFLICT names-both=True
+CONFLICT apply exit=3 outcome=blocked legacy-unchanged=True target-unchanged=True archived=False
+PLATFORM dry exit=1 compat-refuse=1 reason=True crashed=False
+PLATFORM apply exit=3 outcome=blocked compat-status=['refused'] link-created=False
+MUT-gate exit=0 outcome=applied destructive-moved=9/9 => blocked-assertion-red=yes
+MUT-archive exit=0 outcome=applied entries=9 missing-on-disk=7 => archive-assertion-red=yes
+MUT-full-delete exit=0 outcome=applied archives=2 user-files-gone=3/4 => archive+user-cell-red=yes
+MUT-existence-only exists=True byte-identical=3/4 => existence-only-would-pass=yes
+SCRATCH .specify/.tmp/pkg04/pkg04-measure-7e0flwzs (removed after measurement)
+
+# ---------------------------------------------------------------------------
+# 读数解释
+# - BLOCKED（C-5 / SC-002 前半）：非交互 apply 退出 3、outcome=blocked、确认提问 0 次；
+#   干跑计划的 9 个破坏项全部 status=blocked 且零执行（树内对象处置前后摘要不变），
+#   archives=0 且 `.specify/archive/` 未创建；2 个可逆 write 项照常执行；
+#   用户内容逐字节不变。确认门没有第二把钥匙时不自动批准。
+# - APPLY（SC-002 后半 / FR-016）：交互终端单批确认恰好 1 次；11 项全部 done、退出 0；
+#   9 条 archives[] 逐条存在于回执指名位置（9/9），其中每条 digest 与归档对象实测摘要
+#   一致（9/9），recover 9 条与 archives 等长；手改模板替换前内容按字节归档
+#   （pre-sha 与 archived-sha 相同，均为 a3402e46…），目标位置恢复为安装资产。
+# - CONFLICT（C-6 / SC-005）：冲突夹具干跑报 refuse（result refused），reason 同时指名
+#   `.specify/memory/features.md` 与 `.specify/features.md`；apply 退出 3、outcome=blocked，
+#   两个候选内容逐字节不变（未择一胜出），拒不产生归档条目。
+# - PLATFORM（C-6 / FR-014）：symlink 支持被模拟为 False 时，compat-links 项以
+#   `platform-no-symlink` 原因转 refuse（不崩溃）；apply 退出 3，且没有创建任何链接。
+#   支持探测本身在系统临时目录内进行，对工作区零写入（套件内专项断言）。
+# - 四个变异（FR-024 转红能力，均在套件内以 pytest.raises(AssertionError) 钉住）：
+#   MUT-gate（移除确认门）→ 9/9 破坏项被执行，blocked 断言转红；
+#   MUT-archive（移除归档动作）→ 回执 9 条中 7 条归档对象不存在（2 条为搬迁项，
+#   不经该函数），归档存在性断言转红；
+#   MUT-full-delete（注入全量删除）→ archives 仅剩 2 条搬迁项，4 个用户文件中 3 个
+#   被删除，归档枚举与用户内容字节断言双双转红；
+#   MUT-existence-only（把用户内容断言弱化为存在性）→ 内容被改写后存在性读数仍为 True，
+#   而字节读数 3/4，证明字节断言不是存在性断言、弱化形态会被本套件判红。
+# - 变异 4 的语义：本行不是实现注入，而是对断言的判别力证明——若把用户内容检查写成
+#   「存在即可」，被改写内容将漏检；套件的 `_assert_user_content_intact` 使用 sha256，
+#   在内容改变时抛 AssertionError。
+
+# ---------------------------------------------------------------------------
+# review-repair r1 (2026-11-10) — 零写入探针守卫重做后的套件重跑
+# command: bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# captured: 2026-11-10T16:04:43Z
+# exit: 0
+
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_migrate_us2_safety.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+............                                                             [100%]
+12 passed in 13.30s
+
+# 本次变更：zero-write 探针测试改为可观测守卫（sentinel TemporaryDirectory + chdir；
+# 探针必须把 link 写入手上的临时目录），新增 mutation 5（workspace-writing probe
+# variant → zero-write 断言转红）；红基演练双变体见 red-base-probe-guard-2026-11-10.txt。
+# 引擎侧仅新增回执 workspace 键（E-3/E-2），不改上述测量读数所覆盖的处置行为。

@@ -164,15 +164,17 @@ entered into the ledger; the output also carries semantic candidates (time-sensi
 declaration materials + an evidence pack). Present a ledger digest to the user (counts
 and the pending target list, summary-first — never paste raw evidence full text).
 
-**Migration wrap-up lane (init 迁移收尾)**: after a cross-generation `specify init`,
-this skill is the sanctioned wrap-up step — the engine's migration-residue checks detect
-pre-layering leftovers (legacy skill directories, the old git-workflow state files, the
-old tools-registry directory, flat duplicates of nested internal skills) and the
-symlink-form check covers `.<agent>/skills` links. Residue dispositions are
-`archive` (apply's delete refuses non-empty directories; content-bearing residue follows
-archive-not-delete) — each finding's summary names its migration owner (git-utils
-bootstrap / `.specify/shared/definitions/tool-definitions.md` § Terminology). User-authored
-skills are never candidates.
+**Migration wrap-up lane (init 迁移收尾)**: after a cross-generation `specify init`, the
+one-shot closeout main entry is `/speckit.migrate`; this lane stays as the periodic
+recheck fallback — a successful migrate never requires a sanitize run to reach the
+post-migration expected state. The lane's checkers and dispositions are unchanged: the
+engine's migration-residue checks detect pre-layering leftovers (legacy skill directories,
+the old git-workflow state files, the old tools-registry directory, flat duplicates of
+nested internal skills) and the symlink-form check covers `.<agent>/skills` links. Residue
+dispositions are `archive` (apply's delete refuses non-empty directories; content-bearing
+residue follows archive-not-delete) — each finding's summary names its migration owner
+(git-utils bootstrap / `.specify/shared/definitions/tool-definitions.md` § Terminology).
+User-authored skills are never candidates.
 
 ### Stage 3 — Judge
 

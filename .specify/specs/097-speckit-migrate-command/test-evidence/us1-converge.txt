@@ -1,0 +1,52 @@
+# 097 pkg03-us1-engine — US1 收敛证据（T022 / DoD-8 / SC-001 / SC-003）
+# command: bash scripts/bash/run-tests.sh tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py -q
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# captured: 2026-11-10T14:08:07Z
+# exit: 0
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..............                                                           [100%]
+14 passed in 22.23s
+
+# ---------------------------------------------------------------------------
+# 测量读数（同一 CLI 表面，measure 脚本 `.specify/.tmp/pkg03/measure.py`，
+# 逐字粘贴其输出；fixture 由 tests/fixtures/migrate-097/builders.py 生成）
+# ---------------------------------------------------------------------------
+
+SCRATCH .specify/.tmp/pkg03/measure-_r8bwi8l
+LATEST-DRY exit=0 outcome=clean items=0 zero-write=True
+LATEST-HASH 0bc7c10ec1b0ee358272153647995273aa4469ae036a9d5880b785cf2c712a58 0bc7c10ec1b0ee358272153647995273aa4469ae036a9d5880b785cf2c712a58
+LEGACY-DRY exit=1 outcome=planned items=11 zero-write=True
+LEGACY-HASH 691b3660d8da0d56c1b44cedb3c32b52c4fa92dae9fc241611de1d7d19d58296 691b3660d8da0d56c1b44cedb3c32b52c4fa92dae9fc241611de1d7d19d58296
+DIMS {"templates-generated": 3, "anchor-layout": 2, "compat-links": 1, "mirror-consistency": 1, "migration-residue": 4}
+REPEAT-IDENTICAL items=True summary=True
+POINTER [{"topic": "goal-team-archive-migration", "ownerCommand": "/speckit.goal", "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive", "note": "goal/team archive migration is owned by /speckit.goal (migrate-archive); specify migrate neither detects nor disposes it"}]
+MUTATION templates-generated control=3 mutated=0
+MUTATION anchor-layout control=2 mutated=0
+MUTATION compat-links control=1 mutated=0
+MUTATION mirror-consistency control=1 mutated=0
+MUTATION migration-residue control=4 mutated=0
+APPLY exit=0 outcome=applied items=11 statuses=['done'] archives=9 missing-archives=0
+RECEIPT .specify/memory/migrate/receipts/20261110T140751Z-ee4604a7.json status=completed
+RECOVER 9 archives 9
+POINTER-RECEIPT [{"topic": "goal-team-archive-migration", "ownerCommand": "/speckit.goal", "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive", "note": "goal/team archive migration is owned by /speckit.goal (migrate-archive); specify migrate neither detects nor disposes it"}]
+SECOND-RUN exit=0 outcome=clean items=0 zero-write=True
+SECOND-HASH 4f6000e1782bf3115122ce5aec14edc4d3c8b937ba9606f868467d92693e7fc5 4f6000e1782bf3115122ce5aec14edc4d3c8b937ba9606f868467d92693e7fc5
+
+# ---------------------------------------------------------------------------
+# 读数解释
+# - 零写入（DoD-8 / C-7 不变式 1）：latest 与 legacy 的干跑前后树哈希逐字节相等；
+#   apply 后第二次运行前后哈希相等（`4f6000e1…`），且 outcome=clean。
+# - 确定性：同一 legacy 树两次干跑的 items 与 summary 逐字节相同（FR-006）。
+# - 逐维度（SC-001 五类）：templates-generated 3 / anchor-layout 2 / compat-links 1 /
+#   mirror-consistency 1 / migration-residue 4，合计 11 项；每维 ≥ 1。
+# - remove-one-disposition 变异：逐一摘除五个维度的 planner 后，该维度计划项归零
+#   （control 全部 > 0），即「每维至少一项」的断言具备判别力（FR-008 / SC-001 Source）。
+# - 应用与归档（SC-003 / FR-017/018）：apply 后 11 项全部 `done`，9 条归档逐条存在于
+#   回执 `archiveTo`，`recover` 9 条与 `archives` 等长；回执 `status=completed`。
+# - E-9 静止指针：计划与回执均携带 goal/team 指针，且两处 items 均无 goal/team 项。
+# - 最新夹具：干跑 `clean`（0 项，退出 0），零写入——实测非声明。

@@ -1,0 +1,43 @@
+# implement environment probe — T003 — 2026-11-10T12:43:20Z
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# owner of the probe set: tasks.md T003 + § Environment Prerequisites @ 2026-11-10
+
+## P1 — CPython interpreter
+$ python3 --version
+Python 3.11.11
+exit=0
+
+## P2 — pytest runner
+$ python3 -m pytest --version
+pytest 8.4.2
+exit=0
+
+## P3 — one-test smoke via the canonical runner
+$ bash scripts/bash/run-tests.sh tests/contract/test_anchor_layout_migrate.py -q
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_anchor_layout_migrate.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.58s
+exit=0
+
+## P4 — symlink creation under the sanctioned temp root (.specify/.tmp)
+$ git check-ignore -q .specify/.tmp
+exit=0
+$ mkdir -p .specify/.tmp/migrate-probe
+$ ln -s target .specify/.tmp/migrate-probe/probe-link
+exit=0
+$ readlink .specify/.tmp/migrate-probe/probe-link
+target
+exit=0
+$ rm -f .specify/.tmp/migrate-probe/probe-link && rmdir .specify/.tmp/migrate-probe
+exit=0
+
+## P5 — installed-CLI origin reading
+$ python3 -c "import specify_cli; print(specify_cli.__file__)"
+/usr/local/lib/python3.11/site-packages/specify_cli/__init__.py
+exit=0
+
+# finished: 2026-11-10T12:43:28Z

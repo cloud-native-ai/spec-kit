@@ -1,0 +1,4 @@
+tests/contract/test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation
+tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+tests/contract/test_trigger_engine.py::test_c12_v1_6_most_specific_wins
+tests/contract/test_trigger_engine.py::test_c22_codes_are_from_the_closed_set

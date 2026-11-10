@@ -292,8 +292,10 @@ def test_every_template_edge_is_same_class_or_neutral_exempt():
     # `/speckit.status` and `/speckit.measure` command templates (FR-022/FR-026, the two
     # sanctioned additions). The reading moves; the clause it guards (every template edge is
     # same-class or neutral-exempt) does not.
-    assert record.get("commands_scanned") == 29, (
-        "commands_scanned MUST be the scanned template count (29); got %r"
+    # 2026-11-10 (Feature 097): 29 -> 30 — `/speckit.migrate` joins (FR-021). It names no
+    # skill path, so the edge graph gains no edge; only the scanned count moves.
+    assert record.get("commands_scanned") == 30, (
+        "commands_scanned MUST be the scanned template count (30); got %r"
         % record.get("commands_scanned")
     )
 

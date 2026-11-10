@@ -1,0 +1,22 @@
+# tasks-stage validator and accounting readings — captured 2026-11-10T09:17:36Z
+
+## command
+python3 .specify/scripts/python/validate-tasks.py .specify/specs/097-speckit-migrate-command/tasks.md
+
+## output
+PASS: .specify/specs/097-speckit-migrate-command/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+
+## counts
+task rows: 48
+distinct FR cited: 25
+distinct SC cited: 9
+
+## clause accounting (account-clause-coverage.py, baseline frozen this stage)
+companion (must be non-empty on a green run): claimed clauses 11, scanned files 289, clause universe 2014, FR universe 25
+  [clause-uncovered] fail (644) — 644 uncovered, 4 beyond the frozen baseline
+  [fr-uncovered] fail (21) — 4 of 25 FRs cited from citation groups
+  [clause-unparsable] fail (108) — 108 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (4) — baseline holds 640 names; 640 uncovered items are baseline-internal and do not block
+25 error(s), 1 warning(s)
+status: uncovered

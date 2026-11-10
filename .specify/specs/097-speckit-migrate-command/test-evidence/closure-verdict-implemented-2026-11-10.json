@@ -1,0 +1,38 @@
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command/.specify/features/024-specification-workspace-versioning.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 4,
+    "total": 4,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/review-repair-r1/final-failed.txt tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/097-speckit-migrate-command/test-evidence/final-suite.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command/.specify/specs/097-speckit-migrate-command",
+  "tasks": {
+    "closed": 48,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}

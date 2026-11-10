@@ -1,0 +1,42 @@
+# 097 pkg03-us1-engine — 全量套件归因（GATE-1 前置读数）
+# captured: 2026-11-10T14:20Z
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+
+## 目标子集回归（本包直接相关）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py -q`
+- 读数: 退出码 `0`；`47 passed in 21.97s`
+- 说明: pkg02 三个套件（engine contract 15 + planner/receipts 33 中的交集读数见 `.specify/.tmp/pkg03/targeted-regression.txt`）在扩展 MIGRATE-ENGINE 段后全绿——T013 的五类源码守卫仍判真实段 clean。
+
+## 框架源模式 smoke（T018 委托路径）
+
+- 命令: in-process `specify migrate --workspace . --format json`（工作树自身，只读干跑）
+- 读数: 退出码 `0`；`kind=framework-source outcome=clean items=0`；五维全 0；notes 空
+- 说明: `sync-mirrors.py --check`、`regen-command-copies.py --check`（canonical 副本，镜像副本按引擎自身拒绝改用 canonical）、`anchor-layout-migrate.py --action check` 三个委托引擎在本仓均判 clean。
+
+## 全量套件（passes=2：并行主趟 + 串行声明趟）
+
+- 命令: `bash scripts/bash/run-tests.sh --names-out .specify/specs/097-speckit-migrate-command/test-evidence/pkg03-full-failed.txt -q`
+- 主趟读数: `277 failed, 8311 passed, 2 skipped`（入口基线 278 失败名；pkg02 记录 277）
+- 名称级集合比较（`baseline-failed.txt` = 实现入口基线，`pkg02-full-failed.txt` = pkg02 记录，`pkg03-full-failed.txt` = 本包读数）:
+  - `NEW vs entry`: `test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation`、`test_c12_no_match_is_reported_not_invented`、`test_c12_v1_6_most_specific_wins`、`test_trigger_promotion.py::test_invalid_environment_threshold_is_ignored`（4 名，全部 trigger 家族）
+  - `NEW vs pkg02`: `test_trigger_promotion.py::test_invalid_environment_threshold_is_ignored`（1 名）
+  - 翻转绿 vs entry: `test_clause_coverage.py::test_c20…`、`test_non_disposable_contract.py::test_t089…`、`test_trigger_engine.py::test_c13_probe_returns_summaries_only`、`test_trigger_engine.py::test_c23_escalation_pct_and_budget_flag`、`test_trigger_tuning.py::test_missed_flow_yields_an_add_rule_proposal`（5 名）
+- 归因: 家族计数 entry 56 / pkg02 57 / pkg03 57，成员轮转而非增长；见下两条稳定性实测。
+
+## trigger 家族稳定性实测（本包未触碰 trigger 代码）
+
+- `test_trigger_engine.py` 同树连续两次隔离运行: 33 failed vs 31 failed，失败名集合不同（`.specify/.tmp/pkg03/trigger-run1.txt` / `trigger-run2.txt`）；`test_c12_no_match…` 与 `test_c23_escalation…` 交替出现在不同次运行中。
+- `test_trigger_promotion.py` 同树连续两次隔离运行: 19 failed vs 18 failed，失败名集合不同；`test_invalid_environment_threshold_is_ignored` 首跑红、次跑不在名单，且单测隔离运行 `1 passed`（`.specify/.tmp/pkg03/promotion-run1.txt` / `promotion-run2.txt`）。
+- 结论: 上述 4 名均落在既有不稳定的 trigger 家族；pkg02 记录的同源变异性（29 vs 31）在同族重放中复现。pkg03 未引入可归因的新失败。
+
+## `test_c20_the_mirror_copy_resolves_to_its_own_root`（staging 敏感，pkg02 已记录同类）
+
+- 第一次全量运行（本包新文件未入 index）: 该名红；直接重跑单测 `1 failed in 8.08s`，checker 报文 `violations: 0`、`exceptions` 指向探测主机的可选依赖，退出 1。
+- 将本包文件 `git add` 后同一单测: `1 passed in 8.43s`（`.specify/.tmp/pkg03/c20-post-stage.txt`）。
+- 结论: 与 pkg02 记录的「未入 index → 红、staged → 绿」根因一致，非本包行为缺陷；staged 后的全量运行读数（277 名）已剔除该名。
+
+## 判定
+
+- 相对入口基线与 pkg02 记录，本包无 NEW 失败残留：唯一非 trigger 家族名（c20）经 staging 转绿；其余差异全部属于已记录的 trigger 家族不稳定集合。
+- 本特性契约/集成/单元子集（47 项）全绿。

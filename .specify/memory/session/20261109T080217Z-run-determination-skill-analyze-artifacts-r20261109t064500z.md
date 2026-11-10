@@ -20,7 +20,7 @@ skill:analyze-artifacts run=r20261109T064500Z-092a token=not_evaluated elapsed=n
   "feature": null,
   "feature_id": "092",
   "determined_at": "2026-11-09T08:02:17Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T09:45:00Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,7 +83,7 @@ skill:analyze-artifacts run=r20261109T064500Z-092a token=not_evaluated elapsed=n
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -159,8 +159,8 @@ skill:analyze-artifacts run=r20261109T064500Z-092a token=not_evaluated elapsed=n
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -190,7 +190,7 @@ skill:analyze-artifacts run=r20261109T064500Z-092a token=not_evaluated elapsed=n
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

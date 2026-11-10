@@ -1,0 +1,89 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "r20261110T161419Z-b097r2",
+  "stage": "review",
+  "covered": [
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T161856413690Z-d7559967.json",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T161856749447Z-db3fd1a7.json",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T161857082216Z-52f70019.json",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261110T161857414241Z-bd3cabc8.json",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T161908Z-skill-code-review.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T161908Z-skill-review-feature-quality.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T161908Z-skill-review-sdd-process.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/feedback/20261110T161908Z-speckit-review.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T155439Z-run-determination-skill-code-review-r20261110t081104z-b097.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T155439Z-run-determination-skill-review-feature-quality-r20261110t081.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T155439Z-run-determination-skill-review-sdd-process-r20261110t081104z.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T155439Z-run-determination-speckit-review-r20261110t081104z-b097.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T161851Z-run-determination-skill-review-feature-quality-r20261110t161.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T161851Z-run-determination-skill-review-sdd-process-r20261110t161419z.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T161851Z-run-determination-speckit-review-r20261110t161419z-b097r2.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    },
+    {
+      "path": ".specify/memory/session/20261110T161852Z-run-determination-skill-code-review-r20261110t161419z-b097r2.md",
+      "action": "included",
+      "commit": "ff175d3c9"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-10T16:21:00Z"
+}
