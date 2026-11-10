@@ -29,6 +29,10 @@
 - `.specify/shared/guidelines/reporting-obligations.md`（汇报义务与 digest 契约）
 - `.specify/shared/guidelines/fast-fail.md`（派发注入子句与异常行）
 - `.specify/skills/sdd-loop-driver/references/watch-model.md`（等待 / 监听 / 归属层）
+- **Related Features（邻域交叉引用；只在本文记录，不修改对方产物）**:
+  - Feature 027 Team Management — team 席位编排；super agent 角色模型作用在其派发边上
+  - Feature 085 SDD Temporary Goal/Team — SDD 临时 goal/team 与多 agent 并发；本特性引用其并发与席位事实
+  - Feature 093 Concurrency by Default — 并发默认形态与派发能力；本特性的并发一问完全归其 owner
 
 ## Status Criteria
 
