@@ -5,10 +5,10 @@ source: "skill:review-feature-quality"
 tags: ["run-determination", "r20261109t023000z-auto-closeout-review"]
 title: "run-determination skill:review-feature-quality r20261109T023000Z-auto-closeout-review"
 created: "2026-11-09T05:35:27Z"
-summary: "skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=no
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-11-09T05:35:27Z",
-  "settled_at": null,
+  "settled_at": "2026-11-10T15:54:39Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -86,14 +86,14 @@ skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=no
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": "red_state_undeclared",
+      "user_turn_class": "topic_change",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
       },
-      "adjacent": false,
+      "adjacent": true,
       "signal": {
         "key": "satisfaction",
         "direction": "improve"
@@ -164,18 +164,6 @@ skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=no
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -195,11 +183,6 @@ skill:review-feature-quality run=r20261109T023000Z-auto-closeout-review token=no
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
