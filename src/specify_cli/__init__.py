@@ -15,15 +15,20 @@ Or install globally:
     specify init --here
 """
 
+import hashlib
 import json
 import os
 import re
+import secrets
 import shlex
 import shutil
 import ssl
 import subprocess
 import sys
+import tempfile
 import traceback
+from contextlib import contextmanager
+from datetime import datetime, timezone
 
 # Check Python version
 if sys.version_info < (3, 8):
@@ -2008,23 +2013,21 @@ def ensure_agent_layer_dirs(root_path: Path,
     return agents_root
 
 
-def cleanup_obsolete_framework_assets(
+def plan_obsolete_framework_asset_removals(
     project_path: Path,
     ai_assistant: str,
-    tracker: Optional[StepTracker] = None,
-) -> List[str]:
-    """Remove obsolete framework-owned structure from an upgraded workspace.
+) -> List[dict]:
+    """Pure decision function: enumerate obsolete framework-owned artifacts.
 
-    Init copies assets additively (``copytree(dirs_exist_ok=True)``) and never
-    deletes files that a newer framework version dropped or renamed. This prunes
-    ONLY the enumerated, framework-owned artifacts in ``_OBSOLETE_SKILLS``,
-    ``_OBSOLETE_SKILL_FILES``, ``_OBSOLETE_COMMANDS``, and ``_OBSOLETE_TEMPLATES``
-    — restricted to the ``.specify/`` tree and the active agent's command
-    directory. User-authored skills, commands, and templates are never touched.
-
-    Returns the list of removed paths (relative to ``project_path``) for reporting.
+    Shared decision body for init's ``cleanup_obsolete_framework_assets()`` and
+    the migrate planner — one implementation, two entries (FR-009). Only the
+    enumerated framework-owned registries are consulted; user-authored content
+    is never a candidate. Returns ``{"path": <workspace-relative>, "kind": ...}``
+    entries in a stable order; the caller owns the disposal (delete for init,
+    archive-not-delete for migrate).
     """
-    removed: List[str] = []
+    project_path = Path(project_path)
+    decisions: List[dict] = []
     specify_dir = project_path / ".specify"
 
     def _rel(p: Path) -> str:
@@ -2041,46 +2044,82 @@ def cleanup_obsolete_framework_assets(
         if target.is_symlink() or not target.exists():
             continue
         if target.is_dir():
-            shutil.rmtree(target, ignore_errors=True)
-            removed.append(_rel(target))
+            decisions.append({"path": _rel(target), "kind": "obsolete-skill-dir"})
 
-    # 2) Files a skill no longer owns (e.g. moved to another skill): delete the
-    #    file, then prune directories it leaves empty, bounded to that skill dir.
+    # 2) Files a skill no longer owns (e.g. moved to another skill).
     for rel in _OBSOLETE_SKILL_FILES:
         target = skills_dir / rel
         if target.is_symlink() or not target.is_file():
             continue
-        target.unlink()
-        removed.append(_rel(target))
-        skill_root = skills_dir / Path(rel).parts[0]
-        parent = target.parent
-        while parent != skill_root and parent.is_dir() and not any(parent.iterdir()):
-            parent.rmdir()
-            parent = parent.parent
+        decisions.append({"path": _rel(target), "kind": "obsolete-skill-file"})
 
     # 3) Obsolete top-level templates: .specify/templates/<file>
     templates_dir = specify_dir / "templates"
     for filename in _OBSOLETE_TEMPLATES:
         target = templates_dir / filename
         if target.is_file() and not target.is_symlink():
-            target.unlink()
-            removed.append(_rel(target))
+            decisions.append({"path": _rel(target), "kind": "obsolete-template"})
 
     # 4) Obsolete commands: speckit.<stem>.<ext> in the active agent's command
     #    dir, plus the fallback .specify/templates/commands/<stem>.md.
-    command_targets: List[Path] = []
     cmd_dir_rel = _ASSISTANT_COMMAND_DIRS.get(ai_assistant)
     cmd_ext = _ASSISTANT_EXTENSIONS.get(ai_assistant)
     for stem in _OBSOLETE_COMMANDS:
         if cmd_dir_rel and cmd_ext:
-            command_targets.append(
-                project_path / cmd_dir_rel / f"speckit.{stem}.{cmd_ext}"
-            )
-        command_targets.append(specify_dir / "templates" / "commands" / f"{stem}.md")
-    for target in command_targets:
+            target = project_path / cmd_dir_rel / f"speckit.{stem}.{cmd_ext}"
+            if target.is_file() and not target.is_symlink():
+                decisions.append({"path": _rel(target), "kind": "obsolete-command"})
+        target = specify_dir / "templates" / "commands" / f"{stem}.md"
         if target.is_file() and not target.is_symlink():
+            decisions.append(
+                {"path": _rel(target), "kind": "obsolete-command-template"}
+            )
+
+    return decisions
+
+
+def cleanup_obsolete_framework_assets(
+    project_path: Path,
+    ai_assistant: str,
+    tracker: Optional[StepTracker] = None,
+) -> List[str]:
+    """Remove obsolete framework-owned structure from an upgraded workspace.
+
+    Init copies assets additively (``copytree(dirs_exist_ok=True)``) and never
+    deletes files that a newer framework version dropped or renamed. This prunes
+    ONLY the enumerated, framework-owned artifacts in ``_OBSOLETE_SKILLS``,
+    ``_OBSOLETE_SKILL_FILES``, ``_OBSOLETE_COMMANDS``, and ``_OBSOLETE_TEMPLATES``
+    — restricted to the ``.specify/`` tree and the active agent's command
+    directory. User-authored skills, commands, and templates are never touched.
+    The candidate set comes from ``plan_obsolete_framework_asset_removals()`` —
+    the same decision function the migrate planner consumes (FR-009).
+
+    Returns the list of removed paths (relative to ``project_path``) for reporting.
+    """
+    removed: List[str] = []
+    project_path = Path(project_path)
+    decisions = plan_obsolete_framework_asset_removals(project_path, ai_assistant)
+
+    for decision in decisions:
+        target = project_path / decision["path"]
+        kind = decision["kind"]
+        if kind == "obsolete-skill-dir":
+            shutil.rmtree(target, ignore_errors=True)
+            removed.append(decision["path"])
+        elif kind == "obsolete-skill-file":
             target.unlink()
-            removed.append(_rel(target))
+            removed.append(decision["path"])
+            # Prune directories the removal leaves empty, bounded to that
+            # skill dir (path shape: .specify/skills/<skill>/<rel...>).
+            parts = Path(decision["path"]).parts
+            skill_root = project_path.joinpath(*parts[:3])
+            parent = target.parent
+            while parent != skill_root and parent.is_dir() and not any(parent.iterdir()):
+                parent.rmdir()
+                parent = parent.parent
+        else:  # obsolete-template / obsolete-command / obsolete-command-template
+            target.unlink()
+            removed.append(decision["path"])
 
     if tracker:
         if removed:
@@ -2092,6 +2131,32 @@ def cleanup_obsolete_framework_assets(
             tracker.complete("local-templates", "no obsolete assets to remove")
 
     return removed
+
+
+def plan_flat_internal_skill_migrations(project_path: Path) -> List[dict]:
+    """Pure decision function: decide what happens to each flat internal skill.
+
+    Shared decision body for init's ``migrate_flat_internal_skills()`` and the
+    migrate planner — one implementation, two entries (FR-009). A flat
+    directory of a framework-internal name is ``move`` when the nested target
+    is absent and ``remove-stale`` when it already exists (the nested copy is
+    never overwritten). Symlinks and non-directories are never candidates.
+    """
+    project_path = Path(project_path)
+    skills_dir = project_path / ".specify" / "skills"
+    internal_dir = skills_dir / "internal"
+    decisions: List[dict] = []
+    for name in _FRAMEWORK_INTERNAL_SKILLS:
+        flat = skills_dir / name
+        if flat.is_symlink() or not flat.is_dir():
+            continue
+        try:
+            rel = str(flat.relative_to(project_path))
+        except ValueError:
+            rel = str(flat)
+        action = "remove-stale" if (internal_dir / name).exists() else "move"
+        decisions.append({"path": rel, "action": action})
+    return decisions
 
 
 def migrate_flat_internal_skills(
@@ -2108,7 +2173,9 @@ def migrate_flat_internal_skills(
     into the nested location.
 
     Scope is exactly ``_FRAMEWORK_INTERNAL_SKILLS`` — framework-owned names. The
-    skill itself is never lost:
+    skill itself is never lost: the candidate set and each action come from
+    ``plan_flat_internal_skill_migrations()`` — the same decision function the
+    migrate planner consumes (FR-009).
 
     * a flat directory is moved only when the nested target is ABSENT;
     * when the nested target already exists (e.g. a prior layered install left
@@ -2125,23 +2192,12 @@ def migrate_flat_internal_skills(
     moved: List[str] = []
     kept: List[str] = []
     removed_stale: List[str] = []
-    skills_dir = project_path / ".specify" / "skills"
-    internal_dir = skills_dir / "internal"
+    project_path = Path(project_path)
+    internal_dir = project_path / ".specify" / "skills" / "internal"
 
-    def _rel(p: Path) -> str:
-        try:
-            return str(p.relative_to(project_path))
-        except ValueError:
-            return str(p)
-
-    for name in _FRAMEWORK_INTERNAL_SKILLS:
-        flat = skills_dir / name
-        # Only a real directory is a migration candidate. A symlink (user alias)
-        # or a missing/non-dir path is left exactly as-is.
-        if flat.is_symlink() or not flat.is_dir():
-            continue
-        nested = internal_dir / name
-        if nested.exists():
+    for decision in plan_flat_internal_skill_migrations(project_path):
+        flat = project_path / decision["path"]
+        if decision["action"] == "remove-stale":
             # Nested target already present — the flat copy is a stale duplicate
             # of a framework-owned name: remove it (counted as removed_stale)
             # rather than keeping a second, older, visible copy. The nested copy
@@ -2150,15 +2206,15 @@ def migrate_flat_internal_skills(
             try:
                 shutil.rmtree(flat)
             except OSError:
-                kept.append(_rel(flat))
+                kept.append(decision["path"])
                 continue
-            removed_stale.append(_rel(flat))
+            removed_stale.append(decision["path"])
             continue
         # Lazy mkdir so a project with nothing to migrate never gains an empty
         # .specify/skills/internal/ directory.
         internal_dir.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(flat), str(nested))
-        moved.append(_rel(flat))
+        shutil.move(str(flat), str(internal_dir / flat.name))
+        moved.append(decision["path"])
 
     if tracker:
         if moved or kept or removed_stale:
@@ -2660,6 +2716,462 @@ def copy_local_templates(
         raise
 
     return project_path
+
+
+# ---------------------------------------------------------------------------
+# Migrate engine foundation (Feature 097)
+#
+# The shared model, receipt store, workspace-kind resolution and client
+# reference tree for `specify migrate`. Dimension tokens/order are owned by
+# data-model.md E-8 and the disposition domain by requirements.md FR-014; the
+# constants below are the executable mirror the contract tests compare against
+# those owner files.
+# ---------------------------------------------------------------------------
+
+# MIGRATE-ENGINE:START — pinned migrate segment (097 contract test T013 scans it)
+MIGRATE_DIMENSIONS = (
+    "templates-generated",
+    "anchor-layout",
+    "compat-links",
+    "mirror-consistency",
+    "migration-residue",
+)
+_MIGRATE_DIMENSION_INDEX = {
+    name: index for index, name in enumerate(MIGRATE_DIMENSIONS)
+}
+
+# Closed six-value disposition domain (FR-014; order and tokens are the
+# owner's — the contract test extracts them from the requirements file).
+MIGRATE_DISPOSITIONS = (
+    "converged",
+    "write",
+    "replace",
+    "archive",
+    "refuse",
+    "blocked",
+)
+
+MIGRATE_ITEM_STATUSES = ("planned", "done", "refused", "blocked", "failed")
+MIGRATE_MECHANISMS = (
+    "copy",
+    "replace",
+    "archive",
+    "relocate",
+    "symlink",
+    "anchor-engine",
+    "mirror-engine",
+    "none",
+)
+
+MIGRATE_RECEIPT_VERSION = 1
+MIGRATE_RECEIPT_STATUSES = ("running", "completed", "aborted")
+
+
+def migrate_item_id(dimension: str, target: str) -> str:
+    """Stable DiffItem id — sha1(dimension|target) prefix (data-model.md E-1)."""
+    return hashlib.sha1(f"{dimension}|{target}".encode("utf-8")).hexdigest()[:12]
+
+
+class MigrateItem:
+    """One reviewable difference item (data-model.md E-1).
+
+    Validation enforces the E-1 rules that are machine-decidable: the closed
+    dimension/disposition domains, and the reason obligations for ``refuse``
+    (non-empty, naming both candidates) and ``blocked`` (non-empty, the
+    missing second key).
+    """
+
+    def __init__(self, dimension, target, current, expected, disposition, *,
+                 mechanism="none", evidence=None, archiveTo=None, status="", reason=None):
+        self.dimension = dimension
+        self.target = target
+        self.current = current
+        self.expected = expected
+        self.disposition = disposition
+        self.mechanism = mechanism
+        self.evidence = list(evidence or [])
+        self.archiveTo = archiveTo
+        self.reason = reason or None
+        self.status = status or {
+            "refuse": "refused",
+            "blocked": "blocked",
+        }.get(disposition, "planned")
+        self._validate()
+
+    def _validate(self):
+        if self.dimension not in MIGRATE_DIMENSIONS:
+            raise ValueError(f"unknown migration dimension: {self.dimension!r}")
+        if self.disposition not in MIGRATE_DISPOSITIONS:
+            raise ValueError(
+                f"disposition outside the FR-014 domain: {self.disposition!r}"
+            )
+        if self.mechanism not in MIGRATE_MECHANISMS:
+            raise ValueError(f"unknown migration mechanism: {self.mechanism!r}")
+        if self.status not in MIGRATE_ITEM_STATUSES:
+            raise ValueError(f"unknown migration item status: {self.status!r}")
+        if self.disposition == "refuse":
+            if self.status != "refused":
+                raise ValueError("refuse items must carry status 'refused'")
+            if self.archiveTo is not None:
+                raise ValueError("refuse items never archive (archiveTo must be null)")
+            if not self.reason:
+                raise ValueError(
+                    "refuse items require a non-empty reason naming both candidates"
+                )
+            if not self.current or self.current not in self.reason:
+                raise ValueError("refuse reason must name the existing candidate")
+            if not self.expected or self.expected not in self.reason:
+                raise ValueError("refuse reason must name the expected candidate")
+        if self.disposition == "blocked":
+            if self.status != "blocked":
+                raise ValueError("blocked items must carry status 'blocked'")
+            if not self.reason:
+                raise ValueError(
+                    "blocked items require a non-empty reason (missing second key)"
+                )
+        if self.status in ("refused", "blocked", "failed") and not self.reason:
+            raise ValueError(f"status {self.status!r} requires a non-empty reason")
+
+    @property
+    def id(self) -> str:
+        return migrate_item_id(self.dimension, self.target)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "dimension": self.dimension,
+            "target": self.target,
+            "current": self.current,
+            "expected": self.expected,
+            "disposition": self.disposition,
+            "mechanism": self.mechanism,
+            "evidence": list(self.evidence),
+            "archiveTo": self.archiveTo,
+            "status": self.status,
+            "reason": self.reason,
+        }
+
+
+def make_refuse_item(dimension, target, *, current, expected, note=""):
+    """A conflict item: names both candidates and never picks a winner."""
+    reason = (
+        f"conflict — existing candidate: {current}; expected candidate: {expected}"
+    )
+    if note:
+        reason += f"; {note}"
+    return MigrateItem(dimension, target, current, expected, "refuse", reason=reason)
+
+
+def make_blocked_item(
+    dimension,
+    target,
+    *,
+    current,
+    expected,
+    reason="destructive action requires the second key (interactive confirmation); none available",
+):
+    """A destructive item that never obtained the second key."""
+    return MigrateItem(
+        dimension, target, current, expected, "blocked", reason=reason
+    )
+
+
+def _migrate_item_sort_key(item: MigrateItem):
+    return (
+        _MIGRATE_DIMENSION_INDEX[item.dimension],
+        item.target,
+        item.current,
+        item.expected,
+        item.disposition,
+        item.mechanism,
+        item.reason or "",
+    )
+
+
+def migrate_normalize_items(items) -> List[MigrateItem]:
+    """Sort by (E-8 dimension order, target) and collapse duplicate keys.
+
+    The full sort key includes the content fields so the surviving item of a
+    duplicate ``(dimension, target)`` pair is independent of input order —
+    repeated dry-runs on one tree serialize byte-identically (FR-006).
+    """
+    normalized: List[MigrateItem] = []
+    seen = set()
+    for item in sorted(items, key=_migrate_item_sort_key):
+        key = (item.dimension, item.target)
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized.append(item)
+    return normalized
+
+
+class MigratePlan:
+    """A reviewable difference plan (data-model.md E-2)."""
+
+    def __init__(self, mode="dry-run", workspace="", workspace_kind="client",
+                 items=None, notes=None, pointers=None):
+        self.planVersion = 1
+        self.mode = mode
+        self.workspace = str(workspace)
+        self.workspace_kind = workspace_kind
+        self.items = migrate_normalize_items(list(items or []))
+        self.notes = list(notes or [])
+        self.pointers = list(pointers or [])
+
+    def summary(self) -> dict:
+        by_dimension = {dimension: 0 for dimension in MIGRATE_DIMENSIONS}
+        by_disposition: Dict[str, int] = {}
+        for item in self.items:
+            by_dimension[item.dimension] += 1
+            by_disposition[item.disposition] = (
+                by_disposition.get(item.disposition, 0) + 1
+            )
+        ordered_dispositions = {
+            disposition: by_disposition[disposition]
+            for disposition in MIGRATE_DISPOSITIONS
+            if disposition in by_disposition
+        }
+        return {
+            "total": len(self.items),
+            "byDimension": by_dimension,
+            "byDisposition": ordered_dispositions,
+        }
+
+    def to_payload(self) -> dict:
+        """Deterministic plan payload — the byte-identical comparison surface.
+
+        Volatile fields (workspace absolute path, run id, timestamps) stay out;
+        the subcommand composes them into the C-4 envelope at emission time.
+        """
+        return {
+            "planVersion": self.planVersion,
+            "mode": self.mode,
+            "workspaceKind": self.workspace_kind,
+            "items": [item.to_dict() for item in self.items],
+            "summary": self.summary(),
+            "notes": list(self.notes),
+            "pointers": list(self.pointers),
+        }
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_payload(), ensure_ascii=False, indent=2) + "\n"
+
+    def to_text(self) -> str:
+        lines = [
+            f"migrate plan — mode={self.mode}, workspace-kind={self.workspace_kind}, "
+            f"items={len(self.items)}"
+        ]
+        for dimension in MIGRATE_DIMENSIONS:
+            dimension_items = [
+                item for item in self.items if item.dimension == dimension
+            ]
+            if not dimension_items:
+                continue
+            lines.append(f"[{dimension}] ({len(dimension_items)})")
+            for item in dimension_items:
+                line = (
+                    f"  {item.target}: {item.current} -> {item.expected}"
+                    f" [{item.disposition}] ({item.mechanism})"
+                )
+                if item.evidence:
+                    line += " evidence=" + ", ".join(item.evidence)
+                if item.reason:
+                    line += f" reason={item.reason}"
+                lines.append(line)
+        for note in self.notes:
+            lines.append(f"note: {note}")
+        return "\n".join(lines) + "\n"
+
+
+def _migrate_utc_iso(moment: Optional[datetime] = None) -> str:
+    return (moment or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def migrate_run_id(now: Optional[datetime] = None) -> str:
+    """Run id ``YYYYMMDDTHHMMSSZ-<8 hex>`` (data-model.md E-3)."""
+    moment = now or datetime.now(timezone.utc)
+    return moment.strftime("%Y%m%dT%H%M%SZ") + "-" + secrets.token_hex(4)
+
+
+def migrate_receipts_dir(workspace) -> Path:
+    """Per-run receipt store root (one file per run, never an aggregate)."""
+    return Path(workspace) / ".specify" / "memory" / "migrate" / "receipts"
+
+
+def create_migrate_receipt(
+    workspace,
+    *,
+    run_id: Optional[str] = None,
+    now: Optional[datetime] = None,
+):
+    """Exclusively create this run's receipt in ``running`` state.
+
+    Returns ``(run_id, path)``. The exclusive create is what keeps two
+    concurrent writers on distinct paths; an explicitly supplied colliding
+    run id raises instead of touching the other run's file.
+    """
+    receipts = migrate_receipts_dir(workspace)
+    receipts.mkdir(parents=True, exist_ok=True)
+    moment = now or datetime.now(timezone.utc)
+    while True:
+        candidate = run_id or migrate_run_id(moment)
+        path = receipts / f"{candidate}.json"
+        try:
+            descriptor = os.open(
+                str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644
+            )
+        except FileExistsError:
+            if run_id is not None:
+                raise
+            continue
+        payload = {
+            "receiptVersion": MIGRATE_RECEIPT_VERSION,
+            "runId": candidate,
+            "mode": "apply",
+            "status": "running",
+            "startedAt": _migrate_utc_iso(moment),
+            "finishedAt": None,
+            "resumedFrom": None,
+            "source": {},
+            "target": {},
+            "outcome": None,
+            "exitCode": None,
+            "items": [],
+            "archives": [],
+            "recover": [],
+            "notes": [],
+            "pointers": [],
+        }
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+        return candidate, path
+
+
+def _write_migrate_receipt(path, payload) -> Path:
+    path = Path(path)
+    part = path.with_suffix(".json.tmp")
+    part.parent.mkdir(parents=True, exist_ok=True)
+    part.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    os.replace(str(part), str(path))
+    return path
+
+
+def update_migrate_receipt(path, **fields) -> dict:
+    """Update this run's own receipt file; no other run's file is touched."""
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    payload.update(fields)
+    _write_migrate_receipt(path, payload)
+    return payload
+
+
+def complete_migrate_receipt(path, *, finished_at: Optional[str] = None, **fields) -> dict:
+    """Close a run: ``running`` -> ``completed`` with a finish timestamp."""
+    return update_migrate_receipt(
+        path,
+        status="completed",
+        finishedAt=finished_at or _migrate_utc_iso(),
+        **fields,
+    )
+
+
+def persist_migrate_receipt(workspace, receipt: dict) -> Optional[Path]:
+    """Persist an apply-mode receipt; dry-run receipts never land on disk."""
+    if receipt.get("mode") != "apply":
+        return None
+    path = migrate_receipts_dir(workspace) / f"{receipt['runId']}.json"
+    return _write_migrate_receipt(path, receipt)
+
+
+def detect_migrate_workspace_kind(workspace) -> str:
+    """``framework-source`` iff ``skills/external/`` is a directory.
+
+    Same guard as sanitize-utils' legacy-residue checker (data-model.md E-6);
+    no version marker and no source-version branch (FR-005, FR-020).
+    """
+    workspace = Path(workspace)
+    if (workspace / "skills" / "external").is_dir():
+        return "framework-source"
+    return "client"
+
+
+def resolve_migrate_engine_dir(workspace, workspace_kind: Optional[str] = None) -> Path:
+    """Engine loading point: installed assets for clients, own copy for the source tree."""
+    workspace = Path(workspace)
+    kind = workspace_kind or detect_migrate_workspace_kind(workspace)
+    if kind == "framework-source":
+        return workspace / ".specify" / "scripts" / "python"
+    resource_root = get_resource_path()
+    if resource_root is None:
+        raise RuntimeError(
+            "Local templates not found — the installed asset root is unavailable"
+        )
+    return Path(resource_root) / "scripts" / "python"
+
+
+def detect_migrate_tool_surfaces(workspace) -> Dict[str, str]:
+    """Assistant key -> command dir, restricted to dirs present in the workspace."""
+    workspace = Path(workspace)
+    surfaces: Dict[str, str] = {}
+    for assistant, rel in _ASSISTANT_COMMAND_DIRS.items():
+        if (workspace / rel).is_dir():
+            surfaces[assistant] = rel
+    return surfaces
+
+
+def detect_migrate_script_variant(workspace, surfaces: Optional[Dict[str, str]] = None) -> str:
+    """``ps`` when an existing generated copy references ``.ps1``, else ``sh``."""
+    workspace = Path(workspace)
+    if surfaces is None:
+        surfaces = detect_migrate_tool_surfaces(workspace)
+    for rel in surfaces.values():
+        command_dir = workspace / rel
+        for path in sorted(command_dir.glob("*.md")):
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if ".ps1" in text:
+                return "ps"
+    return "sh"
+
+
+@contextmanager
+def build_client_reference_tree(workspace):
+    """Project the installed assets into a transient reference tree (E-7).
+
+    Runs the init copy mechanism (``copy_local_templates``, which itself uses
+    ``rewrite_paths`` and ``generate_commands``) against a temporary directory,
+    adds the generated command surfaces for every detected tool directory, and
+    removes the tree in ``finally``. The workspace itself is never written —
+    the zero-write dry-run precondition depends on that.
+    """
+    workspace = Path(workspace)
+    surfaces = detect_migrate_tool_surfaces(workspace)
+    script_variant = detect_migrate_script_variant(workspace, surfaces)
+    primary = next(iter(surfaces), _OFFICIAL_ASSISTANT_KEYS[0])
+    temp_root = tempfile.TemporaryDirectory(prefix="specify-migrate-")
+    try:
+        reference_root = Path(temp_root.name)
+        copy_local_templates(
+            reference_root, primary, script_variant, is_current_dir=True
+        )
+        for assistant, rel in surfaces.items():
+            if assistant == primary:
+                continue
+            generate_commands(
+                assistant,
+                _ASSISTANT_EXTENSIONS.get(assistant, "md"),
+                _ASSISTANT_ARG_FORMATS.get(assistant, "$ARGUMENTS"),
+                reference_root / rel,
+                script_variant,
+            )
+        yield reference_root
+    finally:
+        temp_root.cleanup()
+# MIGRATE-ENGINE:END
 
 
 def get_key():

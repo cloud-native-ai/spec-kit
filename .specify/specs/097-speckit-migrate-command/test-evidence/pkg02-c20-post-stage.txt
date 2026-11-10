@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 8.01s

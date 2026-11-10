@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/contract/test_migrate_engine_contract.py tests/contract/test_cleanup_obsolete_assets.py tests/contract/test_flat_internal_skill_migration.py tests/contract/test_upgrade_end_state.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..............................................                           [100%]
+46 passed in 8.59s
