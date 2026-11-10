@@ -114,6 +114,11 @@ def _payload(args, expect=None):
     return json.loads(_run([*args, "--json"], expect=expect).stdout)
 
 
+def _corpus_entry(scan_cache):
+    """The session payload for the real-corpus accounting (098 scan-cache T027)."""
+    return scan_cache.corpus(SPEC_053, ROOT / ".specify" / "specs")
+
+
 # --- hermetic corpus fixtures ---------------------------------------------
 
 
@@ -425,7 +430,7 @@ def test_c9_named_list_is_collapsible_behind_an_explicit_flag(tmp_path):
 
 
 @pytest.mark.slow
-def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census():
+def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census(scan_cache):
     mod = _load()
     src = ACCOUNTANT.read_text(encoding="utf-8")
     assert "clause_extract" in src, (
@@ -438,8 +443,7 @@ def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census():
     )
     # the census owns this number; pinned here as a drift detector on the excl-053 basis
     # (this feature adds no .yaml contract, so the whole-tree value is the same 39)
-    p = _payload(["--spec-dir", str(SPEC_053), "--corpus-root", str(ROOT / ".specify" / "specs"),
-                  "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+    p = _corpus_entry(scan_cache).payload
     assert p["scanned"]["per_form"]["yaml-openapi"]["clauses"] == OPENAPI_OPERATIONS_EXCL_053, (
         f"OpenAPI operation total moved off the census value; re-derive "
         f"notes/clause-form-census.md and move this pin in the same commit: {p['scanned']['per_form']}"
@@ -902,10 +906,8 @@ def test_c25_the_baseline_is_not_the_gate_scanner_broken_json_shape():
 
 
 @pytest.mark.slow
-def test_c26_every_yaml_contract_is_explicitly_disposed():
-    p = _payload(["--spec-dir", str(SPEC_053),
-                  "--corpus-root", str(ROOT / ".specify" / "specs"),
-                  "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+def test_c26_every_yaml_contract_is_explicitly_disposed(scan_cache):
+    p = _corpus_entry(scan_cache).payload
     scanned = p["scanned"]
     assert scanned["yaml_parsed"] == scanned["yaml_total"], (
         f"every .yaml must be parsed by one of the two extractors: {scanned}"
@@ -917,10 +919,18 @@ def test_c26_every_yaml_contract_is_explicitly_disposed():
 
 
 @pytest.mark.slow
-def test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion():
-    out = _run(["--spec-dir", str(SPEC_053),
-                "--corpus-root", str(ROOT / ".specify" / "specs"),
-                "--baseline", str(SPEC_053 / "coverage-baseline.txt")]).stdout
+def test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion(
+    scan_cache, monkeypatch, capsys
+):
+    # The subject is the printed evidence FORM; the numbers come from the session payload
+    # (scan-cache C-008/T027), so the accountant is not re-run over the real corpus here.
+    mod = _load()
+    entry = _corpus_entry(scan_cache)
+    monkeypatch.setattr(mod, "account", lambda *args, **kwargs: entry.payload)
+    mod.main(["--spec-dir", str(SPEC_053),
+              "--corpus-root", str(ROOT / ".specify" / "specs"),
+              "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+    out = capsys.readouterr().out
     m = re.search(r"parsed\s+(\d+)\s*\+\s*named[- ]unparseable\s+(\d+)\s*==\s*(\d+)", out)
     assert m, f"the SC-006 evidence form (three numbers and their sum) is missing: {out}"
     parsed, named, total = (int(g) for g in m.groups())
@@ -951,7 +961,7 @@ def test_form_str008_attribution_and_four_label_docstring_body():
 
 
 @pytest.mark.slow
-def test_form_exit_code_table():
+def test_form_exit_code_table(scan_cache, monkeypatch):
     """Pinned separately from the label set (checker-form C-23)."""
     mod = _load()
     tmp = Path(__file__).parent  # unused; keeps the two pins' signatures honest
@@ -960,9 +970,12 @@ def test_form_exit_code_table():
     absent = ROOT / ".specify" / "specs" / "does-not-exist-anywhere"
     assert mod.main([str(absent)]) == 2, "2 = input error (spec dir / requirements.md missing)"
 
+    # Exit-code leg kept (scan-cache C-008): main() still runs end to end; its computed
+    # payload is the session cache's report, so the real corpus is not rescanned.
+    entry = _corpus_entry(scan_cache)
     spec_root = ROOT / ".specify" / "specs"
-    baseline = SPEC_053 / "coverage-baseline.txt"
-    if baseline.is_file():
+    monkeypatch.setattr(mod, "account", lambda *args, **kwargs: entry.payload)
+    if entry.payload["baseline_present"]:
         rc = mod.main([str(SPEC_053), "--corpus-root", str(spec_root)])
         assert rc in (0, 1), f"0 = covered, 1 = uncovered beyond baseline; got {rc}"
     else:

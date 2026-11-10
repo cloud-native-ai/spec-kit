@@ -54,10 +54,6 @@ from fixtures.review_git_repo import (
 
 pytestmark = pytest.mark.contract
 
-REPORT_TEMPLATE = FRAMEWORK_ROOT / "templates" / "review-template.md"
-FEATURE_DETAIL_TEMPLATE = FRAMEWORK_ROOT / "templates" / "feature-details-template.md"
-COMMAND_TEMPLATE = FRAMEWORK_ROOT / "templates" / "commands" / "review.md"
-
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 
 #: `templates/review-template.md` § 2.1 carries the four counts as placeholders
@@ -75,6 +71,17 @@ COUNT_PLACEHOLDERS = {
 #: (C-44). The prefix is what makes a second run replace the previous sentence
 #: instead of stacking a new one, so the record stays one fact with two carriers.
 DISCLOSURE_PREFIX = "> **未提交范围"
+
+
+@pytest.fixture(scope="session")
+def root_inputs(scan_cache):
+    """The framework-root reads of this file, built once per session (098 scan-cache C-002).
+
+    Surface: the 071 requirements text and the three template texts. This file only
+    asserts against them; no case writes into the framework root, so the shared,
+    read-only payload is legal here (C-005). Consumer access hands out deep copies.
+    """
+    return scan_cache.root_inputs(FRAMEWORK_ROOT)
 
 
 # --------------------------------------------------------------------------- #
@@ -133,22 +140,14 @@ def _record_text(repo: ReviewGitRepo) -> str:
     return repo.record_path.read_text(encoding="utf-8")
 
 
-def _requirements_path() -> Path:
-    matches = sorted(
-        (FRAMEWORK_ROOT / ".specify" / "specs").glob("071-*/requirements.md")
-    )
-    assert len(matches) == 1, f"expected exactly one 071 requirements owner, got {matches}"
-    return matches[0]
+def _owner_text(root_inputs) -> str:
+    return root_inputs.payload["requirements_text"]
 
 
-def _owner_text() -> str:
-    return _requirements_path().read_text(encoding="utf-8")
-
-
-def _shared_strings() -> Dict[str, str]:
+def _shared_strings(root_inputs) -> Dict[str, str]:
     """Read the Shared Strings table: the literal source for every STR-NNN."""
     table: Dict[str, str] = {}
-    for line in _owner_text().splitlines():
+    for line in _owner_text(root_inputs).splitlines():
         match = re.match(r"^\|\s*`(STR-\d{3})`\s*\|\s*`([^`]+)`\s*\|", line)
         if match:
             table[match.group(1)] = match.group(2)
@@ -156,13 +155,13 @@ def _shared_strings() -> Dict[str, str]:
     return table
 
 
-def _legal_skip_reasons() -> List[str]:
+def _legal_skip_reasons(root_inputs) -> List[str]:
     """The five-value closed reason set, read from its owner (FR-014).
 
     Read rather than hard-coded: the script holds its own copy, and the drift
     between the two is exactly what this case exists to catch (C-36).
     """
-    owner = _owner_text()
+    owner = _owner_text(root_inputs)
     match = re.search(r"跳过理由的取值封闭为([^；]+)", owner)
     assert match, "FR-014 MUST state the closed skip-reason set verbatim"
     reasons = re.findall(r"`([^`]+)`", match.group(1))
@@ -180,9 +179,9 @@ def _fresh_delta(repo: ReviewGitRepo) -> tuple:
     return run, shapes
 
 
-def _subsection_template() -> str:
+def _subsection_template(root_inputs) -> str:
     """The report's code subsection (`### 2.1`) as authored by its owner."""
-    text = REPORT_TEMPLATE.read_text(encoding="utf-8")
+    text = root_inputs.payload["report_template"]
     start = text.index("### 2.1")
     rest = text[start:]
     following = re.search(r"\n## ", rest)
@@ -190,13 +189,13 @@ def _subsection_template() -> str:
     return rest[: following.start()]
 
 
-def _render_report_subsection(receipt: Receipt, verdict: str = "pass") -> str:
+def _render_report_subsection(receipt: Receipt, root_inputs, verdict: str = "pass") -> str:
     """Render the report's code subsection by copying the block field by field.
 
     This is the command's copy act, verbatim: every placeholder is replaced by
     the block field it names, and no number is computed here.
     """
-    rendered = _subsection_template()
+    rendered = _subsection_template(root_inputs)
     for field, placeholder in COUNT_PLACEHOLDERS.items():
         assert placeholder in rendered, (
             f"§ 2.1 MUST carry the {placeholder} placeholder (C-9/C-74)"
@@ -472,10 +471,10 @@ def test_c35_exit_2_writes_no_block_and_names_its_reason(repo: ReviewGitRepo):
 # C-36 — gap versus skip, and the five-value reason set
 # --------------------------------------------------------------------------- #
 
-def test_c36_a_legal_skip_is_disclosed_and_earns_no_coverage(repo: ReviewGitRepo):
+def test_c36_a_legal_skip_is_disclosed_and_earns_no_coverage(repo: ReviewGitRepo, root_inputs):
     shapes = _standard(repo)
     _fresh_record(repo)
-    reason = _legal_skip_reasons()[0]
+    reason = _legal_skip_reasons(root_inputs)[0]
     run = _receipt(
         repo,
         "--since",
@@ -499,14 +498,14 @@ def test_c36_a_legal_skip_is_disclosed_and_earns_no_coverage(repo: ReviewGitRepo
     )
     row = receipt.row_for(repo.CODE_PATH)
     assert row is not None and row.verdict == "skipped" and row.reason == reason
-    assert _kv(run).get("verdict") != _shared_strings()["STR-006"], (
+    assert _kv(run).get("verdict") != _shared_strings(root_inputs)["STR-006"], (
         "with skipped_files > 0 the segment verdict MUST NOT be `pass` (C-37)"
     )
 
 
-def test_c36_the_five_value_reason_set_is_read_from_its_owner(repo: ReviewGitRepo):
+def test_c36_the_five_value_reason_set_is_read_from_its_owner(repo: ReviewGitRepo, root_inputs):
     """Every value of the owner's closed set is accepted; the set is not guessed."""
-    reasons = _legal_skip_reasons()
+    reasons = _legal_skip_reasons(root_inputs)
     shapes = _standard(repo)
     accepted: List[str] = []
     for reason in reasons:
@@ -581,8 +580,8 @@ def _add_blocking(repo: ReviewGitRepo) -> None:
     assert noted.returncode == 0, noted.describe()
 
 
-def test_c37_c38_the_verdict_is_the_conjunction_of_the_three_signals(repo: ReviewGitRepo):
-    strings = _shared_strings()
+def test_c37_c38_the_verdict_is_the_conjunction_of_the_three_signals(repo: ReviewGitRepo, root_inputs):
+    strings = _shared_strings(root_inputs)
     pass_literal = strings["STR-006"]
     blocked_literal = strings["STR-007"]
     not_evaluated = strings["STR-002"]
@@ -614,7 +613,7 @@ def test_c37_c38_the_verdict_is_the_conjunction_of_the_three_signals(repo: Revie
         "--skip-with-reason",
         "src/*",
         "--reason",
-        _legal_skip_reasons()[-1],
+        _legal_skip_reasons(root_inputs)[-1],
     )
     seen["skip"] = _kv(run)["verdict"]
     assert seen["skip"] == not_evaluated, (
@@ -633,7 +632,7 @@ def test_c37_c38_the_verdict_is_the_conjunction_of_the_three_signals(repo: Revie
         "--skip-with-reason",
         "src/*",
         "--reason",
-        _legal_skip_reasons()[-1],
+        _legal_skip_reasons(root_inputs)[-1],
     )
     seen["skip+blocking"] = _kv(run)["verdict"]
     assert seen["skip+blocking"] == blocked_literal
@@ -676,8 +675,8 @@ def _drop_entry(record: str, path: str) -> str:
     return "\n".join(kept) + "\n"
 
 
-def test_c38_the_blocking_signal_is_a_presence_test_not_a_resolved_state(repo: ReviewGitRepo):
-    strings = _shared_strings()
+def test_c38_the_blocking_signal_is_a_presence_test_not_a_resolved_state(repo: ReviewGitRepo, root_inputs):
+    strings = _shared_strings(root_inputs)
     shapes = _standard(repo)
     _fresh_record(repo)
     _add_blocking(repo)
@@ -704,8 +703,8 @@ def test_c38_the_blocking_signal_is_a_presence_test_not_a_resolved_state(repo: R
     )
 
 
-def test_c38_an_empty_delta_never_reaches_the_receipt(repo: ReviewGitRepo):
-    strings = _shared_strings()
+def test_c38_an_empty_delta_never_reaches_the_receipt(repo: ReviewGitRepo, root_inputs):
+    strings = _shared_strings(root_inputs)
     shapes = _standard(repo)
     _fresh_record(repo)
     before = _record_text(repo)
@@ -823,10 +822,10 @@ def test_sc002_the_gap_drill_deletes_one_entry_and_the_rerun_goes_red(repo: Revi
 # C-43 / C-44 / C-74 — the counts and the disclosure on both carriers
 # --------------------------------------------------------------------------- #
 
-def test_c74_the_four_counts_agree_three_ways(repo: ReviewGitRepo):
+def test_c74_the_four_counts_agree_three_ways(repo: ReviewGitRepo, root_inputs):
     run, _shapes = _fresh_delta(repo)
     receipt = run.receipt_from_stdout_or_raise()
-    subsection = _render_report_subsection(receipt)
+    subsection = _render_report_subsection(receipt, root_inputs)
     entry = _render_feature_detail_entry(receipt)
 
     assert _three_way_agreement(receipt, subsection, entry) == [], (
@@ -846,7 +845,7 @@ def test_c74_the_four_counts_agree_three_ways(repo: ReviewGitRepo):
     )
 
     # Provenance: the rule that makes the copies copies, read from their owners.
-    template = _subsection_template()
+    template = _subsection_template(root_inputs)
     assert re.search(r"copied field by field|抄自", template), (
         "§ 2.1 MUST state that the four counts are copied field by field from the "
         "receipt block"
@@ -854,18 +853,18 @@ def test_c74_the_four_counts_agree_three_ways(repo: ReviewGitRepo):
     assert re.search(r"never recomputed|MUST NOT 独立计算|不.{0,2}重算|never re-aggregate", template), (
         "§ 2.1 MUST forbid recomputation of the four counts"
     )
-    command = COMMAND_TEMPLATE.read_text(encoding="utf-8")
+    command = root_inputs.payload["command_template"]
     assert "Latest Review" in command, (
         "the command template MUST name the feature detail's `## Latest Review` entry "
         "as the second verifiable carrier (C-13/C-43)"
     )
-    detail = FEATURE_DETAIL_TEMPLATE.read_text(encoding="utf-8")
+    detail = root_inputs.payload["feature_detail_template"]
     assert "## Latest Review" in detail, (
         "the carrier MUST be the existing `## Latest Review` entry, not a new field"
     )
 
 
-def test_c43_a_non_zero_gap_or_skip_count_is_surfaced_outside_the_block(repo: ReviewGitRepo):
+def test_c43_a_non_zero_gap_or_skip_count_is_surfaced_outside_the_block(repo: ReviewGitRepo, root_inputs):
     shapes = _standard(repo)
     _fresh_record(repo)
     run = _receipt(
@@ -877,13 +876,13 @@ def test_c43_a_non_zero_gap_or_skip_count_is_surfaced_outside_the_block(repo: Re
         "--skip-with-reason",
         "src/*",
         "--reason",
-        _legal_skip_reasons()[-1],
+        _legal_skip_reasons(root_inputs)[-1],
     )
     assert run.returncode == 0, run.describe()
     receipt = run.receipt_from_stdout_or_raise()
     assert receipt.count("skipped_files") == 1
 
-    subsection = _render_report_subsection(receipt, verdict=_kv(run)["verdict"])
+    subsection = _render_report_subsection(receipt, root_inputs, verdict=_kv(run)["verdict"])
     outside_block = subsection
     assert RECEIPT_BEGIN not in outside_block, (
         "fixture precondition: the report subsection is a carrier of its own, not a "

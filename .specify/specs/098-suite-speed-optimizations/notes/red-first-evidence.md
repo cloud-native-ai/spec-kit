@@ -175,3 +175,44 @@ own write and stays green.)
 Anomaly line: none in this record — the three failures are the expected red of the guard
 against the tree before its evidence carriers exist, and the drill's non-empty comparison is
 the intended discriminator output; no in-passing repair was applied to the guard.
+
+## WP-5 / T024 — `tests/contract/test_scan_cache_contract.py` (scan-cache C-001…C-004, C-007, C-010, C-011)
+
+- Date: 2026-11-10
+- Tree state at the red run: the guard file is the only change on disk — `tests/conftest.py`
+  carries no scan-cache factory (`ScanCache` / `SCAN_SURFACES` / block markers absent), and
+  neither converted corpus file consumes a session payload.
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_scan_cache_contract.py -q`
+- Exit code: `1`
+- Result: `4 failed, 3 errors in 0.55s` (7 collected cases).
+- Full run-time log: `.specify/.tmp/wp5/red-first.log` (this worktree; scratch, not retained).
+
+Failing/erroring cases (the red this record owns — each blames its missing subject):
+
+```text
+FAILED tests/contract/test_scan_cache_contract.py::test_c002_the_managed_surfaces_are_exactly_the_two_declared
+FAILED tests/contract/test_scan_cache_contract.py::test_c003_the_factory_keeps_no_mtime_or_persistent_cache
+FAILED tests/contract/test_scan_cache_contract.py::test_c007_the_corpus_build_is_in_process_over_the_house_pattern
+FAILED tests/contract/test_scan_cache_contract.py::test_c010_a_new_session_observes_a_tampered_corpus
+ERROR tests/contract/test_scan_cache_contract.py::test_c001_c011_one_build_and_one_traversal_serve_two_consumers
+ERROR tests/contract/test_scan_cache_contract.py::test_c001_the_variant_is_part_of_the_key
+ERROR tests/contract/test_scan_cache_contract.py::test_c004_a_consumer_mutation_never_reaches_the_store
+```
+
+Decisive excerpts (two representatives; the errors all name the same missing fixture):
+
+```text
+# static case: the factory block markers do not exist yet
+E  AssertionError: tests/conftest.py MUST bracket the scan-cache factory between
+   'scan-cache begin' and 'scan-cache end' comment markers; the static checks below
+   judge that block and nothing else
+
+# drill case: the driver session cannot even construct the factory
+E  AttributeError: module '_drill_conftest' has no attribute 'ScanCache'
+
+# fixture-backed cases (three ERRORs): the session fixture does not exist
+E  fixture 'scan_cache' not found
+```
+
+Anomaly line: none in this record — every failure is the expected red of the guard against
+the tree before its subject exists; no in-passing repair was applied to the guard.

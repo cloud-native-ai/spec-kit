@@ -1,0 +1,90 @@
+# T030 — session scan-cache mutation drills CA-M1…CA-M5
+
+- date: 2026-11-10
+- owner of the legs: `contracts/scan-cache.contract.md` § E
+- guard under drill: `tests/contract/test_scan_cache_contract.py` (committed; the tracked
+  tree was never mutated)
+- method: every leg runs on a throwaway minimal harness under
+  `.specify/.tmp/wp5/mutations/<leg>/` (gitignored scratch, not retained) — a copy of
+  `tests/conftest.py`, the guard file, the `scripts/python/` engines the build loads, and a
+  `pytest.ini` registering the four markers. The harness is green before any mutation
+  (validity control), and each leg mutates exactly one thing in its own copy.
+
+## Harness control (pristine copy green)
+
+- Command: `cd .specify/.tmp/wp5/mutations/harness && python3 -m pytest tests/contract/test_scan_cache_contract.py -q`
+- Exit `0`; `7 passed in 0.51s`.
+
+## CA-M1 — build the corpus payload per test instead of per session (must fail C-001/C-011)
+
+- Mutation in the copy's `tests/conftest.py`: `@pytest.fixture(scope="session")` →
+  `@pytest.fixture` on `scan_cache`.
+- Command: `python3 -m pytest tests/contract/test_scan_cache_contract.py::test_c001_c011_one_build_and_one_traversal_serve_two_consumers -q`
+- Exit `1`; `1 failed in 0.04s`:
+  ```text
+  E  AssertionError: the factory fixture MUST be session-scoped (C-001/C-003): the lifetime
+     is the session, so a per-test build (CA-M1) is a contract violation, not an optimisation
+  FAILED tests/contract/test_scan_cache_contract.py::test_c001_c011_one_build_and_one_traversal_serve_two_consumers
+  ```
+
+## CA-M2 — return the stored payload without a copy (must fail C-004)
+
+- Mutation: `return copy.deepcopy(self._stored)` → `return self._stored` in `_ScanEntry.payload`.
+- Command: `python3 -m pytest …::test_c004_a_consumer_mutation_never_reaches_the_store -q`
+- Exit `1`; `1 failed in 0.07s`:
+  ```text
+  E  AssertionError: consumer access MUST return a fresh copy, not the store
+  FAILED tests/contract/test_scan_cache_contract.py::test_c004_a_consumer_mutation_never_reaches_the_store
+  ```
+  (The second assertion — a tampered copy leaking into the next access — is what the same
+  case would also catch; the identity assertion fires first.)
+
+## CA-M3 — add mtime-based in-session staleness detection (must fail C-003)
+
+- Mutation in the copy's `_absorb`: an `os.stat(str(root)).st_mtime` staleness probe is
+  inserted before lookup.
+- Command: `python3 -m pytest …::test_c003_the_factory_keeps_no_mtime_or_persistent_cache -q`
+- Exit `1`; `1 failed in 0.04s`:
+  ```text
+  E  AssertionError: C-003 forbids in-session staleness detection: freshness is provided by
+     session boundaries, never by mtime or content polling — found ['os.stat(', 'st_mtime']
+  FAILED tests/contract/test_scan_cache_contract.py::test_c003_the_factory_keeps_no_mtime_or_persistent_cache
+  ```
+
+## CA-M4 — make a mutating test consume the shared payload (must fail C-005)
+
+- Mutation: the leg copy gains `tests/contract/test_ca_m4_mutating_consumer.py`, a case that
+  takes the shared payload, writes a new contract file into the corpus it scanned, and then
+  expects the shared payload to see the write.
+- Command: `python3 -m pytest tests/contract/test_ca_m4_mutating_consumer.py -q`
+- Exit `1`; `1 failed in 0.06s`:
+  ```text
+  E  AssertionError: C-005: a test that writes into the tree it scans MUST NOT consume the
+     shared payload - the session payload never re-reads, so its own write is invisible
+  E  assert 1 == (1 + 1)
+  FAILED tests/contract/test_ca_m4_mutating_consumer.py::test_ca_m4_a_mutating_consumer_would_read_a_stale_payload
+  ```
+  Reading: this is why C-005 draws the boundary — a writer consuming the session payload gets
+  a stale read by construction, so writing cases keep their own per-test fixture (as
+  `test_c20` and every tmp-corpus case do). The cross-session detector for the same staleness
+  class is CA-M5's target, the C-010 drill.
+
+## CA-M5 — freeze a hardcoded payload in the fixture (must fail C-010)
+
+- Mutation: after the real `account()` call the corpus build returns a constant payload
+  (`total = 1`, one uncovered-less clause) while the traversal still happens, so
+  `build_count`/`traversals` stay 1 and the drill must catch the staleness itself.
+- Command: `python3 -m pytest …::test_c010_a_new_session_observes_a_tampered_corpus -q`
+- Exit `1`; `1 failed in 0.28s`:
+  ```text
+  E  AssertionError: a new session MUST rebuild and see the tampered corpus (C-010): a cache
+     that returned a stale or constant payload would repeat {'worker': 'none', 'build_count': 1,
+     'traversals': 1, 'scanned_total': 1, 'clause_universe': 1, 'uncovered': []},
+     got {'worker': 'none', 'build_count': 1, 'traversals': 1, 'scanned_total': 1,
+     'clause_universe': 1, 'uncovered': []}
+  E  assert 1 == (1 + 1)
+  FAILED tests/contract/test_scan_cache_contract.py::test_c010_a_new_session_observes_a_tampered_corpus
+  ```
+
+Anomaly line: none — all five legs reddened exactly the clause they target, and no leg
+required a repair to the committed guard or fixture.
