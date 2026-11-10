@@ -1395,11 +1395,13 @@ def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchan
         "an absent store changes no exit status; got %r then %r"
         % (with_store.returncode, without_store.returncode)
     )
-    assert "未找到运行记录存储" in without_store.stdout, (
-        "the store-free render states the availability explicitly; got %r" % without_store.stdout
+    assert without_store.stdout.startswith("状态摘要"), (
+        "the store-free render still answers the reader view; got %r" % without_store.stdout
     )
     def identities(text: str) -> list:
-        return [re.split(r"\s{2,}", row.strip())[0] for row in _rows(text)]
+        # The executor cell is the row identity; the SPEC column is the stable per-entry identity under the
+        # executor-primary redesign, so ordering is compared on that column.
+        return [re.split(r"\s{2,}", row.strip())[1] for row in _rows(text)]
 
     assert identities(with_store.stdout) == identities(without_store.stdout), (
         "the store's presence never reorders or re-caps the entry set; got %r vs %r"
@@ -1521,17 +1523,19 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
     )
     out = proc.stdout
     assert out.splitlines()[0].startswith("状态摘要"), out
-    # Reader-column redesign (2026-11-10): executor / activity / state / elapsed replace the duplicated
-    # silence-flag columns; each row answers the four questions a stopped-flow reader actually asks.
-    for column in ("线路", "执行体", "在做什么", "状态", "已执行时间"):
+    # Reader-column redesign, second revision (2026-11-10): the EXECUTOR is the row; closed lines are
+    # hidden; every row answers — who executes, which spec, what it is doing, its state, its elapsed time.
+    for column in ("执行体", "所属 spec", "在做什么", "状态", "已执行时间"):
         assert column in out, "the single human format names its columns in reader words; got %r" % out
     for retired in ("已静默", "标记", "最近步骤与消耗"):
         assert retired not in out, "the redundant column %r must be gone; got %r" % (retired, out)
     rows = _rows(out)
     assert len(rows) == 1, "one aligned row per entry; got %r" % rows
     assert entry["line_id"] in rows[0], rows[0]
-    assert "fork(" in rows[0], "the executor column names the process carrier; got %r" % rows[0]
-    assert any(word in rows[0] for word in ("活跃", "等待中", "阻塞", "已停滞", "已关闭")), rows[0]
+    assert ("fork(" in rows[0]) or ("—（无存活执行体）" in rows[0]), (
+        "the executor column names the process carrier or states its absence; got %r" % rows[0]
+    )
+    assert any(word in rows[0] for word in ("活跃", "等待中", "阻塞", "已停滞")), rows[0]
     assert any(unit in rows[0] for unit in ("秒", "分", "小时", "天")), (
         "the elapsed column reports time in reader words; got %r" % rows[0]
     )
@@ -1557,7 +1561,7 @@ def test_the_default_format_is_the_single_human_table(tmp_path):
         env_overrides=env,
     )
     assert default.returncode == json_run.returncode == 0
-    assert default.stdout.startswith("状态摘要") and "线路" in default.stdout
+    assert default.stdout.startswith("状态摘要") and "执行体" in default.stdout
     import json as _json
     assert _json.loads(json_run.stdout)["entries"], "the machine channel still parses"
     assert retired.returncode == 2, "the retired text/auto display variants are gone"

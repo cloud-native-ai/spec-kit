@@ -839,13 +839,19 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
     # Workspace rule (FR-011): only entries whose project_dir is this workspace are listed, and only they count
     # against the cap. An entry of another project is not rendered and carries no label of its own.
     def in_workspace(entry: dict) -> bool:
-        value = entry.get("project_dir")
-        if not isinstance(value, str) or not value:
-            return False
-        try:
-            return Path(value).expanduser().resolve() == workspace
-        except OSError:
-            return False
+        # A line's project is either the workspace itself or one of its write worktrees: entries registered
+        # for a worktree of THIS repo (repo_root == workspace) belong to this workspace's view — the executor
+        # is the row identity, and its working tree must not hide it (2026-11-10 executor-primary revision).
+        for key in ("project_dir", "repo_root"):
+            value = entry.get(key)
+            if not isinstance(value, str) or not value:
+                continue
+            try:
+                if Path(value).expanduser().resolve() == workspace:
+                    return True
+            except OSError:
+                continue
+        return False
 
     scoped = [e for e in raw if in_workspace(e)]
     projected = [project_entry(e, now, stale_bound) for e in scoped]
@@ -859,8 +865,12 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
         return (0 if item["is_active"] else 1, -epoch, str(item["line_id"]))
 
     projected.sort(key=sort_key)
-    omitted = max(0, len(projected) - cap)
-    entries = projected[:cap]
+    # Reader contract (2026-11-10 second revision): the digest answers "what is happening now" — closed lines
+    # are history and never occupy the capped view; they stay in ``all_entries`` for consumers reading the
+    # full set.
+    visible = [item for item in projected if str(item.get("state")) != "closed"]
+    omitted = max(0, len(visible) - cap)
+    entries = visible[:cap]
 
     # The efficiency dimension (contracts C-63…C-68): ONE store reading behind both surfaces. The element's unit is
     # the STEP — the ``(unit_id, unit_type)`` identity the exec-quant record carries, never a listing row — so the
@@ -891,6 +901,8 @@ def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
         "now": now,
         "store": store,
         "efficiency": efficiency,
+        "workspace": str(workspace),
+        "executors": read_executors(workspace, entries, now),
     }, None
 
 
@@ -1085,42 +1097,98 @@ def _human_seconds(seconds) -> str:
     return "%d 天 %d 小时" % (seconds // 86400, (seconds % 86400) // 3600)
 
 
-def _activity_cell(item, element_unit):
-    """`slug: description` — what this line is doing, the reader-facing form of the same reading.
+def _pid_alive(pid) -> bool:
+    try:
+        os.kill(int(pid), 0)
+    except PermissionError:
+        return True
+    except (ProcessLookupError, ValueError, OSError):
+        return False
+    return True
 
-    The line's own stage wins: exec-quant elements are a global store and positional alignment can hand a
-    line another line's step, so an element unit is only a fallback when the line records no stage. A closed
-    line with no stage has nothing it is "doing now" — it renders the dash, not a borrowed step.
+
+def read_executors(workspace, entries, now):
+    """One row per ALIVE agent execution of this workspace — the executor, not the spec, is the row identity.
+
+    Sources: the ``pid-<line>-<stage>`` files the stage runner writes under ``<workspace>/.specify/state/``
+    (each carries ``pid=`` / ``line=`` / ``stage=`` / ``at=``), plus the registry's own recorded
+    ``cli_pid`` / ``runner_pid`` when alive. A dead pid is never rendered: the digest answers what is running
+    now. Several executions may share one spec; each keeps its own row.
     """
-    stage = str(item.get("stage") or "")
-    if stage and stage != DASH and stage != "-":
-        slug = "/speckit.%s" % stage
-    else:
+    state_dir = Path(workspace) / ".specify" / "state"
+    out = []
+    if not state_dir.is_dir():
+        return out
+    by_line = {str(e.get("line_id")): e for e in entries if str(e.get("state")) != "closed"}
+    known = set()
+
+    def add(entry, pid, stage, started):
+        if int(pid) in known or not _pid_alive(pid):
+            return
+        known.add(int(pid))
+        out.append(
+            {
+                "line_id": str(entry.get("line_id")),
+                "pid": int(pid),
+                "stage": stage or "",
+                "started_epoch": started,
+                "cli": entry.get("cli") or "",
+                "worktree_path": entry.get("worktree_path") or DASH,
+            }
+        )
+
+    for path in sorted(state_dir.glob("pid-*")):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        fields = {}
+        for line in text.splitlines():
+            key, _, value = line.strip().partition("=")
+            if key and value:
+                fields.setdefault(key, value)
+        pid = fields.get("pid", "")
+        line_id = fields.get("line", "")
+        entry = by_line.get(line_id)
+        if not pid.isdigit() or entry is None:
+            continue
+        try:
+            started = int(fields.get("at", ""))
+        except ValueError:
+            started = None
+        add(entry, pid, fields.get("stage", ""), started)
+
+    for entry in by_line.values():
+        for key in ("cli_pid", "runner_pid"):
+            pid = entry.get(key)
+            if isinstance(pid, int) or (isinstance(pid, str) and pid.isdigit()):
+                add(entry, pid, str(entry.get("stage") or ""), None)
+    return out
+
+
+def _activity_of(stage, item):
+    """`slug: description` for one execution; a worker suffix (``analyze-w1``) rides in parentheses."""
+    raw = str(stage or item.get("stage") or "")
+    if raw in ("", DASH, "-"):
         event = str(item.get("last_event") or "")
-        slug = event if event.startswith("/speckit.") or event.startswith("skill:") else ""
-    if not slug or slug == DASH:
+        if event.startswith("/speckit.") or event.startswith("skill:"):
+            return event
         return DASH
-    name = slug
-    for prefix in ("/speckit.", "speckit.", "skill:"):
-        if name.startswith(prefix):
-            name = name[len(prefix):]
-            break
-    label = _STAGE_LABELS.get(name.lower())
-    return "%s: %s" % (slug, label) if label else slug
+    base = re.split(r"[-_]", raw)[0]
+    base = re.sub(r"\d+$", "", base)
+    label = _STAGE_LABELS.get(base.lower())
+    slug = "/speckit.%s" % base
+    text = "%s: %s" % (slug, label) if label else slug
+    suffix = raw[len(base):].strip("-_")
+    return text + ("（%s）" % suffix if suffix else "")
 
 
-def _executor_cell(item):
-    parts = []
-    cli = str(item.get("cli") or "")
-    pid = item.get("cli_pid") or item.get("runner_pid")
-    if pid:
-        parts.append("fork(%s, pid %s)" % (cli or "cli", pid))
-    elif cli:
-        parts.append("fork(%s)" % cli)
-    worktree = item.get("worktree_path")
+def _executor_row_cell(ex):
+    parts = ["fork(%s, pid %s)" % (ex.get("cli") or "cli", ex["pid"])]
+    worktree = ex.get("worktree_path")
     if worktree and worktree != DASH:
         parts.append("worktree %s" % os.path.basename(str(worktree).rstrip("/")))
-    return " · ".join(parts) or DASH
+    return " · ".join(parts)
 
 
 def _elapsed_cell(item, now, is_closed):
@@ -1142,54 +1210,72 @@ def _human_measure(value) -> str:
 
 
 def render_digest_table(state) -> str:
-    """The ONE human-facing digest rendering — reader columns, natural-language cells.
+    """The ONE human-facing digest rendering — the EXECUTOR is the row, the spec is a column.
 
-    Reader contract (2026-11-10 redesign): every row answers four questions in order — who executes this
-    line (执行体), what it is doing now in `slug: description` form (在做什么), what state it is in (状态,
-    with explicit staleness duration when over the bound), and how long it has been running (已执行时间).
-    Presentation only over the same state (C-41); the machine vocabulary stays in the ``json`` channel.
+    Reader contract (2026-11-10 second revision): closed lines are history and are not shown; every row is one
+    live agent execution answering — 执行体 (process carrier, pid, worktree), 所属 spec, 在做什么
+    (`slug: description`), 状态 (with explicit staleness duration when over the bound) and 已执行时间 (that
+    execution's own duration). A non-closed line with no live executor keeps one row with an empty executor
+    cell so a stopped flow stays visible. Presentation only over the same reading (C-41); the empty view
+    renders the ``nothing-running`` literal (C-45).
     """
-    if not state["entries"]:
+    visible = [item for item in state["entries"] if str(item.get("state")) != "closed"]
+    if not visible:
         return NOTHING_RUNNING
 
-    efficiency = state.get("efficiency") or {}
-    depth = efficiency.get("depth")
-    elements = efficiency.get("elements") or []
+    executors = state.get("executors") or []
+    by_line = {}
+    for ex in executors:
+        by_line.setdefault(str(ex.get("line_id")), []).append(ex)
+    now = _parse_iso(state["generated_at"])
     header = "状态摘要 · 生成于 %s（UTC）· 最多 %d 条 · 注册目录 %s" % (
         state["generated_at"],
         state["cap"],
         state["registry_dir"],
     )
-    now = _parse_iso(state["generated_at"])
     rows = []
-    for position, item in enumerate(state["entries"]):
-        unit = None
-        if efficiency.get("available") and position < len(elements):
-            for field in element_fields(elements[position], depth):
-                if field.startswith("unit="):
-                    unit = field.partition("=")[2]
-                    break
+    for item in visible:
+        line_id = item["line_id"] or DASH
         state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
-        if item["stale"] and str(item["state"]) != "closed":
+        if item["stale"]:
             state_word = "%s（静默 %s）" % (
                 state_word,
                 _human_seconds(item.get("age_seconds")),
             )
-        rows.append(
-            (
-                item["line_id"] or DASH,
-                _executor_cell(item),
-                _activity_cell(item, unit),
-                state_word,
-                _elapsed_cell(item, now, str(item["state"]) == "closed"),
+        line_executors = by_line.get(str(item["line_id"]), [])
+        if not line_executors:
+            rows.append(
+                (
+                    "—（无存活执行体）",
+                    line_id,
+                    _activity_of(None, item),
+                    state_word,
+                    _elapsed_cell(item, now, False),
+                )
             )
-        )
+            continue
+        for ex in line_executors:
+            if ex.get("started_epoch") and now:
+                elapsed = _human_seconds(
+                    max(0, int(now.timestamp() - int(ex["started_epoch"])))
+                )
+            else:
+                elapsed = _elapsed_cell(item, now, False)
+            rows.append(
+                (
+                    _executor_row_cell(ex),
+                    line_id,
+                    _activity_of(ex.get("stage"), item),
+                    state_word,
+                    elapsed,
+                )
+            )
     import unicodedata
 
     def display_width(text):
         return sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1 for ch in text)
 
-    head = ("线路", "执行体", "在做什么", "状态", "已执行时间")
+    head = ("执行体", "所属 spec", "在做什么", "状态", "已执行时间")
     widths = [max(display_width(r[i]) for r in rows + [head]) for i in range(5)]
 
     def fmt_row(r):
@@ -1201,20 +1287,12 @@ def render_digest_table(state) -> str:
 
     lines = [header, "", fmt_row(head), fmt_row(tuple("-" * w for w in widths))]
     lines.extend(fmt_row(r) for r in rows)
-    completion = last_completion(state)
-    if completion is not None:
-        lines.append("")
-        lines.append(
-            "最近完成：%s（%s前）"
-            % (completion["line_id"], _human_duration(completion["age"]))
-        )
+    efficiency = state.get("efficiency") or {}
     withheld = efficiency.get("withheld") or ""
     if state["omitted"] or withheld:
         lines.append(
             "另有 %d 条未显示%s" % (state["omitted"], ("，" + withheld) if withheld else "")
         )
-    if not efficiency.get("available"):
-        lines.append("未找到运行记录存储，本页无法给出活动读数")
     return "\n".join(lines)
 
 
