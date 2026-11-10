@@ -19,13 +19,13 @@
 - [x] Success criteria are measurable — SC-001…SC-011 each have a stated comparison or count plus a named measurement source
 - [x] Success criteria stay on the acceptance surface — criteria name runner commands, collected ids, failure-name lists and wall-clock comparisons; no internal code structure is prescribed
 - [x] All acceptance scenarios are defined — five user stories, each with Given/When/Then scenarios covering the golden path and the pass-through/tier edge
-- [x] Edge cases are identified — no-xdist serial fallback, empty default selection, caller `-m` composition, `serial`+`slow` overlap, per-worker session scope, same-tree name comparison, retained process boundaries, measurement noise
+- [x] Edge cases are identified — no-xdist serial fallback, empty default selection, caller `-m` composition, caller path/`-k` tier behavior, `serial`+`slow` overlap, per-worker session scope, same-tree name comparison, full-set serial verification cost, intra-session cache mutation, wait deadline expiry, retained process boundaries, unrestorable in-process state, measurement noise
 - [x] Scope is clearly bounded — A12 (no selection-criteria change, no slot-count change, no CI workflow, no new dependency), FR-021 forbids shortcut classes
-- [x] Dependencies and assumptions identified — Runtime Stack table RS-001…RS-004 with owners and pins; Assumptions A1–A13
+- [x] Dependencies and assumptions identified — Runtime Stack table RS-001…RS-004 with owners and pins; Assumptions A1–A17
 
 ## Feature Readiness
 
-- [x] All functional requirements have clear acceptance criteria — FR-001…FR-011 → SC-001…SC-006/SC-011; FR-012…FR-014 → SC-007; FR-015…FR-017 → SC-008; FR-018…FR-019 → SC-009; FR-020 → SC-004/SC-005; FR-021 → SC-010; FR-022 → SC-011
+- [x] All functional requirements have clear acceptance criteria — FR-001…FR-011 → SC-001…SC-006/SC-011; FR-012…FR-014 → SC-007; FR-015…FR-017 → SC-008; FR-018…FR-019 → SC-009; FR-020 → SC-004/SC-005; FR-021 → SC-010; FR-022 → SC-011; FR-023 → SC-002/SC-003/SC-011; FR-024 → SC-006/SC-010; FR-025 → SC-007; FR-026 → SC-008; FR-027 → SC-009
 - [x] User scenarios cover primary flows — each of the five parked requirement items maps to one independently testable story
 - [x] Feature outcomes are measurable and traceable to sources — every SC has a Measurement Sources row naming the command/record and evidence landing point
 - [x] No implementation details leak as unowned decisions — open implementation choices (exact slow-member inventory, conversion list, probe mechanics) are explicitly deferred to plan/implement as data with evidence requirements (A6, A9)
@@ -41,12 +41,12 @@ status: ok
   [marker-count] pass (0)
   [dup-id] pass (0)
   [path-marker] pass (0)
-scanned: 243 lines, 33 definition rows, 3 shared strings
+scanned: 267 lines, 38 definition rows, 3 shared strings
 0 error(s), 0 warning(s)
 ```
 
 ## Notes
 
 - Every count above is taken from the checker run above, not hand-typed.
-- `Related Feature` intentionally remains `Need clarification`; binding is deferred to `/speckit.clarify` per the Feature Integration Protocol.
+- `Related Feature` is bound to Feature 086 by the 2026-11-10 `/speckit.clarify` Mode A session; the Feature Binding Rules' registry duties (086 detail file + index row) were discharged in the same pass.
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`; none are incomplete in this pass.

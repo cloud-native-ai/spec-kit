@@ -6,13 +6,15 @@
 **Flow Class**: execution
 **Flow Type**: -
 **Readers**: 框架维护者（维护 `scripts/bash/run-tests.sh`、`pyproject.toml` marker 注册、`tests/conftest.py` 共享夹具与 `tests/contract/`、`tests/integration/` 测试的作者）、SDD 驱动者（baseline / closure 两槽位全量运行的执行与记账者）、以及下游项目中经同一 runner 运行测试的维护者——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
-**Reading scenario**: 在判定「缺省测试运行选择哪一档」「哪些测试可以打 slow marker、判据是什么」「两槽位全量预算如何保持完整」「全语料扫描能否跨测试复用」「哪些固定 sleep 必须去掉、换成什么确定性与同步机制」「哪些 subprocess 调用应改为进程内直调、哪些必须保留」时打开本规格，据 FR-001…FR-022 与 SC-001…SC-011 决定 `/speckit.clarify` 与后续实现是否放行
+**Reading scenario**: 在判定「缺省测试运行选择哪一档」「哪些测试可以打 slow marker、判据是什么」「两槽位全量预算如何保持完整」「全语料扫描能否跨测试复用」「哪些固定 sleep 必须去掉、换成什么确定性与同步机制」「哪些 subprocess 调用应改为进程内直调、哪些必须保留」时打开本规格，据 FR-001…FR-027 与 SC-001…SC-011 决定 `/speckit.clarify` 与后续实现是否放行
 **Input**: User description: "测试套件提速五项优化：1) 引入 pytest-xdist -n auto（先只并行 tests/contract 验证）；2) 给慢测试打 slow marker（integration 进程/队列类 + 少数全语料扫描型 contract），PR 默认 -m 「not slow」，全量留给每日或 closure；3) 会话级缓存全语料扫描结果：coverage_receipt / clause_coverage 的仓库遍历改为 session fixture；4) 去固定 sleep：client_metrics 的 1.1s×8 换成注入时钟/单调序号，runner 测试用事件文件替代固定等待；5) 能走进程内 API 的不要起子进程：subprocess.run 中的 specify CLI / 纯 Python 引擎调用改直调。约束：不改测试覆盖选择与判据；两槽位全量预算（implement 起点 + closure）与 runner 入口 scripts/bash/run-tests.sh 不变；xdist 已是缺省形态，本特性验证并固化 -m 「not slow」缺省与 marker 分档。"
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 086
+**Feature Name**: Efficient Test Execution (Concurrent by Default)
+
+**Binding note**: Bound by `/speckit.clarify` Mode A under `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules; 086's Future Evolution names the parked TODO behind this spec as its follow-up. The binding does not regress 086's status (`Ready for Review`).
 
 ## Overview
 
@@ -42,6 +44,7 @@
 1. **Given** 测试树中存在 `slow` 标记的测试，**When** 以规范 runner 无参数运行，**Then** 运行的收集集合等于全量集合减去 `slow` 集合，且 stderr 的运行形态行披露被排除条数。
 2. **Given** 一个不含任何 `slow` 标记的树，**When** 缺省运行，**Then** 选择等于全量集合，运行形态行披露排除数为 0。
 3. **Given** 调用方自带 `-m "contract"`，**When** 缺省运行，**Then** runner 原样转交该选择，缺省的 `not slow` 排除 MUST NOT 重写或合并调用方的 `-m`。
+4. **Given** 调用方只给路径或 `-k`（未给 `-m`）且未请求 [[STR-003]]，**When** 缺省运行，**Then** 缺省慢档排除仍生效（前置单一 [[STR-002]]），路径/`-k` 只在快档内收窄；**Given** 同一调用同时给 [[STR-003]]，**Then** 缺省排除整体关闭。
 
 ---
 
@@ -58,6 +61,7 @@
 1. **Given** 存在 `slow` 标记，**When** 以全量档运行，**Then** 收集集合包含全部 `slow` 测试，退出码与失败名单语义与既有 runner 契约一致。
 2. **Given** 任一预算槽位，**When** 执行槽位命令，**Then** 命令显式请求全量档，产出 `--names-out` 名单并记录到状态脊，比较规则不变。
 3. **Given** 变更前后的同一棵树，**When** 比较全量档 `--collect-only -q` 的测试 id 集合，**Then** 差集仅包含本特性新增测试与逐条列明的显式处置，没有删除或改名的既有测试。
+4. **Given** 全量档的并行安全需要同树双向名称比较，**When** closure 槽位执行全量并行运行，**Then** 在同一棵树上另执行一次串行全量验证运行并以 `--names-out` 双向比较；该验证运行不占两槽位预算、不作为 SC-004/SC-005 的墙钟读数。
 
 ---
 
@@ -119,6 +123,11 @@
 - **名称级比较的时点**：并行/串行名称级一致性比较 MUST 在同一棵树上进行；跨树比较结果不得当作隔离性证据。
 - **被保留的子进程边界**：CLI 契约、信号/超时/中断、git 与外部命令、以子进程隔离为被测对象的用例，转换 MUST 保留其进程边界。
 - **测量噪声**：墙钟门槛 MUST 在同主机、同日、同一 runner 形态下比较，并记录完整命令、退出码、完整输出与时长；不得用不同机器或不同选择的口径互相比较。
+- **调用方仅路径/`-k` 的缺省档**：缺省慢档排除仍生效，路径/`-k` 在其内收窄；[[STR-003]] 是唯一关闭缺省排除的开关；调用方自带 `-m` 时不施加缺省排除（单 `-m` 原则）。
+- **全量并行安全的验证成本**：closure 同树的串行全量验证运行是验证证据，不占槽、不进度量；「不新增第三次全量运行」按 FR-020 原文限于「为度量」。
+- **会话内改写共享缓存输入**：消费共享缓存的用例 MUST NOT 改写被扫描树；需要改写者改用每测试夹具，跨会话突变演练才是陈旧语义的判据。
+- **等待截止到期**：以具名失败报告超时，MUST NOT 转成 `skip` / `xfail` / 重试；截止与轮询间隔写在等待点。
+- **进程内直调遇到不可恢复状态**：改动 cwd/env 等全局状态且无法用夹具恢复的调用 MUST 归类为保留子进程，理由逐点记录。
 
 ## Requirements *(mandatory)*
 
@@ -135,9 +144,9 @@
 
 - **FR-005**: `pyproject.toml` MUST 注册名为 [[STR-001]] 的 marker 并给出语义描述；注册缺失或 marker 名不符 MUST 使对应契约测试转红，MUST NOT 只靠文档约定。
 - **FR-006**: [[STR-001]] 的成员判据 MUST 可判定：只允许两类——(a) 需要拉起、等待或终止外部进程/队列的 integration 类测试；(b) 少数需要遍历全语料（整仓或多 spec 目录）的 contract 测试。每一条标记 MUST 在 `test-evidence/` 记录所属类别与理由；MUST NOT 仅凭单次耗时噪声或主观感受归档，MUST NOT 把普通单元测试成批标慢来换取数字。
-- **FR-007**: 缺省档 MUST 排除慢档：当调用方没有自带选择时，runner MUST 以等价 [[STR-002]] 的选择运行，并与既有 `serial` 两遍模型正交组合（并行遍排除 `serial` 与慢档，串行遍只取 `serial` 中未被排除者）；排除条数 MUST 由 stderr 的运行形态行披露，使部分运行不能伪装成完整。排除后选择为空时 MUST 具名报错并非零退出。
+- **FR-007**: 缺省档 MUST 排除慢档：当调用方没有自带选择时，runner MUST 以等价 [[STR-002]] 的选择运行，并与既有 `serial` 两遍模型正交组合（并行遍排除 `serial` 与慢档，串行遍只取 `serial` 中未被排除者）；排除条数 MUST 由 stderr 的运行形态行披露，使部分运行不能伪装成完整。排除后选择为空时 MUST 具名报错并非零退出。缺省排除的落点 MUST 是 runner 的缺省值（本仓不新增 CI 工作流，A10）：调用方未给 `-m` 且未请求 [[STR-003]] 时，runner MUST 前置单一 [[STR-002]] 选择；调用方只给路径或 `-k` 不抑制该缺省；调用方自带 `-m` 时 MUST NOT 前置缺省（见 FR-009）；[[STR-003]] 时不前置。排除条数 MUST 由对 [[STR-001]] 的 marker 枚举在本次选择内计算（与 C-011 对 `serial` 的同法），MUST NOT 以硬编码清单充当读数。
 - **FR-008**: 全量档 MUST 可用且显式：runner MUST 提供一个声明的全量开关 [[STR-003]]，使一次运行覆盖含慢档的完整选择；`--help` MUST 记录该开关，未知选项仍 MUST 按宪法 XXI 非零拒绝；该开关 MUST NOT 改变其他既有参数的语义。
-- **FR-009**: 调用方选择 MUST 优先：调用方自带 `-m` / 路径 / `-k` 时，runner MUST 原样转交，缺省慢档排除 MUST NOT 重写、合并或拆解调用方的 `-m`；[[STR-003]] 与调用方选择同时出现时，执行一个不含缺省排除的完整选择。档位与执行形态（并行/串行）正交，`--serial` 不改变档位语义。
+- **FR-009**: 调用方选择 MUST 优先：调用方自带 `-m` / 路径 / `-k` 时，runner MUST 原样转交，缺省慢档排除 MUST NOT 重写、合并或拆解调用方的 `-m`；[[STR-003]] 与调用方选择同时出现时，执行一个不含缺省排除的完整选择。档位与执行形态（并行/串行）正交，`--serial` 不改变档位语义。runner MUST NOT 在一次运行中产生两个竞争选择语义的 `-m`：调用方自带 `-m` 时缺省排除整体不施加，选择由调用方的单一 `-m` 拥有；路径与 `-k` 与缺省排除正交，后者仍生效，除非 [[STR-003]] 关闭它。
 - **FR-010**: 两槽位预算 MUST 保持全量：implement 起点 `baseline` 与 review 通过后的 `closure` MUST 经同一 runner 以全量档（含 [[STR-003]]）运行，并继续用 `--names-out` 做名称级名单比较；驱动者文档中的两槽位命令 MUST 显式请求全量档，使缺省档变更不可能静默缩小预算覆盖面。槽位数、时点与顺序 MUST 不变。
 - **FR-011**: 全量选择 MUST 不回归（封闭清单声明）：全量档可收集的测试 id 集合在变更前后 MUST 相等，除本特性新增测试与逐条列明的显式处置外无差异；基线取 implement 起点 `--collect-only -q` 读数，允许差集与判据按 `.specify/shared/guidelines/closed-set-claims.md` 声明。MUST NOT 删除、改名或参数化缩减既有测试来提速。
 
@@ -160,6 +169,11 @@
 - **FR-020**: 度量 MUST 完整捕获并可溯源：本特性 MUST 在同主机、同日、同一 runner 形态下记录全量档与缺省档的墙钟耗时、运行期子进程调用数、固定等待数、全量档收集 id 数；基线取 implement 起点 `baseline` 槽位读数与 2026-11-10 只读探针（证据：`test-evidence/requirements-baseline-probe.txt`）；每次测量 MUST 记录命令、退出码、完整输出与时长。MUST NOT 为度量新增第三次全量运行——组件级测量以定向证据记录在 `test-evidence/`。
 - **FR-021**: 被禁止的提速方式 MUST 判红：重试至绿、随机丢参、引入 `skip` / `xfail`、缩小参数化、放宽时限掩盖挂起、无上限 worker 数，任一出现即 MUST 判红；本特性 MUST NOT 以这些方式兑现任何 SC。
 - **FR-022**: 既有接口 MUST 不变：runner 入口路径、`--names-out` 文件格式与计数行、退出码语义、`serial` 两遍组合、`--workers` 解析顺序 MUST 保持不变；新增档位开关 MUST 满足宪法 XXI（`-h` / `--help` / `--version` 零副作用、未声明选项非零拒绝），且既有的 runner 契约用例 MUST 保持全绿。
+- **FR-023**: 与 086 runner 契约的关系 MUST 是**增量兼容**：C-001…C-016 的条款文本 MUST NOT 被重开或改写；档位增量面 MUST 由本特性自己的契约面承载（plan 阶段落 `contracts/`，显式引用 086 契约）。约定点 MUST 至少覆盖：C-001 在调用方未给选择时由缺省档选择填充；C-002 的 `mode=` 行保持前缀兼容并以附加字段披露档位与排除数；C-003 的头部行如实包含 runner 实际追加的参数；C-007/C-009 的 worker 与 `--dist` 解析不变；C-010/C-011 的 `serial` 两遍模型与档位正交。并行安全验收 MUST NOT 钉死与主机相关的有效 worker 数——断言的是形态（恰一个 worker 开关、缺省 `--dist load`、调用方 `--dist` 透传）而不是数字。既有 C-001…C-016 对应用例 MUST 保持全绿。
+- **FR-024**: [[STR-001]] 的成员证据 MUST 机器可查：每条标记测试在 `test-evidence/` 的登记册中恰有一行（测试 id、类别、理由、日期），登记册 MUST 被守门测试消费——已标记测试缺行、或登记册出现不再标记的孤儿行时，守门测试 MUST 转红。守门测试 MUST 同时断言：缺省档收集集合 = 全量档收集集合 − [[STR-001]] 集合；运行形态行披露的排除数 = 本次选择内的 [[STR-001]] 成员数；[[STR-003]] 时排除数为 0 且收集集合回到全量。守门测试 MUST NOT 通过读取硬编码成员数通过。
+- **FR-025**: 会话缓存的失效语义 MUST 是**按会话重建**：缓存键为（会话，并行 worker，受管扫描面），每个会话首次消费时构建一次；结构 MUST 只读/不可变，MUST NOT 跨会话持久化，MUST NOT 依赖 mtime 或内容轮询做进程内陈旧检测；新会话（含每个 xdist worker）必然重建并看到当前内容。共享范围 MUST 限于稳定的只读框架输入（`.specify/specs` 全语料与框架根文件）；一次性、可变的测试夹具（disposable repo、tmp 语料）MUST NOT 进入共享缓存。改写扫描内容的用例 MUST 使用每测试夹具（FR-013）；跨会话突变演练 MUST 证明相应断言转红。
+- **FR-026**: 可观察事件的等待 MUST 带明确截止：轮询 MUST 仅在事件未出现时发生，观察到事件后立即继续；每个等待 MUST 在等待点记录显式上限（缺省 30 秒，与既有 runner 测试约定一致；超过 30 秒的截止逐条记录理由），超时 MUST 以具名失败报告，MUST NOT 以 `skip` / `xfail` / 重试吞掉；轮询间隔 MUST ≤ 0.2 秒。作用域内 MUST NOT 以固定 sleep 充当同步；保留的真实时间语义等待（如 TTL）逐条列入豁免。
+- **FR-027**: 进程边界的二值归类 MUST 显式覆盖保留侧：console 入口与入口解析、`--help` / `--version` / 未知选项退出码、信号/超时/中断、git 与外部命令、以进程隔离为被测对象的用例、需要不同解释器的用例、以及无法用夹具恢复的全局状态（cwd/env）调用 MUST 保留子进程并逐点记录理由；其余只验证纯 Python 引擎或 CLI 的文件效果/返回值的调用 MUST 改进程内直调，原断言若含退出码 MUST 以 CliRunner 的等价结果保持。转换等价性 MUST 以同一断言集前后全绿证明；清单断言 MUST 在任一已转换点改回子进程时转红并指名。
 
 ### Runtime Stack & Dependency Ownership
 
@@ -167,18 +181,18 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | 规范测试运行器与选择语义 | signed-contract | runner 契约（`.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md`） | `pyproject.toml` 既有 `pytest` 依赖；本特性零新增第三方依赖 | `scripts/bash/run-tests.sh` | 既有 C-001…C-016 对应用例保持全绿；新增档位行为另有契约用例 | FR-001, FR-002, FR-007, FR-008, FR-009, FR-022 | EP-001 |
+| RS-001 | 规范测试运行器与选择语义 | signed-contract | runner 契约（`.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md`） | `pyproject.toml` 既有 `pytest` 依赖；本特性零新增第三方依赖 | `scripts/bash/run-tests.sh` | 既有 C-001…C-016 对应用例保持全绿；新增档位行为另有契约用例 | FR-001, FR-002, FR-007, FR-008, FR-009, FR-022, FR-023, FR-024 | EP-001 |
 | RS-002 | 进程并行引擎（pytest-xdist） | signed-contract | pytest-xdist 上游（本仓只消费） | `pyproject.toml` 既有 `pytest-xdist; python_version >= '3.9'` 声明；探针实测可导入版本 3.8.0 | `pyproject.toml` | 缺省并行在 contract 子集与全量上达到名称级一致；3.8 无 xdist 时完整串行 | FR-001, FR-002, FR-003, FR-004 | EP-002 |
-| RS-003 | CPython `>=3.8` 标准库（子进程、时钟、文件系统）与 pytest session 夹具模型 | signed-contract | CPython / pytest 上游（本仓只消费） | `pyproject.toml` 既有 `requires-python` 声明 | `pyproject.toml` | 会话夹具在 `>=3.8` 与并行 worker 下行为一致；注入时钟不依赖第三方库 | FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018 | EP-003 |
-| RS-004 | 本特性修订的测试基础设施面（runner 档位、marker 注册、共享夹具、转换清单） | in-scope | 本特性自身 | 不适用（无外部版本面） | `scripts/bash/run-tests.sh`、`pyproject.toml`、`tests/conftest.py`、受管测试文件 | 档位、缓存、去 sleep 与直调四组断言在 `>=3.8` 与缺省并行下全绿 | FR-005, FR-006, FR-010, FR-011, FR-019, FR-020, FR-021 | EP-004 |
+| RS-003 | CPython `>=3.8` 标准库（子进程、时钟、文件系统）与 pytest session 夹具模型 | signed-contract | CPython / pytest 上游（本仓只消费） | `pyproject.toml` 既有 `requires-python` 声明 | `pyproject.toml` | 会话夹具在 `>=3.8` 与并行 worker 下行为一致；注入时钟不依赖第三方库 | FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-025, FR-026 | EP-003 |
+| RS-004 | 本特性修订的测试基础设施面（runner 档位、marker 注册、共享夹具、转换清单） | in-scope | 本特性自身 | 不适用（无外部版本面） | `scripts/bash/run-tests.sh`、`pyproject.toml`、`tests/conftest.py`、受管测试文件 | 档位、缓存、去 sleep 与直调四组断言在 `>=3.8` 与缺省并行下全绿 | FR-005, FR-006, FR-010, FR-011, FR-019, FR-020, FR-021, FR-027 | EP-004 |
 
 ### Key Entities *(include if requirement involves data)*
 
 - **测试档位（Test tier）**: 封闭两值——缺省档（排除慢档，供日常/PR 循环）与全量档（含慢档，供每日与两槽位预算）；由 runner 的选择组合实现，不新增第二份测试清单。
-- **慢档标记（Slow marker）**: 单一 marker 名 [[STR-001]]；成员判据是进程/队列类 integration 与全语料扫描型 contract，逐条理由为证据，不是规则表。
-- **会话级扫描缓存（Session scan cache）**: 每个会话（并行下每 worker）计算一次的只读语料快照；跨测试复用，可突变验证的输入源保持不变。
+- **慢档标记（Slow marker）**: 单一 marker 名 [[STR-001]]；成员判据是进程/队列类 integration 与全语料扫描型 contract，逐条理由为证据，不是规则表；成员证据的载体是 `test-evidence/` 中的机器可读登记册（测试 id、类别、理由、日期），守门测试消费它。
+- **会话级扫描缓存（Session scan cache）**: 每个会话（并行下每 worker）计算一次的只读语料快照；缓存键为（会话，worker，受管扫描面），按会话重建、结构不可变，无跨会话持久化与进程内陈旧检测；跨测试复用，可突变验证的输入源保持不变。
 - **注入时钟 / 单调序号（Injected clock / monotonic sequence）**: 代替真实时间差制造确定顺序的测试夹具输入；只影响测试内时间戳来源，不改产品语义。
-- **事件文件（Event file）**: runner 测试等待完成的可观察信号；以出现为准继续，可不依赖固定等待。
+- **事件文件（Event file）**: runner 测试等待完成的可观察信号；等待以显式截止与 ≤ 0.2 秒轮询消费，观察到事件立即继续，超时以具名失败报告。
 - **进程边界分类（Process boundary classification）**: 每个子进程调用点的二值归类——「边界即被测对象」保留，或「仅调用 Python 行为」转换；转换清单是其唯一载体。
 
 ## Success Criteria *(mandatory)*
@@ -190,12 +204,12 @@
 - **SC-003**: 全量档并行与串行名称级一致：closure 同树比较双向差为空（既存失败按名称相等处理）；新增失败名数为零（FR-002、FR-010、FR-022）。 **Path**: final
 - **SC-004**: 缺省档显著提速：缺省档墙钟 ≤ implement 起点基线（同 runner 缺省并行、全量选择）的 50%，同主机同日测量并完整捕获；把慢档重新并入缺省档时读数应回退，作为反度量记录（FR-007、FR-020）。 **Path**: final
 - **SC-005**: 全量档不回归且两槽位完整：全量档墙钟 ≤ 基线的 110%；`baseline` 与 `closure` 两槽位均以全量档执行并产出 `--names-out` 名单，closure 比较新增失败名为零（FR-008、FR-010）。 **Path**: final
-- **SC-006**: 分档可判定：缺省档收集 id 集合 = 全量档收集 id 集合 − [[STR-001]] 集合（集合差为零）；每条 [[STR-001]] 成员带类别与理由；三组夹具（无调用方 `-m`、调用方 `-m contract`、[[STR-003]] 与调用方 `-m contract` 并用）分别证明 [[STR-002]] 的缺省行为、调用方选择优先与全量档覆盖（FR-005…FR-009）。 **Path**: final
+- **SC-006**: 分档可判定：缺省档收集 id 集合 = 全量档收集 id 集合 − [[STR-001]] 集合（集合差为零）；每条 [[STR-001]] 成员带类别与理由；三组夹具（无调用方 `-m`、调用方 `-m contract`、[[STR-003]] 与调用方 `-m contract` 并用）分别证明 [[STR-002]] 的缺省行为、调用方选择优先与全量档覆盖（FR-005…FR-009）；另加调用方仅路径/`-k` 的夹具证明缺省排除仍生效；守门测试证明登记册与已标记集合恰一一对应、披露排除数等于本次选择内成员数、[[STR-003]] 恢复全量（FR-024）。 **Path**: final
 - **SC-007**: 会话缓存按会话而非按用例：带计数探针的缺省档运行中，`test_coverage_receipt.py` 与 `test_clause_coverage.py` 的受管仓库遍历各发生次数 ≤ worker 数，用例数大于遍历次数；缓存前后断言等价，篡改被扫描内容时相应测试转红（FR-012…FR-014）。 **Path**: final
-- **SC-008**: 固定同步 sleep 清零：`test_client_metrics.py` 与 runner 测试作用域内承担同步/顺序语义的 `time.sleep` 数量为零（程序化扫描），豁免清单为空或逐条带理由；`test_client_metrics.py` 的墙钟不再包含 8×1.1 秒固定等待（前后定向测量记录）（FR-015…FR-017）。 **Path**: final
+- **SC-008**: 固定同步 sleep 清零：`test_client_metrics.py` 与 runner 测试作用域内承担同步/顺序语义的 `time.sleep` 数量为零（程序化扫描），豁免清单为空或逐条带理由；`test_client_metrics.py` 的墙钟不再包含 8×1.1 秒固定等待（前后定向测量记录）；事件等待均有显式截止与 ≤ 0.2 秒轮询，超时以具名失败报告（FR-015…FR-017、FR-026）。 **Path**: final
 - **SC-009**: 进程内直调清单闭合：纯 Python 引擎与 specify CLI 的非边界调用点在转换清单中为零，保留点每条有进程边界理由；转换前后同一断言集合全绿；把任一已转换点改回子进程时清单断言转红（FR-018、FR-019）。 **Path**: final
 - **SC-010**: 禁止捷径缺席：全量档收集集合无删除（由 SC-001 承载），变更 diff 中新增的 `skip` / `xfail` / 重试装饰器数为零，参数化条目数不减少（FR-021）。 **Path**: supporting
-- **SC-011**: runner 接口不变：既有 runner 契约用例（C-001…C-016 对应）全绿，`--help` / `--version` / 未知选项三组用例全绿，`--names-out` 计数行格式不变（FR-022）。 **Path**: supporting
+- **SC-011**: runner 接口不变：既有 runner 契约用例（C-001…C-016 对应）全绿，`--help` / `--version` / 未知选项三组用例全绿，`--names-out` 计数行格式不变；档位增量由 098 自己的契约面承载且 `mode=` 行保持前缀兼容（FR-022、FR-023）。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
@@ -223,13 +237,19 @@
 
 ## Clarifications
 
-<!-- 本阶段无待澄清项；访谈式问题已按假设自行裁决并记录于 § Assumptions，答案将由 /speckit.clarify 按需补记。 -->
+### Session 2026-11-10
+
+- Q: 本特性与 Feature 086 / runner 契约的两层关系如何裁定（绑定、契约载体、全量并行验收成本）？ → A: （i）Related Feature 绑定 **086 Efficient Test Execution (Concurrent by Default)**——其 Future Evolution 明列本 parked TODO 为后续项，属匹配 Feature，不新建、不改号；086 状态保持 `Ready for Review` 不回退，绑定义务（详情文件 Related Specifications + 索引行 Last Updated）按 Feature Binding Rules 履行。（ii）契约关系为**增量兼容**：C-001…C-016 文本不重开；098 以 plan 阶段自己的契约面承载档位增量，并声明 C-001 在无调用方选择时由缺省档填充、C-002 的 `mode=` 前缀兼容并附加档位字段、C-003 头部如实、C-007/C-009 不变、C-010/C-011 与档位正交（FR-023）。（iii）并行安全验收：先 `tests/contract` 定向运行（缺省并行 vs `--serial`，`--names-out` 双向 `comm` 差为空），再在 closure 同树对全量档执行一次并行槽 + 一次串行全量验证运行；后者不占两槽预算、不作为 SC-004/SC-005 的墙钟读数，FR-020 的「第三次全量运行」禁令限于度量用途（A14）。
+- Q: [[STR-001]] 的成员判定、缺省排除的落点与「不得缩小覆盖」的守门测试如何钉死？ → A: 落点是 **runner 缺省值**（本仓无测试 CI 工作流，不新增；A10）。判定矩阵：调用方无 `-m` 且无 [[STR-003]] → runner 前置单一 [[STR-002]]，路径/`-k` 不抑制；调用方自带 `-m` → 不前置缺省，选择由调用方单一 `-m` 拥有（不产生第二个 `-m`）；[[STR-003]] → 不前置。成员仅限两类（进程/队列类 integration、全语料扫描型 contract），逐条写入 `test-evidence/` 的机器可读登记册；守门测试断言登记册与 `pytest --collect-only -q -m slow` 恰一一对应（无缺行、无孤儿行）、缺省收集 = 全量 − slow、披露排除数 = 本次选择内 slow 数、`--full` 恢复全量（FR-007、FR-009、FR-024）。
+- Q: 会话级缓存的失效语义（缓存键与陈旧检测）是什么？ → A: 键 =（会话，并行 worker，受管扫描面）；每会话首次消费构建一次、只读不可变；不跨会话持久化、不做 mtime/内容轮询的进程内陈旧检测；新会话（含每个 xdist worker）必然重建并看到当前内容。共享范围限于稳定只读的框架输入（`.specify/specs` 全语料与框架根文件）；disposable repo、tmp 语料等可变夹具永不共享；改写内容的用例用每测试夹具，突变演练在新会话上转红（FR-025、FR-012…FR-014）。
+- Q: 去固定 sleep 的替代判定与单次运行的等待上限是什么？ → A: `test_client_metrics.py` 的顺序确定性改由注入时钟/单调序号（测试自持时间戳与文件 mtime 序列），真实 `time.sleep` 清零；runner 等待改为事件/状态文件的可观察信号，轮询仅在事件未出现时进行、观察即继续；每个等待有显式截止（缺省 30 秒，超时逐条记录理由），轮询间隔 ≤ 0.2 秒，超时以具名失败报告，不得 `skip` / `xfail` / 重试吞掉；作用域内保留的真实时间语义等待逐条豁免（FR-015…FR-017、FR-026）。
+- Q: 进程内直调的边界与等价性验证怎么定？ → A: 保留侧扩展为 console 入口与入口解析、`--help` / `--version` / 未知选项退出码、信号/超时/中断、git 与外部命令、以进程隔离为被测对象、需要不同解释器、以及无法用夹具恢复的全局状态（cwd/env）调用；其余只验证纯 Python 引擎或 CLI 文件效果/返回值的调用改进程内直调，原断言含退出码的以 CliRunner 等价结果保持；每个转换/保留点有记录，同一断言集前后全绿，任一转换点改回子进程时清单断言转红（FR-027、FR-018、FR-019）。
 
 ## Assumptions
 
 - **A1（Flow Class 判定理由）**: 本特性判为 `execution`——交付物是测试基础设施代码、marker 注册、共享夹具与 runner 行为，验收由机器执行与解析（测试运行、收集集合、名单比较）；没有「交给人阅读的文档」作为交付主体，故 `Flow Type` 写 `-`。用户显式要求头部携带 `**Flow Class**: execution`，与判定一致。
 - **A2（「引入 xdist」按现状纠正为「验证并固化」）**: 用户原文第 1 条以「引入 pytest-xdist」表述，但 086 已把 xdist 设为 runner 缺省并行形态（探针：xdist 3.8.0 可导入，runner 解析 `MODE="parallel"` 并传 `-n <effective> --dist load`）。按宪法 VIII（代码是现状事实源），本特性落成「在 `tests/contract` 先行验证名称级一致、再扩到全量」，MUST NOT 重建并行机制。
-- **A3（档位缺省的裁决）**: 「PR 默认 `-m "not slow"`，全量留给每日或 closure」裁决为：runner 缺省档排除慢档；全量档由显式开关 [[STR-003]] 请求；两槽位命令改为显式全量。理由：缺省值变化不得静默缩小两槽位全量预算（宪法 XX），槽位数/时点/顺序保持不变。若 plan 阶段证明「缺省全量 + 显式 fast 档」更优，须以否定面和证据重开本假设，不能静默翻转。
+- **A3（档位缺省的裁决）**: 「PR 默认 `-m "not slow"`，全量留给每日或 closure」裁决为：runner 缺省档排除慢档；全量档由显式开关 [[STR-003]] 请求；两槽位命令改为显式全量。理由：缺省值变化不得静默缩小两槽位全量预算（宪法 XX），槽位数/时点/顺序保持不变。「缺省全量 + 显式 fast 档」记录为**被否决**的替代设计，而非暂缓项：它把昂贵缺省保留给所有人、只在显式 fast 档才给增益，与本特性的用户目标相反；预算缩小风险由 FR-007/FR-010/FR-024 的显式全量与守门测试承接。
 - **A4（`--full` 标识符冲突检查）**: 全仓检索（2026-11-10）发现 `--full` 已存在于 `scripts/python/history-utils.py`（语义：提取全部会话），那是另一个脚本的局部 flag；CLI flag 的作用域是脚本级，不构成共享标识符冲突，故采用 [[STR-003]] 作为 runner 的全量开关。若 plan 改用其他名字，MUST 同步更新 [[STR-003]] 的值与其消费行。
 - **A5（`slow` 命名冲突检查）**: 仓库内 `pytest.mark.slow` 使用数为 0；`tests/contract/test_measure.py` 中的字符串 "slow" 属于度量词汇禁用表，与本 marker 无关。pyproject 现有 marker 为 `contract` / `integration` / `serial`，新增 [[STR-001]] 不冲突。
 - **A6（成员清单是数据，不是规则）**: `slow` 的逐测试清单与 subprocess 转换清单在 plan/implement 由测量产生，本规格只钉判据与证据要求，MUST NOT 在需求中固化逐文件清单（同理：2026-11-10 探针读数 499 处 `subprocess.run`、20 处 `time.sleep`、0 个 session 夹具、0 个 `slow` marker 是**基线读数**，不是未来必须达到的常量）。
@@ -240,3 +260,7 @@
 - **A11（保留子进程的边界清单）**: CLI 契约（`--help` / `--version` / 未知选项 / 退出码）、信号/超时/中断、git 与外部命令、以子进程隔离为被测对象的用例保留子进程；这是分类判据的实例化方向，具体逐点清单由变换记录承载。
 - **A12（范围外）**: 不改变测试选择判据，不改变两槽位数/时点/顺序，不新增 CI 工作流，不新增第三方依赖；`pyproject.toml` 仅新增 marker 注册。
 - **A13（下游 3.8 兼容）**: 无 xdist 的下游解释器仍完整串行（runner 契约 C-006）；`slow` marker 是 pytest 原生能力，不引入新的解释器门槛。
+- **A14（全量并行安全验证的成本）**: closure 同树的串行全量验证运行是**验证证据**，不占两槽位、不参与 SC-004/SC-005 墙钟读数；FR-020 的「不新增第三次全量运行」按其原文限于「为度量」。contract 子集的并行/串行对照是定向运行，不是全量槽。
+- **A15（缓存失效语义）**: 会话缓存的失效 = 按会话重建；会话内不设 mtime/内容陈旧检测，突变隔离由 FR-013 的消费边界与跨会话突变演练共同保证。
+- **A16（等待上限）**: 每个可观察事件等待在等待点记录显式截止，缺省 30 秒（与 086 runner 测试的既有 30 秒约定一致）；超过 30 秒的截止逐条记录理由；轮询间隔 ≤ 0.2 秒。
+- **A17（直调保留侧判据）**: A11 的边界清单在 clarify 扩展为 console 入口、不同解释器与不可恢复的全局状态三类实例；逐点转换/保留清单仍由变换记录承载（A6）。
