@@ -14,6 +14,8 @@
 
 `.specify/instructions.md` is produced by running `scripts/bash/generate-instructions.sh` — never hand-edited. The generator's whole-section reconcile injects the missing section in template order.
 
+**Section-count pin obligation**: `tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22` pins the top-level `##` counts and requires a same-commit bump. The commit that adds the section MUST raise `TPL_EXPECTED` and `LIVE_EXPECTED` by `+1` each; adding the section without the pin bump turns that test red.
+
 ## C-2. Definition pointer lines (FR-032)
 
 - `shared/definitions/agent-definitions.md`: one pointer line naming [[STR-004]] as the owner of the role concept (not a fourth layer).

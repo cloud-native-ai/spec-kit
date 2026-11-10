@@ -4,11 +4,13 @@
 
 ## C-1. One reader, one renderer
 
-`status-digest.py` remains the only digest renderer (FR-029, FR-035). The role view is computed by importing the role-edge engine's pure evaluation function and passing the digest's **already-read** registry entries — one state read per digest run. A second store read, a second parser or a second renderer is a red defect.
+`status-digest.py` remains the only digest renderer (FR-029, FR-035). The role view is computed through the role-edge engine's **importable interface** (`contracts/role-edge-engine.contract.md` C-1): exactly one `read_carrier_inputs` call per digest run over the engine's default carrier roots (state / teams / logs / registry), then exactly one `evaluate_role_model` call. That materialization is the digest's single state-read pass — the legacy line entries and the role view both derive from it, and **no carrier root may be read twice**. A second read of any carrier, a second parser or a second renderer is a red defect.
 
 ## C-2. Entry fields (FR-029)
 
 Every rendered executor entry carries: `id` (identity), `parent` (parent-edge identity), `roles` (role set; both-roles rendered via the `dual-role` marker), `depth`, `state`, `last_activity` + `age`, `stale`. Table columns and JSON keys share these names; the table may localize labels but MUST NOT invent a second vocabulary.
+
+**Schema by source type** (the merged set is a union, not a re-keying): an entry that originates from a line-registry row keeps its existing keys unchanged (`line_id`, `last_activity_at`, … — C-6) and **gains** `parent` / `roles` / `depth`; an executor row that originates outside the line registry (team member, fan-out child, driver stage) uses the role-view names `id` / `last_activity` for the two fields whose legacy names are line-specific, and states `project_dir` / `branch` / `stage` as `null` where the source type does not carry them. The two field families never mix inside one entry.
 
 ## C-3. Bounded output (existing semantics, unchanged)
 
@@ -27,7 +29,7 @@ One digest read renders a parent row plus one row per child for an N-child fan-o
 
 ## C-6. JSON shape
 
-Existing keys (`registry_dir`, `generated_at`, `cap`, `stale_bound_seconds`, `entries`, `all_entries`, `omitted`, `profile`, `state_summary`, efficiency block) keep their names and meanings. `entries[]` gain `parent`, `roles`, `depth`. `--format table` remains the default; `--format json` remains available.
+Existing keys (`registry_dir`, `generated_at`, `cap`, `stale_bound_seconds`, `entries`, `all_entries`, `omitted`, `profile`, `state_summary`, efficiency block) keep their names and meanings. `entries[]` gain `parent`, `roles`, `depth`; rows that come from the line registry keep `line_id` / `last_activity_at` (C-2 governs which family a row uses). `--format table` remains the default; `--format json` remains available.
 
 ## C-7. Guarding tests
 

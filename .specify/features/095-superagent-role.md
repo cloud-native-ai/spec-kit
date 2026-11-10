@@ -7,11 +7,20 @@
 ## Key Changes（planned）
 
 1. 新增定义 owner `shared/definitions/superagent-definitions.md`（[[STR-004]]）：角色定义、边谓词、深度、super↔sub 协议（下行 / 上行 / 分类 / 等待 / 尝试 / 授权 / 终止）、九项身份转变注入、状态同步与恢复映射、可视化映射、零第二机制边界、术语边界。
-2. 新增只读角色-边判定引擎动作：从既有载体（父侧派发记录、run report 映射表、状态脊 / line registry、artifact triplet）判定边、角色集（含 [[STR-002]]）、深度与三类违例；零写点，契约测试在注入违例时转红。
-3. `status-digest.py` 增加角色-边视图：身份、父边、角色集、深度、状态、age、stale、截断声明与 `nothing-running`；不新建 parser / renderer / dashboard。
+2. 新增独立只读角色-边判定引擎 `scripts/python/role-edge-check.py`（动作 `report` / `query`）：从既有载体（父侧派发记录、run report 映射表、状态脊 / line registry、artifact triplet）判定边、角色集（含 [[STR-002]]）、深度与四类封闭违例（self-dispatch / dangling-parent / unbacked-role-claim / depth-inconsistent）；零写点，契约测试在注入违例时转红。
+3. `status-digest.py` 增加角色-边视图：身份、父边、角色集、深度、状态、age、stale、截断声明与 `nothing-running`；经引擎可导入接口一次物化（`read_carrier_inputs` + `evaluate_role_model`），不新建 parser / renderer / dashboard。
 4. 派发面只加字段：`run-agent` 注入清单增加 [[STR-003]] 指针；team 派发与 driver 阶段派发携带父身份、子 label 与角色声明；driver 手册入口自检加一行指针。
 5. harness 落点：`templates/instructions-template.md` 新增极小指针段（生成文件预算由 `scripts/bash/generate-instructions.sh` 判据）；`agent-definitions.md`、`subagent-definitions.md`、`framework-map.md` 各加指针行；`better-harness.md` 不改。
 6. 收尾产出 080–094 机制观测附录：逐切片 `exercised`（可解析证据路径 + 可复现机器记录）或 `not-observed`，不以配置存在或「运行顺利」推断。
+
+## Implementation Notes
+
+- 实现按 `plan.md` § Work Packages 的 P1–P6 包推进；定义 owner 先行（阻塞全部用户故事），镜像按文件级 `sync-mirrors.py --only` 同步（基线 428 行 DIFF-class，只要求被触及的镜像对无 NEW drift）。
+- 身份转变注入是派发载荷内的封闭九项指针清单；既有派发前自检按 `role-transition` 标识 + 九项 item-id 句柄逐项判定，缺任一即阻断（`data-model.md` § 7）。
+- 违例集封闭四类；`dual-role` 声明表示已授予派发职责，不是 superagent 主张——已授权未派发不得被判违例（`data-model.md` § 5）。
+- instructions 新增段 ≤600 B，超限时只允许缩为纯指针行，不抬预算（A7）；`test_fast_fail_discipline.py` 的 section-count pin 与模板段同提交升降。
+- 测试执行唯一入口 `scripts/bash/run-tests.sh`；完成门判据是「相对 implement 起点基线零新增失败」（FR-036）。
+- 本节其余实现细节随 `/speckit.implement` 落笔（按阶段落笔惯例）。
 
 ## Clarify Notes（2026-11-10，无人值守 clarify）
 
@@ -42,6 +51,15 @@
 - **harness 落点**：instructions 模板新增 `## Super Agent (相对逻辑角色)` 段，目标 ≤600 B（实测余量 946 B），超限只允许缩为一纯指针行；`better-harness.md` 不改（clarify 裁定；brief 该行与之冲突，以需求为准）。
 - **任务边界**：P1 定义 owner + 指针行 / P2 判定引擎 / P3 协议与注入接线 / P4 digest 角色视图 / P5 harness 落点 / P6 收尾（080–094 观测附录 + 既有测试处置），均 ≤16 任务。
 - **镜象基线**：实测 428 条既有 drift、`.specify/shared/` 100 个既有脏文件（路径前缀改写，与本特性无关）；实现只按文件级 `--only` 同步被触及的对，其余脏文件不提交、不还原。
+
+## Related Files
+
+- Feature Index: `.specify/features.md`（095 行）
+- Feature Detail: `.specify/features/095-superagent-role.md`（本文件）
+- Specification: `.specify/specs/095-superagent-role/requirements.md`
+- Plan / data-model / contracts / quickstart / feature-ref / tasks / checklists / observation-appendix: `.specify/specs/095-superagent-role/` 同名产物
+- Owner page（implement 产物）: `shared/definitions/superagent-definitions.md`（运行时镜像 `.specify/shared/definitions/superagent-definitions.md`）
+- Engine（implement 产物）: `scripts/python/role-edge-check.py`；digest: `scripts/python/status-digest.py`
 
 ## Status Criteria
 

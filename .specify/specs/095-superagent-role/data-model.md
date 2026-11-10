@@ -10,7 +10,7 @@ All entities below are **projections over existing carriers** (FR-003, FR-025, F
 | role set | subset of `{superagent, subagent}` | Output as a **set**; the both-roles machine marker is `dual-role` ([[STR-002]]) |
 | owner | `.specify/shared/definitions/superagent-definitions.md` ([[STR-004]]) | This model only fixes the field names the engine consumes |
 
-Validation: a role is decided **only** by edge endpoints (FR-001). Records that classify by executor type, model or prompt wording are a defect; the contract test's type-based-classification mutation must turn red.
+Validation: a role is decided **only** by edge endpoints (FR-001). Records that classify by executor type, model or prompt wording are a defect; the contract test's type-based-classification mutation must turn red. `dual-role` is a set-state marker, never a third role value; and a **declaration** value `dual-role` (see § 2) marks granted dispatch duty — it is not a superagent role claim.
 
 ## 2. Role Edge (record kind `role-edge`, [[STR-005]])
 
@@ -19,10 +19,11 @@ Validation: a role is decided **only** by edge endpoints (FR-001). Records that 
 | `parent` | executor identity | The parent's own dispatch label; for a root: status-spine `run_id`, else line-registry `line_id`, else the owner-declared fallback literal `root` (FR-003) |
 | `child` | dispatch label | Existing label forms: team/dispatch convention, `run-agent` label, driver stage `<line_id>-<stage>` |
 | `attempt` | string | Existing dispatch-attempt / iteration identifier; a retry is a new attempt, never an overwrite (FR-013) |
-| `role_declaration` | `subagent` \| `dual-role` | Child-side role on this edge; `dual-role` only when the child was granted dispatch duty in the same payload |
+| `role_declaration` | `subagent` \| `dual-role` | Child-side role on this edge; `dual-role` only when the child was granted dispatch duty in the same payload (a grant marker, not a superagent claim) |
+| `dispatch_duty` | `granted` \| `not-granted` | The same grant fact projected separately for the engine output keyset (contract C-3): `granted` iff `role_declaration = dual-role` |
 | `depth` | integer ≥ 0 | Computed: shortest edge distance from a root; roots are depth 0 |
 | `source` | `{carrier, path, line}` | Primary carrier of the record; `carrier` ∈ `team-report` \| `driver-spine` \| `run-agent-label` |
-| `conflicts` | list of `{field, paths[2+]}` | Same field disagreeing between two carriers; both paths named; never a silent pick (FR-003) |
+| `conflicts` | list of `{field, paths[2+], edge}` | Same field disagreeing between two carriers; both paths named; emitted as a top-level `conflicts` row carrying the edge identity (`parent` / `child` / `attempt`); never a silent pick (FR-003) |
 
 Invariants: one dispatch produces exactly one edge; `parent == child` (after identity resolution) is `self-dispatch`; an unresolvable `parent` is `dangling-parent`.
 
@@ -35,6 +36,8 @@ Invariants: one dispatch produces exactly one edge; `parent == child` (after ide
 |-------|------|-----------|--------|
 | <dispatch-label> | subagent \| dual-role | <workspace path> | <parent identity> |
 ```
+
+A row declaring `role = superagent` for an executor is an **explicit superagent assertion**: legal only while the engine finds ≥1 edge that executor parents; otherwise it is `unbacked-role-claim` (§ 5).
 
 **(b) Driver stage envelope sidecar** — `prompt-<line_id>-<stage>.md.meta.json` under the driver's state directory gains a `role_edge` object carrying the six downlink fields (below). The engine also derives the edge from the existing four-piece artifact set (`pid-` / `status-` / `log-` / `heartbeat-<line_id>-<stage>`) when the sidecar is absent: child = `<line_id>-<stage>`, parent = spine `run_id`.
 
@@ -56,9 +59,8 @@ Invariants: one dispatch produces exactly one edge; `parent == child` (after ide
 | `parent` | string \| null | Its incoming edge's parent (roots: null) |
 | `roles` | set | Derived: `superagent` iff it parents ≥1 edge; `subagent` iff it is a child on ≥1 edge |
 | `depth` | integer \| null | Shortest distance from a root; `null` when a cycle makes it unresolvable |
-| `state` | `running` \| `completed` \| `failed` \| `cancelled` \| `unknown` | From the existing edge-state carriers (triplet `.status`, spine stage verdict, report outcome) |
-| `last_activity` / `age` | timestamp / duration | From the artifact triplet + status-spine heartbeat (existing digest fields) |
-| `stale` | boolean | The digest's existing stale-bound judgement (bound value owned by `status-digest.py` / its 088 contract) |
+| `sources` | list of `{carrier, path, line}` | Carriers where this executor was observed (union over its edge records); an engine output key (contract C-3) |
+| `state` / `last_activity` / `age` / `stale` | enum / timestamp / duration / boolean | **Digest-view fields, not engine output keys**: the engine emits `id` / `parent` / `roles` / `depth` / `sources`; the digest renders these from its existing sources (artifact triplet `.status`, spine stage verdict, report outcome, watch model) |
 
 ## 5. Violation (closed four-kind set)
 
@@ -66,7 +68,7 @@ Invariants: one dispatch produces exactly one edge; `parent == child` (after ide
 |------|-----------|-------------|
 | `self-dispatch` | resolved `parent == child` | FR-002, SC-001 |
 | `dangling-parent` | parent identity unresolvable (§3 rule 5) | FR-005, FR-006, SC-001 |
-| `unbacked-role-claim` | an executor carries a recorded `superagent` claim (mapping row `role=dual-role` or envelope declaration) but parents no edge | FR-005, SC-001 |
+| `unbacked-role-claim` | an executor carries an **explicit recorded `superagent` role assertion** (a carrier's declared-role field taking the value `superagent` — a mapping row or a `role_edge` declaration) while the judgement finds no edge where it is the parent. A `dual-role` declaration marks granted dispatch duty, is **not** a superagent claim, and never triggers this kind — granted-but-not-yet-dispatched stays legal | FR-005, SC-001 |
 | `depth-inconsistent` | a recorded `depth_position` disagrees with the computed depth, or the graph contains a cycle making depth unresolvable | FR-004, FR-005 (operationalizes "深度越界"; see plan D-6) |
 
 Not violations here (owners elsewhere, referenced only): SDD license-chain depth 2, one-run-per-member, virtual cannot host (`subagent-definitions.md` § Dispatch-Time Governance Obligation); authorization refusals (`sdd-route.py --action authorize`); stale-attempt consumption (attribution values owned by `watch-model.md`).
