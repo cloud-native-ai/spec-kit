@@ -1,0 +1,55 @@
+# 074 回合重跑 — seal 裁决与重跑一致性（P8b，修复后引擎）
+
+captured_at: 2026-11-10T17:31:48Z
+target: .specify/specs/074-goal-team-sdd-unification/
+engine: scripts/python/seal-utils.py @ 8460536ca (P8b-fixed)
+dirty_spec_tree_at_run: 0 (round products committed first @ 8460536ca)
+seal_md_created: no (refusal zero persistence)
+before_snapshot: 074-round-20261110.txt（未改动，保留旧回合原样）
+
+=== RUN 1 ===
+$ python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification/
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+exit: 2
+
+--- 回合裁决清单（每次运行重算，逐字复现） ---
+FR-027(a): resolved — 父 requirements.md 的 8 条 SC 行各带恰一个行尾 `**Path**: final`（0 -> 8；`validate-requirements.py` 的 path-marker 面 pass；逐条见 074-factory-resolutions.md § D）。
+FR-027(b): resolved — 两组 STR 同号不同义的声明映射核验通过：074a 本地 STR-010→父 STR-011；074b 本地 STR-004/005/006/007→父 STR-007/008/009/010（证据：074-merge-plan-rerun-20261111.json 的 id_maps.STR，17 条映射）。
+FR-027(c): resolved — 18 个源引用（36 条冲突 = 源/镜像双扫）按 C-018 `recheck-clean` 处置（074-factory-resolutions.md § A/B）；重跑 merge-plan 0 open conflicts、0 factory_doc_refs（074-merge-plan-rerun-20261111.json）。
+FR-027(d): blocked — 074b review 的 P0 F1（字母分片分支把 /speckit.* 前置解析到父目录）只带驱动者记录的豁免，按 C-044 不构成用户豁免；无修复证据（实测 2026-11-11：scripts/bash/common.sh:86 仍为 `^[0-9]+-`，仍回退「最新 spec 目录」）。父级聚合 review 视图为 summary+pointer、不含 finding 块，seal 的 P0 扫描未点名该项；回合按原记录（.specify/specs/074b-nested-governance/review.md:115-136）判 blocked，不得读作已处置。
+FR-027(e): resolved — 父 tasks.md 的 57 条拆前未勾选行按 C-022 进入「Superseded pre-split record」块（57 条 `> - [ ]` 引用行 + 57 条 superseded 元数据行），merge-manifest.json 的 dispositions[] 逐条 57 条；合并后父 tasks.md 未勾选行 = 0。
+额外阻断 B1: resolved —（原假阳性根因已修）引擎 `_registry_row` 跨空行继续读表行；本轮 seal 不再报 state-drift，状态双载体一致（`.specify/features.md` 的 074 行 Status = `Ready for Review`；`.specify/features/074-goal-team-sdd-unification.md` `**Status**: Ready for Review`）。红先用例 tests/contract/test_seal_seal.py::test_registry_row_is_read_across_blank_lines_inside_the_table（p8b-red-first-20261111.txt）。
+额外阻断 B2: blocked — closure-input-defect 持续：闭包判定器 exit 2，`requirements.md carries no § Runtime Stack & Dependency Ownership`（074 早于该门禁）；本轮 MUST NOT 自造运行时声明，该条即两次 seal 运行唯一的引擎条件。
+额外阻断 B3: resolved —（原合并产物校验债已修）引擎分片任务行按阶段标题落位；`validate-tasks.py` 对合并后父 tasks.md 报 0 errors / 2 warnings（33 × story-labels 与 10 × green-dangling 均为 0；读数见 074-merge-checks-rerun-20261111.txt）。
+额外阻断 B4: resolved —（原内容丢失已修）引擎条款正则支持 1–3 位 ID；074b 的 C-21…C-30 已追加到 `contracts/report-and-attribution.md` 为 C-055…C-064，T037–T040 的 green 认领随之改写并解析（green-dangling 0；证据 074-merge-plan-rerun-20261111.json）。
+终态: blocked（exit 2）——非 Sealed；以上为全部具名阻断（FR-027(d) + B2），无第三态、无静默默认。
+
+=== RUN 2 ===
+$ python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification/
+seal-utils.py seal: error (exit 2)
+  outcome: error
+  status: Ready for Review -> Sealed
+  writes: 0
+  - closure-input-defect: the closure engine exited 2: closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership
+    fix: repair the acceptance input (every SC carries exactly one trailing `**Path**` marker and a status row), then rerun the closure engine
+    rerun: rerun seal after the closure engine reads its inputs
+exit: 2
+
+--- 回合裁决清单（每次运行重算，逐字复现） ---
+FR-027(a): resolved — 父 requirements.md 的 8 条 SC 行各带恰一个行尾 `**Path**: final`（0 -> 8；`validate-requirements.py` 的 path-marker 面 pass；逐条见 074-factory-resolutions.md § D）。
+FR-027(b): resolved — 两组 STR 同号不同义的声明映射核验通过：074a 本地 STR-010→父 STR-011；074b 本地 STR-004/005/006/007→父 STR-007/008/009/010（证据：074-merge-plan-rerun-20261111.json 的 id_maps.STR，17 条映射）。
+FR-027(c): resolved — 18 个源引用（36 条冲突 = 源/镜像双扫）按 C-018 `recheck-clean` 处置（074-factory-resolutions.md § A/B）；重跑 merge-plan 0 open conflicts、0 factory_doc_refs（074-merge-plan-rerun-20261111.json）。
+FR-027(d): blocked — 074b review 的 P0 F1（字母分片分支把 /speckit.* 前置解析到父目录）只带驱动者记录的豁免，按 C-044 不构成用户豁免；无修复证据（实测 2026-11-11：scripts/bash/common.sh:86 仍为 `^[0-9]+-`，仍回退「最新 spec 目录」）。父级聚合 review 视图为 summary+pointer、不含 finding 块，seal 的 P0 扫描未点名该项；回合按原记录（.specify/specs/074b-nested-governance/review.md:115-136）判 blocked，不得读作已处置。
+FR-027(e): resolved — 父 tasks.md 的 57 条拆前未勾选行按 C-022 进入「Superseded pre-split record」块（57 条 `> - [ ]` 引用行 + 57 条 superseded 元数据行），merge-manifest.json 的 dispositions[] 逐条 57 条；合并后父 tasks.md 未勾选行 = 0。
+额外阻断 B1: resolved —（原假阳性根因已修）引擎 `_registry_row` 跨空行继续读表行；本轮 seal 不再报 state-drift，状态双载体一致（`.specify/features.md` 的 074 行 Status = `Ready for Review`；`.specify/features/074-goal-team-sdd-unification.md` `**Status**: Ready for Review`）。红先用例 tests/contract/test_seal_seal.py::test_registry_row_is_read_across_blank_lines_inside_the_table（p8b-red-first-20261111.txt）。
+额外阻断 B2: blocked — closure-input-defect 持续：闭包判定器 exit 2，`requirements.md carries no § Runtime Stack & Dependency Ownership`（074 早于该门禁）；本轮 MUST NOT 自造运行时声明，该条即两次 seal 运行唯一的引擎条件。
+额外阻断 B3: resolved —（原合并产物校验债已修）引擎分片任务行按阶段标题落位；`validate-tasks.py` 对合并后父 tasks.md 报 0 errors / 2 warnings（33 × story-labels 与 10 × green-dangling 均为 0；读数见 074-merge-checks-rerun-20261111.txt）。
+额外阻断 B4: resolved —（原内容丢失已修）引擎条款正则支持 1–3 位 ID；074b 的 C-21…C-30 已追加到 `contracts/report-and-attribution.md` 为 C-055…C-064，T037–T040 的 green 认领随之改写并解析（green-dangling 0；证据 074-merge-plan-rerun-20261111.json）。
+终态: blocked（exit 2）——非 Sealed；以上为全部具名阻断（FR-027(d) + B2），无第三态、无静默默认。
+

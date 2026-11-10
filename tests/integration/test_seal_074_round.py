@@ -15,7 +15,10 @@ Evidence the round produced (captured by T039/T041/T043):
 * ``test-evidence/074-merge-plan-before.json`` — the pre-fix plan, whose
   ``conflicts[]`` names the ``factory-doc-ref-ambiguous`` class 36 times.
 * ``test-evidence/074-merge-plan-after.json`` — the post-fix plan (0 open conflicts).
-* ``test-evidence/074-round-20261110.txt`` — the seal adjudication, run twice.
+* ``test-evidence/074-round-20261110.txt`` — the pre-fix round's adjudication,
+  kept unchanged as the before snapshot of the P8b rerun.
+* ``test-evidence/074-round-rerun-20261111.txt`` — the rerun on the repaired
+  engine: two seal runs, the same refusal list, the FR-027 floor covered.
 """
 
 from __future__ import annotations
@@ -35,7 +38,7 @@ EVIDENCE = REPO_ROOT / ".specify" / "specs" / "099-speckit-seal" / "test-evidenc
 PARENT = REPO_ROOT / ".specify" / "specs" / "074-goal-team-sdd-unification"
 SLICE_A = "074a-authorized-routing"
 SLICE_B = "074b-nested-governance"
-ROUND_EVIDENCE = EVIDENCE / "074-round-20261110.txt"
+ROUND_EVIDENCE = EVIDENCE / "074-round-rerun-20261111.txt"
 
 #: The declared mappings the round MUST honour (074a / 074b `## Parent Mapping`).
 DECLARED_STR_MAPPINGS = {
@@ -153,7 +156,8 @@ def _adjudication_blocks(text: str) -> list[dict]:
 def test_blocked_state_rerun_is_identical_and_names_the_same_verdict():
     assert ROUND_EVIDENCE.is_file(), (
         "the blocked round's adjudication is carried by "
-        "`test-evidence/074-round-20261110.txt` (T043/T044)"
+        "`test-evidence/074-round-rerun-20261111.txt` (P8b rerun; the pre-fix "
+        "round stays as `074-round-20261110.txt`)"
     )
     blocks = _adjudication_blocks(ROUND_EVIDENCE.read_text(encoding="utf-8"))
     assert len(blocks) == 2, (
