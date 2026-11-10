@@ -269,10 +269,10 @@ US2 5（T017–T021）· US3 4（T022–T025）· Polish 7（T026–T032）  合
 
 | 契约文件 | 分区 |
 |----------|------|
-| `hierarchy-and-authorization.md`（16） | C-1…C-2→T004、C-3→T008、C-4→T009、C-5→T010、C-6…C-8→T011、C-9…C-10→T023、C-11…C-14→T024、C-15…C-16→T025 |
-| `routing-decision.md`（14） | C-17→T004、C-18…C-27→T017、C-28→T019、C-29→T020、C-30→T027 |
-| `nested-invocation.md`（13） | C-31…C-33→T013、C-34…C-37→T014、C-38…C-40→T015、C-41…C-42→T016、C-43→T028 |
-| `bootstrap-and-maintenance.md`（4） | C-44…C-46→T004、C-47→T028 |
+| `hierarchy-and-authorization.md`（16） | C-001…C-002→T004、C-003→T008、C-004→T009、C-005→T010、C-006…C-008→T011、C-009…C-010→T023、C-011…C-014→T024、C-015…C-016→T025 |
+| `routing-decision.md`（14） | C-001→T004、C-002…C-011→T017、C-012→T019、C-013→T020、C-014→T027 |
+| `nested-invocation.md`（13） | C-047…C-049→T013、C-050…C-053→T014、C-054…C-056→T015、C-057…C-058→T016、C-059→T028 |
+| `bootstrap-and-maintenance.md`（4） | C-001…C-003→T004、C-004→T028 |
 
 ## 9. Feature 表复审（tasks 阶段的强制项）
 
@@ -384,7 +384,7 @@ contracts/compat-and-safety.md:12
 contracts/diffusion.md:8
 contracts/report-and-attribution.md:10
 $ grep -ohE '^\*\*C-[0-9]+\*\*' …/contracts/*.md | wc -l
-30     # ids contiguous C-1…C-30
+30     # ids contiguous C-001…C-064
 ```
 
 ## 4. Cross-artifact gate — `pre-analyze-check.py --stage tasks`
@@ -482,9 +482,9 @@ coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 flo
 
 | Contract | Clauses | Rows |
 |----------|---------|------|
-| `contracts/report-and-attribution.md` | C-21…C-23 / C-24…C-26 / C-27…C-29 / C-30 | T037 / T038 / T039 / T040 |
-| `contracts/diffusion.md` | C-13…C-14 / C-15…C-17 / C-18 / C-19 / C-20 | T043 / T044 / T045 / T046 / T047 |
-| `contracts/compat-and-safety.md` | C-1…C-2 / C-3…C-6 / C-7…C-12 | T049 / T050 / T051 |
+| `contracts/report-and-attribution.md` | C-055…C-057 / C-058…C-060 / C-061…C-063 / C-064 | T037 / T038 / T039 / T040 |
+| `contracts/diffusion.md` | C-001…C-002 / C-003…C-005 / C-006 / C-007 / C-008 | T043 / T044 / T045 / T046 / T047 |
+| `contracts/compat-and-safety.md` | C-001…C-002 / C-003…C-006 / C-007…C-012 | T049 / T050 / T051 |
 
 Each clause is claimed exactly once and each file's ordinals ascend with row order — the validator's
 four green checks agree (§ 1), and the accountant's `claimed clauses = 30` (§ 3b) is the same fact

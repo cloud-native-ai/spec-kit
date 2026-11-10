@@ -625,13 +625,13 @@ ______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
                     continue
                 drifted.append(rel)
         assert not missing, (
-            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+            "non-wiring source disappeared (C-005, zero new commands/skills): %r" % missing
         )
 >       assert not drifted, (
-            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "non-wiring source changed (C-005: the slice may only touch W1-W4 and the "
             "feedback-step pointer). drifted: %r" % drifted
         )
-E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/internal/run-agent/SKILL.md']
+E       AssertionError: non-wiring source changed (C-005: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/internal/run-agent/SKILL.md']
 E       assert not ['skills/internal/run-agent/SKILL.md']
 
 tests/contract/test_expression_compatibility.py:527: AssertionError
@@ -1080,7 +1080,7 @@ ____________ test_unwatched_detector_positive_expired_and_negative _____________
 tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2446/test_unwatched_detector_positi0')
 
     def test_unwatched_detector_positive_expired_and_negative(tmp_path):
-        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        """C-056: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
         # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
         # cases anchor to call time instead of module-import NOW. NOW binds at
         # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
@@ -1105,7 +1105,7 @@ ____________________ test_dead_no_exit_record_is_never_done ____________________
 tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2446/test_dead_no_exit_record_is_ne0')
 
     def test_dead_no_exit_record_is_never_done(tmp_path):
-        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        """C-057: dead pid without an exit record is never DONE; live adds no stop."""
         ws = Workspace(tmp_path)
         ws.write_artifact("tasks.md")
         ws.write_spine(started_at=NOW - 100)
@@ -1759,13 +1759,13 @@ ______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
                     continue
                 drifted.append(rel)
         assert not missing, (
-            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+            "non-wiring source disappeared (C-005, zero new commands/skills): %r" % missing
         )
 >       assert not drifted, (
-            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "non-wiring source changed (C-005: the slice may only touch W1-W4 and the "
             "feedback-step pointer). drifted: %r" % drifted
         )
-E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/internal/create-team/SKILL.md']
+E       AssertionError: non-wiring source changed (C-005: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/internal/create-team/SKILL.md']
 E       assert not ['skills/internal/create-team/SKILL.md']
 
 tests/contract/test_expression_compatibility.py:535: AssertionError

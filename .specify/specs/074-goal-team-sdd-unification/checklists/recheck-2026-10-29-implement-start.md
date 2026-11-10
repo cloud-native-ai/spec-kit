@@ -30,11 +30,11 @@ already-answered items. Nothing here re-scores the checklist.
 
 | Item | Answer now recorded at | Verdict |
 |------|------------------------|---------|
-| CHK007 (`ambiguous` / `conflicting` undefined) | `contracts/routing-decision.md` C-23 (out-of-domain value = ambiguous) and C-24 (one closed conflict pair); the golden-table rows are authored from the owner document (tasks T020) | answered for implementation; residual: FR-011 still delegates only the reason-code vocabulary, so the decision's closed forms live in the design face |
-| CHK008 (goal-only run undefined) | `data-model.md` E1 `target_ref` — absent Target means the run is scoped to the whole Goal; `contracts/nested-invocation.md` C-31 / C-32 validate a Target only when one is supplied | answered |
-| CHK011 (SC-001's "both records" has no named carriers) | `contracts/hierarchy-and-authorization.md` C-8 (authorization probe record) + C-14 (the same record carried into the team run report written under the existing `create-team` contract) | answered |
-| CHK025 (FR-003 host-rendering prohibition has no SC) | `contracts/hierarchy-and-authorization.md` C-3; pinned mechanically by `tests/contract/test_neutral_metadata_schema.py:130` / `:137` (equality + membership cross-check) and delivered by tasks T008 | answered |
-| CHK026 (FR-014 no-restatement obligation has no SC) | `contracts/routing-decision.md` C-17 / C-30; measured by tasks T027 (reverse-count audit) and `tests/contract/test_sdd_routing_definitions.py` | answered |
+| CHK007 (`ambiguous` / `conflicting` undefined) | `contracts/routing-decision.md` C-007 (out-of-domain value = ambiguous) and C-008 (one closed conflict pair); the golden-table rows are authored from the owner document (tasks T020) | answered for implementation; residual: FR-011 still delegates only the reason-code vocabulary, so the decision's closed forms live in the design face |
+| CHK008 (goal-only run undefined) | `data-model.md` E1 `target_ref` — absent Target means the run is scoped to the whole Goal; `contracts/nested-invocation.md` C-047 / C-048 validate a Target only when one is supplied | answered |
+| CHK011 (SC-001's "both records" has no named carriers) | `contracts/hierarchy-and-authorization.md` C-008 (authorization probe record) + C-014 (the same record carried into the team run report written under the existing `create-team` contract) | answered |
+| CHK025 (FR-003 host-rendering prohibition has no SC) | `contracts/hierarchy-and-authorization.md` C-003; pinned mechanically by `tests/contract/test_neutral_metadata_schema.py:130` / `:137` (equality + membership cross-check) and delivered by tasks T008 | answered |
+| CHK026 (FR-014 no-restatement obligation has no SC) | `contracts/routing-decision.md` C-001 / C-014; measured by tasks T027 (reverse-count audit) and `tests/contract/test_sdd_routing_definitions.py` | answered |
 
 ## C. Answered on the task/measurement face (3)
 
@@ -42,7 +42,7 @@ already-answered items. Nothing here re-scores the checklist.
 |------|------------------------|---------|
 | CHK012 ("the review surface" unbound to a mechanism) | `tasks.md` T029 — `/speckit.review` is named as this slice's classification-honesty audit face, with the engine's determinism scoped to declared inputs only | answered |
 | CHK021 (SC-004 containment claim void — no baseline referent) | `tasks.md` GATE-5 + `test-evidence/targeted-set-v1-baseline.txt` — a named 13-file set, a name-level comparison form (`comm -13` over failed nodeids), and the zero-delta criterion; re-captured at implement start by T002 | answered |
-| CHK024 (FR-025 has no scenario or SC) | `tasks.md` § Requirement Coverage Map — FR-025 carries the recorded implement waiver ("no new SC, no renumbering"), with C-44…C-47 as its decidable face and the waiver accounted in `verification.md` | answered (waived, not silently dropped) |
+| CHK024 (FR-025 has no scenario or SC) | `tasks.md` § Requirement Coverage Map — FR-025 carries the recorded implement waiver ("no new SC, no renumbering"), with C-001…C-004 as its decidable face and the waiver accounted in `verification.md` | answered (waived, not silently dropped) |
 
 ## Subtraction result
 

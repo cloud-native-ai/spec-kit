@@ -1,0 +1,51 @@
+# 074 重跑 — 合并后校验读数（修复后引擎）
+captured_at: 2026-11-10T17:30:25Z
+
+## 1. validate-tasks — PASS（0 error / 2 warning）
+
+command: `python3 scripts/python/validate-tasks.py .specify/specs/074-goal-team-sdd-unification/tasks.md`
+exit: 0
+未勾选行（`^- \[ \]`）: 0
+Superseded 块引用行（`^> - \[ \]`）: 57
+闭合行（`^- \[X\]`）: 58
+阶段标题行（`^## Phase`）: 19（父 8 + 074a 6 + 074b 5）
+结论：B3 的 33 × story-labels 与 10 × green-dangling 均为 0；2 warnings 为分片任务行原样合并带来的既有 parallel-safe / green-path-divergence，非本轮新增内容。
+
+全量输出：
+```
+WARN  307: parallel-safe: [P] tasks T003 (line 307) and T035 (line 347) both WRITE ['specify/scripts/python/account-clause-coverage.py'] in phase `## Phase 1: Setup (Shared Infrastructure)` — [P] requires different write targets; drop [P] from one row or re-target it, never by deleting the cited path
+WARN  333: green-path-divergence: T025 (line 333) and T049 (line 364) both write tests/contract/test_sdd_invocation_governance.py but claim different green points (['contracts/hierarchy-and-authorization.md#C-015', 'contracts/hierarchy-and-authorization.md#C-016'] vs ['contracts/compat-and-safety.md#C-001', 'contracts/compat-and-safety.md#C-002']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+PASS (with warnings): .specify/specs/074-goal-team-sdd-unification/tasks.md — 0 error(s), 2 warning(s)
+```
+
+## 2. validate-requirements — PASS
+
+command: `python3 scripts/python/validate-requirements.py .specify/specs/074-goal-team-sdd-unification/requirements.md`
+exit: 0
+```
+file: .specify/specs/074-goal-team-sdd-unification/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 528 lines, 36 definition rows, 11 shared strings
+0 error(s), 0 warning(s)
+```
+
+## 3. dated record 哈希 — PASS（运行前后逐字节一致）
+
+文件数: 47（两片 review.md / code-review.md / verification.md + test-evidence/ 与 checkpoints/ 全部文件）
+before: `074-dated-record-hashes-rerun-before.txt`
+after: 与 before 逐条 sha256 比较 0 变化（复算见本文件生成脚本）
+
+## 4. 合并产物结构读数
+
+- contracts/report-and-attribution.md 条款: C-47 C-48 C-49 C-50 C-51 C-52 C-53 C-54 C-055 C-056 C-057 C-058 C-059 C-060 C-061 C-062 C-063 C-064 
+- contracts/nested-invocation.md 条款数: 29（父 16 + 074a 追加 13）
+- contracts/hierarchy-and-authorization.md 条款数: 16（074a 创建，本文件序列 C-001…）
+- contracts/compat-and-safety.md 条款数: 12（074b 创建）
+- contracts/diffusion.md 条款数: 8（074b 创建）
+- 分片任务行落位: 074a 块 6 个阶段标题、074b 块 5 个阶段标题，均以 `<\!-- source: <slug> -->` 标注

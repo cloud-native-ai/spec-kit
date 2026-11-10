@@ -284,37 +284,37 @@ requirement entry**, never per parent file's physical grouping (D-1).
 
 | Slice FR | Parent FR | Parent clause(s) | Parent contract file |
 |----------|-----------|------------------|----------------------|
-| FR-001 | FR-001 | C-2 | `route-decision.md` |
-| FR-002 | FR-002 | C-3 | `route-decision.md` |
-| FR-003 | FR-003 | C-15, C-60 | `authorization-and-probe.md`, `diffusion-and-compat.md` |
-| FR-004 | FR-004 | C-16, C-17, C-18, C-19 | `authorization-and-probe.md` |
-| FR-005 | FR-005 | C-20, C-21, C-29, C-59 | `authorization-and-probe.md`, `diffusion-and-compat.md` |
-| FR-006 | FR-006 | C-22, C-23, C-24 | `authorization-and-probe.md` |
-| FR-007 | FR-007 | C-13, C-14 | `route-decision.md` |
-| FR-008 | FR-008 | C-4, C-5, C-6 | `route-decision.md` |
-| FR-009 | FR-009 | C-7 | `route-decision.md` |
-| FR-010 | FR-010 | C-6, C-8 | `route-decision.md` |
-| FR-011 | FR-011 | C-9, C-10 | `route-decision.md` |
-| FR-012 | FR-012 | C-11 | `route-decision.md` |
-| FR-013 | FR-013 | C-12, C-54 (FR-013 facet, D-2) | `route-decision.md`, `report-and-attribution.md` |
-| FR-014 | FR-014 | C-1, C-5, C-13, C-14, C-66 (FR-014 facet) | `route-decision.md`, `diffusion-and-compat.md` |
-| FR-015 | FR-015 | C-31, C-32 | `nested-invocation.md` |
-| FR-016 | FR-016 | C-34, C-35, C-36, C-37, C-38, C-46 | `nested-invocation.md` |
-| FR-017 | FR-017 | C-36, C-41, C-46 | `nested-invocation.md` |
-| FR-018 | FR-018 | C-24, C-30, C-39, C-64 (FR-018 facet) | `authorization-and-probe.md`, `nested-invocation.md`, `diffusion-and-compat.md` |
-| FR-019 | FR-019 | C-40 | `nested-invocation.md` |
-| FR-025 | parent FR 025 | C-45, C-58, C-59, C-67 | `nested-invocation.md`, `diffusion-and-compat.md` |
+| FR-001 | FR-001 | C-002 | `route-decision.md` |
+| FR-002 | FR-002 | C-003 | `route-decision.md` |
+| FR-003 | FR-003 | C-015, C-60 | `authorization-and-probe.md`, `diffusion-and-compat.md` |
+| FR-004 | FR-004 | C-016, C-001, C-002, C-003 | `authorization-and-probe.md` |
+| FR-005 | FR-005 | C-004, C-005, C-013, C-59 | `authorization-and-probe.md`, `diffusion-and-compat.md` |
+| FR-006 | FR-006 | C-006, C-007, C-008 | `authorization-and-probe.md` |
+| FR-007 | FR-007 | C-013, C-014 | `route-decision.md` |
+| FR-008 | FR-008 | C-004, C-005, C-006 | `route-decision.md` |
+| FR-009 | FR-009 | C-007 | `route-decision.md` |
+| FR-010 | FR-010 | C-006, C-008 | `route-decision.md` |
+| FR-011 | FR-011 | C-009, C-010 | `route-decision.md` |
+| FR-012 | FR-012 | C-011 | `route-decision.md` |
+| FR-013 | FR-013 | C-012, C-54 (FR-013 facet, D-2) | `route-decision.md`, `report-and-attribution.md` |
+| FR-014 | FR-014 | C-001, C-005, C-013, C-014, C-66 (FR-014 facet) | `route-decision.md`, `diffusion-and-compat.md` |
+| FR-015 | FR-015 | C-047, C-048 | `nested-invocation.md` |
+| FR-016 | FR-016 | C-050, C-051, C-052, C-053, C-054, C-003 | `nested-invocation.md` |
+| FR-017 | FR-017 | C-052, C-057, C-003 | `nested-invocation.md` |
+| FR-018 | FR-018 | C-008, C-014, C-055, C-64 (FR-018 facet) | `authorization-and-probe.md`, `nested-invocation.md`, `diffusion-and-compat.md` |
+| FR-019 | FR-019 | C-056 | `nested-invocation.md` |
+| FR-025 | parent FR 025 | C-002, C-58, C-59, C-67 | `nested-invocation.md`, `diffusion-and-compat.md` |
 
 #### Slice SC → parent SC → parent clause(s)
 
 | Slice SC | Parent SC | Parent clause(s) | Delivered facet in this slice |
 |----------|-----------|------------------|-------------------------------|
-| SC-001 | SC-001 | C-19, C-29 | authorization refusal names the failing half, with both source paths |
-| SC-002 | SC-002 | C-10, C-13, C-14 | golden table judged row by row; repeated evaluation identical |
-| SC-003 | SC-003 | C-42 (+ parent C-48 deferred) | content face per D-3: artifact chain, zero merge/push, path references |
-| SC-004 | SC-004 | C-28 (+ parent C-65 deferred) | stage executors cannot start; unqualified prompts blocked; pre-existing cases green |
-| SC-006 | parent SC 006 | C-24, C-30, C-39, C-64 | no second registry / ledger / spine / ownership / queue |
-| SC-007 | parent SC 007 | C-9, C-14 | ambiguous or conflicting input never yields direct |
+| SC-001 | SC-001 | C-003, C-013 | authorization refusal names the failing half, with both source paths |
+| SC-002 | SC-002 | C-010, C-013, C-014 | golden table judged row by row; repeated evaluation identical |
+| SC-003 | SC-003 | C-058 (+ parent C-48 deferred) | content face per D-3: artifact chain, zero merge/push, path references |
+| SC-004 | SC-004 | C-012 (+ parent C-65 deferred) | stage executors cannot start; unqualified prompts blocked; pre-existing cases green |
+| SC-006 | parent SC 006 | C-008, C-014, C-055, C-64 | no second registry / ledger / spine / ownership / queue |
+| SC-007 | parent SC 007 | C-009, C-014 | ambiguous or conflicting input never yields direct |
 
 #### Parent clauses deferred to `074b-nested-governance` (not counted as slice coverage)
 
@@ -324,10 +324,10 @@ decision rather than an omission:
 
 | Parent clause(s) | Serves | Slice that owns it |
 |------------------|--------|--------------------|
-| C-25, C-26 | parent FR 023 (Agent responsibility statement; leaf stays leaf) | `074b-nested-governance` |
-| C-27, C-65 | parent FR 026 (default-`forbidden` containment claim) | `074b-nested-governance` |
-| C-33, C-43, C-44 | parent FR 027 (additive on the four predecessor surfaces) | `074b-nested-governance` |
-| C-47, C-48, C-49, C-53 | parent FR 021 (the `## Nested SDD Runs` report section) | `074b-nested-governance` |
+| C-009, C-010 | parent FR 023 (Agent responsibility statement; leaf stays leaf) | `074b-nested-governance` |
+| C-011, C-65 | parent FR 026 (default-`forbidden` containment claim) | `074b-nested-governance` |
+| C-049, C-059, C-001 | parent FR 027 (additive on the four predecessor surfaces) | `074b-nested-governance` |
+| C-004, C-48, C-49, C-53 | parent FR 021 (the `## Nested SDD Runs` report section) | `074b-nested-governance` |
 | C-50, C-51, C-52 | parent FR 020 (supervisor-only writes; ledger attribution; no Goal field) | `074b-nested-governance` |
 | C-54 (report-section facet) | parent FR 021 (the section's verdict reference) | `074b-nested-governance` |
 | C-55 | parent FR 022 (team Stage-vocabulary disambiguation) | `074b-nested-governance` |
@@ -350,42 +350,42 @@ one plan re-review (efficiency-model §3.5(a)) after `/speckit.analyze` returned
 8 MEDIUM / 3 LOW. Each entry records the decision and the reason; the requirement text each one
 projects is already in `requirements.md` and is read there, never re-derived here.
 
-1. **F-01 — `authorize` exit alphabet (substantive: C-8, C-28, `quickstart.md` S4, `tasks.md` T007).**
+1. **F-01 — `authorize` exit alphabet (substantive: C-008, C-012, `quickstart.md` S4, `tasks.md` T007).**
    Decision: `authorize` exits `0` for **any** authorization verdict — allowed and refused alike — and
    `2` for malformed or unreadable input; a refusal is expressed by the JSON `verdict` / `reason`
    fields together with the failing half, never by the process status. Reason: the pre-revision text
-   carried two contradictory alphabets for one engine (C-28 fixed `0` / `2` for `route`, while
+   carried two contradictory alphabets for one engine (C-012 fixed `0` / `2` for `route`, while
    `quickstart.md` S4 documented `0` / `2` / `3` for `authorize`), so a caller could not tell
    "refused" from "engine failed", and any test written from one surface would have contradicted the
    other. Both verdict-producing actions now share one two-valued alphabet, and the refusal/error
    distinction lives where the record is. Pinned by `tests/contract/test_sdd_authorization.py`, whose
    T007 obligation now asserts `0` on the refused case.
-2. **HIGH-1 — definition-class closure (substantive: C-18, C-20, with C-21 / C-22 / C-24 kept in
+2. **HIGH-1 — definition-class closure (substantive: C-002, C-004, with C-005 / C-006 / C-008 kept in
    step).** Decision: `definition-class` is a value of `change_nature` — the five inputs stay five —
    its membership is derived from the target path by the predicate owned by `requirements.md` FR-008,
    and the change is cross-cutting by default, bounded only on a declared bounded correction with a
    recorded rationale. Reason: the class was an open phrase ("templates that generate them") while
    both the cross-cutting default and the bounded-correction escape keyed off class membership, so no
    implementer could decide membership; carrying it inside the declared change nature closes the set
-   without adding the sixth input C-18 forbids. C-21's and C-22's first conditions are now read off
-   the `feature` / `maintenance` values instead of an unmapped one, and C-24's conflict pair uses the
+   without adding the sixth input C-002 forbids. C-005's and C-006's first conditions are now read off
+   the `feature` / `maintenance` values instead of an unmapped one, and C-008's conflict pair uses the
    `feature` literal.
-3. **HIGH-2 — `SDD assignment` defined (substantive, narrow: C-9).** Decision: the third predicate
+3. **HIGH-2 — `SDD assignment` defined (substantive, narrow: C-009).** Decision: the third predicate
    condition names a defined term — a member duty whose routing decision is recorded as [[STR-004]],
    with the definition owned by `requirements.md` FR-005. Reason: two readings survived (a recorded
    `sdd` verdict vs. any dispatch intending to run SDD) and they differ exactly on the dispatch FR-005
    exists to block. The three conditions themselves are unchanged.
 4. **Driver-adjudicated MEDIUM repairs touching this plan's artifacts** (decisions recorded in the
-   state spine; listed here so the plan does not read as untouched): C-13's per-member cap escape is
-   removed in favour of a hard cap of one run per member (B-04); C-14 names the two SC-001 carriers
-   (B-01); C-25 makes the FR-011 reason code mandatory on an override record (B-03); C-26 defines
+   state spine; listed here so the plan does not read as untouched): C-013's per-member cap escape is
+   removed in favour of a hard cap of one run per member (B-04); C-014 names the two SC-001 carriers
+   (B-01); C-009 makes the FR-011 reason code mandatory on an override record (B-03); C-010 defines
    `write-bearing change` by pointer to FR-007 (C-03); `data-model.md` E4 / E7 carry the same three
    alignments; and the delivery-surface counts become 15 rows = 9 new + 6 edited with `feature-ref.md`
    § 2 as the owner (F-02).
 
 **What this revision does not do**: it changes no clause id, adds no clause, moves no clause between
 files, defers no clause differently, and re-opens no requirement. The clause count stays 47 and the
-C-1…C-47 partition `tasks.md` claims is untouched, so every `[green:]` claim still resolves. The same
+C-001…C-004 partition `tasks.md` claims is untouched, so every `[green:]` claim still resolves. The same
 eighteen Constitution Check rows remain ✅ Pass: no principle depends on the exit alphabet or on the
 class phrase, and the one-source-of-truth row is strengthened rather than weakened, because the path
 predicate now has a single owner in `requirements.md` FR-008 that the contracts cite.
@@ -400,8 +400,8 @@ predicate now has a single owner in `requirements.md` FR-008 that the contracts 
 re-derived here; each entry records what changed in the design and why.
 
 1. **F-01 (HIGH) — one containment criterion instead of two (classification: minor).**
-   `contracts/compat-and-safety.md` gains a reading rule between C-6 and C-7 that reads FR-026/SC-005's
-   "same verdict" and FR-027/C-6's "every pre-change case passes" as **one** decidable criterion over
+   `contracts/compat-and-safety.md` gains a reading rule between C-006 and C-007 that reads FR-026/SC-005's
+   "same verdict" and FR-027/C-006's "every pre-change case passes" as **one** decidable criterion over
    the set both claims reach (`S2`, the standalone-driver entry suite): for a case id that is already
    **red** in the pre-change baseline the criterion is **verdict-unchanged**, and "MUST pass" governs
    only the case ids that are **green** in that baseline. Reason: two criteria stood over one shared
@@ -411,14 +411,14 @@ re-derived here; each entry records what changed in the design and why.
    `md-bold-closed`); it is text-level disambiguation, hence **minor**, and the plan's scope needs no
    re-anchoring beyond this record.
 2. **Text-level alignment carried in the same pass (classification: minor).** MEDIUM/LOW findings whose
-   remedy is wording rather than design: C-25 and `data-model.md` V-5 now state **one** cardinality (at
+   remedy is wording rather than design: C-059 and `data-model.md` V-5 now state **one** cardinality (at
    most one attributed ledger item per report — exactly one with a Target, none without) instead of
    "exactly one" versus "at most one"; FR-020's "summary" is bound to the **existing** goal-level
-   summary channel so it cannot be read as a second artifact; C-29 names the handoff's integration
+   summary channel so it cannot be read as a second artifact; C-063 names the handoff's integration
    identity and the incomplete-handoff rule (missing identity ⇒ the outer layer MUST NOT report
    success); `contracts/diffusion.md` `Measures` names the DoD / task rows that grade the diffusion
-   faces instead of `—`, adding no SC; C-11 declares its anchor prose-level (`requirements.md`
-   § Overview) and C-20 declares itself a design-level criterion; C-13 states the Stage boundary
+   faces instead of `—`, adding no SC; C-011 declares its anchor prose-level (`requirements.md`
+   § Overview) and C-008 declares itself a design-level criterion; C-001 states the Stage boundary
    **bidirectionally** and lets the seat's operating object — not the name — decide a definition that
    carries both duties.
 
@@ -440,31 +440,31 @@ entry**, never per parent file's physical grouping (D-1).
 | FR-020 | parent FR 020 | C-50, C-51, C-52 | `report-and-attribution.md` |
 | FR-021 | parent FR 021 | C-47, C-48, C-49, C-53, C-54 (report-section facet) | `report-and-attribution.md` |
 | FR-022 | parent FR 022 | C-55, C-66 (Stage-vocabulary facet) | `diffusion-and-compat.md` |
-| FR-023 | parent FR 023 | C-25, C-26 (C-60 cited; claimed by `074a`) | `authorization-and-probe.md`, `diffusion-and-compat.md` |
+| FR-023 | parent FR 023 | C-059, C-060 (C-60 cited; claimed by `074a`) | `authorization-and-probe.md`, `diffusion-and-compat.md` |
 | FR-024 | parent FR 024 | C-56, C-57 | `diffusion-and-compat.md` |
-| FR-026 | parent FR 026 | C-27, C-65 (C-16/C-28 cited; delivered by `074a`) | `authorization-and-probe.md`, `diffusion-and-compat.md` |
+| FR-026 | parent FR 026 | C-061, C-65 (C-004/C-062 cited; delivered by `074a`) | `authorization-and-probe.md`, `diffusion-and-compat.md` |
 | FR-027 | parent FR 027 | C-61, C-62, C-33, C-43, C-44 | `nested-invocation.md`, `diffusion-and-compat.md` |
-| FR-028 | parent FR 028 | C-63, C-67 (parent FR 028 facet) (C-30/C-64 cited; delivered elsewhere) | `diffusion-and-compat.md`, `authorization-and-probe.md` |
+| FR-028 | parent FR 028 | C-63, C-67 (parent FR 028 facet) (C-064/C-64 cited; delivered elsewhere) | `diffusion-and-compat.md`, `authorization-and-probe.md` |
 
 #### Slice SC → parent SC → parent clause(s)
 
 | Slice SC | Parent SC | Parent clause(s) | Delivered facet in this slice |
 |----------|-----------|------------------|-------------------------------|
-| SC-005 | parent SC 005 | C-27, C-61, C-62 | superset + same-verdict over 7 frozen node-id sets (17 files, 266 cases) |
+| SC-005 | parent SC 005 | C-061, C-61, C-62 | superset + same-verdict over 7 frozen node-id sets (17 files, 266 cases) |
 | SC-008 | parent SC 008 | C-51, C-52 | parsed Goal field set identical before/after (12 keys); attribution only through the existing ledger reference |
 
 #### Parent clauses that are `074a`'s or another owner's (cited, not claimed)
 
 | Parent clause(s) | Serves | Owner |
 |------------------|--------|-------|
-| C-15, C-16, C-17, C-18, C-19, C-20, C-21, C-22, C-23, C-24, C-28, C-29 | parent FR 003–006 (key set, seat map, AND resolution, anti-nesting predicate, depth-2 chain) | `074a-authorized-routing` |
+| C-003, C-004, C-005, C-006, C-007, C-008, C-055, C-056, C-057, C-058, C-062, C-063 | parent FR 003–006 (key set, seat map, AND resolution, anti-nesting predicate, depth-2 chain) | `074a-authorized-routing` |
 | C-31, C-32, C-34…C-42, C-45, C-46 | parent FR 015–019, 025 (entry form, handoff, stop at review, stall, setup path) | `074a-authorized-routing` |
 | C-54 (parent FR 013 facet) | parent FR 013 (verdict record carrier) | `074a-authorized-routing` (D-2) |
 | C-58, C-59 | parent FR 025 (invocation kinds, bootstrap/maintenance authorization) | `074a-authorized-routing` |
 | C-60 (key-set facet) | parent FR 003 (authoring baseline lists the key) | `074a-authorized-routing` |
 | C-66 (parent FR 018 facet) | parent FR 018 (no second store) | `074a-authorized-routing` |
-| C-1…C-14 | parent FR 001–014 (control hierarchy, routing verdict) | `074a-authorized-routing` |
-| C-30, C-64 | parent FR 026/028, 018 | `074a-authorized-routing` (cited by this slice's C-12) |
+| C-001…C-002 | parent FR 001–014 (control hierarchy, routing verdict) | `074a-authorized-routing` |
+| C-064, C-64 | parent FR 026/028, 018 | `074a-authorized-routing` (cited by this slice's C-012) |
 
 **Recorded discrepancy, not repaired**: `074a`'s deferred table lists 21 clause ids while its prose says
 "20", and parent C-66's Stage-vocabulary facet is named in that prose but absent from the table. This
@@ -481,26 +481,26 @@ each, in the same order.
 - **D-1 — attribution follows the requirement entry, not the parent file's grouping.** The design set
   covers local FR-020–FR-028 and SC-005–SC-008. Each projected clause names its parent clause as
   *source*, drawn from `report-and-attribution.md` (parent C-47…C-54) and `diffusion-and-compat.md`
-  (parent C-55…C-67) plus two clauses from `authorization-and-probe.md` (parent C-25/C-26) and three
+  (parent C-55…C-67) plus two clauses from `authorization-and-probe.md` (parent C-059/C-060) and three
   from `nested-invocation.md` (parent C-33/C-43/C-44). Clauses in those files that serve `074a`'s
   entries (parent C-58, C-59, C-64, C-66's parent FR 018 facet, C-54's parent FR 013 facet) are **not** claimed; the
   parent-deferred table above records each of them with its owner. Because the parent's files are
   organized by theme, this slice's three files are organized by its own behaviour groups instead
-  (`compat-and-safety` C-1…C-12, `diffusion` C-13…C-20, `report-and-attribution` C-21…C-30), and the
+  (`compat-and-safety` C-001…C-012, `diffusion` C-001…C-008, `report-and-attribution` C-055…C-064), and the
   clause ids stay contiguous across them in file-name order so the coverage audit can partition them.
 
-- **D-2 — the routing verdict is consumed by reference here, never recomputed.** Local C-28 is the
+- **D-2 — the routing verdict is consumed by reference here, never recomputed.** Local C-062 is the
   receiving end of `074a`'s D-2: the section's `routing-verdict reference` points at the verdict that
   `074a` recorded in the Agent execution evidence (inputs, verdict, reason code, actor, user override),
   carried by the handoff and the invoking agent's result. The section copies no input set, no verdict
-  table and no reason-code vocabulary (local C-28, guarded by V-10's reverse-count audit), and when the
+  table and no reason-code vocabulary (local C-062, guarded by V-10's reverse-count audit), and when the
   record cannot be located the section records the reference as missing while the outer layer is
   forbidden to re-derive it (`requirements.md` § Edge Cases, 5th item). The engine
   `scripts/python/sdd-route.py` is cited as the producer of that record and is not invoked from the
   report-writing step.
 
 - **D-3 — the `## Nested SDD Runs` heading literal and the section's semantics are this slice's.** Local
-  STR-010 is the single heading literal; local C-21/C-22/C-23 deliver "mandatory for every run,
+  STR-010 is the single heading literal; local C-055/C-056/C-057 deliver "mandatory for every run,
   explicit when no invocation occurred, per-invocation fields"; `tests/contract/test_nested_run_report.py`
   is the only new suite that asserts them, and `074a`'s `test_nested_sdd_invocation.py:560` keeps its
   negative assertion (the literal is not present in the driver's handoff reference). Two slices,

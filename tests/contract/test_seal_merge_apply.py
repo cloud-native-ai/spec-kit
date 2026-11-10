@@ -239,6 +239,86 @@ def test_contract_merge_appends_clauses_and_creates_slice_only_file(tmp_path):
     assert "C-007" not in extra_text
 
 
+def test_one_and_two_digit_clause_ids_merge_instead_of_being_lost(tmp_path):
+    """C-015: clause ids are ``C-<digits>``; 1-2 digit ids merge like 3-digit ids.
+
+    The real 074 tree writes ``**C-1** … **C-67**``. An engine anchored to
+    ``C-\\d{3}`` recognizes none of them, so every slice clause is silently
+    dropped (the P8 round's B4 content loss). This test rewrites the fixture's
+    pinned 3-digit ids to the 1-2 digit form and expects the same merge.
+    """
+    repo = _copy_fixture("split-pair", tmp_path / "repo")
+    rewrites = {
+        _spec(repo) / "contracts" / "core.contract.md": [
+            ("**C-001**", "**C-1**"), ("**C-002**", "**C-2**")],
+        _spec(repo, ALPHA) / "contracts" / "core.contract.md": [
+            ("**C-001**", "**C-1**"), ("**C-005**", "**C-5**")],
+        _spec(repo, ALPHA) / "contracts" / "extra-alpha.md": [
+            ("**C-007**", "**C-7**")],
+        _spec(repo, BETA) / "contracts" / "core.contract.md": [
+            ("**C-002**", "**C-2**")],
+        _spec(repo, ALPHA) / "requirements.md": [
+            ("| `C-001` | `C-001` |", "| `C-1` | `C-1` |")],
+        _spec(repo, BETA) / "requirements.md": [
+            ("| `C-002` | `C-002` |", "| `C-2` | `C-2` |")],
+    }
+    for path, pairs in rewrites.items():
+        text = path.read_text(encoding="utf-8")
+        for before, after in pairs:
+            assert before in text, f"{path} lacks {before!r}"
+            text = text.replace(before, after)
+        path.write_text(text, encoding="utf-8")
+    proc, payload = _run_apply(repo)
+    assert proc.returncode == 0, payload.get("conditions")
+    core = (_spec(repo) / "contracts" / "core.contract.md").read_text(encoding="utf-8")
+    assert "**C-003** — Alpha-only clause, appended by merge order. (FR-003)" in core, (
+        "a 1-2 digit slice clause must append under the parent file's next free "
+        "C-N instead of being skipped as an unrecognized id form"
+    )
+    assert "**C-2** — Parent core clause two. (FR-002)" in core, (
+        "the parent's own 1-2 digit clause is left untouched"
+    )
+    extra_text = (_spec(repo) / "contracts" / "extra-alpha.md").read_text(encoding="utf-8")
+    assert "**C-001** — Alpha-only contract file clause. (FR-003)" in extra_text
+    assert "C-7" not in extra_text
+    entries = {(entry["slice"], entry["slice_id"]): entry
+               for entry in _manifest(repo)["id_maps"]["C"]}
+    assert entries[(ALPHA, "C-1")]["parent_id"] == "C-1", (
+        "C-016: the declared 1-2 digit Parent Mapping row must be readable"
+    )
+    assert entries[(ALPHA, "C-5")]["parent_id"] == "C-003", (
+        "C-015: the appended 1-2 digit clause records its merged id in id_maps"
+    )
+
+
+def test_merged_slice_task_rows_keep_their_phase_headings(tmp_path):
+    """C-015/C-022: slice rows land under phase headings, so the merged file validates.
+
+    The P8 round's B3: rows appended as one flat block after the last kept parent
+    row carry ``[USn]`` labels under ``<no phase>``, and validate-tasks reports
+    one story-labels error per row.
+    """
+    repo = _copy_fixture("split-pair", tmp_path / "repo")
+    for slug, label in ((ALPHA, "Alpha"), (BETA, "Beta")):
+        (_spec(repo, slug) / "tasks.md").write_text(
+            "# Tasks: fixture %s\n\n"
+            "## Phase 1: User Story 1 - fixture story\n\n"
+            "- [X] T001 [US1] %s first closed task.\n"
+            "- [X] T002 [US1] %s second closed task.\n" % (slug, label, label),
+            encoding="utf-8")
+    proc, payload = _run_apply(repo)
+    assert proc.returncode == 0, payload.get("conditions")
+    merged = (_spec(repo) / "tasks.md").read_text(encoding="utf-8")
+    assert "## Phase 1: User Story 1 - fixture story" in merged, (
+        "the slice phase headings must ride along so the rows keep their story phase"
+    )
+    validator = _run_validator(VALIDATE_TASKS, _spec(repo) / "tasks.md")
+    assert validator.returncode == 0, (
+        "the merged task list must pass validate-tasks (story-label placement); got:\n"
+        + validator.stdout[-1600:]
+    )
+
+
 def test_directory_candidates_merge_and_create_at_file_level(tmp_path):
     repo = _copy_fixture("split-pair", tmp_path / "repo")
     _run_apply(repo)

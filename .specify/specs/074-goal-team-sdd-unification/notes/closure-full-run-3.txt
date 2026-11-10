@@ -885,7 +885,7 @@ ____________ test_unwatched_detector_positive_expired_and_negative _____________
 tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2477/test_unwatched_detector_positi0')
 
     def test_unwatched_detector_positive_expired_and_negative(tmp_path):
-        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        """C-056: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
         # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
         # cases anchor to call time instead of module-import NOW. NOW binds at
         # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
@@ -910,7 +910,7 @@ ____________________ test_dead_no_exit_record_is_never_done ____________________
 tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2477/test_dead_no_exit_record_is_ne0')
 
     def test_dead_no_exit_record_is_never_done(tmp_path):
-        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        """C-057: dead pid without an exit record is never DONE; live adds no stop."""
         ws = Workspace(tmp_path)
         ws.write_artifact("tasks.md")
         ws.write_spine(started_at=NOW - 100)

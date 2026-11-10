@@ -574,7 +574,7 @@ tests/contract/test_nested_sdd_invocation.py:84: AssertionError
 __________________ test_no_instruction_issues_a_merge_or_push __________________
 
     def test_no_instruction_issues_a_merge_or_push():
-        """Every line that mentions a merge/push command must also prohibit it (C-37).
+        """Every line that mentions a merge/push command must also prohibit it (C-053).
     
         The test also requires the prohibition to be **present**: a scan that can only ever be
         empty would pass on a document that never forbids merging at all, which is the classic
@@ -594,7 +594,7 @@ _____________ test_nested_run_reaches_review_zero_merge_zero_push ______________
 tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2407/test_nested_run_reaches_review0')
 
     def test_nested_run_reaches_review_zero_merge_zero_push(tmp_path):
-        """The end-to-end content face (C-41, D-3): review reached, zero merge, zero push.
+        """The end-to-end content face (C-057, D-3): review reached, zero merge, zero push.
     
         There is no executable nested run in this slice (the driver is a chat instruction, not a
         CLI), so the decidable face is: the entry precondition resolves allowed on the fixture's
@@ -614,7 +614,7 @@ tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2407/test_nested_run_reaches_r
         rc, _stdout, _stderr = project.run_authorize(project.seat_allowed)
         payload = project.run_authorize_json(project.seat_allowed)
         assert rc == 0 and payload["effective"] == ALLOWED, (
-            f"the authorized seat must resolve allowed before a nested run may start (C-8): "
+            f"the authorized seat must resolve allowed before a nested run may start (C-008): "
             f"rc={rc} payload={payload!r}"
         )
     
@@ -643,7 +643,7 @@ tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2407/test_nested_run_reaches_r
         }
 >       assert _gaps(handoff) == [], (
                ^^^^^^^^^^^^^^
-            f"the end-to-end handoff must carry the whole closed field set (C-34 / C-41): "
+            f"the end-to-end handoff must carry the whole closed field set (C-050 / C-057): "
             f"gaps={_gaps(handoff)}"
         )
 

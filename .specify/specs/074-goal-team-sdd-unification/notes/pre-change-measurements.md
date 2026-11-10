@@ -280,7 +280,7 @@ $ git status --short | wc -l
 The eight modified tracked session files and the twenty-five untracked entries above are **pre-existing**
 and are neither committed nor reverted by this slice.
 
-## 3. Instruction-surface sizes (the ceiling judgement for FR-024 / C-18)
+## 3. Instruction-surface sizes (the ceiling judgement for FR-024 / C-006)
 
 ```text
 $ wc -c templates/instructions-template.md .specify/instructions.md
@@ -379,11 +379,11 @@ name there is a stage record, not a registry, ledger, state spine, ownership mod
 ## 10. Containment (post-change): the two claims discharged by name-set comparison (T050)
 
 This section is written **after** the change (the file's other sections are the pre-change halves of
-the same comparisons). It discharges `contracts/compat-and-safety.md` C-3, C-4, C-5 and C-6 — the
+the same comparisons). It discharges `contracts/compat-and-safety.md` C-003, C-004, C-005 and C-006 — the
 slice's two containment claims and the four-surface additivity audit — and it is the only place the
 comparison is made.
 
-### 10.1 Claim 1+2 — post ⊇ pre per named set, shared ids verdict-unchanged (C-3, C-4, C-6)
+### 10.1 Claim 1+2 — post ⊇ pre per named set, shared ids verdict-unchanged (C-003, C-004, C-006)
 
 **Same command, same file lists** as the pre-change capture that owns the sets
 ([`../test-evidence/compat-baseline-nodeids.txt`](../test-evidence/compat-baseline-nodeids.txt),
@@ -416,11 +416,11 @@ rc=0
 
 Every one of the 266 shared ids is **green after** as it was **green before**: the post-change failing
 set is empty, so it agrees with the pre-change verdict for every shared id (the reading rule for
-C-3/C-6 admits a case red in the baseline to stay red; here there is none — none of the 17 files
+C-003/C-006 admits a case red in the baseline to stay red; here there is none — none of the 17 files
 appears in [`../baseline-failed.txt`](../baseline-failed.txt)). Full capture:
 [`../test-evidence/containment-post-change-run.txt`](../test-evidence/containment-post-change-run.txt).
 
-### 10.2 Claim 3 — the four predecessor surfaces are untouched (C-5, C-7, C-8, C-9)
+### 10.2 Claim 3 — the four predecessor surfaces are untouched (C-005, C-007, C-008, C-009)
 
 `git diff` against the baseline commit named above, over each surface's owner paths. **The positive
 control matters**: without it an empty diff proves only that the command printed nothing, so the last

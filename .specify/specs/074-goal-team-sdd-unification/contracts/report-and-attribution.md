@@ -53,3 +53,14 @@ the outer layer reads the same verdict the duty acted on (FR-013, FR-021).
 | C-47, C-48, C-49, C-53 | FR-021 | SC-003 | `skills/internal/create-team/SKILL.md` § Report contract |
 | C-50, C-51, C-52 | FR-020 | SC-008 | supervisor write duty; `goal-definitions.md` (referenced) |
 | C-54 | FR-013, FR-021 | — | report section § verdict reference |
+
+**C-055**: The team run-report contract gains exactly one mandatory section, whose heading literal is
+**C-056**: The section lists, per invocation: an outcome value of `[[STR-007]]`, `[[STR-008]]`, or
+**C-057**: A run with no nested invocation MUST state that explicitly inside the section rather than
+**C-058**: The team supervisor is the sole writer of the section and of every other tracked artifact in
+**C-059**: At report time the team supervisor appends **at most one** ledger item carrying the existing
+**C-060**: The parsed Goal field set is identical before and after a nested run. Attribution is
+**C-061**: The other mandatory report sections keep their existing content obligations. The nested
+**C-062**: The routing-verdict reference required per invocation is a **reference** to the verdict
+**C-063**: The section reads the handoff's closed field set by reference and adds no field of its own: a
+**C-064**: The report contract has exactly one owner (`create-team/SKILL.md` § Report contract); the

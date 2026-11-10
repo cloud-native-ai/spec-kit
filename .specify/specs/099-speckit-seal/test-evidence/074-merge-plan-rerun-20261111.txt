@@ -1,0 +1,36 @@
+# 074 重跑 — merge-plan（修复后引擎）
+action: merge-plan  verdict: ok  exit: 0
+slices: 074a-authorized-routing(order=1, split-record), 074b-nested-governance(order=2, split-record)
+checks: {"artifact_rows": 78, "candidate_count": 15, "excluded_candidates": 0, "factory_doc_refs": 0, "id_map_entries": 188, "open_conflicts": 0, "slice_conditions": ["name-family", "parent-declaration"], "slice_count": 2}
+id_maps.FR: 28 ({'mapped': 19, 'localization': 9})
+id_maps.SC: 8 ({'localization': 8})
+id_maps.STR: 17 ({'mapped': 17})
+id_maps.T: 58 ({'appended': 58})
+id_maps.C: 77 ({'appended': 77})
+id_maps.E: 0 ({})
+open_conflicts: 0
+factory_doc_refs: 0
+-- C 家族映射（前 12 条）--
+  074a-authorized-routing contracts/bootstrap-and-maintenance.md#C-44 -> C-001 (appended)
+  074a-authorized-routing contracts/bootstrap-and-maintenance.md#C-45 -> C-002 (appended)
+  074a-authorized-routing contracts/bootstrap-and-maintenance.md#C-46 -> C-003 (appended)
+  074a-authorized-routing contracts/bootstrap-and-maintenance.md#C-47 -> C-004 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-1 -> C-001 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-2 -> C-002 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-3 -> C-003 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-4 -> C-004 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-5 -> C-005 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-6 -> C-006 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-7 -> C-007 (appended)
+  074a-authorized-routing contracts/hierarchy-and-authorization.md#C-8 -> C-008 (appended)
+-- 074b report-and-attribution 的追加条款 --
+  C-21 -> C-055 (appended)
+  C-22 -> C-056 (appended)
+  C-23 -> C-057 (appended)
+  C-24 -> C-058 (appended)
+  C-25 -> C-059 (appended)
+  C-26 -> C-060 (appended)
+  C-27 -> C-061 (appended)
+  C-28 -> C-062 (appended)
+  C-29 -> C-063 (appended)
+  C-30 -> C-064 (appended)

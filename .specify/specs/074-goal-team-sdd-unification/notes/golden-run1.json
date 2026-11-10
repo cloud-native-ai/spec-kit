@@ -161,7 +161,7 @@
       ],
       "effective_blast_radius": "cross-cutting",
       "match": true,
-      "face": "FR-011 / C-24：冲突组合（conflicting）"
+      "face": "FR-011 / C-008：冲突组合（conflicting）"
     },
     {
       "case_id": "G7-bounded-definition-correction",
@@ -316,7 +316,7 @@
       ],
       "effective_blast_radius": "local-bounded-definition-correction",
       "match": true,
-      "face": "C-20：有界修正必须随附非空理由"
+      "face": "C-004：有界修正必须随附非空理由"
     },
     {
       "case_id": "G13-all-sdd-conditions",
@@ -342,7 +342,7 @@
       ],
       "effective_blast_radius": "cross-cutting",
       "match": true,
-      "face": "FR-009 / C-24：五条全部命中，取码次序取首条且携带全部命中条件"
+      "face": "FR-009 / C-008：五条全部命中，取码次序取首条且携带全部命中条件"
     },
     {
       "case_id": "G14-ambiguous-beats-conflict",
@@ -369,7 +369,7 @@
       ],
       "effective_blast_radius": "cross-cutting",
       "match": true,
-      "face": "C-24：多条件同时命中时按声明次序取码（ambiguous 先于 conflicting）"
+      "face": "C-008：多条件同时命中时按声明次序取码（ambiguous 先于 conflicting）"
     }
   ]
 }

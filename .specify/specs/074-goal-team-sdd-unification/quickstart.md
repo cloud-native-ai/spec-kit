@@ -247,7 +247,7 @@ python3 -m pytest -q tests/contract/test_agent_dispatch_mechanism.py \
 Real output (exit `0`): `191 passed in 22.64s`, recorded in
 `test-evidence/targeted-set-v1-baseline.txt` with `stage_base=939766891`.
 
-This is the suite whose anti-nesting cases must stay green for non-authorized paths (C-15 / SC-004).
+This is the suite whose anti-nesting cases must stay green for non-authorized paths (C-015 / SC-004).
 
 #### S7.3 The engine, the owner document, and the driver reference do not exist yet
 
@@ -300,7 +300,7 @@ one pointer line in each of the two documents.
 
 **Not executed at plan stage** — no report exists to inspect; the section does not exist yet (S1).
 
-**Pinning test**: `tests/contract/test_nested_run_report.py` (planned, local C-21…C-30), which
+**Pinning test**: `tests/contract/test_nested_run_report.py` (planned, local C-055…C-064), which
 asserts, over a temp repository built by `tests/fixtures/nested_sdd.py`:
 
 1. the heading literal is exactly `## Nested SDD Runs`;
@@ -374,7 +374,7 @@ Goal-wide run writes no attribution field.
 
 **Not executed at plan stage** — the sentence lands during implementation.
 
-**Pinning test**: `tests/contract/test_sdd_diffusion.py` (planned, local C-13/C-14), which asserts:
+**Pinning test**: `tests/contract/test_sdd_diffusion.py` (planned, local C-001/C-002), which asserts:
 
 1. the conceptual model's Stage bullet still carries exactly `executor` / `evaluator` / `optimizer`
    with no value renamed and no SDD stage name added;
@@ -395,7 +395,7 @@ model and must stay green.
 a tracked product file; running it here would edit a file this stage does not own. The generator has no
 dry-run flag (measured: its option surface is positional only).
 
-**Pinning test**: `tests/contract/test_instructions_section_propagation.py` C-1 (every template `## `
+**Pinning test**: `tests/contract/test_instructions_section_propagation.py` C-001 (every template `## `
 section exists verbatim in the live file) plus `tests/contract/test_instructions_size_budget.py`. The
 first is the mechanism that turns a template-only edit into a red suite until the regeneration runs, so
 the pairing is self-enforcing.
@@ -500,6 +500,6 @@ rc=0
 
 **Reading**: zero pre-existing mirror drift, so every mirror row in `plan.md` is both "no NEW drift" and
 measurably "clean". The flow-class count staying at 79 units / 0 findings is the mechanical form of
-local C-11 (no new command, no new skill). The file counts (406/114/59) are higher than `074a`'s
+local C-011 (no new command, no new skill). The file counts (406/114/59) are higher than `074a`'s
 recorded 405/113/58 because `074a` added three files — the baseline must be read at the commit it was
 taken, never copied forward.

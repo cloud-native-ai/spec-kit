@@ -81,9 +81,9 @@ sdd-route: /home/agent/tmp/spec-kit/074a-quickstart/flow/.specify/teams/fixture-
 # RC=2
 ```
 
-**Reading**: the exit alphabet is exactly two-valued (C-8 / C-28) — `0` for both verdicts and `2`
+**Reading**: the exit alphabet is exactly two-valued (C-008 / C-012) — `0` for both verdicts and `2`
 only for malformed input — and a refusal names the failing half (`seat`) plus both source paths and
-the seat slug, so the verdict is recheckable (C-14). The scratch root
+the seat slug, so the verdict is recheckable (C-014). The scratch root
 (`~/tmp/spec-kit/074a-quickstart/`) was removed after the run, per
 `.specify/shared/guidelines/temp-directory-discipline.md` §4.
 
@@ -96,7 +96,7 @@ the seat slug, so the verdict is recheckable (C-14). The scratch root
 
 `quickstart.md` S5 emits no shell command on purpose: `/speckit.*` and the SDD driver are chat
 instructions, so there is no executable "start a nested run" CLI. The decidable face executed here is
-the one C-41 / D-3 fixes — **the content face**: the entry precondition resolves **allowed** on the
+the one C-057 / D-3 fixes — **the content face**: the entry precondition resolves **allowed** on the
 authorized seat and **refused with the failing half named** on the forbidden seat, the assembled
 handoff carries the whole closed field set, the stages reached stop at `review`, and a real
 repository's `git log` / `git status` are identical before and after (zero merge, zero push).
@@ -140,10 +140,10 @@ zero merge / zero push (git log + status + branch + HEAD identical): True
 printed `stages_reached` across eight lines and the JSON with two-space indentation. Field values,
 verdicts and the git states are verbatim.)
 
-**Reading**: the complete handoff carries all seven closed fields (C-34) — including the four-fact
-integration identity with `main` named as the retained branch (C-36) — and the run's git state is
+**Reading**: the complete handoff carries all seven closed fields (C-050) — including the four-fact
+integration identity with `main` named as the retained branch (C-052) — and the run's git state is
 byte-identical before and after, which is what "zero merge and zero push" looks like when it is
-measured rather than asserted (C-37 / C-41). The entry half is the engine's own verdict: the
+measured rather than asserted (C-053 / C-057). The entry half is the engine's own verdict: the
 authorized seat resolves `allowed`, the forbidden seat resolves `forbidden` with `failed_half=seat`.
 
 **Pinning test**: `tests/contract/test_nested_sdd_invocation.py::test_nested_run_reaches_review_zero_merge_zero_push`
@@ -250,7 +250,7 @@ Real output, exit `0`:
 # RC=0
 ```
 
-**Reading**: verdict `direct` with the record naming all six conditions that held (C-22 is an `all`
+**Reading**: verdict `direct` with the record naming all six conditions that held (C-006 is an `all`
 branch, so the record shows the whole conjoint set, not just one witness). The value literals used
 here (`maintenance`, `not-required`, `local`, `reversible`, `standard`) are the owner document's
 declared domain values — S2's own disclaimer said the example would be wrong if they differed, and
@@ -315,7 +315,7 @@ $ python3 .specify/scripts/python/sdd-route.py --action route \
 ```
 
 **Reading**: both adjudicate forms exit `0` — an adjudication is a produced verdict, not an engine
-failure (C-28) — and neither falls through to `direct` even though five of the six direct conditions
+failure (C-012) — and neither falls through to `direct` even though five of the six direct conditions
 held in the first case. `absent_inputs` names the missing input rather than leaving the reader to
 infer it.
 
@@ -361,7 +361,7 @@ an ambiguous value and the conflict combination, and the record shows
 `triggered_conditions: [input-ambiguous, input-conflicting, nature-feature, blast-cross-cutting, ...]`
 while the reason code is the earlier declared row (`adjudicate-ambiguous-value`, row 2, taken ahead
 of `adjudicate-conflicting-inputs`, row 3), so every triggered condition is carried and two
-evaluations of the same inputs stay byte-identical (C-24).
+evaluations of the same inputs stay byte-identical (C-008).
 
 **Pinning tests**: `tests/contract/test_sdd_routing_engine.py` (21 cases: determinism, precedence,
 reason-code order, exit alphabet, zero writes, three owner-document mutation probes, golden row
@@ -462,13 +462,13 @@ above):
 
 Every refusal is a **produced verdict**, not an error status (exit `0`), and every one names the
 failed condition, the recipient's resolved values, both source paths and the seat slug — the field
-set C-14 requires, and the reason no reader has to accept a bare "not authorized".
+set C-014 requires, and the reason no reader has to accept a bare "not authorized".
 
 **Stage executor and virtual-mode refusals — declared, not engine-produced.** The engine above
 returns `allowed` for the authorized seat, which is exactly why the leaf rule and the virtual-mode
 rule cannot live in the engine action: they are conditions on the *dispatch* (chain position and
 execution mode), read by the probe from the target project's state, not facts of the two declared
-halves. This slice adds no new command, gate or scheduler to make them executable (C-16), so their
+halves. This slice adds no new command, gate or scheduler to make them executable (C-016), so their
 evidence is the declaration plus the executable case that pins it:
 
 - `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation —
@@ -707,7 +707,7 @@ The first case re-derives the vocabularies from the owner document and fails if 
 reason code, verdict literal, domain value, domain sequence or condition list; the second does the same
 over the six edited/new framework surfaces. Both green, so the reverse count and the program agree.
 
-**Result**: `contracts/routing-decision.md` C-30 holds on every surface this slice produces — F-1, F-2
+**Result**: `contracts/routing-decision.md` C-014 holds on every surface this slice produces — F-1, F-2
 and F-4 have exactly one landing place plus the mirror, and F-3's remaining hits are records that cite
 rather than own.
 
@@ -796,7 +796,7 @@ $ ls -1 "$REG" | grep -c '074a'
 
 Six line entries, the newest written **2026-10-29 00:08:32** — nearly three hours before the T001 capture
 (`02:5xZ`) and before this implement stage began — and none carries a slice-level id. So this slice
-registered no line: it reuses this loop's existing line, as C-43 requires.
+registered no line: it reuses this loop's existing line, as C-059 requires.
 
 ### The added-path inventory (the strongest form of the same claim)
 
@@ -864,8 +864,8 @@ registry, cite `worktree-per-write-line`, require serialization or rejection of 
 and forbid a second mechanism. The second requires the per-member cap to be hard and its second-duty case
 to be resolved by the existing line regime ("Feature 064"), with no second concurrency primitive. Both
 are satisfied by the landed text, so a nested run resolves to the existing registry entry and this loop's
-existing state spine — `contracts/nested-invocation.md` C-43 and `contracts/bootstrap-and-maintenance.md`
-C-47 hold.
+existing state spine — `contracts/nested-invocation.md` C-059 and `contracts/bootstrap-and-maintenance.md`
+C-004 hold.
 
 ---
 
@@ -1196,7 +1196,7 @@ independent fixtures rather than asserted once.
 
 ## S4 — the Stage vocabulary is disambiguated and nothing is renamed (pinned, executed)
 
-**Pinned test**: `tests/contract/test_sdd_diffusion.py` C-13 / C-14 cases. **Captured** after
+**Pinned test**: `tests/contract/test_sdd_diffusion.py` C-001 / C-002 cases. **Captured** after
 `7842fa888`, comparing the edited bullet against the same bullet at the part-2 base commit.
 
 ```bash
@@ -1281,7 +1281,7 @@ file, so no symlink repair was needed. The second-run idempotence check is T054'
 
 **Placement constraint discovered (disclosed)**: the first placement — between `## Proactive Flow
 Trigger` and `## Fact, Correctness & Logic Checks (Input Sanity)` — broke a delivered guard this
-slice does not own (`tests/contract/test_proactive_trigger_section.py` C-3 and C-9 pin that exact
+slice does not own (`tests/contract/test_proactive_trigger_section.py` C-003 and C-009 pin that exact
 adjacency, and `test_ask_record_repeat.py` re-states it). The section was moved to the next free
 slot; no contract text changed, only the position. Commit `e1ee11c35`.
 

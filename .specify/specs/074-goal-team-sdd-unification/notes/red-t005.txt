@@ -106,9 +106,9 @@ ________________ test_forbidden_dimensions_are_stated_as_a_rule ________________
 >       assert rule_line is not None, (
             "the owner document MUST state, as a rule, that the decision consumes none of: "
             "implementation medium, file extension, language, artifact count, author "
-            "identity (C-18)"
+            "identity (C-002)"
         )
-E       AssertionError: the owner document MUST state, as a rule, that the decision consumes none of: implementation medium, file extension, language, artifact count, author identity (C-18)
+E       AssertionError: the owner document MUST state, as a rule, that the decision consumes none of: implementation medium, file extension, language, artifact count, author identity (C-002)
 E       assert None is not None
 
 tests/contract/test_sdd_routing_definitions.py:274: AssertionError

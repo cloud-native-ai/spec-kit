@@ -16,8 +16,8 @@
 | 文件 | 性质 | 对应 finding |
 |------|------|--------------|
 | `requirements.md` | 需求条文（FR-005/006/007/008/010/012、SC-001、A4、A9、Edge Cases 一处） | HIGH-1、HIGH-2、C-03、B-01、B-02、B-03、B-04 |
-| `contracts/routing-decision.md` | 契约 C-18、C-20、C-21、C-22、C-24、C-25、C-26、C-28 | HIGH-1、HIGH-3、C-03、B-03 |
-| `contracts/hierarchy-and-authorization.md` | 契约 C-8、C-9、C-13、C-14 | HIGH-3、HIGH-2、B-01、B-04 |
+| `contracts/routing-decision.md` | 契约 C-002、C-004、C-005、C-006、C-008、C-009、C-010、C-012 | HIGH-1、HIGH-3、C-03、B-03 |
+| `contracts/hierarchy-and-authorization.md` | 契约 C-008、C-009、C-013、C-014 | HIGH-3、HIGH-2、B-01、B-04 |
 | `data-model.md` | E4（inputs / override）、E7（cap、SDD 指派定义指针） | HIGH-1、HIGH-2、B-03、B-04 |
 | `quickstart.md` | S4 退出码字母表；S1/S3 的 `--nature` 字面量与封闭域对齐 | HIGH-3、HIGH-1 |
 | `tasks.md` | T007（退出码断言）、T017 / T023 / T024 同步、T029 审计职责、Requirement Coverage Map 两处、FR-025 waiver、DoD-2 计数 | HIGH-1、HIGH-2、B-02、B-04、E-01、F-02 |
@@ -102,7 +102,7 @@ status: ok
 rc=0
 ```
 
-条款总数与编号区间未变（C-1…C-47，四个文件 16/14/13/4），因此 `tasks.md` 的 47 条 `[green:]`
+条款总数与编号区间未变（C-001…C-004，四个文件 16/14/13/4），因此 `tasks.md` 的 47 条 `[green:]`
 认领仍一一成立、`validate-tasks.py` 的 green 四项检查零告警。
 
 ## 5. 定向回归（targeted-set-v1，stage_base=plan）
@@ -173,9 +173,9 @@ $ git diff --name-only -- .specify/specs/074-goal-team-sdd-unification \
 | 文件 | 性质 | 对应 finding |
 |------|------|--------------|
 | `checklists/readiness-2026-10-29.md` | CHK006 一处：`074a` 的裸 id `FR-017` → `074a`'s local FR 017（含跨切片限定语） | F-02（HIGH） |
-| `contracts/compat-and-safety.md` | C-6 与 C-7 之间新增 C-3 / C-6 共享集合 `S2` 的判据消歧段；C-11 标注散文级锚点 | F-01（HIGH）、E-03 |
-| `contracts/report-and-attribution.md` | C-25 基数统一（at most one / exactly one / none）；FR-020「summary」绑定既有 goal summary 通道；C-29 增补集成身份与不完整交接规则 | A-02、A-01、E-01 |
-| `contracts/diffusion.md` | `Measures` 由 `—` 改为 DoD-2 / DoD-4 / DoD-6 + T042/T048/T051/T056 指针；C-13 双向约束 + 席位 operating object 判定；C-20 标注设计级判据 | E-02、E-04、E-03 |
+| `contracts/compat-and-safety.md` | C-006 与 C-007 之间新增 C-003 / C-006 共享集合 `S2` 的判据消歧段；C-011 标注散文级锚点 | F-01（HIGH）、E-03 |
+| `contracts/report-and-attribution.md` | C-059 基数统一（at most one / exactly one / none）；FR-020「summary」绑定既有 goal summary 通道；C-063 增补集成身份与不完整交接规则 | A-02、A-01、E-01 |
+| `contracts/diffusion.md` | `Measures` 由 `—` 改为 DoD-2 / DoD-4 / DoD-6 + T042/T048/T051/T056 指针；C-001 双向约束 + 席位 operating object 判定；C-008 标注设计级判据 | E-02、E-04、E-03 |
 | `data-model.md` | E2 写者 / 何时写两行与 V-5 基数改写（至多一条；有 Target 恰一条；无 Target 零条） | A-02 |
 | `plan.md` | 新增 `## Plan Revision`（F-01 决策 + 同轮文本级对齐清单） | F-01、PLAN-EDIT 记录 |
 | `.specify/memory/features.md` / `features/074.md` | 补记 074b tasks（`61496b869`）与 checklist（`7d9308519`）两阶段；Last Updated 同步 | G-01 |

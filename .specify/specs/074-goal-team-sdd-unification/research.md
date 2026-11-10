@@ -333,9 +333,9 @@ mechanical.
 
 **Decision**: the slice's design set covers local FR-001–FR-025 and SC-001–SC-007. Clauses are
 re-derived per requirement entry regardless of which parent contract file physically carries them,
-numbered consecutively `C-1`…`C-47` across four slice files, each tagged `父 C-nn` for its source
-(parent C-1…C-14 → slice C-17…C-30; parent C-58/C-59/C-67 and the FR-014/FR-018 facets of C-64/C-66
-→ slice C-30/C-43/C-44/C-46/C-47). Entities are renumbered `E1`…`E9` with the two deferred parent
+numbered consecutively `C-001`…`C-004` across four slice files, each tagged `父 C-nn` for its source
+(parent C-001…C-014 → slice C-001…C-014; parent C-58/C-59/C-67 and the FR-014/FR-018 facets of C-64/C-66
+→ slice C-014/C-059/C-001/C-003/C-004). Entities are renumbered `E1`…`E9` with the two deferred parent
 entities named rather than renumbered; validation rules keep `V-1`…`V-29` unchanged because all 29
 fall inside the slice and a renumbering would create a second id space for an identical set.
 
@@ -347,7 +347,7 @@ fall inside the slice and a renumbering would create a second id space for an id
   `confirmed-user`.
 - `python3 scripts/python/clause_extract.py .specify/specs/074a-authorized-routing/contracts/*.md`
   (executed; output in `test-evidence/plan-stage-checks.md`) — 47 clauses, ids contiguous
-  `C-1`…`C-47`, every file canonical `md-bold-closed`.
+  `C-001`…`C-004`, every file canonical `md-bold-closed`.
 
 **Rejected**: (a) grouping the slice's contracts to mirror the parent's five file names — it would
 force the deferred clauses' requirement entries (parent FR 020–024, FR 026–028) back into the slice,
@@ -452,7 +452,7 @@ U0–U6); folding the nested form into the U0 default table (semantics collide: 
 **Decision**: local FR-013's "team run report **or** Agent execution evidence" is discharged here by
 the **Agent execution evidence**: the five inputs, the verdict, the reason code, the actor, and any
 user override are recorded there, and the handoff plus the invoking Agent's result reach that record
-by stable path (slice contract C-27). The team report's nested section — and the verdict reference it
+by stable path (slice contract C-011). The team report's nested section — and the verdict reference it
 will carry — arrives with `074b-nested-governance` and reads the same record without recomputation.
 
 **Evidence**: the slice defines no fixed report section (parent STR-011's heading literal is parent
@@ -535,7 +535,7 @@ with no subagent dispatch. Executed this stage: `clause_extract.py` (47 clauses)
 ### RB1 — Projection with a local id space, tagged to the parent clause it projects
 
 
-**Decision**: the slice owns a continuous local clause set `C-1`…`C-30` across three contract files,
+**Decision**: the slice owns a continuous local clause set `C-001`…`C-064` across three contract files,
 a local entity set `E1`…`E8`, and a local validation set `V-1`…`V-12`; every clause, entity and rule
 that projects a parent clause carries its source tag (`parent C-nn` / `父 E-n` / `parent V-nn`). Only
 the 30 parent clauses that serve this slice's eight requirement entries are claimed; the rest stay
@@ -543,7 +543,7 @@ the 30 parent clauses that serve this slice's eight requirement entries are clai
 
 **Evidence**:
 - `074a-authorized-routing/plan.md:266-290` is the authority for the split. Its table names the
-  parent clauses deferred to this slice (C-25, C-26, C-27, C-33, C-43, C-44, C-47, C-48, C-49, C-50,
+  parent clauses deferred to this slice (C-059, C-060, C-061, C-33, C-43, C-44, C-47, C-48, C-49, C-50,
   C-51, C-52, C-53, C-54, C-55, C-56, C-57, C-61, C-62, C-63, C-65) grouped by the parent FR each
   serves, and its prose records the two partial facets (parent C-54's report-section facet, parent
   C-66's Stage-vocabulary facet) that `074a` deliberately left here.
@@ -554,10 +554,10 @@ the 30 parent clauses that serve this slice's eight requirement entries are clai
   `074a`'s artifact to reconcile the count — a correction there would touch another slice's committed
   plan, while nothing downstream depends on the integer.
 - The parent's own FR→clause rows confirm the grouping: parent FR 020 → C-50…C-52, FR 021 →
-  C-47…C-49 + C-53 + C-54, FR 022 → C-55 + C-66, FR 023 → C-25 + C-26 (+ C-60, claimed by `074a`),
-  FR 024 → C-56 + C-57, FR 026 → C-27 + C-65, FR 027 → C-33 + C-43 + C-44 + C-61 + C-62, FR 028 →
+  C-47…C-49 + C-53 + C-54, FR 022 → C-55 + C-66, FR 023 → C-059 + C-060 (+ C-60, claimed by `074a`),
+  FR 024 → C-56 + C-57, FR 026 → C-061 + C-65, FR 027 → C-33 + C-43 + C-44 + C-61 + C-62, FR 028 →
   C-63 + C-67 (parent `feature-ref.md:62-91`).
-- `074a` already claimed parent C-15/C-16/C-30/C-60 and the parent FR 013 / parent FR 018 facets of C-54/C-66
+- `074a` already claimed parent C-003/C-004/C-064/C-60 and the parent FR 013 / parent FR 018 facets of C-54/C-66
   (`074a-authorized-routing/feature-ref.md:63-89`), so this slice references them instead of
   re-claiming them.
 
@@ -610,7 +610,7 @@ reference as missing and the outer layer MUST NOT re-derive it.
   table, precedence and reason codes (212 lines, delivered by `074a`); `scripts/python/sdd-route.py`
   (1,045 lines) computes a verdict and never stores one in a report.
 - The requirements' edge case fixes the failure direction: a missing reference is recorded as missing,
-  and a fabricated or recomputed reference is a contract violation (local C-8).
+  and a fabricated or recomputed reference is a contract violation (local C-008).
 
 **Rejected**: (a) re-running `sdd-route.py route` from the report-writing step — it would produce a
 second verdict for one duty and could disagree with the one the duty acted on; (b) inlining the
@@ -639,7 +639,7 @@ driver, does not execute stage commands itself, ends at review) are added to
   than a convention.
 - `shared/definitions/agent-definitions.md` owns the three-layer taxonomy (Template / Instance /
   Execution) and is the right place for *what an agent is*, not for *what an author must state*; the
-  authoring baseline is the surface an author reads while writing (parent C-26's "conformance check
+  authoring baseline is the surface an author reads while writing (parent C-060's "conformance check
   reads the declaration and the responsibility text together").
 
 **Rejected**: (a) a new section in `agent-definitions.md` — that file owns the taxonomy, and the rule
@@ -690,9 +690,9 @@ before this slice.
 - Section counts: template 29 top-level `## ` headings, live file 30 — the additive reconcile has
   already injected one section the template no longer carries, and it never rewrites existing
   sections.
-- `tests/contract/test_instructions_section_propagation.py:11-17` states the C-1/C-2 propositions:
-  every template `## ` section MUST exist verbatim in the live file (C-1) and the generator injects
-  additively and idempotently (C-2). Adding the section without regenerating therefore turns C-1 red,
+- `tests/contract/test_instructions_section_propagation.py:11-17` states the C-001/C-002 propositions:
+  every template `## ` section MUST exist verbatim in the live file (C-001) and the generator injects
+  additively and idempotently (C-002). Adding the section without regenerating therefore turns C-001 red,
   which is the mechanical reason the regeneration is part of the same change.
 - `tests/contract/test_instructions_size_budget.py` reports size against the budget and never restates
   the number in the command template, so the ceiling this slice declares lives in its own plan and
@@ -714,7 +714,7 @@ routing owner. No new `## ` section is created, and the sentence restates no des
 **Evidence**:
 - `shared/guidelines/proactive-trigger.md` has exactly 10 top-level `## ` sections
   (`## Ownership` … `## Maintenance Duties`), and `tests/contract/test_proactive_trigger_section.py`
-  C-2 pins that set as closed and ordered — a new section would break a delivered contract.
+  C-002 pins that set as closed and ordered — a new section would break a delivered contract.
 - `:68-79` is § Promotion & Safety Boundary, which already carries the promotion threshold, the
   destructive-never-promotes rule and the execution-report duty; the new conjunction belongs beside
   them and must point at the owner rather than re-derive the classification.
@@ -754,7 +754,7 @@ re-collect other suites.
   "a green check is a claim" lesson; a permanent superset ratchet over *other* features' suites would
   convert a per-change claim into an invariant nobody granted — legitimate case removals (a wording
   pin replaced by an engine test, as `test_proactive_trigger_section.py` documents for its own former
-  C-8…C-16) would then fail for reasons unrelated to this feature.
+  C-008…C-004) would then fail for reasons unrelated to this feature.
 
 **Rejected**: (a) a count comparison — non-conforming by C-62; (b) a permanent test that re-collects
 the sibling suites and compares with a checked-in set — it would fire on every future legitimate case

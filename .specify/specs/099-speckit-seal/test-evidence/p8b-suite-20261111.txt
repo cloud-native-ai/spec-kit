@@ -1,0 +1,15 @@
+# P8b 复跑 — 修复后受影响套件读数
+captured_at: 2026-11-10T17:28:30Z
+engine: scripts/python/seal-utils.py @ b0cb4e6f4+P8b-fix
+command: bash scripts/bash/run-tests.sh <8 contract files + test_seal_074_round.py> -q
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py tests/contract/test_seal_seal.py tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_archive_gate.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_sealed_status_domain.py tests/integration/test_seal_074_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 55%]
+..........................................................               [100%]
+130 passed in 8.26s
+
+exit=0

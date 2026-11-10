@@ -165,18 +165,18 @@ python3 scripts/python/clause_extract.py .specify/specs/074a-authorized-routing/
 
 ```text
 bootstrap-and-maintenance.md	form=md-bold-closed	clauses=4
-  C-44 C-45 C-46 C-47
+  C-001 C-002 C-003 C-004
 hierarchy-and-authorization.md	form=md-bold-closed	clauses=16
-  C-1 … C-16
+  C-001 … C-016
 nested-invocation.md	form=md-bold-closed	clauses=13
-  C-31 … C-43
+  C-047 … C-059
 routing-decision.md	form=md-bold-closed	clauses=14
-  C-17 … C-30
+  C-001 … C-014
 rc=0
 ```
 
 47 clauses across 4 files (ids printed one per line in the real run; elided here only in the `…`
-ranges). All four files are canonical `md-bold-closed`; ids are contiguous `C-1`…`C-47` in
+ranges). All four files are canonical `md-bold-closed`; ids are contiguous `C-001`…`C-004` in
 file-name order: `bootstrap` 44–47, `hierarchy-and-authorization` 1–16, `nested-invocation` 31–43,
 `routing-decision` 17–30.
 
@@ -288,7 +288,7 @@ flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=7
 coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
 ```
 
-Confirms the slice adds no flow unit (no new command, no new skill) — the FR-025 / C-47 negative check.
+Confirms the slice adds no flow unit (no new command, no new skill) — the FR-025 / C-004 negative check.
 
 ## 7. Targeted contract suite baseline
 
@@ -376,16 +376,16 @@ python3 scripts/python/clause_extract.py .specify/specs/074b-nested-governance/c
 
 ```text
 compat-and-safety.md	form=md-bold-closed	clauses=12
-  C-1 … C-12
+  C-001 … C-012
 diffusion.md	form=md-bold-closed	clauses=8
-  C-13 … C-20
+  C-001 … C-008
 report-and-attribution.md	form=md-bold-closed	clauses=10
-  C-21 … C-30
+  C-055 … C-064
 rc=0
 ```
 
 30 clauses across 3 files (the real run printed each id on its own line; elided here only in the `…`
-ranges). All three are canonical `md-bold-closed` and the ids are contiguous C-1…C-30 in file-name
+ranges). All three are canonical `md-bold-closed` and the ids are contiguous C-001…C-064 in file-name
 order: `compat-and-safety` 1–12, `diffusion` 13–20, `report-and-attribution` 21–30.
 
 ## 2. Clause and FR coverage accounting
@@ -491,7 +491,7 @@ coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 flo
 Zero pre-existing drift, so the mirror criterion in `plan.md` is both "no NEW drift" and measurably
 "clean". The counts read 406/114/59 rather than `074a`'s recorded 405/113/58 because `074a` added three
 files — a baseline belongs to the commit it was taken at, never to a copy of an older number. The
-flow-class result (79 units / 0 findings) is the mechanical form of local C-11 (no new command, no new
+flow-class result (79 units / 0 findings) is the mechanical form of local C-011 (no new command, no new
 skill).
 
 ## 6. Diagnostic measurements quoted by `research.md` and `quickstart.md`
@@ -545,7 +545,7 @@ baseline and reports `gate total moved from the frozen 23 to 27`. The four added
 slice (the tree is unmodified at capture time), so this is drift inherited from earlier features, not
 an effect of this stage. It is recorded rather than repaired: repairing it would mean editing another
 feature's declarations or rebasing its frozen baseline inside a plan-only commit — a decision, not a
-correction, and outside this slice's declared scope. The slice's own criterion (local C-19's pointer
+correction, and outside this slice's declared scope. The slice's own criterion (local C-007's pointer
 sentence adds no gate-scannable declaration) is that the total measured after the edit equals the
 pre-change total, and no green claim is made over the inherited case.
 

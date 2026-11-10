@@ -1,6 +1,6 @@
 <!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/test-evidence/containment-post-change-collect.txt) -->
 
-# Post-change collect-only capture — slice 074b-nested-governance, containment claim C-3/C-4/C-6
+# Post-change collect-only capture — slice 074b-nested-governance, containment claim C-003/C-004/C-006
 # Method: the same command and file lists as the pre-change capture in compat-baseline-nodeids.txt
 #         python3 -m pytest --collect-only -q <files>   (one node id per line, sorted per suite)
 # Captured 2026-10-29 at HEAD 772fe2b84 (after T049's superset edit).

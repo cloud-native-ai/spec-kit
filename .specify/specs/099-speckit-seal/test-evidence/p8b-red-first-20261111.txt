@@ -1,0 +1,123 @@
+# P8b red-first — 三个根因用例在未修复引擎上的读数
+captured_at: 2026-11-10T17:26:54Z
+engine: scripts/python/seal-utils.py @ b0cb4e6f4 (unfixed)
+command: bash scripts/bash/run-tests.sh <three nodeids> -q
+
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_seal_merge_apply.py::test_one_and_two_digit_clause_ids_merge_instead_of_being_lost tests/contract/test_seal_merge_apply.py::test_merged_slice_task_rows_keep_their_phase_headings tests/contract/test_seal_seal.py::test_registry_row_is_read_across_blank_lines_inside_the_table -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_merged_slice_task_rows_keep_their_phase_headings _____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8364/popen-gw1/test_merged_slice_task_rows_ke0')
+
+    def test_merged_slice_task_rows_keep_their_phase_headings(tmp_path):
+        """C-015/C-022: slice rows land under phase headings, so the merged file validates.
+    
+        The P8 round's B3: rows appended as one flat block after the last kept parent
+        row carry ``[USn]`` labels under ``<no phase>``, and validate-tasks reports
+        one story-labels error per row.
+        """
+        repo = _copy_fixture("split-pair", tmp_path / "repo")
+        for slug, label in ((ALPHA, "Alpha"), (BETA, "Beta")):
+            (_spec(repo, slug) / "tasks.md").write_text(
+                "# Tasks: fixture %s\n\n"
+                "## Phase 1: User Story 1 - fixture story\n\n"
+                "- [X] T001 [US1] %s first closed task.\n"
+                "- [X] T002 [US1] %s second closed task.\n" % (slug, label, label),
+                encoding="utf-8")
+        proc, payload = _run_apply(repo)
+        assert proc.returncode == 0, payload.get("conditions")
+        merged = (_spec(repo) / "tasks.md").read_text(encoding="utf-8")
+>       assert "## Phase 1: User Story 1 - fixture story" in merged, (
+            "the slice phase headings must ride along so the rows keep their story phase"
+        )
+E       AssertionError: the slice phase headings must ride along so the rows keep their story phase
+E       assert '## Phase 1: User Story 1 - fixture story' in '# Tasks: fixture parent\n\n- [X] T001 Parent retained closed task.\n- [X] T002 [US1] Alpha first closed task.\n- [X] ...0 (whole-file fact); carriers: .specify/specs/099a-fixture-alpha/tasks.md, .specify/specs/099b-fixture-beta/tasks.md\n'
+
+tests/contract/test_seal_merge_apply.py:312: AssertionError
+________ test_one_and_two_digit_clause_ids_merge_instead_of_being_lost _________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8364/popen-gw0/test_one_and_two_digit_clause_0')
+
+    def test_one_and_two_digit_clause_ids_merge_instead_of_being_lost(tmp_path):
+        """C-015: clause ids are ``C-<digits>``; 1-2 digit ids merge like 3-digit ids.
+    
+        The real 074 tree writes ``**C-1** … **C-67**``. An engine anchored to
+        ``C-\\d{3}`` recognizes none of them, so every slice clause is silently
+        dropped (the P8 round's B4 content loss). This test rewrites the fixture's
+        pinned 3-digit ids to the 1-2 digit form and expects the same merge.
+        """
+        repo = _copy_fixture("split-pair", tmp_path / "repo")
+        rewrites = {
+            _spec(repo) / "contracts" / "core.contract.md": [
+                ("**C-001**", "**C-1**"), ("**C-002**", "**C-2**")],
+            _spec(repo, ALPHA) / "contracts" / "core.contract.md": [
+                ("**C-001**", "**C-1**"), ("**C-005**", "**C-5**")],
+            _spec(repo, ALPHA) / "contracts" / "extra-alpha.md": [
+                ("**C-007**", "**C-7**")],
+            _spec(repo, BETA) / "contracts" / "core.contract.md": [
+                ("**C-002**", "**C-2**")],
+            _spec(repo, ALPHA) / "requirements.md": [
+                ("| `C-001` | `C-001` |", "| `C-1` | `C-1` |")],
+            _spec(repo, BETA) / "requirements.md": [
+                ("| `C-002` | `C-002` |", "| `C-2` | `C-2` |")],
+        }
+        for path, pairs in rewrites.items():
+            text = path.read_text(encoding="utf-8")
+            for before, after in pairs:
+                assert before in text, f"{path} lacks {before!r}"
+                text = text.replace(before, after)
+            path.write_text(text, encoding="utf-8")
+        proc, payload = _run_apply(repo)
+        assert proc.returncode == 0, payload.get("conditions")
+        core = (_spec(repo) / "contracts" / "core.contract.md").read_text(encoding="utf-8")
+>       assert "**C-003** — Alpha-only clause, appended by merge order. (FR-003)" in core, (
+            "a 1-2 digit slice clause must append under the parent file's next free "
+            "C-N instead of being skipped as an unrecognized id form"
+        )
+E       AssertionError: a 1-2 digit slice clause must append under the parent file's next free C-N instead of being skipped as an unrecognized id form
+E       assert '**C-003** — Alpha-only clause, appended by merge order. (FR-003)' in '# Contract — fixture core (parent)\n\n**C-1** — Parent core clause one. (FR-001)\n\n**C-2** — Parent core clause two. (FR-002)\n'
+
+tests/contract/test_seal_merge_apply.py:274: AssertionError
+________ test_registry_row_is_read_across_blank_lines_inside_the_table _________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-8364/popen-gw2/test_registry_row_is_read_acro0')
+
+    def test_registry_row_is_read_across_blank_lines_inside_the_table(tmp_path):
+        """B1: blank lines inside the index table must not hide the row from seal.
+    
+        The real `.specify/features.md` separates table blocks with blank lines
+        (lines 71-81). A parser that resets its header on a blank line reads
+        registry=None and raises a false `state-drift` — the P8 round's B1.
+        """
+        repo = _copy_fixture("single-spec", tmp_path / "repo")
+        registry = repo / ".specify" / "specs" / CLEAN / "feature-registry.md"
+        lines = registry.read_text(encoding="utf-8").splitlines()
+        separator = next(i for i, line in enumerate(lines) if line.startswith("|----"))
+        lines[separator + 1:separator + 1] = ["", ""]
+        registry.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        _commit(repo)
+        proc, payload = _seal(repo, CLEAN)
+>       assert "state-drift" not in _context_codes(payload), (
+            "a blank line inside the table is a formatting fact, not a status drift; "
+            "payload=%s" % json.dumps(payload, ensure_ascii=False)[:900]
+        )
+E       AssertionError: a blank line inside the table is a formatting fact, not a status drift; payload={"action": "seal", "conditions": [{"code": "state-drift", "evidence": "the claimed status pair is inconsistent: detail='Ready for Review' (.specify/specs/099-fixture-clean/feature-detail.md); registry=None (.specify/specs/099-fixture-clean/feature-registry.md)", "fix_path": "repair the status pair through the registry reconcile owner; seal never picks one carrier over the other", "rerun": "rerun seal after the named input is repaired"}], "exit_code": 2, "seal": {"from_status": null, "outcome": "error", "receipt": null, "to_status": null, "writes": []}, "spec_dir": "/tmp/pytest-of-agent/pytest-8364/popen-gw2/test_registry_row_is_read_acro0/repo/.specify/specs/099-fixture-clean", "verdict": "error"}
+E       assert 'state-drift' not in {'state-drift'}
+E        +  where {'state-drift'} = _context_codes({'action': 'seal', 'conditions': [{'code': 'state-drift', 'evidence': "the claimed status pair is inconsistent: detail...ed'}], 'exit_code': 2, 'seal': {'from_status': None, 'outcome': 'error', 'receipt': None, 'to_status': None, ...}, ...})
+
+tests/contract/test_seal_seal.py:260: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_merge_apply.py::test_merged_slice_task_rows_keep_their_phase_headings
+FAILED tests/contract/test_seal_merge_apply.py::test_one_and_two_digit_clause_ids_merge_instead_of_being_lost
+FAILED tests/contract/test_seal_seal.py::test_registry_row_is_read_across_blank_lines_inside_the_table
+3 failed in 6.24s
+
+exit=1

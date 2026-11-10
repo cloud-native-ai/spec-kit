@@ -1,0 +1,12 @@
+# P8b — 074 重跑 before 快照
+captured_at: 2026-11-10T17:29:22Z
+pre_rerun_head: b0cb4e6f40d566eb4422b2a5afe2c968e65932db
+pre_merge_base: 3f2a05cba (restored for the rerun)
+old_evidence_retained:
+  - test-evidence/074-round-20261110.txt (old blocked adjudication, kept as the before snapshot)
+  - test-evidence/074-merge-plan-before.json / 074-merge-plan-after.json
+  - test-evidence/074-factory-resolutions.md / 074-merge-checks.txt / 074-merge-apply.txt
+  - test-evidence/074-dated-record-hashes-before.txt
+old_manifest_digest: sha256:aedcccadce0dc69d4cb3763db2fef7781fe45acfcfe830d610e73780b3b07b60
+old_tasks_rows: active=58
+restore_plan: git rm added-after-3f2a05cba files; git checkout 3f2a05cba -- <three 074 dirs>; git checkout HEAD -- 074 parent requirements.md (keep the eight FR-027(a) Path markers)

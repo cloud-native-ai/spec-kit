@@ -260,7 +260,10 @@ SLICE_CODE = "slice-candidate-unconfirmed"
 
 _DEFINITION_RE = re.compile(r"^-\s+\*\*(FR|SC)-(\d{3})\*\*")
 _TASK_ROW_RE = re.compile(r"^-\s+\[(.)\]\s+(T\d{3})\b")
-_CLAUSE_RE = re.compile(r"^\*\*(C-\d{3})\*\*")
+_CLAUSE_RE = re.compile(r"^\*\*(C-\d{1,3})\*\*")
+#: A slice task list groups its rows under `## Phase ...` headings; the merged
+#: parent keeps those headings so story labels stay inside a story phase.
+SLICE_PHASE_RE = re.compile(r"^##\s+Phase\b", re.IGNORECASE)
 _ENTITY_RE = re.compile(r"^\|\s*(E\d+)\s*\|")
 _STR_REF_RE = re.compile(r"\[\[(STR-\d{3})\]\]")
 _DATE_RE = re.compile(r"\d{4}-?\d{2}-?\d{2}")
@@ -296,7 +299,7 @@ def _section(text: str, heading_pattern: str):
 
 
 def _canonical_id(cell: str) -> Optional[str]:
-    match = re.match(r"^\s*`?((?:FR|SC|STR)-\d{3}|T\d{3}|C-\d{3}|E\d+)`?\s*$", cell)
+    match = re.match(r"^\s*`?((?:FR|SC|STR)-\d{3}|T\d{3}|C-\d{1,3}|E\d+)`?\s*$", cell)
     return match.group(1) if match else None
 
 
@@ -304,7 +307,7 @@ def _target_id(cell: str) -> Optional[str]:
     match = re.search(r"(FR|SC|STR)[- ]?(\d{3})", cell)
     if match:
         return "%s-%s" % (match.group(1), match.group(2))
-    match = re.search(r"\b(T\d{3}|C-\d{3}|E\d+)\b", cell)
+    match = re.search(r"\b(T\d{3}|C-\d{1,3}|E\d+)\b", cell)
     return match.group(1) if match else None
 
 
@@ -1127,7 +1130,7 @@ MERGE_APPENDIX_HEADING = "## Merged from slices"
 POINTER_BEGIN = "<!-- begin: merge-apply aggregated pointer view (generated) -->"
 POINTER_END = "<!-- end: merge-apply aggregated pointer view -->"
 SLICE_STATUS_RE = re.compile(r"^(SC-\d{3}|FR-\d{3})_status=(.*)$")
-_ID_TOKEN_RE = re.compile(r"\b(?:STR-\d{3}|FR-\d{3}|SC-\d{3}|C-\d{3}|T\d{3}|E\d+)\b")
+_ID_TOKEN_RE = re.compile(r"\b(?:STR-\d{3}|FR-\d{3}|SC-\d{3}|C-\d{1,3}|T\d{3}|E\d+)\b")
 _MERGED_INTO_RE = re.compile(r"^\*\*Merged into\*\*:\s*(.+?)\s*$")
 _TASK_ANY_RE = re.compile(r"^-\s+\[(.)\]\s+T\d{3}\b")
 
@@ -1151,11 +1154,22 @@ def _slice_rewrite_map(id_maps: Dict[str, list], slug: str,
     return mapping
 
 
+#: `(父 C-47–C-54)` style annotations name ids of the *parent's* own clauses. They
+#: are not slice-local references, so a slice-local rewrite mapping must leave them
+#: alone; rewriting would repoint them at an unrelated merged id.
+_PARENT_ANNOTATION_RE = re.compile(r"[（(]父 [^）)]*[）)]")
+
+
 def _rewrite_ids(text: str, mapping: Dict[str, str]) -> str:
     if not mapping:
         return text
+    protected = [(match.start(), match.end())
+                 for match in _PARENT_ANNOTATION_RE.finditer(text)]
 
     def _replace(match):
+        if any(start <= match.start() and match.end() <= end
+               for start, end in protected):
+            return match.group(0)
         return mapping.get(match.group(0), match.group(0))
 
     return _ID_TOKEN_RE.sub(_replace, text)
@@ -1380,12 +1394,24 @@ def _tasks_content(repo, spec_dir, action, ordered, id_maps, carriers):
         if not tasks_path.is_file():
             continue
         mapping = _slice_rewrite_map(id_maps, item["slug"])
+        block = []
         for line in _read_text(tasks_path).splitlines():
-            if _TASK_ROW_RE.match(line):
-                appended.append(_rewrite_ids(line, mapping))
+            if SLICE_PHASE_RE.match(line):
+                block.append(line)
+            elif _TASK_ROW_RE.match(line):
+                if not block:
+                    # a slice that opens with a row before any phase heading still
+                    # gets a heading, so the row is never parentless in the parent
+                    block.append("## Phase: merged slice tasks (`%s`)" % item["slug"])
+                block.append(_rewrite_ids(line, mapping))
+        if block:
+            merged_block = ["", "<!-- source: %s -->" % item["slug"]]
+            merged_block.extend(block)
+            appended.append(merged_block)
     anchor_rows = [index for index, line in enumerate(kept) if _TASK_ROW_RE.match(line)]
     insert_at = anchor_rows[-1] + 1 if anchor_rows else len(kept)
-    out = kept[:insert_at] + appended + kept[insert_at:]
+    inserted = [line for block in appended for line in block]
+    out = kept[:insert_at] + inserted + kept[insert_at:]
     superseded = _open_task_rows(parent_text)
     if superseded:
         carrier_note = ", ".join(carriers) if carriers else "-"
@@ -1644,8 +1670,16 @@ def _merge_state(spec_dir: Path, ordered):
 # --- the manifest and its post-merge checks --------------------------------
 
 def _continuous(numbers) -> bool:
+    """Contiguous from the sequence's own first value (gaps/duplicates fail).
+
+    The anchor is the minimum, not 1: clause ids are scoped per file and the
+    real 074 trees number them across the whole contract set (``report-and-
+    attribution.md`` starts at ``C-47``). A fixed ``1..max`` window would call
+    every such file discontinuous and, worse, would pass only when the parser
+    recognized no clauses at all.
+    """
     values = sorted(set(numbers))
-    return not values or values == list(range(1, values[-1] + 1))
+    return not values or values == list(range(values[0], values[-1] + 1))
 
 
 def _scan_merged_checks(spec_dir: Path, dated_stable: bool) -> Dict[str, Any]:
@@ -1991,7 +2025,12 @@ def _registry_row(text: str, key: str) -> Optional[Dict[str, Any]]:
     for index, line in enumerate(text.splitlines()):
         stripped = line.strip()
         if not stripped.startswith("|"):
-            header = None
+            # A blank line inside the table is a formatting fact: the real
+            # `.specify/features.md` separates row blocks with blank lines. Only
+            # non-blank, non-table content (prose, a new heading) ends the table
+            # context; resetting on a blank line silently hides every row after it.
+            if stripped:
+                header = None
             continue
         cells = [cell.strip() for cell in stripped.strip("|").split("|")]
         if header is None:

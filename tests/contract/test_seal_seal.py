@@ -242,6 +242,31 @@ def test_clean_single_spec_seals_and_writes_the_three_surfaces(tmp_path):
         "E10: exactly one sealing entry is appended under ## Latest Review")
 
 
+def test_registry_row_is_read_across_blank_lines_inside_the_table(tmp_path):
+    """B1: blank lines inside the index table must not hide the row from seal.
+
+    The real `.specify/features.md` separates table blocks with blank lines
+    (lines 71-81). A parser that resets its header on a blank line reads
+    registry=None and raises a false `state-drift` — the P8 round's B1.
+    """
+    repo = _copy_fixture("single-spec", tmp_path / "repo")
+    registry = repo / ".specify" / "specs" / CLEAN / "feature-registry.md"
+    lines = registry.read_text(encoding="utf-8").splitlines()
+    separator = next(i for i, line in enumerate(lines) if line.startswith("|----"))
+    lines[separator + 1:separator + 1] = ["", ""]
+    registry.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _commit(repo)
+    proc, payload = _seal(repo, CLEAN)
+    assert "state-drift" not in _context_codes(payload), (
+        "a blank line inside the table is a formatting fact, not a status drift; "
+        "payload=%s" % json.dumps(payload, ensure_ascii=False)[:900]
+    )
+    assert proc.returncode == 0 and payload["seal"]["outcome"] == "sealed", (
+        "the row after the blank line stays readable, so the clean spec seals; "
+        f"exit={proc.returncode} payload={json.dumps(payload, ensure_ascii=False)[:900]}"
+    )
+
+
 def test_merged_spec_seals_with_a_complete_manifest(tmp_path):
     repo = _copy_fixture("merged-clean", tmp_path / "repo")
     _commit(repo)

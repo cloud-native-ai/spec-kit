@@ -25,7 +25,7 @@ $ python3 -m pytest -q tests/contract/test_sdd_routing_definitions.py
 ..FFFFF.......                                                           [100%]
 E       AssertionError: F-1 declares its landing as '## Inputs', which the document does not contain — an ownership claim with no landing point is not decidable (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
 E       AssertionError: owner document has no '## Inputs' section; declared landings must resolve (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
-E       AssertionError: the owner document MUST state, as a rule, that the decision consumes none of: implementation medium, file extension, language, artifact count, author identity (C-18)
+E       AssertionError: the owner document MUST state, as a rule, that the decision consumes none of: implementation medium, file extension, language, artifact count, author identity (C-002)
 =========================== short test summary info ============================
 FAILED tests/contract/test_sdd_routing_definitions.py::test_each_fact_has_a_resolvable_landing_section
 FAILED tests/contract/test_sdd_routing_definitions.py::test_five_inputs_declare_closed_value_domains
@@ -76,7 +76,7 @@ ERROR tests/contract/test_sdd_authorization.py::test_authorize_writes_no_file
 `--action authorize`), which is task T011's deliverable in the next part. The red is *absence*, not
 a contradictory assertion: the record shape the cases assert (`agent_capability`, `seat_policy`,
 `effective`, `verdict`, `reason`, `failed_half`, `team_slug`, `seat_slug`, `sources`) is the
-authorization-probe record contracted by C-8 / C-14, and T011 implements to it
+authorization-probe record contracted by C-008 / C-014, and T011 implements to it
 (full log: `red-t007.txt`).
 
 ## T006 — fixture smoke check (not a test row)
@@ -267,7 +267,7 @@ would fail:
   requires that no reason code, no verdict literal, no domain value and no domain/condition sequence
   appears in it.
 - **No clock.** `recorded_at` is null unless the caller passes `--recorded-at`, because a timestamp
-  read inside the engine would break the byte-identical property C-24 requires. The golden action
+  read inside the engine would break the byte-identical property C-008 requires. The golden action
   reads no clock at all, so its two runs are byte-identical (`notes/golden-run1.json` /
   `golden-run2.json`, same sha256 `7ad8419e…`).
 
@@ -324,7 +324,7 @@ FAILED tests/contract/test_sdd_invocation_governance.py::test_the_four_dispatch_
 ```
 
 **Reading of the red**: the eleven failures are the eleven *declaration* cases — every one fails as
-a **missing statement** on the surface that owns it (`'no confirmation gate' in gov` → the C-16
+a **missing statement** on the surface that owns it (`'no confirmation gate' in gov` → the C-016
 sentence does not exist yet; `dispatch form 'prompt-names-a-driver' … does not name 'failed
 condition'` → the probe still restates the obligation in prose). No case fails as a contradictory
 assertion, and no case fails for a reason outside US3's scope. The six passes are the two
@@ -359,7 +359,7 @@ FAILED tests/contract/test_sdd_invocation_governance.py::test_the_four_dispatch_
 The three cases T023 claims went green here: `test_c9_the_predicate_narrows_to_exactly_three_conditions`,
 `test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate`, and
 `test_c10_the_probe_calls_the_engine_and_fails_closed` — 9 passed = those three + the 6 that were
-already green at T022. The 8 still red are exactly the clauses T024 owns (C-11…C-16), each failing
+already green at T022. The 8 still red are exactly the clauses T024 owns (C-011…C-016), each failing
 as a missing statement.
 
 ## Correction disclosed — one pre-existing paragraph restored between T023 and T024
@@ -417,7 +417,7 @@ $ bash scripts/bash/run-tests.sh --names-out notes/targeted-set-v1-failed.txt <t
 Name-level identical to the implement-start re-capture (191 passed, 0 failed names; the names-out
 file is byte-identical — `git diff` on it is empty), so this part introduces no new failure in the
 slice's non-regression set, and the three pre-existing anti-nesting assertions
-(`test_agent_dispatch_mechanism.py` C-6 / C-20, `test_sdd_loop_driver_skill.py` C-20) keep their
+(`test_agent_dispatch_mechanism.py` C-006 / C-004, `test_sdd_loop_driver_skill.py` C-004) keep their
 verdict. Full log: `green-t025-targeted.txt`. No second full-suite run was made: the E2 baseline slot
 was consumed at implement start (`test-evidence/implement.jsonl` seq 1).
 
@@ -446,9 +446,9 @@ ____________ test_heading_literal_is_stated_verbatim_and_line_exact ____________
         exact = [line for line in text.splitlines() if line.strip() == HEADING_LITERAL]
 >       assert len(exact) == 1, (
             f"the report contract MUST state {HEADING_LITERAL!r} verbatim on its own line "
-            f"exactly once (C-21); found {len(exact)} line-exact occurrences"
+            f"exactly once (C-055); found {len(exact)} line-exact occurrences"
         )
-E       AssertionError: the report contract MUST state '## Nested SDD Runs' verbatim on its own line exactly once (C-21); found 0 line-exact occurrences
+E       AssertionError: the report contract MUST state '## Nested SDD Runs' verbatim on its own line exactly once (C-055); found 0 line-exact occurrences
 E       assert 0 == 1
 E        +  where 0 = len([])
 
@@ -459,9 +459,9 @@ ________ test_the_literal_lands_in_exactly_one_shipped_source_document _________
         holders = _documents_carrying(HEADING_LITERAL)
 >       assert holders == ["skills/internal/create-team/SKILL.md"], (
             "the heading literal MUST have exactly one definition point, the report contract "
-            f"(C-21 / C-30); documents carrying it: {holders}"
+            f"(C-055 / C-064); documents carrying it: {holders}"
         )
-E       AssertionError: the heading literal MUST have exactly one definition point, the report contract (C-21 / C-30); documents carrying it: []
+E       AssertionError: the heading literal MUST have exactly one definition point, the report contract (C-055 / C-064); documents carrying it: []
 E       assert [] == ['skills/inte...eam/SKILL.md']
 E         Right contains one more item: 'skills/internal/create-team/SKILL.md'
 
@@ -561,14 +561,14 @@ ____ test_stage_bullet_keeps_the_three_values_and_gains_the_disambiguation _____
         stated = re.findall(r"`([^`]+)`", bullet.split("(canonical names")[0])
 >       assert tuple(stated) == TEAM_STAGE_VALUES, (...)
 >       assert "SDD" in bullet and re.search(r"阶段名册|roster", bullet), (
-            "the added text MUST state that this dimension is not the SDD stage roster (C-13)"
+            "the added text MUST state that this dimension is not the SDD stage roster (C-001)"
         )
-E       AssertionError: the added text MUST state that this dimension is not the SDD stage roster (C-13)
+E       AssertionError: the added text MUST state that this dimension is not the SDD stage roster (C-001)
 
 ______________________ test_no_added_surface_enumerates_the_sdd_stage_roster ______________________
 E       in _added_texts -> hosting = _hosting_paragraph()
 E       AssertionError: the authoring baseline must carry exactly one hosting-responsibility
-        paragraph (C-17), found 0
+        paragraph (C-005), found 0
 
 =================== short test summary info ====================
 FAILED tests/contract/test_sdd_diffusion.py::test_stage_bullet_keeps_the_three_values_and_gains_the_disambiguation
@@ -589,8 +589,8 @@ rc=1
 because nothing has moved yet, and red if this slice breaks its subject:
 
 - `test_shipped_stage_executor_preset_declares_no_hosting_capability` — the shipped leaf already carries
-  no `sdd-invocation` key; asserted against the artifact, not against a convention (C-15).
-- `test_the_hosting_criterion_fails_in_both_directions` — the C-16 criterion is *executed* over
+  no `sdd-invocation` key; asserted against the artifact, not against a convention (C-003).
+- `test_the_hosting_criterion_fails_in_both_directions` — the C-004 criterion is *executed* over
   synthetic definitions (declaration-only fails, statements-only fails); it does not depend on the
   authoring baseline carrying the rule yet.
 - `test_trigger_section_set_stays_the_delivered_closed_set` — the trigger document already has exactly
@@ -654,7 +654,7 @@ new-failures direction. Collected count moved 290 → 321 exactly by the two sui
    only its first red run (11 failed / 4 passed → 10 failed / 5 passed).
 2. **Section position (T045)**: the routing section was first placed between `## Proactive Flow
    Trigger` and `## Fact, Correctness & Logic Checks (Input Sanity)`. Two delivered guards pin that
-   exact adjacency (`tests/contract/test_proactive_trigger_section.py` C-3 / C-9 and
+   exact adjacency (`tests/contract/test_proactive_trigger_section.py` C-003 / C-009 and
    `test_ask_record_repeat.py`), so the first placement turned them red. The section moved to the next
    free slot (after Input Sanity, before `## One Source Of Truth`); commit `e1ee11c35`. Both guards are
    green in the E3 run above.
@@ -681,7 +681,7 @@ tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skil
 ```
 
 **Repair 1 — the section-count pin (disclosed, cross-feature)**. `test_a7_section_counts_…` pins the
-template at exactly 29 top-level `## ` sections and the live file at 30; C-18 requires exactly one
+template at exactly 29 top-level `## ` sections and the live file at 30; C-006 requires exactly one
 additive `## ` section, so both counts move by one. The pin's own docstring documents the protocol
 ("Stale-pin update (2026-10-27): the Closed-Set Claims amendment adds one ambient section"), i.e. the
 integer is a *counter of ambient sections*, and adding one is its recorded update path. Bumped
@@ -731,7 +731,7 @@ rc=0
 ```
 
 **Reading**: 23 = the 17 preserved cases + 6 new ones; `17 ⊂ 23` and all 17 keep their verdict, so the
-edit is a superset in the direction C-1/C-2 require. The six added node ids:
+edit is a superset in the direction C-001/C-002 require. The six added node ids:
 
 ```text
 tests/contract/test_sdd_invocation_governance.py::test_c1_an_agent_definition_without_the_key_resolves_forbidden
@@ -742,7 +742,7 @@ tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_agent_key_ch
 tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_seat_key_changes_no_other_field_of_the_dispatch
 ```
 
-**Non-vacuity of the C-2 cases** (measured, not assumed): the declared/absent pair differs by one
+**Non-vacuity of the C-002 cases** (measured, not assumed): the declared/absent pair differs by one
 line of the same document at the same path, and the two records differ in exactly the declaring
 source — `supplying.agent: declared → absent-key`, with `effective`, `failed_half` and `reason`
 identical:
@@ -754,7 +754,7 @@ reason equal: True | failed_half: agent agent
 effective: forbidden forbidden
 ```
 
-Had any other field moved, the C-2 cases fail — which is the property they are written to hold.
+Had any other field moved, the C-002 cases fail — which is the property they are written to hold.
 
 ## E-7 · `tests/contract/test_sdd_compat_containment.py` — RED (T051)
 
@@ -785,7 +785,7 @@ rc=0
 ```
 
 **T052's run** — the compatibility suite together with the file T049 extended, because the two files
-together are what carry C-1…C-12:
+together are what carry C-001…C-012:
 
 ```text
 $ python3 -m pytest -q tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_invocation_governance.py
@@ -806,18 +806,18 @@ an absence assertion is worthless if its token set could never appear. Two check
 clean offenders: []
 mutated 集成  : ['集成']
 mutated 确认门: ['确认门']
-C-8 on clean: []
-C-8 mutated : ['Work Package']
-C-9 U-token on clean: None
-C-9 U-token mutated : <re.Match object; span=(1617, 1619), match='U3'>
-C-12 target_ref on clean: True True
+C-008 on clean: []
+C-008 mutated : ['Work Package']
+C-009 U-token on clean: None
+C-009 U-token mutated : <re.Match object; span=(1617, 1619), match='U3'>
+C-012 target_ref on clean: True True
 ```
 
 The tokens are also ordinary vocabulary elsewhere in the framework sources (`集成` in 18 files,
 `确认门` in 17, `daemon` in 13, `scheduler` in 4, `自动上送` in 2), so their absence from this one
 section is a property of the section rather than of an unreachable string list.
 
-3. The C-10 gate case carries its own positive control: the scanner reports gates in
+3. The C-010 gate case carries its own positive control: the scanner reports gates in
    `skills/internal/create-team/references/summary-mapping.md` and
    `shared/guidelines/task-complexity-rubric.md`, i.e. it does see these document families, while
    none of the slice's nine delivered paths is a gate source.
