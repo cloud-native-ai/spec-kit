@@ -1521,12 +1521,20 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
     )
     out = proc.stdout
     assert out.splitlines()[0].startswith("状态摘要"), out
-    for column in ("线路", "状态", "阶段", "已静默", "标记", "最近步骤与消耗"):
+    # Reader-column redesign (2026-11-10): executor / activity / state / elapsed replace the duplicated
+    # silence-flag columns; each row answers the four questions a stopped-flow reader actually asks.
+    for column in ("线路", "执行体", "在做什么", "状态", "已执行时间"):
         assert column in out, "the single human format names its columns in reader words; got %r" % out
+    for retired in ("已静默", "标记", "最近步骤与消耗"):
+        assert retired not in out, "the redundant column %r must be gone; got %r" % (retired, out)
     rows = _rows(out)
     assert len(rows) == 1, "one aligned row per entry; got %r" % rows
     assert entry["line_id"] in rows[0], rows[0]
-    assert any(word in rows[0] for word in ("活跃中", "已静默", "最近活跃")), rows[0]
+    assert "fork(" in rows[0], "the executor column names the process carrier; got %r" % rows[0]
+    assert any(word in rows[0] for word in ("活跃", "等待中", "阻塞", "已停滞", "已关闭")), rows[0]
+    assert any(unit in rows[0] for unit in ("秒", "分", "小时", "天")), (
+        "the elapsed column reports time in reader words; got %r" % rows[0]
+    )
 
 
 def test_the_default_format_is_the_single_human_table(tmp_path):

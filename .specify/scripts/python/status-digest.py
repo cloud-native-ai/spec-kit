@@ -323,6 +323,13 @@ def project_entry(entry: dict, now: datetime, stale_bound: int) -> dict:
         "stale": bool(age_seconds is not None and age_seconds > stale_bound),
         "stale_bound_seconds": stale_bound,
         "triplet": triplet,
+        # Redesigned digest inputs (2026-11-10): executor, activity slug/description and elapsed time.
+        "created_at": entry.get("created_at") or DASH,
+        "last_event": entry.get("last_event") or DASH,
+        "cli": entry.get("cli") or "",
+        "cli_pid": entry.get("cli_pid"),
+        "runner_pid": entry.get("runner_pid"),
+        "worktree_path": entry.get("worktree_path") or DASH,
         # E5's per-entry projection: packed from the same reading, never a second parser (C-41).
         "line_activity": project_line_activity(entry, triplet, age_seconds),
     }
@@ -1044,8 +1051,86 @@ def _human_duration(age: str) -> str:
     return " ".join(parts)
 
 
-_STATE_WORDS = {"active": "活跃", "closed": "已关闭", "stalled": "已停滞"}
-_FLAG_WORDS = {"active": "活跃中", "stale": "已静默", "recent": "最近活跃"}
+_STATE_WORDS = {
+    "active": "活跃",
+    "waiting": "等待中",
+    "blocked": "阻塞",
+    "closed": "已关闭",
+    "stalled": "已停滞",
+}
+_STAGE_LABELS = {
+    "requirements": "需求撰写",
+    "clarify": "需求澄清",
+    "plan": "实现规划",
+    "tasks": "任务拆解",
+    "checklist": "质量清单",
+    "analyze": "一致性分析",
+    "implement": "实现",
+    "review": "评审",
+    "closure": "收尾",
+    "migrate": "迁移收尾",
+}
+
+
+def _human_seconds(seconds) -> str:
+    if seconds is None:
+        return DASH
+    seconds = int(seconds)
+    if seconds < 60:
+        return "%d 秒" % seconds
+    if seconds < 3600:
+        return "%d 分" % (seconds // 60)
+    if seconds < 86400:
+        return "%d 小时 %d 分" % (seconds // 3600, (seconds % 3600) // 60)
+    return "%d 天 %d 小时" % (seconds // 86400, (seconds % 86400) // 3600)
+
+
+def _activity_cell(item, element_unit):
+    """`slug: description` — what this line is doing, the reader-facing form of the same reading.
+
+    The line's own stage wins: exec-quant elements are a global store and positional alignment can hand a
+    line another line's step, so an element unit is only a fallback when the line records no stage. A closed
+    line with no stage has nothing it is "doing now" — it renders the dash, not a borrowed step.
+    """
+    stage = str(item.get("stage") or "")
+    if stage and stage != DASH and stage != "-":
+        slug = "/speckit.%s" % stage
+    else:
+        event = str(item.get("last_event") or "")
+        slug = event if event.startswith("/speckit.") or event.startswith("skill:") else ""
+    if not slug or slug == DASH:
+        return DASH
+    name = slug
+    for prefix in ("/speckit.", "speckit.", "skill:"):
+        if name.startswith(prefix):
+            name = name[len(prefix):]
+            break
+    label = _STAGE_LABELS.get(name.lower())
+    return "%s: %s" % (slug, label) if label else slug
+
+
+def _executor_cell(item):
+    parts = []
+    cli = str(item.get("cli") or "")
+    pid = item.get("cli_pid") or item.get("runner_pid")
+    if pid:
+        parts.append("fork(%s, pid %s)" % (cli or "cli", pid))
+    elif cli:
+        parts.append("fork(%s)" % cli)
+    worktree = item.get("worktree_path")
+    if worktree and worktree != DASH:
+        parts.append("worktree %s" % os.path.basename(str(worktree).rstrip("/")))
+    return " · ".join(parts) or DASH
+
+
+def _elapsed_cell(item, now, is_closed):
+    created = _parse_iso(item.get("created_at"))
+    if created is None:
+        return DASH
+    end = _parse_iso(item.get("updated_at")) if is_closed else now
+    if end is None:
+        return DASH
+    return _human_seconds(max(0, int((end - created).total_seconds())))
 
 
 def _human_measure(value) -> str:
@@ -1057,11 +1142,12 @@ def _human_measure(value) -> str:
 
 
 def render_digest_table(state) -> str:
-    """The ONE human-facing digest rendering — readable Chinese columns and natural-language cells.
+    """The ONE human-facing digest rendering — reader columns, natural-language cells.
 
-    Presentation only over the same state (C-41): the machine vocabulary stays in the ``json`` channel; here a
-    reader sees what each line is, whether it is quiet, and what its last step cost. The empty set renders the
-    ``nothing-running`` literal (C-45).
+    Reader contract (2026-11-10 redesign): every row answers four questions in order — who executes this
+    line (执行体), what it is doing now in `slug: description` form (在做什么), what state it is in (状态,
+    with explicit staleness duration when over the bound), and how long it has been running (已执行时间).
+    Presentation only over the same state (C-41); the machine vocabulary stays in the ``json`` channel.
     """
     if not state["entries"]:
         return NOTHING_RUNNING
@@ -1069,65 +1155,33 @@ def render_digest_table(state) -> str:
     efficiency = state.get("efficiency") or {}
     depth = efficiency.get("depth")
     elements = efficiency.get("elements") or []
-    bound_seconds = state["stale_bound_seconds"]
-    if bound_seconds % 3600 == 0:
-        bound_words = "%d 小时" % (bound_seconds // 3600)
-    elif bound_seconds % 60 == 0:
-        bound_words = "%d 分钟" % (bound_seconds // 60)
-    else:
-        bound_words = "%d 秒" % bound_seconds
-    profile_words = {"interactive": "交互模式"}.get(profile_in_force(state), profile_in_force(state))
-    header = "状态摘要 · 生成于 %s（UTC）· 最多 %d 条 · 静默阈值 %s · %s · 注册目录 %s" % (
+    header = "状态摘要 · 生成于 %s（UTC）· 最多 %d 条 · 注册目录 %s" % (
         state["generated_at"],
         state["cap"],
-        bound_words,
-        profile_words,
         state["registry_dir"],
     )
+    now = _parse_iso(state["generated_at"])
     rows = []
     for position, item in enumerate(state["entries"]):
-        state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
-        stage = item["stage"] if item["stage"] not in (None, "-", "") else "—"
-        flags = []
-        if item["is_active"]:
-            flags.append(_FLAG_WORDS["active"])
-        if item["stale"]:
-            flags.append(_FLAG_WORDS["stale"])
-        if not flags:
-            flags.append(_FLAG_WORDS["recent"])
-        activity = item.get("line_activity")
-        if activity:
-            flags.append(
-                "进行中（%s，%s）"
-                % (activity["label"] or DASH, _human_duration(activity["age"]))
-            )
-        summary = "无运行记录"
+        unit = None
         if efficiency.get("available") and position < len(elements):
-            element = elements[position]
-            fields = element_fields(element, depth)
-            pairs = []
-            for field in fields:
-                key, _, value = field.partition("=")
-                label = {
-                    "unit": "步骤",
-                    "elapsed": "耗时",
-                    "tokens": "令牌",
-                    "invocations": "调用",
-                    "agent": "执行体",
-                }.get(key, key)
-                if key == "unit":
-                    pairs.append("%s %s" % (label, value))
-                else:
-                    pairs.append("%s %s" % (label, _human_measure(value)))
-            summary = " · ".join(pairs) if pairs else "无运行记录"
+            for field in element_fields(elements[position], depth):
+                if field.startswith("unit="):
+                    unit = field.partition("=")[2]
+                    break
+        state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
+        if item["stale"] and str(item["state"]) != "closed":
+            state_word = "%s（静默 %s）" % (
+                state_word,
+                _human_seconds(item.get("age_seconds")),
+            )
         rows.append(
             (
                 item["line_id"] or DASH,
+                _executor_cell(item),
+                _activity_cell(item, unit),
                 state_word,
-                stage,
-                _human_duration(item["age"]),
-                "；".join(flags),
-                summary,
+                _elapsed_cell(item, now, str(item["state"]) == "closed"),
             )
         )
     import unicodedata
@@ -1135,15 +1189,16 @@ def render_digest_table(state) -> str:
     def display_width(text):
         return sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1 for ch in text)
 
-    head = ("线路", "状态", "阶段", "已静默", "标记", "最近步骤与消耗")
-    widths = [max(display_width(r[i]) for r in rows + [head]) for i in range(6)]
+    head = ("线路", "执行体", "在做什么", "状态", "已执行时间")
+    widths = [max(display_width(r[i]) for r in rows + [head]) for i in range(5)]
 
     def fmt_row(r):
         cells = []
-        for i in range(6):
+        for i in range(5):
             pad = widths[i] - display_width(r[i])
             cells.append(r[i] + " " * pad)
         return "  ".join(cells).rstrip()
+
     lines = [header, "", fmt_row(head), fmt_row(tuple("-" * w for w in widths))]
     lines.extend(fmt_row(r) for r in rows)
     completion = last_completion(state)
@@ -1159,7 +1214,7 @@ def render_digest_table(state) -> str:
             "另有 %d 条未显示%s" % (state["omitted"], ("，" + withheld) if withheld else "")
         )
     if not efficiency.get("available"):
-        lines.append("未找到运行记录存储，本页无法给出消耗读数")
+        lines.append("未找到运行记录存储，本页无法给出活动读数")
     return "\n".join(lines)
 
 
