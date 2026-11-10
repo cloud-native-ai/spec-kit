@@ -701,11 +701,11 @@ ALLOWED_POST_BASELINE_CHANGES = {
     },
     "skills/internal/sanitize-materials/SKILL.md": {
         "reason": "2026-10-27 Feature 073 record-retention lane (sanitize --lane retention)",
-        "markers": ("--lane materials|retention|renumber|all", "record-retention.py", "Receipt red line"),
+        "markers": ("--lane materials|retention|renumber|layout|all", "record-retention.py", "Receipt red line"),
     },
     "templates/commands/sanitize.md": {
         "reason": "2026-10-27 Feature 073 record-retention lane entry and delegation",
-        "markers": ("--lane materials|retention|renumber|all", "record-retention.py", "renumber-utils.py"),
+        "markers": ("--lane materials|retention|renumber|layout|all", "record-retention.py", "renumber-utils.py"),
     },
     # 2026-10-28 trunk fix(sdd-loop-driver): read-only stages account for the
     # wrap-up bookkeeping entries; the analyze surface scopes its read-only

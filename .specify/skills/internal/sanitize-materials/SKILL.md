@@ -1,6 +1,6 @@
 ---
 name: sanitize-materials
-description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration, the record-retention lane for consumed exec-quant / feedback / session records (consume → receipt → retire; no receipt means no deletion; 30-day grace), and the renumber lane that repairs sequence-number collisions left by concurrent/parallel lines (duplicate-only, spec directories / register IDs / REC-OI prefix-follow / feature-local T-CHK, single front-loaded confirmation, verification by re-scan). Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "记录回收", "retention", "consume-then-retire", "序号重排", "编号冲突", "duplicate number", "renumber", "speckit.sanitize"].
+description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration, the record-retention lane for consumed exec-quant / feedback / session records (consume → receipt → retire; no receipt means no deletion; 30-day grace), the renumber lane that repairs sequence-number collisions left by concurrent/parallel lines (duplicate-only, spec directories / register IDs / REC-OI prefix-follow / feature-local T-CHK, single front-loaded confirmation, verification by re-scan), and the layout lane that converges a legacy anchor layout (`.specify/memory/` anchors, `memory/features/<NNN>.md` details) to the current one (anchors at the `.specify/` root, details as `<NNN>-<slug>.md`) through a rename-only migration engine that refuses existing targets and never deletes. Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "记录回收", "retention", "consume-then-retire", "序号重排", "编号冲突", "duplicate number", "renumber", "speckit.sanitize"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/sanitize-materials/SKILL.md>"
 ---
@@ -47,10 +47,11 @@ merge semantics, and gate criteria defer to engine output and `--help`.
 Parameters are parsed by the command from `$ARGUMENTS` (protocol owned by the command
 template); their semantics govern how this skill runs:
 
-- `--lane materials|retention|renumber|all` — select the lane. `materials` (default) is the
+- `--lane materials|retention|renumber|layout|all` — select the lane. `materials` (default) is the
   existing seven-stage prose-hygiene flow; `retention` runs only the record-retention
   lane (R1–R5 below); `renumber` runs only the sequence-number lane (N1–N5 below);
-  `all` runs materials first, then retention, then renumber.
+  `layout` runs only the anchor-layout convergence lane (L1–L4 below); `all` runs
+  materials first, then retention, then renumber, then layout.
 - `--roots <csv>` — restrict scanning to a subset of material root kinds. A partial scan
   **never auto-resolves**: pending findings on unscanned roots keep their state (findings
   contract C-14; design authority named under Stores below).
@@ -354,10 +355,11 @@ and never re-proposed (`--reopen` restores it); the dismissal persists the reaso
 
 ## Layout lane (L1–L4)
 
-The anchor layout — `features.md`, `constitution.md`, `glossary.md`, `register.md`, `tools.md` at the
-`.specify/` root and feature details at `.specify/features/<NNN>-<slug>.md` — is the convergence target for
-older projects. The mechanism is owned by `scripts/python/anchor-layout-migrate.py` (deterministic; the moves
-are rename-only, archive-not-delete, and the script never rewrites project documents).
+Runs when `--lane layout` or `--lane all`. The anchor layout — `features.md`, `constitution.md`,
+`glossary.md`, `register.md`, `tools.md` at the `.specify/` root and feature details at
+`.specify/features/<NNN>-<slug>.md` — is the convergence target for older projects. The mechanism is owned by
+`scripts/python/anchor-layout-migrate.py` (deterministic; the moves are rename-only, archive-not-delete, and
+the script never rewrites project documents).
 
 - **L1 detect** — `python3 .specify/scripts/python/anchor-layout-migrate.py --action check --json`; exit 0
   clean, 1 findings (the plan).

@@ -5,14 +5,16 @@ Framework material hygiene: detects stale/residual and redundant materials (sema
 ## Execution Flow
 
 ```text
-/speckit.sanitize [check] [--lane materials|retention|renumber|all] [--roots <csv>]
+/speckit.sanitize [check] [--lane materials|retention|renumber|layout|all] [--roots <csv>]
 ```
 
 **Materials lane (default)** — seven stages: Preflight → Collect → Judge → Present → Confirm → Apply → Wrap-up. Default runs the full flow; `check` stops after Present (no cleanup prompt); `--roots` restricts the scan to a subset of material roots (partial scans never auto-resolve findings).
 
-**Retention lane (`--lane retention`)** — consume → receipt → retire for the per-run record stores. Five steps: Preflight → Scan → Distill/Promote → Plan/Present → Confirm/Apply. `--lane all` runs materials first, then retention, then renumber. `check` stops after Scan/Present.
+**Retention lane (`--lane retention`)** — consume → receipt → retire for the per-run record stores. Five steps: Preflight → Scan → Distill/Promote → Plan/Present → Confirm/Apply. `--lane all` runs materials first, then retention, then renumber, then layout. `check` stops after Scan/Present.
 
 **Renumber lane (`--lane renumber`)** — sequence-number collision repair for concurrent/parallel lines: Preflight → Scan → Plan/Present → Confirm → Apply. Four families: spec directory numbers (`.specify/specs/NNN-slug`), register IDs (`REC-<prefix>-NN`, `OI-<prefix>-NN`, `OI-N`, `T-NNN`), REC/OI prefix-follow for a renamed spec, and feature-local `T`/`CHK` duplicates. Repair is **duplicate-only**: a freed number is never reused and gaps are never compacted.
+
+**Layout lane (`--lane layout`)** — anchor-layout convergence for projects initialized under an older generation: Preflight → Detect → Present → Apply → Verify. The legacy anchors (`.specify/memory/{features,constitution,glossary,register,tools}.md`) move to the `.specify/` root, and `memory/features/<NNN>.md` details become `.specify/features/<NNN>-<slug>.md`. The engine is rename-only and refuses an existing target (the legacy file stays in place, reported `skipped`); it never deletes and never rewrites the project's documents — it prints the reference paths the caller must update. Decision gate: functional × autonomous → repair and disclose, not stop-and-ask.
 
 ### Engine Calls
 
@@ -95,7 +97,7 @@ Renumber artifacts under `.specify/memory/renumber/` are durable evidence, one f
 
 ## Scope
 
-Checks and cleanup target **framework-owned materials only** (memory layer, specs, history, mirrors, compat symlinks, docs tree). The retention lane additionally treats the framework-owned record stores (`exec-quant`, `feedback`, `session`) as **data**; it consumes and retires them under the receipt gate. The renumber lane rewrites references inside framework-owned materials but never touches git refs, dated records, or evidence logs. User source code, product scripts, and test cases are never assessed or modified. Non-git environments degrade semantic detection (deterministic checks unaffected); retention deletion in a non-git workspace requires an explicit override, while renumber apply refuses a non-git workspace outright.
+Checks and cleanup target **framework-owned materials only** (memory layer, specs, history, mirrors, compat symlinks, docs tree). The retention lane additionally treats the framework-owned record stores (`exec-quant`, `feedback`, `session`) as **data**; it consumes and retires them under the receipt gate. The renumber lane rewrites references inside framework-owned materials but never touches git refs, dated records, or evidence logs. User source code, product scripts, and test cases are never assessed or modified. The layout lane only renames/moves framework-owned anchors and feature-detail files under `.specify/`; it never edits their content. Non-git environments degrade semantic detection (deterministic checks unaffected); retention deletion in a non-git workspace requires an explicit override, while renumber apply refuses a non-git workspace outright.
 
 ## See Also
 

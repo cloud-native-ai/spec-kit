@@ -37,7 +37,7 @@ def test_engine_exists_in_source_and_mirror():
 
 def test_template_declares_lane_engine_and_store():
     text = _text(TEMPLATE)
-    assert "--lane materials|retention|renumber|all" in text
+    assert "--lane materials|retention|renumber|layout|all" in text
     assert "renumber-utils.py" in text
     assert "序号重排" in text
     assert ".specify/memory/renumber/" in text
@@ -46,7 +46,7 @@ def test_template_declares_lane_engine_and_store():
 
 def test_skill_declares_lane_families_and_red_lines():
     text = _text(SKILL)
-    assert "--lane materials|retention|renumber|all" in text
+    assert "--lane materials|retention|renumber|layout|all" in text
     for stage in ("N1", "N2", "N3", "N4", "N5"):
         assert f"### {stage} —" in text, f"missing renumber stage: {stage}"
     for family in ("spec-number", "register", "rec-follow", "local"):
@@ -72,7 +72,7 @@ def test_gate_pointer_reused_not_duplicated():
 def test_generated_copies_carry_the_lane():
     for copy in COPIES:
         text = _text(copy)
-        assert "--lane materials|retention|renumber|all" in text, f"copy missing lane: {copy}"
+        assert "--lane materials|retention|renumber|layout|all" in text, f"copy missing lane: {copy}"
         assert "renumber-utils.py" in text, f"copy missing engine: {copy}"
 
 

@@ -1,5 +1,5 @@
 ---
-description: 框架资料卫生治理：检测过期残留并按两级判据清理；含记录消费回收与序号重排 lane
+description: 框架资料卫生治理：检测过期残留并按两级判据清理；含记录消费回收、序号重排与布局收敛 lane
 ---
 <!-- AUTO-GENERATED from templates/commands/sanitize.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 > **Concurrency obligation（执行义务，按指针抵达）**: this command is an execution body — consider concurrency first, default to it when the class and capability allow, and, when serial, name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This template restates none of their rules.
@@ -10,7 +10,7 @@ description: 框架资料卫生治理：检测过期残留并按两级判据清�
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. 可选参数:`--lane materials|retention|renumber|all`(默认 materials;retention 只跑记录消费回收 lane;renumber 只跑序号重排 lane)、`--roots <csv>`(限定资料根子集,部分扫描不自动收敛)、`check`(仅检查,不进入清理提示)。
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. 可选参数:`--lane materials|retention|renumber|layout|all`(默认 materials;retention 只跑记录消费回收 lane;renumber 只跑序号重排 lane;layout 只跑锚点布局收敛 lane)、`--roots <csv>`(限定资料根子集,部分扫描不自动收敛)、`check`(仅检查,不进入清理提示)。
 
 ## Glossary
 
@@ -18,11 +18,11 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 ## Delegation
 
-框架资料卫生治理的完整执行流:检测过期残留与冗余、运行确定性正确性检查、持久化 pending 发现,经用户确认后按两级判据清理并出具执行报告。另含记录消费回收 lane:对 exec-quant/feedback/session 原始记录执行 scan → distill(回执) → plan → apply;以及序号重排 lane:并发/并行线路各自从同一基数取号,合流后可能留下两个制品同占一个号,该 lane 以确定性引擎扫描四类编号家族、产出重排映射与引用清单,经单批次确认后机械执行并重扫校验。materials lane 的七阶段流程(Preflight → Collect → Judge → Present → Confirm → Apply → Wrap-up)、retention lane 的 R1–R5、renumber lane 的 N1–N5 与全部行为红线均委派给一个 internal 技能;本命令只保留入口、参数解析与收尾生命周期。
+框架资料卫生治理的完整执行流:检测过期残留与冗余、运行确定性正确性检查、持久化 pending 发现,经用户确认后按两级判据清理并出具执行报告。另含记录消费回收 lane:对 exec-quant/feedback/session 原始记录执行 scan → distill(回执) → plan → apply;以及序号重排 lane:并发/并行线路各自从同一基数取号,合流后可能留下两个制品同占一个号,该 lane 以确定性引擎扫描四类编号家族、产出重排映射与引用清单,经单批次确认后机械执行并重扫校验;以及布局收敛 lane:旧世代锚点布局(`.specify/memory/` 下的五个锚点、`.specify/features/<NNN>.md` 详情)收敛到当前锚点布局(`.specify/` 根锚点、`<NNN>-<slug>.md` 详情),引擎只做重命名、拒绝覆盖既存目标、从不删除,并输出调用方需更新的引用路径清单。materials lane 的七阶段流程(Preflight → Collect → Judge → Present → Confirm → Apply → Wrap-up)、retention lane 的 R1–R5、renumber lane 的 N1–N5、layout lane 的 L1–L4 与全部行为红线均委派给一个 internal 技能;本命令只保留入口、参数解析与收尾生命周期。
 
-- **Skill**: `sanitize-materials` — runtime path `.specify/skills/internal/sanitize-materials/SKILL.md`(materials 引擎:`.specify/scripts/python/sanitize-utils.py`;retention 引擎:`.specify/scripts/python/record-retention.py`;renumber 引擎:`.specify/scripts/python/renumber-utils.py`;发现 schema/合并语义/门控判据以引擎输出与 `--help` 为准)。
+- **Skill**: `sanitize-materials` — runtime path `.specify/skills/internal/sanitize-materials/SKILL.md`(materials 引擎:`.specify/scripts/python/sanitize-utils.py`;retention 引擎:`.specify/scripts/python/record-retention.py`;renumber 引擎:`.specify/scripts/python/renumber-utils.py`;layout 引擎:`.specify/scripts/python/anchor-layout-migrate.py`;发现 schema/合并语义/门控判据以引擎输出与 `--help` 为准)。
 - **Inputs**: `$ARGUMENTS` 解析出的参数(见上;`--lane` 选择 lane;`--roots` 部分扫描不自动收敛;`check` 止于 Present 不进入 Confirm);glossary 锚定先行。
-- **Outputs**: materials 的发现台账与清理计划(`.specify/memory/sanitize/`);retention 的摘要、回执、计划与回收审计(`.specify/memory/retention/`);renumber 的重排计划、裁定登记与重排审计(`.specify/memory/renumber/`);用户确认破坏性计划后为已执行清理/回收/重排 + 三要素执行报告(执行内容 / 变更工件 / 修改途径)。
+- **Outputs**: materials 的发现台账与清理计划(`.specify/memory/sanitize/`);retention 的摘要、回执、计划与回收审计(`.specify/memory/retention/`);renumber 的重排计划、裁定登记与重排审计(`.specify/memory/renumber/`);layout 的迁移计划(引擎输出,无独立台账)与调用方需更新的引用路径清单;用户确认破坏性计划后为已执行清理/回收/重排/迁移 + 三要素执行报告(执行内容 / 变更工件 / 修改途径)。
 
 ## Residual probe (goal/team residuals — read-only)
 
