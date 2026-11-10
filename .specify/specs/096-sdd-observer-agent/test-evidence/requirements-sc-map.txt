@@ -1,0 +1,41 @@
+# SC → task row → evidence trace (T046)
+
+Captured 2026-11-10, worktree `096-sdd-observer-agent`, HEAD `3fd3c41f6`.
+One line per Success Criterion: path marker · task rows · evidence that discharges it.
+
+SC-001 (final path) · rows T008, T012, T013, T043, T045 · evidence: us1-journal-coverage.txt, sc001-mutations.txt, full-suite.txt, quickstart-run.md
+SC-002 (final path) · rows T014, T016, T022, T043, T045 · evidence: pointer-drills.txt, objectivity-red-legs.txt, full-suite.txt, quickstart-run.md
+SC-003 (final path) · rows T023, T024, T029, T030, T043, T045 · evidence: sc003-non-blocking.txt, us3-non-blocking.txt, quickstart-run.md
+SC-004 (final path) · rows T014, T016, T018, T019, T022, T043, T045 · evidence: objectivity-red-legs.txt, pointer-drills.txt, quickstart-run.md
+SC-005 (supporting path) · rows T036, T037, T038, T039, T040, T043, T045 · evidence: us5-isolation.txt, dual-line-isolation.txt, quickstart-run.md
+SC-006 (supporting path) · rows T031, T032, T033, T035, T043, T045, T047 · evidence: digest-boundary.txt, us4-boundaries.txt, render-verify.txt, tasks-stage-gates.txt
+SC-007 (supporting path) · rows T015, T016, T022, T043, T045 · evidence: gap-drill.txt, quickstart-run.md
+
+## Existence check (at map creation)
+
+Every evidence path above resolves non-empty at map creation, except the T047 gate
+reading that this row precedes (`tasks-stage-gates.txt`, written by T047 and re-checked there):
+
+- SC-001 us1-journal-coverage.txt: ok (non-empty)
+- SC-001 sc001-mutations.txt: ok (non-empty)
+- SC-001 full-suite.txt: ok (non-empty)
+- SC-001 quickstart-run.md: ok (non-empty)
+- SC-002 pointer-drills.txt: ok (non-empty)
+- SC-002 objectivity-red-legs.txt: ok (non-empty)
+- SC-002 full-suite.txt: ok (non-empty)
+- SC-002 quickstart-run.md: ok (non-empty)
+- SC-003 sc003-non-blocking.txt: ok (non-empty)
+- SC-003 us3-non-blocking.txt: ok (non-empty)
+- SC-003 quickstart-run.md: ok (non-empty)
+- SC-004 objectivity-red-legs.txt: ok (non-empty)
+- SC-004 pointer-drills.txt: ok (non-empty)
+- SC-004 quickstart-run.md: ok (non-empty)
+- SC-005 us5-isolation.txt: ok (non-empty)
+- SC-005 dual-line-isolation.txt: ok (non-empty)
+- SC-005 quickstart-run.md: ok (non-empty)
+- SC-006 digest-boundary.txt: ok (non-empty)
+- SC-006 us4-boundaries.txt: ok (non-empty)
+- SC-006 render-verify.txt: ok (non-empty)
+- SC-006 tasks-stage-gates.txt: ok (non-empty; written by T047 — see its § Final state)
+- SC-007 gap-drill.txt: ok (non-empty)
+- SC-007 quickstart-run.md: ok (non-empty)
