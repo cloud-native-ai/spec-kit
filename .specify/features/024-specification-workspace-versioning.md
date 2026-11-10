@@ -3,9 +3,9 @@
 **Feature ID**: 024  
 **Name**: Specification Workspace Versioning  
 **Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
-**Status**: Implemented  
+**Status**: Ready for Review  
 **Created**: 2026-06-05  
-**Last Updated**: 2026-11-10
+**Last Updated**: 2026-11-11
 
 ## Overview
 
@@ -20,6 +20,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 2026-11-10 (review, `/speckit.review` 097): four segments + Acceptance Reality Check complete — process report `.specify/specs/097-speckit-migrate-command/review.md`, code record `code-review.md` (123 changed / 97 judged / 26 generated-skipped / 0 gap; 1 `blocking`). `Implemented → Ready for Review` **refused — `blocking-unresolved`**: the current code-segment record carries a blocking entry (unfailable zero-write test, `tests/integration/test_migrate_us2_safety.py:273`) and the feature still claims `Planned` (the `Planned → Implemented` flip was never landed although the checker returns `accept` with `final_path` pass 4/4), so the transition has no matching From-state. Status left unchanged; no waiver presented. ARC record: pass 4 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 4.
 
 2026-11-10 (review-repair r1, 097): the blocking defect and the eight P1 findings were repaired. The zero-write probe test is now an observable guard (sentinel transient directory + workspace chdir, plus a fifth red-ability mutation; two-variant red-base drill in `test-evidence/red-base-probe-guard-2026-11-10.txt`); the smoke record was re-executed verbatim (105 passed, `final-suite.txt`); C-1/docs/template converged to `--help`; the receipt `workspace` key landed (C-4/E-2/E-3); SC-002/SC-007/DoD-4 wording, quickstart status and tasks DoD status refreshed. `closure-acceptance-check.py` on the repaired tree: verdict `accept`, reasons none, `final_path` pass 4/4, all four `Planned → Implemented` conditions true → **`Planned → Implemented` landed** (registry row and this detail agree). `Implemented → Ready for Review` remains pending a re-run of `/speckit.review` against this tree.
+
+2026-11-11 (review r2, `/speckit.review` 097): full re-run of the four segments + Acceptance Reality Check against `da34a3d44`; every round-1 P0/P1 repair anchor re-verified (status flip, zero-write probe guard with both red variants, smoke literal byte-identical to the executed command, SC-007 pointer, `--help`/-h convergence, receipt `workspace` key). Segment conclusions: process **P1×3 / P2×4** (framework-level recommendations, no P0), artifact **pass** (9/9, A1–A9 closed), implementation **pass** (smoke 105 passed / exit 0 / `final-suite.txt`), code record **`not-evaluated`** with 0 `blocking` / 0 `important` / 6 `suggestion` / 1 `nitpick` / 1 `praise` (147 changed / 107 judged / 40 generated-skipped / 0 gap; gate `allow`). ARC: claim `Implemented`, verdict `accept`, `final_path` pass 4 / blocked 0 / deferred 0 / partial 0 / fail 0 / unknown 0 / total 4. `Implemented → Ready for Review` **landed** (all four conjunctive conditions hold; no waiver). Process report `review.md`, archived round-1 records `review-097-speckit-migrate-command.md` and `code-review-20261110T161419Z.md`.
 
 ## Key Changes
 
