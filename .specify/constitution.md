@@ -1,5 +1,17 @@
 <!--
 Sync Impact Report
+- Version change: 1.19.0 → 1.19.1 (PATCH; carrier correction, 2026-11-10)
+- Modified principles: VII. Workflow Gates — the Pre-Status-Flip Gate's status-line carrier is corrected from `verification.log` to `verification.md`: the framework's implementation chain (acceptance-hardening § Gates, the implement template, the closure checker) reads `verification.md`, and the repository ignores `*.log`, so the previous literal named a file the chain never reads. User ruling (2026-11-10): amend the constitution to the framework carrier rather than create a second record surface.
+- Added principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ shared/guidelines/better-harness.md (+ .specify mirror) — the two sensor references now name verification.md
+  ✅ tests/contract/test_fast_fail_discipline.py — live version pin 1.19.0 → 1.19.1
+- Follow-up TODOs: none
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.18.0 → 1.19.0 (MINOR; new Principle XXII added, 2026-11-09)
 - Added principles: XXII. Re-Anchoring (不忘初心 · 温故而知新) — every agent persists a task ANCHOR and a RULE anchor, and after every core step runs compact -> reload -> evaluate at T0/T1/T2, with the five direction questions asking the RULES first and yielding `on-track` / `correction-applied` / `decision-needed`; only `decision-needed` is surfaced, never an approval request
 - Modified principles: None
@@ -220,7 +232,7 @@ The SDD workflow MUST be followed rigorously:
 - **Workflow Gates (NON-NEGOTIABLE)**:
   - **Feature reuse-first**: bind evolution/refactor specs to an existing Feature (many-specs-to-one-feature); create a new Feature only when none fits
   - **No status regression**: appending an evolution spec to an `Implemented` Feature keeps it Implemented; never revert to Planned
-  - **Pre-Status-Flip Gate** (Planned→Implemented): requires zero open `[ ]` tasks AND a status line for every Success Criterion in `verification.log`
+  - **Pre-Status-Flip Gate** (Planned→Implemented): requires zero open `[ ]` tasks AND a status line for every Success Criterion in `verification.md`
   - **Deferred tasks are first-class**: work that cannot run this session is marked `[~]` with `<!-- deferred: reason -->`, never left as `[ ]`
   - **Template-only features**: features with no executable runtime code judge Test-First as Partial (justified) — "tests" verify template content, canonical paths, and structure instead
 
@@ -564,4 +576,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.19.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-09
+**Version**: 1.19.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-10

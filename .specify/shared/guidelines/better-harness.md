@@ -24,7 +24,7 @@ Spec Kit 全部改进机制共同服务的目标的**单一事实源**：feedbac
 | 回路侧 | 含义 | Spec Kit 中的对应资产 |
 |--------|------|----------------------|
 | **Feedforward guides**（前馈引导） | agent 行动前就位的目标、边界与路径 | constitution、specs / plans / tasks、instructions（AGENTS.md）、glossary、skills / agents / teams / tools 定义、checklists |
-| **Feedback sensors**（反馈传感） | agent 行动后观察结果、帮助自我纠正的信号 | tests / verification.log、`/speckit.analyze`、`/speckit.review`、feedback entries、evidence 泳道（session / project / assets / runs / feedback） |
+| **Feedback sensors**（反馈传感） | agent 行动后观察结果、帮助自我纠正的信号 | tests / verification.md、`/speckit.analyze`、`/speckit.review`、feedback entries、evidence 泳道（session / project / assets / runs / feedback） |
 
 改进工作应问：**摩擦发生在前馈缺失，还是反馈缺失？** 前者补引导资产，后者补传感信号。
 
@@ -36,7 +36,7 @@ Spec Kit 全部改进机制共同服务的目标的**单一事实源**：feedbac
 |------|-------------|----------------------|
 | **Task Understanding**（任务理解） | agent 是否知道目标和"完成"的含义？ | constitution、`/speckit.requirements` / `clarify`、feature index、glossary、instructions |
 | **Controlled Execution**（可控执行） | 工作是否在受支持、可重复的路径上？ | `/speckit.plan` / `tasks` / `implement`、skills、tools 定义（行为规则）、scripts、teams 编排 |
-| **Change Validation**（改动验证） | 是否有证据证明变更确实有效？ | Test-First（原则 IV）、`/speckit.checklist`、`/speckit.analyze`、verification.log |
+| **Change Validation**（改动验证） | 是否有证据证明变更确实有效？ | Test-First（原则 IV）、`/speckit.checklist`、`/speckit.analyze`、verification.md |
 | **Reliable Delivery**（可靠交付） | 速度是否绕过了质量检查或验收？ | workflow gates（原则 VII）、`/speckit.review`、git-workflow 技能、Pre-Status-Flip Gate |
 | **Learning Capture**（经验沉淀） | 下一个任务是否从本次受益？ | memory（session / knowledge）、history、**feedback 机制**、Self-Improvement workflow、`improve-*` 技能族 |
 
