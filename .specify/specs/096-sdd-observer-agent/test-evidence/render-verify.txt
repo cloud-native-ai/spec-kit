@@ -1,0 +1,90 @@
+# T042 — generated surfaces verified (FR-001)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T042) · FR-001
+
+## A) Mirror drift against the pre-edit baseline (`plan-mirror-baseline.txt`)
+
+Pre-write `python3 scripts/python/sync-mirrors.py --check` (real output, drift lines only):
+
+```text
+OK: all per-tool command copies match the source templates.
+MISS  .specify/agents/templates/sdd-observer.agent.md
+MISS  .specify/scripts/python/journal-utils.py
+MISS  .specify/shared/declarations/facts/journal-format.yaml
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+```
+
+`python3 scripts/python/sync-mirrors.py --write`:
+
+```text
+Regenerated command copies for 4 tools.
+MISS  .specify/agents/templates/sdd-observer.agent.md
+sync  agents/ -> .specify/agents/templates/ (1 files)
+MISS  .specify/scripts/python/journal-utils.py
+sync  scripts/ -> .specify/scripts/ (1 files)
+MISS  .specify/shared/declarations/facts/journal-format.yaml
+sync  shared/ -> .specify/shared/ (1 files)
+write_exit=0
+```
+
+Post-write `python3 scripts/python/sync-mirrors.py --check` → **exit 0**, every pair `ok`
+(full capture `.specify/.tmp/096/mirror-check-post-write.txt`, 13 lines). Pair sizes moved
+with the feature by exactly the two new source files:
+
+```text
+ok    scripts/ == .specify/scripts/ (127 files, byte-identical)   # baseline: 126
+ok    shared/ == .specify/shared/ (112 files, byte-identical)     # baseline: 111
+```
+
+Reading: **no NEW drift** against `test-evidence/plan-mirror-baseline.txt` (baseline exit
+0 → current exit 0); the two count changes are the declared new files, not drift.
+
+## B) Mirror byte-identity
+
+```text
+cmp agents/sdd-observer.agent.md .specify/agents/templates/sdd-observer.agent.md
+mirror_byte_identical=yes
+```
+
+## C) Four render copies exist and carry the fast-fail clause
+
+```text
+.qoder/agents/sdd-observer.agent.md exists size=5355  begin=yes end=yes prohibition=yes anomaly-line=yes
+.claude/agents/sdd-observer.md exists size=5304       begin=yes end=yes prohibition=yes anomaly-line=yes
+.github/agents/sdd-observer.agent.md exists size=5360 begin=yes end=yes prohibition=yes anomaly-line=yes
+.opencode/agents/sdd-observer.md exists size=5298     begin=yes end=yes prohibition=yes anomaly-line=yes
+```
+
+The strict interval check runs in `test_fast_fail_discipline.py`:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10 or i11"
+```
+
+Exit status: 0
+
+```text
+..                                                                       [100%]
+2 passed in 6.21s
+```
+
+i10 pins the 18-preset set (17 → 18 at T020) byte-identical to the owner literal; i11 pins
+each mirror byte-identical to its source and each per-tool copy's clause interval
+byte-identical to `rewrite_paths(owner)` — including the new `sdd-observer` preset.
+
+## D) Render-pass drift on unrelated agent copies (disclosed, generated)
+
+`specify render-agents --ai <tool>` reported `rendered 21 agent(s)` for qoder, claude,
+copilot and opencode (exit 0 each). Besides the four new `sdd-observer` copies, the pass
+refreshed 12 pre-existing copies whose sources had changed in earlier features without a
+re-render:
+
+| Files | Drift origin (source-side, not this feature) |
+|-------|----------------------------------------------|
+| `.qoder/agents/sdd-implement-{coordinator,executor}.agent.md`, `.claude/…`, `.github/…`, `.opencode/…` (8) | 086 runner rule: step 4 gained the "every test execution goes through `run-tests.sh`" sentence |
+| `.qoder/agents/reporter.agent.md`, `.claude/…`, `.github/…`, `.opencode/…` (4) | 087/092 reporter source: the 092 D4 handoff comment line |
+
+Reading: these are render products of the declared T041 step, not hand edits and not 096
+source changes; `.specify/agents/.render-manifest.json` records the regenerated hashes.
+Leaving them unrendered would be pre-existing render lag, not a 096 obligation failure.

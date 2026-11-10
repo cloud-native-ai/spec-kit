@@ -1,0 +1,51 @@
+# T022 — pointer drills (SC-002)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T022) · SC-002
+
+## A) Every persistent pointer in a clean fixture journal resolves
+
+Command:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q -k "persistent_pointers" -v
+```
+
+Exit status: 0
+
+```text
+192 workers [1 item]
+
+.                                                                        [100%]
+============================== 1 passed in 6.65s ===============================
+```
+
+Covered case:
+
+```text
+test_journal_engine.py::test_persistent_pointers_resolve
+```
+
+Reading: `check` exits 0 and writes nothing (byte-compare before/after); every
+`persistent:` pointer in the fixture journal resolves — path pointers exist under the
+fixture root, commit pointers pass `git cat-file -e <sha>^{commit}`.
+
+## B) Forged and unresolvable pointers turn `check` red
+
+Same tamper-drill command as `objectivity-red-legs.txt` § A; the two pointer variants:
+
+```text
+test_journal_engine.py::test_tamper_drills_turn_check_red[forged-pointer-V-10]
+test_journal_engine.py::test_tamper_drills_turn_check_red[unresolvable-commit-V-10]
+```
+
+Real output (from the 5-case selection):
+
+```text
+.....                                                                    [100%]
+============================== 5 passed in 7.37s ===============================
+exit=0
+```
+
+Reading: a persistent path pointer to a missing path exits 1 naming the row (V-10); a
+commit pointer that `git cat-file -e` cannot resolve exits 1 naming the row (V-10).

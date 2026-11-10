@@ -1,0 +1,27 @@
+# T039 — US5 slice through the one runner (SC-005)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T039) · SC-005
+
+Command (the US5 independent test):
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py -q
+```
+
+Exit status: 0
+
+```text
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.............................                                            [100%]
+29 passed in 7.40s
+```
+
+Reading: the US5 slice is green — 18 journal-engine tests and 11 observer-template tests.
+The US5-specific cases are `test_first_journal_row_precedes_first_stage_completion`,
+`test_dual_line_isolation`, `test_same_line_second_writer_exits_three` (with their
+engine-mutation teeth checks) and the template-side instance-identity / subagent audit.
+Concrete isolation readings are in `dual-line-isolation.txt` (T040).

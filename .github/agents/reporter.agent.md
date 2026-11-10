@@ -43,6 +43,7 @@ The structure I report on, its cadence, and my own stream artifact are read from
 - The roster row that seats me (`reporting-territory`, `reporting-cadence`)
 - The run's state surfaces inside my read territory — the state spine and the run's own artifacts
 - The cadence definition and the element floor, reached by anchor to `.specify/shared/guidelines/progress-reporting.md`
+<!-- 092 handoff: D4 — 周期数值的唯一 owner 是 `.specify/shared/guidelines/reporting-obligations.md` § 二（长跑档 30 s）；上一行只抵达 `progress-reporting.md` 的交互档缺省与内容下限，该行保留不改、仅作历史记录。参见 092 D4，2026-11-09。 -->
 
 ## Downstream (Outputs)
 

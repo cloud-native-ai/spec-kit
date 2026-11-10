@@ -1,0 +1,37 @@
+# T040 — dual-line isolation readings (SC-005)
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T040) · SC-005
+
+Tool: `tests/fixtures/sdd-observer/dual_line_builder.py` builds two independent project
+roots under the sanctioned scratch root `.specify/.tmp/096/us5/`; each line gets its own
+spec dir, state spine and state dir. Both appends ran the real engine
+(`scripts/python/journal-utils.py --action append`).
+
+## Real output
+
+```text
+append line-a: exit=0
+append line-b: exit=0
+journal L1: <worktree>/.specify/.tmp/096/us5/line-a/.specify/specs/096-sdd-observer-agent-a/journal.md
+journal L2: <worktree>/.specify/.tmp/096/us5/line-b/.specify/specs/096-sdd-observer-agent-b/journal.md
+identity L1: sdd-observer-line-a
+identity L2: sdd-observer-line-b
+shared path count: 0 (list: [])
+second writer exit: 3
+second writer stdout: concurrent-writer-refused
+teardown: True
+```
+
+## Reading
+
+- **Two journals, two identities**: the two lines project into two distinct `journal.md`
+  files and two distinct instance identities (`sdd-observer-<line_id>`); neither journal
+  carries the other line's `line_id` (asserted by `test_dual_line_isolation`).
+- **Zero shared paths**: across `root` / `spec_dir` / `state_dir` / `spine` / `journal` /
+  `triplet_dir`, the intersection is empty.
+- **Second live writer refused**: with an exclusive `flock` held on line A's journal, a
+  second append exits `3` with `concurrent-writer-refused` and writes nothing (byte-compare
+  in the test); the same-lock drill against a lock-removed engine copy is *not* refused, so
+  the exit 3 comes from the protocol, not the fixture.
+- Fixture scratch dir removed after capture (`teardown: True`).

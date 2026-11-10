@@ -300,14 +300,23 @@ PREDECESSOR_H2_SECTIONS = [
 
 DECOMPOSITION_H2 = "Task Decomposition & Team Coordination（任务拆解与配合）"
 
+SDD_OBSERVER_H2 = "SDD Observer（观察者：启动、记录节与收束）"
+
 
 def test_skill_sections_are_additive_only():
-    """The 070 section is inserted; every predecessor H2 keeps its position."""
+    """The 070 section is inserted; every predecessor H2 keeps its position.
+
+    Stale-pin update (2026-11-10, Feature 096 T025): the observer lifecycle section
+    is inserted immediately before the compiled `Wrap-up` section; every predecessor
+    keeps its relative order.
+    """
     sections = _h2_sections(_read(SKILL_MD))
     expected = (
         PREDECESSOR_H2_SECTIONS[:7]
         + [DECOMPOSITION_H2]
-        + PREDECESSOR_H2_SECTIONS[7:]
+        + PREDECESSOR_H2_SECTIONS[7:-1]
+        + [SDD_OBSERVER_H2]
+        + PREDECESSOR_H2_SECTIONS[-1:]
     )
     assert sections == expected, (
         "the 070 section must be the only SKILL.md H2 insertion, got %r" % sections
@@ -331,12 +340,21 @@ PREDECESSOR_DOCS_H2 = [
 
 DOCS_DECOMPOSITION_H2 = "任务拆解与配合（070-subagent-task-teams 切片）"
 
+DOCS_OBSERVER_H2 = "观察者生命周期（096-sdd-observer-agent 切片）"
+
 
 def test_docs_page_sections_are_additive_only():
-    """The docs page gains one pointer section; predecessor sections remain."""
+    """The docs page gains one pointer section; predecessor sections remain.
+
+    Stale-pin update (2026-11-10, Feature 096 T034): the observer lifecycle pointer
+    section is inserted before 触发与路由; every predecessor keeps its position.
+    """
     sections = _h2_sections(_read(DOCS_PAGE))
     expected = (
-        PREDECESSOR_DOCS_H2[:7] + [DOCS_DECOMPOSITION_H2] + PREDECESSOR_DOCS_H2[7:]
+        PREDECESSOR_DOCS_H2[:7] + [DOCS_DECOMPOSITION_H2]
+        + PREDECESSOR_DOCS_H2[7:10]
+        + [DOCS_OBSERVER_H2]
+        + PREDECESSOR_DOCS_H2[10:]
     )
     assert sections == expected, (
         "the 070 docs section must be the only docs-page H2 insertion, got %r"

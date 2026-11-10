@@ -1,0 +1,29 @@
+# T021 — US2 slice through the one runner
+
+Captured: 2026-11-10, worktree `096-sdd-observer-agent`, base at capture `e3ba849cf`
+Package: `wp04-release-and-evidence` (T021) · SC-002, SC-004
+
+Command:
+
+```bash
+bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py -q
+```
+
+Exit status: 0
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+...........................                                              [100%]
+27 passed in 8.12s
+```
+
+Reading: the US2 slice is green — 18 journal-engine tests (tamper drills, gap drill,
+pointer resolution, engine CLI) and 9 observer-template tests (neutral frontmatter, role
+face, verbatim prohibition, read/write surface, three-layer binding, forbidden
+capabilities, byte-identical fast-fail clause, instance identity, subagent audit).
+Drill-specific readings are in `objectivity-red-legs.txt`, `pointer-drills.txt` and
+`gap-drill.txt` (T022).

@@ -11,6 +11,7 @@ driver/digest-side boundary assertions.
 """
 from __future__ import annotations
 
+import ast
 import importlib.util
 import json
 import re
@@ -345,6 +346,110 @@ def test_digest_field_set_matches_the_frozen_baseline():
         assert current_rows == baseline_rows, (
             "digest row-key set drifted from the frozen baseline"
         )
+
+
+# --------------------------------------------------------------------------- #
+# US4 boundary (T032) — observer-verification C-06(d)(e) and C-09
+# --------------------------------------------------------------------------- #
+
+ENV_PROBE = (REPO_ROOT / ".specify" / "specs" / "096-sdd-observer-agent"
+             / "test-evidence" / "env-probe.txt")
+LOOP_STATE = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "loop-state.py"
+OBLIGATIONS = REPO_ROOT / "shared" / "guidelines" / "reporting-obligations.md"
+CARRIERS = (
+    "shared/guidelines/reporting-obligations.md",
+    "shared/declarations/facts/driver-stage-artifacts.yaml",
+    "skills/external/sdd-loop-driver/scripts/loop-state.py",
+    "shared/declarations/facts/driver-stage-sequence.yaml",
+)
+
+
+def _implement_entry_base():
+    text = ENV_PROBE.read_text(encoding="utf-8")
+    match = re.search(r"`git rev-parse HEAD` → `([0-9a-f]{40})`", text)
+    assert match, "env-probe.txt does not carry the implement-entry base"
+    return match.group(1)
+
+
+def _declaration_statement(slug: str):
+    reader = _module("sdd_observer_declaration_reader_boundary",
+                     REPO_ROOT / "scripts" / "python" / "declaration_reader.py")
+    return reader.load_fact(str(REPO_ROOT), slug)["body"]["statement"]
+
+
+def _loop_state_literal_rows():
+    text = LOOP_STATE.read_text(encoding="utf-8")
+    match = re.search(r"^STAGE_ARTIFACTS = (\{.*?^\})", text, re.MULTILINE | re.DOTALL)
+    assert match, "loop-state.py carries no STAGE_ARTIFACTS literal"
+    return ast.literal_eval(match.group(1))
+
+
+def test_observer_rides_only_the_existing_sub_flow_projection():
+    section = observer_section()
+    assert "`--sub-flow <label>=<triplet-dir>`" in section, (
+        "the observer does not ride the existing supervision projection"
+    )
+    assert "三段约定" in section and "`<line_id>--<run_stamp>--observer`" in section, (
+        "the observer label does not follow the existing three-segment convention"
+    )
+    assert "MUST NOT 新增字段、行或小节" in section, (
+        "the section does not forbid a new digest field, row or block"
+    )
+    digest_text = DIGEST.read_text(encoding="utf-8")
+    pattern_match = re.search(
+        r'^SUPERVISION_LABEL_PATTERN = re\.compile\(\s*r?"([^"]+)"\s*\)',
+        digest_text, re.MULTILINE)
+    assert pattern_match, "status-digest.py exposes no SUPERVISION_LABEL_PATTERN"
+    pattern = re.compile(pattern_match.group(1))
+    assert pattern.match("L1--R1--observer"), (
+        "the observer's three-segment label does not match the existing digest pattern"
+    )
+
+
+def test_status_digest_carries_no_observer_or_journal_token():
+    text = DIGEST.read_text(encoding="utf-8")
+    assert "observer" not in text, "status-digest.py carries an observer token"
+    assert "journal" not in text, "status-digest.py carries a journal token"
+
+
+def test_boundary_carriers_are_unchanged_against_the_implement_entry_base():
+    base = _implement_entry_base()
+    result = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", "%s..HEAD" % base, "--",
+         *CARRIERS],
+        capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "", (
+        "a boundary carrier changed against the implement-entry base %s: %r"
+        % (base, result.stdout)
+    )
+
+
+def test_stage_artifact_mapping_matches_the_stage_sequence():
+    sequence = _declaration_statement("driver-stage-sequence")
+    declared = _declaration_statement("driver-stage-artifacts")["stages"]
+    assert isinstance(sequence, list) and sequence, "the stage sequence is not a list"
+    assert set(declared) == set(sequence), (
+        "the declared artifact map's stage keys drift from the stage sequence"
+    )
+    literal = _loop_state_literal_rows()
+    assert set(literal) == set(sequence), (
+        "the loop-state fallback table's stage keys drift from the stage sequence"
+    )
+    assert "## 十一 · 零新增机制" in OBLIGATIONS.read_text(encoding="utf-8"), (
+        "reporting-obligations.md lost its zero-new-machinery heading"
+    )
+
+
+def test_journal_is_not_a_stage_artifact_or_u4_condition():
+    declared = _declaration_statement("driver-stage-artifacts")["stages"]
+    tables = [declared, _loop_state_literal_rows()]
+    for table in tables:
+        for stage, row in table.items():
+            for entry in list(row.get("artifacts", [])) + list(row.get("owned_paths", [])):
+                assert "journal" not in str(entry).lower(), (
+                    "stage %r requires the journal as an artifact: %r" % (stage, entry)
+                )
 
 
 # --------------------------------------------------------------------------- #

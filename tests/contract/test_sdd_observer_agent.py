@@ -1,9 +1,11 @@
 """Contract tests for the sdd-observer agent template (Feature 096).
 
-Contracts: `contracts/observer-role.contract.md` C-02…C-08 authored in T018 and the C-09
-instance-identity face extended in T038. The template is a framework source under `agents/`;
-its installed mirror and per-tool copies are later packages' subjects. Journal spellings stay
-with their declaration owners; this module pins only the template's own face.
+Contracts: `contracts/observer-role.contract.md` C-02…C-08 authored in T018, the C-09
+instance-identity face extended in T038, and the `contracts/observer-verification.contract.md`
+C-06 template-side boundary assertions added in T031. The template is a framework source
+under `agents/`; its installed mirror and per-tool copies are later packages' subjects.
+Journal spellings stay with their declaration owners; this module pins only the template's
+own face.
 """
 from __future__ import annotations
 
@@ -176,6 +178,74 @@ def test_fast_fail_clause_is_byte_identical():
     owner = _clause_interval(FAST_FAIL_DOC.read_text(encoding="utf-8"))
     assert _clause_interval(_text()) == owner, (
         "the template's fast-fail clause is not byte-identical to its owner literal"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# observer-verification C-06 — template-side boundary: exactly two write surfaces
+# --------------------------------------------------------------------------- #
+
+PROTECTED_SURFACES = ("state spine", "stage artifact", "feature registry", "glossary")
+WRITE_GRANT_VERB = re.compile(
+    r"\bwrite(?:s|ing)?\b|\bappend(?:s|ing)?\b|\bupdat(?:e|es|ing)\b|"
+    r"\bmodif(?:y|ies|ying)\b|\bedit(?:s|ing)?\b|写入|追加|改写|修改", re.IGNORECASE)
+WRITE_PROHIBITION = re.compile(
+    r"MUST NOT|never|defect|forbidden|禁止|缺陷|不得", re.IGNORECASE)
+
+
+def _write_grant_violations(text: str):
+    """Lines that grant a write path to a surface outside the observer's two surfaces."""
+    violations = []
+    for line in text.splitlines():
+        if not any(surface in line for surface in PROTECTED_SURFACES):
+            continue
+        if not WRITE_GRANT_VERB.search(line):
+            continue
+        if WRITE_PROHIBITION.search(line):
+            continue
+        violations.append(line.strip())
+    return violations
+
+
+def test_write_surface_is_exactly_two_and_grants_no_third_path():
+    _, body = _frontmatter_fields(_text())
+    assert "Write surface: exactly two surfaces" in body, (
+        "the boundary does not declare exactly two write surfaces"
+    )
+    assert "journal through `scripts/python/journal-utils.py`" in body, (
+        "the journal surface (through the engine) is not one of the two"
+    )
+    assert "own execution artifacts" in body, (
+        "the observer's own execution artifacts are not the second surface"
+    )
+    assert ("Writing the state spine, stage artifacts, feature registry or glossary "
+            "is a defect") in body, "the out-of-surface write set is not declared a defect"
+    assert _write_grant_violations(body) == [], (
+        "the template grants a write path outside the declared two surfaces: %r"
+        % _write_grant_violations(body)
+    )
+
+    # The predicate has teeth: a doctored grant must be caught.
+    doctored = body + "\nWrite the stage artifact into the state spine after each window.\n"
+    assert _write_grant_violations(doctored), (
+        "the write-grant predicate missed a doctored out-of-surface grant"
+    )
+
+
+def test_role_face_is_no_seat_and_carries_no_value_field():
+    _, body = _frontmatter_fields(_text())
+    assert "not a stage executor, reviewer or reporter seat" in body, (
+        "the seat boundary is not declared"
+    )
+    assert "no write authority over the development line" in body, (
+        "the role face does not deny write authority over the line"
+    )
+    assert "不评价、不建议、不推断" in body, "the verbatim prohibition is absent"
+    for prohibited in ("evaluation", "suggestion", "causal inference", "severity",
+                       "recommendation"):
+        assert prohibited in body, "the no-value-field rule does not name %r" % prohibited
+    assert "deterministic projection" in body, (
+        "entries are not declared deterministic projections of carrier facts"
     )
 
 
