@@ -1,44 +1,32 @@
-# Analyze Findings — W3（tasks.md）
+# Analyze findings — W3 (tasks.md), round 2 post-repair
 
-- **Wave**: W3（并发只读检测波）
-- **读域**: `.specify/specs/096-sdd-observer-agent/tasks.md`（唯一被判对象；未读取其他 spec 制品）
-- **报告日期**: 2026-11-10
-- **写面**: 本文件与 Wrap-up 记账；未修改任何制品
-- **校验状态**: W3-01、W3-04 为 HIGH，须由独立校验波确认；本波未自证（校验波载体规则禁止宿主内进程内子代理）
+- Domain: `.specify/specs/096-sdd-observer-agent/tasks.md` only (file-level exclusive read domain)
+- Round: 2 (re-run after repair; IDs continue from round 1 to avoid collision with merged report W3-01…W3-06)
+- Mode: read-only on artifacts; no fixes applied
+- Deterministic checks run this round:
+  - `validate-tasks.py` → `0 error(s), 4 warning(s)` (all 4 appear in the Green Attribution disclosed-warnings table; exit 0)
+  - `account-clause-coverage.py --spec-dir ... --corpus-root ...` → `status: ok`, `claimed clauses 58`, `FR 23/23`, `uncovered beyond baseline: 0` (exit 0; corpus-level `[clause-unparsable] fail (107)` is a pre-existing warning, not introduced here)
+  - `pre-analyze-check.py --stage tasks` → `decision: pass`, `errors=0`, `advisories=82` (all `missing-path` for paths this feature creates; non-blocking without `--strict`)
+  - Prior E-01 delta: the four previously unclaimed clauses are now claimed; 58/58 claimed exactly once and `validate-tasks.py` reports zero `green-dangling` / `green-clause-collision`.
 
 ## Findings
 
-| ID | Category | Severity | Anchor | 一句话事实 | 建议归属（指针） |
-|----|----------|----------|--------|------------|------------------|
-| W3-01 | inconsistency（包级顺序） | HIGH | `.specify/specs/096-sdd-observer-agent/tasks.md:89-100,232,337` | 包序声明 wp01 先于 wp02，但 wp01 内的 T037 被 wp02 内的 T020 阻塞，且 package 表 Edge 列未记这条反向边，三种顺序声明（Edge 列 / Declared integration order / Parallel Team Strategy）无一种能同时成立，按字面执行会死锁。 | `tasks.md` § Package Map / § Declared integration order / § Parallel Team Strategy（经 `/speckit.tasks` 收敛；优先复核 T037 的 blocker 或其包归属） |
-| W3-02 | inconsistency（写域领地） | MEDIUM | `.specify/specs/096-sdd-observer-agent/tasks.md:93,95,98,186` | T023 属 wp03，却写 `tests/fixtures/sdd-observer/failure_builder.py`——该路径位于 wp01 声明的 owned 目录内、且不在 wp03 的 write domain 中，与 § Package Map 的互斥领地声明不符。 | `tasks.md` § Package Map（wp03 写域补路径，或 T023 改归 wp01） |
-| W3-03 | inconsistency（并行标记） | MEDIUM | `.specify/specs/096-sdd-observer-agent/tasks.md:111,124,163,193,288-293` | § Parallel Opportunities / Parallel Example 宣称 T006、T018、T027 可并行（并称 T004 在 T001 之后），但对应行分别是无 `[P]`、无 `[P]`、`blockedBy: T026`、无 blocker，指引与行级标记相互矛盾。 | `tasks.md` 对应任务行的 `[P]` / `[blockedBy:]` 标记，或 § Parallel Opportunities 文本 |
-| W3-04 | concurrency-safety（项目指令冲突） | HIGH | `.specify/specs/096-sdd-observer-agent/tasks.md:11,108,369` | 所有 red-first 证据都追加到单一 `notes/red-first-evidence.md`，而写入行分属 wp01、wp02、wp03 且 wp02/wp03 被允许并发执行，违反 `AGENTS.md` § Concurrent Development Safety 的“记录类数据一文一件、不得共享可变聚合”MUST。 | T001（落地路径改为每条记录一文件，或按包/时间戳分文件）；本波只读，不修复 |
-| W3-05 | coverage-gap（DoD） | MEDIUM | `.specify/specs/096-sdd-observer-agent/tasks.md:24,66-85,109-111` | DoD-8 要求 § Premises 的 14 个生成期量在 implement entry 全部重测，但无任何任务行承担该重测（T002 只重取三个测试基线，T004 只重探环境），DoD 与任务覆盖之间存在缺口。 | DoD-8 / Setup 行 T002–T004（补一条 premise 重测行或把 DoD-8 的 owner 显式落到 implement Step 0） |
-| W3-06 | underspecification（可追溯性） | LOW | `.specify/specs/096-sdd-observer-agent/tasks.md:168` | T017 只枚举 data-model 的 V-1…V-13 与 V-16/V-17，V-14、V-15、V-18、V-19、V-20 在 tasks.md 全文无任何归属行，五条规则的覆盖不可追溯。 | T017 的检查范围，或 data-model → task 映射（本波读域不含 data-model.md，需聚合波对照确认） |
+| ID | Severity | Anchor | Fact (one sentence) | Suggested ownership (pointer) |
+|----|----------|--------|---------------------|-------------------------------|
+| W3-07 | CRITICAL | `tasks.md:30` | GATE-1's check writes the scratch file `/tmp/096-current-names.txt`, while `.specify/shared/guidelines/temp-directory-discipline.md:19` explicitly forbids bare `/tmp/...` and Constitution XVII delegates that closed set to the owner — the gate instructs a MUST violation. | tasks stage: replace with `.specify/.tmp/096/current-names.txt` (matched by `.specify/.gitignore` `.tmp/`) or `~/tmp/096/...`; then re-run GATE-1. |
+| W3-08 | HIGH | `tasks.md:22`, `tasks.md:37`, `tasks.md:211` | DoD-6/GATE-8/T032 claim `reporting-obligations.md`, `STAGE_ARTIFACTS` and `driver-stage-sequence.yaml` are “unmodified/unchanged”, but the only check is a bare `git diff --name-only` (working tree vs index, blind to committed changes) and T032 names no baseline or hash — the containment claim is void for lack of a baseline referent. | tasks stage: pin the implement-entry commit and compare `git diff --name-only <base>...HEAD -- <three paths>`, plus a content-shape/hash assertion in the boundary test. |
+| W3-09 | HIGH | `tasks.md:24`, `tasks.md:66-85`, `tasks.md:111` | DoD-8 requires every § Premises quantity to be re-measured at implement entry, but the only re-measurement row (T004) covers § Environment Prerequisites and T002/T005 re-capture only four baselines; the counts FR 23 / SC 7 / clauses 58 / fact files 34 / presets 17 / bounded 19 / H2 14 / mirror list 9 / stage sequence 8 / digest tokens 0 have no re-measurement row or evidence path. | tasks stage: extend T004 (or add a Setup row) to run each § Premises re-derivation command and record readings/deltas under `notes/pre-change-measurements.md` or `test-evidence/premises-entry.txt`. |
+| W3-10 | HIGH | `tasks.md:120`, `tasks.md:122`, `tasks.md:161`, `tasks.md:163`, `tasks.md:186`, `tasks.md:231` | The Foundational phase says “no story row may start before both [T006 and T007] exist” (CRITICAL), but T014/T018/T023/T036 each list only one of T006/T007 in `[blockedBy:]`; since row-level tags are declared the ordering authority inside a package, T014/T036 can start before T006 is closed. | tasks stage: add both foundational rows to each story-row blocker set, or qualify the blanket phase rule and explain the intentional partial dependency. |
+| W3-11 | MEDIUM | `tasks.md:348`, `tasks.md:351`, `tasks.md:353`, `tasks.md:169`, `tasks.md:187`, `tasks.md:254` | The SC → row trace disagrees with the row citation groups: SC-001 omits T047 (row cites SC-001), SC-004 includes T019 (row cites no SC-004), and SC-006 omits T024 (row cites SC-006). | tasks stage: reconcile the § SC → row trace with each row's parenthetical citation group (or correct the row citations). |
+| W3-12 | MEDIUM | `tasks.md:291`, `tasks.md:193` | § Parallel Opportunities says T026 and T027 “run in parallel after T025”, but T027 carries `[blockedBy: T026]`, so the pair cannot start together. | tasks stage: remove T026 from T027's blocker set if the pointer does not depend on the reference file, or delete the parallel claim. |
+| W3-13 | MEDIUM | `tasks.md:284`, `tasks.md:319-323`, `tasks.md:96-100` | § Within Each User Story says “Story complete before moving to the next priority” and the MVP order is US1 → US2 → US3, but US2's slice-green/evidence rows T021–T022 sit in `wp04-release-and-evidence`, which executes after `wp03-driver-lifecycle` (US3/US4/US5). | tasks stage: move T021–T022 into wp03 (they only need T017/T020) or qualify the story-completion rule for package dispatch. |
+| W3-14 | LOW | `tasks.md:289-292`, `tasks.md:303-310`, `tasks.md:111`, `tasks.md:124`, `tasks.md:163`, `tasks.md:210-211` | The `[P]` marker set disagrees with the parallel statements: T006, T018, T031 and T032 are named as parallel in § Parallel Opportunities / the Parallel Example but lack `[P]`, and T004 is `[P]` without the `[blockedBy: T001]` edge that “after T001” implies. | tasks stage: add `[P]` where the section already schedules the rows in parallel, and add the T001 blocker to T004 (or drop the “after T001” wording). |
+| W3-15 | LOW | `tasks.md:372` (cf. `validate-tasks.py` WARN at `tasks.md:162`) | The disclosed-warnings row for T016→T024 explains the inversion as “C-03 before C-04”, but the validator's actual pair is T016 C-07 → T024 C-03 (the adjacent C-03/C-04 inversion is T014→T024, not T016). | tasks stage: correct the rationale to the actual clause pair, or re-state the pair as T014→T024 if that is the intended inversion. |
+| W3-16 | LOW | `tasks.md:11`, `tasks.md:98`, `tasks.md:108`, `tasks.md:252` | The evidence-layout prose says “execution readings land in test-evidence/” and “every other evidence file is written by rows of exactly one package”, but T002/T005 write `notes/pre-change-measurements.md` and T045 writes `notes/quickstart-run.md`, which T001 (Setup) created — a second package touches that path. | tasks stage: qualify the prose to the actual landing points (notes vs test-evidence) and include `quickstart-run.md` in the Setup/write-domain exception. |
+| W3-17 | LOW | `tasks.md:191`, `tasks.md:194` | T025 authors the new driver H2 without stating its position, while T028 pins it “immediately before the compiled Wrap-up section”; an executor following T025 alone can place it elsewhere and fail the T028 pin. | tasks stage: state the H2's required position in T025 (last H2 before `Wrap-up`). |
 
-## 检测波执行记录
+## Notes
 
-- **A duplication**: 已执行；未发现近重复要求。DoD/GATE 对同一检查命令的成对引用属验收/收口双层引用，未按漂移副本计。
-- **B ambiguity**: 已执行；全文无 `TODO` / `TKTK` / `???` / `TBD` 占位。
-- **C underspecification**: 已执行；产出 W3-05、W3-06。
-- **D constitution alignment**: 已执行；对照 `.specify/constitution.md` 的 22 条原则标题未发现 MUST 冲突；W3-04 是 `AGENTS.md` 项目指令冲突，非宪法原则冲突。
-- **E coverage gaps**: 已执行（tasks.md 内部）；FR-001…FR-023、SC-001…SC-007 均在任务行中以文本形式出现，SC → row trace 七行齐全；缺口见 W3-05、W3-06。
-- **F inconsistency**: 已执行；产出 W3-01、W3-02、W3-03。
-- **G feature relevance & registry**: 仅执行 tasks.md 侧检查（T044 承担 registry reconcile）；`.specify/features.md` 与 `.specify/features/096.md` 不在本波读域，未对 index/detail 漂移下判。
-- **H checklist accountability**: 未执行；`checklists/` 不在本波读域（W1 已处置）。
-- **I decision tension records**: 不适用；判定对象是 plan.md，不在本波读域。
-
-## 机器核对摘要
-
-- 任务行：47 条，`T001`–`T047` 唯一，无缺号、无重号。
-- `[blockedBy:]`：0 个未知目标、0 个自环；行级依赖图无环（47/47 可拓扑排序）。
-- `[green:]`：54 条，0 碰撞；与 header 的 58 子句 − 4 条已披露未认领 = 54 相符。
-- 包分区：14 + 5 + 10 + 13 = 42 打包行 + 5 Setup 行 = 47。
-- 跨包行级依赖：`T031←T029`（wp02←wp03）、`T032←T020`（wp03←wp02）、`T037←T020`（wp01←wp02）、`T018←T006`（wp02←wp01）、`T033←T003`（wp04←Setup）；包表 Edge 列只部分承载这些边（见 W3-01）。
-- FR / SC 文本覆盖：FR 23/23、SC 7/7（计数取自 tasks.md 文本，未回读 requirements.md 的定义行）。
-
-## 范围与证据边界
-
-- 本波只判 tasks.md；requirements.md、plan.md、data-model.md、contracts/、registry 与 checklists 均未读取，跨制品漂移由聚合波合并判定。
-- 未执行任何修复；W3-01…W3-06 的建议归属仅为指针，修复须回到 `/speckit.tasks` 等对应入口。
+- No artifact was modified by this analysis; the only writes are this findings file and the `/speckit.analyze` wrap-up records.
+- The residue list for round-1 MEDIUM/LOW findings is not reproduced here because this worker's read domain excludes the round-1 findings file; the merge coordinator owns the round-2 residue/delta table (analyze-artifacts § Rounds).
+- W3-07 is a constitution-alignment finding (Constitution XVII / temp-directory discipline) and is reported at CRITICAL without a downgrade candidate.

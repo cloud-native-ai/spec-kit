@@ -1,0 +1,63 @@
+# analyze validation wave — C/H independent read-only validators, round 2（096-sdd-observer-agent）
+
+- **Date**: 2026-11-10 | **Run**: r20261110T081104Z-b096 | **Round**: 2（修复后重过门）
+- **Carrier**: `.specify/skills/internal/create-team/scripts/dispatch.sh`（subprocess carrier / Recipe 7），`qodercli 1.1.85`
+- **CLI flags**: `-p --output-format stream-json --permission-mode auto --tools Read Grep Glob Bash --no-session-persistence`
+- **Briefs**: `.specify/.tmp/096-analyze-validators-r2/briefs/brief-<ID>.md`（temporary, git-ignored; each brief = finding id/category/claim/severity + evidence locations only, no detection reasoning, no other findings）
+- **Raw streams**: `.specify/.tmp/096-analyze-validators-r2/logs/validate-<ID>.{jsonl,live.log,status}`（temporary; distilled below）
+- **Read-only proof**: `git status --porcelain` after the wave equals the pre-wave reading（`git-status-pre.txt` 与 `git-status-post.txt` 逐字节一致）— no validator wrote to the repository; every validator `.status` records `exit=0`.
+
+## Wave summary
+
+| ID | Sent | Verdict | Final severity |
+|----|------|---------|----------------|
+| W3-07 | CRITICAL | confirm | CRITICAL（宪法 XVII / 临时目录纪律；按 Constitution Authority 不可降级） |
+| W3-08 | HIGH | confirm | HIGH |
+| W3-09 | HIGH | confirm | HIGH |
+| W3-10 | HIGH | confirm | HIGH |
+
+sent=4 · confirm=4 · downgrade=0 · reject=0 · downgrade rate = 0/4 · reject rate = 0/4
+
+## Verdict blocks (verbatim from each validator's final message)
+
+### W3-07 — confirm CRITICAL
+
+```
+verdict: confirm
+evidence_supported: tasks.md:30 contains the bare `/tmp/096-current-names.txt` path twice (the `--names-out` write and the `comm -13` comparison); scripts/bash/run-tests.sh:21-24, :82, :224-228 confirms `--names-out` writes FAILED ids to exactly the given path, so executing GATE-1 creates a file in bare `/tmp`; temp-directory-discipline.md §1 (sanctioned roots only `~/tmp/<project>/<purpose>/` and `.specify/.tmp/<purpose>/`) and §2 (forbids "裸 `/tmp/...`、`/var/tmp/...`") establish the prohibition, and §5 exceptions do not cover a persistent scratch output; constitution.md:375-377 (XVII) makes the sanctioned-root rule a MUST and delegates roots/cleanup/exceptions to that owner document.
+evidence_not_supported: The write is prospective — tasks.md instructs the command; the file is created only when an implementer executes GATE-1, and I did not observe any execution. The owner document and XVII are framed around "temporary or scratch directory," while this is a file directly in the OS temp dir; the violation rests on §2's textual ban of the bare-`/tmp` form plus the absence of a §5 exception, which is an interpretive step beyond a literal directory-creation act. No machine guard enforces this instance: scan-temp-usage.py scans only shared/templates/skills/agents/scripts (scripts/python/scan-temp-usage.py:34, :36-39) and skips `.specify`, so the tasks.md text is outside its scope; nothing in the ALLOWLIST covers spec artifacts. I also did not observe any justifying note for this path at the gate, so the "instructs a MUST violation" characterization stands as written.
+VALIDATOR-DONE
+```
+
+### W3-08 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: tasks.md:22 (DoD-6) states reporting-obligations.md, the STAGE_ARTIFACTS mapping and shared/declarations/facts/driver-stage-sequence.yaml "are unmodified" with no baseline named; tasks.md:37 (GATE-8) checks only a bare `git diff --name-only` (no commit arg, working tree vs index, blind to staged/committed changes) naming only two of the three artifacts — STAGE_ARTIFACTS (owner skills/external/sdd-loop-driver/scripts/loop-state.py:211) is unchecked there; tasks.md:211 (T032) asserts the three are "unchanged" without naming a baseline, hash or expected content; no baseline for these carriers is frozen elsewhere in tasks.md (T002/T003/T005 at lines 109-112 cover mirrors, test names, digest field-set, coverage only; base sha c691d658a at line 42 is scoped to environment probes and unreferenced by GATE-8/T032); .specify/shared/guidelines/closed-set-claims.md requires a baseline referent (element 1), lists "无基线参照物的稳定性断言" as a rejection form (line 43), and prescribes HIGH for a void claim carrying a DoD/gate (line 36).
+evidence_not_supported: The phrase "the only check is a bare git diff --name-only" is imprecise in coverage — GATE-8's git check covers two of the three artifacts (STAGE_ARTIFACTS has no check at all in GATE-8), and T032 is itself a planned verification surface (a test assertion) though it carries no referent; DoD-6 also holds a separate digest-field-set baseline check unrelated to these carriers. I could not observe whether the eventual T032 implementation would pin a literal content/hash inside the test, and did not evaluate whether any other existing gate or mirror check incidentally detects changes to loop-state.py or the two carrier files.
+VALIDATOR-DONE
+```
+
+### W3-09 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: tasks.md:24 (DoD-8) mandates re-measurement of every § Premises quantity at implement entry with no check command or owner; tasks.md:66-85 lists 14 premises, states "MUST be re-measured at implement entry" (line 68), of which 11 are the count/token rows named in the finding; tasks.md:109-112 shows T002 re-captures only the 3 baseline rows, T004 re-probes only § Environment Prerequisites (tasks.md:40-48), and T005 re-freezes the coverage baseline, which is not a § Premises row; a full read of all 381 lines plus grep for premise/re-measur/DoD-8 found no other row, GATE-1…GATE-9, T047 gate sweep, or evidence sink covering the 11 count/token premises — only notes/pre-change-measurements.md (T002/T005) and test-evidence/env-probe.txt (T004) exist as re-measurement sinks.
+evidence_not_supported: The finding's count "T002/T005 re-capture only four baselines" slightly overstates their scope as premises baselines — only three of the four captured values are § Premises rows; T005's coverage baseline is outside the table (no effect on the conclusion). The cited artifacts cannot establish, and the finding does not claim, whether an external mechanism (e.g., /speckit.implement Step 0 or the driver) re-measures these premises outside tasks.md; nothing in tasks.md assigns that duty. I did not measure whether downstream test failures would in practice trip loudly on premise drift (T020/T028 carry literal before→after counts that would be stale under drift), so the practical blast radius of the gap beyond DoD-8 being undischargeable was not observed.
+VALIDATOR-DONE
+```
+
+### W3-10 — confirm HIGH
+
+```
+verdict: confirm
+evidence_supported: tasks.md:120 ("No story row may start before both exist") and :122 (CRITICAL phase gate) require both T006 and T007 before any story row; T014 (:161) and T036 (:231) are [US2]/[US5] story rows listing only [blockedBy: T007], while :89 declares row-level [blockedBy:] tags the ordering authority inside a package and :54 says only untagged rows follow phase order; T014/T036 are in wp01 alongside T006 (:93), so no package edge supplies the missing T006 dependency and they can start after T007 closes with T006 still open (T018/:163 and T023/:186 are protected by wp02/wp03 package edges, :100). T014's tamper variants depend on the closed event-class set owned by T006 (:124).
+evidence_not_supported: No observed instance of early start (static artifact inconsistency only; no run records examined); the row texts of T014/T036 do not explicitly cite journal-format, so functional dependence on T006 is inferred, not stated; whether an executor would apply the CRITICAL gate additively rather than defer to the tag authority cannot be determined from the file (no resolution clause exists either way); HIGH severity is a judgement — the concrete impact is a one-token tag repair limited to two fixture rows.
+VALIDATOR-DONE
+```
+
+## Notes
+
+- W3-07 is a constitution-alignment finding (Constitution XVII via its temp-directory owner). Per the skill's Constitution carve-out, a validator-proposed downgrade would not lower it; this validator confirmed outright.
+- W3-08/W3-09 validators each recorded one imprecision in the detector's wording (W3-08: GATE-8 checks only two of the three carriers, STAGE_ARTIFACTS unchecked; W3-09: only three of the four re-captured baselines are § Premises rows) — neither changes the confirmed core, and the boundaries are carried verbatim into the merged report.
+- No validator wrote to the repository; the wave's read-only proof holds.
