@@ -411,6 +411,42 @@ def test_an_alive_pid_file_becomes_the_executor_row(tmp_path):
     assert "/speckit.analyze" in rows[0], rows[0]
 
 
+def test_a_cli_child_of_a_listed_runner_is_not_a_second_executor_row(tmp_path):
+    """Executor identity: the registry may name the runner AND its CLI child for one dispatch."""
+    import json
+    import os
+    import subprocess
+
+    workspace, registry, entry, _paths = _fixture_tree(tmp_path)
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    try:
+        state_dir = workspace / ".specify" / "state"
+        state_dir.mkdir(parents=True)
+        (state_dir / ("pid-%s-analyze" % entry["line_id"])).write_text(
+            "pid=%d start=0 at=1794290000 line=%s stage=analyze event=pid\n"
+            % (os.getpid(), entry["line_id"]),
+            encoding="utf-8",
+        )
+        with_child = dict(entry, cli_pid=child.pid)
+        (registry / (entry["line_id"] + ".json")).write_text(
+            json.dumps(with_child, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+        )
+        proc = _run_digest(
+            ["--action", "digest", "--format", "table", "--workspace", str(workspace)],
+            cwd=workspace,
+            env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+        )
+        assert proc.returncode == 0, proc.stderr
+        rows = _rows(proc.stdout)
+        assert len(rows) == 1, (
+            "the runner and its CLI child are ONE execution; got %r" % rows
+        )
+        assert ("pid %d" % os.getpid()) in rows[0], rows[0]
+    finally:
+        child.terminate()
+        child.wait(timeout=10)
+
+
 def test_closed_lines_do_not_occupy_the_digest(tmp_path):
     """Reader contract (2026-11-10): closed lines are history — the digest never renders them."""
     import json

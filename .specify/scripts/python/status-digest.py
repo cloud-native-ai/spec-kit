@@ -1161,11 +1161,24 @@ def read_executors(workspace, entries, now):
             started = None
         add(entry, pid, fields.get("stage", ""), started)
 
+    def parent_of(pid):
+        try:
+            with open("/proc/%d/stat" % int(pid), "r", encoding="utf-8", errors="replace") as handle:
+                tail = handle.read().rsplit(")", 1)[1].split()
+            return int(tail[1])
+        except (OSError, IndexError, ValueError):
+            return None
+
     for entry in by_line.values():
         for key in ("cli_pid", "runner_pid"):
             pid = entry.get(key)
-            if isinstance(pid, int) or (isinstance(pid, str) and pid.isdigit()):
-                add(entry, pid, str(entry.get("stage") or ""), None)
+            if not (isinstance(pid, int) or (isinstance(pid, str) and pid.isdigit())):
+                continue
+            # The registry may record both the runner and its CLI child for ONE dispatch: a pid whose
+            # parent is already listed is the same execution, not a second row.
+            if parent_of(pid) in known:
+                continue
+            add(entry, pid, str(entry.get("stage") or ""), None)
     return out
 
 
@@ -1240,12 +1253,14 @@ def render_digest_table(state) -> str:
     for item in visible:
         line_id = item["line_id"] or DASH
         state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
-        if item["stale"]:
+        line_executors = by_line.get(str(item["line_id"]), [])
+        if item["stale"] and not line_executors:
+            # Silence describes the line's RECORDS; a live executor is proof of activity, so the
+            # annotation is reserved for rows that have none.
             state_word = "%s（静默 %s）" % (
                 state_word,
                 _human_seconds(item.get("age_seconds")),
             )
-        line_executors = by_line.get(str(item["line_id"]), [])
         if not line_executors:
             rows.append(
                 (
