@@ -110,7 +110,7 @@ This subsection carries the verdict and the pointers only: no opinion body and n
 | Expected set (denominator) | `requirements.md`, `plan.md`, `tasks.md`, `contracts/` (4 files), `data-model.md`, `quickstart.md`, `verification.md`, `feature-ref.md`, `observation-appendix.md`, `checklists/` (2 files), `test-evidence/` (59 files) | union of the standard spec-stage set and `plan.md` § Project Structure (lines 109–120) |
 | Coverage line | 11 / 11 | present members / expected members |
 | Missing members | none | — |
-| Segment verdict | `blocked` | P1 findings A-01…A-03 below |
+| Segment verdict | `blocked` | the three P1 rows below |
 
 | Severity | Artifact path | Line | Why the line is absent | Finding |
 |----------|---------------|------|------------------------|---------|
@@ -133,7 +133,7 @@ One row per finding. `line` is required whenever the artifact is line-addressabl
 | Smoke exit code | 0 | the integer the command returned; re-run at review time: 85 passed, exit 0 |
 | Smoke evidence path | `.specify/specs/095-superagent-role/test-evidence/smoke-six-modules.txt` | exists and non-empty |
 | Scope and regression verdict | scope fails (7 non-095 commits + 1 user-ruling amendment inside the delta); regression fails (18 in-range guards red, attributable to the other-line digest-redesign commits); the 095 packages themselves re-measure green (smoke 85 passed at review; closure checker `accept`, `final_path.pass=7`) | the segment's own reading |
-| Segment verdict | `blocked` | P1 findings I-01, I-02, I-04 below |
+| Segment verdict | `blocked` | the three P1 rows below |
 
 | Severity | Diff path | Line | Why the line is absent | Finding |
 |----------|-----------|------|------------------------|---------|
