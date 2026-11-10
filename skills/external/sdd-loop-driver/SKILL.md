@@ -22,6 +22,7 @@ classification: external
 - **加载本手册的宿主 agent 就是驱动者**：U0–U6（探测/派发/轮询/校验/续环/收尾）由加载者在自己的会话亲自执行，不得委托任何 subagent；**自检**：若处于 subagent 上下文且被赋予「代为驱动循环」的任务，按显式异常行上报并停在前置阶段——嵌套驱动永不是合法形态。
 - **流程不可替换**：不得用 improve-skills/create-skills 等维护路径替代 U0–U6（Hard Requirement 7）。
 - **派发治理义务上收**：子代理提示词不引用/加载驱动技能、不含循环逻辑；义务全文与派发前拦截见 `skills/internal/run-agent/SKILL.md` 派发治理节与 subagent-definitions § Dispatch-Time Governance Obligation。
+- **角色面按指针（根 super agent）**：驱动者是根 super agent；阶段派发载荷携带 `role_edge` 七字段（形态见 `references/stage-prompts.md` § 归属信封）；角色、角色边与协议归 `.specify/shared/definitions/superagent-definitions.md`。执行仍由既有派发前自检与 U4 承担 —— 不新增门禁，阶段序列与哨兵不变。
 - **两侧环境模型**：spec-kit 只要求存在于执行侧（目标项目）；编排侧宿主无需安装，缺之不构成缺口（真源：`.specify/shared/workflow/execution-topology.md`）。
 
 ## When to Load

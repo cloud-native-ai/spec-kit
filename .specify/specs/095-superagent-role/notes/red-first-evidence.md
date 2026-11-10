@@ -163,3 +163,43 @@ FAILED tests/contract/test_role_edge_engine.py::test_three_forms_local_team
 FAILED tests/contract/test_role_edge_engine.py::test_three_forms_fanout_10 - ...
 4 failed, 21 passed in 6.21s
 ```
+
+### Instance 4 — T020 role-transition payload contract (red-first)
+
+- Date: 2026-11-10
+- Command: `bash scripts/bash/run-tests.sh tests/contract/test_role_transition_payload.py -q`
+- Exit status: **1**
+- Red state: the payload fixtures exist (T019) and the payload-side legs are green; the five
+  wiring surfaces (run-agent SKILL, team patterns, team SKILL, driver SKILL, stage-prompts)
+  stand unchanged, so the six surface legs fail on their own named assertions. Captured in a
+  scratch git worktree at `dd7cbbab4` with only the new test module and fixtures copied in, so
+  the record reproduces the pre-wiring tree state. (The first attempt in the working tree also
+  flagged `test_return_contract_five_items` because of a test-side line-wrap comparison defect;
+  that was repaired before any surface edit — disclosed in
+  `test-evidence/role-transition-readings.txt` §1.)
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_role_transition_payload.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+_________________ test_team_report_mapping_table_is_mandatory __________________
+    def test_team_report_mapping_table_is_mandatory():
+        """`## Execution Detail` must carry the five-column dispatch mapping table."""
+        text = _read(TEAM_SKILL[0])
+        section = _section(text, "### Report contract", "### Verification")
+        assert "## Execution Detail" in section
+>       assert "每个被派发的执行体一行" in section, "one row per dispatched executor is not required"
+E       AssertionError: one row per dispatched executor is not required
+
+=========================== short test summary info ============================
+FAILED tests/contract/test_role_transition_payload.py::test_driver_pointer_line_root_superagent
+FAILED tests/contract/test_role_transition_payload.py::test_driver_envelope_names_sidecar_and_role_edge
+FAILED tests/contract/test_role_transition_payload.py::test_run_agent_pointer_item_and_self_check_extension
+FAILED tests/contract/test_role_transition_payload.py::test_seven_downlink_fields_on_each_wired_surface[driver envelope role_edge object-<lambda>]
+FAILED tests/contract/test_role_transition_payload.py::test_seven_downlink_fields_on_each_wired_surface[team Per-Agent Payload role_fields row-<lambda>]
+FAILED tests/contract/test_role_transition_payload.py::test_team_report_mapping_table_is_mandatory
+6 failed, 15 passed in 7.02s
+```
+

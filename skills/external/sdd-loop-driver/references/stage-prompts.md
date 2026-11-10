@@ -321,7 +321,7 @@ python3 <skill-dir>/scripts/line-registry.py --action register --line-id <line> 
 
 - status / pid / heartbeat 行尾携带 `line=<id> run=<id> stage=<stage> event=<type>`；
 - 日志旁路 `log-<line>-<stage>.log.meta.jsonl`（append-only，单写者）承载 `log-start` / `log-terminal`，终止条含 `sentinel_seen` 与 `exit`；
-- 提示词旁路 `prompt-<line>-<stage>.md.meta.json` 在派发前写入；
+- 提示词旁路 `prompt-<line>-<stage>.md.meta.json` 在派发前写入，并携带 `role_edge` 对象 —— 七个下行角色字段 `parent_identity` / `child_label` / `role_declaration` / `dispatch_duty` / `depth_position` / `authority_ref` / `return_channel`（语义与值域归 `.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol；`dual-role` 从不出现在 `role_declaration`）；
 - **日志正文零改动**：哨兵字面量与「最后非空行」判定不变；不得在哨兵后追加信封。
 
 ### 消息入口程序（驱动侧）

@@ -1632,7 +1632,8 @@ def test_i13_channel_three_payload_sixth_field_row():
 
     Row budget: 5 original + `fast_fail_clause` (C-13) + `incremental_landing`
     (serial stage granularity — the landing form a dispatch carries, without
-    which "incremental landing" stays an undecidable sentence in the brief).
+    which "incremental landing" stays an undecidable sentence in the brief) +
+    `role_fields` (095 T022 — the seven downlink role fields, by reference).
     """
     text = _text(TEAM_PATTERNS)
     m = re.search(r"Per-Agent Payload:(.*?)Context Isolation Rules:", text, re.S)
@@ -1642,7 +1643,10 @@ def test_i13_channel_three_payload_sixth_field_row():
     assert "incremental_landing" in rows, (
         f"the payload table lacks incremental_landing; rows are {rows}"
     )
-    assert len(rows) == 7, f"C-13: the payload table has {len(rows)} field rows; expected 7 (5 before + fast_fail_clause + incremental_landing)"
+    assert "role_fields" in rows, (
+        f"the payload table lacks role_fields (095 T022); rows are {rows}"
+    )
+    assert len(rows) == 8, f"C-13: the payload table has {len(rows)} field rows; expected 8 (5 before + fast_fail_clause + incremental_landing + role_fields)"
     tail = text[text.index("Context Isolation Rules:"):]
     assert DOC_REL in tail[:2000] or "fast-fail" in m.group(1), (
         "C-13: the new field row does not point at the clause owner"
