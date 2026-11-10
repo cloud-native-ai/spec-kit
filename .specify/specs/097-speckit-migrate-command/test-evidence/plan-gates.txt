@@ -1,0 +1,81 @@
+# Plan 阶段门禁与基线读数（2026-11-10，worktree 097-speckit-migrate-command）
+
+## 计划校验
+
+```text
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/097-speckit-migrate-command
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 200 lines, 2 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+exit=0
+```
+
+```text
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --repo "$PWD" --spec-dir .specify/specs/097-speckit-migrate-command --stage plan
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=44 waived=0
+summary: {"errors": 0, "advisories": 44, "waived": 0, "fr": 25, "sc": 9, "tasks": 0, "clauses": 0, "files": 10}
+exit=0
+```
+
+Advisory 归类：全部为 `missing-path`，分三类——(a) 计划内待创建文件（`templates/commands/migrate.md`、`docs/reference/commands/migrate.md`、tests、`.specify/memory/migrate/receipts/` 等）；(b) 需求明确拒绝新增的路径（`.specify/version`）；(c) 显式退役/被检测的旧态路径（`.specify/templates/commands`、`.specify/tools/`）。无 error。
+
+```text
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/097-speckit-migrate-command/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 25, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T09:01:39Z"}
+exit=0
+```
+
+## 规划期基线（Mirror Obligations 的 NO-NEW-DRIFT 判据）
+
+```text
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+... (末行) ok    shared/ == .specify/shared/ (111 files, byte-identical)
+exit=0
+```
+
+## quickstart 既有命令实测（Post-Generation 执行验证）
+
+```text
+$ specify init demo --ai claude --script sh --no-git --ignore-agent-tools
+exit=0
+生成 demo/.specify/ 且 source.json: present
+
+$ python3 scripts/python/anchor-layout-migrate.py --action check --json --workspace ~/tmp/speckit-migrate-quickstart/demo
+{"steps": [], "clean": true}
+exit=0
+
+$ specify migrate --help
+exit=2   # 命令尚不存在；quickstart 逐例未执行声明的前提
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_anchor_layout_migrate.py -q
+3 passed in 6.20s
+# runner: python3 -m pytest -n auto --dist load ... （默认并行形态确认）
+
+$ rm -rf ~/tmp/speckit-migrate-quickstart && test ! -d ~/tmp/speckit-migrate-quickstart
+cleanup verified: directory absent
+```
+
+## 计数读数（取自实跑输出，非记忆）
+
+- `templates/commands/*.md` = 29；四个副本树各 29；`docs/reference/commands/*.md` = 27（新增页后 28）
+- `tests/contract/test_migration_distribution.py` `assert len(COMMAND_BASELINE) == 29`（新增后 30）
+
+## 邻接引擎测试基线（实现阶段的对照基线，2026-11-10）
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_anchor_layout_migrate.py tests/contract/test_sanitize_engine_contract.py tests/contract/test_cleanup_obsolete_assets.py tests/contract/test_migration_distribution.py tests/unit/test_sanitize_checks_migration.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+59 passed in 6.61s
+exit=0
+```
