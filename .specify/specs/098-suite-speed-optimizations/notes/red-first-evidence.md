@@ -49,3 +49,38 @@ AssertionError: mode line carries no tier= field: 'workers=2 dist=load passes=2'
 
 Anomaly line: none in this record — every failure is the expected red of the guard
 against the unchanged runner; no in-passing repair was applied to the guard.
+
+## WP-2 / T010 — slow-membership guard cases (slow-membership C-005…C-009)
+
+- Date: 2026-11-10
+- Tree state: the guard cases are the only change on disk — `pyproject.toml` has no
+  `slow` registration, `test-evidence/slow-members.md` does not exist, and no test
+  carries `@pytest.mark.slow` yet.
+- Command: `bash scripts/bash/run-tests.sh --serial tests/contract/test_suite_tier_contract.py -q -k "slow_guard"`
+- Exit code: `1`
+- Collected: `5` slow-guard cases; `2` failed, `3` passed (`11` deselected tier cases).
+- Full run-time log: `.specify/.tmp/wp2/red-guard.log` (this worktree; scratch, not retained).
+- Mode line: `mode=serial reason=explicit tier=fast excluded_slow=0`
+
+Failing cases (the red this record owns):
+
+```text
+FAILED tests/contract/test_suite_tier_contract.py::test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one
+FAILED tests/contract/test_suite_tier_contract.py::test_slow_guard_5_the_membership_evidence_files_are_the_single_carrier
+```
+
+Decisive excerpt showing the failure blames the missing registry, not a broken assertion:
+
+```text
+E FileNotFoundError: ... .specify/specs/098-suite-speed-optimizations/test-evidence/slow-members.md
+E AssertionError: membership carrier missing: .../test-evidence/slow-members.md
+E assert False
+2 failed, 3 passed, 11 deselected in 18.11s
+```
+
+Guards 2 (real-tree collection equality), 3 (disclosure arithmetic) and 4 (guard not a
+member) are green on the empty membership by construction; their discriminating power is
+proven by the SL-M1…SL-M5 mutation legs (T013), which redden them on membership drift.
+
+Anomaly line: none in this record — every failure is the expected red of the guard
+against the tree without a registry; no in-passing repair was applied to the guard.

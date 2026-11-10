@@ -424,6 +424,7 @@ def test_c9_named_list_is_collapsible_behind_an_explicit_flag(tmp_path):
     )
 
 
+@pytest.mark.slow
 def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census():
     mod = _load()
     src = ACCOUNTANT.read_text(encoding="utf-8")
@@ -690,6 +691,7 @@ def test_c19_uncovered_names_are_sorted_one_per_line_and_comm_consumable(tmp_pat
 # =========================================================================== #
 
 
+@pytest.mark.slow
 def test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus():
     src = ACCOUNTANT.read_text(encoding="utf-8")
     hits = re.findall(
@@ -899,6 +901,7 @@ def test_c25_the_baseline_is_not_the_gate_scanner_broken_json_shape():
 # =========================================================================== #
 
 
+@pytest.mark.slow
 def test_c26_every_yaml_contract_is_explicitly_disposed():
     p = _payload(["--spec-dir", str(SPEC_053),
                   "--corpus-root", str(ROOT / ".specify" / "specs"),
@@ -913,6 +916,7 @@ def test_c26_every_yaml_contract_is_explicitly_disposed():
     assert scanned["yaml_total"] > 0, "sentinel: no .yaml was scanned at all"
 
 
+@pytest.mark.slow
 def test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion():
     out = _run(["--spec-dir", str(SPEC_053),
                 "--corpus-root", str(ROOT / ".specify" / "specs"),
@@ -946,6 +950,7 @@ def test_form_str008_attribution_and_four_label_docstring_body():
     )
 
 
+@pytest.mark.slow
 def test_form_exit_code_table():
     """Pinned separately from the label set (checker-form C-23)."""
     mod = _load()

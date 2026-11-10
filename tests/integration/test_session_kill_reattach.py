@@ -14,6 +14,8 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 from fixtures.line_fixtures import (
     engine_json,
     kill_driver_group,
@@ -88,6 +90,7 @@ def _watch(ctx, *extra):
     return proc
 
 
+@pytest.mark.slow
 def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
     """FR-046/047/048: the documented detach recipe + delivered runner are the
     evidence, not a pytest-made process session."""

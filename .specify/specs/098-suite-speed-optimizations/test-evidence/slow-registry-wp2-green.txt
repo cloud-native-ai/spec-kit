@@ -1,0 +1,52 @@
+# WP-2 green — slow marker registration, membership registry, guard (T008–T010)
+# Date: 2026-11-10   Tree: 098-suite-speed-optimizations worktree, after WP-1 (0d1f7a1e4)
+
+## T008 — marker registration (slow-membership C-001)
+
+$ python3 -m pytest --markers 2>/dev/null | grep -A 1 "@pytest.mark.slow"
+@pytest.mark.slow: process-boundary (spawns/waits for/terminates an external process or queue) or
+corpus-scan (traverses the real framework corpus) tests — the runner's default fast tier excludes
+them; --full runs them
+rc=0
+
+## T009 — membership measured, registry written, marks applied (C-002…C-004)
+
+Measurement (two samples, per-test durations): test-evidence/slow-members-measurement.txt
+Registry (single carrier):                     test-evidence/slow-members.md
+
+Derived marked set (the guard's own enumeration side):
+
+$ python3 -m pytest --collect-only -q -m slow tests 2>/dev/null | grep "::"
+tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+tests/contract/test_clause_coverage.py::test_c26_every_yaml_contract_is_explicitly_disposed
+tests/contract/test_clause_coverage.py::test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion
+tests/contract/test_clause_coverage.py::test_form_exit_code_table
+tests/integration/test_sdd_loop_efficiency_runner.py::test_local_nohup_survives_parent_exit
+tests/integration/test_session_kill_reattach.py::test_delivered_runner_recipe_survives_driver_kill_and_reattaches
+(7/8559 collected, 8552 deselected)
+
+Disclosure follows the caller's selection (not a tree constant):
+
+$ bash scripts/bash/run-tests.sh --serial --collect-only -q tests/contract/test_clause_coverage.py 2>&1 | grep "test runner:"
+# test runner: python3 -m pytest -n0 -m "not slow" --collect-only -q tests/contract/test_clause_coverage.py
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=5
+(39/44 collected, 5 deselected)
+
+## T010 — guard cases green (slow-membership C-005…C-009)
+
+$ bash scripts/bash/run-tests.sh --serial tests/contract/test_suite_tier_contract.py -q
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_suite_tier_contract.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+................                                                         [100%]
+16 passed in 59.59s
+rc=0
+(11 tier-selection cases + 5 slow-membership guard cases; red-first record:
+ notes/red-first-evidence.md § WP-2 / T010)
+
+## Compatibility sanity (not T012 — the 086 suite keeps its own green row)
+
+$ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_run_tests_runner_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+40 passed in 33.89s
+rc=0

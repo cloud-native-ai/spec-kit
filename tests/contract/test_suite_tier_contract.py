@@ -1,9 +1,11 @@
-"""Contract cases for the runner's tier selection (098, tier-selection § E obligations 1–10).
+"""Contract cases for the runner's tier selection and slow-membership guard.
 
 Owner of the propositions: `.specify/specs/098-suite-speed-optimizations/contracts/
-tier-selection.contract.md` (§ A–C clauses C-001…C-011, carried here as obligations 1–10).
-WP-2 appends the slow-membership guard cases (slow-membership C-005…C-009) to this file;
-nothing here covers them, and obligation 11 (full-collection equality) lands with WP-3.
+tier-selection.contract.md` (§ A–C clauses C-001…C-011, carried here as obligations 1–10;
+obligation 11 — full-collection equality — lands with WP-3) and
+`contracts/slow-membership.contract.md` (§ A–C clauses C-005…C-009, the guard cases at the
+end of this file). The guard derives both sides at run time — the registry table and
+`pytest --collect-only -q -m slow` — and embeds no member count (slow-membership C-005).
 
 Construction constraints:
 
@@ -42,6 +44,19 @@ SLOW_FAIL = (
     "@pytest.mark.slow\n"
     "def test_slow_fails():\n    assert False\n"
 )
+SLOW_PASS = (
+    "import pytest\n\n"
+    "@pytest.mark.slow\n"
+    "def test_slow_ok():\n    assert True\n"
+)
+
+SPEC_DIR = ROOT / ".specify" / "specs" / "098-suite-speed-optimizations"
+EVIDENCE_DIR = SPEC_DIR / "test-evidence"
+REGISTRY = EVIDENCE_DIR / "slow-members.md"
+MEASUREMENT = EVIDENCE_DIR / "slow-members-measurement.txt"
+GUARD_FILE = "tests/contract/test_suite_tier_contract.py"
+REGISTRY_HEADER = ("test_id", "category", "reason", "date")
+SLOW_CATEGORIES = ("process-boundary", "corpus-scan")
 
 CONTRACT_TREE = {
     "test_selection.py": (
@@ -147,6 +162,68 @@ def _m_tokens(line: str):
     if "pytest" in tokens:
         tokens = tokens[tokens.index("pytest") + 1:]
     return [t for t in tokens if t == "-m" or t.startswith("-m=")]
+
+
+def _clean_env() -> dict:
+    """Environment for a nested invocation: never inherit the parent run's shape."""
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTEST_XDIST_WORKER", None)
+    env.pop("SPECKIT_TEST_WORKERS", None)
+    env["SPECKIT_PYTHON"] = _python()
+    return env
+
+
+def _registry_rows() -> dict:
+    """Parse the membership carrier; fail red on a malformed row or the closed-set breach."""
+    rows = {}
+    header = None
+    for line in REGISTRY.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = tuple(cell.strip() for cell in stripped.strip("|").split("|"))
+        if header is None:
+            header = cells
+            assert cells == REGISTRY_HEADER, (
+                f"registry header MUST be {REGISTRY_HEADER}, got {cells}"
+            )
+            continue
+        if all(set(cell) <= set("-: ") for cell in cells):
+            continue
+        assert len(cells) == len(REGISTRY_HEADER), (
+            f"registry row MUST carry exactly {len(REGISTRY_HEADER)} columns: {stripped}"
+        )
+        test_id, category, reason, date = cells
+        assert category in SLOW_CATEGORIES, (
+            f"category outside the closed set {SLOW_CATEGORIES}: {stripped}"
+        )
+        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", date), f"date is not YYYY-MM-DD: {stripped}"
+        assert reason, f"registry row carries no reason: {stripped}"
+        assert test_id not in rows, f"duplicate registry row: {test_id}"
+        rows[test_id] = category
+    assert header is not None, f"registry table missing in {REGISTRY}"
+    return rows
+
+
+def _marked_ids() -> set:
+    """Slow-membership C-005: the marked set, derived by the marker enumeration itself."""
+    done = subprocess.run(
+        [_python(), "-m", "pytest", "--collect-only", "-q", "-m", "slow", "tests"],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+        env=_clean_env(),
+    )
+    assert done.returncode in (0, 5), done.stdout + done.stderr
+    return {ln.strip() for ln in done.stdout.splitlines() if "::" in ln}
+
+
+def _collect_via_runner(*args) -> set:
+    """Slow-membership C-006: collections come through the canonical runner."""
+    done = _run(["--serial", "--collect-only", "-q", *args], cwd=ROOT)
+    assert done.returncode == 0, done.stdout + done.stderr
+    return _collected(done)
 
 
 # --------------------------------------------------------------------------- #
@@ -413,3 +490,109 @@ def test_obligation_10_the_header_carries_the_injected_expression(tmp_path):
     header = _command_lines(full.stderr)
     assert len(header) == 1, full.stderr
     assert _m_tokens(header[0]) == [], header[0]
+
+
+# --------------------------------------------------------------------------- #
+# Slow-membership guard — C-005: registry and collected marked set are one-to-one
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one():
+    rows = _registry_rows()
+    marked = _marked_ids()
+    assert set(rows) == marked, (
+        "the registry and `pytest --collect-only -q -m slow` must correspond one-to-one:\n"
+        f"marked without a registry row: {sorted(marked - set(rows))}\n"
+        f"registry rows without a marked test: {sorted(set(rows) - marked)}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Slow-membership guard — C-006: real-tree collection equality
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_slow_guard_2_the_real_tree_default_collection_equals_full_minus_marked():
+    fast = _collect_via_runner()
+    full = _collect_via_runner("--full")
+    marked = _marked_ids()
+    assert fast <= full, f"default-tier collection holds ids outside the full tier: {sorted(fast - full)[:10]}"
+    assert full - fast == marked, (
+        "default-tier collection must equal the full-tier collection minus the marked set:\n"
+        f"excluded by the tier but not slow-marked: {sorted((full - fast) - marked)[:10]}\n"
+        f"slow-marked but still collected by the default tier: {sorted(marked - (full - fast))[:10]}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Slow-membership guard — C-007: disclosure arithmetic and --full restore
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_slow_guard_3_disclosure_arithmetic_and_full_restore_on_a_fixture_tree(tmp_path):
+    tree = _write_tree(tmp_path / "tree", {
+        "test_plain.py": PLAIN_OK,
+        "test_slow_one.py": SLOW_PASS.replace("test_slow_ok", "test_slow_one"),
+    })
+
+    before = _run(["--serial", str(tree), "-q"], cwd=tmp_path)
+    assert before.returncode == 0, before.stdout + before.stderr
+    _, rest_before = _mode(before.stderr)
+    assert int(_field(rest_before, "excluded_slow")) == 1, rest_before
+
+    (tree / "test_slow_two.py").write_text(
+        SLOW_PASS.replace("test_slow_ok", "test_slow_two"), encoding="utf-8"
+    )
+    after = _run(["--serial", str(tree), "-q"], cwd=tmp_path)
+    assert after.returncode == 0, after.stdout + after.stderr
+    _, rest_after = _mode(after.stderr)
+    assert int(_field(rest_after, "excluded_slow")) == 2, (
+        f"adding one slow test MUST raise excluded_slow by one: {rest_after}"
+    )
+
+    fast_collect = _run(["--serial", "--collect-only", "-q", str(tree)], cwd=tmp_path)
+    full_collect = _run(["--serial", "--full", "--collect-only", "-q", str(tree)], cwd=tmp_path)
+    assert fast_collect.returncode == 0 and full_collect.returncode == 0, (
+        fast_collect.stdout + fast_collect.stderr + full_collect.stdout + full_collect.stderr
+    )
+    _, rest_full = _mode(full_collect.stderr)
+    assert _field(rest_full, "excluded_slow") == "0", rest_full
+    excluded_names = {
+        node.rsplit("::", 1)[-1] for node in _collected(full_collect) - _collected(fast_collect)
+    }
+    assert excluded_names == {"test_slow_one", "test_slow_two"}, (
+        f"--full must restore exactly the marked tests: {sorted(excluded_names)}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Slow-membership guard — C-008: the guard itself is not a member
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_slow_guard_4_the_guard_file_is_never_a_member():
+    own = sorted(node for node in _marked_ids() if node.split("::", 1)[0] == GUARD_FILE)
+    assert own == [], (
+        "the slow-membership guard must not be slow-marked, or the default tier could "
+        f"never evaluate the equality it owns: {own}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Slow-membership guard — C-009: the two evidence files are the single carrier
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_slow_guard_5_the_membership_evidence_files_are_the_single_carrier():
+    assert REGISTRY.is_file(), f"membership carrier missing: {REGISTRY}"
+    assert MEASUREMENT.is_file(), f"membership measurement record missing: {MEASUREMENT}"
+    assert REGISTRY.stat().st_size > 0 and MEASUREMENT.stat().st_size > 0, (
+        "both membership evidence files must be non-empty"
+    )
+    header_line = "| " + " | ".join(REGISTRY_HEADER) + " |"
+    assert header_line in REGISTRY.read_text(encoding="utf-8"), (
+        f"the registry table must carry the fixed header {header_line!r}"
+    )
+    restating = sorted(
+        path.name
+        for path in EVIDENCE_DIR.iterdir()
+        if path.is_file()
+        and path.name != REGISTRY.name
+        and header_line in path.read_text(encoding="utf-8", errors="replace")
+    )
+    assert restating == [], f"the membership list is restated outside its carrier: {restating}"

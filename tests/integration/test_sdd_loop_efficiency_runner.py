@@ -14,6 +14,8 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNER = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "stage-runner.sh"
 WATCH = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "watch-target.sh"
@@ -106,6 +108,7 @@ def test_status_fields_and_exit_code_propagation(tmp_path):
     assert status.get("detached") == "yes"
 
 
+@pytest.mark.slow
 def test_local_nohup_survives_parent_exit(tmp_path):
     state = tmp_path / "state"
     state.mkdir()
