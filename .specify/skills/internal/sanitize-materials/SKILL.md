@@ -352,6 +352,24 @@ Branch renames are **reported** (`git branch -m …`), never executed — rewrit
 be irreversible once pushed. An adjudicated overlap is recorded with `--action dismiss`
 and never re-proposed (`--reopen` restores it); the dismissal persists the reason path.
 
+## Layout lane (L1–L4)
+
+The anchor layout — `features.md`, `constitution.md`, `glossary.md`, `register.md`, `tools.md` at the
+`.specify/` root and feature details at `.specify/features/<NNN>-<slug>.md` — is the convergence target for
+older projects. The mechanism is owned by `scripts/python/anchor-layout-migrate.py` (deterministic; the moves
+are rename-only, archive-not-delete, and the script never rewrites project documents).
+
+- **L1 detect** — `python3 .specify/scripts/python/anchor-layout-migrate.py --action check --json`; exit 0
+  clean, 1 findings (the plan).
+- **L2 present** — the plan's moves, every refused-existing target (never overwritten), and the reference
+  paths the project must update. Decision gate: functional × autonomous → fix + disclose
+  (`shared/guidelines/confirmation-gates.md` § Decision gate).
+- **L3 apply** — `--action apply`: the five anchors move to the `.specify/` root; `memory/features/<NNN>.md`
+  becomes `.specify/features/<NNN>-<slug>.md`. A move is a rename; no file is deleted, and a move whose target
+  already exists is reported `skipped` and left in place (never merged over, never forced).
+- **L4 verify** — `--action check` clean; report the reference-update list (the project's own documents carry
+  the old paths; the script reports them, the lane does not rewrite them).
+
 ## Behavior Rules (red lines)
 
 - **Scope red line (范围红线)**: never evaluate, modify, or report user source code,

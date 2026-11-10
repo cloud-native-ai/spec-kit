@@ -2340,6 +2340,15 @@ def copy_local_templates(
                         (specify_dir / "templates").mkdir(exist_ok=True)
                         shutil.copy2(item, specify_dir / "templates" / item.name)
 
+        # Seed the tools anchor from its template (create-only): the Guide plus the
+        # Helper Tools Index scaffold; an existing file is this project's own policy.
+        tools_template = resource_path / "templates" / "tools.md"
+        tools_state = specify_dir / "tools.md"
+        if tools_template.is_file() and not tools_state.exists():
+            if tracker:
+                tracker.start("local-templates", "seeding tools.md")
+            shutil.copy2(tools_template, tools_state)
+
         # Seed the git workflow state file from its initial policy template. Create-only:
         # an existing file is this project's declared policy (owned afterwards by the
         # git-utils skill's Bootstrap and observation flows) and is never overwritten.
