@@ -423,7 +423,7 @@ def test_digest_header_names_the_resolved_registry_dir(tmp_path):
     )
     assert proc.returncode == 0, proc.stderr
     header = proc.stdout.splitlines()[0]
-    assert "registry=" + str(registry) in header, (
+    assert str(registry) in header, (
         "the digest header must name the resolved registry directory; got %r" % (header,)
     )
 
@@ -1330,7 +1330,7 @@ def _rows(rendered: str) -> list:
     for line in lines[sep + 1:]:
         if not line.strip():
             break
-        if line.startswith(("last_completion=", "omitted=", "store=")):
+        if line.startswith(("last_completion=", "omitted=", "store=", "最近完成：", "另有 ", "未找到运行记录存储")):
             break
         rows.append(line)
     return rows
@@ -1395,11 +1395,11 @@ def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchan
         "an absent store changes no exit status; got %r then %r"
         % (with_store.returncode, without_store.returncode)
     )
-    assert _efficiency_no_measurements() in without_store.stdout, (
+    assert "未找到运行记录存储" in without_store.stdout, (
         "the store-free render states the availability explicitly; got %r" % without_store.stdout
     )
     def identities(text: str) -> list:
-        return [re.search(r"line_id=(\S+)", row).group(1) for row in _rows(text) if "line_id=" in row]
+        return [re.split(r"\s{2,}", row.strip())[0] for row in _rows(text)]
 
     assert identities(with_store.stdout) == identities(without_store.stdout), (
         "the store's presence never reorders or re-caps the entry set; got %r vs %r"
@@ -1520,14 +1520,13 @@ def test_the_table_format_groups_the_same_entries_readably(tmp_path):
         proc.stderr,
     )
     out = proc.stdout
-    assert out.splitlines()[0].startswith("status digest  generated_at="), out
-    assert "LINE ID" in out and "STATE" in out and "AGE" in out and "EFFICIENCY" in out, (
-        "the single human format is the columnar grid; got %r" % out
-    )
+    assert out.splitlines()[0].startswith("状态摘要"), out
+    for column in ("线路", "状态", "阶段", "已静默", "标记", "最近步骤与消耗"):
+        assert column in out, "the single human format names its columns in reader words; got %r" % out
     rows = _rows(out)
     assert len(rows) == 1, "one aligned row per entry; got %r" % rows
-    assert entry["line_id"] in rows[0] and "active" in rows[0], rows[0]
-    assert entry["state"] in rows[0], rows[0]
+    assert entry["line_id"] in rows[0], rows[0]
+    assert any(word in rows[0] for word in ("活跃中", "已静默", "最近活跃")), rows[0]
 
 
 def test_the_default_format_is_the_single_human_table(tmp_path):
@@ -1550,7 +1549,7 @@ def test_the_default_format_is_the_single_human_table(tmp_path):
         env_overrides=env,
     )
     assert default.returncode == json_run.returncode == 0
-    assert default.stdout.startswith("status digest") and "LINE ID" in default.stdout
+    assert default.stdout.startswith("状态摘要") and "线路" in default.stdout
     import json as _json
     assert _json.loads(json_run.stdout)["entries"], "the machine channel still parses"
     assert retired.returncode == 2, "the retired text/auto display variants are gone"

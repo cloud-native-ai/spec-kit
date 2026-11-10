@@ -1028,13 +1028,40 @@ def render_digest(state) -> str:
     return "\n".join(lines)
 
 
-def render_digest_table(state) -> str:
-    """The ONE human-facing digest rendering — a compact columnar table over the same state (C-41).
+def _human_duration(age: str) -> str:
+    """`83h12m` -> `83 小时 12 分`; anything unparsable is returned unchanged."""
+    match = re.fullmatch(r"(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?", age or "")
+    if not age or not match or not any(match.groups()):
+        return age or DASH
+    days, hours, minutes = (int(g) if g else 0 for g in match.groups())
+    parts = []
+    if days:
+        parts.append("%d 天" % days)
+    if hours:
+        parts.append("%d 小时" % hours)
+    if minutes or not parts:
+        parts.append("%d 分" % minutes)
+    return " ".join(parts)
 
-    One aligned row per entry (line, state, stage, age, flags, unit, elapsed); the header, the single
-    ``last_completion`` footer, the ``omitted`` line and the ``store`` line carry the same content the
-    state carries; the empty set renders the same ``nothing-running`` literal (C-45). Presentation only:
-    no second reading.
+
+_STATE_WORDS = {"active": "活跃", "closed": "已关闭", "stalled": "已停滞"}
+_FLAG_WORDS = {"active": "活跃中", "stale": "已静默", "recent": "最近活跃"}
+
+
+def _human_measure(value) -> str:
+    """A measured quantity in reader words; the not-evaluated vocabulary stays explicit, never a fake zero."""
+    text = str(value)
+    if text in ("not-evaluated", "not_evaluated", "None", "null", ""):
+        return "未测量"
+    return text
+
+
+def render_digest_table(state) -> str:
+    """The ONE human-facing digest rendering — readable Chinese columns and natural-language cells.
+
+    Presentation only over the same state (C-41): the machine vocabulary stays in the ``json`` channel; here a
+    reader sees what each line is, whether it is quiet, and what its last step cost. The empty set renders the
+    ``nothing-running`` literal (C-45).
     """
     if not state["entries"]:
         return NOTHING_RUNNING
@@ -1042,59 +1069,97 @@ def render_digest_table(state) -> str:
     efficiency = state.get("efficiency") or {}
     depth = efficiency.get("depth")
     elements = efficiency.get("elements") or []
-    header = (
-        "status digest  generated_at=%s  cap=%d  stale_bound=%s  profile=%s  registry=%s"
-        % (
-            state["generated_at"],
-            state["cap"],
-            format_duration(state["stale_bound_seconds"]),
-            profile_in_force(state),
-            state["registry_dir"],
-        )
+    bound_seconds = state["stale_bound_seconds"]
+    if bound_seconds % 3600 == 0:
+        bound_words = "%d 小时" % (bound_seconds // 3600)
+    elif bound_seconds % 60 == 0:
+        bound_words = "%d 分钟" % (bound_seconds // 60)
+    else:
+        bound_words = "%d 秒" % bound_seconds
+    profile_words = {"interactive": "交互模式"}.get(profile_in_force(state), profile_in_force(state))
+    header = "状态摘要 · 生成于 %s（UTC）· 最多 %d 条 · 静默阈值 %s · %s · 注册目录 %s" % (
+        state["generated_at"],
+        state["cap"],
+        bound_words,
+        profile_words,
+        state["registry_dir"],
     )
     rows = []
     for position, item in enumerate(state["entries"]):
+        state_word = _STATE_WORDS.get(str(item["state"]), item["state"] or DASH)
+        stage = item["stage"] if item["stage"] not in (None, "-", "") else "—"
         flags = []
         if item["is_active"]:
-            flags.append("active")
+            flags.append(_FLAG_WORDS["active"])
         if item["stale"]:
-            flags.append("stale")
+            flags.append(_FLAG_WORDS["stale"])
         if not flags:
-            flags.append("recent")
+            flags.append(_FLAG_WORDS["recent"])
         activity = item.get("line_activity")
         if activity:
-            flags.append("activity=%s@%s" % (activity["label"] or DASH, activity["age"]))
-        element_text = DASH
+            flags.append(
+                "进行中（%s，%s）"
+                % (activity["label"] or DASH, _human_duration(activity["age"]))
+            )
+        summary = "无运行记录"
         if efficiency.get("available") and position < len(elements):
-            element_text = render_element(elements[position], depth)
+            element = elements[position]
+            fields = element_fields(element, depth)
+            pairs = []
+            for field in fields:
+                key, _, value = field.partition("=")
+                label = {
+                    "unit": "步骤",
+                    "elapsed": "耗时",
+                    "tokens": "令牌",
+                    "invocations": "调用",
+                    "agent": "执行体",
+                }.get(key, key)
+                if key == "unit":
+                    pairs.append("%s %s" % (label, value))
+                else:
+                    pairs.append("%s %s" % (label, _human_measure(value)))
+            summary = " · ".join(pairs) if pairs else "无运行记录"
         rows.append(
             (
                 item["line_id"] or DASH,
-                item["state"] or DASH,
-                item["stage"] or DASH,
-                item["age"],
-                ",".join(flags),
-                element_text,
+                state_word,
+                stage,
+                _human_duration(item["age"]),
+                "；".join(flags),
+                summary,
             )
         )
-    head = ("LINE ID", "STATE", "STAGE", "AGE", "FLAGS", "EFFICIENCY")
-    widths = [max(len(r[i]) for r in rows + [head]) for i in range(6)]
+    import unicodedata
+
+    def display_width(text):
+        return sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1 for ch in text)
+
+    head = ("线路", "状态", "阶段", "已静默", "标记", "最近步骤与消耗")
+    widths = [max(display_width(r[i]) for r in rows + [head]) for i in range(6)]
+
     def fmt_row(r):
-        return "  ".join(r[i].ljust(widths[i]) for i in range(6)).rstrip()
-    lines = [header, "", fmt_row(head),
-             fmt_row(tuple("-" * w for w in widths))]
+        cells = []
+        for i in range(6):
+            pad = widths[i] - display_width(r[i])
+            cells.append(r[i] + " " * pad)
+        return "  ".join(cells).rstrip()
+    lines = [header, "", fmt_row(head), fmt_row(tuple("-" * w for w in widths))]
     lines.extend(fmt_row(r) for r in rows)
     completion = last_completion(state)
     if completion is not None:
         lines.append("")
         lines.append(
-            "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
+            "最近完成：%s（%s前）"
+            % (completion["line_id"], _human_duration(completion["age"]))
         )
     withheld = efficiency.get("withheld") or ""
     if state["omitted"] or withheld:
-        lines.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
+        lines.append(
+            "另有 %d 条未显示%s" % (state["omitted"], ("，" + withheld) if withheld else "")
+        )
     if not efficiency.get("available"):
-        lines.append("store=%s" % efficiency_vocabulary()["no_measurements"])
+        lines.append("未找到运行记录存储，本页无法给出消耗读数")
     return "\n".join(lines)
 
 
