@@ -114,7 +114,6 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | study-code | Analyze project structure and module boundaries before implementing a change |
-| git-workflow | Synchronize branches (rebase/merge/push) under the three-tier workflow |
 | git-utils | Git workspace governance: three-tier branch workflow, multi-environment coordination, disciplined submodule editing, git server provisioning |
 | memory-record | Record module-level decisions and implementation notes |
 | coaching-skills | Coach one skill through a real work item: state the expectation first, observe the real execution, then hand back the micro-adjustment plan |

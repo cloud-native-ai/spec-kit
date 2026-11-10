@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: requirements-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [draw-diagram, memory-recall, memory-record, coaching-skills]
+skills: [draw-diagram, memory-recall, memory-record, coaching-skills, study-kb, study-online]
 run-turn-budget: 500
 display-color: blue
 ---
@@ -122,3 +122,5 @@ Framework skills and agent definitions install together, so every skill I declar
 | memory-recall | Recall prior requirements, clarifications, and decisions before analyzing a new request |
 | memory-record | Persist clarifications, assumptions, and requirement decisions for later reuse |
 | coaching-skills | Coach one skill through a real work item: state the expectation first, observe the real execution, then hand back the micro-adjustment plan |
+| study-kb | Investigate the project's own knowledge base (history / memory / docs / features / specs) for prior decisions and lessons before writing requirements; heavier than memory-recall — use it when the question needs a coverage-checked report, not an entry injection |
+| study-online | Verify external facts, standards or ecosystem claims a requirement rests on, with sourced and dated evidence |
