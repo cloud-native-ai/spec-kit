@@ -30,13 +30,13 @@
 
 ## Definition of Done (DoD)
 
-- DoD-1: **FR lane** — FR-001…FR-025 每一条都在至少一条任务行的文本中被点名（`grep -oE 'FR-0[0-9]{2}' .specify/specs/097-speckit-migrate-command/tasks.md | sort -u | wc -l` 返回 25），且 § FR/SC → row traceability 给出映射。Check: 该命令输出 `25`，行数 48。
+- DoD-1: **FR lane** — FR-001…FR-025 每一条都在至少一条任务行的文本中被点名（`grep -E '^- \[[ xX>~]\] T[0-9]{3} ' .specify/specs/097-speckit-migrate-command/tasks.md | grep -oE 'FR-0[0-9]{2}' | sort -u | wc -l` 返回 25），且 § FR/SC → row traceability 给出映射。Check: 该命令输出 `25`，行数 48；删除任一任务行的 FR 引用必须使该计数小于 25（追溯表与 DoD 行文本不参与计数）。
 - DoD-2: **clause lane** — 采用**严格子集**分区：`contracts/migrate-cli.md` C-1…C-5 与 `contracts/migrate-engine.md` C-1…C-4/C-6/C-7 各由唯一一行以 `[green: <contract>#<clause>]` 声明（分区见 § Green Partition）；未声明条款仍由点名它们的测试行文本钉住，机器上可缺席（owner: `.specify/skills/internal/create-tasks/SKILL.md` § Green）；`contracts/migrate-template.md` 的 T-1…T-6 **不是机器可判条款形态**（clause extractor 只读 `C-*`，该文件被判 `md-none` 具名），改由 T033/T034/T039 的断言钉住。Check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/097-speckit-migrate-command/tasks.md` 退出 0 且 `green-dangling` / `green-clause-collision` / `green-cross-phase` / `green-path-divergence` 全为 0。
 - DoD-3: **no second engine** — migrate 段内不存在第二份路径改写正则、第二份命令渲染、第二份链接名单、第二份镜像对名单、第二份退役清单；`tests/contract/test_migrate_engine_contract.py` 的源码守卫在任一复制实现被移除时转红。Check: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_engine_contract.py -q` 退出 0。
 - DoD-4: **archive-not-delete 靠测量而非声明** — US2 读数中每个被替换/移除对象的归档位置逐条存在，回执 `archives[]` 与 `recover` 可枚举。Check: T028 的 `test-evidence/us2-safety.txt` 含逐条存在性读数与四个变异结果。
 - DoD-5: **分发完整** — 源模板、四个副本、命令文档与 `COMMAND_BASELINE` 30 全部落地，`regen-command-copies.py --check` 退出 0。Check: GATE-2 与 T040 读数。
 - DoD-6: **镜像无 NEW drift** — 本特性触及的两个镜像对相对 R-8 基线无 NEW drift。Check: GATE-3。
-- DoD-7: **final 路径判据全部通过且有 smoke 记录** — SC-001 / SC-002 / SC-003 / SC-004（`requirements.md` 的 `**Path**: final` 标记为唯一 roster）在 `verification.md` 中均为 `pass`，且 smoke 记录齐全。Check: GATE-4。
+- DoD-7: **final 路径判据全部通过且有 smoke 记录** — SC-001 / SC-002 / SC-003 / SC-004（`requirements.md` 的 `**Path**: final` 标记为唯一 roster）在 `verification.log` 中均为 `pass`，且 smoke 记录齐全。Check: GATE-4。
 - DoD-8: **零写入与确定性靠测量** — 干跑前后树哈希不变、重复干跑逐字节相同、apply 后重跑 clean 且零写入。Check: T022 的 `test-evidence/us1-converge.txt`。
 - DoD-9: **quickstart 真实执行** — 场景 1–5 以仓库源码调用形态真实执行并粘贴输出与退出码到 `notes/quickstart-run.md`。Check: T045 记录非空且逐场景含退出码。
 - DoD-10: **零未完成行** — 无 `[ ]` / `[>]` 行残留。Check: GATE-5。
@@ -48,7 +48,7 @@
 - GATE-1: 本特性契约/集成/单元子集全绿且相对记录基线零 NEW failure — check: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q` 退出 0，且 T046 记录中的失败名集合相对实现入口基线无新增。
 - GATE-2: 分发基线同步 — check: `bash scripts/bash/run-tests.sh tests/contract/test_migration_distribution.py -q` 退出 0（`COMMAND_BASELINE` 含 `migrate` 且长度 30），`python3 scripts/python/regen-command-copies.py --check` 退出 0。
 - GATE-3: 镜像义务成立 — check: `python3 scripts/python/sync-mirrors.py --check` 相对 R-8 基线无 NEW drift，`python3 scripts/python/regen-command-copies.py --check` 退出 0。
-- GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `.specify/specs/097-speckit-migrate-command/verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are all present. A `final`-path criterion in `blocked` / `deferred` / `fail` fails this gate unless an explicit user waiver names that criterion. Condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema.
+- GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `.specify/specs/097-speckit-migrate-command/verification.log`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are all present. A `final`-path criterion in `blocked` / `deferred` / `fail` fails this gate unless an explicit user waiver names that criterion. Condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema; carrier name per constitution VII (`verification.log`).
 - GATE-5: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\] T[0-9]{3} ' .specify/specs/097-speckit-migrate-command/tasks.md` returns 0.
 - GATE-6: 结构校验通过 — check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/097-speckit-migrate-command/tasks.md` 退出 0，0 error(s)，且每个 WARN 均在 § Notes 中被裁定。
 
@@ -74,7 +74,7 @@ Probed 2026-11-10 in this worktree (branch `097-speckit-migrate-command`, base `
 
 ### Task State Sigil
 
-`- [ ]` open · `- [>]` claimed（多代理）· `- [X]` closed · `- [~]` deferred（原因写入 `verification.md` `deferred_tasks=`）。
+`- [ ]` open · `- [>]` claimed（多代理）· `- [X]` closed · `- [~]` deferred（行内 `<!-- deferred: reason -->` 承载原因，宪法 VII；`deferred_tasks=` 汇总索引可另记但不替代行内标记）。
 
 ## Path Conventions
 
@@ -261,7 +261,7 @@ Reviewed at tasks generation (2026-11-10): `.specify/features.md` row 024 reads 
 - [ ] T045 Run quickstart scenarios 1–5 end to end and record the real outputs into `.specify/specs/097-speckit-migrate-command/notes/quickstart-run.md`: invoke the repository source with `PYTHONPATH=src python3 -c "import sys; sys.argv=['specify', ...]; from specify_cli import main; main()"` because the installed CLI is the released package (see § Environment Prerequisites @ 2026-11-10); record command, output, exit code and teardown per scenario (FR-023). [blockedBy: T022,T028,T032,T040]
 - [ ] T046 Run the feature's full subset via `bash scripts/bash/run-tests.sh tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q` and record the full output plus any NEW failure names versus the recorded baseline into `.specify/specs/097-speckit-migrate-command/test-evidence/final-suite.txt` (SC-001…SC-009). [blockedBy: T045]
 - [ ] T047 Verify the mirror and copy obligations into `.specify/specs/097-speckit-migrate-command/test-evidence/mirror-verify.txt`: `python3 scripts/python/regen-command-copies.py --check` exits 0 and `python3 scripts/python/sync-mirrors.py --check` shows no NEW drift against the R-8 baseline (FR-021). [blockedBy: T035,T042,T044]
-- [ ] T048 Write `.specify/specs/097-speckit-migrate-command/verification.md` with one `SC-NNN_status=` line per criterion SC-001…SC-009, the smoke record (`smoke_command=`, `smoke_exit_code=0`, `smoke_evidence_path=`), the DoD readings and `deferred_tasks=` (FR-024, FR-025, GATE-4). [blockedBy: T046,T047]
+- [ ] T048 Write `.specify/specs/097-speckit-migrate-command/verification.log` with one `SC-NNN_status=` line per criterion SC-001…SC-009, the smoke record (`smoke_command=`, `smoke_exit_code=0`, `smoke_evidence_path=`), the DoD readings and `deferred_tasks=` (FR-024, FR-025, GATE-4). [blockedBy: T046,T047]
 
 **Checkpoint**: the sanitize boundary is stated in its owner file, both runtime directories are registered, mirrors carry no NEW drift, quickstart is measured, and the closure record exists.
 

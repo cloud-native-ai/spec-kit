@@ -99,7 +99,7 @@
 | `blocked` | 因确认门或冲突未完成 | 3 | apply 后仍存在 `blocked` / `refused` / `failed` 项（执行期 I/O 失败并入此结局，原因写入对应 item 的 `reason`；绝不报 applied） |
 | `error` | 输入或前置条件错误 | 2 | 缺 `.specify/`、非法选项、`--apply` 与 `--dry-run` 互斥冲突等；不产生回执 |
 
-映射为封闭表；实现常量由契约测试与 requirements FR-019 对齐（`contracts/migrate-cli.md` § C-3）。
+映射为封闭表；实现常量由契约测试与 requirements FR-019 对齐（`contracts/migrate-cli.md` § C-3）。`error` 是输入/前置条件错误的退出类别，不是 outcome token：不进入 `outcome` 枚举（E-3）与 JSON 包络（C-4），也不产生回执。
 
 ## E-6 WorkspaceKind — 工作区形态
 
@@ -118,7 +118,7 @@
 
 ## E-8 维度 token 与来源映射（仅映射，不复制检查清单）| dimension | 检查来源（owner 路径） | 处置来源 |
 |-----------|------------------------|----------|
-| `templates-generated` | 客户端：参照树对照 `.specify/templates`（除 commands）、`.specify/skills`、`.specify/agents/templates`、各工具命令副本；框架源：`sync-mirrors.py --check` 的 templates / skills / agents 三个镜像对 + `regen-command-copies.py --check`（命令副本）。框架源模式**不**建参照树 | 缺失→`write`；存在且不等→`replace`；退役命令副本→`archive` |
+| `templates-generated` | 客户端：参照树对照 `.specify/templates`（除 commands）、`.specify/skills`、`.specify/agents/templates`、各工具命令副本；框架源：`sync-mirrors.py --check` 的 templates / skills/external / skills/internal / agents 四个镜像对 + `regen-command-copies.py --check`（命令副本）。框架源模式**不**建参照树 | 缺失→`write`；存在且不等→`replace`；退役命令副本→`archive` |
 | `anchor-layout` | `anchor-layout-migrate.py --action check`（`plan()` 的 `move` / `refuse-existing-target`） | `move`→`archive`（`mechanism=relocate`）；`refuse-existing-target`→`refuse` |
 | `compat-links` | `sanitize-utils.check_broken_symlinks`（含 `COMPAT_SYMLINK_EXPECTATIONS` 的所属工具期望） | 缺失/断链→`write`（`mechanism=symlink`）；普通文件占位→`replace`；平台不支持→`refuse` |
 | `mirror-consistency` | 客户端：参照树对照 `.specify/scripts`、`.specify/shared`；框架源：`sync-mirrors.py --check` 的 scripts / shared 两个镜像对（MISS/DIFF/ORPHAN） | MISS→`write`；DIFF→`replace`；strict ORPHAN→`archive`；非 strict 额外文件不动 |

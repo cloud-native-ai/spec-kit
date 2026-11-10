@@ -112,7 +112,7 @@
 
 #### B. 期望态与只读探测
 
-- **FR-005**: 期望态的唯一来源 MUST 是当前已安装版本随包分发的声明与资产；具体读取入口 MUST 固定为以下既有 owner，不得另立来源：退役清单＝CLI 源内 `OBSOLETE-ASSET-REGISTRY` 标记块（`src/specify_cli/__init__.py`；`sanitize-utils.py` 侧为受漂移测试钉住的镜像）、残留/镜像/链接/索引/死引用＝`sanitize-utils.py` 的确定性检查器、锚点布局＝`anchor-layout-migrate.py` 的 check 动作、生成副本与镜像一致性＝`regen-command-copies.py --check` 与 `sync-mirrors.py --check`、框架资产刷新与退役处置＝init 的既有 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills`。命令 MUST NOT 按源项目版本号选择迁移路径，MUST NOT 读取或引入 `.specify/version` 类版本标记作为判据（当前不存在且本特性不新增），MUST NOT 以模板指纹或命令内置的旧结构清单猜测旧版本。新增或修改一个期望态维度 MUST 经修订声明层或既有引擎完成，MUST NOT 在命令内加入一次性检查。
+- **FR-005**: 期望态的唯一来源 MUST 是当前已安装版本随包分发的声明与资产；「当前已安装版本」MUST 判定为运行本命令的 CLI 进程所加载的包资源（`get_resource_path()` 解析的已安装副本），框架源工作区（`skills/external/` 为目录）以其自身声明与脚本副本为源（宪法 XI 自举），客户端模式 MUST NOT 读取工作区可能过期的 `.specify/scripts/` 副本。具体读取入口 MUST 固定为以下既有 owner，不得另立来源：退役清单＝CLI 源内 `OBSOLETE-ASSET-REGISTRY` 标记块（`src/specify_cli/__init__.py`；`sanitize-utils.py` 侧为受漂移测试钉住的镜像）、残留/镜像/链接/索引/死引用＝`sanitize-utils.py` 的确定性检查器、锚点布局＝`anchor-layout-migrate.py` 的 check 动作、生成副本与镜像一致性＝`regen-command-copies.py --check` 与 `sync-mirrors.py --check`、框架资产刷新与退役处置＝init 的既有 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills`。命令 MUST NOT 按源项目版本号选择迁移路径，MUST NOT 读取或引入 `.specify/version` 类版本标记作为判据（当前不存在且本特性不新增），MUST NOT 以模板指纹或命令内置的旧结构清单猜测旧版本。新增或修改一个期望态维度 MUST 经修订声明层或既有引擎完成，MUST NOT 在命令内加入一次性检查。
 - **FR-006**: 探测 MUST 只读且确定性：同一棵树上的重复干跑 MUST 产出逐项相同的计划（稳定顺序与内容）；干跑 MUST NOT 写入、移动或删除任何文件与数据。计划 MUST 逐项承载「维度、当前态、期望态、拟处置、依据路径」，使每个差异项可独立审阅。
 - **FR-007**: 期望态覆盖维度 MUST 至少包含五类：①模板与生成物（含命令副本、技能与代理镜像）；②锚点布局（`anchor-layout-migrate.py` 的判定对象）；③兼容链接（符号链接模型）；④镜像一致性（框架源与 `.specify/` 镜像）；⑤迁移残留（前代安装形态的残余类）。各维度的检查项集合以既有声明与引擎为唯一 owner，本规格不复述其清单。
 - **FR-008**: 探测 MUST NOT 产生假绿：每个维度 MUST 具备可转红断言——移除该维度的收敛处置、或在夹具中注入一处差异时，对应检查 MUST 报出该项；「计划为空」只允许在真实无差异时出现。
@@ -131,18 +131,18 @@
 - **FR-015**: 破坏性/不可逆动作（删除、移动/归档既有工件、覆盖用户既有内容）MUST 保留前置确认门，判据与清单的唯一 owner 是 `.specify/shared/guidelines/confirmation-gates.md`，本规格不复述清单。确认机制 MUST 为双键：[[STR-004]] 只进入写入模式、不构成对破坏性桶的批准；第二把钥匙在交互终端下为一次单批确认提示（以干跑审阅为前提）；无交互或无人值守环境下不存在第二把钥匙，未确认的破坏性项 MUST 以 `blocked` 结局收束，MUST NOT 被自动批准，且本命令 MUST NOT 提供非交互确认旗标。
 - **FR-016**: 用户内容保护 MUST 成立：用户自建技能、项目专属扩展、用户手改的框架文件 MUST NOT 被当作残留删除；替换用户内容的处置 MUST 先归档再写，并在回执中给出恢复路径；替换与归档 MUST 沿用 reconcile 家族的 archive-not-delete 语义。
 - **FR-017**: 幂等与可续跑 MUST 成立：成功应用后再次运行 MUST 为 clean 计划且零写入；应用中断后再次运行 MUST 能从已落盘的回执与计划续做，MUST NOT 二次搬移已归档对象；同一对象的重复处置 MUST 收敛为 no-op。失败语义 MUST 为前向续跑 + 逐项经归档位置找回（FR-016、FR-018）；命令 MUST NOT 提供全局回滚/undo 动作，回滚能力不在本特性范围内。
-- **FR-018**: 每次运行（干跑与应用）MUST 产出一份逐运行回执，承载运行时间、当前版本、差异项清单、逐项处置、归档位置、拒绝原因、恢复途径与最终结果；回执 MUST 是一文一件的逐条目记录（并发开发安全纪律），MUST NOT 写入单一可变聚合文件。落点 MUST 为 `.specify/memory/migrate/receipts/` 下的独立文件（文件名含运行时间戳/运行 ID），该目录须按目录治理在同一变更内登记。
-- **FR-019**: 命令 MUST 稳定区分四类运行结局并给出可脚本判定的退出码：`clean`（无差异，退出 0）、`planned`（有差异的干跑，退出 1）、`applied`（应用完成或已无剩余差异，退出 0）、`blocked`（因确认门或冲突未完成，退出 3）；输入或前置条件错误退出 2。同一结局的退出码 MUST 稳定，MUST NOT 用退出 0 掩盖未完成的处置。
+- **FR-018**: 每次运行（干跑与应用）MUST 产出一份逐运行回执，承载运行时间、源版本与目标版本、运行状态、续跑标识（续跑时指向被接续的运行）、差异项清单、逐项处置、归档位置、拒绝原因、恢复途径与最终结果；回执 MUST 是一文一件的逐条目记录（并发开发安全纪律），MUST NOT 写入单一可变聚合文件。干跑回执 MUST 以输出流承载、不落盘（FR-006 零写入的适用形态）；应用回执的落点 MUST 为 `.specify/memory/migrate/receipts/` 下的独立文件（文件名含运行时间戳/运行 ID），该目录须按目录治理在同一变更内登记。
+- **FR-019**: 命令 MUST 稳定区分四类运行结局并给出可脚本判定的退出码：`clean`（无差异，退出 0）、`planned`（有差异的干跑，退出 1）、`applied`（应用完成或已无剩余差异，退出 0）、`blocked`（因确认门或冲突未完成，退出 3）；输入或前置条件错误退出 2。应用模式的结局 MUST 按优先级聚合：存在任一 `refuse` / `blocked` 项或执行期 I/O 失败时结局为 `blocked`（退出 3），否则为 `applied`（退出 0）；干跑按计划是否为空取 `clean` / `planned`。结局 MUST 以机器可读 token 载明（文本输出与 `--format json` 包络均含该词），使脚本无需解析自然语言即可判定。同一结局的退出码 MUST 稳定，MUST NOT 用退出 0 掩盖未完成的处置。
 
 #### E. 跨版本与分发
 
-- **FR-020**: 跨版本路径 MUST 为期望态直达：任意旧版本项目（N）一次收敛到当前期望态（N+k），MUST NOT 要求逐版本安装或运行中间版本，MUST NOT 依赖源版本号识别；源版本信息只用于回执记录，MUST NOT 决定处置。
+- **FR-020**: 跨版本路径 MUST 为期望态直达：任意旧版本项目（N）一次收敛到当前期望态（N+k），MUST NOT 要求逐版本安装或运行中间版本，MUST NOT 依赖源版本号识别；源版本信息只用于回执记录，MUST NOT 决定处置。源版本 MUST 从工作区 `.specify/source.json` 读取；文件缺失或不可读时 MUST 记 `unavailable` 并写明原因，MUST NOT 推断或猜测。
 - **FR-021**: 新命令 MUST 经既有命令装配面分发：源模板 `templates/commands/`、四个运行期副本树的再生、`docs/reference/commands/` 文档与分发基线契约测试 MUST 同步更新；副本 MUST 由再生脚本生成，MUST NOT 手写或绕过。
 - **FR-022**: 命令 MUST 满足既有接口契约：CLI 子命令满足宪法 XXI；模板 frontmatter 与副本形态满足既有命令契约测试（含 Qoder 副本 frontmatter 契约）。
 
 #### F. 验收取证
 
-- **FR-023**: 验收 MUST 至少包含三类夹具：纯旧版夹具（旧布局与历史残留）、新旧混杂夹具（部分 init 后）、已最新夹具；纯旧版与混杂夹具 MUST 在干跑报 `planned`、应用后收敛；已最新夹具 MUST 在干跑与再次运行时都报 `clean` 且零写入。旧布局夹具的构成 MUST 只由 FR-005 钉名的声明与检查器已知的残留/布局类合成（退役清单条目、旧代状态文件、平铺 internal 残留、旧锚点布局），MUST NOT 取自历史发行快照，MUST NOT 按命令内猜测清单构造——夹具与探测共享同一来源。
+- **FR-023**: 验收 MUST 至少包含三类夹具：纯旧版夹具（旧布局与历史残留）、新旧混杂夹具（部分 init 后）、已最新夹具；纯旧版与混杂夹具 MUST 在干跑报 `planned`、应用后收敛；已最新夹具 MUST 在干跑与再次运行时都报 `clean` 且零写入。旧布局夹具的构成 MUST 只由 FR-005 钉名的声明与检查器已知的残留/布局类合成（退役清单条目、旧代状态文件、平铺 internal 残留、旧锚点布局、已编辑的模板文件、被删除的镜像脚本文件、缺失或断链的兼容链接），并 MUST 覆盖 SC-001 的全部五类维度，MUST NOT 取自历史发行快照，MUST NOT 按命令内猜测清单构造——夹具与探测共享同一来源。
 - **FR-024**: 安全取证 MUST 以可转红断言覆盖：确认门缺失时破坏性处置 MUST 被测试判红；归档缺失或回执不可枚举时 MUST 判红；把「全量删除」注入处置时 MUST 判红。
 - **FR-025**: 等价性、幂等与续跑取证 MUST 以可转红断言覆盖：两个入口同树同计划（FR-002）；第二次运行零写入（FR-017）；中断续跑不二次搬移。复制或移除其中任一检查实现时，结构测试 MUST 转红。
 

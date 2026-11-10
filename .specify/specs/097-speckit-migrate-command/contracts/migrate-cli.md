@@ -36,7 +36,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 | `blocked` | apply 后仍存在 `refused` / `blocked` / `failed` 项，或破坏桶未获第二把钥匙（`failed` = 执行期 I/O 失败，并入此结局，绝不报 applied） | 3 |
 | `error` | 前置条件/输入错误（含非法选项） | 2 |
 
-同一结局的退出码恒定；MUST NOT 用 0 掩盖未完成的处置。映射与 requirements FR-019 逐项对应，契约测试从 requirements 提取该表比对。
+同一结局的退出码恒定；MUST NOT 用 0 掩盖未完成的处置。映射与 requirements FR-019 逐项对应，契约测试从 requirements 提取该表比对。`error` 不是 outcome token：输入/前置条件错误以 stderr 报文 + 退出 2 收束，不输出计划包络、不产生回执；`outcome` 的取值域为 `clean` / `planned` / `applied` / `blocked`（C-4）。
 
 ## C-4 stdout 包络
 
@@ -63,6 +63,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 - `--format text`：按维度分组呈现逐项「当前态 → 期望态 + 拟处置 + 依据路径」，末尾给出结局与下一步提示；同一信息量，不省略任何 item。
 - 干跑：`receiptPath=null`，回执体在 `receipt` 字段（零写入）。
 - apply：写入回执后 `receiptPath` 为该文件相对路径。
+- 输入/前置条件错误（`error`）不输出本包络：stderr 报文 + 退出 2，无 `outcome` 键、无回执。
 
 ## C-5 确认门（命令面部分）
 
