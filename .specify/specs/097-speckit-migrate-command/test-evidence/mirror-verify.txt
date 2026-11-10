@@ -1,0 +1,59 @@
+# Mirror & copy obligations — feature 097 (T047, FR-021)
+
+**Task**: T047 (also carries the T042 / T044 sync readings) · **Date**: 2026-11-10 · **Worktree**: `097-speckit-migrate-command`
+
+R-8 baseline (research.md, measured 2026-11-10 in this worktree): `regen-command-copies.py --check` exit 0 and `sync-mirrors.py --check` exit 0. The acceptance rule is **no NEW drift** on the pairs this feature touches — not a restated all-green claim.
+
+## Touched pairs — sync (T042 / T044) and byte equality
+
+### Pair 1 — `skills/internal/sanitize-materials/SKILL.md` (T042)
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/sanitize-materials
+scope --only: skills/internal/sanitize-materials
+DIFF .specify/skills/internal/sanitize-materials/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+exit=0
+
+$ diff -q skills/internal/sanitize-materials/SKILL.md .specify/skills/internal/sanitize-materials/SKILL.md
+diff_exit=0
+```
+
+### Pair 2 — `shared/definitions/framework-map.md` (T044)
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/framework-map.md
+scope --only: shared/definitions/framework-map.md
+DIFF .specify/shared/definitions/framework-map.md
+sync  shared/ -> .specify/shared/ (1 files)
+exit=0
+
+$ diff -q shared/definitions/framework-map.md .specify/shared/definitions/framework-map.md
+diff_exit=0
+```
+
+## Obligation checks (T047)
+
+```text
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (135 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (126 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+exit=0
+```
+
+Verdict: `regen-command-copies.py --check` exit 0 (the four `templates/commands/migrate.md` copies and every other copy match their sources); `sync-mirrors.py --check` exit 0 with every pair `ok`. Against the R-8 baseline (both exit 0) there is **no NEW drift** — the two mirror pairs this feature touched are byte-identical (`diff -q` exit 0 for both).

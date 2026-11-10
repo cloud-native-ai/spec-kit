@@ -220,6 +220,105 @@ def test_apply_with_simulated_interactive_confirmation_converges_then_clean(
 
 
 # ---------------------------------------------------------------------------
+# Mixed project (SC-003 / contract C-8): planned -> applied -> clean, and the
+# per-item equivalence assertion has power beyond existence
+# ---------------------------------------------------------------------------
+
+MIXED_DIMENSIONS = ("templates-generated", "compat-links", "migration-residue")
+
+
+def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(
+    tmp_path, monkeypatch
+):
+    workspace = _builders().build_mixed_project(tmp_path / "mixed")
+    before = _tree_digest(workspace)
+
+    dry = _json_payload(_dry_run(workspace), 1)
+
+    assert dry["outcome"] == "planned"
+    assert _tree_digest(workspace) == before, "the mixed dry-run wrote to the workspace"
+    for dimension in MIXED_DIMENSIONS:
+        assert dry["summary"]["byDimension"][dimension] >= 1, (
+            f"the mixed fixture constructed a {dimension!r} class but plans no item"
+        )
+
+    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
+    applied = _json_payload(
+        _invoke(
+            [
+                "migrate",
+                "--workspace",
+                str(workspace),
+                "--apply",
+                "--format",
+                "json",
+            ],
+            input_text="y\n",
+        ),
+        0,
+    )
+    assert applied["outcome"] == "applied"
+    receipt = applied["receipt"]
+    assert all(item["status"] == "done" for item in receipt["items"]), [
+        (item["target"], item["status"]) for item in receipt["items"]
+    ]
+    for entry in receipt["archives"]:
+        assert (workspace / entry["archiveTo"]).exists(), entry
+    assert len(receipt["recover"]) == len(receipt["archives"])
+
+    before_rerun = _tree_digest(workspace)
+    rerun = _json_payload(_dry_run(workspace), 0)
+    assert rerun["outcome"] == "clean"
+    assert rerun["summary"]["total"] == 0
+    assert _tree_digest(workspace) == before_rerun, (
+        "the mixed post-apply re-run wrote to the workspace (FR-017 idempotence)"
+    )
+
+
+def test_mixed_fixture_equivalence_assertion_has_power_beyond_existence(
+    tmp_path, monkeypatch
+):
+    """SC-003 red-ability: an existence-only reading would pass a corrupted tree."""
+    workspace = _builders().build_mixed_project(tmp_path / "mixed")
+    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
+    _json_payload(
+        _invoke(
+            [
+                "migrate",
+                "--workspace",
+                str(workspace),
+                "--apply",
+                "--format",
+                "json",
+            ],
+            input_text="y\n",
+        ),
+        0,
+    )
+    _json_payload(_dry_run(workspace), 0)
+
+    target_rel = ".specify/templates/plan-template.md"
+    target = workspace / target_rel
+    target.write_text(
+        target.read_text(encoding="utf-8")
+        + "\n<!-- corrupted after convergence -->\n",
+        encoding="utf-8",
+    )
+
+    assert target.exists(), "the weakening scenario needs the target to exist"
+
+    weakened = _json_payload(_dry_run(workspace), 1)
+    assert weakened["outcome"] == "planned"
+    corrupted = [
+        item for item in weakened["items"] if item["target"] == target_rel
+    ]
+    assert corrupted, (
+        "existence-only would accept a corrupted converged tree; the per-item "
+        "equivalence assertion must flag the byte difference"
+    )
+
+
+# ---------------------------------------------------------------------------
 # FR-008 red-ability: excising one dimension removes its items
 # ---------------------------------------------------------------------------
 
