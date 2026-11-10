@@ -30,7 +30,7 @@ python3 -m pytest --collect-only -q -m slow > /tmp/slow-ids.txt
 comm -13 /tmp/fast-ids.txt /tmp/full-ids.txt   # MUST equal the slow id set
 ```
 
-Proves SC-006 / TS-02, TS-09, SL-06. **Run status at plan time**: not executable — `--full` and the
+Proves SC-006 / tier-selection C-002, C-009; slow-membership C-006. **Run status at plan time**: not executable — `--full` and the
 default exclusion do not exist yet. Premises: the runner gains `--full`; `--collect-only -q` is forwarded
 to pytest unchanged; collection is the same in both runs (no test bodies execute).
 
@@ -42,7 +42,7 @@ bash scripts/bash/run-tests.sh -m contract -q 2>&1 | grep 'mode='
 bash scripts/bash/run-tests.sh --full -m contract -q 2>&1 | grep 'mode='
 ```
 
-Proves TS-03/04/09/10: default run shows `tier=fast excluded_slow=<measured>`; a caller `-m` shows
+Proves tier-selection C-003/004/009/010: default run shows `tier=fast excluded_slow=<measured>`; a caller `-m` shows
 `tier=caller excluded_slow=0` and no second `-m`. **Run status at plan time**: not executable. Premises:
 mode-line fields are appended (086 C-002 prefix kept); the marker enumeration accepts a caller selection.
 
@@ -53,7 +53,7 @@ mode-line fields are appended (086 C-002 prefix kept); the marker enumeration ac
 bash scripts/bash/run-tests.sh --workers 2 <fixture-tree> -q; echo "exit=$?"
 ```
 
-Proves TS-11: stderr carries `error=empty-selection-after-tier-exclusion tier=fast excluded_slow=<n>` and
+Proves tier-selection C-011: stderr carries `error=empty-selection-after-tier-exclusion tier=fast excluded_slow=<n>` and
 exit is 2. **Run status at plan time**: not executable. Premises: fixture tree registers both `serial` and
 `slow` markers; the enumeration count is greater than zero.
 
@@ -66,7 +66,7 @@ comm -13 /tmp/c-par.txt /tmp/c-ser.txt   # MUST be empty
 comm -23 /tmp/c-par.txt /tmp/c-ser.txt   # MUST be empty
 ```
 
-Proves SC-002 / PC-02/03/06. **Run status at plan time**: runnable in form, but the comparison is
+Proves SC-002 / parallel-consistency C-002/003/006. **Run status at plan time**: runnable in form, but the comparison is
 evidence for the implemented runner; take it after implement. Premises: both lists come from the same
 tree; `--names-out` is written after the passes (a name list is not written mid-run).
 
@@ -77,7 +77,7 @@ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_coverage_receipt.
 bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_scan_cache_contract.py -q
 ```
 
-Proves SC-007 / CA-07, CA-10, CA-11. The guard test records `build_count` and `traversals` and runs the
+Proves SC-007 / scan-cache C-007, C-010, C-011. The guard test records `build_count` and `traversals` and runs the
 tmp-corpus cross-session drill. **Run status at plan time**: not executable (fixture and guard do not
 exist). Premises: `account()` is importable in-process with `_corpus_files` monkeypatchable; xdist gives
 each worker its own session scope (S-0.6).
@@ -88,9 +88,9 @@ each worker its own session scope (S-0.6).
 bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_event_wait_contract.py -q
 ```
 
-Proves SC-008 / EW-02, EW-03, EW-09. **Run status at plan time**: not executable (guard does not exist;
+Proves SC-008 / event-wait C-002, C-003, C-009. **Run status at plan time**: not executable (guard does not exist;
 scope files still carry the counted sleeps in S-0/`plan-baseline-probe.txt`). Premises: the scope file list
-of EW-01 is final; the exemption registry names the two unit-test files; the guard parses the scope files
+of event-wait C-001 is final; the exemption registry names the two unit-test files; the guard parses the scope files
 with Python's AST (no textual heuristic).
 
 ## S-7 — Ordering determinism without real time
@@ -99,7 +99,7 @@ with Python's AST (no textual heuristic).
 bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_client_metrics.py -q
 ```
 
-Proves FR-015 / EW-04, EW-05; the before/after wall pair is recorded in `test-evidence/`. **Run status at
+Proves FR-015 / event-wait C-004, C-005; the before/after wall pair is recorded in `test-evidence/`. **Run status at
 plan time**: not executable as the converted form; the current baseline is S-0.4. Premises: `--now` is
 accepted by `feedback-utils.py` and `--help` documents it; owner-file mtimes are set explicitly by the
 tests.
@@ -110,7 +110,7 @@ tests.
 bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q
 ```
 
-Proves SC-009 / IC-05…IC-09. **Run status at plan time**: not executable. Premises: the AST scan
+Proves SC-009 / inprocess-conversion C-005…C-009. **Run status at plan time**: not executable. Premises: the AST scan
 enumerates `tests/**/*.py` and `tests/conftest.py`; the manifest is complete for that denominator.
 
 ## S-9 — Two-slot commands request the full tier
@@ -132,9 +132,11 @@ git diff --name-only <stage-base>..HEAD -- tests/ | xargs -r grep -nE '@pytest\.
 git diff <stage-base>..HEAD -- tests/ | grep -cE '^\+\s*@pytest\.mark\.parametrize'
 ```
 
-Proves SC-010 / FR-021: zero new skip/xfail decorators; parametrize additions are inspected (removals MUST
-be zero). **Run status at plan time**: not executable (no delta yet). Premise: `<stage-base>` is the
-implement-stage base commit recorded in the spine.
+Proves SC-010 / FR-021: zero new skip/xfail/retry decorator hits and zero in-function `pytest.skip(`/
+`xfail(` hits in the diff; the AST leg (conditional skips, retry-until-green loops) runs per the SC-010
+Measurement Source and its complete hit list is recorded in `test-evidence/forbidden-shortcuts.txt`;
+parametrize removals MUST be zero. **Run status at plan time**: not executable (no delta yet). Premise:
+`<stage-base>` is the implement-stage base commit recorded in the spine.
 
 ## S-11 — Runner interface unchanged
 
@@ -144,7 +146,7 @@ bash scripts/bash/run-tests.sh --version
 bash scripts/bash/run-tests.sh --definitely-undeclared; echo "exit=$?"
 ```
 
-Proves SC-011 / TS-05, TS-12: help lists `--full`; version answers one line; the undeclared option exits
+Proves SC-011 / tier-selection C-005, C-012: help lists `--full`; version answers one line; the undeclared option exits
 non-zero. **Run status at plan time**: not executable as written — the `--help`/`--version` legs work
 today but do not yet list `--full`, and the undeclared-option leg exits non-zero today without a recorded
 transcript. Premises: the script-interface guard wraps the runner; `--full` is added to the usage string
@@ -164,7 +166,7 @@ print("added:", sorted(after - before))
 PY
 ```
 
-Proves SC-001 / TS-15: `removed` equals the recorded disposed list (normally empty) and `added` equals the
+Proves SC-001 / tier-selection C-015: `removed` equals the recorded disposed list (normally empty) and `added` equals the
 tests this feature adds. **Run status at plan time**: not executable (`--full` does not exist; the baseline
 reading is taken at implement start). Premises: both readings come from the same runner and the same tree;
 the disposed list is written per test in `test-evidence/`.
@@ -178,7 +180,7 @@ bash scripts/bash/run-tests.sh -q                                          # def
 # record durations of all three; record the anti-measurement: default tier with the marked set re-merged
 ```
 
-Proves SC-004 / SC-005 / TS-16: default-tier wall ≤ 50 % of baseline, full-tier wall ≤ 110 % of baseline,
+Proves SC-004 / SC-005 / tier-selection C-016: default-tier wall ≤ 50 % of baseline, full-tier wall ≤ 110 % of baseline,
 same host/day/shape; the anti-measurement shows the default tier regresses when marked tests are re-merged.
 **Run status at plan time**: not executable (default tier does not exist; the baseline slot is
 implement-start). Premises: the baseline slot command includes `--full` (WP-3); measurement uses

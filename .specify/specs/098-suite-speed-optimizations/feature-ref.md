@@ -10,26 +10,26 @@ is a dated note on 086's detail and index row.
 
 | # | Path | Change | Requirement | Contract |
 |---|------|--------|-------------|----------|
-| 1 | `scripts/bash/run-tests.sh` | tier flags (`--full`), default exclusion, serial composition, disclosure fields, empty-selection error | FR-007, FR-008, FR-009, FR-011, FR-022, FR-023 | tier-selection TS-01…TS-16 |
-| 2 | `.specify/scripts/bash/run-tests.sh` | regenerated projected mirror (never hand-edited) | FR-022 | tier-selection TS-12 |
-| 3 | `pyproject.toml` | `slow` marker registration only | FR-005 | slow-membership SL-01 |
+| 1 | `scripts/bash/run-tests.sh` | tier flags (`--full`), default exclusion, serial composition, disclosure fields, empty-selection error | FR-007, FR-008, FR-009, FR-011, FR-022, FR-023 | tier-selection C-001…C-016 |
+| 2 | `.specify/scripts/bash/run-tests.sh` | regenerated projected mirror (never hand-edited) | FR-022 | tier-selection C-012 |
+| 3 | `pyproject.toml` | `slow` marker registration only | FR-005 | slow-membership C-001 |
 | 4 | `tests/contract/test_suite_tier_contract.py` (new) | tier behavior and registry guard | FR-005…FR-009, FR-024 | tier-selection, slow-membership |
-| 5 | `tests/contract/test_parallel_consistency_contract.py` (new) | comparison discipline + non-parallel-safe fixture drill | FR-002, FR-003, FR-004 | parallel-consistency PC-01…PC-12 |
-| 6 | `tests/contract/test_scan_cache_contract.py` (new) | build count, immutability, mutation drill | FR-012…FR-014, FR-025 | scan-cache CA-01…CA-11 |
-| 7 | `tests/contract/test_event_wait_contract.py` (new) | zero-sync-sleep scan + wait defaults + exemption registry | FR-015…FR-017, FR-026 | event-wait EW-01…EW-10 |
-| 8 | `tests/contract/test_inprocess_conversion_contract.py` (new) | manifest completeness + revert red leg | FR-018, FR-019, FR-027 | inprocess-conversion IC-01…IC-10 |
-| 9 | `tests/conftest.py` | session scan-cache fixtures (factory, counter, deep copy) | FR-012, FR-013, FR-025 | scan-cache CA-01…CA-08 |
+| 5 | `tests/contract/test_parallel_consistency_contract.py` (new) | comparison discipline + non-parallel-safe fixture drill | FR-002, FR-003, FR-004 | parallel-consistency C-001…C-012 |
+| 6 | `tests/contract/test_scan_cache_contract.py` (new) | build count, immutability, mutation drill | FR-012…FR-014, FR-025 | scan-cache C-001…C-011 |
+| 7 | `tests/contract/test_event_wait_contract.py` (new) | zero-sync-sleep scan + wait defaults + exemption registry | FR-015…FR-017, FR-026 | event-wait C-001…C-010 |
+| 8 | `tests/contract/test_inprocess_conversion_contract.py` (new) | manifest completeness + revert red leg | FR-018, FR-019, FR-027 | inprocess-conversion C-001…C-010 |
+| 9 | `tests/conftest.py` | session scan-cache fixtures (factory, counter, deep copy) | FR-012, FR-013, FR-025 | scan-cache C-001…C-008 |
 | 10 | `tests/contract/test_coverage_receipt.py` | consume session fixtures; no repeated real-repo reads | FR-012 | scan-cache |
 | 11 | `tests/contract/test_clause_coverage.py` | real-corpus sweeps consume the session payload; tmp-corpus tests unchanged | FR-012, FR-013 | scan-cache |
-| 12 | `tests/contract/test_client_metrics.py` | 8 fixed sleeps removed; injected clock and explicit mtimes | FR-015, FR-017 | event-wait EW-04 |
-| 13 | `scripts/python/feedback-utils.py` (+ `.specify/scripts/python/feedback-utils.py` mirror) | optional `--now` deterministic clock, documented in `--help` | FR-015 | event-wait EW-04; data-model E-4 |
-| 14 | `tests/contract/test_feedback_probe_cli.py` | ordering sleep replaced by injected clock | FR-015 (declared same class) | event-wait EW-01, EW-04 |
-| 15 | `tests/contract/test_store_state_protocol.py` | two ordering sleeps replaced by injected clock | FR-015 (declared same class) | event-wait EW-01, EW-04 |
-| 16 | `tests/integration/test_sdd_loop_efficiency_runner.py` | inline poll → shared wait helper with deadline/interval | FR-016, FR-026 | event-wait EW-06…EW-08 |
-| 17 | `tests/integration/test_session_kill_reattach.py` | fixed graces → event predicates | FR-016 | event-wait EW-08 |
-| 18 | `tests/contract/test_line_envelope_contract.py` | heartbeat waits → event predicates | FR-016 | event-wait EW-08 |
-| 19 | `tests/fixtures/line_fixtures.py` | wait helper defaults aligned (30 s / ≤0.2 s) | FR-026 | event-wait EW-06 |
-| 20 | `tests/` conversion files (manifest-listed) | non-boundary `subprocess.run` → in-process calls | FR-018, FR-019, FR-027 | inprocess-conversion IC-01…IC-10 |
+| 12 | `tests/contract/test_client_metrics.py` | 8 fixed sleeps removed; injected clock and explicit mtimes | FR-015, FR-017 | event-wait C-004 |
+| 13 | `scripts/python/feedback-utils.py` (+ `.specify/scripts/python/feedback-utils.py` mirror) | optional `--now` deterministic clock, documented in `--help` | FR-015 | event-wait C-004; data-model E-4 |
+| 14 | `tests/contract/test_feedback_probe_cli.py` | ordering sleep replaced by injected clock | FR-015 (declared same class) | event-wait C-001, C-004 |
+| 15 | `tests/contract/test_store_state_protocol.py` | two ordering sleeps replaced by injected clock | FR-015 (declared same class) | event-wait C-001, C-004 |
+| 16 | `tests/integration/test_sdd_loop_efficiency_runner.py` | inline poll → shared wait helper with deadline/interval | FR-016, FR-026 | event-wait C-006…C-008 |
+| 17 | `tests/integration/test_session_kill_reattach.py` | fixed graces → event predicates | FR-016 | event-wait C-008 |
+| 18 | `tests/contract/test_line_envelope_contract.py` | heartbeat waits → event predicates | FR-016 | event-wait C-008 |
+| 19 | `tests/fixtures/line_fixtures.py` | wait helper defaults aligned (30 s / ≤0.2 s) | FR-026 | event-wait C-006 |
+| 20 | `tests/` conversion files (manifest-listed) | non-boundary `subprocess.run` → in-process calls | FR-018, FR-019, FR-027 | inprocess-conversion C-001…C-010 |
 | 21 | `skills/external/sdd-loop-driver/references/efficiency-model.md` | two slot commands gain `--full` | FR-010 | research R-9 |
 | 22 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | baseline/closure restatements gain `--full` | FR-010 | research R-9 |
 | 23 | `.specify/skills/sdd-loop-driver/references/{efficiency-model,stage-prompts}.md` | regenerated skill mirrors | FR-010 | research R-9 |

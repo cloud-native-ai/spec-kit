@@ -26,14 +26,15 @@ change to the two-slot count/timing/order.
 
 | # | Optimization | Criterion-preserving acceptance | Contract | SC |
 |---|--------------|----------------------------------|----------|----|
-| 1 | xdist verification | `tests/contract` first, then full tree at closure: same-tree default-parallel vs `--serial` `--names-out` lists, bidirectional `comm` empty; a non-parallel-safe fixture must turn the comparison red; missing-engine branch completes serially with `reason=no-xdist` | parallel-consistency PC-01…PC-12 | SC-002, SC-003 |
-| 2 | slow tier | default collection set = full collection set − marked set; excluded count derived by enumeration and disclosed; `--full` restores the full set; both slots run with `--full`; no test deleted or renamed | tier-selection TS-01…TS-16; slow-membership SL-01…SL-09 | SC-004, SC-005, SC-006, SC-010 |
-| 3 | session scan cache | `build_count = 1` per worker with more than one consumer; same assertion set green; cross-session mutation drill turns the affected assertion red; mutable fixtures never share the cache | scan-cache CA-01…CA-11 | SC-007 |
-| 4 | sleep removal | zero synchronization `time.sleep` in scope (AST scan); every wait has an explicit deadline (default 30 s) and interval ≤ 0.2 s; timeout is a named failure, never skip/xfail/retry; same worker-count before/after wall pair | event-wait EW-01…EW-10 | SC-008 |
-| 5 | in-process conversion | manifest closed over the AST census; every keep row carries a boundary class; reverting a converted point turns the guard red and names it; same assertions green before/after | inprocess-conversion IC-01…IC-10 | SC-009 |
+| 1 | xdist verification | `tests/contract` first, then full tree at closure: same-tree default-parallel vs `--serial` `--names-out` lists, bidirectional `comm` empty; a non-parallel-safe fixture must turn the comparison red; missing-engine branch completes serially with `reason=no-xdist` | parallel-consistency C-001…C-012 | SC-002, SC-003 |
+| 2 | slow tier | default collection set = full collection set − marked set; excluded count derived by enumeration and disclosed; `--full` restores the full set; both slots run with `--full`; no test deleted or renamed | tier-selection C-001…C-016; slow-membership C-001…C-009 | SC-004, SC-005, SC-006, SC-010 |
+| 3 | session scan cache | `build_count = 1` per worker with more than one consumer; same assertion set green; cross-session mutation drill turns the affected assertion red; mutable fixtures never share the cache | scan-cache C-001…C-011 | SC-007 |
+| 4 | sleep removal | zero synchronization `time.sleep` in scope (AST scan); every wait has an explicit deadline (default 30 s) and interval ≤ 0.2 s; timeout is a named failure, never skip/xfail/retry; same worker-count before/after wall pair | event-wait C-001…C-010 | SC-008 |
+| 5 | in-process conversion | manifest closed over the AST census; every keep row carries a boundary class; reverting a converted point turns the guard red and names it; same assertions green before/after | inprocess-conversion C-001…C-010 | SC-009 |
 
-No optimization may be cashed in via retry, dropped parameters, `skip`/`xfail`, reduced parametrization,
-loosened timeouts, or unbounded workers (FR-021, SC-010).
+No optimization may be cashed in via any means the criterion owner prohibits
+(`.specify/shared/guidelines/test-execution-efficiency.md` §「不可采纳的提速手段」; this plan does not restate
+that list); the 098-specific detection increments are enforced by the SC-010 diff scan (FR-021, SC-010).
 
 ## Technical Context
 
@@ -44,7 +45,7 @@ loosened timeouts, or unbounded workers (FR-021, SC-010).
 **Target Platform**: developer hosts (Linux/macOS); downstream Python 3.8 without xdist takes the `reason=no-xdist` serial branch
 **Project Type**: single repository — framework source plus its own client runtime (`.specify/`)
 **Performance Goals**: default tier wall ≤ 50 % of the implement-start full default-parallel baseline (SC-004); full tier ≤ 110 % of the same baseline (SC-005); `test_client_metrics.py` wall drops by the removed fixed waits at equal worker count; corpus pair builds once per worker
-**Constraints**: two-slot budget (no third full run for measurement); C-001…C-016 unchanged; script interface contract; no CI workflow; no selection shrink
+**Constraints**: two-slot budget (no third full run for measurement); 086 C-001…C-016 unchanged; script interface contract; no CI workflow; no selection shrink
 **Scale/Scope**: 8543 collected tests; 6 contract files; 9 work packages; conversion manifest spans ~495 discovered `subprocess.run` sites (228 files) with a measured keep/convert split
 
 ## Constitution Check
@@ -55,7 +56,7 @@ loosened timeouts, or unbounded workers (FR-021, SC-010).
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `contracts/tier-selection.contract.md` TS-01…TS-16 and `feature-ref.md` delivery rows trace every FR |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `contracts/tier-selection.contract.md` C-001…C-016 and `feature-ref.md` delivery rows trace every FR |
 | II | Feature-Centric Development | ✅ Pass | `feature-ref.md` binding block; `.specify/features/086-efficient-test-execution.md` § Related Specifications (098 row); no new feature id |
 | III | Intent-Driven Development | ✅ Pass | `requirements.md` states what/why; `plan.md` § Decision Tensions records the how-level alternatives |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | `contracts/*.md` § Test obligations; WP-1/WP-2/WP-5/WP-6/WP-7 order guard tests before behavior change; equivalence runs recorded |
@@ -75,7 +76,7 @@ loosened timeouts, or unbounded workers (FR-021, SC-010).
 | XVIII | Grounded Naming | ✅ Pass | `plan.md` § Technical Context and `requirements.md` § Shared Strings carry [[STR-001…003]] verbatim; new test names follow siblings |
 | XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | `data-model.md` E-7 (tier + excluded count on the runner's own line) and E-2 registry columns |
 | XX | Efficient Test Execution (Concurrent by Default) | ✅ Pass | `plan.md` § Summary acceptance-preservation table and `contracts/*.md` mutation legs (no selection shrink, skip, or retry) |
-| XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | `contracts/tier-selection.contract.md` TS-05 and `contracts/event-wait.contract.md` EW-04 (help-documented, zero-side-effect flags) |
+| XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | `contracts/tier-selection.contract.md` C-005 and `contracts/event-wait.contract.md` C-004 (help-documented, zero-side-effect flags) |
 | XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | `plan.md` § Execution Record keeps the anchor and reading; `research.md` R-10 records the same-author delegation |
 
 **Gates Status**: ✅ All gates pass (no Fail/Partial rows; Complexity Tracking is N/A).
@@ -212,7 +213,7 @@ same-author delegation). The re-measure list names what implement must measure r
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | [`data-model.md`](./data-model.md) | 8 entities (E-1…E-8), 2 state lists, no transition table |
-| Contracts | [`contracts/`](./contracts/) | 6 files, 68 clauses: `tier-selection.contract.md` (TS-01…TS-16), `slow-membership.contract.md` (SL-01…SL-09), `parallel-consistency.contract.md` (PC-01…PC-12), `scan-cache.contract.md` (CA-01…CA-11), `event-wait.contract.md` (EW-01…EW-10), `inprocess-conversion.contract.md` (IC-01…IC-10) |
+| Contracts | [`contracts/`](./contracts/) | 6 files, 68 clauses: `tier-selection.contract.md` (C-001…C-016), `slow-membership.contract.md` (C-001…C-009), `parallel-consistency.contract.md` (C-001…C-012), `scan-cache.contract.md` (C-001…C-011), `event-wait.contract.md` (C-001…C-010), `inprocess-conversion.contract.md` (C-001…C-010) |
 | Quickstart | [`quickstart.md`](./quickstart.md) | 14 scenarios S-0…S-13; S-0.1…S-0.6 executed with real output; every later scenario carries a per-example premise list |
 | Feature reference | [`feature-ref.md`](./feature-ref.md) | 26 delivery-surface rows; disclosures and out-of-scope list |
 | Research | [`research.md`](./research.md) | B-1…B-10 measurements; R-1…R-10 decisions; re-measure list |
@@ -354,12 +355,12 @@ groups), `tests/conftest.py` only if the scan reveals a cwd-independent fixture 
 | # | Risk | Mitigation |
 |---|------|------------|
 | R-1 | The exclusion enumeration adds ~2 s to every default run | Measured and disclosed; it buys the marked-set arithmetic and is dwarfed by the reclaimed slow-test time |
-| R-2 | Two pre-existing failures (c5, c10) appear in every full run | Compared by name only; the closure comparison treats equal names as unchanged (PC-04) |
+| R-2 | Two pre-existing failures (c5, c10) appear in every full run | Compared by name only; the closure comparison treats equal names as unchanged (parallel-consistency C-004) |
 | R-3 | Writing files under `.specify/specs` during a full run flips `test_c20` | Evidence lands outside the corpus during runs and is copied afterward; the driver's `--names-out` is written post-pass |
 | R-4 | `--now` widens a shipped engine's CLI | Default-off byte-equality regression + help documentation + T-002 revision trigger |
-| R-5 | Converting a boundary call weakens a contract test | Closed keep classes, manifest guard, equivalence runs, and the IC-07 revert-red leg |
+| R-5 | Converting a boundary call weakens a contract test | Closed keep classes, manifest guard, equivalence runs, and the inprocess-conversion C-007 revert-red leg |
 | R-6 | A converted test still sleeps elsewhere in its file | The scan guard is AST-based over the whole scope file, not per converted test |
 | R-7 | A slow-marked test is also `serial` and drifts out of both fast passes | Dedicated tier case 7 covers the serial+slow intersection |
-| R-8 | The session cache returns a stale payload inside one session after a corpus write | Mutable writers are excluded by CA-05; the cross-session drill proves freshness; `test_c20` stays cache-free |
+| R-8 | The session cache returns a stale payload inside one session after a corpus write | Mutable writers are excluded by scan-cache C-005; the cross-session drill proves freshness; `test_c20` stays cache-free |
 | R-9 | The conversion census and the manifest disagree after edits | The guard re-scans source and treats the manifest as incomplete when a site is unclassified |
-| R-10 | Full-tree closure comparison is mistaken for a budget slot | PC-07/PC-10 and the driver's efficiency-model §2.5 keep the validation run out of the ledger |
+| R-10 | Full-tree closure comparison is mistaken for a budget slot | parallel-consistency C-007/C-010 and the driver's efficiency-model §2.5 keep the validation run out of the ledger |

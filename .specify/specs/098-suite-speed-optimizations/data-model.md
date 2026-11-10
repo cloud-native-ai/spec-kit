@@ -11,7 +11,7 @@ fixed here and MUST NOT be duplicated in prose elsewhere.
 | field | type | domain / rule |
 |-------|------|----------------|
 | `tier` | enum | `fast` · `full` · `caller` |
-| `excluded_slow` | integer ≥ 0 | members of the slow marker inside the caller's selection |
+| `excluded_slow` | integer ≥ 0 | members of the slow marker excluded by this tier from the caller's selection (0 for `tier=caller` / `tier=full`) |
 | `requested_by` | enum | `default` · `--full` · caller `-m` |
 
 Invariants:

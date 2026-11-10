@@ -18,13 +18,13 @@
 - DoD-4: The four mirror obligations regenerate cleanly — `python3 scripts/python/sync-mirrors.py --check` shows no NEW drift on the runner pair, the `feedback-utils.py` pair and the two driver reference pairs
 - DoD-5: Every `final`-path success criterion (SC-001…SC-009) is `pass` with a named evidence path; SC-010/SC-011 are recorded as `supporting`
 - DoD-6: Quickstart S-1…S-13 are executed and their real output (with teardown) is recorded in `notes/quickstart-run.md`
-- DoD-7: The two-slot test budget stays exactly two: slot 1 `baseline` at implement start, slot 2 `closure` after review; no third full run is added for measurement
+- DoD-7: The two-slot test budget stays exactly two budget slots: slot 1 `baseline` at implement start, slot 2 `closure` after review; no third full run is added for measurement. The closure stage additionally runs its same-tree `--full --serial` validation run (T061): it consumes no budget slot, is not a measurement, and is required by the parallel-consistency comparison (requirements A14, parallel-consistency C-007)
 
 **DoD Status**: pending
 
 ## Completion Gate
 
-- GATE-1: Closure-slot full run has zero NEW failures vs the recorded baseline — **evaluated at the closure stage** (the only post-change full run is slot 2; implement runs no second full suite): check: `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt` then `comm -13 .specify/specs/098-suite-speed-optimizations/baseline-failed.txt .specify/specs/098-suite-speed-optimizations/final-failed.txt` is empty (the two pre-existing names `test_c5_gate_budget_is_unchanged_by_the_owner_document` and `test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census` appear on both sides and compare equal by name)
+- GATE-1: Closure-slot full run has zero NEW failures vs the recorded baseline — **evaluated at the closure stage** (the post-change full runs are the closure slot plus its same-tree serial validation run; implement runs no full suite, and the validation run is neither a budget slot nor a measurement — requirements A14): check: `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt` then `comm -13 .specify/specs/098-suite-speed-optimizations/baseline-failed.txt .specify/specs/098-suite-speed-optimizations/final-failed.txt` is empty (the two pre-existing names `test_c5_gate_budget_is_unchanged_by_the_owner_document` and `test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census` appear on both sides and compare equal by name)
 - GATE-2: Every mirror obligation from plan.md verified with no NEW drift — check: `python3 scripts/python/sync-mirrors.py --check` exits 0 on the runner, `feedback-utils.py` and two `skills/external` reference pairs (generation-time baseline 2026-11-10: exit 0, all pairs `ok`)
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/specs/098-suite-speed-optimizations/tasks.md` returns 0
 - GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are all present; the closure-stage rows supply the SC-003/SC-005 readings before this gate is re-read
@@ -35,7 +35,7 @@
 - **[P]**: Can run in parallel (different files, no dependencies on incomplete tasks)
 - **[Story]**: Which user story this task belongs to (`[US1]`…`[US5]`), required on user-story rows only
 - **[blockedBy: T001,T002]** (optional): the listed tasks MUST be `[X]` before this row starts
-- **[green: <contract>#<clause>]** (optional, repeatable): the row that turns that contract clause green; contract paths resolve relative to this file's directory (not emitted in this file — see § Clause Attribution Deviation)
+- **[green: <contract>#<clause>]** (optional, repeatable): the row that turns that contract clause green; contract paths resolve relative to this file's directory. Every clause of the six contract files is claimed by exactly one row (partition in § Clause Attribution)
 - Every row keeps its checkbox, ID, labels, description, path and tags on ONE line
 
 ## Path Conventions
@@ -83,12 +83,12 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 - [ ] T005 [US1] [blockedBy: T004] Implement `--full` flag parsing, the extended script-interface usage/`--help` text, and caller `-m` detection in both spellings (`-m <expr>`, `-m=<expr>`) in `scripts/bash/run-tests.sh`.
 - [ ] T006 [US1] [blockedBy: T005] Implement the default fast-tier exclusion and its serial two-pass composition (`-m "not serial and not slow"` then `-n0 -m "serial and not slow"`), path/`-k` narrowing inside the tier, and `--serial` orthogonality in `scripts/bash/run-tests.sh`.
-- [ ] T007 [US1] [blockedBy: T006] Implement the `slow` marker enumeration (`excluded_slow` via `--collect-only -q -m slow` with `-q`/`--quiet` normalised away and exit 5 treated as zero), the appended `tier=`/`excluded_slow=` mode-line fields, the truthful header, and the empty-after-exclusion named error (exit 2) in `scripts/bash/run-tests.sh`.
-- [ ] T008 [US1] [P] Register the `slow` marker with its semantic description and default-tier exclusion statement in `pyproject.toml` (markers block, lines 53–57) (FR-005).
-- [ ] T009 [US1] [blockedBy: T008] Measure the candidate durations, write the membership registry `test-evidence/slow-members.md` (columns `test_id | category | reason | date`; categories `process-boundary` / `corpus-scan`) and `test-evidence/slow-members-measurement.txt`, then apply `@pytest.mark.slow` to exactly the measured members only (FR-006).
-- [ ] T010 [US1] [blockedBy: T007, T009] Append the registry↔collect identity, real-tree collection-equality, disclosure-arithmetic and guard-not-a-member cases (slow-membership SL-05…SL-09) to `tests/contract/test_suite_tier_contract.py`, deriving both sides at guard time and embedding no member count.
+- [ ] T007 [US1] [blockedBy: T006] Implement the `slow` marker enumeration (`excluded_slow` via `--collect-only -q -m slow` with `-q`/`--quiet` normalised away and exit 5 treated as zero), the appended `tier=`/`excluded_slow=` mode-line fields, the truthful header, and the empty-after-exclusion named error (exit 2) in `scripts/bash/run-tests.sh`. [green: contracts/tier-selection.contract.md#C-001] [green: contracts/tier-selection.contract.md#C-002] [green: contracts/tier-selection.contract.md#C-003] [green: contracts/tier-selection.contract.md#C-004] [green: contracts/tier-selection.contract.md#C-005] [green: contracts/tier-selection.contract.md#C-006] [green: contracts/tier-selection.contract.md#C-007] [green: contracts/tier-selection.contract.md#C-008] [green: contracts/tier-selection.contract.md#C-009] [green: contracts/tier-selection.contract.md#C-010] [green: contracts/tier-selection.contract.md#C-011]
+- [ ] T008 [US1] [P] Register the `slow` marker with its semantic description and default-tier exclusion statement in `pyproject.toml` (markers block, lines 53–57) (FR-005). [green: contracts/slow-membership.contract.md#C-001]
+- [ ] T009 [US1] [blockedBy: T008] Measure the candidate durations, write the membership registry `test-evidence/slow-members.md` (columns `test_id | category | reason | date`; categories `process-boundary` / `corpus-scan`) and `test-evidence/slow-members-measurement.txt`, then apply `@pytest.mark.slow` to exactly the measured members only (FR-006). [green: contracts/slow-membership.contract.md#C-002] [green: contracts/slow-membership.contract.md#C-003] [green: contracts/slow-membership.contract.md#C-004]
+- [ ] T010 [US1] [blockedBy: T007, T009] Append the registry↔collect identity, real-tree collection-equality, disclosure-arithmetic and guard-not-a-member cases (slow-membership C-005…C-009) to `tests/contract/test_suite_tier_contract.py`, deriving both sides at guard time and embedding no member count.
 - [ ] T011 [US1] [blockedBy: T007] Regenerate the projected runner mirror with `python3 scripts/python/sync-mirrors.py --write --only scripts` and verify `python3 scripts/python/sync-mirrors.py --check` reports no NEW drift on the `run-tests.sh` pair.
-- [ ] T012 [US1] [blockedBy: T010, T011] Run `tests/contract/test_suite_tier_contract.py` (obligations 1–11) and the existing 086 runner contract suite (40 collected cases, P-2) under the canonical runner green; record commands, exits and durations in `test-evidence/tier-contract-green.txt`.
+- [ ] T012 [US1] [blockedBy: T010, T011] Run `tests/contract/test_suite_tier_contract.py` (obligations 1–11) and the existing 086 runner contract suite (40 collected cases, P-2) under the canonical runner green; record commands, exits and durations in `test-evidence/tier-contract-green.txt`. [green: contracts/tier-selection.contract.md#C-012] [green: contracts/tier-selection.contract.md#C-013] [green: contracts/tier-selection.contract.md#C-014] [green: contracts/slow-membership.contract.md#C-005] [green: contracts/slow-membership.contract.md#C-006] [green: contracts/slow-membership.contract.md#C-007] [green: contracts/slow-membership.contract.md#C-008] [green: contracts/slow-membership.contract.md#C-009]
 - [ ] T013 [US1] [blockedBy: T012] Execute mutation drills TS-M1…TS-M8 and SL-M1…SL-M5 on throwaway copies and record each red output in `test-evidence/tier-mutations.txt`.
 
 **Checkpoint**: US1 is independently testable: the fast default, the disclosure count, the caller-priority matrix and the registry guard all run without US2–US5.
@@ -111,12 +111,12 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 - [ ] T015 [US2] [blockedBy: T007, T009] Run the contract-subset comparison (S-4, targeted run — no budget slot): default-parallel `--workers 4 tests/contract --names-out` versus `--serial tests/contract --names-out`, both `comm -13` and `comm -23` empty; record commands, exits, durations and complete lists in `test-evidence/parallel-consistency-contract.txt`.
 - [ ] T016 [US2] [blockedBy: T007] Run the no-xdist PYTHONPATH shim over `tests/contract` (the 086 C-006 construction) and record the `reason=no-xdist` mode line plus a valid `--names-out` list in `test-evidence/parallel-consistency-noxdist.txt`.
-- [ ] T017 [US2] [blockedBy: T014, T015, T016] Run `tests/contract/test_parallel_consistency_contract.py` green and record the run in `test-evidence/parallel-consistency-contract.txt`.
+- [ ] T017 [US2] [blockedBy: T014, T015, T016] Run `tests/contract/test_parallel_consistency_contract.py` green and record the run in `test-evidence/parallel-consistency-contract.txt`. [green: contracts/parallel-consistency.contract.md#C-001] [green: contracts/parallel-consistency.contract.md#C-002] [green: contracts/parallel-consistency.contract.md#C-003] [green: contracts/parallel-consistency.contract.md#C-004] [green: contracts/parallel-consistency.contract.md#C-005] [green: contracts/parallel-consistency.contract.md#C-006] [green: contracts/parallel-consistency.contract.md#C-009] [green: contracts/parallel-consistency.contract.md#C-010] [green: contracts/parallel-consistency.contract.md#C-011] [green: contracts/parallel-consistency.contract.md#C-012]
 - [ ] T018 [US2] [P] [blockedBy: T005] Add `--full` to the two slot command rows in `skills/external/sdd-loop-driver/references/efficiency-model.md` §2 (baseline `:91`, closure `:92`) so neither slot can silently run the default tier (FR-010).
 - [ ] T019 [US2] [P] [blockedBy: T005] Add `--full` to the baseline (`:165`) and closure (`:206`) restatements in `skills/external/sdd-loop-driver/references/stage-prompts.md`.
 - [ ] T020 [US2] [blockedBy: T018, T019] Regenerate the skill mirrors with `python3 scripts/python/sync-mirrors.py --write --only skills/external` and verify `--check` reports no NEW drift on the two driver reference pairs.
 - [ ] T021 [US2] [blockedBy: T020] Append the two-slot `--full` doc-assertion case and the full-collection equality case (tier-selection §E obligation 11) to `tests/contract/test_suite_tier_contract.py`.
-- [ ] T022 [US2] [blockedBy: T003, T021] Produce the full-tier collection diff (S-12) against the implement-start id set in `notes/pre-change-measurements.md` and record `test-evidence/full-collection-diff.txt` (FR-011).
+- [ ] T022 [US2] [blockedBy: T003, T021] Produce the full-tier collection diff (S-12) against the implement-start id set in `notes/pre-change-measurements.md` and record `test-evidence/full-collection-diff.txt` (FR-011). [green: contracts/tier-selection.contract.md#C-015]
 - [ ] T023 [US2] [blockedBy: T017] Execute mutation drills PC-M1…PC-M5 on throwaway copies and record each red output in `test-evidence/parallel-mutations.txt`.
 
 **Checkpoint**: US2 independently proves the full path is intact and the budget surfaces request it; US1 is not required for the parallel-consistency drill itself.
@@ -137,11 +137,11 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] [blockedBy: T024] Add the session scan-cache fixture factory to `tests/conftest.py` for surfaces `framework-specs-corpus` and `framework-root-inputs`, keyed by (worker, surface, root, variant), with a build counter and `copy.deepcopy` consumer access (CA-07 house pattern: `importlib.util.spec_from_file_location` over `scripts/python/account-clause-coverage.py`).
+- [ ] T025 [US3] [blockedBy: T024] Add the session scan-cache fixture factory to `tests/conftest.py` for surfaces `framework-specs-corpus` and `framework-root-inputs`, keyed by (worker, surface, root, variant), with a build counter and `copy.deepcopy` consumer access (scan-cache C-007 house pattern: `importlib.util.spec_from_file_location` over `scripts/python/account-clause-coverage.py`). [green: contracts/scan-cache.contract.md#C-001] [green: contracts/scan-cache.contract.md#C-002] [green: contracts/scan-cache.contract.md#C-003] [green: contracts/scan-cache.contract.md#C-004] [green: contracts/scan-cache.contract.md#C-007]
 - [ ] T026 [US3] [blockedBy: T025] Convert the real-repository reads in `tests/contract/test_coverage_receipt.py` to the session `framework-root-inputs` surface.
-- [ ] T027 [US3] [blockedBy: T025] Convert the real-corpus consumers whose subject is the computed result (c10, c26, c27 and the `form_exit_code_table` payload leg) in `tests/contract/test_clause_coverage.py` to the session payload; keep `test_c20`'s byte-identity check cache-free (CA-06) and the `form_exit_code_table` subprocess exit-code leg (CA-08).
-- [ ] T028 [US3] [blockedBy: T003, T026, T027] Run both corpus files before/after with `--full` and compare pass/fail names, then run the build-count/traversal probe; record `test-evidence/cache-counts.txt` and the equivalence names (land probe output outside `.specify/specs` during the run and copy afterwards — corpus-write hazard).
-- [ ] T029 [US3] [blockedBy: T028] Run `tests/contract/test_scan_cache_contract.py` plus both converted files green and record the run.
+- [ ] T027 [US3] [blockedBy: T025] Convert the real-corpus consumers whose subject is the computed result (c10, c26, c27 and the `form_exit_code_table` payload leg) in `tests/contract/test_clause_coverage.py` to the session payload; keep `test_c20`'s byte-identity check cache-free (scan-cache C-006) and the `form_exit_code_table` subprocess exit-code leg (scan-cache C-008). [green: contracts/scan-cache.contract.md#C-005] [green: contracts/scan-cache.contract.md#C-006] [green: contracts/scan-cache.contract.md#C-008]
+- [ ] T028 [US3] [blockedBy: T003, T026, T027] Run both corpus files before/after with `--full` and compare pass/fail names, then run the build-count/traversal probe; record `test-evidence/cache-counts.txt` and the equivalence names (land probe output outside `.specify/specs` during the run and copy afterwards — corpus-write hazard). [green: contracts/scan-cache.contract.md#C-009]
+- [ ] T029 [US3] [blockedBy: T028] Run `tests/contract/test_scan_cache_contract.py` plus both converted files green and record the run. [green: contracts/scan-cache.contract.md#C-010] [green: contracts/scan-cache.contract.md#C-011]
 - [ ] T030 [US3] [blockedBy: T029] Execute mutation drills CA-M1…CA-M5 on throwaway copies and record each red output in `test-evidence/cache-mutations.txt`.
 
 **Checkpoint**: US3's independent criterion is the per-worker build count plus the equivalence pair; nothing in US1/US2/US4/US5 needs to be present.
@@ -158,20 +158,20 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T031 [US4] Author the event-wait contract cases in `tests/contract/test_event_wait_contract.py`: the AST zero-synchronization-sleep scan over the EW-01 scope files (naming file and line), the `wait_until` default assertions (`timeout <= 30`, `interval <= 0.2`), and the per-line exemption registry; record the red run in `notes/red-first-evidence.md`.
+- [ ] T031 [US4] Author the event-wait contract cases in `tests/contract/test_event_wait_contract.py`: the AST zero-synchronization-sleep scan over the event-wait C-001 scope files (naming file and line), the `wait_until` default assertions (`timeout == 30` — the enacted default, red against the measured pre-change 5.0 — `interval <= 0.2`), and the per-line exemption registry; record the red run in `notes/red-first-evidence.md`. [green: contracts/event-wait.contract.md#C-001] [green: contracts/event-wait.contract.md#C-003]
 
 ### Implementation for User Story 4
 
 - [ ] T032 [US4] [blockedBy: T031] Add the optional `--now <YYYY-MM-DDTHH:MM:SSZ>` injected clock to `scripts/python/feedback-utils.py`, read by `now_iso()` (`:125`) and `timestamp_id()` (`:129`), documented in `--help`, default-off byte-identical, an unparsable value exits non-zero with a named error.
 - [ ] T033 [US4] [blockedBy: T032] Regenerate the `scripts/` mirror pair with `python3 scripts/python/sync-mirrors.py --write --only scripts` and verify `--check` reports no NEW drift on `feedback-utils.py`.
-- [ ] T034 [US4] [blockedBy: T032] Convert the eight ordering sleeps in `tests/contract/test_client_metrics.py` (lines 338, 391, 394, 400, 432, 458, 463, 671) to `--now`-injected timestamps plus explicit `os.utime` owner-file mtimes, keeping the assertion set unchanged (EW-05).
+- [ ] T034 [US4] [blockedBy: T032] Convert the eight ordering sleeps in `tests/contract/test_client_metrics.py` (lines 338, 391, 394, 400, 432, 458, 463, 671) to `--now`-injected timestamps plus explicit `os.utime` owner-file mtimes, keeping the assertion set unchanged (event-wait C-005). [green: contracts/event-wait.contract.md#C-004] [green: contracts/event-wait.contract.md#C-005]
 - [ ] T035 [US4] [P] [blockedBy: T032] Replace the ordering sleep in `tests/contract/test_feedback_probe_cli.py` with the injected clock.
 - [ ] T036 [US4] [P] [blockedBy: T032] Replace the two ordering sleeps in `tests/contract/test_store_state_protocol.py` with the injected clock.
-- [ ] T037 [US4] Align the `wait_until` defaults in `tests/fixtures/line_fixtures.py:396` to `timeout=30` and `interval<=0.2`.
+- [ ] T037 [US4] Align the `wait_until` defaults in `tests/fixtures/line_fixtures.py:396` to `timeout=30` and `interval<=0.2`. [green: contracts/event-wait.contract.md#C-006] [green: contracts/event-wait.contract.md#C-007]
 - [ ] T038 [US4] [blockedBy: T037] Replace the inline poll in `tests/integration/test_sdd_loop_efficiency_runner.py` with the shared `wait_until` (explicit 30 s deadline, 0.2 s interval, named failure on timeout).
 - [ ] T039 [US4] [P] [blockedBy: T037] Replace the SIGHUP grace and post-exit residue waits in `tests/integration/test_session_kill_reattach.py` with event predicates over the observable file state.
-- [ ] T040 [US4] [P] [blockedBy: T037] Replace the heartbeat first-write and advance waits in `tests/contract/test_line_envelope_contract.py` with event predicates.
-- [ ] T041 [US4] [blockedBy: T033, T034, T035, T036, T038, T039, T040] Run the guard and the six scope files green; record the `test_client_metrics.py` before/after wall pair (EW-10) against `notes/pre-change-measurements.md` in `test-evidence/event-wait-green.txt`.
+- [ ] T040 [US4] [P] [blockedBy: T037] Replace the heartbeat first-write and advance waits in `tests/contract/test_line_envelope_contract.py` with event predicates. [green: contracts/event-wait.contract.md#C-008]
+- [ ] T041 [US4] [blockedBy: T033, T034, T035, T036, T038, T039, T040] Run the guard and the six scope files green; record the `test_client_metrics.py` before/after wall pair (event-wait C-010) against `notes/pre-change-measurements.md` in `test-evidence/event-wait-green.txt`. [green: contracts/event-wait.contract.md#C-002] [green: contracts/event-wait.contract.md#C-009] [green: contracts/event-wait.contract.md#C-010]
 - [ ] T042 [US4] [blockedBy: T041] Execute mutation drills EW-M1…EW-M5 on throwaway copies and record each red output in `test-evidence/event-wait-mutations.txt`.
 
 **Checkpoint**: US4's independent criterion is the scan plus the green six-file run; the wall pair is directional evidence, never an assertion.
@@ -188,20 +188,20 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T043 [US5] Author the in-process conversion contract cases in `tests/contract/test_inprocess_conversion_contract.py`: the AST census over `tests/**/*.py` and `tests/conftest.py`, manifest completeness against that denominator, the closed keep-class set, and the revert-red leg; record the red run in `notes/red-first-evidence.md`.
+- [ ] T043 [US5] Author the in-process conversion contract cases in `tests/contract/test_inprocess_conversion_contract.py`: the AST census over `tests/**/*.py` and the read-only `tests/conftest.py`, manifest completeness against that denominator, the closed keep-class set, and the revert-red leg; record the red run in `notes/red-first-evidence.md`. [green: contracts/inprocess-conversion.contract.md#C-001] [green: contracts/inprocess-conversion.contract.md#C-002]
 
 ### Implementation for User Story 5
 
 - [ ] T044 [US5] [blockedBy: T043] Add the generic in-process invocation helper to `tests/script_api.py` (importlib load, stdout/stderr capture, `main(argv)` exit code; `typer.testing.CliRunner` equivalent for the Typer CLI).
-- [ ] T045 [US5] [blockedBy: T044] Generate `test-evidence/inprocess-conversion.md` from the AST census (one row per site: `file | call_site | verdict | boundary_class | reason`) and pilot-convert one contract file with local `_run` wrappers, recording before/after equivalence (FR-019).
+- [ ] T045 [US5] [blockedBy: T044] Generate `test-evidence/inprocess-conversion.md` from the AST census (one row per site: `file | call_site | verdict | boundary_class | reason`) and pilot-convert one contract file with local `_run` wrappers, recording before/after equivalence (FR-019). [green: contracts/inprocess-conversion.contract.md#C-003] [green: contracts/inprocess-conversion.contract.md#C-004] [green: contracts/inprocess-conversion.contract.md#C-005] [green: contracts/inprocess-conversion.contract.md#C-006]
 - [ ] T046 [US5] [blockedBy: T045] Convert the contract-area engine group A (goal/flow/concurrency/confirmation engines) to in-process calls and fill their manifest rows.
 - [ ] T047 [US5] [blockedBy: T045] Convert the contract-area engine group B (docs/probe/trigger/summary engines) and fill their manifest rows.
 - [ ] T048 [US5] [blockedBy: T045] Convert the contract-area engine group C (mirror/measure/state engines) where non-boundary and fill their manifest rows.
 - [ ] T049 [US5] [blockedBy: T046, T047, T048] Record the contract-area keep rows with boundary classes (fixture-layer `cwd=`/`env=` helpers, `copy-topology` cases) in `test-evidence/inprocess-conversion.md` (FR-027).
 - [ ] T050 [US5] [blockedBy: T045] Convert the integration-area groups (docs-scenario and evidence-lane) non-boundary engine calls and fill their manifest rows.
 - [ ] T051 [US5] [blockedBy: T045] Convert the unit-area engine-call group and fill their manifest rows.
-- [ ] T052 [US5] [blockedBy: T049, T050, T051] Record the integration/unit keep rows, run the guard over the full manifest, fix every unclassified site and update the manifest evidence pointers.
-- [ ] T053 [US5] [blockedBy: T052] Run the guard and the converted files green with equivalence evidence in `test-evidence/inprocess-equivalence.txt`.
+- [ ] T052 [US5] [blockedBy: T049, T050, T051] Record the integration/unit keep rows, run the guard over the full manifest, fix every unclassified site and update the manifest evidence pointers. [green: contracts/inprocess-conversion.contract.md#C-007] [green: contracts/inprocess-conversion.contract.md#C-008]
+- [ ] T053 [US5] [blockedBy: T052] Run the guard and the converted files green with equivalence evidence in `test-evidence/inprocess-equivalence.txt`. [green: contracts/inprocess-conversion.contract.md#C-009] [green: contracts/inprocess-conversion.contract.md#C-010]
 - [ ] T054 [US5] [blockedBy: T053] Execute mutation drills IC-M1…IC-M5 on throwaway copies (including revert-one-converted-point red then restore) and record each output in `test-evidence/inprocess-mutations.txt`.
 
 **Checkpoint**: US5's independent criterion is the closed manifest plus the equivalence pair; group file sets are proven disjoint by the manifest scan before any concurrent dispatch of T046–T048/T050/T051.
@@ -213,12 +213,12 @@ Every count below was produced by the command shown, run in this worktree on 202
 **Purpose**: Measurement records, forbidden-shortcut and interface evidence, quickstart execution and the closure-stage handoff.
 
 - [ ] T055 [P] Record the anti-measurement disclosure from the slot-1 baseline reading (the pre-change default had the marked set merged) in `test-evidence/tier-measurements.txt` — no additional full run (FR-020).
-- [ ] T056 [blockedBy: T003, T012] Measure the default-tier wall on the same host and day (S-13 leg 3, targeted measurement per A9 — not a budget slot) and record the ratio against the slot-1 baseline in `test-evidence/tier-measurements.txt`.
-- [ ] T057 Run the SC-010 forbidden-shortcut diff scan (new `skip`/`xfail`/retry decorators, parametrize removals) and record `test-evidence/forbidden-shortcuts.txt` (FR-021).
+- [ ] T056 [blockedBy: T003, T012] Measure the default-tier wall on the same host and day (S-13 leg 3, targeted measurement per A9 — not a budget slot) and record the ratio against the slot-1 baseline in `test-evidence/tier-measurements.txt`. [green: contracts/tier-selection.contract.md#C-016]
+- [ ] T057 Run the SC-010 forbidden-shortcut diff scan (decorator and in-function `skip`/`xfail` forms, conditional skips, retry-until-green loops, parametrize removals) and record `test-evidence/forbidden-shortcuts.txt` (FR-021).
 - [ ] T058 [P] Run the SC-011 interface evidence (S-11: `--help` lists `--full`, `--version` answers one line, an undeclared option exits non-zero) and record `test-evidence/interface-evidence.txt`.
 - [ ] T059 [P] Write the `test-evidence/` index linking every SC-001…SC-011 to its evidence path(s), including this feature's coverage baseline and the closure records.
 - [ ] T060 Run quickstart scenarios S-1…S-13 and record the real output (with teardown) in `notes/quickstart-run.md`; land run-time output outside `.specify/specs` and copy afterwards (corpus-write hazard).
-- [~] T061 [blockedBy: T054, T060] Closure-stage row, executed by the driver after review (slot 2 of 2; handoff to the `closure` stage): run `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt`, compare by name with `comm -13` against `baseline-failed.txt`, run the same-tree `--full --serial` validation run with the bidirectional name comparison, and record the full-tier wall ratio against the slot-1 baseline in `test-evidence/closure.txt` <!-- deferred: driver closure stage after review; slot 2 of 2 — not an implement-stage run -->
+- [~] T061 [blockedBy: T054, T060] Closure-stage row, executed by the driver after review (slot 2 of 2; handoff to the `closure` stage): run `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/098-suite-speed-optimizations/final-failed.txt`, compare by name with `comm -13` against `baseline-failed.txt`, run the same-tree `--full --serial` validation run with the bidirectional name comparison, and record the full-tier wall ratio against the slot-1 baseline in `test-evidence/closure.txt` [green: contracts/parallel-consistency.contract.md#C-007] [green: contracts/parallel-consistency.contract.md#C-008] <!-- deferred: driver closure stage after review; slot 2 of 2 — not an implement-stage run -->
 
 **Checkpoint**: All evidence lands; the closure-stage row remains `[~]` until the driver's closure stage executes it.
 
@@ -245,7 +245,7 @@ Every count below was produced by the command shown, run in this worktree on 202
 ### Within Each User Story
 
 - Tests are authored and red before the behavior change (T004→T005, T024→T025, T031→T032, T043→T044); guards over existing behavior prove their discriminating power through the mutation rows.
-- Every contract file's clauses are claimed by exactly one row (`[green:]`), in clause order per contract.
+- Every contract file's clauses are claimed by exactly one row (`[green:]`); a claim may sit out of clause order when the completing row is later (the guard-green row or the deferred closure row T061).
 
 ### Parallel Opportunities
 
@@ -379,19 +379,29 @@ Each leg is exercised against a throwaway copy; the recorded red output is the p
 
 ---
 
-## Clause Attribution Deviation (surfaced at tasks generation, 2026-11-10)
+## Clause Attribution (renumbered 2026-11-10, analyze repair round)
 
-This file carries **no clause-attribution tags**. The six `contracts/*.contract.md` files declare clause ids with two-letter prefixes (`TS-01`…`IC-10`), while the framework's clause-syntax owner `.specify/shared/definitions/contract-clause-definitions.md` § 1 fixes the clause id form as `C-<number>` (optionally one decimal level). Its executable `scripts/python/clause_extract.py` — consumed by `scripts/python/validate-tasks.py` and `scripts/python/account-clause-coverage.py` — matches only `C-\d+`, so it reads those six files as `md-none` (no machine-decidable clause form). Measured at generation time:
+This section replaces the former "Clause Attribution Deviation" record. At tasks generation the six `contracts/*.contract.md` files declared two-letter-prefixed clause ids that the framework's clause-syntax owner (`.specify/shared/definitions/contract-clause-definitions.md` § 1, form `C-<number>`) and its executable `scripts/python/clause_extract.py` could not parse (`md-none`). The analyze stage's Round-1 gate confirmed the defect (`clause-unparsable`, `fr-uncovered` 0/27) as W3-01.
 
-- `python3 scripts/python/validate-tasks.py .specify/specs/098-suite-speed-optimizations/tasks.md` reports every prefixed-shaped attribution as `green-dangling` ("that file declares no machine-decidable clause form").
-- `python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations` treats the six contracts as named-unparseable and would place every FR of this specification in its `fr-uncovered` lane.
+The repair round executed the plan-owned remedy: every clause id in the six contract files was renumbered to the canonical `C-<three-digit>` form, every citation was updated (contracts, plan.md, quickstart.md, feature-ref.md and this file), and this file now emits one `[green:]` claim per clause (68 clauses, 68 claims; partition by row is in the table below). Machine readings after the repair:
 
-The driver-side gate `pre-analyze-check.py --stage tasks` uses a broader clause regex (`[A-Z]{2,4}-\d{2}`) and counts the same 68 clauses, so the two framework engines disagree on this artifact set. The remedy is a plan-owned renumbering of the six contracts' clause ids to the canonical `C-<n>` form with every citation updated (plan.md, research.md, quickstart.md, feature-ref.md and this file); the tasks phase MUST NOT perform that substantive plan-artifact rewrite. The analyze stage's mandatory coverage-accounting step will report the same facts from its own run; the plan stage owns the fix.
+- `python3 scripts/python/clause_extract.py`-based extraction reads all six files as `md-bold-closed` with 68 clauses (16/9/12/11/10/10).
+- All 27 FRs are cited from clause citation groups (`fr-uncovered` 0/27).
+- `validate-tasks.py` resolves every `[green:]` claim; the only warnings are out-of-order claims on rows whose completing moment is later (parallel-consistency C-007/C-008 at the closure row T061; scan-cache C-007 at the fixture row T025 before T027's C-005/C-006; event-wait C-002 at the guard-green row T041).
+
+| Contract | Clause range | Claiming rows |
+|----------|--------------|---------------|
+| `tier-selection.contract.md` | C-001…C-016 | C-001…C-011 → T007; C-012…C-014 → T012; C-015 → T022; C-016 → T056 |
+| `slow-membership.contract.md` | C-001…C-009 | C-001 → T008; C-002…C-004 → T009; C-005…C-009 → T010 |
+| `parallel-consistency.contract.md` | C-001…C-012 | C-001…C-005 and C-009 → T014; C-006 → T015; C-010/C-011 → T016; C-012 → T017; C-007/C-008 → T061 |
+| `scan-cache.contract.md` | C-001…C-011 | C-001…C-004 and C-007 → T025; C-005/C-006/C-008 → T027; C-009 → T028; C-010/C-011 → T029 |
+| `event-wait.contract.md` | C-001…C-010 | C-001/C-003 → T031; C-004/C-005 → T034; C-006/C-007 → T037; C-008 → T040; C-002/C-009/C-010 → T041 |
+| `inprocess-conversion.contract.md` | C-001…C-010 | C-001/C-002 → T043; C-003…C-006 → T045; C-007/C-008 → T052; C-009/C-010 → T053 |
 
 ## Notes
 
 - Runtime evidence rule: while a corpus-scanning test is running, never write under `.specify/specs` (research B-5 / `test-evidence/corpus-write-hazard.txt`); run-time output lands outside the corpus and is copied afterwards.
-- Two-slot budget: exactly two full runs — slot 1 `baseline` at implement start (T003), slot 2 `closure` after review (T061). Every other run in this file is a targeted run or a collection, and none is a third full-suite consumption.
+- Two-slot budget: exactly two budget-slot full runs — slot 1 `baseline` at implement start (T003), slot 2 `closure` after review (T061). The closure stage adds one same-tree `--full --serial` validation run (T061) as validation evidence: it consumes no slot and no SC-004/SC-005 wall-clock reading (requirements A14); every other run in this file is a targeted run or a collection.
 - Pre-existing failures are compared by name, never by count: `test_c5_gate_budget_is_unchanged_by_the_owner_document` and `test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census` appear on both sides of every full-run comparison (research B-4).
 - `[P]` means different write targets and no incomplete dependency; when in doubt, sequence with `[blockedBy:]` rather than assume disjointness.
 - Prefer `[~]` over leaving a row `[ ]`: T061 is the only `[~]` row and it is a deliberate handoff to the driver's closure stage.
