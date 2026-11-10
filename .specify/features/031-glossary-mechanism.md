@@ -39,8 +39,8 @@ Not yet reviewed. Spec (029-glossary-mechanism) clarified 2026-07-16 (feature bi
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/031-task-complexity-rubric.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/031-glossary-mechanism.md
 
 ## Status Tracking
 

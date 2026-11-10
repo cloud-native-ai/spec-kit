@@ -49,8 +49,8 @@ Dropped MCP as a standalone tool category (commit 48cd498). The command now oper
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/016-refactor-tools-command.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/016-refactor-tools-command.md
 - Specification (current): .specify/specs/016-refactor-tools-command/requirements.md
 - Specification (historical): .specify/specs/004-speckit-tools-command/requirements.md
 - Quality Checklist: .specify/specs/004-speckit-tools-command/checklists/requirements.md

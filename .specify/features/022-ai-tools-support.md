@@ -102,8 +102,8 @@ Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/022-ai-tools-support.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/022-ai-tools-support.md
 - Specification: .specify/specs/018-cli-priority-support/requirements.md
 - Quality Checklist: .specify/specs/018-cli-priority-support/checklists/requirements.md
 - Plan: .specify/specs/018-cli-priority-support/plan.md

@@ -51,8 +51,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/058-sdd-loop-driver.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/058-sdd-loop-driver.md
 
 ## Status Tracking
 

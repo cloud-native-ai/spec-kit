@@ -37,8 +37,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/024-agent-env-config.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/024-specification-workspace-versioning.md
 - Cross-referenced Feature: .specify/memory/features/045.md (Framework Source Provenance, Draft 2026-08-17) — the source/provenance axis, orthogonal to this schema-version axis; its stamp must NOT take this Feature's envisioned `.specify/version` marker path.
 
 ## Status Tracking

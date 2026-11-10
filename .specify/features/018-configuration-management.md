@@ -31,7 +31,7 @@ Initial generation/refresh.
 
 - Specification: .specify/specs/018-018-configuration-management/requirements.md
 - Feature Index: .specify/features.md
-- Feature Detail: .specify/features/018-cli-priority-support.md
+- Feature Detail: .specify/features/018-configuration-management.md
 - Quality Checklist: .specify/specs/018-018-configuration-management/checklists/requirements.md
 
 ## Status Tracking

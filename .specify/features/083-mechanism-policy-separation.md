@@ -67,8 +67,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/083-mechanism-policy-separation.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/083-mechanism-policy-separation.md
 - Requirements: .specify/specs/083-mechanism-policy-separation/requirements.md
 - Quality Checklist: .specify/specs/083-mechanism-policy-separation/checklists/requirements.md
 - Test Evidence: .specify/specs/083-mechanism-policy-separation/test-evidence/

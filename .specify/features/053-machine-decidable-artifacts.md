@@ -114,8 +114,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/053-machine-decidable-artifacts.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/053-machine-decidable-artifacts.md
 
 ## Status Tracking
 

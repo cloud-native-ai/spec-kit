@@ -35,8 +35,8 @@ Gap identified during full-registry feature reconcile: `.github/workflows/` is e
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/034-evidence-infra.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/034-ci-cd-pipeline.md
 
 ## Status Tracking
 

@@ -43,8 +43,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/068-exec-quant-feedback-channel.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/068-exec-quant-feedback-channel.md
 
 ## Related Specifications/Requirements
 

@@ -65,8 +65,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/084-harness-triple-structure.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/084-harness-triple-structure.md
 - Requirements: .specify/specs/084-harness-triple-structure/requirements.md（19 FR / 6 SC / 14 STR / A1–A10）
 - Quality Checklist: .specify/specs/084-harness-triple-structure/checklists/requirements.md
 - Layer Criteria Checklist: .specify/specs/084-harness-triple-structure/checklists/layer-criteria-2026-11-05.md

@@ -126,8 +126,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/052-fast-fail-principle.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/052-fast-fail-principle.md
 
 ## Status Tracking
 

@@ -91,8 +91,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/051-user-facing-comprehension.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/051-user-facing-comprehension.md
 - Requirements Spec: .specify/specs/051-user-facing-comprehension/requirements.md
 - Quality Checklist: .specify/specs/051-user-facing-comprehension/checklists/requirements.md
 

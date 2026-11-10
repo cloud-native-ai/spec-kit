@@ -46,8 +46,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/063-review-p1-governance.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/063-review-p1-governance.md`
 - 权威评审报告（治理输入，F1–F8 真源）: `.specify/specs/062-humanize-command/review.md`
 - 运行简报（dated record，未归档）: `/tmp/sdd-review-p1/brief.md`
 

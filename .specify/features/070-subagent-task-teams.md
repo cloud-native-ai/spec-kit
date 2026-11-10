@@ -52,8 +52,8 @@ Feature 058 的无人值守循环在阶段边界是串行且整体的：一个�
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/070-subagent-task-teams.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/070-subagent-task-teams.md
 - Specification: .specify/specs/070-subagent-task-teams/requirements.md
 - Quality Checklist: .specify/specs/070-subagent-task-teams/checklists/requirements.md
 - Clarify Decisions: .specify/specs/070-subagent-task-teams/notes/clarify-decisions.md

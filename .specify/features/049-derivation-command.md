@@ -46,8 +46,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/049-docs-reconcile.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/049-derivation-command.md
 - 需求 048: .specify/specs/048-derive-command/requirements.md
 - 概念锚: shared/definitions/derivation-definitions.md
 - 邻近 Feature: 040(Program-First 纪律)、041(项目级一等概念归档先例)、046(可逆动作自动执行 + 执行报告判据)、047(命令自带 stdlib 引擎先例)

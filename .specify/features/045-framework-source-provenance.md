@@ -31,7 +31,7 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
+- Feature Index: .specify/features.md
 - Requirement: .specify/specs/043-init-commit-stamp/requirements.md (Draft 2026-08-17: 3 US / 8 FR / 5 SC / 3 shared strings)
 - Cross-referenced Feature: .specify/memory/features/024.md (schema-version axis, orthogonal; filename `.specify/version` reserved to 024)
 

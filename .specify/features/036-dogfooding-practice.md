@@ -39,8 +39,8 @@ Dogfooding 的核心在于工具开发者与使用者联系紧密（甚至同一
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/036-team-summary.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/036-dogfooding-practice.md
 
 ## Status Tracking
 

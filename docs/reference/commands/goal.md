@@ -110,4 +110,4 @@ Driving a host CLI's own goal mechanism from an archived definition is deliberat
 
 - `.specify/shared/definitions/goal-definitions.md` — the concept authority
 - `docs/reference/commands/team.md` — the team side of the binding
-- `.specify/features/041-refactor-feedback-probe.md` — Feature detail
+- `.specify/features/041-goal-registry.md` — Feature detail

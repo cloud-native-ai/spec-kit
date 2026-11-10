@@ -41,8 +41,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/061-subagent-cli-config.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/061-subagent-cli-config.md`
 - 需求简报（终态权威文档）: `/tmp/061-subagent-cli-config-brief.md`
 
 ## Related Specifications/Requirements

@@ -35,8 +35,8 @@ Gap identified during full-registry feature reconcile: no linter/formatter confi
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/035-token-efficiency.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/035-code-quality-tooling.md
 
 ## Status Tracking
 

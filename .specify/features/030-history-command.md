@@ -36,8 +36,8 @@ It is deliberately **tool-aware** (session history lives in different places per
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/030-summarize-project.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/030-history-command.md
 - Command template: templates/commands/history.md
 - Engine: scripts/python/history-utils.py; wrapper: scripts/bash/collect-history.sh
 - Docs: docs/commands/history.md

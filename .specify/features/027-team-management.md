@@ -74,8 +74,8 @@ Planning completed for requirement `026-agent-team-management`. Clarifications r
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/027-feedback-mechanism.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/027-team-management.md
 
 ## Status Tracking
 

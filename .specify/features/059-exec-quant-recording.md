@@ -42,8 +42,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/059-exec-quant-recording.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/059-exec-quant-recording.md
 
 ## Related Specifications/Requirements
 

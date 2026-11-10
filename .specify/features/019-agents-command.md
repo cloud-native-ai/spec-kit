@@ -67,8 +67,8 @@ Spec 023 (agent-framework-redesign, Implemented 2026-07-10): Redesigns the Agent
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/019-agents-command.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/019-agents-command.md
 - Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——其 US3 对 /speckit.agents 路由表做接线核查（run/create/refine 三行到既有 agent 技能），不新建 agent 系技能。
 
 ## Status Tracking

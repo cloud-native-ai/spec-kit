@@ -63,8 +63,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/081-acceptance-hardening.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/081-acceptance-hardening.md
 - Requirements: .specify/specs/081-acceptance-hardening/requirements.md
 - Quality Checklist: .specify/specs/081-acceptance-hardening/checklists/requirements.md
 - Test Evidence: .specify/specs/081-acceptance-hardening/test-evidence/

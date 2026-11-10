@@ -31,7 +31,7 @@ Initial generation/refresh.
 
 - Specification: .specify/specs/012-012-review-command/requirements.md
 - Feature Index: .specify/features.md
-- Feature Detail: .specify/features/012-skill-home-workdir.md
+- Feature Detail: .specify/features/012-review-command.md
 - Quality Checklist: .specify/specs/012-012-review-command/checklists/requirements.md
 
 ## Status Tracking

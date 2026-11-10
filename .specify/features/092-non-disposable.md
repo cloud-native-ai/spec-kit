@@ -68,8 +68,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/092-non-disposable.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/092-non-disposable.md`
 - 规格：`.specify/archive/specs/092-non-disposable/requirements.md`（65 FR / 20 SC；clarify D-1…D-8）
 - 计划：`.specify/archive/specs/092-non-disposable/plan.md`（P1–P8、T-001…T-007、EP-001…008、RK-1…RK-6、Shift List、A–H 分档）
 - 任务：`.specify/archive/specs/092-non-disposable/tasks.md`

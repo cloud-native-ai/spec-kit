@@ -56,8 +56,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/065-loop-interruption-recovery.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/065-loop-interruption-recovery.md
 - Specification: .specify/specs/065-loop-interruption-recovery/requirements.md
 - Slice 065a Specification: .specify/specs/065a-state-awareness/requirements.md
 - Slice 065a Plan: .specify/specs/065a-state-awareness/plan.md

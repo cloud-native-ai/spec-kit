@@ -50,8 +50,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/087-arch-diagram-docs.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/087-arch-diagram-docs.md`
 
 ## Status Tracking
 

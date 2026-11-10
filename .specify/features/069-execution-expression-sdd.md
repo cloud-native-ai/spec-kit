@@ -57,8 +57,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/069-execution-expression-sdd.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/069-execution-expression-sdd.md`
 
 ## Related Specifications/Requirements
 

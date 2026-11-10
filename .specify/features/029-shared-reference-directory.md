@@ -43,8 +43,8 @@ Requirement `028-sdd-workflow-refactor` drafted via `/speckit.requirements` and 
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/029-glossary-mechanism.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/029-shared-reference-directory.md
 
 ## Status Tracking
 

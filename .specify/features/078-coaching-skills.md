@@ -47,8 +47,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/078-coaching-skills.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/078-coaching-skills.md
 - Spec: .specify/specs/078-coaching-skills/requirements.md
 - Checklist: .specify/specs/078-coaching-skills/checklists/requirements.md；.specify/specs/078-coaching-skills/checklists/coaching-loop-2026-10-30.md
 

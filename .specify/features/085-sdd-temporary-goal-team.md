@@ -46,8 +46,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/085-sdd-temporary-goal-team.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/085-sdd-temporary-goal-team.md
 - Requirements: .specify/specs/085-sdd-temporary-goal-team/requirements.md
 - Test Evidence: .specify/specs/085-sdd-temporary-goal-team/test-evidence/（plan/implement 阶段填充）
 

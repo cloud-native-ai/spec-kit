@@ -98,8 +98,8 @@ spec-kit 的改进侧已有「批评和自我批评」纪律：SI-3C 要求每�
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/076-decision-tension-contract.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/076-decision-tension-contract.md
 - 任务清单: .specify/specs/076-decision-tension-contract/tasks.md
 - 条款覆盖基线: .specify/specs/076-decision-tension-contract/coverage-baseline.txt
 - 设计调研：08_工具开发 `artifacts/designs/speckit-decision-dialectic/research-report.md`

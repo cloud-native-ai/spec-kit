@@ -50,8 +50,8 @@ Not yet reviewed. Registered as Draft from the clarify session of requirement 04
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/044-reduce-confirmation-flows.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/044-agent-metadata-portability.md
 - Bound requirement: .specify/specs/040-agent-metadata-portability/requirements.md
 - Bound requirement (continuation): .specify/specs/054-agent-registration-wiring/requirements.md
 - Distribution code: src/specify_cli/__init__.py (`_AGENT_LINK_DIRS`, `ensure_per_file_agent_links()`, `ensure_agent_layer_dirs()`, `copy_local_templates()`)

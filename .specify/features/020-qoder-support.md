@@ -41,8 +41,8 @@ Generated implementation plan `006-add-qoder-support/plan.md` plus Phase 0/1 des
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/020-speckit-todo-command.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/020-qoder-support.md
 - Specification: .specify/specs/006-add-qoder-support/requirements.md
 - Plan: .specify/specs/006-add-qoder-support/plan.md
 - Tasks: .specify/specs/006-add-qoder-support/tasks.md

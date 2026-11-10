@@ -121,8 +121,8 @@ Completed implementation for requirements iteration `008-create-skills-skill`: e
 - Historical Quickstart: .specify/specs/005-tool-skill-ids/quickstart.md
 - Historical Specification: .specify/specs/005-tool-skill-ids/requirements.md
 - Historical Specification: .specify/specs/013-013-skills-command/requirements.md
-- Feature Index: .specify/.specify/features.md
-- Feature Detail: .specify/.specify/features/013-portable-skill-creation.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/013-skills-command.md
 - Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——新增 run-skills 承载 /speckit.skills 缺失的 run 语义；modify 族仍由 improve-skills/merge-skills/think-skills 承载，无新 modify 技能。
 
 ## Status Tracking

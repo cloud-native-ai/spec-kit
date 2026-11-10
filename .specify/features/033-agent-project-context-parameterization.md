@@ -41,8 +41,8 @@ Not yet reviewed. Registered as Draft directly from field feedback (2026-07-21):
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/033-docs-command.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/033-agent-project-context-parameterization.md
 - Installer copy logic: src/specify_cli/__init__.py (`copy_local_templates()`)
 - Detection helper: src/specify_cli/__init__.py (`detect_tech_stack`)
 - Motivating rollout: shared/workflow/interview-walkthrough.md; reference case (project-internal): draft/case-study/01-interview-driven-ui-refactor.md

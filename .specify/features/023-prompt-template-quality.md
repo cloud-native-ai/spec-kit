@@ -37,8 +37,8 @@ Gap identified during project-intrinsic analysis. Command templates in `template
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/023-agent-framework-redesign.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/023-prompt-template-quality.md
 
 ## Status Tracking
 

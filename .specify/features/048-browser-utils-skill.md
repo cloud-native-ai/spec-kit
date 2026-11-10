@@ -38,8 +38,8 @@ browser-utils 是 Spec Kit 的浏览器自动化技能。本 Feature 承载其�
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/048-derive-command.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/048-browser-utils-skill.md
 - 需求 046: .specify/specs/046-browser-site-memory/requirements.md
 - 邻近 Feature: 013 Skills Command(技能管理编排,不含能力本体)
 

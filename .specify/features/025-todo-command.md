@@ -53,8 +53,8 @@ The TODO-in-Context discipline landed (owner: `.specify/shared/guidelines/todo-i
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/025-agent-skill-enablement.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/025-todo-command.md
 - Specification: .specify/specs/020-speckit-todo-command/requirements.md
 - Quality Checklist: .specify/specs/020-speckit-todo-command/checklists/requirements.md
 

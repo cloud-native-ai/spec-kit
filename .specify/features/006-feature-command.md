@@ -31,7 +31,7 @@ Initial generation/refresh.
 
 - Specification: .specify/specs/006-006-feature-command/requirements.md
 - Feature Index: .specify/features.md
-- Feature Detail: .specify/features/006-add-qoder-support.md
+- Feature Detail: .specify/features/006-feature-command.md
 - Quality Checklist: .specify/specs/006-006-feature-command/checklists/requirements.md
 
 ## Status Tracking

@@ -31,7 +31,7 @@ Initial generation/refresh.
 
 - Specification: .specify/specs/009-009-plan-command/requirements.md
 - Feature Index: .specify/features.md
-- Feature Detail: .specify/features/009-claude-code-support.md
+- Feature Detail: .specify/features/009-plan-command.md
 - Quality Checklist: .specify/specs/009-009-plan-command/checklists/requirements.md
 
 ## Status Tracking

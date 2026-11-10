@@ -42,8 +42,8 @@ Registered as Draft during `/speckit.clarify` for requirement 044 (2026-08-18), 
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/046-confirmation-gate-governance.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/046-confirmation-gate-governance.md
 - 交叉引用: 027 Team Management(首要落地场景)、028 Feedback Mechanism(收尾提交提示形态)、031 Glossary Mechanism(收尾术语确认非阻塞化)、041 Goal Registry(goal 写入预览门控)、047 Framework Material Hygiene(清理处置消费两级判据)
 
 ## Status Tracking

@@ -39,8 +39,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/057-decompose-command-skills.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/057-decompose-command-skills.md
 
 ## Related Specifications/Requirements
 

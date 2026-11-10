@@ -38,8 +38,8 @@ Registered from `/speckit.clarify` binding for spec 035-token-efficiency (2026-0
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/040-agent-metadata-portability.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/040-token-efficiency-discipline.md
 - Requirements Spec: .specify/specs/035-token-efficiency/requirements.md
 
 ## Status Tracking

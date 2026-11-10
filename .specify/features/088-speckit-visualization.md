@@ -74,8 +74,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/088-speckit-visualization.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/088-speckit-visualization.md
 - Spec: `.specify/specs/088-speckit-visualization/requirements.md`
 
 ### Related Specifications

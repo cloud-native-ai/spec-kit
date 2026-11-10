@@ -44,8 +44,8 @@ Probe 目前只在 feedback 域完成实体化（028 的 Class×Object 注册表
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/056-probe-handler-system.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/056-probe-handler-system.md
 
 ## Status Tracking
 

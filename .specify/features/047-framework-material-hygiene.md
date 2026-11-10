@@ -45,8 +45,8 @@ plan.md + data-model.md(5 实体:Finding/Store/Cleanup Plan/Material Root/Execut
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/047-feedback-introspection.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/047-framework-material-hygiene.md
 - 交叉引用: 037 Docs Command(docs 内容收敛移交)、008 Instructions Command(符号链接/说明文件再生成移交)、046 Confirmation Gate Governance(清理处置消费两级判据)、040 Token Efficiency Discipline(程序优先/摘要优先)
 
 ## Status Tracking

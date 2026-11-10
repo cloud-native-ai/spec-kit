@@ -48,8 +48,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/064-subagent-concurrency.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/064-subagent-concurrency.md
 - Specification: .specify/specs/064-subagent-concurrency/requirements.md
 - Quality Checklist: .specify/specs/064-subagent-concurrency/checklists/requirements.md
 - Concurrency Checklist: .specify/specs/064-subagent-concurrency/checklists/concurrency.md

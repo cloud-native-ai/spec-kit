@@ -50,8 +50,8 @@ Feature 状态**保持 Implemented**,不回退为 Planned:037 已交付能力仍
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/037-goal-registry.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/037-docs-command.md
 - 交叉引用: 047 Framework Material Hygiene(sanitize 只做 docs 引用存在性等正确性检查,内容编纂收敛移交本命令)
 
 ## Status Tracking

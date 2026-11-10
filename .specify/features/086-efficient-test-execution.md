@@ -117,8 +117,8 @@
 - Runner contract (067 RC-03): `.specify/specs/067-loop-efficiency-hardening/contracts/runner-contract.md`
 - Budget ledger parser: `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`
 - Preserved mechanisms: `.specify/specs/085-sdd-temporary-goal-team/`
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/086-efficient-test-execution.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/086-efficient-test-execution.md
 
 ## Related Specifications/Requirements
 

@@ -45,8 +45,8 @@ Created from the 025-agent-skill-enablement requirements specification. Clarifie
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/026-agent-skill-enablement.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/026-agent-skill-enablement.md
 - Specification: .specify/specs/025-agent-skill-enablement/requirements.md
 - Quality Checklist: .specify/specs/025-agent-skill-enablement/checklists/requirements.md
 

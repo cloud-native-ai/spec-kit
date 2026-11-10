@@ -52,8 +52,8 @@ Not yet reviewed. Registered as Draft during `/speckit.clarify` for requirement 
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/041-refactor-feedback-probe.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/041-goal-registry.md
 - Concept authority (read-only for this Feature): shared/definitions/goal-definitions.md (mirrored to .specify/shared/definitions/) — defines the Goal concept, its boundary against Requirement, criteria authority, singularity, and the Goal–Team binding; this Feature owns the file layout inside `<goal-slug>/`, which that document explicitly delegates.
 - Bound requirement: .specify/specs/037-goal-registry/requirements.md
 - Upstream aggregation mechanism (Feature 027 / requirement 036): .specify/specs/036-team-summary/requirements.md, skills/create-team/references/summary-mapping.md

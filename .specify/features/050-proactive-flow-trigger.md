@@ -81,8 +81,8 @@
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/050-proactive-flow-trigger.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/050-proactive-flow-trigger.md
 - 需求 050: .specify/specs/050-proactive-flow-trigger/requirements.md
 - 质量检查清单: .specify/specs/050-proactive-flow-trigger/checklists/requirements.md
 - 邻近 Feature(**消费关系,非归属**):

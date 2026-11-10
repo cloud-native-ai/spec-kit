@@ -90,8 +90,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/077-doc-sdd-integration.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/077-doc-sdd-integration.md`
 - Requirements: `.specify/specs/077-doc-sdd-integration/requirements.md`
 - Flow Class Declaration: 本条特性线的类别只写在 `.specify/specs/077-doc-sdd-integration/requirements.md` 头部区的 `**Flow Class**` 行；本文件与本特性索引至多留此指针，不复制取值（单一真源，`contracts/class-declaration.md` C-007）
 - Quality Checklist: `.specify/specs/077-doc-sdd-integration/checklists/requirements.md`

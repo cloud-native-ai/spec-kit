@@ -43,8 +43,8 @@ Generated implementation plan `009-claude-code-support/plan.md` plus Phase 0/1 d
 
 ## Related Files
 
-- Feature Index: .specify/memory/features.md
-- Feature Detail: .specify/.specify/features/021-agent-specific-config.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/021-claude-code-support.md
 - Specification: .specify/specs/009-claude-code-support/requirements.md
 - Quality Checklist: .specify/specs/009-claude-code-support/checklists/requirements.md
 - Plan: .specify/specs/009-claude-code-support/plan.md

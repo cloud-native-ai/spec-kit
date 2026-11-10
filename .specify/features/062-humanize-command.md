@@ -66,8 +66,8 @@
 
 ## Related Files
 
-- Feature Index: `.specify/memory/features.md`
-- Feature Detail: `.specify/.specify/features/062-humanize-command.md`
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/062-humanize-command.md`
 - 需求语义权威（dated record，逐字归档）: `.specify/specs/062-humanize-command/notes/source-requirement.md`
 - 实现计划与任务: `.specify/specs/062-humanize-command/plan.md`、`.specify/specs/062-humanize-command/tasks.md`
 - 契约与评估布局: `.specify/specs/062-humanize-command/contracts/`、`.specify/specs/062-humanize-command/data-model.md`
