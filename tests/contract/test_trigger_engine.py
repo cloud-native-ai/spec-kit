@@ -146,8 +146,12 @@ def ws(tmp_path: Path) -> Path:
 
 
 def run_cli(args: list, cwd: Path) -> subprocess.CompletedProcess:
+    # C-7 gives engine self-location priority over the CWD walk, so a worktree nested
+    # under another repo's `.specify/.tmp/` resolves to that repo and defeats the
+    # fixture. Name the fixture workspace explicitly; an explicit flag in `args` wins.
+    argv = list(args) if "--workspace" in args else ["--workspace", str(cwd), *args]
     return subprocess.run(
-        [sys.executable, str(ENGINE), *args],
+        [sys.executable, str(ENGINE), *argv],
         cwd=cwd, capture_output=True, text=True,
     )
 

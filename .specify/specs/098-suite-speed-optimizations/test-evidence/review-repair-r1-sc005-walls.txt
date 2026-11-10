@@ -1,0 +1,64 @@
+# SC-005 wall comparison — review-repair r1 (pre-change baseline → final tree)
+# Date: 2026-11-11; host: the slot-1 baseline host; same runner form, same day.
+# Purpose: rebuild the implement-start baseline on the implement-entry tree (A3/I3) and
+# compare it with the final tree (SC-005 restated as pre-change baseline → final tree).
+
+## Leg 1 — pre-change baseline (throwaway worktree at the implement-entry commit)
+
+- Implement-entry commit: `af73f65f1` = parent of the first implement commit `0d1f7a1e4`
+  (WP-1). `git diff --stat b3da3a26d af73f65f1 -- tests/ scripts/ pyproject.toml` is the
+  constitution version pin only (`tests/contract/test_fast_fail_discipline.py`, 3+/2-);
+  no behavior, runner or test-selection change.
+- Throwaway worktree: `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/098-prechange-af73f65f1`
+  (`git worktree add --detach <path> af73f65f1`), removed after this record.
+- Command (old runner: full selection by construction, no `--full` flag exists at this tree):
+  `bash scripts/bash/run-tests.sh --names-out /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/repair-r1/prechange-baseline-failed.txt`
+- Exit `1`; wall **76.52 s** (date +%s.%N around the invocation).
+- pytest summary: `279 failed, 8261 passed, 2 skipped, 576 warnings in 42.21s`
+- Serial-exception pass: `1 passed, 8542 deselected, 3 warnings in 18.87s`
+- Mode line: `# test runner: mode=parallel workers=auto dist=load passes=2`
+  (no tier fields — the pre-change runner selects everything).
+- `--names-out`: 279 entries → `test-evidence/review-repair-prechange-failed.txt`
+- Complete stdout/stderr: `test-evidence/run-logs/review-repair-prechange-full.log.gz`
+
+## Leg 2 — final tree (after the review-repair edits)
+
+- Command: `bash scripts/bash/run-tests.sh --full --names-out .specify/.tmp/repair-r1/final-tree-failed.txt`
+- Exit `1`; wall **70.73 s**
+- pytest summary: `254 failed, 8332 passed, 2 skipped, 576 warnings in 46.91s`
+- Serial-exception pass: `1 passed, 8588 deselected, 3 warnings in 17.91s`
+- Mode line: `# test runner: mode=parallel workers=auto dist=load passes=2 tier=full excluded_slow=0`
+- `--names-out`: 254 entries → `test-evidence/review-repair-final-failed.txt`
+- Complete stdout/stderr: `test-evidence/run-logs/review-repair-final-full.log.gz`
+
+## Ratio (SC-005's wall clause)
+
+- `70.73 / 76.52 = 0.9243` → **92.4 %**, inside the required **≤ 110 %**.
+
+## Name-level disclosure (not the SC-005 criterion; T061 carries the closure comparison)
+
+- New names vs the pre-change baseline (`comm -13`): **5** —
+  - `tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store` (slot-1 baseline name)
+  - `tests/contract/test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill` (slot-1 baseline name)
+  - `tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership` (slot-1 baseline name)
+  - `tests/integration/test_trigger_tuning.py::test_a_single_missed_flow_is_below_the_add_rule_bar` (slot-1 baseline name)
+  - `tests/contract/test_tools_inventory_ownership.py::test_no_surface_claims_it_anywhere_in_the_repo`
+    — the only name not in the recorded slot-1 baseline; isolated re-run:
+    `bash scripts/bash/run-tests.sh tests/contract/test_tools_inventory_ownership.py::test_no_surface_claims_it_anywhere_in_the_repo -q`
+    → exit 0, `1 passed in 6.25s` (load-induced, not a regression).
+- New names vs the **recorded slot-1 baseline** (`comm -13 baseline-failed.txt final-tree-failed.txt`):
+  **1** — the isolated-green `test_tools_inventory_ownership` name above.
+- Names in the slot-1 baseline but absent from the final run (`comm -23`): **34** — 27
+  `test_trigger_engine.py` names (the SC-002 fixture-isolation repair), plus
+  `test_trigger_promotion.py::test_invalid_environment_threshold_is_ignored`,
+  `test_trigger_tuning.py::test_repeated_tune_is_idempotent_in_proposal_count`,
+  `test_clause_coverage.py::test_c20_*`, `test_non_disposable_contract.py::test_t089_*`,
+  `test_non_disposable_contract.py::test_t092_*` and two further trigger names — all
+  removals (SC-005 forbids new names only), load-variation reads disclosed as such.
+
+## Budget disclosure
+
+- Slot 1 (`baseline`) is **re-constituted** on its proper pre-change tree by this repair;
+  the final-tree leg is the re-measurement the review-repair authorizes. Slot 2
+  (`closure`, T061) is untouched and remains deferred. No third budget slot is added;
+  these two legs replace the mis-timed post-WP-8 slot-1 reading (F3/A3/I3).

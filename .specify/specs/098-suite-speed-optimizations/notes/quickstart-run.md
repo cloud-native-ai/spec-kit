@@ -107,6 +107,35 @@ mode: mode=serial reason=explicit tier=fast excluded_slow=5
   `test-evidence/quickstart-s4-serial-names.txt`.
 - Teardown: name lists copied; scratch remains gitignored.
 
+### S-4 repair r1 — final-tree re-run after the fixture-isolation repair (2026-11-11)
+
+The pre-repair readings above recorded a raw `comm -13` of 2 serial-only names in
+`test_trigger_engine.py`. Review-repair r1 fixed the root cause (the engine's C-7
+self-location defeated the pytest fixture in this nested worktree, so the file wrote the
+parent repo's trigger store and raced/flipped across arms; see
+`test-evidence/review-repair-r1-trigger-fix.txt`). Re-run on the repaired final tree:
+
+```text
+$ bash scripts/bash/run-tests.sh --workers 4 tests/contract --names-out <scratch>/s4r-par-names.txt -q
+exit 1, wall 175.76 s, summary 137 failed, 6781 passed, 2 skipped in 150.68 s
+mode: mode=parallel workers=4 dist=load passes=2 tier=fast excluded_slow=5
+
+$ bash scripts/bash/run-tests.sh --serial tests/contract --names-out <scratch>/s4r-ser-names.txt -q
+exit 1, wall 557.04 s, summary 137 failed, 6782 passed, 2 skipped, 5 deselected in 553.16 s
+mode: mode=serial reason=explicit tier=fast excluded_slow=5
+```
+
+- `comm -13` (serial-only): **0**; `comm -23` (parallel-only): **0** — the criterion's
+  reading now holds on the final tree, one run per arm, no retry.
+- Both lists carry 137 names and are set-equal; the two former serial-only names
+  (`test_c20_new_session_is_not_suppressed`, `test_c21_auto_execute_is_only_a_flag`) pass
+  in both arms after the repair.
+- Record: `test-evidence/review-repair-r1-sc002-comm.txt`; lists
+  `test-evidence/review-repair-s4-parallel-names.txt` /
+  `test-evidence/review-repair-s4-serial-names.txt`; logs
+  `test-evidence/run-logs/review-repair-s4-parallel.log.gz` /
+  `test-evidence/run-logs/review-repair-s4-serial.log.gz`.
+
 ## S-5 — Session cache build count and mutation drill
 
 Adaptation (recorded): the default tier now excludes the five slow-marked corpus cases, so

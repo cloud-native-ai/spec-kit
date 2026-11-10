@@ -18,6 +18,12 @@ selection with `--full` (tier-selection C-001 / C-006: the full tier keeps 086's
 unchanged). The selection-integrity reading is therefore re-derived against a real base-commit
 tree extraction — section 2 — so a lost or renamed test cannot hide behind the timing.
 
+**Superseded for SC-005 by review-repair r1 (2026-11-11, A3/I3)**: a true pre-change baseline was
+rebuilt on a throwaway worktree at the implement-entry commit (`af73f65f1`, parent of the first
+implement commit `0d1f7a1e4`) and re-measured against the final tree — see **§ 7 below**. The
+section-1 slots below remain the implement-stage readings and the `--names-out` source for
+`baseline-failed.txt`; the SC-005 wall comparison uses § 7's pair.
+
 ## 1. Slot 1 of 2 — full-suite budget run
 
 - Command: `bash scripts/bash/run-tests.sh --full --names-out .specify/.tmp/wp9/baseline-failed.txt`
@@ -8638,3 +8644,45 @@ tests/unit/test_wp_report.py::test_report_rejects_negative_intervention_inputs
   lines are not call sites — the AST census behind `test-evidence/inprocess-conversion.md` owns the
   final denominator).
 - Post-change context (same command at `HEAD`): `359` source lines in `160` files.
+
+## 7. Review-repair r1 — rebuilt pre-change baseline → final tree (SC-005's referent)
+
+- Date: 2026-11-11; same host as the slot-1 readings; same runner form on both legs.
+- **Why**: A3/I3 — the slot-1 run in § 1 executed at WP-9 on the post-WP-8 tree, so the
+  original "≤ 110 % of the baseline" reading compared post-change against post-change. This
+  section re-constitutes slot 1 on its proper pre-change tree and re-measures the final tree.
+- **Rebuild tree**: throwaway worktree `git worktree add --detach
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/098-prechange-af73f65f1 af73f65f1`
+  (implement-entry commit = parent of the first implement commit `0d1f7a1e4`).
+  `git diff --stat b3da3a26d af73f65f1 -- tests/ scripts/ pyproject.toml` = the constitution
+  version pin in `tests/contract/test_fast_fail_discipline.py` only — the tests, runner and
+  selection surface equal the base commit. The worktree was removed after its run.
+- **Pre-change leg**: `bash scripts/bash/run-tests.sh --names-out
+  <scratch>/prechange-baseline-failed.txt` (the old runner selects everything by
+  construction — no `--full` flag exists at that tree) → exit `1`, wall **76.52 s**,
+  `279 failed, 8261 passed, 2 skipped, 576 warnings in 42.21s`; serial-exception pass
+  `1 passed, 8542 deselected in 18.87s`; `mode=parallel workers=auto dist=load passes=2`.
+  Names: `test-evidence/review-repair-prechange-failed.txt` (279 entries); full output
+  `test-evidence/run-logs/review-repair-prechange-full.log.gz`.
+- **Final-tree leg**: `bash scripts/bash/run-tests.sh --full --names-out
+  <scratch>/final-tree-failed.txt` → exit `1`, wall **70.73 s**,
+  `254 failed, 8332 passed, 2 skipped, 576 warnings in 46.91s`; serial-exception pass
+  `1 passed, 8588 deselected in 17.91s`; `mode=parallel workers=auto dist=load passes=2
+  tier=full excluded_slow=0`. Names: `test-evidence/review-repair-final-failed.txt`
+  (254 entries); full output `test-evidence/run-logs/review-repair-final-full.log.gz`.
+- **Ratio**: `70.73 / 76.52 = 92.4 %` ≤ **110 %** — SC-005's wall clause holds with a genuine
+  pre-change referent.
+- **Name disclosure** (not SC-005's criterion; T061 owns the closure comparison):
+  `comm -13 prechange final` = 5, of which 4 are slot-1 baseline names and
+  `test_tools_inventory_ownership.py::test_no_surface_claims_it_anywhere_in_the_repo` re-runs
+  green in isolation (`1 passed in 6.25s`, load-induced); `comm -13` against the **recorded**
+  slot-1 baseline = 1 (that same isolated-green name); `comm -23` = 34 removals (27
+  `test_trigger_engine.py` names from the SC-002 fixture-isolation repair plus load-variation
+  reads — removals only, no violation).
+  Full record: `test-evidence/review-repair-r1-sc005-walls.txt`.
+- **SC-005 restatement**: the criterion's wall clause is read as **pre-change baseline →
+  final tree** (this section's pair). Its two-slot-completeness clause remains with T061
+  (slot 2 `closure`), which stays deferred; SC-005's verification status is therefore
+  `partial` with the ladder fields in `verification.md`.
+- **Budget**: no third slot. Slot 1 is re-constituted on its proper tree; the final-tree leg is
+  the repair's authorized re-measurement; slot 2 (T061) is untouched.
