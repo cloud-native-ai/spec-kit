@@ -36,7 +36,7 @@
 
 <!--
   ACTION REQUIRED for /speckit.plan:
-  Do NOT hard-code principle names here. Instead, read `.specify/memory/constitution.md`,
+  Do NOT hard-code principle names here. Instead, read `.specify/constitution.md`,
   enumerate every heading matching `### <roman-or-arabic-numeral>. <name>` (e.g.
   `### I. Template-First Architecture`, `### IV. Test-First Development`), and render
   ONE row in the table below per principle in the exact order they appear in the
@@ -49,7 +49,7 @@
   - Evidence (one-line citation pointing at the design artefact that demonstrates compliance)
 -->
 
-**Core Principles Compliance** (rendered from `.specify/memory/constitution.md`):
+**Core Principles Compliance** (rendered from `.specify/constitution.md`):
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
@@ -65,7 +65,7 @@
 
 *Owner of the record shape, the admissibility criteria, the rejection forms and the load-bearing
 threshold: `.specify/shared/guidelines/decision-tension.md` — one pointer, read from the repository
-root (the same form this template uses for `.specify/memory/constitution.md`); a plan artifact lives
+root (the same form this template uses for `.specify/constitution.md`); a plan artifact lives
 under `.specify/specs/<key>/`, so a plan-directory-relative link would resolve to a path that does
 not exist. This section lists the field names and points at that file — it MUST NOT restate the
 criteria table, the rejection list or the threshold table.*

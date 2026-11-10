@@ -20,7 +20,7 @@ Calling surface (contract `contracts/closure-acceptance-check.contract.md` C-01�
   --repo <root>             Single-feature mode: repository root for repo-relative path resolution
                             (default: the checkout this script lives in). Audit mode: the audited
                             root itself (default: the current working directory), whose registry
-                            is read from `<root>/.specify/memory/features.md` (C-02/C-04).
+                            is read from `<root>/.specify/features.md` (C-02/C-04).
   --feature-detail <path>   The claimed feature status, read from a feature detail file.
   --feature-registry <path> The claimed feature status, read from a registry file. Either flag
                             may be given; when neither is, the status is resolved from the spec
@@ -546,7 +546,7 @@ def resolve_claimed_status(resolved):
        `feature-registry.md`). `data-model.md` § Fixture set declares the feature detail and the
        registry row to be part of each declarative fixture's file set, so a fixture directory
        carries its claim exactly the way a real spec directory carries its artifacts;
-    4. the repository registry (`.specify/memory/features.md`) by the spec directory's key.
+    4. the repository registry (`.specify/features.md`) by the spec directory's key.
 
     A caller that names a carrier explicitly (1, 2) is never silently overruled; step 3 is what
     makes a fixture — whose key is not a registry row — still have a determinable claim.
@@ -571,7 +571,7 @@ def resolve_claimed_status(resolved):
         if status is not None:
             return status, str(local_registry)
 
-    repo_registry = Path(resolved["repo"]) / ".specify" / "memory" / "features.md"
+    repo_registry = Path(resolved["repo"]) / ".specify" / "features.md"
     if repo_registry.is_file():
         status = _registry_status(repo_registry, feature_key(spec_dir))
         if status is not None:
@@ -1647,17 +1647,17 @@ def run_audit(args):
     if args.spec_dir:
         raise InputError(
             "--spec-dir is not an audit input: --audit-existing audits a repository root given "
-            "by --repo and reads <root>/.specify/memory/features.md (C-02/C-04); drop --spec-dir "
+            "by --repo and reads <root>/.specify/features.md (C-02/C-04); drop --spec-dir "
             "to audit, or drop --audit-existing to check one feature's directory"
         )
 
     repo = Path(os.path.abspath(args.repo)) if args.repo else Path(os.getcwd())
     if not repo.is_dir():
         raise InputError("repo root not found: %s" % repo)
-    registry = repo / ".specify" / "memory" / "features.md"
+    registry = repo / ".specify" / "features.md"
     if not registry.is_file():
         raise InputError(
-            "audit registry not found: %s (--audit-existing reads <root>/.specify/memory/"
+            "audit registry not found: %s (--audit-existing reads <root>/.specify/"
             "features.md under the root given by --repo)" % registry
         )
     if args.json_out:
@@ -1810,7 +1810,7 @@ def main(argv=None):
     parser.add_argument("--feature-registry", default=None,
                         help="feature registry file carrying the claimed status")
     parser.add_argument("--audit-existing", action="store_true",
-                        help="read-only audit of <repo>/.specify/memory/features.md's "
+                        help="read-only audit of <repo>/.specify/features.md's "
                              "Implemented-family rows; zero writes, exit 0 whenever the "
                              "inputs parse (C-10/C-11)")
     parser.add_argument("--json", action="store_true",

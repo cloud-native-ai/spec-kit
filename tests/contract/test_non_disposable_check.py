@@ -827,7 +827,7 @@ def _repair_stale(tree):
         (tree / relpath).unlink()
 
 
-STATUS_REGISTRY = ".specify/memory/features.md"
+STATUS_REGISTRY = ".specify/features.md"
 
 
 def _create_status(tree):
@@ -836,7 +836,7 @@ def _create_status(tree):
     _write(tree, STATUS_REGISTRY,
            "| ID | Name | Description | Status | Feature Details | Spec Path | Last Updated |\n"
            "|----|------|-------------|--------|-----------------|-----------|--------------|\n"
-           "| 900 | fixture | a fixture row | Implemented | `.specify/memory/features/900.md` "
+           "| 900 | fixture | a fixture row | Implemented | `.specify/features/900-900.md` "
            "| `.specify/specs/900-fixture/requirements.md` | 2026-11-09 |\n")
     _write(tree, ".specify/specs/900-fixture/verification.md",
            "# Verification — 900-fixture\n\n| SC | Path | Status | Evidence |\n"

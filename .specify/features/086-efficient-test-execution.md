@@ -1,0 +1,178 @@
+# Feature Detail: 测试高效执行（默认并发）
+
+**Feature ID**: 086
+**Name**: Efficient Test Execution (Concurrent by Default)
+**Description**: 让 spec-kit 测试套件默认以进程级并行执行（并行引擎可用时），同时保留显式串行开关、缺引擎自动回退与嵌套运行保护，并使失败名清单在两条路径下可比；把「测试覆盖是必要条件而非充分条件、测试执行效率是同层级质量属性」固化为随框架分发的原则（owner 指南 + constitution 模板/live + instructions 模板/live + 生成器 MUST-include 条目）；扩展驱动预算台账解析器识别并行参数；保留并使用 085 的临时 Goal/Team 与多 agent 并发机制作为本次运行的真实场景 dogfood。
+**Status**: Ready for Review
+**Created**: 2026-11-06
+**Last Updated**: 2026-11-06（review 阶段完成——`Implemented → Ready for Review`，见下方 § Latest Review 与 § 当前状态裁定；`review.md` + `code-review.md` 落盘，四段全 pass，ARC `agree`）；2026-11-06（implement 阶段完成——见下方 § Status Tracking 的当前状态裁定与 `verification.md`）；2026-11-06（tasks 阶段完成：`tasks.md` 生成 56 行任务（Tests Mode ON；C-001…C-052 每条款恰一个 `[green:]` 载体；19 条变异腿逐腿有载体任务，汇总表见 `tasks.md` § Mutation Leg Carriers；DoD/GATE/DoD-2 全部有行），`validate-tasks.py` = 0 error 0 warning，`decomposition --mode tasks` = proceed（33 FR / 56 任务，上限 60 / 80）；同阶段补入 H-01…H-05 修复前的基线槽位 T001a 与两槽预算记账行 T014b。checklist 阶段完成：`checklists/requirements.md` 44 条检查项（44/44 带 `Req §` 或 `Gap` 归属），软上限 40 被有意超出 4 条并已在文件 `## Notes` 记录理由；门禁记录见 `test-evidence/checklist-gates.txt`。analyze 阶段完成：阻塞发现 C-01（契约条款缺 FR 引用，FR 覆盖率 30/33）与 H-01…H-05、M/L 级发现已由驱动者的 analyze 修复 pass 逐项处置，`account-clause-coverage.py` 恢复 status=ok / fr-uncovered 0。plan 阶段完成：plan.md / research.md / data-model.md / contracts/ / quickstart.md / feature-ref.md 落盘；19 条 Constitution Check 全 Pass；3 条决策张力 T-001…T-003；10 条执行前提 EP-001…EP-010 全部 verified；1 条继承 blocker（085 SC-010 → inherited，carrier gate:GATE-086）；9 个工作包分 3 个并发切片；`pre-analyze --stage plan` decision=pass；无源码/模板/测试改动；085 面未触碰。clarify 阶段完成：Related Feature 已绑定 Feature 086；requirements 澄清追加 4 条 Q/A + A13–A19，FR/SC/STR 计数不变；`validate-requirements.py` = ok；`overlap-check` = clear；无源码改动，085 面未触碰）
+
+## Overview
+
+本特性解决两件不同层级但同源的问题。
+
+**一、执行模型**。当前 canonical 运行器（`scripts/bash/run-tests.sh`）单进程串行跑完整套件；post-pull 实测完整串行 1031.48 s / 19 failed，同一 runner 同一 `--names-out` 口径下 `-n auto` 为 201.87 s / 20 failed，加速比约 5.1×，唯一新增失败名为 watch-target 自测（并行负载下超过其 60 s 超时，串行约 28 s）。实测同时确认本套件没有 async 可并行的对象（0 个 async 测试函数、167 个测试文件使用子进程），因此并发机制是**进程级并行**而非异步。
+
+**二、原则层**。用户的要求不止于此：任何构建测试框架/用例的项目都必须考虑「测试不仅能覆盖，还要能高效执行」。这条原则必须进入随框架出厂的那一层——constitution（模板 + live）、instructions（模板 + live）、生成器的 MUST-include 清单——否则下游项目拿不到。因此本特性同时新增一份 owner 指南，单一持有该原则的判据（进程级并行 vs 异步并发的选择、测量方式、反模式），其余四处只持指针。
+
+**三、保留义务与 dogfood**。085 建立的临时 Goal/Team、阶段专用 agent、默认 24 并发、worktree 写入隔离、集成队列与阶段 checkpoint 必须原样保留；本特性自身这次 SDD 运行就是它们的真实场景验证，为 085 SC-010（此前为 `partial`，缺完整 8 阶段带 LLM 阶段 agent 的运行）提供证据。所有对 085 面的改动必须是 additive，历史记录只读。
+
+**并行安全的写法**：本次实测的失败名差集只有一项，因此 requirements 把并行安全写成「判据 + 实测差集」（差集必须为空；非空项逐项处置为修根因 / 具名串行例外 / 归入既存失败），而不是预先假设一串会坏的测试。没有证据的项不修。
+
+## Latest Review
+
+2026-11-06 `/speckit.review` 完成，状态 `Implemented → Ready for Review`。完整记录见
+`.specify/specs/086-efficient-test-execution/review.md`（四段 + Acceptance Reality Check）与
+`.specify/specs/086-efficient-test-execution/code-review.md`（代码段逐文件覆盖回执）。
+
+- **四段裁定**：process **pass** / artifact **pass**（期望集 13 成员，`13 / 13` 已查、缺失 `none`）/
+  implementation **pass**（smoke 三件套：命令原文 + exit `0` + `test-evidence/smoke-086.txt`）/
+  code **pass**（`113 / 113` 已判、`0` 跳过、`0` 缺口，`blocking` 0 条，gate `allow`）。
+- **Acceptance Reality Check**：`closure-acceptance-check.py` 的 `final_path` 记录逐字复制为
+  `pass 8 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 8`，与本文件
+  § Status Tracking 的自述比较结果为 **`agree`**，未被本阶段改写。
+- **转移四条件**（`.specify/templates/feature-details-template.md` § Canonical Status State Machine）
+  逐条成立：`deferred_tasks=` 为空；review 证据已产出（上述两份记录）；代码段记录 `blocking` = 0；
+  SC-001…SC-008 全部 `pass`，无未豁免的 blocked/deferred/fail。无任何豁免。
+- **发现计数**：进程族 P0 0 / P1 8（F1、F2、F5、F6、F7、F9、F10、F11）/ P2 5（F3、F4、F8、F12、F13）；代码族 `blocking` 0 / `important` 2 / `suggestion` 1 /
+  `question` 1。两条 `important`（F10 指针形态漂移、F11 六面守卫看不见该漂移）已在 `review.md` § 3
+  就地作答，不阻塞转移。
+- **未重跑全量套件**：T047 收口槽已是本特性的最后一次全量读数，本次只按名复核（两向差集皆空、19 名）
+  并在实现段跑一次定向下探（`84 passed in 8.63s`，exit 0），未消耗第三个槽。
+- **085 面零写入**：review 不改 085 任何路径，SC-010 的 review 记录缺口仍由 GATE-086 承接。
+
+2026-11-06 `/speckit.plan` 完成，状态 `Draft → Planned`：
+
+- **产物**：`plan.md`（19 行动态 Constitution Check 对照 live v1.16.0，无 Fail/Partial；§ Decision Tensions T-001…T-003；§ Execution Premises EP-001…EP-010；§ Inherited Blockers 1 行；§ Risks R-1…R-9；§ Work Packages 9 个包分 A/B 两个并发切片 + C 集成切片）、`research.md`（B-1…B-9 实测基线、R-1…R-10 裁决、9 行重测清单）、`data-model.md`（E-1…E-10 / V-1…V-22 / SM-1…SM-3）、`contracts/`（4 文件 / C-001…C-052 / 19 条变异腿）、`quickstart.md`（S-0 已实测 + S-1…S-8 route (b)）、`feature-ref.md`（21 行交付面 + 7 条披露裁决）。
+- **门禁**：`validate-decision-tensions` ok（3 条记录、0 error）；`pre-analyze --stage plan` **pass**（errors=0，advisories=25 全为 implement 才创建的路径）；`decomposition --mode plan` proceed（fr=33 ≤ 60，单包）；`doc-consistency --action structure` not-applicable（执行类）；`overlap-check` decision=overlap，经裁决为**治理面的叠加共存**（13 个不同 (spec, path) 对，均为单一所有者名单/章节类文件；新增 owner 指南路径被其他任何特性命中 0 次）；镜像 `--check` 零漂移；门禁扫描 total 27 对冻结基线 23 的既有漂移记为 EP-008。
+- **边界**：本阶段不改源码、模板、测试；085 的 goal/team/checkpoints/contracts 与历史零改动（`git diff --name-only` 为空）；临时 Team 仍由驱动者在 plan U4 后创建（085 C-008）。
+- **披露**：watch-target 测试 id 由派发简报的 `test_c24` 更正为实存 `test_c22_watch_target_hook_selftest`；门禁扫描判据取「不超过改动前的 27」而非「等于冻结的 23」（两条断言等值的守卫测试在串行基线上已是红的）；同源评审（same-author）在本承载下为直接受限阅读，已在 `research.md` R-10 具名标注。
+
+## Key Changes
+
+1. **运行器执行模型**：canonical 运行器由「串行默认」改为「并行引擎可用时默认并行」，新增 `--serial`、`--workers N|auto`、`SPECKIT_TEST_WORKERS`，嵌套运行自动串行，缺引擎自动回退并在 stderr 给出具名说明；保留 `--names-out`、stderr 头部、退出码与 `comm -13` 注释行纪律。
+2. **并行安全**：默认并行运行相对串行运行的失败名差集必须为空；非空项逐项处置，串行例外必须具名、可枚举、可复核，禁止 skip / xfail / 重跑碰运气 / 缩小 selection。
+3. **依赖边界**：并行引擎为仅开发侧依赖，CLI 运行时依赖集合不变；Python 3.8 下游拿不到引擎属正常路径，由自动回退承接。
+4. **原则四件套**：新增 owner 指南 `shared/guidelines/test-execution-efficiency.md`；constitution 模板与 live 各加一条原则（编号各自独立）；instructions 模板与 live 各加一个常驻章节；生成器 MUST-include 清单加一条。四处均为指针形态。
+5. **计数与预算守卫**：新增原则引起的原则数、常驻章节数、指令字节预算与 MUST-include 条目数在同一变更中更新。
+6. **预算台账**：`audit-test-budget.py` 的参数识别扩展到并行相关开关（进程数及其长形式、分布式策略、最大进程数），使显式并行的全量运行不被台账丢弃，且既有记录的解析结果不变。
+7. **085 保留与 dogfood**：不删除、不禁止、不绕过、不重写 085 的 goal/team/checkpoints/contracts 与历史；本次运行留下临时 Goal/Team、每阶段 checkpoint、requested/effective 并发与至少一个阶段实际并发数 > 1 的证据；085 SC-010 依证据更新（完整才 pass）。
+8. **记录与文档**：特性索引/详情、`CHANGELOG.md` 与开发文档的跑测说明与新默认行为一致。
+
+## Implementation Notes
+
+- **同口径才可求差**：串行与并行必须用同一 runner、同一 selection、同一 `--names-out` 口径比较；基线记**名称**而不是只记计数（仓库既有教训：计数相等会掩盖成员变化）。
+- **降级串行不是预算证据**：067 RC-03 的授权形式是「采纳并行后，同一命令去掉并行参数仍是一次完整可跑运行」；违反这一点的"更快"不成立。
+- **串行例外的形态**：任何例外必须是具名、可枚举、可复核的标记，理由必须是并行特有的（负载、共享状态、超时），不得以"它偶尔红"为由。
+- **原则不复制**：constitution/instructions 中的条目只能是指针，实体判据只在 owner 指南里；instructions 常驻章节不得内联 owner 指南的二级标题。
+- **085 面只读**：本特性的所有改动对 085 的机制、契约与历史必须是 additive；dogfood 证据取自实际派发记录，不取自声明值。
+
+### 实现期实测与裁决（2026-11-06 implement）
+
+- **收口口径**：同一 runner、同一 selection、同一 `--names-out`；**记名称不记计数**。slot-1 串行基线
+  `19 failed, 7475 passed, 7 skipped in 687.41s`（`test-evidence/baseline.txt`）；slot-2 并行收口
+  `19 failed, 7535 passed, 7 skipped in 284.12s` + 串行例外 pass `1 passed, 7561 deselected in 35.22s`
+  （`test-evidence/closure-diff.txt`）。`comm -13` 与 `comm -23` 两向皆空，`final-failed.txt` 恰 19 名。
+  passed 数差 60 是两条路径的 collect 口径差（串行例外在并行 pass 中被 `-m "not serial"` 排除、在串行 pass 中重跑），
+  不是成员变化——差集为空才是判据。
+- **并行安全处置**：默认并行相对串行的失败名差集为**空**，因此没有修根因项、没有具名串行例外新增；
+  唯一既有例外是 watch-target 自测，以注册的 `@pytest.mark.serial` 具名、可枚举、可复核（`test-evidence/parallel-safety.txt`）。
+- **两槽预算**：只花两个全量槽（T050 基线、T047 收口）。T014 / T016 两臂 / M-16 真实套件负载两轮为具名
+  `out-of-slot-exception`，T044 复用 T047 的快照夹逼，T040 是五文件定向重跑——逐行账见
+  `test-evidence/full-run-budget.md`。**一次已披露的返工**：T047 第一次尝试为 `slot-2-in-slot-rerun-attempt`
+  （触发因是本包自己的沙箱 worktree 落在仓库根内，被 `_md_files()` 遍历看见，`21 failed`；移除后
+  `test_isomorphism_map.py` `27 passed` 反证），清理后重跑得到上表的 slot-2 记录，基线未重取。
+- **A13 调度决策**：代表两臂（默认 `-n auto --dist load` vs `-n 8 --dist loadfile`）失败名完全相同、新名 0，
+  且替代臂不快（204.99 / 201.34 = 1.02×）——**默认保持 `load`**，不加 worker cap。
+- **原则四件套**：owner 指南 `shared/guidelines/test-execution-efficiency.md` 单持判据；constitution 模板/live
+  各加一条原则（模板 19 / live 20），instructions 模板/live 各加一个常驻章节（模板 33 / live 34，
+  live `34,685 B` ≤ 预算 `34,816 B`，余 131 B）；四处均为指针形态，未内联 owner 指南标题
+  （`test-evidence/mirror-parity.txt`）。
+- **无新增机制**：`skills/` 唯一新增为 `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`（US5 要求的
+  解析器扩展，非技能条目模板）；`templates/commands/` 零改动；CLI 运行时依赖集合在 HEAD 与 merge-base
+  `24cb4edc` 上读数完全一致（`test-evidence/no-new-machinery.txt`）。
+- **状态裁决**：`closure-acceptance-check.py` 判 **accept**（exit 0，`reasons` 为空，`final_path`
+  pass 8 / total 8 / unknown 0，四项完成条件全 true，无任何豁免）。按
+  `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate 转 **Implemented**。
+  **披露**：本文件与 `features.md` 在运行裁决前曾按预期写过 `Blocked`（当时估计 085 的 `partial`
+  会作为继承缺口挡住收口）。实际裁决是 accept —— 检查器对 `inherited` 行的判据是**载体可解析**
+  （`gate:GATE-086` 在 `tasks.md` 中解析成立），而不是"依赖方的该行已转 pass"；该行的可解析性已用
+  反证确认过（清空 carrier、或改成 `gate:GATE-999`，均立即产生
+  `inherited-blocker-undisposed: 085:SC-010_status`）。所以按检查器的结论落地 `Implemented`，
+  而 085 SC-010 仍如实保持 `partial`，其缺口由 GATE-086 承接、留待 review 阶段补齐。这正是
+  "继承 blocker 未被处置才 block、如实记录即可 accept" 的设计意图，不是被豁免掉的缺口。
+  **未上移**到 `Ready for Review`：该转移是 `/speckit.review` 的门，四条件尚未成立（review 证据未产出）。
+
+## Future Evolution Suggestions
+
+- parked TODO `.specify/memory/todo/20261030-suite-speed-optimizations.md` 的其余四项（slow marker、会话缓存、去 sleep、进程内直调）在本特性之外，可在并行默认稳定后逐项评估。
+- 若后续实测证明个别测试的并行不安全是结构性的（同一路径写、共享全局状态），可考虑把串行例外升级为可枚举的清单文件，并为其建立守卫。
+
+## Related Files
+
+- Requirements: `.specify/specs/086-efficient-test-execution/requirements.md`
+- Gate evidence: `.specify/specs/086-efficient-test-execution/test-evidence/requirements-gates.txt`
+- Quality checklist: `.specify/specs/086-efficient-test-execution/checklists/requirements.md`
+- Canonical runner: `scripts/bash/run-tests.sh`（及运行时镜像 `.specify/scripts/bash/run-tests.sh`）
+- Runner contract (067 RC-03): `.specify/specs/067-loop-efficiency-hardening/contracts/runner-contract.md`
+- Budget ledger parser: `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`
+- Preserved mechanisms: `.specify/specs/085-sdd-temporary-goal-team/`
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/086-efficient-test-execution.md
+
+## Related Specifications/Requirements
+
+- `.specify/specs/086-efficient-test-execution/requirements.md` — 本 Feature 的唯一规格。2026-11-06 `/speckit.clarify` Mode A 绑定 Feature 086（不新建、不改号）；绑定理由：该规格交付的运行器执行模型升级、测试执行效率原则四件套、台账解析器扩展与 085 机制 dogfood，正是本 Feature 索引行定义的能力域。
+
+## Status Tracking
+
+- **Draft**: 特性行写入索引，`requirements.md` 存在。
+- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 存在且 Constitution Check 无未解释的 Fail。
+- **Implemented**: `tasks.md` 零开放行、每个 SC 有状态行、所有 `final` 路径 SC 为 `pass`、smoke 记录为 `pass`（四条件合取）。
+- **Blocked**: 任务已关但至少一个 `final` 路径 SC 不是 `pass`。
+- **Ready for Review**: review 门四条件合取（deferred 任务已处置、review 证据已产出、代码段记录无 `blocking`、`final` 路径 SC 无未豁免的 blocked/deferred/fail）。**（当前状态）**
+- **Completed**: 人工/治理最终接受。
+
+### 当前状态裁定（2026-11-06 implement 收口）
+
+`**Status**: Implemented`，依据 `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate 第 5 条：
+
+- 前置检查 1–4 全部通过：`tasks.md` 56 行零开放（`grep -cE '^- \[[ >]\]'` = 0）、SC-001…SC-012 每条都有
+  `SC-NNN_status` 行、`deferred_tasks=` 为空（无 `[~]` 行）；
+- 检查 5 的裁决者是 `closure-acceptance-check.py`，它返回 **accept**（exit 0，`reasons` 为空，
+  `final_path` pass 8 / total 8 / unknown 0，四项完成条件全 true）。本特性 SC-001…SC-012 **全部** `pass`；
+  085 的 `SC-010` 仍是 `partial`，但那是**依赖方**的记录，本特性的处置是把该行按 `inherited` 承接给
+  `gate:GATE-086`（`plan.md` § Inherited Blockers 第 1 行），而检查器对 `inherited` 行的判据是载体可解析、
+  不是依赖方该行已 pass；
+- 因此本特性落地 **`Implemented`**，未使用任何豁免。**披露**：裁决前本文件与 `features.md` 曾按预期先写成
+  `Blocked`（当时估计继承缺口会挡住收口），实测裁决为 accept 后已改正；该行的可解析性另作反证确认
+  （清空 carrier 或改成 `gate:GATE-999` 都立即产生 `inherited-blocker-undisposed: 085:SC-010_status`）；
+- **未**上移到 `Ready for Review`：那是 `/speckit.review` 的门，其四条件尚未成立。085 SC-010 的 review
+  阶段记录与 checkpoint 仍待补齐。
+- 完整裁决原文与九行门禁输出见 `.specify/specs/086-efficient-test-execution/verification.md` 与
+  `test-evidence/completion-gate.txt`。
+
+### 当前状态裁定（2026-11-06 review 收口）
+
+`**Status**: Ready for Review`，依据 `.specify/templates/feature-details-template.md` § Canonical Status
+State Machine 的 `Implemented → Ready for Review` 四条件合取（owner 为
+`shared/workflow/acceptance-hardening.md`）：
+
+- **条件 1（deferred 任务已处置或已豁免）**：`tasks.md` 的 `deferred_tasks=` 为空，无 `[~]` 行——
+  无 deferred 需要处置，条件空真成立。
+- **条件 2（review 证据已产出）**：`.specify/specs/086-efficient-test-execution/review.md`（四段全 pass +
+  ARC 槽）与 `code-review.md`（`coverage-receipt`: `changed_files=113 judged_files=113 skipped_files=0
+  gap_files=0 blocking_entries=0 verdict=pass`）均已落盘并随本次提交入库。
+- **条件 3（代码段记录无 `blocking`）**：`code-review.md` 的收据 `blocking_entries=0`；
+  `report --summary --file code-review.md --format json` 返回 `"gate":"allow"`、exit 0（红路径另在临时副本上
+  反证过：注入一条 `blocking` 即返回 `"gate":"deny"`、exit 1）。
+- **条件 4（`final` 路径 SC 无未豁免的 blocked/deferred/fail）**：`closure-acceptance-check.py` 的
+  `final_path` 记录为 `pass 8 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 8`，
+  与本文件 § Status Tracking 的自述比较结果 `agree`；未使用任何豁免。
+- **未上移到 `Completed`**：那是人工/治理最终接受，非本阶段权限。
+- 085 SC-010 保持 `partial`——它是依赖方的记录，其 review 阶段记录缺口由 GATE-086 承接，review 阶段
+  **未写入任何 085 路径**（FR-027 授权的四行 carve-out 已在 implement 用掉）。
+
+### Canonical Status State Machine (single source of truth)
+
+本文件不复述转换表。状态的唯一 owner 是 `shared/workflow/acceptance-hardening.md` § Feature Status / § Verification Vocabulary / § Gates；本仓的载体投影见 `.specify/templates/feature-details-template.md` § Canonical Status State Machine。两者不一致时以 owner 为准，本文件即为陈旧。

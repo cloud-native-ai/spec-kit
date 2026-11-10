@@ -40,7 +40,7 @@ Feature 081 把 spec-kit 的 `Implemented` 从「任务勾完 + 每条 SC 有一
 | 最终评审 | `.specify/specs/081-acceptance-hardening/review.md` |
 | 闭环载荷 | `.specify/specs/081-acceptance-hardening/test-evidence/closure-verdict-081d.json` |
 | 基线对照 | `.specify/specs/081-acceptance-hardening/test-evidence/081d-final-baseline-2.txt` |
-| 特性登记 | `.specify/memory/features/081.md` |
+| 特性登记 | `.specify/features/081-acceptance-hardening.md` |
 
 ## 剩余具名缺口（未计 pass）
 

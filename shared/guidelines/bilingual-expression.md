@@ -22,7 +22,7 @@
 
 「定义处」的可判定信号清单封闭为 S1…S4；信号清单之外的新形态不在检查器判定范围，由评审面承担，本文件下次修订时补信号。
 
-- **S1** 词汇表表体行：`.specify/memory/glossary.md` 词条表的表体行（Canonical 登记处）。
+- **S1** 词汇表表体行：`.specify/glossary.md` 词条表的表体行（Canonical 登记处）。
 - **S2** 覆盖定义面文档的章节标题行：覆盖面清单（见 § 覆盖定义面（封闭集））内文档的 `## ` 标题行。
 - **S3** prose 中加粗引导定义行：`**<词条>**` 紧接半角括号/破折号/冒号的行。
 - **S4** 文档主语言声明行与无声明时的保守缺省：声明优先；无声明时取正文 CJK/拉丁字母占比高者为主语言。
@@ -58,10 +58,10 @@
 
 下列定义面 MUST 双语（信号见 § 定义处与可判定信号）；封闭集增删只能经本文件修订（FR-007 封闭集纪律），任何消费方 MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复述本清单条目。
 
-- 词汇表条目 Canonical：`.specify/memory/glossary.md` 全部词条。
+- 词汇表条目 Canonical：`.specify/glossary.md` 全部词条。
 - `shared/definitions/` 概念条目。
 - `shared/guidelines/` 与 `shared/workflow/` 文档的标题与定义行。
-- 宪法原则标题：`.specify/memory/constitution.md` 的编号原则标题。
+- 宪法原则标题：`.specify/constitution.md` 的编号原则标题。
 - instructions ambient 小节标题：`.specify/instructions.md` 的 `## ` 小节标题。
 - `templates/` 章节标题。
 - 命令与技能名首次定义处的承载文件。
@@ -85,7 +85,7 @@
 ## 一致性与词汇表
 
 - 同一概念在不同文档中的中英双语形态 MUST 一致（FR-005）。
-- 中文侧用词以项目词汇表（`.specify/memory/glossary.md`）的 Canonical 为准：不一致处以词汇表为准并登记变体（A8）；census 的中文侧比对逐字执行。
+- 中文侧用词以项目词汇表（`.specify/glossary.md`）的 Canonical 为准：不一致处以词汇表为准并登记变体（A8）；census 的中文侧比对逐字执行。
 - 词汇表 Canonical 的双语化形态按 requirements Assumptions A5 执行。
 - 词汇表登记协议（谁可登记、字段协议、消费纪律）归 `shared/workflow/glossary.md`，本文件不复述、不承载词条本身。
 

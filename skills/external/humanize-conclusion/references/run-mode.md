@@ -100,7 +100,7 @@
 | 类 | 内容 | 读取口径 |
 |----|------|----------|
 | 动作输出/证据 | 回传信封的 `final_output`、`products`、`evidence`、`failures` | 逐项核对可定位性；核对不上的记「未能核实」 |
-| 项目治理（四件） | `.specify/instructions.md`、`.specify/memory/constitution.md`、`.specify/memory/glossary.md`、`.specify/memory/features.md` 的 062 / 079 行 | 摘要优先：治理文档取相关段落，Feature 注册表取行投影 |
+| 项目治理（四件） | `.specify/instructions.md`、`.specify/constitution.md`、`.specify/glossary.md`、`.specify/features.md` 的 062 / 079 行 | 摘要优先：治理文档取相关段落，Feature 注册表取行投影 |
 | 本次会话 | 调用方在本次会话里已给出的指令、确认与答复 | 只取可复核的部分；推断不算读取 |
 
 - **摘要优先**：MUST NOT 把机器管理的原始数据文件整文件注入——Feature 注册表 MUST 只取行投影，治理文档 MUST 只取相关段落。整文件注入既浪费上下文，也会把无人阅读的细节误当作「已装配的上下文」。

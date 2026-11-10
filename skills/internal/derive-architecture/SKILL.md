@@ -33,7 +33,7 @@ Architecture Element）、四级溯源等级、链完整性规则 C1–C7、自�
 ## Input Contract
 
 - **参数来源**：`/speckit.derive` 按 User Input Protocol（`.specify/shared/workflow/user-input-protocol.md`）解析 `$ARGUMENTS` 后把参数传入本技能。
-- **Glossary 前置**：命令的 Glossary 步骤先于本技能运行——见 `.specify/memory/glossary.md` 与协议 `.specify/shared/workflow/glossary.md`。
+- **Glossary 前置**：命令的 Glossary 步骤先于本技能运行——见 `.specify/glossary.md` 与协议 `.specify/shared/workflow/glossary.md`。
 - **Topic**：要推导架构的**主题**（领域级问题）；解析为 `<topic-slug>`（身份文法见概念真源）。
 - **Source list**：handed-in 的来源清单（标题 / 作者 / URL — 来自用户、同事或另一个模型）。A source list is **input to be verified, not a set of facts to inherit**: handed-in lists routinely contain dead links and community-retitled articles; both are recorded as evidence by Stage 3 rather than silently trusted or silently dropped.
 - **`--max-steps <N>`**：推导步骤预算；触顶如实报告。

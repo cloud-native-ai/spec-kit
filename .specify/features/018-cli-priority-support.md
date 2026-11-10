@@ -1,0 +1,43 @@
+# Feature Detail: Configuration Management
+
+**Feature ID**: 018  
+**Name**: Configuration Management  
+**Description**: Project configuration via pyproject.toml.  
+**Status**: Completed  
+**Created**: 2026-02-10  
+**Last Updated**: 2026-02-10
+
+## Overview
+
+The Configuration Management enables project configuration via pyproject.toml. This is part of the Spec Kit CLI toolkit.
+
+## Latest Review
+
+Initial generation/refresh.
+
+## Key Changes
+
+1. Initial release/indexing.
+
+## Implementation Notes
+
+- Part of specify-cli reference implementation.
+
+## Future Evolution Suggestions
+
+- Continuous improvement based on usage.
+
+## Related Files
+
+- Specification: .specify/specs/018-018-configuration-management/requirements.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/018-cli-priority-support.md
+- Quality Checklist: .specify/specs/018-018-configuration-management/checklists/requirements.md
+
+## Status Tracking
+
+- **Draft**: Concept defined.
+- **Planned**: Spec approved.
+- **Implemented**: Code written.
+- **Ready for Review**: Tests passing.
+- **Completed**: Merged and available.

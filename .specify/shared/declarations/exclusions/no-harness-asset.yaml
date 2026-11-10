@@ -66,7 +66,7 @@
   anchor: shared/workflow/external-dispatch-recipes.md#Two Topologies
 #
 # shared/workflow/feature-integration.md — the deliverable is registry rows in
-# `.specify/memory/features.md` and `features/<ID>.md` — the memory registry, which the consumer
+# `.specify/features.md` and `features/<ID>-<slug>.md` — the memory registry, which the consumer
 # list does not name
 # carrier: scripts/python/closure-acceptance-check.py
 - unit: shared/workflow/feature-integration.md
@@ -74,7 +74,7 @@
   anchor: shared/workflow/feature-integration.md#Core Protocol
 #
 # shared/workflow/glossary.md — the deliverable is glossary entries in
-# `.specify/memory/glossary.md`; the protocol edits a memory-store file, not one of the four kinds
+# `.specify/glossary.md`; the protocol edits a memory-store file, not one of the four kinds
 # carrier: scripts/python/glossary-utils.py
 - unit: shared/workflow/glossary.md
   carrier: scripts/python/glossary-utils.py

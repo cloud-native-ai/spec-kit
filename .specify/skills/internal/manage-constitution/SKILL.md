@@ -1,6 +1,6 @@
 ---
 name: manage-constitution
-description: Create or update the project constitution at `/.specify/memory/constitution.md` from interactive or provided principle inputs — bootstrap it from the constitution template when absent, infer the project's real context, fill every placeholder with concrete values, decide the `x.y.z.ddd` version bump (MAJOR / MINOR / PATCH / DAILY), enforce the mandatory-principle set, propagate every amendment across the dependent templates, and emit the Sync Impact Report. Use this when the user mentions ["constitution", "宪法", "update constitution", "amend constitution", "修订宪法", "governance principles", "治理原则", "principle amendment", "principles update", "version bump", "Sync Impact Report", "constitution version"].
+description: Create or update the project constitution at `/.specify/constitution.md` from interactive or provided principle inputs — bootstrap it from the constitution template when absent, infer the project's real context, fill every placeholder with concrete values, decide the `x.y.z.ddd` version bump (MAJOR / MINOR / PATCH / DAILY), enforce the mandatory-principle set, propagate every amendment across the dependent templates, and emit the Sync Impact Report. Use this when the user mentions ["constitution", "宪法", "update constitution", "amend constitution", "修订宪法", "governance principles", "治理原则", "principle amendment", "principles update", "version bump", "Sync Impact Report", "constitution version"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/manage-constitution/SKILL.md>"
 ---
@@ -9,7 +9,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-constitution/SKILL.md>"
 
 ## Goal
 
-Create or update the project constitution at `/.specify/memory/constitution.md`. That file is
+Create or update the project constitution at `/.specify/constitution.md`. That file is
 a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`,
 `[PRINCIPLE_1_NAME]`). The job is threefold: (a) collect/derive concrete values, (b) fill the
 template precisely, and (c) propagate any amendments across dependent artifacts.
@@ -26,7 +26,7 @@ user-input handling, and handoffs only.
   `$ARGUMENTS` per its User Input Protocol (`.specify/shared/workflow/user-input-protocol.md`) and
   hands over the processed substance: governance principles, amendment intentions, or
   supplemental context.
-- **Operating file**: the project constitution at `/.specify/memory/constitution.md`. Paths
+- **Operating file**: the project constitution at `/.specify/constitution.md`. Paths
   below are repo-root-relative (a leading `/` means the repository root).
 - **Scope of writes**: the constitution file plus the dependent artifacts named in the
   consistency-propagation checklist (Step 4). Nothing else.
@@ -55,7 +55,7 @@ Before processing the template, scan the project to understand its actual contex
 
 ### Step 1 — Ensure and bootstrap the constitution
 
-- Ensure the constitution file exists at `/.specify/memory/constitution.md`.
+- Ensure the constitution file exists at `/.specify/constitution.md`.
 - If the file does **not** exist, generate it from
   `/.specify/templates/constitution-template.md` (copy the template content as the initial
   constitution, then immediately adapt it to the project's actual context by
@@ -308,7 +308,7 @@ constitution file after update. It carries:
 
 ### Step 7 — Write back
 
-Write the completed constitution to `/.specify/memory/constitution.md` (overwrite).
+Write the completed constitution to `/.specify/constitution.md` (overwrite).
 
 ### Step 8 — Final summary to the user
 
@@ -333,7 +333,7 @@ Write the completed constitution to `/.specify/memory/constitution.md` (overwrit
   `TODO(<FIELD_NAME>): explanation` and include it in the Sync Impact Report under deferred
   items.
 - Do not create a new template; always operate on the existing
-  `/.specify/memory/constitution.md` file.
+  `/.specify/constitution.md` file.
 
 ## Boundaries
 

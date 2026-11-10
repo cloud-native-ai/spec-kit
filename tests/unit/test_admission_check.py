@@ -46,11 +46,11 @@ def _build_spec(root, fr_count=12, task_count=25, fr_lines=None, task_lines=None
                 related="058", registry_feature="058", spec_name="012-medium"):
     spec = root / ".specify" / "specs" / spec_name
     spec.mkdir(parents=True, exist_ok=True)
-    (root / ".specify" / "memory" / "features").mkdir(parents=True, exist_ok=True)
-    (root / ".specify" / "memory" / "features.md").write_text(
+    (root / ".specify" / "features").mkdir(parents=True, exist_ok=True)
+    (root / ".specify" / "features.md").write_text(
         "# Feature Index\n\n| ID | Name | Status |\n|----|------|--------|\n"
         "| %s | fixture | Implemented |\n" % registry_feature, encoding="utf-8")
-    (root / ".specify" / "memory" / "features" / ("%s.md" % related)).write_text(
+    (root / ".specify" / "features" / ("%s-fixture.md" % related)).write_text(
         "# Feature %s\n" % related, encoding="utf-8")
 
     if fr_lines is None:
@@ -410,7 +410,7 @@ def test_unresolved_related_feature_rejected(admission_engine, tmp_path, medium_
 
     def missing_detail(root):
         _build_spec(root)
-        (root / ".specify" / "memory" / "features" / "058.md").unlink()
+        (root / ".specify" / "features" / "058-fixture.md").unlink()
 
     project2, base2 = _clone(medium_template, tmp_path, "project-2", mutate=missing_detail)
     code2, payload2 = _run(admission_engine, project2, base2)

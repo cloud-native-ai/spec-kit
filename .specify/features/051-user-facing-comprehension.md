@@ -1,0 +1,131 @@
+# Feature Detail: 面向用户可理解性纪律(User-Facing Comprehension)
+
+**Feature ID**: 051  
+**Name**: 面向用户可理解性纪律(User-Facing Comprehension)  
+**Description**: 把框架今天已在多处执行、却从未被定义的一条规矩——面向用户的输出**不用行话、带足上下文**——命名为一条独立纪律:在 `shared/guidelines/` 建立唯一真源,以行话侧白/黑名单 + 上下文侧下限/上限 + 第三方可复现机械判据把"程度"落成可判定条件(而非"尽量少用"一类形容),扩散到 11 类面向用户界面(门控确认提示、执行报告、反馈通知、访谈提问、澄清提问、主动建议行、干系人工件、外部读者报告、词汇表校正呈现、收尾报告、失败报告),并经宪章模板 + 宪章命令**双落点**输出到下游项目。  
+**Status**: Implemented  
+**Created**: 2026-09-17  
+**Last Updated**: 2026-09-19
+
+## Overview
+
+本 Feature 承载需求 051。动因是一处实测到的**定义缺失**而非能力缺失:框架今天已经在很多流程里执行"不用行话、带足上下文",却从未把它定义出来——研究实测在 `shared/`、`templates/`、`skills/` 中找到 **38 处独立措辞**,分散在至少 4 个互不引用的领域(访谈提问、反馈通知、门控执行报告、项目总结报告),而**真源文档 0 份、统一名字 0 个**(`白话`/`行话`/任何单一标签在仓库中零命中)。按 `one-source-of-truth.md` 的机械测试("改一次事实要改几个文件"),38 个定义点意味着纪律已经破了。
+
+后果不是美学问题。三个可直接引用的缺口:① `confirmation-gates.md` 全文 99 行只判**是否**门控、从不判门控**如何措辞**,13 个治理保留门控无一附措辞义务,而确认提示是用户唯一一次阻止不可撤销动作的机会——一个需要解码的提示换来的是"自信地批准错东西";② 该文档中最强的措辞规则(附用户视角途径、不展示引擎原始调用)作用域**仅限反馈提交提示**,且连契约断言都没有;③ 全仓最成体系的实现(一份内部标识黑名单 + 读者向改写映射)搁浅在 `summarize-project` 技能内部,框架其余部分够不到。
+
+本 Feature 的落地层级是**双层的**:框架自身(真源文档 + 11 类界面接入 + 契约守卫)与下游采纳项目(经宪章模板与 `/speckit.constitution` 命令导出原则,再经 `plan` 门控的动态枚举自动生效)。
+
+## Latest Review
+
+**2026-09-17 `/speckit.requirements` + `/speckit.clarify`(需求 051 → Feature 051,新建)**:规格产出 38 FR / 18 SC(各配度量来源)/ 5 user stories(3×P1 + 2×P2)/ 9 key entities / 26 acceptance scenarios / 15 edge cases / 6 shared strings,质量清单 16/16 通过。
+
+两轮澄清共 6 项裁定,全部记入规格 `## Clarifications`:
+
+- **第一轮(`/speckit.requirements` 内)**:① 界面类接入广度 = **全做,含两处搬家**(11 类真源接入指针 + 访谈模式可理解性规则收敛 + 项目总结黑名单提升,同批完成);② Principle XIV 从未回流到 `templates/` 这一同型既有缺口 = **一起修,并当双落点守卫的首个受测样本**。
+- **第二轮(`/speckit.clarify` Mode A)**:③ Feature 归属 = **新建 051**;④ 读者基准 = **全局一套 + 按类覆盖**(基准读者「未在本会话打开过本仓库、但具备该项目领域知识的人」,界面类只在其真源处声明更严覆盖、不回写);⑤ 上下文上限形态 = **定性上限 + 沿用各界面既有数值约束**,不新增裸数值——已知代价(门控提示与收尾报告无长度界)经用户知情接受并以 FR-011 成文;⑥ 常驻章节与真源文档投递路径实测不同步(`generate-instructions.sh` 全文不同步 `shared/`)= **记录为既有结构性状况 + 加同批抵达与缺失显式提示义务**(FR-038),不修投递脚本。
+
+**Feature 绑定判定**:新建而非绑定。决定性先例是 **032 Task Complexity Rubric** 与 **040 Token Efficiency Discipline**——两者与本 Feature 形状完全相同(`shared/guidelines/` 纪律文档 + 指令模板常驻章节 + 契约测试守卫),都各自成为独立 Feature 而非绑到投递载体(008 Instructions Command),确立"以指令段形式嵌入是**投递事实、不是归属事实**"(050 已援引同一先例)。8 个候选的同胞吸收证据均不支持绑定,逐个核验见规格 `Related Feature` 的候选表。
+
+**2026-09-17 `/speckit.plan`(Draft → Planned)**:产出 `plan.md` + `research.md`(D-1…D-15)+ `data-model.md` + `contracts/` ×5(60 条款)+ `quickstart.md`(6 场景)+ `feature-ref.md`。Constitution v1.11.0 逐条动态枚举 14 项 = **13 Pass / 1 Partial(IV)**,无 Fail。
+
+三项计划期结论值得记住:
+
+1. **Principle VIII 的直接应用——实测推翻需求阶段 6 处陈述**并就地订正(记入规格第三轮 Clarifications):`BLOCKING_PATTERNS` **18 → 17**、传播足迹 **194 → 195**、两处行号、一处引文粗体,以及最重的一条:**FR-035 的全称双落点守卫不可实现**。实测宪章模板有 11 条原则而命令 `MUST include` 清单只有 5 条、交集仅 3 条,且清单另含 2 条不在模板中的原则——**两个方向的包含关系今天都不成立**,全称守卫会在 8 条既有原则上立即失败。改为**具名观察名单**(初始 {STR-003, STR-006});用户在 clarify R1-Q2 选择的"当守卫样本"意图**未被削弱**,XIV 仍在名单内、从任一侧删除仍使 CI 失败。
+2. **最硬的机械约束是确认门控预算整数余量 = 0**:实测 `total 23`、`cap = 93 × 0.25 = 23.25`,且 `test_proactive_trigger_section.py:288-306` 钉死 `== 23` 为**相等**而非 ≤。`SCAN_ROOT_FILES = ("templates",)` 使两个模板文件也在扫描范围内,且 `constitution-template.md` 的 governance-path 归类**不豁免于 `total` 计数**——"它在治理路径里所以安全"是错误推断。处置取**设计规避**(三处新增文本零 `BLOCKING_RE` 命中 + 测试钉死)而非扩充 `POLICY_DOCS`:豁免只能救真源文档、救不了两个模板文件,而豁免整个模板文件会掩盖其中真实门控回流。⇒ 对扫描器**零代码改动**,FR-032 的条件前提不成立。
+3. **Principle IV 判 Partial 而非 Pass**,依 Principle VII `:95` 的 template-only 门(本特性零可执行运行时代码)。**拒绝**"加一个行话 lint 引擎换取 Pass"——那正是 FR-033 与 Principle IX 禁止的投机基础设施,用新增机制换账面合规是拿真实复杂度买好看判定。可判定性因此落在**第三方可复现的机械判据** + SC-006 双评审一致率 ≥90%,而不是自动打分器。
+
+**跨 Feature 交付效应 2 项**(归属在对方、051 为交付方):① SC-017 的悬空指针守卫覆盖**全部 11 份既有 guideline**,把一个既有投递窗口变成受测项(真正修 `generate-instructions.sh` 使其同步 `shared/` 属另一条尚未登记的 Feature,已记入本文件 Future Evolution Suggestions);② FR-028 回流 Principle XIV 使下游首次收到该原则,交付效应落在 **Feature 040** 的 backlog 上(其 Future Evolution 第 1 条正是需要这条双落点通道),反向交叉引用已写入 `features/040.md`。
+
+**未暴露新 Feature、未使既有 Feature 失效**:8 个交叉引用 Feature 的能力范围均不变——`confirmation-gates.md` 判据各节逐字冻结(FR-017 / `surface-pointers` C-4)、`interview-pattern.md` 模式特有规则原文保留(FR-021 / C-7)、`feedback-step.md` 三处既有规则保留为实例(FR-019 / C-10)。
+
+**2026-09-17 `/speckit.tasks`(状态保持 **Planned**,不推进)**:**63 项任务 / 7 Phase**(Setup 2 · US1 11 · US2 9 · US3 12 · US4 5 · US5 15 · Polish 9),`[P]` **12** 项、`[blockedBy]` **57** 行,ID T001…T063 连续唯一,`validate-tasks.py` **首轮即 exit 0(0 error / 0 warning)**。
+
+四项判定:
+
+1. **无 Phase 2 Foundational** —— 纯文档/治理特性无阻塞式前置基础设施,依 tasks 模板的显式指引整节省略并重编号。
+2. **Tests Mode ON 但取 template-only 形态** —— Principle IV 含 MUST 级测试要求(确定性 grep 检出),但 Principle VII `:95` 的 template-only 门同时适用(零可执行运行时代码),故发出的是**结构契约测试**而非单元/集成测试。5 份契约文档的 60 条款映射到 4 个新测试文件 + 1 个扩展;每个 story 都有 **red-first 取证**任务(T005/T016/T024/T035/T040),要求确认失败原因是**制品缺失**而非断言写错。
+3. **MVP = 仅 US1**(与 Feature 050 的"两个 P1 合起来才构成独立增量"不同)—— US1 的 checkpoint 单独即可独立测试且有独立价值:交付"纪律有唯一真源、被每个 agent 常驻读到、被守卫",正是用户诊断的核心缺口;US2/US3 是在其上**加投递面**,不是其价值的必要组成。
+4. **并行度上限由两处跨 story 共享文件决定** —— 真源文档(US1 创建、US5 的 T046 因搬家 B 二次编辑,故 US5 MUST 在 US1 之后,回归门 T054)与 `test_user_facing_comprehension_pointers.py`(US2 的 T014 一次写入全部 C-1…C-14,US4/US5 只运行不编辑)。后者按 `/speckit.tasks` 的**分区规则**处理:三个 story 的验证行各自只对自己分区的条款要求转绿(T021 = C-2/C-4/C-5;T038 = C-10;T052 = C-1/C-3/C-6…C-9/C-11…C-14),分区互斥,故**不存在两行在不同时点要求同一文件全绿**的不可满足对。US5 的 T041–T049 是本特性并行度最高的一段(9 任务 / 9 组互斥文件)。
+
+**环境探测(生成期实测,不缓存)**:本机工具链齐备(python3 3.11.11 / pytest 8.4.2 / bash / git / comm);**不需要**容器运行时、镜像仓库、实集群或网络(`specify init --help` 明写 "Use local templates (GitHub download is no longer supported)")。**一项 partial 结论**:本机 `specify` 为 `/usr/local/lib/python3.11/site-packages/` 下的 **0.0.22 非可编辑安装**,`specify_cli.__file__` 不在仓库树内 ⇒ 直接在临时目录跑 init 验证的是 0.0.22 的模板而非本特性改动,影响 T034(quickstart 场景 5c);替代路径为从本树重装(改动全局 site-packages,**需先征得同意**)或以 T032+T033 的机械核验作为 FR-026 的验收证据并把 T034 记 `[~]`。**跨制品漂移已同批订正**:quickstart.md 场景 5c 原写"以本仓为安装源"经实测不成立,已改写并附探测证据。
+
+**Feature 列表复审**:任务分解**未暴露新 Feature、未使既有 Feature 失效**;63 项任务全部落在 051 已声明的 FR-001…FR-038 范围内。三项跨 Feature 事项均**归属在对方、051 只留痕不修**(T062):① 确认门控预算(total 23 / cap 23.25 / 余量 0)**没有 owner 文档**,建议落进 `confirmation-gates.md` 的 `## 回流约束` 节;② `AGENTS.md` 称 `Total Features` 由 `update-feature-index.sh` 维护与脚本实际行为矛盾(整体重写、表头缺 `Spec Path` 列),应改源头并**要么修脚本要么删脚本**;③ 修 `generate-instructions.sh` 使其同步 `shared/` 属另一条尚未登记的 Feature(051 的 SC-017 守卫已覆盖既有 11 份,可作其验收基线)。
+
+**测试基线自愈已实测**:本文件生成后 `test_specify_script_paths.py::…::test_review_prerequisite_flags_are_supported` 由失败转为**通过**(其 `:90` 断言 `tasks.md` 在输出中),全量契约套件 **24 failed → 23 failed / 1925 passed**,`comm -13` 对 049 冻结基线输出为空 ⇒ 零新增失败。T057 的预期值 **23** 由此实测确定,非预写。
+
+**2026-09-18 `/speckit.analyze` 复跑(状态保持 **Planned**,不推进)**:只读复跑产出 56 条发现、去重为 **50 条**(1 CRITICAL / 3 HIGH / 35 MEDIUM / 11 LOW)。检测与验证**均委派给 fresh-context 子代理**——3 个检测代理按互不相交的制品对切分(规格↔计划↔研究↔quickstart / 计划↔契约↔数据模型↔任务 / Feature 链接↔注册表↔宪章),13 个验证代理每条 CRITICAL/HIGH 一个,且与检测集合互不相交。这是本仓新固化的 `shared/workflow/objective-analysis-gate.md`(同作者检测委派)首次实战:8 份制品全部由同一代理在同一会话内写成,自审证据力弱。验证波 **4 confirm / 9 downgrade / 0 reject,降级率 69%**,每次降级都落在检测代理未核的传播面事实上。**上一批修复自身引入或暴露了 5 条**:B-01(G-4 修复时亲手输入的 ERE 转义竖线,使命令恒零命中)、C-01(条款总数按"改正数字"而非"删除副本"传播,违反 `one-source-of-truth.md:51`)、C-04(I-01 的传播扫描只覆盖 spec 目录,治理记忆仍留全称守卫形态)、C-07(第四轮无治理记录)、C-12(第四轮使 `plan.md` 的"三轮"计数过期)。**第二批已修 6 条**:B-01、B-15、B-16、B-17 四项机械项,加 C-01 的 Principle XIV 修复(6 处手写总数全部改为引用,派生方式只在 `plan.md` Phase 1 摘要声明一次;`gate-neutrality.md` 补上缺失的条款编号头部)与 C-12(删去轮次计数、改按路径引用)。**日期化记录未被当作活体副本修改**:`features.md` 的 3 处与本文件 `:29`/`:46` 的旧总数按 `one-source-of-truth.md:39` 第三个合法副本条件保留原样。**仍待修**:3 条 HIGH(A-02/B-05 的"覆盖全部 11 份 guideline"实测只能遍历 7/8 份、A-03 的 quickstart 6e grep 因目标跨行而恒零命中、B-08 的 SC-018 无条款度量却会被记 `pass`)、V-01(T050 的裸 `--write` 会把无关在途改动吸收进本特性提交,从而以错误理由转绿五个门禁)、以及 C-09/C-11 两条应按 Principle XI 修机制侧的项。
+
+**2026-09-18 `/speckit.analyze` 发现项第三批修复(状态保持 **Planned**,不推进)**:经用户指示修 3 条 HIGH + 1 条 MEDIUM。**A-02/B-05**——"覆盖既有 11 份 guideline"实测为假(模板面 7 份、活动指令面 8 份,`checklist-methodology`/`requirements-guidelines`/`self-improvement` 三份两面无指针),已把 `ambient-section` C-11 拆为主条 + C-11(a) 实测分母 + C-11(b) **余集断言**(余集 ⊆ 具名三份,取**子集**语义:删指针即失败、补指针不误报),遍历面定为两个指令面,于是"11 份全部核算"以**可实现**的形式成立。**A-03**——quickstart 场景 6e 的 grep 因目标字面量跨行而**恒零命中**(与 T056 曾有的 `--stat` 盲命令同类),改用单行片段并把四条命令的改前基线写成具体数字 **2/1/1/0**,使"0"不再与"已收敛"不可区分。**B-08**——SC-018 此前无任何条款度量却会被 T059 记为 `pass`,已新增 `discipline-doc` **C-18**:**计数口径取登记项而非模式命中数**(实测 `外部读者` 作散文出现 17 次,裸计数无意义),另加**声明形态针**的完备性扫描(实测 4 处 / 3 文件 / 零误报),并因此发现 `research.md` D-14 **从未登记的第 4 处**读者基准 `templates/commands/requirements.md:82`(类 ⑦ 的命令侧孪生),按 C-18(c) 收敛为指针——这引入了本特性此前没有的改动面,已同批补齐 `plan.md` 源码树 + Mirror Obligations 行 + T050 再生清单。**V-01**——T050 的裸 `sync-mirrors.py --write` 会把无关在途改动吸收进本特性提交、让五个门禁**以错误理由转绿**,已范围化(实测该范围 `--check` EXIT=0、全树 EXIT=2);该修使门禁"诚实地红"而非"虚假地绿",全树绝对判据本身的问题(B-03)仍开放。顺带把 T051 的镜像对枚举从**表行号**改为**文件名**(新增表行会使行号静默错位)。**条款总数 62 → 63,而本次无需修改任何计数**——上一批按 `one-source-of-truth.md:51` 删除手写总数后它已完全派生,这是该修复的第一次实测收益(第四轮同类变更需同批改 4 个文件)。**一项待用户裁定**:SC-018 的"至多 2 **处**类级覆盖"可读作类或行,类 ⑦ 的真源今天有两处表述,按行口径则 1+3=4 > 3;C-18 已写明口径与代价,不替规格作选择。**仍待修**:B-03、B-02(零改动面用 `git diff --stat HEAD`,CI 洁净检出下恒真空过)、B-04(C-7 的重冻基线无任务承担,而 049/050 同惯例由 T001 承担)、B-06/B-07/B-09/B-12/B-14/B-18 等 MEDIUM,以及 C-09/C-11 两条机制侧项。
+
+**2026-09-18 `/speckit.analyze` 发现项第四批修复(状态保持 **Planned**,不推进)**:经用户指示修 B-02 / B-03 / B-04 三条 MEDIUM。三者共享同一根因——**门禁比对的基线选错了**——故按一个整体修:**T001 重写为本特性所有比对型门禁的唯一基线冻结点**(四组:`BASE_SHA` / 重冻 `baseline-failed.txt` / 冻结既有镜像漂移集 / 其余结构实测值),承 049/050 惯例(二者都由各自 T001 承担,而 C-7 此前只声明义务、未指派承担者)。**B-02**——零改动面用 `git diff --stat HEAD` 断言,对已提交改动不可见且**在 CI 洁净检出下无条件空真**;实测实例比原报多 2 处(GATE-4/T055 之外还有 T011/T033),T002 则**不是**缺陷(开工时 HEAD 即基线,已作为 C-6(c) 的唯一合法用法成文)。`gate-neutrality.md` C-6 补 (a) 基线形态 /(b) MUST NOT 按扩展名过滤(`templates/plan-template.md` 是 `.md`、`scripts/` 下另有 70 个非 py/sh 受跟踪文件会结构性逃逸)/(c) 唯一合法 HEAD 用法,并把归属表里 C-6 那行改成**命令级指令**(T003 会照它撰写 CI 断言)。**实测新形态非空真**:取早于 `scripts/` 真实改动的 `BASE`,新形态报 **7** 个文件、旧形态报 **0**。**B-03**——全树绝对判据的前提已被本特性未触及的 `skills/draw-diagram/` 在途改动推翻(全树 EXIT=2、触及范围 EXIT=0),DoD-8 / GATE-2 / T010 / T029 改为 **049 先例形态**(触及对报 `ok` + 相对冻结集无新增漂移行),GATE-2 拆三段并跑了**负对照**证明其不恒空;`regen-command-copies.py --check` 今天仍干净故保留绝对判据;另订正原文把 `--only` workaround 归给 **050** 的错误(实为 **049**,050 恰是退役它的那个特性)、澄清 `research.md` D-15 只覆盖 pytest 基线而不覆盖镜像基线。**B-04**——去钉死 4 处硬编码计数(T001 的 24/1924、DoD-10 的"24 条"、T057 的"预期为 23"、GATE-1 与 T057 的"24 条基线"),判据统一为"`comm -13` 输出为空";§ Environment Prerequisites 新增两条探测结论(镜像既有漂移、套件既有失败集),各附命令 / 日期 / 归因证据 / 受影响任务。顺带:`## Notes` 的提交纪律行仍引用本轮已删除的全树判据,已改指向 GATE-2 新形态并点明"逐任务提交"与"MUST 用 `BASE_SHA` 而非 `HEAD`"是同一件事的两面;T010 / T029 原以 Mirror Obligations **表行号**枚举所覆盖的行(新增表行会使其静默错位),已改为**按文件名**(与上批 T051 同类缺陷、同种修法)。**与上批 V-01 合流**:V-01 使 WRITE 侧不再吸收无关在途改动,B-03 使 VERIFY 侧不再被无关状态拖红,合起来把该门禁从"要么污染、要么阻塞"变为"在触及对上诚实地通过"(实测二者前缀一致、均 EXIT=0)。**契约条款计数不变(63)**:C-6(a)/(b)/(c) 与 C-11(a)/(b) 是子断言,其行首形态不匹配计数正则 `^\*\*C-[0-9]+\*\*`(已实测各文件计数未变)。**仍待修**:B-06(`confirmation-gates.md:68` 落在 C-4 冻结区与 C-2 禁区之外的盲点)、B-07(FR-030 中立性在两个宪章侧面无任何条款)、B-09(DoD-3 的 `逐字未动` 覆盖 `feedback-step.md:115`,而 C-10/T036 要求改写它;根因是 FR-019 的 `:113-114` 被 5 处下游放宽为 `:113-115`)、B-12(red-first 行把改前即绿的条款写成"因制品未改而失败")、B-14、B-18,以及 C-09/C-11 两条机制侧项。
+
+**2026-09-18 `/speckit.implement` MVP 批次:Phase 1 Setup + Phase 2 US1 落地(状态保持 **Planned**,不推进——13/63 任务完成,US2–US5 未开工)**:经用户裁定范围为 MVP(Setup + US1)并预授权 Phase 边界提交。**T001/T002** 冻结四组基线(`BASE_SHA=710c7179…`、测试失败基线**重冻 24→26**、既有镜像漂移集、结构实测值),**T003/T004** 落地两个结构契约测试文件共 **34** 个用例(discipline-doc C-1…C-18 + 其归属表指派给 T003 的 gate-neutrality C-2/C-3/C-5/C-6 四条 + ambient-section C-1…C-11),**T005** red-first 取证 `28 failed / 6 passed`、失败原因全为制品缺失(17 × FileNotFoundError + 10 × 标题不存在,零导入错误),并对 6 条**改前即绿**的条款逐条写明为何绿(订正 B-12:否则执行者会据"红的才正常"去削弱一个正确的断言)。**T006** 落地真源文档(七节 + 范围限制 + 观察约定 + 接入形态,11 行界面类表去重 8 个源路径、2 个覆盖登记项),**T007** 落地常驻章节(11 行节体,零 `BLOCKING_RE` 命中、零 `/speckit.` 与参数形态、不内联真源文档任一 H2 节名),**T008/T009** 按不可颠倒顺序同步镜像并再生指令文件(模板 `## ` 17→18、活动文件 18→19、新章节落在 Token Efficiency 之后 Dogfooding 之前、C-7 三章节窗口相邻关系未变、8 条 symlink 仍为符号链接),**T010/T011** 镜像与门控核验(触及对全 `ok`、相对冻结集零新增漂移;`total 23 / destructive 13 / governance_kept 10 / violations 0`、扫描器自身零改动),**T012** 两文件 **34 passed**,**T013** quickstart 场景 1–2 全项符合(逐字节相等、guideline 数 12、三处标题各 1、悬空指针遍历 9 `ok` / 0 `MISSING`)。全量契约回归 `comm -13` **空**(26 = 冻结基线,零新增零自愈)。**本批发现并修复四个自身缺陷**:① `_changed_files` 用 `git diff <sha>` 只达受跟踪路径,而本特性制品在提交前是未跟踪的 ⇒ gate-neutrality C-5/C-6 在唯一能起作用的窗口内**看不见自己要判的文件**(已并入 `git ls-files --others`;这是本特性第三个"盲检"缺陷,前两个是 `--stat` 管道形态与 CI 下 `git diff HEAD` 恒空真),暴露它的正是 C-5 自己那条反空转哨兵;② discipline-doc **C-3 原为空断言**——只比较测试文件内两个字面量、从不看树,故"MUST NOT 被重命名"这一规范内容无人断言(改为扫 `shared/guidelines/*.md` 的 `*comprehension*` 变体,并以**临时造一个改名副本**实测其能红,探针文件已删净);③ **C-14 与 C-18 互相矛盾**——C-14 按整节正文数路径得 8,而 C-18 的 `reader_baseline_override` 列必须指名覆盖站点,其中类 ⑧ 的站点并非规则真源 ⇒ 8 不可满足;契约侧 C-18(b)② 早已裁定判据是"覆盖站点"而非"规则真源",故错在**测试**(按列取值,列按表头名定位而非按位置)。④ ambient-section **C-11 把指针目标解析到了框架源树**(`shared/guidelines/<name>.md`),而指针文本与读者解析的是运行时副本 `.specify/shared/guidelines/<name>.md` ⇒ 本仓两侧都在故二者偶然同真,而下游项目只有运行时副本,SC-017 要防的那一种失效对该守卫**结构性不可见**;由 SC-017 规定的演练(临时移走镜像副本)**实跑**暴露——第一版 C-11 在副本缺失时仍 `1 passed`。改为两侧都断言,并双向复演(移走运行时副本 → 红且指名 `no runtime copy`;移走源文件 → 红且指名 `no framework source`;复原 → 34 passed、`cmp` 逐字节相等)。**推广教训**:「今天绿」不等于「能红」——凡守卫对象是一个**投递窗口**的条款,MUST 以演练证明其可红,不能以当前树状态推断(已记入 `notes/red-first-evidence.md` 的修订段)。另**前置执行了 T043 的两项**(收敛 `templates/commands/requirements.md:82` 的未登记第 4 处读者基准声明 + 登记覆盖站点),理由与实测漂移证据记入 T012/T043 行:该复述行与其所有者 `:101` 已漂移(丢了 `not developers`),按唯一真源纪律删副本而非改措辞。**未纳入本批**:`skills/draw-diagram/` 的在途改动(另一单元所有,是那 3 条非基线失败的唯一成因),以及 US2–US5。
+
+**2026-09-19 `/speckit.implement` 续批:US2–US5 + Polish 落地,状态推进 **Planned → Implemented****:经用户指示"把本分支基于 master rebase,然后继续用这个分支完成剩下的工作",并显式批准一处 **CONFIRM 级**门控判定(修改活动宪章 `.specify/memory/constitution.md`)。**先 rebase**:本分支重放到 `gitlab/master`(`925badb6`),7 处冲突按机制解决——6 处 `index.json` 由 `feedback-utils.py --action reindex` 从条目文件重建(而非手工合并 JSON),1 处 `skills/draw-diagram/SKILL.md` 表行按附加式冲突保留双方;随后 master 快进,本分支领先 4 个提交、落后 0,**全程未 push**。**rebase 的一个非显然后果**:原冻结的 `BASE_SHA`(`710c7179`)被**孤立**(不再是 HEAD 的祖先),使 `git diff BASE..HEAD` 把上游提交一并扫进来,两个门禁因此把上游的文件算在本特性头上;已把 `BASE_SHA` 重冻为 `gitlab/master` 并**实测该重冻更严而非更松**(`notes/pre-change-measurements.md` § ① 的取代表)。**US2(确认提示说人话)**:`confirmation-gates.md` 头部所有权区插入**一行**指针覆盖界面类 ①②⑩⑪(判据各节一字未动,C-4 以 SHA-256 按**节标题**提取故行号下移 2 行不影响判据),`:68` 的反馈专属措辞规则按 FR-018 **泛化上移**(引擎调用形态子句移出、归本纪律真源),并由 `test_confirmation_gates_execution_report.py` 的新增用例(9→10)同时断言**头部位置**与**恰一行**,补上 SC-013 点名的守卫缺口。**US3(下游宪章双落点)**:宪章模板 11→13 条原则(XII = STR-006 回流、XIII = STR-003)、命令 `MUST include` 清单 5→7、活动宪章 14→15 条且版本 1.11.0→**1.12.0** 附 Sync Impact Report;`plan-template.md` **零改动**(两条原则经 `plan` 门控的动态枚举自动生效,这正是 SC-005 里"零改动"与"出现在动态枚举中"能同时成立的原因);`test_constitution_double_landing.py` 以**具名观察名单**守卫双落点并在 `tmp_path` 副本上做变异演练(从任一侧删任一原则都能红,双向都带反空真断言)。**US4(反馈措辞归入同一纪律)**:`feedback-step.md` 三处既有措辞规则**保留**为界面类 ③ 的实例,而 `:115` 的并存措辞收敛权威按 C-10 从"以本节为准"**上移**为"以本纪律真源为准"——一行之内一个保留义务与一个改写义务作用于不相交的行(契约发现项 B-09 的订正形态)。**US5(38 处收敛为指针)**:8 个界面类真源文件各含**且仅含一行**指针(GATE-8 八个 `1`),3 处内容搬家完成且保留项逐字未动,`summarize-project` §1.7 的内部标识黑名单与读者向改写映射**提升进真源文档**、原处收敛为指针(独立副本 **0**,C-12(c) 的针取自真源文档的类别字面量,故**可证伪**:改写前实测 1 文件 / 12 命中、改写后 0),`docs/reference/` 三处手写复述收敛(**2/1/1 → 1/0/0**),`docs/public` 仍 0 受跟踪文件(Hugo 构建产物,由既有 create-pages 流程重建而非手改)。**Polish**:quickstart **6 个场景全部实跑**并把输出追加进 `notes/quickstart-run.md`(场景 3 的四个数字与改前**逐字相同**;场景 6c 的全树 `--check` EXIT=2 如实记为上游漂移而非本特性失败,触及对 EXIT=0);`verification.md` 为 SC-001…SC-018 逐条给出状态。**Completion Gate 9 项全部对着当前树重跑通过**,`validate-tasks.py` exit 0,DoD Status **green**。**本轮最重要的产出不是制品而是查出的自身缺陷**:在本特性**自己的守卫**里发现 **6 处缺陷、其中 5 处同一形态**——"一条验证命令返回的答案与它要判的命题无关"(未跟踪文件对 `git diff <sha>` 不可见;比较测试文件内两个字面量而从不看树;指针解析到框架源树而读者解析运行时副本;量整节而非量指定列;缺 `re.M` 使标题集恒空因而守卫永不可能红;针取真源文档自己的新措辞而恒零命中,`strict` xfail 把这次 XPASS 暴露出来)。**每一处都靠实跑发现,不靠阅读**;修好后逐个**变异演练**证明其能红,并给每个"过滤后集合为空"的断言配上**反空真哨兵**。该类与两项对策已写成 `docs/reference/history/00-cross-cutting-lessons.md` § 十二 与常驻指令的 `git diff` 形态子条,使教训活得比本特性久。**具名后续 5 项记录而不修**(`verification.md` 的 `followup_1..5`):门控预算(total 23 / cap 23.25 / 余量 0)无 owner 文档、`AGENTS.md` 称 `Total Features` 由 `update-feature-index.sh` 维护与该脚本实际行为矛盾(故索引行与计数**全程手工编辑**、从未运行该脚本)、上游 `improve-skills/redline-check.py` 源镜像分歧、SC-002 的 CI 计数断言无承担任务行、`feature-details-template.md:70` 与本文件 Implemented 行的状态词表窄于其所有者 `verification-log-template.md` 声明的五值集(本特性实况命中该缺陷)。**3 项 `[~]`**:T034(quickstart 场景 5c 的下游 bootstrap 演练——本机 `specify` 为 site-packages 的 0.0.22 非可编辑安装,init 渲染的是安装包模板而非本树,全局重装需用户同意;FR-026 的验收证据改由 T033 的机械核验承担)、T060(SC-001 抽样评审)、T061(SC-006 双评审盲测)——后两者都要求**未参与本特性实现的评审者**,单会话不可得,而编造通过率会违反观察红线。**一项仍待用户裁定**:SC-018 的"至多 2 **处**类级覆盖"可读作**类**或**行**——按类(已实现,真源文档的覆盖列是唯一计数来源)总数 3 ≤ 3 成立;按行为 4 > 3,则需把 SC-018 改写为 ≤4 或合并 `requirements-guidelines.md` 的两处。两种读法的代价都写明,**未替规格作选择**。
+
+## Key Changes
+
+1. **唯一真源文档** `shared/guidelines/user-facing-comprehension.md`(+ 镜像):命名该纪律,给出行话侧白/黑名单、上下文侧下限/上限与裁决顺序、第三方可复现机械判据、11 类面向用户界面的封闭枚举、基准读者定义与按类覆盖协议、范围限制子句。
+2. **常驻暴露**:`templates/instructions-template.md` 新增顶级 `## User-Facing Comprehension` 章节(摘要 + 指针)。**MUST 是新增顶级章节而非文档地图表新增一行**——增量调谐只按整章节传播,表格行内部改动抵达不到已初始化项目(静默失效)。
+3. **11 类界面真源接入指针**,含两处内容搬家:`interview-pattern.md` 的 Comprehension rules 收敛为指针(其模式特有两规则原文保留、不吞并),`summarize-project` 的内部标识黑名单与改写映射提升为全框架可达的实例来源。`confirmation-gates.md:68` 的反馈专属措辞规则提升为面向全部界面的一般规则;`clarify` 补齐其今天缺失的"不用行话"半侧。
+4. **下游双落点导出**:`templates/constitution-template.md` 新增原则 `User-Facing Comprehension (No Jargon, With Context)` **且** `templates/commands/constitution.md` 的 `MUST include` 清单新增对应条目;本仓活动宪章同批新增对应原则(版本 MINOR 递增 + Sync Impact Report)。同批**回流 Principle XIV**(`One Source of Truth (Authority & Reference Discipline)`)到同两个落点。
+5. **漂移守卫**:契约测试覆盖真源文档存在性与镜像一致性、所有权声明、各节齐备、指令模板两份副本各含且仅含一次章节标题与指针且不内联节名、宪章双落点(**一般化为覆盖全部原则**,以回流的 XIV 为首个受测样本)、项目中立性、单源扫描(内容形态复述数为 0)、门控扫描器计数不变。
+6. **观察接入**:收尾反馈自省可捕获本纪律违规,条目内嵌稳定标记 `user-facing-comprehension`(形态对齐 040 的 `token-efficiency` 标记),干净运行不追加空洞条目。
+
+## Implementation Notes
+
+- **零新机制是硬约束**:MUST NOT 引入行话 lint 引擎、措辞评分器、成熟度报告、跟踪台账或任何新运行时检查器(框架范围纪律 / 不新增机制)。执行手段限于既有契约测试与既有扫描器的 `POLICY_DOCS` 豁免登记。
+- **不改门控判据**:`confirmation-gates.md` 仍是"是否门控"的唯一权威;本 Feature 只新增"如何措辞"。两级判据、破坏性清单、治理保留清单、存疑从严、回流约束 MUST 逐字未改写,且 `scan-confirmation-gates.py` 的门控计数前后 MUST 不变。
+- **镜像无需注册**:`sync-mirrors.py` 按 `rglob("*")` 全量发现,`pyproject.toml` 的 `"shared"` force-include 与 `_CORE_SPECIFY_ASSETS` 均为目录级 ⇒ 新文件自动被拾取。按工具的 4 棵命令副本树经 `regen-command-copies.py` 再生,MUST NOT 手工批改(涉及 194 个文件的措辞轮换一律走再生)。
+- **投递窗口是既有结构性缺口**:常驻章节经 `/speckit.instructions` 增量调谐抵达,真源文档只经 `specify init` 附加式 copytree 或 `sync-mirrors.py` 抵达。本 Feature 只加提示义务;修 `generate-instructions.sh` 使其同步 `shared/` 属**另一条 Feature 的归属**(收益覆盖既有 11 份 guideline,超出本特性范围)。
+- **编号不钉死字面量**:宪章模板现有 I–XI(本批 +2 ⇒ 13 条),活动宪章现有 I–XIV(本批 +1 ⇒ XV,因它已含 XIV)。守卫 MUST 按**原则名**匹配,MUST NOT 钉死罗马数字。
+- **程度形态的选型依据**:房子的四种程度先例中,条件表(`one-source-of-truth.md:33-41`)与粗体机械测试(`:29`、`ask-record-repeat.md:97`)适配散文对象;裸数值 + 覆盖协议(`token-efficiency.md:38`)适配可计量对象。本纪律对象是散文措辞,故取前者;该选型第二轮澄清已获用户批准(此前是需求阶段的未经询问推断)。
+- **`STR-006` 逐字取自活动宪章 `:155`**:回流 Principle XIV 时 MUST 沿用该原则名而 MUST NOT 另拟,否则双落点守卫按名匹配会把它判为两条不同原则。
+
+## Future Evolution Suggestions
+
+- 修投递机制本身:让 `/speckit.instructions` 一并同步 `shared/`,消除全部 guideline 的悬空指针窗口(独立 Feature;本 Feature 的 SC-017 守卫已覆盖既有 11 份,可作为其验收基线)。
+- 若实现后实测出现"无复述的纯膨胀"(门控提示或收尾报告在没有复述工件的情况下持续变长),按 FR-011 记录的升级路径在**该类界面真源处**声明数值覆盖值,而非回写真源纪律文档新增全局数值。
+- 观察标记 `user-facing-comprehension` 积累足够条目后,经 `/speckit.feedback` 的自省与 `improve-*` 链路反哺白/黑名单条件集(数据驱动的判据调优,对齐 040 的观察环形态)。
+- 评估是否把 `interview-pattern.md:255` 的"嵌入契约不可丢弃清单"机制推广到其他被宿主收窄的模式文档(本 Feature 只把新指针纳入该清单)。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/051-user-facing-comprehension.md
+- Requirements Spec: .specify/specs/051-user-facing-comprehension/requirements.md
+- Quality Checklist: .specify/specs/051-user-facing-comprehension/checklists/requirements.md
+
+## Status Tracking
+
+- **Draft**: Feature registered and bound to spec 051; 规格 38 FR / 18 SC,质量清单 16/16,残留活动 `NEEDS CLARIFICATION` 0。
+- **Planned**: `plan.md`、`research.md`(15 条决策)、`data-model.md`(9 实体 / 4 组校验规则 / 2 状态机)、`contracts/` ×5(条款数以 `contracts/` 各文件头部声明为准,跨文件总数派生而非手写——本行此前手写条款总数,在 C-17/C-13 新增后过期,已按 `one-source-of-truth.md:51` 删除副本而非改正数字)、`quickstart.md`(6 场景)、`feature-ref.md` 全部就位;Constitution v1.11.0 逐条动态枚举 14 项 = **13 Pass / 1 Partial(IV)**,Partial 依 Principle VII `:95` 的 template-only 门正当化并已填 Complexity Tracking,无 Fail、无未论证违规。
+- **Implemented**: 真源文档 + 11 类界面指针接入 + 两处搬家 + 宪章双落点(含 XIV 回流)+ 契约守卫全部落地,且 SC-001…SC-018 各有状态记录。**2026-09-19 达成**(实测证据在 `.specify/specs/051-user-facing-comprehension/verification.md`):63 行任务 = **60 `[X]` + 3 `[~]` + 0 `[ ]`**、`validate-tasks.py` exit 0;**Completion Gate 9 项逐条对着当前树重跑全过**;SC 落点 **12 `pass` / 4 `partial` / 2 `deferred` / 0 `fail`**;DoD Status **green**(12 行全满足,三处过期前提就地订正而非作废:DoD-3/DoD-4 的行号引用因上游插入而漂移、判定针实为内容字面量,DoD-11 的状态词表窄于其所有者)。**本行的 `pass/deferred` 措辞是一处已上报的框架缺陷**:状态词表的唯一所有者是 `templates/verification-log-template.md`(五值:`pass | fail | partial | deferred | unknown`),其 `Conventions` 节明写"约束 SC 状态的 DoD 行或门禁 MUST 取自该集合、MUST NOT 取其更窄子集",而 `templates/feature-details-template.md:70` 的转换条件与本行都写作 `pass|deferred`,于是 4 条诚实的 `partial` 使一个已满足的转换在其字面下读作未满足。本轮据所有者词表判定、把偏差记为 `verification.md` 的 `followup_5`,**未**在本特性内改另一所有者的框架模板(`templates/` 在 `scan-confirmation-gates.py` 的 `SCAN_ROOT_FILES` 内,整数余量为 0)。3 项 `[~]` 已按状态机要求在 `features.md` 的 Last Updated 单元格追加 `(deferred: T034,T060,T061)` 后缀。(current)
+- **Ready for Review**: 延后项已解决或明确豁免,评审证据已产出。
+- **Completed**: 纪律在日常运行中被观察到(观察标记条目可检索),38 处措辞收敛为指针且单源扫描持续为 0。
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/051-user-facing-comprehension/requirements.md
+  Quality Checklist: .specify/specs/051-user-facing-comprehension/checklists/requirements.md
+
+### 交叉引用(消费关系,不构成归属)
+
+本 Feature 消费下列 Feature 拥有的既有权威,均**只引用不改写**;归属仍在各自 Feature:
+
+| Feature | 本 Feature 与其关系 |
+|---|---|
+| 040 Token Efficiency Discipline | **最接近的结构先例**:同为 `shared/guidelines/` 纪律 + 常驻章节 + 契约守卫;其"全局阈值 + 场景显式覆盖(声明处生效、不回写)"形态被直接复用为读者基准的裁定形状(FR-037);观察标记形态(`token-efficiency`)被沿用。本 Feature 受其**摘要优先**约束上下文上限(FR-010) |
+| 032 Task Complexity Rubric | **归属判定的决定性先例**:同为嵌入指令文件的行为纪律却自成 Feature,确立"投递事实 ≠ 归属事实" |
+| 046 Confirmation Gate Governance | 消费其治理保留清单(13 个门控)与执行报告三要素定义;给门控提示**新增**措辞义务,但明确不改其"是否门控"判据(FR-017) |
+| 042 Interview Mode | 拥有 `interview-pattern.md`,即可理解性规则今天唯一的完整表述处;本 Feature 把那四条规则**搬出**到独立真源,该文档收敛为指针 + 其模式特有规则(FR-021) |
+| 028 Feedback Mechanism | 消费 `feedback-step.md` 的对外措辞规则(传播足迹 194 文件),把它降级为本纪律在"反馈通知"界面类上的实例(FR-019);观察条目经其引擎记录 |
+| 031 Glossary Mechanism | 消费其 canonical 术语与出向就地注解协议,作为白名单第 ② 条的衔接点 |
+| 005 Constitution Command | 仅投递载体:本 Feature 经其 `MUST include` 清单把原则导出到下游 |
+| 023 Prompt Template Quality | 本 Feature 的守卫属结构契约测试,但约束对象是面向用户消息的**措辞**而非模板结构 |
+
+### 被后续 Feature 引用(入向,反向交叉引用)
+
+| Feature | 关系 |
+|---|---|
+| 052 快速失败纪律(Fast Fail) | **消费本 Feature 拥有的界面类封闭集**:其"上送件"归入类 **⑪ 失败如实报告**,并明确排除类 ① 门控确认提示(理由为实质而非命名——归入 ① 会使其成为一个门控提示,与 052 "不新增门控、不向治理保留清单增行"的裁定及其门控预算零命中主张直接矛盾)。052 的真源文档另须满足本 Feature 对**规则真源文件**的 canonical 指针行要求(其 FR-074)。052 MUST NOT 向本 Feature 的封闭集新增类别,亦 MUST NOT 成为类 ⑪ 的第二规则真源——四要素内容下限归 052,措辞与上下文规则仍归本 Feature。登记于 2026-09-22 `/speckit.clarify`(052 为新建 Feature,本行为其绑定规则要求的反向交叉引用) |

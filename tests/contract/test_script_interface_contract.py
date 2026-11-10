@@ -42,7 +42,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OWNER = ROOT / "shared" / "definitions" / "script-interface-definitions.md"
 OWNER_MIRROR = ROOT / ".specify" / "shared" / "definitions" / "script-interface-definitions.md"
 TEMPLATE = ROOT / "templates" / "constitution-template.md"
-LIVE = ROOT / ".specify" / "memory" / "constitution.md"
+LIVE = ROOT / ".specify" / "constitution.md"
 INSTRUCTIONS_TEMPLATE = ROOT / "templates" / "instructions-template.md"
 INSTRUCTIONS_LIVE = ROOT / ".specify" / "instructions.md"
 SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
@@ -269,7 +269,7 @@ def test_c25_live_constitution_carries_the_principle():
     text = _text(LIVE)
     titles = _principle_titles(text)
     assert PRINCIPLE_TITLE in titles, (
-        f".specify/memory/constitution.md carries no principle titled {PRINCIPLE_TITLE!r}; "
+        f".specify/constitution.md carries no principle titled {PRINCIPLE_TITLE!r}; "
         f"titles present: {titles[-3:]}"
     )
     assert titles.count(PRINCIPLE_TITLE) == 1, (

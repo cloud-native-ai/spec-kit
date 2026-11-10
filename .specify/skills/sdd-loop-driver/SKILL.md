@@ -176,7 +176,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
 - `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。
 - `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门（owner：efficiency-model §5–§7）。
-- **目标项目治理文档**（运行时读取，经 ssh 同样适用）：目标项目的 `constitution`（`.specify/memory/constitution.md`）与 `instructions`（`.specify/instructions.md`，含 `AGENTS.md` / `QODER.md` / `CLAUDE.md` 兼容符号链接）；两者不随本技能分发，缺失时按 Hard Requirement 10 处置。
+- **目标项目治理文档**（运行时读取，经 ssh 同样适用）：目标项目的 `constitution`（`.specify/constitution.md`）与 `instructions`（`.specify/instructions.md`，含 `AGENTS.md` / `QODER.md` / `CLAUDE.md` 兼容符号链接）；两者不随本技能分发，缺失时按 Hard Requirement 10 处置。
 
 ## Boundary
 

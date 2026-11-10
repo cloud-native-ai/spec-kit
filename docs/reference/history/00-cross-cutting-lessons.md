@@ -122,7 +122,7 @@ mirror 文件时 `cp` 被 alias 成 `cp -i`,遇到已存在目标会**静默跳�
 
 ## 十五、`templates/` 保持项目中立
 
-- **Template neutrality**: keep generic `templates/` (esp. `constitution-template.md`) project-agnostic; do NOT push spec-kit-specific content into shared scaffolding. Project-specific rules belong in `.specify/memory/constitution.md` or this file.
+- **Template neutrality**: keep generic `templates/` (esp. `constitution-template.md`) project-agnostic; do NOT push spec-kit-specific content into shared scaffolding. Project-specific rules belong in `.specify/constitution.md` or this file.
 
 ## 十六、文档引用方向是单向的
 

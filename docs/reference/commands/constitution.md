@@ -24,7 +24,7 @@ Create or update the project constitution — the non-negotiable principles and 
    - Determines language(s), framework(s), project type, and domain context
    - Uses inferred context to reject irrelevant template principles and replace with domain-appropriate ones
 
-2. **Ensure constitution exists** — If `.specify/memory/constitution.md` doesn't exist, generates it from `constitution-template.md`, immediately adapting to the project's actual context:
+2. **Ensure constitution exists** — If `.specify/constitution.md` doesn't exist, generates it from `constitution-template.md`, immediately adapting to the project's actual context:
    - Resolves ALL bracketed placeholders
    - Replaces generic principles with project-relevant ones
    - Removes unused template sections
@@ -56,7 +56,7 @@ Create or update the project constitution — the non-negotiable principles and 
 
 7. **Validation** — No unexplained bracket tokens, version matches `x.y.z.ddd`, dates ISO format, principles are declarative and testable.
 
-8. **Write and report** — Overwrites `.specify/memory/constitution.md` and outputs version, bump rationale, files needing follow-up, and suggested commit message.
+8. **Write and report** — Overwrites `.specify/constitution.md` and outputs version, bump rationale, files needing follow-up, and suggested commit message.
 
 ## Version Scheme
 
@@ -71,7 +71,7 @@ Create or update the project constitution — the non-negotiable principles and 
 
 | Artifact | Location |
 |----------|----------|
-| Constitution | `.specify/memory/constitution.md` |
+| Constitution | `.specify/constitution.md` |
 | Updated templates | `.specify/templates/plan-template.md`, etc. |
 
 ## Prerequisites

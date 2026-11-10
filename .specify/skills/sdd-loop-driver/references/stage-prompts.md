@@ -13,7 +13,7 @@
 ```text
 你在推进 <project> 的无人值守 SDD 特性开发，当前阶段：<STAGE>。
 - 项目终态权威文档：<target-state-doc>（所有取舍以它为准）
-- 项目宪法：<project>/.specify/memory/constitution.md（合规底线）
+- 项目宪法：<project>/.specify/constitution.md（合规底线）
 - 上一阶段完成提交：<prev-stage-commit-hash>（续作基线）
 - 当前断点判定：<breakpoint-verdict>（从状态脊恢复时必填）
 - 状态脊：STATE_SPINE_PATH=<state_spine_path>（U0 入口声明；缺失即快速失败）

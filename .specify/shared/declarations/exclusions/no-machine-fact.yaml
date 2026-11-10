@@ -213,7 +213,7 @@
   anchor: skills/internal/manage-agents/SKILL.md#分层信息披露（严格按序，禁止跳层/全量装载）
 #
 # skills/internal/manage-constitution/SKILL.md — (d) the deliverable is
-# `.specify/memory/constitution.md`
+# `.specify/constitution.md`
 # carrier: scripts/python/feedback-utils.py
 - unit: skills/internal/manage-constitution/SKILL.md
   carrier: scripts/python/feedback-utils.py

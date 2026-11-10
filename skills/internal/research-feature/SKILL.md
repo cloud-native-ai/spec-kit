@@ -47,7 +47,7 @@ and **AVAILABLE_DOCS**.
 ### Step 2 — Load context
 
 - Read `FEATURE_SPEC`.
-- Read `.specify/memory/constitution.md`.
+- Read `.specify/constitution.md`.
 - **Crucial**: based on `AVAILABLE_DOCS` and the feature requirements, read and analyze the
   relevant files from the project documentation. DO NOT rely only on memory; check `README.md`
   and the key docs found in the list.
@@ -58,8 +58,8 @@ and **AVAILABLE_DOCS**.
 ### Step 3 — Information gathering & analysis
 
 - **Project Architecture**: understand how the new feature fits into the existing system.
-- **Feature Interdependencies**: check `.specify/memory/features.md` and
-  `.specify/memory/features/` for conflicts or reuse opportunities.
+- **Feature Interdependencies**: check `.specify/features.md` and
+  `.specify/features/` for conflicts or reuse opportunities.
 - **Unknown Resolution**: address any defined "NEEDS CLARIFICATION" markers or research
   questions from `$ARGUMENTS`.
 - **Technology Selection**: verify best practices using the gathered context.

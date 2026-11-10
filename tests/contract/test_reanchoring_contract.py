@@ -15,7 +15,7 @@ def test_owner_document_carries_both_concepts_and_the_tiers():
 
 def test_both_constitution_surfaces_carry_the_principle():
     title = "Re-Anchoring (不忘初心 · 温故而知新)"
-    for rel in (".specify/memory/constitution.md", "templates/constitution-template.md"):
+    for rel in (".specify/constitution.md", "templates/constitution-template.md"):
         assert title in (ROOT / rel).read_text(encoding="utf-8"), rel
 
 

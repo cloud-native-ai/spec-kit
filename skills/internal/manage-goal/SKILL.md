@@ -207,7 +207,7 @@ nothing. On the user's ratification, write the agreed territory back into each a
 ## Command-lifecycle surfaces (kept in `/speckit.goal`)
 
 Entry argument handling (`.specify/shared/workflow/user-input-protocol.md`), the glossary
-pre-step (`.specify/memory/glossary.md`, protocol `.specify/shared/workflow/glossary.md`),
+pre-step (`.specify/glossary.md`, protocol `.specify/shared/workflow/glossary.md`),
 the `## Feedback` / `## Documentation` steps, and handoffs (team binding via
 `/speckit.team`) stay in the command template — they are command lifecycle, not goal
 operations.

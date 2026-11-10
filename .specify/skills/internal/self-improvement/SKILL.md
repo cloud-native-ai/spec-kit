@@ -19,7 +19,7 @@ Execute the Self-Improvement Loop — **why（当前问题是什么）→ what�
 | SI-0…SI-9 step bodies, outcomes, completion report | `.specify/shared/workflow/self-improvement-workflow.md` |
 | evidence lanes, Step A/B/E, red lines | `.specify/shared/workflow/evidence-step.md` |
 | 批评和自我批评 · 证伪尝试 rules | `.specify/shared/guidelines/critique-and-self-critique.md` |
-| 改点 identity and boundaries | `.specify/memory/glossary.md` → `改点`; `.specify/shared/workflow/self-improvement-workflow.md` SI-7 |
+| 改点 identity and boundaries | `.specify/glossary.md` → `改点`; `.specify/shared/workflow/self-improvement-workflow.md` SI-7 |
 | write classification and closing report | `.specify/shared/guidelines/confirmation-gates.md` |
 | Summary-First / escalation ladder | `.specify/shared/guidelines/token-efficiency.md` |
 

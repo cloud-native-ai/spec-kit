@@ -97,7 +97,7 @@ cd /tmp/upgrade-sim && /tmp/sim-venv/bin/specify init . --ai qoder --force --no-
 ## 8. 边界与遗留
 
 - 本方案**未含**发布工程项:版本号升位(当前仍 0.0.22)、release notes 正文、`_source_commit.json` 校验说明——随发布流程落。
-- c7 窗口项、暂存泄漏治理:见 `.specify/memory/register.md` c7 行(另案,不阻塞本方案)。
+- c7 窗口项、暂存泄漏治理:见 `.specify/register.md` c7 行(另案,不阻塞本方案)。
 - `kept` 计数语义若保留(F2 未采纳时),须在 release notes 明示"平铺内部残留属已知项 + 手工回收命令",**不推荐**。(F2 已采纳,本条条件不再成立,留作历史。)
 
 ## 9. 发布清单(草稿)
@@ -111,6 +111,6 @@ cd /tmp/upgrade-sim && /tmp/sim-venv/bin/specify init . --ai qoder --force --no-
   3. 建议:升级后重跑 `/speckit.instructions` 刷新指令面(`skills.md`/`tools.md` 为 create-if-absent 语义,老文件不会自动刷新,见 §6 对应行)。
 - **提交/推送步骤(占位,发布时执行)**:① 提交引擎与测试改动(F1/F2 落 `src/specify_cli/__init__.py`;F3 落 `tests/contract/test_upgrade_end_state.py` + `tests/contract/test_flat_internal_skill_migration.py` 用例修订);② 版本升位提交;③ 构建与发布(`pip wheel` 构建;uv tool / pipx 安装渠道);④ 分支与推送依 `.specify/workflow/git.md` 管理块(git-utils 技能 scope)。
 - **已知遗留**:
-  - c7 窗口项(中立性预算红,另案、不阻塞发布):见 `.specify/memory/register.md` c7 行——待 053 流程的刻意重锚/复核裁定;
+  - c7 窗口项(中立性预算红,另案、不阻塞发布):见 `.specify/register.md` c7 行——待 053 流程的刻意重锚/复核裁定;
   - 并发会话的 merge-skills 批次(`skills/external/merge-skills/**` + 其 `.specify/skills/` 镜像 + evidence 归档)独立归其所属流程,不并入本发布批次;
   - `_source_commit.json` 校验说明(§8 边界项)仍待随发布流程落。

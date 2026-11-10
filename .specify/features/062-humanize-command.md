@@ -1,0 +1,92 @@
+# Feature Detail: Humanize Command（动作输出人类友好化）
+
+**Feature ID**: 062  
+**Name**: Humanize Command（动作输出人类友好化）  
+**Description**: `/speckit.humanize` 是动作输出的人类友好化命令——调用者给一条指令，命令派发恰好一个执行体跑完它，再由主会话结合动作证据、项目治理与会话上下文写成五节结构化报告（结论/关键变化/证据/风险/下一步）；裸文本=待执行指令，改写既有文本须显式 --file/--inline；默认零写入，失败与确认缺失如实报告  
+**Status**: Implemented  
+**Created**: 2026-10-19  
+**Last Updated**: 2026-10-31
+
+## Overview
+
+机器生成的内容、结论与报告常带套话、密集段落与机械句式，可读性差且不适合直接面向读者交付。本 Feature 为框架新增通用内容能力 `/speckit.humanize`：在保真底线（事实、数字、单位、日期、名称、结论、因果关系与引用关系不变，不编造、不静默消歧）的前提下，从四个维度改写调用者提供的内容——语气与风格自然化、上下文与逻辑补全（只在输入已蕴含的范围内）、格式与可读性优化、降低 AI 痕迹（词汇与句式多样性，不承诺任何 AI 内容检测器结果）。
+
+命令定位为薄入口，执行流委派给恰好一个技能（057 命令技能化分解的既有做法）；支持内联内容与外部文档（Markdown/纯文本）两类输入源、四种语气（professional/humorous/empathetic/colloquial）与自由文本受众、显式输出路径写入与覆盖确认；默认只把改写结果返回会话，不创建、不修改任何文件。不新增外部服务、网络调用、模型 API 或第三方依赖（宪法 IX）。
+
+## Latest Review
+
+- 2026-10-31 `/speckit.tasks`（079 扩展登记核对，implement 阶段补记）：tasks 阶段产出本规格 36 行任务，88 条款由 § Contract Coverage Map 人工指派到 31 行（IP/EX/RP/CM/WC），并由 T036 的 `test_wc12_clause_test_map_is_total` 承担「条款 id ↔ 测试名」机器核对（实现期执行）；五个红先行测试行（T005/T013/T019/T024/T036）先于实现行落笔，主契约套件载体是 `tests/contract/test_humanize_command_surface.py`；US4 实现由 T025–T032 落定（内容模式保留入口、两模式共有防线、run-mode § Output、派生面再生成、docs 重定位与登记追加）。状态保持 Implemented（扩展不回退，FR-029）。
+
+- 2026-10-30 `/speckit.tasks`（079 H-06 传播修复，analyze 第二轮唯一 HIGH）：把 requirements 已定义的 `denied`（用户明确拒绝确认）接到任务与验收面——`tasks.md` T010 的 status 改为**七值**并补 `denied` 语义（不执行该步、无替代动作、verdict 取 `aborted`、文案写「用户拒绝确认」与未执行范围），T004 新增 `denied/envelope.md` 夹具，T019 新增拒绝确认断言组（`test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope`）并把 T019 补进 SC-004 覆盖行（T021 保留为确认缺失实现行），quickstart S6 补「用户拒绝确认」场景（S6-B）与完成判据行；同批关闭 M-22（Shared Strings 计数 15）、M-23（本文件与索引计数 36 任务 / 31 指派行）、L-01（H1 采用新名称）、L-02（T014 改引 FR-019）、M-24（SC-010 三组注入夹具由 `run/injection/` 两组补齐）。任务编号保持连续，总数 36（≤40）；`validate-tasks.py` / `decomposition-check.py` / `pre-analyze-check.py` 复跑读数见 `test-evidence/`。状态保持 Implemented。
+
+- 2026-10-30 `/speckit.plan`（079 analyze 修复轮 1）：按 `test-evidence/analyze-fix-brief.md` 的 plan/contracts 归属关闭 H-05（三条 Decision Tension 的 `expected_sacrifice` 各绑定恰一个 `SC-NNN Source ↓`；`validate-decision-tensions.py` 0 error / 0 warning）与 M-04/M-07/M-17/M-19；契约对齐 FR-019（verdict 唯一 owner）、FR-024（运行模式输出与文件内元数据）、FR-025（回传字段与产物内容的注入面）、FR-004（`--audience` 空值 = 未提供）；`data-model` E2/E3/E5/E6/E7 同步（`denied`、`not-read`、语言域 `zh`/`en`）；quickstart S3 改为「一次派发 + `dispatches: 1` + Evidence `none`」；Constitution Check IV 与 `tasks.md` 统一为 Partial（template-only 门）。条款数不变（88），FR/SC 数不变（30/10）。
+
+- 2026-10-30 `/speckit.tasks`（079 扩展）：产出 `.specify/specs/080-humanize-run-output/tasks.md`（36 行任务 / 7 相位 / 0 error 0 warning；`decomposition-check.py --mode tasks` 报 `proceed`，`task_count=36 ≤ 40`；`pre-analyze-check.py --stage tasks` 报 `pass`、`errors=0`，21 条 missing-path advisory 全部命名本特性将新建的路径）。组织按四个用户故事（US1/US2 为 P1、US3/US4 为 P2），Foundational 只放技能模式分叉与运行夹具集；四个红先行测试行分别承载 IP/EX/RP/WC、RP、EX/IP、CM/IP/RP 的断言组，证据落 `notes/red-first-evidence.md`。条款覆盖由 § Contract Coverage Map 人工指派承担（88 条各指派给恰一行），**不使用 `[green:]`**：五份契约使用 `IP`/`EX`/`RP`/`CM`/`WC` 两字母命名空间，`clause_extract.py` 实测 `form=md-none`，声明 `[green:]` 会判 `green-dangling`（066/067 先例）。本阶段为 docs-only 测试预算（`test-evidence/tasks-test-budget.txt` 记 `status=not-run-docs-only`）。状态保持 Implemented（扩展不回退，FR-029）。
+
+- 2026-10-30 `/speckit.plan`（079 扩展）：设计产物落盘——`plan.md`（宪法检查 18 行动态枚举、三处 Decision Tensions：派发载体 T-001 / 并发观测 T-002 / 复杂度分类 T-003、镜像基线实测干净）、`data-model.md`（8 实体 + 26 校验规则 + 运行状态机）、`contracts/` ×5（88 条款：IP 17 / EX 21 / RP 20 / CM 10 / WC 20）、`quickstart.md`（7 场景，行为类逐例前提清单 + docs-only 未执行标注）、`feature-ref.md`（062 扩展绑定）。基线读数冻结于 `test-evidence/stage-plan-baselines.txt`（regen/mirror 干净、probe 75 单元零漂移、门控 27/0、技能正文 ≈4090/5000 tokens）。状态保持 Implemented（扩展不回退，FR-029）。
+
+- 2026-10-30 `/speckit.clarify`（079 扩展）：把命令从「文本转换」重构为「动作输出的人类友好化」——裸文本=待执行指令，经 run-agent 派发一个子代理执行，主会话结合动作证据/项目治理/会话上下文产出五节报告；确认缺失 fail-closed；`--file`/`--inline` 保留为显式备用。状态保持 Implemented（扩展不回退）。
+
+2026-10-19：implement 完成，状态 **Planned → Implemented**。`/speckit.implement` 完成 T001–T033（33/33，0 deferred）：T031 按 quickstart 实跑 S1–S8（生成面零漂移、镜像触碰对字节一致且零 NEW drift、编译面 74 单元零漂移、测试名字级 `comm -13` 对冻结 71 名单为 0 新增——当前 64 failed / 3951 passed、35/35 条款与 29/29 FR 覆盖、S8 确定性抽检全部 exit 0），全量命令/输出/退出码见 `notes/quickstart-run.md`；T032 将 SC-001..SC-011 全量汇总为 pass 并记录证据路径（`verification.md` § T032），`validate-requirements.py` 与 `validate-tasks.py` 均 exit 0（33 任务 / 35 green 认领 / 0 collision）；17 项交付面逐项实存核对 17/17。实现证据路径：`verification.md`、`notes/quickstart-run.md`、`notes/e8-run/`、`tests/fixtures/humanize/`、`tests/contract/test_humanize_command_surface.py`。analyze2 的四项顺带发现（U-08/F-07/L-04/L-05）经核对均已在工作树修复。
+
+2026-10-19：checklist → tasks → analyze 门回环 round 1 修复完成（状态保持 **Planned**）。`/speckit.checklist` 产出 requirements 质量清单（16/16）与 requirements-quality 调查清单（f2fe4027）；`/speckit.tasks` 产出 **33 任务 / 7 Phase**（e14d9a0a，`validate-tasks.py` exit 0）。`/speckit.analyze` 门判 CRITICAL 0 / HIGH 2（H-01 提示注入防线、H-02 主语言判定）→ requirements 修复（173c897d：新增 FR-029/SC-011，FR-013/SC-003 定义主语言可复现判定，FR-018 落定调用语法，FR-019/021/022 补齐 BOM/同路径/扩展名/写入清理）与 plan 修复（d0523cfe：rewrite-behavior 新增 **C-35**，data-model E4/E7/E8 与 quickstart/feature-ref 同步）已完成；tasks 传播轮把 H-01/H-02/B-01、U-01..U-07、F-01/F-02、L-01..L-03、F-05/F-06 落到 T003/T004/T005/T006/T007/T010/T011/T012/T013/T014/T015/T016/T020/T022/T023/T027/T028/T029/T030，**C-35 由 T029 认领**，T020/T023/T027/T028 的 blocker 边已补全。现行程序派生计数：**契约 35 条款（C-1..C-35）/ FR 29 / SC 11 / data-model 30 校验规则 / 33 任务 / 35 green 认领**。状态保持 Planned，待复跑 analyze 与后续 implement。
+
+2026-10-19：plan 完成，状态 Draft → Planned。产出 plan.md（宪法检查 16 行动态枚举，IV 判 Partial 经 VII template-only 门正当化 + 同作者门委派 fresh-context 只读评分复核：12 项发现全部关闭——11 纠正 + 1 非阻断清理，0 裁定上抛）、data-model.md（8 实体 + 30 条校验规则）、contracts/ ×3（35 条款 C-1..C-35：command-surface 10 / rewrite-behavior 14 / tone-input-file 11；C-35 于 repair round 1 新增；FR 覆盖 29/29 由 `clause_blocks` 程序派生）、quickstart.md（8 场景：S1–S6 实跑留痕，S7–S8 逐例免责 + 前提清单）、feature-ref.md（FR 29/29、SC 11/11、17 项交付清单）。4 类基线在改动前冻结于 `notes/`（6 文件）：生成面零漂移；镜像 209 条既有 DIFF（其中 `probe-definitions.md` 为触碰对，见第 181 行）；编译面 73/73 旧指纹可再生漂移（= 23 Complex 命令 + 50 技能）；测试 71 failed / 3929 passed 名单冻结。判据分档：不触碰对取零 NEW drift（相对），已漂移触碰对取特性限定同步后绝对字节一致。**分类纠正**：按 027 分类规则 humanize 为 **Simple**——命令模板不携带 `## Wrap-up`、不注册 probe 命令单元；仅技能侧新增 `skill-humanize-wrapup`（实现后 74 单元）。同批义务：更新 027 分类契约表与 Result 计数（simple 3 → 4）、`test_feedback_command_classification.py` 的钉扎计数、`test_skill_layer_visibility_guards.py` 的 external 普查（13 → 14，internal 37 不变）——两测试均不在冻结失败名单内，复跑必须绿。
+
+2026-10-19：requirements + clarify 完成。规格通过 `validate-requirements.py`（0 error / 0 warning，doc-order pass）；clarify 会话 2 问自裁决——①Related Feature 绑定新建本 Feature（60 个既有 Feature 无一覆盖该能力，绑定先例为新命令各占一 Feature）；②执行技能分类维持 `external`（词汇表判据唯一指向：与 spec-kit 无依赖、任何项目皆可直接使用）。注册行与本详情文件落册。
+
+## Key Changes
+
+1. 新增薄命令模板 `templates/commands/humanize.md`，执行流委派给恰好一个技能，按既有生成机制分发按工具副本（FR-024、FR-025）。
+2. 四维度改写行为与保真底线、受保护内容逐字保留、最小改动、矛盾报告与完整性（FR-003 至 FR-013）。
+3. 语气与受众控制：封闭语气集合 + 自由文本受众，语气不覆盖保真底线，不支持值显式拒收（FR-014 至 FR-017）。
+4. 输入与文件安全默认：单输入源、默认不写文件、显式输出路径 + 覆盖确认、输出格式跟随输入（FR-018 至 FR-023）。
+5. 分发、登记与诚实性：逐命令参考文档、注册表登记、确定性契约检查 + 行为夹具、不承诺检测器结果的明确声明、零新增失败与零新增漂移基线（FR-025 至 FR-028，SC-007 至 SC-010）。
+6. 输入内容安全（提示注入防线）：输入一律按数据处理，指令式文本不改变命令行为、不跳过保真/拒收/零外传、不触发外部动作，逐字保留或按原样改写并在会话报告提示（FR-029、SC-011、C-35）。
+7. 079 扩展（2026-10-30）：输入契约改为「指令执行 + 报告改写」，新增五节报告、执行安全边界与迁移提示；旧内容模式保留为显式入口。plan 补充：运行模式经 run-agent 派发会话级临时执行体（T-001）、并发用受制裁临时根下的一次性占位（T-002）、命令复杂度分类保持 Simple（T-003）；技能正文只加路由，细则落 `references/`。
+8. 079 tasks 阶段（2026-10-30）：任务清单把 88 条条款指派到 31 行（IP/EX/RP/CM/WC 五组），四份故事各自的红先行行与定向集落点固定；条款核算的形态缺口（`form=md-none`）如实记录并交 analyze 裁定，不以人工覆盖表冒充实测覆盖。
+9. 079 tasks 传播修复（2026-10-30，H-06）：把 `denied`（用户拒绝确认）接入夹具、测试断言、SC-004 覆盖行与 quickstart S6-B（无副作用、`denied`→`aborted`、拒绝原因与未执行范围）；`status` 记为七值并由 FR-012 拥有；SC-010 的运行模式与回传注入样本落 `run/injection/`；Feature 062 仍为 `Implemented`，任务总数 36（31 行指派）。
+10. 079 implement（2026-10-31）：内容模式落定为保留的既有入口（不是兼容垫片）并补两模式共有防线（注入防护、保真底线、检测器诚实）；运行模式新增 § Output 目标语义（扩展名封闭集、完整五节报告 + 会话摘要、原子写与 `--force`）；四份按工具副本与技能镜像由再生成入口重建；docs 页与登记面同步到「动作输出人类友好化」口径，状态保持 `Implemented`。
+
+## Implementation Notes
+
+- 执行技能分类为 `external`（词汇表判据：与 spec-kit 无依赖、任何项目皆可直接使用）；plan 若发现判据冲突可修订（缺省条目已记录该复核权）。
+- 默认语气 `professional`；命令名、语气集合、扩展名与选项集四组字符串以规格 Shared Strings（STR-001..004）为消费真源。
+- 调用语法按 FR-018/[[STR-004]]（六选项、`--` 终止、`--file`/`--inline`、`--force`、双源/无输入拒绝）；主语言按 FR-013 可复现规则判定；所有报告回会话，`--output` 文件仅包含改写文本。
+- 注入防线由技能体「输入按数据处理」指令与 E8 威胁样本承载，契约认领行为 C-35（tasks 侧 T029）。
+- 首版显式排除：原地覆盖输入文件、多文件批量处理、翻译、PDF/DOCX/HTML/图片等格式、检测器评分与规避。
+- 长文档分段处理必须重组为单一完整结果，无法完成时报告未处理部分，不得静默截断。
+- 行为评估依赖固定语料（`tests/fixtures/humanize/`，随实现落盘，含指令式内容威胁样本）+ 两位独立评审量规；文件安全用逐字节哈希与目录快照断言。
+
+## Future Evolution Suggestions
+
+- 原地覆盖输入文件（显式确认后）可作为后续特性扩展。
+- 批量文件处理与目录遍历按需另立特性。
+- 更多输入格式（HTML 等）按需扩展支持集合。
+
+## Related Files
+
+- Feature Index: `.specify/memory/features.md`
+- Feature Detail: `.specify/.specify/features/062-humanize-command.md`
+- 需求语义权威（dated record，逐字归档）: `.specify/specs/062-humanize-command/notes/source-requirement.md`
+- 实现计划与任务: `.specify/specs/062-humanize-command/plan.md`、`.specify/specs/062-humanize-command/tasks.md`
+- 契约与评估布局: `.specify/specs/062-humanize-command/contracts/`、`.specify/specs/062-humanize-command/data-model.md`
+
+## Related Specifications/Requirements
+
+- `.specify/specs/080-humanize-run-output/requirements.md`（扩展规格：run-then-report 定位；Feature 062 状态保持 Implemented）
+
+- `.specify/specs/062-humanize-command/requirements.md`（本 Feature 首个规格）
+  Quality Checklist: `.specify/specs/062-humanize-command/checklists/requirements.md`
+- 承接本 Feature 评审产出的后续规格：`.specify/specs/063-review-p1-governance/requirements.md`（Feature 063 Review P1 Governance——把本 Feature `review.md` 的 F1–F8 治理为框架机制；本 Feature 的制品在该特性中是证据，不在其编辑范围内，2026-10-19 登记于 clarify 会话）
+
+## Status Tracking
+
+- **Draft**: requirements 已澄清（2 问自裁决，validator exit 0），注册行与本详情文件已落册（2026-10-19，clarify 会话顺延登记）。
+- **Planned**: 2026-10-19 达成——plan.md + Phase 1 产物（data-model.md、contracts/ ×3、quickstart.md、feature-ref.md）落盘，Constitution Check 无未证成 Fail（IV Partial 经 VII template-only 门正当化），基线冻结于 notes/。
+- **Checklist**: 2026-10-19 完成——`/speckit.checklist` 产出 `checklists/requirements.md`（16/16）与 `checklists/requirements-quality.md`（调查清单，开放项保留给后续轮次）。
+- **Tasks**: 2026-10-19 完成——`/speckit.tasks` 产出 33 任务 / 7 Phase（`validate-tasks.py` exit 0）；repair round 1 传播轮补齐 C-35 认领、注入与文件/格式夹具、主语言量规、调用语法与 blocker 边（green 认领 35 条）。
+- **Analyze / repair round 1**: 2026-10-19 门判 CRITICAL 0 / HIGH 2；requirements 修复（173c897d）与 plan 修复（d0523cfe）已完成，tasks 传播同步完成；状态保持 **Planned**，待复跑 analyze 归零后进入 implement。
+- **Implemented**: 2026-10-19 达成——tasks.md 33/33 `[X]`、零 `[ ]`/`[>]`/`[~]`；`verification.md` SC-001..SC-011 全 pass 并带证据路径；`validate-requirements.py` / `validate-tasks.py` exit 0；17 项交付面实存；零 NEW 测试失败 / 零 NEW 镜像漂移 / 零编译漂移。实现证据：`.specify/specs/062-humanize-command/verification.md`、`notes/quickstart-run.md`、`notes/e8-run/`（/speckit.implement）。
+- **Ready for Review**: deferred 解决/豁免；review 证据产出。
+- **Completed**: 最终验收。

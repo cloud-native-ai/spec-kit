@@ -306,7 +306,7 @@ At wrap-up, invoke the native `memory-record` skill (`skills/internal/memory-rec
 
 ## Command-lifecycle surfaces (kept in `/speckit.todo`)
 
-Entry argument handling (`$ARGUMENTS` per `.specify/shared/workflow/user-input-protocol.md`), the glossary pre-step (`.specify/memory/glossary.md`, protocol `.specify/shared/workflow/glossary.md`), the Philosophy section (a pointer to `.specify/shared/guidelines/todo-in-context.md`), the `## Feedback` / `## Documentation` steps (docs-sync evaluation per `.specify/shared/workflow/docs-step.md`, escalation target `/speckit.docs`), and the Handoffs (implement/review routing via `/speckit.implement` / `/speckit.review`) stay in the command template — they are command lifecycle, not TODO operations.
+Entry argument handling (`$ARGUMENTS` per `.specify/shared/workflow/user-input-protocol.md`), the glossary pre-step (`.specify/glossary.md`, protocol `.specify/shared/workflow/glossary.md`), the Philosophy section (a pointer to `.specify/shared/guidelines/todo-in-context.md`), the `## Feedback` / `## Documentation` steps (docs-sync evaluation per `.specify/shared/workflow/docs-step.md`, escalation target `/speckit.docs`), and the Handoffs (implement/review routing via `/speckit.implement` / `/speckit.review`) stay in the command template — they are command lifecycle, not TODO operations.
 
 ## Wrap-up
 

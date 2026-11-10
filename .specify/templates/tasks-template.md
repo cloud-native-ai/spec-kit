@@ -7,11 +7,11 @@ description: "Task list template for feature implementation"
 
 **Requirement ID**: [REQUIREMENT_ID] (from branch name, e.g., 003)
 **Requirement Key**: [REQUIREMENTS_KEY] (e.g., 003-speckit-agents-command)
-**Related Feature**: [FEATURE_ID] [FEATURE_NAME] (from .specify/memory/features.md)
+**Related Feature**: [FEATURE_ID] [FEATURE_NAME] (from .specify/features.md)
 **Input**: Design documents from `.specify/specs/[REQUIREMENTS_KEY]/`
 **Prerequisites**: plan.md (required), requirements.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests Mode**: [ON | OFF] — derived from `.specify/memory/constitution.md` by `/speckit.tasks`. State the principle (or absence) that drove the decision.
+**Tests Mode**: [ON | OFF] — derived from `.specify/constitution.md` by `/speckit.tasks`. State the principle (or absence) that drove the decision.
 
 **Tests**: When Tests Mode is ON, the examples below include test tasks and they are MANDATORY. When OFF, remove the test rows entirely (do NOT leave empty placeholders).
 

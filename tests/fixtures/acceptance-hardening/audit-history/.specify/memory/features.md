@@ -4,7 +4,7 @@
      Shape owner: .specify/specs/081-acceptance-hardening/data-model.md § Fixture set.
 
      This is the audit-root case 081d's data model assigns: a self-contained audit root — a
-     `.specify/memory/features.md` registry plus `.specify/specs/<key>/` directories INSIDE the
+     `.specify/features.md` registry plus `.specify/specs/<key>/` directories INSIDE the
      case, each carrying the artifacts its registry row claims. It is the only case shape that can
      exercise `--audit-existing --repo <case>`, because that mode enumerates registry rows across a
      repository root.
@@ -15,7 +15,7 @@
      feature directory; every path in this case resolves inside the case itself.
 
      This directory starts with a dot-prefixed component on purpose: it reproduces the audited
-     root's real anatomy (`.specify/memory/features.md`), and it is the shape C-11's zero-write
+     root's real anatomy (`.specify/features.md`), and it is the shape C-11's zero-write
      assertion is strongest on — an implementation that cached, locked or rewrote anything under
      the root it reads would touch exactly these paths.
 -->

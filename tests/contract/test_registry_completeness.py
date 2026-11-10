@@ -46,7 +46,7 @@ def test_c2_discovery_docs_exist():
 
 @pytest.mark.contract
 def test_c3_features_header_count_matches_rows():
-    text = (REPO_ROOT / ".specify/memory/features.md").read_text(encoding="utf-8")
+    text = (REPO_ROOT / ".specify/features.md").read_text(encoding="utf-8")
     m = re.search(r"\*?\*?Total Features\*?\*?:\s*(\d+)", text)
     assert m, "features.md header lacks Total Features count"
     rows = len(re.findall(r"^\| \d{3} \|", text, re.M))

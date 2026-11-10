@@ -110,4 +110,4 @@ def test_upgrade_end_state_over_flat_internal_install(monkeypatch, tmp_path: Pat
     assert text.startswith("# demo-ext (new)\n")
     assert "See .specify/skills/internal/demo-int/SKILL.md" in text
     assert "See skills/internal/demo-int" not in text
-    assert ".specify/memory/constitution.md" in text
+    assert ".specify/constitution.md" in text

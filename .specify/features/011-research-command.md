@@ -1,0 +1,43 @@
+# Feature Detail: Research Command
+
+**Feature ID**: 011  
+**Name**: Research Command  
+**Description**: Gather context and dependencies.  
+**Status**: Completed  
+**Created**: 2026-02-10  
+**Last Updated**: 2026-02-10
+
+## Overview
+
+The Research Command enables gather context and dependencies. This is part of the Spec Kit CLI toolkit.
+
+## Latest Review
+
+Initial generation/refresh.
+
+## Key Changes
+
+1. Initial release/indexing.
+
+## Implementation Notes
+
+- Part of specify-cli reference implementation.
+
+## Future Evolution Suggestions
+
+- Continuous improvement based on usage.
+
+## Related Files
+
+- Specification: .specify/specs/011-011-research-command/requirements.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/011-research-command.md
+- Quality Checklist: .specify/specs/011-011-research-command/checklists/requirements.md
+
+## Status Tracking
+
+- **Draft**: Concept defined.
+- **Planned**: Spec approved.
+- **Implemented**: Code written.
+- **Ready for Review**: Tests passing.
+- **Completed**: Merged and available.

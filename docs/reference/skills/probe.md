@@ -46,4 +46,4 @@ as Future Evolution in the feature detail file.
 
 Related: the feedback-domain instance and its engine are documented in
 [feedback.md](feedback.md); glossary anchors: Probe (umbrella) / Handler / HandlerBinding
-in `.specify/memory/glossary.md`.
+in `.specify/glossary.md`.

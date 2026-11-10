@@ -9,10 +9,10 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Principles | Numbered Core Principles + governance rules; that file is authoritative for the roster, count and version |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status; **hand-maintained** — header and rows edited together (`.specify/shared/workflow/feature-integration.md`) |
-| **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
-| **Glossary** | `.specify/memory/glossary.md` | Vocabulary anchor | Canonical terms, confusables, meanings (protocol: `.specify/shared/workflow/glossary.md`) |
+| **Constitution** | `.specify/constitution.md` | Principles | Numbered Core Principles + governance rules; that file is authoritative for the roster, count and version |
+| **Feature Index** | `.specify/features.md` | Feature roadmap status | Per-feature status; **hand-maintained** — header and rows edited together (`.specify/shared/workflow/feature-integration.md`) |
+| **Feature Details** | `.specify/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
+| **Glossary** | `.specify/glossary.md` | Vocabulary anchor | Canonical terms, confusables, meanings (protocol: `.specify/shared/workflow/glossary.md`) |
 | **Readme** | `README.md` | Project entry point | SDD overview, supported agents, feature list, installation pointer |
 | **Installation** | `docs/tutorials/installation.md` | CLI installation | Setup steps for the `specify` CLI |
 | **Quickstart** | `docs/tutorials/quickstart.md` | First run | End-to-end /speckit.* example |
@@ -241,7 +241,7 @@ Every non-derivable takeaway from a run MUST be recorded before wrap-up; normati
 
 ## ID Register (编号登记)
 
-Every durable identifier — decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session.
+Every durable identifier — decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session.
 
 - **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate decision content.
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.

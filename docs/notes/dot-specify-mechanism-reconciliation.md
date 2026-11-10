@@ -31,10 +31,10 @@ tags: [criterion-reconcile, mechanism-audit, dot-specify]
 | 6 | `.specify/source.json` | CLI init 提交戳(feature 043:framework/commit/stamped_at) | `src/specify_cli/__init__.py:588-602` | 有主 |
 | 7 | `.specify/gate.yaml` | 确认门机械写门:`gate-check.py` 引擎读取,`/speckit.implement` 消费;模板 `templates/gate-template.yaml` | `scripts/python/gate-check.py:45`(GATE_FILE)+ `templates/commands/implement.md:51` | 有主 |
 | 8 | `.specify/.gitignore` | CLI 安装自 `templates/gitignore-specify-template` | `src/specify_cli/__init__.py:2389-2402`（`copy_local_templates` 的 `.gitignore` 安装块） | 有主 |
-| 9 | `.specify/memory/constitution.md` | `/speckit.constitution` | `templates/commands/constitution.md` + `templates/constitution-template.md` | 有主 |
-| 10 | `.specify/memory/features.md` + `features/<NNN>.md`(54 份) | 特性集成工作流(索引手工维护,记录义务归该流程) | `.specify/shared/workflow/feature-integration.md` + `templates/feature-index-template.md` + `templates/feature-details-template.md` | 有主 |
-| 11 | `.specify/memory/glossary.md` | 词汇协议流程 + glossary-utils 引擎 | `.specify/shared/workflow/glossary.md` + `scripts/python/glossary-utils.py` | 有主 |
-| 12 | `.specify/memory/register.md` | ID 登记纪律(指令面携带并强制) | `templates/instructions-template.md:147` | 有主 |
+| 9 | `.specify/constitution.md` | `/speckit.constitution` | `templates/commands/constitution.md` + `templates/constitution-template.md` | 有主 |
+| 10 | `.specify/features.md` + `features/<NNN>-<slug>.md`(54 份) | 特性集成工作流(索引手工维护,记录义务归该流程) | `.specify/shared/workflow/feature-integration.md` + `templates/feature-index-template.md` + `templates/feature-details-template.md` | 有主 |
+| 11 | `.specify/glossary.md` | 词汇协议流程 + glossary-utils 引擎 | `.specify/shared/workflow/glossary.md` + `scripts/python/glossary-utils.py` | 有主 |
+| 12 | `.specify/register.md` | ID 登记纪律(指令面携带并强制) | `templates/instructions-template.md:147` | 有主 |
 | 13 | `.specify/memory/tools.md` | 手工维护的工具系统指南(refresh 脚本显式声明不产出它) | `scripts/bash/refresh-tools.sh:62` | 有主 |
 | 14 | `.specify/memory/tools/<name>.md`(10 份) | `create-tools` / `improve-tools` 技能 + tools-utils 引擎 | `skills/internal/create-tools/SKILL.md` + `scripts/python/tools-utils.py` | 有主 |
 | 15 | `.specify/memory/session/`(11 份 md) | memory-utils 短期存储 + run-determination 运行判定记录 | `scripts/python/memory-utils.py:10` + `scripts/python/run-determination.py` | 有主 |

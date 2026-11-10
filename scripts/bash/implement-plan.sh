@@ -260,7 +260,7 @@ EOF
     fi
 
     # Load constitution if it exists
-    CONSTITUTION_FILE="$REPO_ROOT/.specify/memory/constitution.md"
+    CONSTITUTION_FILE="$REPO_ROOT/.specify/constitution.md"
     if [[ -f "$CONSTITUTION_FILE" ]]; then
         echo "Loaded constitution: $CONSTITUTION_FILE"
     else

@@ -367,7 +367,7 @@ PYEOF
     GLOSSARY_TEMPLATE=".specify/templates/glossary-template.md"
     if [ -f "$GLOSSARY_ENGINE" ] && [ -f "$GLOSSARY_TEMPLATE" ]; then
       if python3 "$GLOSSARY_ENGINE" --action init --from-template "$GLOSSARY_TEMPLATE" >/dev/null 2>&1; then
-        log info "Ensured project glossary at .specify/memory/glossary.md (non-destructive)"
+        log info "Ensured project glossary at .specify/glossary.md (non-destructive)"
       else
         log warning "Glossary init skipped (engine returned non-zero)"
       fi

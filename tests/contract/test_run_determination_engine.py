@@ -7,7 +7,7 @@ Design truth: ``.specify/teams/.work/session-driven-self-improvement/outputs/jud
 The classes below are named after the contract's § 15 verification hooks so S5
 can check each hook without re-deriving it. Two house disciplines shape the file:
 
-* **Red-First 取证 / 变异演练** (owner: ``.specify/memory/glossary.md``). Every
+* **Red-First 取证 / 变异演练** (owner: ``.specify/glossary.md``). Every
   guard here was run red before the engine existed, and three of them were
   mutation-drilled; the evidence lives at
   ``.specify/teams/.work/session-driven-self-improvement/outputs/red-first-evidence.md``.
@@ -238,7 +238,7 @@ class TestOwnerSurfaces:
         assert "UNSUPPORTED_TOOL_HINTS" in text
 
     def test_glossary_owns_the_machinery_terms(self):
-        text = (FRAMEWORK_ROOT / ".specify" / "memory" / "glossary.md").read_text(encoding="utf-8")
+        text = (FRAMEWORK_ROOT / ".specify" / "glossary.md").read_text(encoding="utf-8")
         for term in ("名字级基线", "Red-First 取证", "变异演练", "反空真哨兵", "改点", "运行判定"):
             assert term in text, f"glossary entry missing: {term}"
 
@@ -1441,7 +1441,7 @@ class TestGateBudgetOnEngineSource:
 
     def test_retired_naming_forms_do_not_appear(self, engine_source):
         """Drift guard for the retired forms named by
-        ``.specify/memory/glossary.md`` → `运行判定` (naming-history owner).
+        ``.specify/glossary.md`` → `运行判定` (naming-history owner).
 
         The two literals below appear in this file ONLY as guard copies in the
         sense ``shared/guidelines/one-source-of-truth.md`` § Legitimate duplicates

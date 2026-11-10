@@ -38,7 +38,7 @@ TEMPLATE = ROOT / "templates" / "constitution-template.md"
 # installed downstream exactly like the command was. The command-side half of this
 # double-landing guard follows the content to its owner file.
 SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
-LIVE = ROOT / ".specify" / "memory" / "constitution.md"
+LIVE = ROOT / ".specify" / "constitution.md"
 SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 
 # C-1: the two titles, verbatim.
@@ -447,7 +447,7 @@ def test_c11_live_constitution_carries_the_comprehension_principle():
     text = _text(LIVE)
     titles = {m.group(2).strip() for m in LIVE_TITLE_RE.finditer(text)}
     assert STR003_TITLE in titles, (
-        f".specify/memory/constitution.md carries no principle titled {STR003_TITLE!r}"
+        f".specify/constitution.md carries no principle titled {STR003_TITLE!r}"
     )
     numerals = [m.group(1) for m in LIVE_TITLE_RE.finditer(text)]
     assert len(numerals) == LIVE_COUNT, (

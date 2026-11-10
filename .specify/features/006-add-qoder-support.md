@@ -1,0 +1,43 @@
+# Feature Detail: Feature Command
+
+**Feature ID**: 006  
+**Name**: Feature Command  
+**Description**: Manage feature lifecycle and metadata.  
+**Status**: Completed  
+**Created**: 2026-02-10  
+**Last Updated**: 2026-02-10
+
+## Overview
+
+The Feature Command enables manage feature lifecycle and metadata. This is part of the Spec Kit CLI toolkit.
+
+## Latest Review
+
+Initial generation/refresh.
+
+## Key Changes
+
+1. Initial release/indexing.
+
+## Implementation Notes
+
+- Part of specify-cli reference implementation.
+
+## Future Evolution Suggestions
+
+- Continuous improvement based on usage.
+
+## Related Files
+
+- Specification: .specify/specs/006-006-feature-command/requirements.md
+- Feature Index: .specify/features.md
+- Feature Detail: .specify/features/006-add-qoder-support.md
+- Quality Checklist: .specify/specs/006-006-feature-command/checklists/requirements.md
+
+## Status Tracking
+
+- **Draft**: Concept defined.
+- **Planned**: Spec approved.
+- **Implemented**: Code written.
+- **Ready for Review**: Tests passing.
+- **Completed**: Merged and available.

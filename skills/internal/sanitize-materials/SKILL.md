@@ -58,7 +58,7 @@ template); their semantics govern how this skill runs:
   refers to the kept definition, `--reason <path>` records a dismissal's adjudication
   pointer.
 - Trigger: manual, on demand only.
-- Glossary: apply the project glossary protocol (`.specify/memory/glossary.md` +
+- Glossary: apply the project glossary protocol (`.specify/glossary.md` +
   `.specify/shared/workflow/glossary.md`) before acting — the entry step stays with the command.
 
 ## Engine Invocation Contract

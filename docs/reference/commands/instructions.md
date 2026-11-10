@@ -31,8 +31,8 @@ Generate or update project instructions and compatibility symlinks, ensuring a c
 3. **Analyze project context**:
    - Reads `README.md` for project purpose and features
    - Inspects configuration files (`pyproject.toml`, `package.json`, etc.) for tech stack
-   - Checks `.specify/memory/constitution.md` for mandated project rules
-   - Checks `.specify/memory/features.md` for feature status
+   - Checks `.specify/constitution.md` for mandated project rules
+   - Checks `.specify/features.md` for feature status
    - Only considers `.specify/` at the project root (ignores subdirectory instances)
 
 4. **Update instructions content**:

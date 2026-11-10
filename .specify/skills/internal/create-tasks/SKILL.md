@@ -151,7 +151,7 @@ and testing.
 **Tests are Constitution-driven (NOT a fixed default)**: before generating tasks, detect
 test-mandating principles **deterministically** (token-efficiency program-first — see
 `.specify/shared/guidelines/token-efficiency.md`): run
-`grep -nE 'MUST|MANDATORY|NON-NEGOTIABLE|Test-First|TDD|Contract-Driven' .specify/memory/constitution.md`
+`grep -nE 'MUST|MANDATORY|NON-NEGOTIABLE|Test-First|TDD|Contract-Driven' .specify/constitution.md`
 and consume only the matched principle headings/lines — do NOT read the whole constitution
 into context for this keyword check.
 
@@ -414,7 +414,7 @@ Apply the Feature Integration Protocol (`.specify/shared/workflow/feature-integr
 — canonical convention; do not restate it here). This phase maintains feature status from
 the planning phase. Additionally, **the tasks phase MUST review the Feature list** — task
 breakdown may expose new Features or invalidate old ones. Update
-`.specify/memory/features.md` and detail files synchronously if changes are discovered.
+`.specify/features.md` and detail files synchronously if changes are discovered.
 
 ## Boundaries
 

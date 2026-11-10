@@ -118,10 +118,10 @@ main() {
         done < <(find docs -maxdepth 2 -name "*.md" | sort -h | head -n 10)
     fi
 
-    # 3. Memory (Constitution and Feature Index)
-    if [ -d ".specify/memory" ]; then
-        add_doc_path ".specify/memory/constitution.md"
-        add_doc_path ".specify/memory/features.md"
+    # 3. Governance anchors (Constitution and Feature Index)
+    if [ -f ".specify/constitution.md" ] || [ -f ".specify/features.md" ]; then
+        add_doc_path ".specify/constitution.md"
+        add_doc_path ".specify/features.md"
     fi
 
     # 4. Current Feature Spec (if likely planning)

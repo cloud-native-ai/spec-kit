@@ -1,0 +1,70 @@
+# Feature Detail: Dogfooding Practice
+
+**Feature ID**: 036  
+**Name**: Dogfooding Practice  
+**Description**: Make Dogfooding explicit with zero new machinery: name the principle in the framework constitution and identify the two existing loops — Loop A (downstream projects feed the framework via the existing Feature 028 feedback chain) and Loop B (projects reuse framework capabilities to build their own product feedback loops). Delivered as constitution principle + instructions-template guidance section; advisory only, no gates, no engine/command/storage changes.  
+**Status**: Ready for Review  
+**Created**: 2026-07-25  
+**Last Updated**: 2026-07-25
+
+## Overview
+
+Dogfooding 的核心在于工具开发者与使用者联系紧密（甚至同一人/团队），从而形成顺畅的"使用 → 反馈 → 迭代"循环。Spec Kit 已具备承载该理念的全部循环机制（Feedback 机制、任务记录/verification、memory、history、review），本 Feature 不新建任何循环机器，只做显名化与打通：(1) constitution 新增命名原则 —— 核心理念、两级既存循环指认（Loop A：任何使用 Spec Kit 的项目经既有反馈链路 record → 阈值提示 → package → 手动提交回流帮助框架提升；Loop B：下游项目复用框架能力为自己的产品建循环）、框架自用与偏离留档条款、建议性声明；(2) instructions-template 新增项目无关指引节，含 Loop A 可操作路径、Loop B 能力映射、反误区清单与分阶段/场景裁剪建议。
+
+## Latest Review
+
+2026-07-25 `/speckit.implement`：17/17 任务完成（零延期）。落地：constitution Principle XI（v1.6.0，含用户补充的自举/self-hosting 类比与"自身工程表现良好才有资格辅助他人"表述）+ instructions-template `## Dogfooding Practice` 节（Loop A 四步路径 + Loop B 能力映射表 + 四反误区 + 分阶段/裁剪，双镜像字节一致）+ docs/skills/feedback.md Loop A 补注。契约测试 19/19 绿（C-4 钉死无新机器不变式）；全量回归 748P/106F/13E/1S，相对基线 +19、零新增失败；SC-001…004 全部 pass。运行中亲历并记录两条真实 Dogfooding 发现（rm 别名拦截、quickstart unit-id 格式与引擎校验不符——后者当场修正文档，实证"文档示例以源码为准"条款）。状态 Planned → Implemented。
+
+## Key Changes
+
+1. constitution 新增 `### XI. Dogfooding (Self-Application)`：核心理念、Loop A/Loop B 指认、框架自用 MUST、偏离留档 MUST、对下游建议性且不新增门禁/机制；MINOR 升版。
+2. instructions-template（双镜像）新增 `## Dogfooding Practice` 节：Loop A 回流路径（含零自动传输明示）、Loop B 能力映射（feedback 引擎/memory/history/review/任务记录）、反误区四项、分阶段与场景裁剪。
+3. 契约测试 tests/contract/test_dogfooding_practice.py：C-1…C-7，其中 C-4 断言引擎动作集、命令模板步骤集、memory 布局零变更。
+4. docs/skills/feedback.md 轻量补注：该机制即 Dogfooding Loop A 载体。
+5. （修订记录）裁撤初版的引擎扩展与 review 步骤设计 —— FR-004 将"复用既有机制、不新建平行系统"上升为需求红线。
+
+## Implementation Notes
+
+- 约束强度：建议性原则 + 指引；无门禁、无新增命令步骤（用户两轮澄清一致）。
+- Feature 028 为被指认载体而非扩展对象：动作集 {record, status, list, mark-submitted, reindex, package, upstream} 保持不变（C-4）。
+- 指引内容项目无关（模板中性纪律）；经 `/speckit.instructions` 非破坏送达。
+- 指引中的动作名以 feedback-utils.py 实际 argparse 为准（Principle VIII）。
+- 术语：正式名词 "Dogfooding"；"Dogfooded"/"Dogfoodding" 为误写变体，"Spec Key" 为 "Spec Kit" 听写变体。
+
+## Future Evolution Suggestions
+
+- 若下游对 Loop B 出现共性工具诉求（如按 unit-id 前缀统计），先以指引/惯例满足，仅在多项目重复证据下再评估引擎级支持（Principle IX）。
+- 收集 Loop A 实际回流条目质量，反哺指引措辞。
+- 场景裁剪案例库（不适合日常自用的产品形态）随采用积累。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/036-team-summary.md
+
+## Status Tracking
+
+- **Draft**: Feature 登记，spec 032 产出并完成澄清。
+- **Planned**: plan.md 及设计产物存在且 Constitution Check 无未豁免 Fail。
+- **Implemented**: tasks.md 零 `[ ]` 且 verification.md 覆盖全部 SC-NNN 状态。
+- **Ready for Review**: 全部 `[~]` 延期项解决或显式豁免，评审证据产出。
+- **Completed**: 人工最终验收通过。
+
+### Canonical Status State Machine (single source of truth)
+
+This is the authoritative transition table cited by `/speckit.feature`, `/speckit.plan`, `/speckit.tasks`, and `/speckit.implement`. Those commands MUST NOT paraphrase the rules — they MUST point at this section.
+
+| From | To | Owner Command | Trigger / Definition of Done |
+|------|------|----------------|------------------------------|
+| (n/a) | Draft | `/speckit.feature` | Feature row first added to `.specify/memory/features.md`. |
+| Draft | Planned | `/speckit.plan` | `plan.md`, `data-model.md`, `contracts/`, and `quickstart.md` exist for the requirement bound to this feature; Constitution Check has no unjustified Fail rows. |
+| Planned | Implemented | `/speckit.implement` | `tasks.md` has zero `[ ]` rows (all tasks are `[X]` closed or `[~]` deferred) AND `verification.md` records a `SC-NNN_status=pass|deferred` row for every Success Criterion in `requirements.md`. |
+| Implemented | Ready for Review | `/speckit.review` (or human) | All deferred (`[~]`) tasks are resolved or explicitly waived, and review evidence has been produced. |
+| Ready for Review | Completed | Human / governance | Final acceptance. |
+
+**Critical contract**: `/speckit.plan` MUST land status `Planned` (not `Implemented`). `/speckit.implement` MUST advance `Planned → Implemented` only when the DoD above is satisfied; if any task is `[~]` deferred, append a ` (deferred: T<comma-list>)` suffix to the `Last Updated` cell in `features.md` so the deferral is visible at the index level.
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/032-dogfooding-practice/requirements.md
+  Quality Checklist: .specify/specs/032-dogfooding-practice/checklists/requirements.md

@@ -21,7 +21,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "sanitize" / "correctness"
 
 
 def make_ws(tmp_path: Path) -> Path:
-    (tmp_path / ".specify" / "memory" / "features").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify" / "features").mkdir(parents=True, exist_ok=True)
     return tmp_path
 
 
@@ -29,22 +29,22 @@ def make_ws(tmp_path: Path) -> Path:
 
 def test_features_row_pointing_to_missing_detail(tmp_path):
     ws = make_ws(tmp_path)
-    (ws / ".specify" / "memory" / "features.md").write_text(
+    (ws / ".specify" / "features.md").write_text(
         FIXTURES.joinpath("features-index.md").read_text(encoding="utf-8"), encoding="utf-8")
-    (ws / ".specify" / "memory" / "features" / "098.md").write_text("# 098\n", encoding="utf-8")
+    (ws / ".specify" / "features" / "098-098.md").write_text("# 098\n", encoding="utf-8")
     findings = su.check_index_consistency(ws)
     assert any("099" in f["target"] for f in findings), [f["target"] for f in findings]
 
 
 def test_features_disk_file_without_index_row(tmp_path):
     ws = make_ws(tmp_path)
-    (ws / ".specify" / "memory" / "features.md").write_text(
+    (ws / ".specify" / "features.md").write_text(
         "| ID | Name | Description | Status | Feature Details | Spec Path | Last Updated |\n"
         "|----|------|-------------|--------|------------------|-----------|--------------|\n"
-        "| 098 | Existing | ok | Implemented | .specify/memory/features/098.md | - | 2026-08-01 |\n",
+        "| 098 | Existing | ok | Implemented | .specify/features/098-098.md | - | 2026-08-01 |\n",
         encoding="utf-8")
-    (ws / ".specify" / "memory" / "features" / "098.md").write_text("# 098\n", encoding="utf-8")
-    (ws / ".specify" / "memory" / "features" / "077.md").write_text("# 077 orphan\n", encoding="utf-8")
+    (ws / ".specify" / "features" / "098-098.md").write_text("# 098\n", encoding="utf-8")
+    (ws / ".specify" / "features" / "077-077.md").write_text("# 077 orphan\n", encoding="utf-8")
     findings = su.check_index_consistency(ws)
     assert any("077" in f["target"] for f in findings)
 

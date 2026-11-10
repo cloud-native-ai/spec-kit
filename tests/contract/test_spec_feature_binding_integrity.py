@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FEATURES_MD = REPO_ROOT / ".specify" / "memory" / "features.md"
+FEATURES_MD = REPO_ROOT / ".specify" / "features.md"
 SPECS_DIR = REPO_ROOT / ".specify" / "specs"
 ARCHIVE_DIR = REPO_ROOT / ".specify" / "archive" / "spec"
 

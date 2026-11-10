@@ -1,0 +1,136 @@
+# Feature Detail: AI Tools Support
+
+**Feature ID**: 022  
+**Name**: AI Tools Support  
+**Description**: Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files.  
+**Status**: Implemented  
+**Created**: 2026-05-18  
+**Last Updated**: 2026-07-12  
+
+## Overview
+
+AI Tools Support broadens Spec Kit initialization from a GitHub Copilot-centered default experience to a consistent multi-tool onboarding model. It ensures every officially supported AI tool can be initialized with complete workflow coverage, while existing `.specify` core content remains the shared source of truth and is preserved when teams add or refresh additional tools.
+
+**Evolution (2026-06-21)**: Feature 022 extended to encompass tiered support (Tier 1 / Tier 2). Spec 018-cli-priority-support introduces Codex CLI as a new officially supported tool, elevates Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, and opencode to Tier 1 priority support, and designates Qwen Code as Tier 2. A capability matrix auditing 6 support dimensions is added as the tier compliance mechanism.
+
+**Evolution (2026-06-22)**: Spec 019-tier2-hermes-iflow adds Hermes-Agent and iFlow as two new Tier 2 agents, expanding Tier 2 from 1 tool (Qwen Code) to 3 tools. No changes to Tier 1 classification or existing tool configurations.
+
+**Evolution (2026-06-25)**: Spec 021-agent-specific-config extends Feature 022 from initialization/coexistence to runtime behavior: adds Agent-Specific Configuration sections to 3 command templates and 4 skills, enabling per-agent guidance via inline sections (commands) and `references/` subdocuments (skills), plus centralized execution feedback at `.specify/memory/feedback/`.
+
+**Evolution (2026-07-12)**: Spec 024-agent-env-config extends Feature 022 into **runtime credential configuration**. The `agent-setup` skill is reframed around a unified set of skill-layer environment variables (`AGENT_API_KEY`, `AGENT_MODEL`, `AGENT_BASE_URL`, and conditionally `AGENT_ANTHROPIC_BASE_URL`) that are validated (check), read, and secondary-assigned into each tool's native variables, then persisted to each tool's own config file. Scope is the six API-key-configurable CLIs (claude, codex, qwen, qoder, iflow, opencode); GitHub Copilot and Hermes Agent are out of scope (subscription/OAuth model). This does not change tier classification or init coverage.
+
+**Tasks phase (2026-06-25)**: Task breakdown completed with 37 tasks across 6 phases. Tests Mode ON (Constitution Principle IV). Phase 1: Setup (3 tasks, directories). Phase 2: Foundational (3 tasks, canonical templates). Phase 3: US1 Command Templates (6 tasks, inline agent guidance). Phase 4: US2 Skills + References (16 tasks, 4 SKILL.md + 8 reference docs). Phase 5: US3 Feedback (5 tasks, feedback review + sample). Phase 6: Polish (4 tasks). US1 and US2 can proceed in parallel after Foundational.
+
+**Implementation (2026-06-25)**: All 37 tasks completed (0 deferred). 37 contract tests pass across 3 test files. 7 target files updated with Agent-Specific Configuration sections. 8 agent reference documents created (claude-code-guide.md + copilot-guide.md × 4 skills). Centralized feedback directory at `.specify/memory/feedback/` created. Additive constraint verified: removing Agent-Specific Configuration sections leaves all core workflows intact.
+
+## Latest Review
+
+Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with test-first methodology. The implementation added centralized assistant support profiles, core asset preservation, result summary infrastructure, skills symlinks for all 5 assistants (including newly added Qwen and opencode symlinks), multi-tool coexistence validation, support-surface audits, and comprehensive test coverage across 17 test files.
+
+**Plan phase (2026-06-21)**: Spec 018-cli-priority-support planned. Technical context, data model, contracts, and quickstart generated. Key changes: add Codex CLI to AGENT_CONFIG/_OFFICIAL_ASSISTANT_KEYS, introduce _ASSISTANT_TIERS mapping, add capability matrix audit function, amend constitution Principle V.
+
+**Tasks phase (2026-06-21)**: Task breakdown completed with 73 tasks across 6 phases. TDD mode ON (Constitution Principle IV). Phase 1: Setup (3 tasks). Phase 2: Foundational (12 tasks, config dicts + tier system). Phase 3: US1 Codex CLI onboarding (12 tasks, MVP). Phase 4: US2 tier classification + capability matrix (16 tasks). Phase 5: US3 deep adaptation (15 tasks). Phase 6: Polish & cross-cutting (15 tasks). Parallel opportunities identified across test writing, documentation updates, and config dict changes.
+
+**Plan phase (2026-06-22)**: Spec 019-tier2-hermes-iflow planned. Technical context, data model, contracts, and quickstart generated. Key changes: add `hermes` and `iflow` to all 8 config dicts, add init-flow branches for command generation and symlinks, update constitution Principle V to include both tools in Tier 2, update docs and CLI help text.
+
+**Plan phase (2026-07-12)**: Spec 024-agent-env-config planned. Inlined Phase 0 (no standalone research.md); generated data-model, two contracts (unified-env + per-tool config targets), and quickstart. Key decisions: unified variable set `AGENT_API_KEY`/`AGENT_MODEL`/`AGENT_BASE_URL` (+ conditional `AGENT_ANTHROPIC_BASE_URL` for claude's Anthropic protocol); three-step check→read→write flow with fail-fast/no-partial-writes, idempotency, secret redaction, and unrelated-setting preservation; persist to each tool's own config file (fixing prior qwen/codex export-only gaps: qwen→`~/.qwen/.env`, codex key→`~/.codex/auth.json`). Implementation extends `skills/internal/manage-agents/scripts/config-agent.sh`. All 7 constitution gates pass; Complexity Tracking N/A.
+
+**Implementation phase (2026-07-12)**: Spec 024-agent-env-config implemented. `skills/internal/manage-agents/scripts/config-agent.sh` gained the unified env-var flow — `config_agent_env_validate` and `config_agent_env_apply [--all|<tool>...]` — a 6-tool profile registry, shared helpers (`_ca_trim`, `_ca_ensure_dir`, `_ca_url_has_scheme`, `_ca_dotenv_upsert`, `_ca_json_merge`, `_ca_toml_write_block`), and rewritten per-tool writers (qwen→`~/.qwen/.env`; codex→`config.toml`+`auth.json` @600; qoder/iflow/opencode/claude merge-preserve). SKILL.md reframed around the flow; `references/unified-variables.md` added; tuple docs marked legacy on the input side. 38 feature tests (contract+integration+unit) pass; quickstart e2e confirmed secret-free with all 6 files written. All SC-001..SC-006 pass; 0 tasks deferred. Pre-existing unrelated whole-repo failures are documented in `verification.md`.
+
+**Tasks phase (2026-06-22)**: Task breakdown completed with 48 tasks across 6 phases. TDD mode ON (Constitution Principle IV). Phase 1: Setup (2 tasks). Phase 2: Foundational (16 tasks, config dicts + contract tests). Phase 3: US1 Hermes-Agent init flow (8 tasks). Phase 4: US2 iFlow init flow (8 tasks). Phase 5: US3 coexistence & audit (7 tasks). Phase 6: Polish (7 tasks). US1 and US2 can proceed in parallel after Foundational.
+
+## Key Changes (Implementation — Spec 018, 2026-06-21)
+
+1. Codex CLI formally onboarded: added to `AGENT_CONFIG`, `_OFFICIAL_ASSISTANT_KEYS`, all assistant dict maps, and `_SKILLS_SYMLINK_ASSISTANTS`.
+2. Tier system introduced: `_ASSISTANT_TIERS` dict classifying 5 Tier 1 tools and 1 Tier 2 tool; `tier` and `skills_symlink` fields added to `get_assistant_profile()`.
+3. `InitializationResultSummary` extended with `assistant_tiers` field; `render_rich()` shows tier labels.
+4. Capability matrix audit: `audit_capability_matrix()`, `audit_tool_dimension()`, and 6 dimension checker functions implemented.
+5. `_OFFICIAL_ASSISTANT_KEYS` reordered: Tier 1 tools first (`claude, codex, qoder, copilot, opencode`), then Tier 2 (`qwen`).
+6. Constitution Principle V amended to include Codex CLI and tier classification; version bumped to 1.1.0.
+7. Codex CLI init support: command generation, `.codexignore` template, skills symlink, CODEX_HOME guidance.
+8. Documentation updated: README (tier sections), installation, quickstart with tier annotations.
+9. 45 new tests added across contract/integration/unit layers (all pass); existing tests updated for 6-tool count.
+10. 3 tasks deferred: T042 (generic template), T052 (missing script), T068 (interactive CLI validation).
+
+## Key Changes (Prior Implementation)
+
+1. Centralized assistant support profiles with `InitializationResultSummary`, `get_assistant_profile()`, and related helpers.
+2. Core asset preservation: `copy_local_templates()` now preserves existing `.specify` files with `exist_ok=True`.
+3. Skills symlinks for all 5 assistants including newly added Qwen Code and opencode.
+4. Documentation updates to `docs/tutorials/quickstart.md` and `docs/usage.md` for all 5 assistants.
+5. Added 17 test files covering unit, integration, and contract layers.
+6. Fixed script path alignment in `.specify/scripts/bash/common.sh` and `scripts/bash/common.sh`.
+
+## Key Changes (Plan: Spec 018-cli-priority-support, 2026-06-21)
+
+1. Add Codex CLI to `AGENT_CONFIG`, `_OFFICIAL_ASSISTANT_KEYS`, `_ASSISTANT_COMMAND_DIRS` (`.codex/commands`), `_ASSISTANT_EXTENSIONS` (`md`), `_ASSISTANT_ARG_FORMATS` (`$ARGUMENTS`), and `_SKILLS_SYMLINK_ASSISTANTS`.
+2. Introduce `_ASSISTANT_TIERS` dict mapping all 6 tools to `tier1` or `tier2`. Tier 1: claude, codex, qoder, copilot, opencode. Tier 2: qwen.
+3. Add `tier` field to `get_assistant_profile()` return value and `InitializationResultSummary.assistant_tiers`.
+4. Add `audit_capability_matrix(project_path)` function returning per-tool × per-dimension pass/fail across 6 dimensions (initialization, command_templates, instructions, ignore_config, skills_symlink, refresh_protection).
+5. Amend constitution Principle V to include Codex CLI and tier classification sub-bullet.
+6. Reorder `_OFFICIAL_ASSISTANT_KEYS` so Tier 1 tools appear first in `specify init` menu and documentation.
+7. Update README, installation, quickstart, and usage docs to reflect tier classification and Codex CLI support.
+
+## Implementation Notes
+
+1. Define complete initialization expectations for every officially supported AI tool.
+2. Require multi-tool coexistence within one shared Spec Kit workspace.
+3. Require existing initialized `.specify` core files to be reused instead of overwritten by templates.
+4. Require user-visible initialization summaries for created, reused, skipped, preserved, and attention-required assets.
+5. Require repeat-run and consistency validation across supported tools.
+6. Added planning artifacts for assistant support profiles, core workspace preservation, tool-specific asset isolation, initialization summaries, support-surface audits, and validation scenarios.
+7. Recorded a supporting script-path consistency issue discovered during planning: `.specify/scripts/bash/` helpers must resolve `.specify/specs/<requirements-key>/requirements.md` consistently.
+8. Identified Feature 020 (Qoder Support), Feature 021 (Claude Code Support), Feature 008 (Instructions Command), Feature 015 (CLI Interface), Feature 017 (Template Engine), Feature 019 (Agents Command), and Feature 013 (Skills Command) as integration references without merging or deprecating them.
+9. Generated implementation task breakdown for `011-ai-tools-support` (`tasks.md`) with MVP-first sequencing: new-project support parity, existing-project core preservation, and multi-tool coexistence/audit validation.
+10. Added explicit task coverage for tests before implementation across contract, integration, and unit suites, plus documentation/package/support-surface synchronization.
+11. Added polish coverage to align task-template constitution references with the restored Spec Kit Constitution.
+
+## Implementation Notes
+
+- Treat official tool support as a shared product surface rather than independent one-off assistant integrations.
+- Preserve canonical `.specify` files as the shared source of truth for all tools.
+- Keep tool-specific assets separate from shared core files so tools can be added independently.
+- Validate both new-project initialization and existing-project tool addition.
+- Use the requirements spec as the evidence source for acceptance and future planning.
+- Add tests before implementation for assistant matrix parity, preservation/idempotence, command coverage, support-surface consistency, and `.specify` workflow script path resolution.
+
+## Future Evolution Suggestions
+
+- Maintain a centralized assistant capability matrix to reduce drift as new tools are added.
+- Add release audits that compare official support claims with generated assets and documentation.
+- Track support reports by AI tool to prioritize future onboarding improvements.
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/022-ai-tools-support.md
+- Specification: .specify/specs/018-cli-priority-support/requirements.md
+- Quality Checklist: .specify/specs/018-cli-priority-support/checklists/requirements.md
+- Plan: .specify/specs/018-cli-priority-support/plan.md
+- Data Model: .specify/specs/018-cli-priority-support/data-model.md
+- Contracts: .specify/specs/018-cli-priority-support/contracts/cli-priority-support.openapi.yaml
+- Quickstart: .specify/specs/018-cli-priority-support/quickstart.md
+- Previous Spec: .specify/specs/011-ai-tools-support/requirements.md (original Feature 022 implementation)
+- Feature References: .specify/specs/011-ai-tools-support/feature-ref.md
+- Tasks: .specify/specs/011-ai-tools-support/tasks.md
+- 交叉引用(2026-09-07,由需求 050 的 `/speckit.tasks` Feature 列表复审记录): **需求 050 Proactive Flow Trigger 的 T011 将闭合本 Feature 范围内的一处既有覆盖缺口** —— `_INSTRUCTIONS_FILE_MAP`(`src/specify_cli/__init__.py:1090–1097`)声明 6 条 agent 指令路径,而 `scripts/bash/generate-instructions.sh` 只生成 4 条,致 `_check_instructions`(L1115–1121)对 `hermes → HERMES.md` 与 `opencode → .opencode/instructions.md` **恒返回 fail**。050 因把指令文件定为主动触发的**唯一通道**,该缺口从审计瑕疵升级为硬前置,故由 050 的 T011 在生成脚本侧补齐两条 symlink(不改 `_INSTRUCTIONS_FILE_MAP` 声明)。**归属不变**:这仍属本 Feature「所有官方支持的 AI 工具获得完整初始化覆盖」的范围,050 只是交付方;本 Feature 的 Future Evolution #1(集中式 assistant 能力矩阵)与 050 Out of Scope 的原生 hook 通道同源,宜合并考虑。
+
+## Status Tracking
+
+- **Draft**: The feature intent is identified, but the requirements specification has not yet been validated.
+- **Planned**: AI tool support requirements are drafted, quality-checked, and ready for clarification or planning.
+- **Implemented**: All officially supported AI tools initialize correctly and coexist without overwriting shared core content.
+- **Ready for Review**: Implementation is complete, validation passes, and support claims match generated assets and guidance.
+- **Completed**: Multi-tool AI support is merged, documented, and shipped as the default Spec Kit initialization behavior.
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/011-ai-tools-support/requirements.md
+  Quality Checklist: .specify/specs/011-ai-tools-support/checklists/requirements.md
+- Specification: .specify/specs/019-tier2-hermes-iflow/requirements.md
+  Quality Checklist: .specify/specs/019-tier2-hermes-iflow/checklists/requirements.md
+- Specification: .specify/specs/021-agent-specific-config/requirements.md
+  Quality Checklist: .specify/specs/021-agent-specific-config/checklists/requirements.md
+- Specification: .specify/specs/024-agent-env-config/requirements.md
+  Quality Checklist: .specify/specs/024-agent-env-config/checklists/requirements.md
+  Plan: .specify/specs/024-agent-env-config/plan.md

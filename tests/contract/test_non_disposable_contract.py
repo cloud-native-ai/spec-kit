@@ -87,7 +87,7 @@ NOT_CLOSED_STATES = ("open", "unevaluated", "unconfirmed")
 # --------------------------------------------------------------------------- #
 BASE_FILES = {
     "tests/README.md": "# Guard directory.\n",
-    ".specify/memory/features.md":
+    ".specify/features.md":
         "| ID | Name | Description | Status | Feature Details | Spec Path | Last Updated |\n"
         "|----|------|-------------|--------|-----------------|-----------|--------------|\n",
     ".specify/specs/900-fixture/requirements.md": "# Requirements: 900\n\n**Feature ID**: 900\n",
@@ -117,11 +117,11 @@ _FIXTURES = {
     }),
     # C-803's pair: one tree where `Planned` clashes with `accept`, one where it agrees.
     "clash": dict(BASE_FILES, **{
-        ".specify/memory/features.md":
+        ".specify/features.md":
             "| ID | Name | Description | Status | Feature Details | Spec Path | Last Updated |\n"
             "|----|------|-------------|--------|-----------------|-----------|--------------|\n"
             "| 901 | fixture | a row claiming less than the verdict grants | Planned "
-            "| `.specify/memory/features/901.md` "
+            "| `.specify/features/901-901.md` "
             "| `.specify/specs/901-clash/requirements.md` | 2026-11-09 |\n",
         ".specify/specs/901-clash/requirements.md":
             "# Requirements: 901\n\n**Feature ID**: 901\n\n- **FR-001**: The fixture MUST "
@@ -242,11 +242,11 @@ def _one(record, category):
 SEVEN_FACES = (
     ("owner page", OWNER_PAGE),
     ("declaration fact", FACT),
-    ("glossary terms", ROOT / ".specify" / "memory" / "glossary.md"),
-    ("registry row and details", ROOT / ".specify" / "memory" / "features.md"),
+    ("glossary terms", ROOT / ".specify" / "glossary.md"),
+    ("registry row and details", ROOT / ".specify" / "features.md"),
     ("existing guard suite", ROOT / "tests" / "contract" / "test_non_disposable_check.py"),
     ("history pointer rows", ROOT / "templates" / "commands" / "history.md"),
-    ("decision register rows", ROOT / ".specify" / "memory" / "register.md"),
+    ("decision register rows", ROOT / ".specify" / "register.md"),
 )
 
 
@@ -256,7 +256,7 @@ def test_t086_the_seven_faces_all_exist_and_are_non_empty():
     for label, path in SEVEN_FACES:
         assert path.exists(), "face %r is missing at %s" % (label, path)
         assert path.stat().st_size > 0, "face %r is empty at %s" % (label, path)
-    detail = ROOT / ".specify" / "memory" / "features" / "092.md"
+    detail = ROOT / ".specify" / "features" / "092-non-disposable.md"
     assert detail.exists(), "the registry row's details page is a face too (FR-063)"
 
 

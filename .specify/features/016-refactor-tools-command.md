@@ -1,0 +1,69 @@
+# Feature Detail: Tools Command
+
+**Feature ID**: 016  
+**Name**: Tools Command  
+**Description**: Definition-first tool management: create, modify, and invoke tools with explicit behavioral rules, replacing discovery-driven approach.  
+**Status**: Implemented  
+**Created**: 2026-02-10  
+**Last Updated**: 2026-06-17
+
+## Overview
+
+The Tools Command (`/speckit.tools`) provides a unified interface for defining, discovering, and managing reusable tool records across multiple source types (System binaries, Shell functions, and Project scripts). Originally scoped to MCP tool metadata, the feature evolved to a source-agnostic model after MCP was dropped as a dedicated tool category in favor of treating all tools uniformly.
+
+## Latest Review
+
+Dropped MCP as a standalone tool category (commit 48cd498). The command now operates purely across System/Shell/Project sources with no MCP-specific handling. The `tool-mcp-call-template.md` was removed, and discovery/refresh scripts were simplified.
+
+## Key Changes
+
+1. Initial MCP tool metadata registry flow.
+2. Expanded feature intent from MCP-only visibility to unified tool visibility across System/Shell/Project sources.
+3. Added `templates/commands/tools.md` as the primary command template with source-agnostic discovery.
+4. Upgraded `refresh-tools.sh` to emit unified cross-source JSON payload with normalized `tools` descriptors.
+5. Implemented ToolRecord / ToolInvocationSession validation and tool alias/rename helpers in `src/specify_cli`.
+6. Added contract/integration/unit tests for tool record handling.
+7. Dropped MCP as a dedicated tool category; removed `tool-mcp-call-template.md` and MCP-specific logic from scripts.
+8. Simplified `create-new-tools.sh`, `refresh-tools.sh`, and `tools-utils.py` to work without MCP source type.
+
+## Implementation Notes
+
+- Tool records reside under `.specify/memory/tools/` with workspace-relative canonical IDs.
+- The `/speckit.tools` command is an AI chat instruction, not a terminal command.
+- Discovery scripts output JSON for downstream template rendering.
+- Historical MCP-era tool records remain compatible but no new MCP-typed records are created.
+
+## Key Changes (continued)
+
+9. Spec 016-refactor-tools-command: Refactoring the command from discovery-first to definition-first model. Core shift: users explicitly define tools with behavioral rules, and the AI agent must use these persisted definitions as authoritative source rather than relying on LLM built-in knowledge. Evidence: user request to prevent LLM knowledge interference in tool invocation.
+10. Implementation of definition-first model (2026-06-17): Added `BehavioralRule` dataclass and `DiscoveryDraft` class to `scripts/python/tools-utils.py`. Added `behavioral_rules`, `discovery_origin` fields to `ToolRecord`. Added `validate_strict()` for canonical tool types only. Updated all 3 tool record templates with `## Behavioral Rules` section and `Discovery Origin` field. Rewrote `templates/commands/tools.md` with 10-step definition-first flow (define→modify→view→invoke→list). Added 35 new tests (contract + integration). Evidence: 137 tool-related tests pass, backward compatibility verified.
+11. Added `webhook` tool type (2026-06-17): Extended canonical tool types from 3 to 4 by adding `webhook` — network-level scope for remote operations triggered via HTTP requests to web server endpoints. Created `skills/internal/create-tools/templates/tool-webhook-template.md` with webhook-specific fields (HTTP Method, Content-Type, Auth Method, Timeout). Updated type registries in `tools-utils.py`, command template, contract, data model, and requirements (FR-007). Added 3 webhook-specific contract tests. Evidence: 140 tool-related tests pass.
+12. Aligned the tools domain with the team/agents/skills command pattern (2026-07-30): `/speckit.tools` became a **single-entry intent router** — the five modes now route `define` → new `create-tools` skill and `modify` → new `improve-tools` skill, with `view`/`list` as read-only display and `invoke` behind the preview → confirm → execute gate; the command no longer renders templates inline and gained the `## Agent-Specific Configuration` block plus `Default Behavior (No Arguments)` / `Ambiguous or Unsupported Intent` branches. The four type templates moved from `templates/` into `skills/create-tools/templates/` (registered in `_OBSOLETE_TEMPLATES`, resolved by `create-new-tools.sh` with the old paths as fallback). Fixed four pipeline defects found by exercising the real flow: `save_record` crashed with `IndexError` on shallow tool dirs; `create` conflated a discovery hit with an existing record so it refused to create anything; the template `sed` substitution broke on slash-containing paths and never filled `Source Identifier` / `Status` / `Discovery Origin`; and `load_record` hard-coded `arguments=[]` while `save_record` wrote `## Returns` as `- None`, making a `Verified` record impossible to round-trip. Also fixed `rewrite_paths` mangling nested `skills/<name>/templates/` references into `skills/<name>/.specify/templates/`. **Dogfooding**: registered the project's own `refresh-tools.sh`, `feedback-utils.py`, and `evidence-utils.py` as `Verified` records under `.specify/memory/tools/` with populated parameters, returns, and RFC 2119 rules, plus their rows in the `### Tools` registry. Evidence: new `test_tools_command_routing.py` (25 assertions) passes; 6 previously-red tool tests now green; zero regression against the pre-change failure set.
+
+13. Clarified what a Tool *is* and made the schema able to express it (2026-07-30): an audit found the concept was documented only as a schema — the sole recorded rationale was "override the LLM's built-in knowledge", while the actual purpose (a **stability + efficiency abstraction layer** between an agent's intent and the environment's reality) was absent, the schema could not express environment variance at all, and the reuse discipline existed nowhere outside the tools domain itself. Fixed all three: (a) `shared/definitions/tool-definitions.md` now opens with `## What a Tool Is` stating both rationales — **absorbing environment variance** (command name / version / version-specific flags / CPU architecture / OS) and **replacing throwaway LLM-generated scripts** whose quality and behavior vary between runs — and the three payoffs (stability, efficiency via reduced inference overhead, authority); (b) added `EnvironmentApplicability` to `ToolRecord` (verified_version, version_differences, platform, architecture, fallback, preflight_check) with full save/load round-trip, an `## Environment Applicability` section in all four templates, the "verified, not assumed" rule, and an *environment drift* improvement class in `improve-tools`; (c) propagated the **reuse-before-generating** gate as the shared convention `shared/workflow/tool-reuse-gate.md`, codified it as **Constitution Principle XII — Tool Reuse Over Ad-Hoc Generation** (v1.7.0 → v1.8.0), and surfaced it in `instructions-template.md` / `.specify/instructions.md`. Also resolved the long-standing terminology collision by documenting the three distinct senses of "tools" (Tool record vs AI agent CLI vs an agent's `tools:` tool-call list) in the definition file, the instructions, the tools command, `docs/reference/commands/tools.md`, and `docs/reference/cli/supported-agent-tools.md`. **Dogfooding**: the three existing records gained verified environment data, each preflight confirmed by actual execution (which caught that `refresh-tools.sh --help` exits 1, so the recorded preflight is `--project --json` instead). Evidence: `test_tools_command_routing.py` grew to 38 assertions, all passing; zero regression against the pre-change failure set.
+## Future Evolution Suggestions
+
+- Add tool health-check or availability probing during discovery.
+- Support tool versioning or pinning for reproducible environments.
+- Consider a tool dependency graph for complex multi-tool workflows.
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/016-refactor-tools-command.md
+- Specification (current): .specify/specs/016-refactor-tools-command/requirements.md
+- Specification (historical): .specify/specs/004-speckit-tools-command/requirements.md
+- Quality Checklist: .specify/specs/004-speckit-tools-command/checklists/requirements.md
+- Plan: .specify/specs/004-speckit-tools-command/plan.md
+- Data Model: .specify/specs/004-speckit-tools-command/data-model.md
+- Contracts: .specify/specs/004-speckit-tools-command/contracts/tools-command.openapi.yaml
+- Quickstart: .specify/specs/004-speckit-tools-command/quickstart.md
+- Historical Specification: .specify/specs/002-mcp-tool-call/requirements.md
+
+## Status Tracking
+
+- **Draft**: Concept defined.
+- **Planned**: Spec approved.
+- **Implemented**: Command template and scripts deliver unified tool discovery.
+- **Ready for Review**: Tests passing across all source types.
+- **Completed**: Merged and available as part of the CLI toolkit.

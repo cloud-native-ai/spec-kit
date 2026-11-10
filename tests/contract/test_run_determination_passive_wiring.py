@@ -25,7 +25,7 @@ Three house disciplines shape this file:
 * **反空真哨兵**. Every "the landed text does not carry X" assertion is paired with a
   positive control proving the probe can see X when X is there, so "absent because
   correct" stays distinguishable from "absent because the probe is blind".
-* **Red-First 取证 / 变异演练** (owner: ``.specify/memory/glossary.md``). Evidence:
+* **Red-First 取证 / 变异演练** (owner: ``.specify/glossary.md``). Evidence:
   ``.specify/teams/.work/session-driven-self-improvement/outputs/red-first-evidence-s3.md``.
 
 ``TestOwnerSurfaces`` deliberately passes **before** the wiring exists. That is the
@@ -587,7 +587,7 @@ class TestSensorNotLedger:
         assert "self-improvement-workflow.md" in wiring_flat
 
     def test_the_glossary_owns_the_term(self, wiring):
-        assert "`.specify/memory/glossary.md`" in wiring, (
+        assert "`.specify/glossary.md`" in wiring, (
             "改点 has a term owner; the wiring must reach it by path"
         )
 
@@ -698,7 +698,7 @@ class TestGateBudgetAndNaming:
     @pytest.mark.parametrize("path", [FEEDBACK_STEP, INSTRUCTIONS],
                              ids=lambda p: p.name)
     def test_retired_names_do_not_appear(self, path):
-        """Drift guard for the two retired forms named by ``.specify/memory/glossary.md``
+        """Drift guard for the two retired forms named by ``.specify/glossary.md``
         → `运行判定`. The literals below are guard copies in the sense
         ``one-source-of-truth.md`` § Legitimate duplicates allows."""
         text = _text(path)

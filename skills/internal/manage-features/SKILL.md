@@ -1,6 +1,6 @@
 ---
 name: manage-features
-description: Maintain and refresh the project feature registry — the feature index (`.specify/memory/features.md`) plus the per-feature detail files (`.specify/memory/features/<ID>.md`) — by reconciling it against repo reality under the reconcile model (tolerance band, archive-not-delete, never regress status). Generates/refreshes current features (functional + non-functional), discovers future features via gap analysis, allocates sequential three-digit IDs, instantiates detail files from the template, keeps the index table and the README "Feature List" in sync, and validates. Use this when the user mentions ["feature registry", "features.md", "feature index", "feature list", "feature details", "维护特性", "特性注册表", "特性索引", "特性清单", "更新特性", "特性详情", "reconcile features", "future features", "gap analysis", "DFX", "功能特性"].
+description: Maintain and refresh the project feature registry — the feature index (`.specify/features.md`) plus the per-feature detail files (`.specify/features/<ID>.md`) — by reconciling it against repo reality under the reconcile model (tolerance band, archive-not-delete, never regress status). Generates/refreshes current features (functional + non-functional), discovers future features via gap analysis, allocates sequential three-digit IDs, instantiates detail files from the template, keeps the index table and the README "Feature List" in sync, and validates. Use this when the user mentions ["feature registry", "features.md", "feature index", "feature list", "feature details", "维护特性", "特性注册表", "特性索引", "特性清单", "更新特性", "特性详情", "reconcile features", "future features", "gap analysis", "DFX", "功能特性"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/manage-features/SKILL.md>"
 ---
@@ -23,9 +23,9 @@ Requirements. Content moved here verbatim in substance.
 ## Input Contract
 
 - **Registry surfaces** (the durable artifact space this skill owns):
-  1. **Feature detail files**: `.specify/memory/features/<ID>.md` — instantiated from
+  1. **Feature detail files**: `.specify/features/<ID>.md` — instantiated from
      `.specify/templates/feature-details-template.md`.
-  2. **Feature index**: `.specify/memory/features.md` — one table row per feature.
+  2. **Feature index**: `.specify/features.md` — one table row per feature.
 - **Feature classification**: **functional** (user-facing) vs **non-functional** (quality
   attributes), and **current** (existing) vs **future** (gap-identified, status `Draft`).
 - **Repo context must be readable** (README/docs/build config): desired state is computed
@@ -100,13 +100,13 @@ Three binding rules of the application:
    byte-identical) and the never-regress-status rule.
 
 5. **Allocate IDs**: Sequential three-digit FEATURE_ID from scanning
-   `.specify/memory/features/*.md`.
+   `.specify/features/*.md`.
 
 6. **Instantiate/update detail files**: From `.specify/templates/feature-details-template.md`,
    replace all placeholders, remove unused ones (placeholder glossary and replacement
    rules are owned by that template). Dates ISO format.
 
-7. **Update `.specify/memory/features.md`**: Table with
+7. **Update `.specify/features.md`**: Table with
    `ID | Name | Description | Status | Feature Details | Last Updated`. Auto-derive
    FEATURE_COUNT from table row count — recompute on every write, never hand-maintain
    (the auto-derive contract is owned by `.specify/templates/feature-index-template.md`).
@@ -124,7 +124,7 @@ Three binding rules of the application:
 - Feature names: 2–5 words
 - Index table: single header row, all columns, aligned pipes
 - Status vocabulary: `Draft` | `Planned` | `Implemented` | `Blocked` | `Ready for Review` | `Completed`
-- Feature detail links: `.specify/memory/features/[FEATURE_ID].md`
+- Feature detail links: `.specify/features/[FEATURE_ID].md`
 - Do NOT modify templates; only instantiate copies
 
 ## Boundaries

@@ -22,7 +22,7 @@ def _build_fake_skills_source(root):
     (ext / "SKILL.md").write_text(
         "# demo-ext\n"
         "See skills/internal/demo-int/SKILL.md and skills/external/demo-ext/scripts/run.py\n"
-        "Memory lives at memory/constitution.md\n",
+        "Working notes live at memory/session/notes.md\n",
         encoding="utf-8",
     )
     (int_ / "SKILL.md").write_text(
@@ -64,7 +64,7 @@ def test_two_layer_layout_and_rewrite(tmp_path):
     assert "and skills/external/" not in text
     assert ".specify/skills/internal/demo-int/SKILL.md" in text
     assert ".specify/skills/demo-ext/scripts/run.py" in text
-    assert ".specify/memory/constitution.md" in text
+    assert ".specify/memory/session/notes.md" in text
     assert ".specify/.specify/" not in text
 
     # Nested internal layer

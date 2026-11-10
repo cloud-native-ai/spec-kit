@@ -48,7 +48,7 @@ An interview records the user's own words into a durable artifact and asks quest
 back, so vocabulary discipline matters more here than in most flows and runs **both
 ways**:
 
-- Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map
+- Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`: map
   recorded homophone/confusable variants to canonical terms before acting, surfacing
   each correction.
 - **Inbound** — an interview records the user's own words into a durable artifact, so a
@@ -142,8 +142,8 @@ write behaviour):
 
 6. **Load context summary-first** (see `.specify/shared/guidelines/token-efficiency.md`): read
    the target artifact (it is the edit target, so read it fully); pull
-   `.specify/memory/features.md` as index rows only; take
-   `.specify/memory/constitution.md`, `research.md`, and `docs/` as **targeted excerpts
+   `.specify/features.md` as index rows only; take
+   `.specify/constitution.md`, `research.md`, and `docs/` as **targeted excerpts
    only when a candidate question actually needs them**. Never bulk-load context "to be
    safe" — an interview's context grows every round.
 

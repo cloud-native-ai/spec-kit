@@ -19,8 +19,8 @@
 
 ## 2. 两顶帽子（Two Hats）
 
-- **Framework hat（框架自身）**：工作流作用在 spec-kit 自身；`shared/*` 是源，自优化的输出落到框架自己的治理或运行目标（例如框架自身的 `.specify/memory/constitution.md`、`.specify/instructions.md`，或执行流程解析出的其他目标）。
-- **Client hat（客户项目）**：工作流作用在用户项目；`/speckit.constitution` 输出到客户项目的 `.specify/memory/constitution.md`，`/speckit.instructions` 输出到客户项目的 `.specify/instructions.md`。
+- **Framework hat（框架自身）**：工作流作用在 spec-kit 自身；`shared/*` 是源，自优化的输出落到框架自己的治理或运行目标（例如框架自身的 `.specify/constitution.md`、`.specify/instructions.md`，或执行流程解析出的其他目标）。
+- **Client hat（客户项目）**：工作流作用在用户项目；`/speckit.constitution` 输出到客户项目的 `.specify/constitution.md`，`/speckit.instructions` 输出到客户项目的 `.specify/instructions.md`。
 - **先定帽子，再定目标**：同一个命令可以在两种帽子下运行；不得把框架源内容写进客户项目运行时而当作源修改，也不得把客户运行时修改当作框架源修改。
 - 拓扑与路径解析规则的 owner 是 `shared/definitions/dogfooding-definitions.md` §2.1；本节只引用，不重述。
 
@@ -51,7 +51,7 @@
 
 | 命令或流程 | Client hat 目标 | Framework hat 目标 |
 |------------|-----------------|--------------------|
-| `/speckit.constitution` | 客户项目的 `.specify/memory/constitution.md` | 由框架自身的执行流程解析 |
+| `/speckit.constitution` | 客户项目的 `.specify/constitution.md` | 由框架自身的执行流程解析 |
 | `/speckit.instructions` | 客户项目的 `.specify/instructions.md` | 由框架自身的执行流程解析 |
 | `/speckit.improve` 及其他 `/speckit.*` | 该命令自己的目标制品 | 该命令在框架自身执行时的目标制品 |
 

@@ -138,8 +138,8 @@ This command is the final step of the SDD loop for a feature; it reviews the ful
 
 1. **Artifact Review**: Loads the feature's `requirements.md`, `plan.md`, `tasks.md`, and any supporting documents such as `data-model.md`, `contracts/`, `research.md`, and `quickstart.md` from `.specify/specs/[REQUIREMENTS_KEY]/`.
 2. **Synthesis**: Produces a concise, user- and system-level narrative that explains what the feature does, who it serves, and which constraints and integrations define its boundary.
-3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/memory/features/[ID].md` (where [ID] is the three-digit feature ID like 001, 002, etc.), keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
-4. **Index Integration**: Updates `.specify/memory/features.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
+3. **Feature Memory Update**: Writes or updates a dedicated feature document in `.specify/features/[ID].md` (where the filename is `<three-digit ID>-<slug>.md`, e.g. `001-unify-command-handoffs.md`), keeping prior context while refreshing the current definition and linking back to the latest spec/plan/tasks.
+4. **Index Integration**: Updates `.specify/features.md` so the feature entry points at the up-to-date memory file and records that review has been completed.
 
 Using `/speckit.review` after `/speckit.implement` keeps your feature index and long-term documentation in sync with the latest iteration of the SDD artifacts.
 
@@ -165,7 +165,7 @@ Total: ~12 hours of documentation work
 /speckit.feature Real-time chat system with message history and user presence
 
 # This automatically:
-# - Creates or updates .specify/memory/features.md with a feature entry
+# - Creates or updates .specify/features.md with a feature entry
 # - Assigns a feature ID (e.g., 003) based on existing features
 # - Sets initial status to "Draft"
 
@@ -207,7 +207,7 @@ Total: ~12 hours of documentation work
 
 # This automatically:
 # - Reviews all artifacts produced for the chat feature
-# - Consolidates them into a cohesive feature memory document at .specify/memory/features/003.md
+# - Consolidates them into a cohesive feature memory document at .specify/features/003-checklist-command.md
 # - Updates the feature index with the latest memory file and review status
 ```
 
@@ -221,7 +221,7 @@ In ~30 minutes, you have:
 - Implemented code, tests, and documentation
 - All documents properly versioned in a feature branch
 - A centralized feature index (`features.md`) tracking all project features and their status
-- A consolidated feature memory document at `.specify/memory/features/[ID].md` that serves as the single source of truth for the feature
+- A consolidated feature memory document at `.specify/features/[ID].md` that serves as the single source of truth for the feature
 
 ### The Power of Structured Automation
 
@@ -340,7 +340,7 @@ The templates transform the LLM from a creative writer into a disciplined specif
 
 ## The Constitutional Foundation: Enforcing Architectural Discipline
 
-At the heart of SDD lies a constitution—a set of immutable principles that govern how specifications become code. The constitution (`memory/constitution.md`) acts as the architectural DNA of the system, ensuring that every generated implementation maintains consistency, simplicity, and quality.
+At the heart of SDD lies a constitution—a set of immutable principles that govern how specifications become code. The constitution (`.specify/constitution.md`) acts as the architectural DNA of the system, ensuring that every generated implementation maintains consistency, simplicity, and quality.
 
 ### The Nine Articles of Development
 

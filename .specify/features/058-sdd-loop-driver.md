@@ -1,0 +1,88 @@
+# Feature Detail: 无人值守 SDD 循环驱动机制（Unattended SDD Loop Driver）
+
+**Feature ID**: 058  
+**Name**: 无人值守 SDD 循环驱动机制  
+**Description**: 以一条一遍性提示词驱动主代理完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的完整闭环，全程循环自推进；机制由**自包含、可移植的 skill 唯一承载**（G1 修订裁决 2026-10-15）——固化阶段提示词骨架 / 五大执行机制 / 变体 / 纪律条款与自迭代·独立校验·卡死处置三硬需求运行规则，执行侧宿主 agent 零 `.specify/` 依赖即可加载运行，被驱动子代理所在的目标项目才需要 `.specify/`（执行 /speckit.* 阶段命令）。  
+**Status**: Implemented  
+**Created**: 2026-10-14  
+**Last Updated**: 2026-10-22
+
+## Overview
+
+2026-10-14 从全天会话历史（84 段 / 67 有效会话）蒸馏出的驱动模式被多项目反复手工验证有效（profiles-04 双线并行零提醒、isv-substrate 约 6 小时远端长跑、xuanji-images 双 SDD 线并行全链路），但每次都要靠用户逐次提醒「重试/继续」或在提示词里重复整套执行细节。本特性把它固化为 spec-kit 的一等公民机制：
+
+- **Skill 唯一承载（G1 修订 2026-10-15 + G2）**：新增 skill `sdd-loop-driver`，固化阶段提示词三段骨架、五大执行机制（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+日志轮询 / 收尾纪律）、已验证变体（本地简报先行 / 构建固化分线）、G5 默认纪律，以及自迭代 / 独立校验 / 卡死处置三硬需求的运行规则；执行侧宿主 agent 不要求安装 spec-kit——skill 自包含、可移植，脱离 `.specify/` 即可运行；Team 承载结论被本修订取代。
+- **跨项目通用（G3）**：登录别名、用户、路径、断点阶段全部入口化，远端（ssh + su + 远端 qodercli）与本地（qodercli 直驱）双拓扑均可实例化。
+- **一遍性入口（G4）与断点续跑默认（G6）**：入口只声明目标与起点；断点探测自动判定续跑阶段（含 review 后仅剩合并的收尾场景）。
+
+## Latest Review
+
+2026-10-20 `/speckit.implement`（演化特性 075-sdd-loop-efficiency，**Implemented**）：T000–T052 全部闭合（53 行任务；DoD-1 无 open/claimed 行）；交付 24 项落盘（`references/efficiency-model.md` 四节 owner、5 个新脚本、watch-target 扩展、4 个单测 + 2 个集成测试、5 契约文件 / 50 条款、docs 页、SKILL.md `Efficiency Optimizations` 节、夹具与驱动侧卡死夹具、058 登记面）。证据：50/50 条款由具名测试覆盖 + 覆盖 meta-test 绿；七个变异目标组 / 24 个变异应用全部变红并还原；SC-010 以 `a1aac7e5` 行为基线（`initial_retries=0`、`exit_code={watcher,runner}`）录制并在收口零差异重放；本对镜像 0 drift、宽口径 62 DIFF 与冻结清单逐路径相同（零 NEW drift）、`probe-utils.py --action compile-embeds --check` 74 units 零漂移、064 唯一-owner 守卫 18/18 绿；E2 台账仅 1 个 implement baseline 槽位，closure 留给 review 后的驱动。**063 自身走完整链，不产生快车道记录；状态保持 `Implemented`，不回退。**
+2026-10-20 `/speckit.checklist`（演化特性 075-sdd-loop-efficiency，**checklist**；F-01 补记）：`checklists/efficiency.md` 落盘——39 项检查（31 pass / 8 recorded as not-pass，8 项交由 analyze 门处置）；既有 `checklists/requirements.md` 未改动。该阶段记录此前缺失，本行按 F-01 治理纠正补入；不改状态。
+2026-10-20 `/speckit.tasks`（演化特性 075-sdd-loop-efficiency，**tasks**）：`tasks.md` 落盘——52 任务按 US1–US5 分组（Tests Mode ON；`validate-tasks.py` 0 error / 0 warning）；覆盖快车道准入与 fail-closed 回退、两槽位全量预算与台账审计、plan 改动分类、stream-json runner 与 live-log 派生、本地/远端 nohup 脱离、watcher `--raw-stream` 接线、docs 参考页与镜像同步，以及 watcher 自测（macOS）与镜像漂移两项基线异常的机制侧处置；无新 Feature、无失效 Feature，状态保持 `Implemented`。**063 自身仍走完整链，不产生快车道记录。**
+2026-10-20 `/speckit.plan`（演化特性 075-sdd-loop-efficiency，**Planned**）：plan 四件套 + research 落盘——`plan.md`（四项编排层优化：中型特性快车道 / 两槽位全量测试预算 / plan 只小修约束 / stream-json 进度与 nohup 双拓扑脱离；Constitution 15 Pass + IV Partial（LLM 阶段序列以录制 trace 为证据，已辩护））、`data-model.md`（E1–E8 + 30 校验规则）、`contracts/`（5 文件 49 条款 FL/TB/PC/PD/DI）、`quickstart.md`（S1–S7，逐例前提与钉住者）、`feature-ref.md`（FR 43/43 + SC 13/13 + 23 项交付 + 基线）、`research.md`（R-1…R-10 + B-1…B-7）。交付面 = `skills/external/sdd-loop-driver/`（1 新 reference + 3 更新 + 5 新脚本 + watch-target 扩展）+ docs 页 + 契约/单元/集成测试 + 夹具；零新技能/命令/服务/依赖。**状态保持 `Implemented`**（扩展切片规则，不回退）；框架命令内部硬执行是显式排除项。基线披露：watcher 自测在 macOS 12/4（平台+时序）、sdd-loop-driver 镜像三文件漂移致既有契约 C-12/C-18 红（`--check` 全量 68 DIFF/12 目录），均按机制侧在本特性实现中修复。**063 自身走完整链，不产生快车道记录。**
+2026-10-14 `/speckit.requirements` 需求创建完成（状态落 **Draft**）：需求输入为需求简报（/tmp/sdd-loop-team-brief.md），简报 §7 的 G1–G6 六条用户裁决按指令直接采纳、以 Session 2026-10-14 记录于规格 Clarifications（残留活动澄清标记 0）。规格 24 FR / 8 SC / 6 user stories / 8 key entities / 3 shared strings / 11 edge cases / 显式排除项 4 条；`validate-requirements.py` 首轮 5 error + 1 warning（三处 `[[STR-NNN]]` 被反引号包裹成提及而非引用）→ 修正后 **exit 0**（32 definition rows / 3 shared strings 全 pass）；质量清单 16/16（in-session 澄清合规变体，首轮全绿）。Feature 登记按用户指令于 requirements 阶段先行落册（本文件 + 索引 Draft 行）。**改号记录（2026-10-14）**：登记时编号为 057，与上游先合入的 057-decompose-command-skills 撞号（框架不支持同号不同名——feature-integration.md「Never create duplicate Feature IDs」、features/<ID>.md 按裸编号键控、detect-feature-context.sh 仅取数字前缀），故 rebase master 时改号为 058，规格目录与本文件同步改名。规格内 `Related Feature` 按 create-requirements 缺省值保留，绑定由 `/speckit.clarify` 复核确认（预期即绑定本 Feature 058：编号 1:1 对应，绑定先例启发式核验 039/042/046/050/052 等候选均无本能力归属——039 P10 Loop Card 无派发与校验面、P12 为单命令进程内长跑、042 是访谈模式、046 是门控治理、`project-cluster` 预设不驱动 SDD 阶段链）。
+
+## Key Changes
+
+1. 新增 skill `sdd-loop-driver`（机制唯一承载，G1 修订 2026-10-15）：自包含、可移植（执行侧零 `.specify/` 依赖），固化阶段提示词骨架 / 五大执行机制 / 变体 / G5 纪律条款与三硬需求运行规则（自迭代 / 独立校验 / 卡死处置）。
+2. 阶段派发引用 skill 而不内联复制其内容——机制行为唯一真源，无第二真源。
+3. 断点续跑默认能力：入口不声明阶段时自动探测（git 状态 + specs 目录 + 终态权威文档），含「review 后只剩合并 main」收尾场景。
+4. 阶段校验双条件：尾标（`<STAGE>-DONE`）必要 + 独立校验产物核验（git log / spec 文件存在性 / 纪律合规）充分，伪完成判未完成。
+5. 卡死处置：阶段超时 / 重试上限 / budget / cadence 缺省值可入口覆盖；达上限停环、落线状态、出上送件（对齐快速失败纪律）。
+6. 双拓扑与变体：远端 ssh + su + 远端 qodercli 与本地直驱等价支持；本地简报文件先行；构建固化按角色分线经参数实例化。
+7. **（063 规划，未实现）** 运行效率优化：中型特性快车道（[[STR-006]] 显式启用、七判据 fail-closed、保留 analyze/review）；每线两槽位全量测试预算（implement 起点 baseline + 收口 closure，中间定向测试并留证据）；plan 完成后的只小修约束（编排层执行，U4 按最终 diff 分类，框架内部硬执行显式排除）；runner 默认 stream-json + 自包含派生实时日志 + 本地/远端 nohup 完全脱离。哨兵、判定状态机、退出码、确认门、独立校验与卡死处置不变。
+
+## Implementation Notes
+
+- 派发形态 MUST 遵守 External Dispatch Visibility Contract（`.specify/shared/definitions/subagent-definitions.md`）——禁止缓冲至退出式派发；ssh + su 远端形态与四观测点的映射在 plan 阶段核对。
+- push / 远程分支操作维持确认门控破坏性分类：本地合并为缺省收尾，push 须经入口显式授权（G5；简报 §4.5 的缺省读法据此修正）。
+- 默认值（阶段超时 90 分钟 / 重试上限 2 次 / budget 降级语义沿用 project-cluster 形态）为 informed guess，plan 阶段可修正；数值证据与理由记录于规格 Assumptions。
+- 名字核验（2026-10-14）：全仓无 `sdd-loop` / `sdd_loop` 占用；`-DONE` 尾标后缀在 templates / create-team / shared 零既有占用；预设现仅 capability-arena / project-cluster 两个，无 SDD 流程驱动类预设。
+- 机制不改 requirements / clarify / plan / tasks / implement / review 各技能内部流程；不为变体新增机制分支；不硬编码 workspace 命名规则（显式排除项）。
+- 线状态落盘为状态脊，零上下文可接手（承 project-cluster「状态脊是跨周期唯一记忆」约束）。
+
+## Future Evolution Suggestions
+
+- 子代理 CLI 面扩展：qodercli 缺省之外按框架既有 `DISPATCH_CLI` 抽象适配其他 agent CLI（skill 参数化预留）。
+- 与 039 P12 implement 长跑模式的整合：阶段内长任务复用其状态文件 / 停滞退出语义。
+- 循环驱动自身的运行判定接入（运行判定四轴消费循环日志与线状态），形成对循环质量的反馈闭环。
+- 多机多线的资源协调（cadence 与 ssh 流上限的全局预算）。
+
+## Related Files
+
+- Feature Index: .specify/memory/features.md
+- Feature Detail: .specify/.specify/features/058-sdd-loop-driver.md
+
+## Status Tracking
+
+- **Draft**: requirements.md 已通过确定性检查器（exit 0）与质量清单（16/16）；Related Feature 绑定待 /speckit.clarify 复核确认。
+- **Planned**: plan.md、data-model.md、contracts/、quickstart.md 就绪，Constitution Check 无未辩护 Fail。（2026-10-15 达成：plan 四件套落盘，Constitution 16 项 = 14 Pass + 2 Partial 论证（IV template-only 宪法 :117、XIV 内联受控例外），fresh-context 复核 15 维持 + XVI 缺承载修复后 Pass；交付面 = skill（external）+ docs 页 + 契约测试 + wiring 名册更新，零引擎零 preset。）
+- **Implemented**: tasks.md 全闭合 + verification.md 覆盖全部 SC（含诚实 partial）。（2026-10-15 达成：32 [X] + T031 [~] 真实演练待用户目标；GATE-1 comm 空/3745 passed；SC-009 pass，SC-001…SC-008 partial 如实记录待演练；交付含编译 Wrap-up 面 + probe-registry 绑定。）
+- **Ready for Review**: 延期任务已解决或显式豁免，评审证据产出。
+- **Completed**: 人工终验。
+
+### Canonical Status State Machine (single source of truth)
+
+见 `templates/feature-details-template.md` § Canonical Status State Machine——本文件不复制其转换表。
+
+## Related Specifications/Requirements
+
+- Specification: .specify/specs/058-sdd-loop-driver/requirements.md
+  Quality Checklist: .specify/specs/058-sdd-loop-driver/checklists/requirements.md
+- Specification: .specify/specs/075-sdd-loop-efficiency/requirements.md（**演化特性**，2026-10-20 绑定于 `/speckit.clarify`）：sdd-loop-driver 运行效率优化——中型特性快车道、全量测试预算、plan 只小修约束、stream-json 进度与 nohup 会话解耦。绑定理由：四项优化的承载面全部是本 Feature 的 driver skill 面（SKILL.md / references / watcher），扩展同一机制、无新增能力域，符合 reuse-first；状态保持 Implemented，不回退。
+- Specification: .specify/specs/067-loop-efficiency-hardening/requirements.md（**演化规格**，2026-10-22 创建）：sdd-loop-driver 执行效率加固——有界分段派发 + part brief、测试经济学与显式豁免、派发级测量、微缺口合流与驱动往返收敛。2026-10-22 clarify 范围扩展：新增 User Story 5「框架测试套件瘦身」——以 ≤600 s 冷缓存完整运行、覆盖不缩水、漂移防护不削弱为判据（FR-011…FR-021 / SC-006…SC-010）；基线实测 750 s / 83 failed / 4467 passed（dated record）。绑定理由同 063：效率收益直接降低 058/063 两槽位预算的单次成本；不新建 Feature、不改注册表计数，状态保持 Implemented。**2026-10-22 implemented**：closure 全量 553 s（≤600 s）、名称级 0 NEW / 69 fixed / 14 known debt；723 参数镜像套件绿、35 个纯字节比对函数折叠入台账（0 deleted）、202 个镜像经引擎同步；review `PASS WITH WAIVER`（W-1 钉住名册按台账 join 判定）。
+- Cross-reference: Feature 039 Harvested Harness Improvements——P10 Loop Card（循环纪律卡）与 P12 implement 长跑模式是相邻既有机制；本特性是跨项目、多线、外部 qodercli 子代理、SDD 全流程的循环编排，不吸收也不改动二者。
+- Cross-reference: Feature 042 Interview Mode——team preset 创建的 goal 访谈与模式边界参照；本机制的访谈纪律（自行裁决并记录假设）是其在一遍性无人值守场景的默认形态（G5）。
+- Cross-reference: Feature 046 Confirmation Gate Governance——push / 远程分支操作维持破坏性门控分类，本机制不新增绕过缺省自动化（FR-013）。
+- Cross-reference: Feature 052 快速失败纪律——卡死处置的对齐真源（异常分流 / 上送件四要素 / 禁静默兜底）。
+- Cross-reference: Feature 064 Subagent 并发归属、CLI 能力档案与生命周期解耦——在本机制之上增加环境级 Line Registry、`line_id`/`run_id` 归属信封、同仓工作区隔离、CLI 能力档案与主/子会话生命周期解耦；U0–U6、状态脊、哨兵与 watcher 判定仍由本 Feature 拥有，064 引用不重定义。
+- Cross-reference: Feature 065 SDD 循环中断感知与状态恢复（2026-10-21 于 `/speckit.clarify` 新建并绑定）——在本机制之上增加只读状态聚合、八类中断检测、resume/retry/stop 恢复程序、watchbeat 与驱动者生命周期校验；U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由本 Feature 拥有，065 引用不重定义。
+- Cross-reference: Feature 074 Goal/Team/Agent 与 SDD 开发流程统一（2026-10-28 于 `/speckit.clarify` 新建并绑定）——在 Goal/Team 层增加授权席位对 SDD 运行的有界嵌套调用、三值分流判据与 review 后交接；U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由本 Feature 拥有，074 引用不重定义；反嵌套谓词在既有 owner 中收窄为深度 2 链（virtual 成员不得承载）。
+- 结构先例：team preset `project-cluster`（continuous 跨项目集群）——本特性的状态脊 / 卡死处置缺省值形态以其为结构先例（G1 修订后不再新增 preset，skill 固化同类缺省值）。
+
+**G1 修订（2026-10-15）**：用户裁定机制承载由 Team 改为 Skill——执行 loop 的主代理通常不安装 spec-kit，team 功能依赖执行侧 `.specify/`，脱离框架不可用；被驱动子代理所在目标项目才需要 `.specify/`。机制改为 skill 唯一承载（自包含、可移植、执行侧零框架依赖），三硬需求运行规则固化进 skill；规格已同步修订（FR-001/002/012/015/017/018/024、US4、SC-009）并新增 Session 2026-10-15 修订记录。
+
+**Bind（2026-10-20，`/speckit.clarify` Mode A）**：规格 063 绑定本 Feature 作为演化特性。核验依据：四项优化（快车道、测试预算、plan 小修约束、stream-json/nohup）全部落在 `skills/external/sdd-loop-driver/` 的既有承载面；058 的范围与 Future Evolution Suggestions 均覆盖该方向。未新建 Feature，索引 `Total Features` 不变；状态保持 Implemented。
+
+**Clarify（2026-10-15，Mode A）**：Related Feature 绑定**确认**为本 Feature（编号 1:1 对应，候选核验 039/042/046/050/052 均无本能力归属——本文件的 Related Specifications 在册即绑定义务履行）；四项裁定：合并收尾改 git 状态判定（不设哨兵，FR-013 补条款）；skill 投递形态无关 + 手动投递入范围（FR-025 新增）；skill 分类 **external**（依依赖轴，与 G1 修订同轴）；覆盖扫描经 fresh-context 子代理（同作者条件成立），2 项顺手修复 + 1 条注册表 ANOMALY 已修。
