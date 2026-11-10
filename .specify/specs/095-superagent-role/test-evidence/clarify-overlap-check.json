@@ -1,0 +1,10 @@
+{
+  "decision": "clear",
+  "current_spec": "095-superagent-role",
+  "checked_specs": [
+    "095-superagent-role"
+  ],
+  "overlaps": [],
+  "note": "current feature has no declaration artifact",
+  "checked_at": "2026-11-10T06:19:30Z"
+}

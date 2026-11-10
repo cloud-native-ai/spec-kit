@@ -1,0 +1,40 @@
+# 095 — Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
+
+## Overview
+
+框架里 super agent 事实上早已存在（交互 session、team 协调会话、SDD 驱动者、派发者），但只以「主 session / 编排者 / supervisor / driver / 派发方」等分散措辞出现：没有归一化定义、没有 super↔sub 协议、没有「身份转变时注入什么」的清单，也没有把并发、状态同步、状态跟踪与可视化接到同一张关系模型上。本特性把 super agent 正式定义为**派发边上的相对逻辑角色**（不是实体类型；同一执行体可在不同边上同时是 subagent 与 superagent），交付「定义 + 协议 + 身份转变注入清单 + 既有载体的投影接线」，并以三个真实形态验收：桌面端 Qoder 经 SSH 驱动远端 qodercli、本地 qodercli 编排一个 team、team 成员并发扇出 10 个 subagent 并自行汇总。本运行同时作为 080–094 机制实际效果的观测（FR-038）。
+
+## Key Changes（planned）
+
+1. 新增定义 owner `shared/definitions/superagent-definitions.md`（[[STR-004]]）：角色定义、边谓词、深度、super↔sub 协议（下行 / 上行 / 分类 / 等待 / 尝试 / 授权 / 终止）、九项身份转变注入、状态同步与恢复映射、可视化映射、零第二机制边界、术语边界。
+2. 新增只读角色-边判定引擎动作：从既有载体（父侧派发记录、run report 映射表、状态脊 / line registry、artifact triplet）判定边、角色集（含 [[STR-002]]）、深度与三类违例；零写点，契约测试在注入违例时转红。
+3. `status-digest.py` 增加角色-边视图：身份、父边、角色集、深度、状态、age、stale、截断声明与 `nothing-running`；不新建 parser / renderer / dashboard。
+4. 派发面只加字段：`run-agent` 注入清单增加 [[STR-003]] 指针；team 派发与 driver 阶段派发携带父身份、子 label 与角色声明；driver 手册入口自检加一行指针。
+5. harness 落点：`templates/instructions-template.md` 新增极小指针段（生成文件预算由 `scripts/bash/generate-instructions.sh` 判据）；`agent-definitions.md`、`subagent-definitions.md`、`framework-map.md` 各加指针行；`better-harness.md` 不改。
+6. 收尾产出 080–094 机制观测附录：逐切片 `exercised`（可解析证据路径 + 可复现机器记录）或 `not-observed`，不以配置存在或「运行顺利」推断。
+
+## Clarify Notes（2026-11-10，无人值守 clarify）
+
+- **Feature Linkage**：`Related Feature` 绑定为新 Feature 095（同号惯例，索引 Draft + 本详情文件）；无既有 Feature 承载该主题，候选 019 / 027 / 085 / 093 的比较见规格 Clarifications。
+- **10 条自行裁决**（详见 `requirements.md` § Clarifications · Session 2026-11-10（clarify 阶段））：判定入口 = 可执行只读引擎；协议分层逐项映射既有 owner（不复制字段表）；九项注入为封闭清单（可见性契约落 (f)、注意力预算落 (g)、驱动手册不进入载荷）；并发/状态同步/跟踪/可视化各归既有 owner，零新增投影面；instructions 新增极小指针段并接受 37,454 / 38,400 B 的实测余量约束；角色深度无上限与许可链深度 2 正交；观测读数必须是机器记录；out-of-scope 显式化；术语形态固定。
+- **受影响 FR**：FR-003（父侧派发记录优先 + 冲突报错）、FR-004（两轴一句话落 owner）、FR-005（集合形态 + 引擎为唯一入口）、FR-017（封闭清单 + 红线）、FR-034（driver 手册入口指针）、FR-038（机器读数与反「顺利即有效」）；计数不变（38 FR / 10 SC）。
+- **门读数**：flow-class 读取 `execution` / `source: declaration`；需求校验器与 overlap-check 读数见 `test-evidence/` 与状态脊。
+
+## Related Specifications
+
+- `.specify/specs/095-superagent-role/requirements.md`（本特性的需求规格；三个真实场景为定义输入）
+- `.specify/studies/dsh-superagent-prototype-study/docs/overview.md`（研读归档；授权链、能力分离、WorkerSlots、注意力预算、三层恢复、提示词不可越权）
+- `.specify/shared/definitions/subagent-definitions.md`（子端 owner：三模态、并发义务、可见性契约、派发治理）
+- `.specify/shared/definitions/agent-definitions.md`（Agent 三层分类法）
+- `.specify/shared/guidelines/reporting-obligations.md`（汇报义务与 digest 契约）
+- `.specify/shared/guidelines/fast-fail.md`（派发注入子句与异常行）
+- `.specify/skills/sdd-loop-driver/references/watch-model.md`（等待 / 监听 / 归属层）
+
+## Status Criteria
+
+- **Draft**（当前）: 规格已创建并完成 clarify；等待 plan。
+- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 存在，Constitution Check 无未论证 Fail。
+- **Implemented**: 任务清零、每条 SC 有状态行、所有 `final` 路径 SC 为 pass、smoke 记录 pass。
+- **Blocked**: 任务已关但至少一条 `final` 路径 SC 非 pass；或闭包判定 `block`。
+- **Ready for Review**: review 证据齐、`code-review.md` 无 blocking、无未豁免的 `final` 路径非 pass。
+- **Completed**: 人工 / 治理最终验收。

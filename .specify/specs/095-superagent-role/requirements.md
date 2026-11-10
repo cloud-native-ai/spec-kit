@@ -11,8 +11,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 095
+**Feature Name**: Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
 
 ## Overview
 
@@ -123,9 +123,9 @@
 
 - **FR-001**: 本框架 MUST 把 super agent 正式定义为**派发边上的相对逻辑角色**（[[STR-001]]），不是一个实体类型、不是 Agent 三层分类法之外的新层：一条派发边上，创建子执行体的一端是 super agent，被创建的一端是 subagent；分类 MUST 只由边决定，MUST NOT 由执行体类型、模型、工具列表、提示词措辞或个人描述决定。定义与术语边界的唯一 owner MUST 是 [[STR-004]]（框架源 `shared/definitions/superagent-definitions.md`，按 Two Hats 镜像到运行时）；`agent-definitions.md` 与 `subagent-definitions.md` MUST 只新增指向该 owner 的指针行，MUST NOT 复制规则，也 MUST NOT 出现第二个 subagent 定义。
 - **FR-002**: 边的判定谓词 MUST 可机器判定且与记录一致：一条有向边 `P → C` 存在，当且仅当 P 的一次派发产生了 C 的一次执行；同一次派发 MUST 恰好对应一条边；角色词表以 [[STR-001]] 为 super agent 的机器标识；在同一执行体上角色是**集合**（[[STR-002]] 表示同时具备 subagent 与 superagent 两种角色），MUST NOT 被压成单一类型；自派发（P = C）MUST 被判为违例。
-- **FR-003**: 边 MUST 有唯一机读记录形态（record kind [[STR-005]]）：父执行体身份、子执行体身份、派发尝试标识，以及这些字段所在的既有载体。字段 MUST 解析到既有载体：子身份 MUST 使用既有派发 label（team/dispatch 约定、`run-agent` 的 label，或 stage-runner 的 line+stage 产物命名）；父身份 MUST 是其自身被派发时的 label，根执行体 MUST 使用其既有的运行标识（状态脊 `run_id` 或 line registry `line_id`，无运行标识时使用 owner 文档声明的根标记）。本特性 MUST NOT 新建 registry、状态存储或第二份状态脊。
-- **FR-004**: 深度 MUST 可判定：根执行体深度为 0，任一执行体的深度等于从其根沿边计数的最短距离，且 MUST 与派发记录一起可复核。深度规则 MUST 与既有治理相容并只引用不复述：SDD 调用链的深度 2 许可链、每成员至多一个运行、virtual 模态不得承载，均由 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation 拥有；本特性 MUST NOT 放宽其中任何一条，也 MUST NOT 把角色深度当作第二份授权规则。
-- **FR-005**: 框架 MUST 提供一个确定性的只读判定面（引擎动作），输入是既有运行记录（边记录形态 [[STR-005]]），输出 MUST 可回答：两个身份之间是否存在边；每个执行体在各边上的角色集；其深度；以及违例（自派发、悬空父、无对应边的角色声明、深度越界）。判定面 MUST 只读（零写点）、MUST 满足宪法 XXI 的脚本接口契约、MUST NOT 引入任何存储；不可读或缺失输入 MUST 以具名错误失败，MUST NOT 静默返回空集或按通过处理。该判定面 MUST 由契约测试守护：注入一条违例时转红。
+- **FR-003**: 边 MUST 有唯一机读记录形态（record kind [[STR-005]]）：父执行体身份、子执行体身份、派发尝试标识，以及这些字段所在的既有载体。字段 MUST 解析到既有载体：子身份 MUST 使用既有派发 label（team/dispatch 约定、`run-agent` 的 label，或 stage-runner 的 line+stage 产物命名）；父身份 MUST 是其自身被派发时的 label，根执行体 MUST 使用其既有的运行标识（状态脊 `run_id` 或 line registry `line_id`，无运行标识时使用 owner 文档声明的根标记）。本特性 MUST NOT 新建 registry、状态存储或第二份状态脊。边的来源以父侧派发记录为优先载体（team 派发映射行、驱动状态脊的 line+stage、`run-agent` 的 label），其余载体只作交叉核对；同一字段在两处载体冲突时 MUST 报 conflict 并点名两处路径，MUST NOT 静默择一。
+- **FR-004**: 深度 MUST 可判定：根执行体深度为 0，任一执行体的深度等于从其根沿边计数的最短距离，且 MUST 与派发记录一起可复核。深度规则 MUST 与既有治理相容并只引用不复述：SDD 调用链的深度 2 许可链、每成员至多一个运行、virtual 模态不得承载，均由 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation 拥有；本特性 MUST NOT 放宽其中任何一条，也 MUST NOT 把角色深度当作第二份授权规则。[[STR-004]] MUST 用一句话讲清角色深度（无上限）与许可链深度 2（仅约束 SDD 承载链）的关系；两条轴正交，MUST NOT 互相改写。
+- **FR-005**: 框架 MUST 提供一个确定性的只读判定面（引擎动作），输入是既有运行记录（边记录形态 [[STR-005]]），输出 MUST 可回答：两个身份之间是否存在边；每个执行体在各边上的角色集；其深度；以及违例（自派发、悬空父、无对应边的角色声明、深度越界）。角色集 MUST 以集合形态输出（[[STR-002]] 是集合形态的机读标记）；判定入口 MUST 是该可执行引擎动作，文档程序或人工阅读不构成判定入口。判定面 MUST 只读（零写点）、MUST 满足宪法 XXI 的脚本接口契约、MUST NOT 引入任何存储；不可读或缺失输入 MUST 以具名错误失败，MUST NOT 静默返回空集或按通过处理。该判定面 MUST 由契约测试守护：注入一条违例时转红。
 - **FR-006**: 判定结果 MUST 与既有运行记录逐条可核对：角色查询里的父/子身份 MUST 能在状态脊、line registry 条目、artifact triplet 或 run report 的派发映射表中解析；任一侧无法解析 MUST 报悬空并点名两侧路径，MUST NOT 用对话摘要补建关系。
 - **FR-007**: 相对性 MUST 由三个真实形态的验收覆盖，且 MUST NOT 被解释成实体种类：(a) 桌面端 Qoder 经 SSH 启动远端 qodercli——桌面端是 super agent、远端执行是 subagent；(b) 本地 qodercli 运行一个 team——qodercli 是 super agent、team 成员是 subagent；(c) team 成员并发扇出 10 个 subagent 并自行汇总——该成员在父边上是 subagent、在 10 条子边上是 super agent。三个形态 MUST 各有夹具或可复核的实测记录；任一形态的角色方向被反转时对应验收转红。
 
@@ -143,7 +143,7 @@
 
 #### C. 身份转变注入
 
-- **FR-017**: 当一个 subagent 被授予派发自己子执行体的权利时，派发载荷 MUST 携带身份转变注入（[[STR-003]]），且 MUST 至少包含：(a) 该执行体在本边上的 superagent 角色激活与可派发范围；(b) 它自己的身份与父边；(c) 它必须向自己的每次派发注入的义务清单（按指针）；(d) 可用并发预算与既有 slot/reserve 事实的引用；(e) 汇报路径与 reporter / 主从汇报义务；(f) 它必须读写的既有状态载体与写者边界；(g) 注意力分类与升级规则；(h) 深度剩余与禁止项（承载 SDD 的三条件、virtual 不得承载、每成员一运行，按既有 owner 引用）；(i) 聚合回传契约。注入 MUST 以指针形态承载，MUST NOT 复制任何 owner 的规则文本。
+- **FR-017**: 当一个 subagent 被授予派发自己子执行体的权利时，派发载荷 MUST 携带身份转变注入（[[STR-003]]），且 MUST 至少包含：(a) 该执行体在本边上的 superagent 角色激活与可派发范围；(b) 它自己的身份与父边；(c) 它必须向自己的每次派发注入的义务清单（按指针）；(d) 可用并发预算与既有 slot/reserve 事实的引用；(e) 汇报路径与 reporter / 主从汇报义务；(f) 它必须读写的既有状态载体与写者边界；(g) 注意力分类与升级规则；(h) 深度剩余与禁止项（承载 SDD 的三条件、virtual 不得承载、每成员一运行，按既有 owner 引用）；(i) 聚合回传契约。注入 MUST 以指针形态承载，MUST NOT 复制任何 owner 的规则文本。九项即封闭清单；「可见性契约」义务落在 (f) 并指向 `subagent-definitions.md` § External Dispatch Visibility Contract，「注意力预算」落在 (g)（既有消息分类 FR-010）；注入 MUST NOT 携带完整驱动手册或任何技能加载指令。
 - **FR-018**: 注入 MUST 在派发载荷中物理存在（常驻指令层到不了子代理），并 MUST 由既有派发前自检的形态（载荷子串判定）验证：缺少 [[STR-003]] 的派发 MUST 被判为派发构造缺陷并被阻断；MUST NOT 只在文档里声明注入而不进入载荷。
 - **FR-019**: 双重角色执行体 MUST 保留其作为 subagent 的全部上行义务（回传契约、异常行、并发读数、边界与异常停止）；获得 superagent 角色 MUST NOT 减免其中任何一项。
 - **FR-020**: 双重角色执行体 MUST 把其子执行体的回传聚合成向父的一次结构化返回（第三个真实场景的自行汇总）：聚合 MUST 逐子归属、携带每子的证据路径，MUST NOT 隐藏失败或异常子项；聚合 MUST NOT 取代子项证据，父 MUST 可按需下钻。
@@ -172,14 +172,14 @@
 
 - **FR-032**: 定义 owner（[[STR-004]]）MUST 在框架源 `shared/definitions/superagent-definitions.md` 编写并镜像到运行时；文档 MUST 承载完整模型：角色定义、边谓词、深度、协议（下行 / 上行 / 分类 / 等待 / 尝试 / 授权 / 终止）、身份转变注入、状态同步与恢复映射、可视化映射、零第二机制边界、术语边界。`agent-definitions.md`、`subagent-definitions.md`、`framework-map.md` MUST 各新增指向该 owner 的指针行，MUST NOT 复制规则。
 - **FR-033**: `templates/instructions-template.md` MUST 新增一个极小指针段（相对角色一句话、owner 路径 [[STR-004]]、身份转变注入存在的声明）；重新生成后 `.specify/instructions.md` MUST 保持在 `scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES` 之下（以生成器的预算报告为判据），且该段 MUST NOT 复制模型或预算数值；余量不足时 MUST 缩减为纯指针，MUST NOT 抬高预算或以超预算交付。
-- **FR-034**: 派发面 MUST 接线且只加字段：`run-agent` 的派发注入清单 MUST 增加 [[STR-003]] 项（按指针）；team 派发与驱动阶段派发 MUST 在其既有载荷中携带父身份、子 label 与角色声明；MUST NOT 新增第二套协议、第二个派发器或第二个调度入口。
+- **FR-034**: 派发面 MUST 接线且只加字段：`run-agent` 的派发注入清单 MUST 增加 [[STR-003]] 项（按指针）；team 派发与驱动阶段派发 MUST 在其既有载荷中携带父身份、子 label 与角色声明；MUST NOT 新增第二套协议、第二个派发器或第二个调度入口。driver 手册的 Driver Topology / U0.5 自检 MUST 增加一行指向 [[STR-004]] 的指针（驱动者是根 super agent、阶段派发载荷携带角色字段），执行由既有派发前自检与 U4 承担，MUST NOT 新增门禁。
 - **FR-035**: 本特性 MUST NOT 新建第二套并发机制、registry、状态存储或报告体系；新增判定面 MUST 只读；`status-digest.py` MUST 仍是唯一 digest 渲染器；汇报义务、并发事实与授权裁决 MUST 保持其既有 owner。该项 MUST 以结构断言取证（变更集审计 + 只读性断言），MUST NOT 只以措辞声明。
 - **FR-036**: 受影响的既有测试与文档 MUST 逐条处置（改写 / 保持 / 移除）；移除仅限「所断言的事实已被本特性删除」；处置后的全套契约测试 MUST 在 `>=3.8` 上全绿；MUST NOT 让任何既有断言静默失效。
 - **FR-037**: 实现 MUST 在 Python >= 3.8 上运行、零新增第三方依赖；测试执行唯一入口 MUST 是 `.specify/scripts/bash/run-tests.sh`；新增或修订的可执行脚本 MUST 满足宪法 XXI（`--help`、`--version`、未声明选项拒绝）。
 
 #### H. 本运行对 080–094 的观测
 
-- **FR-038**: 收尾 MUST 产出一份机制观测附录：对 080–094 中本仓 `.specify/specs/` 实际存在的每个切片，逐条记录本运行实际观测到的机制行使证据路径，或显式记录 [[STR-006]]；MUST NOT 以配置存在推断已行使，MUST NOT 声称未被观测的改善；附录 MUST NOT 替代本特性的验收证据。
+- **FR-038**: 收尾 MUST 产出一份机制观测附录：对 080–094 中本仓 `.specify/specs/` 实际存在的每个切片，逐条记录本运行实际观测到的机制行使证据路径，或显式记录 [[STR-006]]；MUST NOT 以配置存在推断已行使，MUST NOT 声称未被观测的改善；附录 MUST NOT 替代本特性的验收证据。每条 `exercised` 行 MUST 携带可解析证据路径与可复现命令或机器记录（run record、feedback 条目、trigger index 条目、digest 输出、flow-class 读取）；配置存在、对话叙述、「本次运行顺利」与本特性自身产物 MUST NOT 作为机制行使证据。
 
 ### Runtime Stack & Dependency Ownership
 
@@ -255,6 +255,19 @@
 - Q: 重试与旧结果如何区分？ → A: 每次重试是新尝试，有新的尝试标识与 label；旧尝试产物保留，父只能消费当前尝试的返回，stale attempt 按既有 attribution 取值识别（FR-013）。
 - Q: 080–094 的「验证效果」怎么落成交付，而不是一句口号？ → A: 落成收尾的机制观测附录（FR-038）：只覆盖本仓实际存在的切片，逐条 `exercised`（带可解析证据路径）或 [[STR-006]]；不推断、不把配置存在当作行使，也不替代本特性自己的验收证据。
 
+### Session 2026-11-10（clarify 阶段 · 访谈式问题自行裁决并记录）
+
+- Q: 角色边判定入口是文档程序还是可执行引擎？角色集与深度的输出形态是否已定？ → A: 判定入口只有一个：可执行只读引擎动作（FR-005）；文档程序或人工阅读不构成判定入口，也不得作为第二判定面。角色集以集合输出（`subagent` / `superagent` 并集，[[STR-002]] 是集合形态的机读标记），深度为从根起的最短边计数。边的来源以**父侧派发记录**为优先载体（team 派发映射行、驱动状态脊的 line+stage、`run-agent` 的 label），其余载体（artifact triplet、状态脊、line registry、run report）只作交叉核对；同一字段在两处载体冲突时 MUST 报 conflict 并点名两处路径，MUST NOT 静默择一。引擎路径与动作名留 plan 固定（A11；FR-003 / FR-005 已按本裁定加约束）。
+- Q: 下行载荷、上行回传、状态查询/取消/恢复各自归哪些既有 owner？本特性只加什么？ → A: 下行义务归 `subagent-definitions.md` § Dispatch-Time Governance Obligation（fast-fail、汇报、并发、反嵌套）与 § External Dispatch Visibility Contract（可观测性）、§ Execution Topology Declaration（拓扑），注入机制归 `run-agent` SKILL 的 Dispatch-time injection；本特性只加 FR-008 / FR-034 的角色字段（父身份、子 label、角色声明、深度位置、授权依据引用、结果契约、回传通道）。上行回传的异常行归 `fast-fail.md` § 子代理派发注入，并发读数三元组归 The Concurrency Obligation 与 `effective-concurrency.yaml`，结构化结果与证据路径归 `create-team` 的报告契约，面向人的汇报归 `reporting-obligations.md`；本特性只加 FR-009 的「返回执行体身份 + 逐子归属」。状态查询/等待归 `watch-model.md`（判定状态机与归属层），恢复/重入归 driver 的 checkpoint 与状态脊（`loop-state.py` 快照只读），取消/终止归既有确认门与 U5 处置，授权重验证归 `sdd-route.py --action authorize`；本特性只加 FR-027 / FR-028 的「重建边 + interrupted/attention」语义。任何 owner 的字段表都不复制。
+- Q: 身份转变注入的清单是否封闭？「可见性契约」与「注意力预算」分别落在哪一项？注入形态与红线如何落位？ → A: FR-017 的九项即**封闭清单**；「可见性契约」义务落在 (f)（状态载体与写者边界），按指针指向 `subagent-definitions.md` § External Dispatch Visibility Contract；「注意力预算」落在 (g)（既有消息分类 FR-010 + `reporting-obligations.md`）；「汇报路径」落在 (e)。注入形态 = 派发载荷正文中的指针清单（不复制规则正文），物理存在由派发前自检按 [[STR-003]] 子串判定（FR-018）。红线：载荷 MUST NOT 携带完整驱动手册、MUST NOT 要求加载任何技能、MUST NOT 引用驱动技能或含循环逻辑（反嵌套，owner 同 § Dispatch-Time Governance Obligation）；驱动手册只属于驱动者（FR-017 / FR-008 已按本裁定收紧）。
+- Q: 并发、状态同步、状态跟踪、可视化四问各自的唯一 owner 与新增投影面？ → A: 并发 = `subagent-definitions.md` § The Concurrency Obligation + 四份 concurrency facts（FR-022），零新增；状态同步 = 单写者与边聚合语义的唯一 owner 是本特性 [[STR-004]]，落盘载体归各既有 owner（状态脊 / line registry / artifact triplet / run report），per-entry 形态（FR-025 / FR-026），零新增 store；状态跟踪 = `status-digest.py` 是唯一 digest，liveness 归 artifact triplet 与 `watch-model.md`，派发映射表归 `create-team` 报告契约（FR-030），零新增观测面；可视化 = `status-digest.py` 是唯一 renderer，新增的只是角色-边字段与扇出形状视图（FR-029 / FR-031），不新建 dashboard、parser 或第二 renderer。
+- Q: instructions 模板是新增一段指针还是并入既有段？其他落点如何分工？ → A: 新增一个极小 `## Super Agent (相对逻辑角色)` 指针段（一句话 + [[STR-004]] 路径 + [[STR-003]] 注入存在声明），置于 `## Spec Kit Framework Map` 之后、`## Spec Kit Runtime & Symlink Model` 之前；判据是生成器预算报告（实测见 A13），超限时缩减为一行纯指针，不抬预算（FR-033）。其他落点分工：`subagent-definitions.md` 只加指针行与一句「父端角色归 owner、本文只拥有子端」的边界句；`better-harness.md` **不改**——它是改进目标锚点而非角色 owner，写入角色模型会造出第二事实源；driver 手册在 Driver Topology / U0.5 自检处只加一行指针，执行仍由既有派发前自检与 U4 承担，不新增门禁（FR-034 已按本裁定补句）；`framework-map.md` 加指针行（FR-032）。
+- Q: 「相对角色可多层」与既有「许可链深度 2」如何共存？ → A: 两条正交的轴，一句话讲清：**角色深度**是图上从根计数的最短距离，无上限、描述性；**SDD 许可链深度 2** 是授权限制，只约束 SDD 承载链（team orchestrator → driver host member → stage executor leaf），由 `subagent-definitions.md` § Dispatch-Time Governance Obligation 拥有。非 SDD 扇出（如 10 子项）不消耗许可链深度；任何执行体进入 SDD 承载链时仍受三条件、三条禁令、virtual 不得承载与每成员一运行约束。该一句话落在 [[STR-004]]，本规格只引用（FR-004 已按本裁定补句）。
+- Q: 080–094 观测附录需要哪些可复核读数？如何避免把「本次运行顺利」写成机制有效？ → A: 每个存在切片的附录行 MUST 携带：切片机制主张、本运行实际行使的**机器读数**（可解析证据路径 + 可复现命令或记录，如 run record JSON、feedback 条目、trigger index 条目、digest 输出、flow-class 读取）或显式 [[STR-006]] 与理由。读数 MUST 来自本运行产生的机器记录；配置存在、对话叙述、「本次运行顺利」、本特性自身产物都不构成机制行使证据——「顺利」最多说明该切片未被触发。附录不替代本特性验收，逐行检查在 implement 收尾执行（FR-038 已按本裁定补句）。
+- Q: 本特性的显式 out-of-scope 边界？ → A: 不新建运行时、调度器、队列、第二 registry / 状态存储 / 仪表盘 / 第二 renderer / 第二派发器；不在测试套件内铺设真实 SSH 主机（A3）；不改写 080–094 的规格或既有 owner 规则文本（只加指针行与字段）；不新增 `/speckit.*` 命令。
+- Q: Related Feature 绑定到哪个 Feature？ → A: 新建 Feature 095（同号惯例，名称 `Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）`，状态 Draft）。无既有 Feature 承载该主题：019 / 027 / 085 / 093 分别拥有 agent 命令、team 管理、SDD 临时 team 并发与并发默认，super agent 是跨它们的相对角色定义，绑定到任一都会把新 owner 塞进邻域。索引行与详情文件同批落盘（A14）。
+- Q: `super agent` / `superagent` / `super-agent` 的规范形态？ → A: 正文规范术语 `super agent`（两词）；机读标识 `superagent`（[[STR-001]]）；`super-agent` 只作 glossary alias，框架正文不用；双重角色的机读标记是 [[STR-002]]，正文用「双重角色」。术语锚点是 `.specify/glossary.md` 的 `Super Agent` 条目（A15）。
+
 ## Assumptions
 
 - **A1（Flow Class 判定理由）**: 判为 `execution`——验收 oracle 是机器行为：定义文档被 agent 读取、派发载荷被契约测试断言、digest 投影被程序消费、角色判定面被程序执行；缺陷在机器读错或执行错时暴露，而不是只在人读错时暴露。
@@ -269,3 +282,6 @@
 - **A10（工作树纪律）**: 工作树存在本特性开始前遗留的脏文件；本特性只提交自己的产物，不提交、不还原这些文件，也不 push。
 - **A11（实现面命名）**: 角色判定引擎的路径、CLI 动作名与根标记字面量由 plan 阶段固定；本规格固定的是查询语义、Shared Strings 与边记录形态，不固定这些实现名。
 - **A12（判定方式）**: owner 文档以路径引用既有规则；守护测试断言指针形态、预算行为与结构不变量，不以散文措辞作为唯一证据（盲检查教训：只对措辞的绿不构成证据）。
+- **A13（指令预算实测）**: 本阶段实测 `.specify/instructions.md` = 37,454 B、`templates/instructions-template.md` = 32,975 B、`scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES` = 38,400 B（余量 946 B）；落段形状以生成器预算报告为判据，实测值不写入模板。
+- **A14（Feature Linkage 处置）**: `Related Feature` 由本阶段绑定为新 Feature 095（索引行 Draft + 详情文件 `.specify/features/095-superagent-role.md`），绑定依据与候选比较见 Clarifications 同名行；`/speckit.requirements` 留下的 `Need clarification` 占位至此关闭。
+- **A15（术语形态）**: 正文规范术语 `super agent`（两词）、机读标识 `superagent`（[[STR-001]]）、`super-agent` 只作 glossary alias、双重角色机读标记 `dual-role`（[[STR-002]]）；术语锚点是 `.specify/glossary.md` 的 `Super Agent` 条目，其定义来源指向 [[STR-004]]。
