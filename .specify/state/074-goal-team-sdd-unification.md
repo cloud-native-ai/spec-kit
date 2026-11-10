@@ -170,3 +170,16 @@ last_verdict: implement DONE (32/32; SC-001..006 pass; targeted 277; mirrors cle
 - 2026-10-29T03:42Z implement part 4 DONE @7305ea7b8（T022–T025；US3 17 governance tests；targeted 191 / 0 new；无 PLAN-EDIT）；part 5 T026–T032 + implement 收尾派发。
 - 2026-10-29T03:56Z implement DONE（32/32；SC-001..006 全 pass；targeted 277 passed；mirrors clean；part 5 在证据粘贴处触 120 回合上限，任务/验证/门均已落盘并由驱动复核）；review 派发。
 - 2026-10-29T02:19Z 074a tasks DONE @a98155404（TASKS-DONE）：tasks.md 32 行（Setup 3 / Foundational 2 / US1 11 / US2 5 / US3 4 / Polish 7；仅 Setup 一对 `[P]`），47 条 `[green:]` 恰好分区 C-1…C-47 且每契约内序号随行序单调；`validate-tasks.py` PASS（0 error / 0 warning——首稿两条 `parallel-safe` 按实际写目标裁定后去掉真冲突行的 `[P]`，未删路径）；`decomposition-check --mode tasks` proceed（fr=20 / tasks=32）；`coverage-baseline.txt` 在 claims 存在后冻结（495 行基线 / claimed 47 / FR 20/20 / beyond 0 / status ok）；`pre-analyze --stage tasks` pass（errors=0 / 65 missing-path advisory，全部指向本切片将创建的文件）；plan-owned 面零改动 → 无 PLAN-EDIT；`check-prerequisites.sh --json` 按分支前缀解析到父 spec 目录（已由简报覆盖），仓内不存在 `create-new-tasks.sh`，tasks.md 按模板就地撰写；父 tasks.md 与父设计零改动；无子代理派发；未 push。
+
+## 访谈裁定（D-074，2026-11-10）
+
+- 用户裁定：**将 074a 与 074b 回合到 074**（两片已完成但未合并回父级）；**SDD 流程需新增 split + merge 流程**（分片完成后必须合并回父）；注册表条目在合并后关闭。
+- 具体形态见访谈第 2 轮 D-074-R1 / D-074-R2 的裁定。
+
+### D-074-R2 裁定补充（2026-11-10）
+
+- **split + merge 以新命令 `/speckit.seal` 落地**：按 review 的结论对 spec 进行封装；**sealed** 是 `Ready for Review` 之后经 seal 处理的**最终态**，sealed 的 spec 方可最终归档。
+
+### D-074-R1 裁定补充（2026-11-10）
+
+- **回合 = 分片产出合并回写父级**：各分片的同名输出件(至少含 `tasks.md`，以及"所有的输出件")按「合并 → 编号重排 → 语义对齐 → 词汇表对齐」回写到父级同名文件；所有输出件使用同一流程；最终确认由 `/speckit.seal`（D-074-R2）完成。
