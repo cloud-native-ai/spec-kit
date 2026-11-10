@@ -133,7 +133,7 @@ binding:
 ## Goal
 
 goal/team 与 spec(SDD) 平行；.specify/goal|teams 统一归档；复杂工作由 spec 设计、goal+team 执行。目标定义在
-`.specify/specs/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md`，本节只作可读呈现。
+`.specify/archive/goal-team/trees/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md`，本节只作可读呈现。
 
 ## Static Structure
 

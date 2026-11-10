@@ -197,7 +197,7 @@ flowchart TD
 
 ## Lineage
 
-- 由预置模板 `project-cluster` 实例化（`skills/create-team/templates/teams/project-cluster.md`;
+- 由预置模板 `project-cluster` 实例化（`skills/internal/create-team/templates/teams/project-cluster.md`;
   原名 `workspace-cluster`,2026-08-20 泛化改名——花名册从 .code-workspace 绑定推广为显式项目登记,
   本团队的花名册仍以 workspace folders 为种子源），
   该模板蒸馏自 2026-07 一次真实的 10 仓 IaC 集群运营 Session（复盘见 `draft/Code Workspace.md`）。

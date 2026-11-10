@@ -130,7 +130,7 @@ binding:
 ## Goal
 
 Every retained write ends with one git close-out (commit -> merge -> push) derived from the model declared in
-`.specify/workflow/git.md`; the goal definition at `.specify/specs/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md`
+`.specify/workflow/git.md`; the goal definition at `.specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout/goal.md`
 is authoritative and this section is readability rendering only.
 
 Success is judged by the goal's four criteria: the four workflow models reproduce their sequences in fixture

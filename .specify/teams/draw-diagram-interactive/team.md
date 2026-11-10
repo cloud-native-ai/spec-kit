@@ -118,7 +118,7 @@ flowchart TD
 | 相 | 内容 |
 |----|------|
 | **WHEN** | 用户发起 `/speckit.team run draw-diagram-interactive` |
-| **SEE** | goal 定义(`.specify/goal/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |
+| **SEE** | goal 定义(`.specify/anchoring/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |
 | **DO** | 一个迭代代:派 builder 改目标副本 → verifier 以副本执行技能产出交互图表 → 三维评分 |
 | **CHECK** | 加权评分(交互 0.45/正确 0.25/整合 0.30)+ verifier 判据「经技能能绘制出随输入调整的网页图表」+ 既有静态路径回归 |
 | **STOP** | threshold 0.8 达标 / iteration ≥ 5 / 连续 2 代回归(regression_limit) |

@@ -109,7 +109,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/goal/draw-two-layer-structure/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 **终态**：绘图能力呈两层自治结构 —— `skills/draw-diagram` 是唯一入口且自行完成语义分析，`skills/draw-{d3js,echarts,excalidraw,mermaid,plantuml}` 各自归位语法实现，用户两层都不必补齐细节；出图后主动征询评价并据以调整。
 

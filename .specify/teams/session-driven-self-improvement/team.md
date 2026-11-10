@@ -176,7 +176,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/goal/session-driven-self-improvement/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 终态是框架中有一套 improve 流程，含两个方面：**主动触发**（通过 improve 命令）与**被动触发**（通过运行判定的结果触发 feedback 流程）。本目标只**建立**该流程，不**进行**提升。
 

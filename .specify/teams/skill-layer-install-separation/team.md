@@ -121,7 +121,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/goal/skill-layer-install-separation/goal.md`（`goal_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。
+**权威定义**：`.specify/anchoring/skill-layer-install-separation/goal.md`（`goal_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。
 
 ## Static Structure
 
@@ -209,7 +209,7 @@ binding:
 
 **失败策略**：retry-once-then-escalate（每单元一次重试，仍败即上送用户）；MUST NOT 用 retry 承载单元累积。
 
-**Summary 刷新**：每阶段交接验证通过后刷新一次（`every: 1`）→ `.specify/goal/skill-layer-install-separation/summary/`；门控顺序与状态行口径由 `skills/create-team/SKILL.md` §Summary Refresh 持有。
+**Summary 刷新**：每阶段交接验证通过后刷新一次（`every: 1`）→ `.specify/goal/skill-layer-install-separation/summary/`；门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。
 
 ## Self-Improvement Contract
 

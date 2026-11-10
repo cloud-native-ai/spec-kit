@@ -148,7 +148,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/goal/command-logic-as-classified-skills/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 - **终态**：命令核心逻辑尽可能由技能承载；每个技能元数据带 internal / external 标注，标注如实表达它与 spec-kit 的依赖关系。
 - **判据**：定义持有 1 条，**本文件不复述其文本** —— 判据是 `achieved` 的唯一权威，本团队 MUST NOT 自行增补或转写口径；需要口径时读定义。
@@ -267,7 +267,7 @@ flowchart LR
 
 **run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.goal targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**
 
-**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/goal/command-logic-as-classified-skills/summary/`（由 `goal_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。
+**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/goal/command-logic-as-classified-skills/summary/`（由 `goal_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。
 
 ## Self-Improvement Contract
 

@@ -95,7 +95,7 @@ binding:
 
 ## Goal
 
-**权威定义**:`.specify/goal/post-refactor-mechanism-integrity/goal.md`(`goal_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。
+**权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`goal_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。
 
 ## Static Structure
 
