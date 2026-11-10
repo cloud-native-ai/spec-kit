@@ -121,3 +121,57 @@ recording that id in `full-collection-disposed.txt` restores green. Details and 
 
 Anomaly line: none in this record — every failure is the expected red of the guard against
 the tree before its subject exists; no in-passing repair was applied to the guards.
+
+## WP-4 / T014 — `tests/contract/test_parallel_consistency_contract.py` (parallel-consistency C-001…C-006, C-009, C-010…C-012)
+
+- Date: 2026-11-10
+- Tree state at the red run: the guard file is the only change on disk — neither
+  `test-evidence/parallel-consistency-contract.txt` (T015) nor
+  `test-evidence/parallel-consistency-noxdist.txt` (T016) exists.
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_parallel_consistency_contract.py -q`
+- Exit code: `1`
+- Result: `3 failed, 1 passed in 3.48s` (4 collected cases).
+- Full run-time log: `.specify/.tmp/wp4/red-first.log` (this worktree; scratch, not retained).
+
+Failing cases (the red this record owns — each blames its missing subject):
+
+```text
+FAILED tests/contract/test_parallel_consistency_contract.py::test_the_comparison_record_judges_by_failure_names
+FAILED tests/contract/test_parallel_consistency_contract.py::test_the_subset_record_does_not_claim_full_suite_safety
+FAILED tests/contract/test_parallel_consistency_contract.py::test_the_no_xdist_record_shows_a_complete_serial_run
+```
+
+Decisive excerpt (the comparison case; the other two fail on the same missing carrier):
+
+```text
+E  AssertionError: the verification record is missing:
+   .../test-evidence/parallel-consistency-contract.txt — T015 owns this record
+   (C-012: a record missing its fields does not support the claim)
+```
+
+The fourth case, `test_non_parallel_safe_fixture_turns_the_comparison_non_empty` (C-009),
+passes by design: it constructs its own non-parallel-safe suite and asserts the
+parallel-vs-serial name comparison is non-empty, so its output is a red comparison rather
+than a failing case. Its captured output (identical construction, one-off reproduction
+`python3 .specify/.tmp/wp4/drill-repro.py`, log `.specify/.tmp/wp4/drill/`):
+
+```text
+parallel arm: exit=1
+mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+serial arm:   exit=0
+mode=serial reason=explicit tier=fast excluded_slow=0
+parallel names: ['tree/test_drill.py::test_alpha']
+serial names:   []
+comm -13 (serial-only):   []
+comm -23 (parallel-only): ['tree/test_drill.py::test_alpha']
+comparison non-empty: True
+```
+
+(The barrier construction makes exactly one parallel test read the other's write: both
+writes precede both reads, so the last writer's value is observed by the other test. The
+serial arm's barrier yields immediately without a worker environment, so each test reads its
+own write and stays green.)
+
+Anomaly line: none in this record — the three failures are the expected red of the guard
+against the tree before its evidence carriers exist, and the drill's non-empty comparison is
+the intended discriminator output; no in-passing repair was applied to the guard.

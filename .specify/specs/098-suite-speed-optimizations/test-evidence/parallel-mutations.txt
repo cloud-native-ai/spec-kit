@@ -1,0 +1,95 @@
+# T023 — parallel-consistency mutation drills PC-M1…PC-M5
+
+- date: 2026-11-10
+- owner of the legs: `contracts/parallel-consistency.contract.md` § F
+- guard under drill: `tests/contract/test_parallel_consistency_contract.py` (committed; the
+  tracked tree was never mutated)
+- method: every leg runs on a throwaway minimal harness under
+  `.specify/.tmp/wp4/mutations/` (gitignored scratch, not retained) — a copy of
+  `scripts/bash/run-tests.sh`, `scripts/bash/script-interface.sh`, the guard file, its
+  `pytest.ini`, and the T015/T016 evidence records + name lists at their declared relative
+  paths. The pristine control copy is green before any mutation (harness validity).
+
+## Harness control (pristine copy green)
+
+- Command: `python3 -m pytest tests/contract/test_parallel_consistency_contract.py -q -k test_` (in `.specify/.tmp/wp4/mutations/control`)
+- Exit `0`; `4 passed in 3.11s`.
+
+## PC-M1 — compare only one `comm` direction (must fail C-002/C-012)
+
+- Mutation in the copy's record: the `comm_23_count` field is deleted — the record performs
+  and records only `comm -13`.
+- Command: `python3 -m pytest tests/contract/test_parallel_consistency_contract.py -q -k test_the_comparison_record_judges_by_failure_names`
+- Exit `1`; `1 failed, 3 deselected in 0.06s`:
+  ```text
+  E  AssertionError: parallel-consistency-contract.txt field set must be exactly the declared
+     schema (C-012): missing=['comm_23_count'] unexpected=[]
+  FAILED ...::test_the_comparison_record_judges_by_failure_names
+  ```
+
+## PC-M2 — compare lists from two different trees (must fail C-003)
+
+- Mutation: `serial_tree_head` replaced with a zero hash, so the two arms claim different
+  recorded trees.
+- Exit `1`; `1 failed, 3 deselected in 0.06s`:
+  ```text
+  E  AssertionError: the two arms were recorded on different tree heads; a cross-tree
+     comparison is not isolation evidence (C-003)
+  FAILED ...::test_the_comparison_record_judges_by_failure_names
+  ```
+
+## PC-M3 — drop `--serial` from the comparison run (must fail C-002)
+
+- Mutation: ` --serial` removed from the recorded `serial_command`, so both lists would come
+  from the same (default-parallel) shape.
+- Exit `1`; `1 failed, 3 deselected in 0.06s`:
+  ```text
+  E  AssertionError: the comparison arm MUST be the --serial run; without it the two lists
+     come from the same shape and prove nothing (C-002):
+     'bash scripts/bash/run-tests.sh --ignore=tests/contract/test_parallel_consistency_contract.py
+      tests/contract --names-out .specify/.tmp/wp4/serial-failed.txt -q'
+  FAILED ...::test_the_comparison_record_judges_by_failure_names
+  ```
+
+## PC-M4 — treat a failure as absent from the serial list (must fail C-004)
+
+- Mutation: the first name removed from the persisted serial list and `serial_names_count`
+  set to `0` — a serial list that pretends the failure never happened.
+- Exit `1`; `1 failed, 3 deselected in 0.06s`:
+  ```text
+  E  AssertionError: .../parallel-contract-serial-names.txt does not match its recorded
+     line count
+  E  assert 159 == 0
+  FAILED ...::test_the_comparison_record_judges_by_failure_names
+  ```
+  (the names-difference leg sits behind the same case: with a truthful count, the
+  re-derived `comm -23` is non-empty and the case reddens on
+  `comm -23 is non-empty (C-002)` / the recorded-vs-derived comm count check.)
+
+## PC-M5 — record the subset result as full-suite safety (must fail C-008)
+
+- Mutation: `full_suite_safety_claimed: yes` while no full-tree comparison record exists.
+- Command: `python3 -m pytest tests/contract/test_parallel_consistency_contract.py -q -k test_the_subset_record_does_not_claim_full_suite_safety`
+- Exit `1`; `1 failed, 3 deselected in 0.06s`:
+  ```text
+  E  AssertionError: the subset record claims full-suite parallel safety, but the full-tree
+     comparison record (.../test-evidence/closure.txt) does not exist; a verified subset
+     MUST NOT be reported as full-suite safety until the full-tree comparison lands (C-008)
+  FAILED ...::test_the_subset_record_does_not_claim_full_suite_safety
+  ```
+
+## Summary
+
+| Leg | Mutation | Guard case reddened | Clause |
+|-----|----------|---------------------|--------|
+| PC-M1 | one `comm` direction only | `test_the_comparison_record_judges_by_failure_names` | C-002 / C-012 |
+| PC-M2 | two different trees | `test_the_comparison_record_judges_by_failure_names` | C-003 |
+| PC-M3 | `--serial` dropped | `test_the_comparison_record_judges_by_failure_names` | C-002 |
+| PC-M4 | failure absent from the serial list | `test_the_comparison_record_judges_by_failure_names` | C-004 |
+| PC-M5 | subset recorded as full-suite safety | `test_the_subset_record_does_not_claim_full_suite_safety` | C-008 |
+
+Every leg reddens exactly the case that owns its clause; the control copy is green. The
+guards are discriminators, not green labels.
+
+Anomaly line: none — all five legs reddened as declared on throwaway copies; no tracked
+file was mutated and no in-passing repair was needed.
