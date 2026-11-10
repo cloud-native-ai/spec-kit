@@ -13,6 +13,7 @@ This is a **map, not a manual**: it tells you *what* exists and *where* it lives
 | History knowledge base | `.specify/history/` | distilled, theme-aggregated conversation knowledge; owner: `/speckit.history` + `history-utils.py` |
 | Review reports | `.specify/review/` | archived code-review reports; owner: the `code-review` skill |
 | Project summary | `.specify/project/` | `summary/` delivery directory plus legacy manage-project artifacts (read-only); owner: the `summarize-project` skill |
+| Study reports | `.specify/studies/` | archived `study-code` output per target (`<target>-study/`: indexable `docs/overview.md`, outlines, strip manifest, figures, self-check evidence, target commit; the stripped source copy is not archived); owner: the `study-code` skill |
 | Spec archive | `.specify/archive/spec/` | archived feature specs; owner: `/speckit.sanitize`'s archive-spec disposition |
 | Goal/team archive history | `.specify/archive/goal-team/` | migration receipts (`receipts/`) and archived source trees (`trees/`), archive-not-delete; never a definition read surface; owner: `/speckit.goal` `migrate-archive` (STR-003) |
 | Artifact templates | `.specify/templates/` | requirements/plan/tasks templates rendered by `/speckit.*` |

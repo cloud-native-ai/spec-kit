@@ -1,0 +1,41 @@
+@startuml dsh-sequence-trigger-to-ticket
+' Planned UML primary view: key behavior flow — 被动路径（人在 GitHub/Feishu 点名）
+' Evidence: src/core/intake.ts:19-62; src/policy.ts:191-211; src/core/evals.ts:71-119,131-156,306-316; src/core/tickets.ts:37-56; src/executor/dsh.ts:264-268,424-470
+title 行为流 — Trigger 从 Source 到 Ticket 再到 Worker
+
+actor "人 (allowed list)" as P
+participant "Source (GitHub/Feishu)\n[本快照缺失]" as SRC
+participant "Passes" as PS
+participant "Intake" as INT
+participant "Thread (聚合)" as TH
+participant "Evals" as EV
+participant "Policy (gate)" as POL
+participant "主 Session (router)" as MAIN
+participant "Tickets" as TK
+participant "Effects 队列" as EF
+participant "DshExecutor" as EX
+participant "worker Session" as W
+
+P -> SRC : 消息/Issue/PR
+SRC -> PS : runtime.receive(trigger)
+PS -> INT : engine.receive(trigger) [事务内]
+INT -> INT : 去重 / scope 过滤
+INT -> TH : 记录关联 + 扇出到订阅 Ticket
+INT -> TH : pending 入队(若无人拥有该 follow-up)
+loop Passes 每 2s 或 requestPass
+  PS -> EV : evaluateDue() → start(thread)
+  EV -> POL : gate(trigger, thread, tickets)
+  POL --> EV : explicit/inferred + MandateBasis
+  EV -> MAIN : assessor.request(candidate)
+  MAIN -> MAIN : orchestrator_route / eval_decide
+  MAIN -> EV : engine.decide(accept/stop/ignore/unavailable)
+end
+EV -> TK : accept → create(ticket, mandate, …) [atomic]
+TK -> TK : assignment = pending; subscriptions; ack 入 Outbox
+TK -> EF : executor.start → enqueue(launch)
+EF -> EX : launch(ticket, assignment)
+EX -> EX : prepareDirectory (10min 上限) + WorkerSlots.reserve
+EX -> W : sessions.ensure(worker-<id>) + 首条 assignment 消息
+EX -> TK : engine.assignmentStarted
+W --> P : 通过 Channel 的 ack/result（Outbox → Source）
+@enduml

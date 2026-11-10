@@ -1,0 +1,301 @@
+docs/000-philosophy.md
+docs/001-domain.md
+docs/002-authorization.md
+docs/003-execution.md
+docs/004-prompts.md
+docs/005-panel.md
+docs/007-architecture.md
+LICENSE
+locale/en.json
+locale/zh.json
+prompts/admission.md
+prompts/cli.md
+prompts/dispatch.md
+prompts/handoff.md
+prompts/handoff-orchestrator.md
+prompts/handoff-worker.md
+prompts/orchestrator.md
+prompts/replies.md
+prompts/shared.md
+prompts/subscriptions.md
+prompts/team/communication.md
+prompts/team/delivery.md
+prompts/team/scope.md
+prompts/worker.md
+prompts/work.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/DSH 执行器与运行时基础设施/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/DSH 执行器与运行时基础设施/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/DSH 执行器与运行时基础设施/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/DSH 执行器与运行时基础设施/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/DSH 执行器与运行时基础设施/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/Superagent 管理面板客户端 UI/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/Superagent 管理面板客户端 UI/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/Superagent 管理面板客户端 UI/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/Superagent 管理面板客户端 UI/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/Superagent 管理面板客户端 UI/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/插件入口、部署校验与策略门控/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/插件入口、部署校验与策略门控/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/插件入口、部署校验与策略门控/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/插件入口、部署校验与策略门控/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/插件入口、部署校验与策略门控/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/特殊配置与命令.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/DSH Superagent 主动式 Agent Bundle/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/DSH Superagent 主动式 Agent 核心引擎/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/API 契约、评估器与文本缓存/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/API 契约、评估器与文本缓存/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/API 契约、评估器与文本缓存/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/API 契约、评估器与文本缓存/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/API 契约、评估器与文本缓存/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/上下文资源与卡片投影/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/上下文资源与卡片投影/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/上下文资源与卡片投影/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/上下文资源与卡片投影/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/上下文资源与卡片投影/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/主会话与执行器工具集/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/主会话与执行器工具集/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/主会话与执行器工具集/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/主会话与执行器工具集/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/主会话与执行器工具集/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/出站消息 Outbox、重试健康与持久化 Effects/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/出站消息 Outbox、重试健康与持久化 Effects/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/出站消息 Outbox、重试健康与持久化 Effects/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/出站消息 Outbox、重试健康与持久化 Effects/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/出站消息 Outbox、重试健康与持久化 Effects/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/后台通知、编排 Passes 与角色模型注入/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/后台通知、编排 Passes 与角色模型注入/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/后台通知、编排 Passes 与角色模型注入/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/后台通知、编排 Passes 与角色模型注入/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/后台通知、编排 Passes 与角色模型注入/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/应用启动、环境装配与数据迁移/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/应用启动、环境装配与数据迁移/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/应用启动、环境装配与数据迁移/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/应用启动、环境装配与数据迁移/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/应用启动、环境装配与数据迁移/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/提示词与技能装配层/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/提示词与技能装配层/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/提示词与技能装配层/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/提示词与技能装配层/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/提示词与技能装配层/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/视图投影与页面数据组装/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/视图投影与页面数据组装/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/视图投影与页面数据组装/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/视图投影与页面数据组装/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/视图投影与页面数据组装/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/设置块与版本快照子系统/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/设置块与版本快照子系统/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/设置块与版本快照子系统/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/设置块与版本快照子系统/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/设置块与版本快照子系统/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/运行时持久化与会话编排/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/运行时持久化与会话编排/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/运行时持久化与会话编排/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/运行时持久化与会话编排/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/dsh-superagent 编排器应用层/运行时持久化与会话编排/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/_module.yaml
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/应用运行时与 HTTP 管理接口/编码规范.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/技术栈.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/架构设计.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/概述.md
+.qoder/repowiki/knowledge/zh/dsh-superagent 编排器组合根与插件入口/编码规范.md
+.qoder/repowiki/knowledge/zh/DSH Superagent 配置系统：Cordis Profile + Settings Schema + SQLite 版本化存储/DSH Superagent 配置系统：Cordis Profile + Settings Schema + SQLite 版本化存储.md
+.qoder/repowiki/knowledge/zh/_index.yaml
+.qoder/repowiki/knowledge/zh/pnpm 依赖管理与 DSH Bundle 包发布约定/pnpm 依赖管理与 DSH Bundle 包发布约定.md
+.qoder/repowiki/knowledge/zh/基于 Cordis Context.logger 的轻量结构化日志/基于 Cordis Context.logger 的轻量结构化日志.md
+.qoder/repowiki/knowledge/zh/基于 DSH Context.logger 的轻量日志输出/基于 DSH Context.logger 的轻量日志输出.md
+.qoder/repowiki/knowledge/zh/基于 DSW 设计令牌与 dt- 命名空间的纯 CSS 面板样式系统/基于 DSW 设计令牌与 dt- 命名空间的纯 CSS 面板样式系统.md
+.qoder/repowiki/knowledge/zh/基于 tsdown + pnpm + Vitest 的 DSH Bundle 构建系统/基于 tsdown + pnpm + Vitest 的 DSH Bundle 构建系统.md
+.qoder/repowiki/knowledge/zh/基于 Zod Schema 的分块设置系统与隔离执行环境配置/基于 Zod Schema 的分块设置系统与隔离执行环境配置.md
+.qoder/repowiki/knowledge/zh/无包清单的 DSH Cordis 插件（依赖由宿主提供）/无包清单的 DSH Cordis 插件（依赖由宿主提供）.md
+.qoder/repowiki/knowledge/zh/结构化错误体系：UserError _ RouteError _ Later _ Conflict 分层与 HTTP 统一映射/结构化错误体系：UserError _ RouteError _ Later _ Conflict 分层与 HTTP 统一映射.md
+.qoder/repowiki/zh/content/API 参考.md
+.qoder/repowiki/zh/content/开发指南.md
+.qoder/repowiki/zh/content/快速开始.md
+.qoder/repowiki/zh/content/执行器与会话管理/DSH执行器核心.md
+.qoder/repowiki/zh/content/执行器与会话管理/会话生命周期管理.md
+.qoder/repowiki/zh/content/执行器与会话管理/后台任务处理.md
+.qoder/repowiki/zh/content/执行器与会话管理/执行器与会话管理.md
+.qoder/repowiki/zh/content/扩展开发/扩展开发.md
+.qoder/repowiki/zh/content/扩展开发/技能开发.md
+.qoder/repowiki/zh/content/扩展开发/提示词扩展.md
+.qoder/repowiki/zh/content/扩展开发/补丁开发.md
+.qoder/repowiki/zh/content/数据存储/ORM 映射与数据访问.md
+.qoder/repowiki/zh/content/数据存储/性能优化与监控.md
+.qoder/repowiki/zh/content/数据存储/数据存储.md
+.qoder/repowiki/zh/content/数据存储/数据库设计.md
+.qoder/repowiki/zh/content/数据存储/数据迁移与版本管理.md
+.qoder/repowiki/zh/content/架构设计/技术选型与依赖.md
+.qoder/repowiki/zh/content/架构设计/数据流设计.md
+.qoder/repowiki/zh/content/架构设计/整体架构模式.md
+.qoder/repowiki/zh/content/架构设计/架构设计.md
+.qoder/repowiki/zh/content/架构设计/核心组件设计/DshExecutor 执行器组件.md
+.qoder/repowiki/zh/content/架构设计/核心组件设计/Engine 引擎组件.md
+.qoder/repowiki/zh/content/架构设计/核心组件设计/Runtime 运行时组件.md
+.qoder/repowiki/zh/content/架构设计/核心组件设计/SourceRegistry 源注册表组件.md
+.qoder/repowiki/zh/content/架构设计/核心组件设计/核心组件设计.md
+.qoder/repowiki/zh/content/核心引擎/工单生命周期管理/工单创建与分配.md
+.qoder/repowiki/zh/content/核心引擎/工单生命周期管理/工单完成与关闭.md
+.qoder/repowiki/zh/content/核心引擎/工单生命周期管理/工单执行跟踪.md
+.qoder/repowiki/zh/content/核心引擎/工单生命周期管理/工单生命周期管理.md
+.qoder/repowiki/zh/content/核心引擎/引擎架构设计.md
+.qoder/repowiki/zh/content/核心引擎/核心引擎.md
+.qoder/repowiki/zh/content/核心引擎/评估决策系统/决策引擎.md
+.qoder/repowiki/zh/content/核心引擎/评估决策系统/策略系统.md
+.qoder/repowiki/zh/content/核心引擎/评估决策系统/评估决策系统.md
+.qoder/repowiki/zh/content/核心引擎/评估决策系统/评估流程.md
+.qoder/repowiki/zh/content/核心引擎/输入处理管道.md
+.qoder/repowiki/zh/content/核心引擎/阶段调度系统/任务分配机制.md
+.qoder/repowiki/zh/content/核心引擎/阶段调度系统/重试与恢复机制.md
+.qoder/repowiki/zh/content/核心引擎/阶段调度系统/阶段定义与状态管理.md
+.qoder/repowiki/zh/content/核心引擎/阶段调度系统/阶段调度系统.md
+.qoder/repowiki/zh/content/源插件系统/GitHub 源插件/GitHub 源插件.md
+.qoder/repowiki/zh/content/源插件系统/GitHub 源插件/事件处理机制.md
+.qoder/repowiki/zh/content/源插件系统/GitHub 源插件/数据读取能力.md
+.qoder/repowiki/zh/content/源插件系统/GitHub 源插件/消息通道系统.md
+.qoder/repowiki/zh/content/源插件系统/GitHub 源插件/轮询与监控.md
+.qoder/repowiki/zh/content/源插件系统/SourceKind 接口规范.md
+.qoder/repowiki/zh/content/源插件系统/源插件系统.md
+.qoder/repowiki/zh/content/源插件系统/自定义源开发指南.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/事件触发器.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/后台任务.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/图片处理.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/数据读取.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/核心架构与配置.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/消息通道.md
+.qoder/repowiki/zh/content/源插件系统/飞书源插件/飞书源插件.md
+.qoder/repowiki/zh/content/管理面板/UI 组件库.md
+.qoder/repowiki/zh/content/管理面板/工单管理.md
+.qoder/repowiki/zh/content/管理面板/执行监控.md
+.qoder/repowiki/zh/content/管理面板/概览页面.md
+.qoder/repowiki/zh/content/管理面板/管理面板.md
+.qoder/repowiki/zh/content/管理面板/线程查看器.md
+.qoder/repowiki/zh/content/管理面板/设置面板.md
+.qoder/repowiki/zh/content/管理面板/面板架构设计.md
+.qoder/repowiki/zh/content/设置与策略管理/版本管理.md
+.qoder/repowiki/zh/content/设置与策略管理/策略引擎.md
+.qoder/repowiki/zh/content/设置与策略管理/设置与策略管理.md
+.qoder/repowiki/zh/content/设置与策略管理/设置历史记录.md
+.qoder/repowiki/zh/content/设置与策略管理/配置系统架构.md
+.qoder/repowiki/zh/content/部署与运维/故障排查.md
+.qoder/repowiki/zh/content/部署与运维/服务管理.md
+.qoder/repowiki/zh/content/部署与运维/环境配置.md
+.qoder/repowiki/zh/content/部署与运维/监控告警.md
+.qoder/repowiki/zh/content/部署与运维/部署与运维.md
+.qoder/repowiki/zh/content/项目概述/基本概念介绍.md
+.qoder/repowiki/zh/content/项目概述/快速开始指南.md
+.qoder/repowiki/zh/content/项目概述/核心特性概览.md
+.qoder/repowiki/zh/content/项目概述/项目介绍与定位.md
+.qoder/repowiki/zh/content/项目概述/项目概述.md
+.qoder/repowiki/zh/meta/repowiki-metadata.json
+README.md
+src/admission.ts
+src/app/api.ts
+src/app/assessment.ts
+src/app/cache.ts
+src/app/cards.ts
+src/app/context.ts
+src/app/delivery.ts
+src/app/effects.ts
+src/app/execution-environment.ts
+src/app/http.ts
+src/app/links.ts
+src/app/migration.ts
+src/app/notices.ts
+src/app/outbox.ts
+src/app/passes.ts
+src/app/prompts.ts
+src/app/resources.ts
+src/app/retry-health.ts
+src/app/role-models.ts
+src/app/runtime.ts
+src/app/sessions.ts
+src/app/settings-history.ts
+src/app/settings.ts
+src/app/setup.ts
+src/app/skill-files.ts
+src/app/source-context.ts
+src/app/store-read.ts
+src/app/store.ts
+src/app/tools/executor.ts
+src/app/tools/main.ts
+src/app/tools/tool.ts
+src/app/versions.ts
+src/app/views/overview.ts
+src/app/views/records.ts
+src/app/views/settings.ts
+src/app/views/sources.ts
+src/app/views/text.ts
+src/app/views/threads.ts
+src/app/views/tickets.ts
+src/client/api.ts
+src/client/app.tsx
+src/client/client.css
+src/client/controls.tsx
+src/client/css.d.ts
+src/client/deployment.tsx
+src/client/draft.tsx
+src/client/eval.tsx
+src/client/execution.tsx
+src/client/index.tsx
+src/client/locales.ts
+src/client/markdown.ts
+src/client/marks.ts
+src/client/overview.tsx
+src/client/prompt-config.ts
+src/client/prompts.tsx
+src/client/provider.tsx
+src/client/route.ts
+src/client/rows.tsx
+src/client/settings-kit.tsx
+src/client/settings.tsx
+src/client/source.tsx
+src/client/text.ts
+src/client/thread.tsx
+src/client/ticket.tsx
+src/client/trigger.tsx
+src/client/widgets.tsx
+src/core/assignments.ts
+src/core/engine.ts
+src/core/errors.ts
+src/core/evals.ts
+src/core/ids.ts
+src/core/index.ts
+src/core/intake.ts
+src/core/memory.ts
+src/core/model.ts
+src/core/part.ts
+src/core/ports.ts
+src/core/reasons.ts
+src/core/replies.ts
+src/core/stage.ts
+src/core/tickets.ts
+src/deployment.ts
+src/executor/background.ts
+src/executor/dsh.ts
+src/index.ts
+src/infra/commands.ts
+src/infra/environment.ts
+src/infra/health.ts
+src/infra/paths.ts
+src/infra/text.ts
+src/kv.ts
+src/limits.ts
+src/navigation.ts
+src/policy.ts
+src/setup.ts

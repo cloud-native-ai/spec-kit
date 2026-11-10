@@ -1,0 +1,4 @@
+self-check over docs/overview.md (evidence paths + anchors)
+evidence paths: 42 | missing: src/sources/ (documented intentional absence)
+anchor links: 29 | unresolved: none
+index rows: 21

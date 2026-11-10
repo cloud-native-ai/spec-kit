@@ -661,7 +661,7 @@ def test_study_mermaid_scoped_to_secondary_content():
 def test_study_deliverable_location_unchanged():
     text = text_of(STUDY_SKILL_FILE)
     assert _baseline()["deliverable_statement"] in text, (
-        "Deliverable statement $WORK_DIR/docs/overview.md must remain (SC-007)"
+        "Deliverable statement $STUDY_ARCHIVE/docs/overview.md must remain (SC-007)"
     )
 
 

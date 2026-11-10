@@ -13,7 +13,7 @@
     "## Report Output Location",
     "## References"
   ],
-  "deliverable_statement": "$WORK_DIR/docs/overview.md",
+  "deliverable_statement": "$STUDY_ARCHIVE/docs/overview.md",
   "reference_guides": [
     "architect-analysis-guide.md",
     "deployment-analysis-guide.md",

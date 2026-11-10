@@ -1,0 +1,32 @@
+@startuml dsh-state-ticket
+' Planned UML secondary view: Ticket 状态（阶段表派生）
+' Evidence: src/core/stage.ts:5-21; docs/003:9-21; docs/001:35
+title Ticket 阶段状态图（首匹配行胜出）
+
+[*] --> Queued : accept 创建 (pending assignment)
+Queued --> Working : assignmentStarted
+Working --> Idle : report waiting / turn 结束 (无后台)
+Idle --> Working : 新 Input 送达 (wake)
+Working --> Working : report progress
+Working --> PersonReview : report ready
+Working --> PersonBlocked : report blocked
+Working --> PersonFailed : report failed
+PersonBlocked --> Working : 人的消息到达
+PersonFailed --> Working : 人的消息到达 / retry
+PersonReview --> EndedCompleted : ready 且无 follow Threads
+Working --> EndedDropped : report dropped
+Idle --> EndedMerged : 跟随的 PR merged (followsDone)
+Idle --> EndedClosed : 跟随的 PR closed (followsDone)
+PersonBlocked --> PersonDelivery : Input 投递失败
+PersonDelivery --> Working : 投递成功 / 新 Assignment / retry
+PersonReview --> Idle : 人的 follow-up 继续（同 Mandate，无 Eval）
+EndedCompleted --> [*]
+EndedDropped --> [*]
+EndedMerged --> [*]
+EndedClosed --> [*]
+note right of PersonReview
+  person 阶段 = 不能继续、必须人介入
+  Ended 后：人消息可 resume（Mandate 重验证），
+  stop（人）则 Mandate 撤销、永不复用
+end note
+@enduml

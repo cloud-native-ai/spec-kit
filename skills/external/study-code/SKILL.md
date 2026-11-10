@@ -7,7 +7,7 @@ classification: external
 
 # study-code — 减法式源码研读
 
-五步固定流程，逐步落盘，最终交付一份可索引报告。每一步的产物都写到 `$STUDY_DIR`（见 § Workspace），报告写到 `$WORK_DIR/docs/overview.md`。
+五步固定流程，逐步落盘，最终交付一份可索引报告。每一步的产物都写到 `$STUDY_DIR`（见 § Workspace），最终报告与证据归档到 `$STUDY_ARCHIVE`。
 
 ## Workspace & inputs
 
@@ -18,6 +18,7 @@ classification: external
     2. 不可写 → 宿主仓库的受治理临时根 `.specify/.tmp/study-code/<repo>-study/`；
     3. 仍不可写 → `~/tmp/study-code/<repo>-study/`。
   选定后在 `strip-manifest.md` 记录所选根与理由。所有剥离与清单都在这里，不碰原仓库。
+- **`$STUDY_ARCHIVE`**：宿主项目中承载研读成果的持久归档目录，固定为 `<宿主项目根>/.specify/studies/<repo>-study/`。最终报告（`docs/overview.md`）、图源（`docs/figures/`）、`strip-manifest.md`、`outline-*.md`、`deep-study.md`、`self-check-evidence.txt`、`target-commit.txt` 从 `$STUDY_DIR` 归档到这里；`stripped/` 研读副本留在 `$STUDY_DIR`（一次性工作区，不归档）。目标仓库只读——任何产物都不得写进 `$WORK_DIR`。
 
 ## Step 1 — strip-repo（减法）
 
@@ -55,26 +56,26 @@ classification: external
 
 ## Step 5 — report（可索引报告）
 
-写 `$WORK_DIR/docs/overview.md`，**必须可索引**，供用户后续追问时快速反查：
+写 `$STUDY_ARCHIVE/docs/overview.md`，**必须可索引**，供用户后续追问时快速反查：
 
 1. **索引表（必备，置于报告开头）**：`概念/组件 → 章节锚点（相对链接） → 证据路径（file:line）`，一行一条，覆盖全部核心概念与组件。
 2. **稳定锚点**：每个章节与组件小节使用固定、可预测的标题（锚点由标题派生），不得中途改名；跨引用使用相对锚点链接。
 3. **查表指南（Lookup guide）**：给常见追问形态配"去哪找"（如"某行为在哪实现" → 核心实现节 + 证据路径；"依赖谁" → 组件构成节）。
 4. **证据密度**：每个结论携带 `路径[:行]`；没有证据的推断标注 `推断`。
-5. 图表：主视图的 UML 图文件放 `$WORK_DIR/docs/figures/`（PNG + `.puml` 源），图中要点回链索引表。
+5. 图表：主视图的 UML 图文件放 `$STUDY_ARCHIVE/docs/figures/`（PNG + `.puml` 源），图中要点回链索引表。
 6. 交付前自检：索引表的每个锚点可跳转、每个证据路径存在、章节标题与索引一致。
 
 默认中文（跟随用户语言）；直接写结论，不要"见上文/见草稿"式导航。
 
 ## Output Requirements
 
-- **UML 主视图**：架构结构、关键行为流、部署拓扑等主视图用标准 UML（经 draw-diagram 渲染；PNG + `.puml` 源放 `$WORK_DIR/docs/figures/`，报告内以相对路径 + 简短图注嵌入）；**Mermaid 仅限次要内容**（速览草图、小流程、小组件）。
+- **UML 主视图**：架构结构、关键行为流、部署拓扑等主视图用标准 UML（经 draw-diagram 渲染；PNG + `.puml` 源放 `$STUDY_ARCHIVE/docs/figures/`，报告内以相对路径 + 简短图注嵌入）；**Mermaid 仅限次要内容**（速览草图、小流程、小组件）。
 - **证据密度**：每个结论带 `路径[:行]`；没有证据的推断显式标注 `推断`。
 - 默认中文（跟随用户语言）；交付前完成 Step 5 自检（索引锚点可跳转、证据路径存在、标题与索引一致）。
 
 ## Report Output Location
 
-`$WORK_DIR/docs/overview.md` — the single deliverable file the user consumes.
+`$STUDY_ARCHIVE/docs/overview.md`（`<宿主项目根>/.specify/studies/<repo>-study/docs/overview.md`）— the single deliverable file the user consumes. 归档同目录另含 `strip-manifest.md`、`outline-code.md`、`outline-docs.md`、`deep-study.md`、`self-check-evidence.txt`、`target-commit.txt` 与 `figures/`；`stripped/` 不归档。
 
 ## References
 

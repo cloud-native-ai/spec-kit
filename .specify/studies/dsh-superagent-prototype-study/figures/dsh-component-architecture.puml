@@ -1,0 +1,89 @@
+@startuml dsh-component-architecture
+' Planned UML primary view: architecture structure (component diagram)
+' Evidence: docs/007-architecture.md:9-25; src/app/runtime.ts:59-172; src/core/ports.ts:106-134
+skinparam componentStyle rectangle
+title dsh-superagent — 组件架构（宿主边界内）
+
+package "DeepSeek Harness (Cordis 宿主)" {
+  [Session 引擎\n(@deepseek-ai/dsh-agent)] as DSH
+  [Web Server / Panel 宿主] as WEB
+}
+
+package "dsh-superagent 插件" {
+  [src/index.ts\napply(ctx, config)] as ENTRY
+  [Runtime\n组合根 + 生命周期\nruntime.ts] as RT
+
+  package "core (无 I/O 领域内核)" {
+    [Engine\n唯一写入口 engine.ts] as ENG
+    [Intake] as INT
+    [Evals] as EV
+    [Tickets] as TK
+    [Assignments] as AS
+    [Replies] as RP
+    [model.ts / ports.ts / stage.ts] as MDL
+  }
+
+  package "app (编排与胶水)" {
+    [Store (SQLite)] as ST
+    [Effects 持久副作用队列] as EF
+    [Outbox 收据/顺序] as OB
+    [Passes 2s 调度] as PS
+    [Settings / Prompts\n版本化] as SET
+    [MasterAssessor\n评估候选] as MA
+    [Sessions 管理\n(router/worker preset)] as SS
+    [HTTP /orchestrator/api\n+ views] as HTTP
+    [工具: main 14 / executor 6] as TOOLS
+  }
+
+  [DshExecutor\nexecutor/dsh.ts] as EX
+  [infra Commands/Environment/Health] as INF
+
+  package "client (React 面板)" {
+    [Panel UI\nOverview/Source/Trigger/Eval/Execution/Settings] as UI
+  }
+
+  package "sources (协议层; 本快照缺失实现)" {
+    [SourceHost / SourceContext\nhost.ts (缺失)] as SRC
+  }
+}
+
+[GitHub CLI gh] as GH
+[Feishu CLI lark-cli] as FS
+[Worker 目录/工作树] as DIR
+[SQLite 文件] as DB
+
+ENTRY --> RT
+RT --> ENG
+RT --> ST
+RT --> EF
+RT --> OB
+RT --> PS
+RT --> SET
+RT --> MA
+RT --> SS
+RT --> EX
+RT --> HTTP
+ENG --> INT
+ENG --> EV
+ENG --> TK
+ENG --> AS
+ENG --> RP
+EV --> MA : assessor 端口
+TK --> EX : executor 端口
+ENG --> OB : outbox 端口
+SRC --> ENG : receive/bindThread/threadClosed
+SRC --> SRC
+EX --> DIR
+EX --> SS
+EX --> EF
+ST --> DB
+OB --> SRC : Channel 发送
+MA --> SS : 候选卡片 steer
+TOOLS --> ENG
+HTTP --> ST
+UI --> HTTP
+INF --> GH
+INF --> FS
+DSH --> SS
+WEB --> UI
+@enduml

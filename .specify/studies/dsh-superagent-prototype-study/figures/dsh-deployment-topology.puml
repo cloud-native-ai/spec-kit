@@ -1,0 +1,38 @@
+@startuml dsh-deployment-topology
+' Planned UML primary view: deployment topology
+' Evidence: src/index.ts:10-25; src/app/runtime.ts:87-104,166-172,228-253; src/app/executor/../executor/dsh.ts:23-36,424-470; docs/003:24-79
+skinparam componentStyle rectangle
+title dsh-superagent — 运行拓扑（单进程 + 外部 CLI + 本地状态）
+
+node "操作者机器" {
+  node "DeepSeek Harness 进程" {
+    component "dsh-superagent 插件\n(Cordis service: orchestrator)" as PLUG
+    component "主 Session\norchestrator (router preset)" as MAIN
+    component "worker Session\nworker-<ticket> (worker preset)" as WORK
+    component "Passes (每2s) + Effects 队列" as LOOPS
+  }
+  database "stateDir/orchestrator.sqlite\n(schema 11, WAL)" as DB
+  folder "执行根 (默认 <stateDir>/work)\nticket 目录/工作树" as WORKDIR
+  artifact "stateDir 锁\n(proper-lockfile, 30s stale)" as LOCK
+  component "命令 shim\n(gh / lark-cli / git)" as SHIM
+}
+
+cloud "GitHub" as GH {
+  component "REST API" as GHAPI
+}
+cloud "Feishu" as FS {
+  component "Open API / 事件" as FSAPI
+}
+
+PLUG --> DB
+PLUG --> LOCK
+PLUG --> LOOPS
+PLUG --> MAIN
+PLUG --> WORK
+PLUG --> WORKDIR : prepare 命令 + 变量
+WORK --> WORKDIR : 读写代码
+MAIN --> SHIM
+WORK --> SHIM
+SHIM --> GHAPI : gh CLI (agent 账号)
+SHIM --> FSAPI : lark-cli (bot 身份, strict-mode=bot)
+@enduml
