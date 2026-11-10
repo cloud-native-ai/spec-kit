@@ -3171,6 +3171,1153 @@ def build_client_reference_tree(workspace):
         yield reference_root
     finally:
         temp_root.cleanup()
+
+
+# ---------------------------------------------------------------------------
+# Outcome map, static pointer, run context (FR-013, FR-019)
+# ---------------------------------------------------------------------------
+
+# Stable outcome -> exit mapping (contracts/migrate-cli.md C-3); the contract
+# test compares this dict against the FR-019 table read from requirements.md.
+MIGRATE_OUTCOME_EXIT_CODES = {
+    "clean": 0,
+    "planned": 1,
+    "applied": 0,
+    "blocked": 3,
+}
+MIGRATE_INPUT_ERROR_EXIT = 2
+
+# Dispositions whose execution needs the second key (FR-015). The destructive
+# criteria themselves stay owned by shared/guidelines/confirmation-gates.md;
+# the safety package refines this classifier against that owner.
+MIGRATE_DESTRUCTIVE_DISPOSITIONS = ("archive", "replace")
+
+# E-9: a constant, non-probed pointer. goal/team archive migration stays owned
+# by /speckit.goal `migrate-archive`; this command never detects or disposes it.
+MIGRATE_STATIC_POINTERS = (
+    {
+        "topic": "goal-team-archive-migration",
+        "ownerCommand": "/speckit.goal",
+        "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+        "note": (
+            "goal/team archive migration is owned by /speckit.goal "
+            "(migrate-archive); specify migrate neither detects nor disposes it"
+        ),
+    },
+)
+
+
+class MigrateEngineError(RuntimeError):
+    """A consumed engine failed in a way the command cannot proceed past."""
+
+
+class MigrateContext:
+    """Per-run planning context shared by the five dimension planners."""
+
+    def __init__(self, workspace, workspace_kind, engine_dir, surfaces=None):
+        self.workspace = Path(workspace)
+        self.workspace_kind = workspace_kind
+        self.engine_dir = Path(engine_dir)
+        self.surfaces = dict(surfaces or {})
+        self.reference_root = None
+        self.run_id = None
+        self.notes = []
+        self.archives = []
+        self.mirror_items = None
+
+
+def migrate_interactive_terminal() -> bool:
+    """Whether the second key can exist at all (an interactive stdin)."""
+    try:
+        return bool(sys.stdin.isatty())
+    except (AttributeError, ValueError, OSError):
+        return False
+
+
+def _migrate_ws_rel(workspace, path) -> str:
+    try:
+        return Path(path).relative_to(Path(workspace)).as_posix()
+    except ValueError:
+        return Path(path).as_posix()
+
+
+def _migrate_engine_module(engine_dir, filename):
+    """Load a sibling engine in-process (read-only consumption, FR-010)."""
+    import importlib.util
+
+    path = Path(engine_dir) / filename
+    if not path.is_file():
+        raise MigrateEngineError(f"engine not found: {path}")
+    module_name = "_migrate_engine_" + hashlib.sha1(
+        str(path).encode("utf-8")
+    ).hexdigest()[:10]
+    cached = sys.modules.get(module_name)
+    if cached is not None:
+        return cached
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    sys.modules[module_name] = module
+    return module
+
+
+def _migrate_run_engine(script, args, cwd):
+    proc = subprocess.run(
+        [sys.executable, str(script)] + list(args),
+        cwd=str(cwd),
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    return proc.returncode, proc.stdout, proc.stderr
+
+
+# ---------------------------------------------------------------------------
+# Planner — five dimensions in E-8 order (contracts/migrate-engine.md C-1/C-4)
+# ---------------------------------------------------------------------------
+
+_MIGRATE_SURFACE_EVIDENCE_PREFIXES = (
+    (".specify/skills/internal/", "skills/internal/"),
+    (".specify/skills/", "skills/external/"),
+    (".specify/agents/templates/", "agents/"),
+    (".specify/templates/", "templates/"),
+    (".specify/scripts/", "scripts/"),
+    (".specify/shared/", "shared/"),
+)
+
+
+def _migrate_owner_evidence(rel, surfaces):
+    """Map a runtime-relative path back to its owner (installed asset) path."""
+    for prefix, source_prefix in _MIGRATE_SURFACE_EVIDENCE_PREFIXES:
+        if rel.startswith(prefix):
+            return source_prefix + rel[len(prefix):]
+    for dir_rel in (surfaces or {}).values():
+        if rel.startswith(dir_rel + "/"):
+            name = rel[len(dir_rel) + 1:]
+            pieces = name.split(".")
+            if len(pieces) >= 2 and pieces[0] == "speckit":
+                return f"templates/commands/{pieces[1]}.md"
+            return f"{dir_rel}/{name}"
+    return rel
+
+
+def _migrate_ignored_or_excluded(rel_parts):
+    if any(part in COPY_TREE_IGNORE_NAMES for part in rel_parts):
+        return True
+    # Caller runtime data under .specify/skills/ is never compared (C-4).
+    return "site" in rel_parts and rel_parts[:2] == (".specify", "skills")
+
+
+def _migrate_iter_reference_files(reference_root, rel_prefix):
+    base = Path(reference_root) / rel_prefix
+    if not base.is_dir():
+        return
+    for path in sorted(base.rglob("*")):
+        rel = path.relative_to(reference_root)
+        if _migrate_ignored_or_excluded(rel.parts):
+            continue
+        if path.is_file() and not path.is_symlink():
+            yield rel.as_posix()
+
+
+def _migrate_iter_workspace_files(workspace, rel_prefix):
+    base = Path(workspace) / rel_prefix
+    if not base.is_dir():
+        return
+    for path in sorted(base.rglob("*")):
+        rel = path.relative_to(workspace)
+        if _migrate_ignored_or_excluded(rel.parts):
+            continue
+        if path.is_symlink() or path.is_file():
+            yield rel.as_posix()
+
+
+def _migrate_compare_surface(ctx, rel_prefix, dimension, *, extras=False):
+    """Compare one runtime surface against the transient reference tree.
+
+    Only files present in the reference tree are candidates (C-4); extras are
+    candidates solely for the strict `.specify/scripts` pair.
+    """
+    items = []
+    reference_files = set(
+        _migrate_iter_reference_files(ctx.reference_root, rel_prefix)
+    )
+    for rel in sorted(reference_files):
+        reference = Path(ctx.reference_root) / rel
+        target = ctx.workspace / rel
+        evidence = [_migrate_owner_evidence(rel, ctx.surfaces)]
+        item = None
+        if target.is_symlink() or (target.exists() and not target.is_file()):
+            item = MigrateItem(
+                dimension, rel, "exists-not-file",
+                "byte-equal to installed asset", "replace",
+                mechanism="replace", evidence=evidence,
+            )
+        elif not target.exists():
+            item = MigrateItem(
+                dimension, rel, "missing",
+                "byte-equal to installed asset", "write",
+                mechanism="copy", evidence=evidence,
+            )
+        elif reference.read_bytes() != target.read_bytes():
+            item = MigrateItem(
+                dimension, rel, "differs",
+                "byte-equal to installed asset", "replace",
+                mechanism="replace", evidence=evidence,
+            )
+        if item is not None:
+            item._source = str(reference)
+            items.append(item)
+    if extras:
+        for rel in _migrate_iter_workspace_files(ctx.workspace, rel_prefix):
+            if rel in reference_files:
+                continue
+            items.append(
+                MigrateItem(
+                    dimension, rel, "extra file (no installed source)",
+                    "absent (archived, recoverable)", "archive",
+                    mechanism="archive",
+                    evidence=[f"strict mirror pair: {rel_prefix}"],
+                )
+            )
+    return items
+
+
+def _migrate_obsolete_decisions(ctx):
+    """Union of the init decision function over every detected tool surface."""
+    assistants = sorted(ctx.surfaces) or [_OFFICIAL_ASSISTANT_KEYS[0]]
+    seen = {}
+    for assistant in assistants:
+        for decision in plan_obsolete_framework_asset_removals(
+            ctx.workspace, assistant
+        ):
+            seen.setdefault(decision["path"], decision)
+    return [seen[path] for path in sorted(seen)]
+
+
+def _migrate_obsolete_items(ctx, dimension, kinds):
+    items = []
+    for decision in _migrate_obsolete_decisions(ctx):
+        if decision["kind"] not in kinds:
+            continue
+        items.append(
+            MigrateItem(
+                dimension, decision["path"], "registry-listed",
+                "absent (archived, recoverable)", "archive",
+                mechanism="archive",
+                evidence=[
+                    "src/specify_cli/__init__.py"
+                    "#plan_obsolete_framework_asset_removals:"
+                    + decision["kind"]
+                ],
+            )
+        )
+    return items
+
+
+_MIGRATE_DRIFT_LINE_RE = re.compile(
+    r"^(MISS|DIFF\[projected\]|DIFF|ORPHAN)\s+(\S+)"
+)
+
+
+def _migrate_dimension_for_mirror_path(path):
+    if path.startswith(".specify/scripts") or path.startswith(".specify/shared"):
+        return "mirror-consistency"
+    return "templates-generated"
+
+
+def _migrate_collect_sync_mirror_items(ctx):
+    script = Path(ctx.engine_dir) / "sync-mirrors.py"
+    if not script.is_file():
+        raise MigrateEngineError(f"engine not found: {script}")
+    engine = _migrate_engine_module(ctx.engine_dir, "sync-mirrors.py")
+    rc, stdout, stderr = _migrate_run_engine(script, ["--check"], cwd=ctx.workspace)
+    if rc not in (0, 2):
+        raise MigrateEngineError(
+            f"sync-mirrors --check failed (exit {rc}): {stderr.strip()}"
+        )
+    pairs = sorted(engine.MIRROR_PAIRS, key=lambda pair: len(pair[1]), reverse=True)
+    items = []
+    for line in stdout.splitlines():
+        match = _MIGRATE_DRIFT_LINE_RE.match(line.strip())
+        if not match:
+            continue
+        kind, path = match.group(1), match.group(2)
+        pair = next(
+            (
+                candidate
+                for candidate in pairs
+                if path == candidate[1] or path.startswith(candidate[1] + "/")
+            ),
+            None,
+        )
+        if pair is None:
+            continue
+        rel_in_pair = path[len(pair[1]):].lstrip("/")
+        source_rel = pair[0] + ("/" + rel_in_pair if rel_in_pair else "")
+        dimension = _migrate_dimension_for_mirror_path(path)
+        evidence = [f"scripts/python/sync-mirrors.py#--check:{kind}"]
+        if kind == "MISS":
+            item = MigrateItem(
+                dimension, path, "missing in mirror",
+                f"mirror of {source_rel}", "write",
+                mechanism="mirror-engine", evidence=evidence,
+            )
+        elif kind.startswith("DIFF"):
+            item = MigrateItem(
+                dimension, path, "differs from source",
+                f"mirror of {source_rel}", "replace",
+                mechanism="mirror-engine", evidence=evidence,
+            )
+        else:
+            item = MigrateItem(
+                dimension, path, "mirror-only (no canonical source)",
+                "absent (archived, recoverable)", "archive",
+                mechanism="archive", evidence=evidence,
+            )
+        item._mirror_only = source_rel
+        items.append(item)
+    return items
+
+
+def _migrate_sync_mirror_items(ctx, dimensions):
+    if ctx.mirror_items is None:
+        ctx.mirror_items = _migrate_collect_sync_mirror_items(ctx)
+    return [item for item in ctx.mirror_items if item.dimension in dimensions]
+
+
+_MIGRATE_REGEN_DRIFT_RE = re.compile(r"^  (\S+?)(?: \((.+)\))?$")
+
+
+def _migrate_regen_script(ctx):
+    # The mirror copy of regen-command-copies.py refuses to run and names the
+    # canonical copy; framework-source engines therefore resolve to scripts/.
+    canonical = ctx.workspace / "scripts" / "python" / "regen-command-copies.py"
+    if ctx.workspace_kind == "framework-source" and canonical.is_file():
+        return canonical
+    return Path(ctx.engine_dir) / "regen-command-copies.py"
+
+
+def _migrate_regen_copy_items(ctx):
+    script = _migrate_regen_script(ctx)
+    if not script.is_file():
+        raise MigrateEngineError(f"engine not found: {script}")
+    rc, stdout, stderr = _migrate_run_engine(script, ["--check"], cwd=ctx.workspace)
+    if rc not in (0, 1):
+        raise MigrateEngineError(
+            f"regen-command-copies --check failed (exit {rc}): {stderr.strip()}"
+        )
+    items = []
+    in_drift = False
+    for line in stdout.splitlines():
+        if line.startswith("DRIFT detected"):
+            in_drift = True
+            continue
+        if not in_drift:
+            continue
+        match = _MIGRATE_REGEN_DRIFT_RE.match(line)
+        if not match:
+            continue
+        path = match.group(1)
+        marker = match.group(2) or ""
+        evidence = ["scripts/python/regen-command-copies.py#--check"]
+        if marker.startswith("missing"):
+            item = MigrateItem(
+                "templates-generated", path, "missing",
+                "regenerated from the command template", "write",
+                mechanism="mirror-engine", evidence=evidence,
+            )
+        elif marker.startswith("stale"):
+            item = MigrateItem(
+                "templates-generated", path, "stale (no source template)",
+                "absent (archived, recoverable)", "archive",
+                mechanism="archive", evidence=evidence,
+            )
+        else:
+            item = MigrateItem(
+                "templates-generated", path, "differs from the generated copy",
+                "regenerated from the command template", "replace",
+                mechanism="mirror-engine", evidence=evidence,
+            )
+        item._command_surface = Path(path).parent.as_posix()
+        items.append(item)
+    return items
+
+
+def _migrate_plan_templates_generated(ctx):
+    if ctx.workspace_kind == "client":
+        items = []
+        for rel_prefix in (
+            ".specify/templates",
+            ".specify/skills",
+            ".specify/agents/templates",
+        ):
+            items += _migrate_compare_surface(ctx, rel_prefix, "templates-generated")
+        for dir_rel in sorted(ctx.surfaces.values()):
+            items += _migrate_compare_surface(
+                ctx, dir_rel, "templates-generated"
+            )
+        items += _migrate_obsolete_items(
+            ctx,
+            "templates-generated",
+            ("obsolete-template", "obsolete-command", "obsolete-command-template"),
+        )
+        return items
+    items = _migrate_sync_mirror_items(ctx, ("templates-generated",))
+    items += _migrate_regen_copy_items(ctx)
+    items += _migrate_obsolete_items(
+        ctx,
+        "templates-generated",
+        ("obsolete-template", "obsolete-command", "obsolete-command-template"),
+    )
+    return items
+
+
+def _migrate_plan_mirror_consistency(ctx):
+    if ctx.workspace_kind == "client":
+        items = _migrate_compare_surface(
+            ctx, ".specify/scripts", "mirror-consistency", extras=True
+        )
+        items += _migrate_compare_surface(
+            ctx, ".specify/shared", "mirror-consistency"
+        )
+        return items
+    return _migrate_sync_mirror_items(ctx, ("mirror-consistency",))
+
+
+def _migrate_plan_anchor_layout(ctx):
+    script = Path(ctx.engine_dir) / "anchor-layout-migrate.py"
+    if not script.is_file():
+        raise MigrateEngineError(f"engine not found: {script}")
+    rc, stdout, stderr = _migrate_run_engine(
+        script,
+        ["--action", "check", "--workspace", str(ctx.workspace), "--json"],
+        cwd=ctx.workspace,
+    )
+    if rc == 2:
+        raise MigrateEngineError(
+            f"anchor layout check refused the workspace: {stderr.strip()}"
+        )
+    try:
+        payload = json.loads(stdout)
+    except ValueError as exc:
+        raise MigrateEngineError(f"anchor layout check output unreadable: {exc}")
+    items = []
+    evidence = ["scripts/python/anchor-layout-migrate.py#--action check"]
+    for step in payload.get("steps") or []:
+        source_rel = _migrate_ws_rel(ctx.workspace, step["from"])
+        target_rel = _migrate_ws_rel(ctx.workspace, step["to"])
+        if step["kind"] == "move":
+            items.append(
+                MigrateItem(
+                    "anchor-layout", source_rel, "legacy-location",
+                    f"moved-to: {target_rel}", "archive",
+                    mechanism="relocate", evidence=evidence,
+                )
+            )
+        elif step["kind"] == "refuse-existing-target":
+            items.append(
+                make_refuse_item(
+                    "anchor-layout",
+                    source_rel,
+                    current=source_rel,
+                    expected=target_rel,
+                    note="anchor target already exists; both candidates are kept",
+                )
+            )
+    return items
+
+
+def _migrate_compat_target_path(compat_name):
+    # Link-shape rule from shared/workflow/symlink-model.md and the
+    # generate-instructions.sh ln -sf set: tool skills links point at the
+    # skills mirror, instruction-file links at the generated instructions.
+    if compat_name.endswith("/skills"):
+        return ".specify/skills"
+    return ".specify/instructions.md"
+
+
+def _migrate_plan_compat_links(ctx):
+    engine = _migrate_engine_module(ctx.engine_dir, "sanitize-utils.py")
+    items = []
+    skipped = []
+    evidence = ["scripts/python/sanitize-utils.py#check_broken_symlinks"]
+    for finding in engine.check_broken_symlinks(ctx.workspace):
+        target = finding["target"]
+        link = ctx.workspace / target
+        expected_target = _migrate_compat_target_path(target)
+        resolved = ctx.workspace / expected_target
+        if not resolved.exists():
+            skipped.append(target)
+            continue
+        link_target = os.path.relpath(resolved, start=link.parent)
+        expected = f"symlink -> {expected_target}"
+        if link.is_symlink() and not link.exists():
+            item = MigrateItem(
+                "compat-links", target, "symlink-broken", expected,
+                "write", mechanism="symlink", evidence=evidence,
+            )
+        elif link.exists() and not link.is_symlink() and link.is_dir():
+            items.append(
+                make_refuse_item(
+                    "compat-links",
+                    target,
+                    current=target,
+                    expected=expected,
+                    note="the existing directory is populated; replacing it is never automatic",
+                )
+            )
+            continue
+        elif link.exists() and not link.is_symlink():
+            item = MigrateItem(
+                "compat-links", target, "regular-file", expected,
+                "replace", mechanism="symlink", evidence=evidence,
+            )
+        else:
+            item = MigrateItem(
+                "compat-links", target, "missing", expected,
+                "write", mechanism="symlink", evidence=evidence,
+            )
+        item._link_target = link_target
+        items.append(item)
+    if skipped:
+        ctx.notes.append(
+            "compat-links: instruction target .specify/instructions.md absent; "
+            "skipped " + ", ".join(sorted(skipped))
+        )
+    return items
+
+
+def _migrate_residue_finding_items(checker_name, findings):
+    items = []
+    for finding in findings:
+        items.append(
+            MigrateItem(
+                "migration-residue",
+                finding["target"],
+                finding.get("category") or checker_name,
+                "absent (archived, recoverable)",
+                "archive",
+                mechanism="archive",
+                evidence=[f"scripts/python/sanitize-utils.py#{checker_name}"],
+            )
+        )
+    return items
+
+
+def _migrate_plan_migration_residue(ctx):
+    engine = _migrate_engine_module(ctx.engine_dir, "sanitize-utils.py")
+    items = _migrate_residue_finding_items(
+        "check_legacy_install_residue",
+        engine.check_legacy_install_residue(ctx.workspace),
+    )
+    items += _migrate_residue_finding_items(
+        "check_flat_internal_duplicates",
+        engine.check_flat_internal_duplicates(ctx.workspace),
+    )
+    items += _migrate_obsolete_items(
+        ctx, "migration-residue", ("obsolete-skill-dir", "obsolete-skill-file")
+    )
+    for decision in plan_flat_internal_skill_migrations(ctx.workspace):
+        evidence = [
+            "src/specify_cli/__init__.py"
+            "#plan_flat_internal_skill_migrations:" + decision["action"]
+        ]
+        if decision["action"] == "remove-stale":
+            items.append(
+                MigrateItem(
+                    "migration-residue", decision["path"],
+                    "flat duplicate of a nested internal skill",
+                    "absent (archived, recoverable)", "archive",
+                    mechanism="archive", evidence=evidence,
+                )
+            )
+        else:
+            name = Path(decision["path"]).name
+            destination = f".specify/skills/internal/{name}"
+            item = MigrateItem(
+                "migration-residue", decision["path"], "flat internal skill",
+                f"moved-to: {destination}", "archive",
+                mechanism="relocate", evidence=evidence,
+            )
+            item._relocate_to = destination
+            items.append(item)
+    return items
+
+
+_MIGRATE_DIMENSION_PLANNERS = {
+    "templates-generated": _migrate_plan_templates_generated,
+    "anchor-layout": _migrate_plan_anchor_layout,
+    "compat-links": _migrate_plan_compat_links,
+    "mirror-consistency": _migrate_plan_mirror_consistency,
+    "migration-residue": _migrate_plan_migration_residue,
+}
+
+
+def plan_migrate_items(ctx):
+    items = []
+    for dimension in MIGRATE_DIMENSIONS:
+        items.extend(_MIGRATE_DIMENSION_PLANNERS[dimension](ctx))
+    return migrate_normalize_items(items)
+
+
+# ---------------------------------------------------------------------------
+# Executor — write / replace / archive / relocate mechanisms (FR-009/011/016)
+# ---------------------------------------------------------------------------
+
+
+def _migrate_digest(path):
+    path = Path(path)
+    digest = hashlib.sha256()
+    if path.is_symlink():
+        digest.update(b"L")
+        digest.update(os.readlink(path).encode("utf-8"))
+        return digest.hexdigest()
+    if path.is_file():
+        digest.update(b"F")
+        digest.update(path.read_bytes())
+        return digest.hexdigest()
+    for child in sorted(path.rglob("*")):
+        rel = child.relative_to(path).as_posix()
+        if child.is_symlink():
+            digest.update(f"L {rel} {os.readlink(child)}\n".encode("utf-8"))
+        elif child.is_file():
+            digest.update(f"F {rel} ".encode("utf-8"))
+            digest.update(hashlib.sha256(child.read_bytes()).digest())
+        else:
+            digest.update(f"D {rel}\n".encode("utf-8"))
+    return digest.hexdigest()
+
+
+def _migrate_archive_target(workspace, run_id, rel):
+    parts = Path(rel).parts
+    if parts and parts[0] == ".specify":
+        parts = parts[1:]
+    target = Path(workspace) / ".specify" / "archive" / "migrate" / run_id
+    for part in parts:
+        target = target / part
+    return target
+
+
+def _migrate_archive_object(ctx, item, change):
+    source = ctx.workspace / item.target
+    if not (source.exists() or source.is_symlink()):
+        raise FileNotFoundError(f"planned object missing: {item.target}")
+    digest = _migrate_digest(source)
+    destination = _migrate_archive_target(ctx.workspace, ctx.run_id, item.target)
+    if destination.exists() or destination.is_symlink():
+        raise FileExistsError(
+            "archive target already exists: "
+            + _migrate_ws_rel(ctx.workspace, destination)
+        )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source), str(destination))
+    item.archiveTo = _migrate_ws_rel(ctx.workspace, destination)
+    item.status = "done"
+    return {
+        "path": item.target,
+        "archiveTo": item.archiveTo,
+        "change": change,
+        "digest": digest,
+    }
+
+
+def _migrate_write_copy(ctx, item):
+    source = Path(item._source)
+    target = ctx.workspace / item.target
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, target)
+    item.status = "done"
+
+
+def _migrate_write_symlink(ctx, item):
+    link = ctx.workspace / item.target
+    link.parent.mkdir(parents=True, exist_ok=True)
+    if link.is_dir() and not link.is_symlink():
+        raise IsADirectoryError(
+            f"refusing to replace the directory {item.target}"
+        )
+    if link.is_symlink() or link.exists():
+        link.unlink()
+    os.symlink(item._link_target, str(link))
+    item.status = "done"
+
+
+def _migrate_execute_relocate(ctx, item):
+    source = ctx.workspace / item.target
+    destination = ctx.workspace / item._relocate_to
+    if destination.exists():
+        ctx.archives.append(_migrate_archive_object(ctx, item, "removed-stale"))
+        return
+    digest = _migrate_digest(source)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source), str(destination))
+    item.archiveTo = item._relocate_to
+    item.status = "done"
+    ctx.archives.append(
+        {
+            "path": item.target,
+            "archiveTo": item.archiveTo,
+            "change": "relocated",
+            "digest": digest,
+        }
+    )
+
+
+def _migrate_execute_anchor(ctx, plan):
+    anchor_items = [
+        item
+        for item in plan.items
+        if item.dimension == "anchor-layout" and item.status == "planned"
+    ]
+    if not anchor_items:
+        return
+    digests = {}
+    for item in anchor_items:
+        source = ctx.workspace / item.target
+        if source.exists():
+            digests[item.target] = _migrate_digest(source)
+    script = Path(ctx.engine_dir) / "anchor-layout-migrate.py"
+    rc, stdout, stderr = _migrate_run_engine(
+        script,
+        ["--action", "apply", "--workspace", str(ctx.workspace), "--json"],
+        cwd=ctx.workspace,
+    )
+    if rc != 0:
+        for item in anchor_items:
+            item.status = "failed"
+            item.reason = f"anchor engine apply failed (exit {rc})"
+        return
+    try:
+        payload = json.loads(stdout)
+    except ValueError:
+        payload = {"applied": []}
+    applied = {
+        _migrate_ws_rel(ctx.workspace, step["from"]): step
+        for step in payload.get("applied", [])
+    }
+    skipped = {
+        _migrate_ws_rel(ctx.workspace, step["from"])
+        for step in payload.get("skipped", [])
+    }
+    for item in anchor_items:
+        if item.target in applied:
+            item.status = "done"
+            item.archiveTo = _migrate_ws_rel(
+                ctx.workspace, applied[item.target]["to"]
+            )
+            ctx.archives.append(
+                {
+                    "path": item.target,
+                    "archiveTo": item.archiveTo,
+                    "change": "relocated",
+                    "digest": digests.get(item.target, ""),
+                }
+            )
+        elif item.target in skipped:
+            item.status = "failed"
+            item.reason = (
+                "anchor target appeared during apply; both files were kept"
+            )
+        else:
+            item.status = "failed"
+            item.reason = "anchor engine did not report this move"
+
+
+def _migrate_execute_mirror(ctx, plan):
+    mirror_items = [
+        item
+        for item in plan.items
+        if item.mechanism == "mirror-engine" and item.status == "planned"
+    ]
+    if not mirror_items:
+        return
+    sync_items = [
+        item for item in mirror_items if getattr(item, "_mirror_only", None)
+    ]
+    command_items = [
+        item for item in mirror_items if getattr(item, "_command_surface", None)
+    ]
+    if sync_items:
+        for item in sync_items:
+            if item.disposition != "replace":
+                continue
+            try:
+                ctx.archives.append(_migrate_archive_object(ctx, item, "replaced"))
+            except OSError as exc:
+                item.status = "failed"
+                item.reason = f"archive before replace failed: {exc}"
+        script = Path(ctx.engine_dir) / "sync-mirrors.py"
+        args = ["--write"]
+        for prefix in sorted({item._mirror_only for item in sync_items}):
+            args += ["--only", prefix]
+        rc, stdout, stderr = _migrate_run_engine(script, args, cwd=ctx.workspace)
+        for item in sync_items:
+            if item.status == "failed":
+                continue
+            item.status = "done" if rc == 0 else "failed"
+            if rc != 0:
+                item.reason = f"sync-mirrors --write failed (exit {rc})"
+    if command_items:
+        by_surface = {}
+        for item in command_items:
+            by_surface.setdefault(item._command_surface, []).append(item)
+        assistant_by_dir = {
+            rel: key for key, rel in _ASSISTANT_COMMAND_DIRS.items()
+        }
+        script_variant = detect_migrate_script_variant(
+            ctx.workspace, ctx.surfaces
+        )
+        generated = False
+        for surface, surface_items in sorted(by_surface.items()):
+            assistant = assistant_by_dir.get(surface)
+            if assistant is None:
+                for item in surface_items:
+                    item.status = "failed"
+                    item.reason = f"no tool owns command surface {surface}"
+                continue
+            for item in surface_items:
+                if item.disposition != "replace":
+                    continue
+                try:
+                    ctx.archives.append(
+                        _migrate_archive_object(ctx, item, "replaced")
+                    )
+                except OSError as exc:
+                    item.status = "failed"
+                    item.reason = f"archive before replace failed: {exc}"
+            try:
+                generate_commands(
+                    assistant,
+                    _ASSISTANT_EXTENSIONS.get(assistant, "md"),
+                    _ASSISTANT_ARG_FORMATS.get(assistant, "$ARGUMENTS"),
+                    ctx.workspace / surface,
+                    script_variant,
+                )
+            except OSError as exc:
+                for item in surface_items:
+                    if item.status != "failed":
+                        item.status = "failed"
+                        item.reason = f"command regeneration failed: {exc}"
+                continue
+            generated = True
+            for item in surface_items:
+                if item.status != "failed":
+                    item.status = "done"
+        if generated:
+            rc, stdout, stderr = _migrate_run_engine(
+                _migrate_regen_script(ctx), ["--check"], cwd=ctx.workspace
+            )
+            if rc != 0:
+                for item in command_items:
+                    if item.status != "failed":
+                        item.status = "failed"
+                        item.reason = (
+                            "regen-command-copies --check still reports drift "
+                            "after regeneration"
+                        )
+
+
+def _migrate_execute_item(ctx, item):
+    if item.status != "planned":
+        return
+    if item.dimension == "anchor-layout" or item.mechanism == "mirror-engine":
+        return
+    try:
+        if item.disposition == "write":
+            if item.mechanism == "symlink":
+                _migrate_write_symlink(ctx, item)
+            else:
+                _migrate_write_copy(ctx, item)
+        elif item.disposition == "replace":
+            ctx.archives.append(_migrate_archive_object(ctx, item, "replaced"))
+            if item.mechanism == "symlink":
+                _migrate_write_symlink(ctx, item)
+            else:
+                _migrate_write_copy(ctx, item)
+        elif item.disposition == "archive":
+            if item.mechanism == "relocate":
+                _migrate_execute_relocate(ctx, item)
+            else:
+                change = (
+                    "removed-stale"
+                    if "duplicate" in item.current
+                    else "archived"
+                )
+                ctx.archives.append(
+                    _migrate_archive_object(ctx, item, change)
+                )
+    except OSError as exc:
+        item.status = "failed"
+        item.reason = f"execution failed: {exc}"
+
+
+# ---------------------------------------------------------------------------
+# Second key, outcome computation, receipt and emission (FR-015/017/018/019)
+# ---------------------------------------------------------------------------
+
+
+def _migrate_second_key(plan):
+    destructive = [
+        item
+        for item in plan.items
+        if item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
+        and item.status == "planned"
+    ]
+    if not destructive:
+        return True
+    if not migrate_interactive_terminal():
+        return False
+    print(
+        f"specify migrate: {len(destructive)} destructive item(s) require the "
+        "second key before they can be applied.",
+        file=sys.stderr,
+    )
+    for item in destructive[:10]:
+        print(
+            f"  {item.dimension}: {item.target} [{item.disposition}]",
+            file=sys.stderr,
+        )
+    if len(destructive) > 10:
+        print(f"  ... and {len(destructive) - 10} more", file=sys.stderr)
+    return bool(
+        typer.confirm(
+            "Apply these destructive items now?", default=False, err=True
+        )
+    )
+
+
+def _migrate_block_destructive(plan):
+    items = []
+    for item in plan.items:
+        if (
+            item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
+            and item.status == "planned"
+        ):
+            items.append(
+                make_blocked_item(
+                    item.dimension,
+                    item.target,
+                    current=item.current,
+                    expected=item.expected,
+                )
+            )
+        else:
+            items.append(item)
+    plan.items = migrate_normalize_items(items)
+
+
+def _migrate_dry_outcome(plan):
+    if plan.items:
+        return "planned", MIGRATE_OUTCOME_EXIT_CODES["planned"]
+    return "clean", MIGRATE_OUTCOME_EXIT_CODES["clean"]
+
+
+def _migrate_apply_outcome(plan):
+    if any(
+        item.status in ("refused", "blocked", "failed") for item in plan.items
+    ):
+        return "blocked", MIGRATE_OUTCOME_EXIT_CODES["blocked"]
+    if not plan.items:
+        return "clean", MIGRATE_OUTCOME_EXIT_CODES["clean"]
+    return "applied", MIGRATE_OUTCOME_EXIT_CODES["applied"]
+
+
+def _migrate_recover_lines(archives):
+    lines = []
+    for entry in archives:
+        if entry["change"] == "relocated":
+            lines.append(
+                f"move {entry['archiveTo']} back to {entry['path']}"
+            )
+        else:
+            lines.append(
+                f"restore {entry['archiveTo']} -> {entry['path']}"
+            )
+    return lines
+
+
+def _migrate_receipt_payload(plan, run_id, outcome, exit_code, archives,
+                            started_at=None):
+    now = _migrate_utc_iso()
+    return {
+        "receiptVersion": MIGRATE_RECEIPT_VERSION,
+        "runId": run_id,
+        "mode": plan.mode,
+        "status": "completed",
+        "startedAt": started_at or now,
+        "finishedAt": now,
+        "resumedFrom": None,
+        "source": {},
+        "target": {},
+        "outcome": outcome,
+        "exitCode": exit_code,
+        "items": [item.to_dict() for item in plan.items],
+        "archives": list(archives),
+        "recover": _migrate_recover_lines(archives),
+        "notes": list(plan.notes),
+        "pointers": list(plan.pointers),
+    }
+
+
+def _migrate_emit(plan, outcome, exit_code, receipt, receipt_path, output_format):
+    if output_format == "json":
+        envelope = {
+            "planVersion": plan.planVersion,
+            "mode": plan.mode,
+            "workspaceKind": plan.workspace_kind,
+            "outcome": outcome,
+            "exitCode": exit_code,
+            "items": [item.to_dict() for item in plan.items],
+            "summary": plan.summary(),
+            "notes": list(plan.notes),
+            "pointers": list(plan.pointers),
+            "receipt": receipt,
+            "receiptPath": receipt_path,
+        }
+        sys.stdout.write(json.dumps(envelope, ensure_ascii=False, indent=2) + "\n")
+        sys.stdout.flush()
+        return
+    text = plan.to_text()
+    text += f"outcome: {outcome} (exit {exit_code})\n"
+    if plan.pointers:
+        text += (
+            "pointer: goal/team archive migration stays with "
+            "/speckit.goal migrate-archive\n"
+        )
+    if outcome == "planned":
+        text += (
+            "next: review the plan, then run: specify migrate "
+            f"--workspace {plan.workspace} --apply\n"
+        )
+    elif outcome == "applied":
+        text += f"receipt: {receipt_path}\n"
+    elif outcome == "blocked":
+        text += "next: review refused/blocked items and re-run --apply\n"
+    sys.stdout.write(text)
+
+
+def _migrate_build_plan(ctx, *, mode):
+    items = plan_migrate_items(ctx)
+    return MigratePlan(
+        mode=mode,
+        workspace=str(ctx.workspace),
+        workspace_kind=ctx.workspace_kind,
+        items=items,
+        notes=ctx.notes,
+        pointers=list(MIGRATE_STATIC_POINTERS),
+    )
+
+
+def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
+    """Plan and, in apply mode, execute — all while the reference tree lives.
+
+    The client reference tree is the replacement source for `write`/`replace`
+    items, so it must stay mounted until execution finishes; output emission
+    happens after this helper returns.
+    """
+    plan = _migrate_build_plan(ctx, mode="apply" if apply_mode else "dry-run")
+    if not apply_mode:
+        outcome, exit_code = _migrate_dry_outcome(plan)
+        receipt = _migrate_receipt_payload(
+            plan, migrate_run_id(), outcome, exit_code, []
+        )
+        return plan, outcome, exit_code, receipt, None
+
+    if not _migrate_second_key(plan):
+        _migrate_block_destructive(plan)
+
+    _migrate_execute_anchor(ctx, plan)
+    _migrate_execute_mirror(ctx, plan)
+    for item in plan.items:
+        _migrate_execute_item(ctx, item)
+        update_migrate_receipt(
+            receipt_file,
+            items=[entry.to_dict() for entry in plan.items],
+            archives=list(ctx.archives),
+        )
+
+    outcome, exit_code = _migrate_apply_outcome(plan)
+    receipt = _migrate_receipt_payload(
+        plan, ctx.run_id, outcome, exit_code, ctx.archives,
+        started_at=started_at,
+    )
+    complete_migrate_receipt(
+        receipt_file,
+        outcome=outcome,
+        exitCode=exit_code,
+        items=receipt["items"],
+        archives=receipt["archives"],
+        recover=receipt["recover"],
+        notes=receipt["notes"],
+        pointers=receipt["pointers"],
+    )
+    return (
+        plan,
+        outcome,
+        exit_code,
+        receipt,
+        _migrate_ws_rel(ctx.workspace, receipt_file),
+    )
+
+
+def _run_migrate(workspace, *, apply_mode, output_format):
+    import io
+    from contextlib import redirect_stdout
+
+    workspace = Path(workspace)
+    kind = detect_migrate_workspace_kind(workspace)
+    engine_dir = resolve_migrate_engine_dir(workspace, kind)
+    surfaces = detect_migrate_tool_surfaces(workspace)
+    ctx = MigrateContext(workspace, kind, engine_dir, surfaces)
+    if kind == "client" and not surfaces:
+        ctx.notes.append("command-copies: no tool surface detected")
+
+    receipt_file = None
+    started_at = None
+    if apply_mode:
+        ctx.run_id, receipt_file = create_migrate_receipt(workspace)
+        started_at = _migrate_utc_iso()
+
+    try:
+        # init's copy mechanism chatters on stdout while the reference tree is
+        # mounted; the transient tree must not pollute the emitted envelope.
+        with redirect_stdout(io.StringIO()):
+            if kind == "client":
+                with build_client_reference_tree(workspace) as reference_root:
+                    ctx.reference_root = reference_root
+                    plan, outcome, exit_code, receipt, receipt_path = (
+                        _migrate_plan_and_run(
+                            ctx,
+                            apply_mode=apply_mode,
+                            receipt_file=receipt_file,
+                            started_at=started_at,
+                        )
+                    )
+            else:
+                plan, outcome, exit_code, receipt, receipt_path = (
+                    _migrate_plan_and_run(
+                        ctx,
+                        apply_mode=apply_mode,
+                        receipt_file=receipt_file,
+                        started_at=started_at,
+                    )
+                )
+    except MigrateEngineError as exc:
+        if apply_mode and receipt_file is not None:
+            update_migrate_receipt(
+                receipt_file,
+                status="aborted",
+                finishedAt=_migrate_utc_iso(),
+                notes=[str(exc)],
+            )
+        print(f"error: {exc}", file=sys.stderr)
+        return MIGRATE_INPUT_ERROR_EXIT
+
+    _migrate_emit(
+        plan, outcome, exit_code, receipt, receipt_path, output_format
+    )
+    return exit_code
 # MIGRATE-ENGINE:END
 
 
@@ -3916,6 +5063,71 @@ def render_agents(
     if render_stats["unmapped"]:
         summary += f"; unmapped intents on {len(render_stats['unmapped'])} agent(s)"
     console.print(summary)
+
+
+@app.command()
+def migrate(
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Plan only (the default mode); states the default explicitly for scripts.",
+    ),
+    apply: bool = typer.Option(
+        False,
+        "--apply",
+        help="Enter write mode (first key); destructive items then need one interactive confirmation.",
+    ),
+    workspace: str = typer.Option(
+        ".",
+        "--workspace",
+        help="Target workspace root; it must already contain .specify/.",
+    ),
+    output_format: str = typer.Option(
+        "text",
+        "--format",
+        help="Output format: text or json.",
+    ),
+):
+    """One-time convergence pass after `specify install` + `specify init`.
+
+    Compares the workspace against the assets of the currently installed CLI
+    and reports (default, dry-run) or applies (--apply) every difference.
+    This command performs neither install nor init; when `.specify/` is
+    missing, `specify init` is the repair entry.
+
+    Outcomes and exit codes (stable, script-decidable):
+    clean    exit 0  no differences remain
+    planned  exit 1  dry-run found differences
+    applied  exit 0  apply completed with nothing refused or blocked
+    blocked  exit 3  refused/blocked/failed items remain after apply
+    Input or precondition errors exit 2.
+    """
+    if dry_run and apply:
+        print(
+            "error: --apply and --dry-run are mutually exclusive",
+            file=sys.stderr,
+        )
+        raise typer.Exit(code=MIGRATE_INPUT_ERROR_EXIT)
+    if output_format not in ("text", "json"):
+        print(
+            f"error: unsupported --format {output_format!r}; expected text or json",
+            file=sys.stderr,
+        )
+        raise typer.Exit(code=MIGRATE_INPUT_ERROR_EXIT)
+    target = Path(workspace).expanduser().resolve()
+    if not (target / ".specify").is_dir():
+        print(
+            f"error: no .specify/ directory under {target} — run "
+            "'specify init' first; specify migrate performs neither install "
+            "nor init",
+            file=sys.stderr,
+        )
+        raise typer.Exit(code=MIGRATE_INPUT_ERROR_EXIT)
+    raise typer.Exit(
+        code=_run_migrate(
+            target, apply_mode=apply, output_format=output_format
+        )
+    )
 
 
 def main():

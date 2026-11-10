@@ -81,3 +81,27 @@ FAILED tests/unit/test_migrate_receipts.py::test_run_id_shape_and_uniqueness
 - 读数: 退出码 `1`；失败名 `277` 条（`test-evidence/pkg02-full-failed.txt`）；相对入口基线 278 名：新增 `4`、翻转绿 `5`。
 - 归因（完整控制组见 `test-evidence/pkg02-baseline-attribution.txt`）: 4 条新增全部位于 `test_trigger_engine.py`（入口基线已含 59 条该家族红；同源连续两次运行失败集合不同，29 vs 31 名）；pristine `HEAD` 源同树重跑与实现后重跑的名单差全在 trigger 家族内；唯一非 trigger 的临时红（`test_script_interface_contract.py::test_c20…`）根因是 4 个新文件尚未入 git index，staged 后转绿（`test-evidence/pkg02-c20-post-stage.txt`）。pkg02 未引入任何可归因的新失败。
 
+
+## pkg03-us1-engine（T014–T022）
+
+---
+### § T014 + T015 — `tests/contract/test_migrate_cli_surface.py` + `tests/integration/test_migrate_us1_converge.py`（red-first）
+
+- 日期: 2026-11-10
+- 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py -q`
+- 退出码: `1`（完整读数 `.specify/.tmp/pkg03/red-suite.txt`）
+- 真实输出（决定性节选，逐字粘贴）:
+
+```text
+E       AttributeError: module 'specify_cli' has no attribute 'MIGRATE_OUTCOME_EXIT_CODES'
+E       AttributeError: <module 'specify_cli' ...> has no attribute 'migrate_interactive_terminal'
+E       AssertionError: exit 2, expected 1
+E         │ No such command 'migrate'.                                   │
+E       assert 'No such option' in "Usage: specify [OPTIONS] COMMAND [ARGS]......"
+...
+14 failed in 8.57s
+```
+
+- 红判据: 14 条失败全部为「被测行为尚不存在」——`specify migrate` 子命令未注册（框架以 “No such command 'migrate'” 退出 2）、结局映射常量与交互判定接缝不存在（AttributeError）；无一条来自断言自身缺陷。实现后同两文件全绿（`test-evidence/us1-converge.txt`）。
+
+---
