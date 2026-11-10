@@ -307,7 +307,7 @@ Dependency set: none — 本特性不消费任何既有 Feature 的 `## Deferred
 | P5 | `seal` 判定与两阶段写入 | `seal-utils.py`（seal 段）、`tests/contract/test_seal_seal.py`、`tests/contract/test_seal_concurrency_and_readonly.py` | 16 | C-005…C-010、C-032…C-039；八类拒绝夹具 + 幂等 + 原子恢复 |
 | P6 | `archive-gate` 与既有 lane 接线 | `seal-utils.py`（gate 段）、`skills/internal/sanitize-materials/SKILL.md`、`skills/internal/manage-features/SKILL.md`、`tests/contract/test_seal_archive_gate.py` | 10 | C-030；单 owner 复制注入转红；遗留 `Completed` 路径 |
 | P7 | 命令面与名册装配 | `templates/commands/seal.md`、`skills/internal/seal-artifact/SKILL.md`、`probe-definitions.md`、`flow-class-definitions.md`、4 份 per-tool 副本（生成）、名册/台账 pin 测试、`docs/reference/commands/seal.md` | 14 | C-041；`regen --check` 与 `sync --check` 无新增漂移；名册/台账测试绿 |
-| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单与 FR-027 五项一一对应 |
+| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单逐条覆盖 FR-027 五项（下限），额外具名阻断逐条点名 |
 | P9 | 收尾验证与记录 | 全量测试基线对照、镜像复核、`verification.md`、registry 收尾（implement 阶段）、`tests/contract/test_seal_boundaries.py`、run determination | 8 | SC-001…SC-009 的 Measurement Sources 各有落点；无新增失败名单 |
 
 ## Complexity Tracking

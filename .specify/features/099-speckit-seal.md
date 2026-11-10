@@ -36,7 +36,7 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 5. 归档准入唯一 owner：`archive-gate` 只读查询；`/speckit.sanitize` 归档 lane、docs lane 与 manage-features
    归档指针在动手前查询，不自判。
 6. 074 真实回合（首个验收）：split → merge-back → seal 全流程，五项实测输入缺陷逐条显式处置，
-   终态二值（`Sealed` 或一一对应的具名阻断清单）。
+   终态二值（`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的具名阻断清单）。
 
 ## Plan Notes
 

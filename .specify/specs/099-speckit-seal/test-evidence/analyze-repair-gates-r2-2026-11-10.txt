@@ -1,0 +1,160 @@
+=== analyze repair r2 gates — 2026-11-10 (099-speckit-seal) ===
+tree: final post-fix state (F-05 text repair: plan.md:310 P8 anchor + .specify/features/099-speckit-seal.md:39 echo)
+run: r20261110T121314Z-b099 · stage=analyze (repair round r2) · 四元组：flow_class=execution；source=declaration；marker=；error=-
+
+--- 1) validate-requirements.py ---
+file: .specify/specs/099-speckit-seal/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 251 lines, 37 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+validate_requirements_exit=0
+
+--- 2.requirements) pre-analyze-check.py --repo . --spec-dir .specify/specs/099-speckit-seal --stage requirements ---
+summary_line: pre-analyze-check: stage=requirements decision=pass errors=0 advisories=101 waived=0
+decision=pass errors=0 advisories=101 waived=0 fr=28 sc=9 tasks=51 clauses=0 files=13
+pre_analyze_requirements_exit=0
+
+--- 2.plan) pre-analyze-check.py --repo . --spec-dir .specify/specs/099-speckit-seal --stage plan ---
+summary_line: pre-analyze-check: stage=plan decision=pass errors=0 advisories=101 waived=0
+decision=pass errors=0 advisories=101 waived=0 fr=28 sc=9 tasks=51 clauses=0 files=13
+pre_analyze_plan_exit=0
+
+--- 2.tasks) pre-analyze-check.py --repo . --spec-dir .specify/specs/099-speckit-seal --stage tasks ---
+summary_line: pre-analyze-check: stage=tasks decision=pass errors=0 advisories=101 waived=0
+decision=pass errors=0 advisories=101 waived=0 fr=28 sc=9 tasks=51 clauses=0 files=13
+pre_analyze_tasks_exit=0
+
+--- 3) decomposition-check.py --mode tasks ---
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 28, "task_count": 51, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T14:57:17Z"}
+decomposition_tasks_exit=0
+
+--- 4) validate-tasks.py (supporting) ---
+PASS: .specify/specs/099-speckit-seal/tasks.md — 0 error(s), 0 warning(s)
+validate_tasks_exit=0
+
+--- 5) validate-decision-tensions.py --spec .specify/specs/099-speckit-seal --json (supporting) ---
+{
+  "spec": ".specify/specs/099-speckit-seal",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 333,
+    "records": 6
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 0
+  },
+  "findings": []
+}
+validate_decision_tensions_exit=0
+
+--- 6) clause_extract.py citation-group replay (supporting; contracts untouched this round) ---
+merge-back.contract.md	form=md-bold-closed	clauses=13
+  C-011
+  C-012
+  C-013
+  C-014
+  C-015
+  C-016
+  C-017
+  C-018
+  C-019
+  C-020
+  C-021
+  C-022
+  C-023
+records-and-boundaries.contract.md	form=md-bold-closed	clauses=14
+  C-032
+  C-033
+  C-034
+  C-035
+  C-036
+  C-037
+  C-038
+  C-039
+  C-040
+  C-041
+  C-042
+  C-043
+  C-044
+  C-045
+seal-engine.contract.md	form=md-bold-closed	clauses=10
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+status-sealed.contract.md	form=md-bold-closed	clauses=8
+  C-024
+  C-025
+  C-026
+  C-027
+  C-028
+  C-029
+  C-030
+  C-031
+clause_extract_exit=0
+
+--- 7) F-05 closure rescan: old-criterion phrase scan on the live chain ---
+pattern: 一一对应|恰好五项|仅五项|限于五项|只允许五项|恰五项|exactly five|one-to-one
+scope: .specify/specs/099-speckit-seal/**/*.md minus dated records (test-evidence/, checklists/) + .specify/features/099-speckit-seal.md + .specify/features.md
+note: hits inside test-evidence/ and checklists/ are dated evaluation records and are intentionally excluded (not modified by repair rounds)
+hits: 0 (ZERO-LIVE-HITS)
+
+--- 8) fixed-anchor readings (verbatim) ---
+[plan.md P8 row]
+310:| P8 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（回合产物）、两片 `requirements.md` 标注、`test-evidence/074-round-*.txt`、`tests/integration/test_seal_074_round.py` | 12 | C-043；SC-006 逐项；阻断清单逐条覆盖 FR-027 五项（下限），额外具名阻断逐条点名 |
+[.specify/features/099-speckit-seal.md:38-39]
+6. 074 真实回合（首个验收）：split → merge-back → seal 全流程，五项实测输入缺陷逐条显式处置，
+   终态二值（`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的具名阻断清单）。
