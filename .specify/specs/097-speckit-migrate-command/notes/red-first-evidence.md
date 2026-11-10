@@ -146,3 +146,43 @@ E       AttributeError: module 'specify_cli' has no attribute 'MIGRATE_DESTRUCTI
 - 命令: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py -q`
 - 退出码: `0` → `47 passed in 22.00s`（`.specify/.tmp/pkg04/regression.txt`）
 - 引擎契约的五类源码守卫在本包新增代码上保持 clean（owner 指针不是第二份清单）。
+
+---
+
+## pkg05-us3-crossversion（T029–T032）
+
+---
+### § T029 — `tests/integration/test_migrate_us3_crossversion.py`（red-first）
+
+- 日期: 2026-11-10
+- 命令: `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us3_crossversion.py -q`
+- 退出码: `1`（完整读数 `.specify/.tmp/pkg05/red-suite.txt`）
+- 真实输出（决定性节选，逐字粘贴）:
+
+```text
+E       KeyError: 'stampFile'
+E       KeyError: 'stampFile'
+E       AttributeError: <module 'specify_cli' ...> has no attribute '_migrate_resume_complete_write'
+E       AssertionError: the resumed run must name the interrupted receipt it continued from
+E       assert None == '20261110T145903Z-a964a807'
+...
+4 failed, 1 passed in 19.86s
+```
+
+- 红判据: 4 条失败全部为「被测行为尚不存在」——回执 `source` / `target` 记录仍是占位
+  `{}`（KeyError `stampFile`，T030 未实现）、中断续跑路径未实现（`resumedFrom` 仍为
+  None；续跑完成接缝 `_migrate_resume_complete_write` 不存在，AttributeError），无一条
+  来自断言自身缺陷。唯一通过项是
+  `test_mutation_selecting_paths_by_source_version_turns_plan_identity_red`
+  （只消费 pkg03 已交付的计划面，不触碰新增接缝），符合预期。
+
+---
+### § T030–T031 — 版本记录与续跑实现（green readings）
+
+- 命令: `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us3_crossversion.py -q`
+- 退出码: `0` → 见 `test-evidence/us3-crossversion.txt`（T032 读数）
+- 实现落点: `migrate_source_record()` / `migrate_target_record()` /
+  `migrate_cli_version()`（回执 source/target 字段，record-only，FR-020）；
+  `load_migrate_resume_state()`（扫描最近 `status=running` 回执）+
+  `migrate_resume_archive_entry()` / `_migrate_resume_complete_write()`
+  （按旧回执自身 `archives[].archiveTo` 判断，目标缺失则只补写、不二次搬移，C-7）。

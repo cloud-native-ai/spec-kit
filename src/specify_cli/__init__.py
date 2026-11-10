@@ -3097,6 +3097,136 @@ def persist_migrate_receipt(workspace, receipt: dict) -> Optional[Path]:
     return _write_migrate_receipt(path, receipt)
 
 
+# ---------------------------------------------------------------------------
+# Version records (FR-020) and the resume scan (C-7)
+# ---------------------------------------------------------------------------
+
+MIGRATE_SOURCE_STAMP_REL = ".specify/source.json"
+
+
+def migrate_cli_version() -> str:
+    """The running CLI's distribution version — record only (FR-020)."""
+    try:
+        from importlib import metadata
+    except ImportError:  # pragma: no cover - the module guard requires py>=3.8
+        return "unavailable"
+    try:
+        return metadata.version("specify-cli")
+    except metadata.PackageNotFoundError:
+        return "unavailable"
+
+
+def migrate_source_record(workspace) -> dict:
+    """Read the workspace's 043 source stamp — record only (FR-020).
+
+    Absence or unreadability is data: ``unavailable`` plus a reason, never a
+    guess. No disposition may read this record; it only states which source
+    version the workspace came from.
+    """
+    path = Path(workspace) / MIGRATE_SOURCE_STAMP_REL
+    record = {
+        "stampFile": None,
+        "frameworkCommit": "unavailable",
+        "stampedAt": None,
+        "reason": None,
+    }
+    if not path.is_file():
+        record["reason"] = ".specify/source.json absent (pre-043 workspace)"
+        return record
+    record["stampFile"] = MIGRATE_SOURCE_STAMP_REL
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        record["reason"] = (
+            ".specify/source.json unreadable: " + exc.__class__.__name__
+        )
+        return record
+    if not isinstance(payload, dict):
+        record["reason"] = ".specify/source.json is not a JSON object"
+        return record
+    commit = payload.get("commit")
+    stamped_at = payload.get("stamped_at")
+    if isinstance(commit, str) and commit:
+        record["frameworkCommit"] = commit
+    if isinstance(stamped_at, str) and stamped_at:
+        record["stampedAt"] = stamped_at
+    if record["frameworkCommit"] == "unavailable":
+        stamp_reason = payload.get("reason")
+        record["reason"] = (
+            stamp_reason
+            if isinstance(stamp_reason, str) and stamp_reason
+            else "source stamp records no commit id"
+        )
+    return record
+
+
+def migrate_target_record() -> dict:
+    """The running CLI's own version and framework commit — record only."""
+    resolved = resolve_source_commit()
+    return {
+        "cliVersion": migrate_cli_version(),
+        "frameworkCommit": resolved["commit"] or "unavailable",
+        "origin": resolved["origin"],
+    }
+
+
+def load_migrate_resume_state(workspace):
+    """The nearest ``status=running`` receipt of this workspace (C-7 resume).
+
+    A crashed apply leaves its receipt running; the next run continues from
+    that receipt's own items and ``archiveTo`` paths — never from paths the new
+    run computes. Read-only: the interrupted run's file is not modified.
+    """
+    receipts = migrate_receipts_dir(workspace)
+    if not receipts.is_dir():
+        return None
+    candidates = []
+    for path in sorted(receipts.glob("*.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(payload, dict) or payload.get("status") != "running":
+            continue
+        run_id = str(payload.get("runId") or path.stem)
+        started = str(payload.get("startedAt") or "")
+        candidates.append((started, run_id, path, payload))
+    if not candidates:
+        return None
+    started, run_id, path, payload = max(candidates, key=lambda entry: entry[:2])
+    items = [
+        item for item in (payload.get("items") or []) if isinstance(item, dict)
+    ]
+    archives_by_path = {}
+    for entry in payload.get("archives") or []:
+        if not isinstance(entry, dict):
+            continue
+        target = entry.get("path")
+        archive_to = entry.get("archiveTo")
+        if (
+            isinstance(target, str) and target
+            and isinstance(archive_to, str) and archive_to
+        ):
+            archives_by_path[target] = entry
+    return {
+        "runId": run_id,
+        "receiptPath": path,
+        "items": items,
+        "itemsDone": sum(1 for item in items if item.get("status") == "done"),
+        "archivesByPath": archives_by_path,
+    }
+
+
+def migrate_resume_note(resume) -> str:
+    """The interrupted stage, reported in plan notes and the new receipt (C-7)."""
+    return (
+        f"resume: interrupted apply {resume['runId']} (status=running) — "
+        f"recorded stage {resume['itemsDone']}/{len(resume['items'])} items done, "
+        f"{len(resume['archivesByPath'])} archived object(s) kept; "
+        "continuing from that receipt"
+    )
+
+
 def detect_migrate_workspace_kind(workspace) -> str:
     """``framework-source`` iff ``skills/external/`` is a directory.
 
@@ -3252,6 +3382,7 @@ class MigrateContext:
         self.surfaces = dict(surfaces or {})
         self.reference_root = None
         self.run_id = None
+        self.resume = None
         self.notes = []
         self.archives = []
         self.mirror_items = None
@@ -4077,10 +4208,54 @@ def _migrate_execute_mirror(ctx, plan):
                         )
 
 
+def migrate_resume_archive_entry(ctx, item):
+    """The old receipt's archive entry when it already archived this target.
+
+    Applies only to write/replace items whose target is still missing while the
+    old receipt's own ``archiveTo`` object exists — the interrupted stage is
+    "object archived, target not yet written" (C-7). A target that exists again
+    is judged by the current plan, not by the old receipt.
+    """
+    resume = getattr(ctx, "resume", None)
+    if not resume or item.disposition not in ("write", "replace"):
+        return None
+    if item.mechanism in ("mirror-engine", "anchor-engine"):
+        return None
+    entry = resume["archivesByPath"].get(item.target)
+    if entry is None:
+        return None
+    target = ctx.workspace / item.target
+    if target.exists() or target.is_symlink():
+        return None
+    archived = ctx.workspace / entry["archiveTo"]
+    if not (archived.exists() or archived.is_symlink()):
+        return None
+    return entry
+
+
+def _migrate_resume_complete_write(ctx, item, entry):
+    """Complete the write an interrupted run left undone; never re-move its archive."""
+    try:
+        if item.mechanism == "symlink":
+            _migrate_write_symlink(ctx, item)
+        else:
+            _migrate_write_copy(ctx, item)
+    except OSError as exc:
+        item.status = "failed"
+        item.reason = f"resume write failed: {exc}"
+        return
+    item.archiveTo = entry["archiveTo"]
+    ctx.archives.append(dict(entry))
+
+
 def _migrate_execute_item(ctx, item):
     if item.status != "planned":
         return
     if item.dimension == "anchor-layout" or item.mechanism == "mirror-engine":
+        return
+    resumed_entry = migrate_resume_archive_entry(ctx, item)
+    if resumed_entry is not None:
+        _migrate_resume_complete_write(ctx, item, resumed_entry)
         return
     try:
         if item.disposition == "write":
@@ -4193,7 +4368,7 @@ def _migrate_recover_lines(archives):
 
 
 def _migrate_receipt_payload(plan, run_id, outcome, exit_code, archives,
-                            started_at=None):
+                            started_at=None, resumed_from=None):
     now = _migrate_utc_iso()
     return {
         "receiptVersion": MIGRATE_RECEIPT_VERSION,
@@ -4202,9 +4377,9 @@ def _migrate_receipt_payload(plan, run_id, outcome, exit_code, archives,
         "status": "completed",
         "startedAt": started_at or now,
         "finishedAt": now,
-        "resumedFrom": None,
-        "source": {},
-        "target": {},
+        "resumedFrom": resumed_from,
+        "source": migrate_source_record(plan.workspace),
+        "target": migrate_target_record(),
         "outcome": outcome,
         "exitCode": exit_code,
         "items": [item.to_dict() for item in plan.items],
@@ -4272,10 +4447,12 @@ def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
     happens after this helper returns.
     """
     plan = _migrate_build_plan(ctx, mode="apply" if apply_mode else "dry-run")
+    resumed_from = (ctx.resume or {}).get("runId")
     if not apply_mode:
         outcome, exit_code = _migrate_dry_outcome(plan)
         receipt = _migrate_receipt_payload(
-            plan, migrate_run_id(), outcome, exit_code, []
+            plan, migrate_run_id(), outcome, exit_code, [],
+            resumed_from=resumed_from,
         )
         return plan, outcome, exit_code, receipt, None
 
@@ -4296,11 +4473,15 @@ def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
     receipt = _migrate_receipt_payload(
         plan, ctx.run_id, outcome, exit_code, ctx.archives,
         started_at=started_at,
+        resumed_from=resumed_from,
     )
     complete_migrate_receipt(
         receipt_file,
         outcome=outcome,
         exitCode=exit_code,
+        resumedFrom=receipt["resumedFrom"],
+        source=receipt["source"],
+        target=receipt["target"],
         items=receipt["items"],
         archives=receipt["archives"],
         recover=receipt["recover"],
@@ -4327,6 +4508,9 @@ def _run_migrate(workspace, *, apply_mode, output_format):
     ctx = MigrateContext(workspace, kind, engine_dir, surfaces)
     if kind == "client" and not surfaces:
         ctx.notes.append("command-copies: no tool surface detected")
+    ctx.resume = load_migrate_resume_state(workspace)
+    if ctx.resume is not None:
+        ctx.notes.append(migrate_resume_note(ctx.resume))
 
     receipt_file = None
     started_at = None
