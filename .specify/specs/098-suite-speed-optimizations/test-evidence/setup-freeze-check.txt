@@ -1,0 +1,95 @@
+# Setup package (T001–T002) — check record
+# 098-suite-speed-optimizations · implement stage · 2026-11-10T12:50Z
+# host: workspace_docker_baremetal_8 · python 3.11.11 · HEAD 89350606cf1b8e0c48361cdfdb4ea35433aa1fb0
+
+## T001 — runtime-evidence landing directory
+
+$ mkdir -p .specify/specs/098-suite-speed-optimizations/notes
+$ test -d .specify/specs/098-suite-speed-optimizations/notes
+notes_dir=present
+
+Empty by design: its first records (red-first-evidence.md, pre-change-measurements.md,
+quickstart-run.md) arrive with later rows (T003/T024/T031/T043/T060). No placeholder file
+was invented — an empty directory is not git-trackable, and sibling specs' notes/
+directories hold only real records (no .gitkeep anywhere under .specify/specs).
+
+## T002 — clause-coverage baseline freeze
+
+Corpus-write-hazard rule applied (tasks.md § Notes / test-evidence/corpus-write-hazard.txt):
+the freeze printed its document into the sanctioned scratch root while the corpus was being
+scanned, and the baseline was copied into the spec dir only after the run completed.
+
+$ python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations --freeze \
+    > .specify/.tmp/sdd-loop/098-setup/coverage-baseline.txt \
+    2> .specify/.tmp/sdd-loop/098-setup/coverage-baseline.err
+exit=0  wall=5059 ms  stderr=0 bytes
+
+$ wc -l .specify/.tmp/sdd-loop/098-setup/coverage-baseline.txt
+642 .specify/.tmp/sdd-loop/098-setup/coverage-baseline.txt      # 2 header lines + 640 frozen names
+
+$ LC_ALL=C sort -c .specify/.tmp/sdd-loop/098-setup/coverage-baseline.txt
+c-sort=ok
+
+Header — the printed freeze context, both lines verbatim:
+
+# coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
+# frozen-from: .specify/specs/*/contracts/* excluding 098-suite-speed-optimizations | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 89350606cf1b | files: 286 (parsed 179 + named 107)
+
+Header confirmation: the freeze context is recorded — the corpus expression, this spec's
+exclusion, the owner forms, the clause-rule owner, base-sha 89350606cf1b (the tree of this
+run) and the scanned-file arithmetic 286 = 179 parsed + 107 named.
+
+Claim universe confirmation — 68 clauses over the six contract files:
+
+$ python3 scripts/python/clause_extract.py .specify/specs/098-suite-speed-optimizations/contracts/*.contract.md
+event-wait.contract.md             form=md-bold-closed  clauses=10
+inprocess-conversion.contract.md   form=md-bold-closed  clauses=10
+parallel-consistency.contract.md   form=md-bold-closed  clauses=12
+scan-cache.contract.md             form=md-bold-closed  clauses=11
+slow-membership.contract.md        form=md-bold-closed  clauses=9
+tier-selection.contract.md         form=md-bold-closed  clauses=16
+clauses_total=68
+
+$ grep -c '^098-suite-speed-optimizations/' coverage-baseline.txt
+0
+→ the baseline carries no name of this spec: the 68 own clauses can never be exempted by
+  their own baseline.
+
+Copy-after verification:
+
+$ \cp -f .specify/.tmp/sdd-loop/098-setup/coverage-baseline.txt \
+         .specify/specs/098-suite-speed-optimizations/coverage-baseline.txt
+$ cmp -s <scratch copy> <spec-dir copy>
+copy_identical=yes
+-rw------- 1 agent agent 42785 Nov 10 20:49 .specify/specs/098-suite-speed-optimizations/coverage-baseline.txt
+
+## Baseline usability check (live accounting against the frozen baseline, read-only)
+
+$ python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations \
+    > .specify/.tmp/sdd-loop/098-setup/coverage-live-check.txt \
+    2> .specify/.tmp/sdd-loop/098-setup/coverage-live-check.err
+exit=0  wall=5385 ms  stderr=0 bytes
+
+baseline: .specify/specs/098-suite-speed-optimizations/coverage-baseline.txt (640 names)
+uncovered beyond baseline: 0
+FR universe: 27
+FR claimed: 27
+FR uncovered: 0
+companion (must be non-empty on a green run): claimed clauses 68, scanned files 292, clause universe 2067, FR universe 27
+  [clause-uncovered] pass (640) — 640 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 27 of 27 FRs cited from citation groups
+  [clause-unparsable] fail (107) — 107 files yield no clause id under the owner's forms; 1 of them declare a positive form (parse doubt, never read as zero-and-covered)
+  [coverage-baseline-delta] pass (0) — baseline holds 640 names; 640 uncovered items are baseline-internal and do not block
+0 error(s), 1 warning(s)
+status: ok
+
+The one warning is the corpus's pre-existing `clause-unparsable` reading, identical to the
+analyze round-2 record (analyze-coverage-accounting-round2-2026-11-10.txt:1310) and round-3
+record (analyze-coverage-accounting-round3-2026-11-10.txt:1307) — not introduced here.
+
+## Counts
+
+- Tasks closed by this package: 2 of 2 (T001, T002)
+- Frozen baseline names: 640 (642 lines including 2 header lines)
+- Claim universe confirmed: 68 clauses across 6 contract files (10+10+12+11+9+16)
+- Live check: 0 errors, 1 pre-existing warning, status ok (exit 0)

@@ -63,8 +63,8 @@ Every count below was produced by the command shown, run in this worktree on 202
 
 **Purpose**: Create the runtime-evidence landing points and freeze the two generation-time baselines that later rows diff against.
 
-- [ ] T001 Create the spec runtime-evidence directory `.specify/specs/098-suite-speed-optimizations/notes/` for red-first evidence, the quickstart run record and the pre-change measurements (directory meaning: `create-tasks` § runtime-evidence landing points).
-- [ ] T002 [P] Freeze the clause-coverage baseline with `python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations --freeze > .specify/specs/098-suite-speed-optimizations/coverage-baseline.txt` and confirm the printed header records the freeze context (68 clauses over the six contract files are the claim universe).
+- [X] T001 Create the spec runtime-evidence directory `.specify/specs/098-suite-speed-optimizations/notes/` for red-first evidence, the quickstart run record and the pre-change measurements (directory meaning: `create-tasks` § runtime-evidence landing points).
+- [X] T002 [P] Freeze the clause-coverage baseline with `python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations --freeze > .specify/specs/098-suite-speed-optimizations/coverage-baseline.txt` and confirm the printed header records the freeze context (68 clauses over the six contract files are the claim universe).
 - [ ] T003 [blockedBy: T001] Record two-slot budget slot 1 of 2 (implement-start baseline, pre-change runner = full selection by construction) plus the pre-change measurements in `.specify/specs/098-suite-speed-optimizations/notes/pre-change-measurements.md`: full-suite wall and `--names-out` reading, full-tier `--collect-only -q` id set, `test_client_metrics.py` wall (S-0.4), corpus-pair pass/fail names (S-0.5), the scope sleep census (P-3) and the subprocess census (P-4) — command, exit code and duration for each; land run-time output outside `.specify/specs` and copy it afterwards (corpus-write hazard, `test-evidence/corpus-write-hazard.txt`).
 
 ## Phase 2: User Story 1 - 缺省反馈循环只跑快档，且排除被明示 (Priority: P1) 🎯 MVP
