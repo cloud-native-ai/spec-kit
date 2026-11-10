@@ -1073,11 +1073,12 @@ def test_x5_live_version_minor_bump():
     Self-Explanatory Structure amendment; raised to 1.17.0 on 2026-11-06 by Feature 086's
     Efficient Test Execution amendment; raised to 1.18.0 on 2026-11-09 by Feature 089's
     Script Interface Contract amendment; raised to 1.19.0 on 2026-11-09 by Feature 090's
-    Re-Anchoring amendment)."""
+    Re-Anchoring amendment; raised to 1.19.1 on 2026-11-10 by the verification-carrier
+    correction amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.19.0", f"C-5: live version is {m.group(1)}; expected 1.19.0"
+    assert m.group(1) == "1.19.1", f"C-5: live version is {m.group(1)}; expected 1.19.1"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
