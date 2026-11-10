@@ -1,0 +1,10 @@
+RUN_CMD=r20261110T072013Z-b095 ELAPSED_MS=691000
+unit: /speckit.checklist   run: r20261110T072013Z-b095
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261110T072013Z-b095 clean=false findings=4
+persisted: .specify/memory/session/20261110T072013Z-run-determination-speckit-checklist-r20261110t072013z-b095.md
+settled previous run 093-checklist-a1: not_evaluated

@@ -1,0 +1,9 @@
+{
+  "id": "20261110T072037Z-skill-create-checklist",
+  "path": ".specify/memory/feedback/20261110T072037Z-skill-create-checklist.md",
+  "duplicate": false,
+  "count_since_submission": 403,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

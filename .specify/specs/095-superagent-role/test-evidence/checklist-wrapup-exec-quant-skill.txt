@@ -1,0 +1,1 @@
+exec-quant: recorded skill:create-checklist run=r20261110T072013Z-b095-skill resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/memory/exec-quant/records/20261110T072037572826Z-4954ba31.json
