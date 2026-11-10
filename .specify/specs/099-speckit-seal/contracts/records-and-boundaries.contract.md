@@ -90,7 +90,8 @@ Glossary、Wrap-up、Handoffs）、`skills/internal/seal-artifact/SKILL.md`（�
 `seal` 的判定 MUST 是对下列条件的合取：from 状态、review/P0、code-review blocking、闭包裁决、合并完成度、
 开放冲突、dirty-spec-tree、状态一致性。任一不成立即拒绝并点名**全部**未满足条件。拒绝码封闭集：
 `from-status-invalid`、`slice-not-sealable`、`review-missing`、`p0-unresolved`、`code-review-blocking`、
-`closure-refused`、`closure-input-defect`、`merge-incomplete`、`conflict-open`、`dirty-spec-tree`；
+`closure-refused`、`closure-input-defect`、`merge-incomplete`、`conflict-open`、`slice-unclosed`、
+`dirty-spec-tree`；
 `already-sealed` 是成功语义（exit 0）；`state-drift` 走 exit 2。**闭包引擎 exit 2 MUST 按输入缺陷处置**
 （`closure-input-defect`，附 stderr 首行），MUST NOT 读作 accept，MUST NOT 吞成通过；闭包裁决 MUST 来自
 `closure-acceptance-check.py` 的单一来源，MUST NOT 由模型或第二个脚本重算。
@@ -102,7 +103,8 @@ Glossary、Wrap-up、Handoffs）、`skills/internal/seal-artifact/SKILL.md`（�
 回合记录 MUST 由 `merge-manifest.json`（冲突与处置行）、被阻断时 stdout 拒绝清单的捕获文件
 （`test-evidence/074-round-*.txt`）、以及（仅 `Sealed` 终态时）`seal.md` 构成；MUST NOT 新建第三份台账。FR-027 的五项实测
 输入（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、P0 驱动者豁免、57 行拆前记录）MUST 各自
-以「已解决（证据指针）」或「阻断（理由）」出现在回合记录中，一一对应、无静默默认。回合终态 MUST 是二值：
+以「已解决（证据指针）」或「阻断（理由）」出现在回合记录中——五项是下限，回合计出的额外具名阻断 MUST
+同样逐条点名，无静默默认。回合终态 MUST 是二值：
 `Sealed` 或具名阻断清单；阻断态重跑 MUST 清单一致。
 
 (FR-026, FR-027, FR-028)

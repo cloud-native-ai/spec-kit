@@ -109,7 +109,7 @@ Sealed ── audit correction (evidence required) ──→ Ready for Review
 
 **校验规则**
 
-- V9 `artifacts[]` 的 `per_slice` 必须覆盖每个分片 × 每个候选输出件（`present` 真假都记录）；`not-applicable` 必须带 `basis`（FR-012、FR-018）。
+- V9 `artifacts[]` 的 `per_slice` 必须覆盖每个分片 × 每个候选输出件（`present` 真假都记录）；目录型候选必须逐文件成行（`name` = `<dir>/<file>`）；dated-record 文件必须带指针语义（无文件副本）；`not-applicable` 必须带 `basis`（FR-012、FR-018、FR-019）。
 - V10 `id_maps` 覆盖每个分片条目；家族至少 FR / SC / STR / 契约条款 / 任务行 / 实体 / 阶段检查点标识（FR-014）。
 - V11 `conflicts[]` 每条含两侧摘录与候选处置；`status=open` 的条数 >0 时 `seal` MUST 阻断（FR-017、FR-009）。
 - V12 `digest` 为剔除 `digest` 与时间键后的排序紧凑 JSON 的 sha256（复用 R-16 形态）。
@@ -129,7 +129,7 @@ Sealed ── audit correction (evidence required) ──→ Ready for Review
 
 ## 6. E5/E6/E7/E8 — 合并明细、映射、冲突与处置
 
-- **E5 Artifact Merge Record**：`name` 取自 15 项封闭候选（FR-012）；`action` 四值；`sources` 为分片 slug 列表；`checks` 记录该件自身的后置校验（如 `id_continuity`）。
+- **E5 Artifact Merge Record**：`name` 取自 15 项封闭候选（FR-012）；`action` 四值；目录型候选按文件级单元落行（`name` 记 `<dir>/<file>`，同名三态见 C-013）；dated-record 文件的动作语义是指针纳入（不复制原件）；`sources` 为分片 slug 列表；`checks` 记录该件自身的后置校验（如 `id_continuity`）。
 - **E6 ID Mapping Record**：`kind` 三值——`mapped`（用父 ID）、`appended`（分片独有，按合并顺序追加）、`localization`（映射已声明、两侧文本不同，属合法本地化，非冲突；见 plan § Disclosed Rulings 1）。
 - **E7 Conflict**：开放即阻断；解决必须具名（`canonical-map` 声明映射 / `recheck-clean` 输入修复后重跑 / `user-waiver` 用户裁定）；无「较新/较全/较大/较后胜出」（FR-017、C-018）。
 - **E8 Disposition Record**：57 行拆前记录按 `supersede` 处置；`superseded` 指向父 `tasks.md` 的原行；`superseded_by` 指向**合并清单本身**（`{path: merge-manifest.json, line: 0}`，line 0 = 整文件事实），其 `slices[].carrier_tasks` 列出真正接手的分片 `tasks.md`——不发明逐行映射（C-016）；`evidence[]` 列分片任务文件路径，`guard_status` 取值 `retired|replaced|unchanged-with-reason`。原行以 `> ` 引用前缀保留在「Superseded pre-split record」块内（`TASK_ROW_RE` 为 `^\s*- \[(.)\]`，`> ` 前缀使其不再被计为任务行，见 R-09）。
@@ -165,18 +165,19 @@ Sealed ── audit correction (evidence required) ──→ Ready for Review
 
 字段：`verdict`、`exit_code`、`conditions[]`（每条 `{code, evidence, fix_path, rerun}`）。MUST NOT 含时间戳——阻断态两次运行的清单须逐字节一致（C-038）。
 
-**封闭拒绝码**（覆盖 SC-002 的八类失败，另含 FR-006 的缺 review、FR-005 的 slice-not-sealable，以及成功语义 already-sealed；`state-drift` 不在本表，见下）：
+**封闭拒绝码**（覆盖 SC-002 的八类失败，另含 FR-006 的缺失 review 记录（`review.md` / `code-review.md`）、FR-005 的 slice-not-sealable，以及成功语义 already-sealed；`state-drift` 不在本表，见下）：
 
 | 码 | 触发 | 来源 |
 |----|------|------|
 | `from-status-invalid` | from 状态非 `Ready for Review`（且非已封装） | FR-005 |
 | `slice-not-sealable` | 目标目录本身是分片 | FR-005 |
-| `review-missing` | 当前 review 记录缺失 | FR-006 |
+| `review-missing` | 当前 `review.md` 或 `code-review.md` 缺失 | FR-006 |
 | `p0-unresolved` | 当前 review 有未处置 P0（驱动者豁免不算） | FR-006 |
 | `code-review-blocking` | `code-review.md` 含 `blocking` 条目 | FR-006 |
 | `closure-refused` | 闭包裁决 `block` | FR-007 |
 | `closure-input-defect` | 闭包引擎 exit 2 | FR-007 |
 | `merge-incomplete` | 分片非空但 manifest 缺失/覆盖不全/`not-applicable` 依据缺失 | FR-008 |
+| `slice-unclosed` | 分片 `tasks.md` 存在未勾选行（`- [ ]` / `- [>]`），或 `- [~]` 行缺分片 `verification.md` 的 `deferred_tasks=` 记录 | FR-008 |
 | `conflict-open` | manifest 有开放冲突 | FR-008、FR-017 |
 | `dirty-spec-tree` | 父 spec 树有本流程之外的未提交改动 | FR-010 |
 | `already-sealed` | 已封装（**成功语义**，exit 0，非拒绝） | FR-005 |

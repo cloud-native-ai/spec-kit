@@ -66,11 +66,11 @@
 
 ### User Story 3 - 为 074 的回合提供可执行流程并留下可复现裁决 (Priority: P1)
 
-维护者按本特性交付的流程对 074 运行合并回写与 seal。流程必须能识别 074a/074b、把它们全部同名输出件并回父级、让父 `tasks.md` 不再携带未勾选行（57 行被拆前记录按既有 non-disposable 纪律被复核与处置，而不是被静默覆盖）、让父级验收记录可被闭包判定器求值（每条 SC 有状态行且 requirements 满足 Path 标记模式）、并产出父级合并后的 review 结论。最终 seal 给出**完整裁决**：要么 `Sealed`，要么一份逐条点名的拒绝清单——每个已知输入缺陷（缺 Path 标记导致闭包判定器 exit 2、共享字符串同号不同义、出厂文档引用分片本地 ID、review P0 只有驱动者记录的豁免、父 tasks.md 的拆前行）都必须被显式解决或显式阻断，MUST NOT 有静默默认。
+维护者按本特性交付的流程对 074 运行合并回写与 seal。流程必须能识别 074a/074b、把它们全部同名输出件并回父级、让父 `tasks.md` 不再携带未勾选行（57 行被拆前记录按既有 non-disposable 纪律被复核与处置，而不是被静默覆盖）、让父级验收记录可被闭包判定器求值（每条 SC 有状态行且 requirements 满足 Path 标记模式）、并产出父级合并后的 review 结论。最终 seal 给出**完整裁决**：要么 `Sealed`，要么一份逐条点名的拒绝清单——每个已知输入缺陷（缺 Path 标记导致闭包判定器 exit 2、共享字符串同号不同义、出厂文档引用分片本地 ID、review P0 只有驱动者记录的豁免、父 tasks.md 的拆前行）都必须被显式解决或显式阻断，MUST NOT 有静默默认；五项是下限而非上限——回合检出的额外具名阻断同样逐条点名即合规。
 
 **Why this priority**: 这是用户对「背景事实」的直接要求——「本特性须让该状态可被 seal 处置，并为 074 的回合提供可执行流程」。没有真实回合，前两条可以停在夹具上；074 回合是本特性的第一次真实验收。
 
-**Independent Test**: 在 074 的当前树上运行完整回合，断言：合并清单覆盖两片的全部输出件；父 `tasks.md` 未勾选行为 0；父 `verification.md` 每条 SC 有状态行；父级 review 记录由两片合并而来且保留 P0 处置引用；seal 裁决要么 `Sealed` 要么列出与实测输入缺陷一一对应的具名阻断项；重复运行幂等。
+**Independent Test**: 在 074 的当前树上运行完整回合，断言：合并清单覆盖两片的全部输出件；父 `tasks.md` 未勾选行为 0；父 `verification.md` 每条 SC 有状态行；父级 review 记录由两片合并而来且保留 P0 处置引用；seal 裁决要么 `Sealed` 要么列出至少覆盖五项实测输入、并逐条点名额外阻断的具名阻断项；重复运行幂等。
 
 **Acceptance Scenarios**:
 
@@ -104,7 +104,7 @@
 - **无分片的单体 spec**：合并回写为 `not-applicable` 并在记录中显式写明，MUST NOT 被读成「未执行」或伪造成一次空合并。
 - **分片目录只命中一半条件**（名字形如 `<父号><字母>-<slug>` 但 requirements 未声明父，或声明了父但目录名不合形）：不进入分片集合，作为冲突项呈现；分片集合 MUST 由「名字族 + 声明映射」两个条件同时成立确定，并在合并清单中列出所用集合。
 - **父级已 `Sealed` 后又发现新分片**：不重新封装；走唯一的审计更正路径（`Sealed → Ready for Review`，须携带使封装结论不成立的证据），重新合并后再封装。
-- **分片状态不一**（一片已闭合、另一片仍有未勾选行或未决冲突）：合并不得替分片「补完」；未闭合行保持未闭合，seal 以验收/合并前置条件阻断并点名分片与行。
+- **分片状态不一**（一片已闭合、另一片仍有未勾选行或未决冲突）：合并不得替分片「补完」；未闭合行保持未闭合，seal 以 `slice-unclosed`（验收/合并前置条件）阻断并点名分片与行（判据与计数来源见 FR-008）。
 - **同一 ID 家族内重号**（两片的本地任务行编号都从 T001 起）：按合并顺序确定性重编号，原文行文本保留，来源写入合并清单；MUST NOT 用返回时刻或文件名排序以外的随机因素破平。
 - **同一锚点的双端编辑**（父级与分片都改过同一段落且无法由声明映射归并）：进入冲突清单，两侧文本并列；MUST NOT 以「较新者胜出」或「较全者胜出」静默择一。
 - **dated-record 边界**：分片 `review.md` / `code-review.md` / `verification.md` / `test-evidence/` 与既有日期化记录 MUST NOT 被合并改写；父级合并视图只能引用它们。
@@ -129,23 +129,23 @@
 #### B. 封装前置条件与失败语义
 
 - **FR-005**: seal 的 from 状态 MUST 是 `Ready for Review`。已 `Sealed` 的 spec 重入 MUST 幂等成功并具名报告 `already-sealed`；其它任何 from 状态（含 `Draft` / `Planned` / `Implemented` / `Blocked` / 遗留 `Completed`）MUST 以具名理由拒绝且零状态写入。**分片目录 MUST NOT 是封装主体**：分片本身不可被 seal，拒绝理由 MUST 点名其父 spec 为正确目标。状态面互相矛盾（注册表行与特性详情状态不一致，或任一载体缺失）MUST 以 `state-drift` 具名拒绝，退出码 `2`（输入/环境错误），MUST NOT 择一采信任一载体；修复仍归 `/speckit.feature` 的既有 reconcile。
-- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）的 findings 摘要 MUST 显示**零个未处置 P0**——处置只有两种：已修复（有修复指向）或**用户显式裁定豁免**（user-authored artifact 或本会话用户裁定）；驱动者/协调者/代理的确认与「无人反对」MUST NOT 计为豁免。当前 `code-review.md` MUST 零 `blocking` 条目（与既有 `Implemented → Ready for Review` 门同源，MUST NOT 另立判据）。review 记录缺失 MUST 阻断并点名 `/speckit.review`。seal MUST 只读 review 记录：不改写 finding、不重新裁决、不降级。
+- **FR-006**: 「review 结论无 P0」MUST 按当前 review 记录判定：当前 `review.md`（若存在多个，取当前记录集合，归档记录不计）的 findings 摘要 MUST 显示**零个未处置 P0**——处置只有两种：已修复（有修复指向）或**用户显式裁定豁免**（user-authored artifact 或本会话用户裁定）；驱动者/协调者/代理的确认与「无人反对」MUST NOT 计为豁免。当前 `code-review.md` MUST 零 `blocking` 条目（与既有 `Implemented → Ready for Review` 门同源，MUST NOT 另立判据）。当前 `review.md` 或 `code-review.md` 缺失 MUST 以 `review-missing` 具名阻断（退出码 `1`）并点名 `/speckit.review`。seal MUST 只读 review 记录：不改写 finding、不重新裁决、不降级。
 - **FR-007**: 「验收记录齐备」MUST 以既有闭包判定器 `scripts/python/closure-acceptance-check.py` 的裁决为单一来源：每条 SC 在父 `verification.md` 有状态行；每条 `final` 路径判据为 `pass`；smoke 记录 `pass`；父 `requirements.md` 的每条 SC 行 MUST 满足 `**Path**` 标记模式（恰一个、行尾）。exit 2 MUST 按**输入缺陷**处置（修复后重跑或具名阻断），MUST NOT 读作 `accept`；MUST NOT 由模型或第二个脚本重新推导该裁决。
-- **FR-008**: 「合并回写完成」MUST 由合并清单证成（FR-018）：当分片集合非空时，每个分片 × 每个输出件都必须有一条合并记录，未决冲突数为 0，且合并后校验（FR-014…FR-016）全绿；当分片集合为空时，记录 MUST 写 `not-applicable` 并说明判定依据，MUST NOT 静默跳过。
+- **FR-008**: 「合并回写完成」MUST 由合并清单证成（FR-018）：当分片集合非空时，每个分片 × 每个输出件都必须有一条合并记录，未决冲突数为 0，且合并后校验（FR-014…FR-016）全绿；分片集合非空时，「完成」还 MUST 要求每个分片**已闭合**：分片 `tasks.md` 中未勾选行（`- [ ]` 与 `- [>]`）计数为 0，`- [~]` deferred 行 MUST 在分片 `verification.md` 的 `deferred_tasks=` 逐项有名（行形态与计数来源：与父 `tasks.md` 相同的任务行正则；缺记录计为未闭合）；任一未闭合分片 MUST 以 `slice-unclosed` 具名阻断并点名分片与行，MUST NOT 替分片补完或伪勾选；当分片集合为空时，记录 MUST 写 `not-applicable` 并说明判定依据，MUST NOT 静默跳过。
 - **FR-009**: 全部前置条件 MUST 同时成立（合取）；任一不成立 MUST 拒绝封装：状态不变、无「已封装」声明、无部分封装。拒绝报告 MUST 逐条点名**全部**未满足条件（不是只报第一条）、每条的修复路径与重跑方式；退出码封闭集 MUST 为 `0`（封装成功或幂等）/ `1`（前置条件拒绝）/ `2`（输入或环境错误），语义专属于 seal 引擎的 `--help` 契约。MUST NOT 以「三缺一」通过。判定与写入 MUST 两阶段执行：全部判定先在只读阶段算齐，只有全部成立才进入写入；写入集中的 [[STR-002]] 与状态面 MUST 同批落盘，任一写入失败 MUST 以原字节恢复已写文件并以退出码 `2` 结束。拒绝（退出码 `1`）MUST NOT 产生任何持久化写入：拒绝报告只经 stdout（及调用方捕获）呈现，MUST NOT 新建拒绝记录文件或第二份台账；重跑由同一确定性重算复现同一清单。
 - **FR-010**: 封装记录 MUST 每个 spec 一份，落在父 spec 目录的固定文件名 `seal.md`（[[STR-002]]），机器可读核心至少含：判定时刻与钉住的提交、判定时的 from/to 状态、所引 review 记录路径与其 P0/P1/P2 与 `blocking` 计数、闭包判定器回执（含 exit 码与七键 final_path 记录，逐字复制不再重算）、合并清单指针与分片列表、命中的豁免引用、引擎身份与命令。记录 MUST 引用来源而不复述第二份测量。父 spec 树存在本流程之外的未提交改动时 MUST 拒绝（`dirty-spec-tree`）并指名路径。每 spec 的 [[STR-002]] MUST 只承载**当前**回执；审计更正后再次封装 MUST 原子替换该文件，并在机器可读核心写入 `supersedes: <前回执钉住的提交>`；前回执由 git 历史承载，MUST NOT 另建第二份回执文件或历史聚合。
 
 #### C. 合并回写（split + merge-back）
 
 - **FR-011**: 分片集合 MUST 由两个条件同时成立确定并写入合并清单：(a) 目录名形如 `<父编号><一个或多个字母>-<slug>` 且位于同一 `.specify/specs/`；(b) 该分片 `requirements.md` 显式声明父规格（父映射表或父分支声明）。只命中一个条件的目录 MUST NOT 进入集合，MUST 作为冲突项呈现。分片顺序 MUST 取父级拆分记录的声明顺序；拆分记录缺席时 MUST 取字母后缀的字典序，并记录所用依据。MUST NOT 依赖运行期目录列举顺序。
-- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contracts/`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`checklists/`、`checkpoints/`、`test-evidence/` 与 `notes/`。**必选下限**：`tasks.md` 无论分片是否产出 MUST 被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席则新建）、父 `review.md`（分片 review 记录的汇总指针视图，缺席则新建）与合并清单 MUST 产出。**其余候选按实际产出枚举**：两侧皆有 → `merge`；仅分片有 → `create`；仅父级有 → `keep` 并接受同一套对齐检查；两侧皆无 → `not-applicable`。每个输出件 MUST 记录动作（merge / create / keep / not-applicable）与来源。MUST NOT 为单个输出件发明第二套合并流程：输出件差异只体现在其**声明的 ID 家族**与结构单元上。
+- **FR-012**: **所有输出件走同一流程**：合并 MUST 以「同名输出件」为合并单位。**候选宇宙**（封闭集）MUST 恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contracts/`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`checklists/`、`checkpoints/`、`test-evidence/` 与 `notes/`。**目录型候选**（`contracts/`、`checklists/`、`checkpoints/`、`test-evidence/`、`notes/`）的合并单位 MUST 是**文件**：按文件名在父级与全部分片间取并集，逐文件处置——两侧同名 → 该文件为合并单元（`merge`；内容按其声明结构归并，无法确定性归并或同一锚点双端编辑 → 冲突）；仅分片有 → `create`；仅父级有 → `keep`。`test-evidence/`、`checkpoints/` 内的既有日期化测量文件属 dated record：MUST NOT 复制或改写原件；同名时父级文件维持 `keep` 并在合并清单记录指向分片原件的指针，仅分片有时以父级**指针视图**（汇总行 + 指针）`create`，分片原件字节不变。**必选下限**：`tasks.md` 无论分片是否产出 MUST 被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席则新建）、父 `review.md`（分片 review 记录的汇总指针视图，缺席则新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，缺席则新建）与合并清单 MUST 产出。**其余候选按实际产出枚举**：两侧皆有 → `merge`；仅分片有 → `create`；仅父级有 → `keep` 并接受同一套对齐检查；两侧皆无 → `not-applicable`。每个输出件 MUST 记录动作（merge / create / keep / not-applicable）与来源。MUST NOT 为单个输出件发明第二套合并流程：输出件差异只体现在其**声明的 ID 家族**与结构单元上。
 - **FR-013**: 合并 MUST 是确定性的：同输入产生逐字节一致的合并产物与合并清单；成功后的 `apply` 重跑 MUST 零 diff、幂等；任何决策 MUST NOT 依赖返回时刻、文件系统列举顺序、随机源或「最后写入者胜出」。不可确定性归并的差异 MUST 进入冲突清单（FR-017），MUST NOT 由启发式择一。
 - **FR-014**: **编号重排** MUST 对每个在案的 ID 家族（至少 FR、SC、STR、契约条款、任务行、实体与阶段/检查点标识）给出可判定规则：分片本地 ID 有父映射的 MUST 使用父 ID；无父映射的分片独有 ID MUST 按合并顺序追加到父序列（连续、无空洞、无重复），并写入合并清单的映射表。合并产物内的一切引用 MUST 改写为合并后 ID；引用在映射后不可解析 MUST 判为冲突，MUST NOT 留下悬空引用。同一家族两次运行 MUST 得到同一映射。
 - **FR-015**: **语义对齐** MUST 以分片声明的映射表为唯一依据：每个分片需求/判据条目 MUST 有且仅有一个父目标（除非分片显式声明并记录多对一的合法合并）；无映射、映射目标不存在、两个分片条目映射到同一父目标而无声明合并，三者都 MUST 判为冲突。引擎 MUST NOT 用模型转述判断「意思相同」，也 MUST NOT 发明映射。
-- **FR-016**: **词汇表对齐** MUST 保证合并后每个共享字符串引用（`[[STR-NNN]]` 形态）解析到合并后的父级唯一注册表；同号不同义（同一 ID 在分片与父级指向不同字面量）MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。出厂文档（框架源与镜像）中对分片本地 ID 的引用 MUST 被检出：在合并后语义下解析会改变含义的引用，MUST 逐条记录解决（重指向合并后 ID / 改用逐字字面量 / 用户豁免）。新术语 MUST 经 `.specify/glossary.md` 的既有协议进入词汇表，MUST NOT 在 spec 内联定义第二份术语表。
+- **FR-016**: **词汇表对齐** MUST 保证合并后每个共享字符串引用（`[[STR-NNN]]` 形态）解析到合并后的父级唯一注册表；同号不同义（同一 ID 在分片与父级指向不同字面量）MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。**token→注册表绑定** MUST 可机械判定：`[[STR-NNN]]` 的解析域是其声明登记处——spec 文档以自身 `requirements.md` § Shared Strings 为登记处（登记处口径 owner：`shared/definitions/sdd-routing-definitions.md` § 字面量登记处，MUST NOT 在本规格复制）；spec 之外的文档 MUST 显式声明所用登记处（spec 路径 + 节锚），未声明登记处的引用 MUST 做跨登记处解析检查：恰好一个分片注册表命中且字面量一致 → 按该分片本地 ID 检出并按本条记录解决方式；零命中、或多处命中且字面量不同 → 判为冲突，MUST NOT 猜测归属。出厂文档（框架源与镜像）中对分片本地 ID 的引用 MUST 被检出：在合并后语义下解析会改变含义的引用，MUST 逐条记录解决（重指向合并后 ID / 改用逐字字面量 / 用户豁免）。新术语 MUST 经 `.specify/glossary.md` 的既有协议进入词汇表，MUST NOT 在 spec 内联定义第二份术语表。
 - **FR-017**: 冲突 MUST 是一等记录：每条含输出件、单元（ID/标题/行区间）、两侧内容摘录、候选处置与状态；任一未决冲突 MUST 阻断 seal（FR-009）。冲突的解决 MUST 显式且留痕（用户裁定或声明的解决规则），MUST NOT 静默择一、MUST NOT 造成内容丢失；引擎 MUST NOT 以「较新/较全/较大/较后」任一单侧截断作为解决。
 - **FR-018**: **归属记录** MUST 由合并清单承载，合并清单 MUST 落父 spec 目录的固定文件名 `merge-manifest.json`（机器可读、键序稳定；[[STR-002]] 只引用不复述）：逐输出件记录来源分片与动作，逐单元/逐 ID 记录来源（分片 slug + 原 ID）与重映射；合并完成后父 spec MUST 成为唯一现行权威；分片目录 MUST 被标注 `merged into <父 spec>`（指针或状态行），其内容作为 dated record 保留，MUST NOT 被 seal 删除。分片承载物的后续处置（保留/退役）MUST 按 non-disposable 纪律复核后决定，MUST NOT 默认沉默保留。
-- **FR-019**: **证据保全** MUST 遵守 dated-record 红线：分片的 `review.md`、`code-review.md`、`verification.md`、`test-evidence/` 与其它既有日期化测量 MUST NOT 被改写；父级合并视图 MUST 以「汇总行 + 指针」形态引用它们（与 074 父 `verification.md` 既有的聚合指针形态同构），MUST NOT 制造第二份测量。
+- **FR-019**: **证据保全** MUST 遵守 dated-record 红线：分片的 `review.md`、`code-review.md`、`verification.md`、`test-evidence/` 与其它既有日期化测量 MUST NOT 被改写；父级合并视图 MUST 以「汇总行 + 指针」形态引用它们（与 074 父 `verification.md` 既有的聚合指针形态同构），MUST NOT 制造第二份测量；目录型候选内的 dated-record 文件 MUST 按 FR-012 的指针纳入动作处置（不复制、不改写原件）。
 - **FR-020**: 合并回写的写面 MUST 被限定：只写父 spec 目录、分片的 `merged into` 标注、以及 FR-016 记录过解决方式的出厂文档引用修正；MUST NOT 归档、移动或删除 spec 目录，MUST NOT 触碰 goal/team 树（归 `/speckit.goal` 的 `migrate-archive`），MUST NOT push。并发安全 MUST 按「一 spec 一记录文件」满足：两条并行线封装不同 spec 时写入不同路径，MUST NOT 引入共享可变聚合文件。
 
 #### D. 命令面、边界与取证
@@ -159,7 +159,7 @@
 #### E. 074 回合与验收
 
 - **FR-026**: 本特性 MUST 交付一次可执行的 **074 回合**：按 FR-011 识别 074a/074b，按 FR-012…FR-019 合并其全部同名输出件到父 `074-goal-team-sdd-unification/`，产出父级合并后的 review 结论（两片 `review.md` + `code-review.md` 的汇总视图与指针）与合并清单，使父 `tasks.md` 的未勾选行数为 0（57 行拆前记录按 FR-018 的 non-disposable 处置显式复核后保留为带日期记录或标注，MUST NOT 静默覆盖）、父 `verification.md` 每条 SC 有状态行，然后运行 seal。回合终态 MUST 是二值之一：`Sealed` 或带具名阻断清单的拒绝；MUST NOT 有部分封装或静默状态。
-- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2——逐条记录取值（显式决定，或记录过的严格默认 `final`），MUST NOT 读作通过；(b) 074b 本地 STR 编号与父级同号不同义——按 FR-016 的冲突规则呈现并解决；(c) 出厂文档 `skills/internal/create-team/SKILL.md` 以 074b 分片本地 ID 引用 outcome 字面量（`STR-004`/`STR-005`/`STR-006` 在 074b 本地表为 `completed`/`blocked`/`failed`；父级同号为 `sdd`/`direct`/`adjudicate`）——按 FR-016 检出并记录重指向（合并后父 ID `STR-007`/`STR-008`/`STR-009`）或逐字字面量；(d) 074b review 的 P0（字母分片分支解析到父目录）只带驱动者记录的豁免——按 FR-006 不算用户豁免，须有修复证据或用户显式裁定，否则为具名阻断；(e) 父 `tasks.md` 的 57 行拆前记录——按 FR-018 处置，MUST NOT 静默覆盖或删除。每项 MUST 在回合记录中逐条出现，状态为「已解决（证据指针）」或「阻断（理由）」。
+- **FR-027**: 074 回合 MUST 对每项实测输入缺陷给出显式处置，MUST NOT 静默默认：(a) 父/分片 SC 行缺 `**Path**` 标记导致闭包判定器 exit 2——逐条记录取值（显式决定，或记录过的严格默认 `final`），MUST NOT 读作通过；(b) 分片本地 STR 编号与父级同号不同义——实测两组：074a 本地 `STR-010`（`"seats"`，已声明映射 → 父 `STR-011`）与 074b 本地 `STR-004`–`STR-007`（`"completed"`/`"blocked"`/`"failed"`/`"## Nested SDD Runs"`，已声明映射 → 父 `STR-007`–`STR-010`）——按 FR-016 的冲突规则呈现并解决；(c) 出厂文档 `skills/internal/create-team/SKILL.md` 以 074b 分片本地 ID 引用 outcome 字面量（`STR-004`/`STR-005`/`STR-006` 在 074b 本地表为 `completed`/`blocked`/`failed`；父级同号为 `sdd`/`direct`/`adjudicate`）——按 FR-016 检出并记录重指向（合并后父 ID `STR-007`/`STR-008`/`STR-009`）或逐字字面量；(d) 074b review 的 P0（字母分片分支解析到父目录）只带驱动者记录的豁免——按 FR-006 不算用户豁免，须有修复证据或用户显式裁定，否则为具名阻断；(e) 父 `tasks.md` 的 57 行拆前记录——按 FR-018 处置，MUST NOT 静默覆盖或删除。每项 MUST 在回合记录中逐条出现，状态为「已解决（证据指针）」或「阻断（理由）」。五项是**下限**：回合实测新增的具名阻断（含五项之外的同号不同义、目录同名产物冲突）MUST 同样逐条点名，MUST NOT 以「不在五项内」为由省略。
 - **FR-028**: 回合裁决 MUST 可复现：合并清单、封装记录或拒绝清单、以及前端状态面三者一致；在阻断状态下重跑 MUST 得到同一阻断清单（幂等、可复现），MUST NOT 因重跑顺序改变结论；回合 MUST NOT 改写任何分片测量记录或 review 记录（FR-019）。
 
 ### Runtime Stack & Dependency Ownership
@@ -188,7 +188,7 @@
 - **SC-003**: 合并确定性：同一夹具树两次运行产出逐字节一致的合并产物与合并清单；成功后的 `apply` 重跑零 diff；把任一决策改成「按返回时刻排序」注入变异时测试转红。 **Path**: final
 - **SC-004**: 合并完整性：合并后的父级产物中，每个在案 ID 家族的序列连续无洞、无重复、零悬空引用；映射表覆盖每个分片条目（无映射、重复映射、目标缺失三类冲突计数为零或全部显式解决）；父 `tasks.md` 未勾选行为 0。任一断言失效时测试转红。 **Path**: final
 - **SC-005**: 词汇表对齐有效：同号不同义夹具被检出为冲突（两侧字面量并列），出厂文档引用分片本地 ID 的夹具被检出且解决留痕；不存在「同号不同义静默存活」的合并产物；注入静默重编号变异时测试转红。 **Path**: final
-- **SC-006**: 074 真实回合（用户指定的 acceptance 用例）可执行且可复现：以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行 split→merge-back→seal 全流程；实测输入 MUST 为：074a 32/32、074b 26/26 任务行闭合；父 `tasks.md` 57 个未勾选行；父级无 `review.md`/`code-review.md`；父 `verification.md` 以聚合指针集存在（提交 `91726a641`，每 SC 一行——本条以实测更正简报的「父目录无 verification.md」前提）。回合产出覆盖两片全部实际输出件的合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0（57 行按 FR-018 显式处置）；父 `verification.md` 每条 SC 有状态行；seal 终态为 `Sealed` 或与 FR-027 五项实测输入一一对应的具名阻断清单；阻断状态下重跑清单一致。 **Path**: final
+- **SC-006**: 074 真实回合（用户指定的 acceptance 用例）可执行且可复现：以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行 split→merge-back→seal 全流程；实测输入 MUST 为：074a 32/32、074b 26/26 任务行闭合；父 `tasks.md` 57 个未勾选行；父级无 `review.md`/`code-review.md`；父 `verification.md` 以聚合指针集存在（提交 `91726a641`，每 SC 一行——本条以实测更正简报的「父目录无 verification.md」前提）。回合产出覆盖两片全部实际输出件的合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0（57 行按 FR-018 显式处置）；父 `verification.md` 每条 SC 有状态行；seal 终态为 `Sealed` 或至少逐条覆盖 FR-027 五项实测输入的具名阻断清单——五项之外的实测阻断只需逐条点名即合规，不构成不合规；验收断言：回合记录对五项逐项呈 resolved/blocked，且拒绝清单每条阻断都能解析到回合证据（五项之外的多出条目不判违规）；阻断状态下重跑清单一致。 **Path**: final
 - **SC-007**: 归档准入有效：非 `Sealed` 的 spec 在任一归档/退休入口被具名拒绝并指向 `/speckit.seal`；`Sealed` 通过同一判据；遗留 `Completed` 的归档路径按 FR-023 记录。把准入判据复制到第二个实现处时测试转红（单一 owner）。 **Path**: supporting
 - **SC-008**: 零重复机制可静态核验：状态值域只有一个 owner，全部消费方识别 `Sealed`（任一处移除时漂移守卫转红）；仓库中不存在第二套状态机、第二份注册表、第二个归档机制、调度器或并行 spec 树；seal 引擎 `scripts/python/seal-utils.py`（[[STR-003]]）的动作表不含移动/删除/push/调度。 **Path**: supporting
 - **SC-009**: 并发与只读边界成立：两个并发写者对不同 spec 封装时写出不同路径（夹具断言无共享可变聚合）；seal 对 review 记录与分片测量记录的哈希在运行前后一致（只读取证）；对父 spec 树的非本流程改动触发 `dirty-spec-tree` 拒绝。 **Path**: supporting
@@ -200,7 +200,7 @@
 - **SC-003 Source**: 两次运行的合并产物与清单的 sha256 对照；`apply` 重跑的 `git diff --stat` 零输出；「返回时刻排序」变异的转红实测。
 - **SC-004 Source**: 合并后产物的程序化扫描（ID 序列、悬空引用、映射覆盖、未勾选行计数），读数写入 `test-evidence/`。
 - **SC-005 Source**: 同号不同义与出厂引用两类夹具的冲突清单；解决记录（重指向/逐字/豁免）与合并后解析检查；静默重编号变异的转红实测。
-- **SC-006 Source**: 074 回合的合并清单、回合记录与 seal 裁决（封装记录或拒绝清单），逐项对照 FR-027 的五项实测输入；重跑对照。
+- **SC-006 Source**: 074 回合的合并清单、回合记录与 seal 裁决（封装记录或拒绝清单），逐项对照 FR-027 的五项实测输入（下限），并核对五项之外阻断的逐条点名；重跑对照。
 - **SC-007 Source**: 归档入口的拒绝/通过夹具与引擎查询记录；单一 owner 的检索型断言（第二实现注入转红）。
 - **SC-008 Source**: 状态值域漂移守卫契约测试；仓库结构面的静态审计（引擎动作表、目录与注册表清单）；移除 `Sealed` 的变异实测。
 - **SC-009 Source**: 并发双写夹具的路径断言；seal 运行前后 review/测量文件哈希对照；脏树拒绝夹具。

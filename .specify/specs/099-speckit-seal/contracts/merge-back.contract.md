@@ -24,8 +24,14 @@
 
 候选宇宙恰为：`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`contracts/`、`research.md`、
 `quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`checklists/`、
-`checkpoints/`、`test-evidence/`、`notes/`。**必选下限**：`tasks.md` 无论是否产出都必须被处置；分片集合
-非空时，父 `verification.md`（聚合指针视图，缺席新建）、父 `review.md`（分片 review 记录的汇总指针视图，
+`checkpoints/`、`test-evidence/`、`notes/`。**目录型候选**（`contracts/`、`checklists/`、`checkpoints/`、
+`test-evidence/`、`notes/`）的合并单位是**文件**：按文件名在父级与全部分片间取并集，逐文件处置——两侧
+同名 → 该文件为合并单元（`merge`；内容按其声明结构归并，无法确定性归并或同一锚点双端编辑 → 冲突）；
+仅分片有 → `create`；仅父级有 → `keep`。`test-evidence/`、`checkpoints/` 内的既有日期化测量文件属
+dated record（C-020）：MUST NOT 复制或改写原件；同名时父级文件维持 `keep` 并在合并清单记录指向分片原件的
+指针，仅分片有时以父级指针视图（汇总行 + 指针）`create`，分片原件字节不变。**必选下限**：`tasks.md` 无论
+是否产出都必须被处置；分片集合非空时，父 `verification.md`（聚合指针视图，缺席新建）、父 `review.md`
+（分片 review 记录的汇总指针视图，缺席新建）、父 `code-review.md`（分片 code-review 记录的汇总指针视图，
 缺席新建）与 `merge-manifest.json` MUST 产出。其余候选按实际产出枚举：两侧皆有 → `merge`；仅分片有 →
 `create`；仅父级有 → `keep`（并接受同一套对齐检查）；两侧皆无 → `not-applicable`。MUST NOT 为单个输出件
 发明第二套合并流程；输出件差异只体现在其声明的 ID 家族与结构单元上。
@@ -63,7 +69,12 @@ MUST NOT 发明映射。父级与分片对同一映射单元的文本差异属**
 **C-017** — 词汇表对齐：共享字符串解析到合并后的唯一父级注册表。
 
 合并后每个 `[[STR-NNN]]` 引用 MUST 解析到父级唯一注册表。同一 ID 在分片与父级指向不同字面量（同号不同义）
-MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。出厂文档（框架源与镜像）中对分片本地 ID 的引用
+MUST 判为冲突，两侧字面量并列呈现，MUST NOT 静默重编号。**token→注册表绑定**：`[[STR-NNN]]` 的解析域由其
+声明登记处决定——spec 文档以自身 `requirements.md` § Shared Strings 为登记处（口径 owner：
+`shared/definitions/sdd-routing-definitions.md` § 字面量登记处）；spec 之外的出厂文档 MUST 显式声明所用登记处
+（spec 路径 + 节锚）。未声明登记处的引用 MUST 做跨登记处解析检查：恰好一个分片注册表命中且字面量一致 →
+按该分片本地 ID 检出并按本条记录解决方式；零命中、或多处命中且字面量不同 → 判为冲突，MUST NOT 猜测归属。
+出厂文档（框架源与镜像）中对分片本地 ID 的引用
 MUST 被检出：在合并后语义下解析会改变含义的引用，MUST 逐条记录解决方式（重指向合并后 ID / 改用逐字字面量 /
 用户豁免），并写入 manifest 的 `factory_doc_resolutions[]`（`{path, line, before, after, kind}`，
 `kind` ∈ `repoint | literal | user-waiver`）；`after` MUST 可核实（重跑不再复现该引用缺陷）。新术语 MUST 经 `.specify/glossary.md` 既有协议进入词汇表，MUST NOT 在 spec 内联定义第二份术语表。
@@ -92,7 +103,9 @@ MUST NOT 造成内容丢失；引擎 MUST NOT 以「较新/较全/较大/较后�
 
 分片的 `review.md`、`code-review.md`、`verification.md`、`test-evidence/` 与其它既有日期化测量 MUST NOT 被
 改写；父级合并视图 MUST 以「汇总行 + 指针」形态引用它们（与 074 父 `verification.md` 聚合指针形态同构）。
-引擎 MUST 在运行前后对上述文件取哈希并断言一致；MUST NOT 制造第二份测量。
+目录型候选内的 dated-record 文件按**指针纳入**处置：同名文件父级保持 `keep` 并在合并清单留指针，仅分片
+有时父级生成指针视图，MUST NOT 复制分片原件为父级副本。引擎 MUST 在运行前后对上述文件取哈希并断言一致；
+MUST NOT 制造第二份测量。
 
 (FR-019)
 
@@ -100,7 +113,7 @@ MUST NOT 造成内容丢失；引擎 MUST NOT 以「较新/较全/较大/较后�
 
 `plan.md`、`research.md`、`data-model.md`、`quickstart.md`、`feature-ref.md` 以父级文本为权威、保持原文本
 不变；分片独有章节（父级不存在同名标题）MUST 进入 `## Merged from slices` 附录区块并带 `<!-- source:
-<slice> -->` 来源标注；同名标题的差异按 C-016 归入 `localization`，不构成冲突。父级 `review.md` /
+<slice> -->` 来源标注；同名标题的差异按 C-016 归入 `localization`，不构成冲突。父级 `review.md` / `code-review.md` /
 `verification.md` 的合并视图按 C-013 / C-020 的「汇总 + 指针」形态生成。
 
 (FR-012, FR-019)

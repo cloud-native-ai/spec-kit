@@ -28,7 +28,7 @@
 **074 真实回合**（SC-006）是本特性的第一次验收：以 `.specify/specs/074-goal-team-sdd-unification/`
 为目标执行 split → merge-back → seal 全流程，五项实测输入缺陷（缺 `Path` 标记、STR 同号不同义、
 出厂文档引用分片本地 ID、驱动者记录的 P0 豁免、57 行拆前记录）逐条显式处置；回合终态是二值：
-`Sealed` 或与五项一一对应的具名阻断清单。
+`Sealed` 或至少逐条覆盖五项、并逐条点名额外阻断的拒绝清单。
 
 零新增重复机制：不新增第二套状态机/注册表/归档机制/调度器/并行 spec 树（FR-024，静态可核验）。
 
@@ -142,7 +142,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 - **binding_constraints**:
   - pole_a: 绿只能来自用户裁定或修复证据，代理的确认与「无人反对」不是豁免。
   - pole_b: 回合必须可执行到底并给出二值终态，不能停在「无法判定」。
-- **discriminating_evidence**: 在 074b P0 仍只有驱动者记录的状态下运行 `seal`；结果二值：`Sealed` / 与五项实测输入一一对应的具名阻断清单。
+- **discriminating_evidence**: 在 074b P0 仍只有驱动者记录的状态下运行 `seal`；结果二值：`Sealed` / 至少逐条覆盖五项实测输入、并逐条点名额外阻断的拒绝清单。
 - **expected_sacrifice**: SC-006 Source ↓ 074 的归档时点后移到用户裁定或修复落地之后。
 - **revision_trigger**: 用户对 P0 给出显式裁定，或修复证据落地 → 立即重跑同一回合（同一确定性清单机制），不改变判定代码。
 - **tension_id**: T-005

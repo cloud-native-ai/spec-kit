@@ -49,7 +49,7 @@
 - DoD-3: **引擎契约** — `seal-utils.py` 动作封闭集恰四值、退出码封闭集恰三值、`--help`/`--version` 零副作用、未声明选项非零拒绝（FR-021、C-001…C-004）。Check: `bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q` 全绿。
 - DoD-4: **确定性与幂等** — `merge-apply` 两次运行逐字节一致、成功重跑零 diff；`seal` 重跑 `already-sealed`；阻断态重跑拒绝清单一致（FR-013、FR-028、C-014、C-007、C-038）。Check: `bash scripts/bash/run-tests.sh tests/integration/test_seal_merge_determinism.py tests/contract/test_seal_seal.py -q` 全绿。
 - DoD-5: **拒绝零持久化且逐条点名** — 八类拒绝各以封闭码具名、状态不变、报告含全部未满足条件与修复路径；`state-drift`/`closure-input-defect` 走 exit 2 且不读作通过（FR-009、C-006、C-042）。Check: `bash scripts/bash/run-tests.sh tests/contract/test_seal_seal.py -q` 全绿。
-- DoD-6: **074 回合二值终态** — `.specify/specs/074-goal-team-sdd-unification/` 回合产出完整合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0；seal 终态为 `Sealed` 或与 FR-027 五项实测输入一一对应的具名阻断清单；重跑清单一致（SC-006、FR-027、FR-028）。Check: `test-evidence/074-round-20261110.txt` 存在且五个 FR-027 项各有 resolved/blocked 记录。
+- DoD-6: **074 回合二值终态** — `.specify/specs/074-goal-team-sdd-unification/` 回合产出完整合并清单与父级汇总视图；父 `tasks.md` 未勾选行为 0；seal 终态为 `Sealed` 或至少逐条覆盖 FR-027 五项实测输入（额外具名阻断逐条点名）的拒绝清单；重跑清单一致（SC-006、FR-027、FR-028）。Check: `test-evidence/074-round-20261110.txt` 存在且五个 FR-027 项各有 resolved/blocked 记录。
 - DoD-7: **零新增重复机制** — 引擎动作表无 move/delete/archive/push/scheduler；状态值域单 owner；无第二注册表/台账/并行 spec 树（FR-024、SC-008、C-008、C-036）。Check: `bash scripts/bash/run-tests.sh tests/contract/test_seal_boundaries.py tests/contract/test_seal_archive_gate.py -q` 全绿。
 - DoD-8: **镜像与副本生成** — `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 零新增漂移（相对 T001 冻结基线）（FR-021、plan § Mirror Obligations）。Check: GATE-2。
 - DoD-9: **final 判据全 pass 且有 smoke 记录** — `verification.md` 每条 SC 一行状态，`**Path**: final` 判据均为 `pass`，smoke 三键齐备（GATE-4）。Check: GATE-4。
@@ -144,21 +144,21 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for User Story 2 (plan face, MANDATORY) ⚠️
 
-- [ ] T018 [P] [US2] 构建夹具树 `tests/fixtures/seal/`：`split-pair/`（父 `099-fixture-parent` + 两片各带 `## Parent Mapping` 与 `.specify/state/<parent>.md` 拆分记录）、`conflict-injections/`（同号不同义 `[[STR-NNN]]`、无映射条目、只命中一半条件的分片候选、同一锚点双端编辑）、`factory-doc/`（出厂文档引用分片本地 ID）（FR-011、FR-013、FR-017）。
-- [ ] T019 [US2] 写红先契约测试 `tests/contract/test_seal_merge_plan.py`：两条件分片集合、声明顺序与 `order_basis`、15 项封闭候选的动作分类（`merge|create|keep|not-applicable` 且 `not-applicable` 带 `basis`）、`id_maps` 家族、同号不同义与无映射冲突、出厂文档分片本地 ID 检出，红输出记入 `notes/red-first-evidence.md`（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、SC-005、[blockedBy: T018]）。
+- [ ] T018 [P] [US2] 构建夹具树 `tests/fixtures/seal/`：`split-pair/`（父 `099-fixture-parent` + 两片各带 `## Parent Mapping` 与 `.specify/state/<parent>.md` 拆分记录）、`conflict-injections/`（同号不同义 `[[STR-NNN]]`、未声明登记处的 `[[STR-NNN]]`（跨登记处歧义）、无映射条目、只命中一半条件的分片候选、同一锚点双端编辑、目录同名文件三态）、`factory-doc/`（出厂文档引用分片本地 ID）（FR-011、FR-013、FR-017）。
+- [ ] T019 [US2] 写红先契约测试 `tests/contract/test_seal_merge_plan.py`：两条件分片集合、声明顺序与 `order_basis`、15 项封闭候选的动作分类（`merge|create|keep|not-applicable` 且 `not-applicable` 带 `basis`）、目录型候选的文件级单元与同名三态、dated-record 文件的指针纳入（不复制原件）、token→注册表绑定（未声明登记处的引用检出与歧义冲突）、`id_maps` 家族、同号不同义与无映射冲突、出厂文档分片本地 ID 检出，红输出记入 `notes/red-first-evidence.md`（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、SC-005、[blockedBy: T018]）。
 
 ### Implementation for User Story 2 (merge-plan)
 
-- [ ] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。
+- [ ] T020 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-plan` 只读动作：分片发现（C-011 双条件）、顺序派生与依据留痕、15 项候选逐件动作（目录型候选按文件级单位、dated-record 文件指针纳入）、token→注册表绑定检查、ID 家族映射与冲突收集、稳定 JSON，零写盘（FR-011、FR-012、FR-014、FR-015、FR-016、FR-017、C-011…C-018、[blockedBy: T019]）。
 
 ### Tests for User Story 2 (apply face, MANDATORY) ⚠️
 
-- [ ] T021 [US2] 写红先契约测试 `tests/contract/test_seal_merge_apply.py`：`merge/create/keep` 动作结果、全部引用改写为合并后 ID、拆前行 `supersede` 处置、恰一行 `**Merged into**:` 分片标注、`merge-manifest.json` schema（稳定键序、自摘要、`checks`）、dated-record 哈希稳定、合并后 fixture 父级的 `validate-requirements.py` / `validate-tasks.py` exit 0，红输出记入 `notes/red-first-evidence.md`（FR-018、FR-019、SC-004、[blockedBy: T020]）。
+- [ ] T021 [US2] 写红先契约测试 `tests/contract/test_seal_merge_apply.py`：`merge/create/keep` 动作结果（含目录型候选的文件级单位与同名三态）、dated-record 指针纳入（无父级副本、原件字节不变）、全部引用改写为合并后 ID、拆前行 `supersede` 处置、恰一行 `**Merged into**:` 分片标注、`merge-manifest.json` schema（稳定键序、自摘要、`checks`）、dated-record 哈希稳定、合并后 fixture 父级的 `validate-requirements.py` / `validate-tasks.py` exit 0，红输出记入 `notes/red-first-evidence.md`（FR-018、FR-019、SC-004、[blockedBy: T020]）。
 - [ ] T022 [US2] 写红先集成测试 `tests/integration/test_seal_merge_determinism.py`：两次运行 sha256 名单逐字节一致、`merge-apply` 重跑零 diff、把任一排序键改为「返回时刻」的变异转红，红输出记入 `notes/red-first-evidence.md`（FR-013、SC-003、[blockedBy: T020]）。
 
 ### Implementation for User Story 2 (merge-apply)
 
-- [ ] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。
+- [ ] T023 [US2] 在 `scripts/python/seal-utils.py` 实现 `merge-apply` 动作：确定性写父级合并产物（目录型候选按文件级单位；dated-record 文件只写指针视图、不复制原件）、`merge-manifest.json`、分片 `**Merged into**:` 标注、C-017 记录过解决方式的出厂文档引用修正（含未声明登记处的引用检出）、C-022 的 supersede 处置、dated-record 哈希断言；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-012、FR-013、FR-018、FR-019、FR-020、C-014、C-019…C-023、[blockedBy: T021,T022]）。
 - [ ] T024 [US2] 用既有验证器证成合并产物：对合并后的 fixture 父级运行 `python3 scripts/python/validate-requirements.py` 与 `python3 scripts/python/validate-tasks.py`（均 exit 0），并扫描 ID 连续、重复 ID、悬空引用与未勾选行计数，读数记入 `test-evidence/merge-apply-checks.txt`（FR-014、SC-004、[blockedBy: T023]）。
 
 **Checkpoint**: 合并回写在夹具上确定性成立，冲突显式且阻断。
@@ -174,12 +174,12 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
 - [ ] T025 [US1] 构建封装修剪夹具：`tests/fixtures/seal/single-spec/`（review 干净、`code-review.md` 零 `blocking`、`verification.md` 每条 SC 有状态行、SC 行带行尾 `**Path**` 标记、注册表+详情同处 `Ready for Review`）与 `tests/fixtures/seal/seal-refusals/` 八类失败夹具（from 状态错误、P0 未处置含仅驱动者豁免、验收状态行缺失、闭包 exit 2、分片存在未决冲突、分片未闭合、脏 spec 树、`state-drift`）及「三缺一」变异夹具（FR-005、FR-006、FR-007、FR-008、FR-009、SC-001、SC-002、[blockedBy: T024]）。
-- [ ] T026 [US1] 写红先契约测试 `tests/contract/test_seal_seal.py`：主路径（exit 0、`seal.md` 落盘、注册表行与详情同批 `Sealed`）、幂等重跑（`already-sealed`、无第二份回执、状态面不动）、八类拒绝逐夹具点名封闭码且状态不变、「三缺一」变异转红、074 形态的闭包 exit 2 报 `closure-input-defect` 且不读作通过，红输出记入 `notes/red-first-evidence.md`（FR-005、FR-006、FR-007、FR-008、FR-009、FR-010、SC-001、SC-002、[blockedBy: T025]）。
+- [ ] T026 [US1] 写红先契约测试 `tests/contract/test_seal_seal.py`：主路径（exit 0、`seal.md` 落盘、注册表行与详情同批 `Sealed`）、幂等重跑（`already-sealed`、无第二份回执、状态面不动）、八类拒绝逐夹具点名封闭码（含分片未闭合报 `slice-unclosed`）且状态不变、「三缺一」变异转红、074 形态的闭包 exit 2 报 `closure-input-defect` 且不读作通过，红输出记入 `notes/red-first-evidence.md`（FR-005、FR-006、FR-007、FR-008、FR-009、FR-010、SC-001、SC-002、[blockedBy: T025]）。
 - [ ] T027 [US1] 写红先契约测试 `tests/contract/test_seal_concurrency_and_readonly.py`：两条并行写者对不同 spec 写出不同路径（无共享可变聚合）、`seal` 运行前后 review 与分片测量文件哈希一致、`dirty-spec-tree` 拒绝并指名路径，红输出记入 `notes/red-first-evidence.md`（FR-019、FR-020、SC-009、C-037、C-039、C-040、[blockedBy: T026]）。
 
 ### Implementation for User Story 1
 
-- [ ] T028 [US1] 在 `scripts/python/seal-utils.py` 实现 `seal` 只读判定段：状态对读取（与闭包引擎 `resolve_claimed_status` 同源；不一致/缺失 → `state-drift` exit 2）、review/P0 判定（C-044 两载体 `- **User waiver**:` 字面形式才计豁免）、`code-review.md` 的 `blocking` 扫描、闭包子进程与七键回执逐字复制（exit 2 → `closure-input-defect`）、`merge-manifest.json` 完成度检查（`not-applicable` 须带 `basis`）、`git status --porcelain -- <parent-spec-dir>` 脏树探测、以及 stdout-only 且顺序稳定的拒绝报告（FR-004、FR-005、FR-006、FR-007、FR-008、FR-009、C-031、C-042、[blockedBy: T026,T027]）。
+- [ ] T028 [US1] 在 `scripts/python/seal-utils.py` 实现 `seal` 只读判定段：状态对读取（与闭包引擎 `resolve_claimed_status` 同源；不一致/缺失 → `state-drift` exit 2）、review/P0 判定（C-044 两载体 `- **User waiver**:` 字面形式才计豁免）、`code-review.md` 的 `blocking` 扫描与 `review.md`/`code-review.md` 缺失判定（`review-missing`）、闭包子进程与七键回执逐字复制（exit 2 → `closure-input-defect`）、`merge-manifest.json` 完成度检查（`not-applicable` 须带 `basis`）与分片闭合判据（`slice-unclosed`：未勾选行计数 + `[~]` 的 `deferred_tasks=` 记录）、`git status --porcelain -- <parent-spec-dir>` 脏树探测、以及 stdout-only 且顺序稳定的拒绝报告（FR-004、FR-005、FR-006、FR-007、FR-008、FR-009、C-031、C-042、[blockedBy: T026,T027]）。
 - [ ] T029 [US1] 实现 `seal` 写入段：同批原子写 `seal.md`（data-model § 3 封闭字段集，重封装写 `supersedes`）、注册表行（`Status` 与 `Last Updated`）与特性详情（`Status` 与 `## Latest Review` 追加），任一写入失败按原字节恢复本批已写文件并 exit 2；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-002、FR-004、FR-009、FR-010、C-005、C-032、C-033、C-034、[blockedBy: T028]）。
 
 **Checkpoint**: 干净单体 spec 可封装；八类拒绝具名且零持久化；重跑幂等。
@@ -215,14 +215,14 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 **Goal**: 以 `.specify/specs/074-goal-team-sdd-unification/` 为目标执行真实 split → merge-back → seal 回合，五项实测输入缺陷逐条显式处置，终态二值（`Sealed` 或具名阻断清单）。
 
-**Independent Test**: 在 074 当前树（074a 32/32、074b 26/26 闭合；父 `tasks.md` 57 个 `[ ]` 行；父级无 `review.md`/`code-review.md`；父 `verification.md` 为聚合指针集）运行完整回合——断言合并清单覆盖两片全部实际输出件、父 `tasks.md` 未勾选行为 0、父 `verification.md` 每条 SC 有状态行、seal 裁决与 FR-027 五项一一对应、阻断态重跑清单一致。
+**Independent Test**: 在 074 当前树（074a 32/32、074b 26/26 闭合；父 `tasks.md` 57 个 `[ ]` 行；父级无 `review.md`/`code-review.md`；父 `verification.md` 为聚合指针集）运行完整回合——断言合并清单覆盖两片全部实际输出件、父 `tasks.md` 未勾选行为 0、父 `verification.md` 每条 SC 有状态行、seal 裁决至少逐条覆盖 FR-027 五项（额外阻断逐条点名）、阻断态重跑清单一致。
 
-- [ ] T039 [US3] 对 074 运行 `merge-plan` 并逐条处置其报告的冲突（C-018 的 `recheck-clean`）:（a）出厂文档 `skills/internal/create-team/SKILL.md:99,101` 的 `[[STR-004]]`/`[[STR-005]]`/`[[STR-006]]` 是 074b 本地语义（`completed`/`blocked`/`failed`），存在性判定成立但合并后须重指向父级 `[[STR-007]]`/`[[STR-008]]`/`[[STR-009]]`（值同，实测 2026-11-10）或改用逐字字面量并记录；（b）为 074 父 `requirements.md` 每条 SC 行补恰一个行尾 `**Path**: final`（严格默认、逐条记录）——实测 2026-11-10 `grep -c '\*\*Path\*\*' .specify/specs/074-goal-team-sdd-unification/requirements.md` = 0（FR-016、FR-027(a)、FR-027(c)、SC-006、[blockedBy: T038]）。
-- [ ] T040 [US3] 对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `merge-apply`：产出父级合并 `tasks.md`（拆前未勾选行按 C-022 以 `> ` 引用前缀保留进「Superseded pre-split record」块——实测 2026-11-10 父 `tasks.md` 未勾选行 57）、父 `verification.md` 聚合指针视图补齐（每条 SC 有状态行）、父 `review.md` 汇总指针视图（两片 review 记录的汇总，缺席新建）、`merge-manifest.json`（逐输出件动作、`id_maps`、`dispositions`、`factory_doc_resolutions`、`checks`）与两片 `requirements.md` 的 `**Merged into**:` 标注（FR-012、FR-018、FR-019、FR-026、SC-006、[blockedBy: T039]）。
+- [ ] T039 [US3] 对 074 运行 `merge-plan` 并逐条处置其报告的冲突（C-018 的 `recheck-clean`；含两组 STR 同号不同义的声明映射核验：074a 本地 `STR-010` → 父 `STR-011`，074b 本地 `STR-004`–`STR-007` → 父 `STR-007`–`STR-010`）:（a）出厂文档 `skills/internal/create-team/SKILL.md:99,101` 的 `[[STR-004]]`/`[[STR-005]]`/`[[STR-006]]` 是 074b 本地语义（`completed`/`blocked`/`failed`），存在性判定成立但合并后须重指向父级 `[[STR-007]]`/`[[STR-008]]`/`[[STR-009]]`（值同，实测 2026-11-10）或改用逐字字面量并记录；（b）为 074 父 `requirements.md` 每条 SC 行补恰一个行尾 `**Path**: final`（严格默认、逐条记录）——实测 2026-11-10 `grep -c '\*\*Path\*\*' .specify/specs/074-goal-team-sdd-unification/requirements.md` = 0（FR-016、FR-027(a)、FR-027(b)、FR-027(c)、SC-006、[blockedBy: T038]）。
+- [ ] T040 [US3] 对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `merge-apply`：产出父级合并 `tasks.md`（拆前未勾选行按 C-022 以 `> ` 引用前缀保留进「Superseded pre-split record」块——实测 2026-11-10 父 `tasks.md` 未勾选行 57）、父 `verification.md` 聚合指针视图补齐（每条 SC 有状态行）、父 `review.md` 汇总指针视图（两片 review 记录的汇总，缺席新建）、父 `code-review.md` 汇总指针视图（两片 code-review 记录的汇总，缺席新建）、`merge-manifest.json`（逐输出件动作、目录候选文件级单元、dated-record 指针、`id_maps`、`dispositions`、`factory_doc_resolutions`、`checks`）与两片 `requirements.md` 的 `**Merged into**:` 标注（FR-012、FR-018、FR-019、FR-026、SC-006、[blockedBy: T039]）。
 - [ ] T041 [US3] 回合后置校验：`python3 scripts/python/validate-tasks.py .specify/specs/074-goal-team-sdd-unification/tasks.md` exit 0 且未勾选行为 0、`python3 scripts/python/validate-requirements.py .specify/specs/074-goal-team-sdd-unification/requirements.md` exit 0、两片 dated record（`review.md`/`code-review.md`/`verification.md`/`test-evidence/`）运行前后哈希一致，读数记入 `test-evidence/074-merge-checks.txt`（FR-019、SC-004、SC-009、[blockedBy: T040]）。
 - [ ] T042 [US3] 写集成测试 `tests/integration/test_seal_074_round.py`：真实树只读 `merge-plan` 面断言（两片以 `order_basis: split-record` 被识别、冲突类别具名）与阻断态重跑一致性；测试 MUST NOT 改写 074 树（FR-026、FR-028、SC-006、[blockedBy: T041]）。
-- [ ] T043 [US3] 先提交回合产物（074 父目录 + 两片标注 + 出厂文档修正），再对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `seal`，把完整 stdout 裁决捕获到 `test-evidence/074-round-20261110.txt`；终态 MUST 二值——`Sealed`（exit 0）或与 FR-027 五项实测输入一一对应的具名阻断清单（exit 1；`state-drift` 为 exit 2）；重跑一次证明清单一致（FR-026、FR-027、FR-028、SC-006、plan § Decision Tensions T-005、[blockedBy: T042]）。
-- [ ] T044 [US3] 把回合裁决写入既有承载（不建第三份台账）：`merge-manifest.json` 的 `conflicts[]`/`dispositions[]`、仅 `Sealed` 时的 `seal.md` `waivers[]`、被阻断时的 `test-evidence/074-round-20261110.txt`；FR-027 五项（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、074b P0 仅驱动者豁免、57 行拆前记录）逐项呈 `resolved`（证据指针）或 `blocked`（理由），无第三态、无静默默认（FR-027、C-043、[blockedBy: T043]）。
+- [ ] T043 [US3] 先提交回合产物（074 父目录 + 两片标注 + 出厂文档修正），再对 `.specify/specs/074-goal-team-sdd-unification/` 运行 `seal`，把完整 stdout 裁决捕获到 `test-evidence/074-round-20261110.txt`；终态 MUST 二值——`Sealed`（exit 0）或至少逐条覆盖 FR-027 五项实测输入、并逐条点名额外阻断的拒绝清单（exit 1；`state-drift` 为 exit 2）；重跑一次证明清单一致（FR-026、FR-027、FR-028、SC-006、plan § Decision Tensions T-005、[blockedBy: T042]）。
+- [ ] T044 [US3] 把回合裁决写入既有承载（不建第三份台账）：`merge-manifest.json` 的 `conflicts[]`/`dispositions[]`、仅 `Sealed` 时的 `seal.md` `waivers[]`、被阻断时的 `test-evidence/074-round-20261110.txt`；FR-027 五项（缺 `Path` 标记、STR 同号不同义、出厂文档引用分片本地 ID、074b P0 仅驱动者豁免、57 行拆前记录）逐项呈 `resolved`（证据指针）或 `blocked`（理由），五项之外阻断同样逐条落承载，无第三态、无静默默认（FR-027、C-043、[blockedBy: T043]）。
 
 **Checkpoint**: 074 回合可执行、可复现、裁决完整（`Sealed` 或具名阻断）。
 

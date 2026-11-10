@@ -58,8 +58,8 @@ python3 scripts/python/seal-utils.py --action merge-plan \
 
 预期形态：退出 `1`（存在开放冲突）或 `0`（无冲突）；JSON 负载含分片集合（`074a-authorized-routing`、
 `074b-nested-governance`，`order_basis: split-record`）、15 项输出件的动作分类、ID 映射表与冲突清单。
-074 的已知合并冲突至少包含：STR 同号不同义（074b 本地 004/005/006）与出厂文档
-`create-team/SKILL.md` 的分片本地 ID 引用。（"SC 行缺 `**Path**` 标记"不是合并冲突——它是闭包输入缺陷，
+074 的已知合并冲突至少包含：STR 同号不同义（074a 本地 `STR-010` → 父 `STR-011`；074b 本地
+004/005/006 与 007）与出厂文档 `create-team/SKILL.md` 的分片本地 ID 引用。（"SC 行缺 `**Path**` 标记"不是合并冲突——它是闭包输入缺陷，
 在 `seal` 阶段报 `closure-input-defect`；回合的处置是补标记后重跑，见 S-7。）
 
 > **不可执行于 plan 阶段。** Premises：(a) `seal-utils.py` 存在且动作 `merge-plan` 已实现（P3）；
@@ -119,7 +119,7 @@ python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/099
 ## S-5 八类拒绝各点一次名（`seal` 失败路径）
 
 逐个夹具运行（每个夹具只注入一种缺陷）：from 状态错误、P0 未处置（含只有驱动者豁免）、
-验收状态行缺失、闭包引擎 exit 2、分片存在未决冲突、分片未闭合、脏 spec 树、状态面漂移。
+验收状态行缺失、闭包引擎 exit 2、分片存在未决冲突、分片未闭合（`slice-unclosed`）、脏 spec 树、状态面漂移。
 
 ```bash
 python3 scripts/python/seal-utils.py --action seal --spec-dir <fixture> --json; echo "exit=$?"
@@ -168,8 +168,8 @@ git commit -m "chore(074): merge back slices"
 python3 scripts/python/seal-utils.py --action seal --spec-dir .specify/specs/074-goal-team-sdd-unification --json > .specify/specs/099-speckit-seal/test-evidence/074-round-$(date -u +%Y%m%d).txt 2>&1; echo "exit=$?"
 ```
 
-期望终态（二值）：`Sealed`（`exit=0`），或与 FR-027 五项实测输入一一对应的具名阻断清单（`exit=1` 或
-`state-drift` 的 `exit=2`）；阻断态重跑 MUST 清单一致。
+期望终态（二值）：`Sealed`（`exit=0`），或至少逐条覆盖 FR-027 五项实测输入、并逐条点名额外阻断的拒绝清单
+（`exit=1` 或 `state-drift` 的 `exit=2`）；阻断态重跑 MUST 清单一致。
 
 > **不可执行于 plan 阶段。** Premises：(a) 五项输入缺陷的实测形态按 research R-9/R-10/R-12/R-17（本日实测）；
 > (b) 074b 的 P0 豁免只有驱动者记录，除非回合内出现修复证据或用户以 `- **User waiver**:` 字面裁定（C-044）；
