@@ -58,7 +58,8 @@
 - **Implemented**: [STATUS_IMPLEMENTED_CRITERIA]
 - **Blocked**: [STATUS_BLOCKED_CRITERIA]
 - **Ready for Review**: [STATUS_READY_FOR_REVIEW_CRITERIA]
-- **Completed**: [STATUS_COMPLETED_CRITERIA]
+- **Sealed**: [STATUS_SEALED_CRITERIA]
+- **Completed** (legacy — closed for new work): [STATUS_COMPLETED_CRITERIA]
 
 ### Canonical Status State Machine (single source of truth)
 
@@ -76,7 +77,9 @@ Owner of the schemas projected here: `shared/workflow/acceptance-hardening.md` �
 | Blocked | Ready for Review | **illegal** | Not a transition. A blocked feature has not earned review; it MUST re-enter through `Implemented`. |
 | Implemented | Blocked | `/speckit.implement` / `/speckit.review` — audit correction | Permitted **only** as an audit correction, and only while it cites the evidence that makes the earlier claim false. |
 | Implemented | Ready for Review | `/speckit.review` (or human) | **Four conjunctive conditions, all required**: every deferred (`[~]`) task resolved or explicitly waived; review evidence produced; the current code-segment record (`code-review.md`) contains no `blocking` entry; and no `final`-path criterion sits in `blocked` / `deferred` / `fail` unless an explicit user waiver names it. Stated in full in **the gate below**, which owns them — this cell is their summary. |
-| Ready for Review | Completed | Human / governance | Final acceptance. |
+| Ready for Review | Sealed | `/speckit.seal` | **Terminal status for new work.** Review concluded with zero unhandled P0, acceptance records complete, merge-back done when slices exist — the conjunctive conditions are owned by `shared/workflow/acceptance-hardening.md` § Feature Status, and this cell is their summary. |
+| Ready for Review | Completed | **legacy only — closed for new work** | Retained for records written before `Sealed` existed: no retroactive rewrite, no downgrade, and new work MUST NOT land `Completed`. A legacy `Completed` row does not automatically earn archive admission. |
+| Sealed | Ready for Review | `/speckit.seal` — audit correction | Permitted **only** as an audit correction, and only while it cites the evidence that falsifies the seal conclusion (same shape as `Implemented → Blocked`). |
 
 #### `Planned → Implemented` — four conjunctive conditions
 
@@ -89,7 +92,7 @@ All four MUST hold. Three of four is `Blocked`.
 
 A feature that satisfies (1), (2) and (4) but not (3) — zero open tasks, a status row per criterion, a green smoke — is exactly the shape that used to be readable as `Implemented`, and it is `Blocked`.
 
-**Never regress — one narrow exception.** Every backward transition stays illegal, with exactly one exception: `Implemented → Blocked` as an audit correction, and only while it cites the evidence that makes the false claim false. "The user did not object", an agent's own confirmation, and a later discovery that nobody wrote down are not evidence.
+**Never regress — two narrow audit corrections.** Every backward transition stays illegal, with exactly two exceptions, each an audit correction that cites its evidence: `Implemented → Blocked` and `Sealed → Ready for Review`, and only while the citation makes the earlier claim false. "The user did not object", an agent's own confirmation, and a later discovery that nobody wrote down are not evidence. Neither exception widens into a general rollback channel.
 
 **Critical contract**: `/speckit.plan` MUST land status `Planned` (not `Implemented`). `/speckit.implement` MUST advance `Planned → Implemented` only when all four conditions above hold, and MUST land `Blocked` when they do not; if any task is `[~]` deferred, append a ` (deferred: T<comma-list>)` suffix to the `Last Updated` cell in `features.md` so the deferral is visible at the index level.
 
@@ -115,7 +118,7 @@ A feature that satisfies (1), (2) and (4) but not (3) — zero open tasks, a sta
 | [FEATURE_NAME] | Short human-readable name (2-5 words) |
 | [FEATURE_SLUG] | Kebab-case combination of ID + normalized name (e.g., 001-feature-mechanism-redesign) |
 | [FEATURE_DESCRIPTION] | One-line summary in natural language |
-| [FEATURE_STATUS] | Draft | Planned | Implemented | Blocked | Ready for Review | Completed |
+| [FEATURE_STATUS] | Draft | Planned | Implemented | Blocked | Ready for Review | Sealed | Completed |
 | [FEATURE_CREATED_DATE] | ISO date when first created (YYYY-MM-DD) |
 | [FEATURE_LAST_UPDATED_DATE] | ISO date of last modification (YYYY-MM-DD) |
 | [FEATURE_OVERVIEW] | Paragraph explaining motivation and context |

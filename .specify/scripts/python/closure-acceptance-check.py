@@ -253,9 +253,11 @@ SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path", "smok
 #: declaration is unreadable; `FLOW_CLASSES_LABEL` is emitted in that case.
 DEFAULT_FLOW_CLASS = FLOW_CLASSES[0] if FLOW_CLASSES else "execution"
 
-#: Claimed statuses that assert the feature is already implemented. V-12: the claimed-but-blocked
+#: Claimed statuses that assert the feature is already implemented. `Sealed` joins the family
+#: because sealing claims every final-path criterion passed (099 plan § Disclosed Rulings 3), so a
+#: `Sealed` row plus a `block` verdict is a detectable contradiction. V-12: the claimed-but-blocked
 #: reason can only fire for one of these, so a `Planned → Implemented` run never emits it.
-CLAIMED_IMPLEMENTED = ("Implemented", "Ready for Review")
+CLAIMED_IMPLEMENTED = ("Implemented", "Ready for Review", "Sealed")
 
 #: Cells that carry no content. A dash is how these tables spell "nothing here", so it must read as
 #: empty rather than as a value (the fixtures use the em dash for a verified premise's absent

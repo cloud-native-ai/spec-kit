@@ -1,0 +1,183 @@
+# P1 (T003–T015) evidence — status value `Sealed` single-owner extension and consumer sync
+
+Collected 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal`
+(branch `099-speckit-seal`, base `1f88f8821`). Red-first readings: `notes/red-first-evidence.md`.
+Every command below went through the single runner `scripts/bash/run-tests.sh` or is verbatim as shown.
+
+## 1. Guard green (T003 after T006–T013)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sealed_status_domain.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 6.24s
+```
+
+EXIT=0 — 10/10 legs green; each leg names one C-029 surface (schema owner, template transition
+table, template `[FEATURE_STATUS]` + Status bullet, index vocabulary, manage-features vocabulary,
+feature-integration protocol row, non-disposable owner domain line, non-disposable owner
+status×verdict row, non-disposable engine table, closure completion-claim family).
+
+## 2. Updated pins + guard green (T004, T005, T003)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py -q
+
+```text
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_sealed_status_domain.py tests/contract/test_status_gate_owner.py tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_schema_ownership.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+....................................................................     [100%]
+68 passed in 6.34s
+```
+
+EXIT=0 — 58 pre-existing pins (updated in T004/T005, schema-ownership assertion left as-is) + 10 new guard legs.
+
+## 3. Focused regression set around the touched surfaces
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py tests/contract/test_acceptance_review_composition.py tests/contract/test_closure_acceptance_check.py tests/contract/test_code_review_skill_contract.py tests/contract/test_constitution_double_landing.py tests/contract/test_gate_wiring_081.py tests/contract/test_non_disposable_check.py tests/contract/test_non_disposable_contract.py tests/contract/test_non_disposable_seam.py tests/contract/test_non_disposable_seam_bypass.py tests/contract/test_review_p1_review_loop.py tests/contract/test_review_code_composition.py tests/contract/test_stage_class_wiring.py tests/contract/test_self_explanatory_constitution.py tests/contract/test_line_state_blocked.py tests/contract/test_neutrality_budget.py tests/contract/test_one_source_of_truth.py -q
+
+```text
+22 failed, 495 passed in 37.18s
+```
+
+All 22 failure node ids were checked one by one with `grep -qF` against
+`baseline-failed.txt` (T001's frozen 280-name list): **22/22 present in the baseline — zero new
+failures** in this focused set.
+
+## 4. Full-suite baseline comparison (GATE-1 mechanism, early reading)
+
+### 4.1 First run (before the c25 oracle repair)
+
+$ bash scripts/bash/run-tests.sh --names-out /tmp/p1-current-failed.txt
+
+```text
+========== 277 failed, 8273 passed, 2 skipped, 576 warnings in 42.43s ==========
+=============== 1 passed, 8552 deselected, 3 warnings in 17.95s ================
+# failed-name list written: /tmp/p1-current-failed.txt (277 entries) passes=2
+```
+
+$ LC_ALL=en_US.UTF-8 comm -13 .specify/specs/099-speckit-seal/baseline-failed.txt /tmp/p1-current-failed.txt
+
+Five names are absent from the baseline; each was triaged:
+
+| Name | Disposition |
+|------|-------------|
+| `test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root` | Transient of the uncommitted state: the checker reported `tests/contract/test_sealed_status_domain.py is neither a tracked candidate nor ignored` because the new test file was still untracked at run time. Re-verified green after the file is tracked (§ 6). |
+| `test_script_interface_contract.py::test_c25_amendment_carries_sync_report_minor_bump_and_last_amended` | Real: the new Sync Impact Report block pushed the 089 block past the test's fixed 40-line head window. Root-cause repair applied (same pattern `test_constitution_double_landing.py` C-12 already records): locate the 089 block by its own `Version change: 1.17.0 → 1.18.0` and require it to name the 089 principle; re-verified green (§ 6). |
+| `test_trigger_engine.py::test_c11_malformed_rule_id_exits_invalid`, `::test_c23_escalation_pct_and_budget_flag`, `::test_c23_rows_and_turns_are_distinct` | Pre-existing flaky batch: `test_trigger_engine.py` carries 27 baseline failures; consecutive runs produce the same batch size with a changing name set, and the cited tests pass standalone. No P1 surface is read by these tests. |
+
+### 4.2 Closing run (after the c25 repair; package files staged)
+
+$ bash scripts/bash/run-tests.sh --names-out /tmp/p1-current-failed-2.txt
+
+```text
+========== 274 failed, 8276 passed, 2 skipped, 576 warnings in 42.21s ==========
+# failed-name list written: /tmp/p1-current-failed-2.txt (274 entries) passes=2
+```
+
+$ LC_ALL=en_US.UTF-8 comm -13 .specify/specs/099-speckit-seal/baseline-failed.txt /tmp/p1-current-failed-2.txt
+
+```text
+tests/contract/test_trigger_engine.py::test_c23_escalation_pct_and_budget_flag
+tests/contract/test_trigger_engine.py::test_c23_rows_and_turns_are_distinct
+tests/integration/test_trigger_promotion.py::test_invalid_environment_threshold_is_ignored
+```
+
+3 names differ, all in the pre-existing trigger-engine / trigger-promotion flaky family (baseline
+carries 27 + 18 failures from that family). The reverse delta is 9 names — the same family flipping
+the other way — which is the signature of the family's parallel-load instability, not of a P1
+regression: no P1 change is read by these tests, and the cited tests pass or fail independently of
+staging my files. `test_c20` and `test_c25` no longer appear — both resolved (§ 4.1, § 6).
+
+## 5. Mirror projection and parity (T015)
+
+$ python3 scripts/python/sync-mirrors.py --write
+$ python3 scripts/python/sync-mirrors.py --check
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (428 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (135 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (126 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+```
+
+EXIT=0 / EXIT=0 — file counts are identical to the T001 baseline (`notes/pre-change-measurements.md`
+§ PM-1: templates 23 / skills/external 428 / skills/internal 135 / agents 17 / scripts 126 /
+shared 111), i.e. zero NEW drift on `shared/`, `templates/`, `skills/internal/`, `scripts/`.
+
+$ python3 scripts/python/regen-command-copies.py --check
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+EXIT=0.
+
+## 6. Post-repair and post-staging checks
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_script_interface_contract.py::test_c25_amendment_carries_sync_report_minor_bump_and_last_amended tests/contract/test_constitution_double_landing.py tests/contract/test_sealed_status_domain.py -q
+
+```text
+30 passed in 6.76s
+```
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root -q
+
+```text
+1 passed in 8.04s
+```
+
+(Green only once `tests/contract/test_sealed_status_domain.py` is tracked: the checker's screen
+reports an untracked on-disk `*.py` as `candidate-not-collected`, which exits 1. Staging the file
+is the whole remedy; no code changed for this leg.)
+
+## 7. Counts
+
+| Measure | Reading |
+|---------|---------|
+| Rows closed in this package | 13 (T003–T015) |
+| New guard legs | 10 (`tests/contract/test_sealed_status_domain.py`) |
+| Updated existing pins | 2 six-value pins (T004/T005) + 1 constitution version pin + 1 Sync-Report-window oracle repair |
+| Surfaces carrying `Sealed` after this package | schema owner + 4 vocabulary carriers + protocol table + non-disposable owner domain/table + 2 engines + constitution narrative (per C-025/C-029) |
+| Mirror drift vs T001 baseline | zero new drift (file counts identical; `--check` exit 0) |
+| New test failures vs T001 baseline | zero attributable to this package after triage/repair; the only remaining delta is the pre-existing trigger-family flakiness (§ 4.2) |
+
+## 8. Artifact hashes (sha256, final)
+
+```text
+63939d134117e1e1a2961d6f436861ad1dc5a271b5f34fe2c5b7f09a45b8bab9  tests/contract/test_sealed_status_domain.py
+d4bd5a2ba41ee114e72374e76af10ae05a540631e83a6a18b7dc9ab3bb08ff46  tests/contract/test_status_gate_owner.py
+b5dc62acce47bd5a7c0ab68ecb2e690b5c4c0ca8f40252c4f0cce78073f023ff  tests/contract/test_acceptance_state_machine.py
+ad5b0c49e9cfca30edecc04ae7d3e476c4decab697b59e9e938f0ecef2c0e2a3  shared/workflow/acceptance-hardening.md
+37836c4d8b9158b1ddcc3a5fa713e2594520f751ef68c6996bf13f0b179f8460  shared/workflow/feature-integration.md
+7ec75e129a8a977a5a0b7751062f49d59cc98973fb1fef51cb5c8f86514a21a2  shared/definitions/non-disposable-definitions.md
+01f03a647887e9b3c9b0545721775e55b3a28dd6225b25381cc4f158c57ff17a  templates/feature-details-template.md
+dcb8d1f085912ce354a0dd7f04a23fadb73121b107a5c203ad7166ddef19ba23  templates/feature-index-template.md
+5548c1b727c2953b7b876ac09abcda4bb12cf2b967c0b9f40759816362387b20  skills/internal/manage-features/SKILL.md
+ce28636c96f15eb8ebc3cf27004f4b3d1cb501e7acbe63a3cf43f08a28fe50cc  scripts/python/closure-acceptance-check.py
+68567308cc18f62ef714459a720d836665302b05eba0ac7a342921326e2f7d57  scripts/python/non-disposable-check.py
+bfc4d06563c24f8ebfa731de4547938e37adb7dcd1099573a0603f228a581f05  .specify/constitution.md
+c2b2ae1beba46afdf6e0a66d5d694981c483f0883265b0e84e9b0b021c1b01dc  tests/contract/test_fast_fail_discipline.py
+9a18033b1810ed32e08feb58d40ddb8682a16f86659b61ae837273616c4b5d09  tests/contract/test_script_interface_contract.py
+beed25979f0006f3fb44cecee046e5408f98b967d382b2d059f8c0bd701e837d  .specify/specs/099-speckit-seal/notes/red-first-evidence.md
+```
+
+Mirror files change in lockstep with their sources and are verified byte-identical by
+`sync-mirrors.py --check` (§ 5); their hashes are deliberately not listed a second time — the
+parity check is the one owner of that fact.

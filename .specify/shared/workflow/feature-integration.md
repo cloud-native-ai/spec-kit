@@ -4,7 +4,7 @@ This document defines the standard feature tracking integration used by SDD life
 
 ## Core Protocol
 
-Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.checklist`, `/speckit.review`) automatically integrates with the feature tracking system:
+Every SDD lifecycle command (`/speckit.requirements`, `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.checklist`, `/speckit.review`, `/speckit.seal`) automatically integrates with the feature tracking system:
 
 1. **Detect feature context**:
    - If `.specify/features.md` exists, detect the current feature directory (format: `.specify/specs/[REQUIREMENTS_KEY]/`)
@@ -36,6 +36,12 @@ Each command owns exactly one transition:
 | `/speckit.implement` | `Planned → Implemented` | Requires Pre-Status-Flip Gate |
 | `/speckit.checklist` | `Implemented → Ready for Review` | Conditional initiator — applies only when the checklist runs after `/speckit.implement`: after implement it initiates the transition and cites the same owner criterion; before implement it initiates nothing, MUST NOT error for the absence of a code-segment conclusion, and MUST NOT manufacture one. Criteria are owned by `templates/feature-details-template.md` § Canonical Status State Machine and are not restated here |
 | `/speckit.review` | `Implemented → Ready for Review` | Unconditional initiator. Criteria are owned by `templates/feature-details-template.md` § Canonical Status State Machine and are not restated here; this gate is a property of the transition, not of this one command |
+| `/speckit.seal` | `Ready for Review → Sealed` | Unconditional initiator once its conjunctive conditions hold. Criteria are owned by `shared/workflow/acceptance-hardening.md` § Feature Status and are not restated here; `Sealed` is the terminal status for new work |
+
+`Ready for Review → Completed` is **closed for new work**: `Completed` survives only as a legacy record value
+for rows written before `Sealed` existed (no retroactive rewrite, no downgrade), and new work reaches its
+terminal status through `/speckit.seal` (`Ready for Review → Sealed`). A legacy `Completed` row does not
+thereby earn archive admission — admission is queried from `seal-utils.py --action archive-gate`.
 
 ## Pre-Status-Flip Gate (implement phase only)
 

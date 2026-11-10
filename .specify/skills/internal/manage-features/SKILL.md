@@ -63,12 +63,12 @@ Three binding rules of the application:
   capability disappeared from the code — keep the row and mark its status/description
   accordingly (history is part of the registry's value).
 - **Never regress status**: registry convergence must not move a feature's status
-  backward (e.g. Implemented → Draft) without explicit user confirmation. One narrow
-  exception exists, taken by pointer: `Implemented → Blocked` is legal only as an audit
-  correction that cites the evidence making the earlier claim false — the exception's
-  criteria and its one legal shape are owned by
+  backward (e.g. Implemented → Draft) without explicit user confirmation. Narrow
+  exceptions exist, taken by pointer: `Implemented → Blocked` and
+  `Sealed → Ready for Review` are legal only as audit corrections that cite the evidence
+  making the earlier claim false — the exceptions' criteria and their legal shape are owned by
   `.specify/templates/feature-details-template.md` § Canonical Status State Machine
-  ("Never regress — one narrow exception"), and this rule copies none of them.
+  ("Never regress — two narrow audit corrections"), and this rule copies none of them.
   > Gate probe: gate-feature-status-regression — after the user decision, record firing
   > evidence per `.specify/shared/guidelines/confirmation-gates.md` §门控观察协议
   > (non-blocking).
@@ -126,7 +126,7 @@ Three binding rules of the application:
 
 - Feature names: 2–5 words
 - Index table: single header row, all columns, aligned pipes
-- Status vocabulary: `Draft` | `Planned` | `Implemented` | `Blocked` | `Ready for Review` | `Completed`
+- Status vocabulary: `Draft` | `Planned` | `Implemented` | `Blocked` | `Ready for Review` | `Sealed` | `Completed`
 - Feature detail links: `.specify/features/[FEATURE_ID].md`
 - Do NOT modify templates; only instantiate copies
 

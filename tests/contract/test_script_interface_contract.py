@@ -297,10 +297,22 @@ def test_c25_amendment_carries_sync_report_minor_bump_and_last_amended():
         "the Sync Impact Report must state the version change"
     )
     # The report must name THIS amendment's principle; a fixed older title alone would let any
-    # later amendment pass without naming its own subject.
-    assert AMBIENT_HEADING in head, (
+    # later amendment pass without naming its own subject. Stale-oracle repair (2026-11-10,
+    # Feature 099 T014): the report history is append-only and later amendments prepend their own
+    # blocks, so the 089 block no longer sits inside the fixed 40-line window (the same repair
+    # `test_constitution_double_landing.py` C-12 already records for the 051 block). Locate the
+    # 089 block by its own version change — the subject stays "this amendment's report names its
+    # own principle", only the locator moves off a line count.
+    reports = re.findall(r"<!--\s*\nSync Impact Report\n(.*?)-->", text, re.S)
+    assert reports, "no Sync Impact Report block was found in the live constitution"
+    own = [r for r in reports if re.search(r"1\.17\.0\s*(?:→|->)\s*1\.18\.0", r)]
+    assert len(own) == 1, (
+        "the 089 amendment's Sync Impact Report block (Version change: 1.17.0 → 1.18.0) is "
+        "missing or duplicated"
+    )
+    assert AMBIENT_HEADING in own[0], (
         f"the Sync Impact Report must name the principle THIS amendment added "
-        f"({PRINCIPLE_TITLE!r}); the head names none of it"
+        f"({PRINCIPLE_TITLE!r}); the 089 block names none of it"
     )
 
     m = re.search(r"^\*\*Version\*\*:\s*(\d+)\.(\d+)\.(\d+)", text, re.M)

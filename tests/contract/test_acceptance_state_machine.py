@@ -87,14 +87,18 @@ BLOCKED_LITERAL_OWNERS = {
     "templates/tasks-template.md": "[blockedBy:",
 }
 
-#: The six status values each vocabulary owner must carry once `Blocked` lands (SV-06). Closed:
-#: asserted as a set, so a five-value owner fails rather than passing on a sample.
+#: The status values each vocabulary owner must carry once `Blocked` lands (SV-06). Closed:
+#: asserted as a set, so a five-value owner fails rather than passing on a sample. Stale-pin
+#: update (2026-11-10, Feature 099 T005; owner `shared/workflow/acceptance-hardening.md`
+#: § Feature Status): the domain gains exactly one value `Sealed` with the single transition
+#: `Ready for Review → Sealed`, so the pin reads seven.
 FEATURE_STATUS_VALUES = (
     "Draft",
     "Planned",
     "Implemented",
     "Blocked",
     "Ready for Review",
+    "Sealed",
     "Completed",
 )
 
@@ -510,9 +514,11 @@ def test_manage_features_names_blocked_and_points_at_the_machine_for_its_excepti
         "SV-06 requires that line to carry `Blocked`"
     )
     members = [v.strip().strip("`") for v in row.split(":", 1)[1].split("|")]
-    assert set(members) == set(FEATURE_STATUS_VALUES) and len(members) == 6, (
-        "the `Status vocabulary` line must be the six values %r; measured %r — five values is "
-        "the pre-081d shape, and a seventh would be a value the state machine does not admit"
+    # Stale-pin update (2026-11-10, Feature 099 T005): six -> seven values, `Sealed` joining the
+    # closed set; the cardinality moves with FEATURE_STATUS_VALUES and stays an equality pin.
+    assert set(members) == set(FEATURE_STATUS_VALUES) and len(members) == 7, (
+        "the `Status vocabulary` line must be the seven values %r; measured %r — six values is "
+        "the pre-099 shape, and an eighth would be a value the state machine does not admit"
         % (list(FEATURE_STATUS_VALUES), members)
     )
 

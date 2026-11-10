@@ -1,5 +1,20 @@
 <!--
 Sync Impact Report
+- Version change: 1.19.1 → 1.19.2 (PATCH; lifecycle narrative convergence, 2026-11-10)
+- Modified principles: None (no principle text changes)
+- Modified sections: Feature Governance → Feature Lifecycle Management — `Sealed` is added as the terminal status for new work, and `Completed` is marked legacy-only (closed for new work; no retroactive rewrite, no downgrade). The value domain and the `Ready for Review → Sealed` transition stay owned by `shared/workflow/acceptance-hardening.md` § Feature Status; this narrative converges to that owner and restates no transition rule (Feature 099 T014, FR-003 / C-027)
+- Added principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — verified to carry no lifecycle or terminal-state narrative (generic `[SECTION_2_NAME]` / `[SECTION_3_NAME]` placeholders only), so there is no terminal-state wording there to converge; unchanged
+  ✅ tests/contract/test_fast_fail_discipline.py — live version pin 1.19.1 → 1.19.2 (the file's own live-path literal is baseline-red for an unrelated path reason; the expectation literal follows the amendment)
+  ✅ tests/contract/test_script_interface_contract.py — C-25's oracle repaired: the 089 Sync Impact Report block is located by its own version change instead of a fixed 40-line window (same repair the C-12 guard already records for the 051 block), then required to name the 089 principle as before
+- Follow-up TODOs: none
+- Preserved by design: the schema owner decides the value domain; a constitution narrative bullet is a projection, never a second enumeration — it names the owner and adds no threshold, transition table or value-domain copy
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.19.0 → 1.19.1 (PATCH; carrier correction, 2026-11-10)
 - Modified principles: VII. Workflow Gates — the Pre-Status-Flip Gate's status-line carrier is corrected from `verification.log` to `verification.md`: the framework's implementation chain (acceptance-hardening § Gates, the implement template, the closure checker) reads `verification.md`, and the repository ignores `*.log`, so the previous literal named a file the chain never reads. User ruling (2026-11-10): amend the constitution to the framework carrier rather than create a second record surface.
 - Added principles: None
@@ -553,7 +568,8 @@ a persisted anchor plus a periodic review does, and it costs one cheap reload pe
 - **Planned**: Spec approved, implementation scheduled  
 - **Implemented**: Code changes merged to feature branch
 - **Ready for Review**: PR open, tests passing
-- **Completed**: Merged to main, deployed
+- **Sealed**: Review concluded and acceptance records complete; the terminal status for new work, and the only status admitted to archive — value domain and transition owner: `.specify/shared/workflow/acceptance-hardening.md` § Feature Status
+- **Completed** (legacy): Merged to main, deployed — retained only for records written before `Sealed`; closed for new work (no retroactive rewrite, no downgrade)
 
 ### Feature Documentation Requirements
 - Each Feature MUST have a detailed Feature Detail document
@@ -576,4 +592,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.19.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-10
+**Version**: 1.19.2 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-10

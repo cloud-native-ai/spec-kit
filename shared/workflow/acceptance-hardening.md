@@ -57,11 +57,44 @@ All four MUST hold. Three of four is `Blocked`.
 | `Blocked` | `Ready for Review` | **no — illegal** | a blocked feature has not earned review; it must re-enter through `Implemented` |
 | `Implemented` | `Blocked` | yes, narrow | **audit correction only**, and it MUST cite the evidence that makes the claim false |
 
-### Never regress — one narrow exception
+### Never regress — two narrow audit corrections
 
-Every backward transition stays illegal, with exactly one exception: `Implemented → Blocked` as an audit
-correction, and only while citing evidence. "The user did not object", an agent's own confirmation, or a later
-discovery that nobody wrote down is not evidence.
+Every backward transition stays illegal, with exactly two exceptions, each an audit correction that cites its
+evidence: `Implemented → Blocked`, and `Sealed → Ready for Review` (the seal conclusion is falsified; the
+evidence lands on both verifiable carriers — the registry row and the feature detail). "The user did not
+object", an agent's own confirmation, or a later discovery that nobody wrote down is not evidence. Neither
+exception widens into a general rollback channel.
+
+### `Sealed` — the terminal status for new work
+
+`Sealed` is the **terminal feature status for new work**: no forward transition leaves it, and it is the only
+status admitted to archive — the admission itself is owned by `scripts/python/seal-utils.py` `--action
+archive-gate` and is queried, never re-implemented. Exactly one forward transition enters it —
+`Ready for Review → Sealed` — and `/speckit.seal` is that transition's only owner command. `Completed` is not
+a second terminal: it survives only as a legacy record value (no retroactive rewrite, no downgrade) and new
+work MUST NOT land it.
+
+| Term | Meaning |
+|------|---------|
+| `Sealed` | The spec's review is concluded, its acceptance records are complete and merge-back has landed when slices exist; the feature detail and the registry row both read `Sealed`. |
+| `Ready for Review → Sealed` | The single forward transition into `Sealed`; owner command `/speckit.seal`; the conjunctive conditions below. |
+| `Sealed → Ready for Review` | Audit correction only, citing the evidence that the seal conclusion does not hold — the same shape as `Implemented → Blocked`. |
+
+**The `Ready for Review → Sealed` conditions (all conjunctive).** All MUST hold; any failure refuses the
+transition, leaves the status unchanged and names every unmet condition with its repair path:
+
+1. The from state is `Ready for Review` on both carriers and they agree; a mismatch or a missing carrier is
+   `state-drift` — an input error, never a one-sided reading.
+2. The current review conclusion carries zero unhandled P0: every P0 is fixed (with a fix pointer) or
+   explicitly waived by the user, and the current `code-review.md` carries zero `blocking` entries. A
+   driver's or an agent's confirmation is never a user waiver.
+3. The acceptance record is complete per the closure checker: every success criterion has a status row, every
+   `final`-path criterion is `pass`, the smoke record is `pass`, and every SC line carries its `**Path**`
+   marker. The checker's exit `2` is an input defect, never an `accept`.
+4. Merge-back is complete when the slice set is non-empty: the merge manifest covers every slice × output
+   pair with zero unresolved conflicts (`not-applicable` carries its basis) and every slice is closed; with
+   no slices the manifest records `not-applicable` and its basis.
+5. The parent spec tree carries no uncommitted change outside this flow (`dirty-spec-tree`).
 
 ## Verification Vocabulary
 

@@ -113,22 +113,22 @@ Probed 2026-11-10 in `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sd
 
 ### Tests for Foundational
 
-- [ ] T003 写红先漂移守卫 `tests/contract/test_sealed_status_domain.py`，覆盖 C-029 的七面（模板转移表状态集、模板 `[FEATURE_STATUS]` 行、索引模板词汇行、feature-integration 协议行、manage-features 词表、non-disposable 状态表、closure completion-claim 家族），运行 `bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py -q` 并把红输出与退出码记入 `.specify/specs/099-speckit-seal/notes/red-first-evidence.md`（FR-001、SC-008、[blockedBy: T001]）。
-- [ ] T004 [P] 把 `tests/contract/test_status_gate_owner.py` 的六状态 pin（415–426 行处的 stale-pin 约定）更新为含 `Sealed` 的七状态封闭集（FR-001、C-029）。
-- [ ] T005 [P] 把 `tests/contract/test_acceptance_state_machine.py` 的六值 pin（`FEATURE_STATUS_VALUES`，92 行与 513 行）更新为七值集；保持 `tests/contract/test_acceptance_schema_ownership.py` 中「每个投影落在域内」的断言原样不变并在七值域下转绿（FR-001、C-029）。
+- [X] T003 写红先漂移守卫 `tests/contract/test_sealed_status_domain.py`，覆盖 C-029 的七面（模板转移表状态集、模板 `[FEATURE_STATUS]` 行、索引模板词汇行、feature-integration 协议行、manage-features 词表、non-disposable 状态表、closure completion-claim 家族），运行 `bash scripts/bash/run-tests.sh tests/contract/test_sealed_status_domain.py -q` 并把红输出与退出码记入 `.specify/specs/099-speckit-seal/notes/red-first-evidence.md`（FR-001、SC-008、[blockedBy: T001]）。
+- [X] T004 [P] 把 `tests/contract/test_status_gate_owner.py` 的六状态 pin（415–426 行处的 stale-pin 约定）更新为含 `Sealed` 的七状态封闭集（FR-001、C-029）。
+- [X] T005 [P] 把 `tests/contract/test_acceptance_state_machine.py` 的六值 pin（`FEATURE_STATUS_VALUES`，92 行与 513 行）更新为七值集；保持 `tests/contract/test_acceptance_schema_ownership.py` 中「每个投影落在域内」的断言原样不变并在七值域下转绿（FR-001、C-029）。
 
 ### Implementation for Foundational
 
-- [ ] T006 [P] 扩展状态 schema owner `shared/workflow/acceptance-hardening.md` § Feature Status：`Sealed`（[[STR-001]]）的值定义、术语表行，以及唯一转移 `Ready for Review → Sealed` 及其条件；不新增第二个值或第二条转移（FR-001、FR-002、C-024、C-025）。
-- [ ] T007 [P] 在 `shared/workflow/feature-integration.md` § Status State Machine 增加 `/speckit.seal` 协议行（`Ready for Review → Sealed`，owner 命令 `/speckit.seal`），并把 `Ready for Review → Completed` 标注为对新工作关闭（FR-001、FR-002、FR-003、C-025、C-027）。
-- [ ] T008 [P] 扩展 `shared/definitions/non-disposable-definitions.md`：注册表状态值域行（196 行）加入 `Sealed`，并在其后的 status×verdict 表补 `Sealed` 行（FR-001、C-025、C-029）。
-- [ ] T009 [P] 更新 `templates/feature-details-template.md`：§ Canonical Status State Machine 的转移行、`**Status**` 词汇 bullet、`[FEATURE_STATUS]` 占位词汇行同批识别 `Sealed`（FR-001、C-025）。
-- [ ] T010 [P] 更新 `templates/feature-index-template.md`：状态封闭词汇行加入 `Sealed`（FR-001、C-025）。
-- [ ] T011 [P] 更新 `skills/internal/manage-features/SKILL.md` 的状态词表，使 reconcile 流程把 `Sealed` 识别为受治理状态（FR-001、C-025）。
-- [ ] T012 [P] 更新 `scripts/python/closure-acceptance-check.py`：`CLAIMED_IMPLEMENTED`（258 行）加入 `Sealed`，使 completion-claim 家族与 `AUDIT_FAMILY`（1508 行）随动覆盖（FR-001、plan § Disclosed Rulings 3）。
-- [ ] T013 [P] 更新 `scripts/python/non-disposable-check.py` 的状态×裁决表，使 `Sealed` 行被判定而不是落到范围之外（FR-001、C-025）。
-- [ ] T014 按 `manage-constitution` 流程收敛宪法生命周期叙述：`templates/constitution-template.md` 与 `.specify/constitution.md` 的终态表述同批改说 `Sealed`（schema owner 为准），版本号与 amend 日期同步（FR-002、FR-003、C-027、[blockedBy: T006]）。
-- [ ] T015 投影并核对镜像：`python3 scripts/python/sync-mirrors.py --write` 后 `python3 scripts/python/sync-mirrors.py --check`，确认相对 T001 基线在 `shared/`、`templates/`、`skills/internal/`、`scripts/` 零新增漂移（FR-021、plan § Mirror Obligations、[blockedBy: T006,T007,T008,T009,T010,T011,T012,T013,T014]）。
+- [X] T006 [P] 扩展状态 schema owner `shared/workflow/acceptance-hardening.md` § Feature Status：`Sealed`（[[STR-001]]）的值定义、术语表行，以及唯一转移 `Ready for Review → Sealed` 及其条件；不新增第二个值或第二条转移（FR-001、FR-002、C-024、C-025）。
+- [X] T007 [P] 在 `shared/workflow/feature-integration.md` § Status State Machine 增加 `/speckit.seal` 协议行（`Ready for Review → Sealed`，owner 命令 `/speckit.seal`），并把 `Ready for Review → Completed` 标注为对新工作关闭（FR-001、FR-002、FR-003、C-025、C-027）。
+- [X] T008 [P] 扩展 `shared/definitions/non-disposable-definitions.md`：注册表状态值域行（196 行）加入 `Sealed`，并在其后的 status×verdict 表补 `Sealed` 行（FR-001、C-025、C-029）。
+- [X] T009 [P] 更新 `templates/feature-details-template.md`：§ Canonical Status State Machine 的转移行、`**Status**` 词汇 bullet、`[FEATURE_STATUS]` 占位词汇行同批识别 `Sealed`（FR-001、C-025）。
+- [X] T010 [P] 更新 `templates/feature-index-template.md`：状态封闭词汇行加入 `Sealed`（FR-001、C-025）。
+- [X] T011 [P] 更新 `skills/internal/manage-features/SKILL.md` 的状态词表，使 reconcile 流程把 `Sealed` 识别为受治理状态（FR-001、C-025）。
+- [X] T012 [P] 更新 `scripts/python/closure-acceptance-check.py`：`CLAIMED_IMPLEMENTED`（258 行）加入 `Sealed`，使 completion-claim 家族与 `AUDIT_FAMILY`（1508 行）随动覆盖（FR-001、plan § Disclosed Rulings 3）。
+- [X] T013 [P] 更新 `scripts/python/non-disposable-check.py` 的状态×裁决表，使 `Sealed` 行被判定而不是落到范围之外（FR-001、C-025）。
+- [X] T014 按 `manage-constitution` 流程收敛宪法生命周期叙述：`templates/constitution-template.md` 与 `.specify/constitution.md` 的终态表述同批改说 `Sealed`（schema owner 为准），版本号与 amend 日期同步（FR-002、FR-003、C-027、[blockedBy: T006]）。
+- [X] T015 投影并核对镜像：`python3 scripts/python/sync-mirrors.py --write` 后 `python3 scripts/python/sync-mirrors.py --check`，确认相对 T001 基线在 `shared/`、`templates/`、`skills/internal/`、`scripts/` 零新增漂移（FR-021、plan § Mirror Obligations、[blockedBy: T006,T007,T008,T009,T010,T011,T012,T013,T014]）。
 - [ ] T016 写红先引擎契约测试 `tests/contract/test_seal_engine_contract.py`，覆盖 C-001…C-010（四动作封闭集、三值退出码、`--help`/`--version` 零副作用、未声明选项非零拒绝、选项面封闭、两阶段声明、stdout-only 拒绝、写路径白名单），红输出记入 `notes/red-first-evidence.md`（FR-021、FR-025、[blockedBy: T001]）。
 - [ ] T017 实现 `scripts/python/seal-utils.py` 骨架：argparse + `script_interface_cli` 守卫（`--help`/`--version` 零副作用、未声明选项 exit 2）、四动作派发封闭集、三值退出码域、`--json` 稳定负载、写路径白名单常量、C-009 的字面 `.specify` 组件守卫（禁止向上找最近 `.specify` 的启发式）；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认 `--check` exit 0（FR-021、C-001…C-010、[blockedBy: T016]）。
 
