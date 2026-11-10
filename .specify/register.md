@@ -214,7 +214,8 @@
 | REC-095-03 | 095 review P1: 为活动特性分支增加行号作用域提交守卫（无行号提交拒绝或显式记录为跨线），保特性分支可二分、可评审 | `.specify/specs/095-superagent-role/review.md` §5.4（源 F3） | open |
 | REC-095-04 | 095 review P1: 每次 stage record 写入须同步推进 `<!-- loop-state:begin -->` 块（state/stage/attempt/last_verdict），缺块推进的记录拒绝 | `.specify/specs/095-superagent-role/review.md` §5.3（源 F4） | open |
 | REC-095-05 | 095 review P2: 冻结基线需要存活重取时给出合法的二次载体（dated archive → refreeze），避免以 `[~]` 延后进入 review 门 | `.specify/specs/095-superagent-role/review.md` §5.2（源 F5） | open |
-| REC-095-06 | 095 review P2: `git-delta-review.sh` 头部注释与 usage 的步骤普查改为五步，并把 capture 命名为第 5 步 | `.specify/specs/095-superagent-role/review.md` §5.5（源 F6） | open |
+| REC-095-06 | 095 review P2: `git-delta-review.sh` 头部注释与 usage 的步骤普查改为五步，并把 capture 命名为第 5 步 | `.specify/specs/095-superagent-role/review.md` §5.5（源 F6） | done（2026-11-10，`2cf1e82ca` — review-repair r1；契约守卫已对齐五步并通过） |
 | REC-095-07 | 095 review P2: stage runner 的 pid 行携带 `run=`；重派发归档旧 status；status mtime 晚于 pid 文件才判 DONE；`--window` 到期返回 RUNNING | `.specify/specs/095-superagent-role/review.md` §5.3（源 F7/F8/F11） | open |
 | REC-095-08 | 095 review P2: pre-analyze gate 接受「定位符 + 注记」（取首 token），并豁免 `per package` / `每包` 的 count-claim 读法 | `.specify/specs/095-superagent-role/review.md` §5.3（源 F9/F10） | open |
 | REC-095-09 | 095 review P1: feature 创建流程实例化完整详情头字段（含 `**Status**`）与 `## Latest Review`；closure checker 的显式输入错误点名缺失字段 | `.specify/specs/095-superagent-role/review.md` §5.1（源 F12） | open |
+| REC-095-10 | 095 review round-2 P2: 修复轮改写确定性守卫时，记录的绿色读数须携带重复次数（或冻结时钟）；单次采样不构成确定性证据 | `.specify/specs/095-superagent-role/review.md` §5.3（源 N1） | open |

@@ -3,7 +3,7 @@
 **Feature ID**: 095
 **Name**: Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
 **Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
-**Status**: Implemented
+**Status**: Ready for Review
 **Created**: 2026-11-10
 **Last Updated**: 2026-11-10
 
@@ -21,6 +21,14 @@
   - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 7 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 7; claimed status `Planned`; ARC verdict `agree`; no fixed item.
   - **Status transition `Implemented → Ready for Review`: refused (`blocking-unresolved`)** — the current code record carries 2 `blocking` entries (condition c); `deferred_tasks=T003` is unresolved and unwaived (condition a); and the claimed status was `Planned` because the implement-owned `Planned → Implemented` flip never landed, so the transition had no legal source state. No user waiver exists; the status was left unchanged at `Planned` at review time.
   - **Review-repair r1 (2026-11-10)**: the missed implement Feature Integration flip is landed — the registry row and this file now read `Implemented` (the four conjunctive conditions hold; `T003` resolved by archive-then-refreeze). The two `blocking` causes (in-range digest-redesign regressions and the dropped C-68 state) are repaired and re-measured green; the record still carrying the entries is superseded only by the next code-segment run, so a re-review is required before the transition is re-judged.
+
+- **2026-11-10 — `/speckit.review` round 2 (run `r20261110T055657Z-b095-review-r2`)** — Report: `.specify/specs/095-superagent-role/review.md`; code record: `.specify/specs/095-superagent-role/code-review.md` (round-1 records archived as `review-r1.md` / `code-review-r1.md`).
+  - **Process segment**: `pass` — 0 P0; 1 carried P1 (F3, line-scoped commit guard) and 8 P2; round-1's P0 (missed Feature Integration flip) and the two code `blocking` causes are verified fixed at their anchors; F7/F8 are disclosed as budget-deferred (FO-095-05 / FO-095-02).
+  - **Artifact segment**: `pass` — coverage 11/11, no missing member; two P2 (SC-007 budget reconciliation; stale `Planned` literals in `tasks.md` / the checklist).
+  - **Implementation segment**: `pass` — scope registered (`verification.md` § 跨线提交); regression re-measured green (smoke `85 passed`, exit 0; closure suite `216 failed / 8414 passed`, NEW = 3 environment/concurrency-owned names). Smoke triple: command from `verification.md`, exit 0, evidence `.specify/specs/095-superagent-role/test-evidence/review-r2-smoke.txt`.
+  - **Code segment**: `pass` — 0 `blocking`, 6 `important` (each answered), 5 `suggestion`, 1 `praise`; coverage receipt 344 changed / 17 judged / 327 skipped / 0 gap; client capture skipped (framework hat).
+  - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 7 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 7; claimed status `Implemented`; ARC verdict `agree`.
+  - **Status transition `Implemented → Ready for Review`: allowed** — the four conjunctive conditions hold; the status is flipped on this file and `.specify/features.md` row 095.
 
 ## Key Changes（planned）
 
