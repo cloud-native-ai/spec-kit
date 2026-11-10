@@ -4,11 +4,11 @@
 |------|-----|
 | **分支** | `096-sdd-observer-agent` |
 | **基准** | `b3da3a26dfba209057f65c2b17962b9516812c39` (`b3da3a26d`) |
-| **目标** | `ed4dd1e6b43336e84a6de41d2c24f13c6a64fb35` (`ed4dd1e6b`) |
+| **目标** | `262f30bdeef601a41efd230c14317445a5da1fc8` (`262f30bde`) |
 | **基准来源** | `feature-first-commit` |
 | **渲染模式** | `renderer: text` |
 | **Reviewer** | `Qiming Liu (John)` |
-| **日期** | `2026-11-10T15:36:34Z` |
+| **日期** | `2026-11-10T15:54:02Z` |
 
 ## 变更概览
 
@@ -69,7 +69,7 @@
  ...ion-speckit-checklist-r20261110t081104z-b096.md | 207 +++++
  ...on-skill-analyze-artifacts-r20261110t081104z.md | 202 +++++
  ...ation-speckit-analyze-r20261110t081104z-b096.md | 209 +++++
- .specify/scripts/python/journal-utils.py           | 869 +++++++++++++++++++++
+ .specify/scripts/python/journal-utils.py           | 879 +++++++++++++++++++++
  .../shared/declarations/facts/journal-format.yaml  |  91 +++
  .specify/shared/guidelines/better-harness.md       |   4 +-
  .specify/skills/sdd-loop-driver/SKILL.md           |  55 ++
@@ -77,6 +77,7 @@
  .../sdd-loop-driver/references/stage-prompts.md    |   1 +
  .../2026-11-10-observer-requirements-quality.md    |  72 ++
  .../checklists/requirements.md                     |  38 +
+ .../specs/096-sdd-observer-agent/code-review.md    | 696 ++++++++++++++++
  .../contracts/journal-engine.contract.md           |  81 ++
  .../contracts/journal-format.contract.md           |  79 ++
  .../contracts/observer-lifecycle.contract.md       |  89 +++
@@ -94,7 +95,8 @@
  .../specs/096-sdd-observer-agent/quickstart.md     | 102 +++
  .../specs/096-sdd-observer-agent/requirements.md   | 253 ++++++
  .specify/specs/096-sdd-observer-agent/research.md  | 102 +++
- .specify/specs/096-sdd-observer-agent/tasks.md     | 382 +++++++++
+ .specify/specs/096-sdd-observer-agent/review.md    | 325 ++++++++
+ .specify/specs/096-sdd-observer-agent/tasks.md     | 400 ++++++++++
  .../test-evidence/analyze-clause-coverage-r3.txt   | 669 ++++++++++++++++
  .../test-evidence/analyze-clause-coverage-r4.txt   | 669 ++++++++++++++++
  .../test-evidence/analyze-clause-coverage-r5.txt   | 669 ++++++++++++++++
@@ -119,8 +121,8 @@
  .../analyze-repair-dispositions-r3-2026-11-10.md   |  30 +
  .../analyze-repair-dispositions-r4-2026-11-10.md   |  30 +
  .../analyze-repair-dispositions-r5-2026-11-10.md   |  57 ++
- .../analyze-repair-gates-2026-11-10.txt            | 743 ++++++++++++++++++
- .../analyze-repair-gates-r3-2026-11-10.txt         | 744 ++++++++++++++++++
+ .../analyze-repair-gates-2026-11-10.txt            | 743 +++++++++++++++++
+ .../analyze-repair-gates-r3-2026-11-10.txt         | 744 +++++++++++++++++
  .../analyze-repair-gates-r4-2026-11-10.txt         | 726 +++++++++++++++++
  .../analyze-repair-gates-r5-2026-11-10.txt         | 725 +++++++++++++++++
  .../analyze-validation-wave-round2.txt             |  63 ++
@@ -148,6 +150,12 @@
  .../requirements-glossary-conflict.txt             |  17 +
  .../test-evidence/requirements-sc-map.txt          |  41 +
  .../test-evidence/requirements-validator.txt       |  10 +
+ .../review-repair-dispositions-r1-2026-11-10.md    |  71 ++
+ .../review-repair-r1-closure-acceptance.txt        |  42 +
+ .../review-repair-r1-mandated-suite.txt            |  12 +
+ .../review-repair-r1-red-green-probe.txt           |  14 +
+ .../test-evidence/review-repair-r1-smoke.txt       |  16 +
+ .../test-evidence/review-smoke.txt                 |  22 +
  .../test-evidence/sc001-mutations.txt              |  93 +++
  .../test-evidence/sc003-non-blocking.txt           |  51 ++
  .../test-evidence/tasks-stage-gates.txt            | 100 +++
@@ -157,16 +165,17 @@
  .../test-evidence/us4-boundaries.txt               |  38 +
  .../test-evidence/us5-isolation.txt                |  27 +
  .../test-evidence/wp02-observer-definition.txt     | 192 +++++
+ .../specs/096-sdd-observer-agent/verification.md   |  56 ++
  agents/sdd-observer.agent.md                       |  72 ++
  docs/reference/skills/sdd-loop-driver.md           |   7 +
- scripts/python/journal-utils.py                    | 869 +++++++++++++++++++++
+ scripts/python/journal-utils.py                    | 879 +++++++++++++++++++++
  shared/declarations/facts/journal-format.yaml      |  91 +++
  shared/guidelines/better-harness.md                |   4 +-
  skills/external/sdd-loop-driver/SKILL.md           |  55 ++
  .../references/observer-lifecycle.md               |  64 ++
  .../sdd-loop-driver/references/stage-prompts.md    |   1 +
  tests/contract/test_fast_fail_discipline.py        |  10 +-
- tests/contract/test_journal_engine.py              | 519 ++++++++++++
+ tests/contract/test_journal_engine.py              | 605 ++++++++++++++
  tests/contract/test_non_regression_070.py          |  26 +-
  tests/contract/test_sdd_loop_driver_skill.py       |   4 +
  tests/contract/test_sdd_observer_agent.py          | 286 +++++++
@@ -175,7 +184,7 @@
  tests/fixtures/sdd-observer/failure_builder.py     | 154 ++++
  tests/fixtures/sdd-observer/line_builder.py        | 213 +++++
  tests/fixtures/sdd-observer/tamper_builder.py      |  76 ++
- 162 files changed, 20083 insertions(+), 115 deletions(-)
+ 171 files changed, 21461 insertions(+), 115 deletions(-)
 ```
 
 ---
@@ -183,40 +192,26 @@
 ## Review 意见
 
 
-### 🔴 [BLOCKING] scripts/python/journal-utils.py (Line 65)
+### 👍 [PRAISE] scripts/python/journal-utils.py (Line 202)
 
-> OBSERVER_HEADING_RE anchors at column 0 ('^##\\s+Observer Record'), but the shape owner SKILL.md § SDD Observer prints the same heading with two leading spaces inside its fenced block. Copying the owner block verbatim makes read_spine() find no record: 'journal-utils.py --action append' exits 2 with 'identity-mismatch: no observer record section' (verified on a fixture whose spine uses the owner text). Strip leading whitespace before matching, or dedent the owner block and add a test that feeds the owner's literal block to append.
+> Review-repair r1 fixes verified in this delta: _last_anomaly() records an ANOMALY line that precedes the completion sentinel, and read_spine() strips leading whitespace so the owner's indented record block parses. Both contract cases have red legs (test-evidence/review-repair-r1-red-green-probe.txt) and pass in this run's smoke (test-evidence/review-r2-smoke.txt).
 
-<sub>23:36:47</sub>
-
-
-### 🟠 [IMPORTANT] scripts/python/journal-utils.py (Line 622)
-
-> Anomaly projection reads only the final non-empty log line ('last_line.startswith("ANOMALY:")'). The fixture builder write_quartet(anomaly=..., sentinel_present=True) writes ANOMALY before the completion sentinel, so a green stage that reports an anomaly is never projected: an append over that line produced 47 rows and zero 'anomaly' rows (probe reproduced). FR-012 and US1 AS2 name anomaly as a recorded event class. Scan the log for the last ANOMALY: line rather than only the last line, and add the anomaly+sentinel contract case.
-
-<sub>23:36:48</sub>
+<sub>23:56:36</sub>
 
 
-### 🟢 [SUGGESTION] scripts/python/journal-utils.py (Line 346)
-
-> Journal._parse stores self.title = lines[0] but no rule or finding code ever compares it with title_template; journal-format C-02 fixes the first line as '# SDD Journal — <spec-key>'. Tampering the title to '# Not A Journal — ' and running check exits 0 with '0 findings'. Either add a finding code (a V rule) for the title or drop title from the parsed structure so no consumer relies on it.
-
-<sub>23:36:49</sub>
-
-
-> **未提交范围（未评审）**: 1 个未提交路径未计入本次评审对象（.specify/specs/096-sdd-observer-agent/checkpoints/）；本回执不对该范围给出任何结论。
+> **未提交范围（未评审）**: 2 个未提交路径未计入本次评审对象（.specify/specs/096-sdd-observer-agent/checkpoints/, .specify/specs/096-sdd-observer-agent/test-evidence/review-r2-smoke.txt）；本回执不对该范围给出任何结论。
 
 <!-- coverage-receipt:begin -->
 receipt_version=1
 base=b3da3a26dfba209057f65c2b17962b9516812c39
-head=ed4dd1e6b43336e84a6de41d2c24f13c6a64fb35
+head=262f30bdeef601a41efd230c14317445a5da1fc8
 base_source=feature-first-commit
 renderer=text
-changed_files=162
+changed_files=171
 judged_files=11
-skipped_files=151
+skipped_files=160
 gap_files=0
-lines_added=20083
+lines_added=21461
 lines_deleted=115
 file.001.path=.claude/agents/reporter.md
 file.001.verdict=skipped
@@ -410,287 +405,314 @@ file.063.reason=non-code-file
 file.064.path=.specify/specs/096-sdd-observer-agent/checklists/requirements.md
 file.064.verdict=skipped
 file.064.reason=non-code-file
-file.065.path=.specify/specs/096-sdd-observer-agent/contracts/journal-engine.contract.md
+file.065.path=.specify/specs/096-sdd-observer-agent/code-review.md
 file.065.verdict=skipped
 file.065.reason=non-code-file
-file.066.path=.specify/specs/096-sdd-observer-agent/contracts/journal-format.contract.md
+file.066.path=.specify/specs/096-sdd-observer-agent/contracts/journal-engine.contract.md
 file.066.verdict=skipped
 file.066.reason=non-code-file
-file.067.path=.specify/specs/096-sdd-observer-agent/contracts/observer-lifecycle.contract.md
+file.067.path=.specify/specs/096-sdd-observer-agent/contracts/journal-format.contract.md
 file.067.verdict=skipped
 file.067.reason=non-code-file
-file.068.path=.specify/specs/096-sdd-observer-agent/contracts/observer-role.contract.md
+file.068.path=.specify/specs/096-sdd-observer-agent/contracts/observer-lifecycle.contract.md
 file.068.verdict=skipped
 file.068.reason=non-code-file
-file.069.path=.specify/specs/096-sdd-observer-agent/contracts/observer-verification.contract.md
+file.069.path=.specify/specs/096-sdd-observer-agent/contracts/observer-role.contract.md
 file.069.verdict=skipped
 file.069.reason=non-code-file
-file.070.path=.specify/specs/096-sdd-observer-agent/coverage-baseline.txt
+file.070.path=.specify/specs/096-sdd-observer-agent/contracts/observer-verification.contract.md
 file.070.verdict=skipped
 file.070.reason=non-code-file
-file.071.path=.specify/specs/096-sdd-observer-agent/data-model.md
+file.071.path=.specify/specs/096-sdd-observer-agent/coverage-baseline.txt
 file.071.verdict=skipped
 file.071.reason=non-code-file
-file.072.path=.specify/specs/096-sdd-observer-agent/feature-ref.md
+file.072.path=.specify/specs/096-sdd-observer-agent/data-model.md
 file.072.verdict=skipped
 file.072.reason=non-code-file
-file.073.path=.specify/specs/096-sdd-observer-agent/notes/pre-change-measurements.md
+file.073.path=.specify/specs/096-sdd-observer-agent/feature-ref.md
 file.073.verdict=skipped
 file.073.reason=non-code-file
-file.074.path=.specify/specs/096-sdd-observer-agent/notes/quickstart-run.md
+file.074.path=.specify/specs/096-sdd-observer-agent/notes/pre-change-measurements.md
 file.074.verdict=skipped
 file.074.reason=non-code-file
-file.075.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp01.md
+file.075.path=.specify/specs/096-sdd-observer-agent/notes/quickstart-run.md
 file.075.verdict=skipped
 file.075.reason=non-code-file
-file.076.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp02.md
+file.076.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp01.md
 file.076.verdict=skipped
 file.076.reason=non-code-file
-file.077.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp03.md
+file.077.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp02.md
 file.077.verdict=skipped
 file.077.reason=non-code-file
-file.078.path=.specify/specs/096-sdd-observer-agent/plan.md
+file.078.path=.specify/specs/096-sdd-observer-agent/notes/red-first-evidence-wp03.md
 file.078.verdict=skipped
 file.078.reason=non-code-file
-file.079.path=.specify/specs/096-sdd-observer-agent/quickstart.md
+file.079.path=.specify/specs/096-sdd-observer-agent/plan.md
 file.079.verdict=skipped
 file.079.reason=non-code-file
-file.080.path=.specify/specs/096-sdd-observer-agent/requirements.md
+file.080.path=.specify/specs/096-sdd-observer-agent/quickstart.md
 file.080.verdict=skipped
 file.080.reason=non-code-file
-file.081.path=.specify/specs/096-sdd-observer-agent/research.md
+file.081.path=.specify/specs/096-sdd-observer-agent/requirements.md
 file.081.verdict=skipped
 file.081.reason=non-code-file
-file.082.path=.specify/specs/096-sdd-observer-agent/tasks.md
+file.082.path=.specify/specs/096-sdd-observer-agent/research.md
 file.082.verdict=skipped
 file.082.reason=non-code-file
-file.083.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r3.txt
+file.083.path=.specify/specs/096-sdd-observer-agent/review.md
 file.083.verdict=skipped
 file.083.reason=non-code-file
-file.084.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r4.txt
+file.084.path=.specify/specs/096-sdd-observer-agent/tasks.md
 file.084.verdict=skipped
 file.084.reason=non-code-file
-file.085.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r5.txt
+file.085.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r3.txt
 file.085.verdict=skipped
 file.085.reason=non-code-file
-file.086.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-round2.txt
+file.086.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r4.txt
 file.086.verdict=skipped
 file.086.reason=non-code-file
-file.087.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage.txt
+file.087.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-r5.txt
 file.087.verdict=skipped
 file.087.reason=non-code-file
-file.088.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r3.txt
+file.088.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage-round2.txt
 file.088.verdict=skipped
 file.088.reason=non-code-file
-file.089.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r4.txt
+file.089.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-clause-coverage.txt
 file.089.verdict=skipped
 file.089.reason=non-code-file
-file.090.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r5.txt
+file.090.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r3.txt
 file.090.verdict=skipped
 file.090.reason=non-code-file
-file.091.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-round2.txt
+file.091.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r4.txt
 file.091.verdict=skipped
 file.091.reason=non-code-file
-file.092.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions.txt
+file.092.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-r5.txt
 file.092.verdict=skipped
 file.092.reason=non-code-file
-file.093.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W1.md
+file.093.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions-round2.txt
 file.093.verdict=skipped
 file.093.reason=non-code-file
-file.094.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W2.md
+file.094.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-decision-tensions.txt
 file.094.verdict=skipped
 file.094.reason=non-code-file
-file.095.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W3.md
+file.095.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W1.md
 file.095.verdict=skipped
 file.095.reason=non-code-file
-file.096.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-r3-W13.md
+file.096.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W2.md
 file.096.verdict=skipped
 file.096.reason=non-code-file
-file.097.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-r3-W2.md
+file.097.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-W3.md
 file.097.verdict=skipped
 file.097.reason=non-code-file
-file.098.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-2026-11-10.md
+file.098.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-r3-W13.md
 file.098.verdict=skipped
 file.098.reason=non-code-file
-file.099.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r3-2026-11-10.md
+file.099.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-findings-r3-W2.md
 file.099.verdict=skipped
 file.099.reason=non-code-file
-file.100.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r4-2026-11-10.md
+file.100.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-2026-11-10.md
 file.100.verdict=skipped
 file.100.reason=non-code-file
-file.101.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r5-2026-11-10.md
+file.101.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r3-2026-11-10.md
 file.101.verdict=skipped
 file.101.reason=non-code-file
-file.102.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-round2-2026-11-10.md
+file.102.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r4-2026-11-10.md
 file.102.verdict=skipped
 file.102.reason=non-code-file
-file.103.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-2026-11-10.md
+file.103.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-r5-2026-11-10.md
 file.103.verdict=skipped
 file.103.reason=non-code-file
-file.104.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r3-2026-11-10.md
+file.104.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-merged-round2-2026-11-10.md
 file.104.verdict=skipped
 file.104.reason=non-code-file
-file.105.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r4-2026-11-10.md
+file.105.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-2026-11-10.md
 file.105.verdict=skipped
 file.105.reason=non-code-file
-file.106.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r5-2026-11-10.md
+file.106.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r3-2026-11-10.md
 file.106.verdict=skipped
 file.106.reason=non-code-file
-file.107.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-2026-11-10.txt
+file.107.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r4-2026-11-10.md
 file.107.verdict=skipped
 file.107.reason=non-code-file
-file.108.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r3-2026-11-10.txt
+file.108.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-dispositions-r5-2026-11-10.md
 file.108.verdict=skipped
 file.108.reason=non-code-file
-file.109.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r4-2026-11-10.txt
+file.109.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-2026-11-10.txt
 file.109.verdict=skipped
 file.109.reason=non-code-file
-file.110.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r5-2026-11-10.txt
+file.110.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r3-2026-11-10.txt
 file.110.verdict=skipped
 file.110.reason=non-code-file
-file.111.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-validation-wave-round2.txt
+file.111.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r4-2026-11-10.txt
 file.111.verdict=skipped
 file.111.reason=non-code-file
-file.112.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-validation-wave.txt
+file.112.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-repair-gates-r5-2026-11-10.txt
 file.112.verdict=skipped
 file.112.reason=non-code-file
-file.113.path=.specify/specs/096-sdd-observer-agent/test-evidence/clarify-validator.txt
+file.113.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-validation-wave-round2.txt
 file.113.verdict=skipped
 file.113.reason=non-code-file
-file.114.path=.specify/specs/096-sdd-observer-agent/test-evidence/decision-tensions-plan.txt
+file.114.path=.specify/specs/096-sdd-observer-agent/test-evidence/analyze-validation-wave.txt
 file.114.verdict=skipped
 file.114.reason=non-code-file
-file.115.path=.specify/specs/096-sdd-observer-agent/test-evidence/digest-boundary.txt
+file.115.path=.specify/specs/096-sdd-observer-agent/test-evidence/clarify-validator.txt
 file.115.verdict=skipped
 file.115.reason=non-code-file
-file.116.path=.specify/specs/096-sdd-observer-agent/test-evidence/digest-fieldset-baseline.txt
+file.116.path=.specify/specs/096-sdd-observer-agent/test-evidence/decision-tensions-plan.txt
 file.116.verdict=skipped
 file.116.reason=non-code-file
-file.117.path=.specify/specs/096-sdd-observer-agent/test-evidence/dual-line-isolation.txt
+file.117.path=.specify/specs/096-sdd-observer-agent/test-evidence/digest-boundary.txt
 file.117.verdict=skipped
 file.117.reason=non-code-file
-file.118.path=.specify/specs/096-sdd-observer-agent/test-evidence/env-probe.txt
+file.118.path=.specify/specs/096-sdd-observer-agent/test-evidence/digest-fieldset-baseline.txt
 file.118.verdict=skipped
 file.118.reason=non-code-file
-file.119.path=.specify/specs/096-sdd-observer-agent/test-evidence/full-suite-names.txt
+file.119.path=.specify/specs/096-sdd-observer-agent/test-evidence/dual-line-isolation.txt
 file.119.verdict=skipped
 file.119.reason=non-code-file
-file.120.path=.specify/specs/096-sdd-observer-agent/test-evidence/full-suite.txt
+file.120.path=.specify/specs/096-sdd-observer-agent/test-evidence/env-probe.txt
 file.120.verdict=skipped
 file.120.reason=non-code-file
-file.121.path=.specify/specs/096-sdd-observer-agent/test-evidence/gap-drill.txt
+file.121.path=.specify/specs/096-sdd-observer-agent/test-evidence/full-suite-names.txt
 file.121.verdict=skipped
 file.121.reason=non-code-file
-file.122.path=.specify/specs/096-sdd-observer-agent/test-evidence/journal-format-harness.txt
+file.122.path=.specify/specs/096-sdd-observer-agent/test-evidence/full-suite.txt
 file.122.verdict=skipped
 file.122.reason=non-code-file
-file.123.path=.specify/specs/096-sdd-observer-agent/test-evidence/objectivity-red-legs.txt
+file.123.path=.specify/specs/096-sdd-observer-agent/test-evidence/gap-drill.txt
 file.123.verdict=skipped
 file.123.reason=non-code-file
-file.124.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-baseline-suites.txt
+file.124.path=.specify/specs/096-sdd-observer-agent/test-evidence/journal-format-harness.txt
 file.124.verdict=skipped
 file.124.reason=non-code-file
-file.125.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-gates-baseline.txt
+file.125.path=.specify/specs/096-sdd-observer-agent/test-evidence/objectivity-red-legs.txt
 file.125.verdict=skipped
 file.125.reason=non-code-file
-file.126.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-mirror-baseline.txt
+file.126.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-baseline-suites.txt
 file.126.verdict=skipped
 file.126.reason=non-code-file
-file.127.path=.specify/specs/096-sdd-observer-agent/test-evidence/pointer-drills.txt
+file.127.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-gates-baseline.txt
 file.127.verdict=skipped
 file.127.reason=non-code-file
-file.128.path=.specify/specs/096-sdd-observer-agent/test-evidence/pre-analyze-plan.txt
+file.128.path=.specify/specs/096-sdd-observer-agent/test-evidence/plan-mirror-baseline.txt
 file.128.verdict=skipped
 file.128.reason=non-code-file
-file.129.path=.specify/specs/096-sdd-observer-agent/test-evidence/premises-entry.txt
+file.129.path=.specify/specs/096-sdd-observer-agent/test-evidence/pointer-drills.txt
 file.129.verdict=skipped
 file.129.reason=non-code-file
-file.130.path=.specify/specs/096-sdd-observer-agent/test-evidence/render-verify.txt
+file.130.path=.specify/specs/096-sdd-observer-agent/test-evidence/pre-analyze-plan.txt
 file.130.verdict=skipped
 file.130.reason=non-code-file
-file.131.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-flow-class-lookup.txt
+file.131.path=.specify/specs/096-sdd-observer-agent/test-evidence/premises-entry.txt
 file.131.verdict=skipped
 file.131.reason=non-code-file
-file.132.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-add.txt
+file.132.path=.specify/specs/096-sdd-observer-agent/test-evidence/render-verify.txt
 file.132.verdict=skipped
 file.132.reason=non-code-file
-file.133.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-conflict.txt
+file.133.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-flow-class-lookup.txt
 file.133.verdict=skipped
 file.133.reason=non-code-file
-file.134.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-sc-map.txt
+file.134.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-add.txt
 file.134.verdict=skipped
 file.134.reason=non-code-file
-file.135.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-validator.txt
+file.135.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-conflict.txt
 file.135.verdict=skipped
 file.135.reason=non-code-file
-file.136.path=.specify/specs/096-sdd-observer-agent/test-evidence/sc001-mutations.txt
+file.136.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-sc-map.txt
 file.136.verdict=skipped
 file.136.reason=non-code-file
-file.137.path=.specify/specs/096-sdd-observer-agent/test-evidence/sc003-non-blocking.txt
+file.137.path=.specify/specs/096-sdd-observer-agent/test-evidence/requirements-validator.txt
 file.137.verdict=skipped
 file.137.reason=non-code-file
-file.138.path=.specify/specs/096-sdd-observer-agent/test-evidence/tasks-stage-gates.txt
+file.138.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-repair-dispositions-r1-2026-11-10.md
 file.138.verdict=skipped
 file.138.reason=non-code-file
-file.139.path=.specify/specs/096-sdd-observer-agent/test-evidence/us1-journal-coverage.txt
+file.139.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-closure-acceptance.txt
 file.139.verdict=skipped
 file.139.reason=non-code-file
-file.140.path=.specify/specs/096-sdd-observer-agent/test-evidence/us2-objectivity.txt
+file.140.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-mandated-suite.txt
 file.140.verdict=skipped
 file.140.reason=non-code-file
-file.141.path=.specify/specs/096-sdd-observer-agent/test-evidence/us3-non-blocking.txt
+file.141.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-red-green-probe.txt
 file.141.verdict=skipped
 file.141.reason=non-code-file
-file.142.path=.specify/specs/096-sdd-observer-agent/test-evidence/us4-boundaries.txt
+file.142.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-repair-r1-smoke.txt
 file.142.verdict=skipped
 file.142.reason=non-code-file
-file.143.path=.specify/specs/096-sdd-observer-agent/test-evidence/us5-isolation.txt
+file.143.path=.specify/specs/096-sdd-observer-agent/test-evidence/review-smoke.txt
 file.143.verdict=skipped
 file.143.reason=non-code-file
-file.144.path=.specify/specs/096-sdd-observer-agent/test-evidence/wp02-observer-definition.txt
+file.144.path=.specify/specs/096-sdd-observer-agent/test-evidence/sc001-mutations.txt
 file.144.verdict=skipped
 file.144.reason=non-code-file
-file.145.path=agents/sdd-observer.agent.md
+file.145.path=.specify/specs/096-sdd-observer-agent/test-evidence/sc003-non-blocking.txt
 file.145.verdict=skipped
 file.145.reason=non-code-file
-file.146.path=docs/reference/skills/sdd-loop-driver.md
+file.146.path=.specify/specs/096-sdd-observer-agent/test-evidence/tasks-stage-gates.txt
 file.146.verdict=skipped
 file.146.reason=non-code-file
-file.147.path=scripts/python/journal-utils.py
-file.147.verdict=reviewed
-file.148.path=shared/declarations/facts/journal-format.yaml
+file.147.path=.specify/specs/096-sdd-observer-agent/test-evidence/us1-journal-coverage.txt
+file.147.verdict=skipped
+file.147.reason=non-code-file
+file.148.path=.specify/specs/096-sdd-observer-agent/test-evidence/us2-objectivity.txt
 file.148.verdict=skipped
 file.148.reason=non-code-file
-file.149.path=shared/guidelines/better-harness.md
+file.149.path=.specify/specs/096-sdd-observer-agent/test-evidence/us3-non-blocking.txt
 file.149.verdict=skipped
 file.149.reason=non-code-file
-file.150.path=skills/external/sdd-loop-driver/SKILL.md
+file.150.path=.specify/specs/096-sdd-observer-agent/test-evidence/us4-boundaries.txt
 file.150.verdict=skipped
 file.150.reason=non-code-file
-file.151.path=skills/external/sdd-loop-driver/references/observer-lifecycle.md
+file.151.path=.specify/specs/096-sdd-observer-agent/test-evidence/us5-isolation.txt
 file.151.verdict=skipped
 file.151.reason=non-code-file
-file.152.path=skills/external/sdd-loop-driver/references/stage-prompts.md
+file.152.path=.specify/specs/096-sdd-observer-agent/test-evidence/wp02-observer-definition.txt
 file.152.verdict=skipped
 file.152.reason=non-code-file
-file.153.path=tests/contract/test_fast_fail_discipline.py
-file.153.verdict=reviewed
-file.154.path=tests/contract/test_journal_engine.py
-file.154.verdict=reviewed
-file.155.path=tests/contract/test_non_regression_070.py
-file.155.verdict=reviewed
-file.156.path=tests/contract/test_sdd_loop_driver_skill.py
+file.153.path=.specify/specs/096-sdd-observer-agent/verification.md
+file.153.verdict=skipped
+file.153.reason=non-code-file
+file.154.path=agents/sdd-observer.agent.md
+file.154.verdict=skipped
+file.154.reason=non-code-file
+file.155.path=docs/reference/skills/sdd-loop-driver.md
+file.155.verdict=skipped
+file.155.reason=non-code-file
+file.156.path=scripts/python/journal-utils.py
 file.156.verdict=reviewed
-file.157.path=tests/contract/test_sdd_observer_agent.py
-file.157.verdict=reviewed
-file.158.path=tests/contract/test_sdd_observer_lifecycle.py
-file.158.verdict=reviewed
-file.159.path=tests/fixtures/sdd-observer/dual_line_builder.py
-file.159.verdict=reviewed
-file.160.path=tests/fixtures/sdd-observer/failure_builder.py
-file.160.verdict=reviewed
-file.161.path=tests/fixtures/sdd-observer/line_builder.py
-file.161.verdict=reviewed
-file.162.path=tests/fixtures/sdd-observer/tamper_builder.py
+file.157.path=shared/declarations/facts/journal-format.yaml
+file.157.verdict=skipped
+file.157.reason=non-code-file
+file.158.path=shared/guidelines/better-harness.md
+file.158.verdict=skipped
+file.158.reason=non-code-file
+file.159.path=skills/external/sdd-loop-driver/SKILL.md
+file.159.verdict=skipped
+file.159.reason=non-code-file
+file.160.path=skills/external/sdd-loop-driver/references/observer-lifecycle.md
+file.160.verdict=skipped
+file.160.reason=non-code-file
+file.161.path=skills/external/sdd-loop-driver/references/stage-prompts.md
+file.161.verdict=skipped
+file.161.reason=non-code-file
+file.162.path=tests/contract/test_fast_fail_discipline.py
 file.162.verdict=reviewed
+file.163.path=tests/contract/test_journal_engine.py
+file.163.verdict=reviewed
+file.164.path=tests/contract/test_non_regression_070.py
+file.164.verdict=reviewed
+file.165.path=tests/contract/test_sdd_loop_driver_skill.py
+file.165.verdict=reviewed
+file.166.path=tests/contract/test_sdd_observer_agent.py
+file.166.verdict=reviewed
+file.167.path=tests/contract/test_sdd_observer_lifecycle.py
+file.167.verdict=reviewed
+file.168.path=tests/fixtures/sdd-observer/dual_line_builder.py
+file.168.verdict=reviewed
+file.169.path=tests/fixtures/sdd-observer/failure_builder.py
+file.169.verdict=reviewed
+file.170.path=tests/fixtures/sdd-observer/line_builder.py
+file.170.verdict=reviewed
+file.171.path=tests/fixtures/sdd-observer/tamper_builder.py
+file.171.verdict=reviewed
 <!-- coverage-receipt:end -->
