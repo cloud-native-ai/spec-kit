@@ -66,3 +66,23 @@ SCRATCH .specify/.tmp/pkg04/pkg04-measure-7e0flwzs (removed after measurement)
 # - 变异 4 的语义：本行不是实现注入，而是对断言的判别力证明——若把用户内容检查写成
 #   「存在即可」，被改写内容将漏检；套件的 `_assert_user_content_intact` 使用 sha256，
 #   在内容改变时抛 AssertionError。
+
+# ---------------------------------------------------------------------------
+# review-repair r1 (2026-11-10) — 零写入探针守卫重做后的套件重跑
+# command: bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q
+# cwd: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command
+# captured: 2026-11-10T16:04:43Z
+# exit: 0
+
+# test runner: python3 -m pytest -n auto --dist load tests/integration/test_migrate_us2_safety.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+............                                                             [100%]
+12 passed in 13.30s
+
+# 本次变更：zero-write 探针测试改为可观测守卫（sentinel TemporaryDirectory + chdir；
+# 探针必须把 link 写入手上的临时目录），新增 mutation 5（workspace-writing probe
+# variant → zero-write 断言转红）；红基演练双变体见 red-base-probe-guard-2026-11-10.txt。
+# 引擎侧仅新增回执 workspace 键（E-3/E-2），不改上述测量读数所覆盖的处置行为。

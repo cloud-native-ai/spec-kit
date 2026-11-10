@@ -17,7 +17,7 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 `/speckit.migrate` 是薄投影：探测、计划与处置全部由已安装 CLI 的 `specify migrate` 子命令完成；模板不实现任何检查、残留清单、路径改写或处置判断，也不自带第二份计划。命令把新旧混杂的工作区收敛到当前安装版本的期望态，逐项给出「当前态 → 期望态 + 拟处置 + 依据路径」。
 
-1. **Dry-run first.** 运行 `specify migrate`（人读计划）或 `specify migrate --format json`（机器可读包络，键见命令 `--help`），并逐项向用户转述计划：
+1. **Dry-run first.** 运行 `specify migrate`（人读计划）或 `specify migrate --format json`（机器可读包络；模板原样转述，不解析键集），并逐项向用户转述计划：
 
 ```bash
 specify migrate --format json

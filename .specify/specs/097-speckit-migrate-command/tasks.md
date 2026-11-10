@@ -33,7 +33,7 @@
 - DoD-1: **FR lane** — FR-001…FR-025 每一条都在至少一条任务行的文本中被点名（`grep -E '^- \[[ xX>~]\] T[0-9]{3} ' .specify/specs/097-speckit-migrate-command/tasks.md | grep -oE 'FR-0[0-9]{2}' | sort -u | wc -l` 返回 25），且 § FR/SC → row traceability 给出映射。Check: 该命令输出 `25`，任务行 48；红判据按 FR 判定——删除任一 FR 在任务行中的全部行内引用后，该 FR 必须从去重集合消失、计数降为 24（2026-11-10 实测单点样例：仅删 T016 行内 FR-004 或仅删 T015 行内 FR-008，两者各为唯一引用，删除后计数均为 24；多点 FR 如 FR-001 由 T014、T016 两行点名，须删除两处才降为 24，单删一处计数不变属预期、不判红）。追溯表与 DoD 行文本不参与计数。
 - DoD-2: **clause lane** — 采用**严格子集**分区：`contracts/migrate-cli.md` C-1…C-5 与 `contracts/migrate-engine.md` C-1…C-4/C-6/C-7 各由唯一一行以 `[green: <contract>#<clause>]` 声明（分区见 § Green Partition）；未声明条款仍由点名它们的测试行文本钉住，机器上可缺席（owner: `.specify/skills/internal/create-tasks/SKILL.md` § Green）；`contracts/migrate-template.md` 的 T-1…T-6 **不是机器可判条款形态**（clause extractor 只读 `C-*`，该文件被判 `md-none` 具名），改由 T033/T034/T039 的断言钉住。Check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/097-speckit-migrate-command/tasks.md` 退出 0 且 `green-dangling` / `green-clause-collision` / `green-cross-phase` / `green-path-divergence` 全为 0。
 - DoD-3: **no second engine** — migrate 段内不存在第二份路径改写正则、第二份命令渲染、第二份链接名单、第二份镜像对名单、第二份退役清单。判别力由 `tests/contract/test_migrate_engine_contract.py` 的测试内注入变异证明：五类源码守卫先钉住非空的 migrate 段、对真实源判 clean；每类守卫另对一份合成第二实现（测试内构造的源文本）判违例——某类注入未被抓出（守卫失效）或真实源含第二实现（实现漂移）均使套件转红。Check: `bash scripts/bash/run-tests.sh tests/contract/test_migrate_engine_contract.py -q` 退出 0（clean 断言与五类注入变异断言在同一次套件运行中执行，读数随 T046 的 `test-evidence/final-suite.txt` 留档）。
-- DoD-4: **archive-not-delete 靠测量而非声明** — US2 读数中每个被替换/移除对象的归档位置逐条存在，回执 `archives[]` 与 `recover` 可枚举。Check: T028 的 `test-evidence/us2-safety.txt` 含逐条存在性读数与四个变异结果。
+- DoD-4: **archive-not-delete 靠测量而非声明** — US2 读数中每个被替换/移除对象的归档位置逐条存在，回执 `archives[]` 与 `recover` 可枚举。Check: T028 的 `test-evidence/us2-safety.txt` 含逐条存在性读数与五个转红演练结果（gate 移除、归档移除、全删注入、probe 写工作区变体、existence-only 弱化）。
 - DoD-5: **分发完整** — 源模板、四个副本、命令文档与 `COMMAND_BASELINE` 30 全部落地，`regen-command-copies.py --check` 退出 0。Check: GATE-2 与 T040 读数。
 - DoD-6: **镜像无 NEW drift** — 本特性触及的两个镜像对相对 R-8 基线无 NEW drift。Check: GATE-3。
 - DoD-7: **final 路径判据全部通过且有 smoke 记录** — SC-001 / SC-002 / SC-003 / SC-004（`requirements.md` 的 `**Path**: final` 标记为唯一 roster）在 `verification.md` 中均为 `pass`，且 smoke 记录齐全。Check: GATE-4。
@@ -41,7 +41,7 @@
 - DoD-9: **quickstart 真实执行** — 场景 1–5 以仓库源码调用形态真实执行并粘贴输出与退出码到 `notes/quickstart-run.md`。Check: T045 记录非空且逐场景含退出码。
 - DoD-10: **零未完成行** — 无 `[ ]` / `[>]` 行残留。Check: GATE-5。
 
-**DoD Status**: pending
+**DoD Status**: pass（DoD-1…DoD-10 全部 pass，读数见 `verification.md` § Definition of Done readings；2026-11-10 review-repair r1 复核）
 
 ## Completion Gate
 

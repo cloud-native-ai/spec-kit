@@ -78,9 +78,12 @@ def _sample_workspace(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_help_exits_zero_declares_outcomes_and_has_zero_side_effects(tmp_path):
+def test_help_exits_zero_declares_outcomes_and_has_zero_side_effects(
+    tmp_path, monkeypatch
+):
     workspace = tmp_path / "empty"
     workspace.mkdir()
+    monkeypatch.chdir(workspace)
     before = sorted(path.name for path in workspace.iterdir())
 
     result = _invoke(["migrate", "--help"])
@@ -119,6 +122,9 @@ def test_default_mode_is_dry_run_and_json_envelope_matches_c4(tmp_path):
     assert payload["receiptPath"] is None
     assert isinstance(payload["receipt"], dict)
     assert payload["receipt"]["mode"] == "dry-run"
+    assert payload["receipt"]["workspace"] == str(workspace.resolve()), (
+        "the dry-run receipt body must identify its workspace (C-4 / E-3)"
+    )
     assert payload["summary"]["total"] == len(payload["items"])
     assert not (workspace / ".specify" / "memory" / "migrate").exists(), (
         "dry-run must not create the receipt store"
@@ -149,7 +155,9 @@ def test_apply_and_dry_run_together_exit_2_with_zero_writes(tmp_path):
     assert sorted(path.name for path in workspace.iterdir()) == before
 
 
-@pytest.mark.parametrize("flag", ["--bogus", "--yes", "--force", "--non-interactive"])
+@pytest.mark.parametrize(
+    "flag", ["--bogus", "--yes", "--force", "--non-interactive", "-h"]
+)
 def test_undeclared_or_confirmation_flags_exit_2(tmp_path, flag):
     workspace = _sample_workspace(tmp_path)
 

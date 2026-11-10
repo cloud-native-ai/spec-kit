@@ -3,7 +3,7 @@
 **Feature ID**: 024  
 **Name**: Specification Workspace Versioning  
 **Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
-**Status**: Planned  
+**Status**: Implemented  
 **Created**: 2026-06-05  
 **Last Updated**: 2026-11-10
 
@@ -18,6 +18,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 2026-11-10 (plan, `/speckit.migrate` 097): the version-marker premise was superseded by a declaration-driven design — the expected state is projected from the currently installed CLI's assets and declarations, so no `.specify/version` marker and no version→migration registry are needed. Bound sub-spec: `.specify/specs/097-speckit-migrate-command/` (requirements → plan: 3 contracts, 9 entities, 14 work packages).
 
 2026-11-10 (review, `/speckit.review` 097): four segments + Acceptance Reality Check complete — process report `.specify/specs/097-speckit-migrate-command/review.md`, code record `code-review.md` (123 changed / 97 judged / 26 generated-skipped / 0 gap; 1 `blocking`). `Implemented → Ready for Review` **refused — `blocking-unresolved`**: the current code-segment record carries a blocking entry (unfailable zero-write test, `tests/integration/test_migrate_us2_safety.py:273`) and the feature still claims `Planned` (the `Planned → Implemented` flip was never landed although the checker returns `accept` with `final_path` pass 4/4), so the transition has no matching From-state. Status left unchanged; no waiver presented. ARC record: pass 4 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 4.
+
+2026-11-10 (review-repair r1, 097): the blocking defect and the eight P1 findings were repaired. The zero-write probe test is now an observable guard (sentinel transient directory + workspace chdir, plus a fifth red-ability mutation; two-variant red-base drill in `test-evidence/red-base-probe-guard-2026-11-10.txt`); the smoke record was re-executed verbatim (105 passed, `final-suite.txt`); C-1/docs/template converged to `--help`; the receipt `workspace` key landed (C-4/E-2/E-3); SC-002/SC-007/DoD-4 wording, quickstart status and tasks DoD status refreshed. `closure-acceptance-check.py` on the repaired tree: verdict `accept`, reasons none, `final_path` pass 4/4, all four `Planned → Implemented` conditions true → **`Planned → Implemented` landed** (registry row and this detail agree). `Implemented → Ready for Review` remains pending a re-run of `/speckit.review` against this tree.
 
 ## Key Changes
 
@@ -54,7 +56,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 ## Status Tracking
 
 - **Draft**: Gap identified; no workspace versioning exists.
-- **Planned**: Version schema and migration registry designed.
-- **Implemented**: Version marker and upgrade command functional.
+- **Planned**: One-shot migration design planned — the expected state is projected from the currently installed CLI's assets and declarations (the `.specify/version` marker and version→migration registry premise was superseded; see Latest Review 2026-11-10).
+- **Implemented**: `specify migrate` functional — zero-write dry-run plan, confirmation-gated apply with archive-not-delete and per-run receipts; 097's final-path criteria pass and its smoke record is green.
+- **Blocked**: Tasks closed and at least one `final`-path criterion is not `pass`.
 - **Ready for Review**: Migration tests pass; existing workspaces upgradable.
 - **Completed**: Workspace versioning is the standard upgrade path across CLI releases.

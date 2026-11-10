@@ -48,6 +48,7 @@ def test_one_receipt_file_per_run_in_running_state(tmp_path):
     assert payload["status"] == "running"
     assert payload["finishedAt"] is None
     assert payload["startedAt"] == "2026-11-10T09:30:12Z"
+    assert payload["workspace"] == str(tmp_path.resolve())
     assert payload["items"] == []
     assert payload["archives"] == []
     assert [p.name for p in migrate_receipts_dir(tmp_path).iterdir()] == [

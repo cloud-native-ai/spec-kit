@@ -16,7 +16,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 | `--apply` | flag | 关 | 进入写入模式（第一把钥匙）；与 `--dry-run` 互斥 |
 | `--workspace` | PATH | `.` | 目标工作区根；必须已含 `.specify/` |
 | `--format` | `text` \| `json` | `text` | `json` 输出机器可读包络（C-4） |
-| `--help` / `-h` | flag | — | 零副作用应答（C-6） |
+| `--help` | flag | — | 零副作用应答（C-6） |
 
 **MUST NOT** 提供任何形态的额外确认旗标（`--yes`、`--force`、`--non-interactive`、`--confirm` 等）；出现即契约违约（C-5）。
 未声明的选项 MUST 被拒绝（非零退出，退出码 2，Typer 缺省行为），MUST NOT 落到主流程。

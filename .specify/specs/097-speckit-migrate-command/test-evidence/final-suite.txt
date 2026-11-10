@@ -1,28 +1,23 @@
-# Final subset suite — feature 097 (T046, SC-001…SC-009)
+# Final subset suite — feature 097 (T046 re-run after review-repair r1, SC-001…SC-009)
 
 **Task**: T046 · **Date**: 2026-11-10 · **Worktree**: `097-speckit-migrate-command`
 
 ## Command
 
+The literal below is the command that produced the output in § Full output, including its
+`--names-out` path — recorded verbatim (review findings A2/I1: the earlier record omitted it).
+
 ```bash
-bash scripts/bash/run-tests.sh --names-out .specify/.tmp/pkg07/final-failed.txt \
-  tests/contract/test_migrate_cli_surface.py \
-  tests/contract/test_migrate_engine_contract.py \
-  tests/contract/test_migrate_template.py \
-  tests/contract/test_migrate_distribution_assembly.py \
-  tests/contract/test_migration_distribution.py \
-  tests/unit/test_migrate_planner.py \
-  tests/unit/test_migrate_receipts.py \
-  tests/integration/test_migrate_us1_converge.py \
-  tests/integration/test_migrate_us2_safety.py \
-  tests/integration/test_migrate_us3_crossversion.py \
-  tests/integration/test_migrate_us4_equivalence.py -q
+bash scripts/bash/run-tests.sh --names-out .specify/.tmp/review-repair-r1/final-failed.txt tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q
 ```
 
 cwd: `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/097-speckit-migrate-command`
-started: 2026-11-10T15:31:55Z · finished: 2026-11-10T15:32:19Z
+started: 2026-11-10T16:05:08Z · finished: 2026-11-10T16:05:31Z
 
-This reading supersedes the first T046 capture (101 passed @ 15:26Z): the T048 gate opened one acceptance gap (see § Acceptance repair) whose two tests now join this subset. The command is unchanged; only the tree grew.
+This reading supersedes the T046 103-passed capture (2026-11-10T15:31:55Z) after review-repair r1:
+the US2 zero-write probe test was rebuilt into an observable guard plus a fifth in-suite mutation
+(`tests/integration/test_migrate_us2_safety.py`) and the CLI-surface rejection set gained `-h`
+(`tests/contract/test_migrate_cli_surface.py`), so the tree carries two more tests (103 → 105).
 
 ## Full output
 
@@ -32,10 +27,10 @@ This reading supersedes the first T046 capture (101 passed @ 15:26Z): the T048 g
 bringing up nodes...
 bringing up nodes...
 
-........................................................................ [ 69%]
-...............................                                          [100%]
-103 passed in 21.96s
-# failed-name list written: .specify/.tmp/pkg07/final-failed.txt (0 entries) passes=1
+........................................................................ [ 68%]
+.................................                                        [100%]
+105 passed in 22.22s
+# failed-name list written: .specify/.tmp/review-repair-r1/final-failed.txt (0 entries) passes=1
 # exit=0
 ```
 
@@ -44,7 +39,7 @@ bringing up nodes...
 Baseline (implement entry, 2026-11-10): `.specify/specs/097-speckit-migrate-command/test-evidence/implement-entry-baseline-suite.txt`; its failed-name list is `.specify/specs/097-speckit-migrate-command/baseline-failed.txt` (278 names).
 
 ```bash
-comm -23 <(sort final-failed.txt) <(sort baseline-failed.txt)   # NEW failure names
+comm -23 <(sort .specify/.tmp/review-repair-r1/final-failed.txt) <(sort .specify/specs/097-speckit-migrate-command/baseline-failed.txt)   # NEW failure names
 # output: (empty)
 new_count=0
 baseline_count=278
@@ -55,15 +50,16 @@ Final failing set: **0 names** (the run wrote an empty list). NEW failures versu
 ## SC readings carried by this run (GATE-1)
 
 - SC-001 / SC-003 / SC-007 / SC-008 (US1 convergence, zero-write, boundary pointers): `test_migrate_cli_surface.py`, `test_migrate_us1_converge.py`, `test_migrate_planner.py` all green.
-- SC-002 / SC-005 / SC-008 (US2 safety, archive recovery, conflict, user content): `test_migrate_us2_safety.py` green.
+- SC-002 / SC-005 / SC-008 (US2 safety, archive recovery, conflict, user content): `test_migrate_us2_safety.py` green — including the rebuilt zero-write probe guard and mutation 5 (workspace-writing probe variant → zero-write assertion red).
 - SC-004 / SC-006 (US3 cross-version, interruption resume): `test_migrate_us3_crossversion.py` green.
 - SC-009 (US4 distribution assembly) and the two-entry equivalence: `test_migrate_template.py`, `test_migrate_distribution_assembly.py`, `test_migration_distribution.py`, `test_migrate_us4_equivalence.py` green.
 - DoD-3 (no second engine, five injected-mutation guards): `test_migrate_engine_contract.py` is inside this green run — the clean assertions and the five injection mutations execute in the same suite run, as DoD-3's Check requires.
 
-## Acceptance repair disclosed (T048 gate discovery)
+## Review-repair r1 changes carried by this run
 
-At T048 the gate re-validation found that contract C-8's last bullet ("旧版与混杂夹具 dry-run `planned`、应用后逐项零差异、再跑 `clean`") and SC-003's mixed-fixture limb had **no acceptance reading**: `build_mixed_project` (T007) was constructed and smoke-built but no test exercised it. Probe `.specify/.tmp/pkg07/mixed-probe.txt` (same date) measured the capability correct: mixed dry-run `planned` exit 1 total 3 (templates-generated 1 / compat-links 1 / migration-residue 1), zero-write; apply exit 0 `applied`, all items done, 2 archives present; re-run `clean` exit 0 zero-write; a corrupted converged target is flagged again (`planned`) while it exists — the equivalence assertion has power beyond existence.
+- `tests/integration/test_migrate_us2_safety.py` — `test_symlink_support_probe_is_zero_write` now hands the probe a sentinel transient directory (monkeypatched `tempfile.TemporaryDirectory`) and chdirs into the workspace, so it asserts both where the probe wrote and that the workspace digest cannot move; the injected workspace-writing probe variant is the fifth in-suite red-ability mutation. The two-variant red-base drill transcript is `test-evidence/red-base-probe-guard-2026-11-10.txt`.
+- `tests/contract/test_migrate_cli_surface.py` — the `--help` zero-side-effect limb now snapshots the directory the command could reach (cwd = workspace); `-h` is pinned as an undeclared option (exit 2) per the converged C-1; the dry-run receipt body must carry its `workspace` key.
+- `tests/unit/test_migrate_receipts.py` — the running receipt must carry the `workspace` key (data-model E-3).
+- The earlier acceptance-repair disclosure (mixed fixture, 101 → 103) is preserved in git history of this file and in `verification.md` `notes=`; this capture supersedes it with 103 → 105.
 
-Two tests were added to `tests/integration/test_migrate_us1_converge.py` (the file T015 owns; test-only, no engine change): `test_mixed_fixture_converges_in_one_apply_then_reruns_clean` and `test_mixed_fixture_equivalence_assertion_has_power_beyond_existence`. Targeted run: `6 passed in 22.30s` (exit 0). This full-subset reading then reports 103 passed (was 101). Disclosed again in `verification.md` `notes=` and the pkg07 commit message.
-
-Verdict: **exit 0 — 103 passed, 0 failed, zero NEW failures vs the implement-entry baseline.**
+Verdict: **exit 0 — 105 passed, 0 failed, zero NEW failures vs the implement-entry baseline.**

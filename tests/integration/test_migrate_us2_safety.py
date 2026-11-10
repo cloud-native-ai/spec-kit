@@ -15,10 +15,12 @@ and archive executor are exercised from the same file.
 
 Mutation discipline (FR-024 / SC-002 / SC-005 / SC-008): every safety
 assertion is proven red-able inside this suite. Removing the confirmation
-gate, removing the archive step, injecting a full delete, and weakening the
-user-content check to existence-only must each make the corresponding
-assertion fail — a mutation that stays green means the assertion has no
-discriminative power.
+gate, removing the archive step, injecting a full delete, and replacing the
+symlink probe with a workspace-writing variant must each make the
+corresponding assertion fail — a mutation that stays green means the
+assertion has no discriminative power. The existence-only weakening is a
+check-power drill over the same reading: the weakened form stays green while
+the byte assertion reds.
 """
 
 import hashlib
@@ -26,6 +28,7 @@ import importlib.util
 import json
 import os
 import shutil
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -270,16 +273,80 @@ def test_destructive_classifier_projects_the_confirmation_gates_owner():
         assert specify_cli.migrate_is_destructive(item(reversible)) is False
 
 
-def test_symlink_support_probe_is_zero_write(tmp_path):
-    workspace = _builders().build_legacy_project(tmp_path / "legacy")
+def _fixed_temporary_directory(path: Path):
+    """A TemporaryDirectory stand-in that hands the probe a known scratch path.
+
+    The real object deletes what the probe creates on exit, so its write would
+    stay unobservable; the stand-in keeps the link in place and lets the
+    assertion prove *where* the probe wrote, not merely that nothing moved.
+    """
+
+    class _FixedDirectory:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return str(path)
+
+        def __exit__(self, *exc_info):
+            return False
+
+    return _FixedDirectory
+
+
+def _assert_probe_is_workspace_isolated(workspace: Path, sentinel: Path, probe):
+    """The zero-write reading, observable on both sides.
+
+    The probe must create its link inside the transient directory it was
+    handed (``sentinel``) and leave the workspace digest byte-identical. A
+    probe that scribbles into the current directory — chdir'd to the
+    workspace by the caller — moves the digest; a probe that stops using its
+    transient directory leaves the sentinel empty. Either regression reds.
+    """
     before = _tree_digest(workspace)
-
-    verdict = specify_cli.migrate_symlink_supported()
-
-    assert isinstance(verdict, bool)
+    verdict = probe()
+    assert isinstance(verdict, bool), verdict
+    assert (sentinel / "link").is_symlink(), (
+        "the probe created no link inside the transient directory it was handed"
+    )
+    assert os.readlink(sentinel / "link") == "target"
     assert _tree_digest(workspace) == before, (
         "the symlink-support probe wrote to the workspace"
     )
+
+
+def test_symlink_support_probe_is_zero_write(tmp_path, monkeypatch):
+    workspace = _builders().build_legacy_project(tmp_path / "legacy")
+    sentinel = tmp_path / "probe-scratch"
+    sentinel.mkdir()
+    monkeypatch.setattr(
+        tempfile, "TemporaryDirectory", _fixed_temporary_directory(sentinel)
+    )
+    monkeypatch.chdir(workspace)
+
+    _assert_probe_is_workspace_isolated(
+        workspace, sentinel, specify_cli.migrate_symlink_supported
+    )
+
+
+def test_mutation_workspace_writing_probe_turns_the_zero_write_check_red(
+    tmp_path,
+):
+    workspace = _builders().build_legacy_project(tmp_path / "legacy")
+    sentinel = tmp_path / "probe-scratch"
+    sentinel.mkdir()
+
+    def workspace_writing_probe():
+        # The injected variant keeps its transient link but also writes one
+        # stray link into the workspace — the regression the guard exists for.
+        os.symlink("target", str(sentinel / "link"))
+        os.symlink("target", str(workspace / ".specify" / "probe-link"))
+        return True
+
+    with pytest.raises(AssertionError, match="wrote to the workspace"):
+        _assert_probe_is_workspace_isolated(
+            workspace, sentinel, workspace_writing_probe
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -24,9 +24,21 @@ post_change_commit=1b2d998c6 plus the pkg07 working tree (this file lands in the
 
 # -- Smoke test record (exactly one per feature) --
 
-smoke_command=bash scripts/bash/run-tests.sh tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q
+smoke_command=bash scripts/bash/run-tests.sh --names-out .specify/.tmp/review-repair-r1/final-failed.txt tests/contract/test_migrate_cli_surface.py tests/contract/test_migrate_engine_contract.py tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migration_distribution.py tests/unit/test_migrate_planner.py tests/unit/test_migrate_receipts.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us2_safety.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py -q
 smoke_exit_code=0
 smoke_evidence_path=.specify/specs/097-speckit-migrate-command/test-evidence/final-suite.txt
+
+# -- Closure verdict (implement status step, landed by review-repair r1 2026-11-10) --
+# Copied from closure-acceptance-check.py --json-out; the verdict measures the tree being
+# claimed (this working tree). The pre-flip run reads the prior `Planned` claim; the
+# post-flip run re-reads the landed `Implemented` claim against the same tree.
+
+closure_verdict=accept
+closure_reasons=(none emitted)
+closure_final_path=pass 4 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 4
+closure_conditions=every_final_path_pass=true, no_open_rows=true, smoke_record_pass=true, status_row_per_criterion=true
+closure_checker_command=python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/097-speckit-migrate-command --feature-detail .specify/features/024-specification-workspace-versioning.md --json --json-out .specify/specs/097-speckit-migrate-command/test-evidence/closure-verdict-pre-flip-2026-11-10.json
+closure_evidence=.specify/specs/097-speckit-migrate-command/test-evidence/closure-verdict-pre-flip-2026-11-10.json and closure-verdict-implemented-2026-11-10.json
 
 # -- Evidence records (bind every pass claim to archived evidence) --
 
@@ -37,12 +49,12 @@ verdict=pass
 
 sample_id=SC-002
 evidence_path=.specify/specs/097-speckit-migrate-command/test-evidence/us2-safety.txt
-evidence_sha256=287529cfcd69807880a185e81df4929a1519bf9737602b59c3b40e18f6b8c253
+evidence_sha256=e73f5a239d9d001defd437f654a83682e29b495c73491749e3f14d8a411550f1
 verdict=pass
 
 sample_id=SC-003
 evidence_path=.specify/specs/097-speckit-migrate-command/test-evidence/final-suite.txt
-evidence_sha256=bf6f01e8fc003f27784ceb9dfc0a869094282f8ed8aca19014cc41e8433ed177
+evidence_sha256=f3a09310389e1b653904a9d6069a6b10259894f14f9ca729bf8d9ee4876f18d8
 verdict=pass
 
 sample_id=SC-004
@@ -52,7 +64,7 @@ verdict=pass
 
 sample_id=SC-005
 evidence_path=.specify/specs/097-speckit-migrate-command/test-evidence/us2-safety.txt
-evidence_sha256=287529cfcd69807880a185e81df4929a1519bf9737602b59c3b40e18f6b8c253
+evidence_sha256=e73f5a239d9d001defd437f654a83682e29b495c73491749e3f14d8a411550f1
 verdict=pass
 
 sample_id=SC-006
@@ -67,7 +79,7 @@ verdict=pass
 
 sample_id=SC-008
 evidence_path=.specify/specs/097-speckit-migrate-command/test-evidence/us2-safety.txt
-evidence_sha256=287529cfcd69807880a185e81df4929a1519bf9737602b59c3b40e18f6b8c253
+evidence_sha256=e73f5a239d9d001defd437f654a83682e29b495c73491749e3f14d8a411550f1
 verdict=pass
 
 sample_id=SC-009
@@ -81,11 +93,11 @@ verdict=pass
 
 SC-001_status=pass
 SC-001_value=us1-converge.txt: latest fixture dry-run clean exit 0 with unchanged tree hash; legacy fixture dry-run planned exit 1 with unchanged tree hash and items in all five dimensions (3/2/1/1/4); apply applied exit 0, 11/11 items done, 9 archives all present; second run clean exit 0 zero-write; the per-dimension removal mutation zeroes each dimension (control >0)
-SC-001_note=own fixture readings, not delegated evidence; suite inside the 103-passed final run (final-suite.txt).
+SC-001_note=own fixture readings, not delegated evidence; suite inside the 105-passed final run (final-suite.txt).
 
 SC-002_status=pass
-SC-002_value=us2-safety.txt: non-interactive apply exit 3 outcome blocked with 9/9 destructive items blocked and zero executed (confirm-calls=0), 2 reversible writes executed; interactive apply one confirmation, 9/9 archive entries exist with matching digests, recover equals archives; four in-suite mutations (gate removal, archive removal, full delete, existence-only weakening) each turn the corresponding assertion red
-SC-002_note=both halves measured on one fixture family; the mutations prove red-ability (FR-024).
+SC-002_value=us2-safety.txt: non-interactive apply exit 3 outcome blocked with 9/9 destructive items blocked and zero executed (confirm-calls=0), 2 reversible writes executed; interactive apply one confirmation, 9/9 archive entries exist with matching digests, recover equals archives; in-suite red-ability: three product mutations (gate removal, archive removal, full delete) each turn the corresponding assertion red, and the workspace-writing symlink-probe variant turns the zero-write assertion red (observable probe guard, 12-test re-run); the existence-only weakening is a check-power drill — the weakened reading stays green while the byte assertion reds (MUT-existence-only)
+SC-002_note=both halves measured on one fixture family; the product mutations and the check-power drills prove red-ability (FR-024).
 
 SC-003_status=pass
 SC-003_value=final-suite.txt: mixed fixture dry-run planned exit 1 total 3 (templates-generated 1 / compat-links 1 / migration-residue 1) zero-write; one apply applied exit 0 with all items done and 2 archives present; re-run clean exit 0 zero-write; latest fixture clean in dry-run and re-run with zero writes (us1-converge.txt); a corrupted converged target exists while the equivalence reading flags it (test_mixed_fixture_equivalence_assertion_has_power_beyond_existence), so an existence-only weakening turns red; three-class outcomes decidable by outcome token and exit code
@@ -104,7 +116,7 @@ SC-006_value=us3-crossversion.txt INTERRUPT: interrupted apply (target deleted, 
 SC-006_note=counts and existence assertions on one fixture (SC-006 wording).
 
 SC-007_status=pass
-SC-007_value=us1-converge.txt: every plan and receipt carries the E-9 static goal/team pointer and zero goal/team items; the sanitize Migration wrap-up lane now declares `/speckit.migrate` as the one-shot closeout main entry with the lane as periodic recheck fallback and unchanged checkers/dispositions (T041/T042, framework source and mirror byte-identical)
+SC-007_value=us1-converge.txt POINTER/POINTER-RECEIPT: every plan and receipt carries the E-9 static goal/team pointer and zero goal/team items; the sanitize Migration wrap-up lane declares `/speckit.migrate` as the one-shot closeout main entry with the lane as periodic recheck fallback and unchanged checkers/dispositions — `skills/internal/sanitize-materials/SKILL.md:167-178`, framework source and mirror byte-identical (mirror-verify.txt Pair 1, diff_exit=0); the reused migration-residue dimension is empty on the post-apply re-run (SECOND-RUN outcome=clean items=0)
 SC-007_note=migrate absorbs no goal/team migration and no periodic sanitize duty (FR-012/FR-013).
 
 SC-008_status=pass
@@ -128,8 +140,8 @@ deferred_reason_summary=
 
 DoD-1=pass — FR lane: 25 distinct FR-0NN tokens cited by task rows (`grep -E '^- \\[[ xX>~]\\] T[0-9]{3} ' tasks.md | grep -oE 'FR-0[0-9]{2}' | sort -u | wc -l` returns 25)
 DoD-2=pass — clause lane: `python3 .specify/scripts/python/validate-tasks.py tasks.md` exit 0, 0 error(s), 0 warning(s)
-DoD-3=pass — no second engine: test_migrate_engine_contract.py green inside the 103-passed final run (clean assertions plus the five in-test injection mutations in one suite run)
-DoD-4=pass — archive-not-delete measured: us2-safety.txt per-object existence readings plus the four mutations
+DoD-3=pass — no second engine: test_migrate_engine_contract.py green inside the 105-passed final run (clean assertions plus the five in-test injection mutations in one suite run)
+DoD-4=pass — archive-not-delete measured: us2-safety.txt per-object existence readings plus the five red-ability drills (gate removal, archive removal, full delete, workspace-writing probe variant, existence-only weakening)
 DoD-5=pass — distribution complete: test_migration_distribution.py green, regen-command-copies.py --check exit 0, us4 counts 30/30/28 with COMMAND_BASELINE 30
 DoD-6=pass — mirrors no NEW drift: sync-mirrors.py --check exit 0 vs the R-8 baseline (exit 0); both touched pairs diff -q byte-identical (mirror-verify.txt)
 DoD-7=pass — final-path criteria SC-001…SC-004 all pass and the smoke record is present (this file)
@@ -139,7 +151,7 @@ DoD-10=pass — zero unfinished rows: `grep -cE '^- \\[[ >]\\] T[0-9]{3} ' tasks
 
 # -- Gates (tasks.md § Completion Gate) --
 
-GATE-1=pass — feature subset exit 0, 103 passed, zero NEW failing names vs the implement-entry baseline (278 names; final-suite.txt)
+GATE-1=pass — feature subset exit 0, 105 passed, zero NEW failing names vs the implement-entry baseline (278 names; final-suite.txt)
 GATE-2=pass — test_migration_distribution.py green in GATE-1's run; regen-command-copies.py --check exit 0 (mirror-verify.txt)
 GATE-3=pass — sync-mirrors.py --check exit 0, no NEW drift vs R-8; regen-command-copies.py --check exit 0 (mirror-verify.txt)
 GATE-4=pass — every final-path criterion (SC-001…SC-004) is pass; smoke_command/smoke_exit_code=0/smoke_evidence_path all present
@@ -148,18 +160,18 @@ GATE-6=pass — validate-tasks.py exit 0, 0 error(s), 0 warning(s)
 
 # -- Free-form notes --
 
-notes=Disclosed acceptance repair (2026-11-10, T048 gate re-validation): contract C-8's last bullet and SC-003's mixed-fixture limb had no acceptance reading — build_mixed_project was constructed by T007 but no test exercised it. A zero-write probe (.specify/.tmp/pkg07/mixed-probe.txt) measured the capability correct (planned exit 1 total 3; applied exit 0 with 2 archives; re-run clean zero-write; corrupted converged target flagged while existing), then two tests were added to tests/integration/test_migrate_us1_converge.py — the T015 suite — test-only, no engine change. Targeted run 6 passed; the T046 subset was re-run and re-recorded (101 to 103 passed, zero NEW failures). The worktree's pre-existing unrelated changes (.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt modification; checkpoints/01-requirements.md, checkpoints/02-clarify.md, test-evidence/analyze-validation-round2-2026-11-10.md untracked) were left untouched and are not part of this package. Quickstart substituted the repository source for the installed CLI per tasks.md § Environment Prerequisites (installed CLI is released 0.0.22).
+notes=Disclosed acceptance repair (2026-11-10, T048 gate re-validation): contract C-8's last bullet and SC-003's mixed-fixture limb had no acceptance reading — build_mixed_project was constructed by T007 but no test exercised it. A zero-write probe (.specify/.tmp/pkg07/mixed-probe.txt) measured the capability correct (planned exit 1 total 3; applied exit 0 with 2 archives; re-run clean zero-write; corrupted converged target flagged while existing), then two tests were added to tests/integration/test_migrate_us1_converge.py — the T015 suite — test-only, no engine change. Targeted run 6 passed; the T046 subset was re-run and re-recorded (101 to 103 passed, zero NEW failures). The worktree's pre-existing unrelated changes (.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt modification; checkpoints/01-requirements.md, checkpoints/02-clarify.md, test-evidence/analyze-validation-round2-2026-11-10.md untracked) were left untouched and are not part of this package. Quickstart substituted the repository source for the installed CLI per tasks.md § Environment Prerequisites (installed CLI is released 0.0.22). Review-repair r1 (2026-11-10): the US2 zero-write probe test was rebuilt into an observable guard plus mutation 5 (red-base drill: test-evidence/red-base-probe-guard-2026-11-10.txt; us2 re-run appended in us2-safety.txt, 12 passed); the smoke record was re-executed and re-recorded verbatim with its --names-out path (103 to 105 passed, final-suite.txt); SC-002/SC-007/DoD-4 wording aligned with the exercised drills; contract C-1, the command docs and the template converged to --help only (no -h registration); the receipt workspace key was implemented (C-4/E-2/E-3); quickstart's status declaration and tasks.md's DoD status were refreshed.
 
 # -- Human-readable view (NOT the record; rendered from the block above) --
 
 | SC | Path | Status | Evidence pointer |
 |----|------|--------|------------------|
 | SC-001 | final | pass | us1-converge.txt — five-dimension convergence, zero-write hashes, per-dimension removal mutation |
-| SC-002 | final | pass | us2-safety.txt — blocked bucket, one-confirmation apply, archives recoverable, four mutations |
+| SC-002 | final | pass | us2-safety.txt — blocked bucket, one-confirmation apply, archives recoverable, five red-ability drills (observable probe guard) |
 | SC-003 | final | pass | final-suite.txt — mixed planned/applied/clean + existence-only weakening red (repair disclosed) |
 | SC-004 | final | pass | us3-crossversion.txt — one-run N→N+k, version fields, routing mutation |
 | SC-005 | supporting | pass | us2-safety.txt — conflict names both candidates, no winner |
 | SC-006 | supporting | pass | us3-crossversion.txt — interruption resume, no second move |
-| SC-007 | supporting | pass | us1-converge.txt — static pointer, zero goal/team items; sanitize lane boundary |
+| SC-007 | supporting | pass | us1-converge.txt + SKILL.md:167-178 + mirror-verify.txt — static pointer, zero goal/team items; sanitize lane boundary |
 | SC-008 | supporting | pass | us2-safety.txt — user content byte-identical, archive-before-write |
 | SC-009 | supporting | pass | us4-equivalence.txt + mirror-verify.txt — assembly faces, regen/mirror checks |

@@ -22,7 +22,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 | `--apply` | flag | off | Enter write mode (first key); mutually exclusive with `--dry-run` |
 | `--workspace` | PATH | `.` | Target workspace root; must already contain `.specify/` |
 | `--format` | `text` \| `json` | `text` | `json` emits the machine-readable envelope (`planVersion`, `mode`, `workspaceKind`, `outcome`, `exitCode`, `items`, `summary`, `notes`, `pointers`, `receipt`, `receiptPath`) |
-| `--help` / `-h` | flag | — | Zero-side-effect answer declaring the outcomes and exit codes |
+| `--help` | flag | — | Zero-side-effect answer declaring the outcomes and exit codes |
 
 There is no confirmation-class flag (`--yes`, `--force`, `--non-interactive`, `--confirm`); undeclared options are rejected with exit 2.
 

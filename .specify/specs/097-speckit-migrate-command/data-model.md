@@ -58,6 +58,7 @@
 | `mode` | enum | `dry-run` \| `apply` |
 | `status` | enum | `running` \| `completed` \| `aborted`（apply 开始时写 `running`，正常收束写 `completed`；崩溃留下 `running` 供续跑识别） |
 | `startedAt` / `finishedAt` | string \| null | ISO-8601 UTC；`running` 时 `finishedAt=null` |
+| `workspace` | string | 工作区根绝对路径；运行记录字段（E-2），不参与确定性比较 |
 | `resumedFrom` | string \| null | 续跑时指向被接续的 `runId` |
 | `source` | object | `{stampFile: ".specify/source.json" \| null, frameworkCommit: string \| "unavailable", stampedAt: string \| null, reason: string \| null}`；只作记录（FR-020） |
 | `target` | object | `{cliVersion: string, frameworkCommit: string \| "unavailable", origin: "git" \| "embedded" \| "unavailable"}` |
