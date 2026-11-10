@@ -38,6 +38,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -230,13 +231,13 @@ def collect_args(ws: Path, unit_id="/speckit.plan", **over):
 def make_determination(ws: Path, unit_id: str, run_id: str, extra=()):
     """Create a real determination record for ``unit_id`` via the adjacent
     engine's own CLI (the honest upstream form — no fabricated store files)."""
-    return subprocess.run(
-        [sys.executable, str(RUN_DETERMINATION),
-         "--action", "determine", "--workspace-root", str(ws),
+    return run_engine_in_process(
+        RUN_DETERMINATION,
+        ["--action", "determine", "--workspace-root", str(ws),
          "--unit-id", unit_id, "--run-id", run_id,
          "--complexity", "complex", "--qualification", "qualified",
          "--elapsed-ms", "81234", *[str(e) for e in extra]],
-        capture_output=True, text=True, timeout=120, check=False)
+    )
 
 
 def assert_no_blanks(node, path="$"):

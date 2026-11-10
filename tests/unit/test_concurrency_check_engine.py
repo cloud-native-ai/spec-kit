@@ -27,6 +27,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "concurrency-check.py"
 READER = REPO_ROOT / "scripts" / "python" / "declaration_reader.py"
@@ -66,9 +68,11 @@ def _run_engine(*args, cwd=None, timeout=120):
     assert ENGINE.is_file(), (
         "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
         "not in this worktree yet")
+    if cwd is None:
+        return run_engine_in_process(ENGINE, [str(arg) for arg in args])
     return subprocess.run(
         [sys.executable, str(ENGINE), *[str(arg) for arg in args]],
-        capture_output=True, text=True, cwd=str(cwd or REPO_ROOT), timeout=timeout,
+        capture_output=True, text=True, cwd=str(cwd), timeout=timeout,
     )
 
 

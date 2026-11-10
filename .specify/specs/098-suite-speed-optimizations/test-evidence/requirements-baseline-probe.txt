@@ -1,0 +1,64 @@
+# 098 requirements baseline probe (read-only)
+date: 2026-11-10
+worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations
+head: b3da3a26dfba209057f65c2b17962b9516812c39
+
+## runner default mode (evidence: scripts/bash/run-tests.sh header + mode resolution)
+9:#   - The default is process parallelism (-n <effective> --dist load). The suite's cost is
+170:    MODE="parallel"
+174:    MODE_ARGS=(-n "$WORKERS_N")
+185:    MODE_ARGS=(-n0)
+
+## xdist availability
+xdist 3.8.0
+
+## registered markers (pyproject.toml)
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "contract: contract and external-surface validation tests",
+    "integration: integration tests using filesystem or fixture workspaces",
+    "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
+]
+
+## test files and test functions per directory
+tests/contract: files=327 test_funcs=4841 subprocess_run_lines=340
+tests/integration: files=81 test_funcs=484 subprocess_run_lines=89
+tests/unit: files=66 test_funcs=1034 subprocess_run_lines=46
+tests/scenarios: files=0 test_funcs=0 subprocess_run_lines=0
+subprocess.run total (tests/, all trees): 499
+
+## time.sleep occurrences in test code (tests/, excluding fixtures)
+      8 tests/contract/test_client_metrics.py
+      2 tests/integration/test_session_kill_reattach.py
+      2 tests/contract/test_store_state_protocol.py
+      2 tests/contract/test_line_envelope_contract.py
+      1 tests/unit/test_line_registry_engine.py
+      1 tests/unit/test_concurrency_check_engine.py
+      1 tests/integration/test_sdd_loop_efficiency_runner.py
+      1 tests/contract/test_feedback_probe_cli.py
+
+## named sleep targets
+tests/contract/test_client_metrics.py:338:        time.sleep(1.1)                       # deterministic entry ordering
+tests/contract/test_client_metrics.py:391:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:394:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:400:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:432:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:458:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:463:        time.sleep(1.1)
+tests/contract/test_client_metrics.py:671:        time.sleep(1.1)
+tests/integration/test_sdd_loop_efficiency_runner.py:125:        time.sleep(0.2)
+
+## session-scoped pytest fixtures in tests/ (fixture declarations)
+0
+
+## corpus-scan surfaces named by the requirement
+-rw------- 1 agent agent 51615 Nov 10 16:10 tests/contract/test_clause_coverage.py
+-rw------- 1 agent agent 41457 Nov 10 16:10 tests/contract/test_coverage_receipt.py
+
+## two-slot budget invocation (driver evidence)
+91:| `baseline` | implement 起点（首个任务前） | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
+92:| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
+
+## slow marker usage (expected: none before this feature)
+0

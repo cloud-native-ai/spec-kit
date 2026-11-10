@@ -26,6 +26,7 @@ from fixtures.line_fixtures import (
     run_engine,
     run_watcher,
     stub_calls,
+    wait_until,
     watcher_path,
     write_heartbeat,
     write_log,
@@ -292,6 +293,7 @@ def test_en_13_clarification_non_blocking(tmp_path):
     entry2 = _register(reg, project, l2, r2)
     heartbeat = tmp_path / "heartbeat-l2.log"
     write_heartbeat(heartbeat, line=l2, run=r2, stage="plan")
+    before_first_write = heartbeat.stat().st_mtime_ns
     writer = subprocess.Popen(
         ["bash", "-c",
          f'while :; do printf "at=%s line={l2} run={r2} stage=plan event=heartbeat\\n" '
@@ -300,17 +302,23 @@ def test_en_13_clarification_non_blocking(tmp_path):
         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     try:
-        time.sleep(0.2)
+        # The heartbeat first-write and advance waits are observable events
+        # (C-008), never fixed graces: wait for the writer's first write, then
+        # for an advance across the resolve-message call.
+        assert wait_until(
+            lambda: heartbeat.stat().st_mtime_ns != before_first_write,
+            timeout=30, interval=0.2,
+        ), "the heartbeat writer never performed its first write"
         before_mtime = heartbeat.stat().st_mtime_ns
         started = time.time()
         decision = engine_json("resolve-message", "--message", "继续推进", reg=reg)
         elapsed = time.time() - started
         assert decision["decision"] == "clarify"
         assert elapsed < 5, "clarification must return immediately"
-        time.sleep(0.3)
-        assert heartbeat.stat().st_mtime_ns > before_mtime, (
-            "the other line's heartbeat writer must keep advancing during clarification"
-        )
+        assert wait_until(
+            lambda: heartbeat.stat().st_mtime_ns > before_mtime,
+            timeout=30, interval=0.2,
+        ), "the other line's heartbeat writer must keep advancing during clarification"
     finally:
         writer.terminate()
         writer.wait(timeout=5)

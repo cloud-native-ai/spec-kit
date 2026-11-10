@@ -22,6 +22,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from specify_cli import copy_local_templates
@@ -81,9 +83,9 @@ def _state_file(ws: Path, text: str = STATE_TEXT) -> Path:
 
 
 def _run(ws: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(ENGINE), "--action", "observe", *args,
-                           "--workspace", str(ws)],
-                          capture_output=True, text=True, check=False)
+    return run_engine_in_process(
+        ENGINE, ["--action", "observe", *args, "--workspace", str(ws)]
+    )
 
 
 def _payload(proc: subprocess.CompletedProcess) -> dict:

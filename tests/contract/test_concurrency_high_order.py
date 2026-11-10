@@ -31,6 +31,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -58,10 +60,7 @@ def _run_engine(*args):
     assert ENGINE.is_file(), (
         "red-first: scripts/python/concurrency-check.py is the WP2 engine target and is "
         "not in this worktree yet")
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *[str(arg) for arg in args]],
-        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=180,
-    )
+    return run_engine_in_process(ENGINE, [str(arg) for arg in args])
 
 
 def _reader_module():

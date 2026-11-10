@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -14,9 +15,7 @@ OLD = "2026-09-01T00:00:00Z"
 
 
 def _run(ws: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args, "--workspace-root", str(ws)],
-        capture_output=True, text=True, timeout=120)
+    return run_engine_in_process(ENGINE, [*args, "--workspace-root", str(ws)])
 
 
 def _json(proc: subprocess.CompletedProcess) -> dict:
@@ -140,9 +139,7 @@ def _apply(ws: Path, plan: Path, *extra: str) -> subprocess.CompletedProcess:
 
 
 def test_args_manifest_matches_parser() -> None:
-    proc = subprocess.run(
-        [sys.executable, str(ENGINE), "--action", "args-manifest"],
-        capture_output=True, text=True, timeout=60)
+    proc = run_engine_in_process(ENGINE, ["--action", "args-manifest"])
     assert proc.returncode == 0, proc.stderr
     manifest = json.loads(proc.stdout)
     assert set(manifest) == {"scan", "distill", "plan", "apply", "status",

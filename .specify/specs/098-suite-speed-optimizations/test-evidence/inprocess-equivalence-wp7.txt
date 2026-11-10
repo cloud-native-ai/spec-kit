@@ -1,0 +1,102 @@
+# In-process conversion — WP-7 evidence (T043–T049)
+
+Feature: 098-suite-speed-optimizations (US5). Contract: `contracts/inprocess-conversion.contract.md`
+C-001…C-010. Carrier of the classification rows: `test-evidence/inprocess-conversion.md`.
+
+## Census and manifest
+
+- AST census (guard `scan_sites`, `tests/**/*.py` including `tests/conftest.py`): 503
+  `subprocess.run` sites over 231 files before the WP-7 conversions.
+- Converted sites: 60 (helpers swapped to `script_api.run_engine_in_process`; the same
+  stdout/stderr/exit-code assertions run before and after).
+- Post-conversion census: 443 sites; every site in every manifest-covered file is
+  classified and no converted point is back on `subprocess.run`.
+- Manifest: 179 rows over 67 files — 60 `convert`, 119 `keep` with a class from the C-002
+  closed set. Keep classes present: `git-external`, `other-interpreter`,
+  `process-isolation-subject`, `global-state-unrecoverable`, `cli-contract`,
+  `copy-topology`.
+- WP-7 covered surface: the contract-area group files (A/B/C), `tests/fixtures/*` and
+  `tests/conftest.py`; `script_api.py`'s one bash call is a keep row.
+
+## Guard run (T043 carrier, WP-7 state)
+
+Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_inprocess_conversion_contract.py -q`
+
+```text
+1 failed, 7 passed in 4.51s
+exit=1
+```
+
+Green at WP-7 close: C-005 schema, C-002 class closure, C-003/C-008 reasons and routes,
+C-001 covered-file completeness + stale-keep detection (zero findings over the 67 covered
+files), C-007 revert-red leg (synthetic census), C-004 fixture-layer keep rows, C-010
+keep-side sample.
+
+Red and named for T052 (WP-8 owner): the full-tree completeness case — 295 unclassified
+site keys over 164 uncovered files: `tests/contract` leftovers 166, `tests/integration`
+84, `tests/unit` 44, `tests/derive_fixtures.py` 1. This is the handoff inventory, not a
+WP-7 regression: no covered file has an unclassified site.
+
+## Equivalence pairs (same pass/fail names)
+
+The before arm is a `git clone --shared` of HEAD `dbe948684` (WP-6 close) with no WP-7
+changes; the after arm is this worktree with the WP-7 changes. Both arms were run with
+`--serial` so the order is deterministic (the suite carries order-dependent pre-existing
+reds, see below). Full output is retained beside this file as
+`inprocess-equivalence-wp7-<before|after>-<a|b|c>.txt`.
+
+| Group | Selection | Before (exit, result, wall) | After (exit, result, wall) | Name diff |
+|-------|-----------|------------------------------|-----------------------------|-----------|
+| A goal/flow/concurrency/confirmation | `group_a.txt` 37 files | 1, `31 failed, 621 passed, 5 deselected in 58.78s` | 1, `31 failed, 621 passed, 5 deselected in 29.98s` | empty |
+| B docs/probe/trigger/summary | `group_b.txt` 5 files | 1, `25 failed, 206 passed in 18.01s` | 1, `25 failed, 206 passed in 15.55s` | empty |
+| C mirror/measure/state | `group_c.txt` 6 files | 0, `168 passed, 1 skipped in 47.56s` | 0, `168 passed, 1 skipped in 44.67s` | empty |
+| Pilot (T045) `test_flow_class_correctness.py` | 1 file | 0, `7 passed in 7.46s` | 0, `7 passed in 0.24s` | empty |
+
+Name comparison was mechanical: `grep '^FAILED ' | sort -u` over both arms, `comm -23` and
+`comm -13` both empty for every group. The single skip in group C is
+`test_t078_the_new_executable_artifacts_are_exactly_what_c32_names` (its own trunk-diff
+`pytest.skip`, identical in both arms).
+
+Supplementary parallel reading (fast tier, `--workers 2`): group A `33.59s → 18.90s`
+(31 failed both, same names). Parallel B/C are not used as the equivalence surface because
+`--dist load` changes test order between runs and the suite carries order-dependent
+pre-existing reds (the three `test_c12_*` trigger cases fail in isolation on the *before*
+tree too; serial whole-file ordering is the stable surface).
+
+## Pre-existing reds disclosed (not introduced by WP-7)
+
+Both arms carry the same 31 (group A) and 25 (group B) failures; they reproduce on the
+unmodified HEAD clone. They are live-tree guard drift at the WP-6 close (for example
+`test_ledger_reconciliation` 85 vs pinned 83, `/speckit.research` delegation mismatch, and
+gate-scan pins that moved earlier on this branch). WP-7 converts calls without changing a
+single assertion, and the name diff proves no change in outcome.
+
+## In-passing repair (disclosed)
+
+`test_isomorphism_map` / `test_flow_class_spec_declaration` / `test_ledger_reconciliation`
+/ `test_delegation_classes` were red because the WP-5 package left a full 134 MB
+`before-tree` clone inside `.specify/.tmp/wp5/`, which the corpus scans read as a second
+owner tree. The tree was *moved* (reversible, not deleted) to
+`/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/quarantine-098/wp5-before-tree`;
+its evidence record (`test-evidence/cache-counts.txt`) names HEAD `d8b8ca92b`, so the
+measurement stays reproducible. No product file was touched for this repair.
+
+Anomaly line: one in-passing repair (the WP-5 scratch quarantine above); no converted
+assertion changed and no selection shrank.
+
+## Keep rows (T049)
+
+`test-evidence/inprocess-conversion.md` carries the contract-area keep rows with their
+classes: fixture-layer `cwd=`/`env=` drivers (`tests/fixtures/client_project.py`
+`run_engine`/`run_script`, `tests/fixtures/line_fixtures.py` drivers,
+`tests/fixtures/nested_sdd.py`, `tests/fixtures/review_git_repo.py`) as
+`global-state-unrecoverable`; projected-copy subjects (`test_doc_consistency_checker.py`
+client shapes, `test_expression_compatibility.py` client lookup,
+`test_trigger_engine.py` mirror case, `test_sdd_loop_driver_cli_profiles.py` `.specify/`
+engine calls) as `copy-topology`; console-entry cases as `cli-contract`; bash/grep/cp
+subjects as `other-interpreter`; git as `git-external`; pytest-child and fixture-driver
+subjects as `process-isolation-subject`.
+
+## Hashes
+
+See the package report for the commit hash and the evidence-file hashes.

@@ -1,0 +1,36 @@
+# SC-002 isolation repair — tests/contract/test_trigger_engine.py (review-repair r1)
+# Date: 2026-11-11.
+
+## Diagnosis
+
+- The engine `scripts/python/trigger-utils.py` resolves its workspace root by contract C-7:
+  explicit `--workspace` > engine self-location > nearest `.specify` CWD ancestor > CWD.
+- This worktree is nested under the parent repository's `.specify/.tmp/`, so the first
+  `.specify`-named ancestor of the engine's own path is the **parent** repository:
+  engine self-location won and every `run_cli` call wrote the parent repo's trigger store
+  instead of the pytest fixture (`ws`). Concurrency across xdist workers then raced on one
+  `index.json` (`write_index_atomic` `.part` → `os.replace`) and the shared telemetry
+  accumulated session rows, producing arm-dependent failures: the two serial-only names
+  (`test_c20_new_session_is_not_suppressed`, `test_c21_auto_execute_is_only_a_flag`) and,
+  in earlier observations, `test_c15_*`.
+- This is the documented path-resolution trap (AGENTS.md § Two Hats): a worktree inside the
+  repo's `.specify/.tmp/` must not let engine self-location write framework-repo state.
+
+## Repair
+
+- `run_cli(args, cwd)` now prepends `--workspace <cwd>` unless `args` already names one.
+  C-7 keeps explicit `--workspace` first, so the engine contract is unchanged and the
+  fixture becomes the resolved workspace; on a normal (non-nested) checkout the CWD walk
+  already resolved `ws`, so the change is behavior-neutral there.
+- No assertion was weakened, no test removed, no retry used.
+
+## Evidence
+
+- File run (canonical runner):
+  `bash scripts/bash/run-tests.sh tests/contract/test_trigger_engine.py -q`
+  → exit 0, **145 passed in 7.46s**, `mode=parallel workers=auto dist=load passes=1 tier=fast
+  excluded_slow=0`.
+- Effect on the recorded failure set: 27 `test_trigger_engine.py` names in
+  `test-evidence/review-repair-final-failed.txt` territory disappear from both SC-002 arms;
+  the two former serial-only names pass in both arms (`test-evidence/review-repair-r1-sc002-comm.txt`).
+- No files outside `tests/contract/test_trigger_engine.py` were changed by this repair.

@@ -31,6 +31,8 @@ import re
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 # --- paths -----------------------------------------------------------------
@@ -1842,10 +1844,7 @@ FEATURE_WRITE_SURFACE = (
 def _scan_json():
     import json
     import subprocess
-    r = subprocess.run(
-        ["python3", str(SCANNER.relative_to(ROOT)), "--json"],
-        capture_output=True, text=True, cwd=str(ROOT),
-    )
+    r = run_engine_in_process(SCANNER, ["--json"])
     assert r.returncode == 0, f"the gate scanner failed to run: {r.stderr[-400:]}"
     return json.loads(r.stdout)
 
@@ -1887,10 +1886,7 @@ def test_g3_counting_unit_is_matching_lines(tmp_path):
     )
     import json
     import subprocess
-    r = subprocess.run(
-        ["python3", str(SCANNER), "--root", str(tmp_path), "--json"],
-        capture_output=True, text=True,
-    )
+    r = run_engine_in_process(SCANNER, ["--root", str(tmp_path), "--json"])
     assert r.returncode == 0, r.stderr
     payload = json.loads(r.stdout)
     assert payload["total"] == 2, (

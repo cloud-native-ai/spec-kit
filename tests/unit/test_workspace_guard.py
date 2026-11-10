@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "python" / "workspace-guard.py"
 
 
@@ -26,8 +28,7 @@ def _repo(tmp_path: Path) -> Path:
 
 
 def _run(*args: str):
-    return subprocess.run([sys.executable, str(SCRIPT), *args],
-                          capture_output=True, text=True)
+    return run_engine_in_process(SCRIPT, args)
 
 
 def test_snapshot_then_check_is_clean(tmp_path):

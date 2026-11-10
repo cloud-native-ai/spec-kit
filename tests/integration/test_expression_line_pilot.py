@@ -53,6 +53,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -180,9 +181,11 @@ def pilot(tmp_path: Path) -> Pilot:
 # --------------------------------------------------------------------------- #
 def _run_posix(script: Path, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
     assert script.is_file(), "engine missing: %s" % script
+    if cwd is None:
+        return run_engine_in_process(script, args)
     return subprocess.run(
         [sys.executable, str(script), *args],
-        cwd=str(cwd or REPO_ROOT),
+        cwd=str(cwd),
         capture_output=True,
         text=True,
     )

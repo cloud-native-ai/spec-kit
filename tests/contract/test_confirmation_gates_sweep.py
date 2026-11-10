@@ -41,6 +41,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -131,12 +133,7 @@ AUTO_EXEC_SURFACES = [
 
 
 def run_scanner() -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCANNER), "--root", str(REPO_ROOT), "--json"],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
+    proc = run_engine_in_process(SCANNER, ["--root", str(REPO_ROOT), "--json"])
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 

@@ -14,6 +14,7 @@ import json
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 import yaml
 
@@ -42,17 +43,15 @@ def _team(root: Path, slug: str, *, goal_slug: str, inline_goal: str,
 
 
 def _define(root: Path, slug: str, objective: str, criteria: list[str]) -> None:
-    cmd = ["python3", str(GOAL_UTILS), "create", slug, "--objective", objective,
-           "--repo-root", str(root)]
+    cmd = ["create", slug, "--objective", objective, "--repo-root", str(root)]
     for c in criteria:
         cmd += ["--criterion", c]
-    subprocess.run(cmd, capture_output=True, text=True, check=True)
+    run_engine_in_process(GOAL_UTILS, cmd).check_returncode()
 
 
 def _refresh(root: Path, goal_slug: str) -> dict:
-    proc = subprocess.run(
-        ["python3", str(GENERATOR), "--goal", goal_slug, "--repo-root", str(root), "--json"],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        GENERATOR, ["--goal", goal_slug, "--repo-root", str(root), "--json"]
     )
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)

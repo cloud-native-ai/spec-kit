@@ -171,6 +171,15 @@
 | REC-086-W1 | 在 `shared/workflow/acceptance-hardening.md` § Inherited Blockers 写明「`inherited` 行按载体是否可解析来判」,并镜像进 `closure-acceptance-check.py --help` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W1(F9、F6) | open |
 | REC-086-W2 | `templates/feature-details-template.md` § Canonical Status State Machine 禁止任何形式的预测性状态写入(哪怕瞬时),预期值改落 checkpoint 的 `observations:` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W2(F6) | open |
 | REC-086-D1 | owner 指南指针每面一种路径形态:出厂文本取运行时形态、在声明规格里重钉 `STR-003`、owner 文件自身头部一致 | `.specify/specs/086-efficient-test-execution/review.md` § 5.5 REC-D1(F10、F11) | open |
+| REC-098-01 | 两槽位 baseline 行不得被排到最后一个工作包:任务分解须让 implement-start baseline 先于任何行为变更包(如所有 WP 行 `blockedBy` 该行) | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.2 REC-098-01(carried;原始见 `review-098.md` § 5.1) | open |
+| REC-098-02 | review 在缺少 `verification.md` / closure verdict 时必须 fast-fail:implement 收口是 review 的硬前置,不得在缺失证据面上产出四段评审 | `.specify/specs/098-suite-speed-optimizations/review-098.md` § 5.2 REC-098-02(F1、A1、I1) | open |
+| REC-098-03 | 驱动状态脊在每个阶段 U2/U3/U4 必须落盘;review 派发时脊的阶段不是 implement 收口即 fast-fail 并点名陈旧字段 | `.specify/specs/098-suite-speed-optimizations/review-098.md` § 5.2 REC-098-03(F2、F4) | open |
+| REC-098-04 | `git-delta-review.sh receipt` 的 skip selector 必须先于二进制的行数测量生效;二进制证据可按法定 `binary` 理由跳过并产出真实回执块 | `.specify/specs/098-suite-speed-optimizations/review-098.md` § 5.3 REC-098-04(F6) | open |
+| REC-098-05 | 评审门须在 final-path 判据的最新同树测量与判据矛盾时拒绝转移;证据记录不得以更弱的「0 new names」读数替代声明的「双向 comm 为空」 | `.specify/specs/098-suite-speed-optimizations/review-098.md` § 5.4 REC-098-05(A2、I2) | open |
+| REC-098-06 | implement 的 scope audit 必须枚举 `base..head` 中无任务行对应的提交并要求记录的 user ruling(register D 行或拆分提交) | `.specify/specs/098-suite-speed-optimizations/review-098.md` § 5.5 REC-098-06(F7) | open |
+| REC-098-07 | checkpoint 校验须断言「记录关于其自身阶段」：文件内 sentinel/标题必须与文件名阶段一致，字节复制他阶段记录使阶段关闭失败 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.4 REC-098-07(F2) | open |
+| REC-098-08 | review 门的 ARC 拒绝须区分「待 closure」与「缺陷」：当唯一阻断理由是 closure 槽位的 `final-path-not-pass` 时，结论记录具名 `pending-closure` 残余（ARC 记录不变），或把 closure 预算腿移到 review 之前 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.2 REC-098-08(F3) | open |
+| REC-098-09 | 验证记录必须绑定实测树：`baseline_tree=` / `post_change_tree=` 与 base/claim commit 分离，墙钟与名单读数可据此复现 | `.specify/specs/098-suite-speed-optimizations/review.md` § 5.1 REC-098-09(A1) | open |
 | F-1 (089) | Feature 089 的 `scripts/python/` 文件数争议（requirements 曾记 38，树实测 37） | `.specify/specs/089-script-interface-contract/feature-ref.md` § 7 F-1 | closed 2026-11-06（requirements 已改为 37，`argparse` 计数 36→35） |
 | D-1 (092) | 处置词汇不合并：`archive/supersede/correct/exempt` 与 `sanitize-utils.py` 的 `delete/archive/repair/delegate/dismiss` 各为封闭集，建两张映射表 + 一条裁决规则 + 不可映射项处置 | `.specify/archive/specs/092-non-disposable/requirements.md` § Clarifications 会话条目 D-1（落地于 `shared/definitions/non-disposable-definitions.md` § Disposition Bridge） | open（实现期落地） |
 | D-2 (092) | 不落宪法原则：判据取目标逐字内容，Non-Disposable 以手段而非项目级原则落地，七面同批落地且 owner 唯一 | 同上 D-2（七面见 `plan.md` § Landing Checklist） | open（实现期落地；是否补原则由 OI-4 另行裁定） |
@@ -225,3 +234,7 @@
 | REC-099-4 | 驱动状态脊随阶段推进（或将 U0 块标为快照并指向 line registry）；带外用户裁定修订登记为特性行 | `.specify/specs/099-speckit-seal/review.md` § 5.3 REC-099-4（F7、F8） | open |
 | REC-099-5 | seal 批量写入在途中失败时恢复当前文件（或写前登记为已写），并补故障注入用例 | `.specify/specs/099-speckit-seal/review.md` § 5.2 REC-099-5（F9） | open |
 | REC-099-6 | tasks 阶段收口须处置每条 `green-cross-phase` 警告（重切分区或记录有意顺序） | `.specify/specs/099-speckit-seal/review.md` § 5.1 REC-099-6（F10） | open |
+| T-001 (098) | 098 plan 承重决策：缺省档排除慢档、全量档由 `--full` 显式请求（反题=缺省全量 + 显式 fast 档；重开条件=下游把缺省档误当全量 ≥2 次或 closure 出现可归因于缺省档漏跑的失败名 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-001 | active（重开条件见记录） |
+| T-002 (098) | 098 plan 承重决策：顺序确定性由 `feedback-utils.py` 的可选 `--now` 注入时钟提供（反题=测试侧直接构造/回写条目时间戳；重开条件=任一调用方无法注入时间戳或 `--now` 出现在生产调用记录 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-002 | active（重开条件见记录） |
+| T-003 (098) | 098 plan 承重决策：进程内直调按「清单 + 二值边界类」逐点转换，携带 cwd/env 的 fixture 层调用保留子进程（反题=全部保持子进程；重开条件=任一转换点出现无法用断言集等价解释的行为差异 ≥1，或 fixture 层必须进程内化才能达到 SC-009） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-003 | active（重开条件见记录） |
+| D-098-01 | 用户裁定（2026-11-10）：宪法 Principle VII 的 Pre-Status-Flip Gate 状态载体由 `verification.log` 更正为 `verification.md`（框架实现链实际读取的文件；仓库忽略 `*.log`），遂以 PATCH 1.19.0 → 1.19.1 随 098 delta 落地；该修订无 098 需求/任务行，由本登记行承接归属 | `.specify/constitution.md` 顶部 Sync Impact Report（1.19.1 段）+ commit `af73f65f1` | ratified（user ruling 2026-11-10；review F7 补登记） |

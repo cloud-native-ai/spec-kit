@@ -1,0 +1,29 @@
+# 098 plan-stage probe — 2026-11-10T08:59:44Z
+## interpreter
+python 3.11.11
+pytest 8.4.2
+xdist 3.8.0
+rc=0
+
+## full-tree collect (default tier today = no exclusion)
+$ python3 -m pytest --collect-only -q
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8543 tests collected in 1.72s
+rc=0
+
+## slow-marked collect (expect none registered/used)
+$ python3 -m pytest --collect-only -q -m slow
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+no tests collected (8543 deselected) in 1.75s
+rc=5
+
+## session-scoped fixtures in tests/ (expect 0)
+0
+
+## time.sleep occurrences in the declared 098 scope files
+tests/contract/test_client_metrics.py: 8
+tests/integration/test_sdd_loop_efficiency_runner.py: 1
+tests/integration/test_session_kill_reattach.py: 2
+tests/contract/test_line_envelope_contract.py: 2
+tests/contract/test_feedback_probe_cli.py: 1
+tests/contract/test_store_state_protocol.py: 2

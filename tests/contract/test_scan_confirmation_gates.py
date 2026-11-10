@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -23,12 +25,7 @@ DESTRUCTIVE_LINE = "删除文件前 MUST 等待用户确认。"
 
 
 def run_scanner(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(SCANNER), *args],
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
+    return run_engine_in_process(SCANNER, args)
 
 
 def make_tree(root: Path) -> None:

@@ -200,3 +200,5 @@
 | Merge Manifest（合并清单） | merge manifest, 合并清单 | 一次合并回写的归属记录：分片集合与顺序依据、逐输出件动作、ID 映射、冲突与处置、合并后校验；固定文件名 merge-manifest.json，落父 spec 目录，每 spec 一文件（需求 099） | auto | proposed |
 | Seal Record（封装回执） | 封装回执 | 按 spec 一份的最终封装回执文件 seal.md：判定时刻与钉住提交、review 与闭包回执引用、合并清单指针、豁免与引擎身份；只承载当前回执，重封装原子替换并写 supersedes（需求 099） | auto | proposed |
 | Slice（分片 spec） | 分片 | 名字族命中 <父编号><字母>-<slug> 且 requirements.md 显式声明父规格的 spec 目录；是合并来源、不是封装主体，合并后保留为 dated record 并获得一行 Merged into 标注（需求 099） | auto | proposed |
+| 测试档位 | 缺省档, 全量档, test tier, 分档 | 规范 runner 的测试选择档位：缺省档排除 slow 标记（供日常/PR 循环），全量档包含全部测试（供每日与 SDD 两槽位预算）；两档的收集集合差恰等于 slow 集合，排除条数必须披露；载体为 scripts/bash/run-tests.sh，判据见 .specify/specs/098-suite-speed-optimizations/requirements.md（需求 098） | auto | proposed |
+| 慢档标记 | slow marker, slow 标记, 慢档 | pytest marker（名 slow），用于标记需要拉起/等待/终止外部进程或队列的 integration 测试与少数全语料扫描型 contract 测试；成员判据与逐条理由取证见 .specify/specs/098-suite-speed-optimizations/requirements.md（需求 098），不是普通单测的成批标慢 | auto | proposed |

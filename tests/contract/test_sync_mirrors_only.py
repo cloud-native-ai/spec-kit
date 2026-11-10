@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -17,9 +19,7 @@ SCRIPT = "scripts/python/sync-mirrors.py"
 
 
 def _run(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, SCRIPT, *args], cwd=REPO_ROOT,
-        capture_output=True, text=True)
+    return run_engine_in_process(REPO_ROOT / SCRIPT, args)
 
 
 @pytest.mark.contract

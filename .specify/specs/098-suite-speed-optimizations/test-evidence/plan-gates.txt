@@ -1,0 +1,54 @@
+# 098 plan-stage final gates — 2026-11-10T09:21:05Z
+
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/098-suite-speed-optimizations
+spec: .specify/specs/098-suite-speed-optimizations
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 365 lines, 3 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+rc=0
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/098-suite-speed-optimizations
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=0 waived=0
+{"stage": "plan", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 27, "sc": 11, "tasks": 0, "clauses": 68, "files": 13}, "checked_at": "2026-11-10T09:21:05Z"}
+rc=0
+
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/098-suite-speed-optimizations/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 27, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T09:21:05Z"}
+rc=0
+
+$ python3 scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/098-suite-speed-optimizations
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+not-applicable: 结构门禁只适用于表达类；已检视 1 个文件，未做结构判定
+rc=0
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/098-suite-speed-optimizations/requirements.md
+  [path-marker] pass (0)
+scanned: 267 lines, 38 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+rc=0
+
+$ python3 scripts/python/concurrency-check.py reading --record .specify/specs/098-suite-speed-optimizations/test-evidence/plan-execution-reading.yaml
+{
+  "action": "reading",
+  "checked_at": "2026-11-10T09:21:05Z",
+  "decision": "pass",
+  "findings": [],
+  "measured": {
+    "bound": {
+      "ceiling": 4,
+rc=0
+
+$ python3 scripts/python/sync-mirrors.py --check  (pre-edit baseline, this stage made no source edits)
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (111 files, byte-identical)
+rc=0

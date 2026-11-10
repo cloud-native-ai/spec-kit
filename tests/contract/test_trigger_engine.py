@@ -27,6 +27,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -144,8 +146,12 @@ def ws(tmp_path: Path) -> Path:
 
 
 def run_cli(args: list, cwd: Path) -> subprocess.CompletedProcess:
+    # C-7 gives engine self-location priority over the CWD walk, so a worktree nested
+    # under another repo's `.specify/.tmp/` resolves to that repo and defeats the
+    # fixture. Name the fixture workspace explicitly; an explicit flag in `args` wins.
+    argv = list(args) if "--workspace" in args else ["--workspace", str(cwd), *args]
     return subprocess.run(
-        [sys.executable, str(ENGINE), *args],
+        [sys.executable, str(ENGINE), *argv],
         cwd=cwd, capture_output=True, text=True,
     )
 
@@ -217,10 +223,7 @@ def test_c1_stdlib_only():
 
 
 def test_c2_sync_mirrors_check_clean():
-    proc = subprocess.run(
-        [sys.executable, str(SYNC_MIRRORS), "--check"], cwd=ROOT,
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SYNC_MIRRORS, ["--check"])
     assert proc.returncode == 0, f"sync-mirrors --check exit {proc.returncode}:\n{proc.stdout[-1500:]}"
 
 

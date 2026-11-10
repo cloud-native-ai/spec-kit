@@ -47,6 +47,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -1715,10 +1717,7 @@ def test_wc06_mirror_in_sync():
 
 def test_wc07_skill_body_budget():
     script = REPO_ROOT / "skills" / "external" / "improve-skills" / "scripts" / "skill-shape.py"
-    out = subprocess.run(
-        [sys.executable, str(script), str(SKILL_SRC), "--json"],
-        capture_output=True, text=True, encoding="utf-8", cwd=str(REPO_ROOT), timeout=180,
-    )
+    out = run_engine_in_process(script, [str(SKILL_SRC), "--json"])
     assert out.returncode == 0, f"skill-shape.py failed (WC-07): {out.stderr[-800:]}"
     report = json.loads(out.stdout)
     assert report["verdict"] == "pass", f"skill-shape verdict is {report['verdict']!r} (WC-07)"

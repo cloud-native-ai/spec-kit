@@ -18,6 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from fixtures import wp_fixtures
@@ -132,18 +133,8 @@ def _spine(tmp_path: Path, plan=None, ledger=(), extra: str = "") -> Path:
 
 def _run(spine: Path, out_dir: Path, *args):
     assert SCRIPT.is_file(), "missing report script: %s" % SCRIPT
-    return subprocess.run(
-        [
-            sys.executable,
-            str(SCRIPT),
-            "--spine",
-            str(spine),
-            "--out-dir",
-            str(out_dir),
-            *args,
-        ],
-        capture_output=True,
-        text=True,
+    return run_engine_in_process(
+        SCRIPT, ["--spine", str(spine), "--out-dir", str(out_dir), *args]
     )
 
 

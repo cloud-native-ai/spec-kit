@@ -54,4 +54,5 @@ markers = [
     "contract: contract and external-surface validation tests",
     "integration: integration tests using filesystem or fixture workspaces",
     "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
+    "slow: process-boundary (spawns/waits for/terminates an external process or queue) or corpus-scan (traverses the real framework corpus) tests — the runner's default fast tier excludes them; --full runs them",
 ]

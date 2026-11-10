@@ -1,0 +1,52 @@
+# SC-002 bidirectional comparison — review-repair r1 (final tree, tests/contract)
+# Date: 2026-11-11; same tree for both arms; same runner form; tier=fast excluded_slow=5.
+
+## Root cause repaired (I2/A2)
+
+- `tests/contract/test_trigger_engine.py::run_cli` spawned the engine without an explicit
+  workspace. The engine's contract C-7 gives **engine self-location** priority over the CWD
+  walk; this worktree lives under the parent repo's `.specify/.tmp/`, so every call resolved
+  to the parent repository instead of the pytest fixture. Two fail shapes followed: the
+  shared trigger store accumulated session state across runs, and concurrent workers raced
+  on one `index.json` — the observed serial-only names were the ones that flipped between
+  arms.
+- Repair (isolation-defect path of C-004): `run_cli` passes `--workspace <cwd>` unless the
+  call already names one (the C-7 priority then resolves the fixture; C-7 keeps explicit
+  `--workspace` first, so the engine contract is untouched). The file then runs 145/145
+  green under the canonical runner (7.46 s, `mode=parallel workers=auto`).
+
+## Arm 1 — default parallel
+
+- Command: `bash scripts/bash/run-tests.sh --workers 4 tests/contract --names-out .specify/.tmp/repair-r1/s4r-par-names.txt -q`
+- Exit `1`; wall `175.76 s`
+- Summary: `137 failed, 6781 passed, 2 skipped in 150.68s`
+- Mode: `mode=parallel workers=4 dist=load passes=2 tier=fast excluded_slow=5`
+- Serial-exception pass: `1 passed, 6925 deselected in 18.44s`
+- Names: 137 → `test-evidence/review-repair-s4-parallel-names.txt`
+- Log: `test-evidence/run-logs/review-repair-s4-parallel.log.gz`
+
+## Arm 2 — explicit serial
+
+- Command: `bash scripts/bash/run-tests.sh --serial tests/contract --names-out .specify/.tmp/repair-r1/s4r-ser-names.txt -q`
+- Exit `1`; wall `557.04 s`
+- Summary: `137 failed, 6782 passed, 2 skipped, 5 deselected in 553.16s`
+- Mode: `mode=serial reason=explicit tier=fast excluded_slow=5`
+- Names: 137 → `test-evidence/review-repair-s4-serial-names.txt`
+- Log: `test-evidence/run-logs/review-repair-s4-serial.log.gz`
+
+## Bidirectional name comparison
+
+- `comm -13` (parallel file, serial file) = serial-only names: **0**
+- `comm -23` (parallel file, serial file) = parallel-only names: **0**
+- Both lists carry 137 names; the sets are equal. SC-002's required reading (both
+  directions empty) holds on the final tree.
+- Repaired names: `test_trigger_engine.py::test_c20_new_session_is_not_suppressed` and
+  `::test_c21_auto_execute_is_only_a_flag` are absent from both lists (they pass in both
+  arms after the fixture-isolation repair). No retry was used; one run per arm.
+
+## Disclosure
+
+- The failure counts dropped from 157 (parallel) / 159 (serial) at the pre-repair reading to
+  137 / 137 because the fixture-isolation repair removed 20 pre-existing shared-state
+  failures in `test_trigger_engine.py`. Removals are not a SC-002 violation; the criterion
+  is set equality between the two arms on the same tree.

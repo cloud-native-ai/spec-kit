@@ -23,6 +23,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -544,9 +546,9 @@ def test_c18_the_engine_suite_that_reads_the_owner_doc_stays_green():
 
 
 def test_c19_the_gate_budget_survives_the_new_section():
-    r = subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "python" / "scan-confirmation-gates.py"),
-         "--summary"], capture_output=True, text=True, cwd=str(ROOT))
+    r = run_engine_in_process(
+        ROOT / "scripts" / "python" / "scan-confirmation-gates.py", ["--summary"]
+    )
     assert r.returncode == 0, r.stdout + r.stderr
     total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
     violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))

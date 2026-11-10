@@ -1,0 +1,236 @@
+# T013 — mutation drills TS-M1…TS-M8 and SL-M1…SL-M5
+# Date: 2026-11-11 (full 13-leg re-run at closure; supersedes the 2026-11-10 partial
+# record — 12 legs, TS-M8 blocked — retained in git history)
+# Owner of the legs: contracts/tier-selection.contract.md §F, contracts/slow-membership.contract.md §D.
+# Guard under drill: tests/contract/test_suite_tier_contract.py (committed; the tracked tree
+# was never mutated). Method: every leg runs on a throwaway copy under .specify/.tmp/t013/
+# (gitignored scratch, not retained); the red output below is the discriminator proof.
+# Mutations were applied to copies only.
+
+## Method notes
+
+- Tier legs use a minimal harness copy (runner + script-interface.sh + the guard file +
+  a pytest.ini registering `serial`/`slow`/`contract`); every case is selected by exact
+  node id, so a `-k` substring can never pull an unrelated case into a leg.
+- Slow legs and TS-M8 use a full-tree copy (135 MB; `.git`, `.specify/.tmp`,
+  `__pycache__`, `.pytest_cache` excluded), one copy per drift.
+- Obligation 11's baseline carries two parametrized ids whose bracket embeds the absolute
+  tree root (T022 normalized them to the worktree root). A full-tree copy at any other
+  path re-normalizes exactly those two ids to the copy root before drilling — an
+  adaptation of the baseline *input* for the copy, not a mutation of the guard; the
+  tracked baseline is untouched, and the real-tree obligation 11 is green (control below).
+  Without that adaptation the pristine copy reddens on those two ids alone (observed
+  once; not a membership signal).
+
+## Harness controls (pristine copies green before any mutation)
+
+- Tier legs — minimal harness copy:
+  `python3 -m pytest tests/contract/test_suite_tier_contract.py` with the ten exact
+  obligation node ids (1…10) `-q` → exit `0`; `11 passed in 38.74s`
+  (obligation 3 is parametrized twice).
+- TS-M7 — source/mirror pair + `sync-mirrors.py` + `script-interface.sh` + the 086 suite:
+  `python3 -m pytest tests/contract/test_run_tests_runner_contract.py::test_c016_runner_carriers_follow_the_declared_projection -q`
+  → exit `0`; `1 passed in 0.07s`.
+- Slow legs — full-tree copy:
+  `python3 -m pytest tests/contract/test_suite_tier_contract.py::test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one -q`
+  → exit `0`; `1 passed in 12.39s`.
+- Obligation 11 — full-tree copy (after copy-root normalization): → exit `0`;
+  `1 passed in 3.07s`. Real tree, same case: exit `0`; `1 passed in 3.01s`.
+- TS-M8 — fresh copy of the same substrate (re-normalized): → exit `0`;
+  `1 passed in 3.14s`.
+
+## Tier-selection legs (guard: tests/contract/test_suite_tier_contract.py)
+
+### TS-M1 — delete the default `-m "not slow"` injection (must fail obligation 1)
+
+- Mutation in the copy's runner: `SINGLE_PASS_ARGS=(-m "not slow")` → `SINGLE_PASS_ARGS=()`.
+- Command in the copy:
+  `python3 -m pytest tests/contract/test_suite_tier_contract.py::test_obligation_1_default_tier_excludes_the_slow_test -q`
+- Exit `1`; `1 failed in 2.06s`:
+  ```text
+  E       FAILED tree/test_mixed.py::test_slow_fails - assert False
+  E       1 failed, 1 passed in 0.39s
+  E       assert 1 == 0
+  FAILED tests/contract/test_suite_tier_contract.py::test_obligation_1_default_tier_excludes_the_slow_test
+  ```
+  (the fast default executed the slow test — the injection it should have applied was gone.)
+
+### TS-M2 — apply the default exclusion even when the caller passed `-m` (must fail obligation 3)
+
+- Mutation: the caller-`-m` branch never fires (`if [ "$caller_has_m" -eq 1 ]; then` →
+  `if false; then`).
+- Command: `…::test_obligation_3_the_caller_m_owns_the_selection -q`
+- Exit `1`; `2 failed in 4.81s` (both spellings):
+  ```text
+  E       AssertionError: workers=2 dist=load passes=2 tier=fast excluded_slow=2
+  E       assert 'fast' == 'caller'
+  FAILED ...::test_obligation_3_the_caller_m_owns_the_selection[expr_args0]
+  FAILED ...::test_obligation_3_the_caller_m_owns_the_selection[expr_args1]
+  ```
+
+### TS-M3 — ignore `--full` (must fail obligation 1's `--full` leg)
+
+- Mutation: `--full) FULL_REQUESTED=1; shift ;;` → `--full) shift ;;`.
+- Command: `…::test_obligation_1_default_tier_excludes_the_slow_test -q`
+- Exit `1`; `1 failed in 4.06s`:
+  ```text
+  E       1 passed in 0.38s
+  E       # test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=1
+  E       assert 0 == 1
+  FAILED ...::test_obligation_1_default_tier_excludes_the_slow_test
+  ```
+  (the `--full` leg ran the fast tier — exit 0, `tier=fast` — where the case requires
+  exit 1 and `tier=full`.)
+
+### TS-M4 — hardcode `excluded_slow` to a constant (must fail obligation 1/2)
+
+- Mutation: `EXCLUDED_SLOW="$(collect_slow_count)"` → `EXCLUDED_SLOW=0`.
+- Command (declared pair): `…::test_obligation_1_… …::test_obligation_2_… -q`
+- Exit `1`; `1 failed, 1 passed in 3.83s`:
+  ```text
+  E       AssertionError: workers=2 dist=load passes=1 tier=fast excluded_slow=0
+  E       assert '0' == '1'
+  FAILED ...::test_obligation_1_default_tier_excludes_the_slow_test
+  ```
+  (obligation 2 expects 0 on a no-slow tree and stays green — the constant is valid
+  there; the declared pair 1/2 is reddened by obligation 1.)
+
+### TS-M5 — normalise the empty-after-exclusion case to exit 0 (must fail obligation 8)
+
+- Mutation: in `fail_on_tier_emptiness`, the named error's `exit 2` → `exit 0`.
+- Command: `…::test_obligation_8_empty_after_exclusion_is_a_named_error -q`
+- Exit `1`; `1 failed in 2.04s`:
+  ```text
+  E       no tests ran in 0.37s
+  E       # test runner: error=empty-selection-after-tier-exclusion tier=fast excluded_slow=2
+  E       assert 0 == 2
+  FAILED ...::test_obligation_8_empty_after_exclusion_is_a_named_error
+  ```
+  (the error line is emitted but the run exits 0 — the named error stopped being an error.)
+
+### TS-M6 — drop the slow filter from one of the two fast passes (must fail obligation 7)
+
+- Mutation: `SERIAL_EXPR="serial and not slow"` → `SERIAL_EXPR="serial"`.
+- Command: `…::test_obligation_7_a_serial_and_slow_test_is_excluded_from_both_fast_passes -q`
+- Exit `1`; `1 failed in 2.42s`:
+  ```text
+  E       FAILED tree/test_intersection.py::test_serial_slow_fails - assert False
+  E       1 failed, 1 passed, 2 deselected in 0.03s
+  FAILED ...::test_obligation_7_a_serial_and_slow_test_is_excluded_from_both_fast_passes
+  ```
+  (the mutant's fast serial pass executed the serial+slow test.)
+
+### TS-M7 — edit the runner source without regenerating the mirror (must fail 086 C-016 / C-012)
+
+- Copy: `scripts/bash/run-tests.sh` (source), `.specify/scripts/bash/run-tests.sh`
+  (mirror), `scripts/python/sync-mirrors.py`, `scripts/bash/script-interface.sh` and the
+  086 suite at their declared paths; one comment line appended to the source only.
+- Command: `python3 -m pytest tests/contract/test_run_tests_runner_contract.py::test_c016_runner_carriers_follow_the_declared_projection -q`
+- Exit `1`; `1 failed in 0.04s`:
+  ```text
+  E       AssertionError: scripts/bash/run-tests.sh and .specify/scripts/bash/run-tests.sh
+          drifted from the declared projection — regenerate with
+          `sync-mirrors.py --write --only scripts`
+  E         + # mutation drill TS-M7: source-only edit, mirror not regenerated
+  FAILED tests/contract/test_run_tests_runner_contract.py::test_c016_runner_carriers_follow_the_declared_projection
+  ```
+
+### TS-M8 — delete or rename one existing test (must fail obligation 11 / C-015)
+
+- Copy: full-tree copy; control green (above), then one existing test renamed in the
+  copy: `tests/contract/test_085_disposal_table.py::test_every_measured_module_has_exactly_one_disposition`
+  → `…_disposition_renamed` (a baseline id disappears from the full collection).
+- Command: `…::test_obligation_11_the_full_collection_never_loses_a_baseline_id -q`
+- Exit `1`; `1 failed in 3.10s`:
+  ```text
+  E       AssertionError: the full-tier collection no longer yields ids recorded in the
+          implement-start baseline (…/notes/pre-change-measurements.md): deleting or
+          renaming an existing test MUST redden this case; …:
+          ['tests/contract/test_085_disposal_table.py::test_every_measured_module_has_exactly_one_disposition']
+  E       assert not ['tests/contract/test_085_disposal_table.py::test_every_measured_module_has_exactly_one_disposition']
+  FAILED ...::test_obligation_11_the_full_collection_never_loses_a_baseline_id
+  ```
+  (the unrecorded set is exactly the renamed baseline id — the disposition list is empty,
+  so the deletion is unrecorded.)
+
+## Slow-membership legs (guards: test_slow_guard_1 / test_slow_guard_2)
+
+### SL-M1 — delete a registry row for a marked test (must fail C-005)
+
+- Drift in the copy: the `test_local_nohup_survives_parent_exit` row removed from
+  `test-evidence/slow-members.md`.
+- Command: `…::test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one -q`
+- Exit `1`; `1 failed in 2.82s`:
+  ```text
+  E       AssertionError: the registry and `pytest --collect-only -q -m slow` must correspond one-to-one:
+  E         marked without a registry row: ['tests/integration/test_sdd_loop_efficiency_runner.py::test_local_nohup_survives_parent_exit']
+  E         registry rows without a marked test: []
+  FAILED ...::test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one
+  ```
+
+### SL-M2 — add a registry row for an unmarked test (must fail C-005)
+
+- Drift: a row added for
+  `tests/contract/test_run_tests_runner_contract.py::test_c001_default_run_is_parallel_without_a_parallel_argument`.
+- Exit `1`; `1 failed in 2.79s`:
+  ```text
+  E         marked without a registry row: []
+  E         registry rows without a marked test: ['tests/contract/test_run_tests_runner_contract.py::test_c001_default_run_is_parallel_without_a_parallel_argument']
+  FAILED ...::test_slow_guard_1_…
+  ```
+
+### SL-M3 — change a category to a value outside the two-member set (must fail C-003)
+
+- Drift: `| corpus-scan |` → `| flaky |` (first row, `test_c10_…`).
+- Exit `1`; `1 failed in 0.07s`:
+  ```text
+  E       AssertionError: category outside the closed set ('process-boundary', 'corpus-scan'):
+          | tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census | flaky | … |
+  E       assert 'flaky' in ('process-boundary', 'corpus-scan')
+  FAILED ...::test_slow_guard_1_…
+  ```
+
+### SL-M4 — mark a new test without adding a row (must fail C-005 / C-007)
+
+- Drift: `@pytest.mark.slow` added to
+  `tests/integration/test_session_kill_reattach.py::test_run_stage_requires_the_engine`.
+- Exit `1`; `1 failed in 2.82s`:
+  ```text
+  E         marked without a registry row: ['tests/integration/test_session_kill_reattach.py::test_run_stage_requires_the_engine']
+  E         registry rows without a marked test: []
+  FAILED ...::test_slow_guard_1_…
+  ```
+  (C-005 reddened; C-007 is the fixture-tree arithmetic case and is not on this drift's path.)
+
+### SL-M5 — replace the derived count with a constant in the guard (C-006/C-007 cannot go red on membership drift)
+
+- Mutant guard: in the copy's `test_slow_guard_2`, `assert full - fast == marked, (` →
+  `assert len(full) - len(fast) == 7, (` — the derived comparison replaced by a constant count.
+- Drift on that tree: the `slow` marker moved from
+  `test_delivered_runner_recipe_survives_driver_kill_and_reattaches` to
+  `test_run_stage_requires_the_engine` (member count unchanged at 7; registry untouched).
+- Observed (each command: `python3 -m pytest …::test_slow_guard_…` in its own copy):
+  - mutant guard_2 on the undrifted baseline: exit `0`; `1 passed in 11.60s` (the constant is valid there).
+  - **mutant guard_2 on the drifted tree: exit `0`; `1 passed in 11.59s` — the mutated guard
+    CANNOT go red on this membership drift** (the declared outcome of the leg).
+  - pristine guard_1 on the same drift: exit `1`; `1 failed in 2.81s` —
+    ```text
+    E         marked without a registry row: ['tests/integration/test_session_kill_reattach.py::test_run_stage_requires_the_engine']
+    E         registry rows without a marked test: ['tests/integration/test_session_kill_reattach.py::test_delivered_runner_recipe_survives_driver_kill_and_reattaches']
+    ```
+  - pristine guard_2 on the same drift: exit `0`; `1 passed in 11.55s` (C-006 re-derives both
+    sides from the tree, so registry drift is C-005's red surface — consistent with the
+    clause wording).
+- Conclusion recorded, not repaired: the constant-count formulation removes the guard's
+  ability to discriminate membership drift; the committed guard's derived comparison is the
+  load-bearing form.
+
+## Anomalies
+
+- None. All 13 legs executed and behaved as declared: TS-M1…TS-M7 reddened their named
+  obligations, TS-M8 (previously blocked by then-open T021/T003) reddened obligation 11 on
+  a single renamed baseline id, SL-M1…SL-M4 reddened C-005/C-003, and SL-M5 reproduced the
+  declared discrimination loss (mutant green on drift; pristine guard_1 red on the same drift).
+  No in-passing repair was applied to any artifact; the only adaptation, copy-root
+  normalization of two path-embedded baseline ids, is recorded under Method notes and left
+  the tracked baseline untouched.

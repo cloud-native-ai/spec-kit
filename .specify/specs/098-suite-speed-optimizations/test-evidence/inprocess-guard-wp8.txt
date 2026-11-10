@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_inprocess_conversion_contract.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 4.52s

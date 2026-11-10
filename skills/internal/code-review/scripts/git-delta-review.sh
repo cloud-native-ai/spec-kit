@@ -1178,12 +1178,25 @@ cmd_receipt() {
 
     mapfile -t changed < <(printf '%s\n' "${changed[@]}" | LC_ALL=C sort)
 
-    # 行数是量测值: 测不出来就不写块, 绝不写 0 也不估算 (C-41 / V16)
-    local lines_added=0 lines_deleted=0 stat_a stat_d stat_rest
-    while IFS=$'\t' read -r stat_a stat_d stat_rest; do
+    # 行数是量测值: 测不出来就不写块, 绝不写 0 也不估算 (C-41 / V16)。
+    # 法定跳过选择器先于量测: 被 --skip-with-reason 命中的路径不进入聚合,
+    # 否则一个合法 binary 跳过会让整个回执 exit 2 (FR-014 / C-36)。
+    local lines_added=0 lines_deleted=0 stat_a stat_d stat_path index selector skip_path
+    while IFS=$'\t' read -r stat_a stat_d stat_path; do
         [[ -z "${stat_a:-}" ]] && continue
+        skip_path=false
+        for index in "${!skip_globs[@]}"; do
+            selector="${skip_globs[$index]}"
+            [[ -z "$selector" ]] && continue
+            # shellcheck disable=SC2053  # 选择器是调用方给的 glob, 故意不加引号
+            if [[ "$stat_path" == $selector ]]; then
+                skip_path=true
+                break
+            fi
+        done
+        [[ "$skip_path" == "true" ]] && continue
         if [[ "$stat_a" == "-" || "$stat_d" == "-" ]]; then
-            echo "行数无法测量 (binary): ${stat_rest:-?}" >&2
+            echo "行数无法测量 (binary): ${stat_path:-?}" >&2
             echo "不可量测的数字字段意味着不写块 (C-41 / V16)" >&2
             exit 2
         fi

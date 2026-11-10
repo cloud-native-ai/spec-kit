@@ -1,0 +1,47 @@
+# Closure acceptance record — review-repair r1 (2026-11-11)
+# Producer: scripts/python/closure-acceptance-check.py (the one judgement pipeline).
+
+## Invocation A — the implement skill's bare form
+
+`python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/098-suite-speed-optimizations`
+
+exit 2 — input error, recorded verbatim:
+
+```
+closure-acceptance-check: input error: cannot determine the claimed feature status for
+.../.specify/specs/098-suite-speed-optimizations: no --feature-detail / --feature-registry
+was given, the spec dir carries no feature-detail.md or feature-registry.md, and
+.../.specify/features.md has no row for '098-suite-speed-optimizations'
+```
+
+Reading: 098 is a follow-up spec bound to Feature 086 by the clarify stage ("不新建、不改号"),
+so it has no registry row and its claim is 086's detail file. The claim is resolved by the
+checker's declared `--feature-detail` input (calling surface C-02) — invocation B.
+
+## Invocation B — with the bound feature's claim carrier
+
+`python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/098-suite-speed-optimizations --feature-detail .specify/features/086-efficient-test-execution.md --json`
+
+exit 1 — verdict `block`. Record (field-for-field from the payload):
+
+- verdict: `block`
+- claimed_status: `Ready for Review` (source `/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/features/086-efficient-test-execution.md`)
+- reasons:
+  - `final-path-not-pass` → `SC-003`
+  - `final-path-not-pass` → `SC-005`
+  - `status-claims-implemented-but-blocked`
+- final_path counts: blocked=0, deferred=0, fail=0, partial=2, pass=7, total=9, unknown=0
+- completion conditions: every_final_path_pass=False, no_open_rows=True, smoke_record_pass=True, status_row_per_criterion=True
+- tasks: closed=60, deferred=1, in_progress=0, open=0
+- smoke: present=True records=1 exit_code=0 evidence_exists=True
+
+## Reading
+
+- The record exists and every completion condition except the final-path one is true:
+  60/60 task rows closed + T061 deferred, a status row per criterion, a passing smoke record.
+- `final-path-not-pass: SC-003` and `: SC-005` are the two criteria whose readings belong to
+  the driver's closure stage (T061, slot 2), deferred by design; `status-claims-implemented-
+  but-blocked` follows from the bound feature's `Ready for Review` claim exceeding that record.
+- This is the honest pre-closure verdict, not a repaired-defect residue: the review's named
+  conditions 1 and 2 are gone (verification.md exists; SC-002 measures empty both ways);
+  condition 3 now has a machine-produced record naming exactly the closure-stage criteria.

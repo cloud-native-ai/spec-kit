@@ -48,6 +48,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHECKER = REPO_ROOT / "scripts" / "python" / "doc-consistency-check.py"
 PLAN_TEMPLATE = REPO_ROOT / "templates" / "plan-template.md"
@@ -180,12 +182,7 @@ def make_repo(tmp_path, *, requirements=DECLARED_EXPRESSION, plan=None,
 
 def _run(*args):
     assert CHECKER.is_file(), "structure checker missing: %s" % CHECKER
-    return subprocess.run(
-        [sys.executable, str(CHECKER), *args],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(CHECKER, args)
 
 
 def run_structure(spec_dir, *extra, fmt="json"):

@@ -1,0 +1,67 @@
+# T012 — tier contract + 086 runner suite green under the canonical runner
+# Date: 2026-11-10
+# Tree: 098-suite-speed-optimizations worktree, after T010/T011 (WP-2 @ 1dca066fb) and the
+#       mirror regeneration T011 recorded; this row changed no source file.
+# Runtime output landed under .specify/.tmp/t013/t012/ (gitignored scratch, not retained);
+# this file is the record.
+
+## Scope note — obligation 11
+
+The row text names "obligations 1–11". Obligation 11 (full-collection equality, tier-selection
+C-015) is authored at T021 (US2, still `[ ]`, blockedBy T020):
+`grep -c "def test_obligation_11" tests/contract/test_suite_tier_contract.py` → `0`.
+Analyze round-2 W3-02 / round-3 W13-07 recorded this sequencing gap and carried it as LOW.
+This record covers every case that exists at this row — tier-selection obligations 1–10
+(obligation 3 in both accepted `-m` spellings) plus the slow-membership guard cases C-005…C-009 —
+and claims nothing about obligation 11.
+
+## Premise re-derivations
+
+- P-2 (086 suite size): `bash scripts/bash/run-tests.sh --serial tests/contract/test_run_tests_runner_contract.py --collect-only -q`
+  → exit `0`; `40 tests collected in 0.03s` (matches the tasks premise `40`).
+- Tier contract size: `bash scripts/bash/run-tests.sh --serial tests/contract/test_suite_tier_contract.py --collect-only -q`
+  → exit `0`; `16 tests collected in 0.03s` (11 obligation cases + 5 slow-membership guard cases).
+
+## Green run A — tier contract file
+
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py -q`
+- Exit: `0`; wall `37.98 s`; pytest summary `16 passed in 36.05s`.
+- Header: `# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_suite_tier_contract.py -q`
+- Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0`
+- The run includes the five `test_slow_guard_*` cases (slow-membership C-005…C-009), green.
+
+## Green run B — 086 runner contract suite
+
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_run_tests_runner_contract.py -q`
+- Exit: `0`; wall `35.34 s`; pytest summary `40 passed in 33.62s`.
+- Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0`
+- The run includes `test_c016_runner_carriers_follow_the_declared_projection` (the mirror equals
+  the declared projection — C-012's 086-C-016 leg) among the 40 green cases.
+
+## Clause mapping
+
+- **C-012** (every 086 clause keeps its meaning under the tier dimension): run B — 40/40 green,
+  including the C-016 projection case.
+- **C-014** (existing runner contract suite stays green): run B — 40/40.
+- **C-013** (slow marker registration): registration exists — `pyproject.toml:57`, and
+  `python3 -m pytest --markers` answers `@pytest.mark.slow: process-boundary (spawns/waits for/
+  terminates an external process or queue) or corpus-scan (traverses the real framework corpus)
+  tests — the runner's default fast tier excludes them; --full runs them`.
+  The clause's second half — "missing registration or a different marker name MUST turn the
+  contract test red" — has **no enforcing case** at this row. Measured on a throwaway full-tree
+  copy with the `slow:` registration line removed from `pyproject.toml` (verified removed:
+  `pytest --markers` count for `@pytest.mark.slow` → `0`):
+  `python3 -m pytest tests/contract/test_suite_tier_contract.py -q` → exit `0`,
+  `16 passed in 65.68s`. Registration existence is evidenced; red-on-missing is recorded as
+  unenforced and is NOT claimed.
+- **Slow-membership C-005…C-009**: carried by the five `test_slow_guard_*` cases in run A.
+
+## Anomalies / limits
+
+- Obligation 11 is absent at this row (T021 owns it; recorded upstream as W13-07, carried LOW).
+  No repair applied — authoring the case belongs to T021.
+- C-013's red-on-missing-registration half is unenforced by any current case (measured above).
+  No case was authored here: case authoring is outside this row's action (the contract owner /
+  T004 hold the guard file's case set).
+- No other anomaly: both runs are green with the declared mode lines; no in-passing repair was
+  applied to any artifact.

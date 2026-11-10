@@ -1,0 +1,137 @@
+# T028 — corpus-pair equivalence (before/after) and the build-count/traversal probe
+
+- date: 2026-11-10
+- owner of the propositions: `contracts/scan-cache.contract.md` C-009 (equivalence, assertion
+  strength unchanged) and C-011 (build_count = 1 per worker with more than one consumer;
+  traversals = 1 for `framework-specs-corpus`); requirements SC-007.
+- corpus-write hazard: every run-time output below landed in `.specify/.tmp/wp5/` while the
+  runs were in flight (the scanned corpus lives under `.specify/specs`) and was copied into
+  this file afterwards (`test-evidence/corpus-write-hazard.txt`, research B-5 / plan R-3).
+
+## 1. Equivalence — same selection, before vs after the conversion
+
+The "before" arm is the exact pre-WP-5 tree: `git archive HEAD | tar -x -C
+.specify/.tmp/wp5/before-tree` with `HEAD = d8b8ca92b` (the WP-4 close, i.e. the last commit
+before any WP-5 change). The "after" arm is this worktree with the two converted files and
+the session factory in place. Same selection, same host, same day, same worker count.
+
+| arm | command | exit | pytest summary | wall |
+|-----|---------|------|----------------|------|
+| before | `bash scripts/bash/run-tests.sh --full --workers 2 --names-out <out>/before-failed.txt tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q` | `1` | `2 failed, 62 passed in 42.58s` | 45 s |
+| after | same command shape, `--names-out <out>/after-failed.txt` | `1` | `2 failed, 62 passed in 15.22s` | 16 s |
+
+The wall readings are disclosure only — no assertion anywhere uses them — and the speedup is
+bought by the removed full-corpus scans, never by shrinking the selection (both arms ran
+`--full` over the same 64 collected cases).
+
+### Name sets (sorted, from the runner's own `--names-out` files)
+
+before (2 entries):
+
+```text
+tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+```
+
+after (2 entries):
+
+```text
+tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+```
+
+### Comparison (C-009)
+
+```text
+$ comm -13 <before-failed.txt> <after-failed.txt> | wc -l
+0
+$ comm -23 <before-failed.txt> <after-failed.txt> | wc -l
+0
+```
+
+Both directions empty: the same 2 names were red before and after, and every name that was
+green before is green after. The two names are the recorded pre-existing failures of this
+tree (`test-evidence/targeted-pretest-baseline.txt`; GATE-1's baseline names — the OpenAPI
+census drift and the confirmation-gate budget pin), unchanged by this package.
+
+## 2. The probe implementation (C-011)
+
+The probe is the run itself, not a re-run (single-run evidence discipline): `tests/conftest.py`
+carries an environment-gated `pytest_sessionfinish` hook that dumps each worker's cache
+counters as JSON when `SPEC_KIT_SCAN_CACHE_STATS_DIR` is set (unset in normal runs — no
+output, no file). Each entry reports the `(worker, surface, root, variant)` identity plus
+`build_count`, `traversals` (calls to the accountant's `_corpus_files` during the build) and
+`access_count` (consumer accesses of the entry).
+
+### 2a. Full-tier probe run (the converted files, 2 workers)
+
+- command: `SPEC_KIT_SCAN_CACHE_STATS_DIR=<out>/stats bash scripts/bash/run-tests.sh --full
+  --workers 2 tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q`
+- mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=full excluded_slow=0`
+
+Per-worker counters (verbatim):
+
+```json
+// gw0
+[
+  {
+    "surface": "framework-root-inputs",
+    "root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations",
+    "variant": "071-requirements+templates",
+    "worker": "gw0",
+    "build_count": 1,
+    "traversals": 1,
+    "access_count": 1
+  },
+  {
+    "surface": "framework-specs-corpus",
+    "root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs",
+    "variant": "spec=053-machine-decidable-artifacts|baseline=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/.specify/specs/053-machine-decidable-artifacts/coverage-baseline.txt|freeze=0",
+    "worker": "gw0",
+    "build_count": 1,
+    "traversals": 1,
+    "access_count": 4
+  }
+]
+// gw1
+[
+  {
+    "surface": "framework-root-inputs",
+    "root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations",
+    "variant": "071-requirements+templates",
+    "worker": "gw1",
+    "build_count": 1,
+    "traversals": 1,
+    "access_count": 1
+  }
+]
+```
+
+Reading (C-011 / SC-007):
+
+- `framework-specs-corpus`: `build_count = 1` on the worker that consumed it and
+  `traversals = 1` — one full-corpus traversal served `access_count = 4` consumers
+  (`test_c10`, `test_c26`, `test_c27` and the `form_exit_code_table` payload leg; `test_c20`
+  stayed cache-free by design, C-006, and ran its own subprocess scan).
+- Per-file traversal bound: the corpus file made **1** managed traversal with **2** workers
+  (bound: ≤ worker count), and its consumer count (4) exceeds its traversal count (1) — the
+  cache is per session, not per case (FR-012).
+- `framework-root-inputs`: `build_count = 1` per worker (`gw0`, `gw1`), each serving that
+  worker's receipt cases; the second worker rebuilt because a session-scoped fixture is
+  built once per worker — the worker component of the key, never the test count (C-001).
+- `gw1` carries no corpus entry because no corpus consumer was scheduled there by
+  `--dist load`; that is the expected shape, not a missing measurement.
+
+### 2b. Default-tier probe run (SC-007's "default-tier run" reading)
+
+- command: `SPEC_KIT_SCAN_CACHE_STATS_DIR=<out>/stats-fast bash scripts/bash/run-tests.sh
+  --workers 2 tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q`
+- mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=5`
+- summary: `1 failed, 58 passed in 3.27s` (the 1 failure is the pre-existing `test_c5`; the
+  five corpus-scan tests are excluded by the slow registry — WP-2 — so the corpus surface is
+  legitimately absent from the default tier).
+- counters: `framework-root-inputs` on `gw0` and `gw1`: `build_count = 1`, `traversals = 1`,
+  `access_count = 1` each. The corpus surface has no entry — 0 traversals ≤ worker count.
+
+Anomaly line: none — both red names are the recorded pre-existing baseline failures, and no
+in-passing repair was applied to the pair, the fixture or the probe.

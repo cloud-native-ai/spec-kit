@@ -38,6 +38,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -84,12 +86,7 @@ OWNER_TEXT = """# Flow Class Definitions (unit-test fixture)
 # --------------------------------------------------------------------------- #
 def _run(*args: str) -> subprocess.CompletedProcess:
     assert ENGINE.is_file(), "flow-class engine missing: %s" % ENGINE
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(ENGINE, args)
 
 
 def _lookup(repo: Path, unit_id: str) -> subprocess.CompletedProcess:

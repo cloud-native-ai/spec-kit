@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -107,8 +109,7 @@ def _load_scanner():
 
 
 def _summary():
-    r = subprocess.run([sys.executable, str(SCANNER), "--summary"],
-                       capture_output=True, text=True, cwd=str(ROOT))
+    r = run_engine_in_process(SCANNER, ["--summary"])
     assert r.returncode == 0, r.stdout + r.stderr
     total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
     violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))

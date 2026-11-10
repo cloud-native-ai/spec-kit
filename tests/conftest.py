@@ -1,4 +1,8 @@
+import copy
 import hashlib
+import importlib.util
+import json
+import os
 import shutil
 import subprocess
 import sys
@@ -258,3 +262,186 @@ def install_template_clone(
         f"template clone ({method}) diverged from the session snapshot {digest}"
     )
     return method
+
+
+# --------------------------------------------------------------------------
+# 098 US3: session scan cache
+#
+# Owner of these propositions: `.specify/specs/098-suite-speed-optimizations/contracts/
+# scan-cache.contract.md` (C-001…C-011); field shapes: that spec's `data-model.md` E-3.
+#
+# Two managed, read-only framework surfaces are built once per session — under xdist
+# once per worker — and shared by every consumer:
+#
+#   framework-specs-corpus   the accountant's account() report over the corpus root
+#                            (default: the spec dir's parent), built IN PROCESS with the
+#                            house pattern: importlib load of
+#                            `scripts/python/account-clause-coverage.py`, with its
+#                            `_corpus_files` wrapped by a traversal counter
+#   framework-root-inputs    the 071 requirements text and the three template texts the
+#                            coverage-receipt contract cases read
+#
+# The stored payload is never handed out: consumer access returns a deep copy (C-004).
+# Freshness comes from session boundaries only — no mtime read, no content polling, no
+# on-disk store (C-003). A case that writes into the tree it scans keeps its own
+# per-test fixture and never uses this cache (C-005); test_c20's byte-identity check
+# stays a separate, cache-free subprocess case (C-006). The key is
+# (worker, surface, root, variant) (C-001); `variant` is the frozen argument tuple that
+# changes the payload, and `worker` is the xdist worker id or 'none'.
+# --- scan-cache begin
+SCAN_SURFACES = ("framework-specs-corpus", "framework-root-inputs")
+
+_SCAN_CACHE_INSTANCES: list = []
+
+
+def _load_accountant():
+    path = ROOT / "scripts" / "python" / "account-clause-coverage.py"
+    assert path.is_file(), f"missing scan subject: {path}"
+    spec = importlib.util.spec_from_file_location("_scan_cache_accountant", path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _build_specs_corpus(spec_dir, corpus_root, baseline):
+    """account() over one corpus, counting the traversal that produces the payload."""
+    accountant = _load_accountant()
+    traversals = []
+    original = accountant._corpus_files
+
+    def counted(corpus_root_arg):
+        traversals.append(1)
+        return original(corpus_root_arg)
+
+    accountant._corpus_files = counted
+    report = accountant.account(spec_dir, corpus_root, baseline)
+    return report, len(traversals)
+
+
+def _build_root_inputs(root):
+    """The 071 requirements text and the receipt templates, read once per session."""
+    specs = root / ".specify" / "specs"
+    matches = sorted(specs.glob("071-*/requirements.md"))
+    if len(matches) != 1:
+        raise AssertionError(
+            f"expected exactly one 071 requirements owner under {specs}, got {matches}"
+        )
+    payload = {
+        "requirements_path": matches[0],
+        "requirements_text": matches[0].read_text(encoding="utf-8"),
+        "report_template": (root / "templates" / "review-template.md").read_text(
+            encoding="utf-8"
+        ),
+        "command_template": (root / "templates" / "commands" / "review.md").read_text(
+            encoding="utf-8"
+        ),
+        "feature_detail_template": (
+            root / "templates" / "feature-details-template.md"
+        ).read_text(encoding="utf-8"),
+    }
+    return payload, 1
+
+
+class _ScanEntry:
+    """One built surface: the read-only payload plus the counters the guard reads."""
+
+    def __init__(self, surface, root, variant, worker, payload, traversals):
+        self.surface = surface
+        self.root = root
+        self.variant = variant
+        self.worker = worker
+        self.build_count = 1
+        self.traversals = traversals
+        self.access_count = 0
+        self._stored = payload
+
+    @property
+    def payload(self):
+        """A deep copy of the stored payload — consumer access never touches the store."""
+        return copy.deepcopy(self._stored)
+
+    def stats(self):
+        return {
+            "surface": self.surface,
+            "root": str(self.root),
+            "variant": self.variant,
+            "worker": self.worker,
+            "build_count": self.build_count,
+            "traversals": self.traversals,
+            "access_count": self.access_count,
+        }
+
+
+class ScanCache:
+    """Session-scoped factory; the key is (worker, surface, root, variant) (C-001)."""
+
+    def __init__(self):
+        self.worker = os.environ.get("PYTEST_XDIST_WORKER", "none")
+        self._entries = {}
+        _SCAN_CACHE_INSTANCES.append(self)
+
+    def _absorb(self, surface, root, variant, build):
+        key = (self.worker, surface, str(root), variant)
+        if key not in self._entries:
+            payload, traversals = build()
+            self._entries[key] = _ScanEntry(
+                surface, root, variant, self.worker, payload, traversals
+            )
+        entry = self._entries[key]
+        entry.access_count += 1
+        return entry
+
+    def corpus(self, spec_dir, corpus_root=None, baseline=None):
+        spec_dir = Path(spec_dir).resolve()
+        corpus_root = (
+            Path(corpus_root).resolve() if corpus_root is not None else spec_dir.parent
+        )
+        baseline = (
+            Path(baseline).resolve()
+            if baseline is not None
+            else spec_dir / "coverage-baseline.txt"
+        )
+        variant = "spec={0}|baseline={1}|freeze=0".format(spec_dir.name, baseline)
+        return self._absorb(
+            SCAN_SURFACES[0],
+            corpus_root,
+            variant,
+            lambda: _build_specs_corpus(spec_dir, corpus_root, baseline),
+        )
+
+    def root_inputs(self, root):
+        root = Path(root).resolve()
+        return self._absorb(
+            SCAN_SURFACES[1],
+            root,
+            "071-requirements+templates",
+            lambda: _build_root_inputs(root),
+        )
+
+
+@pytest.fixture(scope="session")
+def scan_cache():
+    """The session scan cache; built once per session (per xdist worker) on first use."""
+    return ScanCache()
+# --- scan-cache end
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """C-011 probe diagnostics: with SPEC_KIT_SCAN_CACHE_STATS_DIR set, dump the counters.
+
+    Counters only — payloads are never written, and without the environment variable
+    this hook does nothing. The T028 build-count probe reads these files.
+    """
+    stats_dir = os.environ.get("SPEC_KIT_SCAN_CACHE_STATS_DIR")
+    if not stats_dir:
+        return
+    out = Path(stats_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    for index, cache in enumerate(_SCAN_CACHE_INSTANCES):
+        target = out / "scan-cache-stats-{0}-{1}.json".format(cache.worker, index)
+        target.write_text(
+            json.dumps([entry.stats() for entry in cache._entries.values()], indent=2)
+            + "\n",
+            encoding="utf-8",
+        )

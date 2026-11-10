@@ -1,0 +1,31 @@
+# 098 plan-stage session-fixture probe — 2026-11-10T09:15:49Z
+# premise EP-002 / A8: a session-scoped fixture builds once per xdist worker
+$ PROBE_MARKER_DIR=<scratch>/session-markers python3 -m pytest <scratch>/session-scope -q -n 2 -p no:cacheprovider
+...                                                                      [100%]
+3 passed in 0.40s
+rc=0
+--- build markers (one per worker) ---
+built-gw0.marker
+built-gw1.marker
+marker_count=2
+--- probe source ---
+import os
+from pathlib import Path
+import pytest
+
+MARKER_DIR = Path(os.environ["PROBE_MARKER_DIR"])
+
+@pytest.fixture(scope="session")
+def snap():
+    worker = os.environ.get("PYTEST_XDIST_WORKER", "none")
+    (MARKER_DIR / f"built-{worker}.marker").write_text(worker)
+    return worker
+
+def test_a(snap):
+    assert snap
+
+def test_b(snap):
+    assert snap
+
+def test_c(snap):
+    assert snap

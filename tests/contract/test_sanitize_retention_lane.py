@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT / "templates" / "commands" / "sanitize.md"
 SKILL = ROOT / "skills" / "internal" / "sanitize-materials" / "SKILL.md"
@@ -59,9 +61,7 @@ def test_generated_copies_carry_the_lane():
 
 
 def test_retention_action_set_is_closed():
-    proc = subprocess.run(
-        [sys.executable, str(ENGINE), "--action", "args-manifest"],
-        capture_output=True, text=True, timeout=60)
+    proc = run_engine_in_process(ENGINE, ["--action", "args-manifest"])
     assert proc.returncode == 0, proc.stderr
     manifest = json.loads(proc.stdout)
     assert list(manifest) == ["scan", "distill", "plan", "apply", "status",

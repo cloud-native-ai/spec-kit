@@ -13,6 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -132,10 +133,7 @@ def test_init_is_non_destructive_roundtrip(tmp_path: Path):
     (tmp_path / ".specify").mkdir(parents=True)
 
     def run(*args):
-        cp = subprocess.run(
-            [sys.executable, str(ENGINE), "--root", str(tmp_path), *args],
-            capture_output=True, text=True,
-        )
+        cp = run_engine_in_process(ENGINE, ["--root", str(tmp_path), *args])
         assert cp.returncode == 0, cp.stderr
         return json.loads(cp.stdout)
 

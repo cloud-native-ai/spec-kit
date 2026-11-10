@@ -11,6 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 ROOT = Path(__file__).resolve().parents[2]
 SKILL = ROOT / "skills" / "external" / "sdd-house-keeping"
 INVENTORY = SKILL / "scripts" / "mechanism-inventory.py"
@@ -20,8 +22,7 @@ OLD = "2026-09-01T00:00:00Z"
 
 
 def _run(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, *args], capture_output=True,
-                          text=True, timeout=120)
+    return run_engine_in_process(args[0], [str(arg) for arg in args[1:]])
 
 
 def _json(proc: subprocess.CompletedProcess) -> dict:

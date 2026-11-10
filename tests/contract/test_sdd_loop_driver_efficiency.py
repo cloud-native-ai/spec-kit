@@ -16,6 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -37,10 +38,7 @@ def _text(path):
 
 
 def _run(args):
-    return subprocess.run(
-        [sys.executable] + [str(item) for item in args],
-        capture_output=True, text=True,
-    )
+    return run_engine_in_process(args[0], [str(item) for item in args[1:]])
 
 
 def _script_help(name):

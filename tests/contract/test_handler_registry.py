@@ -22,11 +22,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 from tests.script_api import ROOT
 
 DEFS = ROOT / "shared" / "definitions" / "probe-definitions.md"
 PROBE_ENGINE = ROOT / "scripts" / "python" / "probe-utils.py"
-PY_PROBE = [sys.executable, str(PROBE_ENGINE)]
 
 KINDS = {"engine", "agent", "gate"}
 MODES = {"non-blocking", "blocking"}
@@ -203,9 +204,8 @@ def test_seed_order_constraint_run_determination_first() -> None:
 # --- engine behavior: validate green on the real tree ------------------------
 
 def test_handlers_validate_exits_zero_on_real_tree() -> None:
-    proc = subprocess.run(
-        [*PY_PROBE, "--action", "handlers", "--validate", "--workspace-root", str(ROOT)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        PROBE_ENGINE, ["--action", "handlers", "--validate", "--workspace-root", str(ROOT)]
     )
     assert proc.returncode == 0, (
         f"handlers --validate exit {proc.returncode}:\n{proc.stdout}\n{proc.stderr}"
@@ -231,9 +231,8 @@ def test_duplicate_binding_triple_exits_two(tmp_path: Path) -> None:
     (registry_dir / "probe-definitions.md").write_text(
         "\n".join(lines) + "\n", encoding="utf-8"
     )
-    proc = subprocess.run(
-        [*PY_PROBE, "--action", "handlers", "--validate", "--workspace-root", str(tmp_path)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        PROBE_ENGINE, ["--action", "handlers", "--validate", "--workspace-root", str(tmp_path)]
     )
     combined = proc.stdout + proc.stderr
     assert proc.returncode == 2, (

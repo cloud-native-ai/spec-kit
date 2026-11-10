@@ -1,0 +1,136 @@
+# T041 — event-wait guard + six scope files green; test_client_metrics wall pair
+# Date: 2026-11-10 (CST; both wall readings same host, same day, same worker count)
+# Tree: 098-suite-speed-optimizations worktree after T032–T040 and the T033 mirror sync.
+#       Run-time output landed under .specify/.tmp/wp6/ (gitignored scratch, not retained);
+#       this file is the record (corpus-write hazard: nothing was written under .specify/specs
+#       while a corpus-scanning case ran).
+
+## Premise re-derivations (WP-6 start, before any edit)
+
+- P-3 census: `grep -rn --include='*.py' 'time\.sleep' tests/ | wc -l` → `21` occurrences in
+  10 files; the C-001 scope subset is `16` calls / 6 files
+  (8 + 1 + 2 + 1 + 2 + 2), matching the generation-time premise.
+- `wait_until` default before change: `tests/fixtures/line_fixtures.py:396`
+  `def wait_until(predicate, timeout: float = 5.0, interval: float = 0.05) -> bool:`.
+- `test_client_metrics.py` collection: `16` cases.
+
+## C-010 directional wall pair — `test_client_metrics.py` (SC-008)
+
+Same host, same day, same command, same worker count; the pair is directional evidence,
+never an assertion.
+
+- Before (pre-change tree; reading taken 2026-11-10 23:55 local, before any WP-6 edit):
+  - Command: `/usr/bin/time -f 'wall_seconds=%e' bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_client_metrics.py -q`
+  - Exit `0`; `wall_seconds=8.42`; pytest summary `16 passed in 6.65s`
+  - Header: `# test runner: python3 -m pytest -n 2 --dist load -m "not slow" tests/contract/test_client_metrics.py -q`
+  - Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0`
+- After (converted tree; reading taken 2026-11-10 23:58 local):
+  - Same command.
+  - Exit `0`; `wall_seconds=3.63`; pytest summary `16 passed in 1.87s`
+  - Same header and mode line (selection unchanged: `16` cases both sides).
+- Reading: the eight `time.sleep(1.1)` ordering waits are gone from the wall
+  (8.8 s of fixed waits spread over 2 workers); the assertion set is unchanged — the same
+  16 cases with the same numeric/boundary/disclosure assertions, edited only at the
+  timing source (injected `--now` clock and explicit `os.utime`).
+
+## Green run A — the guard alone (C-002 / C-009)
+
+- Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_event_wait_contract.py -q`
+- Exit `0`; wall `2.21 s`; pytest summary `8 passed in 0.49s`.
+- Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0`
+- All eight cases green, including the clause-derived scope identity (C-001), the zero-sleep
+  AST scan (C-002), the closed exemption registry (C-003), the helper defaults (C-006/C-007),
+  the adopted call-site scan (C-009), the inline-poll scan and the injected-clock structural
+  case (C-004).
+
+## Green run B — guard + six scope files, full tier
+
+- Command: `bash scripts/bash/run-tests.sh --full --workers 2 tests/contract/test_event_wait_contract.py tests/contract/test_client_metrics.py tests/contract/test_feedback_probe_cli.py tests/contract/test_store_state_protocol.py tests/integration/test_sdd_loop_efficiency_runner.py tests/integration/test_session_kill_reattach.py tests/contract/test_line_envelope_contract.py -q`
+- Exit `0`; wall `10.63 s`; pytest summary `92 passed in 9.03s` (8 guard + 84 scope).
+- Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=full excluded_slow=0`
+- `--full` includes the two slow-marked cases inside the scope files
+  (`test_local_nohup_survives_parent_exit`, `test_delivered_runner_recipe_survives_driver_kill_and_reattaches`),
+  i.e. every edited wait is exercised.
+- Pre-change baseline on the same six files: `84 passed in 14.93s`, wall `16.50 s` — same
+  84 case names, now green on the converted tree.
+
+## C-002 zero-synchronization-sleep scan reading (mechanical)
+
+- Scan: AST call-site scan over the six C-001 files, run by
+  `test_c002_the_scope_files_carry_zero_synchronization_sleep`.
+- Pre-change red inventory (16 hits, named file and line):
+  `tests/contract/test_client_metrics.py:338 :391 :394 :400 :432 :458 :463 :671`,
+  `tests/integration/test_sdd_loop_efficiency_runner.py:128`,
+  `tests/integration/test_session_kill_reattach.py:173 :291`,
+  `tests/contract/test_line_envelope_contract.py:303 :310`,
+  `tests/contract/test_feedback_probe_cli.py:277`,
+  `tests/contract/test_store_state_protocol.py:325 :332`.
+- Post-change: `0` hits; the case is green.
+- Remaining `time.sleep` occurrences in `tests/` and their classification (none is a scope
+  synchronization sleep):
+  - `tests/fixtures/line_fixtures.py:407` — the shared helper's polling interval itself.
+  - `tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py:158` — polling interval
+    inside a fixture writer process (C-003: out of scope).
+  - `tests/contract/test_parallel_consistency_contract.py:420` — a string literal inside the
+    deliberate non-parallel-safe drill.
+  - `tests/unit/test_line_registry_engine.py:123` — exemption 1 (generated flock-holder
+    script, string-embedded).
+  - `tests/unit/test_concurrency_check_engine.py:289` — exemption 2 (synthetic task
+    duration measured by a wall-clock comparison).
+  - `tests/contract/test_event_wait_contract.py:68 :72 :176` — this guard's own registry
+    data and message strings, not calls.
+
+## Exemption registry (C-003)
+
+- `tests/unit/test_line_registry_engine.py:123` — "the generated flock holder must outlive
+  the 0.2 s lock timeout under test" (anchor `time.sleep(2)` in the generated script string).
+- `tests/unit/test_concurrency_check_engine.py:289` — "synthetic task duration that a
+  wall-clock comparison measures" (anchor `time.sleep(0.12)`).
+- Registry is a closed two-entry set derived from clause C-003 at guard time; no scope file
+  is exempted, and a stale anchor fails the guard.
+
+## Helper defaults and adopted call sites (C-006/C-007/C-009)
+
+- `wait_until` defaults after T037: `timeout=30`, `interval=0.05`
+  (`tests/fixtures/line_fixtures.py:396`); asserted by the guard, not only read.
+- Every `wait_until` call in the six scope files is an `assert` with a named failure
+  message and an explicit numeric `timeout` ≤ 30 (`interval=0.2` where given); zero
+  `pytest.skip` / `pytest.xfail` call sites exist in the scope files.
+
+## `--now` injected clock — interface evidence (T032)
+
+- `python3 scripts/python/feedback-utils.py --help` → exit `0`; usage block lists
+  `[--now NOW]` and the option's help text ("inject a fixed UTC clock for every now_iso() /
+  timestamp_id() reading in this invocation: YYYY-MM-DDTHH:MM:SSZ (second granularity);
+  absent = the real clock, byte-identical").
+- `python3 scripts/python/feedback-utils.py --version` → `feedback-utils.py 0.0.22`, exit `0`.
+- `python3 scripts/python/feedback-utils.py --bogus-option` → exit `2` (undeclared token).
+- Injected round trip: `--action record … --now 2026-11-10T12:34:56Z` →
+  entry id `20261110T123456Z-speckit-plan`, frontmatter `created: "2026-11-10T12:34:56Z"`.
+- Default-off path: the same record without `--now` → id `20261110T155723Z-speckit-plan`
+  (real clock, unchanged behaviour).
+- Unparsable value: `--action status --now 2026-11-10T25:61:61Z` → exit `2`,
+  `error: --now: cannot parse '2026-11-10T25:61:61Z' — expected YYYY-MM-DDTHH:MM:SSZ`.
+
+## Mirror obligation (T033)
+
+- `python3 scripts/python/sync-mirrors.py --write --only scripts` → exit `0`.
+- `python3 scripts/python/sync-mirrors.py --check` → exit `0`; `scripts/ == .specify/scripts/
+  (126 files, byte-identical)` — no NEW drift on the `feedback-utils.py` pair.
+
+## Artifact hashes (sha256)
+
+- `tests/contract/test_event_wait_contract.py` `6f4b61ed79dfa7e725a2a68eb2b7bca965dcd3b21d5d1e440a494f94f6037d81`
+- `tests/contract/test_client_metrics.py` `4abfcb4213ac7438df37a73ee2ee26b00e66cb86d7af29fad15cb6eb6f352d92`
+- `tests/contract/test_feedback_probe_cli.py` `6fbd6aa2b9303db823c766f077abfa8444cf8e355f743af4a44f2090b261aba3`
+- `tests/contract/test_store_state_protocol.py` `bf979ea0f3ed11c5c3e2049f79b15ea8a57c0b55968a3e60105d9447a0761f09`
+- `tests/contract/test_line_envelope_contract.py` `75e166468b581dee499c2fe4e08ab0331fc2f7c0b169acd899ce930e8acfe0cc`
+- `tests/integration/test_sdd_loop_efficiency_runner.py` `3685c03ceb855f40b7bd09c1fb7b1fe6c09e7b83f0305ab4128f82cad2f8098f`
+- `tests/integration/test_session_kill_reattach.py` `b9f27190c1ee3db1c2ebd041d564fac8d67bded56517bbfa110d95d18a8f3db0`
+- `tests/fixtures/line_fixtures.py` `9668eb69a86f4e7508db2ca9c282b6338aed4d19900046e45453f646f997c6ce`
+- `scripts/python/feedback-utils.py` `3e4fd313e4bd1987df3b2cdcdfb2622c030865054b3a44a6a7c79abcf992a93f`
+- `.specify/scripts/python/feedback-utils.py` `3e4fd313e4bd1987df3b2cdcdfb2622c030865054b3a44a6a7c79abcf992a93f` (byte-identical mirror)
+
+Anomaly line: none — every run above exited `0` on the first attempt after the conversions;
+no in-passing repair beyond the guard-side C-003 whitespace normalisation already disclosed
+in `notes/red-first-evidence.md`.

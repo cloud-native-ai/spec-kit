@@ -1,0 +1,141 @@
+# Slow membership measurement — 098-suite-speed-optimizations
+# Date: 2026-11-10   Host: same worktree, Python 3.11.11 / pytest 8.4.2 / xdist 3.8.0
+# Purpose: per-test durations for the candidate pool behind test-evidence/slow-members.md.
+# Two independent samples (slow-membership C-004: never a single sample). The runs landed
+# outside .specify/specs and were copied here afterwards (corpus-write hazard).
+#
+# Command (identical for both samples; --full keeps the pool selection complete):
+#   bash scripts/bash/run-tests.sh --serial --full -q --durations=0 \
+#     tests/integration/test_sdd_loop_efficiency_runner.py \
+#     tests/integration/test_session_kill_reattach.py \
+#     tests/contract/test_clause_coverage.py
+#
+# Membership rule applied (recorded, not contractual):
+#   A candidate is a member iff (a) it belongs to one of the two closed categories
+#   (slow-membership C-002) AND (b) its call duration was >= 1.0 s in BOTH samples.
+#   The 1.0 s line is a feedback-loop heuristic, not a contract constant: it is about
+#   8x the measured suite average (slot-1 baseline 1031 s serial over 8543 collected
+#   tests ~= 0.12 s/test). Ordinary unit tests are not candidates at all.
+#
+# Sample 1: exit code 1 (the two pre-existing failures below), pytest wall 64.22 s
+# Sample 2: exit code 1 (the same two), pytest wall 63.43 s
+# Pre-existing failures (identical on the recorded baseline, not caused by this row):
+#   FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+#   FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+#
+# Membership decisions (7 members -> test-evidence/slow-members.md):
+#   corpus-scan (>= 1.0 s in both samples):
+#     c10 10.44/10.06 s, c20 10.57/10.29 s, c26 10.02/10.24 s, c27 10.15/9.89 s,
+#     form_exit_code_table 9.86/10.00 s
+#   process-boundary (>= 1.0 s in both samples):
+#     test_local_nohup_survives_parent_exit 6.21/6.21 s,
+#     test_delivered_runner_recipe_survives_driver_kill_and_reattaches 1.59/1.60 s
+# Candidate-pool tests left unmarked because they measured below 1.0 s in both samples
+# (they remain in the default tier; no blanket application — FR-006):
+#   test_c4_owner_doc_copies_no_clause_body_from_any_contract 0.02/0.02 s (corpus-shaped
+#     but cheap: it reads contract files only), test_done_branch_skips_redispatch
+#     0.71/0.71 s, test_dead_branch_retains_registry_evidence 0.66/0.66 s,
+#     test_remote_unreachable_is_stalled_not_dead 0.25/0.25 s, and every remaining
+#     test of the two integration files (< 0.1 s).
+#
+# ============================================================================
+# SAMPLE 1 — full slowest-durations section
+# ============================================================================
+============================== slowest durations ===============================
+10.57s call     tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+10.44s call     tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+10.15s call     tests/contract/test_clause_coverage.py::test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion
+10.02s call     tests/contract/test_clause_coverage.py::test_c26_every_yaml_contract_is_explicitly_disposed
+9.86s call     tests/contract/test_clause_coverage.py::test_form_exit_code_table
+6.21s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_local_nohup_survives_parent_exit
+1.59s call     tests/integration/test_session_kill_reattach.py::test_delivered_runner_recipe_survives_driver_kill_and_reattaches
+0.71s call     tests/integration/test_session_kill_reattach.py::test_done_branch_skips_redispatch
+0.66s call     tests/integration/test_session_kill_reattach.py::test_dead_branch_retains_registry_evidence
+0.30s call     tests/contract/test_clause_coverage.py::test_c22_baseline_internal_items_still_print_their_count
+0.28s call     tests/contract/test_clause_coverage.py::test_c21_baseline_discipline_comm_delta_paired_with_a_non_empty_claim
+0.25s call     tests/integration/test_session_kill_reattach.py::test_remote_unreachable_is_stalled_not_dead
+0.22s call     tests/contract/test_clause_coverage.py::test_c18b_deleting_one_citation_from_a_group_makes_that_fr_uncovered
+0.22s call     tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+0.17s call     tests/contract/test_clause_coverage.py::test_c16_uncovered_is_a_set_difference_with_the_str009_prefix_both_directions
+0.16s call     tests/contract/test_clause_coverage.py::test_c24_the_idiom_is_a_sorted_name_list_consumed_by_comm_not_a_second_form
+0.16s call     tests/contract/test_clause_coverage.py::test_c9_named_list_is_collapsible_behind_an_explicit_flag
+0.16s call     tests/contract/test_clause_coverage.py::test_c17_an_empty_uncovered_set_carries_a_non_empty_companion
+0.16s call     tests/contract/test_clause_coverage.py::test_c7_relational_sentinel_is_printed_and_holds_never_a_literal_total
+0.16s call     tests/contract/test_clause_coverage.py::test_c7b_ids_that_collapse_into_one_name_are_reported_never_absorbed
+0.16s call     tests/contract/test_clause_coverage.py::test_c19_uncovered_names_are_sorted_one_per_line_and_comm_consumable
+0.15s call     tests/contract/test_clause_coverage.py::test_c18_the_two_lanes_are_separate_sections_with_separate_counts
+0.15s call     tests/contract/test_clause_coverage.py::test_c8_named_count_tracks_the_owner_coverage_and_is_printed_with_the_form_set
+0.11s call     tests/contract/test_clause_coverage.py::test_form_human_tail_line_is_the_str003_shape
+0.11s call     tests/contract/test_clause_coverage.py::test_c15_parseable_but_zero_clause_file_is_named_with_a_companion
+0.10s call     tests/contract/test_clause_coverage.py::test_form_json_key_set_verdict_array_and_status_vocabulary
+0.10s call     tests/contract/test_clause_coverage.py::test_c13_parse_doubt_yaml_is_named_and_never_guessed_zero
+0.09s call     tests/contract/test_clause_coverage.py::test_form_positional_artifact_path_is_accepted
+0.07s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_once_snapshot_does_not_redispatch
+0.07s call     tests/contract/test_clause_coverage.py::test_c23_the_baseline_header_records_the_form_set_and_the_freeze_context
+0.06s call     tests/contract/test_clause_coverage.py::test_c24b_the_baseline_is_codepoint_sorted_so_comm_can_consume_it
+0.05s call     tests/contract/test_clause_coverage.py::test_c7_both_sides_name_the_accountants_same_default_path
+0.05s call     tests/contract/test_clause_coverage.py::test_c17b_a_zero_denominator_turns_the_sentinel_red
+0.05s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_status_fields_and_exit_code_propagation
+0.05s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_auto_selects_stream_when_cli_advertises_capability
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_stream_mode_writes_raw_and_live
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_detached_no_marks_unprotected
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_raw_receive_timestamps_pair_with_live_lines
+0.03s call     tests/integration/test_session_kill_reattach.py::test_run_stage_fails_loud_when_registry_update_fails
+0.03s call     tests/contract/test_clause_coverage.py::test_c25_the_baseline_is_not_the_gate_scanner_broken_json_shape
+0.02s call     tests/contract/test_clause_coverage.py::test_c4_owner_doc_copies_no_clause_body_from_any_contract
+0.02s setup    tests/integration/test_sdd_loop_efficiency_runner.py::test_stream_mode_writes_raw_and_live
+0.02s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_buffered_degradation_when_cli_lacks_stream
+0.01s call     tests/contract/test_clause_coverage.py::test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins
+
+(130 durations < 0.005s hidden.  Use -vv to show these durations.)
+
+# ============================================================================
+# SAMPLE 2 — full slowest-durations section
+# ============================================================================
+============================== slowest durations ===============================
+10.29s call     tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+10.24s call     tests/contract/test_clause_coverage.py::test_c26_every_yaml_contract_is_explicitly_disposed
+10.06s call     tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+10.00s call     tests/contract/test_clause_coverage.py::test_form_exit_code_table
+9.89s call     tests/contract/test_clause_coverage.py::test_c27_the_sc006_evidence_form_is_three_numbers_and_a_sum_assertion
+6.21s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_local_nohup_survives_parent_exit
+1.60s call     tests/integration/test_session_kill_reattach.py::test_delivered_runner_recipe_survives_driver_kill_and_reattaches
+0.71s call     tests/integration/test_session_kill_reattach.py::test_done_branch_skips_redispatch
+0.66s call     tests/integration/test_session_kill_reattach.py::test_dead_branch_retains_registry_evidence
+0.25s call     tests/integration/test_session_kill_reattach.py::test_remote_unreachable_is_stalled_not_dead
+0.22s call     tests/contract/test_clause_coverage.py::test_c18b_deleting_one_citation_from_a_group_makes_that_fr_uncovered
+0.22s call     tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+0.21s call     tests/contract/test_clause_coverage.py::test_c21_baseline_discipline_comm_delta_paired_with_a_non_empty_claim
+0.17s call     tests/contract/test_clause_coverage.py::test_c16_uncovered_is_a_set_difference_with_the_str009_prefix_both_directions
+0.16s call     tests/contract/test_clause_coverage.py::test_c9_named_list_is_collapsible_behind_an_explicit_flag
+0.16s call     tests/contract/test_clause_coverage.py::test_c22_baseline_internal_items_still_print_their_count
+0.16s call     tests/contract/test_clause_coverage.py::test_c7b_ids_that_collapse_into_one_name_are_reported_never_absorbed
+0.16s call     tests/contract/test_clause_coverage.py::test_c8_named_count_tracks_the_owner_coverage_and_is_printed_with_the_form_set
+0.16s call     tests/contract/test_clause_coverage.py::test_c7_relational_sentinel_is_printed_and_holds_never_a_literal_total
+0.16s call     tests/contract/test_clause_coverage.py::test_c18_the_two_lanes_are_separate_sections_with_separate_counts
+0.16s call     tests/contract/test_clause_coverage.py::test_c17_an_empty_uncovered_set_carries_a_non_empty_companion
+0.16s call     tests/contract/test_clause_coverage.py::test_c24_the_idiom_is_a_sorted_name_list_consumed_by_comm_not_a_second_form
+0.15s call     tests/contract/test_clause_coverage.py::test_c19_uncovered_names_are_sorted_one_per_line_and_comm_consumable
+0.11s call     tests/contract/test_clause_coverage.py::test_form_human_tail_line_is_the_str003_shape
+0.10s call     tests/contract/test_clause_coverage.py::test_c13_parse_doubt_yaml_is_named_and_never_guessed_zero
+0.10s call     tests/contract/test_clause_coverage.py::test_c15_parseable_but_zero_clause_file_is_named_with_a_companion
+0.10s call     tests/contract/test_clause_coverage.py::test_form_json_key_set_verdict_array_and_status_vocabulary
+0.09s call     tests/contract/test_clause_coverage.py::test_form_positional_artifact_path_is_accepted
+0.07s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_once_snapshot_does_not_redispatch
+0.06s call     tests/contract/test_clause_coverage.py::test_c24b_the_baseline_is_codepoint_sorted_so_comm_can_consume_it
+0.05s call     tests/contract/test_clause_coverage.py::test_c23_the_baseline_header_records_the_form_set_and_the_freeze_context
+0.05s call     tests/contract/test_clause_coverage.py::test_c7_both_sides_name_the_accountants_same_default_path
+0.05s call     tests/contract/test_clause_coverage.py::test_c17b_a_zero_denominator_turns_the_sentinel_red
+0.05s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_status_fields_and_exit_code_propagation
+0.05s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_auto_selects_stream_when_cli_advertises_capability
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_raw_receive_timestamps_pair_with_live_lines
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_stream_mode_writes_raw_and_live
+0.04s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_detached_no_marks_unprotected
+0.03s call     tests/integration/test_session_kill_reattach.py::test_run_stage_fails_loud_when_registry_update_fails
+0.03s call     tests/contract/test_clause_coverage.py::test_c25_the_baseline_is_not_the_gate_scanner_broken_json_shape
+0.02s call     tests/contract/test_clause_coverage.py::test_c4_owner_doc_copies_no_clause_body_from_any_contract
+0.02s call     tests/integration/test_sdd_loop_efficiency_runner.py::test_buffered_degradation_when_cli_lacks_stream
+0.02s setup    tests/integration/test_sdd_loop_efficiency_runner.py::test_stream_mode_writes_raw_and_live
+0.01s call     tests/contract/test_clause_coverage.py::test_c6_the_cap_is_pinned_in_three_forms_with_meta_pins
+
+(130 durations < 0.005s hidden.  Use -vv to show these durations.)

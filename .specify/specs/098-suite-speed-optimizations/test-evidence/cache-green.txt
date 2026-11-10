@@ -1,0 +1,40 @@
+# T029 — green run of the scan-cache guard plus both converted files
+
+- date: 2026-11-10
+- owner of the claims: `contracts/scan-cache.contract.md` C-010 and C-011 (the guard's
+  cross-session drill and the build-count/traversal case).
+- corpus-write hazard: the run-time log landed in `.specify/.tmp/wp5/green-run.log` while
+  the run was in flight and was copied here afterwards.
+
+## Run A — guard + both converted files (same selection as T028's after arm)
+
+- command: `bash scripts/bash/run-tests.sh --full tests/contract/test_scan_cache_contract.py
+  tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q`
+- mode line: `# test runner: mode=parallel workers=auto dist=load passes=1 tier=full excluded_slow=0`
+- exit: `1`
+- summary: `2 failed, 69 passed in 19.43s` (wall 21 s)
+- failures (both are the recorded pre-existing baseline names, unchanged by this package —
+  GATE-1 lists the same two names):
+
+```text
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+```
+
+- The 69 passes decompose as: guard `7` + `test_coverage_receipt.py` `20` +
+  `test_clause_coverage.py` `42`. No NEW failure name appears; the two red names are the
+  same names T028's before/after comparison shows on both sides.
+
+## Run B — the new guard file alone
+
+- command: `bash scripts/bash/run-tests.sh --full tests/contract/test_scan_cache_contract.py -q`
+- exit: `0`
+- summary: `7 passed in 7.09s`
+
+The seven cases are the file's full case set: C-002 surface enum, C-003 no-mtime/no-store
+static, C-007 in-process house-pattern static, C-001/C-011 one-build-one-traversal across
+two consumers, C-001 variant-in-key, C-004 deep-copy isolation, and C-010 the cross-session
+tamper drill.
+
+Anomaly line: none — the only red names in Run A are the two recorded pre-existing failures
+on both sides of the T028 comparison; no in-passing repair was applied.

@@ -34,6 +34,8 @@ from pathlib import Path
 
 import pytest
 
+from script_api import run_engine_in_process
+
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -603,10 +605,7 @@ def _checker_exceptions_payload() -> list[dict]:
     assert CHECKER.is_file(), (
         f"the checker is missing: {CHECKER.relative_to(ROOT)} — T032/T045 have not landed yet"
     )
-    proc = subprocess.run(
-        [sys.executable, str(CHECKER), "--json", "--emit-rule"],
-        cwd=str(ROOT), capture_output=True, text=True, timeout=300,
-    )
+    proc = run_engine_in_process(CHECKER, ["--json", "--emit-rule"])
     assert proc.returncode == 0, (
         f"`script-interface-check.py --json --emit-rule` exited {proc.returncode}\n"
         f"stderr:\n{proc.stderr[-2000:]}"
@@ -673,23 +672,18 @@ def test_c30_owner_table_and_checker_payload_agree_row_for_row():
 # ======================================================================================
 
 
-def _run_checker(root: Path, *args: str, timeout: int = 300):
+def _run_checker(root: Path, *args: str):
     """Run the checker against ``root`` and return the CompletedProcess.
 
     Every C-1/C-2 assertion is made through this one door: the clause is about what the
     engine *reports*, so the report is read, never the engine's internals. ``--root`` is
-    always passed explicitly — a scenario tree is never the repository the test lives in.
+    always passed explicitly — a scenario tree is never the repository the test lives in,
+    and the explicit root is what makes the in-process route equivalent (C-003).
     """
-    import subprocess
-    import sys
-
     assert CHECKER.is_file(), (
         f"the checker is missing: {CHECKER.relative_to(ROOT)} — T032 has not landed yet"
     )
-    return subprocess.run(
-        [sys.executable, str(CHECKER), "--root", str(root), *args],
-        cwd=str(root), capture_output=True, text=True, timeout=timeout,
-    )
+    return run_engine_in_process(CHECKER, ["--root", str(root), *args])
 
 
 def _payload(proc) -> dict:
@@ -2916,13 +2910,9 @@ def _sync_module():
     return module
 
 
-def _run_sync(*args: str, timeout: int = 300):
+def _run_sync(*args: str):
     """Run `sync-mirrors.py` with the repository as its own root (never a scenario tree)."""
-    import subprocess
-    import sys
-
-    return subprocess.run([sys.executable, str(SYNC), *args],
-                          cwd=str(ROOT), capture_output=True, text=True, timeout=timeout)
+    return run_engine_in_process(SYNC, args)
 
 
 def test_c34_the_projection_rule_is_declared_once_and_names_its_rows():

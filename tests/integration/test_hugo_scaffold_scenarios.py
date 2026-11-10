@@ -15,6 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -58,10 +59,7 @@ def fake_theme(root: Path, min_version: str = "0.158.0") -> None:
 
 
 def run(root: Path, *args: str) -> dict:
-    proc = subprocess.run(
-        [sys.executable, str(SCRIPT), "--root", str(root), *args],
-        capture_output=True, text=True,
-    )
+    proc = run_engine_in_process(SCRIPT, ["--root", str(root), *args])
     assert proc.stdout, proc.stderr
     return json.loads(proc.stdout)
 
@@ -222,9 +220,8 @@ def test_scaffolded_space_still_validates_clean(tmp_path: Path):
     """Cross-engine invariant: the site layer introduces no docs-space violation."""
     make_docs(tmp_path)
     run(tmp_path, "--action", "scaffold")
-    proc = subprocess.run(
-        [sys.executable, str(DOCS_UTILS), "--action", "validate", "--root", str(tmp_path)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        DOCS_UTILS, ["--action", "validate", "--root", str(tmp_path)]
     )
     assert proc.returncode == 0, proc.stderr
     assert json.loads(proc.stdout)["violations"] == []
@@ -400,9 +397,8 @@ def test_book_mode_space_still_validates_clean(tmp_path: Path):
     make_docs(tmp_path)
     fake_theme(tmp_path)
     run(tmp_path, "--action", "scaffold")
-    proc = subprocess.run(
-        [sys.executable, str(DOCS_UTILS), "--action", "validate", "--root", str(tmp_path)],
-        capture_output=True, text=True,
+    proc = run_engine_in_process(
+        DOCS_UTILS, ["--action", "validate", "--root", str(tmp_path)]
     )
     assert proc.returncode == 0, proc.stderr
     assert json.loads(proc.stdout)["violations"] == []

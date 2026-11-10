@@ -1,0 +1,24 @@
+# r2 closure verdict — 098-suite-speed-optimizations
+
+- Date: 2026-11-11. Tree: HEAD `c4f7c8bd1` + the isolation fix in
+  `tests/integration/test_trigger_{tuning,promotion}.py` (this record's commit).
+- Invocation (claim carrier = the bound feature's detail; 098 has no registry row by the
+  clarify binding "不新建、不改号"):
+
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/098-suite-speed-optimizations --feature-detail .specify/features/086-efficient-test-execution.md --json --json-out .specify/specs/098-suite-speed-optimizations/test-evidence/review-repair-r2-closure-payload.json`
+
+- Exit `0`.
+- Record (field-for-field from `test-evidence/review-repair-r2-closure-payload.json`):
+  - verdict: `accept`
+  - reasons: `[]` (empty)
+  - final_path: pass 9 · partial 0 · fail 0 · blocked 0 · deferred 0 · unknown 0 · total 9
+  - completion conditions: no_open_rows=true · status_row_per_criterion=true ·
+    every_final_path_pass=true · smoke_record_pass=true
+  - tasks: closed 61 · deferred 0 · open 0 · in_progress 0
+  - smoke: present=true · records=1 · exit_code=0 · evidence_exists=true
+- Bare invocation without `--feature-detail`: exit 2 with
+  "… .specify/features.md has no row for '098-suite-speed-optimizations'" — the resolution
+  fact of the follow-up-spec binding, unchanged from the r1 record.
+- The previous `block` verdict (7 pass / 2 partial) is superseded by T061's closure readings:
+  `test-evidence/closure.txt`; the r1 verdict stays archived at
+  `test-evidence/review-repair-r1-closure-verdict.txt` + `review-repair-r1-closure-payload.json`.

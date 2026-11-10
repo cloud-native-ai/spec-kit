@@ -279,18 +279,18 @@ class TestTwoBranchMerge:
         return subprocess.run(["git", "-C", str(repo), *args],
                               capture_output=True, text=True)
 
-    def _record_on_branch(self, repo: Path, run_id: str) -> None:
+    def _record_on_branch(self, repo: Path, run_id: str, now: str) -> None:
         p = subprocess.run(
             [sys.executable, str(repo / "scripts/python/feedback-utils.py"),
              "--action", "record", "--workspace-root", str(repo),
              "--unit-id", "/speckit.plan", "--unit-type", "command",
-             "--run-id", run_id, "--review", "r", "--points", "- p"],
+             "--run-id", run_id, "--review", "r", "--points", "- p",
+             "--now", now],
             capture_output=True, text=True)
         assert p.returncode == 0, p.stderr
 
     def test_branch_merge_yields_zero_conflicts_and_both_entries(self, tmp_path):
         import shutil
-        import time
         repo = tmp_path / "repo"
         repo.mkdir()
         scripts_dir = repo / "scripts/python"
@@ -311,26 +311,25 @@ class TestTwoBranchMerge:
         # Entry filenames carry second granularity: two branches recording
         # the SAME unit within the same wall-clock second collide on the
         # filename itself (a pre-existing property, unchanged by req 055).
-        # Cross the boundary so each record lands in its own second — the
-        # realistic multi-branch scenario this feature closes.
+        # The injected clock gives each record its own second (C-004) — the
+        # realistic multi-branch scenario this feature closes, without a
+        # real sleep.
         self._git(repo, "init", "-q")
         self._git(repo, "config", "user.email", "t@example.com")
         self._git(repo, "config", "user.name", "T")
         self._git(repo, "checkout", "-q", "-b", "main")
-        self._record_on_branch(repo, "base-run")
+        self._record_on_branch(repo, "base-run", "2026-11-01T00:00:00Z")
         self._git(repo, "add", "-A")
         self._git(repo, "commit", "-q", "-m", "base")
 
         self._git(repo, "checkout", "-q", "-b", "feature-a")
-        time.sleep(1.1)
-        self._record_on_branch(repo, "run-a")
+        self._record_on_branch(repo, "run-a", "2026-11-01T00:00:01Z")
         self._git(repo, "add", "-A")
         self._git(repo, "commit", "-q", "-m", "a")
 
         self._git(repo, "checkout", "-q", "main")
         self._git(repo, "checkout", "-q", "-b", "feature-b")
-        time.sleep(1.1)
-        self._record_on_branch(repo, "run-b")
+        self._record_on_branch(repo, "run-b", "2026-11-01T00:00:02Z")
         self._git(repo, "add", "-A")
         self._git(repo, "commit", "-q", "-m", "b")
 

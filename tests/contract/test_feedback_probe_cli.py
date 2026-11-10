@@ -8,6 +8,7 @@ C-6, package exclusion C-4) — one test file per contract document.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -196,12 +197,15 @@ class TestListFiltersAndDispose:
 
 @pytest.mark.contract
 class TestCleanupAction:
-    def _record(self, root: Path, run_id: str) -> None:
-        rc = feedback_utils.main([
+    def _record(self, root: Path, run_id: str, *, now: str | None = None) -> None:
+        argv = [
             "--action", "record", "--workspace-root", str(root),
             "--unit-id", "/speckit.plan", "--unit-type", "command",
             "--run-id", run_id, "--review", "r", "--points", "p",
-        ])
+        ]
+        if now is not None:
+            argv += ["--now", now]
+        rc = feedback_utils.main(argv)
         assert rc == 0
 
     def _package(self, root: Path, capsys) -> str:
@@ -272,10 +276,12 @@ class TestCleanupAction:
         ])
         # now_iso() has second granularity: an entry recorded in the SAME
         # second as mark-submitted falls outside the pending window
-        # (created > submitted_at is False). Cross the boundary deliberately.
-        import time
-        time.sleep(1.1)
-        self._record(probe_workspace, "remove-me")  # pending → packaged
+        # (created > submitted_at is False). The injected clock crosses that
+        # boundary deliberately (C-004) — no real sleep participates.
+        pending_at = (
+            datetime.now(timezone.utc) + timedelta(seconds=2)
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self._record(probe_workspace, "remove-me", now=pending_at)  # pending → packaged
         zip_rel = self._package(probe_workspace, capsys)
         store = probe_workspace / ".specify" / "memory" / "feedback"
         before = sorted(p.name for p in store.glob("2*.md"))

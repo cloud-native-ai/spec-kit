@@ -57,6 +57,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -570,11 +572,7 @@ def test_trigger_section_set_stays_the_delivered_closed_set():
 
 
 def test_trigger_edit_moves_no_gate():
-    proc = subprocess.run(
-        ["python3", str(GATE_SCANNER), "--root", str(REPO_ROOT), "--json"],
-        capture_output=True,
-        text=True,
-    )
+    proc = run_engine_in_process(GATE_SCANNER, ["--root", str(REPO_ROOT), "--json"])
     assert proc.returncode == 0, proc.stderr
     total = json.loads(proc.stdout)["total"]
     assert total == PRE_CHANGE_GATE_TOTAL, (

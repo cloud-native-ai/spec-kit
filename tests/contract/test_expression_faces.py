@@ -39,6 +39,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "flow-class-check.py"
 GATES = REPO_ROOT / "shared" / "workflow" / "expression-gates.md"
@@ -73,12 +75,7 @@ def _run(*args: str) -> subprocess.CompletedProcess:
         "Red is the intended pre-implementation state for 069b T016."
         % ENGINE.relative_to(REPO_ROOT)
     )
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(ENGINE, args)
 
 
 def _json(proc: subprocess.CompletedProcess) -> dict:
@@ -276,8 +273,6 @@ DECLARED_SUBJECT_ROOTS = ("shared", "templates/commands", "skills", "docs")
 
 def _run_duplicate(*paths: str) -> tuple[subprocess.CompletedProcess, dict]:
     args = [
-        sys.executable,
-        str(DOC_CHECK),
         "--action",
         "verify",
         "--faces",
@@ -288,7 +283,7 @@ def _run_duplicate(*paths: str) -> tuple[subprocess.CompletedProcess, dict]:
     for path in paths:
         args.extend(["--path", path])
     args.extend(["--spec-dir", str(SPEC_DIR), "--format", "json"])
-    proc = subprocess.run(args, cwd=str(REPO_ROOT), capture_output=True, text=True)
+    proc = run_engine_in_process(DOC_CHECK, args)
     assert proc.stdout.strip(), (
         "doc-consistency-check must print JSON; stderr=%r" % proc.stderr
     )

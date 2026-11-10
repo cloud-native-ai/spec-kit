@@ -1,0 +1,4 @@
+# test runner: python3 -m pytest -n0 -m "not slow" tests/contract/test_flow_class_correctness.py -q
+# test runner: mode=serial reason=explicit tier=fast excluded_slow=0
+.......                                                                  [100%]
+7 passed in 0.24s

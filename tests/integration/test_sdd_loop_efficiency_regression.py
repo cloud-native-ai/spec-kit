@@ -19,6 +19,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNER = REPO_ROOT / "scripts" / "bash" / "run-tests.sh"
 AUDIT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "audit-test-budget.py"
@@ -110,10 +112,8 @@ def test_injected_regression_found_by_name_diff(tmp_path):
         }) + "\n<!-- test-budget:end -->\n",
         encoding="utf-8",
     )
-    audited = subprocess.run(
-        [sys.executable, str(AUDIT), "--spine", str(spine),
-         "--spec-dir", str(tmp_path / "spec")],
-        capture_output=True, text=True,
+    audited = run_engine_in_process(
+        AUDIT, ["--spine", str(spine), "--spec-dir", str(tmp_path / "spec")]
     )
     assert audited.returncode == 1, audited.stdout + audited.stderr
     assert "baseline_compare" in (audited.stdout + audited.stderr)

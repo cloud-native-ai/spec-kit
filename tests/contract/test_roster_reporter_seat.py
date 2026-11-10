@@ -27,6 +27,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -123,11 +124,7 @@ def _run_guard(path: Path, *extra) -> subprocess.CompletedProcess:
         "roster guard missing: %s — expected at T013 (087). Red is the intended pre-implementation"
         " state for T011." % GUARD.relative_to(REPO_ROOT)
     )
-    return subprocess.run(
-        [sys.executable, str(GUARD), str(path), *extra],
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(GUARD, [str(path), *extra])
 
 
 def _read(path: Path) -> str:

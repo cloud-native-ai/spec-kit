@@ -26,6 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -486,10 +487,7 @@ def test_c33_proxy_messages_are_actionable_not_bare_labels(tmp_path):
     mod = _require("validate-requirements.py")
     broken = tmp_path / "c33.md"
     broken.write_text("# x\n\n- **FR-001** a\n\n- **FR-003** b\n", encoding="utf-8")
-    r = subprocess.run(
-        [sys.executable, str(SCRIPTS / "validate-requirements.py"), str(broken)],
-        capture_output=True, text=True, cwd=str(ROOT),
-    )
+    r = run_engine_in_process(SCRIPTS / "validate-requirements.py", [str(broken)])
     assert r.returncode == 1
     lines = [l for l in r.stdout.splitlines() if re.match(r"^\d+: ", l)]
     assert lines, r.stdout

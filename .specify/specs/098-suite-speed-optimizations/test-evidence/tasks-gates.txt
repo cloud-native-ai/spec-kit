@@ -1,0 +1,21 @@
+# tasks-stage gates — 098-suite-speed-optimizations — 2026-11-10
+
+## validate-tasks.py (structural validator)
+PASS: .specify/specs/098-suite-speed-optimizations/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+
+## decomposition-check.py --mode tasks
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 27, "task_count": 61, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-10T09:39:21Z"}
+exit=0
+
+## pre-analyze-check.py --stage tasks
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=23 waived=0
+exit=0
+
+## clause-attribution deviation probe (read-only)
+$ python3 scripts/python/account-clause-coverage.py .specify/specs/098-suite-speed-optimizations
+scanned 292 files: parsed 179 + named-unparseable 113 == 292  [relational sentinel OK]
+named-unparseable: 113 (use --list-named to expand)
+  [fr-uncovered] fail (27) — 0 of 27 FRs cited from citation groups
+status: baseline-missing
+exit=2

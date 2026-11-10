@@ -15,6 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from fixtures import wp_driver_sim, wp_fixtures
@@ -85,10 +86,9 @@ def _run_preflight(tmp_path: Path, plan: dict, owned=()):
     plan["plan_hash"] = wp_fixtures.canonical_hash_of(plan)
     spine = wp_fixtures.make_spine(repo / "state.md", plan=plan)
     manifest = wp_fixtures.make_manifest(repo / "manifest.json", owned=owned)
-    return subprocess.run(
+    return run_engine_in_process(
+        GATE,
         [
-            sys.executable,
-            str(GATE),
             "--spine",
             str(spine),
             "--stage",
@@ -102,8 +102,6 @@ def _run_preflight(tmp_path: Path, plan: dict, owned=()):
             "--repo",
             str(repo),
         ],
-        capture_output=True,
-        text=True,
     )
 
 

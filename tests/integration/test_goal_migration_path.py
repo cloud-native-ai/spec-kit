@@ -11,6 +11,7 @@ import json
 import subprocess
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 import yaml
 
@@ -36,15 +37,16 @@ def _team(root, slug, *, goal_slug=None, inline="An inline outcome."):
 
 
 def _migrate(root, team_slug, *, drop=False):
-    cmd = ["python3", str(GOAL_UTILS), "migrate", team_slug, "--repo-root", str(root), "--json"]
+    cmd = ["migrate", team_slug, "--repo-root", str(root), "--json"]
     if drop:
         cmd.append("--drop-inline")
-    return subprocess.run(cmd, capture_output=True, text=True)
+    return run_engine_in_process(GOAL_UTILS, cmd)
 
 
 def _refresh(root, goal_slug):
-    proc = subprocess.run(["python3", str(GENERATOR), "--goal", goal_slug,
-                           "--repo-root", str(root), "--json"], capture_output=True, text=True)
+    proc = run_engine_in_process(
+        GENERATOR, ["--goal", goal_slug, "--repo-root", str(root), "--json"]
+    )
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 
@@ -107,8 +109,9 @@ def test_migration_is_not_a_precondition_for_the_mechanism(tmp_path):
 
 def test_migrating_an_existing_definition_is_refused(tmp_path):
     _team(tmp_path, "dup", goal_slug="already", inline="x")
-    subprocess.run(["python3", str(GOAL_UTILS), "create", "already", "--objective",
-                    "Pre-existing.", "--repo-root", str(tmp_path)],
-                   capture_output=True, text=True, check=True)
+    run_engine_in_process(
+        GOAL_UTILS,
+        ["create", "already", "--objective", "Pre-existing.", "--repo-root", str(tmp_path)],
+    ).check_returncode()
     proc = _migrate(tmp_path, "dup")
     assert proc.returncode == 2, "migrating onto an existing definition must be refused"

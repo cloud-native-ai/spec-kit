@@ -1,0 +1,77 @@
+# T057 — SC-010 forbidden-shortcut diff scan (FR-021)
+
+- Authority: `tasks.md` T057; `requirements.md` SC-010 / FR-021; the forbidden-means owner is
+  `.specify/shared/guidelines/test-execution-efficiency.md` (referenced, not restated).
+- Date: 2026-11-11; base `b3da3a26d` vs head `ec1620289` + WP-9; the scan ran from
+  `.specify/.tmp/wp9/scan-forbidden-shortcuts.py` (scratch; run-time output outside the corpus).
+- Channels: text over every added line of `git diff base..HEAD -- tests/`; AST over each
+  changed/added test file, comparing the base-commit AST findings with HEAD so a pre-existing
+  skip form in a merely-edited file is not miscounted as new.
+
+## Complete scan output
+
+```text
+# SC-010 forbidden-shortcut diff scan
+base: b3da3a26d
+head: HEAD
+changed test files: 132
+added test lines scanned: 3243
+
+## Rules (complete list)
+- text: skip-decorator, xfail-decorator, skipif-call, in-function-skip, in-function-xfail, unittest-skip, retry-decorator, rerun-flag
+- AST (base-vs-HEAD finding diff): skip/skipif/xfail/flaky/retry/repeat decorators;
+  in-function pytest.skip/xfail/unittest.skip calls; conditional skip branches;
+  retry-until-green while loops (while + break + assert or test/run/invoke/main call)
+- parametrize: decorator count base vs head; collected parametrized-id count
+- FR-021 increments: new wait_until timeout > 30 s or interval > 0.2 s;
+  runner worker-resolution drift (the two blocks diffed verbatim)
+
+## Text channel hits: 0
+
+## AST channel — new findings in the change diff
+decorator: 0
+call: 0
+conditional: 0
+retry: 0
+wait-timeout: 0
+wait-interval: 0
+(pre-existing findings inside changed files, not counted as new: 21)
+
+## Parametrize removals
+decorators at base: 281 in 106 files
+decorators at head: 282 in 107 files
+removed (base - head): 0
+
+## Timeout values on added lines (classification)
+new event-wait deadlines beyond the FR-026 cap: 0
+  tests/contract/test_line_envelope_contract.py | timeout=30 | within cap
+  tests/contract/test_line_envelope_contract.py | timeout=30 | within cap
+  tests/contract/test_parallel_consistency_contract.py | timeout=30 | within cap
+  tests/contract/test_scan_cache_contract.py | timeout=180 | subprocess/process bound (not an event wait)
+  tests/integration/test_sdd_loop_efficiency_runner.py | timeout=30 | within cap
+  tests/integration/test_session_kill_reattach.py | timeout=30 | within cap
+  tests/integration/test_session_kill_reattach.py | timeout=20 | within cap
+  tests/integration/test_session_kill_reattach.py | timeout=10 | within cap
+  tests/integration/test_session_kill_reattach.py | timeout=30 | within cap
+
+## Runner worker-resolution drift: no (31 lines compared)
+
+## Verdict
+total forbidden hits: 0
+SC-010: PASS (zero hits)
+```
+
+## Classification of the readings
+
+- Text channel: 0 hits on added lines.
+- AST channel: 0 new decorators, 0 new in-function skip/xfail calls, 0 new conditional skip
+  branches, 0 new retry-until-green loops. The 21 pre-existing findings inside changed files are
+  unchanged by the diff and are not new shortcuts.
+- Parametrize: decorators 281 → 282 (removed 0); no parametrize entry was deleted or merged.
+- FR-021 increments: no new `wait_until` deadline above the FR-026 caps (30 s / 0.2 s). The one
+  added `timeout=180` sits on a `subprocess.run` in the scan-cache cross-session drill — a
+  process-execution bound, not an observable-event wait, so FR-026's cap does not apply.
+- Runner worker resolution: the 31-line block is byte-identical between base and HEAD (no new
+  resolution rule).
+- SC-001's collection comparison carries the no-deletion half of SC-010
+  (`test-evidence/full-collection-diff.txt`: removed 0).

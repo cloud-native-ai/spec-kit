@@ -16,6 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,8 +40,7 @@ def cp():
 
 def run(script, *args):
     """Run a gate script and return (exit_code, combined_output)."""
-    p = subprocess.run([sys.executable, str(script), *args],
-                       capture_output=True, text=True)
+    p = run_engine_in_process(script, args)
     return p.returncode, p.stdout + p.stderr
 
 

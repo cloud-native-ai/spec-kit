@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "decomposition-check.py"
 
@@ -24,8 +26,7 @@ def _tasks(path, count):
 
 
 def _run(*args):
-    return subprocess.run([sys.executable, str(SCRIPT), *args],
-                          capture_output=True, text=True)
+    return run_engine_in_process(SCRIPT, args)
 
 
 def test_plan_at_ceiling_proceeds(tmp_path):

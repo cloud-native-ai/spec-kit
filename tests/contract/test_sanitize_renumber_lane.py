@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT / "templates" / "commands" / "sanitize.md"
 SKILL = ROOT / "skills" / "internal" / "sanitize-materials" / "SKILL.md"
@@ -85,9 +87,7 @@ def test_docs_describe_the_lane():
 
 
 def test_engine_cli_contract():
-    manifest = subprocess.run(
-        [sys.executable, str(ENGINE), "--action", "args-manifest"],
-        capture_output=True, text=True, timeout=60)
+    manifest = run_engine_in_process(ENGINE, ["--action", "args-manifest"])
     assert manifest.returncode == 0, manifest.stderr
     import json
     payload = json.loads(manifest.stdout)

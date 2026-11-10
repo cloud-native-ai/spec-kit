@@ -122,11 +122,42 @@ class FeedbackError(ValueError):
 # --------------------------------------------------------------------------- #
 # Helpers (pure)
 # --------------------------------------------------------------------------- #
+_NOW_OVERRIDE: Optional[str] = None
+
+
+def set_now_option(value: Optional[str]) -> None:
+    """Apply the optional injected clock (--now) for this invocation.
+
+    ``value=None`` restores the real clock, so an invocation without the option is
+    byte-identical to the pre-change engine. A value must be a canonical
+    second-granularity UTC stamp (``YYYY-MM-DDTHH:MM:SSZ``) — the engine's stored
+    form — otherwise the invocation is rejected with a named error.
+    """
+    global _NOW_OVERRIDE
+    if value is None:
+        _NOW_OVERRIDE = None
+        return
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    except (ValueError, TypeError):
+        raise FeedbackError(
+            f"--now: cannot parse {value!r} — expected YYYY-MM-DDTHH:MM:SSZ")
+    if parsed.strftime("%Y-%m-%dT%H:%M:%SZ") != value:
+        raise FeedbackError(
+            f"--now: {value!r} is not a canonical second-granularity UTC stamp "
+            "(expected YYYY-MM-DDTHH:MM:SSZ)")
+    _NOW_OVERRIDE = value
+
+
 def now_iso() -> str:
+    if _NOW_OVERRIDE is not None:
+        return _NOW_OVERRIDE
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def timestamp_id() -> str:
+    if _NOW_OVERRIDE is not None:
+        return _NOW_OVERRIDE.replace("-", "").replace(":", "")
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
@@ -2644,6 +2675,11 @@ def build_parser() -> argparse.ArgumentParser:
                         help="dispose: optional introspection ref "
                              "(introspection-<ts>#F-<nn>)")
     parser.add_argument("--workspace-root", default=None)
+    parser.add_argument("--now", default=None,
+                        help="inject a fixed UTC clock for every now_iso() / "
+                             "timestamp_id() reading in this invocation: "
+                             "YYYY-MM-DDTHH:MM:SSZ (second granularity); absent "
+                             "= the real clock, byte-identical")
     parser.add_argument("--unit", default=None,
                         help="client-metrics: optional unit filter "
                              "(custom:<owner>/<name>); without it all client "
@@ -2786,11 +2822,12 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
         return None
 
 def main(argv: Optional[List[str]] = None) -> int:
-    _sig_guard(argv, declared=['--action', '--package', '--report-file', '--include-introspection', '--confirm', '--lifecycle-point', '--plan-file', '--dry-run', '--slice', '--kind', '--disposition', '--id', '--to', '--reason', '--ref', '--workspace-root', '--unit', '--unit-id', '--unit-type', '--run-id', '--review', '--review-file', '--points', '--points-file', '--partial', '--feature', '--feature-id', '--notes', '--threshold', '--since', '--limit', '--contains', '--all', '--set', '--format'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--action', '--package', '--report-file', '--include-introspection', '--confirm', '--lifecycle-point', '--plan-file', '--dry-run', '--slice', '--kind', '--disposition', '--id', '--to', '--reason', '--ref', '--workspace-root', '--now', '--unit', '--unit-id', '--unit-type', '--run-id', '--review', '--review-file', '--points', '--points-file', '--partial', '--feature', '--feature-id', '--notes', '--threshold', '--since', '--limit', '--contains', '--all', '--set', '--format'])  # answer --version / reject an undeclared option
     parser = build_parser()
     args = parser.parse_args(argv)
     warn_anchor_mismatch(args.action, args)
     try:
+        set_now_option(args.now)
         payload = _ACTIONS[args.action](args)
     except FeedbackError as exc:
         print(f"error: {exc}", file=sys.stderr)

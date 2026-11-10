@@ -1,0 +1,70 @@
+# WP-1 runner tier mechanism — verification record (2026-11-10)
+
+Scope: T004–T007 and T011 of `.specify/specs/098-suite-speed-optimizations/tasks.md`.
+Rows T012 and T013 are NOT covered here: both are `[blockedBy: T010]` (WP-2, not dispatched
+in this package) and remain `[ ]`; `test-evidence/tier-contract-green.txt` stays reserved
+for T012's combined record (obligations 1–11 + slow-membership C-005…C-009).
+Red-first record: `notes/red-first-evidence.md` (WP-1 / T004 section).
+
+## 1. Pre-edit mirror baseline
+
+- Command: `python3 scripts/python/sync-mirrors.py --check`
+- Exit: `0` — every pair `ok`, including
+  `projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok`
+
+## 2. Red → green transition of the guard (T004 → T007)
+
+- Red (unchanged runner): `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py -q`
+  → exit `1`; `11 failed in 9.61s` (all 11 cases; decisive excerpts in
+  `notes/red-first-evidence.md`).
+- Green attempt 1 → exit `1`; `6 failed, 5 passed in 27.06s`. Failure attribution first:
+  all six were assertion-side defects, not subject defects — (a) xdist `-q` does not
+  report marker-deselection counts on a `-n 2` run (`1 passed` without `deselected`), so
+  the "N deselected" expectations were dropped in favour of exit codes, passed/failed
+  counts, per-pass summaries and the runner's own `excluded_slow`; (b) the caller-`-m`
+  tree has two marked tests, not three, so the expected summary is `1 passed, 1 failed`.
+  No runner change was made to satisfy a wrong assertion.
+- Green attempt 2: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_suite_tier_contract.py -q`
+  → exit `0`; `11 passed in 23.92s`.
+- Syntax scan of the edited artifact (evidence form must match artifact class):
+  `bash -n scripts/bash/run-tests.sh` → exit `0`.
+
+## 3. Compatibility baseline re-derived (P-2) and the combined green run
+
+- P-2 re-derivation: `bash scripts/bash/run-tests.sh --workers 1 tests/contract/test_run_tests_runner_contract.py --collect-only -q`
+  → exit `0`; `40 tests collected in 0.03s` (matches the recorded premise `40`).
+- Combined run (after the mirror regeneration, same tree):
+  - Command: `bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_run_tests_runner_contract.py tests/contract/test_suite_tier_contract.py -q`
+  - Exit: `0`; pytest summary `51 passed in 58.48s` (40 + 11); wall `1m0.236s`
+  - Mode line: `# test runner: mode=parallel workers=2 dist=load passes=1 tier=fast excluded_slow=0`
+  - This run includes 086 `test_c016_runner_carriers_follow_the_declared_projection`
+    against the freshly regenerated mirror (C-012 / 086 C-016).
+
+## 4. Mirror regeneration (T011)
+
+- Command: `python3 scripts/python/sync-mirrors.py --write --only scripts`
+- Exit: `0`; exactly one file re-projected: `DIFF[projected] .specify/scripts/bash/run-tests.sh`,
+  `sync scripts/ -> .specify/scripts/ (1 files)`.
+- Command: `python3 scripts/python/sync-mirrors.py --check`
+- Exit: `0`; `scripts/ == .specify/scripts/ (126 files, byte-identical)` and the
+  `run-tests.sh` projection `ok` — no NEW drift on the runner pair.
+- Artifact executed at least once (build ≠ launch): `bash -n .specify/scripts/bash/run-tests.sh`
+  → `0`; `.specify/scripts/bash/run-tests.sh --help` lists `--full` (exit `0`);
+  `--version` answers one line `run-tests.sh 0.0.22` (exit `0`); `--definitely-undeclared`
+  exits non-zero (`4`, pytest's own rejection through the declared pass-through).
+
+## 5. Clause claims turned green by this package
+
+- `contracts/tier-selection.contract.md` C-001…C-011 (T007) — the 11 guard cases above
+  exercise obligations 1–10; mode-line fields, header expression and the named
+  empty-selection error are asserted literally.
+- `contracts/tier-selection.contract.md` C-012/C-013/C-014 belong to T012 and are NOT
+  claimed here (C-013 is additionally gated by WP-2's marker registration; the
+  `contract`/`serial`/`slow` markers the fixture trees register are local to the throwaway
+  trees, not `pyproject.toml`).
+
+## 6. Anomaly line
+
+Anomaly surfaced (not repaired in passing): the WP-1 package mapping lists T012/T013, but
+both rows' own `[blockedBy: T010]` (a WP-2 row outside this package's write scope) is
+unmet, so they MUST NOT start. Details in the package report.

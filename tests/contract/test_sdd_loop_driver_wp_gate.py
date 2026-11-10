@@ -73,6 +73,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from fixtures import wp_fixtures
@@ -102,9 +103,7 @@ ISO_8601 = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
 def _run(*args):
-    return subprocess.run(
-        [sys.executable, str(SCRIPT), *args], capture_output=True, text=True
-    )
+    return run_engine_in_process(SCRIPT, args)
 
 
 def _spine(tmp_path: Path, plan=None, **kwargs) -> Path:

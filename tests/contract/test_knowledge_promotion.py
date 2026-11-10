@@ -16,6 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -173,9 +174,9 @@ def test_memory_tag_convention_counts_two_occurrences(tmp_path: Path):
     workspace.mkdir()
 
     for index in range(2):
-        result = subprocess.run(
+        result = run_engine_in_process(
+            ENGINE,
             [
-                sys.executable, str(ENGINE),
                 "--workspace-root", str(workspace),
                 "--action", "record",
                 "--scope", "session",
@@ -184,20 +185,18 @@ def test_memory_tag_convention_counts_two_occurrences(tmp_path: Path):
                 "--tags", "user-emphasis,key:temp-dirs",
                 "--content", "User restated the same point.",
             ],
-            capture_output=True, text=True,
         )
         assert result.returncode == 0, result.stderr
 
-    result = subprocess.run(
+    result = run_engine_in_process(
+        ENGINE,
         [
-            sys.executable, str(ENGINE),
             "--workspace-root", str(workspace),
             "--action", "recall",
             "--scope", "session",
             "--tags", "key:temp-dirs",
             "--format", "json",
         ],
-        capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)

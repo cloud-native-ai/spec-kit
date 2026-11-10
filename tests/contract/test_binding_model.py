@@ -14,6 +14,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -28,9 +30,7 @@ OTHER_RUN_ID = "r20261110T010203Z-094b"
 def _run(root: Path, *args: str) -> subprocess.CompletedProcess:
     # The shared flags go AFTER the action: argparse lets a subparser overwrite a namespace
     # attribute the top level already set (measured; engine main() records the same rule).
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args, "--repo-root", str(root), "--json"],
-        capture_output=True, text=True, cwd=REPO_ROOT)
+    return run_engine_in_process(ENGINE, [*args, "--repo-root", str(root), "--json"])
 
 
 def _binding_block(owner: str = "command-run", owner_id: str = RUN_ID,

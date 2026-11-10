@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 from tests.fixtures.git_closeout.block import parse_block
@@ -1119,10 +1121,7 @@ CLOSED_SET_OWNER = "shared/guidelines/closed-set-claims.md"
 
 def live_gate_ids() -> set[str]:
     """The gate ids of a scan taken in this run — the comparison unit, read mechanically."""
-    proc = subprocess.run(
-        [sys.executable, str(GATE_SCANNER), "--json", "--root", str(REPO_ROOT)],
-        capture_output=True, text=True, check=False,
-    )
+    proc = run_engine_in_process(GATE_SCANNER, ["--json", "--root", str(REPO_ROOT)])
     assert proc.returncode == 0, f"gate scan failed: {proc.stdout}{proc.stderr}"
     return {gate["id"] for gate in json.loads(proc.stdout)["gates"]}
 

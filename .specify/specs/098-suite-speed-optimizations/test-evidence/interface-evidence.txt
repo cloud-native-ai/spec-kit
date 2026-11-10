@@ -1,0 +1,50 @@
+# T058 — runner interface evidence (S-11, SC-011)
+
+- Authority: `tasks.md` T058; `contracts/tier-selection.contract.md` C-005/C-012 (FR-022);
+  script-interface contract (Constitution XXI).
+- Date: 2026-11-11; tree head `ec1620289` + WP-9.
+
+## `--help` lists `--full`
+
+```text
+$ bash scripts/bash/run-tests.sh --help
+exit=0
+usage: run-tests.sh [--names-out <file>] [--full] [pytest arguments...]
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+  --names-out (triggers the write)
+  --full
+side-effects: runs pytest in the caller's tree with the fast tier by default (slow-marked tests excluded; a caller -m owns its selection); with --names-out also writes the sorted FAILED test-id list to that file; the flags write nothing
+exit-codes: 0 pytest passed; pytest's own exit code otherwise; 2 an unrecognized option, a malformed --workers value, or an empty selection after tier exclusion
+```
+
+`--full` appears in the usage line and as a declared option.
+
+## `--version` answers exactly one line
+
+```text
+$ bash scripts/bash/run-tests.sh --version
+exit=0
+run-tests.sh 0.0.22
+```
+
+Machine-readable single line (`run-tests.sh <version>`), no side effects.
+
+## An undeclared option exits non-zero
+
+```text
+$ bash scripts/bash/run-tests.sh --definitely-undeclared
+exit=4
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" --definitely-undeclared
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]
+__main__.py: error: unrecognized arguments: --definitely-undeclared
+  inifile: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations/pyproject.toml
+  rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/098-suite-speed-optimizations
+
+```
+
+The undeclared token is rejected by the pytest invocation with a usage error; the exit code
+is non-zero as required. The 086 runner contract suite (40 cases) and the tier contract cases
+that pin the help/undeclared behaviour are green in `test-evidence/tier-contract-green.txt`.

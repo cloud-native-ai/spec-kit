@@ -34,6 +34,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 from tests.script_api import probe_utils
@@ -55,9 +56,7 @@ PROBE_UTILS = REPO_ROOT / "scripts" / "python" / "probe-utils.py"
 # --------------------------------------------------------------------------- #
 
 def _manifest(engine_path: Path) -> dict:
-    out = subprocess.run(
-        [sys.executable, str(engine_path), "--action", "args-manifest"],
-        capture_output=True, text=True, check=False)
+    out = run_engine_in_process(engine_path, ["--action", "args-manifest"])
     assert out.returncode == 0, (
         f"{engine_path.name} --action args-manifest failed (rc={out.returncode}): "
         f"{out.stderr.strip()[:300]}"
@@ -340,9 +339,9 @@ def test_c20_repo_compiled_face_carries_the_full_argument_form():
 # --------------------------------------------------------------------------- #
 
 def _run_engine(engine_path: Path, args: list, ws: Path):
-    return subprocess.run(
-        [sys.executable, str(engine_path), *args, "--workspace-root", str(ws)],
-        capture_output=True, text=True, check=False)
+    return run_engine_in_process(
+        engine_path, [*args, "--workspace-root", str(ws)]
+    )
 
 
 def _scratch_ws(tmp_path: Path) -> Path:

@@ -11,8 +11,9 @@ import os
 import signal
 import subprocess
 import sys
-import time
 from pathlib import Path
+
+import pytest
 
 from fixtures.line_fixtures import (
     engine_json,
@@ -88,6 +89,7 @@ def _watch(ctx, *extra):
     return proc
 
 
+@pytest.mark.slow
 def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
     """FR-046/047/048: the documented detach recipe + delivered runner are the
     evidence, not a pytest-made process session."""
@@ -167,13 +169,15 @@ def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
             # must survive driver death and be reattachable).
             driver.kill()
             driver.wait(timeout=5)
-        time.sleep(0.4)
+        # SIGHUP grace replaced by an observable event (C-008): survival is
+        # proven by the heartbeat advancing after the driver group died, never
+        # assumed by a fixed sleep.
+        before = paths["heartbeat"].stat().st_mtime_ns
+        assert wait_until(lambda: paths["heartbeat"].stat().st_mtime_ns > before,
+                          timeout=30, interval=0.2), (
+            "heartbeat stopped after the driver kill")
         assert pid_alive(runner_pid), "detached runner must survive the driver group SIGHUP"
         assert pid_alive(cli_pid), "CLI child must survive the driver group SIGHUP"
-        before = paths["heartbeat"].stat().st_mtime_ns
-        assert wait_until(lambda: paths["heartbeat"].stat().st_mtime_ns > before, timeout=3), (
-            "heartbeat stopped after the driver kill"
-        )
 
         # New session reattaches through the registry + state spine only.
         engine_json(
@@ -196,7 +200,8 @@ def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
         assert not paths["status"].exists() or "exit=" not in paths["status"].read_text()
 
         release.write_text("go", encoding="utf-8")
-        assert wait_until(lambda: "exit=" in snapshot(paths["status"]), timeout=20)
+        assert wait_until(lambda: "exit=" in snapshot(paths["status"]), timeout=20), (
+            "stage status never recorded its exit after the release")
         done = _watch(ctx)
         assert done.returncode == 0 and "verdict=DONE" in done.stdout, done.stdout
         after = entry()
@@ -268,7 +273,8 @@ def test_done_branch_skips_redispatch(tmp_path):
     ctx = _prepare(tmp_path, duration=0.5)
     stage = ctx["stage"]
     try:
-        assert wait_until(lambda: "exit=" in snapshot(ctx["stage"]["paths"]["status"]), timeout=10)
+        assert wait_until(lambda: "exit=" in snapshot(ctx["stage"]["paths"]["status"]), timeout=10), (
+            "stage status never recorded its exit (done branch)")
         stage["runner"].wait(timeout=5)
         identity = engine_json("verify-identity", "--line-id", ctx["line"], reg=ctx["reg"])
         assert identity["branch_hint"] == "done"
@@ -285,7 +291,15 @@ def test_dead_branch_retains_registry_evidence(tmp_path):
     stage = ctx["stage"]
     try:
         stage["runner"].wait(timeout=10)
-        time.sleep(0.2)
+        # Post-exit residue replaced by an observable event (C-008): the
+        # registry identity must settle to `dead`; the poll reruns the engine's
+        # own reading instead of assuming a fixed grace elapsed.
+        assert wait_until(
+            lambda: engine_json(
+                "verify-identity", "--line-id", ctx["line"], reg=ctx["reg"]
+            )["identity"] == "dead",
+            timeout=30, interval=0.2,
+        ), "runner identity never settled to dead after the stage exited"
         identity = engine_json("verify-identity", "--line-id", ctx["line"], reg=ctx["reg"])
         assert identity["identity"] == "dead"
         dead = _watch(ctx)

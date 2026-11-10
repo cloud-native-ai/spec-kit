@@ -17,6 +17,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -71,12 +73,7 @@ class TestScriptsDistributionParity:
 
     def test_repo_has_no_orphan_or_drifted_scripts(self):
         """The live gate: every .specify/scripts file has a canonical source."""
-        result = subprocess.run(
-            [sys.executable, str(ENGINE), "--check"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-        )
+        result = run_engine_in_process(ENGINE, ["--check"])
         assert result.returncode == 0, (
             "sync-mirrors.py --check failed.\n"
             "An ORPHAN line means a mirror-only file that `specify init` can never "

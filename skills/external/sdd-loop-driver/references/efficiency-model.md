@@ -88,8 +88,8 @@ FL-01…FL-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 | 槽位 | 时点 | 程序 |
 |------|------|------|
-| `baseline` | implement 起点（首个任务前） | `run-tests.sh --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
-| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
+| `baseline` | implement 起点（首个任务前） | `run-tests.sh --full --names-out <spec-dir>/baseline-failed.txt`，按名称捕获失败名单 |
+| `closure` | `review` 通过之后、合并之前，由驱动或独立校验单元执行 | `run-tests.sh --full --names-out <spec-dir>/final-failed.txt`，`comm -13` 名称级比较 |
 
 implement 内 MUST NOT 再运行第二次全量套件；其内部回归比较义务由收口槽位承担。槽内重跑记 `in-slot-rerun`，不另开槽。
 

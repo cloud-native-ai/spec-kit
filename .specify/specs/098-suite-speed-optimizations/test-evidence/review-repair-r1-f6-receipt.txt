@@ -1,0 +1,40 @@
+# F6 — receipt binary/skip ordering, repaired and drilled (review-repair r1)
+# Date: 2026-11-11. Scripts: skills/internal/code-review/scripts/git-delta-review.sh (source)
+# and .specify/skills/internal/code-review/scripts/git-delta-review.sh (mirror, byte-identical
+# via `sync-mirrors.py --write --only skills/internal/code-review`; `--check` exit 0 after).
+
+## Change
+
+- Before: the `receipt` subcommand summed `git diff --numstat` over every changed file and
+  refused with exit 2 as soon as a binary line (`-\t-\t<path>`) appeared — even when a legal
+  `--skip-with-reason <glob> --reason binary` selector named that path. The skill declares
+  `binary` a legal skip reason (FR-014 closed set), so the selector was unusable.
+- After: the skip selectors are applied **before** the line-count loop. A matched path is
+  excluded from `lines_added` / `lines_deleted` and never triggers the binary refusal; an
+  unmatched binary file still refuses with exit 2 (C-41 / V16 unchanged).
+  Implementation: `skills/internal/code-review/scripts/git-delta-review.sh` (§ receipt,
+  the numstat loop) — one loop guard, no other semantic change.
+
+## Drill (throwaway git fixture under `.specify/.tmp/repair-r1/receipt-fixture`)
+
+Fixture: base commit with `code.py`; head commit appends text lines and adds `run.log.gz`
+(a real gzip binary); a `review.md` record.
+
+Positive (selector applied):
+`git-delta-review.sh receipt --review-file review.md --since <base> --skip-with-reason '*.gz' --reason binary --renderer text`
+
+- exit **0**
+- block fields: `changed_files=3 judged_files=2 skipped_files=1 gap_files=0 lines_added=3
+  lines_deleted=0`; `file.03.path=run.log.gz` `file.03.verdict=skipped` `file.03.reason=binary`
+- the binary file is excluded from the line aggregate.
+
+Negative (no selector — pre-existing refusal preserved):
+`git-delta-review.sh receipt --review-file review2.md --since <base> --renderer text`
+
+- exit **2**; stderr: `行数无法测量 (binary): run.log.gz` / `不可量测的数字字段意味着不写块 (C-41 / V16)`
+
+## Guard re-runs (affected suites)
+
+- `bash scripts/bash/run-tests.sh --workers 4 tests/contract/test_coverage_receipt.py tests/contract/test_code_review_skill_contract.py -q`
+  → exit 0, `59 passed in 1.88s`.
+- Full stdout: `.specify/.tmp/repair-r1/receipt-tests.log` (scratch; reproduced by the command above).

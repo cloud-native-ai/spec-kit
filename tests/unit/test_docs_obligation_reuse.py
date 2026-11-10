@@ -26,6 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -49,8 +50,9 @@ def record_arg(space: Path) -> str:
 
 
 def obligation(space: Path, *extra: str) -> dict:
-    proc = subprocess.run([sys.executable, str(SCRIPT), "--action", "obligation", "--root", str(space), *extra],
-                          capture_output=True, text=True)
+    proc = run_engine_in_process(
+        SCRIPT, ["--action", "obligation", "--root", str(space), *extra]
+    )
     assert proc.returncode == 0, f"engine exited {proc.returncode}: {proc.stderr}{proc.stdout}"
     return json.loads(proc.stdout)
 

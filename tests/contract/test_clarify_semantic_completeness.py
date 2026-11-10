@@ -34,6 +34,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -316,9 +317,7 @@ def test_c4_document_order_invariant_beside_append_only():
 def _doc_order_findings(text, tmp_path, name="spec.md"):
     p = tmp_path / name
     p.write_text(text, encoding="utf-8")
-    r = subprocess.run(
-        [sys.executable, str(CHECKER), str(p)], capture_output=True, text=True
-    )
+    r = run_engine_in_process(CHECKER, [str(p)])
     return [l for l in r.stdout.splitlines() if re.match(r"^\d+: doc-order", l)]
 
 

@@ -33,6 +33,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "flow-class-check.py"
 
@@ -77,12 +79,7 @@ def _run(*args: str) -> subprocess.CompletedProcess:
         "Red is the intended pre-implementation state for 069b T004."
         % ENGINE.relative_to(REPO_ROOT)
     )
-    return subprocess.run(
-        [sys.executable, str(ENGINE), *args],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
+    return run_engine_in_process(ENGINE, args)
 
 
 def _json(proc: subprocess.CompletedProcess) -> dict:

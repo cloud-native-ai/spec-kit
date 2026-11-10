@@ -1,0 +1,111 @@
+# HAZARD RECORD — evidence file written inside the scanned corpus while the run was in flight
+# This run is NOT the baseline: the harness `tee`ed its own output into .specify/specs during the
+# corpus scan, which turned test_c20's before/after md5 check red (3 failed incl. test_c20).
+# The clean rerun (no writes inside the corpus) is targeted-pretest-baseline.txt (2 pre-existing
+# failures, 62 passed). This file is kept as the measurement behind research.md B-5 / plan risk R-3.
+
+# 098 plan-stage targeted baseline 2 — 2026-11-10T09:00:16Z
+
+## T2 client_metrics (8 x 1.1s sleeps today)
+$ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_client_metrics.py -q
+# test runner: python3 -m pytest -n 2 --dist load tests/contract/test_client_metrics.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+................                                                         [100%]
+16 passed in 6.64s
+rc=0 wall=8s
+
+## T3 corpus-scan pair (repeated full-corpus traversals today)
+$ bash scripts/bash/run-tests.sh --workers 2 tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q
+# test runner: python3 -m pytest -n 2 --dist load tests/contract/test_coverage_receipt.py tests/contract/test_clause_coverage.py -q
+# test runner: mode=parallel workers=2 dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+..................F..................F........F.................         [100%]
+=================================== FAILURES ===================================
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c5_gate_budget_is_unchanged_by_the_owner_document():
+        r = subprocess.run(
+            [sys.executable, str(SCRIPTS / "scan-confirmation-gates.py"), "--summary"],
+            capture_output=True, text=True, cwd=str(ROOT),
+        )
+        assert r.returncode == 0, r.stdout + r.stderr
+        m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
+        v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)
+        assert m and v, r.stdout
+>       assert int(m.group(1)) == GATE_TOTAL, (
+            f"the owner document sits in shared/, i.e. inside the scanned surface, and the "
+            f"integer headroom is 0: total moved to {m.group(1)}"
+        )
+E       AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 28
+E       assert 28 == 27
+E        +  where 28 = int('28')
+E        +    where '28' = <built-in method group of re.Match object at 0x7fa6c9aa5750>(1)
+E        +      where <built-in method group of re.Match object at 0x7fa6c9aa5750> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 28'>.group
+
+tests/contract/test_clause_coverage.py:292: AssertionError
+__ test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census ___
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census():
+        mod = _load()
+        src = ACCOUNTANT.read_text(encoding="utf-8")
+        assert "clause_extract" in src, (
+            "FR-026: both lanes must share one extractor; a private second parser here is "
+            "the drift the owner document exists to prevent"
+        )
+        assert not re.search(r"['\"]operations:['\"]", src), (
+            "MUST NOT probe for a literal `operations:` key — no file in the corpus has one, "
+            "so such a probe silently classifies every OpenAPI contract as something else"
+        )
+        # the census owns this number; pinned here as a drift detector on the excl-053 basis
+        # (this feature adds no .yaml contract, so the whole-tree value is the same 39)
+        p = _payload(["--spec-dir", str(SPEC_053), "--corpus-root", str(ROOT / ".specify" / "specs"),
+                      "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+>       assert p["scanned"]["per_form"]["yaml-openapi"]["clauses"] == OPENAPI_OPERATIONS_EXCL_053, (
+            f"OpenAPI operation total moved off the census value; re-derive "
+            f"notes/clause-form-census.md and move this pin in the same commit: {p['scanned']['per_form']}"
+        )
+E       AssertionError: OpenAPI operation total moved off the census value; re-derive notes/clause-form-census.md and move this pin in the same commit: {'md-bold-closed': {'files': 123, 'clauses': 1604}, 'md-bold-paren': {'files': 4, 'clauses': 45}, 'md-heading': {'files': 46, 'clauses': 333}, 'yaml-openapi': {'files': 6, 'clauses': 30}, 'yaml-assertions': {'files': 1, 'clauses': 6}, 'md-none': {'files': 106, 'clauses': 0}}
+E       assert 30 == 39
+
+tests/contract/test_clause_coverage.py:442: AssertionError
+___ test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus ___
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus():
+        src = ACCOUNTANT.read_text(encoding="utf-8")
+        hits = re.findall(
+            r"\.(?:write_text|write_bytes|mkdir|unlink|rmtree)\(|open\([^)]*['\"][wax]", src
+        )
+        freeze_hits = [h for h in hits]
+        assert freeze_hits == [] or "--freeze" in src, (
+            f"write points must belong to the explicit --freeze action only: {freeze_hits}"
+        )
+    
+        spec_root = ROOT / ".specify" / "specs"
+        files = sorted(p for p in spec_root.rglob("*") if p.is_file())
+        assert files, "sentinel: the corpus is empty, so the checksum proves nothing"
+        before = hashlib.md5(b"".join(p.read_bytes() for p in files)).hexdigest()
+        _run(["--spec-dir", str(SPEC_053), "--corpus-root", str(spec_root),
+              "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+        after = hashlib.md5(b"".join(p.read_bytes() for p in files)).hexdigest()
+>       assert before == after, "an accounting run modified the corpus it was reading"
+E       AssertionError: an accounting run modified the corpus it was reading
+E       assert '49c91cb25fbc...c633f2b3dcd82' == 'bb8d5587da9b...f7687ef1d4b8b'
+E         
+E         - bb8d5587da9b57a8d7ff7687ef1d4b8b
+E         + 49c91cb25fbc58ae405c633f2b3dcd82
+
+tests/contract/test_clause_coverage.py:710: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/contract/test_clause_coverage.py::test_c10_openapi_clauses_are_method_keys_and_the_total_matches_the_census
+FAILED tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+3 failed, 61 passed in 31.84s
+rc=1 wall=34s

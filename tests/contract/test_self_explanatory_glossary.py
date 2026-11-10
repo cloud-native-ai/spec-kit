@@ -45,6 +45,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from script_api import run_engine_in_process
 import pytest
 
 pytestmark = pytest.mark.contract
@@ -101,10 +102,7 @@ def read(path: Path) -> str:
 
 def run_engine(*args: str):
     """Run the glossary engine against this repository; return (rc, parsed stdout, stderr)."""
-    cp = subprocess.run(
-        [sys.executable, str(ENGINE), "--root", str(ROOT), *args],
-        capture_output=True, text=True,
-    )
+    cp = run_engine_in_process(ENGINE, ["--root", str(ROOT), *args])
     out = cp.stdout.strip()
     payload = json.loads(out) if out.startswith("{") else out
     return cp.returncode, payload, cp.stderr

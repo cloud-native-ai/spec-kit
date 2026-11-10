@@ -1,0 +1,28 @@
+# Review smoke — 098 (implementation segment, review run 2026-11-11)
+
+Command:
+```bash
+bash scripts/bash/run-tests.sh --workers 4 tests/contract/test_suite_tier_contract.py tests/contract/test_parallel_consistency_contract.py tests/contract/test_scan_cache_contract.py tests/contract/test_event_wait_contract.py tests/contract/test_inprocess_conversion_contract.py tests/contract/test_run_tests_runner_contract.py -q
+```
+
+Exit code: 0
+
+Wall / runner header (stderr, complete):
+```text
+# test runner: python3 -m pytest -n 4 --dist load -m "not slow" tests/contract/test_suite_tier_contract.py tests/contract/test_parallel_consistency_contract.py tests/contract/test_scan_cache_contract.py tests/contract/test_event_wait_contract.py tests/contract/test_inprocess_conversion_contract.py tests/contract/test_run_tests_runner_contract.py -q
+# test runner: mode=parallel workers=4 dist=load passes=1 tier=fast excluded_slow=0
+wall_seconds=36.80
+```
+
+stdout (complete):
+```text
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 83%]
+..............                                                           [100%]
+86 passed in 34.83s
+```
+
+- 86 passed in 34.83s; mode=parallel workers=4 dist=load passes=1 tier=fast excluded_slow=0.
+- This is the review-run smoke over the five new guard files plus the 086 runner contract suite; the feature itself has no `smoke_command`/`smoke_exit_code`/`smoke_evidence_path` record because verification.md is absent (see review.md findings F1/A1/I1).
