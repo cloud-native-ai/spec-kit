@@ -1,0 +1,55 @@
+# T055/T056 — tier wall-clock measurements and scope disclosure
+
+- Authority: `tasks.md` T055/T056; `contracts/tier-selection.contract.md` C-016 (FR-020,
+  SC-004, SC-005); requirements A9/A14 (targeted measurement, not a budget slot).
+- Date: 2026-11-11; host: the slot-1 baseline host (192 vCPU); tree head `ec1620289` + WP-9.
+- Run-time output landed under `.specify/.tmp/wp9/` and was copied here afterwards; nothing
+  was written under `.specify/specs` while a corpus-scanning run was in flight.
+
+## 1. Selection equality (S-13 legs 2–3 premise)
+
+Tier unchanged (`tier=fast`) in both shapes; only the execution shape differs.
+
+| shape | command | exit | wall | collected | mode line |
+|-------|---------|------|------|-----------|-----------|
+| parallel | `bash scripts/bash/run-tests.sh --collect-only -q` | 0 | 11.01 s | 8582 | `mode=parallel workers=auto dist=load passes=2 tier=fast excluded_slow=7` |
+| serial | `bash scripts/bash/run-tests.sh --serial --collect-only -q` | 0 | 5.60 s | 8582 | `mode=serial reason=explicit tier=fast excluded_slow=7` |
+
+Node-id set difference: parallel − serial = **0**, serial − parallel = **0**. The two arms
+select the same ids; the excluded count is `7` in both.
+
+## 2. Same-selection wall pair and ratio (C-016 / SC-004)
+
+| arm | command | exit | wall | pytest summary | mode line |
+|-----|---------|------|------|----------------|-----------|
+| parallel | `bash scripts/bash/run-tests.sh -q` | 1 | **73.42 s** | `282 failed, 8297 passed, 2 skipped in 47.03 s` | `mode=parallel workers=auto dist=load passes=2 tier=fast excluded_slow=7` |
+| serial | `bash scripts/bash/run-tests.sh --serial -q` | 1 | **692.15 s** | `268 failed, 8312 passed, 2 skipped, 7 deselected in 687.34 s` | `mode=serial reason=explicit tier=fast excluded_slow=7` |
+
+- Complete stdout + stderr for each arm (command, exit, wall in the header):
+  `test-evidence/run-logs/default-parallel.log.gz` and
+  `test-evidence/run-logs/default-serial.log.gz`.
+- Ratio: `73.42 / 692.15 = 0.1061` → **10.6 %**, inside the required **≤ 50 %**.
+  Both arms are the same tree, same host, same day, same tier; only the execution shape
+  differs, so the wall difference is attributable to the execution shape.
+- Failed names: the parallel arm's 282 are 281 slot-1-baseline names plus one outlier
+  (`tests/integration/test_trigger_promotion.py::test_invalid_environment_threshold_is_ignored`);
+  that file is untouched by this feature, the case passed in the slot-1 full run and in the
+  serial arm, and passes 3/3 isolated re-runs (6.55 s / 6.28 s / 6.26 s) — a pre-existing
+  parallel-isolation flake, not a regression. The serial arm's 268 names are all in the
+  slot-1 baseline (0 new).
+
+## 3. Scope disclosure (T055) — selection difference, never an efficiency claim
+
+- Slot-1 baseline (the pre-change default had the marked set merged, so its wall is a
+  full-selection reading): `bash scripts/bash/run-tests.sh --full --names-out <scratch>/baseline-failed.txt`
+  on this tree/day → exit 1, wall **70.99 s**, `287 failed, 8299 passed, 2 skipped in 47.55 s`,
+  selection 8589, mode line `tier=full excluded_slow=0`.
+- Default-vs-full raw walls: **73.42 s** (fast, 8582 selected) vs **70.99 s** (full, 8589 selected);
+  delta `+2.43 s` (+3.4 % of the full wall). This is a selection difference plus run noise —
+  the fast tier is NOT faster than the full tier in raw wall, and no SC consumes this number.
+- Anti-measurement (slow members re-merged into the default tier): the re-merged selection is
+  exactly the full tier, whose wall is the slot-1 reading above; the observed change is
+  `+2.43 s` against the default parallel arm. Recorded as a selection-difference observation,
+  never as a speedup/regression claim. No additional full run was started (FR-020; A9/A14).
+- The five slow-member `corpus-scan` cases account for the 7 excluded ids together with the
+  two process-boundary members; the registry owner is `test-evidence/slow-members.md`.

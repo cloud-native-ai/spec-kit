@@ -1,0 +1,1 @@
+# No per-test dispositions: the full-tier collection diff showed removed = 0.

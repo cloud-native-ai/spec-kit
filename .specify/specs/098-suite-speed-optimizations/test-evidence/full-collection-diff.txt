@@ -1,0 +1,87 @@
+# T022 — full-tier collection diff (S-12) against the implement-start id set
+
+- Authority: `tasks.md` T022; `contracts/tier-selection.contract.md` C-015 (FR-011, SC-001).
+- Date: 2026-11-11; tree head `ec1620289` (WP-8 close; WP-9 recording).
+- Baseline id set: `notes/pre-change-measurements.md`, block
+  `<!-- implement-start-full-ids:begin -->` … `<!-- implement-start-full-ids:end -->`
+  (8543 ids; re-derived from the base-commit tree `b3da3a26d`, old runner = full selection
+  by construction; two parametrized ids normalized from the scratch tree path to the worktree root).
+- After reading: `bash scripts/bash/run-tests.sh --serial --full --collect-only -q`
+  → exit `0`; wall `2.99 s`; `8589 tests collected in 1.79 s`.
+- Comparison: node-id sets, tree-root normalized (script in the evidence run below).
+
+## Result
+
+- removed: **0**
+- added: **46**, every id in one of this feature's five new contract files:
+
+| file | added ids |
+|------|-----------|
+| `tests/contract/test_event_wait_contract.py` | 8 |
+| `tests/contract/test_inprocess_conversion_contract.py` | 9 |
+| `tests/contract/test_parallel_consistency_contract.py` | 4 |
+| `tests/contract/test_scan_cache_contract.py` | 7 |
+| `tests/contract/test_suite_tier_contract.py` | 18 |
+
+- disposed list: `test-evidence/full-collection-disposed.txt` — no per-test dispositions
+  (nothing was removed or renamed).
+
+## Added ids (complete)
+
+```text
+tests/contract/test_event_wait_contract.py::test_c001_the_scope_is_exactly_the_clause_declared_six_files
+tests/contract/test_event_wait_contract.py::test_c002_the_scope_files_carry_zero_synchronization_sleep
+tests/contract/test_event_wait_contract.py::test_c003_the_exemption_registry_is_closed_and_per_line
+tests/contract/test_event_wait_contract.py::test_c004_entry_creation_uses_the_injected_clock
+tests/contract/test_event_wait_contract.py::test_c006_a_timeout_is_never_converted_to_skip_or_xfail
+tests/contract/test_event_wait_contract.py::test_c006_c007_the_helper_defaults_are_thirty_seconds_and_a_small_interval
+tests/contract/test_event_wait_contract.py::test_c006_no_inline_polling_loop_in_the_scope_files
+tests/contract/test_event_wait_contract.py::test_c009_adopted_wait_call_sites_assert_a_deadline_and_a_small_interval
+tests/contract/test_inprocess_conversion_contract.py::test_c001_every_covered_file_classifies_all_of_its_sites
+tests/contract/test_inprocess_conversion_contract.py::test_c002_keep_rows_use_the_closed_class_set_and_convert_rows_use_a_dash
+tests/contract/test_inprocess_conversion_contract.py::test_c003_c008_every_row_carries_a_reason_and_convert_names_its_route
+tests/contract/test_inprocess_conversion_contract.py::test_c004_fixture_layer_helpers_are_keep_with_the_global_state_class
+tests/contract/test_inprocess_conversion_contract.py::test_c005_the_manifest_is_a_pipe_table_with_the_declared_columns
+tests/contract/test_inprocess_conversion_contract.py::test_c006_the_full_tree_scan_names_its_uncovered_files
+tests/contract/test_inprocess_conversion_contract.py::test_c007_a_reverted_conversion_turns_red_and_names_the_site
+tests/contract/test_inprocess_conversion_contract.py::test_c008_converted_rows_still_make_the_in_process_call
+tests/contract/test_inprocess_conversion_contract.py::test_c010_the_keep_side_sample_covers_the_named_boundary_kinds
+tests/contract/test_parallel_consistency_contract.py::test_non_parallel_safe_fixture_turns_the_comparison_non_empty
+tests/contract/test_parallel_consistency_contract.py::test_the_comparison_record_judges_by_failure_names
+tests/contract/test_parallel_consistency_contract.py::test_the_no_xdist_record_shows_a_complete_serial_run
+tests/contract/test_parallel_consistency_contract.py::test_the_subset_record_does_not_claim_full_suite_safety
+tests/contract/test_scan_cache_contract.py::test_c001_c011_one_build_and_one_traversal_serve_two_consumers
+tests/contract/test_scan_cache_contract.py::test_c001_the_variant_is_part_of_the_key
+tests/contract/test_scan_cache_contract.py::test_c002_the_managed_surfaces_are_exactly_the_two_declared
+tests/contract/test_scan_cache_contract.py::test_c003_the_factory_keeps_no_mtime_or_persistent_cache
+tests/contract/test_scan_cache_contract.py::test_c004_a_consumer_mutation_never_reaches_the_store
+tests/contract/test_scan_cache_contract.py::test_c007_the_corpus_build_is_in_process_over_the_house_pattern
+tests/contract/test_scan_cache_contract.py::test_c010_a_new_session_observes_a_tampered_corpus
+tests/contract/test_suite_tier_contract.py::test_obligation_10_the_header_carries_the_injected_expression
+tests/contract/test_suite_tier_contract.py::test_obligation_11_the_full_collection_never_loses_a_baseline_id
+tests/contract/test_suite_tier_contract.py::test_obligation_1_default_tier_excludes_the_slow_test
+tests/contract/test_suite_tier_contract.py::test_obligation_2_a_tree_without_slow_tests_equals_the_full_selection
+tests/contract/test_suite_tier_contract.py::test_obligation_3_the_caller_m_owns_the_selection[expr_args0]
+tests/contract/test_suite_tier_contract.py::test_obligation_3_the_caller_m_owns_the_selection[expr_args1]
+tests/contract/test_suite_tier_contract.py::test_obligation_4_path_and_k_do_not_suppress_the_tier
+tests/contract/test_suite_tier_contract.py::test_obligation_5_full_with_a_caller_m_is_still_the_callers_selection
+tests/contract/test_suite_tier_contract.py::test_obligation_6_serial_mode_never_selects_a_tier
+tests/contract/test_suite_tier_contract.py::test_obligation_7_a_serial_and_slow_test_is_excluded_from_both_fast_passes
+tests/contract/test_suite_tier_contract.py::test_obligation_8_empty_after_exclusion_is_a_named_error
+tests/contract/test_suite_tier_contract.py::test_obligation_9_help_lists_full_and_an_undeclared_option_still_exits_non_zero
+tests/contract/test_suite_tier_contract.py::test_slow_guard_1_the_registry_and_the_collected_marked_set_are_one_to_one
+tests/contract/test_suite_tier_contract.py::test_slow_guard_2_the_real_tree_default_collection_equals_full_minus_marked
+tests/contract/test_suite_tier_contract.py::test_slow_guard_3_disclosure_arithmetic_and_full_restore_on_a_fixture_tree
+tests/contract/test_suite_tier_contract.py::test_slow_guard_4_the_guard_file_is_never_a_member
+tests/contract/test_suite_tier_contract.py::test_slow_guard_5_the_membership_evidence_files_are_the_single_carrier
+tests/contract/test_suite_tier_contract.py::test_the_two_slot_commands_request_the_full_tier
+```
+
+## Reproduction
+
+```bash
+git archive b3da3a26d | tar -x -C <scratch>/before-tree
+(cd <scratch>/before-tree && bash scripts/bash/run-tests.sh --serial --collect-only -q) > <scratch>/baseline.txt
+bash scripts/bash/run-tests.sh --serial --full --collect-only -q > <scratch>/after.txt
+# normalize the scratch root prefix to the worktree root, then compare the id sets
+```
