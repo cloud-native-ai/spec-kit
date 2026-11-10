@@ -49,7 +49,7 @@
 
 | # | Step / Event | Evidence (commit SHA, file, or quoted excerpt) | Deviation from prescribed flow? |
 |---|--------------|------------------------------------------------|---------------------------------|
-| 1 | Driver U0 entry writes the line state spine | `.specify/state/099-speckit-seal.md:5-14` (`stage: requirements`, `attempt: 0`) — the block is never advanced through the rest of the run | Yes — the spine stays at the U0 snapshot (F7) |
+| 1 | Driver U0 entry writes the line state spine | `.specify/state/099-speckit-seal.md:4-14` (`stage: requirements`, `attempt: 0`) — the block is never advanced through the rest of the run | Yes — the spine stays at the U0 snapshot (F7) |
 | 2 | requirements stage | e0e239709 → 594832030 (run records) → 404dcbde6 (close-out) | None |
 | 3 | clarify stage | 0131e24d2 → 4951b5967 → c998f2a43 | None |
 | 4 | plan stage | 749b613c0 → f7959ccc1 → 32406eddd | None |
@@ -175,7 +175,7 @@ The four conjunctive conditions owned by `templates/feature-details-template.md`
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/features.md L102 (Last Updated cell); /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/features/099-speckit-seal.md L22 (dated P9 entry under `## Latest Review`)
+- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/features.md L102 (Last Updated cell); /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/features/099-speckit-seal.md L23 (dated P9 entry under `## Latest Review`)
 - **Evidence** (verbatim quote):
 
   ```
@@ -190,7 +190,7 @@ The four conjunctive conditions owned by `templates/feature-details-template.md`
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/099-speckit-seal/plan.md L208–L209; /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/099-speckit-seal/contracts/merge-back.contract.md L132–L136 (C-023)
+- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/099-speckit-seal/plan.md L208–L209; /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/099-speckit-seal/.specify/specs/099-speckit-seal/contracts/merge-back.contract.md L134–L136 (C-023)
 - **Evidence** (verbatim quote):
 
   ```
@@ -222,7 +222,7 @@ The four conjunctive conditions owned by `templates/feature-details-template.md`
 
 - **Severity**: P2
 - **Category**: Workflow
-- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/state/099-speckit-seal.md L5–L14 (loop-state block; repository root, outside the worktree)
+- **Location**: /storage/project/cloud-native-ai/spec-kit/.specify/state/099-speckit-seal.md L4–L14 (loop-state block; repository root, outside the worktree)
 - **Evidence** (verbatim quote):
 
   ```
