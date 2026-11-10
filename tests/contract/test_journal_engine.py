@@ -9,6 +9,7 @@ no second copy. The line fixture is built by `tests/fixtures/sdd-observer/line_b
 from __future__ import annotations
 
 import calendar
+import fcntl
 import importlib.util
 import os
 import re
@@ -45,6 +46,10 @@ def line_builder():
 
 def tamper_builder():
     return _load_module("sdd_observer_tamper_builder", FIXTURES / "tamper_builder.py")
+
+
+def dual_line_builder():
+    return _load_module("sdd_observer_dual_line_builder", FIXTURES / "dual_line_builder.py")
 
 
 def journal_format(repo: Path = REPO_ROOT) -> dict:
@@ -386,4 +391,128 @@ def test_persistent_pointers_resolve(tmp_path):
             assert resolved.returncode == 0, chunk
         else:
             assert (fixture["root"] / target).exists(), chunk
+
+
+# --------------------------------------------------------------------------- #
+# US5 — first-row ordering, dual-line isolation and the single-writer refusal
+# --------------------------------------------------------------------------- #
+
+STAGE_CARRIER_PREFIXES = ("pid-", "status-", "log-", "heartbeat-", "prompt-")
+
+
+def _withhold_stage_carriers(fixture, stash):
+    """Move every stage carrier aside, leaving a line that has not started a stage yet."""
+    stash.mkdir(parents=True, exist_ok=True)
+    moved = []
+    for path in sorted(fixture["state_dir"].iterdir()):
+        if path.name.startswith(STAGE_CARRIER_PREFIXES):
+            target = stash / path.name
+            path.rename(target)
+            moved.append((path, target))
+    checkpoints = fixture["spec_dir"] / "checkpoints"
+    if checkpoints.is_dir():
+        target = stash / "checkpoints"
+        checkpoints.rename(target)
+        moved.append((checkpoints, target))
+    return moved
+
+
+def _restore_carriers(moved):
+    for original, stashed in moved:
+        stashed.rename(original)
+
+
+def test_first_journal_row_precedes_first_stage_completion(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    moved = _withhold_stage_carriers(fixture, tmp_path / "withheld")
+    try:
+        first = append(fixture)
+        assert first.returncode == 0, first.stderr
+        # `observed_at` is the engine clock in whole seconds; cross a second boundary so the
+        # second append (the stage completions) is provably later than the first row.
+        time.sleep(1.05)
+    finally:
+        _restore_carriers(moved)
+    second = append(fixture)
+    assert second.returncode == 0, second.stderr
+
+    rows = row_values(parse_journal(fixture["journal"]))
+    first_row = rows[0]
+    completions = [row for row in rows if row["event"] == "stage-end"]
+    assert first_row["event"] in ("line-start", "observer-start"), \
+        [row["event"] for row in rows[:3]]
+    assert completions, "the zero-failure fixture must project stage completions"
+    first_completion = completions[0]
+    assert int(first_row["seq"]) < int(first_completion["seq"]), (
+        "file order is the authority: the first journal row must precede the first stage-end row"
+    )
+    assert first_row["observed_at"] < first_completion["observed_at"], (
+        "the observer's first entry must be observed before the first stage completes"
+    )
+    clean = check(fixture)
+    assert clean.returncode == 0, clean.stdout
+
+
+def test_dual_line_isolation(tmp_path):
+    first, second = dual_line_builder().build_dual(tmp_path)
+    for fixture in (first, second):
+        assert append(fixture).returncode == 0
+
+    journals = {first["journal"], second["journal"]}
+    assert len(journals) == 2, "two parallel lines must produce two distinct journals"
+    assert all(journal.is_file() for journal in journals)
+
+    identities = [parse_journal(fixture["journal"])["header"]["observer_instance"]
+                  for fixture in (first, second)]
+    assert identities[0] == "sdd-observer-" + first["line_id"]
+    assert identities[1] == "sdd-observer-" + second["line_id"]
+    assert identities[0] != identities[1], "two parallel lines must have two instance identities"
+
+    surfaces = [(fixture["spec_dir"], fixture["spine"], fixture["state_dir"],
+                 fixture["journal"], fixture["triplet_dir"]) for fixture in (first, second)]
+    assert set(surfaces[0]).isdisjoint(set(surfaces[1])), "the two lines share a path"
+
+    for fixture in (first, second):
+        text = fixture["journal"].read_text(encoding="utf-8")
+        other = second if fixture is first else first
+        assert ("line_id: %s" % fixture["line_id"]) in text
+        assert ("line_id: %s" % other["line_id"]) not in text
+        clean = check(fixture)
+        assert clean.returncode == 0, clean.stdout
+
+
+def test_same_line_second_writer_exits_three(tmp_path):
+    fixture = _fresh_line(tmp_path)
+    assert append(fixture).returncode == 0
+    before = fixture["journal"].read_bytes()
+    with open(fixture["journal"], "a+", encoding="utf-8") as holder:
+        fcntl.flock(holder.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            refused = append(fixture)
+        finally:
+            fcntl.flock(holder.fileno(), fcntl.LOCK_UN)
+    assert refused.returncode == 3, (refused.stdout, refused.stderr)
+    assert "concurrent-writer-refused" in refused.stdout
+    assert fixture["journal"].read_bytes() == before, "a refused writer must write nothing"
+
+    # The drill has teeth: with the flock line removed from a copied engine, the same held
+    # lock is not refused — so exit 3 comes from the protocol, not from the fixture.
+    source = ENGINE.read_text(encoding="utf-8")
+    marker = "            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)\n"
+    assert marker in source, "the single-writer marker moved; update the drill"
+    mutated_engine = tmp_path / "journal-utils-mutated.py"
+    mutated_engine.write_text(source.replace(marker, "", 1), encoding="utf-8")
+    mutated_fixture = _fresh_line(tmp_path / "mutated")
+    assert append(mutated_fixture).returncode == 0
+    mutated_env = dict(os.environ)
+    mutated_env["PYTHONPATH"] = str((REPO_ROOT / "scripts" / "python")) + os.pathsep + \
+        mutated_env.get("PYTHONPATH", "")
+    with open(mutated_fixture["journal"], "a+", encoding="utf-8") as holder:
+        fcntl.flock(holder.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            unrefused = append(mutated_fixture, engine=mutated_engine, env=mutated_env)
+        finally:
+            fcntl.flock(holder.fileno(), fcntl.LOCK_UN)
+    assert unrefused.returncode != 3, unrefused.stdout
+    assert "concurrent-writer-refused" not in unrefused.stdout
 

@@ -1,0 +1,89 @@
+# wp02-observer-definition — execution evidence
+
+Package: `wp02-observer-definition` (rows T018, T019, T020, T037, T038)
+Captured: 2026-11-10, line worktree `096-sdd-observer-agent`
+Base at capture: `df35f3e76916237f2ef693fba0ac07a564a5d97c`
+
+## T018 — observer agent contract module, red while the template was absent
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 1 — 7 failed, every failure `missing observer template: agents/sdd-observer.agent.md`.
+Full capture: `notes/red-first-evidence-wp02.md` § T018.
+
+## T019 + T038 — observer agent template and its contract module
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 0
+
+```text
+.........                                                                [100%]
+9 passed in 6.40s
+```
+
+Covers `contracts/observer-role.contract.md` C-02…C-08 (neutral frontmatter, role face, verbatim
+「不评价、不建议、不推断」, read domain / write surface, three-layer binding, internal-subagent
+bounds, forbidden capabilities, byte-identical fast-fail clause) plus the C-09 instance-identity
+face (slug from `line_id`, `create-agent` at the driver's startup step, no stage-command
+creation).
+
+## T037 — journal engine US5 extension
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py -q`
+Exit status: 0
+
+```text
+..................                                                       [100%]
+18 passed in 7.35s
+```
+
+New assertions: first-journal-row ordering (two-phase fixture: first append before any stage
+carrier, second append after a 1.05 s clock boundary; strict `observed_at` precedence), dual-line
+isolation (two journals, two `sdd-observer-<line_id>` identities, disjoint path set, each journal
+carries only its own line id), same-line second-writer refusal (exit `3` +
+`concurrent-writer-refused`, journal byte-unchanged) with a flock-removal teeth leg.
+No red-first leg exists for this row: the observed behavior landed in `wp01-journal-core` and
+tasks.md § Tests line 11 exempts appended assertions over an already-authored module
+(disclosure recorded in `notes/red-first-evidence-wp02.md` § T037).
+
+## T020 — fast-fail preset enumeration 17 → 18 / 19 → 20
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10"`
+Exit status: 0
+
+```text
+.                                                                        [100%]
+1 passed in 7.57s
+```
+
+`FACTORY_PRESETS` gained `agents/sdd-observer.agent.md` (comment: `096`), the i10 count moved
+17 → 18, and the C-12 bounded count moved 19 → 20 (`18 presets + 2 authoring texts`).
+
+Intermediate reading (declared, not a wp02 failure):
+`bash scripts/bash/run-tests.sh tests/contract/test_fast_fail_discipline.py -q -k "i10 or i11"`
+→ exit 1, `1 failed, 1 passed in 9.95s`; i11 fails on
+`AssertionError: C-11: missing mirror .specify/agents/templates/sdd-observer.agent.md`.
+The mirror and the four render copies are T041/T042 (wp04) products by the declared package
+order (T041 is `[blockedBy: T010,T017,T019,T025,T027]`); DoD-5/GATE-2 close i11 there.
+`python3 scripts/python/sync-mirrors.py --check` currently lists MISS for all three source
+additions made by wp01/wp02 (`journal-format.yaml`, `journal-utils.py`, `sdd-observer.agent.md`)
+— the same declared intermediate state.
+
+## Package combined reading
+
+Command: `bash scripts/bash/run-tests.sh tests/contract/test_journal_engine.py tests/contract/test_sdd_observer_agent.py -q`
+Exit status: 0
+
+```text
+...........................                                              [100%]
+27 passed in 7.59s
+```
+
+## Package files
+
+| Row | Path | sha256 (first 16) |
+|-----|------|-------------------|
+| T018/T038 | `tests/contract/test_sdd_observer_agent.py` | `7e6b70cfebe3d3a3` |
+| T019 | `agents/sdd-observer.agent.md` | `287335c2357f4c2e` |
+| T020 | `tests/contract/test_fast_fail_discipline.py` (modified) | see commit |
+| T037 | `tests/contract/test_journal_engine.py` (modified) | see commit |
+| T018/T037 | `notes/red-first-evidence-wp02.md` (modified) | see commit |
