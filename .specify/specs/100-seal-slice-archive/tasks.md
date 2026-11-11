@@ -160,9 +160,9 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 
 **Purpose**: 冻结四类对照物（改前测量、条款覆盖基线、运行时证据落点），使后续「零新增」判据全部有对照物。
 
-- [ ] T001 捕获改前基线：创建 `.specify/specs/100-seal-slice-archive/notes/pre-change-measurements.md`，逐项贴真实输出与捕获日期——`python3 scripts/python/sync-mirrors.py --check`（`DIFF` 集逐行）、`python3 scripts/python/regen-command-copies.py --check`、`ls templates/commands/*.md | wc -l`、`git rev-parse HEAD`、`git status --short`、seal 测试文件清单（`ls tests/contract/test_seal_*.py tests/integration/test_seal_*.py`）；本行不写任何源文件。 [P]
-- [ ] T002 创建其余运行时证据落点 `.specify/specs/100-seal-slice-archive/notes/red-first-evidence.md` 与 `.specify/specs/100-seal-slice-archive/notes/quickstart-run.md` 的标题骨架（Foundational 起的红先行与 quickstart 行已有地方可写）。 [P]
-- [ ] T003 冻结条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/100-seal-slice-archive --freeze > .specify/specs/100-seal-slice-archive/coverage-baseline.txt`（脚本只打印、不写文件），核对头部含 `frozen-from:` 且正文**不含**本 spec 的 40 条 `C-N` 名——基线排除被核算 spec 自身，本 spec 条款只能被任务行认领、不能被自己的基线豁免（FR-024）。 [blockedBy: T001]
+- [X] T001 捕获改前基线：创建 `.specify/specs/100-seal-slice-archive/notes/pre-change-measurements.md`，逐项贴真实输出与捕获日期——`python3 scripts/python/sync-mirrors.py --check`（`DIFF` 集逐行）、`python3 scripts/python/regen-command-copies.py --check`、`ls templates/commands/*.md | wc -l`、`git rev-parse HEAD`、`git status --short`、seal 测试文件清单（`ls tests/contract/test_seal_*.py tests/integration/test_seal_*.py`）；本行不写任何源文件。 [P]
+- [X] T002 创建其余运行时证据落点 `.specify/specs/100-seal-slice-archive/notes/red-first-evidence.md` 与 `.specify/specs/100-seal-slice-archive/notes/quickstart-run.md` 的标题骨架（Foundational 起的红先行与 quickstart 行已有地方可写）。 [P]
+- [X] T003 冻结条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/100-seal-slice-archive --freeze > .specify/specs/100-seal-slice-archive/coverage-baseline.txt`（脚本只打印、不写文件），核对头部含 `frozen-from:` 且正文**不含**本 spec 的 40 条 `C-N` 名——基线排除被核算 spec 自身，本 spec 条款只能被任务行认领、不能被自己的基线豁免（FR-024）。 [blockedBy: T001]
 
 **Checkpoint**: 四类分母落盘（镜像/副本、命令面、名字级测试基线、条款覆盖），后续零新增判据均有冻结对照物。
 
