@@ -5,7 +5,7 @@
 **Description**: 按 review 结论封装 spec；`Sealed` 是 `Ready for Review` 之后的终态与归档准入状态；承载分片同名输出件的合并回写（split + merge-back）。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-11（100 plan：follow-up spec `100-seal-slice-archive` 经 `/speckit.plan` 产出 plan.md / research.md / data-model.md / 3 份契约（40 条款）/ quickstart.md / feature-ref.md；22 项 Constitution 全 Pass、6 条 decision-tension、11 条 Execution Premise 全 verified、Dependency set none、8 个工作包；plan 门禁 pre-analyze pass（errors=0）、validate-decision-tensions ok（6 records）、decomposition proceed、overlap adjudicated（099 绑定增量）；099 状态保持 `Ready for Review`；见 § Related Specifications/Requirements）
+**Last Updated**: 2026-11-11（100 plan：follow-up spec `100-seal-slice-archive` 经 `/speckit.plan` 产出 plan.md / research.md / data-model.md / 3 份契约（40 条款）/ quickstart.md / feature-ref.md；22 项 Constitution 全 Pass、6 条 decision-tension、11 条 Execution Premise 全 verified、Dependency set none、8 个工作包；plan 门禁 pre-analyze pass（errors=0）、validate-decision-tensions ok（6 records）、decomposition proceed、overlap adjudicated（099 绑定增量）；099 状态保持 `Ready for Review`；100 tasks：tasks.md 53 行 / 8 工作包 / 40 条款 `[green:]` 各认领一次，validate-tasks PASS 0/0、decomposition proceed 28/53、覆盖 claimed 40 / FR 28/28 / beyond-baseline 0；见 § Plan Notes 与 § Related Specifications/Requirements）
 
 ## Overview
 
@@ -50,6 +50,14 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 - **执行前提**：EP-001…EP-012 全部 `verified`；Inherited Blockers `Dependency set: none`（074 是验收目标而非依赖）。
 - **执行形态**：9 个工作包、每包 ≤16 行；依赖边 P1 ∥ P2 → P3 → P4 → P5 → P6 ∥ P7-tests → P8 → P9；
   探索波次 requested=4 / effective=4。
+- **follow-up 100 tasks（2026-11-11）**：`100-seal-slice-archive/tasks.md` 落盘——53 行（Setup 3 / Foundational 6 /
+  US1 12 / US2 11 / US4 5 / US3 8 / Polish 8）、8 个工作包（每包 ≤16 行）、40 条契约条款各被一个任务行
+  `[green:]` 认领一次且各契约内随行序单调；Tests Mode ON（宪法 IV）；阶段顺序 F → US1 → US2 → US4 → US3 → Polish
+  （服从 plan 的 P1 ∥ P5 → P2 → P3 → P4 → P7 依赖链，099 同型先例）。门禁：`validate-tasks.py` PASS（0 error /
+  0 warning）；`decomposition-check.py --mode tasks` proceed（fr_count=28 / task_count=53）；条款覆盖
+  claimed 40 / FR 28/28 / uncovered beyond baseline 0（`coverage-baseline.txt` 冻结于 base-sha `90bab87ee3b9`）；
+  `concurrency-check.py coverage --stage tasks` pass（covered-by-default）；读数见
+  `.specify/specs/100-seal-slice-archive/test-evidence/tasks-stage-checks.txt`。状态保持 `Ready for Review`。
 - **阶段门读数**：`test-evidence/plan-stage-checks.txt`（validate-decision-tensions、pre-analyze `--stage plan`、
   decomposition `--mode plan`、mirror/regen 零基线、074 闭包 exit 2、测试入口 32 passed）。
 
