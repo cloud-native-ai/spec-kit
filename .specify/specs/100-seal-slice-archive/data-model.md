@@ -82,7 +82,7 @@
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `carrier` | string | 声明的运行期载体路径（`.specify/state/<slug>.md`） |
+| `carrier` | string | 声明的运行期载体路径：`.specify/state/<parent>.md` 或 `.specify/state/<slug>.md`（合计 1 + 分片数 个载体） |
 | `status` | string | 封闭二值：`runtime-updated` \| `absent` |
 | `reason` | string | `absent` 时必填：状态根不可解析 / 记录缺席；`runtime-updated` 时为 `null` |
 | `updates` | array | `runtime-updated` 时的 `[{line, before, after}]`；`absent` 时为空数组 |
@@ -102,7 +102,7 @@
 
 ## 7. E8 — Archive Action Verdict（stdout）
 
-`--json` 负载沿用 099 引擎的 `_payload` 形态：`{action, spec_dir, verdict, exit, conditions[], …}`。本特性的 `verdict` 封闭为 `ok` / `refused` / `error`；具名结论与 reason 集见 `contracts/archive-actions.contract.md` C-103。**拒绝（exit 1）与错误（exit 2）零持久化**：无拒绝记录、无空清单、无第二份台账。
+`--json` 负载沿用 099 引擎的 `_payload` 形态：`{action, spec_dir, verdict, outcome, exit, conditions[], …}`。本特性的 `verdict` 封闭为 `ok` / `refused` / `error`；成功语义的**具名结论**由独立字段 `outcome` 承载，封闭四值 `would-archive`（仅 `archive-plan`）/ `archived` / `already-archived` / `not-applicable`；`refused` 与 `error` 的 `outcome` 为 `null`，其具名 reason 集见 `contracts/archive-actions.contract.md` C-103。**拒绝（exit 1）与错误（exit 2）零持久化**：无拒绝记录、无空清单、无第二份台账。
 
 ## 8. E9 — Merge Manifest Path-Field Amendment
 
@@ -149,7 +149,7 @@ empty slice set                          --任何动作--> not-applicable (exit 
 | E3 Archive Manifest | C-201…C-207 |
 | E4 Archived Slice Entry | C-203 |
 | E5 / E6 Reference Ledger | C-204, C-205, C-307…C-309 |
-| E7 Carrier Roster | C-301…C-305 |
+| E7 Carrier Roster | C-301…C-307 |
 | E8 Verdict | C-103, C-107 |
 | E9 Merge Manifest Amendment | C-211 |
 | E10 Rollback Recipe | C-106, C-110 |

@@ -17,7 +17,7 @@
 
 **C-103** — 结果词汇与退出码封闭；拒绝零持久化。
 
-成功语义（exit `0`）：`would-archive`（仅 `archive-plan`，表示可执行且无阻断）、`archived`（apply 成功）、`already-archived`（幂等）、`not-applicable`（分片集为空）。拒绝语义（exit `1`）：`destination-exists`、`dirty-spec-tree`、`conflict-open`、`slice-unclosed`、`unresolved-references`、`unclassified-reference`。输入或环境错误（exit `2`）：`merge-manifest-missing`、`merge-manifest-invalid`、`slice-missing`、`partial-archive`、`archive-drift`、`archive-manifest-invalid`、`not-a-git-tree`、`mirror-copy`、`write-failed`。三个退出码之外 MUST NOT 出现，词汇之外 MUST NOT 新增 reason。拒绝 MUST 零持久化：无拒绝记录、无空清单、无第二份台账；报告只经 stdout，每条带修复路径与重跑命令。
+成功语义（exit `0`）：`verdict = ok`，具名结论由 `outcome` 字段承载，封闭四值 `would-archive`（仅 `archive-plan`，表示可执行且无阻断）、`archived`（apply 成功）、`already-archived`（幂等）、`not-applicable`（分片集为空）。拒绝语义（exit `1`）：`verdict = refused`，`outcome = null`，reason 封闭为 `destination-exists`、`dirty-spec-tree`、`conflict-open`、`slice-unclosed`、`unresolved-references`、`unclassified-reference`。输入或环境错误（exit `2`）：`verdict = error`，`outcome = null`，reason 封闭为 `merge-manifest-missing`、`merge-manifest-invalid`、`slice-missing`、`partial-archive`、`archive-drift`、`archive-manifest-invalid`、`not-a-git-tree`、`mirror-copy`、`write-failed`。三个退出码之外 MUST NOT 出现，词汇之外 MUST NOT 新增 reason。拒绝 MUST 零持久化：无拒绝记录、无空清单、无第二份台账；报告只经 stdout，每条带修复路径与重跑命令。
 
 (FR-007, FR-009)
 
@@ -71,7 +71,7 @@
 
 **C-112** — 归档后的分片发现先读清单，语义不变。
 
-`merge-plan`、`merge-apply`、`seal` 的分片发现与载体解析 MUST 先读 `archive-manifest.json`，把归档分片视为**同一分片集**：MUST NOT 把归档读成「无分片」，MUST NOT 把 `slices/` 目录读成新的分片候选，MUST NOT 改变分片顺序依据。归档后重跑 `merge-apply` MUST 幂等成功且零写入；seal 的 P0 / `blocking` / 闭合判定 MUST 继续读取归档后的分片原始记录。该条只扩展解析路径，MUST NOT 改变合并回写与封装判定语义。清单缺失或不可解析时回退既有同级目录扫描。
+`merge-plan`、`merge-apply`、`seal` 的分片发现与载体解析 MUST 先读 `archive-manifest.json`，把归档分片视为**同一分片集**：MUST NOT 把归档读成「无分片」，MUST NOT 把 `slices/` 目录读成新的分片候选，MUST NOT 改变分片顺序依据。归档后重跑 `merge-apply` MUST 幂等成功且零写入；seal 的 P0 / `blocking` / 闭合判定 MUST 继续读取归档后的分片原始记录。该条只扩展解析路径，MUST NOT 改变合并回写与封装判定语义。**清单缺席**时回退既有同级目录扫描；**清单存在但不可解析、或其 `slices[]` 与合并清单/目录树不一致**时 MUST 以 exit `2`（`archive-manifest-invalid` / `archive-drift`）拒绝，MUST NOT 回退成「无分片」读取。
 
 (FR-019)
 
@@ -100,7 +100,7 @@
 | SC | 首红模块 | 取证形态 |
 |----|----------|----------|
 | SC-001 | `tests/integration/test_seal_archive_round.py` | 074 回合前后文件数/逐文件 sha256/相对路径集合 + `git diff --name-status -M` + 清单复核 |
-| SC-002 | 同模块（幂等）+ `tests/contract/test_seal_archive_apply.py` | 重跑 apply `already-archived` 零 diff；plan 零待移动；内容变异哈希转红 |
+| SC-002 | `tests/integration/test_seal_archive_idempotency.py` + `tests/contract/test_seal_archive_apply.py` | 重跑 apply `already-archived` 零 diff；plan 零待移动；内容变异哈希转红 |
 | SC-003 | `tests/contract/test_seal_archive_plan.py` | 活/日期化/未分类三类夹具；注入悬空引用与移除映射两类变异转红 |
 | SC-004 | `tests/integration/test_seal_archive_round.py`（阻断态）+ `tests/contract/test_seal_engine_contract.py` | 阻断态夹具照常归档；merge-apply 拒绝夹具不启动；`COMMAND_BASELINE` 对照 |
 | SC-005 | `tests/contract/test_seal_boundaries.py`（扩展） | 写面静态审计；注入删除/状态写入转红 |

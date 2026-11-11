@@ -9,7 +9,7 @@
 
 | 扫描根 | 分类归属 |
 |--------|----------|
-| `.specify/specs/<parent>/`（递归） | 正式活文档 = live；`notes/**`、`test-evidence/**`、`checklists/**` = dated；`slices/**`（归档后）= dated；`merge-manifest.json` = 仅路径形态值 live；`archive-manifest.json` 自身**排除**（它是映射 owner，不是引用载体） |
+| `.specify/specs/<parent>/`（递归） | 正式活文档 = live；`notes/**`、`test-evidence/**`、`checklists/**` = dated；`slices/**`（归档后）= dated；`merge-manifest.json` = 仅路径形态值 live；`archive-manifest.json` 与父级 `seal.md` 自身**排除**（前者是映射 owner，后者由 seal 拥有且归档不改写） |
 | `.specify/specs/<slug>/`（每个分片；归档后按其 `to` 位置） | dated（分片内部全部文件） |
 | `.specify/register.md` | live |
 | `.specify/features.md` | dated |
@@ -38,7 +38,7 @@
 
 **C-303** — 活载体名册（封闭集）。
 
-「live」载体恰为：`<parent>` 的正式文档（`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`contracts/**`、父级 `seal.md` 若未来存在）；`merge-manifest.json` 的路径形态值；`.specify/register.md`；`.specify/features/<ID>.md` 的 `## Related Specifications/Requirements` 章节；`.specify/glossary.md`；`.specify/instructions.md`；`shared/**` 源与 `.specify/shared/**` 镜像；`tests/**`。MUST NOT 在本名单外新增 live 载体而不修订本条款。
+「live」载体恰为：`<parent>` 的正式文档（`requirements.md`、`plan.md`、`tasks.md`、`data-model.md`、`research.md`、`quickstart.md`、`feature-ref.md`、`verification.md`、`review.md`、`code-review.md`、`contracts/**`）；`merge-manifest.json` 的路径形态值；`.specify/register.md`；`.specify/features/<ID>.md` 的 `## Related Specifications/Requirements` 章节；`.specify/glossary.md`；`.specify/instructions.md`；`shared/**` 源与 `.specify/shared/**` 镜像；`tests/**`。父级 `seal.md` MUST NOT 作为 live 载体被改写（FR-028 禁止改 `seal.md`；它由 seal 拥有）。MUST NOT 在本名单外新增 live 载体而不修订本条款。
 
 (FR-013)
 

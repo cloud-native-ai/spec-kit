@@ -75,7 +75,7 @@ Output at plan time: 28 lines, `FR-001`…`FR-028`, zero missing (the enumeratio
 | SC | 首红模块 | 变异取证 |
 |----|----------|----------|
 | SC-001 | `tests/integration/test_seal_archive_round.py` | 归档前后文件数/sha256/相对路径集合；`git diff --name-status -M` 零纯删除；清单可复核 |
-| SC-002 | `tests/integration/test_seal_archive_idempotency.py` | 重跑 `already-archived` 零 diff；内容变异使哈希检查转红 |
+| SC-002 | `tests/integration/test_seal_archive_idempotency.py` + `tests/contract/test_seal_archive_apply.py` | 重跑 `already-archived` 零 diff；内容变异使哈希检查转红 |
 | SC-003 | `tests/contract/test_seal_archive_plan.py` | 活/日期化/未分类三类夹具；注入悬空引用与移除映射转红 |
 | SC-004 | `tests/integration/test_seal_archive_round.py`（阻断态） + `tests/contract/test_seal_engine_contract.py` | 阻断态照常归档、merge 拒绝不启动；`COMMAND_BASELINE` 对照 |
 | SC-005 | `tests/contract/test_seal_boundaries.py` | 写面静态审计；注入删除/状态写入转红 |
@@ -99,7 +99,9 @@ shared/definitions/sdd-routing-definitions.md
 docs/reference/commands/seal.md
 tests/contract/test_seal_engine_contract.py
 tests/contract/test_seal_boundaries.py
+tests/contract/test_seal_merge_plan.py
 tests/contract/test_seal_merge_apply.py
+tests/integration/test_seal_merge_determinism.py
 tests/contract/test_seal_archive_plan.py
 tests/contract/test_seal_archive_apply.py
 tests/contract/test_seal_archive_manifest.py

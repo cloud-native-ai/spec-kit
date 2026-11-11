@@ -41,19 +41,19 @@
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | requirements → clarify → plan 链完整；本阶段状态上限为「绑定 Feature 不推进」；`Implemented` 仍归 `/speckit.implement`。 |
 | VIII | Code as the Single Source of Truth | ✅ Pass | research.md R-01…R-14 全部带 file:line 或本日实测；074 读数（58/54 文件、`merge.status=merged`、清单摘要）取自本日解析。 |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | 恰两个新动作、一份新清单、三份契约页；无第二命令/第二引擎/第二词表/调度器；回滚不新增动作。 |
-| X | Documentation Naming & Location Conventions | ✅ Pass | 清单名 `archive-manifest.json`（[[STR-002]]）与 `merge-manifest.json` 同构；`slices/` 为父 spec 内 lowercase 目录；不新建顶层目录。 |
+| X | Documentation Naming & Location Conventions | ✅ Pass | 清单名 `archive-manifest.json`（[[STR-002]]）与 `merge-manifest.json` 同构；`slices/` 为父 spec 内 lowercase 数据目录；命令参考只改既有 `docs/reference/commands/seal.md`；不新建顶层目录，不新增无文档目录（C-113 的 `framework-map.md:38` 登记）。 |
 | XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子已点名：框架源（`templates/`、`skills/`、`shared/`、`scripts/`、`tests/`）+ `.specify/` 镜像经 `sync-mirrors.py` 再生；本特性自身走本仓 SDD 链。 |
-| XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用 `script_interface_cli.py` 守卫、`sync-mirrors.py`、`regen-command-copies.py`、`run-tests.sh`、C-034 摘要算法；仅三件真正新增（归档计划器、引用分类器、清单 schema）。 |
+| XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用 `script_interface_cli.py` 守卫、`sync-mirrors.py`、`regen-command-copies.py`、`run-tests.sh`、C-034 摘要算法；命令模板与技能是 099 已建三件套的内容扩展（C-114），不新建命令或 Tool；仅三件真正新增（归档计划器、引用分类器、清单 schema）。 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Reliable Delivery（合并后残留在流程内收口）与 Change Validation（零丢失哈希 + 未解析=0 双读数）；证据纪律由程序给出。 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 处置词表 owner 唯一（non-disposable § Disposition Set，原地扩目的地）；动作集 owner 唯一（099 C-001，原地扩六）；清单 schema owner 唯一（本特性契约页）；计划/契约只引用不复述。 |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 处置词表 owner 唯一（non-disposable § Disposition Set，原地扩目的地）；动作集 owner 唯一（099 C-001，原地扩六）；清单 schema owner 唯一（本特性契约页）；命令模板与命令参考按 099 先例引用 `seal-utils.py --help` 与契约条款，不复述动作集/字段集（C-114）。 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 拒绝报告逐条点名全部未满足条件 + 修复路径 + 重跑命令；`quickstart.md` 首次出现处定义归档、清单、活引用、日期化记录。 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | `partial-archive` / `slice-missing` / `archive-drift` / `unclassified-reference` 全部具名阻断或退出 2；不猜测哪一侧为准。 |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `slices/` 语义登记进 `framework-map.md:38` 行（FR-002）；无临时目录新增；运行期 state 沿用既有忽略规则。 |
 | XVIII | Grounded Naming | ✅ Pass | 名称来自用户词面（`slices/`、归档）或房内同族先例（`archive-plan` / `archive-apply` ← `merge-plan` / `merge-apply`；`archive-manifest.json` ← `merge-manifest.json`）。 |
-| XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | 用户视图只有一问「合并完成的分片是否已经归档、引用是否全部可解析」——一个命令、一份清单、一个退出码回答；分类器与载体名册留作内部结构。 |
+| XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | 用户视图只有一问「合并完成的分片是否已经归档、引用是否全部可解析」——`quickstart.md` S-2…S-6 只展示 plan / apply / rerun / rollback 四个用户动作，一个命令、一份清单、一个退出码回答；分类器与载体名册留作内部结构（`contracts/reference-classification`）。 |
 | XX | Efficient Test Execution (Concurrent by Default) | ✅ Pass | 全部测试走 `run-tests.sh` 默认并行；新测试无共享全局状态；判据按失败名单比较，不按墙钟。 |
-| XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | 六动作仍复用 `script_interface_cli.py` 守卫；`--help`/`--version` 零副作用、未声明选项 `2`，由引擎契约测试钉住。 |
-| XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | 本 plan 携带任务锚（28 FR / 10 SC / 074 回合）与规则锚（门禁、fast-fail、预算）；§ Execution Model 把 fast-fail 注入与异常行要求写进每包派发。 |
+| XXI | Script Interface Contract (Declared, Zero-Side-Effect) | ✅ Pass | 六动作仍复用 `script_interface_cli.py` 守卫（owner：`shared/definitions/script-interface-definitions.md`）；`--help`/`--version` 零副作用、未声明选项 `2`，由 C-115 与引擎契约测试钉住。 |
+| XXII | Re-Anchoring (不忘初心 · 温故而知新) | ✅ Pass | 本 plan 携带任务锚（28 FR / 10 SC / 074 回合）与规则锚（门禁、fast-fail、预算）；§ Execution Model 的 P1…P8 每包派发均要求注入 fast-fail 条款并返回异常行或「无事可报」行。 |
 
 **Gates Status**: ✅ 22 行全部 Pass。无 ❌ / ⚠ 行；§ Complexity Tracking 记 `N/A`。flow-class 读取：`spec:100-seal-slice-archive → execution`（`flow-class-check.py --action lookup`，2026-11-11）。
 
@@ -85,7 +85,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
   - pole_a: 074 今天必须可归档，而它的封装终态是具名阻断。
   - pole_b: 归档不得掩盖或改变封装判定的输入，同一输入在归档前后必须给出同一条阻断清单。
 - **discriminating_evidence**: 在阻断态夹具上先跑 seal 记录阻断清单，再跑 archive-apply，再跑 seal。结果二值：两次阻断清单逐条一致且归档成功 / 任一不一致或归档被 `not-sealed` 拒绝。
-- **expected_sacrifice**: SC-004 Source ↓ 一次 `/speckit.seal` 运行多出一个提交批次与两个引擎调用，流程步骤从 4 步变 6 步。
+- **expected_sacrifice**: SC-004 Source ↓ 一次 `/speckit.seal` 运行从 4 个步骤面增为 7 步（新增 `archive-plan`、`archive-apply` 与 archive 批次提交），每次运行多出两个引擎调用与一次提交。
 - **revision_trigger**: 归档后重跑 seal 连续 2 次出现阻断清单变化 → 重开，把归档后移到 `Sealed` 之后并重新评估 074 的处置时点。
 - **tension_id**: T-002
 
@@ -228,7 +228,7 @@ Dependency set: none — 本特性不消费任何既有 Feature 的 `## Deferred
 ## Disclosed Rulings
 
 1. **`destination-exists` 与「部分归档」的退出码分层**（requirements Edge Cases 两条相邻规则的收敛）：同一分片在源与目标同时存在 → `destination-exists` 拒绝（exit 1，两侧不动）；跨分片的半归档状态（一片已在目标、另一片仍在源）或清单声称的分片两处都找不到 → 输入缺陷（exit 2，`partial-archive` / `slice-missing`）。判据是「同一分片的双侧冲突是前置拒绝；分片集内部不自洽是输入缺陷」。
-2. **`merge-manifest.retention` 不改**（FR-018 的「只改路径字段」）：099 写入的 `retention: pending-review` 是非路径字段，归档不触碰它；处置决定由 `archive-manifest.json` 的逐片 `moved` 行承载（non-disposable 的处置记录形态）。
+2. **`merge-manifest.retention` 不改**（FR-018 的「只改路径字段」）：099 写入的 `retention: pending-review` 是非路径字段，归档不触碰它；处置决定由 `archive-manifest.json` 的逐片 `{slug, from, to}` 行承载——封闭 schema 以 `from` / `to` 两字段表达 non-disposable 的 `moved = {from, to}` 记录形态，不新增 `moved` 键（C-203 的封闭集）。
 3. **扫描根是封闭集，不覆盖其他 spec 的历史记录**：`.specify/specs/<other>/**`（例如 099 的 `test-evidence/` 中引用 074 分片的记录）不在本特性的解析声明内；它们是其他 spec 的日期化记录，保持原字节，且归档清单的 `from → to` 映射对它们同样可用。FR-015 的「覆盖声明的扫描根」按此声明执行，不把「全仓所有历史文件」偷换进声明。
 4. **既有镜像漂移不修**：`.specify/templates/gitignore-specify-template` 的既有 DIFF 早于本特性且不在写面，按「不修、不掩」记录在案；本特性的判据是「触及的镜像对零新增漂移」。
 5. **074 回合在主 worktree 的 `.specify/state/` 缺席环境下执行**：运行期载体 3 条全部记 `absent`；这不改变 FR-017 的算术（`runtime-updated + absent = 3`），主仓环境下则为 2 更新 + 1 缺席。
@@ -237,9 +237,9 @@ Dependency set: none — 本特性不消费任何既有 Feature 的 `## Deferred
 
 ### Stage execution record（本 plan 阶段）
 
-- `requested`: 0 — 本阶段为单作者 in-process 撰写（plan / research / data-model / contracts / quickstart / feature-ref）。
+- `requested`: 0 — 本阶段为单作者 in-process 撰写（plan / research / data-model / contracts / quickstart / feature-ref），未声明可并发的派发单元。
 - `effective`: 0 — 未派发任何子代理执行单元；按 owner 的 carrier 定义，in-process 工作不计入派发读数。
-- `effective_reason`: `single-package` — 阶段简报固定单包作者执行，且宿主未启用子代理派发载体；同作者评分按 `objective-analysis-gate.md` 处置（见 § Disclosed Rulings 之外的 Constitutions 备注，评分证据为直接读取）。
+- `effective_reason`: `single-unit` — 可表示的被派发单元集为空（enumerated unit set size 0；单作者 in-process 不构成派发单元）；同时宿主未启用子代理派发载体。同作者评分按 `objective-analysis-gate.md` 处置（评分证据为直接读取，逐行标注）。
 
 ### Work packages（8 包，每包 ≤16 行）
 
@@ -247,14 +247,14 @@ Dependency set: none — 本特性不消费任何既有 Feature 的 `## Deferred
 
 | 包 | 主题 | 写域（文件级） | 行数上限 | 验收锚 |
 |----|------|----------------|----------|--------|
-| P1 | 动作集 4→6 与 CLI 表面 | `scripts/python/seal-utils.py`（常量/解析/派发/守卫）、`tests/contract/test_seal_engine_contract.py`（六动作 pin）、`tests/contract/test_seal_boundaries.py`（动作表审计） | 16 | 契约 C-101、C-103；`--help`/`--version`/未声明选项/退出码封闭；命令名集合不变 |
+| P1 | 动作集 4→6 与 CLI 表面 | `scripts/python/seal-utils.py`（常量/解析/派发/守卫）、`tests/contract/test_seal_engine_contract.py`（六动作 pin）、`tests/contract/test_seal_boundaries.py`（动作表审计） | 16 | 契约 C-101、C-103、C-115；`--help`/`--version`/未声明选项/退出码封闭；命令名集合不变 |
 | P2 | manifest-aware 分片发现 | `seal-utils.py`（`_discover_slices` / `_derive_order` / `_merge_state` / 清单读取）、`tests/contract/test_seal_merge_plan.py`、`tests/integration/test_seal_merge_determinism.py`、`tests/integration/test_seal_074_round.py` | 14 | 契约 C-112；归档后 merge-plan 同一分片集、merge-apply 幂等零写、seal P0 列表不变 |
-| P3 | `archive-plan`：前置条件 + 引用分类 + 清单 | `seal-utils.py`（plan 段）、`tests/fixtures/seal-archive/`、`tests/contract/test_seal_archive_plan.py`、`tests/contract/test_seal_archive_manifest.py` | 16 | 契约 C-102、C-104、C-201…C-212、C-301…C-307；两跑逐字节、闭环算术、unclassified 阻断 |
-| P4 | `archive-apply`：两阶段批次 + 移动 + 改写 + 原子恢复 | `seal-utils.py`（apply 段）、`tests/contract/test_seal_archive_apply.py`、`tests/integration/test_seal_archive_idempotency.py` | 16 | 契约 C-105、C-106、C-108…C-111；重命名对、零纯删除、失败按原字节恢复、`already-archived` |
+| P3 | `archive-plan`：前置条件 + 引用分类 + 清单 | `seal-utils.py`（plan 段）、`tests/fixtures/seal-archive/`、`tests/contract/test_seal_archive_plan.py`、`tests/contract/test_seal_archive_manifest.py` | 16 | 契约 C-102、C-104、C-201…C-212、C-301…C-307、C-312；两跑逐字节、闭环算术、unclassified 阻断 |
+| P4 | `archive-apply`：两阶段批次 + 移动 + 改写 + 原子恢复 | `seal-utils.py`（apply 段）、`tests/contract/test_seal_archive_apply.py`、`tests/integration/test_seal_archive_idempotency.py` | 16 | 契约 C-105、C-106、C-108…C-111、C-308…C-311；重命名对、零纯删除、失败按原字节恢复、`already-archived` |
 | P5 | owner 原地修订 | `shared/definitions/non-disposable-definitions.md`、`shared/definitions/framework-map.md`、099 三份契约（C-001/C-008/C-019/C-023/C-035/C-036） | 12 | 契约 C-113；处置词表仍四值、目的地封闭二形；动作集唯一 owner；布局行登记 `slices/` |
 | P6 | 命令面与技能面 | `templates/commands/seal.md`、`skills/internal/seal-artifact/SKILL.md`、4 份 per-tool 副本（生成）、`docs/reference/commands/seal.md` | 14 | 契约 C-114；`regen --check`/`sync --check` 无新增漂移；模板只引用引擎判定 |
 | P7 | 074 真实回合 | `.specify/specs/074-goal-team-sdd-unification/`（`slices/` + `archive-manifest.json` + 路径字段）、`.specify/register.md`、`.specify/features/074-…md` 活区、`shared/definitions/sdd-routing-definitions.md` + 镜像、两个测试载体、`test-evidence/074-archive-round.txt` | 14 | 契约 C-107；SC-001/SC-002/SC-003/SC-005/SC-006/SC-010 的读数；注册状态与封装结论不变 |
-| P8 | 收尾验证与记录 | 全量测试基线对照、镜像/副本复核、回滚夹具、`verification.md`、`feature-ref.md` 复算、registry 收尾（implement 阶段）、run determination | 10 | 十项 SC 的 Measurement Sources 各有落点；无新增失败名单；回滚逐字节恢复 |
+| P8 | 收尾验证与记录 | 全量测试基线对照、镜像/副本复核、回滚夹具、`verification.md`、`feature-ref.md` 复算、registry 收尾（implement 阶段）、run determination | 10 | 契约 C-116；十项 SC 的 Measurement Sources 各有落点；无新增失败名单；回滚逐字节恢复 |
 
 ## Complexity Tracking
 

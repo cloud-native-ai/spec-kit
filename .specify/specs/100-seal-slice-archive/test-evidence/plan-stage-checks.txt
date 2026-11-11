@@ -146,3 +146,13 @@ exit=0
 $ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements ... (summary)
 {"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T02:16:49Z"}
 exit=0
+
+== 11. Same-author objective-analysis gate (post-generation) ==
+- Condition: FIRED — the plan artifact set was authored in this session; the Constitution Check and the Post-Generation Quality Gate score self-authored artifacts.
+- Delegation: two fresh-context read-only subagents dispatched in parallel on disjoint scopes — (A) Constitution Check rows vs .specify/constitution.md; (B) cross-artifact coherence across requirements/plan/research/data-model/contracts/quickstart/feature-ref.
+- Findings A (Constitution): 7 defect rows — X (rule half untested), XII (reuse ceiling incomplete), XIV (single-source claim overgeneralized), XVII (registration claim), XIX/XXI/XXII (evidence cells named no openable artifact).
+- Findings B (coherence): 7 violations — (1) C-103 outcomes not expressible in E8 verdict model; (2) plan Ruling 2's 'moved' row absent from C-203 closed schema; (3) C-112 fallback vs C-103 archive-manifest-invalid; (4) C-115 unanchored; (5) C-109/C-107 anchor gaps; (6) SC-002 red-first map drift; (7) E6 runtime carrier form narrower than C-309.
+- Repairs applied (12): E8 gains a closed outcome field (would-archive/archived/already-archived/not-applicable) with C-103 naming the verdict/outcome split; Ruling 2 aligned to the closed schema (from/to express moved, no moved key); C-112 fixed (missing manifest -> sibling fallback; unparseable/inconsistent -> exit 2); seal.md removed from the live roster and excluded from the scan (FR-028); E6 carrier form corrected to 1 + slice count; P1 anchor += C-115, P3 += C-312, P4 += C-308…C-311, P8 += C-116; C-116 and feature-ref SC-002 aligned to idempotency + apply modules; feature-ref delivery surface += P2's two test files; Constitution rows X/XII/XIV/XIX/XXI/XXII evidence strengthened; T-002 step count corrected to 4 -> 7.
+- Rejected after direct verification (2): (a) 'nothing binds slices/ registration' — FR-002 + C-113 already bind framework-map.md:38; (b) SC-006 map drift — both tables already name the idempotency module once SC-002 is made explicit.
+- Downgrade rate: 0 of 14 findings downgraded; 2 rejected as non-defects; 12 repairs landed before the final gate re-run.
+- Post-repair re-run: pre-analyze pass (errors=0 / advisories=35), validate-decision-tensions ok (6 records / 0 error), clause extraction 40 clauses / 28 FR covered.
