@@ -120,7 +120,7 @@ SKILL_BASELINE = frozenset(
         "archive-session", "clarify-artifact", "code-review",
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",
-        "derive-architecture", "implement-feature", "improve-agent",
+        "debt-audit", "derive-architecture", "implement-feature", "improve-agent",
         "improve-team", "improve-tools", "manage-agents",
         "manage-constitution", "manage-features", "manage-feedback",
         "manage-goal", "manage-history", "manage-instructions", "manage-todo",
@@ -132,7 +132,7 @@ SKILL_BASELINE = frozenset(
     }
 )
 assert len(COMMAND_BASELINE) == 31
-assert len(SKILL_BASELINE) == 57
+assert len(SKILL_BASELINE) == 58
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

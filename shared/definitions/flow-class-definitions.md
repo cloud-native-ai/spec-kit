@@ -201,6 +201,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:create-tasks | execution | behavior-oracle |  | 交付任务清单；由 validate-tasks 与覆盖核对判定 |
 | skill:create-team | execution | behavior-oracle |  | 交付团队定义；由预检与运行结果判定 |
 | skill:create-tools | execution | behavior-oracle |  | 交付 Tool 记录；由校验与调用行为判定 |
+| skill:debt-audit | execution | behavior-oracle |  | 交付债务清单与治理方案；由证据路径与复算判定 |
 | skill:derive-architecture | expression | reader-oracle |  | 交付可重放的推导链；是否可溯源只能由读者判定 |
 | skill:implement-feature | execution | mixed-oracle |  | 代码须运行、规格回填须读者核；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
 | skill:improve-agent | execution | behavior-oracle |  | 交付改进后的代理；以再运行判定 |
