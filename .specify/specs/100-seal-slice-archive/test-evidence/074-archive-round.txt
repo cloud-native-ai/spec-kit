@@ -1,0 +1,896 @@
+# 074 archive round — real acceptance reading (P7)
+
+- **Date**: 2026-11-11
+- **Worktree**: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive
+- **Head at attempt**: `4c8e2301c` (T033/T038 fixture work committed)
+- **Authority**: tasks.md T042–T044; contracts C-102 / C-302 / C-307 / C-110; SC-001 / SC-002 / SC-010
+- **Verdict**: **BLOCKED** — `archive-plan` refused (exit 1); `archive-apply` refused (exit 1) with zero persistence. The 074 round did NOT execute; T043 / T044 remain open.
+
+## T042 — archive-plan (read-only preview)
+
+```bash
+python3 scripts/python/seal-utils.py --action archive-plan \
+  --spec-dir .specify/specs/074-goal-team-sdd-unification --repo . --json
+```
+
+Exit: `1` (`verdict=refused`, `outcome=null`, 62 conditions). Payload, verbatim:
+
+```json
+{
+  "action": "archive-plan",
+  "archive": {
+    "basis": null,
+    "manifest": null,
+    "merge_amendments": [],
+    "moves": [],
+    "unclassified": null,
+    "unresolved_after": null,
+    "unresolved_before": null
+  },
+  "conditions": [
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:89 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:90 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:172 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:173 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (cross-line: .specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074-goal-team-sdd-unification/coverage-baseline.txt:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (unclassified-carrier)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:26 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:34 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:47 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:52 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:53 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:54 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:55 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:56 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:37 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:41 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:45 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:47 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:112 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:187 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:308 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:337 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:366 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (cross-line: .specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:25 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:29 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:31 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:30 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:31 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:32 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:33 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:34 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:35 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:37 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:41 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:45 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:48 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unresolved-references",
+      "evidence": "4 reference target(s) will not exist after the move: .specify/specs/074-goal-team-sdd-unification/test-evidence/plan.jsonl:3 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/plan-targeted-failed.txt; .specify/specs/074-goal-team-sdd-unification/test-evidence/tasks.jsonl:3 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/tasks-targeted-failed.txt; .specify/specs/074a-authorized-routing/test-evidence/plan.jsonl:1 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/plan-targeted-failed.txt; .specify/specs/074a-authorized-routing/test-evidence/tasks.jsonl:1 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/tasks-targeted-failed.txt",
+      "fix_path": "fix the dangling reference or add the missing target",
+      "rerun": "rerun archive-plan after every target resolves"
+    }
+  ],
+  "exit_code": 1,
+  "outcome": null,
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/.specify/specs/074-goal-team-sdd-unification",
+  "verdict": "refused"
+}
+```
+
+## T043 — archive-apply attempt (fail-closed reading)
+
+```bash
+python3 scripts/python/seal-utils.py --action archive-apply \
+  --spec-dir .specify/specs/074-goal-team-sdd-unification --repo . --json
+```
+
+Exit: `1`; the 62 conditions are byte-identical to the plan's. Zero persistence: `git status --porcelain` is identical before and after; no `archive-manifest.json`; no `slices/` directory; `archive.moves` empty. Payload, verbatim:
+
+```json
+{
+  "action": "archive-apply",
+  "archive": {
+    "basis": null,
+    "manifest": null,
+    "merge_amendments": [],
+    "moves": [],
+    "unclassified": null,
+    "unresolved_after": null,
+    "unresolved_before": null
+  },
+  "conditions": [
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:89 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:90 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:172 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:173 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (cross-line: .specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074-goal-team-sdd-unification/coverage-baseline.txt:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (unclassified-carrier)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:26 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:34 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:47 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:52 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:53 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:54 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:55 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/code-review.md:56 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:37 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:41 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:45 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:47 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:112 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:187 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:308 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:337 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:366 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074a-authorized-routing/review.md:1 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (cross-line: .specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:25 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:29 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:31 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/code-review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (../074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:30 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:31 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:32 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:33 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:34 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:35 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:36 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:37 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:38 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:39 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:40 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:41 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:42 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:43 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:44 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:45 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:46 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074b-nested-governance)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unclassified-reference",
+      "evidence": ".specify/specs/074b-nested-governance/review.md:48 carries a source-path shape outside the declared F1/F2/F3 forms and carrier roster (.specify/specs/074a-authorized-routing)",
+      "fix_path": "rewrite the line into a declared carrier/form or fix the reference; the classifier never guesses",
+      "rerun": "rerun archive-plan after the line is classified"
+    },
+    {
+      "code": "unresolved-references",
+      "evidence": "4 reference target(s) will not exist after the move: .specify/specs/074-goal-team-sdd-unification/test-evidence/plan.jsonl:3 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/plan-targeted-failed.txt; .specify/specs/074-goal-team-sdd-unification/test-evidence/tasks.jsonl:3 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/tasks-targeted-failed.txt; .specify/specs/074a-authorized-routing/test-evidence/plan.jsonl:1 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/plan-targeted-failed.txt; .specify/specs/074a-authorized-routing/test-evidence/tasks.jsonl:1 -> .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/tasks-targeted-failed.txt",
+      "fix_path": "fix the dangling reference or add the missing target",
+      "rerun": "rerun archive-plan after every target resolves"
+    }
+  ],
+  "exit_code": 1,
+  "outcome": null,
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/.specify/specs/074-goal-team-sdd-unification",
+  "verdict": "refused"
+}
+```
+
+## Blocker arithmetic
+
+| code | count |
+|------|------:|
+| `unclassified-reference` | 61 |
+| `unresolved-references` | 1 condition naming 4 targets |
+| **total** | **62** |
+
+Unclassified rows by carrier:
+
+| carrier | rows | form |
+|---------|-----:|------|
+| `.specify/memory/session/20261029T065659Z-run-determination-speckit-review-r20261029t045000z-b074.md` | 5 | absolute `/storage/...` paths + carrier-level cross-line join |
+| `.specify/specs/074a-authorized-routing/review.md` | 18 | absolute `/storage/...` table column + cross-line join |
+| `.specify/specs/074a-authorized-routing/code-review.md` | 15 | `../<slug>` fragments inside verbatim `git diff --stat` output |
+| `.specify/specs/074b-nested-governance/review.md` | 18 | absolute `/storage/...` table column + cross-line join |
+| `.specify/specs/074b-nested-governance/code-review.md` | 4 | `../<slug>` fragments inside verbatim `git diff --stat` output |
+| `.specify/specs/074-goal-team-sdd-unification/coverage-baseline.txt` | 1 | out-of-roster parent file, **zero** slice-path hits (see observation) |
+
+The single `unresolved-references` condition names four absent targets, all the recorded
+`--names-out` files of zero-failure stage runs (the sibling `part5-failed.txt` is 0 bytes):
+`.specify/specs/074a-authorized-routing/notes/plan-targeted-failed.txt` and
+`notes/tasks-targeted-failed.txt` — referenced by
+`.specify/specs/074-goal-team-sdd-unification/test-evidence/{plan,tasks}.jsonl` and
+`.specify/specs/074a-authorized-routing/test-evidence/{plan,tasks}.jsonl`.
+
+## Reading against the owners
+
+- **C-302**: absolute paths and `../<slug>` are not F1/F2/F3; a scan-root line carrying a
+  source-path shape outside the three declared forms MUST become `unclassified-reference`.
+  All 60 flagged rows sit in **dated** carriers (slice-internal review/code-review records,
+  one `.specify/memory/session/` record), whose bytes the contract forbids the archive to rewrite.
+- **C-307**: a reference is resolved only when its target exists (pre- and post-move); the four
+  `--names-out` targets are already absent in the current tree.
+- **plan T-005 `expected_sacrifice`**: the flow fail-closes on undeclared forms; the sanctioned
+  remedy is to bring the form into the contract and rerun (its `revision_trigger` asks for two
+  real rounds). `requirements.md` Edge Case (line 105) allows the same two remedies — admit the
+  form into the closed roster, or repair the record — then rerun.
+- **Observation, not repaired**: `coverage-baseline.txt` has zero slice-path hits, while FR-012 /
+  C-305 phrase the block around a *hit* and the engine flags any out-of-roster parent file
+  unconditionally. Relaxing that branch would leave 60 blockers; it does not change the outcome.
+
+## T033 / T038 fixture readings (green)
+
+```
+bash scripts/bash/run-tests.sh tests/integration/test_seal_archive_round.py \
+  tests/integration/test_seal_archive_rollback.py -q
+8 passed in 6.53s   # exit 0
+```
+
+- The rollback drill executes the C-110 / quickstart S-6 recipe literally on a
+  `runtime-present` replay; each omitted step (`move` / `restore` / `runtime` / `manifest`)
+  turns the completion check red; the full recipe restores the pinned tree byte for byte and
+  reproduces the identical plan.
+- T038's `blocked-pair` replay archives in a named seal blocking state, leaves the blocking
+  list and the receipt surface untouched, and shows a refused merge never starts the archive.
+- Neither reading closes T042–T044: they are fixture replays, not the real round.
+
+## Why this is a fast-fail decision, not a repair
+
+Repairing the 61 dated-record rows means rewriting another feature's historical evidence
+(absolute paths to repo-relative, `../` fragments out of verbatim tool output, cross-line joins),
+and the four unresolved targets require reconstructing `--names-out` artifacts. Both are choices
+between readings that no artifact records, so the engine, its tests and this package MUST NOT
+take them (C-302; plan T-005).
+
+## Regression reading (the P7 entry set, after T033/T038)
+
+```bash
+bash scripts/bash/run-tests.sh tests/integration/test_seal_074_round.py \
+  tests/integration/test_seal_archive_round.py \
+  tests/integration/test_seal_archive_rollback.py \
+  tests/integration/test_seal_archive_idempotency.py \
+  tests/contract/test_seal_archive_apply.py \
+  tests/contract/test_sdd_compat_containment.py \
+  tests/contract/test_sdd_diffusion.py -q
+```
+
+`2 failed, 58 passed` — the same two failures recorded at the P7 entry baseline
+(`51 passed` before this package added 7 tests):
+`tests/contract/test_sdd_diffusion.py::test_trigger_edit_moves_no_gate` (pre-existing) and
+`tests/integration/test_seal_074_round.py::test_live_plan_identifies_both_slices_from_the_split_record`
+(environment-dependent: this worktree has no `.specify/state/074-*.md`, so `order_basis`
+reads `letter-order`; tasks.md § Notes 5). Zero new failures.
