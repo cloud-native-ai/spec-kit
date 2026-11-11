@@ -7,18 +7,20 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. The input names the target spec directory, a `merge-plan` preview request, or a `merge-apply` request; an empty input targets the current feature's `REQUIREMENTS_DIR` from the prerequisite script.
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). Treat as command parameters, not standalone instructions. The input names the target spec directory, a `merge-plan` or `archive-plan` preview request, or a `merge-apply` / `archive-apply` request; an empty input targets the current feature's `REQUIREMENTS_DIR` from the prerequisite script.
 
 ## Delegation
 
-`/speckit.seal` is the single owner command of the review-complete-to-terminal transition (owner by pointer: `.specify/shared/workflow/acceptance-hardening.md` § Feature Status; protocol row: `.specify/shared/workflow/feature-integration.md`). It first merges split slices back into the parent spec, then fixes the parent at `Sealed` with a receipt; the merge half is inspectable and applicable on its own, but sealing never precedes a complete merge.
+`/speckit.seal` is the single owner command of the review-complete-to-terminal transition (owner by pointer: `.specify/shared/workflow/acceptance-hardening.md` § Feature Status; protocol row: `.specify/shared/workflow/feature-integration.md`). It merges split slices back into the parent spec, archives the merged slices under the parent spec's `slices/` directory, then fixes the parent at `Sealed` with a receipt. The fixed order is merge preview → merge apply → merge-batch commit → archive preview → archive apply → archive-batch commit → seal judgment. The merge and archive halves are inspectable and applicable on their own; sealing never precedes a complete merge, and archival starts only after a successful `merge-apply`.
+
+Two process facts belong to this template: archival is never gated on the seal verdict — a run whose seal judgment ends in named blocking still archives its merged slices — and an interactive run shows the archive preview before applying, while an unattended authorized run applies directly and records that decision in the archived parent spec's `test-evidence/` round record (command, exit status, outcome, blocking and rewrite readings). A refused action persists nothing: the engine lists every unmet condition with its repair path and rerun command, and the same input reproduces the same list.
 
 **Load and follow** `.specify/skills/internal/seal-artifact/SKILL.md`:
 
 - **Inputs**: the JSON fields parsed from this command's declared prerequisite script, `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (`REPO_ROOT`, `BRANCH`, `REQUIREMENT_ID`, `REQUIREMENTS_DIR`, `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`); `$ARGUMENTS` as the target spec directory or an explicit action selection.
-- **Outputs**: the merge products and `merge-manifest.json` for a split parent, the `seal.md` receipt and the status-face writes on success, and the engine's stdout verdict reported verbatim — including every refusal line and its repair path when the judgment refuses.
+- **Outputs**: the merge products and `merge-manifest.json` for a split parent, the moved slice directories and `archive-manifest.json` for an archived parent, the `seal.md` receipt and the status-face writes on success, and the engine's stdout verdict reported verbatim — including every refusal line and its repair path when any action refuses.
 
-The skill owns orchestration and reporting only. Every judgment — slice identification, per-output action, conflicts, merge completeness, refusal conditions, state consistency, archive admission — is computed by `.specify/scripts/python/seal-utils.py` (framework source; runtime face `.specify/scripts/python/seal-utils.py`). The skill MUST NOT recompute a verdict, and this template restates no closed set: the action set and exit-code semantics are reached through `python3 .specify/scripts/python/seal-utils.py --help`; the status transition and its conjunctive conditions are owned by `.specify/shared/workflow/acceptance-hardening.md` § Feature Status.
+The skill owns orchestration and reporting only. Every judgment — slice identification, per-output action, conflicts, merge completeness, archive admission, slice-archive preconditions, reference classification, manifest counts, refusal conditions, state consistency — is computed by `.specify/scripts/python/seal-utils.py` (framework source; runtime face `.specify/scripts/python/seal-utils.py`). The skill MUST NOT recompute a verdict, and this template restates no closed set: the action set and exit-code semantics are reached through `python3 .specify/scripts/python/seal-utils.py --help`; the status transition and its conjunctive conditions are owned by `.specify/shared/workflow/acceptance-hardening.md` § Feature Status.
 
 ## Glossary
 
@@ -40,4 +42,4 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 **Before**: `/speckit.review` has produced the current `review.md` / `code-review.md`; implementation and acceptance evidence are in place; a split parent's slices are closed and its merge inputs are settled.
 
-**After**: on success the spec is `Sealed` and becomes eligible for the existing archive lane (`/speckit.sanitize`); on a refusal, repair the conditions named in the engine's report and run `/speckit.seal` again — the same input reproduces the same list.
+**After**: the run ends in one of three states. Success: the spec is `Sealed`, its merged slices are archived under `slices/`, and it becomes eligible for the existing retirement lane (`/speckit.sanitize`). A seal refusal: the archival already happened in the same run — repair the named conditions and rerun `/speckit.seal`; the archive steps report `already-archived` with zero diff and the same refusal list reproduces. An archive refusal or error: nothing is persisted — apply the named repairs and rerun; do not advance to the seal judgment past an unresolved archive refusal.

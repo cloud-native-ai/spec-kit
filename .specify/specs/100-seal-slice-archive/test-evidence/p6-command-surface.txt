@@ -1,0 +1,95 @@
+# P6 — 命令面与技能面（T039–T040）读数
+# 2026-11-11 · worktree 100-seal-slice-archive · package base = 595d78a86 (P4 closed)
+
+== 1. Drift baseline before P6 writes =========================================
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit 0
+
+$ python3 scripts/python/sync-mirrors.py --check
+DIFF .specify/templates/gitignore-specify-template
+... (all other pairs ok)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit 2
+note: 唯一漂移为本特性写面之外的既有项（quickstart S-1.3 记录在案；plan § 执行前提出处 4「既有镜像漂移不修」）。
+
+== 2. Generation =============================================================
+
+$ python3 scripts/python/regen-command-copies.py
+Regenerated command copies for 4 tools.
+exit 0
+
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/seal-artifact
+DIFF .specify/skills/internal/seal-artifact/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+exit 0
+
+== 3. Post-change checks (zero new drift) ====================================
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit 0
+
+$ python3 scripts/python/sync-mirrors.py --check
+(no DIFF / DRIFT lines)
+exit 0
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/seal-artifact
+ok    skills/internal/ == .specify/skills/internal/ (1 files, byte-identical)
+exit 0
+
+attribution note: 第 1 节的既有 gitignore 漂移在第 3 节读数中不再出现。P6 的写面收敛命令带 --only 限定
+（regen 只写 4 份副本，sync 只写 skills/internal/seal-artifact 一对）；同一 worktree 内并发执行的 P5
+任务文本（T036）包含一次全量 `sync-mirrors.py --write`，该既有漂移在 P5 的执行窗口内被源→镜像收敛
+（copy2 保留源 mtime 09:44）。P6 不认领也不回退该文件。
+
+== 4. COMMAND_BASELINE (T040) ================================================
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_migration_distribution.py -q
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_migration_distribution.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+..................                                                       [100%]
+18 passed in 6.22s
+exit 0
+
+$ ls templates/commands/*.md | wc -l
+31
+（COMMAND_BASELINE 31 不变；无新增命令名。）
+
+四份逐工具副本均含归档阶段（grep -l "archive-plan"）：
+.claude/commands/speckit.seal.md
+.github/prompts/speckit.seal.prompt.md
+.opencode/command/speckit.seal.md
+.qoder/commands/speckit.seal.md
+
+== 5. Adjacent seal suites (observed, not a P6 acceptance gate) ==============
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py -q
+4 failed, 40 passed in 8.12s
+exit 1
+
+- test_seal_boundaries.py::test_the_directory_registry_difference_is_fully_classified
+  UNREGISTERED_LIVE_SPECS pin 只列 067/075/080；现场多出 097/098/100（测试 pin 过期）
+- test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source
+  引擎 P4 新增的 .unlink()（C-008 审计 pin 仍按 099 旧写面）
+- test_seal_boundaries.py::test_the_engine_shells_out_only_read_only_git_verbs
+  引擎 P4 新增的 git mv（同上）
+- test_seal_boundaries.py::test_the_audit_report_is_complete_and_optionally_recorded
+  依赖上一条 pin
+
+判定依据：`git diff HEAD -- scripts/python/seal-utils.py` 为空（引擎与 P4 提交逐字节一致），P6 只改
+文档/技能/生成副本，四红均非 P6 引入；按 FR-025「既有红不修不掩」留待 P8 全量基线对照。
+
+== 6. P6 write surface (staged by explicit path) =============================
+
+templates/commands/seal.md
+skills/internal/seal-artifact/SKILL.md
+.specify/skills/internal/seal-artifact/SKILL.md            (generated mirror)
+.claude/commands/speckit.seal.md                           (generated)
+.github/prompts/speckit.seal.prompt.md                     (generated)
+.opencode/command/speckit.seal.md                          (generated)
+.qoder/commands/speckit.seal.md                            (generated)
+docs/reference/commands/seal.md
+.specify/specs/100-seal-slice-archive/tasks.md             (T039/T040 closed)
+.specify/specs/100-seal-slice-archive/test-evidence/p6-command-surface.txt
