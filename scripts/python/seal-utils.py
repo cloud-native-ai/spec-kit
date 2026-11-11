@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).
 
-Owner of the four-action closed set, the three-value exit domain and the write-path
+Owner of the six-action closed set, the three-value exit domain and the write-path
 allowlist. The action bodies land in later work packages on top of this surface.
 
-Actions (exactly four; a fifth MUST NOT appear):
+Actions (exactly six; a seventh MUST NOT appear):
   merge-plan     read-only   slice set, per-artifact actions, ID maps and conflicts
   merge-apply    write       deterministic merge into the parent spec, merge-manifest.json,
                              one `**Merged into**` line per slice
   seal           write       judgment first (read-only), then one atomic write batch:
                              seal.md + registry row + feature detail
   archive-gate   read-only   archive admission verdict (0 allow / 1 refuse / 2 input error)
+  archive-plan   read-only   slice-archive precondition, classification and manifest preview
+  archive-apply  write       batch move into the parent spec's slices/ plus manifest write
 
 Exit codes (exactly three; a fourth MUST NOT appear):
   0 success or idempotent (already-sealed included; an allowed archive-gate)
@@ -39,11 +41,12 @@ from typing import Any, Dict, Optional, Sequence, Tuple
 
 ENGINE_NAME = "seal-utils.py"
 
-#: C-001: the action set is closed at exactly four values.
-ACTIONS = ("merge-plan", "merge-apply", "seal", "archive-gate")
+#: C-001 / 100 C-101: the action set is closed at exactly six values.
+ACTIONS = ("merge-plan", "merge-apply", "seal", "archive-gate",
+           "archive-plan", "archive-apply")
 #: C-005: the two-phase declaration — which actions are pure judgments and which write.
-READ_ONLY_ACTIONS = ("merge-plan", "archive-gate")
-WRITE_ACTIONS = ("merge-apply", "seal")
+READ_ONLY_ACTIONS = ("merge-plan", "archive-gate", "archive-plan")
+WRITE_ACTIONS = ("merge-apply", "seal", "archive-apply")
 
 #: C-002: the exit domain is closed at exactly three values.
 EXIT_OK = 0
@@ -956,7 +959,9 @@ def _factory_doc_refs(repo: Path, slices, parent_strings, id_maps):
     return refs, conflicts
 
 
-def _pending(action: str, spec_dir: Optional[Path]) -> Tuple[Dict[str, Any], int]:
+def _pending(args: argparse.Namespace,
+             spec_dir: Optional[Path]) -> Tuple[Dict[str, Any], int]:
+    action = args.action
     return _payload(
         action, spec_dir, "error", EXIT_INPUT_ERROR,
         [_condition(
@@ -2952,6 +2957,8 @@ HANDLERS = {
     "merge-apply": action_merge_apply,
     "seal": action_seal,
     "archive-gate": action_archive_gate,
+    "archive-plan": _pending,
+    "archive-apply": _pending,
 }
 
 
@@ -2962,20 +2969,21 @@ HANDLERS = {
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=ENGINE_NAME,
-        description="Seal engine for /speckit.seal: merge-back, seal judgment and "
-                    "archive admission.",
+        description="Seal engine for /speckit.seal: merge-back, seal judgment, "
+                    "archive admission and slice-archive planning/apply.",
     )
     _sig_configure(
         parser,
-        effects="merge-plan and archive-gate write nothing; merge-apply and seal write "
-                "only within the allowlisted paths (the parent spec directory, one slice "
-                "requirements.md marker line and recorded factory-doc resolutions); a "
-                "flag-only invocation writes nothing",
+        effects="merge-plan, archive-gate and archive-plan write nothing; merge-apply "
+                "and seal write only within the allowlisted paths (the parent spec "
+                "directory, one slice requirements.md marker line and recorded "
+                "factory-doc resolutions); archive-apply carries the slice-archive "
+                "write batch; a flag-only invocation writes nothing",
         codes="0 success or idempotent; 1 a precondition refused; 2 an input or "
               "environment error",
     )
     parser.add_argument("--action", required=True, choices=ACTIONS,
-                        help="one of the four closed actions")
+                        help="one of the six closed actions")
     parser.add_argument("--spec-dir", required=True,
                         help="target spec directory (required, no default)")
     parser.add_argument("--repo", default=None,

@@ -1,16 +1,19 @@
-"""Boundary audit for Feature 099 (P6, T034).
+"""Boundary audit for Feature 099 (P6, T034); action table revised by Feature 100 (P1, T006).
 
 Contract: ``.specify/specs/099-speckit-seal/contracts/seal-engine.contract.md`` C-008
           ``.specify/specs/099-speckit-seal/contracts/status-sealed.contract.md`` C-025
           ``.specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md``
           C-035/C-036 (four-way boundary, zero new duplicate mechanisms)
+          ``.specify/specs/100-seal-slice-archive/contracts/archive-actions.contract.md``
+          C-101 (six-action closed set, 3/3 read-only/write partition)
           FR-020 / FR-022 / FR-024 / SC-008
 
 Three evidence families, each statically decidable:
 
-* **engine action table** — the four-action closed set carries no move/delete/archive
-  action, no push and no scheduler; the read-only git verbs are closed; the action
-  vocabulary stays read-only where the contract says read-only;
+* **engine action table** — the six-action closed set splits exactly 3 read-only /
+  3 write and carries no move/delete/archive-retirement action, no push and no
+  scheduler; the read-only git verbs are closed; the action vocabulary stays
+  read-only where the contract says read-only;
 * **status domain single owner** — the seven-value domain and the single forward
   transition live in the declared owner/carrier set only; a second machine copy of the
   value domain on any other framework surface turns this module red;
@@ -23,6 +26,8 @@ exception row), so it lands after its consumed object (T031) rather than red-fir
 
 Readings: run with ``SEAL_BOUNDARIES_AUDIT=<path>`` to write the audit dump; the
 checked-in copy is ``.specify/specs/099-speckit-seal/test-evidence/boundaries-audit.txt``.
+Feature 100's reading lands in
+``.specify/specs/100-seal-slice-archive/test-evidence/foundational-checks.txt``.
 """
 
 from __future__ import annotations
@@ -210,8 +215,9 @@ def _git_verb_sites(tree):
 
 def test_the_action_table_is_closed_and_carries_no_destructive_action(eng):
     actions = tuple(eng.ACTIONS)
-    assert actions == ("merge-plan", "merge-apply", "seal", "archive-gate"), (
-        f"C-001/C-008: the action table is closed at exactly these four; got {actions}"
+    assert actions == ("merge-plan", "merge-apply", "seal", "archive-gate",
+                       "archive-plan", "archive-apply"), (
+        f"C-101: the action table is closed at exactly these six; got {actions}"
     )
     for action in actions:
         head = action.split("-", 1)[0]
@@ -219,12 +225,19 @@ def test_the_action_table_is_closed_and_carries_no_destructive_action(eng):
             f"C-008: the action table MUST NOT carry a {head!r} action; got {action!r}"
         )
     archive_actions = [action for action in actions if "archive" in action]
-    assert archive_actions == ["archive-gate"], (
-        "C-008/C-030: the only archive-shaped action is the read-only admission query; "
-        f"got {archive_actions}"
+    assert archive_actions == ["archive-gate", "archive-plan", "archive-apply"], (
+        "C-101: the archive-shaped actions are the admission query, the read-only "
+        f"archive plan and the archive write batch; got {archive_actions}"
     )
-    assert "archive-gate" in eng.READ_ONLY_ACTIONS, (
-        "C-030: `archive-gate` is a query — it MUST stay on the read-only side"
+    assert "archive-gate" in eng.READ_ONLY_ACTIONS and "archive-plan" in eng.READ_ONLY_ACTIONS, (
+        "C-030/C-101: `archive-gate` and `archive-plan` are queries — they MUST stay "
+        "on the read-only side"
+    )
+    assert "archive-apply" in eng.WRITE_ACTIONS, (
+        "C-101: `archive-apply` is the only archive write action"
+    )
+    assert len(eng.READ_ONLY_ACTIONS) == 3 and len(eng.WRITE_ACTIONS) == 3, (
+        "C-101: the six actions split exactly 3 read-only / 3 write"
     )
     assert set(eng.READ_ONLY_ACTIONS) | set(eng.WRITE_ACTIONS) == set(actions)
     assert not set(eng.READ_ONLY_ACTIONS) & set(eng.WRITE_ACTIONS)
@@ -487,7 +500,8 @@ def _audit_report() -> str:
 def test_the_audit_report_is_complete_and_optionally_recorded():
     report = _audit_report()
     assert "Verdict: clean" in report
-    assert "Action table: merge-plan, merge-apply, seal, archive-gate" in report
+    assert "Action table: merge-plan, merge-apply, seal, archive-gate, " \
+           "archive-plan, archive-apply" in report
     assert "Orphan slices: none" in report
     target = os.environ.get("SEAL_BOUNDARIES_AUDIT")
     if target:
