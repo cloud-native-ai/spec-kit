@@ -111,6 +111,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-create-skills-wrapup | skill-wrapup | skill:create-skills | wrap-up |
 | skill-create-team-wrapup | skill-wrapup | skill:create-team | wrap-up |
 | skill-create-tools-wrapup | skill-wrapup | skill:create-tools | wrap-up |
+| skill-debt-audit-wrapup | skill-wrapup | skill:debt-audit | wrap-up |
 | skill-database-utils-wrapup | skill-wrapup | skill:database-utils | wrap-up |
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |

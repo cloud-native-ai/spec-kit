@@ -167,6 +167,9 @@ FROZEN_COMMANDS = (
 # 2026-11-11 (Feature 099): 56 -> 57 = 18 external + 39 internal; the new unit is
 # `internal/seal-artifact`, the `/speckit.seal` internal skill. It names the engine by
 # path only and adds no C-5 wiring token, so only the roster moves.
+# 2026-11-11 (harness binding): 57 -> 58 = 18 external + 40 internal; the new unit is
+# `internal/debt-audit`, the tech-debt inventory skill bound to the sdd-debt-governor
+# agent template. It names the agent and owners by path only; the roster moves.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -197,6 +200,7 @@ FROZEN_SKILLS = (
     "internal/create-tasks",
     "internal/create-team",
     "internal/create-tools",
+    "internal/debt-audit",
     "internal/derive-architecture",
     "internal/implement-feature",
     "internal/improve-agent",
