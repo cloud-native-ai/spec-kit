@@ -77,7 +77,7 @@ python3 scripts/python/seal-utils.py --action archive-plan \
   --spec-dir .specify/specs/074-goal-team-sdd-unification --repo . --json
 ```
 
-预期形态：`verdict=ok`，具名结论 `would-archive`；负载包含分片集（2 片）、移动对、引用台账候选（live / dated 计数）、`unresolved=0`、`unclassified=0` 与退出码 `0`。若任一前置不成立，`verdict=refused`（exit `1`）或 `error`（exit `2`），逐条点名**全部**未满足条件。
+预期形态：`verdict=ok`，具名结论 `would-archive`；负载包含分片集（2 片）、移动对、引用台账候选（`checks.live_rewrite` / `checks.dated_preserved` 计数）、`checks.unresolved_before=0`、`checks.unresolved_after=0`（plan 期按投影归档树复算）、`checks.unclassified=0` 与退出码 `0`。若任一前置不成立，`verdict=refused`（exit `1`）或 `error`（exit `2`），逐条点名**全部**未满足条件。
 
 **Premises**: ① `archive-plan` 由 P3 实现并注册进 `ACTIONS`/`HANDLERS`；② `merge-manifest.json` 处于 `merge.status=merged`、零开放冲突（本日实测 R-07）；③ 074 的 2 个分片在源与目标中恰在一侧（当前都在源）；④ 引用分类按 `contracts/reference-classification.contract.md` 的封闭集判定。**Pinned by**: `tests/contract/test_seal_archive_plan.py::test_plan_reports_move_pairs_and_zero_unresolved`（P3）。
 
@@ -89,10 +89,10 @@ python3 scripts/python/seal-utils.py --action archive-plan \
 python3 scripts/python/seal-utils.py --action archive-apply \
   --spec-dir .specify/specs/074-goal-team-sdd-unification --repo . --json
 git status --porcelain -- .specify/specs/074-goal-team-sdd-unification
-git diff --name-status -M -- .specify/specs/074-goal-team-sdd-unification .specify/specs/074a-authorized-routing .specify/specs/074b-nested-governance
+git diff --name-status -M HEAD -- .specify/specs/074-goal-team-sdd-unification .specify/specs/074a-authorized-routing .specify/specs/074b-nested-governance
 ```
 
-预期：exit `0`，具名结论 `archived`；两片位于 `.specify/specs/074-goal-team-sdd-unification/slices/<slug>/`；`git diff --name-status -M` 对每个被移动文件给出 `R` 重命名对、零 `D` 纯删除；父 spec 根出现 `archive-manifest.json`。随后按显式路径提交 archive 批次（父 spec 树、`register.md`、详情活区、`shared` 源/镜像、两个测试载体、归档清单），单行提交消息，`git add -A` 禁用。
+预期：exit `0`，具名结论 `archived`；两片位于 `.specify/specs/074-goal-team-sdd-unification/slices/<slug>/`；`git diff --name-status -M HEAD`（比较基 = apply 前提交；`git mv` 已暂存，索引写入不改变该读数）对每个被移动文件给出 `R` 重命名对、零 `D` 纯删除；父 spec 根出现 `archive-manifest.json`。随后按显式路径提交 archive 批次（父 spec 树、`register.md`、详情活区、`shared` 源/镜像、两个测试载体、归档清单），单行提交消息，`git add -A` 禁用。
 
 **Premises**: ① `archive-apply` 由 P4 实现；② `archive-plan` 先行且无阻断；③ 工作树在父 spec 与分片范围内干净；④ 本仓库是 git 工作树（S-1.4）；⑤ 提及的两个测试载体路径存在（实测）。**Pinned by**: `tests/contract/test_seal_archive_apply.py::test_apply_is_a_pure_rename_batch` 与 `tests/integration/test_seal_archive_round.py::test_074_round_moves_both_slices`（P4/P7）。
 
@@ -108,13 +108,13 @@ python3 scripts/python/seal-utils.py --action archive-plan \
 git diff --stat -- .specify/specs/074-goal-team-sdd-unification
 ```
 
-预期：apply exit `0` 且具名 `already-archived`；plan 报告零待移动、零未解析；`git diff --stat` 零输出；不产生第二份清单。
+预期：apply exit `0` 且具名 `already-archived`；plan 报告同一 `already-archived` 结论、零待移动、零未解析；`git diff --stat` 零输出；不产生第二份清单。
 
 **Premises**: ① S-3 已成功且其批次已提交；② 后到者读到先到者清单即收敛（无锁文件）；③ 归档后的分片发现走 `archive-manifest.json`（C-112）。**Pinned by**: `tests/integration/test_seal_archive_idempotency.py::test_second_apply_is_already_archived_with_zero_diff`（P4）。
 
 ---
 
-## S-5 阻断态流程（封装修阻断不阻断归档）
+## S-5 阻断态流程（封装阻断不阻断归档）
 
 ```bash
 python3 scripts/python/seal-utils.py --action merge-apply \
@@ -142,17 +142,19 @@ python3 scripts/python/seal-utils.py --action seal \
 git mv .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing .specify/specs/074a-authorized-routing
 git mv .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance .specify/specs/074b-nested-governance
 # ② 逐条 live-rewrite 载体 + merge-manifest.json 恢复归档前字节
-git restore --source=<pinned_commit> -- .specify/register.md .specify/features/074-goal-team-sdd-unification.md \
+git restore --source=<pinned_commit> --staged --worktree -- .specify/register.md .specify/features/074-goal-team-sdd-unification.md \
   .specify/specs/074-goal-team-sdd-unification/merge-manifest.json .specify/specs/074-goal-team-sdd-unification/tasks.md
-# ③ 移除 apply 新建的归档清单
+# ③ 移除 apply 新建的归档清单（若已暂存，先从索引移除再删工作树文件）
+git rm -f --cached .specify/specs/074-goal-team-sdd-unification/archive-manifest.json 2>/dev/null || true
 rm .specify/specs/074-goal-team-sdd-unification/archive-manifest.json
 # ④ 运行期面按清单 references.runtime[] 逐条把 after 逆写回 before
 git status --porcelain -- .specify/specs/074-goal-team-sdd-unification .specify/register.md
+git diff --exit-code <pinned_commit> -- .specify/specs/074-goal-team-sdd-unification .specify/specs/074a-authorized-routing .specify/specs/074b-nested-governance
 ```
 
-完成判据：父 spec、分片与全部 live 载体的 sha256 等于清单记录的 `before` 值；`git status` 相对回滚前无新增差异。
+完成判据：父 spec、分片与全部 live 载体相对 `pinned_commit` 的树零差异（路径集 = `<parent>` + 每个分片的 **`from`（源）路径**（逆移动后分片所在位置）+ `references.rows[].carrier` 去重后的 live 载体；`git diff --exit-code <pinned_commit> -- <该路径集>` 为空），且清单 `references.rows[]` 的 `before` / `after` 逐行核对成立；`git status` 相对回滚前无新增差异。
 
-**Premises**: ① `pinned_commit` 取自归档清单（apply 前 HEAD）；② 步骤 ② 的路径清单来自清单的 `live-rewrite` 行，示例只列测量到的载体（`register.md`、详情活区、`merge-manifest.json`、父 `tasks.md`），其余载体（`plan.md`、`research.md`、`quickstart.md`、`verification.md`、`review.md`、`code-review.md`、`feature-ref.md`、`contracts/`、`shared` 源/镜像、两个测试载体）按同一形式逐条补入；③ 步骤 ④ 只适用于状态根可见的环境（本 worktree 全部 `absent`，该步为空操作）；④ 示例使用真实父 spec 路径，但**未执行**——夹具版本由 P7 的 rollback 测试执行并断言逐字节恢复。**Pinned by**: `tests/integration/test_seal_archive_round.py::test_rollback_restores_byte_identical_tree`（P7）。
+**Premises**: ① `pinned_commit` 取自归档清单（apply 前 HEAD）；② 步骤 ② 的路径清单来自清单的 `live-rewrite` 行，示例只列测量到的载体（`register.md`、详情活区、`merge-manifest.json`、父 `tasks.md`），其余载体（`plan.md`、`research.md`、`quickstart.md`、`verification.md`、`review.md`、`code-review.md`、`feature-ref.md`、`contracts/`、`shared` 源/镜像、两个测试载体）按同一形式逐条补入；③ 步骤 ④ 只适用于状态根可见的环境（本 worktree 全部 `absent`，该步为空操作）；④ 示例使用真实父 spec 路径，但**未执行**——夹具版本由 P7 的 rollback 测试执行并断言逐字节恢复。**Pinned by**: `tests/integration/test_seal_archive_rollback.py::test_rollback_restores_byte_identical_tree`（P7/P8）。
 
 ---
 

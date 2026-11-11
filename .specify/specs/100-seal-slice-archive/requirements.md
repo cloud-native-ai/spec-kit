@@ -18,7 +18,7 @@
 
 ## Overview
 
-`/speckit.seal` 在 099 中交付了「分片同名输出件合并回写父级 + 封装判定」，但把**分片目录本身的后续处置**明确留给了 non-disposable 复核：099 契约 C-019 写「分片承载物的后续保留/退役 MUST 按 non-disposable 纪律复核后决定，MUST NOT 默认沉默保留」，同时 C-023 / C-008 禁止 merge-apply 与引擎动作表移动、归档或删除 spec 目录。结果是 074 的实测形态（在提交 `48e273d73` 测量）：074a（58 文件 / 约 942 KB）与 074b（54 文件 / 约 827 KB）已全部合并回父级、父级合并清单与指针视图齐备，但两个分片仍作为 `.specify/specs/` 的同级目录存在，被 5 条 `register.md` 推荐行、父 spec 的 143 处路径提及、merge-manifest 的 123 个路径值、框架 owner 文档与 3 个测试文件引用。它们既没有被处置，也没有明确的处置流程——这正是本特性要消除的「合并后残留」。
+`/speckit.seal` 在 099 中交付了「分片同名输出件合并回写父级 + 封装判定」，但把**分片目录本身的后续处置**明确留给了 non-disposable 复核：099 契约 C-019 写「分片承载物的后续保留/退役 MUST 按 non-disposable 纪律复核后决定，MUST NOT 默认沉默保留」，同时 C-023 / C-008 禁止 merge-apply 与引擎动作表移动、归档或删除 spec 目录。结果是 074 的实测形态（在提交 `48e273d73` 测量）：074a（58 文件 / 约 942 KB）与 074b（54 文件 / 约 827 KB）已全部合并回父级、父级合并清单与指针视图齐备，但两个分片仍作为 `.specify/specs/` 的同级目录存在，被 5 条 `register.md` 推荐行、父 `tasks.md` 的 143 处 path-or-name 提及（plan 阶段 R-08 的 path-form 检测式给出更窄读数）、merge-manifest 的 123 个 path-form 值与 449 个裸 slug 名、框架 owner 文档与 3 个测试文件引用。它们既没有被处置，也没有明确的处置流程——这正是本特性要消除的「合并后残留」。
 
 本特性为 `/speckit.seal` 增加一个**分片归档步骤**：在每个分片已完成合并回写后，把它整体移入父 spec 目录下的 `slices/<原分片目录名>/`（[[STR-001]]），用 `git mv` 保留历史；产出一份按 spec 的归档清单 `archive-manifest.json`（[[STR-002]]），逐片记录原路径→归档路径、文件清单与 sha256、以及每一条引用更新/保留记录；确定性改写全部**活引用**，**日期化记录**保持原字节并只经清单的 `from → to` 映射解析，最终「未解析引用 = 0」作为 apply 的合取前置（fail closed）。该步骤在 merge-apply 成功后即可执行，**不依赖最终 `Sealed` 判定**——074 当前就是「合并完成、封装阻断」的真实状态，归档必须能在此状态落地。
 
@@ -32,7 +32,7 @@
 
 **Why this priority**: 这是用户诉求的第一句——把 074a/074b 清理掉而信息不丢。没有这一步，合并回写后的分片永远留在同级目录里，`/speckit.seal` 的流程也就没有终点。
 
-**Independent Test**: 对 074 执行归档；断言两个分片只存在于 `074-goal-team-sdd-unification/slices/` 下、文件数与逐文件 sha256 与归档前一致、`git diff --name-status -M` 对每个文件给出重命名对（无纯删除）、归档清单存在且可复核；重跑 apply 断言 `already-archived`（[[STR-005]]）且零 diff。
+**Independent Test**: 对 074 执行归档；断言两个分片只存在于 `074-goal-team-sdd-unification/slices/` 下、文件数与逐文件 sha256 与归档前一致、`git diff --name-status -M <归档前提交>`（比较基 = apply 不提交时的 `HEAD`；`git mv` 的索引写入不改变该读数）在被移动分片路径集上对每个被移动文件给出重命名对（无纯删除），批次内清单/活引用载体的 A/M 集合单独断言、归档清单存在且可复核；重跑 apply 断言 `already-archived`（[[STR-005]]）且相对重跑前零新增 diff。
 
 **Acceptance Scenarios**:
 
@@ -73,7 +73,7 @@
 1. **Given** 一条 spec 的 merge-apply 成功、最终封装判定为具名阻断，**When** 运行 `/speckit.seal`，**Then** 归档步骤照常先预览后执行，分片进入 `slices/`（[[STR-001]]），阻断清单与归档清单同时存在且互不覆盖。
 2. **Given** 一条 spec 的 merge-apply 被拒绝（开放冲突或分片未闭合），**When** 运行 `/speckit.seal`，**Then** 归档步骤不启动，报告点名上游阻断，零移动、零写入。
 3. **Given** 分片集合为空，**When** 运行归档步骤，**Then** 以 `0` 退出并报告 `not-applicable` 及判定依据，零写入、零清单。
-4. **Given** 完整仓库，**When** 运行命令面审计，**Then** `/speckit.*` 命令名集合与 `COMMAND_BASELINE` 与改动前一致；新增第 32 个命令时守卫转红。
+4. **Given** 完整仓库，**When** 运行命令面审计，**Then** `/speckit.*` 命令名集合与 `COMMAND_BASELINE` 与改动前一致；在 `COMMAND_BASELINE` 之外新增一个命令时守卫转红。
 
 ---
 
@@ -96,10 +96,10 @@
 ### Edge Cases
 
 - **分片集合为空**：归档步骤报告 `not-applicable` 与判定依据，退出 `0`，零写入；不得读作「已归档」。
-- **部分归档**：一个分片在源、另一个在目标，或同一分片两端同时存在：按输入缺陷退出 `2`，点名路径，零写入；不猜测哪一侧为准。
-- **目标目录已存在且源也存在**：`destination-exists` 拒绝（退出 `1`），两侧都不动。
+- **部分归档（跨分片混合）**：一个分片在源、另一个在目标：按输入缺陷退出 `2`（`partial-archive`），点名路径，零写入；不猜测哪一侧为准。
+- **同一分片两端同时存在**：`destination-exists` 拒绝（退出 `1`），两侧都不动（与上一条的跨分片混合是两类状态）。
 - **源与目标都不存在**：合并清单声称的分片在树上找不到：`slice-missing` 输入缺陷（退出 `2`）。
-- **归档后再次运行 merge-plan / merge-apply / seal**：必须通过归档清单发现分片，行为与归档前等价；`merge-apply` 幂等成功且零写入。
+- **归档后再次运行 merge-plan / merge-apply / seal**：按 FR-019 的 manifest-aware 发现规则执行；`merge-apply` 幂等成功且零写入，seal 的 P0 / 闭合清单与归档前逐条一致。
 - **运行期 line registry 缺失**：worktree 中 `.specify/state/` 不可见时记 `absent`，不阻断；主仓可见时更新并留痕。
 - **日期化记录引用旧路径**：保持原字节，经 `from → to` 映射解析；不得为了「看起来干净」改写它们。
 - **活引用位于未声明的载体**：`unclassified-reference` 阻断，先把它纳入契约的载体封闭集或修掉，再重跑。
@@ -116,44 +116,46 @@
 - **FR-002**: 归档目的地 MUST 恰为 `<父 spec 目录>/slices/<原分片目录名>/`（[[STR-001]]）；分片目录名 MUST 原样保留，内部相对树 MUST 原样保留，MUST NOT 扁平化、重命名或改变父子关系。`slices/` 的语义 MUST 在框架布局 owner（`.specify/shared/definitions/framework-map.md` 的 Feature specs 行）登记，MUST NOT 创建无文档目录。
 - **FR-003**: 归档 MUST 是一次**纯移动**：每个分片目录以 `git mv` 语义整体移动，git 变更视图 MUST 对每个文件呈现重命名对，MUST NEVER 呈现纯删除；MUST NOT 复制后删除，MUST NOT 改写分片内任何文件的字节，MUST NOT 在分片内添加标记行。
 - **FR-004**: **零丢失** MUST 可判定：归档前后每个分片的文件数 MUST 相等、逐文件 sha256 MUST 相等、目录内相对路径集合 MUST 相等；归档清单 MUST 逐片记录文件清单与哈希，并记录可复算的聚合摘要。任一不等即归档失败并按原字节回滚。
-- **FR-005**: 归档清单 MUST 每个父 spec 一份，落在父 spec 根目录的固定文件名 `archive-manifest.json`（[[STR-002]]），机器可读、键序稳定（`indent=2, sort_keys=True, ensure_ascii=False`）。核心字段集 MUST 在契约中声明为**封闭集**（未知字段 MUST NOT 写入），且该封闭集 MUST 覆盖：schema 版本、目标 spec、生成者与引擎身份、钉住的归档前提交、分片顺序与顺序依据、逐片 `{slug, from, to, file_count, files[{path, sha256}], merged_into_pointer}`、引用更新台账、检查读数与可复算摘要。清单 MUST NOT 含墙钟时间或依赖运行时刻的字段；同输入两次 plan MUST 逐字节一致。
-- **FR-006**: 归档前置条件 MUST 是合取：合并清单存在且 `merge.status` 为已完成、开放冲突数为 0、每个分片按 099 的既有闭合判据已闭合、父 spec 与分片范围内无本流程之外的未提交改动、每个分片在源与目标中**恰好存在一侧**。任一不成立 MUST 拒绝或按输入缺陷退出，并逐条点名**全部**未满足条件；MUST NOT 只报第一条，MUST NOT 有部分归档。
+- **FR-005**: 归档清单 MUST 每个父 spec 一份，落在父 spec 根目录的固定文件名 `archive-manifest.json`（[[STR-002]]），机器可读、键序稳定（`indent=2, sort_keys=True, ensure_ascii=False`）。核心字段集 MUST 在契约中声明为**封闭集**（未知字段 MUST NOT 写入），且该封闭集 MUST 覆盖：schema 版本、目标 spec、生成者与引擎身份、钉住的归档前提交、分片顺序与顺序依据、逐片条目（字段集 owner：契约 C-203；恰含 `slug`、`from`、`to`、`order`、`file_count`、`files[{path, sha256}]`、`merged_into_pointer`）、引用更新台账、检查读数与可复算摘要。清单 MUST NOT 含墙钟时间或依赖运行时刻的字段；同输入两次 plan MUST 逐字节一致。
+- **FR-006**: 归档前置条件 MUST 是合取：① 合并清单存在、可解析且 `merge.status` 为 `"merged"`（`"not-applicable"` 是分片集为空的具名成功，按 FR-007 以 `0` 报告，不进入本合取）；② 开放冲突数为 0；③ 每个分片按 099 的既有闭合判据已闭合；④ 父 spec 与分片范围内无本流程之外的未提交改动；⑤ 每个分片在源与目标中恰好存在一侧，**且全部分片位于同一侧**（全在源 = 首次归档；全在目标 = 已归档）；跨分片混合（一片在源、一片在目标）与「全在目标但归档清单缺席」均按输入缺陷 `2`（`partial-archive` / `archive-drift`）。任一不成立 MUST 按契约 C-102 的逐项映射以**唯一**退出码结束（前置拒绝 `1` / 输入缺陷 `2`；每个条件的具名 reason 由 C-102 拥有，reason 封闭集 owner = C-103，本 FR 不另列词表）——并逐条点名**全部**未满足条件；MUST NOT 只报第一条，MUST NOT 有部分归档。
 - **FR-007**: 分片集合为空时，归档 MUST 以 `0` 退出并具名报告 `not-applicable` 与判定依据（依据 MUST 来自合并清单或分片发现结果，不得只写「无分片」），MUST NOT 创建空清单，MUST NOT 静默跳过。
-- **FR-008**: 归档 MUST 由既有 seal 引擎的两个新动作构成：只读的 `archive-plan`（[[STR-003]]）与写入的 `archive-apply`（[[STR-004]]）。动作集合的 owner（099 契约 `seal-engine.contract.md` C-001）MUST 在同一次变更内原地修订为「既有四动作 + 这两个动作」，MUST NOT 新建第二个引擎或第二条命令入口。两个动作 MUST 满足既有脚本接口契约：`--help` / `--version` 零副作用、未声明选项以 `2` 拒绝。退出码 MUST 封闭为 `0`（成功或幂等）/ `1`（前置条件拒绝）/ `2`（输入或环境错误），语义与既有 seal 动作一致。
+- **FR-008**: 归档 MUST 由既有 seal 引擎的两个新动作构成：只读的 `archive-plan`（[[STR-003]]）与写入的 `archive-apply`（[[STR-004]]）。动作集合的 owner（099 契约 `seal-engine.contract.md` C-001）MUST 在同一次变更内原地修订为「既有四动作 + 这两个动作」，MUST NOT 新建第二个引擎或第二条命令入口。两个动作 MUST 满足既有脚本接口契约：`--help` / `--version` 零副作用、未声明选项以 `2` 拒绝。退出码 MUST 封闭为 `0`（成功或幂等）/ `1`（前置条件拒绝）/ `2`（输入或环境错误），语义与既有 seal 动作一致；具名结局与拒绝/错误 reason 的封闭集 owner = 契约 C-103，本 FR 不另列 reason 词表。
 - **FR-009**: `archive-apply`（[[STR-004]]）MUST 两阶段执行：先在只读阶段重算与 `archive-plan` 相同的完整计划，只有阻断数为 0 才进入写入；写入 MUST 按批次执行并在失败时按原字节恢复已移动目录与已改写文件，以 `2` 结束，MUST NOT 留下可被读作半归档的状态。拒绝（`1`）MUST 零持久化写入，报告只经 stdout，MUST NOT 创建拒绝记录或第二份台账；同输入重跑 MUST 复现同一阻断清单（顺序稳定）。
-- **FR-010**: 已归档是幂等成功，不是拒绝：当归档清单存在、每个分片位于目标且源侧不存在时，`archive-apply` MUST 以 `0` 退出并具名报告 `already-archived`（[[STR-005]]），不产生第二份清单、不重复移动、不重复改写引用；`archive-plan` 重跑 MUST 报告零待移动、零未解析。
+- **FR-010**: 已归档是幂等成功，不是拒绝：当归档清单存在、可解析并通过 schema 校验、每个分片位于目标且源侧不存在时，`archive-apply` MUST 以 `0` 退出并具名报告 `already-archived`（[[STR-005]]），不产生第二份清单、不重复移动、不重复改写引用；`archive-plan` 重跑 MUST 以同一 `already-archived` 结论报告零待移动、零未解析。清单存在但不可解析或 schema 不符 MUST 按输入缺陷以 `2`（`archive-manifest-invalid`）退出，不得读作 `already-archived`。该已归档判定 MUST 先于 FR-006 的干净树前置求值（本流程自身产物不算「流程之外」的改动）。
 - **FR-011**: 回滚 MUST 可执行且被文档化：归档清单 MUST 携带恢复所需的全部事实（逐片 `from` / `to`、逐文件哈希、逐条引用的 `before` / `after`）；契约与 quickstart MUST 给出确定性的恢复步骤（逆移动 + 逆向引用改写 + 移除清单）。MUST NOT 新增回滚动作或第二个回滚引擎；按文档步骤执行后树 MUST 与归档前逐字节一致，并由测试夹具证明。
 - **FR-012**: 引用分类 MUST 是确定性的封闭判定：每条**命中** MUST 落入 `live-rewrite`（当前指针）/ `dated-preserved`（日期化记录）二值之一；每个被声明的运行期 line registry 载体 MUST 各记一条 `runtime-updated`（存在并更新）或 `absent`（缺席）。载体名册与扫描根 MUST 是封闭集，owner MUST 在本特性的契约中声明；分类 MUST 只依据路径、行前缀、章节边界或文件谓词，MUST NOT 依赖模型对语义的转述判断。任何落在封闭集之外、却仍指向旧分片路径的命中 MUST 成为 `unclassified-reference` 阻断（fail closed）。
 - **FR-013**: **活引用** MUST 在同一 apply 批次内被改写为归档路径。必须覆盖的载体下限为：`.specify/register.md` 的推荐行、特性详情的活指针区、父 spec 的 `plan.md` / `research.md` / `quickstart.md` / `tasks.md` / `verification.md` / `review.md` / `code-review.md` / `feature-ref.md` / `contracts/`、父 `merge-manifest.json` 的路径字段、框架 owner 文档与其 `.specify/` 镜像、以及硬编码分片路径的测试文件。每条改写 MUST 在清单中有 `before` / `after` / `carrier` / `line` 记录。
 - **FR-014**: **日期化记录** MUST 保持原字节不变：至少包括分片内部全部文件、`.specify/memory/**`、`.specify/history/**`、`features.md` 的日期化 Last Updated 叙述、特性详情的时间线章节。它们的旧分片路径 MUST 只经 `archive-manifest.json`（[[STR-002]]）的 `from → to` 前缀映射解析；运行前后哈希 MUST 一致。父 `tasks.md` 的 `> superseded` 拆分账是**当前合并账**，按活引用处理（改路径、不改历史事实）。
 - **FR-015**: 「未解析引用 = 0」MUST 有唯一定义并 fail closed：一条引用被判定为已解析，当且仅当 (a) 其目标路径在树上存在，或 (b) 它是日期化记录中的旧分片路径且该前缀命中归档清单的 `from → to` 映射并落到存在的归档路径。`archive-plan` MUST 报告未解析数；`archive-apply` MUST 在未解析数大于 0 时拒绝；apply 成功后复验 MUST 仍为 0。检查 MUST 覆盖契约声明的扫描根，MUST NOT 只抽查已知载体。
-- **FR-016**: 归档清单 MUST 承载完整的**引用台账**：每条命中一条记录，含载体、行号、`before`、`after` 与二值 `kind`（`live-rewrite` / `dated-preserved`）之一；每个运行期载体另有一条 `runtime-updated` 或 `absent` 记录。闭环算术 MUST 成立——扫描命中总数 = `live-rewrite` + `dated-preserved`；`runtime-updated` + `absent` = 被声明的运行期载体数；移动文件行数 = 归档清单的 `files` 行数。任一行缺失或算术不成立 MUST 阻断。
-- **FR-017**: 运行期 line registry（环境级，git-ignored 的 `.specify/state/**`）MUST 按活指针处理：当状态根可解析且记录存在时，其中的分片路径引用 MUST 在同一批次更新并记 `runtime-updated`；当状态根不可解析或记录缺席时，清单 MUST 记 `absent` 并说明原因，MUST NOT 因此阻断。该更新 MUST NOT 进入版本库提交范围，MUST NOT 改变任何 line 的 `spine_state` 或阶段读数。
-- **FR-018**: 父 `merge-manifest.json` 的更新 MUST 限定为路径字段（至少 `slices[].carrier_tasks`、`dispositions[].evidence[]`、`artifacts[].pointer.paths[]` 与任何其他路径形态的值）；合并结论、计数、冲突、ID 映射与分片顺序 MUST 保持不变；摘要 MUST 按 099 契约 C-034 的既有算法重算，归档清单 MUST 记录更新前后的摘要。MUST NOT 借归档改写 merge-back 语义。
+- **FR-016**: 归档清单 MUST 承载完整的**引用台账**：每条命中一条记录，含载体、行号、`before`、`after` 与二值 `kind`（`live-rewrite` / `dated-preserved`）之一；每个运行期载体另有一条 `runtime-updated` 或 `absent` 记录。闭环算术 MUST 成立——扫描命中总数 = `live-rewrite` + `dated-preserved`；`runtime-updated` + `absent` = 被声明的运行期载体数；移动文件行数 = 归档清单的 `files` 行数。运行期载体引用 MUST NOT 计入扫描命中总数（它们只产生 `references.runtime[]` 行，见 FR-017）。任一行缺失或算术不成立 MUST 阻断。
+- **FR-017**: 运行期 line registry（环境级，git-ignored 的 `.specify/state/**`）MUST 按活指针处理：当状态根可解析且记录存在时，其中的分片路径引用 MUST 在同一批次更新并记 `runtime-updated`（记录存在但零命中也记 `runtime-updated` 并在该行 `updates` 为空数组，表示已核对）；当状态根不可解析或记录缺席时，清单 MUST 记 `absent` 并说明原因，MUST NOT 因此阻断。该更新 MUST NOT 进入版本库提交范围，MUST NOT 改变任何 line 的 `spine_state` 或阶段读数。
+- **FR-018**: 父 `merge-manifest.json` 的更新 MUST 限定为**匹配 `.specify/specs/<任一分片 slug>[/…]` 形态的字符串值**（由引擎对该清单全文做模式扫描枚举，MUST NOT 用手写字段清单代替；匹配集合 = 允许差异集）；匹配集合之外的每个值 MUST 与归档前逐字节一致（摘要字段 `digest` 除外，它按 C-034 重算）；合并结论、计数、冲突、ID 映射与分片顺序 MUST 保持不变；摘要 MUST 按 099 契约 C-034 的既有算法重算，归档清单 MUST 记录更新前后的摘要。MUST NOT 借归档改写 merge-back 语义。
 - **FR-019**: 归档后，`merge-plan` / `merge-apply` / `seal` 的分片发现与载体解析 MUST 先读归档清单，把归档分片视为**同一分片集**：MUST NOT 把归档读成「无分片」，MUST NOT 把归档目录读成新的分片候选，MUST NOT 改变分片顺序依据。归档后重跑 `merge-apply` MUST 幂等成功且零写入；seal 的 P0 / `blocking` / 闭合判定 MUST 继续读取归档后的分片原始记录。该条只扩展解析路径，MUST NOT 改变合并回写与封装判定语义。
 - **FR-020**: 分片归档 MUST NOT 是退休归档：目的地 MUST 只在父 spec 的 `slices/` 子树内（[[STR-001]]），MUST NOT 写入或查询 `.specify/archive/`，MUST NOT 查询 `archive-gate`，MUST NOT 被任何退休入口复用。处置词汇 MUST 复用 non-disposable owner 的既有四值，本次 MUST 只原地补充 `archive` 的「所属父 spec 的 `slices/`」这一目的地形态；MUST NOT 新增第五个处置值、第二份词表或第二个归档引擎。独立 spec 的退休仍归 `/speckit.sanitize` 归档 lane。
 - **FR-021**: 本特性 MUST NOT 新建 `/speckit.*` 命令：`COMMAND_BASELINE` MUST 保持不变，命令名集合 MUST 与改动前逐一相同。归档流程 MUST 固化在既有三件产物内：`templates/commands/seal.md`（及经既有副本生成器产生的逐工具副本）、`skills/internal/seal-artifact/SKILL.md`、`scripts/python/seal-utils.py`；技能 MUST NOT 在引擎判定之外自行给出归档结论。
-- **FR-022**: 流程文档 MUST 同步：命令模板 MUST 说明归档发生在 merge-apply 成功之后、先预览后 apply、封装修阻断不阻断归档、以及拒绝语义；命令参考文档与 quickstart MUST 各给出可执行的归档走查与恢复走查；文档 MUST 按指针引用判定 owner，MUST NOT 复述第二份判定表。
+- **FR-022**: 流程文档 MUST 同步：命令模板 MUST 说明归档发生在 merge-apply 成功之后、先预览后 apply、封装阻断不阻断归档、以及拒绝语义；命令参考文档与 quickstart MUST 各给出可执行的归档走查与恢复走查；文档 MUST 按指针引用判定 owner，MUST NOT 复述第二份判定表。无人值守运行的归档决定 MUST 记入被归档的父 spec（验收回合为 074）的 `test-evidence/` 回合记录（命令、退出码、`outcome`、阻断与实际改写读数）；交互运行 MUST 先展示 `archive-plan` 预览再 apply。
 - **FR-023**: 契约 MUST 原地扩展既有 owner，不建第二套：099 的 `seal-engine.contract.md`（动作集与写面）、`merge-back.contract.md`（分片后续处置与写面边界）、`records-and-boundaries.contract.md`（四向边界与零重复机制）MUST 在同一变更内修订；本特性的契约页只拥有**归档清单 schema、载体分类与解析定义**这三件新事实。
 - **FR-024**: 每条可判定断言 MUST 有契约级或单元级测试（红先或带变异取证），至少覆盖：目的地布局与重命名对、零丢失哈希、清单确定性与闭环算术、引用分类封闭性、活引用改写完整性、日期化记录字节保持、未解析 = 0 的 fail closed、幂等、拒绝语义封闭集、纯移动无删除、归档后 manifest-aware 解析、状态/封装结论不变、无新命令、回滚逐字节恢复、并发写路径互异。测试执行 MUST 走唯一入口 `scripts/bash/run-tests.sh`；只有措辞变化的检查 MUST NOT 计为取证。
-- **FR-025**: 本特性 MUST 交付一次可执行的 **074 回合**：对 `.specify/specs/074-goal-team-sdd-unification/` 执行归档，074a 与 074b MUST 恰好落在 `slices/` 下（[[STR-001]]），归档清单 MUST 存在且零丢失断言成立，活引用 MUST 全部解析、日期化引用 MUST 经映射解析、未解析数 MUST 为 0；074 的注册状态与封装结论（当前为具名阻断）MUST 保持不变；全量测试 MUST 零新增红（按失败 node-id 名单比对，既有红不修不掩）。
+- **FR-025**: 本特性 MUST 交付一次可执行的 **074 回合**：对 `.specify/specs/074-goal-team-sdd-unification/` 执行归档，074a 与 074b MUST 恰好落在 `slices/` 下（[[STR-001]]），归档清单 MUST 存在且零丢失断言成立，活引用 MUST 全部解析、日期化引用 MUST 经映射解析、未解析数 MUST 为 0；074 的注册状态与封装结论（当前为具名阻断）MUST 保持不变；全量测试 MUST 零新增红（按失败 node-id 名单比对，既有红不修不掩；基线 = 实现入口 `/speckit.implement` step 6 以 `--names-out` 捕获、并在该入口提交处钉住的失败 node-id 名单；判据 = 实现后名单去除基线名单后为空，基线名单原样保留）。
 - **FR-026**: 074 回合 MUST 可复现：归档成功后重跑 `archive-plan` MUST 报告零待移动、零未解析；重跑 `archive-apply` MUST 得到 `already-archived`（[[STR-005]]）与零 diff；阻断态下的阻断清单 MUST 逐条稳定，MUST NOT 因重跑顺序改变结论。
-- **FR-027**: **零新增重复机制** MUST 可静态核验：仓库 MUST NOT 因本特性新增第二套处置词表、第二个归档引擎、第二份注册表/台账、调度器或并行 spec 树；归档清单 MUST 每个父 spec 一份单文件，MUST NOT 引入共享可变聚合。两条并行线归档不同 spec 时 MUST 写入不同路径；同一 spec 的并发 apply MUST 由「后到者读清单 → `already-archived`」收敛，MUST NOT 依赖锁文件。
-- **FR-028**: 写面 MUST 封闭且可静态审计：`archive-apply`（[[STR-004]]）只允许写 (a) 分片目录在父 spec 树内的移动，(b) 父 spec 的活引用文件、归档清单与 `merge-manifest.json` 路径字段，(c) 契约声明的框架 owner 文档与镜像、测试文件，(d) 可选且缺席不阻断的运行期 state 记录。MUST NOT 删除文件、MUST NOT push、MUST NOT 改注册表状态或 `seal.md`、MUST NOT 触碰 goal/team 树、MUST NOT 写声明集合之外的路径。静态审计以引擎写路径白名单为准，白名单外的写路径出现时审计测试 MUST 转红。
+- **FR-027**: **零新增重复机制** MUST 可静态核验：仓库 MUST NOT 因本特性新增第二套处置词表、第二个归档引擎、第二份注册表/台账、调度器或并行 spec 树；归档清单 MUST 每个父 spec 一份单文件，MUST NOT 引入共享可变聚合。两条并行线归档不同 spec 时 MUST 写入不同路径；同一 spec 的并发 apply MUST 由「后到者读清单 → `already-archived`」收敛；若清单尚未写出而树已被先到者改动，按输入缺陷以 `2`（`archive-drift` / `partial-archive`）退出，MUST NOT 写第二份清单；MUST NOT 依赖锁文件。
+- **FR-028**: 写面 MUST 封闭且可静态审计：`archive-apply`（[[STR-004]]）只允许写 (a) 分片目录从 `.specify/specs/<slug>` 到 `<父 spec>/slices/<slug>` 的纯移动（源侧移出与目标侧落入属同一移动动作；目标 MUST 限父 spec 的 `slices/` 子树），(b) 契约 C-301 声明的 live 载体名册中的活引用文件（含 `.specify/register.md`、`.specify/features/<ID>.md` 的活区、`.specify/glossary.md`、`.specify/instructions.md`）、归档清单与父 `merge-manifest.json` 路径字段，(c) 契约声明的框架 owner 文档与镜像、测试文件，(d) 可选且缺席不阻断的运行期 state 记录。MUST NOT 删除文件、MUST NOT push、MUST NOT 改注册表状态或 `seal.md`、MUST NOT 触碰 goal/team 树、MUST NOT 写声明集合之外的路径。静态审计以引擎写路径白名单为准，白名单外的写路径出现时审计测试 MUST 转红。
 
 ### Runtime Stack & Dependency Ownership
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | CPython 标准库（移动、哈希、JSON、文本与路径判定） | signed-contract | CPython 上游（本仓只消费） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 归档动作在锁定解释器上跑通 plan/apply 全部分支 | FR-005, FR-008 | EP-001 |
-| RS-002 | `pytest`（契约与单元测试） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有测试依赖 | `pyproject.toml` | `bash scripts/bash/run-tests.sh` 全绿且零新增红 | FR-024 | EP-002 |
-| RS-003 | `git`（`git mv`、`status --porcelain`、`diff --name-status -M`） | signed-contract | git 上游（本仓只消费） | 运行环境既有 git；非 git 工作树按输入错误退出 `2` | `.specify/workflow/git.md` | 重命名对可判、恢复步骤可执行 | FR-003, FR-011 | EP-003 |
-| RS-004 | 既有 seal 引擎与 non-disposable 处置 owner | in-scope | 本特性自身（就地扩展动作集与目的地形态，不新建引擎或词表） | 不适用（无外部版本面） | 不适用（in-scope） | 动作集/写面/边界守卫与静态审计 | FR-020, FR-023 | EP-004 |
+| RS-001 | CPython 标准库（移动、哈希、JSON、文本与路径判定） | signed-contract | CPython 上游（本仓只消费） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 归档动作在锁定解释器上跑通 plan/apply 全部分支 | FR-005, FR-008 | RS-P1 |
+| RS-002 | `pytest`（契约与单元测试） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有测试依赖 | `pyproject.toml` | `bash scripts/bash/run-tests.sh` 结果集减去实现入口钉住的基线失败名单后为空（零新增红；既有红不修不掩） | FR-024 | RS-P2 |
+| RS-003 | `git`（`git mv`、`status --porcelain`、`diff --name-status -M`） | signed-contract | git 上游（本仓只消费） | 运行环境既有 git；非 git 工作树按输入错误退出 `2` | `.specify/workflow/git.md` | 重命名对可判、恢复步骤可执行 | FR-003, FR-011 | RS-P3 |
+| RS-004 | 既有 seal 引擎与 non-disposable 处置 owner | in-scope | 本特性自身（就地扩展动作集与目的地形态，不新建引擎或词表） | 不适用（无外部版本面） | 不适用（in-scope） | 动作集/写面/边界守卫与静态审计 | FR-020, FR-023 | RS-P4 |
+
+**Stack Premises (RS-P1…RS-P4)**: RS-P1 = CPython ≥3.8 标准库足以承载引擎（零第三方依赖）；RS-P2 = pytest 与唯一测试入口 `scripts/bash/run-tests.sh` 可用；RS-P3 = git 工作树与 `git mv` / `status --porcelain` / `diff --name-status -M` 可用（非 git 树按输入错误退出）；RS-P4 = 既有 seal 引擎与 non-disposable owner 可就地扩展（无外部版本面）。
 
 ### Key Entities *(include if requirement involves data)*
 
 - **Archive Manifest（`archive-manifest.json`，[[STR-002]]）**: 每个父 spec 一份的归档记录；承载分片移动对、逐文件清单与哈希、引用台账、检查读数、钉住的提交与可复算摘要。它是「旧路径 → 归档路径」的唯一解析通道。
-- **Archived Slice Entry**: 一个分片的归档条目；含 slug、原路径、归档路径、文件数、逐文件 `{relative_path, sha256}`、以及指回父合并清单的指针。
+- **Archived Slice Entry**: 一个分片的归档条目；含 slug、原路径、归档路径、顺序（`order`）、文件数、逐文件 `{path, sha256}`、以及指回父合并清单的指针。
 - **Reference Update Row**: 一条引用处置记录；含载体路径、行号、`before`、`after`、二值 `kind`（`live-rewrite` / `dated-preserved`）；运行期载体另有 `runtime-updated` / `absent` 记录。
 - **Runtime State Record**: 环境级、git-ignored 的 line registry 记录；存在时按活指针更新，缺席时在清单中记 `absent`，不改变任何状态读数。
 
@@ -161,20 +163,20 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 074 真实验收通过：归档后 074a 与 074b 恰好位于 `.specify/specs/074-goal-team-sdd-unification/slices/` 下（[[STR-001]]），文件数与逐文件 sha256 与归档前一致（运行时探针计数，不写死点值），`archive-manifest.json`（[[STR-002]]）存在且可复核，git 变更视图对每个文件给出重命名对且零纯删除；074 的注册状态与封装结论保持不变。 **Path**: final
-- **SC-002**: 零丢失与幂等成立：归档前后逐文件哈希一致；归档成功后重跑 apply 得到 `already-archived`（[[STR-005]]）与零 diff，重跑 plan 得到零待移动、零未解析；把任一文件内容注入变异后哈希检查转红。 **Path**: final
+- **SC-001**: 074 真实验收通过：归档后 074a 与 074b 恰好位于 `.specify/specs/074-goal-team-sdd-unification/slices/` 下（[[STR-001]]），文件数与逐文件 sha256 与归档前一致（运行时探针计数，不写死点值），`archive-manifest.json`（[[STR-002]]）存在且可复核，`git diff --name-status -M HEAD` 变更视图（读数在 archive 批次提交前捕获，`HEAD` = 归档前提交）在被移动分片路径集上对每个被移动文件给出重命名对且零纯删除，批次内其余写入（清单 A、merge-manifest/live 载体 M）按声明的 A/M 集合断言、全局零 D；074 的注册状态与封装结论保持不变。 **Path**: final
+- **SC-002**: 零丢失与幂等成立：归档前后逐文件哈希一致；归档成功后重跑 apply 得到 `already-archived`（[[STR-005]]）且相对重跑前零新增 diff，重跑 plan 得到零待移动、零未解析；把任一文件内容注入变异后哈希检查转红。 **Path**: final
 - **SC-003**: 引用完整性 fail closed：活引用全部指向存在的归档路径；日期化引用保持原字节且经清单映射解析；未解析数为 0；注入一条指向旧路径的活引用、或从清单移除一个 `from → to` 映射时，检查 MUST 转红。 **Path**: final
-- **SC-004**: 流程集成成立：对封装判定为具名阻断的夹具 spec，`/speckit.seal` 在 merge-apply 成功后仍执行归档；`archive-plan`（[[STR-003]]）与 `archive-apply`（[[STR-004]]）的预览/写入计划一致；退出码封闭为 `0/1/2`；`COMMAND_BASELINE` 不变，新增第 32 个命令时守卫转红。 **Path**: final
+- **SC-004**: 流程集成成立：对封装判定为具名阻断的夹具 spec，`/speckit.seal` 在 merge-apply 成功后仍执行归档；`archive-plan`（[[STR-003]]）与 `archive-apply`（[[STR-004]]）的预览/写入计划一致（比较单元 = apply 只读阶段重算的规范化计划 JSON 的 sha256，与 plan 负载中同一计划的 sha256 相等）；退出码封闭为 `0/1/2`；`COMMAND_BASELINE` 不变，在 `COMMAND_BASELINE` 之外新增一个命令时守卫转红。 **Path**: final
 - **SC-005**: 边界不越权：归档前后注册表状态、特性详情状态、`seal.md`（若存在）与合并结论/计数/冲突不变；仓库中不存在本特性造成的删除、push、goal/team 写入或 `.specify/archive/` 写入；把一次删除或一次状态写入注入引擎后静态审计转红。 **Path**: supporting
 - **SC-006**: 确定性成立：同一夹具树两次 `archive-plan` 的清单逐字节一致；成功 apply 重跑零 diff；把任一排序改成按文件系统时间或返回时刻时测试转红。 **Path**: supporting
 - **SC-007**: 清单完整性与闭环算术成立：每个被移动文件在清单中有且仅有一行；每条引用命中在台账中有且仅有一行；`扫描命中总数 = live-rewrite + dated-preserved`、`runtime-updated + absent = 被声明的运行期载体数`、`移动文件行数 = files 行数` 三组两侧复算相等；删掉任一行时检查转红。 **Path**: supporting
 - **SC-008**: 运行期 line registry 处置有效：记录存在时其分片路径被更新并记 `runtime-updated`；记录缺席时记 `absent` 且不阻断；两种情形各有夹具，把缺席改成阻断时测试转红。 **Path**: supporting
-- **SC-009**: 单一机制与并发安全成立：仓库中不存在第二套处置词表、第二个归档引擎或第二份按 spec 的归档清单；两个夹具 spec 并发归档写入不同路径；把一份清单复制成共享聚合时测试转红。 **Path**: supporting
+- **SC-009**: 单一机制与并发安全成立：仓库中不存在**本特性新增的**第二套处置词表、第二个归档引擎或第二份按 spec 的归档清单（基线中既有的 sanitize 五值处置集与 non-disposable 四值词表按原样保留；基线参照物 = 改动前仓库状态）；两个夹具 spec 并发归档写入不同路径；把一份清单复制成共享聚合时测试转红。 **Path**: supporting
 - **SC-010**: 回滚可执行：按契约/quickstart 文档的恢复步骤执行后，树与归档前逐字节一致（分片位置、活引用、清单存在性全部恢复）；跳过任一步骤时夹具断言转红。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 074 回合的 run 记录：归档前后逐文件 sha256 清单、`git diff --name-status -M` 输出、`archive-manifest.json`、状态面快照；读数写入 `test-evidence/`。
+- **SC-001 Source**: 074 回合的 run 记录：归档前后逐文件 sha256 清单、`git diff --name-status -M HEAD` 输出（在 archive 批次提交前捕获）、`archive-manifest.json`、状态面快照；读数写入 `test-evidence/`。
 - **SC-002 Source**: 同一回合的前后哈希对照、重跑 apply/plan 的退出码与 `git diff --stat` 零输出；内容变异夹具的转红实测。
 - **SC-003 Source**: 解析检查的机读报告（未解析计数、`live-rewrite` / `dated-preserved` 行数）、注入悬空引用与移除映射两类变异实测。
 - **SC-004 Source**: 阻断态夹具与 merge-apply 拒绝夹具的引擎输出与退出码；`COMMAND_BASELINE` 审计与命令名集合对照。
@@ -187,7 +189,7 @@
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
-| String ID | Value (verbatim) | Consumed by |
+| String ID | Value (verbatim) | Primary consumers (non-exhaustive; [[STR-NNN]] markers remain authoritative) |
 |-----------|------------------|-------------|
 | `STR-001` | `"slices"` | FR-002, FR-020, SC-001 |
 | `STR-002` | `"archive-manifest.json"` | FR-005, FR-014, SC-001 |

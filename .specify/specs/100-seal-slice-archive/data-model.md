@@ -91,7 +91,7 @@
 
 | 字段 | 类型 | 含义 |
 |------|------|------|
-| `preconditions` | object | FR-006 五条件的具名布尔读数：`merge_status`、`open_conflicts`、`slices_closed`、`dirty_spec_tree`、`side_presence` |
+| `preconditions` | object | FR-006 五条件的具名读数：`merge_status`（string：`merged`/`not-applicable`）、`open_conflicts`（int）、`slices_closed`（bool）、`dirty_spec_tree`（bool）、`side_presence`（object：逐 slug → `source`/`destination`/`both`/`missing`） |
 | `moved_files` | int | 移动文件行数；MUST 等于全部 `files` 行数之和 |
 | `live_rewrite` / `dated_preserved` / `unclassified` | int | 引用台账的三类计数；`unclassified` MUST 为 0 |
 | `unresolved_before` / `unresolved_after` | int | plan 时与 apply 后复验的未解析数；两者 MUST 为 0 |
@@ -102,12 +102,12 @@
 
 ## 7. E8 — Archive Action Verdict（stdout）
 
-`--json` 负载沿用 099 引擎的 `_payload` 形态：`{action, spec_dir, verdict, outcome, exit, conditions[], …}`。本特性的 `verdict` 封闭为 `ok` / `refused` / `error`；成功语义的**具名结论**由独立字段 `outcome` 承载，封闭四值 `would-archive`（仅 `archive-plan`）/ `archived` / `already-archived` / `not-applicable`；`refused` 与 `error` 的 `outcome` 为 `null`，其具名 reason 集见 `contracts/archive-actions.contract.md` C-103。**拒绝（exit 1）与错误（exit 2）零持久化**：无拒绝记录、无空清单、无第二份台账。
+`--json` 负载沿用 099 引擎的 `_payload` 形态：`{action, spec_dir, verdict, outcome, exit, conditions[], …}`。本特性的 `verdict` 封闭为 `ok` / `refused` / `error`；成功语义的**具名结论**由独立字段 `outcome` 承载，封闭四值 `would-archive`（仅 `archive-plan`，表示可执行且无阻断）/ `archived` / `already-archived`（apply 幂等；`archive-plan` 在已归档树上也 MUST 报告该结论，零待移动、零未解析、零写入）/ `not-applicable`；`refused` 与 `error` 的 `outcome` 为 `null`，其具名 reason 集见 `contracts/archive-actions.contract.md` C-103。**拒绝（exit 1）与错误（exit 2）零持久化**：无拒绝记录、无空清单、无第二份台账。
 
 ## 8. E9 — Merge Manifest Path-Field Amendment
 
-- **只改**字符串值中形如 `.specify/specs/<slug>[/…]` 的路径（至少 `slices[].carrier_tasks`、`dispositions[].evidence[]`、`artifacts[].pointer.paths[]` 与任何同形值）。
-- **不改**裸 slug（`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键）、合并结论、计数、冲突、ID 映射、分片顺序与 `retention`。
+- **只改**匹配 `.specify/specs/<任一分片 slug>[/…]` 形态的字符串值（引擎对清单全文做模式扫描枚举；匹配集合 = 允许差异集；`slices[].carrier_tasks`、`dispositions[].evidence[]`、`artifacts[].pointer.paths[]` 只是已知实例）。
+- **不改**匹配集合之外的每个值（含裸 slug：`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键）、合并结论（`merge`）、`checks` 计数字段、冲突、ID 映射、分片顺序与 `retention`。
 - `digest` 按 C-034 原算法重算；E3 的 `merge_manifest.digest_before/after` 记录前后值。
 
 ## 9. 状态机（归档生命周期）
@@ -116,18 +116,21 @@
 (no manifest, all slices at source)      --archive-plan--> would-archive（只读）
 would-archive --archive-apply--> archived（写批次成功；manifest 落盘）
 archived      --archive-apply--> already-archived（exit 0；零写入）
+archived      --archive-plan--> already-archived（exit 0；只读；零待移动零未解析）
 any state     --refusal (exit 1)--> unchanged（零持久化）
 any state     --input error (exit 2)--> unchanged（写批次内失败则按原字节恢复）
-(no manifest, slices split across sides) --任何动作--> partial-archive (exit 2)
-(manifest, tree disagrees with manifest) --任何动作--> archive-drift (exit 2)
-empty slice set                          --任何动作--> not-applicable (exit 0；零写入零清单)
+(no manifest, same slice both sides)     --任何动作--> destination-exists (exit 1)
+(no manifest, slice absent both sides)   --任何动作--> error (reason: slice-missing; exit 2)
+(no manifest, slices split across sides) --任何动作--> error (reason: partial-archive; exit 2)
+(manifest, tree disagrees with manifest) --任何动作--> error (reason: archive-drift; exit 2)
+empty slice set                          --任何动作--> not-applicable (exit 0；零写入零清单；先于上述 no-manifest 行求值)
 ```
 
 ## 10. 校验规则
 
 - **V1** 目的地恰为 `<spec_path>/slices/<slug>`；目录名与内部相对树不变（FR-002）。
-- **V2** 纯移动：每个被移动文件在 `git diff --name-status -M` 中是一条重命名对，零纯删除（FR-003）。
-- **V3** 每个分片在源与目标中恰在一侧；双侧 → `destination-exists`（exit 1）；双侧皆无 → `slice-missing`（exit 2）（FR-006；Edge Cases）。
+- **V2** 纯移动：在被移动分片路径集上，每个被移动文件在 `git diff --name-status -M <pinned_commit>` 中是一条重命名对，零纯删除（比较基 = apply 前提交；`git mv` 的索引写入不改变该读数）；批次内清单 A 与活引用载体 M 按声明集合断言，全局零 D（FR-003）。
+- **V3** 每个分片在源与目标中恰在一侧；同一分片双侧 → `destination-exists`（exit 1）；同一分片双侧皆无 → `slice-missing`（exit 2）；跨分片混合（一片在源、一片在目标）→ `partial-archive`（exit 2）（FR-006；Edge Cases）。
 - **V4** 零丢失：`file_count`、逐文件 `sha256`、相对路径集合归档前后相等；不等即失败并回滚（FR-004）。
 - **V5** 清单字段是封闭集；未知字段 MUST NOT 写入；读取侧遇未知或缺失字段 exit 2（FR-005）。
 - **V6** 清单无墙钟字段；同输入两次 plan 逐字节一致（FR-005、SC-006）。
@@ -137,8 +140,8 @@ empty slice set                          --任何动作--> not-applicable (exit 
 - **V10** 运行期载体各一行 `runtime-updated` / `absent`；缺席不改退出码（FR-017）。
 - **V11** 合并清单只改路径形态值；摘要按 C-034 重算并记录前后值（FR-018）。
 - **V12** 归档后 `merge-plan` / `merge-apply` / `seal` 的分片集、顺序与 P0 读取面不变（FR-019）。
-- **V13** 写面白名单封闭：移动仅 `archive-apply` 且目标限父 spec 的 `slices/`；无删除 / push / 状态写（FR-028）。
-- **V14** 回滚按文档步骤后，父 spec、分片与全部 live 载体的 sha256 等于清单记录的 `before` 值（FR-011、SC-010）。
+- **V13** 写面白名单封闭：移动仅 `archive-apply` 且目标限父 spec 的 `slices/`；无删除 / push / **注册表状态写**（「状态写」= 对 `.specify/features.md`、特性详情状态、父 spec 的 `seal.md` 回执的状态字段写入；`.specify/register.md` 的推荐行文本改写属活引用改写，不属本项；`.specify/state/**` 的运行期载体更新按 FR-017 单独允许且不属本项）（FR-028）。
+- **V14** 回滚按文档步骤后，父 spec、分片与全部 live 载体相对 `pinned_commit` 的树零差异（`git diff --exit-code <pinned_commit> -- <parent> <slices> <live carriers>` 为空），且清单 `references.rows[]` 的 `before` / `after` 逐行核对成立（FR-011、SC-010）。
 
 ## 11. 实体 → 条款映射
 

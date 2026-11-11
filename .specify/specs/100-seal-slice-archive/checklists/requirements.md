@@ -33,7 +33,7 @@
 ## Notes
 
 - **Implementation-detail exception**: 本规格点名 `templates/commands/seal.md`、`skills/internal/seal-artifact/SKILL.md`、`scripts/python/seal-utils.py`、`archive-manifest.json` 等既有/新增表面，原因是用户需求本身固定了「固化进 `/speckit.seal`」「不新建命令」「复用既有引擎」这些交付边界；这些是实现约束，不是被偷渡的新运行时/API/存储设计。房内先例：099 的同项按相同方式解决。
-- **Checker evidence**: `test-evidence/validate-requirements.txt`（requirements 阶段读数 218 行）与 `test-evidence/clarify-gates.txt`（clarify 复核读数 229 行）— `status: ok`；0 error / 0 warning；38 条定义行（28 FR + 10 SC）/ 5 shared strings；ID 连续、文档序递增、引用可解析（含 Shared Strings 双向一致）、零活动澄清标记、零重复 ID、每条 SC 恰好一个行尾 `**Path**` 标记且含 `final`。
+- **Checker evidence**: `test-evidence/validate-requirements.txt`（requirements 阶段读数 218 行）与 `test-evidence/clarify-gates.txt`（clarify 复核读数 229 行）— `status: ok`；0 error / 0 warning；38 条定义行（28 FR + 10 SC）/ 5 shared strings；ID 连续、文档序递增、引用可解析（含 Shared Strings 双向一致）、零活动澄清标记、零重复 ID、每条 SC 恰好一个行尾 `**Path**` 标记且取值 ∈ {`final`, `supporting`}（实测 final=4 / supporting=6）。
 - **Gate evidence (requirements stage)**: `test-evidence/pre-analyze-requirements.txt` — `decision=pass`，errors=0，advisories=5，全部是未来路径：`.specify/state/` 在本 worktree 不可见（git-ignored，运行时目录）、`.specify/specs/074-goal-team-sdd-unification/slices/` 尚未创建（本特性的产出目标）；其中 2 条来自本清单对同一路径的引用，与规格正文的 3 条同源。计数 **28 FR / 10 SC**。
 - **Decomposition evidence**: `test-evidence/decomposition-plan.txt` — `decision=proceed`（`fr_count=28`，ceiling 120）；plan 门无需拆分。
 - **Flow Class evidence**: `test-evidence/flow-class-lookup.txt` — `flow_class: execution`，`source: declaration`（验收 oracle 是程序：引擎动作、清单算术、引用解析与契约测试均可被机器执行/校验）。
@@ -42,3 +42,4 @@
 - **Related Feature**: 已绑定 Feature 099（Speckit Seal）by the 2026-11-11 `/speckit.clarify` Mode A session; the Feature Binding Rules' registry duties（`features.md` 099 行 Last Updated + `features/099-speckit-seal.md` § Related Specifications/Requirements）were discharged in the same pass. 099 状态保持 `Ready for Review`。
 - **Self-decided clarifications**（无人值守 requirements 阶段，记录于规格的 `## Clarifications`）：触发点 = merge-apply 成功且不依赖 `Sealed`；目的地与清单形态；活引用/日期化引用的两分与「未解析 = 0」的映射解析定义；分片归档不是退休、不查 `archive-gate`；运行期 state 缺席不阻断。
 - **Clarify-stage rulings**（2026-11-11，无人值守自我裁决，记录于规格的 `## Clarifications`）：新增 5 条 Q/A——触发与顺序边界、引用分类谓词与 dated-record 豁免判据、清单 schema/校验器/074 验收读数、回滚分层、non-disposable/sanitize/archive-gate 关系；FR/SC/STR 计数不变（28 / 10 / 5）。
+- **Analyze-stage annotation（2026-11-11，dated record）**: 本文件是 requirements 阶段记录。稍后的 dated quality checklist（`2026-11-11-requirements-quality.md`）记录 11 fail / 18 observe；这些条目由同日 analyze 运行裁决并回修，修复记录与逐条处置见 `test-evidence/analyze-merged-2026-11-11.md` 与 `test-evidence/analyze-dispositions.md`。dated checklist 的 fail 判定位保留为分析前读数；上方 `[x]` 判定位保留为 requirements 阶段读数，两者都不因后续阶段而重打分。

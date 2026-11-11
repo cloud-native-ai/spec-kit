@@ -3,7 +3,7 @@
 **Feature**: 100-seal-slice-archive（`/speckit.seal` 的分片归档步骤）——**bound Feature 099 Speckit Seal**
 **Spec directory**: `.specify/specs/100-seal-slice-archive/`
 **Binding**: `spec:100-seal-slice-archive` → Feature **099**（`/speckit.clarify` Mode A under shared/workflow/feature-integration.md § Feature Binding Rules）；`flow_class=execution`（注册声明，不是推断）
-**Delivery surface**: 既有三件产物内的增量 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py`；2 份既有 owner 页 + 6 条 099 契约条款原地修订；3 份新契约页；074 回合产物与测试。
+**Delivery surface**: 既有三件产物内的增量 `templates/commands/seal.md` + `skills/internal/seal-artifact/SKILL.md` + `scripts/python/seal-utils.py`；2 份既有 owner 页（`non-disposable-definitions.md`、`framework-map.md`）+ `sdd-routing-definitions.md` 的 074 live 指针修订 + 6 条 099 契约条款原地修订；3 份新契约页；074 回合产物与测试。
 **Authority**: `requirements.md`（28 FR / 10 SC / 5 STR / 5 条 Clarifications）是意图 owner；`contracts/` 是符合性 owner；`plan.md` 是设计 owner。本页只映射，不复述规则。
 
 ## Feature registration（本阶段）
@@ -74,7 +74,7 @@ Output at plan time: 28 lines, `FR-001`…`FR-028`, zero missing (the enumeratio
 
 | SC | 首红模块 | 变异取证 |
 |----|----------|----------|
-| SC-001 | `tests/integration/test_seal_archive_round.py` | 归档前后文件数/sha256/相对路径集合；`git diff --name-status -M` 零纯删除；清单可复核 |
+| SC-001 | `tests/integration/test_seal_archive_round.py` | 归档前后文件数/sha256/相对路径集合；分片路径集上 `git diff --name-status -M HEAD` 零纯删除（清单/活引用载体按 A/M 集合断言）；清单可复核 |
 | SC-002 | `tests/integration/test_seal_archive_idempotency.py` + `tests/contract/test_seal_archive_apply.py` | 重跑 `already-archived` 零 diff；内容变异使哈希检查转红 |
 | SC-003 | `tests/contract/test_seal_archive_plan.py` | 活/日期化/未分类三类夹具；注入悬空引用与移除映射转红 |
 | SC-004 | `tests/integration/test_seal_archive_round.py`（阻断态） + `tests/contract/test_seal_engine_contract.py` | 阻断态照常归档、merge 拒绝不启动；`COMMAND_BASELINE` 对照 |
@@ -83,7 +83,7 @@ Output at plan time: 28 lines, `FR-001`…`FR-028`, zero missing (the enumeratio
 | SC-007 | `tests/contract/test_seal_archive_manifest.py` | 三组闭环算术；删行变异转红 |
 | SC-008 | `tests/contract/test_seal_archive_apply.py` | 运行期存在/缺席两类夹具；缺席转阻断变异转红 |
 | SC-009 | `tests/contract/test_seal_boundaries.py` + 并发夹具 | 单一机制静态审计；双写路径互异；聚合变异转红 |
-| SC-010 | `tests/integration/test_seal_archive_round.py`（rollback） | 回滚前后树哈希对照；跳过步骤转红 |
+| SC-010 | `tests/integration/test_seal_archive_rollback.py`（独立回滚测试） | 回滚前后树哈希对照；跳过步骤转红 |
 
 ## Delivery surface（供 `/speckit.tasks` 与 overlap-check 消费）
 
@@ -108,8 +108,12 @@ tests/contract/test_seal_archive_manifest.py
 tests/contract/test_sdd_compat_containment.py
 tests/contract/test_sdd_diffusion.py
 tests/integration/test_seal_archive_round.py
+tests/integration/test_seal_archive_rollback.py
 tests/integration/test_seal_archive_idempotency.py
 tests/integration/test_seal_074_round.py
+tests/unit/test_seal_archive_classify.py
+tests/unit/test_seal_archive_manifest_math.py
+tests/unit/test_seal_archive_schema.py
 tests/fixtures/seal-archive/
 ```
 

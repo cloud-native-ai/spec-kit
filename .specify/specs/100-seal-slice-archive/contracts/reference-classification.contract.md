@@ -9,8 +9,8 @@
 
 | 扫描根 | 分类归属 |
 |--------|----------|
-| `.specify/specs/<parent>/`（递归） | 正式活文档 = live；`notes/**`、`test-evidence/**`、`checklists/**` = dated；`slices/**`（归档后）= dated；`merge-manifest.json` = 仅路径形态值 live；`archive-manifest.json` 与父级 `seal.md` 自身**排除**（前者是映射 owner，后者由 seal 拥有且归档不改写） |
-| `.specify/specs/<slug>/`（每个分片；归档后按其 `to` 位置） | dated（分片内部全部文件） |
+| `.specify/specs/<parent>/`（递归） | 正式活文档 = live；`notes/**`、`test-evidence/**`、`checklists/**` = dated；`slices/**`（归档后）= dated；`merge-manifest.json` = 仅字符串值中匹配 F1/F2 的 path-form 值 live（键名与非 path-form 字符串不计为命中）；`archive-manifest.json` 与父级 `seal.md` 自身**排除**（前者是映射 owner，后者由 seal 拥有且归档不改写） |
+| `.specify/specs/<slug>/`（每个分片；归档**前**按源路径扫描；归档后只由父根递归扫描，不再单独扫描，避免同一命中两行） | dated（分片内部全部文件） |
 | `.specify/register.md` | live |
 | `.specify/features.md` | dated |
 | `.specify/features/<ID>.md` | 混合（按 C-304 章节谓词） |
@@ -26,13 +26,13 @@
 
 **C-302** — 引用形态封闭为三类；裸 slug 不是引用。
 
-一个「引用」是一次命中下列形态之一的文本：
+一个「引用」是一次命中下列形态之一的文本（`<slug>` MUST ∈ 清单 `archive-manifest.slices[].slug`）：
 
-- **F1（spec-root 全路径）**：`.specify/specs/<slug>`，可带 `/…` 尾巴。
-- **F2（父 spec 内相对路径）**：`<slug>/…`，且前一字符不是标识符字符（字母、数字、`_`、`-`）。F2 只在载体位于 `.specify/specs/<parent>/` 子树内时被识别。
-- **F3（测试构造行）**：仅在 `tests/**` 中，一个 slug 字符串字面量出现在同一行同时含 `.specify` 与 `specs` 的行上（路径构造式）。
+- **F1（spec-root 全路径）**：`.specify/specs/<slug>`，可带 `/…` 尾巴；左边界为行首或非路径延续字符（`/` 与 `.` 不构成左边界，排除绝对路径与 `../<slug>`），右边界为字符串结束、`/` 或非标识符字符。
+- **F2（父 spec 内相对路径）**：`<slug>/…`，前一字符不是标识符字符（字母、数字、`_`、`-`）且不是 `/`（排除 `../<slug>` 与绝对路径中的同名段）；F2 只在载体位于 `.specify/specs/<parent>/` 子树内时被识别。
+- **F3（测试构造式）**：仅在 `tests/**` 中，一个 slug 字符串字面量是**路径构造表达式**的组成部分——该表达式以 `Path` 连接、字符串拼接、f-string 或整路径字面量的形式同时含 `.specify` 与 `specs` 段；identity 比较（如 `assert make(".specify/specs/<slug>") == "<slug>"`）的右侧字面量不在路径表达式中，不计为 F3、MUST NOT 被改写。
 
-裸 slug 出现（后方无 `/`、前方无 `.specify/specs/`）MUST NOT 计为引用：`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键、`<!-- source: <slug> -->` 标注一律保持原字节。落在三类之外的路径形态（绝对路径、`../<slug>`、跨行拼接等）在扫描根内命中 MUST 成为 `unclassified-reference` 阻断（fail closed）。
+F1 与 F2 同时可匹配时 MUST 取最长匹配 F1；F1 与 F3 同时可匹配时取 F1；F2/F3 只在未被 F1 覆盖的跨度上识别；同一命中恰产生一条台账行与一次改写。裸 slug 出现（不满足三类形态）MUST NOT 计为引用：`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键、`<!-- source: <slug> -->` 标注一律保持原字节。绝对路径与 `../<slug>` 不属三类形态；若扫描根内某行包含**源路径形态**（`.specify/specs/<slug>` 或 `../<slug>`）但该行不构成 F1/F2/F3（例如被绝对路径前缀或跨行拼接拆开），该命中 MUST 报 `unclassified-reference`。跨行拼接按载体级检查：载体含源路径的两段但任何单行都不构成三类形态 → 该载体报 `unclassified-reference`。改写后的归档路径（`.specify/specs/<parent>/slices/<slug>`）与 identity 裸 slug 常量不含源路径形态，MUST NOT 触发本项（保证 apply 后复验与重跑幂等）。
 
 (FR-012)
 
@@ -56,13 +56,13 @@
 
 **C-306** — 日期化豁免的四条件同时成立才是 `dated-preserved`。
 
-一个命中被计为 `dated-preserved`，当且仅当：(a) 其载体 ∈ dated 封闭集，或位于混合载体的 dated 章节；(b) 命中文本包含清单映射中的某个 `from` 前缀（或其父内相对形态）；(c) 该文件归档前后 sha256 相等；(d) 映射后的目标在树上存在。四条之外 MUST NOT 记 `dated-preserved`；MUST NOT 以「读起来像历史」、文件名直觉或任何模型判断替代上述四条。
+一个命中被计为 `dated-preserved`，当且仅当：(a) 其载体 ∈ dated 封闭集，或位于混合载体的 dated 章节；(b) 命中文本包含清单映射中的某个 `from` 前缀（或其父内相对形态）；(c) 该文件归档前后 sha256 相等；(d) 映射后的目标存在——**plan 期**按计划的投影归档树判定（目标 = `to` 路径，由同一计划创建），**apply 后**按真实树判定。四条之外 MUST NOT 记 `dated-preserved`；MUST NOT 以「读起来像历史」、文件名直觉或任何模型判断替代上述四条。
 
 (FR-012, FR-014)
 
 **C-307** — 「未解析引用 = 0」的唯一定义与 fail closed。
 
-一条引用被判定为**已解析**，当且仅当：(a) 其目标路径在树上存在；或 (b) 它是 `dated-preserved` 行，其旧前缀命中归档清单的 `from → to` 映射并落到存在的归档路径。两者之外即未解析。`archive-plan` MUST 报告未解析数；`archive-apply` MUST 在未解析数大于 0 时拒绝（`unresolved-references`，exit `1`）；apply 成功后复验 MUST 仍为 0。
+一条引用被判定为**已解析**，当且仅当：(a) 其目标路径存在（plan 期的 live 目标按真实树、dated 目标按投影归档树；apply 后两者均按真实树）；或 (b) 它是 `dated-preserved` 行，其旧前缀命中归档清单的 `from → to` 映射并落到存在的归档路径。两者之外即未解析。`archive-plan` MUST 报告未解析数；`archive-apply` MUST 在未解析数大于 0 时拒绝（`unresolved-references`，exit `1`）；apply 成功后复验 MUST 仍为 0。
 
 (FR-015)
 
@@ -74,19 +74,19 @@
 
 **C-309** — 运行期载体的声明集与缺席语义。
 
-声明的运行期载体恰为 `.specify/state/<parent>.md` 与每个分片的 `.specify/state/<slug>.md`（合计 1 + 分片数）。每个载体 MUST 各记一条 `runtime-updated`（状态根可解析且记录存在时，其中的分片路径引用在同一批次更新，逐条记 `line` / `before` / `after`）或 `absent`（状态根不可解析或记录缺席，附原因）。该更新 MUST NOT 进入版本库提交范围，MUST NOT 改变任何 line 的 `spine_state` 或阶段读数；`absent` MUST NOT 阻断。
+声明的运行期载体恰为 `.specify/state/<parent>.md` 与每个分片的 `.specify/state/<slug>.md`（合计 1 + 分片数）。每个载体 MUST 各记一条 `runtime-updated`（状态根可解析且记录存在时，其中的分片路径引用在同一批次更新，逐条记 `line` / `before` / `after`；记录存在但零命中时也记 `runtime-updated`，`updates` 为空数组表示已核对）或 `absent`（状态根不可解析或记录缺席，附原因）。该更新 MUST NOT 进入版本库提交范围，MUST NOT 改变任何 line 的 `spine_state` 或阶段读数；`absent` MUST NOT 阻断。
 
 (FR-017)
 
 **C-310** — 框架 owner 文档与镜像同批处理。
 
-`shared/**` 源与 `.specify/shared/**` 镜像是两个独立 live 载体：同一逻辑引用在两处各记一行台账，且 MUST 在同一 apply 批次内被改写为相同文本。MUST NOT 只改一侧；镜像侧的写入 MUST 与 `sync-mirrors.py` 的逐字节一致纪律相容（源与镜像最终同字节）。
+`shared/**` 源与 `.specify/shared/**` 镜像是两个独立 live 载体：同一逻辑引用在两处各记一行台账，且 MUST 在同一 apply 批次内被改写为相同文本。MUST NOT 只改一侧；镜像侧的写入 MUST 与 `sync-mirrors.py` 的逐字节一致纪律相容（源与镜像最终同字节）。若同一逻辑引用在源与镜像任一改写后不逐字节一致（含只改一侧），`archive-apply` MUST 以 `2`（`mirror-copy`）结束并按原字节恢复该批。
 
 (FR-013)
 
 **C-311** — 测试载体按构造行谓词判定。
 
-`tests/**` 中的 F3 命中 MUST 由引擎把 slug 字面量改写为 `<parent>/slices/<slug>`，使路径构造式在归档后仍指向存在的目录。仅作 identity 使用的 slug 常量（例如断言合并清单 `slug` 字段的常量）MUST NOT 被改写。测试文件的改写在台账中按 `live-rewrite` 记录；改写后该测试 MUST 仍能解析其声明的载体路径。
+`tests/**` 中的 F3 命中 MUST 由引擎把路径构造表达式内的 slug 字面量改写为 `<parent>/slices/<slug>`，使路径构造式在归档后仍指向存在的目录。identity 比较右侧的 slug 字面量（如 `assert make(".specify/specs/<slug>") == "<slug>"`）不属 C-302 F3 的路径表达式，MUST NOT 被改写；声明为独立常量的裸 slug 按 C-302 不计为引用，MUST NOT 改写。测试文件的改写在台账中按 `live-rewrite` 记录；改写后该测试 MUST 仍能解析其声明的载体路径。
 
 (FR-013)
 

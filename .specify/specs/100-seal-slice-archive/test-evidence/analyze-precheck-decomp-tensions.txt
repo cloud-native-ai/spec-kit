@@ -1,0 +1,17 @@
+=== decomposition-check ===
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T02:54:45Z"}
+EXIT=0
+
+=== validate-decision-tensions ===
+spec: .specify/specs/100-seal-slice-archive
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 276 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+EXIT=0
