@@ -32,12 +32,17 @@ pytestmark = pytest.mark.contract
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "seal-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "seal"
+ARCHIVE_FIXTURES = REPO_ROOT / "tests" / "fixtures" / "seal-archive"
 
 PARENT = "099-fixture-parent"
 ALPHA = "099a-fixture-alpha"
 BETA = "099b-fixture-beta"
 CONFLICT_ALPHA = "099a-fixture-conflict"
 CONFLICT_BETA = "099b-fixture-conflict"
+
+ARCHIVE_PARENT = "100-fixture-parent"
+ARCHIVE_ALPHA = "100a-fixture-alpha"
+ARCHIVE_BETA = "100b-fixture-beta"
 
 #: C-013: the candidate universe is closed at exactly these fifteen names.
 CANDIDATES = {
@@ -61,6 +66,17 @@ def _copy_fixture(name: str, tmp_path: Path) -> Path:
         "for T018/T019 before the fixture work package lands"
     )
     target = tmp_path / name.replace("/", "-")
+    shutil.copytree(source, target)
+    return target
+
+
+def _copy_archive_fixture(tmp_path: Path) -> Path:
+    """Copy the archived-pair fixture into the test's tmp tree."""
+    source = ARCHIVE_FIXTURES / "archived-pair"
+    assert source.is_dir(), (
+        f"fixture tree missing: {source} — T007 creates it before the red-first run"
+    )
+    target = tmp_path / "archived-pair"
     shutil.copytree(source, target)
     return target
 
@@ -475,3 +491,90 @@ def test_merge_plan_exit_semantics(tmp_path):
     )
     for condition in dirty_payload["conditions"]:
         assert set(condition) == {"code", "evidence", "fix_path", "rerun"}
+
+
+# ---------------------------------------------------------------------------
+# C-112 — archived slices are discovered from `archive-manifest.json`
+# ---------------------------------------------------------------------------
+
+def test_c112_archived_pair_keeps_the_slice_set_and_order(tmp_path):
+    repo = _copy_archive_fixture(tmp_path)
+    proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+    assert proc.returncode == 0, (
+        "C-112: an archived pair is the same slice set, not an empty one; "
+        "exit=%d conditions=%r" % (proc.returncode, payload.get("conditions"))
+    )
+    plan = payload["plan"]
+    assert [entry["slug"] for entry in plan["slices"]] == [ARCHIVE_ALPHA, ARCHIVE_BETA]
+    assert [entry["order"] for entry in plan["slices"]] == [1, 2]
+    assert {entry["order_basis"] for entry in plan["slices"]} == {"split-record"}, (
+        "C-112: the order basis recorded at archive time is carried through unchanged"
+    )
+    assert plan["checks"]["slice_count"] == 2
+    assert plan["checks"]["open_conflicts"] == 0
+    assert all("/" not in entry["slug"] for entry in plan["slices"]), (
+        "C-112: `slices/` is never read as a new slice candidate"
+    )
+
+
+def test_c112_archived_slices_are_read_from_their_archived_paths(tmp_path):
+    repo = _copy_archive_fixture(tmp_path)
+    plan = _plan(repo, ARCHIVE_PARENT)
+    for entry in plan["slices"]:
+        assert entry["carrier_tasks"] == (
+            ".specify/specs/%s/slices/%s/tasks.md" % (ARCHIVE_PARENT, entry["slug"])
+        ), "C-112: the archived slice record is read at its `to` path"
+    mapped = _entry(_entries(plan, "FR"), ARCHIVE_ALPHA, "FR-001")
+    assert mapped["parent_id"] == "FR-001", (
+        "C-112: the id maps are derived from the archived requirements, byte for byte"
+    )
+
+
+def test_c112_empty_archive_directory_falls_back_to_the_sibling_scan(tmp_path):
+    repo = _copy_fixture("split-pair", tmp_path)
+    (repo / ".specify" / "specs" / PARENT / "slices").mkdir()
+    plan = _plan(repo)
+    assert [entry["slug"] for entry in plan["slices"]] == [ALPHA, BETA], (
+        "C-112: an empty `slices/` directory is the absent-manifest fallback case"
+    )
+
+
+def test_c112_unparsable_archive_manifest_is_an_input_error(tmp_path):
+    repo = _copy_archive_fixture(tmp_path)
+    manifest = repo / ".specify" / "specs" / ARCHIVE_PARENT / "archive-manifest.json"
+    manifest.write_text("{ not json\n", encoding="utf-8")
+    proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+    assert proc.returncode == 2
+    assert payload["verdict"] == "error"
+    assert [condition["code"] for condition in payload["conditions"]] == [
+        "archive-manifest-invalid"
+    ], "C-112: an unparsable archive record exits 2 as `archive-manifest-invalid`"
+
+
+def test_c112_manifest_disagreeing_with_the_merge_manifest_is_drift(tmp_path):
+    repo = _copy_archive_fixture(tmp_path)
+    merge_path = repo / ".specify" / "specs" / ARCHIVE_PARENT / "merge-manifest.json"
+    document = json.loads(merge_path.read_text(encoding="utf-8"))
+    document["slices"][1]["order"] = 3
+    merge_path.write_text(
+        json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+    assert proc.returncode == 2
+    assert payload["verdict"] == "error"
+    assert [condition["code"] for condition in payload["conditions"]] == [
+        "archive-drift"
+    ], "C-112: an archive record disagreeing with the merge manifest is drift"
+
+
+def test_c112_manifest_disagreeing_with_the_tree_is_drift(tmp_path):
+    repo = _copy_archive_fixture(tmp_path)
+    parent = repo / ".specify" / "specs" / ARCHIVE_PARENT
+    shutil.move(str(parent / "slices" / ARCHIVE_BETA),
+                str(repo / ".specify" / "specs" / ARCHIVE_BETA))
+    proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+    assert proc.returncode == 2
+    assert payload["verdict"] == "error"
+    assert [condition["code"] for condition in payload["conditions"]] == [
+        "archive-drift"
+    ], "C-112: a half-archived tree is drift, never a fallback read"

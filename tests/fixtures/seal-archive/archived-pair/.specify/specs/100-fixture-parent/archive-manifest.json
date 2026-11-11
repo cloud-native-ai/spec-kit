@@ -1,0 +1,106 @@
+{
+  "checks": {
+    "dated_preserved": 0,
+    "files_match": true,
+    "live_rewrite": 0,
+    "moved_files": 4,
+    "preconditions": {
+      "dirty_spec_tree": false,
+      "merge_status": "merged",
+      "open_conflicts": 0,
+      "side_presence": {
+        "100a-fixture-alpha": "destination",
+        "100b-fixture-beta": "destination"
+      },
+      "slices_closed": true
+    },
+    "runtime_carriers": 3,
+    "unclassified": 0,
+    "unresolved_after": 0,
+    "unresolved_before": 0
+  },
+  "digest": "sha256:20a121484c7196b036dfe44c4e61c77781bb9011d8238293aa48284ee70a84ac",
+  "generated_by": {
+    "command": "seal-utils.py --action archive-apply --spec-dir .specify/specs/100-fixture-parent",
+    "engine": "seal-utils.py",
+    "version": "fixture"
+  },
+  "merge_manifest": {
+    "digest_after": "sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02",
+    "digest_before": "sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02",
+    "path": "merge-manifest.json"
+  },
+  "order_basis": "split-record",
+  "order_source": ".specify/state/100-fixture-parent.md#拆分记录.proposed_slices",
+  "pinned_commit": "0000000000000000000000000000000000000000",
+  "references": {
+    "rows": [],
+    "runtime": [
+      {
+        "carrier": ".specify/state/100-fixture-parent.md",
+        "reason": null,
+        "status": "runtime-updated",
+        "updates": []
+      },
+      {
+        "carrier": ".specify/state/100a-fixture-alpha.md",
+        "reason": "state record absent in the fixture tree",
+        "status": "absent",
+        "updates": []
+      },
+      {
+        "carrier": ".specify/state/100b-fixture-beta.md",
+        "reason": "state record absent in the fixture tree",
+        "status": "absent",
+        "updates": []
+      }
+    ]
+  },
+  "schema_version": 1,
+  "slices": [
+    {
+      "file_count": 2,
+      "files": [
+        {
+          "path": "requirements.md",
+          "sha256": "5f1ef8a75f1c499e90716f1c498179055ba4d9daa3bdd3b320154ccfdaf878fd"
+        },
+        {
+          "path": "tasks.md",
+          "sha256": "cd89ed6898567e7f08ac02881115a2796858b2e36582cb9778626df366fc6de0"
+        }
+      ],
+      "from": ".specify/specs/100a-fixture-alpha",
+      "merged_into_pointer": {
+        "line": 5,
+        "path": ".specify/specs/100-fixture-parent/slices/100a-fixture-alpha/requirements.md"
+      },
+      "order": 1,
+      "slug": "100a-fixture-alpha",
+      "to": ".specify/specs/100-fixture-parent/slices/100a-fixture-alpha"
+    },
+    {
+      "file_count": 2,
+      "files": [
+        {
+          "path": "requirements.md",
+          "sha256": "56c5a3be7b1571488c02949f50ba2d33df409592c9a9f321760dc4d0209c897f"
+        },
+        {
+          "path": "tasks.md",
+          "sha256": "4441e8e2fc7db6e3730df6167093fd1cfc73b6c68c7a25ffd667caf8454a1d93"
+        }
+      ],
+      "from": ".specify/specs/100b-fixture-beta",
+      "merged_into_pointer": {
+        "line": 5,
+        "path": ".specify/specs/100-fixture-parent/slices/100b-fixture-beta/requirements.md"
+      },
+      "order": 2,
+      "slug": "100b-fixture-beta",
+      "to": ".specify/specs/100-fixture-parent/slices/100b-fixture-beta"
+    }
+  ],
+  "spec": "100-fixture-parent",
+  "spec_path": ".specify/specs/100-fixture-parent"
+}

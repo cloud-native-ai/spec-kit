@@ -251,3 +251,252 @@ FAILED tests/contract/test_seal_engine_contract.py::test_c010_json_payload_is_ca
 ```
 
 
+
+## T007/T035 红先 — manifest-aware 分片发现（`archive-manifest.json`，C-112）
+
+- **采集点**: 2026-11-11 · worktree `100-seal-slice-archive` · 引擎未改动（`scripts/python/seal-utils.py` sha256 `f6355d5b0eb9b27c36d1343b098f98a2dbe974278ab52376c572966a4b008178`）· 夹具 `tests/fixtures/seal-archive/archived-pair/` 与两份测试文件已就位
+- **命令（verbatim）**: `bash scripts/bash/run-tests.sh tests/contract/test_seal_merge_plan.py tests/integration/test_seal_074_round.py -q`
+- **退出码**: `1`
+- **完整 stdout/stderr（verbatim）**:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_merge_plan.py tests/integration/test_seal_074_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.................F.FFFF....F..FFF                                        [100%]
+=================================== FAILURES ===================================
+_______ test_c112_manifest_disagreeing_with_the_merge_manifest_is_drift ________
+[gw22] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw22/test_c112_manifest_disagreeing0')
+
+    def test_c112_manifest_disagreeing_with_the_merge_manifest_is_drift(tmp_path):
+        repo = _copy_archive_fixture(tmp_path)
+        merge_path = repo / ".specify" / "specs" / ARCHIVE_PARENT / "merge-manifest.json"
+        document = json.loads(merge_path.read_text(encoding="utf-8"))
+        document["slices"][1]["order"] = 3
+        merge_path.write_text(
+            json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+        proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+>       assert proc.returncode == 2
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor.../test_c112_manifest_disagreeing0/archived-pair/.specify/specs/100-fixture-parent",\n  "verdict": "ok"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_merge_plan.py:563: AssertionError
+____________ test_c112_manifest_disagreeing_with_the_tree_is_drift _____________
+[gw23] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw23/test_c112_manifest_disagreeing0')
+
+    def test_c112_manifest_disagreeing_with_the_tree_is_drift(tmp_path):
+        repo = _copy_archive_fixture(tmp_path)
+        parent = repo / ".specify" / "specs" / ARCHIVE_PARENT
+        shutil.move(str(parent / "slices" / ARCHIVE_BETA),
+                    str(repo / ".specify" / "specs" / ARCHIVE_BETA))
+        proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+>       assert proc.returncode == 2
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor.../test_c112_manifest_disagreeing0/archived-pair/.specify/specs/100-fixture-parent",\n  "verdict": "ok"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_merge_plan.py:576: AssertionError
+____________ test_c112_archived_pair_keeps_the_slice_set_and_order _____________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw18/test_c112_archived_pair_keeps_0')
+
+    def test_c112_archived_pair_keeps_the_slice_set_and_order(tmp_path):
+        repo = _copy_archive_fixture(tmp_path)
+        proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+        assert proc.returncode == 0, (
+            "C-112: an archived pair is the same slice set, not an empty one; "
+            "exit=%d conditions=%r" % (proc.returncode, payload.get("conditions"))
+        )
+        plan = payload["plan"]
+>       assert [entry["slug"] for entry in plan["slices"]] == [ARCHIVE_ALPHA, ARCHIVE_BETA]
+E       AssertionError: assert [] == ['100a-fixtur...fixture-beta']
+E         
+E         Right contains 2 more items, first extra item: '100a-fixture-alpha'
+E         Use -v to get more diff
+
+tests/contract/test_seal_merge_plan.py:508: AssertionError
+_________ test_c112_archived_slices_are_read_from_their_archived_paths _________
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw19/test_c112_archived_slices_are_0')
+
+    def test_c112_archived_slices_are_read_from_their_archived_paths(tmp_path):
+        repo = _copy_archive_fixture(tmp_path)
+        plan = _plan(repo, ARCHIVE_PARENT)
+        for entry in plan["slices"]:
+            assert entry["carrier_tasks"] == (
+                ".specify/specs/%s/slices/%s/tasks.md" % (ARCHIVE_PARENT, entry["slug"])
+            ), "C-112: the archived slice record is read at its `to` path"
+>       mapped = _entry(_entries(plan, "FR"), ARCHIVE_ALPHA, "FR-001")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_merge_plan.py:527: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+entries = [], slice_slug = '100a-fixture-alpha', slice_id = 'FR-001'
+
+    def _entry(entries: list, slice_slug: str, slice_id: str) -> dict:
+        found = [e for e in entries
+                 if e["slice"] == slice_slug and e["slice_id"] == slice_id]
+>       assert len(found) == 1, (
+            f"expected exactly one id_map entry for {slice_slug} {slice_id}; "
+            f"got {found!r}"
+        )
+E       AssertionError: expected exactly one id_map entry for 100a-fixture-alpha FR-001; got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_seal_merge_plan.py:116: AssertionError
+___________ test_c112_unparsable_archive_manifest_is_an_input_error ____________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw21/test_c112_unparsable_archive_m0')
+
+    def test_c112_unparsable_archive_manifest_is_an_input_error(tmp_path):
+        repo = _copy_archive_fixture(tmp_path)
+        manifest = repo / ".specify" / "specs" / ARCHIVE_PARENT / "archive-manifest.json"
+        manifest.write_text("{ not json\n", encoding="utf-8")
+        proc, payload = _run_plan(repo, ARCHIVE_PARENT)
+>       assert proc.returncode == 2
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor.../test_c112_unparsable_archive_m0/archived-pair/.specify/specs/100-fixture-parent",\n  "verdict": "ok"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_merge_plan.py:547: AssertionError
+_________ test_live_plan_identifies_both_slices_from_the_split_record __________
+[gw24] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_plan_identifies_both_slices_from_the_split_record():
+        proc, payload = _run_plan()
+        plan = payload["plan"]
+        assert proc.returncode == 0, (
+            "the settled round must leave a conflict-free plan; exit=%d payload=%r"
+            % (proc.returncode, payload.get("conditions"))
+        )
+        slices = plan["slices"]
+        assert [item["slug"] for item in slices] == [SLICE_A, SLICE_B], (
+            "C-012: the split record's declared order (074a → 074b) decides the order"
+        )
+        assert [item["order"] for item in slices] == [1, 2]
+>       assert {item["order_basis"] for item in slices} == {"split-record"}, (
+            "C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录"
+        )
+E       AssertionError: C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录
+E       assert {'letter-order'} == {'split-record'}
+E         
+E         Extra items in the left set:
+E         'letter-order'
+E         Extra items in the right set:
+E         'split-record'
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:99: AssertionError
+________ test_c112_merge_plan_after_archive_reports_the_same_slice_set _________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw29/test_c112_merge_plan_after_arc0')
+
+    def test_c112_merge_plan_after_archive_reports_the_same_slice_set(tmp_path):
+        repo = _replay_tree(tmp_path)
+        before_proc, before = _run_action(repo, "merge-plan")
+        assert before_proc.returncode == 0, (
+            "the replay's pre-archive plan must be conflict-free: %r"
+            % before.get("conditions"))
+        before_plan = before["plan"]
+        assert [entry["slug"] for entry in before_plan["slices"]] == [SLICE_A, SLICE_B]
+    
+        _archive_replay(repo, before_plan)
+    
+        after_proc, after = _run_action(repo, "merge-plan")
+        assert after_proc.returncode == 0, (
+            "C-112: an archived tree is not an input error: %r"
+            % after.get("conditions"))
+        after_plan = after["plan"]
+>       assert _slice_identity(after_plan) == _slice_identity(before_plan), (
+            "C-112: the archived slice set and its order are the same slice set"
+        )
+E       AssertionError: C-112: the archived slice set and its order are the same slice set
+E       assert [] == [('074a-autho...etter-order')]
+E         
+E         Right contains 2 more items, first extra item: ('074a-authorized-routing', 1, 'letter-order')
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:385: AssertionError
+____ test_c112_merge_apply_after_archive_is_an_idempotent_zero_write_rerun _____
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw30/test_c112_merge_apply_after_ar0')
+
+    def test_c112_merge_apply_after_archive_is_an_idempotent_zero_write_rerun(tmp_path):
+        repo = _replay_tree(tmp_path)
+        plan = _run_action(repo, "merge-plan")[1]["plan"]
+        before_proc, before = _run_action(repo, "merge-apply")
+        assert before_proc.returncode == 0
+        assert before["apply"]["idempotent"] is True
+    
+        _archive_replay(repo, plan)
+    
+        after_proc, after = _run_action(repo, "merge-apply")
+        assert after_proc.returncode == 0, (
+            "C-112: merge-apply after the archive is an idempotent success: %r"
+            % after.get("conditions"))
+        assert after["apply"]["idempotent"] is True
+        assert after["apply"]["writes"] == [], (
+            "C-112: the archived rerun performs zero writes"
+        )
+>       assert after["apply"]["slices"] == [SLICE_A, SLICE_B]
+E       AssertionError: assert [] == ['074a-author...d-governance']
+E         
+E         Right contains 2 more items, first extra item: '074a-authorized-routing'
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:412: AssertionError
+_________________ test_c112_seal_judgment_survives_the_archive _________________
+[gw31] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9497/popen-gw31/test_c112_seal_judgment_surviv0')
+
+    def test_c112_seal_judgment_survives_the_archive(tmp_path):
+        repo = _replay_tree(tmp_path)
+        plan = _run_action(repo, "merge-plan")[1]["plan"]
+        before_proc, before = _run_action(repo, "seal")
+        assert [condition for condition in before["conditions"]
+                if condition["code"] == "p0-unresolved"], (
+            "the 074 round's P0 reading is the face this test compares")
+    
+        _archive_replay(repo, plan)
+    
+        after_proc, after = _run_action(repo, "seal")
+        assert after_proc.returncode == before_proc.returncode, (
+            "C-112: the seal verdict (P0 / blocking / closure) is unchanged by the archive"
+        )
+        assert after["verdict"] == before["verdict"]
+>       assert _seal_facets(after) == _seal_facets(before), (
+            "C-112: seal keeps reading the original slice records, now at `to` paths; "
+            "the condition list MUST stay byte-identical"
+        )
+E       AssertionError: C-112: seal keeps reading the original slice records, now at `to` paths; the condition list MUST stay byte-identical
+E       assert [('closure-in...y slice set')] == [('p0-unresol...y Ownership')]
+E         
+E         At index 0 diff: ('closure-input-defect', 'the closure engine exited 2: closure-acceptance-check: input error: /tmp/pytest-of-agent/pytest-9497/popen-gw31/test_c112_seal_judgment_surviv0/replay/.specify/specs/074-goal-team-sdd-unification/requirements.md carries no § Runtime Stack & Dependency Ownership') != ('p0-unresolved', '074b-nested-governance:F1 (line 115 of .specify/specs/074b-nested-governance/review.md) has neither a resolvable `- **Fix**:` pointer nor a user waiver on both carriers')
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:430: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_merge_plan.py::test_c112_manifest_disagreeing_with_the_merge_manifest_is_drift
+FAILED tests/contract/test_seal_merge_plan.py::test_c112_manifest_disagreeing_with_the_tree_is_drift
+FAILED tests/contract/test_seal_merge_plan.py::test_c112_archived_pair_keeps_the_slice_set_and_order
+FAILED tests/contract/test_seal_merge_plan.py::test_c112_archived_slices_are_read_from_their_archived_paths
+FAILED tests/contract/test_seal_merge_plan.py::test_c112_unparsable_archive_manifest_is_an_input_error
+FAILED tests/integration/test_seal_074_round.py::test_live_plan_identifies_both_slices_from_the_split_record
+FAILED tests/integration/test_seal_074_round.py::test_c112_merge_plan_after_archive_reports_the_same_slice_set
+FAILED tests/integration/test_seal_074_round.py::test_c112_merge_apply_after_archive_is_an_idempotent_zero_write_rerun
+FAILED tests/integration/test_seal_074_round.py::test_c112_seal_judgment_survives_the_archive
+9 failed, 24 passed in 6.52s
+```

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "spec": "100-fixture-parent",
+  "merge": {
+    "status": "merged"
+  },
+  "conflicts": [],
+  "slices": [
+    {
+      "slug": "100a-fixture-alpha",
+      "order": 1,
+      "order_basis": "split-record",
+      "order_source": ".specify/state/100-fixture-parent.md#拆分记录.proposed_slices",
+      "carrier_tasks": ".specify/specs/100-fixture-parent/slices/100a-fixture-alpha/tasks.md",
+      "retention": "pending-review"
+    },
+    {
+      "slug": "100b-fixture-beta",
+      "order": 2,
+      "order_basis": "split-record",
+      "order_source": ".specify/state/100-fixture-parent.md#拆分记录.proposed_slices",
+      "carrier_tasks": ".specify/specs/100-fixture-parent/slices/100b-fixture-beta/tasks.md",
+      "retention": "pending-review"
+    }
+  ]
+}

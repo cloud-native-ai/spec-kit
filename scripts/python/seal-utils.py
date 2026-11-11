@@ -454,7 +454,236 @@ def _declares_parent(text: str, parent_slug: str) -> bool:
     return body is not None and parent_slug in "\n".join(body)
 
 
-def _discover_slices(spec_dir: Path):
+# ---------------------------------------------------------------------------
+# Manifest-aware slice discovery (100 C-112)
+# ---------------------------------------------------------------------------
+
+ARCHIVE_MANIFEST_NAME = "archive-manifest.json"
+ARCHIVE_SLICES_DIR = "slices"
+ARCHIVE_MANIFEST_KEYS = frozenset((
+    "schema_version", "spec", "spec_path", "generated_by", "pinned_commit",
+    "order_basis", "order_source", "slices", "references", "merge_manifest",
+    "checks", "digest",
+))
+ARCHIVE_SLICE_KEYS = frozenset((
+    "slug", "from", "to", "order", "file_count", "files", "merged_into_pointer",
+))
+ARCHIVE_ORDER_BASES = ("split-record", "letter-order")
+
+
+class ArchiveManifestError(ValueError):
+    """C-112: the archived layout cannot be read as the same slice set."""
+
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+
+
+def _archive_invalid(message: str) -> ArchiveManifestError:
+    return ArchiveManifestError("archive-manifest-invalid", message)
+
+
+def _archive_drift(message: str) -> ArchiveManifestError:
+    return ArchiveManifestError("archive-drift", message)
+
+
+def _archive_manifest_error(action: str, spec_dir: Path,
+                            exc: ArchiveManifestError) -> Dict[str, Any]:
+    return _payload(
+        action, spec_dir, "error", EXIT_INPUT_ERROR,
+        [_condition(
+            exc.code, str(exc),
+            "repair or restore %s so it agrees with %s and the spec tree"
+            % (ARCHIVE_MANIFEST_NAME, MANIFEST_NAME),
+            "rerun %s after the archive record is repaired" % action,
+        )],
+    )
+
+
+def _is_int(value) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _read_archive_manifest(spec_dir: Path) -> Optional[Dict[str, Any]]:
+    """C-112/C-202/C-203: read the archive record; absent means "no archive".
+
+    The record is validated before it is believed — an unknown or missing field
+    at any closed level refuses with exit 2, never a silent default.
+    """
+    path = spec_dir / ARCHIVE_MANIFEST_NAME
+    if not path.is_file():
+        return None
+    try:
+        document = json.loads(_read_text(path))
+    except ValueError as exc:
+        raise _archive_invalid("%s is unparsable: %s" % (path.name, exc))
+    if not isinstance(document, dict):
+        raise _archive_invalid("%s does not carry a JSON object" % path.name)
+    missing = sorted(ARCHIVE_MANIFEST_KEYS - set(document))
+    unknown = sorted(set(document) - ARCHIVE_MANIFEST_KEYS)
+    if missing or unknown:
+        raise _archive_invalid(
+            "%s key set is not the closed C-202 set (missing=%s; unknown=%s)"
+            % (path.name, missing or "none", unknown or "none"))
+    if document["schema_version"] != 1:
+        raise _archive_invalid(
+            "%s schema_version reads %r; this engine reads only 1"
+            % (path.name, document["schema_version"]))
+    if document["spec"] != spec_dir.name:
+        raise _archive_invalid(
+            "%s names spec %r, not %r"
+            % (path.name, document["spec"], spec_dir.name))
+    expected_spec_path = ".specify/specs/%s" % spec_dir.name
+    if document["spec_path"] != expected_spec_path:
+        raise _archive_invalid(
+            "%s spec_path reads %r, not %r"
+            % (path.name, document["spec_path"], expected_spec_path))
+    if document["order_basis"] not in ARCHIVE_ORDER_BASES:
+        raise _archive_invalid(
+            "%s order_basis reads %r; the closed set is %s"
+            % (path.name, document["order_basis"], list(ARCHIVE_ORDER_BASES)))
+    if not isinstance(document["order_source"], str) or not document["order_source"]:
+        raise _archive_invalid("%s order_source is not a non-empty string" % path.name)
+    if not isinstance(document["slices"], list):
+        raise _archive_invalid("%s slices is not a list" % path.name)
+    for position, entry in enumerate(document["slices"], 1):
+        label = "slices[%d]" % position
+        if not isinstance(entry, dict):
+            raise _archive_invalid("%s of %s is not an object" % (label, path.name))
+        missing = sorted(ARCHIVE_SLICE_KEYS - set(entry))
+        unknown = sorted(set(entry) - ARCHIVE_SLICE_KEYS)
+        if missing or unknown:
+            raise _archive_invalid(
+                "%s key set is not the closed C-203 set (missing=%s; unknown=%s)"
+                % (label, missing or "none", unknown or "none"))
+        for key in ("slug", "from", "to"):
+            if not isinstance(entry[key], str) or not entry[key]:
+                raise _archive_invalid("%s.%s is not a non-empty path" % (label, key))
+        if not _is_int(entry["order"]):
+            raise _archive_invalid("%s.order is not an integer" % label)
+        files = entry["files"]
+        if not isinstance(files, list) or not _is_int(entry["file_count"]) \
+                or entry["file_count"] != len(files):
+            raise _archive_invalid(
+                "%s.file_count does not equal its files row count" % label)
+        for row in files:
+            if not isinstance(row, dict) or set(row) != {"path", "sha256"}:
+                raise _archive_invalid(
+                    "%s.files rows carry exactly {path, sha256}" % label)
+        pointer = entry["merged_into_pointer"]
+        if not isinstance(pointer, dict) or set(pointer) != {"path", "line"}:
+            raise _archive_invalid(
+                "%s.merged_into_pointer carries exactly {path, line}" % label)
+    references = document["references"]
+    if not isinstance(references, dict) or set(references) != {"rows", "runtime"}:
+        raise _archive_invalid(
+            "%s references carries exactly {rows, runtime}" % path.name)
+    if not isinstance(references["rows"], list) \
+            or not isinstance(references["runtime"], list):
+        raise _archive_invalid(
+            "%s references rows/runtime must both be lists" % path.name)
+    for key in ("generated_by", "merge_manifest", "checks"):
+        if not isinstance(document[key], dict):
+            raise _archive_invalid("%s %s is not an object" % (path.name, key))
+    if not isinstance(document["pinned_commit"], str) or not document["pinned_commit"]:
+        raise _archive_invalid("%s pinned_commit is not a non-empty string" % path.name)
+    if not isinstance(document["digest"], str) \
+            or not document["digest"].startswith("sha256:"):
+        raise _archive_invalid("%s digest is not a `sha256:` string" % path.name)
+    return document
+
+
+def _archived_slice_records(repo: Path, spec_dir: Path, document: Dict[str, Any]):
+    """Validate the record against the merge manifest and the tree; same slice set."""
+    merge_path = spec_dir / MANIFEST_NAME
+    if not merge_path.is_file():
+        raise _archive_drift(
+            "%s exists but %s is absent; the archived set has no merge record to "
+            "agree with" % (ARCHIVE_MANIFEST_NAME, MANIFEST_NAME))
+    try:
+        merge_document = json.loads(_read_text(merge_path))
+    except ValueError as exc:
+        raise _archive_drift(
+            "%s is unparsable next to %s: %s"
+            % (MANIFEST_NAME, ARCHIVE_MANIFEST_NAME, exc))
+    recorded = {}
+    for entry in (merge_document.get("slices")
+                  if isinstance(merge_document, dict) else None) or []:
+        if isinstance(entry, dict) and isinstance(entry.get("slug"), str):
+            recorded[entry["slug"]] = entry
+    archived = {entry["slug"]: entry for entry in document["slices"]}
+    if set(archived) != set(recorded):
+        raise _archive_drift(
+            "%s slice set disagrees with %s (archive-only=%s; merge-only=%s)"
+            % (ARCHIVE_MANIFEST_NAME, MANIFEST_NAME,
+               sorted(set(archived) - set(recorded)),
+               sorted(set(recorded) - set(archived))))
+    slices = []
+    for entry in sorted(document["slices"], key=lambda item: item["order"]):
+        slug = entry["slug"]
+        expected_from = ".specify/specs/%s" % slug
+        expected_to = ".specify/specs/%s/%s/%s" % (
+            spec_dir.name, ARCHIVE_SLICES_DIR, slug)
+        if entry["from"] != expected_from or entry["to"] != expected_to:
+            raise _archive_drift(
+                "%s entry %s reads from=%r to=%r; the declared pair is %r -> %r"
+                % (ARCHIVE_MANIFEST_NAME, slug, entry["from"], entry["to"],
+                   expected_from, expected_to))
+        recorded_entry = recorded[slug]
+        if _is_int(recorded_entry.get("order")) \
+                and recorded_entry["order"] != entry["order"]:
+            raise _archive_drift(
+                "%s order for %s reads %r while %s records %r"
+                % (ARCHIVE_MANIFEST_NAME, slug, entry["order"], MANIFEST_NAME,
+                   recorded_entry["order"]))
+        target_dir = repo / entry["to"]
+        if (repo / entry["from"]).exists():
+            raise _archive_drift(
+                "slice %s is still present at its source %s" % (slug, entry["from"]))
+        if not target_dir.is_dir():
+            raise _archive_drift(
+                "archived slice directory is missing: %s" % entry["to"])
+        requirements = target_dir / "requirements.md"
+        if not requirements.is_file():
+            raise _archive_drift(
+                "archived slice carries no requirements.md: %s/requirements.md"
+                % entry["to"])
+        listed = {row["path"] for row in entry["files"]}
+        on_disk = {path.relative_to(target_dir).as_posix()
+                   for path in target_dir.rglob("*") if path.is_file()}
+        if listed != on_disk:
+            raise _archive_drift(
+                "slice %s file set disagrees with %s (recorded-only=%s; tree-only=%s)"
+                % (slug, ARCHIVE_MANIFEST_NAME, sorted(listed - on_disk),
+                   sorted(on_disk - listed)))
+        pointer_path = entry["merged_into_pointer"]["path"]
+        if pointer_path != entry["to"] + "/requirements.md":
+            raise _archive_drift(
+                "slice %s merged_into_pointer.path reads %r, not its archived "
+                "requirements.md" % (slug, pointer_path))
+        slices.append({
+            "slug": slug,
+            "path": target_dir,
+            "requirements": requirements,
+            "text": _read_text(requirements),
+            "archive_order": entry["order"],
+            "archive_order_basis": document["order_basis"],
+            "archive_order_source": document["order_source"],
+        })
+    return slices, []
+
+
+def _discover_slices(spec_dir: Path, repo: Path):
+    """C-011 / C-112: the slice set, read from the archive record when it exists."""
+    archive = _read_archive_manifest(spec_dir)
+    if archive is not None:
+        return _archived_slice_records(repo, spec_dir, archive)
+    slices_dir = spec_dir / ARCHIVE_SLICES_DIR
+    if slices_dir.is_dir() and any(slices_dir.iterdir()):
+        raise _archive_drift(
+            "%s is populated but %s is absent; an archived layout is never read "
+            "back as a sibling scan"
+            % (ARCHIVE_SLICES_DIR + "/", ARCHIVE_MANIFEST_NAME))
     parent_slug = spec_dir.name
     pattern = _slice_name_pattern(parent_slug)
     slices, excluded = [], []
@@ -481,6 +710,34 @@ def _discover_slices(spec_dir: Path):
 
 
 def _derive_order(repo: Path, parent_slug: str, slices):
+    archived = [item for item in slices if "archive_order" in item]
+    if archived:
+        if len(archived) != len(slices):
+            raise _archive_drift(
+                "%s mixes archived and sibling slice records" % parent_slug)
+        ordered = sorted(slices, key=lambda item: item["archive_order"])
+        orders = [item["archive_order"] for item in ordered]
+        if orders != list(range(1, len(ordered) + 1)):
+            raise _archive_drift(
+                "%s order values are not the contiguous 1..n set: %r"
+                % (ARCHIVE_MANIFEST_NAME, orders))
+        bases = {item["archive_order_basis"] for item in ordered}
+        sources = {item["archive_order_source"] for item in ordered}
+        if len(bases) != 1 or len(sources) != 1:
+            raise _archive_drift(
+                "%s carries inconsistent parent-level order fields"
+                % ARCHIVE_MANIFEST_NAME)
+        basis = bases.pop()
+        source = sources.pop()
+        return [{
+            "slug": item["slug"],
+            "order": item["archive_order"],
+            "order_basis": basis,
+            "order_source": source,
+            "path": item["path"],
+            "requirements": item["requirements"],
+            "text": item["text"],
+        } for item in ordered]
     state_path = repo / ".specify" / "state" / ("%s.md" % parent_slug)
     slugs = [item["slug"] for item in slices]
     basis = "letter-order"
@@ -1047,7 +1304,7 @@ def _section_rewrite_conflicts(repo: Path, spec_dir: Path, slices):
 
 
 def _build_plan(repo: Path, spec_dir: Path) -> Dict[str, Any]:
-    slices, excluded = _discover_slices(spec_dir)
+    slices, excluded = _discover_slices(spec_dir, repo)
     ordered_slices = _derive_order(repo, spec_dir.name, slices)
     artifacts = _classify_artifacts(repo, spec_dir, ordered_slices)
     id_maps, map_conflicts, context = _build_id_maps(repo, spec_dir, ordered_slices)
@@ -1097,6 +1354,8 @@ def action_merge_plan(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[st
     repo = Path(args.repo).resolve() if args.repo else Path.cwd()
     try:
         plan = _build_plan(repo, spec_dir)
+    except ArchiveManifestError as exc:
+        return _archive_manifest_error("merge-plan", spec_dir, exc), EXIT_INPUT_ERROR
     except (OSError, ValueError, StopIteration) as exc:
         return _payload(
             "merge-plan", spec_dir, "error", EXIT_INPUT_ERROR,
@@ -1858,6 +2117,8 @@ def action_merge_apply(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[s
     repo = Path(args.repo).resolve() if args.repo else Path.cwd()
     try:
         plan = _build_plan(repo, spec_dir)
+    except ArchiveManifestError as exc:
+        return _archive_manifest_error("merge-apply", spec_dir, exc), EXIT_INPUT_ERROR
     except (OSError, ValueError, StopIteration) as exc:
         return _payload(
             "merge-apply", spec_dir, "error", EXIT_INPUT_ERROR,
@@ -1884,7 +2145,7 @@ def action_merge_apply(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[s
         payload["plan"] = plan
         return payload, EXIT_REFUSED
 
-    slices, _excluded = _discover_slices(spec_dir)
+    slices, _excluded = _discover_slices(spec_dir, repo)
     ordered = _derive_order(repo, spec_dir.name, slices)
 
     unclosed = _unclosed_slice_rows(repo, ordered)
@@ -2589,7 +2850,7 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
     # A split parent's merged review/code-review views are pointer views and carry
     # no finding block (C-013/C-021); the judgment therefore reads the original
     # slice records as well — the pointer view never narrows the reading surface.
-    slices, _excluded = _discover_slices(spec_dir)
+    slices, _excluded = _discover_slices(spec_dir, repo)
     ordered = _derive_order(repo, spec_dir.name, slices) if slices else []
     review_records = [(review_path, review_text)]
     code_review_records = [(code_review_path, code_review_text)]
@@ -2681,7 +2942,7 @@ def evaluate_seal(args: argparse.Namespace, spec_dir: Path):
                 "`**Path**` marker and a status row), then rerun the closure engine",
                 "rerun seal after the closure engine reads its inputs"))
 
-    slices, _excluded = _discover_slices(spec_dir)
+    slices, _excluded = _discover_slices(spec_dir, repo)
     ordered = _derive_order(repo, spec_dir.name, slices) if slices else []
     review_paths = [_rel_path(repo, review_path),
                     _rel_path(repo, code_review_path)]
@@ -3037,6 +3298,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     try:
         payload, code = HANDLERS[args.action](args, spec_dir)
+    except ArchiveManifestError as exc:
+        payload = _archive_manifest_error(args.action, spec_dir, exc)
+        code = EXIT_INPUT_ERROR
     except (OSError, ValueError, StopIteration) as exc:
         payload = _payload(
             args.action, spec_dir, "error", EXIT_INPUT_ERROR,
