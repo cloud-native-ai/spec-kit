@@ -88,16 +88,19 @@ FROZEN_SECTIONS = {
     "两级判据": "089071c2c24bc8e4d8dd2ba10f4f24765f43a34b1fdb70a0d466543e17b2c5bf",
     # Re-frozen 2026-09-23 for the F-13 destructive-bucket registration (goal criteria
     # emptied by an argument-less call). Deliberate, not silent: only this section moved.
-    "破坏性动作清单": "7f876df208df63bfd5041219ef10062f9e77c76f2204b51601a5a72281cfd9c9",
+    # Re-frozen 2026-11-11 for the archive-first reversibility carve-out: the
+    # destructive list gains the exception paragraph; the governance-kept list gains
+    # the retention / spec retirement row. Deliberate, not silent.
+    "破坏性动作清单": "12ae1c76d78334a9a0926a2b9fad505cbcbd67ce2e83a8d453c7e44be009649e",
     # Re-frozen 2026-10-15 for the git-workspace→git-utils skill split (the generic
     # git scopes stayed public and were renamed git-utils; the owner cell of the
     # git-workflow gate row now names git-utils). Deliberate, not silent: only the
     # owner cell moved, the gate wording is unchanged (row count still pinned below).
-    "治理保留清单": "cbb560543ec883aa6b19e37099b2b0e420d91926314148120bef42a090664107",
+    "治理保留清单": "99630089cbd92ed8f1dff1182ff8a172c367c8653fb20e0366b34414cbd8eb0b",
     "存疑从严": "c1f18db4b9eedf55036cdcb77ef7fd9b41791c4bc292b2d57de346e1744facea",
     "回流约束": "ae1711acd3a325334150051f1193f47631eb043ad336e156b02fa4eca6583af7",
 }
-GOVERNANCE_KEPT_ROWS = 13   # data rows in 治理保留清单, pinned by C-4
+GOVERNANCE_KEPT_ROWS = 14   # data rows in 治理保留清单, pinned by C-4
 
 # C-5: the execution-report triad confirmation-gates.md must keep owning.
 TRIAD = ("执行内容", "产出/变更工件", "修改途径")

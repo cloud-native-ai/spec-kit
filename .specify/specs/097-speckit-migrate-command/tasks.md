@@ -143,7 +143,7 @@ Reviewed at tasks generation (2026-11-10): `.specify/features.md` row 024 reads 
 
 **⚠️ CRITICAL**: 本阶段完成前，任何用户故事行不得开始。
 
-- [X] T005 [P] Author `tests/unit/test_migrate_planner.py` red-first: the five dimension tokens and their fixed order come from data-model.md E-8, `(dimension, target)` dedup keeps exactly one item, a repeated dry-run on one tree is byte-identical, and `refuse` / `blocked` items always carry a non-empty reason naming both candidates or the missing second key respectively (FR-006, FR-014).
+- [X] T005 [P] Author `tests/unit/test_migrate_planner.py` red-first: the five dimension tokens and their fixed order come from data-model.md E-8, `(dimension, target)` dedup keeps exactly one item, a repeated dry-run on one tree is byte-identical, and `refuse` / `blocked` items always carry a non-empty reason naming both candidates or the missing archive path respectively (FR-006, FR-014).
 - [X] T006 [P] Author `tests/unit/test_migrate_receipts.py` red-first: run-id shape `YYYYMMDDTHHMMSSZ-<8 hex>`, one receipt file per run, two simulated concurrent writers land on distinct paths, `running` → `completed` transition, and a dry-run writes no receipt file (FR-017, FR-018).
 - [X] T007 [P] Author `tests/fixtures/migrate-097/builders.py` with `build_latest_project` (init copy mechanism into a tmp dir), `build_legacy_project` (legacy anchor layout, `_OBSOLETE_SKILLS` flat dirs, `_OBSOLETE_COMMANDS` old copies, a flat internal duplicate, a missing compat symlink, one edited template file and one deleted script file) and `build_mixed_project`; every constructed name MUST be asserted present in its owner declaration or checker output (FR-023).
 - [X] T008 Implement the DiffItem/Plan model in `src/specify_cli/__init__.py`: id = `sha1(dimension + "|" + target)[:12]`, the E-8 dimension tokens in their fixed order, stable `(dimension, target)` sort, dedup, and serialization for both text and json envelopes (FR-006, FR-007). [blockedBy: T005]
@@ -184,23 +184,23 @@ Reviewed at tasks generation (2026-11-10): `.specify/features.md` row 024 reads 
 
 ---
 
-## Phase 4: User Story 2 — 安全收尾：不可逆动作有确认门、数据可找回 (Priority: P1)
+## Phase 4: User Story 2 — 安全收尾：归档可找回、合并保留双方 (Priority: P1)
 
-**Goal**: 凡删除、移动、覆盖，先归档、留回执、可找回；破坏性动作必须显式确认，无交互环境下宁可 blocked 也不自动批准；目标冲突时命令停住并指名双方。
+**Goal**: 凡删除、移动、覆盖、合并，先归档、留回执、可找回；归档优先使破坏性处置成为可逆动作并自动执行；旧新普通文件冲突由命令合并并保留双方，只有不可合并的结构性冲突才停住并指名双方。
 
-**Independent Test**: 构造含用户手改文件与目标冲突的夹具，断言未确认时破坏性处置零执行、确认后被替换与归档对象均可找回、冲突时拒绝覆盖并指名双方。
+**Independent Test**: 构造含用户手改文件与旧新冲突的夹具，断言非交互应用执行归档优先处置、每个被替换/合并/归档对象均可找回、可合并冲突保留双方、不可合并冲突拒绝并指名双方。
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [X] T023 [US2] Author `tests/integration/test_migrate_us2_safety.py` red-first: a non-interactive apply marks every destructive item `blocked` and executes none (exit 3), the interactive single-batch confirmation executes them, every replaced/archived object exists at its receipt-named archive path, the conflict fixture refuses and names both candidates, user skills and hand-edited files stay byte-identical, and four mutations turn the file red (remove the confirmation gate; remove the archive step; inject full-delete; weaken the assertion to existence-only) (FR-015, FR-016, FR-024). [blockedBy: T007] [green: contracts/migrate-cli.md#C-5] [green: contracts/migrate-engine.md#C-6]
+- [X] T023 [US2] Author `tests/integration/test_migrate_us2_safety.py` red-first: a non-interactive apply executes every archive-first destructive item (exit 0 unless a structural conflict remains), every replaced/merged/archived object exists at its receipt-named archive path, the merge fixture preserves both candidates, the unmergeable structural fixture refuses and names both candidates, user skills and hand-edited files stay byte-identical, and four mutations turn the file red (remove the archive step; inject silent-winner selection; inject full-delete; weaken the assertion to existence-only) (FR-015, FR-016, FR-024). [blockedBy: T007] [green: contracts/migrate-cli.md#C-5] [green: contracts/migrate-engine.md#C-6]
 
 ### Implementation for User Story 2
 
-- [X] T024 [US2] Implement the disposition classifier and destructive-bucket gate in `src/specify_cli/__init__.py`: classify each item against the destructive criteria by pointer to `.specify/shared/guidelines/confirmation-gates.md`, implement the dual key (`--apply` enters write mode; one single-batch interactive confirmation), and make non-interactive destructive items `blocked` with no prompt and no non-interactive flag (FR-014, FR-015). [blockedBy: T021]
+- [X] T024 [US2] Implement the reversibility classifier in `src/specify_cli/__init__.py`: classify each item against the confirmation-gates owner, treat archive-first items as reversible and auto-execute them on `--apply` in every environment, block only destructive items with no archive path, and never add a confirmation flag (FR-014, FR-015). [blockedBy: T021]
 - [X] T025 [US2] Implement archive-not-delete enforcement and recovery enumeration in `src/specify_cli/__init__.py`: every replace/remove first moves the object under `.specify/archive/migrate/<run-id>/<rel>`, each receipt records `archives[]` with `change` and `digest`, and `recover` names one recovery path per entry (FR-016, FR-017, FR-018). [blockedBy: T024]
 - [X] T026 [US2] Implement conflict refusal and platform degradation in `src/specify_cli/__init__.py`: a non-equivalent existing target yields `refuse` naming both candidate paths and never picks a winner, and a host without symlink support yields a `refuse` item with reason `platform-no-symlink` instead of a crash (FR-014, FR-016). [blockedBy: T024]
 - [X] T027 [US2] Implement user-content protection in `src/specify_cli/__init__.py`: user-built skills, project-specific extensions, `site/` data, `.specify/memory/**` and hand-edited framework files are never residue candidates, and any replacement archives the old content first (FR-016). [blockedBy: T025]
-- [X] T028 [US2] Run the US2 suite via `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q` and record the readings into `.specify/specs/097-speckit-migrate-command/test-evidence/us2-safety.txt`: blocked-run exit codes, per-archive existence checks, conflict readings, byte hashes and all four mutation results (SC-002, SC-005, SC-008). [blockedBy: T027,T026,T023]
+- [X] T028 [US2] Run the US2 suite via `bash scripts/bash/run-tests.sh tests/integration/test_migrate_us2_safety.py -q` and record the readings into `.specify/specs/097-speckit-migrate-command/test-evidence/us2-safety.txt`: non-interactive apply exit codes, per-archive existence checks, merge-preservation readings, structural-conflict readings, byte hashes and all four mutation results (SC-002, SC-005, SC-008). [blockedBy: T027,T026,T023]
 
 **Checkpoint**: US1 and US2 work independently — convergence is trustworthy because every destructive action is gated and recoverable.
 
@@ -239,7 +239,7 @@ Reviewed at tasks generation (2026-11-10): `.specify/features.md` row 024 reads 
 
 ### Implementation for User Story 4
 
-- [X] T035 [US4] Author `templates/commands/migrate.md` as a thin projection: `## User Input`, `## Glossary` pointer, `## Delegation` (dry-run first via `specify migrate [--format json]`, apply only via `specify migrate --apply` after presenting the plan and obtaining consent), `## Handoffs`, and verbatim restatement of the four outcomes and their exit codes with receipt/archive pointers (FR-002, FR-021, FR-022). [blockedBy: T033]
+- [X] T035 [US4] Author `templates/commands/migrate.md` as a thin projection: `## User Input`, `## Glossary` pointer, `## Delegation` (dry-run first via `specify migrate [--format json]`, then automatic `specify migrate --apply` because archive-first items are reversible), merge disclosure, `## Handoffs`, and verbatim restatement of the four outcomes and their exit codes with receipt/archive pointers (FR-002, FR-021, FR-022). [blockedBy: T033]
 - [X] T036 [US4] Regenerate the four per-tool copies from the source template with `python3 scripts/python/regen-command-copies.py`: `.github/prompts/speckit.migrate.prompt.md`, `.claude/commands/speckit.migrate.md`, `.qoder/commands/speckit.migrate.md`, `.opencode/command/speckit.migrate.md`; no copy may be hand-written (FR-021). [blockedBy: T035]
 - [X] T037 [US4] Author `docs/reference/commands/migrate.md`: execution flow, the four options, the outcome/exit-code table, the receipt `.specify/memory/migrate/receipts/<run-id>.json` and archive `.specify/archive/migrate/<run-id>/` landing points, and the boundary against `specify init` and `/speckit.sanitize` (FR-021). [blockedBy: T035]
 - [X] T038 [US4] Update `tests/contract/test_migration_distribution.py`: add `migrate` to `COMMAND_BASELINE` and change the pinned `assert len(COMMAND_BASELINE) == 29` to `== 30` (FR-021). [blockedBy: T036]

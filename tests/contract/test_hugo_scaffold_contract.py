@@ -311,6 +311,8 @@ def test_mirror_parity_for_the_whole_skill():
     for source in sorted(SKILL_DIR.rglob("*")):
         if not source.is_file():
             continue
+        if "__pycache__" in source.parts or source.suffix == ".pyc":
+            continue
         mirror = MIRROR_DIR / source.relative_to(SKILL_DIR)
         if not mirror.is_file() or mirror.read_bytes() != source.read_bytes():
             drift.append(source.relative_to(SKILL_DIR).as_posix())

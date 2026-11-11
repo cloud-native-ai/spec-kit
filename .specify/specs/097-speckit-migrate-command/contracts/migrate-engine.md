@@ -29,9 +29,12 @@
 | 期望文件缺失 | `write` | `copy` / `symlink` | 无 |
 | 期望文件存在但内容不等 | `replace` | `replace` | 必归档旧对象 |
 | 注册表退役项、旧代状态文件、旧工具目录、平铺重复（嵌套已存在） | `archive` | `archive` | 必归档 |
-| 锚点搬迁、平铺→嵌套搬迁（目标不存在） | `archive` | `relocate` / `anchor-engine` | 内容保留在目标位置；回执记录 from→to，`recover` 说明回迁方式 |
-| 冲突（目标已存在且内容不等价） | `refuse` | `none` | 不执行；回执指名两个候选 |
-| 破坏性未获第二把钥匙 | `blocked` | `none` | 不执行 |
+| 锚点搬迁、平铺→嵌套搬迁（目标不存在） | `archive` | `relocate` / `anchor-engine` | 先归档原件；回执记录 from→to，`recover` 说明回迁方式 |
+| 锚点旧新同位置：目标为占位 stub、legacy 为真实内容 | `replace` | `anchor-engine` | 归档 stub 与 legacy 后写入真实内容 |
+| 锚点旧新同位置：双方真实且不同 | `replace` | `anchor-engine` | 合并保留双方，归档两个原件；`features.md` 表行并集（目标同名行优先），其余锚点追加固定标记 |
+| 锚点旧新同位置：一方为占位或双方字节相同 | `archive` | `anchor-engine` | 归档 legacy 重复/占位；目标不变 |
+| 不可合并的结构性冲突（非空目录、损坏链接、不可读内容） | `refuse` | `none` | 不执行；回执指名两个候选 |
+| 破坏性处置但没有归档路径 | `blocked` | `none` | 执行器安全网拒绝执行 |
 | 平台不支持符号链接 | `refuse` | `none` | 原因 `platform-no-symlink` |
 | 已在期望态 | `converged` | `none` | 无（`converged` 项只在 apply 的内部收束判断中出现，`converged` 的差异项不进入计划项——计划只列真实差异） |
 
@@ -67,13 +70,14 @@
 ## C-6 安全与确认（引用 owner）
 
 - 破坏性/不可逆动作的清单与判据：`.specify/shared/guidelines/confirmation-gates.md`（本契约不复述）。
-- 双键：`--apply`（第一把）+ 交互终端一次单批确认（第二把）；无人值守行（该 owner 的矩阵）决定非交互时破坏项 `blocked`。
-- `refuse` 不择一胜出；该 item 保留原状并在回执中指名两个候选（现状对象、期望对象）。
-- 用户内容保护：替换/移除前必归档；用户自建技能、项目专属扩展、`site/` 数据永不入选。
+- 单授权 + archive-first：`--apply` 是唯一写入开关；可归档恢复的处置（`replace` / `archive` / `relocate` / `merge`）按可逆动作处理，交互与非交互环境都自动执行，并由回执的 `archives[]` / `recover` 记录恢复路径；不要求第二次确认，不提供确认旗标。
+- 无归档路径的破坏性处置由执行器安全网判 `blocked`，不自动执行。
+- `refuse` 不择一胜出；该 item 保留原状并在回执中指名两个候选（现状对象、期望对象）。锚点旧新普通文件冲突走合并，不进入 `refuse`。
+- 用户内容保护：替换/移除/合并前必归档；用户自建技能、项目专属扩展、`site/` 数据永不入选。
 
 ## C-7 归档、回执、幂等与续跑
 
-- 归档布局：`.specify/archive/migrate/<run-id>/<rel>`，`<rel>` 为对象相对工作区路径（剥离前导 `.specify/`），与 sanitize archive 布局同构。
+- 归档布局：`.specify/archive/migrate/<run-id>/<rel>`，`<rel>` 为对象相对工作区路径（剥离前导 `.specify/`），与 sanitize archive 布局同构；锚点引擎的归档落在 `.specify/archive/migrate/<run-id>/anchor-layout/<rel>`（同一 `<rel>` 规则），合并项的两个原件各有一条归档记录。
 - 回执：`.specify/memory/migrate/receipts/<run-id>.json`，逐运行一文一件；apply 开始时写 `status=running`，逐项更新 `items[].status` 与 `archives[]`，收束写 `completed`。两并发运行产生不同 `run-id` 路径（单元测试钉住）。
 - 干跑回执只走输出流，零落盘。
 - 幂等：apply 后重跑为 `clean` 且零写入。

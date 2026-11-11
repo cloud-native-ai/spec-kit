@@ -95,7 +95,7 @@
 
 1. **期望态构建**：客户端模式以「运行 init 的同一复制机制到临时参照树、再逐文件对照」为唯一投影；不逐文件重写比较（T-001）。
 2. **双工作区语义**：框架源工作区（`skills/external/` 存在，与 sanitize 既有 guard 同源）委托 `sync-mirrors.py --check` 与 `regen-command-copies.py --check`；客户端模式用参照树对照（T-002）。
-3. **处置与安全**：差异项映射进 FR-014 六值封闭集；移动（锚点、平铺内部技能）归 `archive`（可找回的搬迁），有别处既有目标的归 `refuse`；未确认破坏桶归 `blocked`。
+3. **处置与安全**：差异项映射进 FR-014 六值封闭集；移动（锚点、平铺内部技能）与合并归 `archive` / `replace` 的 archive-first 处置，可归档恢复即按可逆动作自动执行；旧新锚点普通文件冲突由引擎合并保留双方，只有不可合并的结构冲突归 `refuse`；无归档路径的破坏性处置归 `blocked`。
 4. **回执**：apply 落盘 `.specify/memory/migrate/receipts/<run-id>.json`；dry-run 为零写入，回执体随 stdout/`--format json` 输出。
 5. **归档**：`.specify/archive/migrate/<run-id>/<相对路径>`。
 6. **无遗留 NEEDS CLARIFICATION**。

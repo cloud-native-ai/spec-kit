@@ -778,17 +778,47 @@ def action_scan(args: argparse.Namespace) -> Dict[str, Any]:
             "pending": sum(1 for g in active if g["status"] == STATUS_PROPOSED)}
 
 
+def _auto_confirm_problems(root: Path, groups: Sequence[Dict[str, Any]]) -> List[str]:
+    """Preconditions for treating this duplicate-only plan as reversible."""
+    problems: List[str] = []
+    needs = [g["group_id"] for g in groups if g["status"] == STATUS_NEEDS_DECISION]
+    if needs:
+        problems.append("needs-decision:" + ",".join(needs))
+    for group in groups:
+        problem = _revalidate(root, group)
+        if problem:
+            problems.append(f"{group['group_id']}:{problem}")
+    targets = [str(item.get("from") or item.get("path") or "")
+               for group in groups for item in group["items"]]
+    targets += [entry["path"] for group in groups
+                for entry in group["refs"]["in_scope"]]
+    clean, dirty = git_clean(root, sorted({target for target in targets if target}))
+    if not clean:
+        problems.append("dirty:" + ",".join(dirty[:5]))
+    return problems
+
+
 def action_plan(args: argparse.Namespace) -> Dict[str, Any]:
     root = resolve_root(args.workspace_root)
     groups, notes = build_groups(root)
     selected = [g for g in groups if g["status"] != STATUS_DISMISSED]
+    auto_requested = bool(getattr(args, "auto_confirm", False))
     if not selected:
         return {"ok": True, "action": "plan", "groups": 0,
+                "autoConfirmed": False if auto_requested else None,
                 "note": "no undismissed numbering collision found"}
+    auto_problems = _auto_confirm_problems(root, selected) if auto_requested else []
+    auto_confirmed = auto_requested and not auto_problems
     plan = {"kind": KIND + ".plan", "schema_version": SCHEMA_VERSION,
             "created_at": now_iso(), "workspace_root": str(root),
-            "confirmed": False, "families": FAMILIES,
+            "confirmed": auto_confirmed, "families": FAMILIES,
             "groups": selected, "info": notes}
+    if auto_requested:
+        plan["auto_confirm"] = {
+            "requested": True,
+            "confirmed": auto_confirmed,
+            "problems": auto_problems,
+        }
     out = Path(args.plan_out) if args.plan_out else None
     if out is None:
         out = plans_dir(root) / f"{stamp()}-plan.json"
@@ -799,6 +829,8 @@ def action_plan(args: argparse.Namespace) -> Dict[str, Any]:
             "groups": len(selected), "families": summarize(selected),
             "needs_decision": sum(1 for g in selected
                                   if g["status"] == STATUS_NEEDS_DECISION),
+            "autoConfirmed": auto_confirmed if auto_requested else None,
+            "autoConfirmProblems": auto_problems,
             "digest": [group_digest(g) for g in selected]}
 
 
@@ -1048,7 +1080,8 @@ def action_status(args: argparse.Namespace) -> Dict[str, Any]:
 
 ARG_MANIFEST = {
     "scan": {"required": [], "source": ["--workspace-root"]},
-    "plan": {"required": [], "source": ["--plan-out", "--workspace-root"]},
+    "plan": {"required": [], "source": ["--plan-out", "--workspace-root",
+                                        "--auto-confirm"]},
     "apply": {"required": ["--plan"], "source": ["--groups",
                                                  "--adopt-ambiguous-refs",
                                                  "--workspace-root"]},
@@ -1073,6 +1106,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--reason", default=None)
     parser.add_argument("--reopen", action="store_true")
     parser.add_argument("--adopt-ambiguous-refs", action="store_true")
+    parser.add_argument("--auto-confirm", action="store_true", dest="auto_confirm")
     parser.add_argument("--format", choices=["text", "json"], default="json")
     return parser
 
@@ -1119,7 +1153,7 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
         return None
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    _sig_guard(argv, declared=['--action', '--workspace-root', '--plan', '--plan-out', '--groups', '--group', '--reason', '--reopen', '--adopt-ambiguous-refs', '--format'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--action', '--workspace-root', '--plan', '--plan-out', '--groups', '--group', '--reason', '--reopen', '--adopt-ambiguous-refs', '--auto-confirm', '--format'])  # answer --version / reject an undeclared option
     args = build_parser().parse_args(argv)
     try:
         handler = {

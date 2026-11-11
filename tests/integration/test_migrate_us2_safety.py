@@ -1,26 +1,19 @@
-"""Integration: US2 safety — dual key, archive-not-delete, conflict refusal, user-content protection (097 T023).
+"""Integration: US2 safety — archive-first auto-execution, merge preservation, structural refusal, user-content protection (097 T023).
 
-Green claims: contracts/migrate-cli.md C-5 (confirmation gate on the command
-surface: --apply is only the first key, the second key lives in an interactive
-terminal, non-interactive destructive items stop as `blocked`) and
-contracts/migrate-engine.md C-6 (owner-referenced destructive criteria,
-`refuse` names both candidates and never picks a winner, user content is never
-a residue candidate and replacement archives first).
-
-Red-first: the destructive classifier, the symlink-support probe and the
-`platform-no-symlink` refusal do not exist when this file is authored — those
-tests fail on missing attributes before the T024–T027 implementation lands
-(readings in notes/red-first-evidence.md). The already-shipped second-key hook
-and archive executor are exercised from the same file.
+Green claims: contracts/migrate-cli.md C-5 (single `--apply` authorization;
+archive-first items execute automatically in every environment; only items
+with no archive path are blocked) and contracts/migrate-engine.md C-6
+(owner-referenced destructive criteria, old/new anchors merge and preserve both
+sides, an unmergeable structural target refuses and names both candidates, user
+content is never a residue candidate and replacement archives first).
 
 Mutation discipline (FR-024 / SC-002 / SC-005 / SC-008): every safety
-assertion is proven red-able inside this suite. Removing the confirmation
-gate, removing the archive step, injecting a full delete, and replacing the
-symlink probe with a workspace-writing variant must each make the
-corresponding assertion fail — a mutation that stays green means the
-assertion has no discriminative power. The existence-only weakening is a
-check-power drill over the same reading: the weakened form stays green while
-the byte assertion reds.
+assertion is proven red-able inside this suite. Removing the archive step,
+injecting a full delete, picking one side of a merge, and replacing the symlink
+probe with a workspace-writing variant must each make the corresponding
+assertion fail — a mutation that stays green means the assertion has no
+discriminative power. The existence-only weakening is a check-power drill over
+the same reading: the weakened form stays green while the byte assertion reds.
 """
 
 import hashlib
@@ -169,36 +162,18 @@ def _digests(workspace: Path, keys) -> dict:
     return {key: specify_cli._migrate_digest(workspace / key[1]) for key in keys}
 
 
-def _assert_noninteractive_blocked(result, workspace, dry, pre_digests):
-    """The C-5 non-interactive reading: destructive items blocked, none executed."""
-    payload = _json_payload(result, 3)
-    assert payload["outcome"] == "blocked"
-    assert payload["exitCode"] == 3
+def _assert_auto_applied_with_archives(result, workspace, snapshot):
+    """The C-5 reading: archive-first items execute automatically and are recoverable."""
+    payload = _json_payload(result, 0)
+    assert payload["outcome"] == "applied"
+    assert payload["exitCode"] == 0
     receipt = payload["receipt"]
-    assert receipt["archives"] == [], "a destructive item executed without the second key"
-    by_key = {(item["dimension"], item["target"]): item for item in payload["items"]}
-    destructive = _destructive_keys(dry)
-    assert destructive, "fixture planned no destructive item"
-    for key in sorted(destructive):
-        item = by_key[key]
-        assert item["disposition"] == "blocked", item
-        assert item["status"] == "blocked", item
-        assert item["reason"], f"blocked item carries no reason: {item}"
-        assert specify_cli._migrate_digest(workspace / key[1]) == pre_digests[key], (
-            f"destructive item executed without the second key: {key}"
-        )
-    assert not (workspace / ".specify" / "archive").exists(), (
-        "the blocked run created an archive directory"
-    )
-    for item in dry["items"]:
-        if item["disposition"] != "write":
-            continue
-        target = workspace / item["target"]
-        assert target.exists() or target.is_symlink(), (
-            f"reversible item did not run under a blocked outcome: {item['target']}"
-        )
-    user_snapshot = _user_content_snapshot(workspace)
-    assert _user_content_exists(workspace, user_snapshot)
+    assert receipt["status"] == "completed"
+    assert all(item["status"] == "done" for item in receipt["items"]), [
+        (item["target"], item["status"]) for item in receipt["items"]
+    ]
+    _assert_archives_exist_and_enumerated(payload, workspace)
+    _assert_user_content_intact(workspace, snapshot)
 
 
 def _assert_archives_exist_and_enumerated(payload, workspace: Path):
@@ -225,7 +200,10 @@ def _assert_archives_exist_and_enumerated(payload, workspace: Path):
         assert located.exists() or located.is_symlink(), (
             f"receipt names a missing archive object: {entry}"
         )
-        assert entry["change"] in ("replaced", "archived", "removed-stale", "relocated"), entry
+        assert entry["change"] in (
+            "replaced", "archived", "removed-stale", "relocated",
+            "merged", "removed-duplicate",
+        ), entry
         assert entry["digest"], entry
         assert entry["digest"] == specify_cli._migrate_digest(located), (
             f"archived object bytes differ from the receipt digest: {entry}"
@@ -350,46 +328,19 @@ def test_mutation_workspace_writing_probe_turns_the_zero_write_check_red(
 
 
 # ---------------------------------------------------------------------------
-# C-5: non-interactive apply blocks every destructive item and executes none
+# C-5: non-interactive apply executes archive-first items and never prompts
 # ---------------------------------------------------------------------------
 
 
-def test_noninteractive_apply_blocks_every_destructive_item_and_executes_none(
+def test_noninteractive_apply_executes_archive_first_items_and_archives_are_recoverable(
     tmp_path, monkeypatch
 ):
     workspace, snapshot = _legacy_with_user_content(tmp_path / "legacy")
     dry = _json_payload(_dry_run(workspace), 1)
-    pre_digests = _digests(workspace, _destructive_keys(dry))
-
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: False)
-    monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    confirm_calls = []
-    monkeypatch.setattr(
-        specify_cli.typer, "confirm", lambda *a, **kw: confirm_calls.append(a) or True
-    )
-
-    result = _apply(workspace)
-
-    assert confirm_calls == [], "a non-interactive run must not prompt"
-    _assert_noninteractive_blocked(result, workspace, dry, pre_digests)
-    _assert_user_content_intact(workspace, snapshot)
-
-
-# ---------------------------------------------------------------------------
-# C-5: the interactive single-batch confirmation executes them; archives exist
-# ---------------------------------------------------------------------------
-
-
-def test_interactive_confirmation_executes_destructive_items_and_archives_are_recoverable(
-    tmp_path, monkeypatch
-):
-    workspace, snapshot = _legacy_with_user_content(tmp_path / "legacy")
-    dry = _json_payload(_dry_run(workspace), 1)
-    pre_digests = _digests(workspace, _destructive_keys(dry))
+    assert _destructive_keys(dry), "fixture planned no destructive item"
     hand_edited_before = _file_sha256(workspace / HAND_EDITED_TEMPLATE)
     assert FIXTURE_EDIT_MARKER in (workspace / HAND_EDITED_TEMPLATE).read_bytes()
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
     confirm_calls = []
     monkeypatch.setattr(
@@ -397,21 +348,14 @@ def test_interactive_confirmation_executes_destructive_items_and_archives_are_re
     )
 
     result = _apply(workspace)
+
+    assert confirm_calls == [], "an archive-first apply must not prompt"
+    _assert_auto_applied_with_archives(result, workspace, snapshot)
+
     payload = _json_payload(result, 0)
-
-    assert len(confirm_calls) == 1, "destructive items need exactly one single-batch confirmation"
-    assert payload["outcome"] == "applied"
-    assert payload["receiptPath"]
-    receipt = payload["receipt"]
-    assert receipt["status"] == "completed"
-    assert all(item["status"] == "done" for item in receipt["items"]), [
-        (item["target"], item["status"]) for item in receipt["items"]
-    ]
-    _assert_archives_exist_and_enumerated(payload, workspace)
-
     hand_edited_entry = next(
         entry
-        for entry in receipt["archives"]
+        for entry in payload["receipt"]["archives"]
         if entry["path"] == HAND_EDITED_TEMPLATE.as_posix()
     )
     archived_copy = workspace / hand_edited_entry["archiveTo"]
@@ -419,64 +363,91 @@ def test_interactive_confirmation_executes_destructive_items_and_archives_are_re
         "the replaced user-edited content was not archived byte-identically"
     )
     assert FIXTURE_EDIT_MARKER not in (workspace / HAND_EDITED_TEMPLATE).read_bytes()
-    _assert_user_content_intact(workspace, snapshot)
 
 
 # ---------------------------------------------------------------------------
-# C-6 / SC-005: conflict refusal names both candidates and never picks a winner
+# C-6 / SC-005: a real/real anchor conflict is merged, never silently won
 # ---------------------------------------------------------------------------
 
 
-def test_conflict_refusal_names_both_candidates_and_never_picks_a_winner(
+def test_real_anchor_conflict_is_merged_and_preserves_both_candidates(
     tmp_path, monkeypatch
 ):
     workspace = _builders().build_legacy_project(tmp_path / "conflict")
     legacy_anchor = workspace / ".specify" / "memory" / "features.md"
-    conflicting_target = workspace / ".specify" / "features.md"
-    conflicting_target.write_text(
-        "# existing conflicting target happens to sit where the anchor belongs\n",
+    target = workspace / ".specify" / "features.md"
+    legacy_anchor.write_text(
+        "# Legacy registry\n\n**Last Updated**: 2026-01-01\n"
+        "**Total Features**: 2\n\n| ID | Name |\n|----|------|\n"
+        "| 001 | Legacy-one |\n| 903 | Legacy-only |\n",
         encoding="utf-8",
     )
-    legacy_bytes = legacy_anchor.read_bytes()
-    conflicting_bytes = conflicting_target.read_bytes()
+    target.write_text(
+        "# Current registry\n\n**Last Updated**: 2026-02-01\n"
+        "**Total Features**: 2\n\n| ID | Name |\n|----|------|\n"
+        "| 001 | Current-one |\n| 002 | Current-two |\n",
+        encoding="utf-8",
+    )
 
     dry = _json_payload(_dry_run(workspace), 1)
-    refusals = [
+    merges = [
         item
         for item in dry["items"]
-        if item["dimension"] == "anchor-layout" and item["disposition"] == "refuse"
-    ]
-    assert refusals, f"the conflict fixture produced no refuse item: {dry['items']}"
-    refusal = refusals[0]
-    assert refusal["status"] == "refused"
-    assert refusal["current"] in refusal["reason"]
-    assert refusal["expected"] in refusal["reason"]
-    assert ".specify/memory/features.md" in refusal["reason"]
-    assert ".specify/features.md" in refusal["reason"]
-
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
-    monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: True)
-
-    result = _apply(workspace)
-    payload = _json_payload(result, 3)
-
-    assert payload["outcome"] == "blocked", "a refused conflict must block the outcome"
-    applied_refusal = next(
-        item
-        for item in payload["items"]
         if item["dimension"] == "anchor-layout"
-        and item["disposition"] == "refuse"
+        and item["disposition"] == "replace"
+        and item["mechanism"] == "anchor-engine"
+        and "features-table-union" in item["expected"]
+    ]
+    assert merges, f"the conflict fixture produced no merge item: {dry['items']}"
+
+    monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
+    payload = _json_payload(_apply(workspace), 0)
+
+    merged = target.read_text(encoding="utf-8")
+    assert "Current-one" in merged and "Current-two" in merged
+    assert "Legacy-only" in merged, "the legacy-only row was dropped"
+    assert "| 001 | Current-one |" in merged, "the target row must win on a duplicate id"
+    assert "Legacy-one" not in merged, "a duplicate legacy row must be archived, not appended"
+    assert "**Total Features**: 3" in merged
+    assert "**Last Updated**: 2026-02-01" in merged
+
+    archived_paths = {entry["path"] for entry in payload["receipt"]["archives"]}
+    assert ".specify/memory/features.md" in archived_paths
+    assert ".specify/features.md" in archived_paths
+    for entry in payload["receipt"]["archives"]:
+        if entry["path"] in archived_paths:
+            assert (workspace / entry["archiveTo"]).exists(), entry
+
+
+def test_real_prose_anchor_conflict_is_merged_with_marker(tmp_path, monkeypatch):
+    workspace = _builders().build_legacy_project(tmp_path / "conflict-prose")
+    legacy_anchor = workspace / ".specify" / "memory" / "constitution.md"
+    target = workspace / ".specify" / "constitution.md"
+    legacy_anchor.write_text(
+        "# Legacy constitution\n\nLegacy principle.\n", encoding="utf-8"
     )
-    assert applied_refusal["status"] == "refused"
-    assert legacy_anchor.read_bytes() == legacy_bytes, "the legacy candidate was moved"
-    assert conflicting_target.read_bytes() == conflicting_bytes, (
-        "a winner was picked for a conflicting target"
+    target.write_text(
+        "# Current constitution\n\nCurrent principle.\n", encoding="utf-8"
     )
-    assert all(
-        entry["path"] != refusal["target"]
-        for entry in payload["receipt"]["archives"]
-    ), "a refused item produced an archive entry"
+
+    dry = _json_payload(_dry_run(workspace), 1)
+    merges = [
+        item
+        for item in dry["items"]
+        if item["dimension"] == "anchor-layout"
+        and item["disposition"] == "replace"
+        and "append-marker" in item["expected"]
+    ]
+    assert merges, f"the prose conflict produced no merge item: {dry['items']}"
+
+    monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
+    _json_payload(_apply(workspace), 0)
+
+    merged = target.read_text(encoding="utf-8")
+    assert "Current principle." in merged
+    assert "Legacy principle." in merged
+    assert "specify-migrate: legacy anchor" in merged
+    assert not legacy_anchor.exists(), "the merged legacy original must be archived away"
 
 
 # ---------------------------------------------------------------------------
@@ -504,9 +475,7 @@ def test_user_content_never_becomes_a_candidate_and_hand_edits_stay_recoverable(
     assert hand_edited["mechanism"] == "replace"
 
     hand_edited_before = _file_sha256(workspace / HAND_EDITED_TEMPLATE)
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: True)
     payload = _json_payload(_apply(workspace), 0)
 
     _assert_user_content_intact(workspace, snapshot)
@@ -544,8 +513,6 @@ def test_platform_without_symlink_support_refuses_with_reason_instead_of_crashin
         assert "platform-no-symlink" in item["reason"]
         assert item["current"] in item["reason"] and item["expected"] in item["reason"]
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: True)
     payload = _json_payload(_apply(workspace), 3)
 
     assert payload["outcome"] == "blocked"
@@ -560,25 +527,18 @@ def test_platform_without_symlink_support_refuses_with_reason_instead_of_crashin
 
 
 # ---------------------------------------------------------------------------
-# Mutation 1: removing the confirmation gate must turn the blocked check red
+# Mutation 1: picking one side of a merge must turn the both-sides check red
 # ---------------------------------------------------------------------------
 
 
-def test_mutation_removing_the_confirmation_gate_turns_the_blocked_check_red(
-    tmp_path, monkeypatch
-):
-    workspace = _builders().build_legacy_project(tmp_path / "legacy")
-    dry = _json_payload(_dry_run(workspace), 1)
-    pre_digests = _digests(workspace, _destructive_keys(dry))
+def _assert_merge_preserves_both(merged_text: str) -> None:
+    assert "Current principle." in merged_text
+    assert "Legacy principle." in merged_text
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: False)
-    monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli, "_migrate_second_key", lambda plan: True)
 
-    result = _apply(workspace)
-
+def test_mutation_picking_one_side_turns_the_merge_check_red():
     with pytest.raises(AssertionError):
-        _assert_noninteractive_blocked(result, workspace, dry, pre_digests)
+        _assert_merge_preserves_both("# Current constitution only\n")
 
 
 # ---------------------------------------------------------------------------
@@ -609,9 +569,7 @@ def test_mutation_removing_the_archive_step_turns_the_archive_check_red(
             "digest": digest,
         }
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: True)
     monkeypatch.setattr(
         specify_cli, "_migrate_archive_object", archive_without_archiving
     )
@@ -650,9 +608,7 @@ def test_mutation_injecting_full_delete_turns_the_archive_and_user_content_check
             target.unlink()
         item.status = "done"
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: True)
     monkeypatch.setattr(specify_cli, "_migrate_execute_item", full_delete)
 
     payload = _json_payload(_apply(workspace), 0)

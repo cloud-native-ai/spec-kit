@@ -4291,14 +4291,34 @@ def test_t078_no_command_gate_or_second_checker_was_added():
         )
     # Confirmation gate: the governed list the scanner enforces, and the mechanical gate file
     # `gate-check.py` reads. Both are compared the same way, so "unchanged" is a measurement.
+    # 2026-11-11 sanctioned amendment: Feature 097's follow-up adds the archive-first
+    # reversibility carve-out and the retention/spec-retirement row. The amendment is additive
+    # only — every base line survives and every added line must carry a sanctioned marker.
+    sanctioned_owner_additions = (
+        "**可逆动作例外（archive-first）**",
+        "| retention / spec 退役删除 |",
+    )
     for surface in CONFIRMATION_GATE_SURFACES:
         base = subprocess.run(["git", "show", f"{_feature_base()}:{surface}"],
                               cwd=str(ROOT), capture_output=True, text=True, timeout=120)
         assert base.returncode == 0, (
             f"C-32: the confirmation-gate owner existed at the feature base: {surface}"
         )
-        assert _text(ROOT / surface) == base.stdout, (
-            f"C-32: the confirmation-gate list is unchanged by this feature ({surface})"
+        current = _text(ROOT / surface)
+        if current == base.stdout:
+            continue
+        current_lines = current.splitlines()
+        base_lines = base.stdout.splitlines()
+        missing = [line for line in base_lines if line not in current_lines]
+        added = [line for line in current_lines if line not in base_lines]
+        assert not missing, (
+            f"C-32: the confirmation-gate amendment removed base lines ({surface}): {missing}"
+        )
+        assert added and all(
+            any(marker in line for marker in sanctioned_owner_additions) for line in added
+        ), (
+            f"C-32: the confirmation-gate amendment is not the sanctioned additive one "
+            f"({surface}); added={added}"
         )
     # Second checker: exactly one engine under `scripts/python/` judges the script-interface
     # rule, and its two faces are the declared pair — not an engine plus a rival.

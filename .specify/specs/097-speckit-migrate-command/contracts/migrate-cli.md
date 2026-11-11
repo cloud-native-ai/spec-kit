@@ -13,7 +13,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 | 选项 | 取值 | 缺省 | 语义 |
 |------|------|------|------|
 | `--dry-run` | flag | **默认** | 只读探测并输出计划；显式传入与默认等价，供脚本自述 |
-| `--apply` | flag | 关 | 进入写入模式（第一把钥匙）；与 `--dry-run` 互斥 |
+| `--apply` | flag | 关 | 进入写入模式（唯一写入授权）；archive-first 项自动执行并可由回执恢复；与 `--dry-run` 互斥 |
 | `--workspace` | PATH | `.` | 目标工作区根；必须已含 `.specify/` |
 | `--format` | `text` \| `json` | `text` | `json` 输出机器可读包络（C-4） |
 | `--help` | flag | — | 零副作用应答（C-6） |
@@ -33,7 +33,7 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 | `clean` | 计划为空（干跑或 apply 均可） | 0 |
 | `planned` | 干跑且存在差异项 | 1 |
 | `applied` | apply 完成，且无 `refused` / `blocked` / `failed` 项 | 0 |
-| `blocked` | apply 后仍存在 `refused` / `blocked` / `failed` 项，或破坏桶未获第二把钥匙（`failed` = 执行期 I/O 失败，并入此结局，绝不报 applied） | 3 |
+| `blocked` | apply 后仍存在 `refused` / `blocked` / `failed` 项（`failed` = 执行期 I/O 失败；`blocked` = 无归档路径的破坏性处置被安全网拒绝），绝不报 applied | 3 |
 | `error` | 前置条件/输入错误（含非法选项） | 2 |
 
 同一结局的退出码恒定；MUST NOT 用 0 掩盖未完成的处置。映射与 requirements FR-019 逐项对应，契约测试从 requirements 提取该表比对。`error` 不是 outcome token：输入/前置条件错误以 stderr 报文 + 退出 2 收束，不输出计划包络、不产生回执；`outcome` 的取值域为 `clean` / `planned` / `applied` / `blocked`（C-4）。
@@ -67,9 +67,9 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 
 ## C-5 确认门（命令面部分）
 
-- `--apply` 只进入写入模式，**不构成**对破坏性桶的批准（第一把钥匙）。
-- 第二把钥匙只在交互终端存在：以干跑审阅为前提的一次单批确认提示；用户拒绝 → 破坏性项 `blocked`、可逆项照常、结局 `blocked`、退出 3。
-- 非交互环境（stdin 非 TTY）MUST NOT 抛出确认提问：破坏性项 `blocked`、可逆项照常、结局 `blocked`、退出 3。
+- `--apply` 是唯一写入授权；本命令不提供第二把钥匙，也不提供 `--yes` / `--force` / `--confirm` / `--non-interactive` 等确认旗标。
+- 破坏性处置 MUST archive-first：原件先复制进逐运行归档根，回执逐项记录 `recover` 路径；因此这些处置是可逆动作，交互与非交互环境都自动执行，不抛出确认提问。
+- 没有归档路径的破坏性处置 MUST NOT 自动执行：执行器安全网将其判为 `blocked`，结局 `blocked`、退出 3。
 - 破坏性/不可逆动作的判据与清单 owner 是 `.specify/shared/guidelines/confirmation-gates.md`；本契约不复述。
 
 ## C-6 接口契约（宪法 XXI 面）

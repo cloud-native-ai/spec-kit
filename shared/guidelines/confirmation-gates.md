@@ -22,6 +22,8 @@
 - 远程推送(push / force-push / 远程分支操作)与写入外部权威源(issue 跟踪、平台注册表等本空间之外的系统)
 - 覆盖用户既有内容(含覆盖用户既有权威条目,如 glossary 用户条目冲突写入、同名目录覆盖清空、以空值覆盖既有 goal 判据集——后者 MUST 由引擎拒绝缺参形态,清空只经显式旗标进入)
 
+**可逆动作例外（archive-first）**: 一个动作若在改变目标之前把原件复制进运行范围归档根、并在回执中逐项记录恢复路径，则它是可逆动作，MUST 自动执行，不进入本清单的前置确认。适用面以各 owner 的归档回执为准：`specify migrate` 的 `.specify/archive/migrate/<run-id>/` + 回执 `recover`；重复编号重排在 git 干净前提下的 `.specify/memory/renumber/` 账本；sanitize 可逆修复与 docs 死链修复。没有归档/回执路径的删除、清空与远程推送仍按本清单保留前置确认（例如 retention / spec 退役删除）。
+
 ## 治理保留清单
 
 以下门控凭本清单保留,不参与可逆性推断(intrinsic 与 governance-kept):
@@ -35,6 +37,7 @@
 | git-workflow 远程操作门控 | skills/external/git-utils | 远程推送属破坏性桶 |
 | tools invoke 预览门控 | tools.md / tool-definitions.md | 任意脚本执行,存疑从严(governance-kept) |
 | feedback consume 删除前确认 | feedback.md | 前置原子删除,破坏性桶 |
+| retention / spec 退役删除 | retention lane / sanitize spec retirement | 无归档回执，删除不可恢复，仍按单批前置确认 |
 | docs 移动/归档/删除分级 | docs.md | 破坏性桶(reconcile R4/R5) |
 | session 导出同名覆盖确认 | session.md | 同名覆盖清空,破坏性桶 |
 | feature 状态回退确认 | feature.md | 治理状态保护(governance-kept) |

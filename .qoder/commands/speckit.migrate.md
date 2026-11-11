@@ -26,15 +26,17 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 specify migrate --format json
 ```
 
-2. **Apply only on consent.** 向用户呈现干跑计划并取得同意后，才运行写入模式：
+2. **Apply automatically.** `--apply` 是本命令唯一的写入授权；每个破坏性步骤都是 archive-first，原件先复制进 `.specify/archive/migrate/<run-id>/`，回执逐项记录 `recover` 路径，因此这些动作按可逆处理并自动执行，不再要求第二次确认，也不新增确认旗标。干跑之后直接运行：
 
 ```bash
-specify migrate --apply
+specify migrate --apply --format json
 ```
 
-   代理会话中的对话同意不是 CLI 的第二把钥匙：非交互执行环境下破坏性项仍判 `blocked`；此时如实转述未执行项与原因，MUST NOT 宣称成功，并引导用户在交互终端重跑或逐项审阅。
+   非交互会话与交互终端行为一致：可逆项自动执行；只有真正无法合并的结构性冲突（如兼容链接位置被非空目录占用、宿主不支持符号链接）与执行期 I/O 失败会留在 `blocked`，其余项照常完成。
 
-3. **Report the outcome verbatim.** 结局与退出码是稳定契约，原样转述：
+3. **Disclose merges.** anchor-layout 维度的旧新同位置文件由引擎合并：占位 stub 被真实内容替换；双方都是真实内容时，`features.md` 按特性 ID 做表行并集（目标侧同名行优先），其余锚点保留目标全文并以固定标记追加旧内容；两个原件都已归档。逐项报告被合并的锚点、归档位置，并建议用对应 owner 命令复核（`/speckit.constitution`、`/speckit.feature`）。合并结果本身可由回执恢复。
+
+4. **Report the outcome verbatim.** 结局与退出码是稳定契约，原样转述：
 
 | outcome | exit | 语义 |
 |---------|------|------|
@@ -45,7 +47,7 @@ specify migrate --apply
 
    输入或前置条件错误以 stderr 报文 + 退出 2 收束（`error` 不是 outcome token）；工作区缺少 `.specify/` 时，修复入口是 `specify init`。
 
-4. **Point at the records.** apply 后报告回执 `.specify/memory/migrate/receipts/<run-id>.json` 与归档根 `.specify/archive/migrate/<run-id>/`；恢复途径以回执的 `recover` 字段为准。
+5. **Point at the records.** apply 后报告回执 `.specify/memory/migrate/receipts/<run-id>.json` 与归档根 `.specify/archive/migrate/<run-id>/`；恢复途径以回执的 `recover` 字段为准。
 
 **Boundary**: neither install nor init — 本命令是 `specify install` + `specify init` 之后的一次性收尾；`/speckit.sanitize` 保留为周期复检 lane；goal/team 定义的档案迁移仍归 `/speckit.goal` 的 `migrate-archive`。
 
@@ -53,4 +55,4 @@ specify migrate --apply
 
 **Before**: `specify install` + `specify init` 已完成，工作区已含 `.specify/`。
 
-**After**: 回执中 blocked / failed 项逐项审阅后重跑 `/speckit.migrate`；周期复检交 `/speckit.sanitize`；工作区刷新与兼容链接修复交 `specify init` / `/speckit.instructions`。
+**After**: 回执中 blocked / failed 项逐项审阅后重跑 `/speckit.migrate`；合并过的 anchor 交对应 owner 命令复核；周期复检交 `/speckit.sanitize`；工作区刷新与兼容链接修复交 `specify init` / `/speckit.instructions`。

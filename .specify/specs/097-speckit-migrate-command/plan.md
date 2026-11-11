@@ -6,7 +6,7 @@
 
 ## Summary
 
-新增 `specify migrate` 子命令与 `/speckit.migrate` 运行期模板，把「install → init → migrate」第三步做成一次性收尾：以**当前已安装版本**的声明与资产为期望态，对 `.specify/` 工作区做只读五维探测（维度 token 与语义 owner：`data-model.md` E-8 / requirements FR-007，本计划不复述清单），产出逐项差异计划（默认零写入干跑），经双键确认后按 FR-014 六值处置收敛，凡移动/替换/移除一律 archive-not-delete 并留下逐运行回执。跨版本为一次直达（N→N+k，无中间版本步骤）；失败语义按 FR-017 为前向续跑 + 逐项归档找回，不提供全局回滚。
+新增 `specify migrate` 子命令与 `/speckit.migrate` 运行期模板，把「install → init → migrate」第三步做成一次性收尾：以**当前已安装版本**的声明与资产为期望态，对 `.specify/` 工作区做只读五维探测（维度 token 与语义 owner：`data-model.md` E-8 / requirements FR-007，本计划不复述清单），产出逐项差异计划（默认零写入干跑），`--apply` 单授权后按 FR-014 六值处置收敛，凡移动/替换/合并/移除一律 archive-first 并留下逐运行回执；可归档恢复的处置按可逆动作自动执行，旧新锚点冲突由引擎合并保留双方。跨版本为一次直达（N→N+k，无中间版本步骤）；失败语义按 FR-017 为前向续跑 + 逐项归档找回，不提供全局回滚。
 
 技术路线是**组合既有引擎，不做第二套迁移逻辑**：客户端工作区的期望态由 init 的同一复制机制投影到临时参照树（`copy_local_templates` + `rewrite_paths` + `generate_commands`）；五维探测分别消费 `sanitize-utils.py` 的只读检查器（链接/残留/平铺重复）、`anchor-layout-migrate.py` 的 check/apply（锚点布局）、`sync-mirrors.py --check` 与 `regen-command-copies.py --check`（框架源工作区的镜像与生成副本）、init 的 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills` 决策（退役与平铺收敛）。`/speckit.sanitize` 保持周期性治理定位，其 Migration lane 声明在同一变更内改为「周期复检兜底」。
 
@@ -21,7 +21,7 @@
 **Target Platform**: 支持符号链接的 Linux/macOS CLI 环境为主；无符号链接平台按降级事实报告（`refuse`），不崩溃。命令不依赖 git。
 **Project Type**: 单包框架 CLI + 命令模板/技能分发（`src/specify_cli/`、`templates/commands/`、`skills/`）。
 **Performance Goals**: 干跑全程零网络、零目标写入；参照树复制与工作区资产同量级，单次干跑在既有测试夹具（< 1000 文件）上 < 30 s；应用阶段每项处置最多一次归档写 + 一次目标写。
-**Constraints**: 干跑绝对零写入（回执只走 stdout / `--format json`）；archive-not-delete；双键确认且**不提供**非交互确认旗标；未确认破坏项 `blocked`；不依赖 git；Python 3.8 语法兼容。
+**Constraints**: 干跑绝对零写入（回执只走 stdout / `--format json`）；archive-first；`--apply` 单授权、**不提供**确认旗标；可归档恢复的破坏性处置自动执行，无归档路径的处置 `blocked`；旧新锚点普通文件冲突合并保留双方；不依赖 git；Python 3.8 语法兼容。
 **Scale/Scope**: 1 个子命令（4 个选项）、1 个模板 + 4 份再生副本、1 个命令文档页、5 个探测维度、6 值处置域（引用 requirements FR-014）、1 个回执存储、14 个工作包。
 
 ## Constitution Check
@@ -45,7 +45,7 @@
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Controlled Execution / Reliable Delivery：blocked/refuse 可判定、归档可找回、回执可枚举 |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 处置域引用 FR-014、期望态 owner 引用 FR-005 路径；契约不复述其清单 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 计划面/命令 help/回执文案按全局基准读者书写，术语走 `.specify/glossary.md` |
-| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 冲突 `refuse` 指名双方、未确认 `blocked`、无静默跳过（契约不变量 I-4） |
+| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 可合并冲突自动合并、不可合并冲突 `refuse` 指名双方、无归档路径 `blocked`、无静默跳过（契约不变量 I-4） |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `.specify/memory/migrate/receipts/` 与 `.specify/archive/migrate/` 在同一变更登记（WP10） |
 | XVIII | Grounded Naming | ✅ Pass | `specify migrate` / `/speckit.migrate` 名称来自 requirements STR-001/STR-002，贯穿全部落点 |
 | XIX | Self-Explanatory Structure (不言自明) | ✅ Pass | 命令面只投影四类结局 + 六值处置，不增额外面；回执字段即用户审阅所需最小集 |
@@ -124,7 +124,7 @@ tests/contract/test_migrate_distribution_assembly.py  # 源模板/四副本/文�
 tests/unit/test_migrate_planner.py              # 维度映射、稳定排序、去重、变异注入拒绝
 tests/unit/test_migrate_receipts.py             # 逐运行一文一件、两写者不同路径
 tests/integration/test_migrate_us1_converge.py  # 纯旧版：干跑零写入 → 应用收敛 → 再跑 clean
-tests/integration/test_migrate_us2_safety.py    # 无 tty blocked、归档找回、冲突 refuse、用户内容保护
+tests/integration/test_migrate_us2_safety.py    # 非交互自动执行、归档找回、合并保留双方、结构冲突 refuse、用户内容保护
 tests/integration/test_migrate_us3_crossversion.py  # N→N+k 一次直达、中断续跑不二次搬移
 tests/integration/test_migrate_us4_equivalence.py   # 两入口同计划、模板不复制逻辑
 tests/fixtures/migrate-097/builders.py          # 由声明生成的旧版/混杂/最新夹具构建器
@@ -153,7 +153,7 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 | WP01 | `specify migrate` 子命令面：4 个选项、前置条件、结局→退出码、`--help` 零副作用、未声明选项拒绝、stdout text/json 包络 | FR-001, FR-003, FR-019, FR-022 |
 | WP02 | 工作区形态识别与客户端参照树：`framework-source` 判定（`skills/external/`，与 sanitize guard 同源）、按已安装资产运行 init 复制机制到临时树（仅客户端模式）、工具/脚本变体探测、失败清理 | FR-005, FR-006, FR-007 |
 | WP03 | 五维规划器：模板与生成物、锚点布局、兼容链接、镜像一致性、迁移残留；稳定排序、按 target 去重、逐项「维度/当前态/期望态/拟处置/依据路径」 | FR-006, FR-007, FR-008 |
-| WP04 | 处置分类与安全门：六值域映射（引用 FR-014）、破坏桶分类（判据与清单 owner = `.specify/shared/guidelines/confirmation-gates.md`）、双键确认、非交互 blocked、冲突 refuse、平台降级 refuse | FR-014, FR-015, FR-016 |
+| WP04 | 处置分类与安全门：六值域映射（引用 FR-014）、可逆性分类（判据与清单 owner = `.specify/shared/guidelines/confirmation-gates.md`）、`--apply` 单授权、archive-first 自动执行、锚点合并、无归档路径 blocked、结构冲突/平台降级 refuse | FR-014, FR-015, FR-016 |
 | WP05 | 执行器：write/replace/archive 逐项执行、归档布局、锚点引擎 apply 委托、平铺移动、链接与副本写、幂等与中断续跑、引擎写模式委托 | FR-009, FR-010, FR-011, FR-016, FR-017 |
 | WP06 | 回执：apply 落盘 `.specify/memory/migrate/receipts/<run-id>.json`、干跑只走 stdout、逐项状态、恢复路径、并发两写者不同路径 | FR-018 |
 | WP07 | init 决策/执行拆分：从 `cleanup_obsolete_framework_assets` / `migrate_flat_internal_skills` 提出纯决策函数，两入口共享；等价性测试 | FR-009 |
@@ -162,7 +162,7 @@ tests/contract/test_migration_distribution.py   # COMMAND_BASELINE 29 → 30
 | WP10 | 目录治理：`shared/definitions/framework-map.md` 登记 `.specify/memory/migrate/` 与 `.specify/archive/migrate/`，镜像同步 | FR-018（目录治理约束） |
 | WP11 | 夹具构建器：由声明生成的纯旧版 / 新旧混杂 / 已最新三类夹具（退役清单、旧代状态文件、平铺残留、旧锚点布局） | FR-023 |
 | WP12 | 集成验收 US1+US3：干跑零写入、应用收敛、再跑 clean、N→N+k 一次直达、中断续跑不二次搬移 | FR-008, FR-017, FR-020, FR-023, FR-025 |
-| WP13 | 安全与用户内容验收 US2：无 tty blocked、归档逐条找回、冲突指名双方、用户内容逐字节不变、变异注入转红（含逐维度移除收敛处置后对应检查转红的断言，FR-008/FR-024） | FR-008, FR-015, FR-016, FR-024 |
+| WP13 | 安全与用户内容验收 US2：非交互自动执行、归档逐条找回、合并保留双方、结构冲突指名双方、用户内容逐字节不变、变异注入转红（含移除归档动作后对应检查转红的断言，FR-008/FR-024） | FR-008, FR-015, FR-016, FR-024 |
 | WP14 | 等价与分发验收 US4：两入口同计划、模板薄投影结构守卫、装配面齐全、`regen --check` 无 NEW drift、镜像无 NEW drift | FR-002, FR-021, FR-022, FR-025 |
 
 ## Execution Premises
@@ -196,7 +196,7 @@ N/A — Constitution Check 无 Fail / Partial 行，无需豁免。
 |----------|------|---------------|
 | Data model | `data-model.md` | 9 entities（E-1 DiffItem、E-2 Plan、E-3 Receipt、E-4 ArchiveEntry、E-5 RunOutcome、E-6 WorkspaceKind、E-7 ReferenceTree、E-8 维度映射、E-9 Pointer）+ 5 条不变量 |
 | Contracts | `contracts/` | 3 files：`migrate-cli.md`（C-1…C-7）、`migrate-engine.md`（C-1…C-8）、`migrate-template.md`（T-1…T-6） |
-| Quickstart | `quickstart.md` | 6 个场景（0 前置已实测 / 1 已最新 / 2 旧版收敛 / 3 非交互 blocked / 4 冲突与中断 / 5 代理会话）；未实现示例逐例列前提并由契约测试钉住，清理步骤已实测 |
+| Quickstart | `quickstart.md` | 6 个场景（0 前置已实测 / 1 已最新 / 2 旧版收敛 / 3 非交互自动执行 / 4 合并与中断 / 5 代理会话）；未实现示例逐例列前提并由契约测试钉住，清理步骤已实测 |
 | Feature ref | `feature-ref.md` | Feature 024 绑定 + FR→WP 矩阵（25/25 FR 覆盖，14 个 WP） |
 
 与 Phase 0 预期的漂移：无。研究阶段预计 `research.md` 独立成文（> 50 行且含外部既有引擎评估），实际按此落地；契约数量按 3 份（命令面 / 引擎 / 模板）落地，与 WP01/WP02–WP07/WP08 的边界一致。

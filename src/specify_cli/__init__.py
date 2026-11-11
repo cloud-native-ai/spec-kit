@@ -2328,9 +2328,14 @@ def copy_local_templates(
                         tracker.start("local-templates", f"copying {filename}")
 
                     # Check if destination file already exists
+                    legacy_anchor = memory_dest / filename
                     if dest_file.exists():
                         console.print(
                             f"[yellow]Memory file {filename} already exists - skipping copy to preserve existing content[/yellow]"
+                        )
+                    elif legacy_anchor.exists():
+                        console.print(
+                            f"[yellow]Memory file {filename} exists under .specify/memory - skipping the placeholder copy; specify migrate will merge the legacy anchor[/yellow]"
                         )
                     else:
                         # Copy the file
@@ -2778,7 +2783,7 @@ class MigrateItem:
     Validation enforces the E-1 rules that are machine-decidable: the closed
     dimension/disposition domains, and the reason obligations for ``refuse``
     (non-empty, naming both candidates) and ``blocked`` (non-empty, the
-    missing second key).
+    missing archive path).
     """
 
     def __init__(self, dimension, target, current, expected, disposition, *,
@@ -2827,7 +2832,7 @@ class MigrateItem:
                 raise ValueError("blocked items must carry status 'blocked'")
             if not self.reason:
                 raise ValueError(
-                    "blocked items require a non-empty reason (missing second key)"
+                    "blocked items require a non-empty reason (missing archive path)"
                 )
         if self.status in ("refused", "blocked", "failed") and not self.reason:
             raise ValueError(f"status {self.status!r} requires a non-empty reason")
@@ -2868,9 +2873,9 @@ def make_blocked_item(
     *,
     current,
     expected,
-    reason="destructive action requires the second key (interactive confirmation); none available",
+    reason="destructive action has no archive step; refusing to execute it",
 ):
-    """A destructive item that never obtained the second key."""
+    """A destructive item with no archive-first execution path."""
     return MigrateItem(
         dimension, target, current, expected, "blocked", reason=reason
     )
@@ -3337,19 +3342,22 @@ MIGRATE_DESTRUCTIVE_CRITERIA_POINTER = (
     ".specify/shared/guidelines/confirmation-gates.md"
 )
 
-# Dispositions whose execution needs the second key (FR-015): `archive` moves
-# or removes an existing object and `replace` overwrites existing content —
-# both sit in the owner's destructive bucket. `write` creates a missing object
-# and stays reversible.
+# Dispositions in the destructive class (FR-015): `archive` moves or removes an
+# existing object and `replace` overwrites existing content. Archive-first
+# execution (a receipt records every original's recovery path) makes them
+# reversible and auto-executable; the executor blocks only an item whose
+# mechanism is `none` (no archive step). `write` creates a missing object.
 MIGRATE_DESTRUCTIVE_DISPOSITIONS = ("archive", "replace")
 
 
 def migrate_is_destructive(item) -> bool:
-    """Whether executing this item is a destructive/irreversible action.
+    """Whether this item's disposition is in the destructive class.
 
     The criteria themselves are owned by
     ``.specify/shared/guidelines/confirmation-gates.md``; this function is the
     executable projection of that owner onto the FR-014 disposition domain.
+    Archive-first execution makes the class reversible; only a destructive
+    item with no archive path is blocked.
     """
     return item.disposition in MIGRATE_DESTRUCTIVE_DISPOSITIONS
 
@@ -3389,12 +3397,13 @@ class MigrateContext:
         self.mirror_items = None
 
 
-def migrate_interactive_terminal() -> bool:
-    """Whether the second key can exist at all (an interactive stdin)."""
-    try:
-        return bool(sys.stdin.isatty())
-    except (AttributeError, ValueError, OSError):
-        return False
+def migrate_placeholder_dir():
+    """The packaged placeholder anchors, used to recognise stub anchor files."""
+    resource = get_resource_path()
+    if resource is None:
+        return None
+    candidate = Path(resource) / "memory"
+    return candidate if candidate.is_dir() else None
 
 
 def migrate_symlink_supported() -> bool:
@@ -3766,14 +3775,33 @@ def _migrate_plan_mirror_consistency(ctx):
     return _migrate_sync_mirror_items(ctx, ("mirror-consistency",))
 
 
+def _migrate_anchor_archive_root(ctx):
+    run_id = ctx.run_id or migrate_run_id()
+    return (
+        Path(ctx.workspace).resolve() / ".specify" / "archive" / "migrate"
+        / run_id / "anchor-layout"
+    )
+
+
+def _migrate_anchor_engine_args(ctx, action):
+    args = [
+        "--action", action, "--workspace", str(Path(ctx.workspace).resolve()),
+        "--json",
+    ]
+    placeholder_dir = migrate_placeholder_dir()
+    if placeholder_dir is not None:
+        args += ["--placeholder-dir", str(placeholder_dir)]
+    if action == "apply":
+        args += ["--archive-root", str(_migrate_anchor_archive_root(ctx))]
+    return args
+
+
 def _migrate_plan_anchor_layout(ctx):
     script = Path(ctx.engine_dir) / "anchor-layout-migrate.py"
     if not script.is_file():
         raise MigrateEngineError(f"engine not found: {script}")
     rc, stdout, stderr = _migrate_run_engine(
-        script,
-        ["--action", "check", "--workspace", str(ctx.workspace), "--json"],
-        cwd=ctx.workspace,
+        script, _migrate_anchor_engine_args(ctx, "check"), cwd=ctx.workspace
     )
     if rc == 2:
         raise MigrateEngineError(
@@ -3788,7 +3816,8 @@ def _migrate_plan_anchor_layout(ctx):
     for step in payload.get("steps") or []:
         source_rel = _migrate_ws_rel(ctx.workspace, step["from"])
         target_rel = _migrate_ws_rel(ctx.workspace, step["to"])
-        if step["kind"] == "move":
+        kind = step["kind"]
+        if kind == "move":
             items.append(
                 MigrateItem(
                     "anchor-layout", source_rel, "legacy-location",
@@ -3796,16 +3825,34 @@ def _migrate_plan_anchor_layout(ctx):
                     mechanism="relocate", evidence=evidence,
                 )
             )
-        elif step["kind"] == "refuse-existing-target":
+        elif kind == "refuse-existing-target":
             items.append(
                 make_refuse_item(
                     "anchor-layout",
                     source_rel,
                     current=source_rel,
                     expected=target_rel,
-                    note="anchor target already exists; both candidates are kept",
+                    note="anchor target cannot be merged automatically; both candidates are kept",
                 )
             )
+        elif kind in ("placeholder-replace", "merge"):
+            items.append(
+                MigrateItem(
+                    "anchor-layout", source_rel, "legacy-content",
+                    f"{kind} ({step.get('strategy') or 'n/a'}): {target_rel}",
+                    "replace", mechanism="anchor-engine", evidence=evidence,
+                )
+            )
+        elif kind in ("drop-placeholder", "dedupe-identical"):
+            items.append(
+                MigrateItem(
+                    "anchor-layout", source_rel, "legacy-duplicate",
+                    f"removed-duplicate: {target_rel}", "archive",
+                    mechanism="anchor-engine", evidence=evidence,
+                )
+            )
+        else:
+            raise MigrateEngineError(f"unknown anchor step kind: {kind}")
     return items
 
 
@@ -4063,47 +4110,74 @@ def _migrate_execute_anchor(ctx, plan):
     ]
     if not anchor_items:
         return
-    digests = {}
-    for item in anchor_items:
-        source = ctx.workspace / item.target
-        if source.exists():
-            digests[item.target] = _migrate_digest(source)
     script = Path(ctx.engine_dir) / "anchor-layout-migrate.py"
     rc, stdout, stderr = _migrate_run_engine(
-        script,
-        ["--action", "apply", "--workspace", str(ctx.workspace), "--json"],
-        cwd=ctx.workspace,
+        script, _migrate_anchor_engine_args(ctx, "apply"), cwd=ctx.workspace
     )
-    if rc != 0:
+    try:
+        payload = json.loads(stdout) if stdout.strip() else {}
+    except ValueError:
+        payload = {}
+    if not payload:
         for item in anchor_items:
             item.status = "failed"
-            item.reason = f"anchor engine apply failed (exit {rc})"
+            item.reason = (
+                f"anchor engine apply failed (exit {rc}): {stderr.strip()}"
+            )
         return
-    try:
-        payload = json.loads(stdout)
-    except ValueError:
-        payload = {"applied": []}
-    applied = {
-        _migrate_ws_rel(ctx.workspace, step["from"]): step
-        for step in payload.get("applied", [])
-    }
-    skipped = {
-        _migrate_ws_rel(ctx.workspace, step["from"])
-        for step in payload.get("skipped", [])
+
+    def _by_source(entries):
+        return {
+            _migrate_ws_rel(ctx.workspace, step["from"]): step
+            for step in entries or []
+        }
+
+    applied = _by_source(payload.get("applied"))
+    skipped = _by_source(payload.get("skipped"))
+    refused = _by_source(payload.get("refused"))
+    failed = _by_source(payload.get("failed"))
+    change_for_kind = {
+        "move": "relocated",
+        "merge": "merged",
+        "placeholder-replace": "replaced",
+        "drop-placeholder": "removed-duplicate",
+        "dedupe-identical": "removed-duplicate",
     }
     for item in anchor_items:
         if item.target in applied:
+            step = applied[item.target]
             item.status = "done"
-            item.archiveTo = _migrate_ws_rel(
-                ctx.workspace, applied[item.target]["to"]
+            primary = step.get("archiveTo") or step.get("archiveFrom")
+            item.archiveTo = (
+                _migrate_ws_rel(ctx.workspace, primary) if primary else None
             )
-            ctx.archives.append(
-                {
-                    "path": item.target,
-                    "archiveTo": item.archiveTo,
-                    "change": "relocated",
-                    "digest": digests.get(item.target, ""),
-                }
+            change = change_for_kind.get(step["kind"], "replaced")
+            archive_pairs = []
+            if step.get("archiveFrom"):
+                archive_pairs.append((step["from"], step["archiveFrom"]))
+            if step.get("archiveTo"):
+                archive_pairs.append((step["to"], step["archiveTo"]))
+            for original, archive in archive_pairs:
+                archive_rel = _migrate_ws_rel(ctx.workspace, archive)
+                ctx.archives.append(
+                    {
+                        "path": _migrate_ws_rel(ctx.workspace, original),
+                        "archiveTo": archive_rel,
+                        "change": change,
+                        "digest": _migrate_digest(ctx.workspace / archive_rel),
+                    }
+                )
+        elif item.target in failed:
+            item.status = "failed"
+            item.reason = (
+                failed[item.target].get("error")
+                or "anchor engine reported a failed step"
+            )
+        elif item.target in refused:
+            item.status = "failed"
+            item.reason = (
+                refused[item.target].get("reason")
+                or "anchor engine refused the step during apply"
             )
         elif item.target in skipped:
             item.status = "failed"
@@ -4112,7 +4186,7 @@ def _migrate_execute_anchor(ctx, plan):
             )
         else:
             item.status = "failed"
-            item.reason = "anchor engine did not report this move"
+            item.reason = "anchor engine did not report this step"
 
 
 def _migrate_execute_mirror(ctx, plan):
@@ -4254,6 +4328,12 @@ def _migrate_execute_item(ctx, item):
         return
     if item.dimension == "anchor-layout" or item.mechanism == "mirror-engine":
         return
+    if migrate_is_destructive(item) and item.mechanism == "none":
+        item.status = "blocked"
+        item.reason = (
+            "destructive action has no archive step; refusing to execute it"
+        )
+        return
     resumed_entry = migrate_resume_archive_entry(ctx, item)
     if resumed_entry is not None:
         _migrate_resume_complete_write(ctx, item, resumed_entry)
@@ -4290,52 +4370,6 @@ def _migrate_execute_item(ctx, item):
 # ---------------------------------------------------------------------------
 # Second key, outcome computation, receipt and emission (FR-015/017/018/019)
 # ---------------------------------------------------------------------------
-
-
-def _migrate_second_key(plan):
-    destructive = [
-        item
-        for item in plan.items
-        if migrate_is_destructive(item) and item.status == "planned"
-    ]
-    if not destructive:
-        return True
-    if not migrate_interactive_terminal():
-        return False
-    print(
-        f"specify migrate: {len(destructive)} destructive item(s) require the "
-        "second key before they can be applied.",
-        file=sys.stderr,
-    )
-    for item in destructive[:10]:
-        print(
-            f"  {item.dimension}: {item.target} [{item.disposition}]",
-            file=sys.stderr,
-        )
-    if len(destructive) > 10:
-        print(f"  ... and {len(destructive) - 10} more", file=sys.stderr)
-    return bool(
-        typer.confirm(
-            "Apply these destructive items now?", default=False, err=True
-        )
-    )
-
-
-def _migrate_block_destructive(plan):
-    items = []
-    for item in plan.items:
-        if migrate_is_destructive(item) and item.status == "planned":
-            items.append(
-                make_blocked_item(
-                    item.dimension,
-                    item.target,
-                    current=item.current,
-                    expected=item.expected,
-                )
-            )
-        else:
-            items.append(item)
-    plan.items = migrate_normalize_items(items)
 
 
 def _migrate_dry_outcome(plan):
@@ -4457,9 +4491,6 @@ def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
             resumed_from=resumed_from,
         )
         return plan, outcome, exit_code, receipt, None
-
-    if not _migrate_second_key(plan):
-        _migrate_block_destructive(plan)
 
     _migrate_execute_anchor(ctx, plan)
     _migrate_execute_mirror(ctx, plan)
@@ -5316,7 +5347,7 @@ def migrate(
     apply: bool = typer.Option(
         False,
         "--apply",
-        help="Enter write mode (first key); destructive items then need one interactive confirmation.",
+        help="Enter write mode (single authorization); archive-first items execute automatically and are recoverable from the run receipt.",
     ),
     workspace: str = typer.Option(
         ".",
@@ -5333,13 +5364,15 @@ def migrate(
 
     Compares the workspace against the assets of the currently installed CLI
     and reports (default, dry-run) or applies (--apply) every difference.
-    This command performs neither install nor init; when `.specify/` is
-    missing, `specify init` is the repair entry.
+    `--apply` is the single write authorization: every destructive step is
+    archive-first, recorded in the run receipt's `recover` paths, and executes
+    without a second interactive confirmation. Old and new anchors are merged
+    rather than one silently chosen.
 
     Outcomes and exit codes (stable, script-decidable):
     clean    exit 0  no differences remain
     planned  exit 1  dry-run found differences
-    applied  exit 0  apply completed with nothing refused or blocked
+    applied  exit 0  apply completed with nothing refused, blocked or failed
     blocked  exit 3  refused/blocked/failed items remain after apply
     Input or precondition errors exit 2.
     """

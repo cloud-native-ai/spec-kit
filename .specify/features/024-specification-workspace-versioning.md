@@ -28,7 +28,7 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 1. `specify migrate` CLI 子命令：默认零写入干跑，`--apply` 进入写入模式；四类结局 `clean` / `planned` / `applied` / `blocked` 配稳定退出码（0/1/0/3，输入错误 2）。
 2. 期望态 = 当前已安装版本的声明与资产：五维只读探测（模板与生成物、锚点布局、兼容链接、镜像一致性、迁移残留）复用 init 迁移分支、`sanitize-utils.py` 检查器与 `anchor-layout-migrate.py`，不按源版本号选择路径。
 3. `/speckit.migrate` 运行期模板：同一 CLI 引擎的薄投影，不复制任何检查或处置逻辑。
-4. 处置安全：六值封闭集（FR-014 of 097）；移动/替换/移除一律 archive-not-delete，逐运行回执落 `.specify/memory/migrate/receipts/`；双键确认，非交互环境破坏项 `blocked`。
+4. 处置安全：六值封闭集（FR-014 of 097）；移动/替换/合并/移除一律 archive-first，逐运行回执落 `.specify/memory/migrate/receipts/`；`--apply` 是唯一写入授权，可归档恢复的处置按可逆动作自动执行；旧新锚点冲突由引擎合并并保留双方，只有不可合并的结构性冲突才 `refuse` / `blocked`。
 5. 跨版本一次直达 N→N+k：无中间版本步骤；失败语义为前向续跑 + 逐项归档找回（不提供全局回滚）。
 6. 取代 024 早期设想的 `.specify/version` 标记、版本→迁移注册表与 `specify upgrade` 命令（097 requirements FR-005/FR-020 记录裁定）。
 

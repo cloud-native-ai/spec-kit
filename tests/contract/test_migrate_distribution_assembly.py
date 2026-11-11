@@ -137,8 +137,8 @@ def test_command_baseline_contains_migrate_at_the_new_length() -> None:
     assert "migrate" in module.COMMAND_BASELINE, (
         "COMMAND_BASELINE must carry `migrate` (FR-021)"
     )
-    assert len(module.COMMAND_BASELINE) == 30, (
-        f"COMMAND_BASELINE length must be the pinned 30, got {len(module.COMMAND_BASELINE)}"
+    assert len(module.COMMAND_BASELINE) == 31, (
+        f"COMMAND_BASELINE length must be the pinned 31, got {len(module.COMMAND_BASELINE)}"
     )
 
 

@@ -19,7 +19,7 @@ sdd-loop-driver     U0–U6             SDD 开发阶段循环
 | 参数 | 解析 |
 |------|------|
 | 目标项目 | 遵循 `shared/workflow/target-resolution.md`：**强依赖 `.specify/`**，从显式路径/会话 cwd **向上搜索**最近的合法 `.specify/` 根；找不到 → 拒绝执行并提示 `sdd-project-setup`/`specify init` |
-| 模式 | 未给 → `check`（只扫描/报告）；用户明确要求清理 → `cleanup` |
+| 模式 | 未给 → `check`（不执行不可逆清理；自动执行可逆修复、git 干净前提下的重复编号重排与 docs 死链修复）；用户明确要求清理 → `cleanup` |
 | 命令面 | 不假设 `/speckit.*` 副本存在；缺失时按 `.specify/skills/internal/<name>/SKILL.md` 加载 owner 技能 |
 
 目标项目缺 `.specify/` 或 constitution → 停止并 handoff `sdd-project-setup`。
@@ -30,7 +30,8 @@ sdd-loop-driver     U0–U6             SDD 开发阶段循环
 H0 ENTRY     目标/模式/命令面解析
 H1 ASSESS    mechanism-inventory.py + logical-framework.py 双盘点（只读）
 H2 RECONCILE 执行 H1 缺口 OR owner 自检漂移：
-             sanitize（materials + retention）→ feature → instructions → docs
+             migrate（版本混杂态按需）→ sanitize（materials + renumber + retention）
+             → feature → instructions → docs（含死链修复）
 H3 STRENGTHEN history → docs 深化 → research → feature 生成
 H4 VERIFY    五族前置检查（本地仅④⑤）+ 双矩阵复扫 + 符号链接 + hook health
 H5 REPORT    候选工作清单 + 运行报告（`.specify/memory/housekeeping/` YAML）
@@ -40,8 +41,8 @@ H5 REPORT    候选工作清单 + 运行报告（`.specify/memory/housekeeping/`
 
 ## 记录回收（retention lane）
 
-- `check` 模式：同时跑 `/speckit.sanitize check`（materials）与 `/speckit.sanitize --lane retention check`，两份摘要一起报告，不删除。
-- `cleanup` 模式：跑 `/speckit.sanitize --lane all`；一个调用内呈现 materials 与 retention 两个计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。
+- `check` 模式：跑 `/speckit.sanitize check --auto-reversible`（materials 可逆修复自动执行）、`/speckit.sanitize --lane renumber --auto-reversible`（引擎在 duplicate-only、无歧义引用、git 干净时自动确认）与 `/speckit.sanitize --lane retention check`，三份摘要一起报告，不删除。
+- `cleanup` 模式：跑 `/speckit.sanitize --lane all --auto-reversible`；一个调用内呈现 materials、renumber 与 retention 计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。
 - 本 skill **不直接调用** `sanitize-utils.py apply` 或 `record-retention.py apply`。
 - 旧框架缺 `record-retention.py`：只跑 materials lane，报告 `retention=not_evaluated`，不删除；缺 `sanitize-utils.py`：回交 setup。
 - 没有 retention receipt 不删除；open feedback、unsettled run-determination、不可解析 exec-quant、无 promotion/ephemeral 决策的 session 笔记永不回收；默认宽限 30 天；目标路径 git 脏时拒绝 apply。

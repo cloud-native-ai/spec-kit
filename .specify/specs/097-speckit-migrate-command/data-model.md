@@ -22,7 +22,7 @@
 | `disposition` | enum | 取值域见 FR-014；本项拟执行的处置 |
 | `mechanism` | enum | 执行机制：`copy` \| `replace` \| `archive` \| `relocate` \| `symlink` \| `anchor-engine` \| `mirror-engine` \| `none` |
 | `evidence` | string[] | 依据路径：owner 文件/检查器/引擎路径（FR-006 的「依据路径」） |
-| `archiveTo` | string \| null | 归档目标（`.specify/archive/migrate/<run-id>/<rel>`）；无归档时 null |
+| `archiveTo` | string \| null | 主归档目标（`.specify/archive/migrate/<run-id>/<rel>`）；合并项另有第二归档条目记在回执 `archives[]`（锚点归档在 `<run-id>/anchor-layout/<rel>`）；无归档时 null |
 | `status` | enum | `planned` \| `done` \| `refused` \| `blocked` \| `failed`（`converged` 项不进入计划，见 E-2；不设 `skipped`——跳过即违约 I-4） |
 | `reason` | string \| null | `refused` / `blocked` / `failed` 时必须非空 |
 
@@ -120,7 +120,7 @@
 ## E-8 维度 token 与来源映射（仅映射，不复制检查清单）| dimension | 检查来源（owner 路径） | 处置来源 |
 |-----------|------------------------|----------|
 | `templates-generated` | 客户端：参照树对照 `.specify/templates`（除 commands）、`.specify/skills`、`.specify/agents/templates`、各工具命令副本；框架源：`sync-mirrors.py --check` 的 templates / skills/external / skills/internal / agents 四个镜像对 + `regen-command-copies.py --check`（命令副本）。框架源模式**不**建参照树 | 缺失→`write`；存在且不等→`replace`；退役命令副本→`archive` |
-| `anchor-layout` | `anchor-layout-migrate.py --action check`（`plan()` 的 `move` / `refuse-existing-target`） | `move`→`archive`（`mechanism=relocate`）；`refuse-existing-target`→`refuse` |
+| `anchor-layout` | `anchor-layout-migrate.py --action check --placeholder-dir`（`plan()` 的 `move` / `placeholder-replace` / `drop-placeholder` / `dedupe-identical` / `merge` / `refuse-existing-target`） | `move`→`archive`（`mechanism=relocate`）；`placeholder-replace`/`merge`→`replace`（`mechanism=anchor-engine`，先归档双方）；`drop-placeholder`/`dedupe-identical`→`archive`（`mechanism=anchor-engine`，归档 legacy）；`refuse-existing-target`→`refuse`（仅不可合并结构性冲突） |
 | `compat-links` | `sanitize-utils.check_broken_symlinks`（含 `COMPAT_SYMLINK_EXPECTATIONS` 的所属工具期望） | 缺失/断链→`write`（`mechanism=symlink`）；普通文件占位→`replace`；平台不支持→`refuse` |
 | `mirror-consistency` | 客户端：参照树对照 `.specify/scripts`、`.specify/shared`；框架源：`sync-mirrors.py --check` 的 scripts / shared 两个镜像对（MISS/DIFF/ORPHAN） | MISS→`write`；DIFF→`replace`；strict ORPHAN→`archive`；非 strict 额外文件不动 |
 | `migration-residue` | `sanitize-utils.check_legacy_install_residue` + `check_flat_internal_duplicates` + init 决策函数（退役资产、平铺内部技能） | 残留→`archive`；平铺→嵌套存在则 `archive`，不存在则 `archive`（`mechanism=relocate`） |

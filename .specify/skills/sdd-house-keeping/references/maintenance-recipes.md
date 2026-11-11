@@ -26,7 +26,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <projec
 
 | 次序 | 命令 | 触发条件 | 效果 |
 |---|---|---|---|
-| 1 | `/speckit.sanitize` | 材料陈旧残留；`cleanup` 模式下还有已消费记录 | materials lane 卫生治理；retention lane 消费→回执→回收 |
+| 1 | `/speckit.sanitize` | 材料陈旧残留、重复编号；`cleanup` 模式下还有已消费记录 | materials 可逆修复自动执行；重复编号在 git 干净且无歧义时自动重排；retention lane 消费→回执→回收 |
 | 2 | `/speckit.feature` | `feat` 缺或注册表与实况漂移 | 注册表 reconcile（增量，不重建） |
 | 3 | `/speckit.instructions` | compat 断、过期、partial/degraded、`BUDGET ... over` | 指令与兼容链接重建；预算收敛 |
 | 4 | `/speckit.docs` | docs 树与代码/特性/指令漂移 | 委托 create-docs 收敛 |
@@ -35,8 +35,8 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <projec
 - **Carrier**：本地 H2/H3 的派发 MUST 缺省使用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 使用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，不作为承载。远端每个 `/speckit.*` 在 `<project-dir>` 下经 run-agent 驱动——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli（execution-config defaults，可覆盖）。
 - constitution 缺失 → 停止并 handoff `sdd-project-setup`。
 - **sanitize 调用契约**：
-  - `check` 模式：同时跑 `/speckit.sanitize check`（materials）与 `/speckit.sanitize --lane retention check`；两份摘要一起报告，不删除。
-  - `cleanup` 模式：跑 `/speckit.sanitize --lane all`；一个调用内呈现 materials 与 retention 两个计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。
+  - `check` 模式：跑 `/speckit.sanitize check --auto-reversible`（materials 可逆修复自动执行）、`/speckit.sanitize --lane renumber --auto-reversible`（引擎在 duplicate-only、无歧义引用、git 干净时自动确认并重排）、与 `/speckit.sanitize --lane retention check`；三份摘要一起报告，不删除。
+  - `cleanup` 模式：跑 `/speckit.sanitize --lane all --auto-reversible`；一个调用内呈现 materials、renumber 与 retention 计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。
   - MUST NOT 直接调用 `sanitize-utils.py apply` 或 `record-retention.py apply`。
   - **能力探测**：缺 `record-retention.py`（旧框架）→ 只跑 materials lane，报告 `retention=not_evaluated — 需升级 spec-kit`，不删除；缺 `sanitize-utils.py` → 回交 setup 做刷新。
   - **命令面**：不假设 `/speckit.*` 副本存在；缺失时按 `.specify/skills/internal/<name>/SKILL.md` 直接加载 owner 技能。
@@ -94,6 +94,9 @@ mode: check|cleanup
 inventory: {physical_before, logical_before, physical_after, logical_after}
 actions:
   - {command: "/speckit.sanitize --lane retention", status: executed|existing|skipped, reason: ...}
+sanitize_materials_auto: {repaired, dismissed, pending}
+sanitize_renumber: {auto_confirmed, applied, pending}
+docs_links: {repaired, pending}
 sanitize_retention: {scanned, eligible, blocked, removed, remaining, ledger}
 unprocessed: [...]
 candidates: {features: [...], feedback: [...], todos: [...]}

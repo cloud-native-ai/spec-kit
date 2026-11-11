@@ -34,7 +34,7 @@ echo $?
 specify migrate --workspace legacy-demo --format json
 echo $?
 
-# 2) 审阅后应用（交互终端下会出现一次单批确认；拒绝则破坏项 blocked）
+# 2) 干跑后自动应用（archive-first 项自动执行；回执记录恢复路径）
 specify migrate --workspace legacy-demo --apply
 
 # 3) 收敛后复检
@@ -47,30 +47,32 @@ echo $?
 **前提清单**：`legacy-demo` 由 `build_legacy_project` 生成（构造只取自 FR-005 钉名的声明：`_OBSOLETE_*`、旧代 git-workflow 状态文件、`.specify/tools/`、平铺 internal 残留、旧锚点布局、一个缺失/被改的框架文件、一个缺失链接）；五项维度各有差异项；干跑哈希不变；第二次 apply 无二次搬移。
 **钉住测试**：`tests/integration/test_migrate_us1_converge.py`、`tests/integration/test_migrate_us3_crossversion.py`、`contracts/migrate-engine.md` C-8。
 
-## 场景 3 — 无交互环境：破坏项 blocked，可逆项照常（已实测：仓库源码形态，测试钉住）
+## 场景 3 — 无交互环境：归档优先项自动执行（已实测：仓库源码形态，测试钉住）
 
 ```bash
 specify migrate --workspace legacy-demo --apply < /dev/null
 echo $?
 ```
 
-预期：不出现确认提问；破坏性项（替换/移动/归档）零执行并标 `blocked`，可逆项（缺失文件补齐、链接建立）照常执行；**退出 3**；回执 `outcome=blocked` 并写明未执行原因。
+预期：不出现确认提问；替换/移动/归档/合并等 archive-first 项自动执行并由回执记录归档与恢复路径；只有不可合并的结构性冲突或无归档路径的处置才标 `blocked`。干净收敛时**退出 0**（`applied`）；存在 blocked/refused/failed 项时退出 3 并逐项写明原因。
 
-**前提清单**：非交互判定以 stdin 非 TTY 为准（`contracts/migrate-cli.md` C-5）；不存在任何非交互确认旗标（`--yes` / `--force` / `--non-interactive` 均 exit 2）；归档缺失即测试转红（FR-024）。
+**前提清单**：归档优先项自动执行（`contracts/migrate-cli.md` C-5）；不存在任何确认旗标（`--yes` / `--force` / `--non-interactive` 均 exit 2）；归档缺失即测试转红（FR-024）。
 **钉住测试**：`tests/integration/test_migrate_us2_safety.py`。
 
-## 场景 4 — 冲突与中断（已实测：仓库源码形态，测试钉住）
+## 场景 4 — 合并、结构冲突与中断（已实测：仓库源码形态，测试钉住）
 
-**冲突**：锚点迁移目标已被占用且内容不等价。干跑 `specify migrate --workspace legacy-demo` 以 **`planned`（退出 1）** 列出该 `refuse` 项并指名两个候选（现状文件、期望目标）；随后 `specify migrate --workspace legacy-demo --apply` 拒绝覆盖、结局 `blocked`、**退出 3**。不覆盖、不择一胜出。
+**合并**：锚点旧新同位置且内容不等价。普通文件由引擎合并并保留双方：`features.md` 按特性 ID 并集（目标同名行优先），其余锚点追加固定标记；两个原件先归档，结局 `applied`。干跑先以 **`planned`（退出 1）** 列出合并项与策略。
+
+**结构冲突**：目标是非空目录、损坏链接或不可读内容。干跑列出 `refuse` 项并指名两个候选；apply 不覆盖、不择一胜出，结局 `blocked`、**退出 3**。
 
 **中断续跑**：在「对象已归档、目标尚未写入」处中断应用；再次执行 `specify migrate --workspace legacy-demo --apply` 时报告中断阶段（回执 `status=running` 与 `resumedFrom`），完成收尾，归档对象不被二次搬移（计数与存在性断言）。
 
-**前提清单**：冲突夹具 = 旧锚点 + 已存在的 `.specify/features.md`（内容不等价）；中断夹具 = 应用后人为删除目标、保留归档与 `status=running` 回执；续跑语义如 `contracts/migrate-engine.md` C-7；`refuse` 语义如 C-3。
-**钉住测试**：`tests/integration/test_migrate_us2_safety.py`、`tests/integration/test_migrate_us3_crossversion.py`。
+**前提清单**：合并夹具 = 旧锚点真实内容 + 根锚点占位/另一份真实内容；结构冲突夹具 = 非空目录或损坏链接占据锚点/链接目标；中断夹具 = 应用后人为删除目标、保留归档与 `status=running` 回执；续跑语义如 `contracts/migrate-engine.md` C-7。
+**钉住测试**：`tests/integration/test_migrate_us2_safety.py`、`tests/integration/test_migrate_us3_crossversion.py`、`tests/contract/test_anchor_layout_migrate.py`。
 
 ## 场景 5 — 代理会话：`/speckit.migrate`（已实测：仓库源码形态，测试钉住）
 
-在代理会话中调用 `/speckit.migrate`：模板先运行干跑计划并呈现，得到用户同意后调用 `--apply`；两个入口在同一棵树上的计划逐项一致；非交互执行环境下模板如实转述 `blocked`，不宣称成功。
+在代理会话中调用 `/speckit.migrate`：模板先运行干跑计划并呈现，随后自动调用 `--apply`（archive-first 项可逆，无需第二次确认）；两个入口在同一棵树上的计划逐项一致；模板披露哪些锚点被合并、原件归档位置与回执恢复路径。
 
 **前提清单**：模板只含 `specify migrate` / `specify migrate --apply` 两条命令面、无任何检查实现（`contracts/migrate-template.md` T-2）；等价性比较对象的确定性部分为 `items` + `summary`（`contracts/migrate-cli.md` C-4）。
 **钉住测试**：`tests/contract/test_migrate_template.py`、`tests/integration/test_migrate_us4_equivalence.py`。

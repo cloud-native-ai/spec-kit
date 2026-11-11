@@ -92,10 +92,8 @@ def _apply(workspace):
     )
 
 
-def _allow_apply(monkeypatch, confirm=True):
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
+def _allow_apply(monkeypatch):
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    monkeypatch.setattr(specify_cli.typer, "confirm", lambda *a, **kw: confirm)
 
 
 def _tree_digest(root: Path) -> str:

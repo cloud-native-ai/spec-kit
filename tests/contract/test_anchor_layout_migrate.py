@@ -1,4 +1,4 @@
-"""Anchor layout migration — detect, apply, refuse and stay idempotent (read/write over a fixture project)."""
+"""Anchor layout migration — detect, apply, merge, refuse and stay idempotent (read/write over a fixture project)."""
 from __future__ import annotations
 
 import json
@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "python" / "anchor-layout-migrate.py"
+PLACEHOLDER_DIR = REPO_ROOT / "memory"
 
 ANCHORS = ("features.md", "constitution.md", "glossary.md", "register.md", "tools.md")
 
@@ -63,17 +64,103 @@ def test_check_reports_the_plan_and_apply_converges(tmp_path):
     assert json.loads(second.stdout)["applied"] == []
 
 
-def test_an_existing_target_is_refused_not_overwritten(tmp_path):
+def test_an_existing_real_target_is_merged_not_overwritten(tmp_path):
     project = _legacy_project(tmp_path)
-    (project / ".specify" / "features.md").write_text("# current policy\n", encoding="utf-8")
+    target = project / ".specify" / "features.md"
+    target.write_text("# current policy\n", encoding="utf-8")
+
     check = _run("--action", "check", "--json", "--workspace", str(project), cwd=tmp_path)
     steps = json.loads(check.stdout)["steps"]
-    refused = [s for s in steps if s["kind"] == "refuse-existing-target"]
+    merges = [step for step in steps if step["kind"] == "merge"]
+    assert merges, steps
+
+    applied = _run("--action", "apply", "--json", "--workspace", str(project), cwd=tmp_path)
+    assert applied.returncode == 0, applied.stderr
+    merged = target.read_text(encoding="utf-8")
+    assert "# current policy" in merged
+    assert "| 041 | Foo Bar |" in merged
+    assert "specify-migrate: legacy anchor" in merged
+    assert not (project / ".specify" / "memory" / "features.md").exists()
+
+    archive_root = next(
+        (project / ".specify" / "archive" / "anchor-layout").iterdir()
+    )
+    assert (archive_root / "memory" / "features.md").is_file()
+    assert (archive_root / "features.md").is_file()
+
+
+def test_a_placeholder_target_is_replaced_by_real_legacy_content(tmp_path):
+    project = tmp_path / "project"
+    specify = project / ".specify"
+    memory = specify / "memory"
+    memory.mkdir(parents=True)
+    legacy = memory / "constitution.md"
+    legacy.write_text("# Real constitution\n\nReal principle.\n", encoding="utf-8")
+    placeholder = specify / "constitution.md"
+    placeholder.write_text(
+        "This file is a placeholder for the project constitution. It should be "
+        "replaced with actual content during development.\n\n"
+        "use `/speckit.constitution` command line to fill content.\n",
+        encoding="utf-8",
+    )
+
+    check = _run(
+        "--action", "check", "--json", "--workspace", str(project),
+        "--placeholder-dir", str(PLACEHOLDER_DIR), cwd=tmp_path,
+    )
+    steps = json.loads(check.stdout)["steps"]
+    assert [step["kind"] for step in steps] == ["placeholder-replace"], steps
+
+    applied = _run(
+        "--action", "apply", "--json", "--workspace", str(project),
+        "--placeholder-dir", str(PLACEHOLDER_DIR), cwd=tmp_path,
+    )
+    assert applied.returncode == 0, applied.stderr
+    assert placeholder.read_text(encoding="utf-8") == "# Real constitution\n\nReal principle.\n"
+    assert not legacy.exists()
+
+
+def test_two_real_feature_registries_are_unioned_by_id(tmp_path):
+    project = tmp_path / "project"
+    specify = project / ".specify"
+    memory = specify / "memory"
+    memory.mkdir(parents=True)
+    (specify / "features.md").write_text(
+        "# Current\n\n**Last Updated**: 2026-02-01\n**Total Features**: 2\n\n"
+        "| ID | Name |\n|----|------|\n| 001 | Current-one |\n| 002 | Current-two |\n",
+        encoding="utf-8",
+    )
+    (memory / "features.md").write_text(
+        "# Legacy\n\n**Last Updated**: 2026-03-01\n**Total Features**: 2\n\n"
+        "| ID | Name |\n|----|------|\n| 001 | Legacy-one |\n| 003 | Legacy-three |\n",
+        encoding="utf-8",
+    )
+
+    applied = _run("--action", "apply", "--json", "--workspace", str(project), cwd=tmp_path)
+    assert applied.returncode == 0, applied.stderr
+    merged = (specify / "features.md").read_text(encoding="utf-8")
+    assert "Current-one" in merged and "Current-two" in merged
+    assert "Legacy-three" in merged, "the legacy-only row was dropped"
+    assert "Legacy-one" not in merged, "a duplicate legacy row must not be appended"
+    assert "**Total Features**: 3" in merged
+    assert "**Last Updated**: 2026-03-01" in merged
+
+
+def test_an_unmergeable_structural_target_is_refused(tmp_path):
+    project = _legacy_project(tmp_path)
+    target = project / ".specify" / "features.md"
+    target.mkdir()
+    (target / "keep.txt").write_text("user content\n", encoding="utf-8")
+
+    check = _run("--action", "check", "--json", "--workspace", str(project), cwd=tmp_path)
+    steps = json.loads(check.stdout)["steps"]
+    refused = [step for step in steps if step["kind"] == "refuse-existing-target"]
     assert refused, steps
+
     _run("--action", "apply", "--workspace", str(project), cwd=tmp_path)
-    assert (project / ".specify" / "features.md").read_text(encoding="utf-8") == "# current policy\n"
+    assert (target / "keep.txt").read_text(encoding="utf-8") == "user content\n"
     assert (project / ".specify" / "memory" / "features.md").is_file(), (
-        "the legacy file must survive a refused move (archive-not-delete)"
+        "the legacy file must survive a refused merge"
     )
 
 

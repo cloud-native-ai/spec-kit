@@ -210,11 +210,22 @@ remain in the ledger for the next run to converge.
 
 ### Stage 5 — Confirm (destructive front-loaded confirmation)
 
-Merge the destructive items (delete / archive) into ONE cleanup plan written to
-`.specify/memory/sanitize/cleanup-plan.json` (`confirmed: false`) and present it to the
-user **in a single batch**. Deletion and move/archive are the destructive bucket — wait
-for user confirmation before any execution (the engine refuses apply with
-`confirmed != true` at exit 2, zero execution).
+Classify the plan by reversibility first (owner: `shared/guidelines/confirmation-gates.md`
+§ 可逆动作例外):
+
+- `repair` / `dismiss` / `archive` are reversible: `archive` moves the object under
+  `.specify/archive/` with a recovery path; `repair` / `dismiss` change state or content
+  in place. In `--auto-reversible` mode execute them without confirmation (write the
+  auto plan with `confirmed: true`, run apply, and report per the execution-report rule).
+- `delete` is a true deletion (no archive copy; recovery is git history only) and stays
+  in the destructive bucket. Merge only the `delete` items into ONE cleanup plan written
+  to `.specify/memory/sanitize/cleanup-plan.json` (`confirmed: false`) and present it to
+  the user **in a single batch**; wait
+  for user confirmation before any execution (the engine refuses apply with
+  `confirmed != true` at exit 2, zero execution).
+
+When `--auto-reversible` is not given, keep the original single-batch behaviour for the
+whole plan.
 
 #### Archive admission gate (spec retirement)
 
@@ -237,11 +248,16 @@ re-implements it.
 
 ### Stage 6 — Apply
 
-After the user releases the plan: first complete the reversible repairs (repair items'
-content modifications — the agent edits the materials directly), set the plan
-`confirmed: true`, then run `--action apply`. The engine mechanically executes
-delete/archive (archives land under `.specify/archive/` preserving relative layout) and
-status updates (pending→resolved).
+`--auto-reversible` path: first complete the reversible repairs (repair items' content
+modifications — the agent edits the materials directly), apply the auto plan
+(`repair` / `dismiss` / `archive` items) with `confirmed: true`, and report each change
+with its archive path. Then, if true `delete` items remain, present the single-batch
+delete plan and apply it only after the user releases it.
+
+Without `--auto-reversible`: after the user releases the plan, first complete the
+reversible repairs, set the plan `confirmed: true`, then run `--action apply`. The engine
+mechanically executes delete/archive (archives land under `.specify/archive/` preserving
+relative layout) and status updates (pending→resolved).
 
 After execution, present the three-element execution report: what executed; changed
 artifacts (per-item locatable); modification path (git history recovers deleted items /
@@ -353,11 +369,18 @@ archived spec numbers and never reuses a freed number.
 
 ### N4 — Confirm
 
-Renumbering moves directories and rewrites references, so it joins the same destructive
-bucket as the cleanup plan — one front-loaded batch, no second gate. Drop unwanted groups
-here; `--groups <csv>` at apply time selects a subset, and unapplied groups stay pending
-so later runs converge on them. `--adopt-ambiguous-refs` exists for one stated reading
-only: the user confirms that every ambiguous mention refers to the kept definition.
+Renumbering moves directories and rewrites references. Under the confirmation-gates
+owner it is reversible when the workspace is git-clean and the plan is duplicate-only
+with no ambiguous references: in `--auto-reversible` mode run `--action plan
+--auto-confirm`; the engine re-checks those preconditions itself, writes
+`confirmed: true` only when they all hold, and returns `autoConfirmed: true`; N5 then
+applies and the ledger records the batch. When any
+precondition fails (dirty targets, ambiguous references, mixed groups) the engine leaves
+`confirmed: false` and the plan joins the same single front-loaded batch as the cleanup
+plan — no second gate. Drop unwanted groups here; `--groups <csv>` at apply time selects
+a subset, and unapplied groups stay pending so later runs converge on them.
+`--adopt-ambiguous-refs` exists for one stated reading only: the user confirms that every
+ambiguous mention refers to the kept definition.
 
 > Gate probe: gate-sanitize-destructive-cleanup — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
 
@@ -377,19 +400,21 @@ and never re-proposed (`--reopen` restores it); the dismissal persists the reaso
 Runs when `--lane layout` or `--lane all`. The anchor layout — `features.md`, `constitution.md`,
 `glossary.md`, `register.md`, `tools.md` at the `.specify/` root and feature details at
 `.specify/features/<NNN>-<slug>.md` — is the convergence target for older projects. The mechanism is owned by
-`scripts/python/anchor-layout-migrate.py` (deterministic; the moves are rename-only, archive-not-delete, and
-the script never rewrites project documents).
+`scripts/python/anchor-layout-migrate.py` (deterministic; archive-first, and the script never rewrites project
+documents).
 
 - **L1 detect** — `python3 .specify/scripts/python/anchor-layout-migrate.py --action check --json`; exit 0
   clean, 1 findings (the plan).
-- **L2 present** — the plan's moves, every refused-existing target (never overwritten), and the reference
-  paths the project must update. Decision gate: functional × autonomous → fix + disclose
-  (`shared/guidelines/confirmation-gates.md` § Decision gate).
-- **L3 apply** — `--action apply`: the five anchors move to the `.specify/` root; `memory/features/<NNN>.md`
-  becomes `.specify/features/<NNN>-<slug>.md`. A move is a rename; no file is deleted, and a move whose target
-  already exists is reported `skipped` and left in place (never merged over, never forced).
-- **L4 verify** — `--action check` clean; report the reference-update list (the project's own documents carry
-  the old paths; the script reports them, the lane does not rewrite them).
+- **L2 present** — the plan's moves, placeholder replacements, merges, dedupes, every refused structural
+  target (never overwritten), and the reference paths the project must update. Decision gate: functional ×
+  autonomous → fix + disclose (`shared/guidelines/confirmation-gates.md` § Decision gate).
+- **L3 apply** — `--action apply --archive-root <root>`: the five anchors converge to the `.specify/` root;
+  a placeholder is replaced by the legacy real content; a real/real pair is merged (registry table union or
+  append marker) with both originals archived; `memory/features/<NNN>.md` becomes
+  `.specify/features/<NNN>-<slug>.md`. Every original is copied into the archive before the target changes;
+  a move whose target already exists is reported `skipped` and left in place (never forced).
+- **L4 verify** — `--action check` clean; report the reference-update list and every merge/archive location
+  (the project's own documents carry the old paths; the script reports them, the lane does not rewrite them).
 
 ## Behavior Rules (red lines)
 

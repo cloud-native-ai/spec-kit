@@ -31,9 +31,9 @@ H0 ENTRY     解析目标项目、模式、工具；拒绝误解析；记录绝�
 H1 ASSESS    双盘点（物理机制 + 逻辑框架），只读，产出本次缺口凭据
 H2 RECONCILE 按固定次序、只处理缺口：
              （版本混杂态按需）`/speckit.migrate`（一次性收尾主入口；clean 时具名跳过）
-             → /speckit.sanitize（materials；cleanup 模式再跑 retention）
+             → /speckit.sanitize（materials + renumber；cleanup 模式再跑 retention）
              → /speckit.feature → /speckit.instructions（含预算收敛）
-             → /speckit.docs
+             → /speckit.docs（含死链修复）
 H3 STRENGTHEN 按依赖次序、按需：
              /speckit.history → /speckit.docs 深化 → /speckit.research
              → /speckit.feature 生成
@@ -44,7 +44,7 @@ H5 REPORT    候选工作清单 + 运行报告（归档到 .specify/memory/house
 ### H0 — Entry
 
 - **目标项目**：遵循共享契约 `.specify/shared/workflow/target-resolution.md`。**本 skill 强依赖 `.specify/`**：显式目标优先；未给 → 从会话 cwd **向上搜索**最近的合法 `.specify/` 根（显式本地路径则从其向上搜索）；项目根必须包含 `.specify/`（至少含 `memory/`、`scripts/`、`templates/` 之一）；解析为绝对路径；**拒绝 basename 为 `.specify` 的根**；目标是框架源仓且未显式指定时先警告。**找不到 `.specify/` → 拒绝执行**，提示运行 `sdd-project-setup`（install）或 `specify init <project-dir>`，可按需 handoff setup。远端先跑 execution-side target-root probe。
-- **模式**：未给 → `check`（只盘点/报告，不执行破坏性回收）；用户明确要求清理 → `cleanup`。
+- **模式**：未给 → `check`（不执行不可逆清理，但自动执行可逆修复、git 干净前提下的重复编号重排与 docs 死链修复）；用户明确要求清理 → `cleanup`（在 check 基础上再执行破坏性回收，仍由 sanitize 既有单批确认保护）。
 - **命令面**：不假设目标项目的 `/speckit.*` 副本存在；H2 前探测命令副本，缺失时按 `.specify/skills/internal/<name>/SKILL.md` 直接加载 owner 技能，不假设 slash 命令可用。
 - 目标项目必须已有 `.specify/` 与 constitution；缺失 → 停止并 handoff `sdd-project-setup`（bootstrap 是 setup 的职责）。
 
@@ -59,7 +59,7 @@ python3 ${SKILL_HOME}/scripts/logical-framework.py --project <project-dir> --jso
 
 物理矩阵回答 `.specify/` 装没装，逻辑矩阵回答 instructions/features/docs 必选层与 goal/glossary/register/knowledge 推荐层、agents/teams 条件层配没配。两层都跑完才算 H1 完成；缺口凭据永远是**本次** H1，不是上次运行的记忆。
 
-**H2 的 migrate 前置（按需）**：H1 缺口凭据显示版本混杂态（机制盘点 partial/degraded 且 provenance 为旧版残留、`.specify/source.json` 落后于已安装 CLI，或 sanitize Migration lane 报告 `migrate-required`）时，先在 H2 次序最前调用 `/speckit.migrate`（dry-run → 按目标治理确认后 apply），再进入 sanitize 等其余步骤；干净 workspace 具名 `migrate: not-required`。命令流 owner 是 `templates/commands/migrate.md`（本技能只决定时机与次序，不复述步骤、选项与退出码）；周期复核仍归 sanitize 的 Migration lane（一次性主入口与周期回退的分工按其 owner 文本）。
+**H2 的 migrate 前置（按需）**：H1 缺口凭据显示版本混杂态（机制盘点 partial/degraded 且 provenance 为旧版残留、`.specify/source.json` 落后于已安装 CLI，或 sanitize Migration lane 报告 `migrate-required`）时，先在 H2 次序最前调用 `/speckit.migrate`（dry-run → 自动 apply；可由回执恢复的项按可逆处理，无需二次确认），再进入 sanitize 等其余步骤；干净 workspace 具名 `migrate: not-required`。命令流 owner 是 `templates/commands/migrate.md`（本技能只决定时机与次序，不复述步骤、选项与退出码）；周期复核仍归 sanitize 的 Migration lane（一次性主入口与周期回退的分工按其 owner 文本）。
 
 ### H2 — Reconcile
 
@@ -67,7 +67,7 @@ python3 ${SKILL_HOME}/scripts/logical-framework.py --project <project-dir> --jso
 
 **远端 H2/H3 执行形态**：所有 `/speckit.*` 命令在 `<project-dir>` 下、经 run-agent 驱动 subagent CLI 执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；CLI 缺省 qodercli。本地派发缺省用 fork 承载（同族 `qodercli` 子进程经 `stage-runner.sh`），异构 agent 用 subprocess 承载；in-process 路径 BANNED。
 
-1. `/speckit.sanitize` — `check` 模式同时跑 materials check（`/speckit.sanitize check`）与 retention check（`/speckit.sanitize --lane retention check`），两份摘要一起报告；`cleanup` 模式跑 `/speckit.sanitize --lane all`，一个调用内呈现 materials 与 retention 两个计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。**本 skill 不直接调用 `sanitize-utils.py apply` 或 `record-retention.py apply`。**
+1. `/speckit.sanitize` — `check` 模式跑 materials check 的自动可逆修复（`/speckit.sanitize check --auto-reversible`）、重复编号自动重排（`/speckit.sanitize --lane renumber --auto-reversible`；引擎仅在 duplicate-only、无歧义引用、git 干净时自动确认）、以及 retention check（`/speckit.sanitize --lane retention check`），三份摘要一起报告；`cleanup` 模式跑 `/speckit.sanitize --lane all --auto-reversible`，一个调用内呈现 materials、renumber 与 retention 计划，破坏性确认仍由 sanitize 既有门处理，**不新增第二道门**。**本 skill 不直接调用 `sanitize-utils.py apply` 或 `record-retention.py apply`。**
    - 目标项目缺 `record-retention.py`（旧框架）：只跑 materials lane，报告 `retention=not_evaluated — 需升级 spec-kit`，不删除；缺 `sanitize-utils.py`：回交 setup 做刷新。
    - `/speckit.*` 副本缺失时按 `.specify/skills/internal/<name>/SKILL.md` 加载 owner 技能，不假设命令面存在。
 2. `/speckit.feature` — 注册表缺失 **或** owner 自检报告与仓库实况漂移时 reconcile。
@@ -118,7 +118,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 
 ## Discipline Defaults
 
-- 可逆动作直接执行并附执行报告；破坏性动作只经 sanitize 既有门。
+- 可逆动作与 archive-first（有归档回执恢复路径）动作直接执行并附执行报告；不可逆删除/回收只经 sanitize 既有门。
 - 远端形态既有脏文件不提交、不还原。
 - 回收提交（commit / merge / push 的步骤与报告字段）按 `.specify/shared/workflow/artifact-commit-step.md` § Close-out 执行——按指针抵达，不在本技能内另立第二套收口。
 - 不 push（除非入口显式授权）。

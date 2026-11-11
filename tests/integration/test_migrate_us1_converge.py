@@ -159,17 +159,12 @@ def test_legacy_fixture_dry_run_is_planned_with_every_dimension_and_zero_writes(
 
 
 # ---------------------------------------------------------------------------
-# Apply converges under the simulated interactive second key; re-run is clean
+# Apply runs automatically (archive-first is reversible); re-run is clean
 # ---------------------------------------------------------------------------
 
 
-def test_apply_with_simulated_interactive_confirmation_converges_then_clean(
-    tmp_path, monkeypatch
-):
+def test_apply_converges_then_clean(tmp_path):
     workspace = _builders().build_legacy_project(tmp_path / "legacy")
-    monkeypatch.setattr(
-        specify_cli, "migrate_interactive_terminal", lambda: True
-    )
 
     result = _invoke(
         [
@@ -180,7 +175,6 @@ def test_apply_with_simulated_interactive_confirmation_converges_then_clean(
             "--format",
             "json",
         ],
-        input_text="y\n",
     )
     payload = _json_payload(result, 0)
 
@@ -227,9 +221,7 @@ def test_apply_with_simulated_interactive_confirmation_converges_then_clean(
 MIXED_DIMENSIONS = ("templates-generated", "compat-links", "migration-residue")
 
 
-def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(
-    tmp_path, monkeypatch
-):
+def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(tmp_path):
     workspace = _builders().build_mixed_project(tmp_path / "mixed")
     before = _tree_digest(workspace)
 
@@ -242,7 +234,6 @@ def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(
             f"the mixed fixture constructed a {dimension!r} class but plans no item"
         )
 
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     applied = _json_payload(
         _invoke(
             [
@@ -253,7 +244,6 @@ def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(
                 "--format",
                 "json",
             ],
-            input_text="y\n",
         ),
         0,
     )
@@ -276,11 +266,10 @@ def test_mixed_fixture_converges_in_one_apply_then_reruns_clean(
 
 
 def test_mixed_fixture_equivalence_assertion_has_power_beyond_existence(
-    tmp_path, monkeypatch
+    tmp_path,
 ):
     """SC-003 red-ability: an existence-only reading would pass a corrupted tree."""
     workspace = _builders().build_mixed_project(tmp_path / "mixed")
-    monkeypatch.setattr(specify_cli, "migrate_interactive_terminal", lambda: True)
     _json_payload(
         _invoke(
             [
@@ -291,7 +280,6 @@ def test_mixed_fixture_equivalence_assertion_has_power_beyond_existence(
                 "--format",
                 "json",
             ],
-            input_text="y\n",
         ),
         0,
     )

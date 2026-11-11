@@ -8,7 +8,7 @@
 
 ```yaml
 ---
-description: <一句话完整描述：旧版 specify 项目的一次性迁移收尾——只读探测、逐项计划、确认后归档式收敛>
+description: <一句话完整描述：旧版 specify 项目的一次性迁移收尾——只读探测、逐项计划、归档式自动收敛>
 short-description: <短标签供 Qoder 副本生成 description>
 ---
 ```
@@ -20,10 +20,10 @@ short-description: <短标签供 Qoder 副本生成 description>
 模板是本特性唯一的**非确定性**载体，但 MUST NOT 承载任何检查或处置实现：
 
 1. 探测与计划 MUST 只经 `specify migrate`（默认干跑；机器可读时 `--format json`）获得。
-2. 处置 MUST 只经 `specify migrate --apply` 执行。
+2. 处置 MUST 只经 `specify migrate --apply` 执行；干跑之后自动运行，不等待对话确认（`--apply` 是唯一写入授权，archive-first 回执是可恢复性契约）。
 3. 模板 MUST NOT 内联任何维度的检查逻辑、残留清单、路径改写规则或处置判断；MUST NOT 自带第二份「计划」。
 4. 模板 MUST NOT 传递任何确认类旗标（命令面不存在该旗标，见 `contracts/migrate-cli.md` C-5）。
-5. 模板 MUST 把命令的结局词与退出码原样转述给用户：`clean` / `planned` / `applied` / `blocked`；`blocked`（含非交互环境）时 MUST 说明哪些项未执行与原因，MUST NOT 宣称成功。
+5. 模板 MUST 把命令的结局词与退出码原样转述给用户：`clean` / `planned` / `applied` / `blocked`；`blocked` 时 MUST 说明哪些项未执行与原因（结构性冲突、无归档路径或执行失败），MUST NOT 宣称成功。
 
 **结构测试断言**（WP14）：
 - `templates/commands/migrate.md` 含字面量 `specify migrate` 与 `specify migrate --apply`；
@@ -48,11 +48,11 @@ short-description: <短标签供 Qoder 副本生成 description>
 | 冻结基线 | `tests/contract/test_migration_distribution.py` | `COMMAND_BASELINE` 加 `migrate`，长度 29 → 30 |
 | 退役面 | `.specify/templates/commands/` | MUST NOT 出现 `migrate.md`（该镜像面已退役） |
 
-## T-5 代理会话中的确认转述
+## T-5 代理会话中的自动执行与披露
 
-- 模板 MUST 在调用 `--apply` 之前向用户呈现干跑计划并取得明确同意（代理会话内的对话确认）。
-- 该对话确认**不是** CLI 的第二把钥匙：`--apply` 在非交互执行环境中仍会把破坏性项判为 `blocked`；模板 MUST 如实转述该结局，引导用户在交互终端重跑或逐项审阅。
-- 模板 MUST NOT 暗示存在绕过第二把钥匙的开关；MUST NOT 编造「已确认」状态。
+- 模板 MUST 在干跑后自动调用 `--apply`；不要求对话同意，也不存在第二把钥匙或确认旗标。
+- 模板 MUST 在收尾披露：哪些 anchor 被合并（占位替换或真实内容合并）、两个原件的归档位置、回执 `recover` 路径，并建议用对应 owner 命令复核合并结果。
+- 模板 MUST NOT 编造「已确认」「已人工审阅」状态；合并与归档是自动执行的事实，按回执如实转述。
 
 ## T-6 回执指向
 

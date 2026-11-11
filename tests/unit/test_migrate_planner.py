@@ -187,7 +187,7 @@ def test_refuse_item_requires_reason_naming_both_candidates():
     assert "symlink -> .specify/skills" in item.reason
 
 
-def test_blocked_item_requires_reason_for_the_missing_second_key():
+def test_blocked_item_requires_reason_for_the_missing_archive_path():
     from specify_cli import MigrateItem, make_blocked_item
 
     with pytest.raises(ValueError):
@@ -208,7 +208,7 @@ def test_blocked_item_requires_reason_for_the_missing_second_key():
     )
     assert item.disposition == "blocked"
     assert item.status == "blocked"
-    assert "second key" in item.reason
+    assert "archive" in item.reason
 
 
 # ---------------------------------------------------------------------------
