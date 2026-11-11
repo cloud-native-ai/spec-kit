@@ -47,6 +47,12 @@ S2 INSTALL   （全部在执行侧=目标项目所在环境运行；编排侧本
              clean reinstall + 三源 pip 回退 + specify check 验证 →
              项目层：absent → specify init（推荐 --ai all 一次覆盖全 agent）；
              partial/degraded → /speckit.instructions 刷新（recover 模式）
+S2.4 MIGRATE （按需）旧版 workspace 收尾：S2 之后、S2.5 之前判定版本混杂态
+             （机制盘点 partial/degraded 且 provenance 显示旧版残留，或
+             `.specify/source.json` 落后于已安装 CLI）→ MUST 经 `/speckit.migrate`
+             先 dry-run 后 apply 完成一次性收敛；干净 workspace → 具名跳过。
+             命令流 owner：`templates/commands/migrate.md` + `docs/reference/commands/migrate.md`
+             （本技能只决定调用时机，不复述其步骤与四值退出码）
 S2.5 BOOTSTRAP 首批内容（只补缺失项，不做完整维护）：
              /speckit.constitution（缺失时）→ /speckit.feature（注册表缺失时
              种子）→ /speckit.docs（docs 树缺失时）→ /speckit.goal（缺失时定义
@@ -61,6 +67,8 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 **S2.5 carrier**：本地每个 S2.5 命令按 fork / subprocess 两类进程承载派发（in-process 路径 BANNED）；远端每个 S2.5 命令经 run-agent 在 `<project-dir>` 下执行（`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`），CLI 缺省 qodercli；SSH 传输细则见 `ssh-utils`。
 
 **Instruction-chain budget gate**: S2 的 `/speckit.instructions` 刷新若报告 `BUDGET ... over`，本 skill 不实现 R3；把超预算章节与生成器报告交给 `sdd-house-keeping` H2 的 Budget convergence（owner 细节见其 `maintenance-recipes.md` § Budget）。
+
+**S2.4 migrate gate（按需，不静默跳过）**：调用前先读命令自己的 dry-run 计划并呈现；apply 属破坏性收敛，按目标项目治理（宪法与确认门）取得同意后执行；migrate 的 outcome/退出码四值由命令模板拥有，本 skill 逐字转发、不重判。判定为干净时 MUST 在报告里具名 `migrate: not-required`，MUST NOT 以沉默代替结论。远端目标同规（经 run-agent 在 `<project-dir>` 下执行）。
 
 ## Hard Requirements
 

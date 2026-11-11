@@ -30,7 +30,8 @@ classification: external
 H0 ENTRY     解析目标项目、模式、工具；拒绝误解析；记录绝对路径
 H1 ASSESS    双盘点（物理机制 + 逻辑框架），只读，产出本次缺口凭据
 H2 RECONCILE 按固定次序、只处理缺口：
-             /speckit.sanitize（materials；cleanup 模式再跑 retention）
+             （版本混杂态按需）`/speckit.migrate`（一次性收尾主入口；clean 时具名跳过）
+             → /speckit.sanitize（materials；cleanup 模式再跑 retention）
              → /speckit.feature → /speckit.instructions（含预算收敛）
              → /speckit.docs
 H3 STRENGTHEN 按依赖次序、按需：
@@ -57,6 +58,8 @@ python3 ${SKILL_HOME}/scripts/logical-framework.py --project <project-dir> --jso
 ```
 
 物理矩阵回答 `.specify/` 装没装，逻辑矩阵回答 instructions/features/docs 必选层与 goal/glossary/register/knowledge 推荐层、agents/teams 条件层配没配。两层都跑完才算 H1 完成；缺口凭据永远是**本次** H1，不是上次运行的记忆。
+
+**H2 的 migrate 前置（按需）**：H1 缺口凭据显示版本混杂态（机制盘点 partial/degraded 且 provenance 为旧版残留、`.specify/source.json` 落后于已安装 CLI，或 sanitize Migration lane 报告 `migrate-required`）时，先在 H2 次序最前调用 `/speckit.migrate`（dry-run → 按目标治理确认后 apply），再进入 sanitize 等其余步骤；干净 workspace 具名 `migrate: not-required`。命令流 owner 是 `templates/commands/migrate.md`（本技能只决定时机与次序，不复述步骤、选项与退出码）；周期复核仍归 sanitize 的 Migration lane（一次性主入口与周期回退的分工按其 owner 文本）。
 
 ### H2 — Reconcile
 
