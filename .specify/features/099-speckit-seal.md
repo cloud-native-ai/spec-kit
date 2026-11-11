@@ -5,7 +5,7 @@
 **Description**: 按 review 结论封装 spec；`Sealed` 是 `Ready for Review` 之后的终态与归档准入状态；承载分片同名输出件的合并回写（split + merge-back）。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-11
+**Last Updated**: 2026-11-11（100 clarify：follow-up spec `100-seal-slice-archive` 经 `/speckit.clarify` Mode A 绑定本 Feature；099 状态保持 `Ready for Review`；见 § Related Specifications/Requirements）
 
 ## Overview
 
@@ -64,6 +64,11 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 - `templates/feature-details-template.md`、`templates/feature-index-template.md`、
   `skills/internal/manage-features/SKILL.md`、`skills/internal/sanitize-materials/SKILL.md`
 - `.specify/specs/074-goal-team-sdd-unification/`（074 回合产物）
+
+## Related Specifications/Requirements
+
+- `.specify/specs/099-speckit-seal/requirements.md` — 本 Feature 的主规格（seal 与 merge-back）。
+- `.specify/specs/100-seal-slice-archive/requirements.md` — follow-up 规格（2026-11-11 `/speckit.clarify` Mode A 绑定；不新建命令/引擎）。绑定理由：它承接 099 C-019 明确延后的「分片承载物后续处置」复核，把归档步骤固化进既有 `/speckit.seal` 三件产物，并原地扩展 C-001 动作集、C-008 写面与 C-035 边界；099 状态保持 `Ready for Review`。
 
 ## Future Evolution Suggestions
 

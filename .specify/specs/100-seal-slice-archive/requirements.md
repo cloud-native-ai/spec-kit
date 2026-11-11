@@ -11,8 +11,10 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 099
+**Feature Name**: Speckit Seal
+
+**Binding note**: Bound by `/speckit.clarify` Mode A under `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules. Feature 099 is the only candidate covering `/speckit.seal`（同命令、同引擎、同技能），and its C-019 explicitly deferred the slice disposition this spec executes; the binding does not regress 099's status (`Ready for Review`).
 
 ## Overview
 
@@ -205,12 +207,21 @@
 - Q: 与 sanitize 的退休归档、`archive-gate` 的关系？ → A: 分片归档不是退休：目的地只在父 spec 的 `slices/` 内，不查 `archive-gate`，不写 `.specify/archive/`；处置词汇复用 non-disposable 的 `archive`，只补目的地形态。（FR-020）
 - Q: 运行期 line registry 缺席怎么办？ → A: 存在则更新并记 `runtime-updated`；缺席则记 `absent`，不阻断（worktree 中 `.specify/state/` 不可见是正常形态）。（FR-017）
 
+### Session 2026-11-11（clarify，无人值守自我裁决）
+
+- **Feature binding（机械应用 Feature Binding Rules）**: 候选对照仅 Feature 099「Speckit Seal」（`/speckit.seal` 的唯一 Feature；099 C-019 明写分片承载物的后续保留/退役 MUST 按 non-disposable 纪律复核后决定）；无第二候选。按 bind 分支绑定 **099**（不新建、不改号），099 状态保持 `Ready for Review` 不回退；registry 义务（`features.md` 099 行 Last Updated 与详情文件 § Related Specifications/Requirements）已在同批履行。先例：098 作为 086 的 follow-up 绑定 086 而非新建。
+- Q: **（Q1 · 触发与顺序边界）** 归档的触发边界是什么——以 merge-apply 的哪次结果为准，幂等重跑、拒绝与输入错误分别如何处置，`merge.status=not-applicable` 呢？它在一次 `/speckit.seal` 运行中的精确位置（含归档写入与 seal 脏树判定的先后）如何？交互/无人值守下的确认门呢？ → A: 触发谓词取自**合并清单状态**而非「命令刚刚写过盘」：`merge-manifest.json` 存在且 `merge.status == "merged"`、开放冲突为 0、每个分片按 099 既有闭合判据已闭合、父 spec 与分片范围内无本流程之外的未提交改动、每个分片在源与目标中恰好存在一侧（即 FR-006 的合取）。`merge-apply` 退出 `0` 的两个形态——新合并（`idempotent: false`）与已合并重跑（`idempotent: true`）——都满足该谓词；退出 `1`（开放冲突 / 分片未闭合）与退出 `2`（输入或环境错误）都使归档不启动，`2` 按输入缺陷点名原因。`merge.status == "not-applicable"`（分片集为空）时归档报 `not-applicable`、退出 `0`、零写入零清单（FR-007）。位置固定为 `merge-plan → merge-apply → 按既有「Commit before sealing」提交 merge 批次 → archive-plan → archive-apply → 按显式路径提交 archive 批次 → seal 判定`：归档的干净树前置要求 merge 产物先收口；archive 产物再收口后，seal 的 `dirty-spec-tree`（099 C-039）才能在已落定的树上判定——这不是新门，是 C-039 的既有适用。最终 `Sealed` 与具名阻断都不阻断归档（FR-001），归档也不查询 seal 终态。确认门：`archive-apply` 是一次 `git mv` + 清单映射的**可逆动作**，按 confirmation-gates owner 属自动执行层，不设独立前置确认；交互运行先展示 `archive-plan` 预览再 apply，无人值守授权运行直接 apply 并记录决策。
+- Q: **（Q2 · 引用分类谓词）** 「活引用改写 vs 历史文本保持原字节」如何机械判定，dated-record 豁免凭什么成立而不依赖模型对语义的转述判断？ → A: 判定顺序固定为「先载体、后谓词、再解析」，三步全由程序执行。① **载体归类**：每条命中先按载体路径落入 `live` / `dated` 两个封闭集；名册（owner = 本特性 plan 阶段的契约页）必须互斥并覆盖全部扫描根，名册外载体出现命中即 `unclassified-reference`。② **混合载体按章节/行谓词细分**：`features/<ID>.md` 的 `## Related Specifications/Requirements` 归 `live`，`## Latest Review` / `## Key Changes` / `## Implementation Notes` 归 `dated`；`features.md` 的注册表行归 `dated`（日期化 Last Updated 叙述）；同一命中同时满足 live 与 dated 谓词、或两个都不满足，均判 `unclassified-reference`（fail closed）。③ **解析测试**：`live` 命中在 apply 后必须直接解析到存在的归档路径；`dated` 命中必须保持原字节且其旧路径前缀命中清单 `from → to` 映射并落到存在的归档路径；两者之外即未解析，apply 拒绝（FR-015）。**dated-record 豁免的机械判据 = 四条同时成立**：(a) 载体 ∈ dated 封闭集（或命中位于混合载体的 dated 章节）；(b) 命中文本包含清单映射中的某个 `from` 前缀；(c) 该文件归档前后 sha256 相等；(d) 映射后的目标在树上存在。MUST NOT 以「读起来像历史」、文件名直觉或任何模型判断替代上述四条。每个命中恰有一条台账行，`live-rewrite` / `dated-preserved` 二值互斥，闭环比照 FR-016。
+- Q: **（Q3 · 清单 schema、校验器与 074 验收读数）** `archive-manifest.json` 的字段封闭集由谁拥有、由谁校验，路径/时间/摘要采用什么约定？074a/074b 的验收读数与样本计数如何钉住——哪些是运行期探针、哪些是固定字面量？ → A: **schema owner** = 本特性 plan 阶段新建的分片归档契约页（`contracts/` 下唯一所有者），逐字段给出类型、必填性与枚举，覆盖 FR-005 的九类内容；未知字段 MUST NOT 写入，`requirements.md` 与命令/技能文档只引用不复述。**validator owner** = 唯一引擎 `seal-utils.py`：`archive-plan` 与 `archive-apply` 共用同一校验路径（apply 先重算同一计划再写），不新增独立校验器、不引入 JSON Schema 依赖；读取侧对未知或缺失字段以退出 `2`（输入缺陷）fail closed，契约测试断言写出的键集等于封闭集、注入未知字段时读取转红。**约定**：所有路径为仓库根相对 POSIX 字符串（无绝对路径）；清单不含墙钟时间或依赖运行时刻的字段；`digest` 复用 099 C-034 的算法（剔除 `digest` 自身的排序紧凑 JSON 的 sha256，带 `sha256:` 前缀）；`schema_version` 从 `1` 起；同输入两次 plan 逐字节一致。**074 验收读数**：基线提交 `48e273d73` 的实测（`notes/requirements-research.md` § 2–3、`test-evidence/requirements-measurements.txt`）为 074a 58 文件 / 942,609 B / aggregate sha256 `0dbcefd2…`，074b 54 文件 / 826,558 B / `91e4520c…`，合计 112 文件；clarify 复核文件计数仍为 58/54。这些是**参考读数，不是测试常量**：SC-001 只钉「归档前后相等」的运行期探针（文件数、逐文件 sha256、相对路径集合、清单逐文件行数），074 回合唯一固定的字面量是两个分片 slug 与父 spec 路径，测试 MUST NOT 写死 58/54 或哈希；验收记录 MUST 报告运行期实测的 `live-rewrite` / `dated-preserved` / `unclassified` / 未解析四项计数并落入 `test-evidence/`。
+- Q: **（Q4 · 回滚分层）** 回滚走 git 层还是引擎层，按什么步骤执行才能回到逐字节一致？ → A: **引擎层零新增**：`archive-apply` MUST NOT 增加回滚/undo 动作或第二引擎（FR-011），动作集只新增 `archive-plan` / `archive-apply`。**版本化面走 git 层**，按文档化步骤逐字执行：① 按清单 `slices[]` 顺序逐片 `git mv <parent>/slices/<slug> <specs-root>/<slug>` 逆移动；② 对每条 `live-rewrite` 的载体与父 `merge-manifest.json` 执行 `git restore --source=<pinned_commit> -- <path>` 恢复归档前字节（`pinned_commit` 由清单钉住；apply 本身不提交）；③ 移除 apply 新建的 `archive-manifest.json`（归档前不存在，移除即恢复存在性）。若归档批次已被提交，等效形态是一条 `git revert <archive-commit>`；两种形态都不得触碰归档批次之外的改动。**运行期面按清单逆写**：`.specify/state/**` 不进版本库，按清单逐条 `before` / `after` 把 `after` 逆写回 `before`，`runtime-updated` 行是唯一依据。完成判据：父 spec、分片与全部 live 载体的 sha256 等于清单记录的 `before` 值；SC-010 夹具按此步骤逐字执行，跳过任一步转红。
+- Q: **（Q5 · 与退休归档、archive-gate、non-disposable 的关系）** 分片归档如何只复用既有 owner 而不建第二套？ → A: **处置词汇复用** non-disposable 的 `archive`（一次移动、映射入记录、可逆、永不删除）。本特性只**原地**修订该 owner 两处：§ Disposition Set 的 `archive` 行目的地由「`.specify/archive/`」扩展为封闭二形——「`.specify/archive/`（退休，归 sanitize 归档 lane）**或**所属父 spec 的 `slices/`（分片归档，归 seal）」；§ Disposal Pathways 明确分片归档的处置记录 = 父 spec 的 `archive-manifest.json` 逐片 `moved = {from, to}` 行，不建第二份台账。四值集合、§ Disposition Bridge 映射表与裁决规则均不变，MUST NOT 新增第五个处置值或第二份词表；框架 owner 文档按 Two Hats 规则在同批修订 `shared/` 源与 `.specify/` 镜像。**不是退休**：分片归档不写 `.specify/archive/`、不查询 `archive-gate`（它只回答「独立 spec 是否可退休」，分片无状态载体）、不被 sanitize / docs / manage-features 的任何退休入口复用；独立 spec 的退休归档仍归 `/speckit.sanitize` 归档 lane 独占。**契约原地修订**：099 `seal-engine.contract.md` C-001 动作集由四扩展为六，C-008 写面白名单唯一新增的移动是 `archive-apply` 且目标限父 spec 的 `slices/`；`records-and-boundaries.contract.md` C-035 的「归档/退休动作归 sanitize」按**退休**语义原地澄清——分片归档是父 spec 内的位置迁移，归 seal，不构成第二个归档机制（C-036 不破）；`merge-back.contract.md` C-019 的「后续保留/退役按 non-disposable 复核后决定」由本特性以 `archive` 决定并要求把决定写入清单；`slices/` 语义按 FR-002 在 `framework-map.md` 的 Feature specs 行登记。
+
 ## Assumptions
 
 - **Flow Class 判定**：`execution`。验收 oracle 是程序：命令模板、引擎动作、契约测试、清单算术与引用解析均可被机器执行/解析；交付物不是供人阅读的文档（虽含文档更新，但缺陷只在机器行为偏离时暴露）。
 - **074 阻断态**：任务简报导出的「074 seal 回合终态 blocked（099 需求第 027 条 (d) 与 B2 具名）」作为继承前提；本阶段实测复核到「无 `seal.md`、注册状态仍为 `Ready for Review`、合并已完成」。归档不依赖该阻断清单的原文。
-- **动作命名**：`archive-plan` / `archive-apply` 沿用 `merge-plan` / `merge-apply` 的房内先例；若 clarify 改名，只改取值不改语义。
-- **清单位置**：`archive-manifest.json` 默认放父 spec 根（与 `merge-manifest.json` 并列）；若 clarify 选择 `slices/` 内，需同步调整 FR-005/FR-014 的路径引用。
+- **动作命名**：`archive-plan` / `archive-apply` 沿用 `merge-plan` / `merge-apply` 的房内先例；clarify（2026-11-11）裁定保留该命名，不再作为待定项。
+- **清单位置**：`archive-manifest.json` 落父 spec 根（与 `merge-manifest.json` 并列），clarify（2026-11-11）确认；FR-005/FR-014 的路径引用按此固定。
 - **父 `tasks.md` 拆分账**：57 行 `> superseded` 行按活指针处理（改路径、不改历史事实）；分片内部的 `tasks.md` 按日期化记录保持原字节。
 - **运行期 state**：`.specify/state/**` 是 git-ignored 的环境级记录；本 worktree 不可见，主仓可见。缺席不阻断。
 - **既有 owner 原地修订**：099 契约与非 disposable owner 的修订属于本特性实现范围；不新增第二套契约家族或处置词表。

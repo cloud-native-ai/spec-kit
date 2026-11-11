@@ -1,0 +1,47 @@
+# Clarify-stage gates — 2026-11-11
+# branch: 100-seal-slice-archive
+# base commit: 17962af8c (requirements stage closed)
+
+## Flow class (read once; reused for the stage)
+python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:100-seal-slice-archive"
+unit_id: spec:100-seal-slice-archive
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+## Structural gate
+$ python3 scripts/python/validate-requirements.py .specify/specs/100-seal-slice-archive/requirements.md
+file: .specify/specs/100-seal-slice-archive/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 229 lines, 38 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+## Clarifications ledger (append-only check)
+grep -c '^- Q:' .specify/specs/100-seal-slice-archive/requirements.md
+before: 5   (Session 2026-11-11, requirements stage)
+after: 10   (5 requirements-stage + 5 clarify-stage)
+strictly increased: yes
+
+## 074 pre-archive probe (read-only, at this worktree's HEAD)
+074a-authorized-routing: files=58 bytes=942609
+074b-nested-governance: files=54 bytes=826558
+baseline readings recorded at 48e273d73 (test-evidence/requirements-measurements.txt):
+  074a 58 files / 942,609 B / aggregate sha256 0dbcefd2334cc312010da70182877e6f07163ef15bcaf066927a3d477c152ae0
+  074b 54 files / 826,558 B / aggregate sha256 91e4520cbd8d580c383f590e4453bf1e6762a03cd8e3d1f46cc072d854962b37
+verdict: file counts and bytes reproduce the baseline; counts are reference readings, not test constants (Q3).
+
+## Feature binding duties
+- .specify/features.md row 099 Last Updated: clarify binding note landed (2026-11-11).
+- .specify/features/099-speckit-seal.md: Last Updated updated; § Related Specifications/Requirements lists the 100 follow-up spec.
+- status regression: none (099 stays `Ready for Review`).
