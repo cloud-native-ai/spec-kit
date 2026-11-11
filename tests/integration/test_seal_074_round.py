@@ -227,13 +227,26 @@ def _commit(repo: Path, message: str) -> None:
     _git(repo, *GIT_IDENTITY, "commit", "-q", "-m", message)
 
 
+def _slice_source(slug: str) -> Path:
+    """The replay's pre-archive source, wherever the live tree keeps the slice."""
+    for candidate in (REPO_ROOT / ".specify" / "specs" / slug,
+                      PARENT / "slices" / slug):
+        if candidate.is_dir():
+            return candidate
+    raise AssertionError(
+        "slice %s exists neither at the sibling path nor under slices/" % slug)
+
+
 def _replay_tree(tmp_path: Path) -> Path:
     """A throwaway git replay of the 074 round (parent + both slices)."""
     repo = tmp_path / "replay"
     specs = repo / ".specify" / "specs"
     specs.mkdir(parents=True)
-    for name in (PARENT.name, SLICE_A, SLICE_B):
-        shutil.copytree(REPO_ROOT / ".specify" / "specs" / name, specs / name)
+    shutil.copytree(
+        PARENT, specs / PARENT.name,
+        ignore=shutil.ignore_patterns("slices", "archive-manifest.json"))
+    for name in (SLICE_A, SLICE_B):
+        shutil.copytree(_slice_source(name), specs / name)
     _git(repo, "init", "-q")
     _commit(repo, "074 replay snapshot")
     return repo
