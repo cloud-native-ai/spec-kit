@@ -571,6 +571,8 @@ ARCHIVE_DATED_TREES = (".specify/memory/", ".specify/history/")
 ARCHIVE_FEATURES_DETAIL_PREFIX = ".specify/features/"
 ARCHIVE_MIXED_HEADING_RE = re.compile(
     r"^##\s+Related Specifications/Requirements\s*$")
+ARCHIVE_MIXED_HEADING_BYTES_RE = re.compile(
+    rb"^##\s+Related Specifications/Requirements\s*$")
 
 
 def archive_manifest_digest(document: Dict[str, Any]) -> str:
@@ -1254,6 +1256,24 @@ def mixed_section_kind(lines, line_no: int) -> str:
         if index == line_no:
             return "live" if in_live else "dated"
     return "dated"
+
+
+def mixed_dated_sections(raw: bytes) -> bytes:
+    """C-304/C-306: a mixed carrier's dated H2 blocks, byte for byte."""
+    blocks, current = [], []
+    for line in raw.splitlines(keepends=True):
+        if re.match(rb"^##\s+", line):
+            blocks.append(current)
+            current = [line]
+        else:
+            current.append(line)
+    blocks.append(current)
+    kept = []
+    for block in blocks:
+        if block and ARCHIVE_MIXED_HEADING_BYTES_RE.match(block[0]):
+            continue
+        kept.extend(block)
+    return b"".join(kept)
 
 
 def map_archived_reference(rel_path: str, slices):
@@ -4442,9 +4462,13 @@ def _archive_apply_batch(repo: Path, spec_dir: Path,
             live_rows.setdefault(row["carrier"], []).append(row)
     moved_prefixes = tuple(entry["from"] + "/" for entry in document["slices"])
     dated = {carrier for carrier in dated
-             if not carrier.startswith(moved_prefixes)} - set(live_rows)
+             if not carrier.startswith(moved_prefixes)}
+    pure_dated = sorted(dated - set(live_rows))
+    mixed = sorted(dated & set(live_rows))
     dated_before = {carrier: hashlib.sha256((repo / carrier).read_bytes()).hexdigest()
-                    for carrier in sorted(dated) if (repo / carrier).is_file()}
+                    for carrier in pure_dated if (repo / carrier).is_file()}
+    mixed_before = {carrier: mixed_dated_sections((repo / carrier).read_bytes())
+                    for carrier in mixed if (repo / carrier).is_file()}
     slices_dir = spec_dir / ARCHIVE_SLICES_DIR
     failure = None
     try:
@@ -4491,6 +4515,11 @@ def _archive_apply_batch(repo: Path, spec_dir: Path,
         for carrier, digest in dated_before.items():
             if hashlib.sha256((repo / carrier).read_bytes()).hexdigest() != digest:
                 raise OSError("dated carrier %s changed during the batch" % carrier)
+        for carrier, dated_region in mixed_before.items():
+            if mixed_dated_sections((repo / carrier).read_bytes()) != dated_region:
+                raise OSError(
+                    "mixed carrier %s changed in its dated sections during the "
+                    "batch" % carrier)
         for carrier in sorted(live_rows):
             if not carrier.startswith("shared/"):
                 continue

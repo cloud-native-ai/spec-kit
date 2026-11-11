@@ -274,6 +274,64 @@ def test_apply_rewrites_live_carriers_and_preserves_dated_bytes(tmp_path):
     assert not [row for row in rows_diff if row[0] == "D"]
 
 
+def test_a_mixed_carrier_changes_only_in_its_live_sections(tmp_path, eng):
+    """C-306(c)/C-308: a mixed carrier is judged per section, not per file."""
+    repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+    _init_git(repo)
+    mixed_rel = ".specify/features/%s.md" % PARENT
+    before = (repo / mixed_rel).read_bytes()
+
+    plan_proc, plan_payload = _run(repo, "archive-plan")
+    assert plan_proc.returncode == 0, plan_payload.get("conditions")
+    rows = plan_payload["archive"]["manifest"]["references"]["rows"]
+    kinds = {row["kind"] for row in rows if row["carrier"] == mixed_rel}
+    assert kinds == {"live-rewrite", "dated-preserved"}, (
+        "fixture premise: the mixed carrier carries both row kinds"
+    )
+
+    proc, payload = _run(repo, "archive-apply")
+    assert proc.returncode == 0, payload.get("conditions")
+
+    after = (repo / mixed_rel).read_bytes()
+    assert after != before, (
+        "the live section is rewritten, so the mixed carrier's file hash changes"
+    )
+    assert eng.mixed_dated_sections(after) == eng.mixed_dated_sections(before), (
+        "C-306(c)/C-308: a mixed carrier's dated sections keep their exact bytes"
+    )
+    lines = after.decode("utf-8").splitlines()
+    for row in (row for row in rows if row["carrier"] == mixed_rel):
+        assert lines[row["line"] - 1] == row["after"], (
+            "C-308: every mixed-carrier row lands exactly as recorded"
+        )
+
+
+def test_a_mixed_carrier_dated_section_change_is_rejected_and_restored(
+        tmp_path, eng, monkeypatch):
+    """C-308: dated-section drift inside a mixed carrier ends the batch at 2."""
+    repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+    _init_git(repo)
+    before = _snapshot(repo)
+    mixed_rel = ".specify/features/%s.md" % PARENT
+    real = eng._archive_line_text
+
+    def sabotage(text, updates, carrier):
+        result = real(text, updates, carrier)
+        if carrier == mixed_rel:
+            result = result.replace("The dated review mentions",
+                                    "The dated review mentioned")
+        return result
+
+    monkeypatch.setattr(eng, "_archive_line_text", sabotage)
+    payload, code = _apply_in_process(eng, repo)
+    assert code == 2, payload.get("conditions")
+    assert "write-failed" in _codes(payload)
+    assert "dated sections" in payload["conditions"][0]["evidence"]
+    assert _snapshot(repo) == before, (
+        "C-108: the refused batch restores the tree byte for byte"
+    )
+
+
 def test_a_source_mirror_mismatch_ends_with_mirror_copy_and_restores(tmp_path):
     repo = _copy_fixture("reference-matrix", tmp_path / "repo")
     mirror = repo / ".specify/shared/definitions/example.md"

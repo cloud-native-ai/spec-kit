@@ -32,7 +32,7 @@
 - **F2（父 spec 内相对路径）**：`<slug>/…`，前一字符不是标识符字符（字母、数字、`_`、`-`）且不是 `/`（排除 `../<slug>` 与绝对路径中的同名段）；F2 只在载体位于 `.specify/specs/<parent>/` 子树内时被识别。
 - **F3（测试构造式）**：仅在 `tests/**` 中，一个 slug 字符串字面量是**路径构造表达式**的组成部分——该表达式以 `Path` 连接、字符串拼接、f-string 或整路径字面量的形式同时含 `.specify` 与 `specs` 段；identity 比较（如 `assert make(".specify/specs/<slug>") == "<slug>"`）的右侧字面量不在路径表达式中，不计为 F3、MUST NOT 被改写。
 
-F1 与 F2 同时可匹配时 MUST 取最长匹配 F1；F1 与 F3 同时可匹配时取 F1；F2/F3 只在未被 F1 覆盖的跨度上识别；同一命中恰产生一条台账行与一次改写。裸 slug 出现（不满足三类形态）MUST NOT 计为引用：`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键、`<!-- source: <slug> -->` 标注一律保持原字节。绝对路径前缀中的 `.specify/specs/<slug>`、`../<slug>` 与跨行拼接不属三类形态，其处置按**载体类**收敛：(i) **live 载体**（含混合载体的 live 章节）中的任何形状外源路径 MUST 报 `unclassified-reference`；(ii) **dated 载体**（含混合载体的 dated 章节）中，凡命中包含某分片 `from` 前缀（含绝对路径前缀、`../<slug>` 前缀与跨行拼接等非 F1/F2/F3 形态）即按 C-306 计为 `dated-preserved`——零改写、文件 sha256 前后相等、经 `from → to` 映射解析——MUST NOT 报 `unclassified-reference`；dated 载体中不含任何分片 `from` 前缀的源路径形状仍报 `unclassified-reference`。跨行拼接按载体级检查：dated 载体记一条载体级 `dated-preserved` 台账行（`line` = 拼接起始行，`before` / `after` = 该行原文），live 载体报 `unclassified-reference`。改写后的归档路径（`.specify/specs/<parent>/slices/<slug>`）与 identity 裸 slug 常量不含源路径形态，MUST NOT 触发本项（保证 apply 后复验与重跑幂等）。
+F1 与 F2 同时可匹配时 MUST 取最长匹配 F1；F1 与 F3 同时可匹配时取 F1；F2/F3 只在未被 F1 覆盖的跨度上识别；同一命中恰产生一条台账行与一次改写。裸 slug 出现（不满足三类形态）MUST NOT 计为引用：`slices[].slug`、`artifacts[].sources[]`、`artifacts[].per_slice[].slice`、`id_maps` 键、`<!-- source: <slug> -->` 标注一律保持原字节。绝对路径前缀中的 `.specify/specs/<slug>`、`../<slug>` 与跨行拼接不属三类形态，其处置按**载体类**收敛：(i) **live 载体**（含混合载体的 live 章节）中的任何形状外源路径 MUST 报 `unclassified-reference`；(ii) **dated 载体**（含混合载体的 dated 章节）中，凡命中包含某分片 `from` 前缀（含绝对路径前缀、`../<slug>` 前缀与跨行拼接等非 F1/F2/F3 形态）即按 C-306 计为 `dated-preserved`——零改写、载体字节按 C-306(c) 的载体类判据保持不变、经 `from → to` 映射解析——MUST NOT 报 `unclassified-reference`；dated 载体中不含任何分片 `from` 前缀的源路径形状仍报 `unclassified-reference`。跨行拼接按载体级检查：dated 载体记一条载体级 `dated-preserved` 台账行（`line` = 拼接起始行，`before` / `after` = 该行原文），live 载体报 `unclassified-reference`。改写后的归档路径（`.specify/specs/<parent>/slices/<slug>`）与 identity 裸 slug 常量不含源路径形态，MUST NOT 触发本项（保证 apply 后复验与重跑幂等）。
 
 (FR-012)
 
@@ -56,7 +56,7 @@ F1 与 F2 同时可匹配时 MUST 取最长匹配 F1；F1 与 F3 同时可匹配
 
 **C-306** — 日期化豁免的四条件同时成立才是 `dated-preserved`。
 
-一个命中被计为 `dated-preserved`，当且仅当：(a) 其载体 ∈ dated 封闭集，或位于混合载体的 dated 章节；(b) 命中文本包含清单映射中的某个 `from` 前缀或其可归因形态（父内相对 `<slug>/`、`../<slug>`、带任意前缀的绝对路径，以及跨行拼接后的拼接文本）；(c) 该文件归档前后 sha256 相等；(d) 映射后的目标存在——**plan 期**按计划的投影归档树判定（目标 = `to` 路径，由同一计划创建），**apply 后**按真实树判定；判定落在 `to` 前缀层，dated 记录尾部所指文件不要求存在。四条之外 MUST NOT 记 `dated-preserved`；MUST NOT 以「读起来像历史」、文件名直觉或任何模型判断替代上述四条。
+一个命中被计为 `dated-preserved`，当且仅当：(a) 其载体 ∈ dated 封闭集，或位于混合载体的 dated 章节；(b) 命中文本包含清单映射中的某个 `from` 前缀或其可归因形态（父内相对 `<slug>/`、`../<slug>`、带任意前缀的绝对路径，以及跨行拼接后的拼接文本）；(c) 载体字节不变，按载体类判定——**纯 dated 载体**（无 `live-rewrite` 行）归档前后整文件 sha256 相等；**混合载体**（同时携带 `live-rewrite` 与 `dated-preserved` 行，如 `features/<ID>.md`）归档前后其 dated 章节（按 C-304 的 H2 章节边界切分）字节逐字节相等，live 章节按台账改写；(d) 映射后的目标存在——**plan 期**按计划的投影归档树判定（目标 = `to` 路径，由同一计划创建），**apply 后**按真实树判定；判定落在 `to` 前缀层，dated 记录尾部所指文件不要求存在。四条之外 MUST NOT 记 `dated-preserved`；MUST NOT 以「读起来像历史」、文件名直觉或任何模型判断替代上述四条。
 
 (FR-012, FR-014)
 
@@ -68,7 +68,7 @@ F1 与 F2 同时可匹配时 MUST 取最长匹配 F1；F1 与 F3 同时可匹配
 
 **C-308** — 改写机制：前缀替换、整行记录、dated 文件哈希不变。
 
-`live-rewrite` 的改写 MUST 是确定性前缀替换：F1 的 `.specify/specs/<slug>` → `.specify/specs/<parent>/slices/<slug>`；F2 的 `<slug>/` → `slices/<slug>/`（仅父 spec 子树内的 live 载体）；F3 把 slug 字面量替换为 `<parent>/slices/<slug>`（保持原有引号与其余字符）。每条改写 MUST 在台账记录 `before` / `after` 整行与 `carrier` / `line`。所有 `dated-preserved` 载体 MUST 在运行前后保持 sha256 相等；任一日 dated 文件哈希变化 MUST 使 apply 以 `2` 结束并按原字节恢复。
+`live-rewrite` 的改写 MUST 是确定性前缀替换：F1 的 `.specify/specs/<slug>` → `.specify/specs/<parent>/slices/<slug>`；F2 的 `<slug>/` → `slices/<slug>/`（仅父 spec 子树内的 live 载体）；F3 把 slug 字面量替换为 `<parent>/slices/<slug>`（保持原有引号与其余字符）。每条改写 MUST 在台账记录 `before` / `after` 整行与 `carrier` / `line`。**纯 dated 载体**（无 `live-rewrite` 行）MUST 在运行前后保持整文件 sha256 相等；**混合载体** MUST 在运行前后保持其 dated 章节（按 C-304 切分）字节逐字节相等。任一纯 dated 载体哈希变化、或任一混合载体 dated 章节字节变化，MUST 使 apply 以 `2` 结束（`write-failed`）并按原字节恢复。
 
 (FR-013, FR-014)
 
