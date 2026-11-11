@@ -35,6 +35,26 @@ delegation only.
   residue list is incomplete: it MUST NOT be read as closing the gate. Prose residue in a notes file
   is not a gate input.
 
+### Incremental re-check protocol（增量复检协议）
+
+A round after the first defaults to an **incremental re-check**; the full re-run is the fallback, not the default:
+
+- **Re-check scope**: round N+1 re-checks exactly (i) the loci repaired in round N and (ii) their one-hop neighbors (a repaired FR/contract clause pulls the artifact sections that cite it).
+- **Reuse is declared, never silent**: every untouched domain is reused and named in the round record with its content hash (path set + hash). An unnamed reuse is an incomplete record.
+- **Validator independence is never downgraded**: every CRITICAL/HIGH of the incremental round still needs a fresh-context, read-only validator; reuse applies to detection domains, never to validation.
+- **Deterministic gates always full-run** as the backstop; a gate that goes red for a reason a repaired locus cannot explain escalates to a full re-run.
+- **Full re-run is mandatory** when any of: more than half of the declared domains were touched; the repairs changed contract surfaces across all three artifact classes; the finding taxonomy or a clause-id map changed; or an incremental round still leaves an open CRITICAL/HIGH.
+- **Round record fields**: touched-loci set · reused domains (path + hash) · per carried finding disposition (`fixed` / `deferred` / `rejected` with reason). The residue rules above apply unchanged.
+
+### Domain and output budget（域与输出预算）
+
+The dispatch layer splits the analysis into file-disjoint domains; this skill owns the sizing and output rules it must follow:
+
+- **Size by expected finding volume**: a domain carries at most ~15 files and ~10 expected findings. A domain expected to exceed either bound MUST be pre-split by file path before dispatch — a domain that fails on output limit and is then re-split is a dispatch defect, and its partial findings are never accepted.
+- **Bounded worker output**: a worker returns findings as structured records only (id / category / claim / severity / locations / evidence) in the findings JSONL; narrative duplicated from the artifacts does not belong in worker output.
+- **Incomplete unit rule**: a worker that returns an output-limit error, a truncated findings set, or a read-domain mismatch is an incomplete unit — re-dispatch its files (split further), never synthesize around a silence.
+
+
 ## Input Contract
 
 - **Prerequisite**: `/speckit.tasks` has produced a complete `tasks.md`. Abort with a
