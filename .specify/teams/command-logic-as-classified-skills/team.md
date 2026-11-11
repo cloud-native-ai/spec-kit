@@ -3,7 +3,7 @@ name: 命令逻辑技能化与分类标注团队
 slug: command-logic-as-classified-skills
 description: 以 serial 五阶段链（命令普查裁定 → 提炼建技能并标注 → 契约齐备 → 结构对齐 → 命令瘦身）把命令模板的核心逻辑下沉为技能，并给每个技能打 internal / external 标注；每次交接有独立验证门，每次 canonical 落盘后有再生成步
 goal: >
-  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/goal/command-logic-as-classified-skills/goal.md）。
+  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/goal.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：spec-kit 的命令核心逻辑尽可能由技能承载——
   命令模板只保留入口与委派，可执行的核心逻辑落在 skills/ 下的技能里；每个技能的元数据都带 internal 或
   external 标注，标注如实表达它与 spec-kit 的依赖关系，使后续按标注分流的处理有据可依。
@@ -72,7 +72,7 @@ territory:
     - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidden，才可派发其第二次累积；因其 write 含 skills/*/SKILL.md 与 skills/*/references|templates|scripts/**，与本团队 write 构成已知前向冲突。具名目录今日尚不存在，故本条目是**待触发的义务**而非已落地的排除；触发时 MUST NOT 静默双写。机械事实（引用、不复述）：shipped 校验器只比 write×write、从不减 forbidden，故 write∩forbidden 的排除式解法在同 goal_slug 下仍会报 overlap——该缺口由对方团队 non_path 的 cross-goal-write 条目持有并已记入 feedback；本团队今日无同 goal_slug 的兄弟团队，故不触发 }
     - { type: dispatch-modality, target: 本团队四个席位里只有 structure-adjuster 能在 Qoder CLI 下**原生**派发——.qoder/agents/ 只注册了 skill-verifier 与 structure-adjuster 两个类型，而 agent-team-supervisor-template / agent-stage-executor-template / agent-stage-evaluator-template 只存在于 skills/create-team/templates/agents/、未安装到宿主注册面，只能 **virtual** 派发（无隔离、无并行、消耗本会话上下文，真源 .specify/shared/definitions/subagent-definitions.md）。故各 stage 批规模 MUST 按 virtual 保守估；要改为原生须先经 /speckit.agents 实例化到 .specify/agents/instances/ 再跑 /speckit.instructions 接线，那是机制侧改动、不在本团队写面内 }
     - { type: run-2-ruling-boundary, target: 2026-10-09 用户裁定（明示）：goal.md Boundaries 的「留待后续」差异化处理现已启动，本轮范围为「技能内外分层 + 安装/可见性分流」——internal = 一切配合 .specify 结构的技能（含全部工作流技能），external = 与 .specify 无关的通用技能；internal 对客户 agent 不可见（输出至 `.specify/skills/internal/`，由 /speckit.* 工作流按显式路径引用），external 经 .qoder/skills 等既有机制扩散到用户 agent。goal.md 文本仍不可经引擎改写（无 boundary 动作），本裁定只在此记账（先例 2026-10-07） }
-    - { type: run-2-ruling-a1, target: 2026-10-09 用户裁定：A1（templates/commands/goal.md :17「No skill, script, or other command may write into the goal archive」）按「授权顺手修复」处置——该句已就地补注（sole writing path = 引擎；经其承载的委派逻辑不排除）；S0 裁定表 #10（manage-goal）条件解除 }
+    - { type: run-2-ruling-a1, target: "2026-10-09 用户裁定：A1（templates/commands/goal.md :17「No skill, script, or other command may write into the goal archive」）按「授权顺手修复」处置——该句已就地补注（sole writing path = 引擎；经其承载的委派逻辑不排除）；S0 裁定表 #10（manage-goal）条件解除" }
     - { type: run-3-ruling-classification-v2, target: 2026-10-09 用户修订指令（明示，D1–D5）：分类终态改判——git-workflow/create-docs/improve-docs/create-skills/improve-skills 转 external（后两组须拆除 .specify 依赖；git-workflow 状态面迁 docs/git-workflow.md）；archive-session/code-review/manage-agents/study-project 暂列 internal（后转只需改注记）；git-fleet+git-server-init+git-submodule-edit+git-workflow 合并为 git-workspace（external，按 merge-skills 纪律，合并作为减膨胀手段）。终态 32 实体：external 17 / internal 15；20 个新建候选全 internal。判定与拆除/合并方向见 S-layer/classification.md v2 }
     - { type: handover-out, target: 2026-10-09 用户指令（「使用 /speckit.goal 和 /speckit.team 命令经剩余工作转换为 goal 和 team，其中 team 需要进行多 subagent 协作，并发处理」）：本团队 run-2 扩展切片的**剩余批次 B2c/B2e/B3/B4/B5/B6/B7 移交**新 goal `skill-layer-install-separation`（同名新团队；serial + 阶段内 native 并发）；已完成批次 B1/B2a/B2b/B2d 的产线与记录保留在本团队。本团队此后聚焦 S1–S3；S1 起点跨团队依赖新团队 S-B 落地 }
 pattern: serial

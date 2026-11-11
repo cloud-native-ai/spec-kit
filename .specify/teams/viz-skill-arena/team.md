@@ -1,7 +1,7 @@
 ---
 name: 可视化技能竞技场团队
 slug: viz-skill-arena
-description: 语义/语法分离的六技能绘图体系竞技——draw-diagram 产出语义绘图规格(SDS: 逻辑模型+几何+视觉权重)，draw-{d3js,echarts,excalidraw,mermaid,plantuml} 并行做语法实现，两轮多裁判评审 + 一次重绘，持续优化整个绘图技能体系
+description: "语义/语法分离的六技能绘图体系竞技——draw-diagram 产出语义绘图规格(SDS: 逻辑模型+几何+视觉权重)，draw-{d3js,echarts,excalidraw,mermaid,plantuml} 并行做语法实现，两轮多裁判评审 + 一次重绘，持续优化整个绘图技能体系"
 goal: >
   通过「用户下发图表任务 → draw-diagram 构建语义绘图规格 SDS(逻辑图模型 + 图元几何 + 视觉权重语义) →
   5 个语法引擎并行按 SDS 实现同一图表 → 第一轮 3 名裁判从不同角度打分 → 根据评审意见优化对应技能

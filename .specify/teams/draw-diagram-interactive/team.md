@@ -4,7 +4,7 @@ slug: draw-diagram-interactive
 description: 以 iteration 闭环为 draw-diagram 技能建设可交互图表绘制能力(图表随用户输入调整,网页格式交付)
 goal: >
   draw-diagram 技能具备绘制可交互图表的能力:图表可根据用户输入做出调整(通常是网页格式)。
-  权威定义见 goal_slug 指向的 .specify/goal/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
+  权威定义见 goal_slug 指向的 .specify/anchoring/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
 goal_slug: draw-diagram-interactive
 territory:
   write:

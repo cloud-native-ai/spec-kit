@@ -6,7 +6,7 @@ description: >
   在框架源码中建立一套 improve 流程；交付物是定义类文件，故 Worker 只产补丁到工作区，
   canonical 落盘由唯一 Meta supervisor 执行，每次交接有独立验证门
 goal: >
-  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/goal/session-driven-self-improvement/goal.md）。
+  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/goal.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：框架中有一套 improve 流程，含两个方面 ——
   主动触发（通过 improve 命令）与被动触发（通过运行判定的结果触发 feedback 流程）。
   成功判据以定义为准，本团队不复述其文本；其主体是「一套新的运行判定，统一 token 消耗、耗时、

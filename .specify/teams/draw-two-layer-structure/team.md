@@ -3,7 +3,7 @@ name: 绘图双层结构重构团队
 slug: draw-two-layer-structure
 description: 以 serial 三阶段链（重构 → 净室自测 → 评价采集）推进 skills/draw-diagram 语义前门与 skills/draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml} 语法引擎的两层自治结构；每次交接有独立验证门
 goal: >
-  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/goal/draw-two-layer-structure/goal.md）。
+  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/goal.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：调用 draw-diagram 不必告知「画什么」（它据上下文
   与补充说明自行分析语义、辨识层级/依赖/上下关系、抽象图表并选定结构类型后委派渲染）；调用五个 draw-* 引擎
   不必告知布局、线段绘制与渲染等实现细节；每次出图后主动征询用户评价并据以调整。

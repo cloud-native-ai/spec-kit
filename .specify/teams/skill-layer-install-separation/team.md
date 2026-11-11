@@ -3,7 +3,7 @@ name: 技能分层与安装分流团队
 slug: skill-layer-install-separation
 description: 以 serial 五阶段链（S-A 技能对去 .specify 化 → S-B 源树重家与引用适配 → S-C 镜像/安装/打包工具链分流 → S-D 测试适配与守卫 → S-E 运行时刷新与终验）把「internal/external 分层 + 安装/可见性分流」从设计落到全绿；每阶段内多个 **native subagent 并发派发**（一响应块多调用、同席位多重 Execution），每次交接有独立验证门
 goal: >
-  承接已定义 Goal `skill-layer-install-separation`（权威定义：.specify/goal/skill-layer-install-separation/goal.md）。
+  承接已定义 Goal `skill-layer-install-separation`（权威定义：.specify/anchoring/skill-layer-install-separation/goal.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：技能源树按 internal/external 两层组织且全仓引用一致；
   客户项目只获得并注册 external 技能（internal 以 .specify/skills/internal/ 嵌套下发、对客户 agent 不可见、
   仅供 /speckit.* 工作流按显式路径消费）；框架自身两态齐备，镜像、安装、打包与测试工具链整链适配。

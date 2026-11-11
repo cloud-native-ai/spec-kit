@@ -29,11 +29,11 @@ developers and the framework's unattended mechanisms. Do not edit it by hand.
 <!-- GIT_OBSERVED_START -->
 ## Observed facts (machine, dated)
 
-- **Observed at**: 2026-11-10T02:33:38Z
+- **Observed at**: 2026-11-11T03:26:42Z
 - **Trunk**: `master` (declared; present locally)
 - **Remotes**: `gitee`, `github`, `gitlab`, `origin`
 - **Remotes vs declaration**: declared-but-missing: none; present-but-undeclared: none
-- **Feature-branch naming**: no dominant numbered convention — 0/1 non-declared local branches are digit-prefixed (e.g. `rename-anchors`)
+- **Feature-branch naming**: `NNN-<slug>` — 1/1 non-declared local branches are digit-prefixed (e.g. `100-seal-slice-archive`)
 - **Closeout declaration**: present
 
 These are machine observations, not declarations: the workflow model and branch declarations above change only through the `git-utils` skill's Bootstrap flow with user confirmation.

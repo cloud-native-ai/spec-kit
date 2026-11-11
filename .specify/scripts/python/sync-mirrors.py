@@ -791,12 +791,25 @@ def main() -> int:
                     print(f"sync  {src_name}/ -> {dst_name}/ ({synced} files)")
         for mirror_rel_s in projected_here:
             kind, source_rel = declared[mirror_rel_s]
-            _expected, problem = project_for(mirror_rel_s)
+            expected, problem = project_for(mirror_rel_s)
             if problem is not None:
                 failures.append((mirror_rel_s, problem))
                 print(f"FAIL  {mirror_rel_s}: {problem}")
-            print(f"projected[{kind}] {mirror_rel_s} <- {source_rel}: "
-                  f"{'refused' if problem is not None else 'ok'}")
+                verdict = "refused"
+            else:
+                # C-35: `ok` means the mirror's bytes EQUAL the projection. "the
+                # projection could be computed" is not a verdict about the mirror --
+                # a computable-but-stale pair is drift, and this line must not say ok.
+                try:
+                    in_sync = (REPO_ROOT / mirror_rel_s).read_bytes() == expected
+                except OSError:
+                    in_sync = False
+                if in_sync:
+                    verdict = "ok"
+                else:
+                    drift = True
+                    verdict = "DIFF[projected]"
+            print(f"projected[{kind}] {mirror_rel_s} <- {source_rel}: {verdict}")
         # Extras are never deleted (archive-not-delete discipline), but in a
         # strict tree they are a distribution defect, not a note.
         for rel in extra:

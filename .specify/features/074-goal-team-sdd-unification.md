@@ -94,3 +94,7 @@
 - **Implemented**: tasks 全部闭合，verification 记录每条 SC 的状态。
 - **Ready for Review**: 延期任务处置完毕、review 证据产生、code-review 无 blocking 条目。
 - **Completed**: 人工终验。
+
+## 2026-11-11
+
+- 第 30 行（2026-10-29 `074a` implement 记录）中「074b 未实现前不擅自推进」的叙述已过时；该 dated 文本原样保留、不改写。父级聚合 `verification.md` / `review.md` 已由 099 回合（`1b3e422a8`，2026-11-11）落盘，Feature 074 当前状态以头部 `Ready for Review` 为准。

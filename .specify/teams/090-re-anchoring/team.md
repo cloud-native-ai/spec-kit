@@ -134,7 +134,7 @@ binding:
 ## Goal
 
 Deliver the remaining stages of Feature 090 through a spec-local temporary team. The spec-local goal definition is
-`.specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring/goal.md`; this section is readability rendering only, and the
+`.specify/anchoring/090-re-anchoring/goal.md`; this section is readability rendering only, and the
 definition is authoritative.
 
 Success is judged by the goal's four criteria: the five rule faces exist and cross-reference (SC-001), the five

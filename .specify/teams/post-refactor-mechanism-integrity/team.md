@@ -3,7 +3,7 @@ name: 重构后机制完整性团队
 slug: post-refactor-mechanism-integrity
 description: serial 三阶段链(S1 修复与端态回归测试 → S2 升级仿真独立验证 → S3 判据对账与收口),把「反向迁移缺口修复 + 全 .specify 面机制对账」从设计落到验证闭合;阶段内 native 并发派发,每次交接独立验证门
 goal: >
-  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/goal/post-refactor-mechanism-integrity/goal.md)。
+  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/anchoring/post-refactor-mechanism-integrity/goal.md)。
   本字段仅为可读性渲染,与定义不一致时以定义为准。终态:客户项目旧 .specify 结构经新版 specify init 升级后正常运转
   (平铺 internal 残留清除、用户技能红线不动、内部技能不可见);且 .specify 除 skills/ 外全部目录与文件均有机制支撑,无无主文件。
   **成功判据以定义为准,本团队不复述其文本**(定义持有 1 条)。
