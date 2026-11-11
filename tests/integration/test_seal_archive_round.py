@@ -220,3 +220,115 @@ def test_the_round_registers_archives_and_keeps_the_seal_blocking_list(tmp_path)
         "FR-026: the archived round is reproducible"
     )
     assert _git(repo, "status", "--porcelain").stdout == ""
+
+
+# ---------------------------------------------------------------------------
+# C-107 / SC-004 — a blocked seal still archives; a refused merge does not start
+# ---------------------------------------------------------------------------
+
+BLOCKED_PAIR = FIXTURES / "blocked-pair"
+
+
+def _replay_fixture(fixture: Path, tmp_path: Path) -> Path:
+    """A committed copy of one fixture tree under ``tmp_path``."""
+    repo = tmp_path / "replay"
+    shutil.copytree(fixture, repo)
+    _git(repo, "init", "-q")
+    _git(repo, "add", "-A")
+    assert _git(repo, "commit", "-qm", "fixture baseline").returncode == 0
+    return repo
+
+
+def _codes(payload: dict) -> list:
+    return [condition["code"] for condition in payload["conditions"]]
+
+
+def _snapshot(root: Path) -> dict:
+    return {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and ".git" not in path.relative_to(root).parts
+    }
+
+
+def _seal_facets(payload: dict) -> list:
+    """The blocking list with only the legitimate archived path normalised out."""
+    archived = SPEC_REL + "/slices/"
+    facets = []
+    for condition in payload["conditions"]:
+        evidence = condition["evidence"]
+        for slug in (ALPHA, BETA):
+            evidence = evidence.replace(archived + slug, ".specify/specs/" + slug)
+        facets.append((condition["code"], evidence))
+    return facets
+
+
+def test_blocked_seal_still_archives(tmp_path):
+    """C-107: the archive runs in a named blocking state and leaves it untouched."""
+    repo = _replay_fixture(BLOCKED_PAIR, tmp_path)
+    seal_proc, seal_before = _run(repo, "seal")
+    assert seal_proc.returncode != 0, (
+        "the blocked-pair fixture must sit in a seal blocking state"
+    )
+    assert "code-review-blocking" in _codes(seal_before), (
+        "SC-004: the fixture's seal blocking is named, not inferred"
+    )
+
+    plan_proc, plan_payload = _run(repo, "archive-plan")
+    assert plan_proc.returncode == 0, plan_payload.get("conditions")
+    assert plan_payload["outcome"] == "would-archive"
+
+    apply_proc, apply_payload = _run(repo, "archive-apply")
+    assert apply_proc.returncode == 0, apply_payload.get("conditions")
+    assert apply_payload["outcome"] == "archived", (
+        "C-107: archiving MUST NOT require a Sealed judgment"
+    )
+    _git(repo, "add", "-A")
+    assert _git(repo, "commit", "-qm", "archive batch").returncode == 0
+
+    seal_after_proc, seal_after = _run(repo, "seal")
+    assert seal_after_proc.returncode == seal_proc.returncode
+    assert seal_after["verdict"] == seal_before["verdict"]
+    assert _seal_facets(seal_after) == _seal_facets(seal_before), (
+        "C-107: the archive never rewrites the seal blocking list"
+    )
+    assert (repo / MANIFEST_REL).is_file()
+    assert not (repo / SPEC_REL / "seal.md").exists(), (
+        "the archive record and the seal receipt are separate surfaces: archive-apply "
+        "never creates or overwrites the receipt"
+    )
+
+
+def test_merge_refusal_does_not_start_archive(tmp_path):
+    """C-102: a refused merge-apply leaves no settled state for the archive."""
+    repo = _prepare_replay(tmp_path)
+    beta_requirements = repo / ".specify/specs" / BETA / "requirements.md"
+    text = beta_requirements.read_text(encoding="utf-8")
+    assert "| FR-001 | FR-002 |" in text, (
+        "the fixture baseline maps beta's FR-001 to parent FR-002"
+    )
+    beta_requirements.write_text(
+        text.replace("| FR-001 | FR-002 |", "| FR-001 | FR-001 |"), encoding="utf-8")
+    _git(repo, "add", "-A")
+    assert _git(repo, "commit", "-qm", "both slices claim parent FR-001").returncode == 0
+
+    merge_proc, merge_payload = _run(repo, "merge-apply")
+    assert merge_proc.returncode == 1, merge_payload.get("conditions")
+    assert "duplicate-mapping" in _codes(merge_payload), (
+        "the upstream refusal is the duplicate parent claim this replay injects"
+    )
+    before = _snapshot(repo)
+
+    plan_proc, plan_payload = _run(repo, "archive-plan")
+    assert plan_proc.returncode == 2, plan_payload.get("conditions")
+    assert "merge-manifest-missing" in _codes(plan_payload), (
+        "C-102 ①: with no settled merge record the archive names the upstream block"
+    )
+    apply_proc, apply_payload = _run(repo, "archive-apply")
+    assert apply_proc.returncode == 2, apply_payload.get("conditions")
+    assert "merge-manifest-missing" in _codes(apply_payload)
+    assert not (repo / MANIFEST_REL).exists()
+    assert not (repo / SPEC_REL / "slices").exists(), (
+        "SC-004: a refused merge never starts the archive"
+    )
+    assert _snapshot(repo) == before, "a refused archive persists nothing"
