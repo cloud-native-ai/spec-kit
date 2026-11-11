@@ -1,0 +1,14 @@
+# Validate Tasks — Feature 100（GATE-5 / GATE-3）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `64931e488`（tasks 行关闭后）
+
+命令（verbatim）:
+`python3 .specify/scripts/python/validate-tasks.py .specify/specs/100-seal-slice-archive/tasks.md`
+
+退出码: `0`
+
+```text
+PASS: .specify/specs/100-seal-slice-archive/tasks.md — 0 error(s), 0 warning(s)
+```
+
+GATE-3（开放行）: `grep -cE '^- \[[ >]\] T[0-9]{3} ' tasks.md` → `0`；53 行全部 `[X]`。

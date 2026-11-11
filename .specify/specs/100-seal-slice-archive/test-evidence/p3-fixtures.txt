@@ -1,0 +1,105 @@
+# P3 Fixture Inventory — T011 / T022
+
+- **Collected**: 2026-11-11 · worktree `100-seal-slice-archive` · engine `scripts/python/seal-utils.py` sha256 `f3cce2c42fe6a86814fc0c06c766896d88f23c63695e8943a86cc76df6238e48`
+- **Fixture roots**: `tests/fixtures/seal-archive/` — six sets (clean-pair, empty, reference-matrix, reference-matrix-unclassified, partial-pair, runtime-present)
+- **Total files**: 86
+
+## Per-tree file counts
+
+- `clean-pair/`: 8 files
+- `empty/`: 2 files
+- `reference-matrix/`: 29 files
+- `reference-matrix-unclassified/`: 30 files
+- `partial-pair/`: 7 files
+- `runtime-present/`: 10 files
+
+## Per-file sha256 (repo-relative, sorted)
+
+```text
+ab6476986c689cccfe1ce42cb8e2bad9eabe4232fe99dccac4b20d925190224a  tests/fixtures/seal-archive/clean-pair/.specify/specs/100a-fixture-alpha/requirements.md
+72014c10a8edfca07c39a484308ee52562fe3847df498bb86df6d39be0543798  tests/fixtures/seal-archive/clean-pair/.specify/specs/100a-fixture-alpha/tasks.md
+1c6de3b0dbd4a176f4b8b597f5b757f9dbaf983a3b5eef2d8f9f59338ed555aa  tests/fixtures/seal-archive/clean-pair/.specify/specs/100b-fixture-beta/requirements.md
+e87f8a74a8e6846b80add4be067c257c2793eed003302da2150655c0f6d316da  tests/fixtures/seal-archive/clean-pair/.specify/specs/100b-fixture-beta/tasks.md
+8e2bcaca857c1e5e59a9c2d0490e5089fbaaa2a2fab9fd0b2356ce61caa49ed4  tests/fixtures/seal-archive/clean-pair/.specify/specs/100-fixture-parent/merge-manifest.json
+d3af011a4b3795deff538aa86bba4f627aa09269b239f699fa3e351235fe9069  tests/fixtures/seal-archive/clean-pair/.specify/specs/100-fixture-parent/requirements.md
+715dd6d73176a55af2dd833f23c2e0a38a8ca0517a562194ef9c0344553c4285  tests/fixtures/seal-archive/clean-pair/.specify/specs/100-fixture-parent/seal.md
+0915a478f0248065b0661430d62717bed3668174aeccbf3ccfff351dd2b931b8  tests/fixtures/seal-archive/clean-pair/.specify/state/100-fixture-parent.md
+1a4e74f5f4471aa008b1080d167c200b322f3f4b10ad449d18d4a317481bb238  tests/fixtures/seal-archive/empty/.specify/specs/100-fixture-empty/merge-manifest.json
+7623801a8f86596270acb492cd9f274e1aa8cfa4be3d6e197bd2affbcad9f524  tests/fixtures/seal-archive/empty/.specify/specs/100-fixture-empty/requirements.md
+ab6476986c689cccfe1ce42cb8e2bad9eabe4232fe99dccac4b20d925190224a  tests/fixtures/seal-archive/partial-pair/.specify/specs/100a-fixture-alpha/requirements.md
+72014c10a8edfca07c39a484308ee52562fe3847df498bb86df6d39be0543798  tests/fixtures/seal-archive/partial-pair/.specify/specs/100a-fixture-alpha/tasks.md
+35a235011a45d4de951b351e52f807e5ffc139d4efb4f6e0170d27369de46caa  tests/fixtures/seal-archive/partial-pair/.specify/specs/100-fixture-parent/merge-manifest.json
+c6120ecad7c0757e9ac8dab3244ae0accf598cec32dcf67f4f7868cbdebb6bd8  tests/fixtures/seal-archive/partial-pair/.specify/specs/100-fixture-parent/requirements.md
+1c6de3b0dbd4a176f4b8b597f5b757f9dbaf983a3b5eef2d8f9f59338ed555aa  tests/fixtures/seal-archive/partial-pair/.specify/specs/100-fixture-parent/slices/100b-fixture-beta/requirements.md
+e87f8a74a8e6846b80add4be067c257c2793eed003302da2150655c0f6d316da  tests/fixtures/seal-archive/partial-pair/.specify/specs/100-fixture-parent/slices/100b-fixture-beta/tasks.md
+55e3f313023ff1c229e0439fdc98fd83753d0061a01efc901a13de9770975345  tests/fixtures/seal-archive/partial-pair/.specify/state/100-fixture-parent.md
+04f2c0f3b098fa4483fead569c14ee454a9449981ad6222ade5f9e9187a22453  tests/fixtures/seal-archive/reference-matrix/shared/definitions/example.md
+2745e24e4052759fc96f2bfc7d5bdedf18a840e73493ec4eaabc74883ee1529f  tests/fixtures/seal-archive/reference-matrix/.specify/features/100-fixture-parent.md
+a8251c0a92f056f210a26d10f1bb9886ea2be4c20515f400c95667ea2fc8c419  tests/fixtures/seal-archive/reference-matrix/.specify/features.md
+b9858ef0df2d62e1b693e41c6d295517c899f9a0bcdfedbc4e247ca69a4fbfda  tests/fixtures/seal-archive/reference-matrix/.specify/glossary.md
+053b23c80c9192268ffa96a62029921800d729656fc9882b1663ab309a1b9b97  tests/fixtures/seal-archive/reference-matrix/.specify/history/topic.md
+8e86acaafddb2acc01d1e5e77cf80ceb436bcbdf361cd8aed4810ecd7389ae31  tests/fixtures/seal-archive/reference-matrix/.specify/instructions.md
+bc21a4cc92e474c4051c2bc9944bc5b358e5126be7e6229e1616cc9cb3fce19f  tests/fixtures/seal-archive/reference-matrix/.specify/memory/session/entry.md
+8573a6d6618f694bc39270a2b0e863148245196e45b53498c42a8dcc335a1ca1  tests/fixtures/seal-archive/reference-matrix/.specify/register.md
+04f2c0f3b098fa4483fead569c14ee454a9449981ad6222ade5f9e9187a22453  tests/fixtures/seal-archive/reference-matrix/.specify/shared/definitions/example.md
+cf2e265210eaedac71593ce001697913483e5c08fc5b1f22377ceb60f5403897  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100a-fixture-alpha/notes.md
+c6a7f8245fe6a0a4a222713470e12db36e3692d537a73bbc452901a37474cbbe  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100a-fixture-alpha/plan.md
+ab6476986c689cccfe1ce42cb8e2bad9eabe4232fe99dccac4b20d925190224a  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100a-fixture-alpha/requirements.md
+9ad9e3be7ceeebd0d564d4fb733c4253d7702ab95cd3c2a928d5042d923c8cff  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100a-fixture-alpha/review.md
+72014c10a8edfca07c39a484308ee52562fe3847df498bb86df6d39be0543798  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100a-fixture-alpha/tasks.md
+4426c75f1b5ff41e529d4d7b2e26a6e18cd3fa487161b9e218f6b6e2dff9258e  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100b-fixture-beta/notes.md
+1c6de3b0dbd4a176f4b8b597f5b757f9dbaf983a3b5eef2d8f9f59338ed555aa  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100b-fixture-beta/requirements.md
+e87f8a74a8e6846b80add4be067c257c2793eed003302da2150655c0f6d316da  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100b-fixture-beta/tasks.md
+7133281ae1d74acb31fae67889c31f2a69e7135b2b51ed655ac2bc56ba82664c  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/checklists/checklist.md
+6925207d288e95a8708f897f7179ed35940684bfa60fe21977843667c12ca273  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/contracts/core.contract.md
+8e2bcaca857c1e5e59a9c2d0490e5089fbaaa2a2fab9fd0b2356ce61caa49ed4  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/merge-manifest.json
+0cb649f95ced5a6a46f8ded8b09e159b2193f2b8c10881df44538405c65b0971  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/notes/note.md
+6218f27437ad0ad9b2195f19a35be73e86fa61c49398f42f8cd8a858af02b9c0  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/plan.md
+25654428c9b6dad55169a46dfd5e82d53498653ce162261b4360b788fe0eccbe  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/requirements.md
+3e9c4ad6241326487abc7d03287419c9ab526fc8a89712964fe880a98bf59e0e  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/seal.md
+29c587c65c496928ce64c84a94b35050795b04e1811a0a0ded1ee31a0e01626e  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/tasks.md
+3ccc2d35d96690e919bffd46eaf2b9c11181ff38a6e9ef3725fa5fb74ab79006  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/test-evidence/evidence.txt
+adcd89746b1d94cf281a8501aac0295e58f2060be9409930e74bc47231277d60  tests/fixtures/seal-archive/reference-matrix/.specify/specs/100-fixture-parent/verification.md
+7eaf3aba6112c745094030fa3fbec57790464e895ee5a06b718872c85fcfa81e  tests/fixtures/seal-archive/reference-matrix/.specify/state/100-fixture-parent.md
+03358e702a733b08b7b1c19bdaec064d98bfd2103a1434ba9059e45d027d532b  tests/fixtures/seal-archive/reference-matrix/tests/contract/test_fixture_refs.py
+04f2c0f3b098fa4483fead569c14ee454a9449981ad6222ade5f9e9187a22453  tests/fixtures/seal-archive/reference-matrix-unclassified/shared/definitions/example.md
+2745e24e4052759fc96f2bfc7d5bdedf18a840e73493ec4eaabc74883ee1529f  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/features/100-fixture-parent.md
+a8251c0a92f056f210a26d10f1bb9886ea2be4c20515f400c95667ea2fc8c419  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/features.md
+b9858ef0df2d62e1b693e41c6d295517c899f9a0bcdfedbc4e247ca69a4fbfda  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/glossary.md
+053b23c80c9192268ffa96a62029921800d729656fc9882b1663ab309a1b9b97  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/history/topic.md
+8e86acaafddb2acc01d1e5e77cf80ceb436bcbdf361cd8aed4810ecd7389ae31  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/instructions.md
+bc21a4cc92e474c4051c2bc9944bc5b358e5126be7e6229e1616cc9cb3fce19f  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/memory/session/entry.md
+8573a6d6618f694bc39270a2b0e863148245196e45b53498c42a8dcc335a1ca1  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/register.md
+04f2c0f3b098fa4483fead569c14ee454a9449981ad6222ade5f9e9187a22453  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/shared/definitions/example.md
+cf2e265210eaedac71593ce001697913483e5c08fc5b1f22377ceb60f5403897  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100a-fixture-alpha/notes.md
+c6a7f8245fe6a0a4a222713470e12db36e3692d537a73bbc452901a37474cbbe  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100a-fixture-alpha/plan.md
+ab6476986c689cccfe1ce42cb8e2bad9eabe4232fe99dccac4b20d925190224a  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100a-fixture-alpha/requirements.md
+9ad9e3be7ceeebd0d564d4fb733c4253d7702ab95cd3c2a928d5042d923c8cff  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100a-fixture-alpha/review.md
+72014c10a8edfca07c39a484308ee52562fe3847df498bb86df6d39be0543798  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100a-fixture-alpha/tasks.md
+4426c75f1b5ff41e529d4d7b2e26a6e18cd3fa487161b9e218f6b6e2dff9258e  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100b-fixture-beta/notes.md
+1c6de3b0dbd4a176f4b8b597f5b757f9dbaf983a3b5eef2d8f9f59338ed555aa  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100b-fixture-beta/requirements.md
+e87f8a74a8e6846b80add4be067c257c2793eed003302da2150655c0f6d316da  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100b-fixture-beta/tasks.md
+7133281ae1d74acb31fae67889c31f2a69e7135b2b51ed655ac2bc56ba82664c  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/checklists/checklist.md
+6925207d288e95a8708f897f7179ed35940684bfa60fe21977843667c12ca273  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/contracts/core.contract.md
+8e2bcaca857c1e5e59a9c2d0490e5089fbaaa2a2fab9fd0b2356ce61caa49ed4  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/merge-manifest.json
+0cb649f95ced5a6a46f8ded8b09e159b2193f2b8c10881df44538405c65b0971  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/notes/note.md
+6218f27437ad0ad9b2195f19a35be73e86fa61c49398f42f8cd8a858af02b9c0  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/plan.md
+25654428c9b6dad55169a46dfd5e82d53498653ce162261b4360b788fe0eccbe  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/requirements.md
+3e9c4ad6241326487abc7d03287419c9ab526fc8a89712964fe880a98bf59e0e  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/seal.md
+29c587c65c496928ce64c84a94b35050795b04e1811a0a0ded1ee31a0e01626e  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/tasks.md
+3ccc2d35d96690e919bffd46eaf2b9c11181ff38a6e9ef3725fa5fb74ab79006  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/test-evidence/evidence.txt
+aa6ba8ab499d4c58b29fce5760f2219209eedef24b0d4110adbf28d6c2662b33  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/unsorted/random.md
+adcd89746b1d94cf281a8501aac0295e58f2060be9409930e74bc47231277d60  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/specs/100-fixture-parent/verification.md
+7eaf3aba6112c745094030fa3fbec57790464e895ee5a06b718872c85fcfa81e  tests/fixtures/seal-archive/reference-matrix-unclassified/.specify/state/100-fixture-parent.md
+03358e702a733b08b7b1c19bdaec064d98bfd2103a1434ba9059e45d027d532b  tests/fixtures/seal-archive/reference-matrix-unclassified/tests/contract/test_fixture_refs.py
+3944c9d79ecab9bfe581169a3be11fce0bb984ab553936257e469a784ef9b55a  tests/fixtures/seal-archive/runtime-present/.gitignore
+ab6476986c689cccfe1ce42cb8e2bad9eabe4232fe99dccac4b20d925190224a  tests/fixtures/seal-archive/runtime-present/.specify/specs/100a-fixture-alpha/requirements.md
+72014c10a8edfca07c39a484308ee52562fe3847df498bb86df6d39be0543798  tests/fixtures/seal-archive/runtime-present/.specify/specs/100a-fixture-alpha/tasks.md
+1c6de3b0dbd4a176f4b8b597f5b757f9dbaf983a3b5eef2d8f9f59338ed555aa  tests/fixtures/seal-archive/runtime-present/.specify/specs/100b-fixture-beta/requirements.md
+e87f8a74a8e6846b80add4be067c257c2793eed003302da2150655c0f6d316da  tests/fixtures/seal-archive/runtime-present/.specify/specs/100b-fixture-beta/tasks.md
+8e2bcaca857c1e5e59a9c2d0490e5089fbaaa2a2fab9fd0b2356ce61caa49ed4  tests/fixtures/seal-archive/runtime-present/.specify/specs/100-fixture-parent/merge-manifest.json
+d3af011a4b3795deff538aa86bba4f627aa09269b239f699fa3e351235fe9069  tests/fixtures/seal-archive/runtime-present/.specify/specs/100-fixture-parent/requirements.md
+715dd6d73176a55af2dd833f23c2e0a38a8ca0517a562194ef9c0344553c4285  tests/fixtures/seal-archive/runtime-present/.specify/specs/100-fixture-parent/seal.md
+63151403b0f2e6f50f69ea7344fa69701f306ada56cd39c61e3ee967f98c8165  tests/fixtures/seal-archive/runtime-present/.specify/state/100a-fixture-alpha.md
+e8653b50d063d8e53f8bbf70fe4c0622434fd56ee1c7d8048669fe24e1125a23  tests/fixtures/seal-archive/runtime-present/.specify/state/100-fixture-parent.md
+```

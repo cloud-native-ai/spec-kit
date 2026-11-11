@@ -1,0 +1,68 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/contract/test_seal_archive_gate.py tests/unit/test_seal_archive_classify.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py tests/integration/test_seal_archive_rollback.py tests/integration/test_seal_074_round.py tests/contract/test_clause_coverage.py tests/contract/test_run_skills_wiring.py tests/contract/test_skill_layer_visibility_guards.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=5
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 48%]
+...........................................................F...F........ [ 97%]
+....                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_c5_gate_budget_is_unchanged_by_the_owner_document ____________
+[gw98] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c5_gate_budget_is_unchanged_by_the_owner_document():
+        r = run_engine_in_process(SCRIPTS / "scan-confirmation-gates.py", ["--summary"])
+        assert r.returncode == 0, r.stdout + r.stderr
+        m = re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout)
+        v = re.search(r"violations[^:]*:\s*(\d+)", r.stdout)
+        assert m and v, r.stdout
+>       assert int(m.group(1)) == GATE_TOTAL, (
+            f"the owner document sits in shared/, i.e. inside the scanned surface, and the "
+            f"integer headroom is 0: total moved to {m.group(1)}"
+        )
+E       AssertionError: the owner document sits in shared/, i.e. inside the scanned surface, and the integer headroom is 0: total moved to 30
+E       assert 30 == 27
+E        +  where 30 = int('30')
+E        +    where '30' = <built-in method group of re.Match object at 0x7fd29c754790>(1)
+E        +      where <built-in method group of re.Match object at 0x7fd29c754790> = <re.Match object; span=(0, 31), match='blocking confirmation gates: 30'>.group
+
+tests/contract/test_clause_coverage.py:296: AssertionError
+_________ test_live_plan_identifies_both_slices_from_the_split_record __________
+[gw85] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_plan_identifies_both_slices_from_the_split_record():
+        proc, payload = _run_plan()
+        plan = payload["plan"]
+        assert proc.returncode == 0, (
+            "the settled round must leave a conflict-free plan; exit=%d payload=%r"
+            % (proc.returncode, payload.get("conditions"))
+        )
+        slices = plan["slices"]
+        assert [item["slug"] for item in slices] == [SLICE_A, SLICE_B], (
+            "C-012: the split record's declared order (074a → 074b) decides the order"
+        )
+        assert [item["order"] for item in slices] == [1, 2]
+>       assert {item["order_basis"] for item in slices} == {"split-record"}, (
+            "C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录"
+        )
+E       AssertionError: C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录
+E       assert {'letter-order'} == {'split-record'}
+E         
+E         Extra items in the left set:
+E         'letter-order'
+E         Extra items in the right set:
+E         'split-record'
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:99: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_seal_archive_classify.py:19: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document
+FAILED tests/integration/test_seal_074_round.py::test_live_plan_identifies_both_slices_from_the_split_record
+2 failed, 146 passed, 192 warnings in 7.12s
+exit=1

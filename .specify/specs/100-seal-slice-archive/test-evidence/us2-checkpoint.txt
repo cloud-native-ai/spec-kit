@@ -1,0 +1,58 @@
+# US2 Checkpoint — Feature 100（T032）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+## 套件读数（分类 + 清单 + merge-apply）
+
+命令（verbatim）:
+`bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_merge_apply.py tests/unit/test_seal_archive_classify.py -q`
+
+退出码: `0`（`63 passed, 192 warnings in 6.37s`；warning 为 `pytest.mark.unit` 未注册提示，既有套件口径）
+
+完整 stdout（verbatim；warnings summary 与 runner 头两行保留）:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_merge_apply.py tests/unit/test_seal_archive_classify.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...............................................................          [100%]
+=============================== warnings summary ===============================
+tests/unit/test_seal_archive_classify.py:19: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+63 passed, 192 warnings in 6.37s
+```
+
+## `reference-matrix` 四项计数（运行期读数）
+
+回放方式: `tests/fixtures/seal-archive/reference-matrix` 复制为 `.specify/.tmp/p8/us2-reference/repo`（sanctioned temp root），`git init` + 基线提交后运行：
+
+```bash
+python3 scripts/python/seal-utils.py --action archive-plan \
+  --spec-dir <repo>/.specify/specs/100-fixture-parent --repo <repo> --json
+```
+
+退出码 `0`，`verdict=ok`、`outcome=would-archive`；`archive.manifest.checks` 实测：
+
+```json
+{
+  "dated_preserved": 14,
+  "live_rewrite": 16,
+  "moved_files": 8,
+  "runtime_carriers": 3,
+  "unclassified": 0,
+  "unresolved_after": 0,
+  "unresolved_before": 0
+}
+```
+
+| 计数 | 读数 | 判据 |
+|------|------|------|
+| `live-rewrite` | 16 | FR-012 / C-307：活引用逐条改写 |
+| `dated-preserved` | 14 | C-302 / C-306：日期化载体原字节、零改写 |
+| `unclassified` | 0 | C-305：封闭集外载体零命中 |
+| 未解析（before/after） | 0 / 0 | C-307：声明根上零悬空 |

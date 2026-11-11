@@ -57,7 +57,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "074b-nested-governance"
+SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "074-goal-team-sdd-unification/slices/074b-nested-governance"
 
 FEATURE_REF = SLICE_DIR / "feature-ref.md"
 CONTAINMENT_CARRIER = SLICE_DIR / "test-evidence" / "compat-baseline-nodeids.txt"

@@ -1,0 +1,22 @@
+# US1 Checkpoint — Feature 100（T021）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+命令（verbatim）:
+`bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py -q`
+
+退出码: `0`（`52 passed in 6.64s`）
+
+完整 stdout/stderr（verbatim）:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+....................................................                     [100%]
+52 passed in 6.64s
+```
+
+判据: US1 的五面（plan 前置/分类、清单 schema 与闭环算术、apply 纯移动与 runtime、幂等重跑、夹具回放零丢失）全部绿灯；FR-024 的套件读数留档于此。

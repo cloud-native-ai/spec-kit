@@ -1,0 +1,9 @@
+=== pre-analyze-check --stage plan ===
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=2 waived=0
+{"stage": "plan", "decision": "pass", "findings": [{"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "non-concrete blockedBy token 'Txxx'"}, {"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "non-concrete blockedBy token 'Tyyy'"}], "summary": {"errors": 0, "advisories": 2, "waived": 0, "fr": 28, "sc": 10, "tasks": 53, "clauses": 0, "files": 12}, "checked_at": "2026-11-11T02:54:38Z"}
+EXIT=0
+
+=== pre-analyze-check --stage tasks ===
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=2 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "non-concrete blockedBy token 'Txxx'"}, {"check": "blocked-by", "severity": "advisory", "path": "tasks.md", "line": 96, "message": "non-concrete blockedBy token 'Tyyy'"}], "summary": {"errors": 0, "advisories": 2, "waived": 0, "fr": 28, "sc": 10, "tasks": 53, "clauses": 0, "files": 12}, "checked_at": "2026-11-11T02:54:39Z"}
+EXIT=0

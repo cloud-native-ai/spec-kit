@@ -1,0 +1,146 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_concurrency_and_readonly.py tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/contract/test_seal_merge_plan.py tests/contract/test_seal_merge_apply.py tests/integration/test_seal_merge_determinism.py tests/integration/test_seal_074_round.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py tests/unit/test_seal_archive_classify.py tests/unit/test_seal_archive_manifest_math.py tests/unit/test_seal_archive_schema.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...............................................F........................ [ 39%]
+.................F......................F............................... [ 79%]
+.............................F.......F                                   [100%]
+=================================== FAILURES ===================================
+__________ test_the_directory_registry_difference_is_fully_classified __________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_directory_registry_difference_is_fully_classified():
+        diff = _audit_difference()
+>       assert diff["unregistered_live"] == sorted(UNREGISTERED_LIVE_SPECS), (
+            "C-036: a live spec directory without a registry row is a difference entry; "
+            "a new one MUST be registered or pinned here with its reason. Ungoverned: "
+            f"{diff['unregistered_live']}"
+        )
+E       AssertionError: C-036: a live spec directory without a registry row is a difference entry; a new one MUST be registered or pinned here with its reason. Ungoverned: ['067', '075', '080', '097', '098', '100']
+E       assert ['067', '075'... '098', '100'] == ['067', '075', '080']
+E         
+E         Left contains 3 more items, first extra item: '097'
+E         Use -v to get more diff
+
+tests/contract/test_seal_boundaries.py:426: AssertionError
+______________ test_c008_no_move_delete_rename_or_push_in_source _______________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+source = '#!/usr/bin/env python3\n"""Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).\n\nOwn...T_INPUT_ERROR\n    render(payload, args.json)\n    return code\n\n\nif __name__ == "__main__":\n    sys.exit(main())\n'
+
+    def test_c008_no_move_delete_rename_or_push_in_source(source):
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+                assert (func.value.id, func.attr) not in DESTRUCTIVE_MODULE_ATTRS, (
+                    f"C-008: destructive call {func.value.id}.{func.attr} MUST NOT exist"
+                )
+            if isinstance(func, ast.Attribute) and func.attr in DESTRUCTIVE_PATH_ATTRS:
+>               raise AssertionError(f"C-008: destructive call .{func.attr}() MUST NOT exist")
+E               AssertionError: C-008: destructive call .unlink() MUST NOT exist
+
+tests/contract/test_seal_engine_contract.py:475: AssertionError
+_____________ test_the_engine_shells_out_only_read_only_git_verbs ______________
+[gw33] linux -- Python 3.11.11 /usr/local/bin/python3
+
+source = '#!/usr/bin/env python3\n"""Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).\n\nOwn...T_INPUT_ERROR\n    render(payload, args.json)\n    return code\n\n\nif __name__ == "__main__":\n    sys.exit(main())\n'
+
+    def test_the_engine_shells_out_only_read_only_git_verbs(source):
+        tree = _tree(source)
+        verbs = _git_verb_sites(tree)
+        assert verbs, "the audit expects the engine's closed git helper call sites"
+        outside = sorted(set(verbs) - READ_ONLY_GIT_VERBS)
+>       assert outside == [], (
+            f"C-008: the engine MUST NOT shell out to non-read-only git verbs; got {outside}"
+        )
+E       AssertionError: C-008: the engine MUST NOT shell out to non-read-only git verbs; got ['mv']
+E       assert ['mv'] == []
+E         
+E         Left contains one more item: 'mv'
+E         Use -v to get more diff
+
+tests/contract/test_seal_boundaries.py:252: AssertionError
+_________ test_live_plan_identifies_both_slices_from_the_split_record __________
+[gw134] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_plan_identifies_both_slices_from_the_split_record():
+        proc, payload = _run_plan()
+        plan = payload["plan"]
+        assert proc.returncode == 0, (
+            "the settled round must leave a conflict-free plan; exit=%d payload=%r"
+            % (proc.returncode, payload.get("conditions"))
+        )
+        slices = plan["slices"]
+        assert [item["slug"] for item in slices] == [SLICE_A, SLICE_B], (
+            "C-012: the split record's declared order (074a → 074b) decides the order"
+        )
+        assert [item["order"] for item in slices] == [1, 2]
+>       assert {item["order_basis"] for item in slices} == {"split-record"}, (
+            "C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录"
+        )
+E       AssertionError: C-012: the order MUST be taken from `.specify/state/074-*.md` § 拆分记录
+E       assert {'letter-order'} == {'split-record'}
+E         
+E         Extra items in the left set:
+E         'letter-order'
+E         Extra items in the right set:
+E         'split-record'
+E         Use -v to get more diff
+
+tests/integration/test_seal_074_round.py:99: AssertionError
+__________ test_the_audit_report_is_complete_and_optionally_recorded ___________
+[gw43] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_audit_report_is_complete_and_optionally_recorded():
+>       report = _audit_report()
+                 ^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_boundaries.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_seal_boundaries.py:485: in _audit_report
+    ", ".join("%s (%s)" % (key, UNREGISTERED_LIVE_SPECS[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7fdd75cf3df0>
+
+>           ", ".join("%s (%s)" % (key, UNREGISTERED_LIVE_SPECS[key])
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      for key in diff["unregistered_live"]) or "-"),
+        "Unregistered archived specs: %s" % (
+            ", ".join("%s (%s)" % (key, UNREGISTERED_ARCHIVED_SPECS[key])
+                      for key in diff["unregistered_archived"]) or "-"),
+        "Detail-only rows: %s" % ", ".join(diff["detail_only"]),
+        "Orphan slices: %s" % (", ".join(diff["orphan_slices"]) or "none"),
+        "Shared mutable aggregates introduced by seal: none (seal.md and "
+        "merge-manifest.json are per-spec single files)",
+        "",
+        "Verdict: clean",
+    ]
+E   KeyError: '097'
+
+tests/contract/test_seal_boundaries.py:485: KeyError
+=============================== warnings summary ===============================
+tests/unit/test_seal_archive_classify.py:19: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_manifest_math.py:20: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_manifest_math.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_schema.py:23: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_schema.py:23: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_boundaries.py::test_the_directory_registry_difference_is_fully_classified
+FAILED tests/contract/test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source
+FAILED tests/contract/test_seal_boundaries.py::test_the_engine_shells_out_only_read_only_git_verbs
+FAILED tests/integration/test_seal_074_round.py::test_live_plan_identifies_both_slices_from_the_split_record
+FAILED tests/contract/test_seal_boundaries.py::test_the_audit_report_is_complete_and_optionally_recorded
+5 failed, 177 passed, 576 warnings in 8.50s

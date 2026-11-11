@@ -1,0 +1,1425 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/unit/test_seal_archive_classify.py tests/unit/test_seal_archive_manifest_math.py tests/unit/test_seal_archive_schema.py tests/contract/test_seal_merge_apply.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..F...........FF.FFFFFFFF.FFFFFFFFF. [ 88%]
+FFFFFFF..                                                                [100%]
+=================================== FAILURES ===================================
+_______________________ test_digest_mismatch_is_rejected _______________________
+[gw56] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_digest_mismatch_is_rejected(eng, base):
+        document = copy.deepcopy(base)
+        document["digest"] = "sha256:" + "0" * 64
+>       assert "digest" in _rejects(eng, document)
+                           ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_schema.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:00...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+_______________ test_c206_a_valid_document_has_no_closure_errors _______________
+[gw45] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_a_valid_document_has_no_closure_errors(eng):
+>       assert eng.archive_closure_errors(_document()) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_closure_errors'
+
+tests/unit/test_seal_archive_manifest_math.py:79: AttributeError
+_________________ test_c034_digest_matches_the_pinned_constant _________________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c034_digest_matches_the_pinned_constant(eng):
+        document = {"alpha": 1, "beta": [{"x": "值"}], "schema_version": 1}
+>       assert eng.archive_manifest_digest(document) == PINNED_DIGEST
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_manifest_digest'
+
+tests/unit/test_seal_archive_manifest_math.py:63: AttributeError
+___________ test_c206_runtime_count_must_match_the_declared_carriers ___________
+[gw47] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_runtime_count_must_match_the_declared_carriers(eng):
+        document = _document(runtime=("runtime-updated",), runtime_carriers=2)
+>       errors = eng.archive_closure_errors(document)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_closure_errors'
+
+tests/unit/test_seal_archive_manifest_math.py:92: AttributeError
+_____________________ test_bare_slug_is_never_a_reference ______________________
+[gw38] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_bare_slug_is_never_a_reference(eng):
+        for line in ('"slug": "%s"' % ALPHA,
+                     "<!-- source: %s -->" % ALPHA,
+                     "- %s：first slice" % ALPHA):
+>           assert _hits(eng, line) == [], line
+                   ^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = '"slug": "100a-fixture-alpha"'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+____________ test_f1_left_boundary_excludes_absolute_and_dot_paths _____________
+[gw32] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f1_left_boundary_excludes_absolute_and_dot_paths(eng):
+>       assert _hits(eng, "See /abs/.specify/specs/%s/plan.md" % ALPHA) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'See /abs/.specify/specs/100a-fixture-alpha/plan.md'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+___________ test_c206_deleting_a_ledger_row_breaks_the_first_family ____________
+[gw46] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_deleting_a_ledger_row_breaks_the_first_family(eng):
+        document = _document(rows=3, live=1, dated=1)
+        assert document["checks"]["live_rewrite"] + document["checks"]["dated_preserved"] \
+            != len(document["references"]["rows"])
+>       errors = eng.archive_closure_errors(document)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_closure_errors'
+
+tests/unit/test_seal_archive_manifest_math.py:86: AttributeError
+_________ test_removing_one_mapping_leaves_dated_references_unresolved _________
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_plan' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_removing_one_mapping_leaves_dated_references_unresolved(eng):
+        path = ".specify/specs/%s/tasks.md" % BETA
+        both = [{"from": ALPHA_FROM, "to": ALPHA_TO},
+                {"from": BETA_FROM, "to": BETA_TO}]
+>       assert eng.map_archived_reference(path, both) == (BETA_TO + "/tasks.md", BETA)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_plan' has no attribute 'map_archived_reference'
+
+tests/contract/test_seal_archive_plan.py:439: AttributeError
+_______________ test_reference_row_and_runtime_levels_are_closed _______________
+[gw53] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_reference_row_and_runtime_levels_are_closed(eng, base):
+        row_unknown = copy.deepcopy(base)
+        row_unknown["references"]["rows"] = [{
+            "carrier": ".specify/register.md", "line": 1, "before": "x",
+            "after": "y", "kind": "live-rewrite", "extra": True}]
+>       _rejects(eng, row_unknown)
+
+tests/unit/test_seal_archive_schema.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+___ test_f2_matches_the_parent_relative_form_only_inside_the_parent_subtree ____
+[gw34] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f2_matches_the_parent_relative_form_only_inside_the_parent_subtree(eng):
+        line = "Sibling shorthand: %s/tasks.md" % BETA
+>       hits = _hits(eng, line)
+               ^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'Sibling shorthand: 100b-fixture-beta/tasks.md'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+_______________ test_mixed_carrier_uses_the_h2_section_predicate _______________
+[gw41] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_mixed_carrier_uses_the_h2_section_predicate(eng):
+        text = (
+            "# Feature\n\n"
+            "## Latest Review\n\n"
+            "dated line\n\n"
+            "## Related Specifications/Requirements\n\n"
+            "live line\n\n"
+            "## Key Changes\n\n"
+            "dated again\n"
+        )
+        lines = text.splitlines()
+>       assert eng.mixed_section_kind(lines, 5) == "dated"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'mixed_section_kind'
+
+tests/unit/test_seal_archive_classify.py:170: AttributeError
+___________________ test_carrier_kind_uses_the_closed_roster ___________________
+[gw40] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_carrier_kind_uses_the_closed_roster(eng):
+>       assert eng.archive_carrier_kind(PARENT_REL + "/plan.md", PARENT, SLUGS) == "live"
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'archive_carrier_kind'
+
+tests/unit/test_seal_archive_classify.py:126: AttributeError
+____________ test_top_level_unknown_and_missing_fields_are_rejected ____________
+[gw51] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_top_level_unknown_and_missing_fields_are_rejected(eng, base):
+        unknown = copy.deepcopy(base)
+        unknown["extra"] = True
+>       assert "key set" in _rejects(eng, unknown)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_schema.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...ion archive-apply --spec-dir .specify/specs/100-fixture-parent', 'engine': 'seal-utils.py', 'version': 'fixture'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+_____________________ test_schema_version_two_is_rejected ______________________
+[gw55] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_schema_version_two_is_rejected(eng, base):
+        document = copy.deepcopy(base)
+        document["schema_version"] = 2
+>       assert "schema_version" in _rejects(eng, document)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_schema.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+_______________ test_c034_digest_ignores_the_digest_field_itself _______________
+[gw43] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c034_digest_ignores_the_digest_field_itself(eng):
+        document = {"alpha": 1, "beta": [{"x": "值"}], "schema_version": 1}
+        with_digest = dict(document, digest=PINNED_DIGEST)
+>       assert eng.archive_manifest_digest(with_digest) == PINNED_DIGEST
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_manifest_digest'
+
+tests/unit/test_seal_archive_manifest_math.py:69: AttributeError
+___________ test_plan_verdict_outcome_and_reason_domains_are_closed ____________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_plan' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_plan_verdict_outcome_and_reason_domains_are_closed(eng):
+>       assert tuple(eng.ARCHIVE_OUTCOMES) == (
+                     ^^^^^^^^^^^^^^^^^^^^
+            "would-archive", "archived", "already-archived", "not-applicable")
+E       AttributeError: module 'seal_utils_archive_plan' has no attribute 'ARCHIVE_OUTCOMES'
+
+tests/contract/test_seal_archive_plan.py:301: AttributeError
+_________________ test_f1_matches_the_spec_root_form_with_tail _________________
+[gw31] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f1_matches_the_spec_root_form_with_tail(eng):
+>       hits = _hits(eng, "Pointer: `.specify/specs/%s/plan.md`." % ALPHA)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'Pointer: `.specify/specs/100a-fixture-alpha/plan.md`.'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+___________ test_paths_may_not_be_absolute_or_carry_parent_segments ____________
+[gw60] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_paths_may_not_be_absolute_or_carry_parent_segments(eng, base):
+        absolute = copy.deepcopy(base)
+        absolute["spec_path"] = "/tmp/spec"
+>       _rejects(eng, absolute)
+
+tests/unit/test_seal_archive_schema.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+________________ test_c206_bool_is_not_an_acceptable_int_count _________________
+[gw49] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_bool_is_not_an_acceptable_int_count(eng):
+        document = copy.deepcopy(_document())
+        document["checks"]["unclassified"] = False
+>       errors = eng.archive_closure_errors(document)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_closure_errors'
+
+tests/unit/test_seal_archive_manifest_math.py:106: AttributeError
+________________ test_pinned_commit_must_be_forty_lowercase_hex ________________
+[gw61] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_pinned_commit_must_be_forty_lowercase_hex(eng, base):
+        document = copy.deepcopy(base)
+        document["pinned_commit"] = "abc123"
+>       _rejects(eng, document)
+
+tests/unit/test_seal_archive_schema.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+____________ test_c206_moved_files_must_equal_the_slice_file_counts ____________
+[gw48] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_moved_files_must_equal_the_slice_file_counts(eng):
+        document = _document(file_counts=(2, 1), moved_files=2)
+>       errors = eng.archive_closure_errors(document)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_closure_errors'
+
+tests/unit/test_seal_archive_manifest_math.py:98: AttributeError
+__________________ test_runtime_absent_semantics_are_enforced __________________
+[gw59] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_runtime_absent_semantics_are_enforced(eng, base):
+        no_reason = copy.deepcopy(base)
+        no_reason["references"]["runtime"][1]["reason"] = None
+>       _rejects(eng, no_reason)
+
+tests/unit/test_seal_archive_schema.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+__________ test_row_kind_domain_and_dated_byte_equality_are_enforced ___________
+[gw58] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_row_kind_domain_and_dated_byte_equality_are_enforced(eng, base):
+        bad_kind = copy.deepcopy(base)
+        bad_kind["references"]["rows"] = [{
+            "carrier": ".specify/register.md", "line": 1, "before": "x",
+            "after": "y", "kind": "rewritten"}]
+>       _rejects(eng, bad_kind)
+
+tests/unit/test_seal_archive_schema.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+_________ test_f3_skips_the_identity_literal_on_the_right_of_equality __________
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f3_skips_the_identity_literal_on_the_right_of_equality(eng):
+        line = ('assert make(".specify/specs/%s") == "%s"' % (BETA, BETA))
+>       hits = _hits(eng, line, carrier="tests/contract/test_x.py", tests=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'assert make(".specify/specs/100b-fixture-beta") == "100b-fixture-beta"'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+__________________ test_c034_digest_is_key_order_independent ___________________
+[gw44] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_manifest_math' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c034_digest_is_key_order_independent(eng):
+        first = {"b": 2, "a": {"y": 1, "x": 0}}
+        second = {"a": {"x": 0, "y": 1}, "b": 2}
+>       assert eng.archive_manifest_digest(first) == eng.archive_manifest_digest(second)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_manifest_math' has no attribute 'archive_manifest_digest'
+
+tests/unit/test_seal_archive_manifest_math.py:75: AttributeError
+______________ test_f1_right_boundary_requires_a_segment_boundary ______________
+[gw33] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f1_right_boundary_requires_a_segment_boundary(eng):
+>       hits = _hits(eng, "See .specify/specs/%s-extra/plan.md" % ALPHA)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'See .specify/specs/100a-fixture-alpha-extra/plan.md'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+__________ test_the_archived_pair_fixture_passes_the_strict_validator __________
+[gw50] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_the_archived_pair_fixture_passes_the_strict_validator(eng, base):
+>       eng.validate_archive_manifest(base, SPEC_NAME)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'
+
+tests/unit/test_seal_archive_schema.py:59: AttributeError
+_______________ test_f1_wins_over_f2_and_f3_on_overlapping_spans _______________
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f1_wins_over_f2_and_f3_on_overlapping_spans(eng):
+        line = "Path .specify/specs/%s/tasks.md and raw %s/tasks.md" % (ALPHA, ALPHA)
+>       hits = _hits(eng, line)
+               ^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'Path .specify/specs/100a-fixture-alpha/tasks.md and raw 100a-fixture-alpha/tasks.md'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+______ test_loose_source_forms_flag_absolute_dotdot_and_rewritten_shapes _______
+[gw39] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_loose_source_forms_flag_absolute_dotdot_and_rewritten_shapes(eng):
+>       assert eng.loose_source_forms(
+               ^^^^^^^^^^^^^^^^^^^^^^
+            "See /abs/.specify/specs/%s/plan.md" % ALPHA, SLUGS) == [
+            ".specify/specs/%s" % ALPHA]
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'loose_source_forms'
+
+tests/unit/test_seal_archive_classify.py:115: AttributeError
+________________ test_closure_arithmetic_violation_is_rejected _________________
+[gw57] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_closure_arithmetic_violation_is_rejected(eng, base):
+        document = copy.deepcopy(base)
+        document["checks"]["moved_files"] += 1
+>       assert "moved_files" in _rejects(eng, document) or \
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+            "arithmetic" in _rejects(eng, document).lower()
+
+tests/unit/test_seal_archive_schema.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 5, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+__________ test_f3_matches_a_slug_literal_on_a_path_construction_line __________
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_f3_matches_a_slug_literal_on_a_path_construction_line(eng):
+        line = ('SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "%s"' % ALPHA)
+>       hits = _hits(eng, line, carrier="tests/contract/test_x.py", tests=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_seal_archive_classify.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_classify' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+line = 'SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "100a-fixture-alpha"'
+
+    def _hits(eng, line, *, carrier=PARENT_REL + "/plan.md", tests=False):
+>       return eng.find_reference_hits(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            line, SLUGS, parent_slug=PARENT, carrier_rel=carrier, tests_carrier=tests)
+E       AttributeError: module 'seal_utils_archive_classify' has no attribute 'find_reference_hits'
+
+tests/unit/test_seal_archive_classify.py:45: AttributeError
+___________ test_slice_level_unknown_and_missing_fields_are_rejected ___________
+[gw52] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_slice_level_unknown_and_missing_fields_are_rejected(eng, base):
+        unknown = copy.deepcopy(base)
+        unknown["slices"][0]["extra"] = 1
+>       _rejects(eng, unknown)
+
+tests/unit/test_seal_archive_schema.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+_____________ test_checks_generated_by_and_merge_levels_are_closed _____________
+[gw54] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+base = {'checks': {'dated_preserved': 0, 'files_match': True, 'live_rewrite': 0, 'moved_files': 4, ...}, 'digest': 'sha256:20...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def test_checks_generated_by_and_merge_levels_are_closed(eng, base):
+        for mutate in (
+            lambda doc: doc["checks"].__setitem__("extra", 1),
+            lambda doc: doc["checks"].pop("files_match"),
+            lambda doc: doc["checks"]["preconditions"].__setitem__("extra", 1),
+            lambda doc: doc["checks"]["preconditions"].pop("side_presence"),
+            lambda doc: doc["generated_by"].__setitem__("extra", 1),
+            lambda doc: doc["generated_by"].pop("version"),
+            lambda doc: doc["merge_manifest"].__setitem__("extra", 1),
+            lambda doc: doc["merge_manifest"].pop("digest_after"),
+        ):
+            document = copy.deepcopy(base)
+            mutate(document)
+>           _rejects(eng, document)
+
+tests/unit/test_seal_archive_schema.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eng = <module 'seal_utils_archive_schema' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+document = {'checks': {'dated_preserved': 0, 'extra': 1, 'files_match': True, 'live_rewrite': 0, ...}, 'digest': 'sha256:20a12148...efore': 'sha256:01da42f8756888e1c2b653eb3bbd20be7aef4b3e667a60326b9e0ea6fbb8ea02', 'path': 'merge-manifest.json'}, ...}
+
+    def _rejects(eng, document):
+        with pytest.raises(Exception) as caught:
+            eng.validate_archive_manifest(document, SPEC_NAME)
+>       assert getattr(caught.value, "code", None) == "archive-manifest-invalid"
+E       assert None == 'archive-manifest-invalid'
+E        +  where None = getattr(AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'"), 'code', None)
+E        +    where AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") = <ExceptionInfo AttributeError("module 'seal_utils_archive_schema' has no attribute 'validate_archive_manifest'") tblen=1>.value
+
+tests/unit/test_seal_archive_schema.py:54: AssertionError
+______________ test_c211_whole_path_values_are_amended_everywhere ______________
+[gw78] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_merge_apply_amend' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c211_whole_path_values_are_amended_everywhere(eng):
+        document = {
+            "schema_version": 1,
+            "spec": PARENT,
+            "merge": {"status": "merged"},
+            "conflicts": [],
+            "slices": [{"slug": ALPHA,
+                        "carrier_tasks": ".specify/specs/%s/tasks.md" % ALPHA,
+                        "retention": "pending-review"}],
+            "dispositions": [{"evidence": [".specify/specs/%s/verification.md" % BETA]}],
+            "artifacts": [{"pointer": {"paths": [".specify/specs/%s/plan.md" % ALPHA]}}],
+            "id_maps": {"FR": [{"slice": ALPHA, "parent_id": "FR-001"}]},
+            "checks": {"open_rows": 0},
+        }
+>       result = eng.amended_merge_document(document, _pairs())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_merge_apply_amend' has no attribute 'amended_merge_document'
+
+tests/contract/test_seal_merge_apply.py:636: AttributeError
+______________ test_c211_partial_and_longer_values_are_untouched _______________
+[gw79] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_merge_apply_amend' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c211_partial_and_longer_values_are_untouched(eng):
+        document = {
+            "merge": {"status": "merged"},
+            "slices": [{
+                "slug": ALPHA,
+                "carrier_tasks": ".specify/specs/%s/tasks.md" % ALPHA,
+                "note": "prefix .specify/specs/%s/tasks.md" % ALPHA,
+                "sibling": ".specify/specs/%s-extra/tasks.md" % ALPHA,
+                "slug_list": [ALPHA, BETA],
+            }],
+        }
+>       result = eng.amended_merge_document(document, _pairs())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_merge_apply_amend' has no attribute 'amended_merge_document'
+
+tests/contract/test_seal_merge_apply.py:672: AttributeError
+_________ test_c211_digest_is_recomputed_and_recorded_before_and_after _________
+[gw80] linux -- Python 3.11.11 /usr/local/bin/python3
+
+eng = <module 'seal_utils_merge_apply_amend' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c211_digest_is_recomputed_and_recorded_before_and_after(eng):
+        document = {
+            "merge": {"status": "merged"},
+            "slices": [{"slug": BETA,
+                        "carrier_tasks": ".specify/specs/%s/tasks.md" % BETA}],
+        }
+>       result = eng.amended_merge_document(document, _pairs())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_merge_apply_amend' has no attribute 'amended_merge_document'
+
+tests/contract/test_seal_merge_apply.py:689: AttributeError
+__________________ test_plan_refuses_outside_a_git_work_tree ___________________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw10/test_plan_refuses_outside_a_gi0')
+
+    def test_plan_refuses_outside_a_git_work_tree(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        proc, payload = _run_plan(repo)
+        assert proc.returncode == 2
+>       assert "not-a-git-tree" in _codes(payload)
+E       AssertionError: assert 'not-a-git-tree' in ['not-implemented']
+E        +  where ['not-implemented'] = _codes({'action': 'archive-plan', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not...mp/pytest-of-agent/pytest-9526/popen-gw10/test_plan_refuses_outside_a_gi0/repo/.specify/specs/100-fixture-parent', ...})
+
+tests/contract/test_seal_archive_plan.py:316: AssertionError
+_______ test_c202_c206_closed_key_sets_at_every_level[reference-matrix] ________
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw20/test_c202_c206_closed_key_sets0')
+fixture = 'reference-matrix'
+
+    @pytest.mark.parametrize("fixture", ["clean-pair", "reference-matrix"])
+    def test_c202_c206_closed_key_sets_at_every_level(tmp_path, fixture):
+>       manifest = _candidate(tmp_path, fixture)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw20/test_c202_c206_closed_key_sets0')
+fixture = 'reference-matrix'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw20/test_c202_c206_closed_key_sets0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+__________ test_plan_clean_pair_is_would_archive_with_zero_unresolved __________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw0/test_plan_clean_pair_is_would_0')
+
+    def test_plan_clean_pair_is_would_archive_with_zero_unresolved(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw0/test_plan_clean_pair_is_would_0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:150: AssertionError
+___________ test_reference_matrix_classifies_live_and_dated_carriers ___________
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw11/test_reference_matrix_classifi0')
+
+    def test_reference_matrix_classifies_live_and_dated_carriers(tmp_path):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw11/test_reference_matrix_classifi0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:327: AssertionError
+_______ test_reference_matrix_without_state_records_reports_three_absent _______
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw16/test_reference_matrix_without_0')
+
+    def test_reference_matrix_without_state_records_reports_three_absent(tmp_path):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw16/test_reference_matrix_without_0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:479: AssertionError
+__________ test_c202_c206_closed_key_sets_at_every_level[clean-pair] ___________
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw19/test_c202_c206_closed_key_sets0')
+fixture = 'clean-pair'
+
+    @pytest.mark.parametrize("fixture", ["clean-pair", "reference-matrix"])
+    def test_c202_c206_closed_key_sets_at_every_level(tmp_path, fixture):
+>       manifest = _candidate(tmp_path, fixture)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw19/test_c202_c206_closed_key_sets0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw19/test_c202_c206_closed_key_sets0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+______________ test_plan_empty_slice_set_is_named_not_applicable _______________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw2/test_plan_empty_slice_set_is_n0')
+
+    def test_plan_empty_slice_set_is_named_not_applicable(tmp_path):
+        repo = _copy_fixture("empty", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run_plan(repo, "100-fixture-empty")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...pen-gw2/test_plan_empty_slice_set_is_n0/repo/.specify/specs/100-fixture-empty",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:188: AssertionError
+_____________ test_manifest_has_no_wallclock_or_environment_fields _____________
+[gw24] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw24/test_manifest_has_no_wallclock0')
+
+    def test_manifest_has_no_wallclock_or_environment_fields(tmp_path):
+>       manifest = _candidate(tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw24/test_manifest_has_no_wallclock0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw24/test_manifest_has_no_wallclock0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+___________ test_plan_runs_on_a_spec_whose_seal_judgment_is_blocked ____________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw8/test_plan_runs_on_a_spec_whose0')
+
+    def test_plan_runs_on_a_spec_whose_seal_judgment_is_blocked(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        seal = repo / SPEC_REL / "seal.md"
+        assert "blocked" in seal.read_text(encoding="utf-8")
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw8/test_plan_runs_on_a_spec_whose0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:294: AssertionError
+______________ test_unclassified_carrier_refuses_before_any_write ______________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw12/test_unclassified_carrier_refu0')
+
+    def test_unclassified_carrier_refuses_before_any_write(tmp_path):
+        repo = _copy_fixture("reference-matrix-unclassified", tmp_path / "repo")
+        _init_git(repo)
+        before = _snapshot(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 1, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw12/test_unclassified_carrier_refu0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:407: AssertionError
+___________ test_runtime_carriers_present_and_absent_are_both_named ____________
+[gw15] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw15/test_runtime_carriers_present_0')
+
+    def test_runtime_carriers_present_and_absent_are_both_named(tmp_path):
+        repo = _copy_fixture("runtime-present", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw15/test_runtime_carriers_present_0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:450: AssertionError
+______________ test_c207_path_fields_are_repo_relative_and_clean _______________
+[gw23] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw23/test_c207_path_fields_are_repo0')
+
+    def test_c207_path_fields_are_repo_relative_and_clean(tmp_path):
+>       manifest = _candidate(tmp_path, "reference-matrix")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw23/test_c207_path_fields_are_repo0')
+fixture = 'reference-matrix'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw23/test_c207_path_fields_are_repo0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+___________________ test_plan_partial_pair_is_an_input_error ___________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw6/test_plan_partial_pair_is_an_i0')
+
+    def test_plan_partial_pair_is_an_input_error(tmp_path):
+        repo = _copy_fixture("partial-pair", tmp_path / "repo")
+        _init_git(repo)
+        before = _snapshot(repo)
+        proc, payload = _run_plan(repo)
+        assert proc.returncode == 2, payload.get("conditions")
+        assert payload["verdict"] == "error"
+>       assert "partial-archive" in _codes(payload), (
+            "C-102 ⑤: a slice split across the two sides is an input defect, never a guess"
+        )
+E       AssertionError: C-102 ⑤: a slice split across the two sides is an input defect, never a guess
+E       assert 'partial-archive' in ['not-implemented']
+E        +  where ['not-implemented'] = _codes({'action': 'archive-plan', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not...tmp/pytest-of-agent/pytest-9526/popen-gw6/test_plan_partial_pair_is_an_i0/repo/.specify/specs/100-fixture-parent', ...})
+
+tests/contract/test_seal_archive_plan.py:267: AssertionError
+________________ test_plan_names_every_unsatisfied_precondition ________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw3/test_plan_names_every_unsatisf0')
+
+    def test_plan_names_every_unsatisfied_precondition(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        _mutate_manifest(repo, lambda d: d["conflicts"].append(
+            {"id": "fixture-conflict", "status": "open"}))
+        (repo / ".specify/specs" / ALPHA / "tasks.md").write_text(
+            "# Tasks: fixture alpha\n\n- [ ] T001 Alpha open task.\n", encoding="utf-8")
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-qm", "inject conflict and open row")
+        (repo / SPEC_REL / "requirements.md").write_text(
+            "# Requirements: fixture parent\n\n- **FR-002**: uncommitted edit.\n",
+            encoding="utf-8")
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 1, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw3/test_plan_names_every_unsatisf0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:220: AssertionError
+___________ test_injected_dangling_live_reference_refuses_unresolved ___________
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw13/test_injected_dangling_live_re0')
+
+    def test_injected_dangling_live_reference_refuses_unresolved(tmp_path):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        register = repo / ".specify" / "register.md"
+        register.write_text(
+            register.read_text(encoding="utf-8")
+            + "- Dangling: `.specify/specs/%s/missing.md`\n" % ALPHA,
+            encoding="utf-8")
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-qm", "inject dangling live reference")
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 1, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw13/test_injected_dangling_live_re0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:429: AssertionError
+_____ test_plan_reports_input_defects_and_refusals_together_with_exit_two ______
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw7/test_plan_reports_input_defect0')
+
+    def test_plan_reports_input_defects_and_refusals_together_with_exit_two(tmp_path):
+        repo = _copy_fixture("partial-pair", tmp_path / "repo")
+        _init_git(repo)
+        _mutate_manifest(repo, lambda d: d["conflicts"].append(
+            {"id": "fixture-conflict", "status": "open"}))
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-qm", "inject conflict")
+        proc, payload = _run_plan(repo)
+        assert proc.returncode == 2, payload.get("conditions")
+        codes = set(_codes(payload))
+>       assert {"conflict-open", "partial-archive"} <= codes, (
+            "C-102: an input defect wins the single exit code while every item stays named"
+        )
+E       AssertionError: C-102: an input defect wins the single exit code while every item stays named
+E       assert {'conflict-op...tial-archive'} <= {'not-implemented'}
+E         
+E         Extra items in the left set:
+E         'partial-archive'
+E         'conflict-open'
+
+tests/contract/test_seal_archive_plan.py:283: AssertionError
+_________________ test_c202_serialization_is_the_declared_form _________________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw21/test_c202_serialization_is_the0')
+
+    def test_c202_serialization_is_the_declared_form(tmp_path):
+>       manifest = _candidate(tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw21/test_c202_serialization_is_the0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw21/test_c202_serialization_is_the0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+________ test_plan_same_slice_on_both_sides_refuses_destination_exists _________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw4/test_plan_same_slice_on_both_s0')
+
+    def test_plan_same_slice_on_both_sides_refuses_destination_exists(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        target = repo / SPEC_REL / "slices" / BETA
+        target.parent.mkdir(parents=True)
+        shutil.copytree(repo / ".specify/specs" / BETA, target)
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-qm", "duplicate beta on both sides")
+        before = _snapshot(repo)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 1, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw4/test_plan_same_slice_on_both_s0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:241: AssertionError
+_______________ test_c206_three_closure_arithmetic_families_hold _______________
+[gw25] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw25/test_c206_three_closure_arithm0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c206_three_closure_arithmetic_families_hold(tmp_path, eng):
+>       manifest = _candidate(tmp_path, "reference-matrix")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw25/test_c206_three_closure_arithm0')
+fixture = 'reference-matrix'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw25/test_c206_three_closure_arithm0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+__________________ test_plan_missing_slice_is_an_input_error ___________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw5/test_plan_missing_slice_is_an_0')
+
+    def test_plan_missing_slice_is_an_input_error(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        shutil.rmtree(repo / ".specify/specs" / BETA)
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-qm", "drop beta")
+        proc, payload = _run_plan(repo)
+        assert proc.returncode == 2, payload.get("conditions")
+        assert payload["verdict"] == "error"
+>       assert "slice-missing" in _codes(payload)
+E       AssertionError: assert 'slice-missing' in ['not-implemented']
+E        +  where ['not-implemented'] = _codes({'action': 'archive-plan', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not...tmp/pytest-of-agent/pytest-9526/popen-gw5/test_plan_missing_slice_is_an_0/repo/.specify/specs/100-fixture-parent', ...})
+
+tests/contract/test_seal_archive_plan.py:257: AssertionError
+____________ test_plan_previews_the_merge_manifest_path_amendments _____________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw18/test_plan_previews_the_merge_m0')
+eng = <module 'seal_utils_archive_plan' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_plan_previews_the_merge_manifest_path_amendments(tmp_path, eng):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        merge_path = repo / SPEC_REL / "merge-manifest.json"
+        original = _read_json(merge_path)
+        proc, payload = _run_plan(repo)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw18/test_plan_previews_the_merge_m0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_plan.py:503: AssertionError
+____________________ test_deleting_a_checks_row_is_rejected ____________________
+[gw27] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw27/test_deleting_a_checks_row_is_0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_deleting_a_checks_row_is_rejected(tmp_path, eng):
+>       manifest = _candidate(tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw27/test_deleting_a_checks_row_is_0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw27/test_deleting_a_checks_row_is_0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+____________________ test_c207_digest_is_the_c034_algorithm ____________________
+[gw22] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw22/test_c207_digest_is_the_c034_a0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c207_digest_is_the_c034_algorithm(tmp_path, eng):
+>       manifest = _candidate(tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw22/test_c207_digest_is_the_c034_a0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw22/test_c207_digest_is_the_c034_a0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+___________ test_sc007_delete_a_ledger_row_turns_the_arithmetic_red ____________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw26/test_sc007_delete_a_ledger_row0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_sc007_delete_a_ledger_row_turns_the_arithmetic_red(tmp_path, eng):
+>       manifest = _candidate(tmp_path, "reference-matrix")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:252: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw26/test_sc007_delete_a_ledger_row0')
+fixture = 'reference-matrix'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw26/test_sc007_delete_a_ledger_row0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+__________ test_c209_unknown_or_missing_fields_refuse_at_every_level ___________
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw30/test_c209_unknown_or_missing_f0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c209_unknown_or_missing_fields_refuse_at_every_level(tmp_path, eng):
+>       manifest = _candidate(tmp_path, "reference-matrix")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw30/test_c209_unknown_or_missing_f0')
+fixture = 'reference-matrix'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw30/test_c209_unknown_or_missing_f0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+__________ test_c212_schema_version_is_one_and_higher_versions_refuse __________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw29/test_c212_schema_version_is_on0')
+eng = <module 'seal_utils_archive_manifest' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+
+    def test_c212_schema_version_is_one_and_higher_versions_refuse(tmp_path, eng):
+>       manifest = _candidate(tmp_path)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_archive_manifest.py:288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw29/test_c212_schema_version_is_on0')
+fixture = 'clean-pair'
+
+    def _candidate(repo: Path, fixture: str = "clean-pair") -> dict:
+        source = FIXTURES / fixture
+        tree = repo / "repo"
+        tree.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, tree)
+        _init_git(tree)
+        proc, payload = _run_plan(tree)
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-plan action body is not implemented on this skeleton', 'fix_path...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw29/test_c212_schema_version_is_on0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:128: AssertionError
+___________________ test_same_input_twice_is_byte_identical ____________________
+[gw28] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9526/popen-gw28/test_same_input_twice_is_byte_0')
+
+    def test_same_input_twice_is_byte_identical(tmp_path):
+        tree = tmp_path / "repo"
+        shutil.copytree(FIXTURES / "reference-matrix", tree)
+        _init_git(tree)
+        first_proc, first_payload = _run_plan(tree)
+        second_proc, second_payload = _run_plan(tree)
+>       assert first_proc.returncode == second_proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw28/test_same_input_twice_is_byte_0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_manifest.py:277: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_seal_archive_classify.py:19: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_manifest_math.py:20: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_manifest_math.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_schema.py:23: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_schema.py:23: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_seal_archive_schema.py::test_digest_mismatch_is_rejected
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c206_a_valid_document_has_no_closure_errors
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c034_digest_matches_the_pinned_constant
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c206_runtime_count_must_match_the_declared_carriers
+FAILED tests/unit/test_seal_archive_classify.py::test_bare_slug_is_never_a_reference
+FAILED tests/unit/test_seal_archive_classify.py::test_f1_left_boundary_excludes_absolute_and_dot_paths
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c206_deleting_a_ledger_row_breaks_the_first_family
+FAILED tests/contract/test_seal_archive_plan.py::test_removing_one_mapping_leaves_dated_references_unresolved
+FAILED tests/unit/test_seal_archive_schema.py::test_reference_row_and_runtime_levels_are_closed
+FAILED tests/unit/test_seal_archive_classify.py::test_f2_matches_the_parent_relative_form_only_inside_the_parent_subtree
+FAILED tests/unit/test_seal_archive_classify.py::test_mixed_carrier_uses_the_h2_section_predicate
+FAILED tests/unit/test_seal_archive_classify.py::test_carrier_kind_uses_the_closed_roster
+FAILED tests/unit/test_seal_archive_schema.py::test_top_level_unknown_and_missing_fields_are_rejected
+FAILED tests/unit/test_seal_archive_schema.py::test_schema_version_two_is_rejected
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c034_digest_ignores_the_digest_field_itself
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_verdict_outcome_and_reason_domains_are_closed
+FAILED tests/unit/test_seal_archive_classify.py::test_f1_matches_the_spec_root_form_with_tail
+FAILED tests/unit/test_seal_archive_schema.py::test_paths_may_not_be_absolute_or_carry_parent_segments
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c206_bool_is_not_an_acceptable_int_count
+FAILED tests/unit/test_seal_archive_schema.py::test_pinned_commit_must_be_forty_lowercase_hex
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c206_moved_files_must_equal_the_slice_file_counts
+FAILED tests/unit/test_seal_archive_schema.py::test_runtime_absent_semantics_are_enforced
+FAILED tests/unit/test_seal_archive_schema.py::test_row_kind_domain_and_dated_byte_equality_are_enforced
+FAILED tests/unit/test_seal_archive_classify.py::test_f3_skips_the_identity_literal_on_the_right_of_equality
+FAILED tests/unit/test_seal_archive_manifest_math.py::test_c034_digest_is_key_order_independent
+FAILED tests/unit/test_seal_archive_classify.py::test_f1_right_boundary_requires_a_segment_boundary
+FAILED tests/unit/test_seal_archive_schema.py::test_the_archived_pair_fixture_passes_the_strict_validator
+FAILED tests/unit/test_seal_archive_classify.py::test_f1_wins_over_f2_and_f3_on_overlapping_spans
+FAILED tests/unit/test_seal_archive_classify.py::test_loose_source_forms_flag_absolute_dotdot_and_rewritten_shapes
+FAILED tests/unit/test_seal_archive_schema.py::test_closure_arithmetic_violation_is_rejected
+FAILED tests/unit/test_seal_archive_classify.py::test_f3_matches_a_slug_literal_on_a_path_construction_line
+FAILED tests/unit/test_seal_archive_schema.py::test_slice_level_unknown_and_missing_fields_are_rejected
+FAILED tests/unit/test_seal_archive_schema.py::test_checks_generated_by_and_merge_levels_are_closed
+FAILED tests/contract/test_seal_merge_apply.py::test_c211_whole_path_values_are_amended_everywhere
+FAILED tests/contract/test_seal_merge_apply.py::test_c211_partial_and_longer_values_are_untouched
+FAILED tests/contract/test_seal_merge_apply.py::test_c211_digest_is_recomputed_and_recorded_before_and_after
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_refuses_outside_a_git_work_tree
+FAILED tests/contract/test_seal_archive_manifest.py::test_c202_c206_closed_key_sets_at_every_level[reference-matrix]
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_clean_pair_is_would_archive_with_zero_unresolved
+FAILED tests/contract/test_seal_archive_plan.py::test_reference_matrix_classifies_live_and_dated_carriers
+FAILED tests/contract/test_seal_archive_plan.py::test_reference_matrix_without_state_records_reports_three_absent
+FAILED tests/contract/test_seal_archive_manifest.py::test_c202_c206_closed_key_sets_at_every_level[clean-pair]
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_empty_slice_set_is_named_not_applicable
+FAILED tests/contract/test_seal_archive_manifest.py::test_manifest_has_no_wallclock_or_environment_fields
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_runs_on_a_spec_whose_seal_judgment_is_blocked
+FAILED tests/contract/test_seal_archive_plan.py::test_unclassified_carrier_refuses_before_any_write
+FAILED tests/contract/test_seal_archive_plan.py::test_runtime_carriers_present_and_absent_are_both_named
+FAILED tests/contract/test_seal_archive_manifest.py::test_c207_path_fields_are_repo_relative_and_clean
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_partial_pair_is_an_input_error
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_names_every_unsatisfied_precondition
+FAILED tests/contract/test_seal_archive_plan.py::test_injected_dangling_live_reference_refuses_unresolved
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_reports_input_defects_and_refusals_together_with_exit_two
+FAILED tests/contract/test_seal_archive_manifest.py::test_c202_serialization_is_the_declared_form
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_same_slice_on_both_sides_refuses_destination_exists
+FAILED tests/contract/test_seal_archive_manifest.py::test_c206_three_closure_arithmetic_families_hold
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_missing_slice_is_an_input_error
+FAILED tests/contract/test_seal_archive_plan.py::test_plan_previews_the_merge_manifest_path_amendments
+FAILED tests/contract/test_seal_archive_manifest.py::test_deleting_a_checks_row_is_rejected
+FAILED tests/contract/test_seal_archive_manifest.py::test_c207_digest_is_the_c034_algorithm
+FAILED tests/contract/test_seal_archive_manifest.py::test_sc007_delete_a_ledger_row_turns_the_arithmetic_red
+FAILED tests/contract/test_seal_archive_manifest.py::test_c209_unknown_or_missing_fields_refuse_at_every_level
+FAILED tests/contract/test_seal_archive_manifest.py::test_c212_schema_version_is_one_and_higher_versions_refuse
+FAILED tests/contract/test_seal_archive_manifest.py::test_same_input_twice_is_byte_identical
+63 failed, 18 passed, 576 warnings in 6.41s

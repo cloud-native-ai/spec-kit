@@ -1,0 +1,158 @@
+# Plan-stage checks — 100-seal-slice-archive
+# date: 2026-11-11T02:15:20Z  worktree HEAD: 9695d78c52fb5013ab092840e9eea3e56e55ec0b
+# entry: /speckit.plan (create-plan skill); branch 100-seal-slice-archive
+
+== 1. flow-class lookup ==
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id spec:100-seal-slice-archive
+unit_id: spec:100-seal-slice-archive
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+== 2. pre-analyze-check --stage plan ==
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/100-seal-slice-archive --stage plan --repo .
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=33 waived=0
+{"stage": "plan", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 103, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 164, "message": "path does not exist under the repo: .specify/specs/074-goal-team-sdd-unification/slices/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 208, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 182, "message": "path does not exist under the repo: tests/fixtures/seal-archive/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 190, "message": "path does not exist under the repo: .specify/templates/commands/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 211, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 234, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 252, "message": "path does not exist under the repo: tests/fixtures/seal-archive/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 252, "message": "path does not exist under the repo: tests/contract/test_seal_archive_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 252, "message": "path does not exist under the repo: tests/contract/test_seal_archive_manifest.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 253, "message": "path does not exist under the repo: tests/contract/test_seal_archive_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 253, "message": "path does not exist under the repo: tests/integration/test_seal_archive_idempotency.py"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 132, "message": "path does not exist under the repo: tests/fixtures/seal-archive/blocked-pair/"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 26, "message": "path does not exist under the repo: .specify/memory/sanitize/cleanup-plan.json"}, {"check": "missing-path", "severity": "advisory", "path": "research.md", "line": 135, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 77, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 78, "message": "path does not exist under the repo: tests/integration/test_seal_archive_idempotency.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 79, "message": "path does not exist under the repo: tests/contract/test_seal_archive_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 80, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 82, "message": "path does not exist under the repo: tests/integration/test_seal_archive_idempotency.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 83, "message": "path does not exist under the repo: tests/contract/test_seal_archive_manifest.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 84, "message": "path does not exist under the repo: tests/contract/test_seal_archive_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 86, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 102, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 103, "message": "path does not exist under the repo: tests/contract/test_seal_archive_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 104, "message": "path does not exist under the repo: tests/contract/test_seal_archive_plan.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 105, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 107, "message": "path does not exist under the repo: tests/integration/test_seal_archive_idempotency.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 108, "message": "path does not exist under the repo: tests/contract/test_seal_archive_manifest.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 109, "message": "path does not exist under the repo: tests/contract/test_seal_archive_apply.py"}, {"check": "missing-path", "severity": "advisory", "path": "contracts/archive-actions.contract.md", "line": 111, "message": "path does not exist under the repo: tests/integration/test_seal_archive_round.py"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 37, "message": "path does not exist under the repo: .specify/state/"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 37, "message": "path does not exist under the repo: .specify/specs/074-goal-team-sdd-unification/slices/"}], "summary": {"errors": 0, "advisories": 33, "waived": 0, "fr": 28, "sc": 10, "tasks": 0, "clauses": 0, "files": 10}, "checked_at": "2026-11-11T02:15:20Z"}
+exit=0
+
+== 3. validate-decision-tensions ==
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/100-seal-slice-archive
+spec: .specify/specs/100-seal-slice-archive
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 276 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+exit=0
+
+== 4. decomposition-check --mode plan ==
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/100-seal-slice-archive/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T02:15:20Z"}
+exit=0
+
+== 5. overlap-check ==
+$ python3 skills/external/sdd-loop-driver/scripts/overlap-check.py --spec-dir .specify/specs/100-seal-slice-archive --repo .
+{"decision": "overlap", "current_spec": "100-seal-slice-archive", "checked_specs": ["100-seal-slice-archive", "001-unify-command-handoffs", "006-add-qoder-support", "009-claude-code-support", "012-skill-home-workdir", "013-portable-skill-creation", "016-refactor-tools-command", "018-cli-priority-support", "020-speckit-todo-command", "021-agent-specific-config", "023-agent-framework-redesign", "024-agent-env-config", "025-agent-skill-enablement", "027-feedback-mechanism", "028-sdd-workflow-refactor", "029-glossary-mechanism", "030-summarize-project", "031-task-complexity-rubric", "032-dogfooding-practice", "033-docs-command", "034-evidence-infra", "035-token-efficiency", "036-team-summary", "037-goal-registry", "038-goal-target", "039-session-export", "040-agent-metadata-portability", "041-refactor-feedback-probe", "042-goal-team-creation", "043-init-commit-stamp", "044-reduce-confirmation-flows", "045-sanitize-command", "047-feedback-introspection", "048-derive-command", "049-docs-reconcile", "050-proactive-flow-trigger", "051-user-facing-comprehension", "052-fast-fail-principle", "053-machine-decidable-artifacts", "055-conflict-free-stores", "056-probe-handler-system", "057-decompose-command-skills", "058-sdd-loop-driver", "059-exec-quant-recording", "060-decompose-subagent-dispatch", "061-subagent-cli-config", "062-humanize-command", "063-review-p1-governance", "064-subagent-concurrency", "065-loop-interruption-recovery", "067-loop-efficiency-hardening", "068-exec-quant-feedback-channel", "069-execution-expression-sdd", "070-subagent-task-teams", "071-review-code-integration", "072-client-self-improvement", "073-record-retention-and-housekeeping", "074-goal-team-sdd-unification", "075-sdd-loop-efficiency", "076-decision-tension-contract", "077-doc-sdd-integration", "078-coaching-skills", "079-bilingual-expression", "080-humanize-run-output", "081-acceptance-hardening", "082-self-explanatory-integration", "083-mechanism-policy-separation", "084-harness-triple-structure", "085-sdd-temporary-goal-team", "086-efficient-test-execution", "087-arch-diagram-docs", "088-speckit-visualization", "089-script-interface-contract", "090-re-anchoring", "091-auto-git-closeout", "093-concurrency-by-default", "094-goal-team-parallel", "095-superagent-role", "096-sdd-observer-agent", "097-speckit-migrate-command", "098-suite-speed-optimizations", "099-speckit-seal"], "current_paths": ["docs/reference/commands/seal.md", "scripts/python/seal-utils.py", "shared/definitions/framework-map.md", "shared/definitions/non-disposable-definitions.md", "shared/definitions/sdd-routing-definitions.md", "skills/internal/seal-artifact/SKILL.md", "templates/commands/seal.md"], "overlaps": [{"other_spec": "027-feedback-mechanism", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "027-feedback-mechanism", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "032-dogfooding-practice", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "033-docs-command", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "033-docs-command", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "047-feedback-introspection", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "048-derive-command", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "049-docs-reconcile", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "056-probe-handler-system", "relation": "nested-path", "current_path": "docs/reference/commands/seal.md", "other_path": "docs/reference"}, {"other_spec": "056-probe-handler-system", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "056-probe-handler-system", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "067-loop-efficiency-hardening", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "078-coaching-skills", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "084-harness-triple-structure", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "085-sdd-temporary-goal-team", "relation": "nested-path", "current_path": "docs/reference/commands/seal.md", "other_path": "docs/reference"}, {"other_spec": "085-sdd-temporary-goal-team", "relation": "same-path", "current_path": "shared/definitions/sdd-routing-definitions.md", "other_path": "shared/definitions/sdd-routing-definitions.md"}, {"other_spec": "088-speckit-visualization", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "088-speckit-visualization", "relation": "nested-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands"}, {"other_spec": "089-script-interface-contract", "relation": "nested-path", "current_path": "docs/reference/commands/seal.md", "other_path": "docs/reference"}, {"other_spec": "089-script-interface-contract", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "089-script-interface-contract", "relation": "nested-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions"}, {"other_spec": "089-script-interface-contract", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "089-script-interface-contract", "relation": "nested-path", "current_path": "shared/definitions/non-disposable-definitions.md", "other_path": "shared/definitions"}, {"other_spec": "089-script-interface-contract", "relation": "nested-path", "current_path": "shared/definitions/sdd-routing-definitions.md", "other_path": "shared/definitions"}, {"other_spec": "090-re-anchoring", "relation": "same-path", "current_path": "shared/definitions/non-disposable-definitions.md", "other_path": "shared/definitions/non-disposable-definitions.md"}, {"other_spec": "093-concurrency-by-default", "relation": "nested-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python"}, {"other_spec": "095-superagent-role", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "097-speckit-migrate-command", "relation": "same-path", "current_path": "shared/definitions/framework-map.md", "other_path": "shared/definitions/framework-map.md"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "docs/reference/commands/seal.md", "other_path": "docs/reference/commands/seal.md"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "scripts/python/seal-utils.py", "other_path": "scripts/python/seal-utils.py"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "shared/definitions/non-disposable-definitions.md", "other_path": "shared/definitions/non-disposable-definitions.md"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "shared/definitions/sdd-routing-definitions.md", "other_path": "shared/definitions/sdd-routing-definitions.md"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "skills/internal/seal-artifact/SKILL.md", "other_path": "skills/internal/seal-artifact/SKILL.md"}, {"other_spec": "099-speckit-seal", "relation": "same-path", "current_path": "templates/commands/seal.md", "other_path": "templates/commands/seal.md"}], "checked_at": "2026-11-11T02:15:22Z"}overlap-check: current=100-seal-slice-archive checked=82 overlaps=34 decision=overlap
+
+exit=1
+
+== 6. mirror + command-copy baseline ==
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+DIFF .specify/templates/gitignore-specify-template
+ok    skills/external/ == .specify/skills/ (429 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (136 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (18 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (129 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (113 files, byte-identical)
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+exit=2
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+== 7. test runner (EP-003) ==
+$ bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...............................                                          [100%]
+31 passed in 6.64s
+
+== 8. clause extraction (contract forms + FR coverage) ==
+$ python3 - <<'EOF' (clause_extract over contracts/)
+archive-actions.contract.md form=md-bold-closed clauses=16 C-101 .. C-116
+archive-manifest.contract.md form=md-bold-closed clauses=12 C-201 .. C-212
+reference-classification.contract.md form=md-bold-closed clauses=12 C-301 .. C-312
+FR covered: 28 of 28; missing: []
+FR-001 C-102, C-107
+FR-002 C-113
+FR-003 C-106
+FR-004 C-203
+FR-005 C-109, C-201, C-202, C-203, C-207, C-208, C-209, C-212
+FR-006 C-102
+FR-007 C-103, C-104
+FR-008 C-101, C-115
+FR-009 C-103, C-108
+FR-010 C-105
+FR-011 C-110
+FR-012 C-109, C-204, C-301, C-302, C-305, C-306
+FR-013 C-303, C-308, C-310, C-311
+FR-014 C-210, C-304, C-306, C-308
+FR-015 C-210, C-301, C-307, C-312
+FR-016 C-204, C-206
+FR-017 C-205, C-309
+FR-018 C-211
+FR-019 C-112
+FR-020 C-113
+FR-021 C-101, C-114
+FR-022 C-107, C-114
+FR-023 C-113
+FR-024 C-116
+FR-025 C-116
+FR-026 C-116
+FR-027 C-105, C-111
+FR-028 C-106
+
+== 9. 074 measured state (acceptance target) ==
+merge.status=merged conflicts=0 slices=2 retention=['pending-review', 'pending-review']
+merge-manifest digest: sha256:a43c954dac989b5768405bf1255a0555aac334869051a382d4a233b81e00ce7b
+074a-authorized-routing 58 files 942609 bytes
+074b-nested-governance 54 files 826558 bytes
+seal.md exists: False
+
+== Adjudication ==
+- pre-analyze: 0 errors; 33 advisories are all 'path does not exist yet' for planned outputs (tests/fixtures/seal-archive/, new archive tests), the absent worktree .specify/state/, and the not-yet-created 074 slices/ — deliverables, not defects.
+- overlap-check: decision=overlap, exit 1, 82 specs checked, 34 overlap rows. Adjudicated as additive coexistence / bound-feature increment, never parallel writes:
+  * 099-speckit-seal same-path x6 (docs/reference/commands/seal.md, scripts/python/seal-utils.py, shared/definitions/non-disposable-definitions.md, shared/definitions/sdd-routing-definitions.md, skills/internal/seal-artifact/SKILL.md, templates/commands/seal.md): this spec IS the 099 increment bound at clarify; owner unchanged, files extended in place.
+  * shared/definitions/framework-map.md same-path (048/078/084/089/095/097): the layout owner is extended additively by every feature that registers a directory; this spec adds one semantics note to the Feature specs row.
+  * shared/definitions/sdd-routing-definitions.md (085), shared/definitions/non-disposable-definitions.md (090): governance owners extended by row, not co-owned.
+  * remaining rows are nested-path claims against directory tokens (scripts/python, templates/commands, docs/reference, shared/definitions) from other features' recorded delivery surfaces; no file-level conflict.
+  * Note: feature-ref originally backticked shared/workflow/feature-integration.md in the Binding sentence, which the declaration collector read as a delivered path; the backticks were removed so the declaration lists only actual deliverables (in-passing repair, disclosed).
+- mirror baseline: sync exit 2 with exactly one pre-existing, unrelated DIFF (.specify/templates/gitignore-specify-template); regen exit 0. Criterion: no NEW drift on touched pairs.
+
+== 10. Final re-run after post-generation edits (plan summary range + feature-ref declaration cleanup) ==
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/100-seal-slice-archive --stage plan --repo . (summary line)
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=33 waived=0
+exit=0
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/100-seal-slice-archive (summary)
+spec: .specify/specs/100-seal-slice-archive
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 276 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+exit=0
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements ... (summary)
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T02:16:49Z"}
+exit=0
+
+== 11. Same-author objective-analysis gate (post-generation) ==
+- Condition: FIRED — the plan artifact set was authored in this session; the Constitution Check and the Post-Generation Quality Gate score self-authored artifacts.
+- Delegation: two fresh-context read-only subagents dispatched in parallel on disjoint scopes — (A) Constitution Check rows vs .specify/constitution.md; (B) cross-artifact coherence across requirements/plan/research/data-model/contracts/quickstart/feature-ref.
+- Findings A (Constitution): 7 defect rows — X (rule half untested), XII (reuse ceiling incomplete), XIV (single-source claim overgeneralized), XVII (registration claim), XIX/XXI/XXII (evidence cells named no openable artifact).
+- Findings B (coherence): 7 violations — (1) C-103 outcomes not expressible in E8 verdict model; (2) plan Ruling 2's 'moved' row absent from C-203 closed schema; (3) C-112 fallback vs C-103 archive-manifest-invalid; (4) C-115 unanchored; (5) C-109/C-107 anchor gaps; (6) SC-002 red-first map drift; (7) E6 runtime carrier form narrower than C-309.
+- Repairs applied (12): E8 gains a closed outcome field (would-archive/archived/already-archived/not-applicable) with C-103 naming the verdict/outcome split; Ruling 2 aligned to the closed schema (from/to express moved, no moved key); C-112 fixed (missing manifest -> sibling fallback; unparseable/inconsistent -> exit 2); seal.md removed from the live roster and excluded from the scan (FR-028); E6 carrier form corrected to 1 + slice count; P1 anchor += C-115, P3 += C-312, P4 += C-308…C-311, P8 += C-116; C-116 and feature-ref SC-002 aligned to idempotency + apply modules; feature-ref delivery surface += P2's two test files; Constitution rows X/XII/XIV/XIX/XXI/XXII evidence strengthened; T-002 step count corrected to 4 -> 7.
+- Rejected after direct verification (2): (a) 'nothing binds slices/ registration' — FR-002 + C-113 already bind framework-map.md:38; (b) SC-006 map drift — both tables already name the idempotency module once SC-002 is made explicit.
+- Downgrade rate: 0 of 14 findings downgraded; 2 rejected as non-defects; 12 repairs landed before the final gate re-run.
+- Post-repair re-run: pre-analyze pass (errors=0 / advisories=35), validate-decision-tensions ok (6 records / 0 error), clause extraction 40 clauses / 28 FR covered.

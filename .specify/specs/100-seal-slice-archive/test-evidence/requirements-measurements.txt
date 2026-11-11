@@ -1,0 +1,40 @@
+# Requirements-stage measurements — 2026-11-11
+# repo: 48e273d7395d949656099c596161ac9210687cfa
+
+## 074a-authorized-routing
+files_total=58 tracked=58 bytes=942609 aggregate_sha256=0dbcefd2334cc312010da70182877e6f07163ef15bcaf066927a3d477c152ae0
+self_path_mentions=327 files_with_mentions=38
+
+## 074b-nested-governance
+files_total=54 tracked=54 bytes=826558 aggregate_sha256=91e4520cbd8d580c383f590e4453bf1e6762a03cd8e3d1f46cc072d854962b37
+self_path_mentions=299 files_with_mentions=42
+
+## Outside-slice carriers (tracked, path or name form)
+.specify/register.md: 5
+.specify/features.md: 13
+.specify/features/074-goal-team-sdd-unification.md: 20
+.specify/glossary.md: 0
+.specify/specs/074-goal-team-sdd-unification/plan.md: 29
+.specify/specs/074-goal-team-sdd-unification/research.md: 12
+.specify/specs/074-goal-team-sdd-unification/quickstart.md: 3
+.specify/specs/074-goal-team-sdd-unification/tasks.md: 143
+.specify/specs/074-goal-team-sdd-unification/verification.md: 24
+.specify/specs/074-goal-team-sdd-unification/review.md: 4
+.specify/specs/074-goal-team-sdd-unification/code-review.md: 4
+.specify/specs/074-goal-team-sdd-unification/feature-ref.md: 1
+.specify/specs/074-goal-team-sdd-unification/merge-manifest.json: 572
+shared/definitions/sdd-routing-definitions.md: 1
+.specify/shared/definitions/sdd-routing-definitions.md: 1
+.specify/skills/sdd-loop-driver/references/nested-invocation.md: 1
+tests/integration/test_seal_074_round.py: 2
+tests/contract/test_sdd_compat_containment.py: 1
+tests/contract/test_sdd_diffusion.py: 1
+
+## merge-manifest path-bearing values
+path_form=123 bare_slug_names=449
+[('$.dispositions[].evidence[]', 114), ('$.artifacts[].pointer.paths[]', 6), ('$.slices[].carrier_tasks', 2), ('$.dispositions[].evidence', 1)]
+
+## Runtime line registry (git-ignored; absent in this worktree)
+worktree .specify/state exists: False
+/storage/project/cloud-native-ai/spec-kit/.specify/state/074-goal-team-sdd-unification.md: mentions=21
+/storage/project/cloud-native-ai/spec-kit/.specify/state/074b-nested-governance.md: mentions=14

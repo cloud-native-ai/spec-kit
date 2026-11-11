@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "spec": "110-fixture-north",
+  "merge": {
+    "status": "merged"
+  },
+  "conflicts": [],
+  "slices": [
+    {
+      "slug": "110a-fixture-north-slice",
+      "order": 1,
+      "order_basis": "split-record",
+      "order_source": ".specify/state/110-fixture-north.md#拆分记录.proposed_slices",
+      "carrier_tasks": ".specify/specs/110a-fixture-north-slice/tasks.md",
+      "retention": "pending-review"
+    }
+  ]
+}

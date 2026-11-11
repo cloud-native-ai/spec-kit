@@ -1,7 +1,7 @@
 """Throwaway target-project harness for the 074a authorization / nested-invocation contracts.
 
 Owned by: Feature 074 slice `074a-authorized-routing`, task T006
-(`.specify/specs/074a-authorized-routing/tasks.md`).
+(`.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md`).
 Consumers: `tests/contract/test_sdd_authorization.py` (T007),
 `tests/contract/test_nested_sdd_invocation.py` (T012).
 

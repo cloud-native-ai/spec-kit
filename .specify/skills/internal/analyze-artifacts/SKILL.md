@@ -139,6 +139,13 @@ records) plus one checklist pass (H), the same-author delegation rule, the stale
 test, and the do-not-flag noise floor:
 [`./references/detection-and-severity.md`](./references/detection-and-severity.md).
 
+**F — cross-clause contradictions.** Two clauses that impose mutually exclusive criteria on
+the same object MUST be reported as one `inconsistency` finding naming both clauses and the
+shared object — for example, one clause requires an artifact's whole-file hash to remain
+unchanged while another requires a section of that same file to be rewritten, or two clauses
+classify the same predicate into different closed sets. Neither clause may be accepted as the
+settled reading while its opposite stands.
+
 **H — checklist accountability.** Every unchecked `[Gap]` item under
 `REQUIREMENTS_DIR/checklists/*.md` MUST be raised as a finding or carry an explicit
 disposition marker in the gate report. The marker form is machine-checkable; free prose

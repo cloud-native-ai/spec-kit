@@ -340,12 +340,12 @@ entities named rather than renumbered; validation rules keep `V-1`…`V-29` unch
 fall inside the slice and a renumbering would create a second id space for an identical set.
 
 **Evidence**:
-- `.specify/specs/074a-authorized-routing/requirements.md` § Parent Mapping (20 FR / 6 SC / 10 STR
+- `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/requirements.md` § Parent Mapping (20 FR / 6 SC / 10 STR
   mapped one-by-one) and § Cross-Slice Design Attribution D-1.
 - `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录（tasks U4，2026-10-28）: the two slices'
   FR sets are declared mutually exclusive and their union is the parent's 28; that declaration is
   `confirmed-user`.
-- `python3 scripts/python/clause_extract.py .specify/specs/074a-authorized-routing/contracts/*.md`
+- `python3 scripts/python/clause_extract.py .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/contracts/*.md`
   (executed; output in `test-evidence/plan-stage-checks.md`) — 47 clauses, ids contiguous
   `C-001`…`C-004`, every file canonical `md-bold-closed`.
 
@@ -542,7 +542,7 @@ the 30 parent clauses that serve this slice's eight requirement entries are clai
 `074a`'s and are cited by path.
 
 **Evidence**:
-- `074a-authorized-routing/plan.md:266-290` is the authority for the split. Its table names the
+- `slices/074a-authorized-routing/plan.md:266-290` is the authority for the split. Its table names the
   parent clauses deferred to this slice (C-059, C-060, C-061, C-33, C-43, C-44, C-47, C-48, C-49, C-50,
   C-51, C-52, C-53, C-54, C-55, C-56, C-57, C-61, C-62, C-63, C-65) grouped by the parent FR each
   serves, and its prose records the two partial facets (parent C-54's report-section facet, parent
@@ -558,7 +558,7 @@ the 30 parent clauses that serve this slice's eight requirement entries are clai
   FR 024 → C-56 + C-57, FR 026 → C-061 + C-65, FR 027 → C-33 + C-43 + C-44 + C-61 + C-62, FR 028 →
   C-63 + C-67 (parent `feature-ref.md:62-91`).
 - `074a` already claimed parent C-003/C-004/C-064/C-60 and the parent FR 013 / parent FR 018 facets of C-54/C-66
-  (`074a-authorized-routing/feature-ref.md:63-89`), so this slice references them instead of
+  (`slices/074a-authorized-routing/feature-ref.md:63-89`), so this slice references them instead of
   re-claiming them.
 
 **Rejected**: (a) inheriting all 67 parent clauses — 37 of them serve requirement entries this slice
@@ -603,7 +603,7 @@ codes are reached at the owner's path. When the record cannot be located, the se
 reference as missing and the outer layer MUST NOT re-derive it.
 
 **Evidence**:
-- `074a-authorized-routing/feature-ref.md:108-110` (ruling 3, RA6/D-2): the verdict is recorded in the
+- `slices/074a-authorized-routing/feature-ref.md:108-110` (ruling 3, RA6/D-2): the verdict is recorded in the
   Agent execution evidence, and "the report section that will reference it is parent FR 021's and
   lands with `074b-nested-governance`".
 - `shared/definitions/sdd-routing-definitions.md` is the single owner of the input domains, verdict
@@ -808,7 +808,7 @@ program-derivable checks were executed instead (`clause_extract.py`, `account-cl
   `decomposition=single-package`, so delegation is impossible and a self-scored row presented as
   independent evidence would be worse than a disclosed one.
 - `.specify/memory/features.md` row 074 reads `Planned`, and
-  `074a-authorized-routing/feature-ref.md:104-105` records the same reading for the first slice ("no
+  `slices/074a-authorized-routing/feature-ref.md:104-105` records the same reading for the first slice ("no
   new Feature row — the slice reuses Feature 074, status stays Planned"). This stage therefore
   appends its entry to `.specify/memory/features/074.md` § Latest Review and updates `Last Updated`;
   it flips nothing.

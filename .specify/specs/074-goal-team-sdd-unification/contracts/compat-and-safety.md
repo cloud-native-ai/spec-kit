@@ -1,4 +1,4 @@
-<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/contracts/compat-and-safety.md) -->
+<!-- merged from 074b-nested-governance (source: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/contracts/compat-and-safety.md) -->
 
 # Contracts: Compatibility, containment and safety (C-001…C-012)
 

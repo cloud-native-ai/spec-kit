@@ -1,0 +1,4 @@
+# Dated record: slice source paths in non-F1/F2/F3 shapes (C-302 carrier-class rule)
+Absolute prefix: /abs/workspace/.specify/specs/100a-fixture-alpha/plan.md
+Dot-dot prefix: ../100b-fixture-beta/tasks.md
+Dangling tail: .specify/specs/100a-fixture-alpha/notes/absent.txt

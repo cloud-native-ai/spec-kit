@@ -1,0 +1,41 @@
+# Analyze-stage deterministic gates — 100-seal-slice-archive — 2026-11-11 (round 1)
+HEAD: 134daf45fc3d778d1831626fe5648e7a1d978e4a
+
+## pre-analyze-check --stage plan
+exit=0
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=2 waived=0
+
+## pre-analyze-check --stage tasks
+exit=0
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=2 waived=0
+
+## validate-requirements
+exit=0
+scanned: 229 lines, 38 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+
+## validate-tasks
+exit=0
+PASS: .specify/specs/100-seal-slice-archive/tasks.md — 0 error(s), 0 warning(s)
+
+## decomposition-check --mode plan
+exit=0
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T03:05:38Z"}
+
+## decomposition-check --mode tasks
+exit=0
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 28, "task_count": 53, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T03:05:38Z"}
+
+## validate-decision-tensions
+exit=0
+scanned: 276 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+
+## account-clause-coverage (JSON at test-evidence/analyze-coverage.json)
+errors= 0 warnings= 1
+clause-uncovered pass 673 | 673 uncovered, 0 beyond the frozen baseline
+fr-uncovered pass 0 | 28 of 28 FRs cited from citation groups
+clause-unparsable fail 108 | 108 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt 
+coverage-baseline-delta pass 0 | baseline holds 673 names; 673 uncovered items are baseline-internal and do not block
+fr: {'universe': 28, 'claimed': 28, 'uncovered': []}

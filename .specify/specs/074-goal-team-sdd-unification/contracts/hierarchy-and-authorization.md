@@ -1,4 +1,4 @@
-<!-- merged from 074a-authorized-routing (source: .specify/specs/074a-authorized-routing/contracts/hierarchy-and-authorization.md) -->
+<!-- merged from 074a-authorized-routing (source: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/contracts/hierarchy-and-authorization.md) -->
 
 # Contracts: Control hierarchy and two-half authorization (C-001…C-016)
 

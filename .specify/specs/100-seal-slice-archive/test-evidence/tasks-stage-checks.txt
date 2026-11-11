@@ -1,0 +1,100 @@
+# tasks-stage checks — 100-seal-slice-archive
+# Captured 2026-11-11 in worktree /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive
+# HEAD 90bab87ee3b9c3e96da970ea46d685dc19b1f32f (branch 100-seal-slice-archive)
+
+## 1. Structure validator — validate-tasks.py
+
+command: python3 .specify/scripts/python/validate-tasks.py .specify/specs/100-seal-slice-archive/tasks.md
+output:
+PASS: .specify/specs/100-seal-slice-archive/tasks.md — 0 error(s), 0 warning(s)
+exit: 0
+
+--json reading:
+status: PASS
+errors: []
+warnings: []
+green_claims: 40 (contracts/archive-actions.contract.md 16; contracts/archive-manifest.contract.md 12; contracts/reference-classification.contract.md 12)
+duplicate clause ids: none
+
+row counts (same file):
+task rows (^- \[[ xX>~]\] T[0-9]{3}): 53
+lines carrying [green:]: 25 (rows with multiple claims share one line)
+clause definitions across contracts (grep -cE '^\*\*C-[0-9]{3}\*\*'): 16 + 12 + 12 = 40
+
+## 2. Decomposition gate — decomposition-check.py --mode tasks
+
+command: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+  --requirements .specify/specs/100-seal-slice-archive/requirements.md \
+  --tasks .specify/specs/100-seal-slice-archive/tasks.md \
+  --json-out .specify/specs/100-seal-slice-archive/test-evidence/decomposition-tasks.json
+output (json-out): {"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 28, "task_count": 53, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-11T02:37:56Z"}
+exit: 0
+
+## 3. Stage coverage gate — concurrency-check.py coverage --stage tasks
+
+command: python3 .specify/scripts/python/concurrency-check.py coverage --stage tasks
+output (summary; full payload measured over the repo goals):
+decision: pass
+tasks stage: {"coverage": "auto", "decision": "covered-by-default", "single_package_decision_required": true}
+findings: []
+checked_at: 2026-11-11T02:38:40Z
+exit: 0
+
+## 4. Clause coverage baseline freeze + account
+
+freeze command: python3 scripts/python/account-clause-coverage.py .specify/specs/100-seal-slice-archive --freeze > .specify/specs/100-seal-slice-archive/coverage-baseline.txt
+freeze exit: 0
+header (verbatim, first two lines):
+# coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
+# frozen-from: .specify/specs/*/contracts/* excluding 100-seal-slice-archive | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 90bab87ee3b9 | files: 313 (parsed 205 + named 108)
+baseline lines: 675 (6 header + 669 names)
+this spec's clause names present in the frozen body: 0 (grep -c '100-seal-slice-archive/contracts' = 0)
+
+account command: python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/100-seal-slice-archive
+output (tail summary, verbatim):
+uncovered beyond baseline: 0
+FR universe: 28
+FR claimed: 28
+FR uncovered: 0
+companion (must be non-empty on a green run): claimed clauses 40, scanned files 316, clause universe 2340, FR universe 28
+  [clause-uncovered] pass (673) — 673 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 28 of 28 FRs cited from citation groups
+  [clause-unparsable] fail (108) — 108 files yield no clause id under the owner's forms; 1 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 673 names; 673 uncovered items are baseline-internal and do not block
+0 error(s), 1 warning(s)
+status: ok
+exit: 0
+
+warning adjudication: clause-unparsable is corpus-wide and pre-existing — the 108 named-unparseable files exist across the whole .specify/specs corpus and are excluded by the frozen baseline; the 1 parse-doubt file is not this spec (this spec's 3 contract pages parse as md-bold-closed: 16/12/12). The warning does not name this feature and is not silenced.
+
+## 5. Environment probes (same day, never cached)
+
+python3 --version                      -> Python 3.11.11
+python3 -c "import pytest; print(pytest.__version__)" -> 8.4.2
+git --version                          -> git version 2.43.5
+git rev-parse --is-inside-work-tree    -> true
+git rev-parse HEAD                     -> 90bab87ee3b9c3e96da970ea46d685dc19b1f32f
+bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q -> 31 passed in 6.62s
+
+## 6. Mirror / command-copy baselines (before any edit)
+
+python3 scripts/python/sync-mirrors.py --check  -> exit 2; exactly one DIFF: .specify/templates/gitignore-specify-template (pre-existing, outside this feature's write surface)
+python3 scripts/python/regen-command-copies.py --check -> OK: all per-tool command copies match the source templates. (exit 0)
+ls templates/commands/*.md | wc -l -> 31
+
+## 7. Trap-form measurements (naive vs deliberate)
+
+clause definitions:
+  deliberate: grep -cE '^\*\*C-[0-9]{3}\*\*' contracts/*.md -> 16 / 12 / 12 (sum 40)
+  naive:      grep -c 'C-' contracts/*.md                  -> 30 / 16 / 17 (sum 63;正文交叉引用被计入)
+FR definitions:
+  deliberate: grep -cE '^- \*\*FR-[0-9]{3}\*\*:' requirements.md -> 28
+task rows:
+  deliberate: ^- \[[ xX>~]\] T[0-9]{3} -> 53 (matches decomposition-check task_count)
+
+## 8. Verdict
+
+validate-tasks: PASS (0 error / 0 warning)
+decomposition --mode tasks: proceed (fr_count=28 <= 120; task_count=53 <= 160)
+coverage: claimed 40 / FR 28/28 / uncovered beyond baseline 0 (status ok; 1 corpus-wide pre-existing warning adjudicated above)
+stage coverage gate: pass (covered-by-default)

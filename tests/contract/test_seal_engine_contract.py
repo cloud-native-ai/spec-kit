@@ -1,7 +1,10 @@
 """Contract tests for the seal engine CLI surface (Feature 099, work package P2).
 
 Contract: ``.specify/specs/099-speckit-seal/contracts/seal-engine.contract.md``
-Clauses:  C-001 … C-010 — the four-action closed set, the three-value exit domain,
+          (C-001's action-set owner, revised in place to six values by Feature 100 C-101)
+          ``.specify/specs/100-seal-slice-archive/contracts/archive-actions.contract.md``
+          C-101 / C-115 — the six-action closed set and the unchanged CLI surface.
+Clauses:  C-001 … C-010 — the six-action closed set, the three-value exit domain,
           zero-side-effect ``--help`` / ``--version``, undeclared-option rejection,
           the closed option surface, the two-phase declaration, stdout-only
           reports, the write-path allowlist, the literal ``.specify`` mirror guard
@@ -9,6 +12,8 @@ Clauses:  C-001 … C-010 — the four-action closed set, the three-value exit d
 
 Red-first: this file landed before ``scripts/python/seal-utils.py`` existed; the
 red reading lives in ``.specify/specs/099-speckit-seal/notes/red-first-evidence.md``.
+The Feature 100 expansion to six actions was written red first; that reading lives
+in ``.specify/specs/100-seal-slice-archive/notes/red-first-evidence.md``.
 Every assertion is written to survive P3–P6: the action bodies are not pinned,
 only the surface the later work packages must keep.
 """
@@ -33,9 +38,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE = REPO_ROOT / "scripts" / "python" / "seal-utils.py"
 ENGINE_HELPER = REPO_ROOT / "scripts" / "python" / "script_interface_cli.py"
 
-ACTIONS = ("merge-plan", "merge-apply", "seal", "archive-gate")
-READ_ONLY_ACTIONS = ("merge-plan", "archive-gate")
-WRITE_ACTIONS = ("merge-apply", "seal")
+ACTIONS = ("merge-plan", "merge-apply", "seal", "archive-gate",
+           "archive-plan", "archive-apply")
+READ_ONLY_ACTIONS = ("merge-plan", "archive-gate", "archive-plan")
+WRITE_ACTIONS = ("merge-apply", "seal", "archive-apply")
 
 #: C-004's closed option surface (``-h``/``--help`` come from argparse itself).
 DECLARED_OPTIONS = {
@@ -193,24 +199,24 @@ def _write_calls(node: ast.AST) -> list:
 
 
 # ---------------------------------------------------------------------------
-# C-001 — the action set is exactly four, and there is no fifth
+# C-001 / 100 C-101 — the action set is exactly six, and there is no seventh
 # ---------------------------------------------------------------------------
 
-def test_c001_action_set_is_exactly_the_four(eng):
+def test_c001_action_set_is_exactly_the_six(eng):
     assert tuple(eng.ACTIONS) == ACTIONS, (
-        "C-001: the engine's action set MUST be exactly the four closed actions"
+        "C-001/C-101: the engine's action set MUST be exactly the six closed actions"
     )
     parser = eng.build_parser()
     action = next(a for a in parser._actions if a.dest == "action")
     assert set(action.choices) == set(ACTIONS)
-    assert len(action.choices) == 4
+    assert len(action.choices) == 6
 
 
-def test_c001_dispatch_table_covers_exactly_the_four(eng):
+def test_c001_dispatch_table_covers_exactly_the_six(eng):
     assert set(eng.HANDLERS) == set(ACTIONS), (
-        "C-001: every declared action has exactly one dispatch entry and no other"
+        "C-001/C-101: every declared action has exactly one dispatch entry and no other"
     )
-    assert len(eng.HANDLERS) == 4
+    assert len(eng.HANDLERS) == 6
 
 
 def test_c001_undeclared_action_is_rejected_with_exit_two_and_echoes_name(engine, tmp_path):
@@ -268,7 +274,7 @@ def test_c002_every_invocation_family_stays_inside_the_domain(engine, tmp_path):
 # C-003 — --help / --version are zero-side-effect; undeclared options are red
 # ---------------------------------------------------------------------------
 
-def test_c003_help_answers_zero_side_effect_and_carries_four_labels(engine, tmp_path):
+def test_c003_help_answers_zero_side_effect_and_carries_the_cli_labels(engine, tmp_path):
     before = _snapshot(tmp_path)
     proc = _run(engine, ["--help"], tmp_path)
     assert proc.returncode == 0, f"C-003: --help MUST exit 0; got {proc.returncode}"
@@ -276,6 +282,10 @@ def test_c003_help_answers_zero_side_effect_and_carries_four_labels(engine, tmp_
     for label in ("usage", "options", "side-effects:", "exit-codes:"):
         assert label in proc.stdout.lower(), (
             f"C-003: the help body MUST carry the {label!r} label"
+        )
+    for action in ACTIONS:
+        assert action in proc.stdout, (
+            f"C-101: the help body MUST list the {action!r} action label"
         )
 
 
@@ -343,8 +353,11 @@ def test_c004_no_bypass_flags_exist(eng):
 # ---------------------------------------------------------------------------
 
 def test_c005_read_only_and_write_actions_partition_the_closed_set(eng):
-    assert set(eng.READ_ONLY_ACTIONS) == {"merge-plan", "archive-gate"}
-    assert set(eng.WRITE_ACTIONS) == {"merge-apply", "seal"}
+    assert tuple(eng.READ_ONLY_ACTIONS) == READ_ONLY_ACTIONS
+    assert tuple(eng.WRITE_ACTIONS) == WRITE_ACTIONS
+    assert len(eng.READ_ONLY_ACTIONS) == 3 and len(eng.WRITE_ACTIONS) == 3, (
+        "C-101: the six actions split exactly 3 read-only / 3 write"
+    )
     assert set(eng.READ_ONLY_ACTIONS) | set(eng.WRITE_ACTIONS) == set(eng.ACTIONS)
     assert not set(eng.READ_ONLY_ACTIONS) & set(eng.WRITE_ACTIONS)
 
@@ -448,8 +461,20 @@ def test_c008_write_path_allowlist_is_declared_and_closed(eng):
     ), "C-008: the write-path allowlist is closed; a new entry is a contract change"
 
 
-def test_c008_no_move_delete_rename_or_push_in_source(source):
+def test_c008_destructive_surface_is_recovery_scoped_and_push_is_absent(source):
     tree = ast.parse(source)
+    enclosing = {}
+
+    def visit(node, function):
+        for child in ast.iter_child_nodes(node):
+            inner = (child.name
+                     if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                     else function)
+            if isinstance(child, ast.Call):
+                enclosing[id(child)] = function
+            visit(child, inner)
+
+    visit(tree, None)
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
@@ -459,9 +484,13 @@ def test_c008_no_move_delete_rename_or_push_in_source(source):
                 f"C-008: destructive call {func.value.id}.{func.attr} MUST NOT exist"
             )
         if isinstance(func, ast.Attribute) and func.attr in DESTRUCTIVE_PATH_ATTRS:
-            raise AssertionError(f"C-008: destructive call .{func.attr}() MUST NOT exist")
+            host = enclosing.get(id(node))
+            assert host == "_archive_restore", (
+                "C-008/C-108: a destructive path call is admitted only inside the "
+                f"archive batch's byte recovery; got {host}.{func.attr}()"
+            )
     for token in _call_arg_strings(tree):
-        assert token not in ("push", "mv", "rm"), (
+        assert token not in ("push", "rm"), (
             f"C-008: the engine MUST NOT shell out to {token!r}"
         )
     assert not (_import_roots(tree) & {"sched"}), (
@@ -585,4 +614,50 @@ def test_c010_json_payload_keeps_non_ascii_readable(engine, tmp_path):
     proc = _run(engine, ["--action", "merge-plan", "--spec-dir", str(spec_dir), "--json"], tmp_path)
     assert "测试" in proc.stdout, (
         "C-010: ensure_ascii=False keeps non-ASCII text readable in the payload"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 100 C-115 — the six-action CLI surface: labels, identity, rejection, no bypass
+# ---------------------------------------------------------------------------
+
+def test_c115_six_action_cli_consistency(eng, engine, tmp_path):
+    spec_dir = _make_spec(tmp_path)
+    before = _snapshot(tmp_path)
+
+    help_proc = _run(engine, ["--help"], tmp_path)
+    assert help_proc.returncode == 0, (
+        f"C-115: --help MUST exit 0; got {help_proc.returncode}"
+    )
+    for action in ACTIONS:
+        assert action in help_proc.stdout, (
+            f"C-115: --help MUST list the six closed actions; {action!r} is missing"
+        )
+    declared = re.search(r"--action \{([^}]+)\}", help_proc.stdout)
+    assert declared is not None, "C-115: --help MUST carry the --action choices"
+    assert tuple(declared.group(1).split(",")) == ACTIONS, (
+        "C-115: the declared choices are exactly the six closed actions in order"
+    )
+
+    version_proc = _run(engine, ["--version"], tmp_path)
+    assert version_proc.returncode == 0, (
+        f"C-115: --version MUST exit 0; got {version_proc.returncode}"
+    )
+    lines = [line for line in version_proc.stdout.strip().splitlines() if line.strip()]
+    assert len(lines) == 1 and re.fullmatch(r"seal-utils\.py \S+", lines[0]), (
+        f"C-115: --version prints exactly one identity line; got {lines!r}"
+    )
+
+    rejected = _run(engine, ["--action", "archive-plan", "--spec-dir", str(spec_dir),
+                             "--force"], tmp_path)
+    assert rejected.returncode == 2, (
+        f"C-115: an undeclared option MUST be rejected with 2; got {rejected.returncode}"
+    )
+
+    options = {opt for a in eng.build_parser()._actions for opt in a.option_strings}
+    for flag in FORBIDDEN_FLAGS:
+        assert flag not in options, f"C-115: bypass flag {flag} MUST NOT exist"
+
+    assert _snapshot(tmp_path) == before, (
+        "C-115: --help / --version / a rejected option MUST NOT touch the workspace"
     )

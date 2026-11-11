@@ -1,0 +1,46 @@
+# US3 Checkpoint — Feature 100（逐行追加；T041 起）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive`
+
+## T041 — 六动作 CLI 一致性（FR-008、SC-004；契约 C-115）
+
+断言组（`test_c115_six_action_cli_consistency`）: `--help` 列出六个动作且 `--action` choices 恰为六值有序集；`--version` 打印一行身份并以 0 退出且零副作用；未声明选项（`--force`）以 2 拒绝且不达任何动作；无 `--force` / `--no-verify` / `--waive` 旁路；全部调用前后工作树快照逐字节不变。
+
+命令（verbatim）: `bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py -q`
+退出码: `0`
+
+完整 stdout/stderr（verbatim）:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+................................                                         [100%]
+32 passed in 6.72s
+```
+
+
+## T045 — US3 检查点（FR-001、FR-021、SC-004）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+命令（verbatim）:
+`bash scripts/bash/run-tests.sh tests/integration/test_seal_archive_round.py tests/contract/test_seal_engine_contract.py tests/contract/test_migration_distribution.py -q`
+
+退出码: `0`（`53 passed in 6.89s`）
+
+完整 stdout/stderr（verbatim）:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_seal_archive_round.py tests/contract/test_seal_engine_contract.py tests/contract/test_migration_distribution.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.....................................................                    [100%]
+53 passed in 6.89s
+```
+
+判据: 阻断态夹具照常归档、merge-apply 拒绝夹具不启动归档（round 套件）；六动作 CLI 一致（engine 契约套件）；`COMMAND_BASELINE` 31 不变（migration distribution 套件）。T038 的 blocked-pair 与 T041 的 CLI 读数并入本检查点。

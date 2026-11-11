@@ -1,0 +1,35 @@
+Review-repair r1 — red-first evidence (REC-100-1)
+Date: 2026-11-11
+Feature: 100-seal-slice-archive
+
+Method: the two new tests landed first; the engine hunk under change was
+temporarily reversed so the tests ran against the pre-repair behavior, then the
+hunk was re-applied.
+
+Reverse step (saved first, then re-applied):
+  git diff -- scripts/python/seal-utils.py > .specify/.tmp/review-repair-r1-100/engine.patch
+  git apply -R .specify/.tmp/review-repair-r1-100/engine.patch
+  # ... red run below ...
+  git apply .specify/.tmp/review-repair-r1-100/engine.patch
+
+RED command (verbatim):
+  bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_apply.py -q -k "mixed_carrier"
+
+RED result: 2 failed in 6.35s
+
+  tests/contract/test_seal_archive_apply.py::test_a_mixed_carrier_dated_section_change_is_rejected_and_restored
+  FAILED  — the sabotaged dated-section byte change was accepted:
+      >       assert code == 2, payload.get("conditions")
+      E       assert 0 == 2
+      tests/contract/test_seal_archive_apply.py:327
+
+  tests/contract/test_seal_archive_apply.py::test_a_mixed_carrier_changes_only_in_its_live_sections
+  FAILED  — the section-level judgment did not exist:
+      >       assert eng.mixed_dated_sections(after) == eng.mixed_dated_sections(before)
+      E       AttributeError: module 'seal_utils_archive_apply' has no attribute 'mixed_dated_sections'
+      tests/contract/test_seal_archive_apply.py:299
+
+GREEN command (verbatim, after the engine hunk was re-applied):
+  bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_apply.py -q -k "mixed_carrier"
+
+GREEN result: 2 passed in 6.33s

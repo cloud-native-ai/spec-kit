@@ -97,7 +97,10 @@ MUST NOT 造成内容丢失；引擎 MUST NOT 以「较新/较全/较大/较后�
 `merge-manifest.json` MUST 逐输出件记录来源与动作、逐单元/逐 ID 记录来源（分片 slug + 原 ID）与重映射。
 合并完成后父 spec MUST 为唯一现行权威；每个分片目录 MUST 被标注 `merged into <父 spec>`（**恰好一行**
 `**Merged into**:` 头部字段，落在分片 `requirements.md`），其内容作为 dated record 保留，MUST NOT 被 seal
-删除或改写。分片承载物的后续保留/退役 MUST 按 non-disposable 纪律复核后决定，MUST NOT 默认沉默保留。
+删除或改写（归档是一次移动：内容原样保留，仅位置改变）。分片承载物的后续处置已由
+`100-seal-slice-archive` 以 non-disposable 处置集的 `archive` 决定：目的地 = 所属父 spec 的
+`slices/<原分片目录名>/`，处置记录 = 父 spec 的 `archive-manifest.json` 逐片 `{from, to}` 行；MUST NOT
+默认沉默保留，MUST NOT 再建第二份保留/退役记录。
 
 (FR-018)
 
@@ -134,8 +137,9 @@ line 0 = 整文件事实），由 `slices[].carrier_tasks` 列出真正接手的
 **C-023** — 写面与并发边界。
 
 `merge-apply` 只写父 spec 目录、分片的 `merged into` 标注与 C-017 记录过解决方式的出厂文档引用修正；
-MUST NOT 归档、移动或删除 spec 目录，MUST NOT 触碰 goal/team 树（归 `/speckit.goal` 的 `migrate-archive`），
-MUST NOT push。并发安全 MUST 按「一 spec 一记录文件」满足：两条并行线封装不同 spec 时写入不同路径，
-MUST NOT 引入共享可变聚合文件。
+MUST NOT 归档、移动或删除 spec 目录（分片归档归 `100-seal-slice-archive` 的独立动作 `archive-apply`，
+MUST NOT 并入 `merge-apply`——`merge-apply` 保持纯合并），MUST NOT 触碰 goal/team 树（归 `/speckit.goal`
+的 `migrate-archive`），MUST NOT push。并发安全 MUST 按「一 spec 一记录文件」满足：两条并行线封装不同
+spec 时写入不同路径，MUST NOT 引入共享可变聚合文件。
 
 (FR-020)

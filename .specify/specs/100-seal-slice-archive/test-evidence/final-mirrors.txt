@@ -1,0 +1,37 @@
+# Final Mirrors & Copies — Feature 100（T047，GATE-2）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+## 终检读数
+
+`python3 scripts/python/sync-mirrors.py --check` → **退出码 0**（零 DIFF）
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (429 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (136 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (18 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (129 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (113 files, byte-identical)
+```
+
+`python3 scripts/python/regen-command-copies.py --check` → **退出码 0**
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+## 与 T001 基线的对照
+
+- T001 基线（`notes/pre-change-measurements.md` § 2）：退出码 2，唯一 `DIFF` = `.specify/templates/gitignore-specify-template`（既有、非本特性写面）。
+- P8 入口发现一处**新增**漂移：`.specify/scripts/python/seal-utils.py`（引擎源在 `abdf9a6df` 的 P7b 修订未同步到镜像侧；镜像 sha256 `86548298…` vs 源 `f6acd8b9…`）。
+- 处置：按「源为权威、镜像是投影」运行 `python3 scripts/python/sync-mirrors.py --write --only scripts/python/seal-utils.py`（退出码 0，`sync scripts/ -> .specify/scripts/ (1 files)`）；两侧复核 sha256 相等 `f6acd8b9b723d4136518cfa77d10dd87f4abb3da620691375d4ac58e0c824c09`。**归属披露**：该修复属本包发现并修复的跨包镜像漏同步（correction，非契约裁决）。
+- 本特性触及的每一对源/镜像与四份 per-tool 命令副本：零新增漂移（`templates/` 23 files、`skills/external` 429、`skills/internal` 136、`agents` 18、`scripts/` 129、`shared/` 113 全部 `ok`；命令副本 `OK`）。
+- 既有模板漂移说明：`.specify/templates/gitignore-specify-template` 的工作树修改在 P8 入口即存在（会话起始 `git status` 已显示），本包**未提交、未还原**（遵守「不修、不掩」；其源与镜像在本次检查时逐字节相等，`templates/ == .specify/templates/` 读 `ok`）。

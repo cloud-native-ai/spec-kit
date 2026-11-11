@@ -1,0 +1,63 @@
+# Final Suite — Feature 100（T046，GATE-1）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `64931e488`（P8 核心批次；本文件的落盘提交紧随其后）
+环境: `PYTHONDONTWRITEBYTECODE=1`（运行前清空全部 `__pycache__`，使源/镜像树比较不受字节码产物影响）
+
+## 命令与读数
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 bash scripts/bash/run-tests.sh \
+  --names-out .specify/specs/100-seal-slice-archive/test-evidence/final-failed.txt
+```
+
+- 并行 pass（默认 fast tier，`-n auto --dist load`）：**207 failed, 8863 passed, 2 skipped, 0 errors in 124.24s**。
+- 串行 pass（`serial` 标记，`passes=2` 的合成名单）：**1 passed, 9079 deselected in 29.90s**。
+- 进程退出码：`1`（并行 pass 的既有失败；本特性的目标不是全绿，而是零新增）。
+- `final-failed.txt`：207 条名字（排序、去重，与并行 pass 的 FAILED 集一致）。
+
+## 对照基线（实现入口）
+
+- **基线 = `/speckit.implement` 入口的全量套件读数**：在 detached worktree（commit `f821daf8362a3050cb14909a820294f70f04d8a9`）上以同一入口运行：
+  **217 failed, 8744 passed, 2 skipped in 51.95s**；名字名单 `.specify/.tmp/p8/baseline-full-failed.txt`（217 条）。
+- 基线树为干净检出，且**不含**本特性的 `tests/fixtures/seal-archive/**`（该 fixture 主题面在基线提交之后才创建）。
+
+## `comm -13` 与归因（raw）
+
+```bash
+comm -13 baseline-217.txt final-207.txt   # 新增失败
+comm -23 baseline-217.txt final-207.txt   # 基线红转绿
+```
+
+- **新增失败：0 条**（`comm -13` 空）。
+- 基线红转绿：10 条（全部为镜像/工作树相关：`templates/gitignore-specify-template` 对已逐字节一致、脚本镜像经生成器同步、git-status 字节稳定类断言）：
+
+```text
+tests/contract/test_coaching_wiring_contract.py::test_c3_mirrors_and_command_copies_are_zero_drift
+tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[templates/gitignore-specify-template->.specify/templates/gitignore-specify-template]
+tests/contract/test_non_disposable_contract.py::test_t089_a_full_run_is_byte_identical_on_git_status
+tests/contract/test_non_disposable_contract.py::test_t092_the_mirror_is_the_generators_copy_and_carries_no_hand_edit
+tests/contract/test_script_interface_contract.py::test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker
+tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+tests/unit/test_status_digest_unit.py::test_c43_two_renders_over_one_registry_are_byte_identical
+```
+
+- 交集（两端同名的既有红）：207 条，逐条保留在 `final-failed.txt` 中，按「既有红不修不掩」不逐一处置；它们分布于与本特性写面无关的模块（环境依赖/缺省工作区输入），与基线名单逐条相同。
+
+## 过程披露（raw 归因中的中间读数）
+
+P8 的中间全量运行出现过 8 条基线外名字，均已在最终读数前消除：
+
+| 中间名字 | 成因 | 处置 |
+|----------|------|------|
+| `test_instructions_size_budget.py`（6 条） | 本包曾以 `tests/fixtures/seal-archive/conftest.py` 局部忽略夹具载体文件；pytest 将嵌套 conftest 以顶层名 `conftest` 注册，遮蔽 `tests/conftest.py` 的 `install_template_clone` | 撤销嵌套 conftest，改为把两个夹具载体文件重命名为非 `test_*.py`（`fixture_refs.py`），数据面不再被收集 |
+| `test_hugo_scaffold_contract.py::test_mirror_parity_for_the_whole_skill` | 运行中生成的 `__pycache__/scaffold-hugo.cpython-311.pyc` 被源/镜像目录比较计入 | 运行前清理 `__pycache__` 并以 `PYTHONDONTWRITEBYTECODE=1` 运行；测试侧未改 |
+| `test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root` | 检查器 `candidate-not-collected`：新夹具文件在上一次运行时尚未被 git 跟踪 | 夹具重命名与文件纳入提交后消失 |
+
+此外，本包修复了两处 P7b 遗留：引擎镜像未同步（`sync-mirrors.py --write --only scripts/python/seal-utils.py`）与 C-008 守卫未跟上 C-113 的原地修订（`test_c008_*` 更新为「唯一移动 + 恢复期删除」；文件名随之更名）。
+
+## 结论
+
+**GATE-1 pass**：全量套件相对实现入口基线新增失败 0，基线红转绿 10；本特性新增测试全部通过。

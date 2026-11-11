@@ -64,7 +64,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "074b-nested-governance"
+SLICE_DIR = REPO_ROOT / ".specify" / "specs" / "074-goal-team-sdd-unification/slices/074b-nested-governance"
 
 CONCEPTUAL_MODEL = REPO_ROOT / "skills" / "internal" / "create-team" / "references" / "conceptual-model.md"
 RUN_AGENT = REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md"

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "spec": "120-fixture-south",
+  "merge": {
+    "status": "merged"
+  },
+  "conflicts": [],
+  "slices": [
+    {
+      "slug": "120a-fixture-south-slice",
+      "order": 1,
+      "order_basis": "split-record",
+      "order_source": ".specify/state/120-fixture-south.md#拆分记录.proposed_slices",
+      "carrier_tasks": ".specify/specs/120a-fixture-south-slice/tasks.md",
+      "retention": "pending-review"
+    }
+  ]
+}

@@ -102,11 +102,11 @@
 | D-001 | Feature 087 的显式残差：配套图检查器**不判定**「图内标签／关系与文档正文所述事实的语义一致」（`stale` 的第二半），只判到「文档对渲染产物的引用仍在且解析」；判据不存在时代码不发明一条不可判的 verdict，改由评审面承接 | `.specify/specs/087-arch-diagram-docs/plan.md` § Decision Tensions T-003 + § Residual Risk + `contracts/diagram-obligation.contract.md` C-009 | open（承接方 = `/speckit.review` 评审面；重开条件 = `--action obligation` 的 `no-trace-record` 计数显著下降，或评审面连续两次报出机械绿但图文语义不一致） |
 | D-001-a | Feature 087 的显式残差（D-001 的具体一例）：`docs/tutorials/quickstart.md` 内的图 alt text 写 "Core Development"、同段正文写 "Develop"；`diagram-obligation.contract.md` `C-009` 只判「文档对渲染产物的引用存在且可解析」，**不判** alt 文本与正文的语义一致，故该不一致不会被检查器报出 | `.specify/specs/087-arch-diagram-docs/feature-ref.md` § 5 的 P2-3 恢复行 + `contracts/diagram-obligation.contract.md` C-009 | open（承接方 = `/speckit.review` 评审面；修复面 = 该文档的 alt 文本，属内容工作、不属本特性） |
 | OI-082-01 | Feature 082 的后续：把 `shared/workflow/best-practice-optimization.md` 接入 `/speckit.improve`（每次调用参考该工作流）；本特性只镜像文档，不接线 | `.specify/specs/082-self-explanatory-integration/requirements.md` § A5 + `shared/workflow/best-practice-optimization.md` § 3 | open（owner = 后续 `/speckit.improve` 改进项；解除条件 = 接线落地并由契约测试断言） |
-| REC-074a-01 | read-only 权威面须可声明并由审计脚本机械核对（含审计基线之前的触碰） | `.specify/specs/074a-authorized-routing/review.md` § REC-1（F1） | open |
-| REC-074a-02 | code-review 的机器路径与 help 由同一有序步骤表派生，`capture` 不得只在机器路径存在 | `.specify/specs/074a-authorized-routing/review.md` § REC-2（F2） | open |
-| REC-074a-03 | `pre-analyze-check` 的路径引用第二候根 `.specify/memory/` 解析，消除永久 advisory 噪声 | `.specify/specs/074a-authorized-routing/review.md` § REC-3（F3） | open |
-| REC-074a-04 | 下游承接义务须有独立状态；`post_change_commit` 改名并强制收口任务推进 | `.specify/specs/074a-authorized-routing/review.md` § REC-4（F5/F6） | open |
-| REC-074a-05 | 入口校验 id 移出 `V-` 空间；golden 行增 `target_paths` 使 FR-008 路径谓词可判定 | `.specify/specs/074a-authorized-routing/review.md` § REC-5（F4 + §2.2） | open |
+| REC-074a-01 | read-only 权威面须可声明并由审计脚本机械核对（含审计基线之前的触碰） | `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md` § REC-1（F1） | open |
+| REC-074a-02 | code-review 的机器路径与 help 由同一有序步骤表派生，`capture` 不得只在机器路径存在 | `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md` § REC-2（F2） | open |
+| REC-074a-03 | `pre-analyze-check` 的路径引用第二候根 `.specify/memory/` 解析，消除永久 advisory 噪声 | `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md` § REC-3（F3） | open |
+| REC-074a-04 | 下游承接义务须有独立状态；`post_change_commit` 改名并强制收口任务推进 | `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md` § REC-4（F5/F6） | open |
+| REC-074a-05 | 入口校验 id 移出 `V-` 空间；golden 行增 `target_paths` 使 FR-008 路径谓词可判定 | `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md` § REC-5（F4 + §2.2） | open |
 | T-013 | 079 plan 承重决策：双语约定 owner 新建独立 `shared/guidelines/bilingual-expression.md`，不扩展词汇表/读者理解纪律的既有 owner（反题=扩 `shared/workflow/glossary.md`；重开条件=两迭代 ≥2 次同批修订诉求） | `.specify/specs/079-bilingual-expression/plan.md` § Decision Tensions T-013 | active（重开条件见记录） |
 | T-014 | 079 plan 承重决策：双语检查器新建独立 `bilingual-expression-check.py`，不并入 `doc-consistency-check.py`（反题=`--action bilingual`；重开条件=两迭代 ≥2 次入口跑漏致 SC-002 采证缺失） | `.specify/specs/079-bilingual-expression/plan.md` § Decision Tensions T-014 | active（重开条件见记录） |
 | T-015 | 079 plan 承重决策：检查器本特性内不接线门禁，SC-002 以 `--scope changed` 采证（反题=接线 blocking；重开条件=≥1 次全角形态随提交进 master） | `.specify/specs/079-bilingual-expression/plan.md` § Decision Tensions T-015 | active（重开条件见记录） |
@@ -234,6 +234,17 @@
 | REC-099-4 | 驱动状态脊随阶段推进（或将 U0 块标为快照并指向 line registry）；带外用户裁定修订登记为特性行 | `.specify/specs/099-speckit-seal/review.md` § 5.3 REC-099-4（F7、F8） | open |
 | REC-099-5 | seal 批量写入在途中失败时恢复当前文件（或写前登记为已写），并补故障注入用例 | `.specify/specs/099-speckit-seal/review.md` § 5.2 REC-099-5（F9） | open |
 | REC-099-6 | tasks 阶段收口须处置每条 `green-cross-phase` 警告（重切分区或记录有意顺序） | `.specify/specs/099-speckit-seal/review.md` § 5.1 REC-099-6（F10） | open |
+| REC-100-1 | 混合载体的 dated 判据按实际实现在 C-306/C-308 中写明（dated-only 文件级 sha；混合载体保留 dated 行字节并逐条列 live 行） | `.specify/specs/100-seal-slice-archive/review.md` § 5.1 REC-100-1（F2） | resolved（2026-11-11 review round 2；review-repair r1 `7aa624e4c`；证据 `test-evidence/review-repair-r1-red-first.txt`、`test-evidence/review-repair-r1-suite.txt`、`test-evidence/review-r2-074-replay.json`） |
+| REC-100-2 | 合并清单台账的 `line` 定位稳定：保留 `digest` 键位或在序列化后重算 merge-manifest 行，并补 074 行定位回归 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-2（F3） | open |
+| REC-100-3 | apply 写入后真实重扫未解析引用（非 0 即恢复批次并 exit 2），并记录实测 `unresolved_after` | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-3（F4） | open |
+| REC-100-4 | analyze 增加跨条款矛盾检测：同一谓词被不同条款分入相反封闭集时在实现前报告 | `.specify/specs/100-seal-slice-archive/review.md` § 5.4 REC-100-4（F1） | resolved（2026-11-11 review round 2；review-repair r1 `7aa624e4c`；证据 `test-evidence/review-repair-dispositions-r1-2026-11-11.md`、`sync-mirrors.py --check --only skills/internal/analyze-artifacts` ok） |
+| REC-100-5 | C-102 的 `not-evaluated (blocked-by …)` 行落地（扩展 condition 载荷或收窄条款措辞） | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-5（F9） | open |
+| REC-100-6 | 每个实现工作包收口前强制跑镜像与命令副本 `--check`，并把该对摘要记入包证据 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-6（F5） | open |
+| REC-100-7 | 状态脊 loop-state 随每条 stage record 推进（或标为 U0 快照）；阻断计数由载荷 `code` 字段投影 | `.specify/specs/100-seal-slice-archive/review.md` § 5.4 REC-100-7（F6、F7） | open |
+| REC-100-8 | DoD 全部满足时在收口提交把 `**DoD Status**` 翻为 `green`，并由收口步骤校验 | `.specify/specs/100-seal-slice-archive/review.md` § 5.1 REC-100-8（F8） | open |
+| REC-100-9 | analyze 命令模板「seven detection passes」与技能八趟枚举对齐（改成技能自己的枚举或指向技能 § 5 单一 owner） | `.specify/specs/100-seal-slice-archive/review.md` § 5.2 REC-100-9（F10） | open |
+| REC-100-10 | `receipt` 读取记录自身 base/head（或强制 `--spec`），不得静默改解析 trunk 基准；补基准漂移测试 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-10（F11） | open |
+| REC-100-11 | 未提交范围排除按记录精确路径而非 `code-review…\.md$` 后缀；补无关同名后缀文件测试 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-11（F12） | open |
 | T-001 (098) | 098 plan 承重决策：缺省档排除慢档、全量档由 `--full` 显式请求（反题=缺省全量 + 显式 fast 档；重开条件=下游把缺省档误当全量 ≥2 次或 closure 出现可归因于缺省档漏跑的失败名 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-001 | active（重开条件见记录） |
 | T-002 (098) | 098 plan 承重决策：顺序确定性由 `feedback-utils.py` 的可选 `--now` 注入时钟提供（反题=测试侧直接构造/回写条目时间戳；重开条件=任一调用方无法注入时间戳或 `--now` 出现在生产调用记录 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-002 | active（重开条件见记录） |
 | T-003 (098) | 098 plan 承重决策：进程内直调按「清单 + 二值边界类」逐点转换，携带 cwd/env 的 fixture 层调用保留子进程（反题=全部保持子进程；重开条件=任一转换点出现无法用断言集等价解释的行为差异 ≥1，或 fixture 层必须进程内化才能达到 SC-009） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-003 | active（重开条件见记录） |
