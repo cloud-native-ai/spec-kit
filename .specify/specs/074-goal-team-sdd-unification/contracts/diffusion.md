@@ -1,4 +1,4 @@
-<!-- merged from 074b-nested-governance (source: .specify/specs/074b-nested-governance/contracts/diffusion.md) -->
+<!-- merged from 074b-nested-governance (source: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/contracts/diffusion.md) -->
 
 # Contracts: Diffusion into the Goal/Team/Agent surfaces (C-001…C-008)
 

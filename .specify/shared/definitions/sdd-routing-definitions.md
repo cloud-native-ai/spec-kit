@@ -181,7 +181,7 @@
 
 ## Verdict record
 
-裁决记录的字段面归 `.specify/specs/074a-authorized-routing/data-model.md` E4，本文件不复述字段表；本文件固定两件事，二者都是本切片可判定的面（C-27）：
+裁决记录的字段面归 `.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/data-model.md` E4，本文件不复述字段表；本文件固定两件事，二者都是本切片可判定的面（C-27）：
 
 - **载体**：本切片的裁决记录落在 **Agent 执行证据**里。嵌套运行的 handoff 与调用方的结果**按稳定路径引用同一条记录**，不复算——外层读到的就是该职责实际据以行动的那条裁决。
 - **时间戳由记录侧承载、引擎不自造**：引擎 MUST NOT 读时钟（同一输入两次求值必须逐字节一致，C-24）。`recorded_at` 缺省为 `null`，由调用方以 `--recorded-at` 传入，或在写入证据时补齐；引擎只把它原样放进载荷。

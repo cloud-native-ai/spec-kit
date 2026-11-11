@@ -71,16 +71,16 @@
 
 - Specification: .specify/specs/074-goal-team-sdd-unification/requirements.md
   Quality Checklist: .specify/specs/074-goal-team-sdd-unification/checklists/requirements.md
-- Specification: .specify/specs/074a-authorized-routing/requirements.md（**切片 074a**，2026-10-29）：父规格 FR-001–019 + FR-025 的投影；20 FR / 6 SC；`Related Feature: 074`；拆分确认见 `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录。
-  Quality Checklist: .specify/specs/074a-authorized-routing/checklists/requirements.md
-  Implementation-Readiness Checklist: .specify/specs/074a-authorized-routing/checklists/readiness-2026-10-29.md（2026-10-29，`b8363f89f`；32 项 / 18 pass / 14 fail）
-  Tasks: .specify/specs/074a-authorized-routing/tasks.md（32 行，全部 `[X]`，`deferred_tasks=` 为空）
-  Verification: .specify/specs/074a-authorized-routing/verification.md（SC-001…SC-006 全 `pass`；FR-020 → `waived (no SC)`）
-  Implement evidence: .specify/specs/074a-authorized-routing/notes/quickstart-run.md（S1–S7 + single-owner + structure）、`notes/red-first-evidence.md`、`test-evidence/implement.jsonl`（7 行）
-- Specification: .specify/specs/074b-nested-governance/requirements.md（**切片 074b**，2026-10-29）：父规格 FR-020–024 + FR-026–028 的投影；8 FR / 2 SC / 7 shared strings；`Related Feature: 074`；Parent Mapping 与 D-1/D-2/D-3 见该文件。
-  Quality Checklist: .specify/specs/074b-nested-governance/checklists/requirements.md
-  Plan: .specify/specs/074b-nested-governance/plan.md（含 `## Parent Design Mapping` 与 `## Cross-Slice Attribution`）、`research.md`（RB1–RB10）、`data-model.md`（E1–E8 / V-1…V-12）、`contracts/`（3 文件 30 条款）、`quickstart.md`（S1–S7）、`feature-ref.md`（9 行交付面）
-  Plan evidence: .specify/specs/074b-nested-governance/test-evidence/{plan-stage-checks.md, targeted-set-v1-baseline.txt, compat-baseline-nodeids.txt}
+- Specification: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/requirements.md（**切片 074a**，2026-10-29）：父规格 FR-001–019 + FR-025 的投影；20 FR / 6 SC；`Related Feature: 074`；拆分确认见 `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录。
+  Quality Checklist: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/checklists/requirements.md
+  Implementation-Readiness Checklist: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/checklists/readiness-2026-10-29.md（2026-10-29，`b8363f89f`；32 项 / 18 pass / 14 fail）
+  Tasks: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md（32 行，全部 `[X]`，`deferred_tasks=` 为空）
+  Verification: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/verification.md（SC-001…SC-006 全 `pass`；FR-020 → `waived (no SC)`）
+  Implement evidence: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/notes/quickstart-run.md（S1–S7 + single-owner + structure）、`notes/red-first-evidence.md`、`test-evidence/implement.jsonl`（7 行）
+- Specification: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/requirements.md（**切片 074b**，2026-10-29）：父规格 FR-020–024 + FR-026–028 的投影；8 FR / 2 SC / 7 shared strings；`Related Feature: 074`；Parent Mapping 与 D-1/D-2/D-3 见该文件。
+  Quality Checklist: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/checklists/requirements.md
+  Plan: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/plan.md（含 `## Parent Design Mapping` 与 `## Cross-Slice Attribution`）、`research.md`（RB1–RB10）、`data-model.md`（E1–E8 / V-1…V-12）、`contracts/`（3 文件 30 条款）、`quickstart.md`（S1–S7）、`feature-ref.md`（9 行交付面）
+  Plan evidence: .specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/test-evidence/{plan-stage-checks.md, targeted-set-v1-baseline.txt, compat-baseline-nodeids.txt}
 - Related Feature 058（无人值守 SDD 循环驱动机制）：拥有 U0–U6、状态脊、哨兵、U4/U5、watcher；本特性引用不重定义，反向交叉引用已记入 `features/058.md`。
 - Related Feature 060（驱动子代理机制技能化）：拥有 Agent Template/Instance/Execution 三层与 create/dispatch/improve 技能；本特性只扩展中性元数据键与派发谓词。
 - Related Feature 070（驱动子代理的任务拆解与配合）：拥有 driver 内工作包分解与 stage-team preset；本特性不替代它，也不修改 create-team/run-team 的 create 行为。

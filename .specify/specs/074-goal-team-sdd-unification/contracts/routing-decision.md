@@ -1,4 +1,4 @@
-<!-- merged from 074a-authorized-routing (source: .specify/specs/074a-authorized-routing/contracts/routing-decision.md) -->
+<!-- merged from 074a-authorized-routing (source: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/contracts/routing-decision.md) -->
 
 # Contracts: Deterministic routing decision (C-001…C-014)
 

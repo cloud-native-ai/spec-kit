@@ -273,7 +273,7 @@ the canonical `**C-N**` form); `sync-mirrors.py --check` → exit 0, no drift;
 
 
 **Reading**: the slice's requirement entries come from
-`.specify/specs/074a-authorized-routing/requirements.md` § Parent Mapping (parent FR-001–FR-019 plus
+`.specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/requirements.md` § Parent Mapping (parent FR-001–FR-019 plus
 parent FR 025, parent SC-001–SC-004 / SC 006 / SC 007, parent STR-001–STR-009 / STR 011). The parent
 design at `.specify/specs/074-goal-team-sdd-unification/` is the design authority: every slice clause is
 a projection of the parent clause named in its `父 C-nn` tag, and the parent contract file is recorded
@@ -426,7 +426,7 @@ re-derived here; each entry records what changed in the design and why.
 
 
 **Reading**: this slice's requirement entries come from
-`.specify/specs/074b-nested-governance/requirements.md` § Parent Mapping (parent FR 020–024 and
+`.specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/requirements.md` § Parent Mapping (parent FR 020–024 and
 parent FR 026–028; parent SC 005 and parent SC 008; parent STR 001–003 and STR 007–010). The parent
 design at `.specify/specs/074-goal-team-sdd-unification/` is the design authority: every projected
 clause names the parent clause in its `parent C-nn` tag, and the parent contract file is recorded here
@@ -512,13 +512,13 @@ each, in the same order.
 
 **E3 stage-status row (targeted evidence)** — `stage=plan`, `row_type=stage-status`, `status=ran`,
 `selection_basis=targeted-set-v1` (19 files, `test-evidence/targeted-set-v1-baseline.txt`),
-`changed_paths[]=.specify/specs/074b-nested-governance/{plan.md,research.md,data-model.md,contracts/*.md,quickstart.md,feature-ref.md,test-evidence/*}`,
-`evidence_ptr=.specify/specs/074b-nested-governance/test-evidence/targeted-set-v1-baseline.txt`.
+`changed_paths[]=.specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/{plan.md,research.md,data-model.md,contracts/*.md,quickstart.md,feature-ref.md,test-evidence/*}`,
+`evidence_ptr=.specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/test-evidence/targeted-set-v1-baseline.txt`.
 
 **Full-suite row (docs-only, six reduced fields per
 `.specify/skills/sdd-loop-driver/references/efficiency-model.md`)** — `stage=plan`,
 `row_type=stage-status`, `status=not-run-docs-only`, `selection_basis=no executable surface changed by
 this stage (design artifacts only), so the full suite has no new subject`,
-`changed_paths[]=.specify/specs/074b-nested-governance/** (markdown only)`,
-`evidence_ptr=.specify/specs/074b-nested-governance/test-evidence/plan-stage-checks.md`. Run fields do
+`changed_paths[]=.specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/** (markdown only)`,
+`evidence_ptr=.specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/test-evidence/plan-stage-checks.md`. Run fields do
 not apply and are not reported as `unknown`.

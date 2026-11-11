@@ -1,4 +1,4 @@
-<!-- merged from 074a-authorized-routing (source: .specify/specs/074a-authorized-routing/contracts/bootstrap-and-maintenance.md) -->
+<!-- merged from 074a-authorized-routing (source: .specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/contracts/bootstrap-and-maintenance.md) -->
 
 # Contracts: Bootstrap and maintenance classification (C-001…C-004)
 

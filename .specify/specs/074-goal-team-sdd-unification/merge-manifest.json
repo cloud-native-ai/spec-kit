@@ -348,8 +348,8 @@
       "pointer": {
         "kind": "pointer-view",
         "paths": [
-          ".specify/specs/074a-authorized-routing/verification.md",
-          ".specify/specs/074b-nested-governance/verification.md"
+          ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/verification.md",
+          ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/verification.md"
         ]
       },
       "pointer_view": true,
@@ -377,8 +377,8 @@
       "pointer": {
         "kind": "pointer-view",
         "paths": [
-          ".specify/specs/074a-authorized-routing/review.md",
-          ".specify/specs/074b-nested-governance/review.md"
+          ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/review.md",
+          ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/review.md"
         ]
       },
       "pointer_view": true,
@@ -406,8 +406,8 @@
       "pointer": {
         "kind": "pointer-view",
         "paths": [
-          ".specify/specs/074a-authorized-routing/code-review.md",
-          ".specify/specs/074b-nested-governance/code-review.md"
+          ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/code-review.md",
+          ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/code-review.md"
         ]
       },
       "pointer_view": true,
@@ -1546,13 +1546,12 @@
     "open_rows": 0
   },
   "conflicts": [],
-  "digest": "sha256:a43c954dac989b5768405bf1255a0555aac334869051a382d4a233b81e00ce7b",
   "dispositions": [
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1567,8 +1566,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1583,8 +1582,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1599,8 +1598,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1615,8 +1614,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1631,8 +1630,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1647,8 +1646,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1663,8 +1662,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1679,8 +1678,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1695,8 +1694,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1711,8 +1710,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1727,8 +1726,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1743,8 +1742,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1759,8 +1758,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1775,8 +1774,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1791,8 +1790,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1807,8 +1806,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1823,8 +1822,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1839,8 +1838,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1855,8 +1854,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1871,8 +1870,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1887,8 +1886,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1903,8 +1902,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1919,8 +1918,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1935,8 +1934,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1951,8 +1950,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1967,8 +1966,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1983,8 +1982,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -1999,8 +1998,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2015,8 +2014,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2031,8 +2030,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2047,8 +2046,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2063,8 +2062,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2079,8 +2078,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2095,8 +2094,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2111,8 +2110,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2127,8 +2126,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2143,8 +2142,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2159,8 +2158,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2175,8 +2174,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2191,8 +2190,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2207,8 +2206,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2223,8 +2222,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2239,8 +2238,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2255,8 +2254,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2271,8 +2270,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2287,8 +2286,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2303,8 +2302,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2319,8 +2318,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2335,8 +2334,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2351,8 +2350,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2367,8 +2366,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2383,8 +2382,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2399,8 +2398,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2415,8 +2414,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2431,8 +2430,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2447,8 +2446,8 @@
     {
       "disposition": "supersede",
       "evidence": [
-        ".specify/specs/074a-authorized-routing/tasks.md",
-        ".specify/specs/074b-nested-governance/tasks.md"
+        ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
+        ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md"
       ],
       "guard_status": "replaced",
       "superseded": {
@@ -2483,7 +2482,7 @@
     },
     {
       "disposition": "fr-027-adjudication",
-      "evidence": ".specify/specs/074b-nested-governance/review.md:115-136",
+      "evidence": ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/review.md:115-136",
       "item": "FR-027(d)",
       "reason": "074b review P0 F1 carries a driver-recorded waiver only (C-044 does not count it); no fix evidence: scripts/bash/common.sh:86 still uses ^[0-9]+- and the latest-directory fallback; no user-authored waiver on both carriers",
       "status": "blocked"
@@ -3754,7 +3753,7 @@
   "schema_version": 1,
   "slices": [
     {
-      "carrier_tasks": ".specify/specs/074a-authorized-routing/tasks.md",
+      "carrier_tasks": ".specify/specs/074-goal-team-sdd-unification/slices/074a-authorized-routing/tasks.md",
       "order": 1,
       "order_basis": "split-record",
       "order_source": ".specify/state/074-goal-team-sdd-unification.md#拆分记录.proposed_slices",
@@ -3762,7 +3761,7 @@
       "slug": "074a-authorized-routing"
     },
     {
-      "carrier_tasks": ".specify/specs/074b-nested-governance/tasks.md",
+      "carrier_tasks": ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/tasks.md",
       "order": 2,
       "order_basis": "split-record",
       "order_source": ".specify/state/074-goal-team-sdd-unification.md#拆分记录.proposed_slices",
@@ -3770,5 +3769,6 @@
       "slug": "074b-nested-governance"
     }
   ],
-  "spec": "074-goal-team-sdd-unification"
+  "spec": "074-goal-team-sdd-unification",
+  "digest": "sha256:af1421a58db0caae592ed05b10272db725f35248d9be9bc798ced912d1e7d660"
 }
