@@ -5,7 +5,7 @@
 **Description**: 按 review 结论封装 spec；`Sealed` 是 `Ready for Review` 之后的终态与归档准入状态；承载分片同名输出件的合并回写（split + merge-back）。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-11（100 clarify：follow-up spec `100-seal-slice-archive` 经 `/speckit.clarify` Mode A 绑定本 Feature；099 状态保持 `Ready for Review`；见 § Related Specifications/Requirements）
+**Last Updated**: 2026-11-11（100 plan：follow-up spec `100-seal-slice-archive` 经 `/speckit.plan` 产出 plan.md / research.md / data-model.md / 3 份契约（40 条款）/ quickstart.md / feature-ref.md；22 项 Constitution 全 Pass、6 条 decision-tension、11 条 Execution Premise 全 verified、Dependency set none、8 个工作包；plan 门禁 pre-analyze pass（errors=0）、validate-decision-tensions ok（6 records）、decomposition proceed、overlap adjudicated（099 绑定增量）；099 状态保持 `Ready for Review`；见 § Related Specifications/Requirements）
 
 ## Overview
 
@@ -69,6 +69,7 @@ split + merge 回写流程，所有同名输出件走同一条确定性流程，
 
 - `.specify/specs/099-speckit-seal/requirements.md` — 本 Feature 的主规格（seal 与 merge-back）。
 - `.specify/specs/100-seal-slice-archive/requirements.md` — follow-up 规格（2026-11-11 `/speckit.clarify` Mode A 绑定；不新建命令/引擎）。绑定理由：它承接 099 C-019 明确延后的「分片承载物后续处置」复核，把归档步骤固化进既有 `/speckit.seal` 三件产物，并原地扩展 C-001 动作集、C-008 写面与 C-035 边界；099 状态保持 `Ready for Review`。
+- `.specify/specs/100-seal-slice-archive/plan.md`（+ `research.md` / `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md`）— 2026-11-11 `/speckit.plan` 产出的设计产物面；动作集四→六、归档清单 schema、载体分类与解析定义、074 回合计划。本 Feature 的契约条款在同批实现变更中原地修订（C-001 / C-008 / C-019 / C-023 / C-035 / C-036）。
 
 ## Future Evolution Suggestions
 
