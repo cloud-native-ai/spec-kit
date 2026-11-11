@@ -3,11 +3,12 @@
 **Feature**: 099-speckit-seal | **Date**: 2026-11-10 | **Plan**: [plan.md](../plan.md)
 **Owns**: `scripts/python/seal-utils.py` 的动作封闭集、调用面、退出码语义、两阶段写入与写面边界。
 
-**C-001** — 动作集合恰好四个，且不存在第五个。
+**C-001** — 动作集合恰好六个，且不存在第七个。
 
-引擎的 `--action` 取值封闭为 `merge-plan`、`merge-apply`、`seal`、`archive-gate`。`merge-plan` 与
-`archive-gate` 是只读动作（零写盘）；`merge-apply` 与 `seal` 是写动作。未声明的动作以退出码 `2`
-拒绝并回显动作名。
+引擎的 `--action` 取值封闭为 `merge-plan`、`merge-apply`、`seal`、`archive-gate`、`archive-plan`、
+`archive-apply`（后两者由 `100-seal-slice-archive` 原地扩展；本条款仍是动作集的唯一 owner，MUST NOT
+在别处出现第二份动作表）。`merge-plan`、`archive-gate` 与 `archive-plan` 是只读动作（零写盘）；
+`merge-apply`、`seal` 与 `archive-apply` 是写动作。未声明的动作以退出码 `2` 拒绝并回显动作名。
 
 (FR-021)
 
@@ -63,8 +64,12 @@ MUST 以原字节恢复本批已写文件并以 `2` 结束；MUST NOT 留下可�
 **C-008** — 写面封闭且可静态审计。
 
 引擎的写动作封顶为：父 spec 目录内的合并产物与两份记录文件；分片 `requirements.md` 的一行
-`**Merged into**` 标注；FR-016 记录过解决方式的出厂文档引用修正。动作表 MUST NOT 含移动、删除、
-归档、`git push` 或调度循环。静态审计以引擎源码中的写路径白名单为准，审计脚本/测试转红即违反。
+`**Merged into**` 标注；FR-016 记录过解决方式的出厂文档引用修正；`archive-apply` 的**唯一**移动——
+分片目录 → 所属父 spec 的 `slices/<原分片目录名>/`（`git mv` 语义，目的地 MUST 限于该子树），以及父 spec
+根的 `archive-manifest.json` 写入（schema owner：`100-seal-slice-archive` 的
+`contracts/archive-manifest.contract.md`）。动作表 MUST NOT 含删除、`git push` 或调度循环；移动动作恰为
+`archive-apply` 一个，MUST NOT 写或移入 `.specify/archive/`。静态审计以引擎源码中的写路径白名单为准，
+审计脚本/测试转红即违反。
 
 (FR-020, FR-024)
 

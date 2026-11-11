@@ -1,0 +1,76 @@
+# T036 (P5) — owner 原地修订 · C-113（FR-002, FR-020, FR-023）
+# date: 2026-11-11 | worktree: .specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive
+
+## Pre-change readings (2026-11-11T12:50:45+08:00)
+# python3 scripts/python/sync-mirrors.py --check
+DIFF .specify/templates/gitignore-specify-template   <- pre-existing, outside this feature's write face (tasks.md Notes 6)
+ok    shared/ == .specify/shared/ (113 files, byte-identical)
+# git status --porcelain: (empty)
+# sha256 (pre):
+7ec75e129a8a977a5a0b7751062f49d59cc98973fb1fef51cb5c8f86514a21a2  shared/definitions/non-disposable-definitions.md (+ mirror)
+a63c1af21c6ba4715a8e1337620fc9724f4be512f13cabbefed54e6871ea97fb  shared/definitions/framework-map.md (+ mirror)
+6421e01507c16839fe8b84cbc9ee6495fb6593609e929ff5b878116eba37be29  .specify/specs/099-speckit-seal/contracts/seal-engine.contract.md
+e9962da5b7f5cb134ca85adfe55a0f438802faef1e98890aeac34bca14980b96  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md
+9532d8bc15d77b2e342d0ac207fa1eb83c8f858b0bf6503db652a63e3f23bc71  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md
+
+## Revised in place (no new clause, no fifth disposition value, no second vocabulary)
+- shared/definitions/non-disposable-definitions.md § Disposition Set — `archive` destination expanded to the
+  closed two-form: retirement `.specify/archive/` | slice archive `<parent spec>/slices/<original dir name>/`.
+  Four-value set unchanged (archive / supersede / correct / exempt); § Disposition Bridge and the unique
+  adjudication rule untouched.
+- shared/definitions/non-disposable-definitions.md § Disposal Pathways — new subsection records the slice
+  disposal record = the parent spec's `archive-manifest.json`, per-slice `{from, to}` rows; manifest schema
+  reached by pointer to `.specify/specs/100-seal-slice-archive/contracts/archive-manifest.contract.md`.
+- shared/definitions/framework-map.md — Feature specs row registers `slices/<slice-dir>/` as data inside the
+  parent spec (never a spec candidate; move + record owned by `/speckit.seal`'s `archive-apply` and the
+  parent's `archive-manifest.json`).
+- 099 seal-engine.contract.md C-001 — action set four → six (`merge-plan`, `merge-apply`, `seal`,
+  `archive-gate`, `archive-plan`, `archive-apply`; read-only 3 / write 3; C-001 stays the sole owner).
+- 099 seal-engine.contract.md C-008 — the sole move action is `archive-apply`, destination limited to
+  `<parent>/slices/`; writes the parent's `archive-manifest.json`; no delete / push / scheduler; MUST NOT
+  write or move into `.specify/archive/`.
+- 099 merge-back.contract.md C-019 — slice disposition is decided as non-disposable `archive`; record =
+  `archive-manifest.json` per-slice rows; no silent retention, no second retention/retirement ledger.
+- 099 merge-back.contract.md C-023 — kept: `merge-apply` stays a pure merge; slice archival is the separate
+  `archive-apply` action and MUST NOT be folded in.
+- 099 records-and-boundaries.contract.md C-035 — retirement semantics clarified: retire lanes stay with
+  `/speckit.sanitize` (and docs); slice archival is a parent-local move owned by seal, is not retirement,
+  and does not query `archive-gate`.
+- 099 records-and-boundaries.contract.md C-036 — kept: slice archival is not a second archive mechanism
+  (reuses the non-disposable `archive` value; parent-local move; no shared mutable aggregate).
+
+## Mirror projection
+# python3 scripts/python/sync-mirrors.py --write
+sync shared/ -> .specify/shared/ (2 files)
+# python3 scripts/python/sync-mirrors.py --check (post)
+ok shared/ == .specify/shared/ (113 files, byte-identical)
+# BYPRODUCT DISCLOSURE: the mandated --write also synced the pre-existing drifted pair
+# `.specify/templates/gitignore-specify-template` (DIFF recorded above; outside the write face; Notes 6 =
+# 不修、不掩). The change is left UNCOMMITTED and is NOT part of this package's commit. The touched mirror
+# pairs (`shared/`) show zero new drift.
+
+## Post-change sha256 (source and mirror byte-identical)
+e26b8bfe35748b8c7a0a5266fe3f130899d0b0685dd17839cb9ee913033bdb61  shared/definitions/non-disposable-definitions.md (+ mirror)
+3ddf102a149bc7e52098cf6df45aff909a433590227b8ab956494ffc55b278b3  shared/definitions/framework-map.md (+ mirror)
+5970a5de22d6d1d3a449f6eee17aad5448947280e57c102cd3f9326bddc07e47  .specify/specs/099-speckit-seal/contracts/seal-engine.contract.md
+b722cab732ced29fc0f06a652046863b64ce2ae3ef8c9ab8456f98a1fd7a2f69  .specify/specs/099-speckit-seal/contracts/merge-back.contract.md
+c8ce9d02ee440bde6f81728d06f50d1257080badb06ad96966dee113551389a5  .specify/specs/099-speckit-seal/contracts/records-and-boundaries.contract.md
+
+## Acceptance re-reads
+dispositions read from the owner page: ['archive', 'supersede', 'correct', 'exempt'], count = 4
+framework-map Feature specs row carries `slices/<slice-dir>/`: True
+
+## Tests
+# bash scripts/bash/run-tests.sh tests/contract/test_non_disposable_contract.py tests/contract/test_framework_map_archive_row.py tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_non_disposable_seam_bypass.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+4 failed, 113 passed in 37.81s
+# The four failures are exactly the pre-existing baseline recorded in test-evidence/p4-regression.txt
+# (P8/T034 owns updating those 099-era guards for the now-six-action engine):
+FAILED tests/contract/test_seal_boundaries.py::test_the_directory_registry_difference_is_fully_classified
+FAILED tests/contract/test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source
+FAILED tests/contract/test_seal_boundaries.py::test_the_engine_shells_out_only_read_only_git_verbs
+FAILED tests/contract/test_seal_boundaries.py::test_the_audit_report_is_complete_and_optionally_recorded
+# Zero new failures from this package.
+# Environmental note: an earlier run in P6's concurrent commit window additionally failed
+# test_t089_a_full_run_is_byte_identical_on_git_status because P6 wrote docs/reference/commands/seal.md and
+# tasks.md during that run; after P6 committed (be41fb2ec) the stable-tree rerun above passed it again.

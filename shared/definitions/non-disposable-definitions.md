@@ -278,13 +278,19 @@ A3 是承重的那一行：`090-re-anchoring` 的注册表行读 `Planned`，而
 
 | 处置 | 含义 | 落盘形态 |
 |------|------|---------|
-| `archive` | 移入 `.specify/archive/` 并留下指针 | 一次移动（`git mv` 语义），见 § Disposal Pathways |
+| `archive` | 移入目的地并留下指针；目的地是封闭二形：退休 → `.specify/archive/`；分片归档 → 所属父 spec 的 `slices/` | 一次移动（`git mv` 语义），见 § Disposal Pathways |
 | `supersede` | 由新载体承担；旧载体被标记为被取代并指向新载体 | 旧文本保留 + 标记 + 指针，见 § Supersede Protocol |
 | `correct` | 就地修正正文 | 正文编辑 + 前后读数 |
 | `exempt` | 显式豁免：写下理由 + 到期条件/复核时点 | 见 § Exemption |
 
 集合 MUST 只在本文档定义；引擎、命令模板、技能、契约 MUST 引用它，MUST NOT 内联第二份成员表。守卫 MUST
 通过本文档读出四个成员拼写，MUST NOT 从引擎或契约里的一个字面表读。
+
+**`archive` 的目的地是封闭二形**：退休 → `.specify/archive/`（归 `/speckit.sanitize` 的归档 lane）；
+分片归档 → 所属父 spec 的 `slices/<原分片目录名>/`（归 `/speckit.seal` 的 `archive-apply`）。目的地 MUST
+只取这两形，MUST NOT 出现第三个目的地；分片归档不是退休，MUST NOT 写入 `.specify/archive/`，退休归档也
+MUST NOT 被读作分片归档。四值集合不变：本次只原地扩展 `archive` 的目的地形态，MUST NOT 新增第五个处置值
+或第二份词表。
 
 ### 被拒绝的取值（C-302）
 
@@ -412,6 +418,14 @@ N 个互相无关的载体"的通道。
 在路由判定该移动无法仅凭记录逆转时取 `true`，其余一律 `false`。
 
 **删除从来不是一种处置**（FR-034 iv）：本文档不提供删除通道；一个载体"不再有用"的结论，其正确出路是归档。
+
+### 分片归档的处置记录
+
+分片归档（目的地 = 所属父 spec 的 `slices/`，见 § Disposition Set）的处置记录是**所属父 spec 的
+`archive-manifest.json` 的逐片 `{from, to}` 行**：每个被归档的分片一行，`from` 为归档前的分片目录路径，
+`to` 为 `slices/` 内路径；清单每个父 spec 一份，与 `merge-manifest.json` 并列。MUST NOT 另建第二份处置
+记录，MUST NOT 在 `seal.md` 或其他回执里复述移动对；清单的字段集、摘要与校验义务由
+`100-seal-slice-archive` 的 `contracts/archive-manifest.contract.md` 拥有（按指针引用，本节不复述）。
 
 ## Supersede Protocol
 

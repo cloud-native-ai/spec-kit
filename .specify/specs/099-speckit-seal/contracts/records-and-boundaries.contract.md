@@ -32,15 +32,20 @@ JSON 的 sha256。`seal.md` MUST 只引用该文件，不复述其内容。
 
 `/speckit.feature`（`manage-features`）继续拥有注册表 reconcile 与声明语义；`/speckit.review` 继续拥有
 review 记录与裁决（seal 只读）；`/speckit.sanitize` 的归档 lane 与 `/speckit.docs` 的 docs lane 继续拥有
-归档/退休动作（seal 只提供 C-030 的准入查询）；`/speckit.goal` 的 `migrate-archive` 继续拥有 spec-local
-goal/team 树迁移（seal 不迁移、不删除）。seal MUST NOT 实现上述任一动作的第二份。
+**退休**归档/退休动作（seal 只提供 C-030 的准入查询）；`/speckit.goal` 的 `migrate-archive` 继续拥有
+spec-local goal/team 树迁移（seal 不迁移、不删除）。**分片归档不是退休**：它是父 spec 内的位置迁移，
+目的地限 `<父 spec>/slices/`，归 seal 的 `archive-apply`，不写 `.specify/archive/`、不查询 C-030 的
+`archive-gate`、不被任何退休入口复用。seal MUST NOT 实现上述任一退休动作的第二份。
 
 (FR-022)
 
 **C-036** — 零新增重复机制可静态核验。
 
 仓库 MUST NOT 因本特性新增：第二套状态机或值域、第二份特性注册表或台账、第二个归档机制、调度器/守护进程、
-并行 spec 树。封装记录与合并清单 MUST 按 spec 落单文件，MUST NOT 引入共享可变聚合。核验以三重证据：
+并行 spec 树。**分片归档不构成第二个归档机制**：它复用 non-disposable 处置集的既有 `archive` 值（owner 页为
+`shared/definitions/non-disposable-definitions.md` § Disposition Set / § Disposal Pathways），只做父 spec 内的
+位置迁移并以父 spec 的 `archive-manifest.json` 记录；退休归档仍独归 `/speckit.sanitize` 的归档 lane，两者不
+互相复用、不共享台账。封装记录与归档清单 MUST 按 spec 落单文件，MUST NOT 引入共享可变聚合。核验以三重证据：
 状态 owner 的单一性（C-025 的静态检索）、引擎动作表（C-008）、目录/注册表清单的差异审计。
 
 (FR-024, SC-008)
