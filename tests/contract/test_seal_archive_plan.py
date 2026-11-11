@@ -365,6 +365,25 @@ def test_reference_matrix_classifies_live_and_dated_carriers(tmp_path):
                 "C-306/C-308: dated records keep their bytes"
             )
 
+    loose = by_carrier[SPEC_REL + "/test-evidence/loose-forms.txt"]
+    assert [row["line"] for row in loose] == [2, 3, 4], (
+        "C-302: absolute-prefixed, `../`-prefixed and dangling-tail hits in a "
+        "dated carrier each get one ledger row"
+    )
+    assert all(row["kind"] == "dated-preserved" and row["before"] == row["after"]
+               for row in loose), (
+        "C-302/C-306: a dated carrier's out-of-shape source paths never rewrite "
+        "and never fail as unclassified"
+    )
+    split = by_carrier[SPEC_REL + "/test-evidence/split-forms.txt"]
+    assert [row["line"] for row in split] == [2], (
+        "C-302: a cross-line occurrence gets one carrier-level dated row at the "
+        "line where the join starts"
+    )
+    assert split[0]["kind"] == "dated-preserved"
+    assert split[0]["before"] == split[0]["after"]
+    assert split[0]["before"].endswith(".specify/specs/100b")
+
     assert SPEC_REL + "/seal.md" not in by_carrier, (
         "C-303: the parent seal.md is owned by seal and MUST NOT be rewritten"
     )
@@ -413,6 +432,23 @@ def test_unclassified_carrier_refuses_before_any_write(tmp_path):
         "C-305: the out-of-roster carrier is named with its line"
     )
     assert _snapshot(repo) == before
+
+
+def test_live_carrier_with_an_absolute_prefix_path_stays_unclassified(tmp_path):
+    repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+    _init_git(repo)
+    register = repo / ".specify" / "register.md"
+    register.write_text(
+        register.read_text(encoding="utf-8")
+        + "- Absolute: `/abs/workspace/.specify/specs/%s/plan.md`\n" % ALPHA,
+        encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-qm", "inject an absolute live reference")
+    proc, payload = _run_plan(repo)
+    assert proc.returncode == 1, payload.get("conditions")
+    assert "unclassified-reference" in _codes(payload), (
+        "C-302(i): an out-of-shape source path in a live carrier stays fail closed"
+    )
 
 
 def test_injected_dangling_live_reference_refuses_unresolved(tmp_path):

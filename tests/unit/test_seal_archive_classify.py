@@ -122,6 +122,17 @@ def test_loose_source_forms_flag_absolute_dotdot_and_rewritten_shapes(eng):
         SLUGS) == [], "the archived path is not a source-path form"
 
 
+def test_loose_source_hits_carry_the_slice_they_attribute_to(eng):
+    hits = eng.loose_source_hits(
+        "See /abs/.specify/specs/%s/plan.md and ../%s/tasks.md" % (ALPHA, BETA),
+        SLUGS)
+    assert [(hit["slug"], hit["form"]) for hit in hits] == [
+        (ALPHA, ".specify/specs/%s" % ALPHA), (BETA, "../%s" % BETA)]
+    assert eng.loose_source_hits(
+        "Archived .specify/specs/%s/slices/%s/plan.md" % (PARENT, ALPHA),
+        SLUGS) == [], "the archived path is not a source-path form"
+
+
 def test_carrier_kind_uses_the_closed_roster(eng):
     assert eng.archive_carrier_kind(PARENT_REL + "/plan.md", PARENT, SLUGS) == "live"
     assert eng.archive_carrier_kind(PARENT_REL + "/contracts/core.md", PARENT,

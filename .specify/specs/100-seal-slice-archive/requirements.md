@@ -101,8 +101,9 @@
 - **源与目标都不存在**：合并清单声称的分片在树上找不到：`slice-missing` 输入缺陷（退出 `2`）。
 - **归档后再次运行 merge-plan / merge-apply / seal**：按 FR-019 的 manifest-aware 发现规则执行；`merge-apply` 幂等成功且零写入，seal 的 P0 / 闭合清单与归档前逐条一致。
 - **运行期 line registry 缺失**：worktree 中 `.specify/state/` 不可见时记 `absent`，不阻断；主仓可见时更新并留痕。
-- **日期化记录引用旧路径**：保持原字节，经 `from → to` 映射解析；不得为了「看起来干净」改写它们。
+- **日期化记录引用旧路径**：保持原字节，经 `from → to` 映射解析——绝对路径前缀、`../` 前缀与跨行拼接同样按此处理，解析落在前缀层（记录尾部所指文件不要求存在）；不得为了「看起来干净」改写它们。
 - **活引用位于未声明的载体**：`unclassified-reference` 阻断，先把它纳入契约的载体封闭集或修掉，再重跑。
+- **形状外引用按载体类分流**：同一个绝对路径 / `../` / 跨行拼接形态，在 live 载体中 → `unclassified-reference` 阻断；在 dated 载体中 → `dated-preserved` 零改写，不阻断。
 - **移动中途失败**：按原字节恢复已移动目录与已改写文件，退出 `2`；不得留下半归档状态。
 - **非 git 工作树**：无法满足 `git mv` 语义时退出 `2` 并点名原因；不得退化为普通 `mv`。
 - **同一 spec 并发归档**：后到者读到归档清单即走 `already-archived`；不得产生第二份清单或重复移动。
@@ -123,7 +124,7 @@
 - **FR-009**: `archive-apply`（[[STR-004]]）MUST 两阶段执行：先在只读阶段重算与 `archive-plan` 相同的完整计划，只有阻断数为 0 才进入写入；写入 MUST 按批次执行并在失败时按原字节恢复已移动目录与已改写文件，以 `2` 结束，MUST NOT 留下可被读作半归档的状态。拒绝（`1`）MUST 零持久化写入，报告只经 stdout，MUST NOT 创建拒绝记录或第二份台账；同输入重跑 MUST 复现同一阻断清单（顺序稳定）。
 - **FR-010**: 已归档是幂等成功，不是拒绝：当归档清单存在、可解析并通过 schema 校验、每个分片位于目标且源侧不存在时，`archive-apply` MUST 以 `0` 退出并具名报告 `already-archived`（[[STR-005]]），不产生第二份清单、不重复移动、不重复改写引用；`archive-plan` 重跑 MUST 以同一 `already-archived` 结论报告零待移动、零未解析。清单存在但不可解析或 schema 不符 MUST 按输入缺陷以 `2`（`archive-manifest-invalid`）退出，不得读作 `already-archived`。该已归档判定 MUST 先于 FR-006 的干净树前置求值（本流程自身产物不算「流程之外」的改动）。
 - **FR-011**: 回滚 MUST 可执行且被文档化：归档清单 MUST 携带恢复所需的全部事实（逐片 `from` / `to`、逐文件哈希、逐条引用的 `before` / `after`）；契约与 quickstart MUST 给出确定性的恢复步骤（逆移动 + 逆向引用改写 + 移除清单）。MUST NOT 新增回滚动作或第二个回滚引擎；按文档步骤执行后树 MUST 与归档前逐字节一致，并由测试夹具证明。
-- **FR-012**: 引用分类 MUST 是确定性的封闭判定：每条**命中** MUST 落入 `live-rewrite`（当前指针）/ `dated-preserved`（日期化记录）二值之一；每个被声明的运行期 line registry 载体 MUST 各记一条 `runtime-updated`（存在并更新）或 `absent`（缺席）。载体名册与扫描根 MUST 是封闭集，owner MUST 在本特性的契约中声明；分类 MUST 只依据路径、行前缀、章节边界或文件谓词，MUST NOT 依赖模型对语义的转述判断。任何落在封闭集之外、却仍指向旧分片路径的命中 MUST 成为 `unclassified-reference` 阻断（fail closed）。
+- **FR-012**: 引用分类 MUST 是确定性的封闭判定：每条**命中** MUST 落入 `live-rewrite`（当前指针）/ `dated-preserved`（日期化记录）二值之一；每个被声明的运行期 line registry 载体 MUST 各记一条 `runtime-updated`（存在并更新）或 `absent`（缺席）。载体名册与扫描根 MUST 是封闭集，owner MUST 在本特性的契约中声明；分类 MUST 只依据路径、行前缀、章节边界或文件谓词，MUST NOT 依赖模型对语义的转述判断。任何落在封闭集之外、却仍指向旧分片路径的命中 MUST 成为 `unclassified-reference` 阻断（fail closed）。载体类决定形状外命中的去向：**live 载体**中的形状外旧分片路径 MUST 成为 `unclassified-reference`；**dated 载体**中的同一命中（含绝对路径前缀、`../` 前缀与跨行拼接）MUST 按 `dated-preserved` 保持原字节并经 `from → to` 映射解析，MUST NOT 阻断。
 - **FR-013**: **活引用** MUST 在同一 apply 批次内被改写为归档路径。必须覆盖的载体下限为：`.specify/register.md` 的推荐行、特性详情的活指针区、父 spec 的 `plan.md` / `research.md` / `quickstart.md` / `tasks.md` / `verification.md` / `review.md` / `code-review.md` / `feature-ref.md` / `contracts/`、父 `merge-manifest.json` 的路径字段、框架 owner 文档与其 `.specify/` 镜像、以及硬编码分片路径的测试文件。每条改写 MUST 在清单中有 `before` / `after` / `carrier` / `line` 记录。
 - **FR-014**: **日期化记录** MUST 保持原字节不变：至少包括分片内部全部文件、`.specify/memory/**`、`.specify/history/**`、`features.md` 的日期化 Last Updated 叙述、特性详情的时间线章节。它们的旧分片路径 MUST 只经 `archive-manifest.json`（[[STR-002]]）的 `from → to` 前缀映射解析；运行前后哈希 MUST 一致。父 `tasks.md` 的 `> superseded` 拆分账是**当前合并账**，按活引用处理（改路径、不改历史事实）。
 - **FR-015**: 「未解析引用 = 0」MUST 有唯一定义并 fail closed：一条引用被判定为已解析，当且仅当 (a) 其目标路径在树上存在，或 (b) 它是日期化记录中的旧分片路径且该前缀命中归档清单的 `from → to` 映射并落到存在的归档路径。`archive-plan` MUST 报告未解析数；`archive-apply` MUST 在未解析数大于 0 时拒绝；apply 成功后复验 MUST 仍为 0。检查 MUST 覆盖契约声明的扫描根，MUST NOT 只抽查已知载体。

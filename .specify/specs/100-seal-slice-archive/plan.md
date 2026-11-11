@@ -111,7 +111,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 
 ### T-005 — 活引用改写出引擎执行，限定封闭文本形态
 
-- **decision**: 活引用改写由引擎按声明形态（spec-root 全路径、父 spec 内相对路径、`tests/**` 路径构造行上的 slug 字面量）做确定性替换；形态之外的命中一律 `unclassified-reference` 阻断，不改由代理临场手改。（FR-012、FR-013）
+- **decision**: 活引用改写由引擎按声明形态（spec-root 全路径、父 spec 内相对路径、`tests/**` 路径构造行上的 slug 字面量）做确定性替换；形态之外的命中在 **live 载体**一律 `unclassified-reference` 阻断，在 **dated 载体**按 C-302 计 `dated-preserved` 零改写（载体类收敛，2026-11-11 P7b 修订）；不改由代理临场手改。（FR-012、FR-013）
 - **antithesis**: 由代理按 `archive-plan` 的编辑清单逐条手工改写，覆盖代码构造、缩写与不常见载体；当「载体少而异质、且需要理解上下文才能安全改写」时它更优——不受文本形态限制，一次能处理任意写法。
 - **binding_constraints**:
   - pole_a: 同输入必须产生逐字节一致的引用台账与改写结果，重跑零 diff（确定性、幂等）。
@@ -119,6 +119,7 @@ Owner of the record shape, admissibility, rejection forms and the load-bearing t
 - **discriminating_evidence**: 对含三类形态的夹具连跑两次 `archive-plan` 与 `archive-apply`，并注入一条第四形态命中。结果二值：两次清单逐字节一致、重跑零 diff、第四形态被 `unclassified-reference` 阻断 / 任一项不成立。
 - **expected_sacrifice**: SC-006 Source ↓ 遇到未声明的引用形态时流程 fail closed 停下，需先把形态纳入契约再重跑。
 - **revision_trigger**: 连续两个真实回合出现「同一类引用形态被反复判为 unclassified」≥2 次 → 重开，把该形态纳入封闭集并补变异腿。
+- **revision (2026-11-11, P7b, owner ruling)**: 074 真实回合以同一类形状（绝对路径前缀、`../` 前缀、跨行拼接）触发 61 条 `unclassified-reference` 后，owner 裁定按载体类收敛——dated 载体的形状外旧分片路径改计 `dated-preserved`（零改写、经映射解析），live 载体保持 fail closed；变异腿见 `tests/contract/test_seal_archive_plan.py`（reference-matrix 的 dated loose-forms 载体）与 `tests/contract/test_seal_archive_apply.py`。
 
 ### T-006 — 归档后分片发现先读归档清单
 
