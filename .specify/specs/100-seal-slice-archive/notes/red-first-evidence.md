@@ -500,3 +500,34 @@ FAILED tests/integration/test_seal_074_round.py::test_c112_merge_apply_after_arc
 FAILED tests/integration/test_seal_074_round.py::test_c112_seal_judgment_survives_the_archive
 9 failed, 24 passed in 6.52s
 ```
+
+---
+
+## T010/T012/T023/T024/T027/T029/T030 红先 — archive-plan 前置、分类与清单（P3，15 行包）
+
+- **采集点**: 2026-11-11 · worktree `100-seal-slice-archive` · 引擎已回退到 P2 提交 `efe5f4d3f` 的版本（sha256 `e7d45cc52e68b031e0f8d0ff038a55b839d9f8de90983e68c40773eb64c69b76`）· 六套夹具（T011/T022）与最终测试文件已落盘
+- **命令（verbatim）**: `bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/unit/test_seal_archive_classify.py tests/unit/test_seal_archive_manifest_math.py tests/unit/test_seal_archive_schema.py tests/contract/test_seal_merge_apply.py -q`
+- **退出码**: `1` — `63 failed, 18 passed`（63 条红 = 新增契约/单元断言 + C-211 扩写；18 条绿 = merge-apply 既有回归与不依赖新符号的用例）
+- **完整 stdout/stderr（verbatim）**: 全量 96 KB 读数存 `test-evidence/p3-red-first.txt`（sha256 `a13b14233c16098c77e933104385ba3dc283e4be7903cd639f0dc455968c6bec`），此处不复写；头部与结尾 verbatim：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/unit/test_seal_archive_classify.py tests/unit/test_seal_archive_manifest_math.py tests/unit/test_seal_archive_schema.py tests/contract/test_seal_merge_apply.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..F...........FF.FFFFFFFF.FFFFFFFFF. [ 88%]
+FFFFFFF..                                                                [100%]
+=================================== FAILURES ===================================
+...
+FAILED tests/contract/test_seal_archive_manifest.py::test_c207_digest_is_the_c034_algorithm
+FAILED tests/contract/test_seal_archive_manifest.py::test_sc007_delete_a_ledger_row_turns_the_arithmetic_red
+FAILED tests/contract/test_seal_archive_manifest.py::test_c209_unknown_or_missing_fields_refuse_at_every_level
+FAILED tests/contract/test_seal_archive_manifest.py::test_c212_schema_version_is_one_and_higher_versions_refuse
+FAILED tests/contract/test_seal_archive_manifest.py::test_same_input_twice_is_byte_identical
+63 failed, 18 passed, 576 warnings in 6.41s
+```
+
+- **红因分类**: `archive-plan` 仍指向 `_pending`（无 `outcome`/`archive` 负载）；分类/摘要/校验/修订符号不存在（`AttributeError`）；C-211 修订函数未实现。夹具与测试文件本身无导入错误——红来自行为缺失，不是拼写。
+- **测试文件哈希（红时定稿字节）**: plan `304df745…`；manifest `f48cfc5d…`；merge_apply `394ff922…`；classify `725f5bc7…`；manifest_math `cdc7911b…`；schema `1adc8f07…`。
+- **转绿读数**: `test-evidence/p3-green.txt`（`81 passed`，exit 0）与 `test-evidence/p3-regression.txt`（`119 passed / 3 failed`，3 条均为 P2 § 4 已记录的既有基线行）。

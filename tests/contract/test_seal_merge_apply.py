@@ -21,6 +21,7 @@ reading lives in ``.specify/specs/099-speckit-seal/notes/red-first-evidence.md``
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import re
 import shutil
@@ -590,3 +591,107 @@ def test_factory_doc_reference_is_repointed_and_recorded(tmp_path):
     slice_requirements = (_spec(repo, "099a-fixture-fd") / "requirements.md").read_text(
         encoding="utf-8")
     assert slice_requirements.count("**Merged into**:") == 1
+
+
+# ---------------------------------------------------------------------------
+# C-211 (Feature 100) — the parent merge manifest's path-form amendment
+# ---------------------------------------------------------------------------
+
+def _load_engine():
+    spec = importlib.util.spec_from_file_location("seal_utils_merge_apply_amend", ENGINE)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture(scope="module")
+def eng():
+    return _load_engine()
+
+
+def _pairs():
+    return [
+        {"slug": ALPHA, "from": ".specify/specs/%s" % ALPHA,
+         "to": ".specify/specs/%s/slices/%s" % (PARENT, ALPHA)},
+        {"slug": BETA, "from": ".specify/specs/%s" % BETA,
+         "to": ".specify/specs/%s/slices/%s" % (PARENT, BETA)},
+    ]
+
+
+def test_c211_whole_path_values_are_amended_everywhere(eng):
+    document = {
+        "schema_version": 1,
+        "spec": PARENT,
+        "merge": {"status": "merged"},
+        "conflicts": [],
+        "slices": [{"slug": ALPHA,
+                    "carrier_tasks": ".specify/specs/%s/tasks.md" % ALPHA,
+                    "retention": "pending-review"}],
+        "dispositions": [{"evidence": [".specify/specs/%s/verification.md" % BETA]}],
+        "artifacts": [{"pointer": {"paths": [".specify/specs/%s/plan.md" % ALPHA]}}],
+        "id_maps": {"FR": [{"slice": ALPHA, "parent_id": "FR-001"}]},
+        "checks": {"open_rows": 0},
+    }
+    result = eng.amended_merge_document(document, _pairs())
+    amended = result["document"]
+    assert amended["slices"][0]["carrier_tasks"] == (
+        ".specify/specs/%s/slices/%s/tasks.md" % (PARENT, ALPHA))
+    assert amended["dispositions"][0]["evidence"] == [
+        ".specify/specs/%s/slices/%s/verification.md" % (PARENT, BETA)]
+    assert amended["artifacts"][0]["pointer"]["paths"] == [
+        ".specify/specs/%s/slices/%s/plan.md" % (PARENT, ALPHA)]
+    assert amended["slices"][0]["slug"] == ALPHA, (
+        "C-211: bare slug values are identity, never path-form values"
+    )
+    assert amended["slices"][0]["retention"] == "pending-review"
+    assert amended["merge"] == {"status": "merged"}
+    assert amended["checks"] == {"open_rows": 0}
+    assert amended["id_maps"] == document["id_maps"]
+    assert {(row["before"], row["after"]) for row in result["amendments"]} == {
+        (".specify/specs/%s/tasks.md" % ALPHA,
+         ".specify/specs/%s/slices/%s/tasks.md" % (PARENT, ALPHA)),
+        (".specify/specs/%s/verification.md" % BETA,
+         ".specify/specs/%s/slices/%s/verification.md" % (PARENT, BETA)),
+        (".specify/specs/%s/plan.md" % ALPHA,
+         ".specify/specs/%s/slices/%s/plan.md" % (PARENT, ALPHA)),
+    }, "C-211: the matching set is the allowed difference set, enumerated in full"
+
+
+def test_c211_partial_and_longer_values_are_untouched(eng):
+    document = {
+        "merge": {"status": "merged"},
+        "slices": [{
+            "slug": ALPHA,
+            "carrier_tasks": ".specify/specs/%s/tasks.md" % ALPHA,
+            "note": "prefix .specify/specs/%s/tasks.md" % ALPHA,
+            "sibling": ".specify/specs/%s-extra/tasks.md" % ALPHA,
+            "slug_list": [ALPHA, BETA],
+        }],
+    }
+    result = eng.amended_merge_document(document, _pairs())
+    amended = result["document"]
+    assert amended["slices"][0]["note"] == "prefix .specify/specs/%s/tasks.md" % ALPHA
+    assert amended["slices"][0]["sibling"] == (
+        ".specify/specs/%s-extra/tasks.md" % ALPHA), (
+        "C-211: matching is a whole-value, path-segment-boundary operation"
+    )
+    assert amended["slices"][0]["slug_list"] == [ALPHA, BETA]
+    assert len(result["amendments"]) == 1
+
+
+def test_c211_digest_is_recomputed_and_recorded_before_and_after(eng):
+    document = {
+        "merge": {"status": "merged"},
+        "slices": [{"slug": BETA,
+                    "carrier_tasks": ".specify/specs/%s/tasks.md" % BETA}],
+    }
+    result = eng.amended_merge_document(document, _pairs())
+    before = eng.archive_manifest_digest(document)
+    after = eng.archive_manifest_digest(result["document"])
+    assert result["digest_before"] == before
+    assert result["digest_after"] == after
+    assert result["document"]["digest"] == after, (
+        "C-211/C-034: the amended manifest carries its recomputed digest"
+    )
+    assert after != before

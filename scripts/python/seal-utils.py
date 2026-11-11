@@ -189,6 +189,23 @@ def render(payload: Dict[str, Any], as_json: bool) -> None:
                                              gate["reason"]))
         print("  status: %s" % (gate["status"] if gate["status"] else "-"))
         print("  pointer: %s" % gate["pointer"])
+    archive = payload.get("archive")
+    if isinstance(archive, dict):
+        print("  outcome: %s" % (payload.get("outcome") or "-"))
+        if archive.get("basis"):
+            print("  basis: %s" % archive["basis"])
+        for move in archive.get("moves") or []:
+            print("  move: %s -> %s (%d files)"
+                  % (move["from"], move["to"], move["file_count"]))
+        manifest = archive.get("manifest") or {}
+        checks = manifest.get("checks") if isinstance(manifest, dict) else None
+        if isinstance(checks, dict):
+            print("  references: live=%s dated=%s unclassified=%s unresolved=%s"
+                  % (checks["live_rewrite"], checks["dated_preserved"],
+                     checks["unclassified"], checks["unresolved_before"]))
+        if archive.get("merge_amendments"):
+            print("  merge-manifest amendments: %d"
+                  % len(archive["merge_amendments"]))
     for condition in payload["conditions"]:
         print("  - %s: %s" % (condition["code"], condition["evidence"]))
         print("    fix: %s" % condition["fix_path"])
@@ -504,11 +521,378 @@ def _is_int(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-def _read_archive_manifest(spec_dir: Path) -> Optional[Dict[str, Any]]:
-    """C-112/C-202/C-203: read the archive record; absent means "no archive".
+# ---------------------------------------------------------------------------
+# Archive planning vocabulary and the single manifest validator (100 C-103,
+# C-201…C-212). One validator serves reading, planning and (later) apply.
+# ---------------------------------------------------------------------------
 
-    The record is validated before it is believed — an unknown or missing field
-    at any closed level refuses with exit 2, never a silent default.
+ARCHIVE_OUTCOMES = ("would-archive", "archived", "already-archived",
+                    "not-applicable")
+ARCHIVE_REFUSAL_REASONS = ("destination-exists", "dirty-spec-tree",
+                           "conflict-open", "slice-unclosed",
+                           "unresolved-references", "unclassified-reference")
+ARCHIVE_ERROR_REASONS = ("merge-manifest-missing", "merge-manifest-invalid",
+                         "slice-missing", "partial-archive", "archive-drift",
+                         "archive-manifest-invalid", "not-a-git-tree",
+                         "mirror-copy", "write-failed")
+ARCHIVE_ERROR_CODES = frozenset(ARCHIVE_ERROR_REASONS)
+
+ARCHIVE_GENERATED_KEYS = frozenset(("engine", "version", "command"))
+ARCHIVE_REFERENCES_KEYS = frozenset(("rows", "runtime"))
+ARCHIVE_ROW_KEYS = frozenset(("carrier", "line", "before", "after", "kind"))
+ARCHIVE_RUNTIME_KEYS = frozenset(("carrier", "status", "reason", "updates"))
+ARCHIVE_RUNTIME_UPDATE_KEYS = frozenset(("line", "before", "after"))
+ARCHIVE_MERGE_KEYS = frozenset(("path", "digest_before", "digest_after"))
+ARCHIVE_CHECKS_KEYS = frozenset((
+    "preconditions", "moved_files", "live_rewrite", "dated_preserved",
+    "unclassified", "unresolved_before", "unresolved_after", "runtime_carriers",
+    "files_match",
+))
+ARCHIVE_CONDITION_KEYS = frozenset((
+    "merge_status", "open_conflicts", "slices_closed", "dirty_spec_tree",
+    "side_presence",
+))
+ARCHIVE_SIDE_VALUES = frozenset(("source", "destination", "both", "missing"))
+ARCHIVE_KINDS = ("live-rewrite", "dated-preserved")
+ARCHIVE_RUNTIME_STATUSES = ("runtime-updated", "absent")
+
+ARCHIVE_HEX_RE = re.compile(r"^[0-9a-f]{40}$")
+ARCHIVE_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+ARCHIVE_LIVE_DOCUMENTS = frozenset((
+    "requirements.md", "plan.md", "tasks.md", "data-model.md", "research.md",
+    "quickstart.md", "feature-ref.md", "verification.md", "review.md",
+    "code-review.md",
+))
+ARCHIVE_LIVE_FILES = frozenset((
+    ".specify/register.md", ".specify/glossary.md", ".specify/instructions.md",
+))
+ARCHIVE_DATED_SUBDIRS = ("notes/", "test-evidence/", "checklists/", "slices/")
+ARCHIVE_LIVE_TREES = ("shared/", ".specify/shared/", "tests/")
+ARCHIVE_DATED_TREES = (".specify/memory/", ".specify/history/")
+ARCHIVE_FEATURES_DETAIL_PREFIX = ".specify/features/"
+ARCHIVE_MIXED_HEADING_RE = re.compile(
+    r"^##\s+Related Specifications/Requirements\s*$")
+
+
+def archive_manifest_digest(document: Dict[str, Any]) -> str:
+    """C-034/C-207: sha256 over the sorted compact JSON with `digest` removed."""
+    body = dict(document)
+    body.pop("digest", None)
+    canonical = json.dumps(body, separators=(",", ":"), sort_keys=True,
+                           ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def archive_closure_errors(document: Dict[str, Any]) -> list:
+    """C-206: the three closure arithmetic families, reported by name."""
+    errors = []
+    references = document.get("references")
+    checks = document.get("checks")
+    slices = document.get("slices")
+    if not isinstance(references, dict) or not isinstance(checks, dict) \
+            or not isinstance(slices, list):
+        return ["document lacks a usable slices/references/checks surface"]
+    rows = references.get("rows")
+    runtime = references.get("runtime")
+    if not isinstance(rows, list) or not isinstance(runtime, list):
+        return ["references rows/runtime are not lists"]
+    live = checks.get("live_rewrite")
+    dated = checks.get("dated_preserved")
+    unclassified = checks.get("unclassified")
+    carriers = checks.get("runtime_carriers")
+    moved = checks.get("moved_files")
+    for name, value in (("live_rewrite", live), ("dated_preserved", dated),
+                        ("unclassified", unclassified),
+                        ("runtime_carriers", carriers), ("moved_files", moved)):
+        if not _is_int(value):
+            errors.append("checks.%s is not an integer" % name)
+    if _is_int(live) and _is_int(dated) and live + dated != len(rows):
+        errors.append(
+            "live_rewrite + dated_preserved (%d) != len(references.rows) (%d)"
+            % (live + dated, len(rows)))
+    if _is_int(carriers):
+        counted = sum(1 for row in runtime
+                      if isinstance(row, dict)
+                      and row.get("status") in ARCHIVE_RUNTIME_STATUSES)
+        if counted != carriers:
+            errors.append(
+                "runtime-updated + absent (%d) != runtime_carriers (%d)"
+                % (counted, carriers))
+    if _is_int(moved):
+        total = sum(entry.get("file_count", 0) for entry in slices
+                    if isinstance(entry, dict)
+                    and _is_int(entry.get("file_count")))
+        if total != moved:
+            errors.append(
+                "sum(slices[].file_count) (%d) != moved_files (%d)"
+                % (total, moved))
+    return errors
+
+
+def _archive_path_ok(value) -> bool:
+    return (isinstance(value, str) and bool(value)
+            and not value.startswith("/") and "\\" not in value
+            and ".." not in value.split("/"))
+
+
+def _archive_exact_keys(container, keys, where: str, label: str) -> None:
+    missing = sorted(keys - set(container))
+    unknown = sorted(set(container) - keys)
+    if missing or unknown:
+        raise _archive_invalid(
+            "%s %s key set is not the closed set (missing=%s; unknown=%s)"
+            % (label, where, missing or "none", unknown or "none"))
+
+
+def validate_archive_manifest(document: Dict[str, Any], spec_name: str,
+                              label: str = ARCHIVE_MANIFEST_NAME) -> None:
+    """C-202…C-209: every closed level, the path basis, arithmetic and digest.
+
+    Shared by the read path and the plan/apply write paths — there is exactly
+    one validator (C-209). Any violation is `archive-manifest-invalid` (exit 2).
+    """
+    if not isinstance(document, dict):
+        raise _archive_invalid("%s does not carry a JSON object" % label)
+    _archive_exact_keys(document, ARCHIVE_MANIFEST_KEYS, "top-level", label)
+    if document["schema_version"] != 1:
+        raise _archive_invalid(
+            "%s schema_version reads %r; this engine reads and writes only 1"
+            % (label, document["schema_version"]))
+    if document["spec"] != spec_name:
+        raise _archive_invalid(
+            "%s names spec %r, not %r" % (label, document["spec"], spec_name))
+    expected_spec_path = ".specify/specs/%s" % spec_name
+    if document["spec_path"] != expected_spec_path:
+        raise _archive_invalid(
+            "%s spec_path reads %r, not %r"
+            % (label, document["spec_path"], expected_spec_path))
+    generated = document["generated_by"]
+    if not isinstance(generated, dict):
+        raise _archive_invalid("%s generated_by is not an object" % label)
+    _archive_exact_keys(generated, ARCHIVE_GENERATED_KEYS,
+                        "generated_by", label)
+    if not all(isinstance(generated[key], str) and generated[key]
+               for key in ARCHIVE_GENERATED_KEYS):
+        raise _archive_invalid(
+            "%s generated_by fields must all be non-empty strings" % label)
+    if not isinstance(document["pinned_commit"], str) \
+            or not ARCHIVE_HEX_RE.match(document["pinned_commit"]):
+        raise _archive_invalid(
+            "%s pinned_commit is not a 40-character lowercase hex commit" % label)
+    if document["order_basis"] not in ARCHIVE_ORDER_BASES:
+        raise _archive_invalid(
+            "%s order_basis reads %r; the closed set is %s"
+            % (label, document["order_basis"], list(ARCHIVE_ORDER_BASES)))
+    if not isinstance(document["order_source"], str) or not document["order_source"]:
+        raise _archive_invalid("%s order_source is not a non-empty string" % label)
+
+    if not isinstance(document["slices"], list):
+        raise _archive_invalid("%s slices is not a list" % label)
+    orders = []
+    for position, entry in enumerate(document["slices"], 1):
+        where = "slices[%d]" % position
+        if not isinstance(entry, dict):
+            raise _archive_invalid("%s %s is not an object" % (label, where))
+        _archive_exact_keys(entry, ARCHIVE_SLICE_KEYS, where, label)
+        for key in ("slug", "from", "to"):
+            if not isinstance(entry[key], str) or not entry[key]:
+                raise _archive_invalid(
+                    "%s %s.%s is not a non-empty path" % (label, where, key))
+        if not _archive_path_ok(entry["from"]) or not _archive_path_ok(entry["to"]):
+            raise _archive_invalid(
+                "%s %s from/to is not a repository-relative POSIX path"
+                % (label, where))
+        if entry["from"] != ".specify/specs/%s" % entry["slug"] \
+                or entry["to"] != "%s/slices/%s" % (expected_spec_path, entry["slug"]):
+            raise _archive_invalid(
+                "%s %s does not carry the declared from/to pair" % (label, where))
+        if not _is_int(entry["order"]):
+            raise _archive_invalid("%s %s.order is not an integer" % (label, where))
+        orders.append(entry["order"])
+        files = entry["files"]
+        if not isinstance(files, list) or not _is_int(entry["file_count"]) \
+                or entry["file_count"] != len(files):
+            raise _archive_invalid(
+                "%s %s.file_count does not equal its files row count"
+                % (label, where))
+        paths = []
+        for row in files:
+            if not isinstance(row, dict):
+                raise _archive_invalid("%s %s.files row is not an object"
+                                       % (label, where))
+            _archive_exact_keys(row, frozenset(("path", "sha256")),
+                                where + ".files", label)
+            if not _archive_path_ok(row["path"]):
+                raise _archive_invalid(
+                    "%s %s.files path is not slice-relative" % (label, where))
+            if not isinstance(row["sha256"], str) \
+                    or not re.match(r"^[0-9a-f]{64}$", row["sha256"]):
+                raise _archive_invalid(
+                    "%s %s.files sha256 is not a 64-character lowercase hex digest"
+                    % (label, where))
+            paths.append(row["path"])
+        if paths != sorted(paths):
+            raise _archive_invalid(
+                "%s %s.files is not sorted by path" % (label, where))
+        pointer = entry["merged_into_pointer"]
+        if not isinstance(pointer, dict):
+            raise _archive_invalid(
+                "%s %s.merged_into_pointer is not an object" % (label, where))
+        _archive_exact_keys(pointer, frozenset(("path", "line")),
+                            where + ".merged_into_pointer", label)
+        if pointer["path"] != entry["to"] + "/requirements.md" \
+                or not _archive_path_ok(pointer["path"]):
+            raise _archive_invalid(
+                "%s %s.merged_into_pointer.path does not name the archived "
+                "requirements.md" % (label, where))
+        if not _is_int(pointer["line"]) or pointer["line"] < 1:
+            raise _archive_invalid(
+                "%s %s.merged_into_pointer.line is not a 1-based line number"
+                % (label, where))
+    if orders != sorted(orders) or orders != list(range(1, len(orders) + 1)):
+        raise _archive_invalid(
+            "%s slices are not sorted by a contiguous 1..n order set" % label)
+
+    references = document["references"]
+    if not isinstance(references, dict):
+        raise _archive_invalid("%s references is not an object" % label)
+    _archive_exact_keys(references, ARCHIVE_REFERENCES_KEYS, "references", label)
+    if not isinstance(references["rows"], list) \
+            or not isinstance(references["runtime"], list):
+        raise _archive_invalid(
+            "%s references rows/runtime must both be lists" % label)
+    row_keys = []
+    for position, row in enumerate(references["rows"], 1):
+        where = "references.rows[%d]" % position
+        if not isinstance(row, dict):
+            raise _archive_invalid("%s %s is not an object" % (label, where))
+        _archive_exact_keys(row, ARCHIVE_ROW_KEYS, where, label)
+        if not _archive_path_ok(row["carrier"]):
+            raise _archive_invalid(
+                "%s %s.carrier is not a repository-relative POSIX path"
+                % (label, where))
+        if not _is_int(row["line"]) or row["line"] < 1:
+            raise _archive_invalid("%s %s.line is not 1-based" % (label, where))
+        if not isinstance(row["before"], str) or not isinstance(row["after"], str):
+            raise _archive_invalid(
+                "%s %s before/after are not strings" % (label, where))
+        if row["kind"] not in ARCHIVE_KINDS:
+            raise _archive_invalid(
+                "%s %s.kind reads %r; the closed set is %s"
+                % (label, where, row["kind"], list(ARCHIVE_KINDS)))
+        if row["kind"] == "dated-preserved" and row["before"] != row["after"]:
+            raise _archive_invalid(
+                "%s %s is dated-preserved but its bytes changed" % (label, where))
+        row_keys.append((row["carrier"], row["line"]))
+    if row_keys != sorted(row_keys):
+        raise _archive_invalid(
+            "%s references.rows is not sorted by (carrier, line)" % label)
+    declared_state = [".specify/state/%s.md" % spec_name] + [
+        ".specify/state/%s.md" % entry["slug"] for entry in document["slices"]]
+    actual_state = [row.get("carrier") for row in references["runtime"]
+                    if isinstance(row, dict)]
+    if actual_state != declared_state:
+        raise _archive_invalid(
+            "%s references.runtime carriers read %r; the declared carrier set is %r"
+            % (label, actual_state, declared_state))
+    for position, row in enumerate(references["runtime"], 1):
+        where = "references.runtime[%d]" % position
+        if not isinstance(row, dict):
+            raise _archive_invalid("%s %s is not an object" % (label, where))
+        _archive_exact_keys(row, ARCHIVE_RUNTIME_KEYS, where, label)
+        if row["status"] not in ARCHIVE_RUNTIME_STATUSES:
+            raise _archive_invalid(
+                "%s %s.status reads %r; the closed set is %s"
+                % (label, where, row["status"], list(ARCHIVE_RUNTIME_STATUSES)))
+        if row["status"] == "absent":
+            if not isinstance(row["reason"], str) or not row["reason"]:
+                raise _archive_invalid(
+                    "%s %s is absent without a reason" % (label, where))
+            if row["updates"] != []:
+                raise _archive_invalid(
+                    "%s %s is absent but carries updates" % (label, where))
+        elif row["reason"] is not None:
+            raise _archive_invalid(
+                "%s %s is runtime-updated but carries a reason" % (label, where))
+        if not isinstance(row["updates"], list):
+            raise _archive_invalid("%s %s.updates is not a list" % (label, where))
+        for update in row["updates"]:
+            if not isinstance(update, dict):
+                raise _archive_invalid(
+                    "%s %s.updates row is not an object" % (label, where))
+            _archive_exact_keys(update, ARCHIVE_RUNTIME_UPDATE_KEYS,
+                                where + ".updates", label)
+            if not _is_int(update["line"]) or update["line"] < 1 \
+                    or not isinstance(update["before"], str) \
+                    or not isinstance(update["after"], str):
+                raise _archive_invalid(
+                    "%s %s.updates row is malformed" % (label, where))
+
+    merge = document["merge_manifest"]
+    if not isinstance(merge, dict):
+        raise _archive_invalid("%s merge_manifest is not an object" % label)
+    _archive_exact_keys(merge, ARCHIVE_MERGE_KEYS, "merge_manifest", label)
+    if merge["path"] != MANIFEST_NAME:
+        raise _archive_invalid(
+            "%s merge_manifest.path reads %r, not %r"
+            % (label, merge["path"], MANIFEST_NAME))
+    for key in ("digest_before", "digest_after"):
+        if not isinstance(merge[key], str) or not ARCHIVE_DIGEST_RE.match(merge[key]):
+            raise _archive_invalid(
+                "%s merge_manifest.%s is not a `sha256:` digest" % (label, key))
+
+    checks = document["checks"]
+    if not isinstance(checks, dict):
+        raise _archive_invalid("%s checks is not an object" % label)
+    _archive_exact_keys(checks, ARCHIVE_CHECKS_KEYS, "checks", label)
+    preconditions = checks["preconditions"]
+    if not isinstance(preconditions, dict):
+        raise _archive_invalid("%s checks.preconditions is not an object" % label)
+    _archive_exact_keys(preconditions, ARCHIVE_CONDITION_KEYS,
+                        "checks.preconditions", label)
+    if preconditions["merge_status"] not in ("merged", "not-applicable"):
+        raise _archive_invalid(
+            "%s checks.preconditions.merge_status reads %r"
+            % (label, preconditions["merge_status"]))
+    if not _is_int(preconditions["open_conflicts"]):
+        raise _archive_invalid(
+            "%s checks.preconditions.open_conflicts is not an integer" % label)
+    if not isinstance(preconditions["slices_closed"], bool) \
+            or not isinstance(preconditions["dirty_spec_tree"], bool):
+        raise _archive_invalid(
+            "%s checks.preconditions booleans are not booleans" % label)
+    side_presence = preconditions["side_presence"]
+    expected_slugs = {entry["slug"] for entry in document["slices"]}
+    if not isinstance(side_presence, dict) \
+            or set(side_presence) != expected_slugs \
+            or any(value not in ARCHIVE_SIDE_VALUES
+                   for value in side_presence.values()):
+        raise _archive_invalid(
+            "%s checks.preconditions.side_presence is not the declared slug map "
+            "over {source, destination, both, missing}" % label)
+    for key in ("moved_files", "live_rewrite", "dated_preserved", "unclassified",
+                "unresolved_before", "unresolved_after", "runtime_carriers"):
+        if not _is_int(checks[key]):
+            raise _archive_invalid("%s checks.%s is not an integer" % (label, key))
+    if not isinstance(checks["files_match"], bool):
+        raise _archive_invalid("%s checks.files_match is not a boolean" % label)
+    errors = archive_closure_errors(document)
+    if errors:
+        raise _archive_invalid(
+            "%s closure arithmetic does not hold: %s" % (label, "; ".join(errors)))
+    if not isinstance(document["digest"], str) \
+            or not ARCHIVE_DIGEST_RE.match(document["digest"]):
+        raise _archive_invalid("%s digest is not a `sha256:` digest" % label)
+    if archive_manifest_digest(document) != document["digest"]:
+        raise _archive_invalid(
+            "%s digest does not match its C-034 recomputation" % label)
+
+
+def _read_archive_manifest(spec_dir: Path) -> Optional[Dict[str, Any]]:
+    """C-112/C-202/C-209: read the archive record; absent means "no archive".
+
+    The record is validated before it is believed — one shared validator covers
+    every closed level, the path basis, arithmetic and the digest.
     """
     path = spec_dir / ARCHIVE_MANIFEST_NAME
     if not path.is_file():
@@ -517,80 +901,9 @@ def _read_archive_manifest(spec_dir: Path) -> Optional[Dict[str, Any]]:
         document = json.loads(_read_text(path))
     except ValueError as exc:
         raise _archive_invalid("%s is unparsable: %s" % (path.name, exc))
-    if not isinstance(document, dict):
-        raise _archive_invalid("%s does not carry a JSON object" % path.name)
-    missing = sorted(ARCHIVE_MANIFEST_KEYS - set(document))
-    unknown = sorted(set(document) - ARCHIVE_MANIFEST_KEYS)
-    if missing or unknown:
-        raise _archive_invalid(
-            "%s key set is not the closed C-202 set (missing=%s; unknown=%s)"
-            % (path.name, missing or "none", unknown or "none"))
-    if document["schema_version"] != 1:
-        raise _archive_invalid(
-            "%s schema_version reads %r; this engine reads only 1"
-            % (path.name, document["schema_version"]))
-    if document["spec"] != spec_dir.name:
-        raise _archive_invalid(
-            "%s names spec %r, not %r"
-            % (path.name, document["spec"], spec_dir.name))
-    expected_spec_path = ".specify/specs/%s" % spec_dir.name
-    if document["spec_path"] != expected_spec_path:
-        raise _archive_invalid(
-            "%s spec_path reads %r, not %r"
-            % (path.name, document["spec_path"], expected_spec_path))
-    if document["order_basis"] not in ARCHIVE_ORDER_BASES:
-        raise _archive_invalid(
-            "%s order_basis reads %r; the closed set is %s"
-            % (path.name, document["order_basis"], list(ARCHIVE_ORDER_BASES)))
-    if not isinstance(document["order_source"], str) or not document["order_source"]:
-        raise _archive_invalid("%s order_source is not a non-empty string" % path.name)
-    if not isinstance(document["slices"], list):
-        raise _archive_invalid("%s slices is not a list" % path.name)
-    for position, entry in enumerate(document["slices"], 1):
-        label = "slices[%d]" % position
-        if not isinstance(entry, dict):
-            raise _archive_invalid("%s of %s is not an object" % (label, path.name))
-        missing = sorted(ARCHIVE_SLICE_KEYS - set(entry))
-        unknown = sorted(set(entry) - ARCHIVE_SLICE_KEYS)
-        if missing or unknown:
-            raise _archive_invalid(
-                "%s key set is not the closed C-203 set (missing=%s; unknown=%s)"
-                % (label, missing or "none", unknown or "none"))
-        for key in ("slug", "from", "to"):
-            if not isinstance(entry[key], str) or not entry[key]:
-                raise _archive_invalid("%s.%s is not a non-empty path" % (label, key))
-        if not _is_int(entry["order"]):
-            raise _archive_invalid("%s.order is not an integer" % label)
-        files = entry["files"]
-        if not isinstance(files, list) or not _is_int(entry["file_count"]) \
-                or entry["file_count"] != len(files):
-            raise _archive_invalid(
-                "%s.file_count does not equal its files row count" % label)
-        for row in files:
-            if not isinstance(row, dict) or set(row) != {"path", "sha256"}:
-                raise _archive_invalid(
-                    "%s.files rows carry exactly {path, sha256}" % label)
-        pointer = entry["merged_into_pointer"]
-        if not isinstance(pointer, dict) or set(pointer) != {"path", "line"}:
-            raise _archive_invalid(
-                "%s.merged_into_pointer carries exactly {path, line}" % label)
-    references = document["references"]
-    if not isinstance(references, dict) or set(references) != {"rows", "runtime"}:
-        raise _archive_invalid(
-            "%s references carries exactly {rows, runtime}" % path.name)
-    if not isinstance(references["rows"], list) \
-            or not isinstance(references["runtime"], list):
-        raise _archive_invalid(
-            "%s references rows/runtime must both be lists" % path.name)
-    for key in ("generated_by", "merge_manifest", "checks"):
-        if not isinstance(document[key], dict):
-            raise _archive_invalid("%s %s is not an object" % (path.name, key))
-    if not isinstance(document["pinned_commit"], str) or not document["pinned_commit"]:
-        raise _archive_invalid("%s pinned_commit is not a non-empty string" % path.name)
-    if not isinstance(document["digest"], str) \
-            or not document["digest"].startswith("sha256:"):
-        raise _archive_invalid("%s digest is not a `sha256:` string" % path.name)
+    validate_archive_manifest(document, spec_dir.name, path.name)
     return document
+
 
 
 def _archived_slice_records(repo: Path, spec_dir: Path, document: Dict[str, Any]):
@@ -778,6 +1091,217 @@ def _derive_order(repo: Path, parent_slug: str, slices):
             "text": item["text"],
         })
     return ordered_slices
+
+
+# ---------------------------------------------------------------------------
+# Archive reference classification (100 C-301…C-311). Pure, path-and-line
+# predicates only — no semantic reading, no model judgment.
+# ---------------------------------------------------------------------------
+
+def _f1_pattern(slug: str):
+    return re.compile(
+        r"(?<![/.\w-])\.specify/specs/%s(?![A-Za-z0-9_-])" % re.escape(slug))
+
+
+def _f2_pattern(slug: str):
+    return re.compile(r"(?<![A-Za-z0-9_./-])%s/" % re.escape(slug))
+
+
+def _is_path_construction(line: str) -> bool:
+    return (".specify" in line and "specs" in line
+            and ("Path" in line or " / " in line or " + " in line
+                 or 'f"' in line or "f'" in line))
+
+
+def find_reference_hits(line: str, slugs, *, parent_slug: str,
+                        carrier_rel: str, tests_carrier: bool = False) -> list:
+    """C-302: the closed F1/F2/F3 forms on one line, longest form wins.
+
+    Overlaps are resolved in declaration order: F1 first, F2 only outside F1,
+    F3 only outside both. A bare slug never produces a hit.
+    """
+    patterns = list(slugs)
+    spec_rel = ".specify/specs/%s" % parent_slug if parent_slug else ""
+    in_parent = bool(spec_rel) and carrier_rel.startswith(spec_rel + "/")
+    hits, spans = [], []
+
+    def add(slug, form, start, end, replacement):
+        if any(start < other_end and end > other_start
+               for other_start, other_end in spans):
+            return
+        spans.append((start, end))
+        hits.append({"slug": slug, "form": form, "start": start, "end": end,
+                     "replacement": replacement})
+
+    for slug in sorted(patterns, key=len, reverse=True):
+        for match in _f1_pattern(slug).finditer(line):
+            add(slug, "F1", match.start(), match.end(),
+                ("%s/slices/%s" % (spec_rel, slug)) if spec_rel
+                else ".specify/specs/%s/slices/%s" % (parent_slug, slug))
+    if in_parent:
+        for slug in sorted(patterns, key=len, reverse=True):
+            for match in _f2_pattern(slug).finditer(line):
+                add(slug, "F2", match.start(), match.end(),
+                    "slices/%s/" % slug)
+    if tests_carrier and _is_path_construction(line):
+        for slug in sorted(patterns, key=len, reverse=True):
+            for match in re.finditer(r"(['\"])%s\1" % re.escape(slug), line):
+                start, end = match.start(1) + 1, match.end() - 1
+                prefix = line[:match.start(1)].rstrip()
+                if prefix.endswith("==") or prefix.endswith("!="):
+                    continue
+                add(slug, "F3", start, end,
+                    "%s/slices/%s" % (parent_slug, slug))
+    return sorted(hits, key=lambda hit: hit["start"])
+
+
+def loose_source_forms(line: str, slugs, hits=None) -> list:
+    """C-302: source-path shapes outside F1/F2/F3 must fail closed."""
+    if hits is None:
+        hits = find_reference_hits(line, slugs, parent_slug="", carrier_rel="",
+                                   tests_carrier=False)
+    spans = [(hit["start"], hit["end"]) for hit in hits]
+    forms = []
+    for slug in slugs:
+        for match in re.finditer(
+                r"(?<![\w-])\.specify/specs/%s(?![A-Za-z0-9_-])"
+                % re.escape(slug), line):
+            if any(match.start() < end and match.end() > start
+                   for start, end in spans):
+                continue
+            forms.append(".specify/specs/%s" % slug)
+        for match in re.finditer(
+                r"(?<![\w-])(?:\.\./)+%s(?![A-Za-z0-9_-])" % re.escape(slug),
+                line):
+            forms.append("../%s" % slug)
+    return forms
+
+
+def rewrite_line(line: str, hits) -> str:
+    result = line
+    for hit in sorted(hits, key=lambda item: item["start"], reverse=True):
+        result = result[:hit["start"]] + hit["replacement"] + result[hit["end"]:]
+    return result
+
+
+def archive_carrier_kind(rel_path: str, parent_slug: str, slugs) -> Optional[str]:
+    """C-301/C-303/C-304: the carrier roster as a closed classifier."""
+    spec_rel = ".specify/specs/%s" % parent_slug
+    if rel_path.startswith(spec_rel + "/"):
+        rest = rel_path[len(spec_rel) + 1:]
+        if rest in ARCHIVE_LIVE_DOCUMENTS:
+            return "live"
+        if rest.startswith("contracts/"):
+            return "live"
+        if rest.startswith(ARCHIVE_DATED_SUBDIRS):
+            return "dated"
+        if rest == MANIFEST_NAME:
+            return "merge-json"
+        if rest in ("seal.md", ARCHIVE_MANIFEST_NAME):
+            return "excluded"
+        return "unclassified"
+    for slug in slugs:
+        if rel_path.startswith(".specify/specs/%s/" % slug):
+            return "dated"
+    if rel_path in ARCHIVE_LIVE_FILES:
+        return "live"
+    if rel_path == ".specify/features.md":
+        return "dated"
+    if rel_path.startswith(ARCHIVE_FEATURES_DETAIL_PREFIX) \
+            and rel_path.endswith(".md") \
+            and "/" not in rel_path[len(ARCHIVE_FEATURES_DETAIL_PREFIX):]:
+        return "mixed"
+    if rel_path.startswith(ARCHIVE_DATED_TREES):
+        return "dated"
+    if rel_path.startswith(ARCHIVE_LIVE_TREES):
+        return "live"
+    return None
+
+
+def mixed_section_kind(lines, line_no: int) -> str:
+    """C-304: only `## Related Specifications/Requirements` is live."""
+    in_live = False
+    for index, line in enumerate(lines, 1):
+        if re.match(r"^##\s+", line):
+            in_live = bool(ARCHIVE_MIXED_HEADING_RE.match(line))
+        if index == line_no:
+            return "live" if in_live else "dated"
+    return "dated"
+
+
+def map_archived_reference(rel_path: str, slices):
+    """C-210: the manifest's `from -> to` prefix map is the only resolver."""
+    matches = []
+    for item in slices:
+        if rel_path == item["from"] or rel_path.startswith(item["from"] + "/"):
+            matches.append(item)
+    if not matches:
+        return (None, None)
+    matches.sort(key=lambda item: len(item["from"]), reverse=True)
+    best = matches[0]
+    if len(matches) > 1 and len(matches[1]["from"]) == len(best["from"]):
+        raise _archive_invalid(
+            "the archive mapping for %r is ambiguous" % rel_path)
+    return (best["to"] + rel_path[len(best["from"]):],
+            best.get("slug") or best["from"].rsplit("/", 1)[-1])
+
+
+def amended_merge_document(document: Dict[str, Any], slices) -> Dict[str, Any]:
+    """C-211: replace whole path-form string values and recompute the digest."""
+    ordered_pairs = sorted(slices, key=lambda item: len(item["from"]),
+                           reverse=True)
+    amendments = []
+
+    def walk(value):
+        if isinstance(value, dict):
+            return {key: walk(inner) for key, inner in value.items()}
+        if isinstance(value, list):
+            return [walk(inner) for inner in value]
+        if isinstance(value, str):
+            for item in ordered_pairs:
+                frm, to = item["from"], item["to"]
+                if value == frm or value.startswith(frm + "/"):
+                    replaced = to + value[len(frm):]
+                    amendments.append({"before": value, "after": replaced})
+                    return replaced
+        return value
+
+    amended = walk(document)
+    if not isinstance(amended, dict):
+        raise _archive_invalid("the merge manifest must carry a JSON object")
+    existing = document.get("digest")
+    digest_before = existing if isinstance(existing, str) \
+        and ARCHIVE_DIGEST_RE.match(existing) else archive_manifest_digest(document)
+    amended.pop("digest", None)
+    digest_after = archive_manifest_digest(amended)
+    amended["digest"] = digest_after
+    return {"document": amended, "amendments": amendments,
+            "digest_before": digest_before, "digest_after": digest_after}
+
+
+def _projected_path_exists(repo: Path, target_rel: str, slices) -> bool:
+    """C-306/C-307: plan-time existence on the projected post-move tree."""
+    if (repo / target_rel).exists():
+        return True
+    for item in slices:
+        to = item["to"]
+        if target_rel == to or target_rel.startswith(to + "/"):
+            tail = target_rel[len(to):]
+            return (repo / (item["from"] + tail)).exists()
+    return False
+
+
+def _hit_target(hit, parent_slug: str, tail: str) -> str:
+    if hit["form"] == "F1":
+        return hit["replacement"] + tail
+    if hit["form"] == "F2":
+        return ".specify/specs/%s/%s%s" % (parent_slug, hit["replacement"], tail)
+    return ".specify/specs/" + hit["replacement"]
+
+
+def _reference_tail(line: str, end: int) -> str:
+    match = re.match(r"[/A-Za-z0-9_.-]*", line[end:])
+    return match.group(0).rstrip(".")
 
 
 # ---------------------------------------------------------------------------
@@ -3213,12 +3737,586 @@ def action_archive_gate(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[
             "rerun the archive lane once the status pair reads Sealed")])
 
 
+# ---------------------------------------------------------------------------
+# archive-plan — preconditions, classification and the manifest candidate
+# (100 C-102…C-104, C-201…C-212, C-301…C-311)
+# ---------------------------------------------------------------------------
+
+def _archive_plan_payload(spec_dir: Path, verdict: str, exit_code: int,
+                          conditions=()) -> Dict[str, Any]:
+    payload = _payload("archive-plan", spec_dir, verdict, exit_code, conditions)
+    payload["outcome"] = None
+    payload["archive"] = {
+        "moves": [],
+        "manifest": None,
+        "merge_amendments": [],
+        "unresolved_before": None,
+        "unresolved_after": None,
+        "unclassified": None,
+        "basis": None,
+    }
+    return payload
+
+
+def _archive_refusal(spec_dir, conditions):
+    codes = [condition["code"] for condition in conditions]
+    exit_code = (EXIT_INPUT_ERROR if any(code in ARCHIVE_ERROR_CODES for code in codes)
+                 else EXIT_REFUSED)
+    verdict = "error" if exit_code == EXIT_INPUT_ERROR else "refused"
+    return _archive_plan_payload(spec_dir, verdict, exit_code, conditions), exit_code
+
+
+def _git_head(repo: Path) -> Optional[str]:
+    proc = _run_git(repo, ["rev-parse", "HEAD"])
+    value = proc.stdout.strip() if proc.returncode == 0 else ""
+    return value if ARCHIVE_HEX_RE.match(value) else None
+
+
+def _load_merge_document(spec_dir: Path) -> Dict[str, Any]:
+    path = spec_dir / MANIFEST_NAME
+    if not path.is_file():
+        raise ArchiveManifestError(
+            "merge-manifest-missing",
+            "%s is absent; archive has no merge state to read" % MANIFEST_NAME)
+    try:
+        document = json.loads(_read_text(path))
+    except ValueError as exc:
+        raise ArchiveManifestError(
+            "merge-manifest-invalid", "%s is unparsable: %s" % (MANIFEST_NAME, exc))
+    if not isinstance(document, dict):
+        raise ArchiveManifestError(
+            "merge-manifest-invalid", "%s does not carry a JSON object" % MANIFEST_NAME)
+    settings = document.get("merge")
+    status = settings.get("status") if isinstance(settings, dict) else None
+    if status not in ("merged", "not-applicable"):
+        raise ArchiveManifestError(
+            "merge-manifest-invalid",
+            "%s merge.status reads %r; merged/not-applicable is the closed input set"
+            % (MANIFEST_NAME, status))
+    if not isinstance(document.get("slices"), list):
+        raise ArchiveManifestError(
+            "merge-manifest-invalid", "%s slices is not a list" % MANIFEST_NAME)
+    if not isinstance(document.get("conflicts", []), list):
+        raise ArchiveManifestError(
+            "merge-manifest-invalid", "%s conflicts is not a list" % MANIFEST_NAME)
+    return document
+
+
+def _merge_recorded_slices(document: Dict[str, Any]):
+    recorded = []
+    for position, entry in enumerate(document.get("slices") or [], 1):
+        if not isinstance(entry, dict) or not isinstance(entry.get("slug"), str) \
+                or not entry["slug"]:
+            raise ArchiveManifestError(
+                "merge-manifest-invalid",
+                "%s slices[%d] carries no usable slug" % (MANIFEST_NAME, position))
+        recorded.append((entry["slug"], entry.get("order")))
+    return recorded
+
+
+def _archive_slice_rel(slug: str) -> str:
+    return ".specify/specs/%s" % slug
+
+
+def _archive_destination_rel(parent_slug: str, slug: str) -> str:
+    return ".specify/specs/%s/%s/%s" % (parent_slug, ARCHIVE_SLICES_DIR, slug)
+
+
+def _archive_side_presence(repo: Path, spec_dir: Path, recorded) -> Dict[str, str]:
+    presence = {}
+    for slug, _order in recorded:
+        source = (repo / _archive_slice_rel(slug)).is_dir()
+        destination = (repo / _archive_destination_rel(spec_dir.name, slug)).is_dir()
+        if source and destination:
+            presence[slug] = "both"
+        elif source:
+            presence[slug] = "source"
+        elif destination:
+            presence[slug] = "destination"
+        else:
+            presence[slug] = "missing"
+    return presence
+
+
+def _archive_dirty_paths(repo: Path, spec_dir: Path, recorded):
+    pathspecs = [_rel_path(repo, spec_dir)]
+    for slug, _order in recorded:
+        pathspecs.append(_archive_slice_rel(slug))
+    pathspecs.extend([
+        ".specify/register.md", ".specify/glossary.md",
+        ".specify/instructions.md", ".specify/features.md", ".specify/features",
+        ".specify/memory", ".specify/history", "shared", ".specify/shared", "tests",
+    ])
+    proc = _run_git(repo, ["status", "--porcelain", "--"] + pathspecs)
+    if proc.returncode != 0:
+        return None
+    dirty = []
+    for line in proc.stdout.splitlines():
+        if not line.strip():
+            continue
+        entry = line[3:] if len(line) >= 3 else line.strip()
+        if " -> " in entry:
+            entry = entry.split(" -> ", 1)[1]
+        entry = entry.strip().strip('"')
+        if entry.rsplit("/", 1)[-1] == ARCHIVE_MANIFEST_NAME:
+            continue
+        dirty.append(entry)
+    return dirty
+
+
+def _archive_slice_files(directory: Path) -> list:
+    rows = []
+    for path in sorted(directory.rglob("*")):
+        if path.is_file():
+            rows.append({"path": path.relative_to(directory).as_posix(),
+                         "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return rows
+
+
+def _archive_runtime_rows(repo: Path, spec_dir: Path, slugs) -> list:
+    state_root = repo / ".specify" / "state"
+    carriers = [".specify/state/%s.md" % spec_dir.name] + [
+        ".specify/state/%s.md" % slug for slug in slugs]
+    rows = []
+    for carrier in carriers:
+        path = repo / carrier
+        if not state_root.is_dir() or not path.is_file():
+            rows.append({
+                "carrier": carrier, "status": "absent",
+                "reason": "the state root or the record is absent in this tree",
+                "updates": [],
+            })
+            continue
+        updates = []
+        for line_no, line in enumerate(_read_text(path).splitlines(), 1):
+            hits = find_reference_hits(line, slugs, parent_slug=spec_dir.name,
+                                       carrier_rel=carrier)
+            if hits:
+                updates.append({"line": line_no, "before": line,
+                                "after": rewrite_line(line, hits)})
+        rows.append({"carrier": carrier, "status": "runtime-updated",
+                     "reason": None, "updates": updates})
+    return rows
+
+
+def _merge_json_value_hits(line: str, slugs, parent_slug: str) -> list:
+    """C-301: only whole path-form string values in the merge manifest are live."""
+    hits = []
+    for match in re.finditer(r'"((?:[^"\\]|\\.)*)"', line):
+        value = match.group(1)
+        for slug in sorted(slugs, key=len, reverse=True):
+            frm = _archive_slice_rel(slug)
+            if value == frm or value.startswith(frm + "/"):
+                to = _archive_destination_rel(parent_slug, slug)
+                hits.append({
+                    "slug": slug, "form": "F1",
+                    "start": match.start(1), "end": match.end(1),
+                    "replacement": to + value[len(frm):],
+                })
+                break
+        else:
+            for slug in sorted(slugs, key=len, reverse=True):
+                if value.startswith(slug + "/"):
+                    to = _archive_destination_rel(parent_slug, slug)
+                    hits.append({
+                        "slug": slug, "form": "F2",
+                        "start": match.start(1), "end": match.end(1),
+                        "replacement": to + "/" + value[len(slug) + 1:],
+                    })
+                    break
+    return sorted(hits, key=lambda hit: hit["start"])
+
+
+def _archive_scan_files(repo: Path, spec_dir: Path, ordered) -> list:
+    files = {}
+    for path in spec_dir.rglob("*"):
+        if path.is_file():
+            files[_rel_path(repo, path)] = path
+    for item in ordered:
+        for path in item["path"].rglob("*"):
+            if path.is_file():
+                files[_rel_path(repo, path)] = path
+    for rel in (".specify/register.md", ".specify/features.md",
+                ".specify/glossary.md", ".specify/instructions.md"):
+        if (repo / rel).is_file():
+            files[rel] = repo / rel
+    for rel in (".specify/features", ".specify/memory", ".specify/history",
+                "shared", ".specify/shared", "tests"):
+        root = repo / rel
+        if root.is_dir():
+            for path in root.rglob("*"):
+                if path.is_file():
+                    files[_rel_path(repo, path)] = path
+    return [(rel, files[rel]) for rel in sorted(files)]
+
+
+def _archive_reference_scan(repo: Path, spec_dir: Path, ordered):
+    parent = spec_dir.name
+    slugs = [item["slug"] for item in ordered]
+    rows, findings = [], []
+    for rel, path in _archive_scan_files(repo, spec_dir, ordered):
+        kind = archive_carrier_kind(rel, parent, slugs)
+        if kind in (None, "excluded"):
+            continue
+        raw = path.read_bytes()
+        if b"\x00" in raw:
+            continue
+        lines = raw.decode("utf-8", errors="replace").splitlines()
+        covered = set()
+        for line_no, line in enumerate(lines, 1):
+            if kind == "merge-json":
+                hits = _merge_json_value_hits(line, slugs, parent)
+                if not hits:
+                    continue
+                rows.append({
+                    "carrier": rel, "line": line_no, "before": line,
+                    "after": rewrite_line(line, hits), "kind": "live-rewrite",
+                })
+                covered.update(hit["slug"] for hit in hits)
+                continue
+            hits = find_reference_hits(
+                line, slugs, parent_slug=parent, carrier_rel=rel,
+                tests_carrier=rel.startswith("tests/"))
+            loose = loose_source_forms(line, slugs, hits=hits)
+            if loose:
+                findings.append({"carrier": rel, "line": line_no,
+                                 "forms": loose})
+                continue
+            if not hits:
+                continue
+            if kind == "unclassified":
+                findings.append({
+                    "carrier": rel, "line": line_no,
+                    "forms": [hit["form"] for hit in hits],
+                })
+                continue
+            live = kind == "live" or (
+                kind == "mixed" and mixed_section_kind(lines, line_no) == "live")
+            rows.append({
+                "carrier": rel, "line": line_no, "before": line,
+                "after": rewrite_line(line, hits) if live else line,
+                "kind": "live-rewrite" if live else "dated-preserved",
+            })
+            covered.update(hit["slug"] for hit in hits)
+        if kind == "merge-json":
+            continue
+        if kind == "unclassified":
+            if not any(finding["carrier"] == rel for finding in findings):
+                findings.append({"carrier": rel, "line": 1,
+                                 "forms": ["unclassified-carrier"]})
+            continue
+        joined = "".join(line.strip() for line in lines)
+        for slug in slugs:
+            needle = _archive_slice_rel(slug)
+            if needle in joined and slug not in covered:
+                findings.append({"carrier": rel, "line": 1,
+                                 "forms": ["cross-line: " + needle]})
+    rows.sort(key=lambda row: (row["carrier"], row["line"]))
+    return rows, findings
+
+
+def _archive_unresolved(repo: Path, spec_dir: Path, ordered, rows) -> list:
+    slugs = [item["slug"] for item in ordered]
+    pairs = [{"slug": item["slug"],
+              "from": _archive_slice_rel(item["slug"]),
+              "to": _archive_destination_rel(spec_dir.name, item["slug"])}
+             for item in ordered]
+    unresolved = []
+    for row in rows:
+        hits = find_reference_hits(
+            row["before"], slugs, parent_slug=spec_dir.name,
+            carrier_rel=row["carrier"],
+            tests_carrier=row["carrier"].startswith("tests/"))
+        for hit in hits:
+            tail = _reference_tail(row["before"], hit["end"])
+            target = _hit_target(hit, spec_dir.name, tail)
+            if not _projected_path_exists(repo, target, pairs):
+                unresolved.append({"carrier": row["carrier"],
+                                   "line": row["line"], "target": target})
+    return unresolved
+
+
+def _archive_manifest_candidate(repo: Path, spec_dir: Path, ordered, merge_doc,
+                                rows, runtime, unresolved_before,
+                                unresolved_after, head: str):
+    slices = []
+    for item in ordered:
+        pointer_line = None
+        for line_no, line in enumerate(item["text"].splitlines(), 1):
+            if line.startswith("**Merged into**:"):
+                pointer_line = line_no
+                break
+        if pointer_line is None:
+            raise ValueError(
+                "slice %s carries no `**Merged into**` line; merge-apply owns it"
+                % item["slug"])
+        files = _archive_slice_files(item["path"])
+        slices.append({
+            "slug": item["slug"],
+            "from": _archive_slice_rel(item["slug"]),
+            "to": _archive_destination_rel(spec_dir.name, item["slug"]),
+            "order": item["order"],
+            "file_count": len(files),
+            "files": files,
+            "merged_into_pointer": {
+                "path": _archive_destination_rel(spec_dir.name, item["slug"])
+                        + "/requirements.md",
+                "line": pointer_line,
+            },
+        })
+    pairs = [{"slug": item["slug"], "from": _archive_slice_rel(item["slug"]),
+              "to": _archive_destination_rel(spec_dir.name, item["slug"])}
+             for item in ordered]
+    amended = amended_merge_document(merge_doc, pairs)
+    basis = ordered[0]["order_basis"]
+    source = ordered[0]["order_source"] if basis == "split-record" \
+        else "directory-name-order"
+    live = sum(1 for row in rows if row["kind"] == "live-rewrite")
+    dated = sum(1 for row in rows if row["kind"] == "dated-preserved")
+    document = {
+        "schema_version": 1,
+        "spec": spec_dir.name,
+        "spec_path": ".specify/specs/%s" % spec_dir.name,
+        "generated_by": {
+            "engine": ENGINE_NAME,
+            "version": _engine_version(),
+            "command": "%s --action archive-apply --spec-dir .specify/specs/%s"
+                       % (ENGINE_NAME, spec_dir.name),
+        },
+        "pinned_commit": head,
+        "order_basis": basis,
+        "order_source": source,
+        "slices": slices,
+        "references": {"rows": rows, "runtime": runtime},
+        "merge_manifest": {
+            "path": MANIFEST_NAME,
+            "digest_before": amended["digest_before"],
+            "digest_after": amended["digest_after"],
+        },
+        "checks": {
+            "preconditions": {
+                "merge_status": "merged",
+                "open_conflicts": 0,
+                "slices_closed": True,
+                "dirty_spec_tree": False,
+                "side_presence": {entry["slug"]: "source" for entry in slices},
+            },
+            "moved_files": sum(entry["file_count"] for entry in slices),
+            "live_rewrite": live,
+            "dated_preserved": dated,
+            "unclassified": 0,
+            "unresolved_before": unresolved_before,
+            "unresolved_after": unresolved_after,
+            "runtime_carriers": len(runtime),
+            "files_match": True,
+        },
+    }
+    document["digest"] = archive_manifest_digest(document)
+    return document, amended["amendments"]
+
+
+def action_archive_plan(args: argparse.Namespace,
+                        spec_dir: Path) -> Tuple[Dict[str, Any], int]:
+    """C-102…C-104 / C-301…C-307: read-only precondition, classification and preview."""
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    git_check = _run_git(repo, ["rev-parse", "--is-inside-work-tree"])
+    head = _git_head(repo)
+    if git_check.returncode != 0 or git_check.stdout.strip() != "true" or head is None:
+        return _archive_refusal(spec_dir, [_condition(
+            "not-a-git-tree",
+            "archive requires a git work tree with a HEAD commit; %s does not "
+            "provide one" % repo,
+            "run archive-plan inside the repository work tree (never a plain `mv`)",
+            "rerun archive-plan from the git work tree")])
+
+    archive_doc = _read_archive_manifest(spec_dir)
+    if archive_doc is not None:
+        _archived_slice_records(repo, spec_dir, archive_doc)
+        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
+        payload["outcome"] = "already-archived"
+        checks = archive_doc["checks"]
+        payload["archive"].update({
+            "manifest": archive_doc,
+            "unresolved_before": checks["unresolved_after"],
+            "unresolved_after": checks["unresolved_after"],
+            "unclassified": checks["unclassified"],
+        })
+        return payload, EXIT_OK
+
+    merge_doc = _load_merge_document(spec_dir)
+    status = merge_doc["merge"]["status"]
+    if status == "not-applicable":
+        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
+        payload["outcome"] = "not-applicable"
+        payload["archive"]["basis"] = (
+            merge_doc["merge"].get("basis")
+            or "the merge manifest records an empty slice set")
+        return payload, EXIT_OK
+    recorded = _merge_recorded_slices(merge_doc)
+    if not recorded:
+        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
+        payload["outcome"] = "not-applicable"
+        payload["archive"]["basis"] = (
+            "the merge manifest records an empty slice set")
+        return payload, EXIT_OK
+
+    presence = _archive_side_presence(repo, spec_dir, recorded)
+    conditions = []
+    for slug, state in presence.items():
+        if state == "both":
+            conditions.append(_condition(
+                "destination-exists",
+                "slice %s exists at both %s and %s"
+                % (slug, _archive_slice_rel(slug),
+                   _archive_destination_rel(spec_dir.name, slug)),
+                "remove one side after inspecting it; archive never picks a side",
+                "rerun archive-plan once exactly one side remains"))
+        elif state == "missing":
+            conditions.append(_condition(
+                "slice-missing",
+                "slice %s is absent at both %s and %s"
+                % (slug, _archive_slice_rel(slug),
+                   _archive_destination_rel(spec_dir.name, slug)),
+                "restore the slice tree or repair merge-manifest.json",
+                "rerun archive-plan after the slice set agrees with the tree"))
+    states = set(presence.values())
+    if states == {"source", "destination"}:
+        conditions.append(_condition(
+            "partial-archive",
+            "the slice set is split across the two sides: %s"
+            % ", ".join("%s=%s" % pair for pair in sorted(presence.items())),
+            "finish or reverse the interrupted archive; archive never guesses",
+            "rerun archive-plan once all slices are on the same side"))
+    elif states == {"destination"}:
+        conditions.append(_condition(
+            "archive-drift",
+            "every slice is at its destination but %s is absent"
+            % ARCHIVE_MANIFEST_NAME,
+            "restore the archive manifest from history or complete the interrupted "
+            "move deliberately",
+            "rerun archive-plan after the record exists and agrees with the tree"))
+
+    open_conflicts = [item for item in merge_doc.get("conflicts") or []
+                      if isinstance(item, dict) and item.get("status") == "open"]
+    for item in open_conflicts:
+        conditions.append(_condition(
+            "conflict-open",
+            "%s records an open conflict: %s"
+            % (MANIFEST_NAME,
+               item.get("id") or json.dumps(item, ensure_ascii=False, sort_keys=True)),
+            "resolve the conflict through the merge owner",
+            "rerun archive-plan after the conflict is closed"))
+
+    views = []
+    for slug, _order in recorded:
+        source = repo / _archive_slice_rel(slug)
+        destination = repo / _archive_destination_rel(spec_dir.name, slug)
+        path = source if source.is_dir() else (
+            destination if destination.is_dir() else None)
+        if path is not None:
+            views.append({"slug": slug, "path": path})
+    unclosed = _unclosed_slice_rows(repo, views)
+    for path_rel, line_no, task_id, task_state in unclosed:
+        conditions.append(_condition(
+            "slice-unclosed",
+            "%s:%d %s is not closed (state `- [%s]`)"
+            % (path_rel, line_no, task_id, task_state),
+            "close the slice task, or record its `deferred_tasks=` entry in the "
+            "slice verification.md",
+            "rerun archive-plan after the slice is closed"))
+
+    dirty = _archive_dirty_paths(repo, spec_dir, recorded)
+    if dirty is None:
+        conditions.append(_condition(
+            "not-a-git-tree",
+            "`git status --porcelain` cannot answer for %s" % repo,
+            "run archive-plan inside the repository work tree",
+            "rerun archive-plan from the git work tree"))
+    else:
+        for path_rel in dirty:
+            conditions.append(_condition(
+                "dirty-spec-tree",
+                "uncommitted change outside the archive batch: %s" % path_rel,
+                "commit or revert the change, then rerun; the archive batch starts "
+                "from a settled tree",
+                "rerun archive-plan on the settled tree"))
+
+    if conditions:
+        return _archive_refusal(spec_dir, conditions)
+
+    slices, _excluded = _discover_slices(spec_dir, repo)
+    ordered = _derive_order(repo, spec_dir.name, slices)
+    recorded_slugs = [slug for slug, _order in recorded]
+    if [item["slug"] for item in ordered] != recorded_slugs:
+        return _archive_refusal(spec_dir, [_condition(
+            "merge-manifest-invalid",
+            "%s records slices %r while the tree scan reads %r"
+            % (MANIFEST_NAME, recorded_slugs,
+               [item["slug"] for item in ordered]),
+            "repair the merge manifest or restore the slice directories",
+            "rerun archive-plan once the record and the tree agree")])
+    for position, (_slug, order) in enumerate(recorded):
+        if _is_int(order) and order != position + 1:
+            return _archive_refusal(spec_dir, [_condition(
+                "merge-manifest-invalid",
+                "%s records order %r for %s, but the derived order is %d"
+                % (MANIFEST_NAME, order, ordered[position]["slug"], position + 1),
+                "repair the merge manifest's slice order",
+                "rerun archive-plan once the record and the split record agree")])
+
+    rows, findings = _archive_reference_scan(repo, spec_dir, ordered)
+    conditions = [
+        _condition(
+            "unclassified-reference",
+            "%s:%d carries a source-path shape outside the declared F1/F2/F3 "
+            "forms and carrier roster (%s)"
+            % (finding["carrier"], finding["line"], ", ".join(finding["forms"])),
+            "rewrite the line into a declared carrier/form or fix the reference; "
+            "the classifier never guesses",
+            "rerun archive-plan after the line is classified")
+        for finding in findings
+    ]
+    unresolved = _archive_unresolved(repo, spec_dir, ordered, rows)
+    if unresolved:
+        conditions.append(_condition(
+            "unresolved-references",
+            "%d reference target(s) will not exist after the move: %s"
+            % (len(unresolved),
+               "; ".join("%s:%d -> %s" % (item["carrier"], item["line"],
+                                          item["target"])
+                         for item in unresolved)),
+            "fix the dangling reference or add the missing target",
+            "rerun archive-plan after every target resolves"))
+    if conditions:
+        return _archive_refusal(spec_dir, conditions)
+
+    runtime = _archive_runtime_rows(
+        repo, spec_dir, [item["slug"] for item in ordered])
+    document, amendments = _archive_manifest_candidate(
+        repo, spec_dir, ordered, merge_doc, rows, runtime, 0, 0, head)
+    validate_archive_manifest(document, spec_dir.name)
+    payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
+    payload["outcome"] = "would-archive"
+    payload["archive"].update({
+        "moves": [{"slug": entry["slug"], "from": entry["from"],
+                   "to": entry["to"], "order": entry["order"],
+                   "file_count": entry["file_count"]}
+                  for entry in document["slices"]],
+        "manifest": document,
+        "merge_amendments": amendments,
+        "unresolved_before": document["checks"]["unresolved_before"],
+        "unresolved_after": document["checks"]["unresolved_after"],
+        "unclassified": document["checks"]["unclassified"],
+    })
+    return payload, EXIT_OK
+
+
 HANDLERS = {
     "merge-plan": action_merge_plan,
     "merge-apply": action_merge_apply,
     "seal": action_seal,
     "archive-gate": action_archive_gate,
-    "archive-plan": _pending,
+    "archive-plan": action_archive_plan,
     "archive-apply": _pending,
 }
 

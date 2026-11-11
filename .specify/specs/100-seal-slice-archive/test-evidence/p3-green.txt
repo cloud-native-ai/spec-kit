@@ -1,0 +1,22 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/unit/test_seal_archive_classify.py tests/unit/test_seal_archive_manifest_math.py tests/unit/test_seal_archive_schema.py tests/contract/test_seal_merge_apply.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 88%]
+.........                                                                [100%]
+=============================== warnings summary ===============================
+tests/unit/test_seal_archive_classify.py:19: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_manifest_math.py:20: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_manifest_math.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_schema.py:23: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/tests/unit/test_seal_archive_schema.py:23: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+81 passed, 576 warnings in 6.40s
