@@ -1154,13 +1154,13 @@ def find_reference_hits(line: str, slugs, *, parent_slug: str,
     return sorted(hits, key=lambda hit: hit["start"])
 
 
-def loose_source_forms(line: str, slugs, hits=None) -> list:
-    """C-302: source-path shapes outside F1/F2/F3 must fail closed."""
+def loose_source_hits(line: str, slugs, hits=None) -> list:
+    """C-302: source-path shapes outside F1/F2/F3, attributed to their slice."""
     if hits is None:
         hits = find_reference_hits(line, slugs, parent_slug="", carrier_rel="",
                                    tests_carrier=False)
     spans = [(hit["start"], hit["end"]) for hit in hits]
-    forms = []
+    found = []
     for slug in slugs:
         for match in re.finditer(
                 r"(?<![\w-])\.specify/specs/%s(?![A-Za-z0-9_-])"
@@ -1168,12 +1168,40 @@ def loose_source_forms(line: str, slugs, hits=None) -> list:
             if any(match.start() < end and match.end() > start
                    for start, end in spans):
                 continue
-            forms.append(".specify/specs/%s" % slug)
+            found.append({"slug": slug, "form": ".specify/specs/%s" % slug,
+                          "start": match.start(), "end": match.end()})
         for match in re.finditer(
                 r"(?<![\w-])(?:\.\./)+%s(?![A-Za-z0-9_-])" % re.escape(slug),
                 line):
-            forms.append("../%s" % slug)
-    return forms
+            found.append({"slug": slug, "form": "../%s" % slug,
+                          "start": match.start(), "end": match.end()})
+    found.sort(key=lambda item: item["start"])
+    return found
+
+
+def loose_source_forms(line: str, slugs, hits=None) -> list:
+    """C-302: source-path shapes outside F1/F2/F3 must fail closed."""
+    return [hit["form"] for hit in loose_source_hits(line, slugs, hits=hits)]
+
+
+def _joined_needle_line(lines, needle: str) -> int:
+    """C-302: map a cross-line occurrence's start back to its 1-based line."""
+    offsets, parts, position = [], [], 0
+    for line in lines:
+        stripped = line.strip()
+        offsets.append(position)
+        parts.append(stripped)
+        position += len(stripped)
+    index = "".join(parts).find(needle)
+    if index < 0:
+        return 1
+    line_no = 1
+    for position, offset in enumerate(offsets, 1):
+        if offset <= index:
+            line_no = position
+        else:
+            break
+    return line_no
 
 
 def rewrite_line(line: str, hits) -> str:
@@ -3962,42 +3990,62 @@ def _archive_reference_scan(repo: Path, spec_dir: Path, ordered):
             hits = find_reference_hits(
                 line, slugs, parent_slug=parent, carrier_rel=rel,
                 tests_carrier=rel.startswith("tests/"))
-            loose = loose_source_forms(line, slugs, hits=hits)
-            if loose:
-                findings.append({"carrier": rel, "line": line_no,
-                                 "forms": loose})
-                continue
-            if not hits:
-                continue
+            loose = loose_source_hits(line, slugs, hits=hits)
             if kind == "unclassified":
-                findings.append({
-                    "carrier": rel, "line": line_no,
-                    "forms": [hit["form"] for hit in hits],
-                })
+                forms = ([hit["form"] for hit in loose]
+                         or [hit["form"] for hit in hits])
+                if forms:
+                    findings.append({"carrier": rel, "line": line_no,
+                                     "forms": forms})
+                continue
+            if not hits and not loose:
                 continue
             live = kind == "live" or (
                 kind == "mixed" and mixed_section_kind(lines, line_no) == "live")
+            if live and loose:
+                findings.append({"carrier": rel, "line": line_no,
+                                 "forms": [hit["form"] for hit in loose]})
+                continue
             rows.append({
                 "carrier": rel, "line": line_no, "before": line,
-                "after": rewrite_line(line, hits) if live else line,
-                "kind": "live-rewrite" if live else "dated-preserved",
+                "after": rewrite_line(line, hits) if live and hits else line,
+                "kind": "live-rewrite" if live and hits else "dated-preserved",
             })
             covered.update(hit["slug"] for hit in hits)
+            covered.update(hit["slug"] for hit in loose)
         if kind == "merge-json":
             continue
         if kind == "unclassified":
-            if not any(finding["carrier"] == rel for finding in findings):
-                findings.append({"carrier": rel, "line": 1,
-                                 "forms": ["unclassified-carrier"]})
             continue
         joined = "".join(line.strip() for line in lines)
         for slug in slugs:
             needle = _archive_slice_rel(slug)
-            if needle in joined and slug not in covered:
+            if needle not in joined or slug in covered:
+                continue
+            if kind == "dated":
+                start = _joined_needle_line(lines, needle)
+                first = lines[start - 1]
+                rows.append({
+                    "carrier": rel, "line": start, "before": first,
+                    "after": first, "kind": "dated-preserved",
+                })
+            else:
                 findings.append({"carrier": rel, "line": 1,
                                  "forms": ["cross-line: " + needle]})
     rows.sort(key=lambda row: (row["carrier"], row["line"]))
     return rows, findings
+
+
+def _dated_prefix_resolves(repo: Path, slug: str, slices) -> bool:
+    """C-307(b): a dated row's old prefix maps onto an existing archived path.
+
+    The judgment lands on the `to` prefix layer, so a dated record naming a
+    tail file that never existed stays readable through the mapping.
+    """
+    for item in slices:
+        if item["slug"] == slug:
+            return _projected_path_exists(repo, item["to"], slices)
+    return False
 
 
 def _archive_unresolved(repo: Path, spec_dir: Path, ordered, rows) -> list:
@@ -4012,12 +4060,16 @@ def _archive_unresolved(repo: Path, spec_dir: Path, ordered, rows) -> list:
             row["before"], slugs, parent_slug=spec_dir.name,
             carrier_rel=row["carrier"],
             tests_carrier=row["carrier"].startswith("tests/"))
+        dated = row["kind"] == "dated-preserved"
         for hit in hits:
             tail = _reference_tail(row["before"], hit["end"])
             target = _hit_target(hit, spec_dir.name, tail)
-            if not _projected_path_exists(repo, target, pairs):
-                unresolved.append({"carrier": row["carrier"],
-                                   "line": row["line"], "target": target})
+            if _projected_path_exists(repo, target, pairs):
+                continue
+            if dated and _dated_prefix_resolves(repo, hit["slug"], pairs):
+                continue
+            unresolved.append({"carrier": row["carrier"],
+                               "line": row["line"], "target": target})
     return unresolved
 
 

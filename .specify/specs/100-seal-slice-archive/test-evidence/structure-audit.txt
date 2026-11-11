@@ -1,0 +1,29 @@
+# Structure & Duplicate-Mechanism Audit — Feature 100（T053；FR-027、SC-009）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+## 命令面
+
+```text
+$ ls templates/commands/*.md | wc -l
+31
+```
+
+`COMMAND_BASELINE` 保持 31；`tests/contract/test_migration_distribution.py` 在同一工作树通过（T045：53 passed）。
+
+## 单一机制（本特性新增面）
+
+| 检查 | 读数 |
+|------|------|
+| 第二套处置词表 | 无。`shared/definitions/non-disposable-definitions.md` § Disposition Set 仍为**封闭四值**：`archive` / `supersede` / `correct` / `exempt`（`archive` 目的地原地扩为封闭二形：退休 `.specify/archive/` \| 父 spec `slices/`）。sanitize 的五值词表按原样保留（owner：`non-disposable-definitions.md` § Disposition Bridge 记录的既有映射）。 |
+| 第二归档引擎 | 无。`scripts/` 下唯一携带 `archive-manifest.json` 的源文件 = `scripts/python/seal-utils.py`。 |
+| 第二份按 spec 清单 | 无。引擎的 JSON 记录名封闭集 = `{merge-manifest.json, archive-manifest.json}`；每父 spec 一份，写入 `<spec_dir>/archive-manifest.json`。 |
+| 派生索引 / 缓存 / 第二映射表 | 无。引擎无 `functools` / `shelve` / `dbm` / `pickle` 导入，无 `lru_cache` / `_cache` 名字，无 `.index` / `.pickle` / `.db` / `.jsonl` 路径字面量；归档树每次动作重新读取（`test_c312_*`）。 |
+| 调度器 / 守护进程 / 锁文件 | 无。引擎导入仅 `argparse/datetime/hashlib/json/re/subprocess/sys`；并发收敛由「后到者读清单」承担（`test_c111_*`）。 |
+| 共享可变聚合 | 无。`.jsonl` 在引擎源码中零出现；写面以 `WRITE_SITE_TABLE` 数据表封闭（`tests/contract/test_seal_boundaries.py`）。 |
+| 命令名集合 | 不变（31；无 `/speckit.*` 新增）。 |
+
+## 佐证
+
+- `bash scripts/bash/run-tests.sh tests/contract/test_seal_boundaries.py tests/contract/test_seal_engine_contract.py -q` → `2 failed, 48 passed`；2 条失败均为实现入口基线同名项（未登记 live spec 097/098/100），本特性零新增失败。T034 的注入腿证明：注入删除 / 注册表状态写入 / `git push` / 共享聚合 / 第二映射表时审计转红。
+- 既有基线词表（sanitize 五值、non-disposable 四值）按原样保留，未新增第五个处置值。

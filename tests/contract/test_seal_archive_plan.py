@@ -395,7 +395,7 @@ def test_reference_matrix_classifies_live_and_dated_carriers(tmp_path):
         "C-310: source and mirror are rewritten to the same text in one batch"
     )
 
-    tests_rows = by_carrier["tests/contract/test_fixture_refs.py"]
+    tests_rows = by_carrier["tests/contract/fixture_refs.py"]
     f3 = [r for r in tests_rows if "SLICE_DIR" in r["before"]][0]
     assert f3["kind"] == "live-rewrite"
     assert "%s/slices/%s" % (PARENT, ALPHA) in f3["after"]

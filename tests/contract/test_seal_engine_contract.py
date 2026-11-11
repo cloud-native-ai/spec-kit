@@ -461,8 +461,20 @@ def test_c008_write_path_allowlist_is_declared_and_closed(eng):
     ), "C-008: the write-path allowlist is closed; a new entry is a contract change"
 
 
-def test_c008_no_move_delete_rename_or_push_in_source(source):
+def test_c008_destructive_surface_is_recovery_scoped_and_push_is_absent(source):
     tree = ast.parse(source)
+    enclosing = {}
+
+    def visit(node, function):
+        for child in ast.iter_child_nodes(node):
+            inner = (child.name
+                     if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                     else function)
+            if isinstance(child, ast.Call):
+                enclosing[id(child)] = function
+            visit(child, inner)
+
+    visit(tree, None)
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
@@ -472,9 +484,13 @@ def test_c008_no_move_delete_rename_or_push_in_source(source):
                 f"C-008: destructive call {func.value.id}.{func.attr} MUST NOT exist"
             )
         if isinstance(func, ast.Attribute) and func.attr in DESTRUCTIVE_PATH_ATTRS:
-            raise AssertionError(f"C-008: destructive call .{func.attr}() MUST NOT exist")
+            host = enclosing.get(id(node))
+            assert host == "_archive_restore", (
+                "C-008/C-108: a destructive path call is admitted only inside the "
+                f"archive batch's byte recovery; got {host}.{func.attr}()"
+            )
     for token in _call_arg_strings(tree):
-        assert token not in ("push", "mv", "rm"), (
+        assert token not in ("push", "rm"), (
             f"C-008: the engine MUST NOT shell out to {token!r}"
         )
     assert not (_import_roots(tree) & {"sched"}), (

@@ -103,3 +103,122 @@ FAILED tests/contract/test_seal_boundaries.py::test_the_directory_registry_diffe
 FAILED tests/contract/test_seal_boundaries.py::test_the_audit_report_is_complete_and_optionally_recorded
 2 failed, 10 passed in 8.10s
 ```
+
+
+## T009 — Foundational 检查点（FR-008、FR-019）
+
+采集点: 2026-11-11 · worktree `100-seal-slice-archive` @ `f3bd72866`
+
+命令（verbatim）: `bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_merge_plan.py tests/integration/test_seal_merge_determinism.py -q`
+
+退出码: `1`（汇总 `4 failed, 67 passed in 8.30s`）
+
+读数归因（相对实现入口 3 条基线名单）:
+- 同名基线失败 2 条：`test_seal_boundaries.py::test_the_directory_registry_difference_is_fully_classified`、`::test_the_audit_report_is_complete_and_optionally_recorded`（未登记 live spec 097/098/100，非本特性写面）。
+- 新增失败 2 条：`test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source`（`.unlink()` 恢复路径）与 `test_seal_boundaries.py::test_the_engine_shells_out_only_read_only_git_verbs`（`git mv`）——均由 P4 的 `git mv`/按原字节恢复引入，按 P4 记录归 T036（C-008 原地修订，已 closed）与 T034（本包审计白名单）所有；T034 在本包内把两条守卫更新到修订后的 C-008 并复核。
+
+完整 stdout/stderr（verbatim）:
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_merge_plan.py tests/integration/test_seal_merge_determinism.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..........F........F..F...............................................F  [100%]
+=================================== FAILURES ===================================
+__________ test_the_directory_registry_difference_is_fully_classified __________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_directory_registry_difference_is_fully_classified():
+        diff = _audit_difference()
+>       assert diff["unregistered_live"] == sorted(UNREGISTERED_LIVE_SPECS), (
+            "C-036: a live spec directory without a registry row is a difference entry; "
+            "a new one MUST be registered or pinned here with its reason. Ungoverned: "
+            f"{diff['unregistered_live']}"
+        )
+E       AssertionError: C-036: a live spec directory without a registry row is a difference entry; a new one MUST be registered or pinned here with its reason. Ungoverned: ['067', '075', '080', '097', '098', '100']
+E       assert ['067', '075'... '098', '100'] == ['067', '075', '080']
+E         
+E         Left contains 3 more items, first extra item: '097'
+E         Use -v to get more diff
+
+tests/contract/test_seal_boundaries.py:426: AssertionError
+______________ test_c008_no_move_delete_rename_or_push_in_source _______________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+source = '#!/usr/bin/env python3\n"""Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).\n\nOwn...T_INPUT_ERROR\n    render(payload, args.json)\n    return code\n\n\nif __name__ == "__main__":\n    sys.exit(main())\n'
+
+    def test_c008_no_move_delete_rename_or_push_in_source(source):
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+                assert (func.value.id, func.attr) not in DESTRUCTIVE_MODULE_ATTRS, (
+                    f"C-008: destructive call {func.value.id}.{func.attr} MUST NOT exist"
+                )
+            if isinstance(func, ast.Attribute) and func.attr in DESTRUCTIVE_PATH_ATTRS:
+>               raise AssertionError(f"C-008: destructive call .{func.attr}() MUST NOT exist")
+E               AssertionError: C-008: destructive call .unlink() MUST NOT exist
+
+tests/contract/test_seal_engine_contract.py:475: AssertionError
+_____________ test_the_engine_shells_out_only_read_only_git_verbs ______________
+[gw33] linux -- Python 3.11.11 /usr/local/bin/python3
+
+source = '#!/usr/bin/env python3\n"""Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).\n\nOwn...T_INPUT_ERROR\n    render(payload, args.json)\n    return code\n\n\nif __name__ == "__main__":\n    sys.exit(main())\n'
+
+    def test_the_engine_shells_out_only_read_only_git_verbs(source):
+        tree = _tree(source)
+        verbs = _git_verb_sites(tree)
+        assert verbs, "the audit expects the engine's closed git helper call sites"
+        outside = sorted(set(verbs) - READ_ONLY_GIT_VERBS)
+>       assert outside == [], (
+            f"C-008: the engine MUST NOT shell out to non-read-only git verbs; got {outside}"
+        )
+E       AssertionError: C-008: the engine MUST NOT shell out to non-read-only git verbs; got ['mv']
+E       assert ['mv'] == []
+E         
+E         Left contains one more item: 'mv'
+E         Use -v to get more diff
+
+tests/contract/test_seal_boundaries.py:252: AssertionError
+__________ test_the_audit_report_is_complete_and_optionally_recorded ___________
+[gw43] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_audit_report_is_complete_and_optionally_recorded():
+>       report = _audit_report()
+                 ^^^^^^^^^^^^^^^
+
+tests/contract/test_seal_boundaries.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_seal_boundaries.py:485: in _audit_report
+    ", ".join("%s (%s)" % (key, UNREGISTERED_LIVE_SPECS[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7ff888709d80>
+
+>           ", ".join("%s (%s)" % (key, UNREGISTERED_LIVE_SPECS[key])
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      for key in diff["unregistered_live"]) or "-"),
+        "Unregistered archived specs: %s" % (
+            ", ".join("%s (%s)" % (key, UNREGISTERED_ARCHIVED_SPECS[key])
+                      for key in diff["unregistered_archived"]) or "-"),
+        "Detail-only rows: %s" % ", ".join(diff["detail_only"]),
+        "Orphan slices: %s" % (", ".join(diff["orphan_slices"]) or "none"),
+        "Shared mutable aggregates introduced by seal: none (seal.md and "
+        "merge-manifest.json are per-spec single files)",
+        "",
+        "Verdict: clean",
+    ]
+E   KeyError: '097'
+
+tests/contract/test_seal_boundaries.py:485: KeyError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_boundaries.py::test_the_directory_registry_difference_is_fully_classified
+FAILED tests/contract/test_seal_engine_contract.py::test_c008_no_move_delete_rename_or_push_in_source
+FAILED tests/contract/test_seal_boundaries.py::test_the_engine_shells_out_only_read_only_git_verbs
+FAILED tests/contract/test_seal_boundaries.py::test_the_audit_report_is_complete_and_optionally_recorded
+4 failed, 67 passed in 8.30s
+```
