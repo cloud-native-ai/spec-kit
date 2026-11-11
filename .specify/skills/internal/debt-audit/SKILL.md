@@ -39,11 +39,13 @@ For each domain, dispatch one bounded execution of the agent template with: its 
 
 ### 4. Verify each return
 
-A domain return is accepted only when: the report artifact exists and is non-empty; every finding carries an evidence path; the closing `DEBT-DONE` sentinel is present; the anomaly line is present (`none` stated explicitly). A missing artifact or sentinel is an incomplete unit — re-dispatch it or report it as a gap; never synthesize from a silence.
+A domain return is accepted only when: the report artifact exists and is non-empty; every finding carries an evidence path and a status class; the closing `DEBT-DONE` line appears in the report **and** the execution log (stdout); the anomaly line is present (`none` stated explicitly). A missing artifact or a sentinel present in only one surface is an incomplete unit — re-dispatch it or report it as a gap; never synthesize from a silence.
 
 ### 5. Synthesize through the same agent
 
-Dispatch one final `sdd-debt-governor` execution over the accepted domain reports to produce the debt register (category · evidence · fact · severity · disposition · owning lane) and the phased plan (mechanism-first, then data reclamation, then structural convergence), with measurable outcomes and abort conditions per wave. Deduplicate by evidence path; a finding without a path is dropped.
+Dispatch one final `sdd-debt-governor` execution over the accepted domain reports to produce the debt register (register ID · severity · status class · category · evidence · fact · disposition · owning lane · wave) and the phased plan (mechanism-first, then data reclamation, then structural convergence), with measurable outcomes and abort conditions per wave. Deduplicate by evidence path; a finding without a path is dropped. Same-path verdict conflicts are adjudicated by the owning document's text, with the losing reading kept and marked `superseded-by`.
+
+When a reuse baseline was supplied, the synthesis MUST carry the four-class comparison (`consistent` / `refined` / `new` / `refuted`) and a method-delta section; the comparison is part of the deliverable, never an afterthought.
 
 ### 6. Report and adjudicate
 
@@ -57,14 +59,15 @@ On user authorization: data reclamation goes to `/speckit.sanitize` (its lanes a
 
 - **The agent judges; this skill orchestrates.** Never invent, downgrade or drop a finding the agent reported; never promote one to a fact without its evidence path.
 - **Disjoint domains only.** Overlapping read domains are a defect, not an optimization.
-- **Reuse is re-verification.** A baseline finding is a candidate, not a conclusion; carry its status class explicitly.
+- **Reuse is re-verification.** A baseline finding is a candidate, not a conclusion; carry its status class explicitly, and label non-reproducible readings as such.
+- **Foreign owners are blockers, not deletions.** Scratch this run created may be reclaimed by the execution that made it; root- or foreign-owned artifacts are reported as blockers with counts — never deleted, moved or chmod-ed.
 - **No destructive action, ever.** No delete, move, archive, rewrite or git write outside the declared report directory.
 - **Surface anomalies at the point they appear** (`shared/guidelines/fast-fail.md`); an incomplete domain is named, never smoothed into the synthesis.
 
 ## Boundaries
 
 - **Cleanup is not this skill.** Reclamation belongs to `/speckit.sanitize`; repairs belong to SDD runs; their owners stay by pointer.
-- **The role definition is not this skill.** Method, evidence discipline and boundaries live in `agents/sdd-debt-governor.agent.md`; this skill binds the invocation, not the behavior.
+- **The role definition is not this skill.** Method, evidence discipline, severity rubric, disposition vocabulary and boundaries live in `agents/sdd-debt-governor.agent.md`; this skill binds the invocation, not the behavior.
 - **No second registry.** The debt register is a report artifact; it is not a durable registry and grants nothing.
 - **The command surface is out of scope** in this release: the capability is skill-level; a slash-command wrapper is a separate, spec-gated decision.
 
