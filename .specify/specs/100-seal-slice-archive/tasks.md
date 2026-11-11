@@ -179,7 +179,7 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 - [X] T006 扩写 `tests/contract/test_seal_boundaries.py` 的动作表审计：六动作封闭、只读/写划分恰 3/3、无破坏性动作、无调度器/守护进程构造；运行该文件全绿并把读数记入 `test-evidence/foundational-checks.txt`（FR-008、FR-028）。 [P] [blockedBy: T005]
 - [X] T007 建夹具 `tests/fixtures/seal-archive/archived-pair/`（父 spec + `slices/` 下两片 + `archive-manifest.json`）并在 `tests/contract/test_seal_merge_plan.py` 写红先测试：清单存在时分片集与顺序不变、`slices/` 不被读成新候选、清单不可解析或与合并清单/树不一致时以 exit 2（`archive-manifest-invalid` / `archive-drift`）拒绝（FR-019）。 [P] [blockedBy: T005]
 - [X] T008 在 `scripts/python/seal-utils.py` 实现 manifest-aware 分片发现：`_discover_slices` / `_derive_order` / `_merge_state` 先读 `archive-manifest.json` 并校验其 `slices[]` 与合并清单及目录树一致，缺席才回退同级扫描，绝不把 `slices/**` 读成新分片候选；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认本对零新增漂移（FR-019）。 [blockedBy: T007]
-- [ ] T009 Foundational 检查点：运行 `bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_merge_plan.py tests/integration/test_seal_merge_determinism.py -q`，把命令、完整输出与退出码记入 `test-evidence/foundational-checks.txt`（FR-008、FR-019）。 [blockedBy: T005,T006,T008]
+- [X] T009 Foundational 检查点：运行 `bash scripts/bash/run-tests.sh tests/contract/test_seal_engine_contract.py tests/contract/test_seal_boundaries.py tests/contract/test_seal_merge_plan.py tests/integration/test_seal_merge_determinism.py -q`，把命令、完整输出与退出码记入 `test-evidence/foundational-checks.txt`（FR-008、FR-019）。 [blockedBy: T005,T006,T008]
 
 **Checkpoint**: 引擎的六动作面与归档后分片发现就位；US1–US4 的行可以开始。
 
@@ -209,7 +209,7 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 - [X] T018 [US1] 写夹具回放测试 `tests/integration/test_seal_archive_round.py`：把 `clean-pair` 复制成临时 git 树，按 merge-apply → 提交 merge 批次 → archive-plan → archive-apply → seal（阻断态）顺序执行，断言分片落在 `slices/`、文件数/逐文件 sha256/相对路径集合不变、全为重命名对、清单可复核、封装阻断不阻断归档也不改变阻断清单（FR-001、FR-003、FR-004、SC-001）。 [green: contracts/archive-actions.contract.md#C-107] [blockedBy: T017,T011]
 - [X] T019 [US1] 实现 `archive-apply` 的两阶段原子性：只读重算门；写入按批次执行；任一步失败按原字节恢复已移动目录与已改写文件并以 exit 2（`write-failed`）结束；拒绝路径零持久化（FR-009、FR-028）。 [green: contracts/archive-actions.contract.md#C-108] [blockedBy: T018]
 - [X] T020 [US1] 补齐确定性面（扩写 `tests/integration/test_seal_archive_idempotency.py`）：两次 `archive-plan` 逐字节一致（sha256 对照）、排序键只取声明字段、apply 重跑零 diff、把排序改为返回时刻或目录枚举顺序时测试转红（FR-005、SC-002、SC-006）。 [green: contracts/archive-actions.contract.md#C-109] [blockedBy: T019,T014]
-- [ ] T021 [US1] US1 检查点：运行 `bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py -q`，把读数记入 `test-evidence/us1-checkpoint.txt`（FR-024）。 [blockedBy: T020]
+- [X] T021 [US1] US1 检查点：运行 `bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_plan.py tests/contract/test_seal_archive_manifest.py tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py -q`，把读数记入 `test-evidence/us1-checkpoint.txt`（FR-024）。 [blockedBy: T020]
 
 ---
 
@@ -236,7 +236,7 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 - [X] T029 [US2] 实现唯一校验器与唯一解析通道：plan / apply / 归档后发现共用同一 schema 校验函数，未知或缺失字段 exit 2；清单是「旧路径 → 归档路径」的唯一映射（不建缓存索引或派生映射文件）；并写红先单元测试 `tests/unit/test_seal_archive_schema.py` 覆盖 schema 校验函数的未知/缺失字段拒绝（FR-005、FR-015）。 [green: contracts/archive-manifest.contract.md#C-209] [green: contracts/archive-manifest.contract.md#C-210] [blockedBy: T028]
 - [X] T030 [US2] 实现并钉住父 `merge-manifest.json` 的路径字段修订：对清单全文模式扫描枚举匹配 `.specify/specs/<任一分片 slug>[/…]` 形态的字符串值（匹配集合 = 允许差异集，不手写字段清单），匹配集合之外的值逐字节不变；合并结论（`merge`）/`checks` 计数/冲突/ID 映射/顺序/`retention` 不变，摘要按 C-034 重算并在归档清单记前后值；扩写 `tests/contract/test_seal_merge_apply.py`（FR-018）。 [green: contracts/archive-manifest.contract.md#C-211] [blockedBy: T029]
 - [X] T031 [US2] 实现 schema 版本纪律：`schema_version` 从 `1` 起且本特性只写 `1`；更高版本或未知字段在读取侧 exit 2（`archive-manifest-invalid`）；字段集增删改只走契约页修订；扩写 `tests/contract/test_seal_archive_manifest.py`（FR-005）。 [green: contracts/archive-manifest.contract.md#C-212] [blockedBy: T030]
-- [ ] T032 [US2] US2 检查点：运行分类 + 清单 + merge-apply 套件，把 `reference-matrix` 上的 `live-rewrite` / `dated-preserved` / `unclassified` / 未解析四项计数记入 `test-evidence/us2-checkpoint.txt`（FR-012、FR-017）。 [blockedBy: T031,T022]
+- [X] T032 [US2] US2 检查点：运行分类 + 清单 + merge-apply 套件，把 `reference-matrix` 上的 `live-rewrite` / `dated-preserved` / `unclassified` / 未解析四项计数记入 `test-evidence/us2-checkpoint.txt`（FR-012、FR-017）。 [blockedBy: T031,T022]
 
 ---
 
@@ -249,10 +249,10 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 **Checkpoint**: 本故事独立可测——回滚、并发、单一机制、owner 修订四面均有独立断言。
 
 - [X] T033 [US4] 写回滚任务 `tests/integration/test_seal_archive_rollback.py`：在夹具上 apply 后按契约 C-110 与 quickstart S-6 的步骤逐字执行（逆 `git mv` → `git restore --source=<pinned_commit> --staged --worktree` → 移除清单 → 运行期逆写），断言 `git diff --exit-code <pinned_commit> -- <parent> <slices> <live carriers>` 为空且 `references.rows[]` 逐行核对成立；跳过任一步骤时断言转红（FR-011、SC-010）。 [green: contracts/archive-actions.contract.md#C-110] [blockedBy: T019,T017]
-- [ ] T034 [US4] 写单一机制与并发静态审计（扩写 `tests/contract/test_seal_boundaries.py`）：每父 spec 一份清单、`tests/fixtures/seal-archive/concurrent/` 两个夹具 spec 并发归档写入不同路径、同一 spec 由「后到者读清单 → `already-archived` / `archive-drift`」收敛且无锁文件；写面白名单以数据表表达（移动仅 `archive-apply` 且目标限 `<parent>/slices/`），并审计引擎外部命令白名单（只允许 `git mv` / `status` / `diff` / `rev-parse`；`push` 缺席），注入删除、注册表状态写入或 `git push` 时转红；把一份清单复制成共享聚合时测试转红；解析无缓存索引/第二份映射表（FR-020、FR-027、FR-028、SC-005、SC-009）。 [green: contracts/archive-actions.contract.md#C-111] [green: contracts/reference-classification.contract.md#C-312] [blockedBy: T017]
+- [X] T034 [US4] 写单一机制与并发静态审计（扩写 `tests/contract/test_seal_boundaries.py`）：每父 spec 一份清单、`tests/fixtures/seal-archive/concurrent/` 两个夹具 spec 并发归档写入不同路径、同一 spec 由「后到者读清单 → `already-archived` / `archive-drift`」收敛且无锁文件；写面白名单以数据表表达（移动仅 `archive-apply` 且目标限 `<parent>/slices/`），并审计引擎外部命令白名单（只允许 `git mv` / `status` / `diff` / `rev-parse`；`push` 缺席），注入删除、注册表状态写入或 `git push` 时转红；把一份清单复制成共享聚合时测试转红；解析无缓存索引/第二份映射表（FR-020、FR-027、FR-028、SC-005、SC-009）。 [green: contracts/archive-actions.contract.md#C-111] [green: contracts/reference-classification.contract.md#C-312] [blockedBy: T017]
 - [X] T035 [US4] 写归档后等价性测试（扩写 `tests/integration/test_seal_074_round.py`）：归档后 merge-plan 报告同一分片集且零待移动、merge-apply exit 0 且零写入、seal 的 P0 / `blocking` / 闭合判定与归档前一致；`slices/**` 不被读成新分片候选；清单缺席时回退同级扫描（FR-019）。 [green: contracts/archive-actions.contract.md#C-112] [blockedBy: T008,T034]
 - [X] T036 [US4] 原地修订既有 owner：`shared/definitions/non-disposable-definitions.md` § Disposition Set 的 `archive` 目的地扩为封闭二形（退休 `.specify/archive/` 或所属父 spec 的 `slices/`）且 § Disposal Pathways 记分片处置记录 = 父 `archive-manifest.json`；`shared/definitions/framework-map.md` 的 Feature specs 行登记 `slices/` 语义；099 `seal-engine.contract.md` C-001/C-008、`merge-back.contract.md` C-019/C-023、`records-and-boundaries.contract.md` C-035/C-036 原地修订；随后 `python3 scripts/python/sync-mirrors.py --write` 并确认零新增漂移（FR-002、FR-020、FR-023）。 [green: contracts/archive-actions.contract.md#C-113] [P] [blockedBy: T005]
-- [ ] T037 [US4] US4 检查点：运行 boundaries/rollback/074_round 套件，抓取归档前后状态面快照（注册表行、详情状态、父 spec 的 `seal.md` 回执缺失或存在时字节不变（命令模板/命令参考不在此列）、合并结论/计数/冲突）存入 `test-evidence/us4-checkpoint.txt`，断言除路径字段、摘要、归档清单与被移动目录外零变化（FR-020、SC-005）。 [blockedBy: T033,T034,T035,T036]
+- [X] T037 [US4] US4 检查点：运行 boundaries/rollback/074_round 套件，抓取归档前后状态面快照（注册表行、详情状态、父 spec 的 `seal.md` 回执缺失或存在时字节不变（命令模板/命令参考不在此列）、合并结论/计数/冲突）存入 `test-evidence/us4-checkpoint.txt`，断言除路径字段、摘要、归档清单与被移动目录外零变化（FR-020、SC-005）。 [blockedBy: T033,T034,T035,T036]
 
 ---
 
@@ -271,7 +271,7 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 - [X] T042 [US3] 074 真实回合 · 预览：运行 `python3 scripts/python/seal-utils.py --action archive-plan --spec-dir .specify/specs/074-goal-team-sdd-unification --repo . --json`，把完整负载（`would-archive`、移动对、台账计数、未解析 0、未分类 0）贴入 `test-evidence/074-archive-round.txt`（FR-001、FR-025）。 [blockedBy: T040,T041,T032]
 - [X] T043 [US3] 074 真实回合 · 执行并提交 archive 批次：运行 `--action archive-apply`；断言 074a/074b 落在 `.specify/specs/074-goal-team-sdd-unification/slices/` 下、文件数与逐文件 sha256 及相对路径集合与归档前一致（运行期探针，不写死计数）、`git diff --name-status -M HEAD` 在被移动分片路径集上全为重命名对（清单 A 与活引用载体 M 按声明集合断言）、`archive-manifest.json` 可复核、注册状态与封装结论不变；按显式路径提交 archive 批次（父 spec 树、`.specify/register.md`、`.specify/features/074-goal-team-sdd-unification.md` 活区、`shared/definitions/sdd-routing-definitions.md` 与镜像、`tests/contract/test_sdd_compat_containment.py`、`tests/contract/test_sdd_diffusion.py`、归档清单）（FR-002、FR-004、FR-025、SC-001）。 [blockedBy: T042]
 - [X] T044 [US3] 074 回合可复现：重跑 archive-plan（`already-archived` 结论、零待移动、零未解析）与 archive-apply（`already-archived`、零 diff）；重跑 seal 并断言阻断清单与归档前逐条一致；把读数追加到 `test-evidence/074-archive-round.txt`（FR-010、FR-026、SC-002）。 [blockedBy: T043]
-- [ ] T045 [US3] US3 检查点：运行阻断态 + 命令面 + 回合套件（`tests/integration/test_seal_archive_round.py`、`tests/contract/test_seal_engine_contract.py`、`tests/contract/test_migration_distribution.py`），把读数记入 `test-evidence/us3-checkpoint.txt`（FR-001、FR-021、SC-004）。 [blockedBy: T044,T038,T041]
+- [X] T045 [US3] US3 检查点：运行阻断态 + 命令面 + 回合套件（`tests/integration/test_seal_archive_round.py`、`tests/contract/test_seal_engine_contract.py`、`tests/contract/test_migration_distribution.py`），把读数记入 `test-evidence/us3-checkpoint.txt`（FR-001、FR-021、SC-004）。 [blockedBy: T044,T038,T041]
 
 ---
 
@@ -279,14 +279,14 @@ Probed 2026-11-11 in this worktree（`100-seal-slice-archive` @ `90bab87ee`）�
 
 **Purpose**: 全量对照、镜像/副本终检、quickstart 实跑、记录收尾——跨全部故事的收口面。
 
-- [ ] T046 全量套件零新增失败（GATE-1）：`bash scripts/bash/run-tests.sh --names-out .specify/specs/100-seal-slice-archive/test-evidence/final-failed.txt`，与实现入口基线名单（owner：`/speckit.implement` step 6 的 `**Test runs**`）做 `comm -13`，新增名单为空；读数存 `test-evidence/final-suite.txt`（FR-024）。 [P] [blockedBy: T045]
-- [ ] T047 镜像与副本终检（GATE-2）：`python3 scripts/python/sync-mirrors.py --check` 相对 T001 基线零新增漂移（唯一既有 `DIFF` 仍是 `.specify/templates/gitignore-specify-template`）、`python3 scripts/python/regen-command-copies.py --check` exit 0；读数存 `test-evidence/final-mirrors.txt`（FR-021）。 [P] [blockedBy: T045]
-- [ ] T048 quickstart 实跑：按 `quickstart.md` S-2…S-6 在夹具树与已归档的 074 树上执行 plan / apply / 重跑 / 阻断态 / 回滚走查，把真实输出与 teardown 贴入 `notes/quickstart-run.md`（FR-011、FR-022）。 [P] [blockedBy: T045]
-- [ ] T049 SC → 首红模块追溯：产出 `test-evidence/sc-trace.txt`，逐条给出 SC-001…SC-010 的测试模块、红先读数与变异取证；只有措辞变化的检查不计为取证（FR-024）。 [green: contracts/archive-actions.contract.md#C-116] [blockedBy: T046]
-- [ ] T050 落 `verification.md`：SC-001…SC-010 每条一行状态（`**Path**` 标记）、smoke 三键（`smoke_command` / `smoke_exit_code=0` / 证据路径）、`deferred_tasks=`；条件集按 `shared/workflow/acceptance-hardening.md` § Gates（FR-024、GATE-4）。 [blockedBy: T049]
-- [ ] T051 Feature 注册表收尾：向 `.specify/features.md` 099 行与 `.specify/features/099-speckit-seal.md` 追加 2026-11-11 tasks 阶段叙述（不新建 Feature 行、状态保持 `Ready for Review`），并复核 Feature 列表（无新增 / 合并 / 失效）。 [P] [blockedBy: T045]
-- [ ] T052 条款覆盖终局：`python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/100-seal-slice-archive` 对照 T003 冻结基线，确认 claimed 40、FR 28/28、uncovered beyond baseline 0；读数存 `test-evidence/coverage-final.txt`（FR-024）。 [blockedBy: T003,T049]
-- [ ] T053 结构与重复机制审计：`ls templates/commands/*.md | wc -l` 仍为 31；仓库无**本特性新增的**第二套处置词表、第二归档引擎、第二份按 spec 清单或调度器（基线中既有的 sanitize 五值词表与 non-disposable 四值词表按原样保留）；读数存 `test-evidence/structure-audit.txt`（FR-027、SC-009）。 [P] [blockedBy: T045]
+- [X] T046 全量套件零新增失败（GATE-1）：`bash scripts/bash/run-tests.sh --names-out .specify/specs/100-seal-slice-archive/test-evidence/final-failed.txt`，与实现入口基线名单（owner：`/speckit.implement` step 6 的 `**Test runs**`）做 `comm -13`，新增名单为空；读数存 `test-evidence/final-suite.txt`（FR-024）。 [P] [blockedBy: T045]
+- [X] T047 镜像与副本终检（GATE-2）：`python3 scripts/python/sync-mirrors.py --check` 相对 T001 基线零新增漂移（唯一既有 `DIFF` 仍是 `.specify/templates/gitignore-specify-template`）、`python3 scripts/python/regen-command-copies.py --check` exit 0；读数存 `test-evidence/final-mirrors.txt`（FR-021）。 [P] [blockedBy: T045]
+- [X] T048 quickstart 实跑：按 `quickstart.md` S-2…S-6 在夹具树与已归档的 074 树上执行 plan / apply / 重跑 / 阻断态 / 回滚走查，把真实输出与 teardown 贴入 `notes/quickstart-run.md`（FR-011、FR-022）。 [P] [blockedBy: T045]
+- [X] T049 SC → 首红模块追溯：产出 `test-evidence/sc-trace.txt`，逐条给出 SC-001…SC-010 的测试模块、红先读数与变异取证；只有措辞变化的检查不计为取证（FR-024）。 [green: contracts/archive-actions.contract.md#C-116] [blockedBy: T046]
+- [X] T050 落 `verification.md`：SC-001…SC-010 每条一行状态（`**Path**` 标记）、smoke 三键（`smoke_command` / `smoke_exit_code=0` / 证据路径）、`deferred_tasks=`；条件集按 `shared/workflow/acceptance-hardening.md` § Gates（FR-024、GATE-4）。 [blockedBy: T049]
+- [X] T051 Feature 注册表收尾：向 `.specify/features.md` 099 行与 `.specify/features/099-speckit-seal.md` 追加 2026-11-11 tasks 阶段叙述（不新建 Feature 行、状态保持 `Ready for Review`），并复核 Feature 列表（无新增 / 合并 / 失效）。 [P] [blockedBy: T045]
+- [X] T052 条款覆盖终局：`python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/100-seal-slice-archive` 对照 T003 冻结基线，确认 claimed 40、FR 28/28、uncovered beyond baseline 0；读数存 `test-evidence/coverage-final.txt`（FR-024）。 [blockedBy: T003,T049]
+- [X] T053 结构与重复机制审计：`ls templates/commands/*.md | wc -l` 仍为 31；仓库无**本特性新增的**第二套处置词表、第二归档引擎、第二份按 spec 清单或调度器（基线中既有的 sanitize 五值词表与 non-disposable 四值词表按原样保留）；读数存 `test-evidence/structure-audit.txt`（FR-027、SC-009）。 [P] [blockedBy: T045]
 
 ---
 

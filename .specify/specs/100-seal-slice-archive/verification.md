@@ -12,6 +12,11 @@ smoke_command=bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_pl
 smoke_exit_code=0
 smoke_evidence_path=.specify/specs/100-seal-slice-archive/test-evidence/us1-checkpoint.txt
 
+# -- Joint acceptance (one row per `in-scope` runtime-stack row in requirements.md) --
+
+RS-004_joint_acceptance=pass
+RS-004_note=既有 seal 引擎与 non-disposable 处置 owner 就地扩展：动作集六值、写面数据表、C-111/C-113 边界审计全绿；未新建第二引擎或第二处置词表（test-evidence/structure-audit.txt、test-evidence/us4-checkpoint.txt）
+
 # -- Per-SC status rows --
 
 SC-001_status=pass
