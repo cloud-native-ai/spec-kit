@@ -1,0 +1,11 @@
+# Checklist stage checks — 100-seal-slice-archive — 2026-11-11
+check: python3 inline verifier over checklists/2026-11-11-requirements-quality.md + requirements.md (read-only; run once on the final artifact)
+checklist_file: checklists/2026-11-11-requirements-quality.md
+items: 36 (CHK001..CHK036; consecutive=True)
+req_anchor: 36/36 = 100.0% (methodology floor: >=80%)
+fr_coverage: 28/28; missing=[]
+sc_coverage: 10/10; missing=[]
+categories: clarity=7 decidability=9 coverage=10 closure=10
+verdicts: pass=7 fail=11 observe=18
+detection: same-author gate FIRED; 2 fresh-context read-only SDD Analysis Workers (A: requirements-internal 22 candidates; B: cross-artifact 15 candidates); 37 candidates -> 9 discarded/downgraded after artifact re-verification; 1 brief premise corrected (tasks.md top-level sections = 20, not 11)
+gates_run_by_this_stage: none (checklist consumes the requirements/clarify gate readings already recorded in test-evidence/validate-requirements.txt)
