@@ -391,6 +391,14 @@ fi
 - **driver lease**：会话接管一条 line 前 `lease-acquire`（`O_CREAT|O_EXCL`）；活持有者 → exit 3；过期 lease 先验证证据再 `lease-break --reason --evidence-ref`；PID 活 + token 匹配 + 心跳过期 = `suspected-alive`，只允许 `--override` 破除。持有者以 ≤ `ttl_seconds/3`（缺省 ≤200s）续租，并在 U2/U3/U4/U5 各续租一次；watch window 遵守 Recipe 6 的窗口上限或续租钩子。
 - **重接线**：`lease-acquire` → `verify-identity`（runner/cli start token、cwd、branch）→ `watch-target.sh --once` → 三分支；不依赖会话记忆或宽泛进程扫描。
 
+## Recipe 8 — Split 收尾派发（Split Closure via /speckit.seal）
+
+**何时**：U6 收尾前判定为 split 线（`merge.status=merged` 的合并清单或分片目录存在）。**派发什么**：恰好一次有界执行，提示词 = 「读取并遵循 `skills/internal/seal-artifact/SKILL.md`，对 `<spec-dir>` 运行 `/speckit.seal` 的完整动作序列（merge-plan → merge-apply（如未合并）→ archive-plan → archive-apply → seal），stdout 逐字回报引擎输出」。承载与阶段派发同规（fork / subprocess；in-process BANNED），哨兵 `SEAL-DONE`。
+
+**U4 判据**（全齐才收尾）：① `seal.md` 存在于父 spec 目录；② `archive-manifest.json` 与引用台账齐备（split 线归档已执行或具名 `already-archived`）；③ 终态裁决逐字回报且未被改写——`Sealed` 或逐条具名阻断均合法；④ 引擎退出码与其输出一致。**失败处理**：拒绝/错误 → 按引擎输出逐条上送（U5 四要素），MUST NOT 手工改状态面、MUST NOT 以 review 结论代替 seal 裁决；重复执行须在 evidence 中注明幂等读数。
+
+**边界**：seal 是 U6 收尾动作，不是阶段——阶段链、阶段哨兵与阶段 U4 均不变；非 split 线零派发。
+
 ## Boundary
 
 - 远端不可达 / 凭证失效 / 子代理 CLI 不在执行身份路径：前置检查（run-agent dispatch-preflight.md）拦截并给修复动作，不裸报错弃线。
