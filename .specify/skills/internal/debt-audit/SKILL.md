@@ -53,7 +53,7 @@ Report the output paths, the counts (findings by severity, domains accepted/gapp
 
 ### 7. Handoff
 
-On user authorization: data reclamation goes to `/speckit.sanitize` (its lanes and confirmation gates own the execution); mechanism repairs go to an SDD run. This skill neither executes nor schedules either.
+On user authorization: data reclamation goes to `/speckit.sanitize` (its lanes and confirmation gates own the execution); mechanism repairs go to an SDD run. When an authorized batch is dispatched for execution, its executor is the **`sdd-debt-fixer` agent template** (`agents/sdd-debt-fixer.agent.md`, runtime face `.specify/agents/templates/`) — one bounded write territory per execution, items and authorization passed verbatim from the register. This skill neither executes nor schedules either.
 
 ## Behavior Rules
 
