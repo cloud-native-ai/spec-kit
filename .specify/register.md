@@ -234,6 +234,14 @@
 | REC-099-4 | 驱动状态脊随阶段推进（或将 U0 块标为快照并指向 line registry）；带外用户裁定修订登记为特性行 | `.specify/specs/099-speckit-seal/review.md` § 5.3 REC-099-4（F7、F8） | open |
 | REC-099-5 | seal 批量写入在途中失败时恢复当前文件（或写前登记为已写），并补故障注入用例 | `.specify/specs/099-speckit-seal/review.md` § 5.2 REC-099-5（F9） | open |
 | REC-099-6 | tasks 阶段收口须处置每条 `green-cross-phase` 警告（重切分区或记录有意顺序） | `.specify/specs/099-speckit-seal/review.md` § 5.1 REC-099-6（F10） | open |
+| REC-100-1 | 混合载体的 dated 判据按实际实现在 C-306/C-308 中写明（dated-only 文件级 sha；混合载体保留 dated 行字节并逐条列 live 行） | `.specify/specs/100-seal-slice-archive/review.md` § 5.1 REC-100-1（F2） | open |
+| REC-100-2 | 合并清单台账的 `line` 定位稳定：保留 `digest` 键位或在序列化后重算 merge-manifest 行，并补 074 行定位回归 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-2（F3） | open |
+| REC-100-3 | apply 写入后真实重扫未解析引用（非 0 即恢复批次并 exit 2），并记录实测 `unresolved_after` | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-3（F4） | open |
+| REC-100-4 | analyze 增加跨条款矛盾检测：同一谓词被不同条款分入相反封闭集时在实现前报告 | `.specify/specs/100-seal-slice-archive/review.md` § 5.4 REC-100-4（F1） | open |
+| REC-100-5 | C-102 的 `not-evaluated (blocked-by …)` 行落地（扩展 condition 载荷或收窄条款措辞） | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-5（F9） | open |
+| REC-100-6 | 每个实现工作包收口前强制跑镜像与命令副本 `--check`，并把该对摘要记入包证据 | `.specify/specs/100-seal-slice-archive/review.md` § 5.3 REC-100-6（F5） | open |
+| REC-100-7 | 状态脊 loop-state 随每条 stage record 推进（或标为 U0 快照）；阻断计数由载荷 `code` 字段投影 | `.specify/specs/100-seal-slice-archive/review.md` § 5.4 REC-100-7（F6、F7） | open |
+| REC-100-8 | DoD 全部满足时在收口提交把 `**DoD Status**` 翻为 `green`，并由收口步骤校验 | `.specify/specs/100-seal-slice-archive/review.md` § 5.1 REC-100-8（F8） | open |
 | T-001 (098) | 098 plan 承重决策：缺省档排除慢档、全量档由 `--full` 显式请求（反题=缺省全量 + 显式 fast 档；重开条件=下游把缺省档误当全量 ≥2 次或 closure 出现可归因于缺省档漏跑的失败名 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-001 | active（重开条件见记录） |
 | T-002 (098) | 098 plan 承重决策：顺序确定性由 `feedback-utils.py` 的可选 `--now` 注入时钟提供（反题=测试侧直接构造/回写条目时间戳；重开条件=任一调用方无法注入时间戳或 `--now` 出现在生产调用记录 ≥1） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-002 | active（重开条件见记录） |
 | T-003 (098) | 098 plan 承重决策：进程内直调按「清单 + 二值边界类」逐点转换，携带 cwd/env 的 fixture 层调用保留子进程（反题=全部保持子进程；重开条件=任一转换点出现无法用断言集等价解释的行为差异 ≥1，或 fixture 层必须进程内化才能达到 SC-009） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-003 | active（重开条件见记录） |
