@@ -122,6 +122,20 @@
       "supersededBy": null,
       "round": 4,
       "updated": "2026-11-10 20:12:34"
+    },
+    {
+      "id": "D-074-R3",
+      "question": "074 回合的时机与 099 seal 的验收关系",
+      "dependsOn": [
+        "D-074-R1"
+      ],
+      "branch": "074",
+      "status": "settled",
+      "decision": "074 回合推迟：待 /speckit.seal(099) 开发完成后，以 074-goal-team-sdd-unification 作为 seal 的真实测试与验证用例(074a/074b 合并回父级 + seal)",
+      "span": "074 spine；099 验收面",
+      "supersededBy": null,
+      "round": 5,
+      "updated": "2026-11-10 20:18:57"
     }
   ],
   "retractions": []

@@ -17,3 +17,7 @@ tags: [test-infrastructure, performance, pytest]
 ## Evolution Log
 
 - 2026-10-30 parked（mid-loop；未在 078 运行中实施，以免改变 baseline/closure 测试口径）。
+
+## 立项记录（2026-11-10）
+
+- 已作为独立 SDD 线启动（见对应的 096/097/098 状态脊与 U5 上送件）；运行至 analyze 门后按「一轮修复回环」规则停线，处置选项见各线 handoff。

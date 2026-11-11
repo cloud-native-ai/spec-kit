@@ -1,11 +1,11 @@
 {
   "store": ".specify/memory/trigger/",
   "schemaVersion": 1,
-  "updated": "2026-11-09T15:09:51Z",
+  "updated": "2026-11-10T20:16:20Z",
   "config": {
     "enabled": true,
     "threshold": 5,
-    "telemetryWindow": 3,
+    "telemetryWindow": 200,
     "probeBudgetPct": 20,
     "minSample": 5
   },
@@ -218,32 +218,27 @@
       "confirmationClass": "reversible",
       "origin": "seed",
       "priority": 30,
-      "state": "suppressed",
+      "state": "active",
       "promotion": {
         "consecutive": 0,
         "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
-        "resetBy": "20261109T150951Z-02",
-        "userResetAt": null
+        "resetBy": "20261110T191910Z-05",
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
-        "hits": 73,
-        "accepted": 37,
-        "declined": 68,
-        "ignored": 11,
-        "lastSeen": "2026-11-09T15:09:51Z"
+        "hits": 21,
+        "accepted": 17,
+        "declined": 56,
+        "ignored": 6,
+        "lastSeen": "2026-11-10T19:19:10Z"
       },
       "provenance": {
         "file": "templates/commands/requirements.md",
         "anchorKind": "handoffs",
         "anchor": "## Handoffs",
         "quote": "If spec has `[NEEDS CLARIFICATION]` or `Related Feature: Need clarification` → `/speckit.clarify`."
-      },
-      "tuning": {
-        "ratifiedAt": "2026-11-09T15:09:49Z",
-        "evidenceRef": "p-001#declineRate",
-        "suppressedBy": "p-001"
       }
     },
     {
@@ -262,7 +257,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -294,7 +289,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -307,7 +302,7 @@
         "file": "templates/commands/requirements.md",
         "anchorKind": "handoffs",
         "anchor": "## Handoffs",
-        "quote": "recommended whenever `.specify/memory/features.md` is absent or still a placeholder"
+        "quote": "recommended whenever `.specify/features.md` is absent or still a placeholder"
       }
     },
     {
@@ -326,7 +321,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -358,14 +353,14 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
-        "hits": 2,
+        "hits": 0,
         "accepted": 0,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": "2026-11-09T15:09:47Z"
+        "lastSeen": null
       },
       "provenance": {
         "file": "templates/commands/tasks.md",
@@ -385,19 +380,19 @@
       "priority": 70,
       "state": "active",
       "promotion": {
-        "consecutive": 1,
+        "consecutive": 0,
         "threshold": 5,
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
-        "hits": 14,
+        "hits": 1,
         "accepted": 1,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": "2026-11-09T15:09:47Z"
+        "lastSeen": "2026-11-10T19:07:02Z"
       },
       "provenance": {
         "file": "templates/commands/checklist.md",
@@ -423,7 +418,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -455,7 +450,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -487,7 +482,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -519,7 +514,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -551,7 +546,7 @@
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -584,7 +579,7 @@
         "promoted": false,
         "destructiveExempt": false,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -616,7 +611,7 @@
         "promoted": false,
         "destructiveExempt": true,
         "resetBy": null,
-        "userResetAt": null
+        "userResetAt": "2026-11-10T19:18:49Z"
       },
       "stats": {
         "hits": 0,
@@ -636,1078 +631,841 @@
   ],
   "events": [
     {
-      "eventId": "20261109T150951Z-02",
+      "eventId": "20261110T191910Z-05",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:51Z"
+      "created": "2026-11-10T19:19:10Z"
     },
     {
-      "eventId": "20261109T150951Z-01",
+      "eventId": "20261110T191910Z-04",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:51Z"
+      "created": "2026-11-10T19:19:10Z"
     },
     {
-      "eventId": "20261109T150950Z-13",
+      "eventId": "20261110T191910Z-03",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:19:10Z"
     },
     {
-      "eventId": "20261109T150950Z-12",
+      "eventId": "20261110T191910Z-02",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:19:10Z"
     },
     {
-      "eventId": "20261109T150950Z-11",
+      "eventId": "20261110T191910Z-01",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:19:10Z"
     },
     {
-      "eventId": "20261109T150950Z-10",
+      "eventId": "20261110T191909Z-02",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:19:09Z"
     },
     {
-      "eventId": "20261109T150950Z-09",
+      "eventId": "20261110T191909Z-01",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:19:09Z"
     },
     {
-      "eventId": "20261109T150950Z-08",
+      "eventId": "20261110T191908Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:08Z"
+    },
+    {
+      "eventId": "20261110T191908Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:08Z"
+    },
+    {
+      "eventId": "20261110T191908Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:08Z"
+    },
+    {
+      "eventId": "20261110T191908Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:08Z"
+    },
+    {
+      "eventId": "20261110T191908Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:08Z"
+    },
+    {
+      "eventId": "20261110T191907Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:07Z"
+    },
+    {
+      "eventId": "20261110T191907Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:07Z"
+    },
+    {
+      "eventId": "20261110T191907Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:07Z"
+    },
+    {
+      "eventId": "20261110T191907Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:07Z"
+    },
+    {
+      "eventId": "20261110T191906Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:06Z"
+    },
+    {
+      "eventId": "20261110T191906Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:06Z"
+    },
+    {
+      "eventId": "20261110T191906Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:06Z"
+    },
+    {
+      "eventId": "20261110T191906Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:06Z"
+    },
+    {
+      "eventId": "20261110T191905Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:05Z"
+    },
+    {
+      "eventId": "20261110T191905Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:05Z"
+    },
+    {
+      "eventId": "20261110T191905Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:05Z"
+    },
+    {
+      "eventId": "20261110T191905Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:05Z"
+    },
+    {
+      "eventId": "20261110T191904Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:04Z"
+    },
+    {
+      "eventId": "20261110T191904Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:04Z"
+    },
+    {
+      "eventId": "20261110T191904Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:04Z"
+    },
+    {
+      "eventId": "20261110T191904Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:04Z"
+    },
+    {
+      "eventId": "20261110T191904Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:04Z"
+    },
+    {
+      "eventId": "20261110T191903Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:03Z"
+    },
+    {
+      "eventId": "20261110T191903Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:03Z"
+    },
+    {
+      "eventId": "20261110T191903Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:03Z"
+    },
+    {
+      "eventId": "20261110T191903Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:03Z"
+    },
+    {
+      "eventId": "20261110T191902Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:02Z"
+    },
+    {
+      "eventId": "20261110T191902Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:02Z"
+    },
+    {
+      "eventId": "20261110T191902Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:02Z"
+    },
+    {
+      "eventId": "20261110T191901Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:01Z"
+    },
+    {
+      "eventId": "20261110T191901Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:01Z"
+    },
+    {
+      "eventId": "20261110T191901Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:01Z"
+    },
+    {
+      "eventId": "20261110T191901Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:01Z"
+    },
+    {
+      "eventId": "20261110T191901Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:01Z"
+    },
+    {
+      "eventId": "20261110T191900Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:19:00Z"
+    },
+    {
+      "eventId": "20261110T191859Z-05",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:18:59Z"
     },
     {
-      "eventId": "20261109T150950Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
-    },
-    {
-      "eventId": "20261109T150950Z-06",
+      "eventId": "20261110T191859Z-04",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:18:59Z"
     },
     {
-      "eventId": "20261109T150950Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
-    },
-    {
-      "eventId": "20261109T150950Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
-    },
-    {
-      "eventId": "20261109T150950Z-03",
+      "eventId": "20261110T191859Z-03",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:18:59Z"
     },
     {
-      "eventId": "20261109T150950Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
-    },
-    {
-      "eventId": "20261109T150950Z-01",
+      "eventId": "20261110T191859Z-02",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:50Z"
+      "created": "2026-11-10T19:18:59Z"
     },
     {
-      "eventId": "20261109T150949Z-17",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-16",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-15",
+      "eventId": "20261110T191859Z-01",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
+      "created": "2026-11-10T19:18:59Z"
     },
     {
-      "eventId": "20261109T150949Z-14",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-13",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-12",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-11",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-10",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-09",
+      "eventId": "20261110T191858Z-04",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
+      "created": "2026-11-10T19:18:58Z"
     },
     {
-      "eventId": "20261109T150949Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-05",
+      "eventId": "20261110T191858Z-03",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
+      "created": "2026-11-10T19:18:58Z"
     },
     {
-      "eventId": "20261109T150949Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150949Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:49Z"
-    },
-    {
-      "eventId": "20261109T150948Z-20",
+      "eventId": "20261110T191858Z-02",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:58Z"
     },
     {
-      "eventId": "20261109T150948Z-19",
+      "eventId": "20261110T191858Z-01",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:58Z"
     },
     {
-      "eventId": "20261109T150948Z-18",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-17",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-16",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-15",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-14",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-13",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-12",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-11",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-10",
+      "eventId": "20261110T191857Z-05",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:57Z"
     },
     {
-      "eventId": "20261109T150948Z-09",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-04",
+      "eventId": "20261110T191857Z-04",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:57Z"
     },
     {
-      "eventId": "20261109T150948Z-03",
+      "eventId": "20261110T191857Z-03",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
+      "response": "ignored",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:57Z"
     },
     {
-      "eventId": "20261109T150948Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
-    },
-    {
-      "eventId": "20261109T150948Z-01",
+      "eventId": "20261110T191857Z-02",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "declined",
       "escalated": false,
-      "created": "2026-11-09T15:09:48Z"
+      "created": "2026-11-10T19:18:57Z"
     },
     {
-      "eventId": "20261109T150947Z-07",
+      "eventId": "20261110T191857Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:57Z"
+    },
+    {
+      "eventId": "20261110T191856Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:56Z"
+    },
+    {
+      "eventId": "20261110T191856Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:56Z"
+    },
+    {
+      "eventId": "20261110T191856Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:56Z"
+    },
+    {
+      "eventId": "20261110T191856Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:56Z"
+    },
+    {
+      "eventId": "20261110T191855Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:55Z"
+    },
+    {
+      "eventId": "20261110T191855Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:55Z"
+    },
+    {
+      "eventId": "20261110T191855Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:55Z"
+    },
+    {
+      "eventId": "20261110T191855Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:18:55Z"
+    },
+    {
+      "eventId": "20261110T191854Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:54Z"
+    },
+    {
+      "eventId": "20261110T191854Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:54Z"
+    },
+    {
+      "eventId": "20261110T191853Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:53Z"
+    },
+    {
+      "eventId": "20261110T191853Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:53Z"
+    },
+    {
+      "eventId": "20261110T191853Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:53Z"
+    },
+    {
+      "eventId": "20261110T191847Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:47Z"
+    },
+    {
+      "eventId": "20261110T191846Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:18:46Z"
+    },
+    {
+      "eventId": "20261110T190707Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:07:07Z"
+    },
+    {
+      "eventId": "20261110T190706Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:07:06Z"
+    },
+    {
+      "eventId": "20261110T190702Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:07:02Z"
+    },
+    {
+      "eventId": "20261110T190702Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:07:02Z"
+    },
+    {
+      "eventId": "20261110T190702Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-10T19:07:02Z"
+    },
+    {
+      "eventId": "20261110T190702Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:07:02Z"
+    },
+    {
+      "eventId": "20261110T190702Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-10T19:07:02Z"
+    },
+    {
+      "eventId": "20261110T190702Z-02",
       "ruleId": "r-006",
       "situationId": "s06",
       "snapshot": "tasks-ready|open-tasks",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
+      "created": "2026-11-10T19:07:02Z"
     },
     {
-      "eventId": "20261109T150947Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150947Z-05",
+      "eventId": "20261110T190702Z-01",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150947Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150947Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150947Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150947Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:47Z"
-    },
-    {
-      "eventId": "20261109T150946Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:09:46Z"
-    },
-    {
-      "eventId": "20261109T150249Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:49Z"
-    },
-    {
-      "eventId": "20261109T150248Z-09",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "ignored",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150248Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:48Z"
-    },
-    {
-      "eventId": "20261109T150247Z-12",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-11",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-10",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-09",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150247Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:47Z"
-    },
-    {
-      "eventId": "20261109T150246Z-18",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-17",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-16",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-15",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-14",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-13",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-12",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-11",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-10",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-09",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150246Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:46Z"
-    },
-    {
-      "eventId": "20261109T150245Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T15:02:45Z"
-    },
-    {
-      "eventId": "20261109T143853Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:53Z"
-    },
-    {
-      "eventId": "20261109T143851Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:51Z"
-    },
-    {
-      "eventId": "20261109T143850Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:50Z"
-    },
-    {
-      "eventId": "20261109T143850Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:50Z"
-    },
-    {
-      "eventId": "20261109T143850Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:50Z"
-    },
-    {
-      "eventId": "20261109T143850Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:50Z"
-    },
-    {
-      "eventId": "20261109T143850Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:50Z"
-    },
-    {
-      "eventId": "20261109T143849Z-09",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-08",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-07",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-06",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-05",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-04",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-03",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "declined",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-02",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
-    },
-    {
-      "eventId": "20261109T143849Z-01",
-      "ruleId": "r-001",
-      "situationId": "s01",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "response": "accepted",
-      "escalated": false,
-      "created": "2026-11-09T14:38:49Z"
+      "created": "2026-11-10T19:07:02Z"
     }
   ],
-  "lastSuggestion": {},
+  "lastSuggestion": {
+    "sth-1": {
+      "sessionId": "sth-1",
+      "turnId": "sth-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:53Z"
+    },
+    "sth-2": {
+      "sessionId": "sth-2",
+      "turnId": "sth-2-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:53Z"
+    },
+    "sth-3": {
+      "sessionId": "sth-3",
+      "turnId": "sth-3-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:53Z"
+    },
+    "sevid-1": {
+      "sessionId": "sevid-1",
+      "turnId": "sevid-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:53Z"
+    },
+    "ssnap-1": {
+      "sessionId": "ssnap-1",
+      "turnId": "ssnap-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:54Z"
+    },
+    "stune-1": {
+      "sessionId": "stune-1",
+      "turnId": "stune-1-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:55Z"
+    },
+    "stune-2": {
+      "sessionId": "stune-2",
+      "turnId": "stune-2-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:55Z"
+    },
+    "stune-3": {
+      "sessionId": "stune-3",
+      "turnId": "stune-3-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:56Z"
+    },
+    "stune-4": {
+      "sessionId": "stune-4",
+      "turnId": "stune-4-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:56Z"
+    },
+    "stune-5": {
+      "sessionId": "stune-5",
+      "turnId": "stune-5-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:56Z"
+    },
+    "stune-6": {
+      "sessionId": "stune-6",
+      "turnId": "stune-6-01",
+      "situationId": "s01",
+      "ruleId": "r-001",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "escalated": false,
+      "suggested": true,
+      "ts": "2026-11-10T19:18:57Z"
+    }
+  },
   "proposals": [
     {
       "proposalId": "p-001",
-      "kind": "suppress",
-      "ruleId": "r-001",
-      "evidence": {
-        "metric": "declineRate",
-        "value": 0.5625,
-        "sampleSize": 16
-      },
-      "state": "applied",
-      "createdAt": "2026-11-09T14:38:50Z",
-      "ratifiedAt": "2026-11-09T15:09:49Z",
-      "reason": "decline rate 1.00 over 6 hits",
-      "appliedAt": "2026-11-09T15:09:49Z"
-    },
-    {
-      "proposalId": "p-002",
       "kind": "add-rule",
       "flow": "/speckit.history",
       "evidence": {
@@ -1715,30 +1473,53 @@
         "value": 2,
         "sampleSize": 2
       },
-      "state": "proposed",
-      "createdAt": "2026-11-09T14:38:50Z"
+      "state": "applied",
+      "createdAt": "2026-11-10T19:07:02Z",
+      "ratifiedAt": "2026-11-10T19:19:05Z",
+      "reason": "decline rate 1.00 over 6 hits",
+      "appliedAt": "2026-11-10T19:19:05Z"
     },
     {
-      "proposalId": "p-003",
+      "proposalId": "p-002",
       "kind": "suppress",
       "ruleId": "r-001",
       "evidence": {
         "metric": "declineRate",
-        "value": 0.726,
-        "sampleSize": 73
+        "value": 0.6667,
+        "sampleSize": 21
       },
       "state": "proposed",
-      "createdAt": "2026-11-09T15:09:49Z"
+      "createdAt": "2026-11-10T19:18:57Z"
+    },
+    {
+      "proposalId": "p-003",
+      "kind": "add-rule",
+      "flow": "/speckit.history",
+      "evidence": {
+        "metric": "missedInvocations",
+        "value": 7,
+        "sampleSize": 7
+      },
+      "state": "proposed",
+      "createdAt": "2026-11-10T19:19:06Z"
     }
   ],
   "manualInvocations": [
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": "sman-1-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-10T19:07:01Z"
+    },
     {
       "flow": "/speckit.history",
       "sessionId": "sman-2",
       "turnId": "sman-2-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T14:38:50Z"
+      "ts": "2026-11-10T19:07:02Z"
     },
     {
       "flow": "/speckit.history",
@@ -1746,23 +1527,7 @@
       "turnId": "sman-1-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T14:38:50Z"
-    },
-    {
-      "flow": "/speckit.history",
-      "sessionId": "sman-1",
-      "turnId": null,
-      "suggested": false,
-      "situationId": null,
-      "ts": "2026-11-09T15:02:46Z"
-    },
-    {
-      "flow": "/speckit.history",
-      "sessionId": "sman-1",
-      "turnId": null,
-      "suggested": false,
-      "situationId": null,
-      "ts": "2026-11-09T15:02:47Z"
+      "ts": "2026-11-10T19:19:00Z"
     },
     {
       "flow": "/speckit.history",
@@ -1770,7 +1535,15 @@
       "turnId": "sman-2-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T15:02:47Z"
+      "ts": "2026-11-10T19:19:00Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": "sman-1-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-10T19:19:00Z"
     },
     {
       "flow": "/speckit.history",
@@ -1778,7 +1551,7 @@
       "turnId": "sman-7-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T15:02:48Z"
+      "ts": "2026-11-10T19:19:02Z"
     },
     {
       "flow": "/speckit.history",
@@ -1786,7 +1559,15 @@
       "turnId": "sman-8-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T15:02:48Z"
+      "ts": "2026-11-10T19:19:02Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-7",
+      "turnId": "sman-7-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-10T19:19:09Z"
     },
     {
       "flow": "/speckit.history",
@@ -1794,31 +1575,7 @@
       "turnId": "sman-8-01",
       "suggested": false,
       "situationId": null,
-      "ts": "2026-11-09T15:02:48Z"
-    },
-    {
-      "flow": "/speckit.history",
-      "sessionId": "sman-1",
-      "turnId": null,
-      "suggested": false,
-      "situationId": null,
-      "ts": "2026-11-09T15:09:48Z"
-    },
-    {
-      "flow": "/speckit.history",
-      "sessionId": "sman-1",
-      "turnId": null,
-      "suggested": false,
-      "situationId": null,
-      "ts": "2026-11-09T15:09:48Z"
-    },
-    {
-      "flow": "/speckit.history",
-      "sessionId": "sman-8",
-      "turnId": "sman-8-01",
-      "suggested": false,
-      "situationId": null,
-      "ts": "2026-11-09T15:09:49Z"
+      "ts": "2026-11-10T19:19:09Z"
     }
   ]
 }
