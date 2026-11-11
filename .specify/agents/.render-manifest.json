@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "opencode",
-  "rendered_at": "20261110T151119Z",
+  "rendered_at": "20261111T021121Z",
   "entries": {
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -26,6 +26,10 @@
     ".qoder/agents/sdd-clarify-analyzer.agent.md": {
       "source": "templates/sdd-clarify-analyzer.agent.md",
       "sha256": "0c39a7e3258fb7721e488f953dc5ee35264284ea78d7a08054c8e7dbed2cd3f8"
+    },
+    ".qoder/agents/sdd-debt-governor.agent.md": {
+      "source": "templates/sdd-debt-governor.agent.md",
+      "sha256": "384ca361ced5aa78f42038b14362182acff94aecbc654a8f12b42458bca58314"
     },
     ".qoder/agents/sdd-implement-coordinator.agent.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
@@ -111,6 +115,10 @@
       "source": "templates/sdd-clarify-analyzer.agent.md",
       "sha256": "22281ce104a0ce67c9521f52abbe858ea57bab89c0f02fd2ce54634d758f08dc"
     },
+    ".claude/agents/sdd-debt-governor.md": {
+      "source": "templates/sdd-debt-governor.agent.md",
+      "sha256": "6fdaf7b304415815cb09052c7051387d1ec6ea5f56d40cf6de4daf0b712b8dac"
+    },
     ".claude/agents/sdd-implement-coordinator.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
       "sha256": "94e2ca489ad62af5c8edf0077eb6bc6a34e48466779c03efc33ebfedda0cf29b"
@@ -195,6 +203,10 @@
       "source": "templates/sdd-clarify-analyzer.agent.md",
       "sha256": "07afa7e34feb919bfabcf10c31b71577187de4a67c1051123795465495a824d9"
     },
+    ".github/agents/sdd-debt-governor.agent.md": {
+      "source": "templates/sdd-debt-governor.agent.md",
+      "sha256": "02e4d499e133cd01c2c1d0f1c812abec82eaff237ad85e767e283bc333d3f73b"
+    },
     ".github/agents/sdd-implement-coordinator.agent.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
       "sha256": "dc9452c79303eaf693e1be7c1be763d05a17038a8f71617d8eec59029c23069d"
@@ -278,6 +290,10 @@
     ".opencode/agents/sdd-clarify-analyzer.md": {
       "source": "templates/sdd-clarify-analyzer.agent.md",
       "sha256": "646245cd4ddb65cc25236ee44a155a190bc76a6f3d7f2a93b1e9e7477d5d4bad"
+    },
+    ".opencode/agents/sdd-debt-governor.md": {
+      "source": "templates/sdd-debt-governor.agent.md",
+      "sha256": "1e9d434b955c3fd4f7233681b642a189de3a0d671fb50debe85d57d26ea91618"
     },
     ".opencode/agents/sdd-implement-coordinator.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
