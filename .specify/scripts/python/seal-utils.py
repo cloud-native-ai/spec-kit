@@ -73,7 +73,6 @@ WRITE_PATH_ALLOWLIST = (
 #: Stable condition codes for the engine-level (non-action) errors.
 MIRROR_CODE = "mirror-copy"
 SPEC_DIR_CODE = "spec-dir-invalid"
-PENDING_CODE = "not-implemented"
 
 #: C-030 / E11: the archive gate's closed reason vocabulary — two admitted outcomes,
 #: two refusals, two input/environment errors. A new reason is a contract change.
@@ -1738,20 +1737,6 @@ def _factory_doc_refs(repo: Path, slices, parent_strings, id_maps):
                             ["declare the registry or repoint the reference",
                              "or record a user-waiver after review"]))
     return refs, conflicts
-
-
-def _pending(args: argparse.Namespace,
-             spec_dir: Optional[Path]) -> Tuple[Dict[str, Any], int]:
-    action = args.action
-    return _payload(
-        action, spec_dir, "error", EXIT_INPUT_ERROR,
-        [_condition(
-            PENDING_CODE,
-            "the %s action body is not implemented on this skeleton" % action,
-            "run the action once its implementing work package lands",
-            "rerun the same command after the action body is implemented",
-        )],
-    ), EXIT_INPUT_ERROR
 
 
 def _finalize_conflicts(conflicts):
@@ -3743,8 +3728,8 @@ def action_archive_gate(args: argparse.Namespace, spec_dir: Path) -> Tuple[Dict[
 # ---------------------------------------------------------------------------
 
 def _archive_plan_payload(spec_dir: Path, verdict: str, exit_code: int,
-                          conditions=()) -> Dict[str, Any]:
-    payload = _payload("archive-plan", spec_dir, verdict, exit_code, conditions)
+                          conditions=(), action: str = "archive-plan") -> Dict[str, Any]:
+    payload = _payload(action, spec_dir, verdict, exit_code, conditions)
     payload["outcome"] = None
     payload["archive"] = {
         "moves": [],
@@ -3758,12 +3743,12 @@ def _archive_plan_payload(spec_dir: Path, verdict: str, exit_code: int,
     return payload
 
 
-def _archive_refusal(spec_dir, conditions):
+def _archive_refusal_state(conditions) -> Dict[str, Any]:
     codes = [condition["code"] for condition in conditions]
     exit_code = (EXIT_INPUT_ERROR if any(code in ARCHIVE_ERROR_CODES for code in codes)
                  else EXIT_REFUSED)
-    verdict = "error" if exit_code == EXIT_INPUT_ERROR else "refused"
-    return _archive_plan_payload(spec_dir, verdict, exit_code, conditions), exit_code
+    return {"kind": "error" if exit_code == EXIT_INPUT_ERROR else "refused",
+            "exit_code": exit_code, "conditions": conditions}
 
 
 def _git_head(repo: Path) -> Optional[str]:
@@ -4115,50 +4100,40 @@ def _archive_manifest_candidate(repo: Path, spec_dir: Path, ordered, merge_doc,
     return document, amended["amendments"]
 
 
-def action_archive_plan(args: argparse.Namespace,
-                        spec_dir: Path) -> Tuple[Dict[str, Any], int]:
-    """C-102…C-104 / C-301…C-307: read-only precondition, classification and preview."""
-    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+def _archive_plan_state(repo: Path, spec_dir: Path) -> Dict[str, Any]:
+    """C-102/C-104/C-105/C-108: the read-only plan both archive actions recompute.
+
+    `archive-plan` reports it; `archive-apply` runs the same computation as its
+    read-only stage and writes only when it returns `would-archive`.
+    """
     git_check = _run_git(repo, ["rev-parse", "--is-inside-work-tree"])
     head = _git_head(repo)
     if git_check.returncode != 0 or git_check.stdout.strip() != "true" or head is None:
-        return _archive_refusal(spec_dir, [_condition(
+        return _archive_refusal_state([_condition(
             "not-a-git-tree",
             "archive requires a git work tree with a HEAD commit; %s does not "
             "provide one" % repo,
-            "run archive-plan inside the repository work tree (never a plain `mv`)",
-            "rerun archive-plan from the git work tree")])
+            "run the archive action inside the repository work tree (never a "
+            "plain `mv`)",
+            "rerun the same archive action from the git work tree")])
 
     archive_doc = _read_archive_manifest(spec_dir)
     if archive_doc is not None:
         _archived_slice_records(repo, spec_dir, archive_doc)
-        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
-        payload["outcome"] = "already-archived"
-        checks = archive_doc["checks"]
-        payload["archive"].update({
-            "manifest": archive_doc,
-            "unresolved_before": checks["unresolved_after"],
-            "unresolved_after": checks["unresolved_after"],
-            "unclassified": checks["unclassified"],
-        })
-        return payload, EXIT_OK
+        return {"kind": "already-archived", "document": archive_doc, "head": head}
 
     merge_doc = _load_merge_document(spec_dir)
     status = merge_doc["merge"]["status"]
     if status == "not-applicable":
-        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
-        payload["outcome"] = "not-applicable"
-        payload["archive"]["basis"] = (
-            merge_doc["merge"].get("basis")
-            or "the merge manifest records an empty slice set")
-        return payload, EXIT_OK
+        return {"kind": "not-applicable",
+                "basis": (merge_doc["merge"].get("basis")
+                          or "the merge manifest records an empty slice set"),
+                "head": head}
     recorded = _merge_recorded_slices(merge_doc)
     if not recorded:
-        payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
-        payload["outcome"] = "not-applicable"
-        payload["archive"]["basis"] = (
-            "the merge manifest records an empty slice set")
-        return payload, EXIT_OK
+        return {"kind": "not-applicable",
+                "basis": "the merge manifest records an empty slice set",
+                "head": head}
 
     presence = _archive_side_presence(repo, spec_dir, recorded)
     conditions = []
@@ -4242,27 +4217,27 @@ def action_archive_plan(args: argparse.Namespace,
                 "rerun archive-plan on the settled tree"))
 
     if conditions:
-        return _archive_refusal(spec_dir, conditions)
+        return _archive_refusal_state(conditions)
 
     slices, _excluded = _discover_slices(spec_dir, repo)
     ordered = _derive_order(repo, spec_dir.name, slices)
     recorded_slugs = [slug for slug, _order in recorded]
     if [item["slug"] for item in ordered] != recorded_slugs:
-        return _archive_refusal(spec_dir, [_condition(
+        return _archive_refusal_state([_condition(
             "merge-manifest-invalid",
             "%s records slices %r while the tree scan reads %r"
             % (MANIFEST_NAME, recorded_slugs,
                [item["slug"] for item in ordered]),
             "repair the merge manifest or restore the slice directories",
-            "rerun archive-plan once the record and the tree agree")])
+            "rerun archive once the record and the tree agree")])
     for position, (_slug, order) in enumerate(recorded):
         if _is_int(order) and order != position + 1:
-            return _archive_refusal(spec_dir, [_condition(
+            return _archive_refusal_state([_condition(
                 "merge-manifest-invalid",
                 "%s records order %r for %s, but the derived order is %d"
                 % (MANIFEST_NAME, order, ordered[position]["slug"], position + 1),
                 "repair the merge manifest's slice order",
-                "rerun archive-plan once the record and the split record agree")])
+                "rerun archive once the record and the split record agree")])
 
     rows, findings = _archive_reference_scan(repo, spec_dir, ordered)
     conditions = [
@@ -4288,27 +4263,238 @@ def action_archive_plan(args: argparse.Namespace,
             "fix the dangling reference or add the missing target",
             "rerun archive-plan after every target resolves"))
     if conditions:
-        return _archive_refusal(spec_dir, conditions)
+        return _archive_refusal_state(conditions)
 
     runtime = _archive_runtime_rows(
         repo, spec_dir, [item["slug"] for item in ordered])
     document, amendments = _archive_manifest_candidate(
         repo, spec_dir, ordered, merge_doc, rows, runtime, 0, 0, head)
     validate_archive_manifest(document, spec_dir.name)
-    payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK)
-    payload["outcome"] = "would-archive"
-    payload["archive"].update({
-        "moves": [{"slug": entry["slug"], "from": entry["from"],
-                   "to": entry["to"], "order": entry["order"],
-                   "file_count": entry["file_count"]}
-                  for entry in document["slices"]],
+    return {"kind": "would-archive", "document": document,
+            "amendments": amendments, "merge_doc": merge_doc,
+            "head": head, "writes": []}
+
+
+def _archive_report(action: str, spec_dir: Path,
+                    state: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+    """Turn one read-only state into the closed verdict/outcome payload (C-103)."""
+    kind = state["kind"]
+    if kind in ("refused", "error"):
+        return _archive_plan_payload(spec_dir, kind, state["exit_code"],
+                                     state["conditions"], action=action), \
+            state["exit_code"]
+    payload = _archive_plan_payload(spec_dir, "ok", EXIT_OK, (), action=action)
+    payload["outcome"] = kind
+    archive = payload["archive"]
+    if kind == "not-applicable":
+        archive["basis"] = state["basis"]
+        return payload, EXIT_OK
+    document = state["document"]
+    checks = document["checks"]
+    archive.update({
         "manifest": document,
-        "merge_amendments": amendments,
-        "unresolved_before": document["checks"]["unresolved_before"],
-        "unresolved_after": document["checks"]["unresolved_after"],
-        "unclassified": document["checks"]["unclassified"],
+        "unresolved_before": (checks["unresolved_after"]
+                              if kind == "already-archived"
+                              else checks["unresolved_before"]),
+        "unresolved_after": checks["unresolved_after"],
+        "unclassified": checks["unclassified"],
     })
+    if kind == "would-archive":
+        archive["moves"] = [{"slug": entry["slug"], "from": entry["from"],
+                             "to": entry["to"], "order": entry["order"],
+                             "file_count": entry["file_count"]}
+                            for entry in document["slices"]]
+        archive["merge_amendments"] = state["amendments"]
     return payload, EXIT_OK
+
+
+def _archive_serialized(document: Dict[str, Any]) -> str:
+    """C-202: the one canonical serialization for the record and its payload."""
+    return json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+
+
+def _archive_move(repo: Path, source_rel: str, destination_rel: str) -> None:
+    proc = _run_git(repo, ["mv", "--", source_rel, destination_rel])
+    if proc.returncode != 0:
+        raise OSError("git mv %s -> %s failed: %s"
+                      % (source_rel, destination_rel, _first_line(proc.stderr)))
+
+
+def _archive_write_text(path: Path, text: str) -> None:
+    path.write_text(text, encoding="utf-8")
+
+
+def _archive_line_text(text: str, updates, carrier: str) -> str:
+    """C-308: deterministic whole-line replacement against the planned text."""
+    lines = text.splitlines()
+    for update in sorted(updates, key=lambda item: item["line"]):
+        index = update["line"] - 1
+        if index < 0 or index >= len(lines) or lines[index] != update["before"]:
+            raise OSError(
+                "%s:%d no longer carries the planned line; the tree moved "
+                "under the batch" % (carrier, update["line"]))
+        lines[index] = update["after"]
+    trailing = "\n" if text.endswith("\n") else ""
+    return "\n".join(lines) + trailing
+
+
+def _archive_restore(repo: Path, document, journal) -> list:
+    """C-108: restore the batch by its original bytes; report what failed."""
+    failures = []
+    manifest_path = journal.get("manifest")
+    if manifest_path is not None and manifest_path.exists():
+        try:
+            manifest_path.unlink()
+        except OSError as exc:
+            failures.append("remove %s: %s" % (manifest_path, exc))
+    for source_rel, destination_rel in reversed(journal["moved"]):
+        proc = _run_git(repo, ["mv", "--", destination_rel, source_rel])
+        if proc.returncode != 0:
+            failures.append("inverse git mv %s -> %s: %s"
+                            % (destination_rel, source_rel,
+                               _first_line(proc.stderr)))
+    for carrier, original in journal["files"].items():
+        try:
+            (repo / carrier).write_bytes(original)
+        except OSError as exc:
+            failures.append("restore %s: %s" % (carrier, exc))
+    created = journal.get("created_dir")
+    if created is not None and created.is_dir() and not any(created.iterdir()):
+        try:
+            created.rmdir()
+        except OSError as exc:
+            failures.append("remove %s: %s" % (created, exc))
+    return failures
+
+
+class _ArchiveMirrorMismatch(OSError):
+    """C-310: the source/mirror pair stopped matching inside one batch."""
+
+
+def _archive_apply_batch(repo: Path, spec_dir: Path,
+                         state: Dict[str, Any]) -> Optional[tuple]:
+    """C-106/C-108/C-308…C-311: one write batch, restored byte for byte."""
+    document = state["document"]
+    pairs = [{"slug": entry["slug"], "from": entry["from"], "to": entry["to"]}
+             for entry in document["slices"]]
+    amendment = amended_merge_document(state["merge_doc"], pairs)
+    journal = {"moved": [], "created_dir": None, "files": {}, "manifest": None}
+    written: list = []
+    dated = {row["carrier"] for row in document["references"]["rows"]
+             if row["kind"] == "dated-preserved"}
+    merge_path = spec_dir / MANIFEST_NAME
+    merge_rel = _rel_path(repo, merge_path)
+    live_rows: Dict[str, list] = {}
+    for row in document["references"]["rows"]:
+        if row["kind"] == "live-rewrite" and row["carrier"] != merge_rel:
+            live_rows.setdefault(row["carrier"], []).append(row)
+    moved_prefixes = tuple(entry["from"] + "/" for entry in document["slices"])
+    dated = {carrier for carrier in dated
+             if not carrier.startswith(moved_prefixes)} - set(live_rows)
+    dated_before = {carrier: hashlib.sha256((repo / carrier).read_bytes()).hexdigest()
+                    for carrier in sorted(dated) if (repo / carrier).is_file()}
+    slices_dir = spec_dir / ARCHIVE_SLICES_DIR
+    failure = None
+    try:
+        if not slices_dir.is_dir():
+            slices_dir.mkdir(parents=True)
+            journal["created_dir"] = slices_dir
+        for entry in document["slices"]:
+            source = repo / entry["from"]
+            for row in entry["files"]:
+                journal["files"].setdefault(
+                    entry["from"] + "/" + row["path"],
+                    (source / row["path"]).read_bytes())
+            _archive_move(repo, entry["from"], entry["to"])
+            journal["moved"].append((entry["from"], entry["to"]))
+        for carrier in sorted(live_rows):
+            path = repo / carrier
+            original = path.read_bytes()
+            journal["files"].setdefault(carrier, original)
+            _archive_write_text(
+                path, _archive_line_text(original.decode("utf-8"),
+                                         live_rows[carrier], carrier))
+            written.append(carrier)
+        for row in document["references"]["runtime"]:
+            if row["status"] != "runtime-updated" or not row["updates"]:
+                continue
+            path = repo / row["carrier"]
+            original = path.read_bytes()
+            journal["files"].setdefault(row["carrier"], original)
+            _archive_write_text(
+                path, _archive_line_text(original.decode("utf-8"),
+                                         row["updates"], row["carrier"]))
+            written.append(row["carrier"])
+        journal["files"].setdefault(merge_rel, merge_path.read_bytes())
+        _archive_write_text(merge_path,
+                            json.dumps(amendment["document"], indent=2,
+                                       ensure_ascii=False) + "\n")
+        written.append(merge_rel)
+        for entry in document["slices"]:
+            after = _archive_slice_files(repo / entry["to"])
+            if after != entry["files"]:
+                raise OSError(
+                    "slice %s no longer matches its recorded file hashes: the "
+                    "zero-loss check failed" % entry["slug"])
+        for carrier, digest in dated_before.items():
+            if hashlib.sha256((repo / carrier).read_bytes()).hexdigest() != digest:
+                raise OSError("dated carrier %s changed during the batch" % carrier)
+        for carrier in sorted(live_rows):
+            if not carrier.startswith("shared/"):
+                continue
+            mirror = ".specify/" + carrier
+            if (repo / mirror).is_file() and \
+                    (repo / carrier).read_bytes() != (repo / mirror).read_bytes():
+                raise _ArchiveMirrorMismatch(
+                    "source/mirror pair %s does not agree after the batch"
+                    % carrier)
+        manifest_path = spec_dir / ARCHIVE_MANIFEST_NAME
+        journal["manifest"] = manifest_path
+        _archive_write_text(manifest_path, _archive_serialized(document))
+        written.append(_rel_path(repo, manifest_path))
+    except OSError as exc:
+        failures = _archive_restore(repo, document, journal)
+        detail = str(exc)
+        if failures:
+            detail += "; restore reported: " + "; ".join(failures)
+        code = ("mirror-copy" if isinstance(exc, _ArchiveMirrorMismatch)
+                else "write-failed")
+        failure = (code, detail)
+    state["writes"] = sorted(written)
+    return failure
+
+
+def action_archive_plan(args: argparse.Namespace,
+                        spec_dir: Path) -> Tuple[Dict[str, Any], int]:
+    """C-102…C-105 / C-301…C-307: read-only precondition, classification and preview."""
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    return _archive_report("archive-plan", spec_dir,
+                           _archive_plan_state(repo, spec_dir))
+
+
+def action_archive_apply(args: argparse.Namespace,
+                         spec_dir: Path) -> Tuple[Dict[str, Any], int]:
+    """C-105/C-106/C-108: recompute the plan, then land one restorable batch."""
+    repo = Path(args.repo).resolve() if args.repo else Path.cwd()
+    state = _archive_plan_state(repo, spec_dir)
+    if state["kind"] == "would-archive":
+        failure = _archive_apply_batch(repo, spec_dir, state)
+        if failure is not None:
+            failure_code, failure_detail = failure
+            return _archive_plan_payload(
+                spec_dir, "error", EXIT_INPUT_ERROR,
+                [_condition(
+                    failure_code,
+                    "the archive write batch stopped and was restored from its "
+                    "original bytes: %s" % failure_detail,
+                    "inspect the named step; the tree is archive-ready again",
+                    "rerun archive-apply once the named failure is repaired")],
+                action="archive-apply"), EXIT_INPUT_ERROR
+    payload, code = _archive_report("archive-apply", spec_dir, state)
+    if state["kind"] == "would-archive":
+        payload["outcome"] = "archived"
+        payload["archive"]["writes"] = state.get("writes", [])
+    return payload, code
 
 
 HANDLERS = {
@@ -4317,7 +4503,7 @@ HANDLERS = {
     "seal": action_seal,
     "archive-gate": action_archive_gate,
     "archive-plan": action_archive_plan,
-    "archive-apply": _pending,
+    "archive-apply": action_archive_apply,
 }
 
 

@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py tests/integration/test_seal_archive_round.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..................                                                       [100%]
+18 passed in 6.57s

@@ -531,3 +531,26 @@ FAILED tests/contract/test_seal_archive_manifest.py::test_same_input_twice_is_by
 - **红因分类**: `archive-plan` 仍指向 `_pending`（无 `outcome`/`archive` 负载）；分类/摘要/校验/修订符号不存在（`AttributeError`）；C-211 修订函数未实现。夹具与测试文件本身无导入错误——红来自行为缺失，不是拼写。
 - **测试文件哈希（红时定稿字节）**: plan `304df745…`；manifest `f48cfc5d…`；merge_apply `394ff922…`；classify `725f5bc7…`；manifest_math `cdc7911b…`；schema `1adc8f07…`。
 - **转绿读数**: `test-evidence/p3-green.txt`（`81 passed`，exit 0）与 `test-evidence/p3-regression.txt`（`119 passed / 3 failed`，3 条均为 P2 § 4 已记录的既有基线行）。
+
+---
+
+## T013/T014 红先 — archive-apply 两阶段、纯移动与幂等（P4，6 行包）
+
+- **采集点**: 2026-11-11 · worktree `100-seal-slice-archive` · 引擎停在 P3 提交 `4b62d1677` 的版本（sha256 `f3cce2c42fe6a86814fc0c06c766896d88f23c63695e8943a86cc76df6238e48`）· `HANDLERS["archive-apply"]` 仍指向 `_pending`
+- **命令（verbatim）**: `bash scripts/bash/run-tests.sh tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py -q`
+- **退出码**: `1` — `14 failed, 3 passed`（14 红 = apply 行为缺失；3 绿 = 已实现的 plan 确定性用例）
+- **完整 stdout/stderr（verbatim）**: 全量读数存 `test-evidence/p4-red-first.txt`（sha256 `45f40e97c3a9053c07f71e66cb9e9f47e306758c2b0ca9339e7fa934fe6b241a`；以最终测试字节对 P3 引擎 `f3cce2c4…` 重采，随后恢复实现版引擎）；头部与结尾 verbatim：
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFF.FFFFFFF.FF.FF                                                        [100%]
+...
+14 failed, 3 passed
+```
+
+- **红因分类**: `archive-apply` 载荷为 `not-implemented`（`_pending`）；`_archive_move` / `_archive_write_text` 注入缝尚不存在（`AttributeError`）；`already-archived`、写批次与恢复路径均无实现。夹具与测试文件无导入错误——红来自行为缺失，不是拼写。
+- **测试文件哈希（红时定稿字节）**: apply `a6ab246fd7eb…`；idempotency `bd5dacc569da…`。

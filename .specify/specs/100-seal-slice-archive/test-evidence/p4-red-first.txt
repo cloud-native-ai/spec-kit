@@ -1,0 +1,273 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_seal_archive_apply.py tests/integration/test_seal_archive_idempotency.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFF.FFFFFFF.FF.FF                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_a_corrupted_move_is_detected_and_the_batch_is_restored __________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw8/test_a_corrupted_move_is_detec0')
+eng = <module 'seal_utils_archive_apply' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f55ddae2c50>
+
+    def test_a_corrupted_move_is_detected_and_the_batch_is_restored(tmp_path, eng,
+                                                                    monkeypatch):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        before = _snapshot(repo)
+>       original_move = eng._archive_move
+                        ^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_apply' has no attribute '_archive_move'
+
+tests/contract/test_seal_archive_apply.py:406: AttributeError
+_______ test_a_content_mutation_is_caught_by_the_hash_check_and_restored _______
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw12/test_a_content_mutation_is_cau0')
+eng = <module 'seal_utils_archive_idem' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdeea4fb450>
+
+    def test_a_content_mutation_is_caught_by_the_hash_check_and_restored(tmp_path, eng,
+                                                                        monkeypatch):
+        repo = _replay(tmp_path)
+        before = _snapshot(repo)
+>       original_move = eng._archive_move
+                        ^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_idem' has no attribute '_archive_move'
+
+tests/integration/test_seal_archive_idempotency.py:167: AttributeError
+___________ test_a_carrier_write_failure_restores_moves_and_rewrites ___________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw9/test_a_carrier_write_failure_r0')
+eng = <module 'seal_utils_archive_apply' from '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/100-seal-slice-archive/scripts/python/seal-utils.py'>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8714b65310>
+
+    def test_a_carrier_write_failure_restores_moves_and_rewrites(tmp_path, eng,
+                                                                 monkeypatch):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        before = _snapshot(repo)
+>       original_write = eng._archive_write_text
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'seal_utils_archive_apply' has no attribute '_archive_write_text'
+
+tests/contract/test_seal_archive_apply.py:438: AttributeError
+_____________ test_apply_outside_a_git_tree_refuses_with_exit_two ______________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw5/test_apply_outside_a_git_tree_0')
+
+    def test_apply_outside_a_git_tree_refuses_with_exit_two(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        before = _snapshot(repo)
+    
+        proc, payload = _run(repo, "archive-apply")
+        assert proc.returncode == 2, payload.get("conditions")
+        assert payload["verdict"] == "error"
+>       assert "not-a-git-tree" in _codes(payload), (
+            "C-106: the engine never degrades to a plain mv outside a work tree"
+        )
+E       AssertionError: C-106: the engine never degrades to a plain mv outside a work tree
+E       assert 'not-a-git-tree' in ['not-implemented']
+E        +  where ['not-implemented'] = _codes({'action': 'archive-apply', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is n...tmp/pytest-of-agent/pytest-9546/popen-gw5/test_apply_outside_a_git_tree_0/repo/.specify/specs/100-fixture-parent', ...})
+
+tests/contract/test_seal_archive_apply.py:348: AssertionError
+________ test_unparsable_record_is_an_input_error_not_already_archived _________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw4/test_unparsable_record_is_an_i0')
+
+    def test_unparsable_record_is_an_input_error_not_already_archived(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw4/test_unparsable_record_is_an_i0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:327: AssertionError
+_____________________ test_refused_apply_persists_nothing ______________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw6/test_refused_apply_persists_no0')
+
+    def test_refused_apply_persists_nothing(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        (repo / SPEC_REL / "requirements.md").write_text(
+            "# Requirements: fixture parent\n\n- **FR-009**: uncommitted edit.\n",
+            encoding="utf-8")
+        before = _snapshot(repo)
+    
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 1, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw6/test_refused_apply_persists_no0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:363: AssertionError
+_________ test_runtime_carriers_are_updated_and_absence_does_not_block _________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw7/test_runtime_carriers_are_upda0')
+
+    def test_runtime_carriers_are_updated_and_absence_does_not_block(tmp_path):
+        repo = _copy_fixture("runtime-present", tmp_path / "repo")
+        _init_git(repo)
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw7/test_runtime_carriers_are_upda0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:380: AssertionError
+____ test_plan_on_the_archived_tree_reports_zero_moves_and_zero_unresolved _____
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw11/test_plan_on_the_archived_tree0')
+
+    def test_plan_on_the_archived_tree_reports_zero_moves_and_zero_unresolved(tmp_path):
+        repo = _replay(tmp_path)
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw11/test_plan_on_the_archived_tree0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/integration/test_seal_archive_idempotency.py:147: AssertionError
+___________ test_second_apply_is_already_archived_with_zero_new_diff ___________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw10/test_second_apply_is_already_a0')
+
+    def test_second_apply_is_already_archived_with_zero_new_diff(tmp_path):
+        repo = _replay(tmp_path)
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw10/test_second_apply_is_already_a0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/integration/test_seal_archive_idempotency.py:126: AssertionError
+_______ test_a_source_mirror_mismatch_ends_with_mirror_copy_and_restores _______
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw2/test_a_source_mirror_mismatch_0')
+
+    def test_a_source_mirror_mismatch_ends_with_mirror_copy_and_restores(tmp_path):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        mirror = repo / ".specify/shared/definitions/example.md"
+        mirror.write_text(mirror.read_text(encoding="utf-8") + "\nmirror-only line\n",
+                          encoding="utf-8")
+        _init_git(repo)
+        before = _snapshot(repo)
+    
+        proc, payload = _run(repo, "archive-apply")
+        assert proc.returncode == 2, payload.get("conditions")
+>       assert "mirror-copy" in _codes(payload), (
+            "C-310: a source/mirror pair that no longer agrees is an input error, "
+            "not a generic write failure"
+        )
+E       AssertionError: C-310: a source/mirror pair that no longer agrees is an input error, not a generic write failure
+E       assert 'mirror-copy' in ['not-implemented']
+E        +  where ['not-implemented'] = _codes({'action': 'archive-apply', 'conditions': [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is n...tmp/pytest-of-agent/pytest-9546/popen-gw2/test_a_source_mirror_mismatch_0/repo/.specify/specs/100-fixture-parent', ...})
+
+tests/contract/test_seal_archive_apply.py:287: AssertionError
+__________ test_apply_success_leaves_a_clean_rerun_and_no_second_plan __________
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw16/test_apply_success_leaves_a_cl0')
+
+    def test_apply_success_leaves_a_clean_rerun_and_no_second_plan(tmp_path):
+        repo = _replay(tmp_path)
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...n-gw16/test_apply_success_leaves_a_cl0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/integration/test_seal_archive_idempotency.py:262: AssertionError
+__________ test_second_apply_reports_already_archived_with_zero_diff ___________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw3/test_second_apply_reports_alre0')
+
+    def test_second_apply_reports_already_archived_with_zero_diff(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        first_proc, first_payload = _run(repo, "archive-apply")
+>       assert first_proc.returncode == 0, first_payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw3/test_second_apply_reports_alre0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:306: AssertionError
+_____________ test_apply_moves_every_slice_and_lands_the_manifest ______________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw0/test_apply_moves_every_slice_a0')
+
+    def test_apply_moves_every_slice_and_lands_the_manifest(tmp_path):
+        repo = _copy_fixture("clean-pair", tmp_path / "repo")
+        _init_git(repo)
+        before = {slug: _file_rows(repo / ".specify/specs" / slug)
+                  for slug in (ALPHA, BETA)}
+    
+        plan_proc, plan_payload = _run(repo, "archive-plan")
+        assert plan_proc.returncode == 0, plan_payload.get("conditions")
+        candidate = plan_payload["archive"]["manifest"]
+        pinned = candidate["pinned_commit"]
+    
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw0/test_apply_moves_every_slice_a0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:185: AssertionError
+_________ test_apply_rewrites_live_carriers_and_preserves_dated_bytes __________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9546/popen-gw1/test_apply_rewrites_live_carri0')
+
+    def test_apply_rewrites_live_carriers_and_preserves_dated_bytes(tmp_path):
+        repo = _copy_fixture("reference-matrix", tmp_path / "repo")
+        _init_git(repo)
+        before = _snapshot(repo)
+        plan_proc, plan_payload = _run(repo, "archive-plan")
+        assert plan_proc.returncode == 0, plan_payload.get("conditions")
+        manifest = plan_payload["archive"]["manifest"]
+        rows = manifest["references"]["rows"]
+        live = [row for row in rows if row["kind"] == "live-rewrite"]
+        dated = [row for row in rows if row["kind"] == "dated-preserved"]
+        live_carriers = {row["carrier"] for row in live}
+        dated_carriers = {row["carrier"] for row in dated} - live_carriers
+        assert live_carriers and dated_carriers, "fixture must exercise both kinds"
+    
+        proc, payload = _run(repo, "archive-apply")
+>       assert proc.returncode == 0, payload.get("conditions")
+E       AssertionError: [{'code': 'not-implemented', 'evidence': 'the archive-apply action body is not implemented on this skeleton', 'fix_pat...ion once its implementing work package lands', 'rerun': 'rerun the same command after the action body is implemented'}]
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...en-gw1/test_apply_rewrites_live_carri0/repo/.specify/specs/100-fixture-parent",\n  "verdict": "error"\n}\n', stderr='').returncode
+
+tests/contract/test_seal_archive_apply.py:244: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_seal_archive_apply.py::test_a_corrupted_move_is_detected_and_the_batch_is_restored
+FAILED tests/integration/test_seal_archive_idempotency.py::test_a_content_mutation_is_caught_by_the_hash_check_and_restored
+FAILED tests/contract/test_seal_archive_apply.py::test_a_carrier_write_failure_restores_moves_and_rewrites
+FAILED tests/contract/test_seal_archive_apply.py::test_apply_outside_a_git_tree_refuses_with_exit_two
+FAILED tests/contract/test_seal_archive_apply.py::test_unparsable_record_is_an_input_error_not_already_archived
+FAILED tests/contract/test_seal_archive_apply.py::test_refused_apply_persists_nothing
+FAILED tests/contract/test_seal_archive_apply.py::test_runtime_carriers_are_updated_and_absence_does_not_block
+FAILED tests/integration/test_seal_archive_idempotency.py::test_plan_on_the_archived_tree_reports_zero_moves_and_zero_unresolved
+FAILED tests/integration/test_seal_archive_idempotency.py::test_second_apply_is_already_archived_with_zero_new_diff
+FAILED tests/contract/test_seal_archive_apply.py::test_a_source_mirror_mismatch_ends_with_mirror_copy_and_restores
+FAILED tests/integration/test_seal_archive_idempotency.py::test_apply_success_leaves_a_clean_rerun_and_no_second_plan
+FAILED tests/contract/test_seal_archive_apply.py::test_second_apply_reports_already_archived_with_zero_diff
+FAILED tests/contract/test_seal_archive_apply.py::test_apply_moves_every_slice_and_lands_the_manifest
+FAILED tests/contract/test_seal_archive_apply.py::test_apply_rewrites_live_carriers_and_preserves_dated_bytes
+14 failed, 3 passed in 6.29s
