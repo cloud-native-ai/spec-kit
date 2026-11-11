@@ -317,6 +317,7 @@ decomposition-check.py --mode plan|tasks --requirements F [--tasks F] [--json-ou
 2. 拆分粒度为**特性切片**：每个切片 MUST 自身落入 8–120 FR / 10–160 任务的区间，并各自拥有独立的 spec 目录与注册表绑定（`Related Feature` 仍指向同一特性）。
 3. 拆分记录经用户或上游流程确认后，驱动按切片顺序逐条走完整链；MUST NOT 在同一线并行推进多个切片。
 4. 拆分是**范围决策**：驱动 MUST NOT 自行删除、合并或重排需求来规避上限；无法在保留原意的前提下拆分时按四要素上送。
+5. 拆分产生的切片在收尾时必须经 `/speckit.seal` 完成 merge-back、分片归档与终态判定（收尾义务与判据 owner：`SKILL.md` § The Loop U6 的 Split closure 与 `references/dispatch-recipes.md` Recipe 8；本节不复述）。
 
 ### 5.4 边界
 

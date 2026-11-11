@@ -90,12 +90,14 @@ U2 DISPATCH  本地：fork 承载逐阶段派发（同族 qodercli 子进程经 
 U3 WATCH     统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；fork 子进程与远端 runner 同规；窗口到期只返回 RUNNING 并立即以递增 --iter 重入，只有阶段 deadline 产生 TIMEOUT（见 references/watch-model.md）
 U4 VERIFY    独立校验：哨兵（必要）+ 产物核验 + 纪律抽查 + Wrap-up 记账核验（充分）→ 通过才续环
 U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出上送件（绝不静默等待）
-U6 LEAVE     全线收束：逐线合并收尾（closure/merge 步在**特性线闭合**处跑 `scripts/python/closure-acceptance-check.py`，`block` 把该线标 `blocked`——线不是也不得再是 `completed`；切片合并仍由 review 门判定）+ 工作树归档清扫，缺省本地合并 + 一份收尾汇总
+U6 LEAVE     全线收束：逐线合并收尾（closure/merge 步在**特性线闭合**处跑 `scripts/python/closure-acceptance-check.py`，`block` 把该线标 `blocked`——线不是也不得再是 `completed`；**split 线**——存在 `merge.status=merged` 的合并清单或分片目录——在合并收尾前 MUST 经 `/speckit.seal` 完成 merge-back、分片归档与终态判定，seal 的终态记录即该线终态；非 split 线沿用 review 门判定）+ 工作树归档清扫，缺省本地合并 + 一份收尾汇总
 ```
 
 多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。首次派发前登记环境级 Line Registry（`scripts/line-registry.py --action register`），事件携带 `(line_id, run_id)` 信封，U6 后 `deregister`；无标识消息经 `resolve-message` 判定，禁止进程扫描推断。
 
 U0 的产物是入口声明（目标/拓扑/权威/切片/断点）与阶段计划；未产出前不得进入 U2，更不得直接编辑目标仓库。
+
+**Split closure（U6 子步，无人值守同规）**：U6 收尾前先判定本线是否 split 线——判定输入 = 该 spec 的合并清单（`merge.status=merged` 且 `slices[]` 非空）或父 spec 下已存在的分片目录；命中即 MUST 派发**一次**有界 `/speckit.seal` 执行（技能 `seal-artifact`；承载与阶段派发同规，见 `references/dispatch-recipes.md` Recipe 8），按引擎顺序完成 merge-plan → merge-apply（未合并时）→ archive-plan → archive-apply → seal 判定。完成判据：`seal.md` 回执存在、归档清单与引用台账齐备、终态裁决**逐字**回报；`Sealed` 与「具名阻断」都是合法终态，驱动 MUST NOT 改写、降级或重判；seal 以拒绝/错误退出时按其输出逐条上送，MUST NOT 绕过引擎改写状态面。该子步不改阶段链（seal 是收尾动作，不是阶段）、不改哨兵判定与 U4 规则；非 split 线不派发、不写任何 seal 产物。
 
 **Qoder Desktop host adapter**: when the driver itself runs inside the Qoder
 Desktop app, every headless `qodercli` child must be launched through the
