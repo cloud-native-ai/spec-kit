@@ -19,7 +19,7 @@ four-member set, and two new action groups appear (action-level Goal, and an ind
 
 The technical approach is deliberately conservative: zero new dependencies, zero new binaries, zero
 deletions, and every dated record byte-identical to `d7c9da7a3`. Convergence is made decidable by a
-measured residue baseline (C1–C4 = 26 line-hits; C5 = 16 lines, 11 of them in the 9 retained anchors;
+measured residue baseline (C1–C4 = 28 line-hits; C5 = 16 lines, 11 of them in the 9 retained anchors;
 C6 = 40 line-hits; C7 = 3 index rows — `research.md` §5) and by contract tests that turn red on the old
 semantics.
 
@@ -271,16 +271,19 @@ therefore **"no NEW drift on the pairs this feature touches"**, never a bare exi
 - `085`: `.specify/features/085-sdd-temporary-goal-team.md`, `.specify/specs/085-sdd-temporary-goal-team/verification.md`
 - `094`: `.specify/features/094-goal-team-parallel.md`, `.specify/specs/094-goal-team-parallel/verification.md`
 
-Extraction over those artifacts (2026-11-12) yields exactly four records: two `deferred_tasks` rows whose
-value is literally `none`, and two `094` `partial` status rows. `037` / `074` / `085` contribute no record
-(no `blocked`/`deferred`/`partial` status line and no non-empty `deferred_tasks=`).
+Extraction over those artifacts (2026-11-12; re-derived at the analyze repair) yields exactly five
+records: two `deferred_tasks` rows whose value is literally `none`, one `037` `partial` status row
+(row 1 below, whose deferred half needs a live human-ratified `coordinate` round), and two `094`
+`partial` status rows. `074` / `085` contribute no record (every status row is `pass` and `deferred_tasks=` is
+empty), and no detail page among the six carries a `## Deferred` list item.
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|
-| 1 | `038:deferred_tasks` | resolved | — | — | `038-goal-target/verification.md` records `deferred_tasks=none`; 038's Targets surface is re-asserted under the new layers by this feature's convergence suite, so nothing was deferred into it |
-| 2 | `042:deferred_tasks` | resolved | — | — | `042-goal-team-creation/verification.md` records `deferred_tasks=none  # 33/33 closed, no [~]`; the team-creation path this feature rewrites carries no inherited deferred work |
-| 3 | `094:SC-001_status` | not-applicable | — | — | 094's own ruling R2 (2026-11-09) re-scoped the criterion and forbids authoring its missing fixture guard; this feature rewrites the command surface but does not reopen 094's criterion, and a delegated pass would be delegated evidence, not its own |
-| 4 | `094:SC-010_status` | not-applicable | — | — | 094's recorded unblock condition requires a user ruling narrowing "whole contract suite green"; this feature's GATE-1 compares the failing-id **set by name** against its own entry baseline and never claims whole-suite green |
+| 1 | `037:SC-016_status` | not-applicable | — | — | `037-goal-registry/verification.md` records that criterion as `partial`: the mechanically checkable half is green, the deferred half ("write intersection = 0 *after ratification*") needs a live human-ratified `coordinate` round writing back to `team.md`. That round belongs to 037's own territory; this feature rewrites the command surface but neither runs nor reopens it, and no carrier in this slice can measure it — `inherited` would overclaim and `resolved` would fabricate closure |
+| 2 | `038:deferred_tasks` | resolved | — | — | `038-goal-target/verification.md` records `deferred_tasks=none`; 038's Targets surface is re-asserted under the new layers by this feature's convergence suite, so nothing was deferred into it |
+| 3 | `042:deferred_tasks` | resolved | — | — | `042-goal-team-creation/verification.md` records `deferred_tasks=none  # 33/33 closed, no [~]`; the team-creation path this feature rewrites carries no inherited deferred work |
+| 4 | `094:SC-001_status` | not-applicable | — | — | 094's own ruling R2 (2026-11-09) re-scoped the criterion and forbids authoring its missing fixture guard; this feature rewrites the command surface but does not reopen 094's criterion, and a delegated pass would be delegated evidence, not its own |
+| 5 | `094:SC-010_status` | not-applicable | — | — | 094's recorded unblock condition requires a user ruling narrowing "whole contract suite green"; this feature's GATE-1 compares the failing-id **set by name** against its own entry baseline and never claims whole-suite green |
 
 ## Complexity Tracking
 
@@ -305,8 +308,9 @@ baseline. Its load-bearing outputs:
    `lifecycle_state: archived` but still carries its binding line and has no receipt, and R3's terminal
    state (archived + binding removed + `disposition-receipt.json`) is what the criterion reads.
 4. **Live-surface roots** — the SC-001 declaration (directories, files, closed exclusion list) and the
-   class definitions C1–C7 with the narrowed baseline patterns; baseline readings
-   `C1 4 · C2 0 · C3 7 · C4 15 · total 26`, plus `C5 16 / C6 40 / C7 3` from the checklist repair
+   class definitions C1–C7 with the narrowed baseline patterns; measured over the declared roots as
+   they stand (21 directories + 9 files, `.specify/features.md` included), baseline readings
+   `C1 4 · C2 0 · C3 8 · C4 16 · total 28`, plus `C5 16 / C6 40 / C7 3` from the checklist repair
    (`test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`).
 5. **Rulings R-01…R-15** — each gap the research found and the reading it closed it with (mirrored in
    `feature-ref.md` §5).
@@ -333,10 +337,10 @@ fence it obeys. Territories are **file-level** where two packages share a direct
 |----|-------|--------|---------|-----------------|-----------|
 | **WP-01** | Concept owners + engine | FR-001…FR-009, FR-028…FR-034; `contracts/goal-engine.contract.md`; T-001/T-004 | `anchor-definitions.md` (new), `goal-definitions.md` (rewritten), engine layer parameter + two action groups + four-member `--scope`, engine user-facing hints repointed to `/speckit.anchor` and `run-checks` JSON key `anchor_slug`, consumer updates | `shared/definitions/anchor-definitions.md`, `shared/definitions/goal-definitions.md`, `scripts/python/goal-utils.py`, `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`, `skills/external/sdd-project-setup/scripts/logical-framework.py`, `skills/external/sdd-house-keeping/scripts/logical-framework.py`, `skills/internal/create-team/scripts/build-summary-input.py`, `src/specify_cli/__init__.py`, + their `.specify/` mirrors | — |
 | **WP-02** | Command surface | FR-010…FR-027; `contracts/anchor-command.contract.md`; `contracts/goal-command.contract.md` | `templates/commands/anchor.md` (new), `goal.md` (rewritten), `manage-anchor` skill (new), `manage-goal` skill (rewritten), four per-tool copies, two reference pages | `templates/commands/anchor.md`, `templates/commands/goal.md`, `skills/internal/manage-anchor/**`, `skills/internal/manage-goal/**`, the four per-tool copy directories, `docs/reference/commands/anchor.md`, `docs/reference/commands/goal.md`, + mirrors | WP-01 (mode semantics) |
-| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials, and the three live feature-index rows (C7: 027 / 041 / 094) plus the 094 detail-page successor note | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping}/**`, `skills/internal/{create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, `.specify/features.md` (three rows), `.specify/features/094-goal-team-parallel.md` (successor note only), + mirrors | WP-01, WP-02 |
-| **WP-04** | Cleanup, migration, dispositions | FR-035…FR-049; `classification.json`; `contracts/migration-cleanup.contract.md`; T-003 | 9 renames + anchor body normalization (A-N-1…A-N-4), 3 migrations, 2 archival moves with receipts, 16 structural renames, team body normalization, 6 R3 dispositions + 1 R2 anchor | `.specify/anchoring/**`, `.specify/goals/**` (new), `.specify/archive/anchoring/**`, `.specify/teams/*/team.md` + receipt files, no other file | WP-01 (engine actions) |
+| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials, and the three live feature-index rows (C7: 027 / 041 / 094) | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping}/**`, `skills/internal/{create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, `.specify/features.md` (three rows), + mirrors | WP-01, WP-02 |
+| **WP-04** | Cleanup, migration, dispositions | FR-035…FR-049; `classification.json`; `contracts/migration-cleanup.contract.md`; T-003 | 9 renames + anchor body normalization (A-N-1…A-N-4), 3 migrations, 2 archival moves with receipts, 16 structural renames, team body normalization, 6 R3 dispositions + 1 R2 anchor | `.specify/anchoring/**`, `.specify/goals/**` (new), `.specify/archive/anchoring/**`, `.specify/teams/*/team.md` + receipt files, `test-evidence/**` of this spec (its own dated readings), no other file | WP-01 (engine actions) |
 | **WP-05** | Guards and evidence | FR-061…FR-071; `contracts/` C-31/C-41/C-49 | contract guards per class, migration/idempotency/resume suite, protected-path guard, convergence integration test, fixtures, all readings | `tests/contract/**`, `tests/integration/**`, `tests/fixtures/anchor-goal-realignment/**`, `test-evidence/**` of this spec | WP-01…WP-04 |
-| **WP-06** | Registry and close | FR-071; `feature-ref.md` | registry row + feature detail status, cross-references, final readings | `.specify/features.md`, `.specify/features/101-anchor-goal-realignment.md` | WP-05 |
+| **WP-06** | Registry and close | FR-071; `feature-ref.md` | registry row + feature detail status, cross-references (the 041 / 094 successor notes), final readings | `.specify/features.md`, `.specify/features/101-anchor-goal-realignment.md`, `.specify/features/041-goal-registry.md`, `.specify/features/094-goal-team-parallel.md` | WP-05 |
 
 **Fence** (binding on every package):
 
@@ -366,7 +370,7 @@ tree where the subject is fine" is not evidence.
 | Guard | Subject | Test | Fails red when |
 |-------|---------|------|----------------|
 | G-1 | Anchor command surface | `tests/contract/test_anchor_command_surface.py` | `anchor.md` missing; modes ≠ 7; template restates the `--scope` value set instead of citing the owner |
-| G-2 | Goal command surface + refusal | `tests/contract/test_goal_command_surface.py` | modes ≠ 4; an Anchor-only mode is accepted, or refused without the literal `anchor-only-mode` naming `/speckit.anchor`; a refusal writes anything |
+| G-2 | Goal command surface + refusal | `tests/contract/test_goal_command_surface.py` | modes ≠ 4; an Anchor-only mode is accepted, or refused without the literal `anchor-only-mode` naming `/speckit.anchor` — asserted by subprocessing the engine read action `command-mode --command goal --mode <mode>`; a refusal writes anything |
 | G-3 | Store purity | `tests/contract/test_anchor_definitions.py` | any `.specify/anchoring/*/` lacks `anchor.md`; an entry classified `action-goal` is still there |
 | G-4 | Single writer + two-writer simulation | `tests/contract/test_goal_store_write_boundary.py` | any non-engine code path writes either definition store; two simulated writers on different slugs land on one path |
 | G-5 | Binding completeness | `tests/contract/test_binding_rename.py` | any live `team.md` contains `goal_slug`; any `anchor_slug` fails to resolve; an affected team has no disposition record; the two dangling bindings are unresolved; an R3 team still carries a binding line or lacks `disposition-receipt.json` |
@@ -400,7 +404,7 @@ The executable contract is `contracts/migration-cleanup.contract.md`; this secti
 - **Phases (P1→P8)**: anchor renames **+ declared anchor body normalization (A-N-1…A-N-4,
   `anchor-body-receipt.json`)** → Goal migrations + obsolete archival (with receipts) → R2 Anchor
   creation → summary moves → team structural rename (one line per file) → team body normalization
-  (declared table N-1…N-6, per-line receipts) → R3 dispositions → self-checks. Each phase is
+  (declared table N-1…N-7, per-line receipts) → R3 dispositions → self-checks. Each phase is
   per-entry resumable. The anchor rename carries the byte-identity assertion; the normalization that
   follows it is a separate declared rewrite with its own per-line receipt, which is what keeps both
   "rename only" and "the archive speaks Anchor" true at once.

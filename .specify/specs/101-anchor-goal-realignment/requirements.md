@@ -205,7 +205,7 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 #### C. Goal command surface
 
 - **FR-019**: `/speckit.goal` MUST 只服务行动级 Goal，由重写后的 canonical `templates/commands/goal.md` 交付，并 MUST 恰好暴露四模式 `create` / `view` / `modify` / `status`；`view` 无 slug 时 MUST 列出 Goal 存档且 MUST 只读；`status` MUST 报告并转换生命周期状态（`active` / `achieved` / `abandoned`，终态保留，`reopen` 仅限 `owner: human` 且追加历史行）；`modify` MUST 编辑指导叙述与完成条件，清空完成条件集 MUST 要求显式用户批准。
-- **FR-020**: 命名 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）的调用 MUST 以具名拒绝（[[STR-007]]）失败、以 exit 2 退出、指向 `/speckit.anchor`、且零写入；MUST NOT 静默回退到 `view`。
+- **FR-020**: 命名 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）的调用 MUST 以具名拒绝（[[STR-007]]）失败、以 exit 2 退出、指向 `/speckit.anchor`、且零写入；MUST NOT 静默回退到 `view`。该拒绝 MUST 有一个可判定的执行主体：引擎只读动作 `command-mode --command goal --mode <mode>` 对四个 Goal 模式 exit 0，对四个 Anchor-only 模式 exit 2、stderr 含字面 [[STR-007]] 与 `/speckit.anchor`、零写入；`--command anchor` 对七个 Anchor 模式 exit 0。契约测试以子进程调用该动作，不以模拟聊天命令代替。
 - **FR-021**: `/speckit.goal` MUST 只经引擎写 `.specify/goals/<goal-slug>/goal.md`（[[STR-002]]），MUST NOT 写锚点档案或任何团队定义。
 - **FR-022**: `/speckit.goal` MUST 委派给四模式的 `manage-goal` 技能；该技能 MUST NOT 暴露 Targets、迁移、coordinate 或团队操作。
 - **FR-023**: Goal MUST NOT 被解析为 Anchor 身份：只存在于 Goal 存档的 slug MUST 无法通过 `anchor_slug`（[[STR-003]]）解析，且任何团队 MUST NOT 绑定它。Goal 与 SDD/Team 的关系 MUST 一并写明：Goal 不进入控制层级、不被团队绑定、不替代 spec/plan/tasks 制品；团队绑定与切片协调始终由 Anchor + Team 承载。
@@ -311,7 +311,7 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 ### Measurement Sources & Collection Methods
 
 - **SC-001 Source**: 残留扫描脚本对 `research.md` §5 声明的活根与类定义做逐类计数，输出每类命中路径；注入用例在测试夹具中执行。活根集合与类定义在 `research.md` §5 中声明，测试读取该声明而非各自硬编码。
-- **SC-002 Source**: 契约测试解析 canonical 模板的 `argument-hint` 与模式表，并对 `/speckit.goal <anchor-only-mode>` 做子进程调用，采集退出码、stderr 与零写入断言。
+- **SC-002 Source**: 契约测试解析 canonical 模板的 `argument-hint` 与模式表，并以子进程调用引擎只读动作 `python3 scripts/python/goal-utils.py command-mode --command goal --mode <mode>`（四个 Goal 模式 exit 0；四个 Anchor-only 模式 exit 2、stderr 含 `anchor-only-mode` 与 `/speckit.anchor`、零写入），采集退出码、stderr 与零写入断言。
 - **SC-003 Source**: 分类记录（逐条 markdown/JSON）与两次目录枚举读数（清理前、清理后）；`find`/`glob` 计数与 `goal-utils.py list --scope anchor|goals` 输出交叉核对。
 - **SC-004 Source**: 回执文件逐条读取；概念摘要由引擎在动作前后各计算一次并写入回执；受保护路径哈希由 `git hash-object` 或 `sha256sum` 在特性前提交与实现后各采集一次。
 - **SC-005 Source**: 对 `.specify/teams/*/team.md` 的 frontmatter 扫描；`goal-utils.py run-checks <team> --json` 逐团队采集 `verdict` / `blocked` / 退出码；五查集合与各检查名的唯一 owner 是 `skills/internal/run-team/SKILL.md` § 2 Preview（五查预检），SC 不复述其条目；处置记录清单。
@@ -364,6 +364,8 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - `PLAN-EDIT: FR-061 / SC-009` — 原文把 `.specify/archive/**` 整树纳入"逐字节不变 / 哈希集合相等"，与该规格 FR-041 / [[STR-006]]（本特性 MUST 新建 `.specify/archive/anchoring/<slug>/` 归档目的地）不可同时满足 → 等值断言收敛为**基线时已存在的条目**（不变、不删）；本特性新增的归档子树不计入等值集合、单独列示，并由 FR-042 的逐条回执承担零丢失证明。注入/守卫两侧仍按基线文件清单逐文件比较。
 
 **Checklist-round-1 corrections（2026-11-12 `checklist` 门修复轮；逐条 `rebaseline` 事件与下游影响见 `notes/checklist-repair.md`）**：本轮按 CHK 发现收敛了 FR-004 / FR-005 / FR-010 / FR-016 / FR-019 / FR-020 / FR-023 / FR-031 / FR-033 / FR-038 / FR-043 / FR-046 / FR-061 / FR-065 与 SC-001 / SC-005 / SC-007 / SC-008 / SC-009、D-4；计数不变（71 FR / 10 SC / 8 STR）。
+
+**Analyze-round-1 corrections（2026-11-12 `analyze` 门修复轮；逐条 `rebaseline` 事件与下游影响见 `notes/analyze-repair.md`）**：FR-020 增加可判定的执行主体（引擎只读动作 `command-mode`），SC-002 的度量来源由不可执行的聊天命令改为对该动作的子进程调用；四模式集合、四个具名拒绝与零写入要求本身不变。下游同步：C-15、plan § Testing Strategy G-2、tasks T018 / T063 / GATE-7、`quickstart.md` S-4。计数不变（71 FR / 10 SC / 8 STR）。
 
 ## Non-Goals & Boundaries *(informative)*
 

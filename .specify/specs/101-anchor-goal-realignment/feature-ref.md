@@ -49,8 +49,8 @@ new surface and needs a plan revision.
 
 | SC | Sensor | Reading (plan-time) | Artifact |
 |----|--------|--------------------|----------|
-| SC-001 | `tests/contract/test_live_semantic_residue.py` over the roots declared in `research.md` §5 | C1 4 · C2 0 · C3 7 · C4 15 · total 26; C5 16 (11 in the 9 retained anchors) · C6 40 · C7 3 | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt`; `test-evidence/checklist-repair-residue-baseline-2026-11-12.txt` |
-| SC-002 | Template `argument-hint` parse + subprocess refusal probes | both templates today carry the old surface (expected) | contract tests C-1/C-14 |
+| SC-001 | `tests/contract/test_live_semantic_residue.py` over the roots declared in `research.md` §5 | C1 4 · C2 0 · C3 8 · C4 16 · total 28; C5 16 (11 in the 9 retained anchors) · C6 40 · C7 3 | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt`; `test-evidence/checklist-repair-residue-baseline-2026-11-12.txt` |
+| SC-002 | Template `argument-hint` parse + engine `command-mode` subprocess probes | both templates today carry the old surface (expected) | contract tests C-1/C-14 |
 | SC-003 | `classification.json` + `cleanup --check` enumeration | 9 anchor / 3 action-goal / 2 obsolete across 14 entries | `classification.json`; `research.md` §3 |
 | SC-004 | Receipts + digest equality + protected-path hashes | no receipts exist yet (nothing migrated) | `test-evidence/plan-baseline-*` (pre) |
 | SC-005 | `team.md` frontmatter scan + `run-checks --json` per team | 16 bound / 4 unbound; 2 dangling (`viz-skill-arena`, `demo-seat-dispatch`); measured `089` → `ok/false` (①②–④=not-evaluated), `091` → `ok/false`, `demo` → `no-goal-definition/false` | `classification.json` `teams`; `research.md` §4 |
@@ -79,7 +79,7 @@ feature (`.Site.Language.Locale`); it reports `not-evaluated` rather than a fabr
 | R-10 | Only four per-tool command-copy directories are in scope | §2 |
 | R-11 | The Hugo premise is falsified at plan time → docs-build limb measures `not-evaluated` | EP-006 |
 | R-12 | Protected-path equality is per-file `git hash-object` against `d7c9da7a3` | C-49 / S-7 |
-| R-13 | Six inherited-blocker rows are declared, five `not-applicable` | `plan.md` § Inherited Blockers |
+| R-13 | Five inherited-blocker rows are declared from three dependency features: two `resolved` (038/042 `deferred_tasks`, measured value `none`) and three `not-applicable` (037 `SC-016_status`, 094 `SC-001_status` / `SC-010_status`); no `inherited` carrier is claimed | `plan.md` § Inherited Blockers |
 | R-14 | Archived teams lose the binding line; provenance moves to `disposition-receipt.json` | C-47 |
 | R-15 | `list` is not given a team-reading surface: `--scope teams list` exits 2 `scope-not-applicable`, and today's `list` ignoring `--scope` is recorded as measured rather than "fixed" | `contracts/goal-engine.contract.md` C-27 |
 | R-16 | The `.specify/archive/**` equality assertion covers **baseline-existing entries**; the new `.specify/archive/anchoring/**` subtree is an addition evidenced by receipts | PLAN-EDIT 4; C-49; G-8 |

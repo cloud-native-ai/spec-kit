@@ -151,10 +151,13 @@ live_surface_roots:
     - .specify/features/**/*.md
       # CLOSED, RECORDED EXCLUSION (FR-005's definitional test still applies): a feature detail page
       # is an append-only delivery record — what a feature delivered, in its own words, at its own
-      # date. It is not a definitional page and rewriting it is the dated-record damage FR-061
-      # forbids. The current-facing claim lives in the index row (root above, class C7) and the
+      # date. It is not a definitional page; rewriting it would do the kind of dated-record damage
+      # FR-061 guards elsewhere — the detail tree is not in FR-061's protected set, so this exclusion
+      # is the plan's own closed choice, recorded here rather than derived from that principle.
+      # The current-facing claim lives in the index row (root above, class C7) and the
       # correction arrives as a dated successor note inside the page (041 already carries one; 094
-      # gains one in WP-03). This exemption is never available to a *definitional* page (a
+      # gains one in WP-06, whose territory owns both detail pages). This exemption is never
+      # available to a *definitional* page (a
       # `shared/definitions/**` owner, a glossary/instruction surface, or a canonical template).
     # all dated spec dirs (.specify/specs/**) are outside every root above, by construction.
 ```
@@ -164,7 +167,7 @@ live_surface_roots:
 
 | Class | Meaning | Patterns (baseline) |
 |-------|---------|---------------------|
-| C1 | Goal defined as project-level / end state | `(?i)(^\|\|>#-*]\s*)(a\|an\|the)?\**goal\**\s+(is\|means\|refers to)\s+(a\|an\|the)?(project-level\|long-horizon\|long-term objective)`; `(?i)^\|\s*\**goal\**\s*\|[^\|\n]*project-level`; `^\|\s*(Goal\|目标)\s*\|[^\|\n]*项目级`; `(目标\|Goal)[^\n。\|]{0,12}(是\|定义为)[^\n。\|]{0,15}(项目级\|远期目标)` |
+| C1 | Goal defined as project-level / end state | `(?i)^[\s>#*+-]*(a\|an\|the)?\s*\**goal\**\s+(is\|means\|refers to)\s+(a\|an\|the)?\s*(project-level\|long-horizon\|long-term objective)`; `(?i)^\|\s*\**goal\**\s*\|[^\|\n]*project-level`; `^\|\s*(Goal\|目标)\s*\|[^\|\n]*项目级`; `(目标\|Goal)[^\n。\|]{0,12}(是\|定义为)[^\n。\|]{0,15}(项目级\|远期目标)` |
 | C2 | Anchor subordinate to Goal | `(?i)\b(goal\|目标)\b[^\n]{0,30}\b(top of\|highest (level\|layer)\|最高层)\b[^\n]{0,30}\b(anchor\|锚点)\b`; `(?i)\b(anchor\|锚点)\b[^\n]{0,40}\b(is\|as)\s+(a\s+)?(sub-?goal\|child goal\|goal slice\|下级目标)\b` |
 | C3 | `/speckit.goal` as the anchor-archive authoring entry | `(?i)speckit\.goal[^\n]{0,160}(sole authoring\|only authoring\|唯一撰写)`; `(?i)(sole authoring entry\|唯一撰写入口)[^\n]{0,160}speckit\.goal`; `speckit\.goal[^\n]{0,120}(锚点档案\|anchoring archive)`; `(锚点档案\|anchoring archive)[^\n]{0,120}speckit\.goal` |
 | C4 | `.specify/goal/<slug>/summary/` as delivery path | `\.specify/goal/<[^>]+>/summary/` |
@@ -172,11 +175,15 @@ live_surface_roots:
 | C6 | A live surface still sends the user to `/speckit.goal` for an Anchor-only mode | `/speckit\.goal\s+(targets\|migrate\|migrate-archive\|coordinate)\b` |
 | C7 | A live feature-index row still states the retired model | `.specify/features.md` only: `\.specify/goal/<[^>]+>`; `\.specify/anchoring/<[^>]+>/goal\.md`; `(?i)project-level goal`; `goal\s*=\s*设计师` |
 
-**Baseline reading before implement** (`test-evidence/live-semantic-scan-baseline-2026-11-12.txt`):
-C1 **4** · C2 **0** · C3 **7** · C4 **15** · total **26** lines over the roots above. C1's four
+**Baseline reading before implement** (`test-evidence/live-semantic-scan-baseline-2026-11-12.txt`),
+measured on the declared roots as they stand (21 directories + 9 files; `.specify/features.md` is a
+root, so the 041 index row is counted where its classes apply):
+C1 **4** · C2 **0** · C3 **8** · C4 **16** · total **28** lines. C1's four
 lines are the glossary `Goal` row, the derivation table row (×2 mirror), and
-`docs/reference/commands/goal.md`; C3's seven are the goal template + its four generated copies and
-`manage-goal/SKILL.md` (×2 mirror); C4's fifteen are the team-domain summary paths named by FR-058.
+`docs/reference/commands/goal.md`; C3's eight are the goal template, its four generated copies,
+`manage-goal/SKILL.md` (×2 mirror) and the 041 feature-index row; C4's sixteen are the team-domain
+summary paths named by FR-058 (6 canonical skill-tree lines ×2 mirror layers), the two
+`docs/reference/commands/team.md` rows, one memory tool record, and the 041 index row.
 Zero C2 lines means the hierarchy inversion lives in prose shapes this baseline does not catch —
 the hierarchy itself is asserted by `sdd-routing-definitions.md` (FR-052) and by the C1 rows, so
 C2 is a regression net, not the convergence target.
@@ -190,7 +197,8 @@ table is the only mechanism allowed to reach it. **C6 40** line-hits: 16 in the 
 mirror layers), 16 in team-domain skills/references (8 × two layers: create-mode 3, run-team 1,
 goal 1, execution-guide 1, summary-mapping 1, goal-editing 1), 2 in
 `docs/reference/commands/team.md`, 2 in `.specify/glossary.md`, 1 in `src/specify_cli/__init__.py`,
-1 in a live team definition, 1 in `docs/reference/commands/seal.md`, 1 in `.specify/features.md`.
+1 in a live team definition (rewritten by the declared N-7 rule, `contracts/migration-cleanup.contract.md`
+C-46), 1 in `docs/reference/commands/seal.md`, 1 in `.specify/features.md`.
 **C7 3** rows of `.specify/features.md` (rows 027, 041, 094) — rewriting those three rows is a WP-03
 deliverable, and the 101 row written at close must not reintroduce the patterns.
 
@@ -255,11 +263,13 @@ test to still fire (a freshly injected old-semantic sentence in a live root must
   implement entry and again at closure; equality is compared as sets, never as a directory digest
   (directory digests move when files are added anywhere under a root). Scratch lists live under
   `.specify/.tmp/`.
-- **R-13 — Inherited blockers are six rows from four dependency features.** 037 contributes two
-  (`SC-016_status`, `deferred_tasks`), 038/042 one each (`deferred_tasks`), 094 two
-  (`SC-001_status`, `SC-010_status`); 074 and 085 contribute nothing extractable (074 has no
-  verification rows, 085 carries empty values). Dispositions are in `plan.md`; only 094's
-  `SC-010_status` is `inherited` and it is carried by this stage's gate row.
+- **R-13 — Inherited blockers are five rows from three dependency features.** 037 contributes one
+  (`SC-016_status`, a `partial` row in its markdown tally), 038/042 one each (`deferred_tasks`, both
+  literally `none`), 094 two (`SC-001_status`, `SC-010_status`); 074 and 085 contribute nothing
+  extractable (every status row is `pass`, `deferred_tasks=` is empty), and no detail page among the
+  six carries a `## Deferred` list item. Dispositions live in `plan.md` § Inherited Blockers: two
+  `resolved` (038/042, measured value `none`) and three `not-applicable` (037/094 — decision-gated
+  rounds this feature neither runs nor reopens). No row is `inherited`, so no carrier is claimed.
 - **R-14 — Disposition receipts are per team, in the team's own directory.** Concurrent Development
   Safety forbids one shared store; `.specify/teams/<slug>/disposition-receipt.json` gives two
   branches disjoint paths and survives the team's archival (the directory stays, only

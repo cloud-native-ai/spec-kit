@@ -80,21 +80,23 @@ both stores is refused with both candidates named.
 
 ## S-4 — The four-mode Goal command and its named rejection [premise]
 
-```
-/speckit.goal create      → accepted
-/speckit.goal view        → accepted
-/speckit.goal modify      → accepted
-/speckit.goal status      → accepted
-/speckit.goal targets     → refused
+```bash
+python3 .specify/scripts/python/goal-utils.py command-mode --command goal --mode create   # exit 0
+python3 .specify/scripts/python/goal-utils.py command-mode --command goal --mode view     # exit 0
+python3 .specify/scripts/python/goal-utils.py command-mode --command goal --mode modify   # exit 0
+python3 .specify/scripts/python/goal-utils.py command-mode --command goal --mode status   # exit 0
+python3 .specify/scripts/python/goal-utils.py command-mode --command goal --mode targets  # exit 2
 ```
 
-**Expected** on `targets`: exit 2 with the literal `anchor-only-mode` ([[STR-007]]), a message naming
-`/speckit.anchor`, no fallback to `view`, zero writes. The same refusal applies to `migrate`,
-`migrate-archive` and `coordinate`.
+**Expected** on `targets`: exit 2 with the literal `anchor-only-mode` ([[STR-007]]) on stderr, a message
+naming `/speckit.anchor`, no fallback to `view`, zero writes. The same refusal applies to `migrate`,
+`migrate-archive` and `coordinate`; `--command anchor` accepts all seven Anchor modes. The chat surface
+(`/speckit.goal <anchor-only-mode>`) carries the same refusal, but the deterministic subject the test
+subprocesses is this engine read action.
 **Pin**: `tests/contract/test_goal_command_surface.py` — exactly four modes in `argument-hint`; each
-Anchor-only mode produces the literal refusal; `/speckit.goal` resolving as the anchor-authoring entry
-turns the test red.
-**Contract**: `contracts/goal-command.contract.md` C-14.
+Anchor-only mode produces the literal refusal through `command-mode`; `/speckit.goal` resolving as the
+anchor-authoring entry turns the test red.
+**Contract**: `contracts/goal-command.contract.md` C-14 / C-15.
 
 ## S-5 — Cleanup: check → apply → re-apply [premise]
 
@@ -125,7 +127,7 @@ is exit 4 `conflict` naming both paths, never a silent rewrite.
 ```bash
 ls .specify/anchoring/*/goal.md 2>/dev/null            # expect: nothing
 grep -rn "goal_slug" .specify/teams .specify/anchoring .specify/goals .specify/agents \
-  .specify/skills .specify/teams.md 2>/dev/null        # expect: nothing
+  .specify/skills 2>/dev/null                         # expect: nothing
 grep -rn '^# Goal:' .specify/anchoring 2>/dev/null     # expect: nothing (C-38 A-N-1 applied)
 python3 .specify/scripts/python/goal-utils.py --scope anchor binding <anchor> --json
 ```
@@ -164,7 +166,7 @@ bash scripts/bash/run-tests.sh tests/contract/test_live_semantic_residue.py -q
 **Expected** at implement exit: every declared class reads 0 — `C1 0 · C2 0 · C3 0 · C4 0` over the
 live roots, `C5 0` in the anchor store (from 11 lines in the 9 retained anchors), `C6 0` (from 40
 line-hits) and `C7 0` in `.specify/features.md` (from 3 rows) — against the plan-time baseline
-`C1 4 · C2 0 · C3 7 · C4 15 · C5 16 (11 in retained anchors) · C6 40 · C7 3`
+`C1 4 · C2 0 · C3 8 · C4 16 · C5 16 (11 in retained anchors) · C6 40 · C7 3`
 (`test-evidence/live-semantic-scan-baseline-2026-11-12.txt` and
 `test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`). The test file **does not exist at plan
 entry** — G-6 creates it in WP-05 with the injection case. The scan roots, the excluded sets and the

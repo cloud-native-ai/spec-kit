@@ -35,7 +35,7 @@
 ## Plan Notes
 
 - **方案（planned 2026-11-12）**：`plan.md` + `research.md`（R-01…R-16 实测基线）+ `classification.json`（14 条目 + 7 团队处置，schema `101-classification/v1`）+ `data-model.md`（11 实体 E-1…E-11）+ `contracts/`（4 页 49 条款：anchor-command C-1…C-12 / goal-command C-13…C-22 / goal-engine C-23…C-35 / migration-cleanup C-36…C-49）+ `quickstart.md`（9 走查 S-0…S-8，逐条标注 `[today]` / `[premise]` / `[pin]`）+ `feature-ref.md`（FR 71/71 与 SC 10/10 映射 + 16 条裁决）。
-- **合规**：Constitution 23 项全 Pass；Complexity Tracking 无 violation；`validate-decision-tensions.py` ok（4 records / 0 error）；Execution Premises EP-001…EP-005 verified、EP-006 falsified（Hugo 文档站构建预存失败，Decision `fallback`，SC-008 构建腿报 `not-evaluated`）；Inherited Blockers 声明六依赖、抽出 4 条记录（2 resolved / 2 not-applicable）。
+- **合规**：Constitution 23 项全 Pass；Complexity Tracking 无 violation；`validate-decision-tensions.py` ok（4 records / 0 error）；Execution Premises EP-001…EP-005 verified、EP-006 falsified（Hugo 文档站构建预存失败，Decision `fallback`，SC-008 构建腿报 `not-evaluated`）；Inherited Blockers 声明六依赖、抽出 5 条记录（2 resolved / 3 not-applicable）。
 - **分类基线**：14 条 = 9 anchor / 2 action-goal / 2 obsolete（与 A-5 暂定清单零偏差）；团队 20 个定义、16 个带绑定；处置 6 条 R3（其中 1 条 already-satisfied）+ 1 条 R2（`viz-skill-arena` → 新建 `visualization-skill-selection`），无 R1。
 - **清理纪律**：迁移/归档幂等判据「目标存在且回执存在且摘要相等」；中断续做 I1–I5（I5 = exit 4）；冲突 exit 4 点名两候选；archive-not-delete；每个动作目标内一条回执。
 - **承重裁决**：T-001 单引擎加层参数而非第二引擎；T-002 命令面拆分而非单命令加 `--layer`；T-003 归档而非删除；T-004 退役取值与退役模式不设别名。

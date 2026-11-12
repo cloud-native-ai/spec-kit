@@ -158,6 +158,10 @@ Only lines matching this table are rewritten; every rewrite is recorded in the t
 | N-4 | `.specify/goal/<slug>/**` | same layer mapping, `**` preserved |
 | N-5 | `.specify/goal/**` (no slug) | `.specify/anchoring/**` |
 | N-6 | `/speckit.goal` on a line that also matches N-1…N-5 or contains `goal.md` | `/speckit.anchor` |
+| N-7 | `/speckit.goal` followed by `targets` / `migrate` / `migrate-archive` / `coordinate` (`/speckit\.goal\s+(targets\|migrate\|migrate-archive\|coordinate)\b`) | `/speckit.anchor` — an Anchor-only mode pointer is retired text whichever line it sits on; without this rule residue class C6 cannot reach 0 |
+
+N-6 and N-7 are order-free: a line matching both receives the same rewrite once. After the table, no
+live team definition may still route an Anchor-only mode to `/speckit.goal` (C6, `research.md` §5).
 
 Out of scope by decision (recorded, not silently skipped): a team's `forbidden` list gains no new
 `.specify/goals/**` entry; the engine's sole-writer invariant, not team territory, is what protects

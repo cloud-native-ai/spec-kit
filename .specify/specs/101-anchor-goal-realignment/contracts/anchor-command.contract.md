@@ -47,7 +47,7 @@ entry, `$ARGUMENTS` processing, glossary pre-pass and the wrap-up lifecycle.
 |------|--------------------|
 | `create` | writes `.specify/anchoring/<anchor-slug>/anchor.md` through the engine; outcome-shaped objective, ≥1 verifiable success criterion |
 | `view` | read-only; with no slug, lists the anchor store |
-| `modify` | edits objective / criteria / boundaries through the engine, prior value recorded in `## History` |
+| `modify` | edits objective / criteria through the engine, prior value recorded in `## History` |
 | `targets` | delegates to the engine `targets` action: `--list` / `--check` / `--add` / `--set` on one Anchor |
 | `migrate` | derives an Anchor from a team's inline goal through the engine `migrate` action |
 | `migrate-archive` | the explicit spec-local legacy migration (094 semantics); archive-not-delete |

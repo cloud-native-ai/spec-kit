@@ -47,7 +47,7 @@
 - GATE-4: 受保护路径与基线相等——`tests/integration/test_101_protected_paths.py` 绿，且新增归档子树被单列而未计入失败。
 - GATE-5: 每条 `final` 路径 SC 为 pass 且冒烟记录在案——`verification.md` 中每个 `**Path**: final` 判据有 `SC-NNN_status=pass` 以及 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`；`supporting` 判据按 T077 索引取值。
 - GATE-6: 结构与 FR lane 静默——`python3 .specify/scripts/python/validate-tasks.py .specify/specs/101-anchor-goal-realignment/tasks.md` exit 0，且 `pre-analyze-check.py --stage tasks` 判定通过。
-- GATE-7: 命令面契约成立——`python3 scripts/python/goal-utils.py --help` 与 `--version` exit 0 且零副作用；`--scope goal` 以非法取值失败；`/speckit.goal targets` 的子进程调用 exit 2 且 stderr 含字面 `anchor-only-mode` 并点名 `/speckit.anchor`。
+- GATE-7: 命令面契约成立——`python3 scripts/python/goal-utils.py --help` 与 `--version` exit 0 且零副作用；`--scope goal` 以非法取值失败；`python3 scripts/python/goal-utils.py command-mode --command goal --mode targets` exit 2 且 stderr 含字面 `anchor-only-mode` 并点名 `/speckit.anchor`，同动作对四个 Goal 模式 exit 0、对 `--command anchor` 的七模式 exit 0。
 
 ## Environment Prerequisites
 
@@ -83,7 +83,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 | 引擎身份 | `goal-utils.py 0.0.22`，`--help` exit 0 | `python3 scripts/python/goal-utils.py --version` | 用 `.specify/scripts/python/` 的镜像判定版本 |
 | 镜像基线 | `sync-mirrors.py --check` exit 0（`shared/` 113 文件逐字节一致） | 同名 | 把基线已有 DIFF 记成本特性漂移 |
 | 副本基线 | `regen-command-copies.py --check` exit 0 | 同名 | 为 `hermes` / `codex` 新建副本目录 |
-| 残留基线 | C1 4 · C2 0 · C3 7 · C4 15（26 行） | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt` | 用 80 字符窗口的宽 pattern，会多出 16 行无关命中 |
+| 残留基线 | C1 4 · C2 0 · C3 8 · C4 16（28 行） | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt` | 用 80 字符窗口的宽 pattern，会多出 16 行无关命中 |
 | flow-class 台账 | 89 单元 / 0 findings / floor 39 / `check` exit 0 | `python3 scripts/python/flow-class-check.py --action check` | 加行不改计数声明 |
 | 文档站 | hugo v0.141.0 渲染 exit 1 | `hugo --renderToMemory` | 用管道取到 `tail` 的退出码，误判为 0 |
 | 基线提交 | `d7c9da7a3` 可解析 | `git cat-file -e d7c9da7a3^{commit}` | — |
@@ -92,7 +92,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 
 ## Phase 1: Setup — 读数与证据落点
 
-- [ ] T001 [SETUP] 建立本规格的两处证据落点（`notes/`、`test-evidence/`），并把实现入口的实测读数连同取数命令与日期逐条写入测量文件：14 个锚点条目目录、20 个团队定义、16 条绑定、5 棵派生 summary、残留基线（C1 4 · C2 0 · C3 7 · C4 15）、flow-class 台账 89 单元——作为后续所有读数行的对照面，无读数的结论一律 `not-evaluated`（FR-071）。write: `.specify/specs/101-anchor-goal-realignment/notes/pre-change-measurements.md`（证据目录只创建、不预填）。
+- [ ] T001 [SETUP] 建立本规格的两处证据落点（`notes/`、`test-evidence/`），并把实现入口的实测读数连同取数命令与日期逐条写入测量文件：14 个锚点条目目录、20 个团队定义、16 条绑定、5 棵派生 summary、残留基线（C1 4 · C2 0 · C3 8 · C4 16）、flow-class 台账 89 单元——作为后续所有读数行的对照面，无读数的结论一律 `not-evaluated`（FR-071）。write: `.specify/specs/101-anchor-goal-realignment/notes/pre-change-measurements.md`（证据目录只创建、不预填）。
 - [ ] T002 [P] [SETUP] 采集受保护路径的实现入口基线：对 FR-061 集合在特性前提交 `d7c9da7a3` 上逐文件 `git hash-object`，输出分两组——"基线已存在"（参与等值断言）与"本特性将新增的归档子树"（只登记目录前缀，不预填内容）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/protected-paths-entry.txt`；证据: G-8 的对照输入（FR-069, FR-061）。[blockedBy: T001]
 - [ ] T003 [P] [SETUP] 经 `bash scripts/bash/run-tests.sh` 跑一次全量套件，按**失败用例 id 名**（不是计数、不是并行模式读数）记录入口失败集，连同退出码与耗时写入证据目录；此后 GATE-1 只做集合差（FR-062, FR-071）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/suite-baseline-entry.txt`。[blockedBy: T001]
 - [ ] T004 [P] [SETUP] 冻结本规格的子句与覆盖基线：以 `account-clause-coverage.py --freeze`（`--spec-dir` 指本规格、`--corpus-root` 指仓根）生成覆盖基线，供收尾判定"条款覆盖面无退化"。write: `.specify/specs/101-anchor-goal-realignment/coverage-baseline.txt`；证据: T080 的收尾对照（FR-071）。[blockedBy: T001]
@@ -108,13 +108,13 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 - [ ] T011 [WP-01] 实现 `--scope auto` 的三层解析：slug 不存在于任何层、或多于一层命中时 exit 2 并指名候选，不得猜测；写入类动作在 `auto` 下以 exit 2 `scope-read-only` 拒绝且零写入（FR-031）。write: `scripts/python/goal-utils.py`。[blockedBy: T010]
 - [ ] T012 [WP-01] 新增行动级 Goal 动作组（`goal-create` / `goal-list` / `goal-view` / `goal-modify` / `goal-status`）：只写 `.specify/goals/<goal-slug>/goal.md`（[[STR-002]]），拒绝跨层写入与同名 slug 双存；`goal-create` 至少要求一条 `--done`，撰写接受步骤形文本（不施加 Anchor 的 outcome-not-steps 校验），`goal-status` 无 `--set` 只报告，终态 Goal 保留在存档不被删除（FR-021, FR-024, FR-025, FR-032）。write: `scripts/python/goal-utils.py`；证据: 跨层写入拒绝的注入用例（T065 的 subject）。[blockedBy: T010]
 - [ ] T013 [WP-01] 新增清理动作组的外壳：`cleanup --check|--apply --classification <path>`，先做输入裁决（schema、class/rule 配对、条目完整性、`mapping_version`、`baseline_commit` 可解析），非法输入 exit 2 且零写入；`cleanup` 不接受 `--scope`（`scope-not-applicable`，exit 2）（FR-032, FR-035）。write: `scripts/python/goal-utils.py`。[blockedBy: T012]
-- [ ] T014 [WP-01] 实现清理的字段映射、概念摘要与回执：映射限于五项（文件位置、`## Objective` → `## Guidance`、`## Success Criteria` → `## Completion Conditions`、标题与身份、Targets 容器），摘要为映射后归一化投影的 `sha256` 并在动作前后各算一次，回执逐条落在动作目标内且带 `delete_policy: archive-not-delete`（FR-039, FR-040, FR-042, FR-043）。write: `scripts/python/goal-utils.py`；证据: T068 的摘要与 Target 丢失去例。[blockedBy: T013]
+- [ ] T014 [WP-01] 实现清理的字段映射、概念摘要与回执：映射限于 FR-039 的三项封闭变更（文件位置、`## Objective` → `## Guidance`、`## Success Criteria` → `## Completion Conditions`），`## Targets` 按 FR-040 抽出到回执并在迁移后正文的固定标题下逐条重渲染，摘要为映射后归一化投影的 `sha256` 并在动作前后各算一次，回执逐条落在动作目标内且带 `delete_policy: archive-not-delete`（FR-039, FR-040, FR-042, FR-043）。write: `scripts/python/goal-utils.py`；证据: T068 的摘要与 Target 丢失去例。[blockedBy: T013]
 - [ ] T015 [WP-01] 实现幂等、可续做与冲突：`already-*` 只在**目标存在 + 回执存在 + 摘要相等**三条件同时成立时给出，第二次 apply 零新增写；目标存在而回执缺失报 exit 4 `half-state`，摘要不等报 exit 4 `conflict` 并指名两侧路径（不覆盖、不改写回执）；在"移除源"前中断后重入报所处阶段并从该阶段续做；目标 slug 已存在且载荷不等价时停下、指名两个候选（FR-043, FR-044, FR-045）。write: `scripts/python/goal-utils.py`；证据: T068 / T069 两个模块的 subject。[blockedBy: T014]
 - [ ] T016 [WP-01] 实现清理阶段机的余项：团队结构改名（每文件只改一行）、团队正文术语归一化（逐行记入回执）、R1 / R2 / R3 处置、派生 summary 随定义移动或归档、以及收尾自检（锚点档纯度、绑定可解析、回执齐备、无孤立 summary）（FR-046, FR-047, FR-048, FR-049）。write: `scripts/python/goal-utils.py`；证据: T071 的夹具收敛断言。[blockedBy: T015]
 - [ ] T017 [WP-01] 把既有动作适配到新层与 `anchor_slug`：`list` 支持 `--scope goals`、对 `--scope teams` 返回 `scope-not-applicable`；`validate` / `binding` / `targets` / `run-checks` / `handoff-decision` / `handoff-ref` / `probe-residual` 保持原语义只换文件名与字段；`run-checks` 的 JSON 键改为 `anchor_slug`（不再发出 `goal_slug`）；引擎面向用户的 8 处提示串把 `targets` / `migrate` / `migrate-archive` / `coordinate` 引导改指 `/speckit.anchor`；`targets` 与 `coordinate` 作用于 Anchor 及其绑定团队，`migrate-archive` 仍是 spec-local 遗留定义树的唯一显式迁移入口（FR-033, FR-016, FR-015, FR-023, FR-017）。write: `scripts/python/goal-utils.py`。[blockedBy: T016]
-- [ ] T018 [WP-01] 让 `command-family` 按定义层分别作答（每层一个判定，而不是单一布尔），并迁移一个既有消费者读新形状（FR-027）。write: `scripts/python/goal-utils.py`；证据: T072 的按层断言。[blockedBy: T017]
+- [ ] T018 [WP-01] 让 `command-family` 按定义层分别作答（每层一个判定，而不是单一布尔），并迁移一个既有消费者读新形状（FR-027）；同一动作组内新增只读动作 `command-mode --command <anchor|goal> --mode <mode>`：两个模式集从 canonical 模板的 `argument-hint` 派生（不另立第二份模式清单），`--command goal` 对四模式 exit 0、对四个 Anchor-only 模式 exit 2 并在 stderr 输出字面 `anchor-only-mode` 与 `/speckit.anchor`、模式不在任何命令集合内 exit 2 `unknown-mode`，全程零写入（FR-020）。write: `scripts/python/goal-utils.py`；证据: T072 的按层断言与 T063 的子进程拒绝读数。[blockedBy: T017]
 - [ ] T019 [WP-01] 让 `migrate` 从团队内联目标派生 **Anchor**（产出锚点定义文件，而不是 Goal），目标层已存在时停下并指名候选（FR-015, FR-045）。write: `scripts/python/goal-utils.py`。[blockedBy: T017]
-- [ ] T020 [WP-01] 保持脚本接口契约：`-h` / `--help` / `--version` 零副作用，未声明选项被拒绝；新增动作的声明选项（`--classification`、`--guidance`、`--done`、`--clear-done`）进入签名守卫（FR-034）。write: `scripts/python/goal-utils.py`；证据: GATE-7 的三条读数。[blockedBy: T018, T019]
+- [ ] T020 [WP-01] 保持脚本接口契约：`-h` / `--help` / `--version` 零副作用，未声明选项被拒绝；新增动作的声明选项（`--classification`、`--guidance`、`--done`、`--clear-done`、`--command`、`--mode`）进入签名守卫（FR-034）。write: `scripts/python/goal-utils.py`；证据: GATE-7 的三条读数。[blockedBy: T018, T019]
 - [ ] T021 [WP-01] 同包适配两个工作流脚本消费者：`scripts/python/sdd-route.py` 的 scope 投影改为四成员并区分锚点侧与行动级 Goal 的路由，`scripts/python/concurrency-check.py` 的布局探针改读锚点定义文件（FR-029, FR-031）。write: `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`。[blockedBy: T010]
 - [ ] T022 [WP-01] 同包适配三个技能内脚本消费者：两份 `logical-framework.py`（`skills/external/sdd-project-setup/scripts/` 与 `skills/external/sdd-house-keeping/scripts/`）改读锚点存档与 `anchor_slug`，`skills/internal/create-team/scripts/build-summary-input.py` 的 summary 输入路径改指 `.specify/anchoring/<slug>/summary/`（FR-029, FR-058）。write: `skills/external/sdd-project-setup/scripts/logical-framework.py`, `skills/external/sdd-house-keeping/scripts/logical-framework.py`, `skills/internal/create-team/scripts/build-summary-input.py`。[blockedBy: T009]
 - [ ] T023 [WP-01] 同包适配 CLI 静态指针：`MIGRATE_STATIC_POINTERS` 的 owner 命令改为 `/speckit.anchor`，行动级 Goal 的提示与可选命令列表按四模式更新（FR-016, FR-015）。write: `src/specify_cli/__init__.py`。[blockedBy: T017]
@@ -142,8 +142,8 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 - [ ] T039 [WP-03] 更新 flow-class 台账：新增七模式命令行、更新四模式命令行、技能行反映两个技能的模式数；在同一变更内用 `flow-class-check.py --action check` 重测台账自身的计数声明与漂移守卫期望（FR-054, FR-027）。write: `shared/definitions/flow-class-definitions.md`；证据: 重测后的台账读数写入证据目录。[blockedBy: T026, T028, T029]
 - [ ] T040 [WP-03] 在探针登记处新增七模式命令的 wrap-up 探针对象、绑定与 docs 面，保留四模式命令的探针；随后用 `probe-utils.py --action compile-embeds` 重生成两个命令模板的 `## Wrap-up` 嵌入（不手改，指纹随登记处变化），并重跑 T030 的副本再生成让副本同步（FR-014, FR-055）。write: `shared/definitions/probe-definitions.md`, `templates/commands/anchor.md`, `templates/commands/goal.md`；证据: 编译前后 diff 与副本 `--check` 读数。[blockedBy: T026, T039]
 - [ ] T041 [WP-03] 修正项目 setup 与 house-keeping 两个技能：检查锚点存档而不是历史路径，并在 bootstrap / 维护指引里点名七模式命令；其脚本已在 WP-01 适配，本行只改技能正文与引用页（FR-056）。write: `skills/external/sdd-project-setup/SKILL.md`, `skills/external/sdd-house-keeping/SKILL.md`。[blockedBy: T022]
-- [ ] T042 [WP-03] 更新教程、前置表与活 feature 索引行：`docs/tutorials/quickstart.md`、`docs/tutorials/installation.md` 及任何命令索引类页面按新语义列出两个命令，删除旧入口描述；同时改写 `.specify/features.md` 中仍陈述旧模型的 3 行（027 / 041 / 094：旧路径、旧绑定字段、`goal=设计师` 一类读法与 `.specify/anchoring/<slug>/goal.md` 的文件名），使残留类 C7 归零（FR-057, FR-005, FR-016）。write: `docs/tutorials/quickstart.md`, `docs/tutorials/installation.md`, `.specify/features.md`。[blockedBy: T031, T032]
-- [ ] T043 [WP-03] 更新四个团队域技能（`create-team` / `improve-team` / `run-team` / `summarize-project`）：改用 Anchor 术语与 `anchor_slug`，交付目录写成 `.specify/anchoring/<slug>/summary/`，活页面不得再把历史单数路径当交付路径（FR-058, FR-017）。write: `skills/internal/create-team/SKILL.md`, `skills/internal/improve-team/SKILL.md`, `skills/internal/run-team/SKILL.md`, `skills/internal/summarize-project/SKILL.md`。[blockedBy: T022]
+- [ ] T042 [WP-03] 更新教程、参考页与活 feature 索引行：`docs/tutorials/quickstart.md`、`docs/tutorials/installation.md`、`docs/reference/commands/team.md` 与 `docs/reference/commands/seal.md` 及任何命令索引类页面按新语义列出两个命令，把其中仍把 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）指向 `/speckit.goal` 的行改指 `/speckit.anchor`，删除旧入口描述；同时改写 `.specify/features.md` 中仍陈述旧模型的 3 行（027 / 041 / 094：旧路径、旧绑定字段、`goal=设计师` 一类读法与 `.specify/anchoring/<slug>/goal.md` 的文件名），使残留类 C6、C7 归零（FR-057, FR-005, FR-016）。write: `docs/tutorials/quickstart.md`, `docs/tutorials/installation.md`, `docs/reference/commands/team.md`, `docs/reference/commands/seal.md`, `.specify/features.md`。[blockedBy: T031, T032]
+- [ ] T043 [WP-03] 更新四个团队域技能（`create-team` / `improve-team` / `run-team` / `summarize-project`）的正文与引用树：改用 Anchor 术语与 `anchor_slug`，交付目录写成 `.specify/anchoring/<slug>/summary/`，活页面不得再把历史单数路径当交付路径，且不得再把 Anchor-only 模式指向 `/speckit.goal`（C6 命中的引用文件逐个改指 `/speckit.anchor`）（FR-058, FR-017, FR-016）。write: `skills/internal/create-team/**`, `skills/internal/improve-team/**`, `skills/internal/run-team/**`, `skills/internal/summarize-project/**`。[blockedBy: T022]
 - [ ] T044 [P] [WP-03] 更新 interview pattern 及点名的其他活 pattern / 定义页：锚点撰写指向七模式命令，只有行动级指导指向四模式命令（FR-059, FR-016）。write: `shared/patterns/interview-pattern.md`。[blockedBy: T007]
 - [ ] T045 [P] [WP-03] 更新非一次性处置回顾面的成员声明：`.specify/anchoring` 与 `.specify/goals` 成为成员，退役成员 `.specify/goal` 在 owner 声明中记录退役理由（镜像副本由 T046 同步）（FR-060）。write: `shared/declarations/facts/non-disposable-review-surface.yaml`。[blockedBy: T007]
 - [ ] T046 [WP-03] 同步本包镜像并复核：本包改写的共享定义、pattern、成员声明与六个技能树（两个外部、四个内部）落到 `.specify/` 下同名位置，`sync-mirrors.py --check` 只允许基线已有 DIFF（FR-054, FR-060）。write: 上述源文件在 `.specify/` 下的同名镜像；证据: `--check` 输出追加到测量文件。[blockedBy: T035, T036, T037, T038, T039, T040, T041, T043, T044, T045]
@@ -151,7 +151,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 
 ## Phase 5: WP-04 — 清理、迁移与团队处置
 
-- [ ] T048 [WP-04] 把分类记录落成实现期证据：逐条读出 `classification.json` 的 slug、status、Targets 数、class、rule id 与实测依据（目标数、summary 存在性），与 requirements § Assumptions 的暂定清单逐条比对；无偏差记明，有偏差记规则 id + 证据，不得静默改判（FR-035, FR-036, FR-037）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/classification-<date>.md`；证据: SC-003。[blockedBy: T016]
+- [ ] T048 [WP-04] 把分类记录落成实现期证据：对每条从 `classification.json` 读出 `slug` / `class` / `rule` / `targets` / `summary`，并从活定义（`.specify/anchoring/<slug>/goal.md`）读出生命周期 `status` 与 Targets 语句数，与 requirements § Assumptions 的暂定清单逐条比对（该文件没有 `status` 字段，生命周期状态取自定义本体）；无偏差记明，有偏差记规则 id + 证据，不得静默改判（FR-035, FR-036, FR-037）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/classification-<date>.md`；证据: SC-003。[blockedBy: T016]
 - [ ] T049 [WP-04] 跑 `cleanup --check`：渲染 9 anchor / 3 action-goal / 2 obsolete 与 7 条团队处置，断言零写入（调用前后工作树状态相同），输出全量保存；与目录枚举读数交叉核对（FR-035）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/cleanup-check-<date>.json`。[blockedBy: T048]
 - [ ] T050 [WP-04] 执行 P1 两子步：9 个判为 anchor 的条目保持原位，引擎先改名（`goal.md` → `anchor.md`，该步只改文件名、其余字节逐字节保持），再执行**声明式正文归一化** A-N-1…A-N-4（`^# Goal:` → `# Anchor:`、`.specify/goal|teams` → `.specify/anchoring|teams` 等），逐行写入 `anchor-body-receipt.json`，未命中行不动；派生 summary 标记为待重生成而不是手改（FR-038, FR-005）。write: `.specify/anchoring/<slug>/anchor.md`（9 条）+ 各条 `anchor-body-receipt.json`；证据: 每条的状态行与逐行回执（C5 由基线 11 行归零）。[blockedBy: T049]
 - [ ] T051 [WP-04] 执行 P2 迁移：`088-speckit-visualization`、`091-auto-git-closeout`、`draw-diagram-interactive` 迁入 `.specify/goals/<slug>/goal.md`，按声明映射改写字段、保留叙述 / 成功判据 / 生命周期 / 时间戳 / History，`088` 的 2 条 Target 语句原样保留在迁移后正文的固定标题下并在回执记身份（FR-039, FR-040, FR-042, FR-043）。write: `.specify/goals/`（3 条）+ 各条 `migration-receipt.json`。[blockedBy: T050]
@@ -159,7 +159,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 - [ ] T053 [WP-04] 执行 R2：为 `viz-skill-arena` 的悬空绑定经引擎 `migrate` 落成 Anchor `visualization-skill-selection`（不得手写锚点定义文件），并把该团队的绑定指向它（FR-046, FR-048）。write: `.specify/anchoring/visualization-skill-selection/anchor.md`, `.specify/teams/viz-skill-arena/team.md`。[blockedBy: T052]
 - [ ] T054 [WP-04] 执行 P4：派生 summary 随定义处置——迁移 / 归档条目的 summary 移入对应目标并在回执记 `summary: moved`，锚点类条目的 summary 留给重生成；锚点存档内不得留下定义已不存在的孤立 summary（FR-049）。write: 对应目标目录内的 summary 子树。[blockedBy: T053]
 - [ ] T055 [WP-04] 执行 P5 团队结构改名：16 个绑定团队的 frontmatter 绑定键由旧名改为 `anchor_slug`，每文件只改这一行、其余字节保持不变；4 个无绑定团队保持逐字节相同，作为 FR-047 验收场景的断言（FR-047）。write: `.specify/teams/<slug>/team.md`（16 个）。[blockedBy: T054]
-- [ ] T056 [WP-04] 执行 P6 正文归一化：按声明的改写表（N-1…N-6）逐处更新团队定义正文中对绑定字段与交付路径的引用，逐行记入回执（FR-047, FR-058）。write: `.specify/teams/<slug>/team.md`（受影响的 16 个）。[blockedBy: T055]
+- [ ] T056 [WP-04] 执行 P6 正文归一化：按声明的改写表（N-1…N-7）逐处更新团队定义正文中对绑定字段、交付路径与 Anchor-only 模式入口的引用，逐行记入回执（FR-047, FR-058）。write: `.specify/teams/<slug>/team.md`（受影响的 16 个）。[blockedBy: T055]
 - [ ] T057 [WP-04] 执行 P7 处置：6 个团队按 R3 归档——`088-reporting-dogfood`、`091-auto-git-closeout`、`085-sdd-temporary-goal-team`、`post-refactor-mechanism-integrity`、`draw-diagram-interactive`、`demo-seat-dispatch`——每个都落到同一条终态（`lifecycle_state: archived` + 删除绑定行 + 目录内 `disposition-receipt.json` 记 `bound_slug` / `reason` / `acted`）；`091-auto-git-closeout` 已带归档状态但仍持绑定行且无回执，因此仍需删行与写回执（FR-046, FR-048）。write: `.specify/teams/<slug>/team.md`, `.specify/teams/<slug>/disposition-receipt.json`。[blockedBy: T056]
 - [ ] T058 [WP-04] 重生成锚点类条目的派生 summary（经既有总结流，不手改），只作用于已有 summary 的目录，不为没有 summary 的条目凭空造一棵（FR-038, FR-049）。write: `.specify/anchoring/<slug>/summary/`（留下的 3 棵）。[blockedBy: T057]
 - [ ] T059 [WP-04] 执行 P8 自检并把读数落盘：锚点档内无行动级条目、每个 `anchor_slug` 可解析、每条被迁移 / 归档条目有回执、无孤立 summary；逐团队采集 `goal-utils.py run-checks <team> --json` 的 `verdict` / `blocked` / 退出码，按 SC-005 判定（仍有绑定者须 `ok/false`，R3 归档团队须 `no-goal-definition/false`、exit 0，记为预期终态而非"五查通过"），并与 SC-003 / SC-005 的来源交叉核对（FR-048, FR-049）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/cleanup-apply-<date>.json`。[blockedBy: T058]
@@ -169,7 +169,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 
 - [ ] T061 [WP-05] 建夹具 `tests/fixtures/anchor-goal-realignment/`：14 条目的分类夹具、20 个团队的绑定夹具（16 绑定 / 4 无绑定 / 2 悬空）、受保护路径夹具，以及一棵"行动级条目尚未迁出"的收敛前树；夹具只提供输入，读数由被测代码产出，不预填期望值（FR-062, FR-068）。write: `tests/fixtures/anchor-goal-realignment/`。[blockedBy: T059]
 - [ ] T062 [WP-05] G-1 `tests/contract/test_anchor_command_surface.py`：模板缺失、模式数不等于 7、或模板复述 `--scope` 取值集而非按路径引用 owner 时转红；注入两种缺陷各观察一次红（FR-062；SC-002）。write: `tests/contract/test_anchor_command_surface.py`；证据: 红先读数入 `notes/red-first-evidence.md`。[blockedBy: T026, T030, T061]
-- [ ] T063 [WP-05] G-2 `tests/contract/test_goal_command_surface.py`：四模式断言；对四个 Anchor-only 模式做子进程调用，采集 exit 2、stderr 含字面 `anchor-only-mode` 与指向七模式命令的文案、以及调用前后存储摘要不变；模板把 Anchor-only 模式当可接受模式时转红（FR-063, FR-020；SC-002）。write: `tests/contract/test_goal_command_surface.py`。[blockedBy: T027, T030, T061]
+- [ ] T063 [WP-05] G-2 `tests/contract/test_goal_command_surface.py`：四模式断言；对四个 Anchor-only 模式以子进程调用引擎只读动作 `python3 scripts/python/goal-utils.py command-mode --command goal --mode <mode>`（并对照 `--command anchor` 的七模式 exit 0），采集 exit 2、stderr 含字面 `anchor-only-mode` 与指向七模式命令的文案、以及调用前后存储摘要不变；模板把 Anchor-only 模式当可接受模式、或该动作缺失时转红（FR-063, FR-020；SC-002）。write: `tests/contract/test_goal_command_surface.py`。[blockedBy: T018, T027, T030, T061]
 - [ ] T064 [WP-05] G-3 `tests/contract/test_anchor_definitions.py`：任一锚点条目缺锚点定义文件、或分类为 action-goal 的条目仍留在锚点档时转红（FR-064；SC-003）。write: `tests/contract/test_anchor_definitions.py`。[blockedBy: T050, T059, T061]
 - [ ] T065 [WP-05] G-4 `tests/contract/test_goal_store_write_boundary.py`：静态写入面审计覆盖 `scripts/`、两层 `skills/`、`src/`、`templates/`，对引擎与声明的派生 `summary/**` 写者（`build-summary-input.py`）开白名单、其余路径一律视为定义写者；两写者模拟证明不同 slug 落到不同路径；注入一次引擎外的**定义文件**写入后必须转红（FR-065, FR-028；SC-006）。write: `tests/contract/test_goal_store_write_boundary.py`。[blockedBy: T012, T016, T061]
 - [ ] T066 [WP-05] G-5 `tests/contract/test_binding_rename.py`：任一活团队定义（frontmatter 或正文，含已归档的团队定义，`runs/**` 除外）仍含旧绑定键、任一 `anchor_slug` 无法解析、受影响团队缺处置记录、或两处悬空绑定未解决时转红（FR-066；SC-005）。write: `tests/contract/test_binding_rename.py`。[blockedBy: T055, T056, T057, T061]
@@ -181,7 +181,7 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 - [ ] T072 [WP-05] G-10 `tests/contract/test_command_family_101.py`：台账缺七模式命令行、参考页缺失、或命令族只答单一布尔时转红（FR-070, FR-027；SC-008）。write: `tests/contract/test_command_family_101.py`。[blockedBy: T018, T031, T039]
 - [ ] T073 [WP-05] 记录文档站读数为 `not-evaluated`：在 `docs/` 跑一次内存渲染，保存退出码与 `.Site.Language.Locale` 报错原文作为 EP-006 的复证；该判据的构建腿据此报 `not-evaluated`，其余腿（参考页存在、台账行、探针面）照常测（FR-071）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/docs-build-<date>.txt`。[blockedBy: T042]
 - [ ] T074 [WP-05] 生成读者复述记录：以 glossary 与两份 owner 为依据，逐词条复述 Anchor、anchoring archive、Re-Anchoring、行动级 Goal 的对象与所在目录；任一词条复述失败即该判定不通过，记录事实而不改写词条求通过（FR-009；SC-010）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/reader-restatement-<date>.md`。[blockedBy: T036]
-- [ ] T075 [WP-05] 在活树跑 G-6 并把全部类的计数与基线并列记录（C1 4 · C2 0 · C3 7 · C4 15 = 26；C5 16 行、其中 11 行在 9 个保留 Anchor；C6 40；C7 3 行），作为最终读数；任何非零项必须定位到具体路径并回对应包修复，不得靠调整扫描根或排除项消音（FR-067）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/residue-scan-<date>.txt`。[blockedBy: T067]
+- [ ] T075 [WP-05] 在活树跑 G-6 并把全部类的计数与基线并列记录（C1 4 · C2 0 · C3 8 · C4 16 = 28；C5 16 行、其中 11 行在 9 个保留 Anchor；C6 40；C7 3 行），作为最终读数；任何非零项必须定位到具体路径并回对应包修复，不得靠调整扫描根或排除项消音（FR-067）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/residue-scan-<date>.txt`。[blockedBy: T067]
 - [ ] T076 [WP-05] 在实现后的树上逐条走 `quickstart.md` 的 S-0…S-8，记录真实输出（真实存储读数与夹具演练分开标注），失败或不适用逐条写明（FR-071）。write: `.specify/specs/101-anchor-goal-realignment/notes/quickstart-run.md`。[blockedBy: T060, T075]
 - [ ] T077 [WP-05] 汇总守卫读数索引：FR-062…FR-071 每条判据一行，指向其证据路径与结果；无读数的判据一律写 `not-evaluated`，不得写通过（FR-071）。write: `.specify/specs/101-anchor-goal-realignment/test-evidence/guard-readings-<date>.md`。[blockedBy: T062, T063, T064, T065, T066, T067, T068, T069, T070, T071, T072, T073, T074, T075, T076]
 
@@ -218,9 +218,10 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 
 | FR | 行 |
 |----|----|
-| FR-001, FR-002, FR-007, FR-008 | T007 |
+| FR-001, FR-007, FR-008 | T007 |
+| FR-002 | T007, T008 |
 | FR-003, FR-004 | T008 |
-| FR-005 | T008, T067 |
+| FR-005 | T008, T042, T050, T067, T078 |
 | FR-006 | T006 |
 | FR-009 | T007, T036, T074 |
 | FR-010 | T026, T030, T034 |
@@ -228,11 +229,11 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 | FR-013 | T026, T030, T031, T033 |
 | FR-014 | T040 |
 | FR-015 | T017, T019, T023, T026, T028 |
-| FR-016 | T017, T023, T026, T042, T044 |
+| FR-016 | T017, T023, T026, T042, T043, T044, T067 |
 | FR-017 | T017, T036, T043 |
 | FR-018 | T078 |
-| FR-019 | T027, T029, T030, T032, T034 |
-| FR-020 | T027, T063 |
+| FR-019 | T027, T030, T034 |
+| FR-020 | T018, T027, T063 |
 | FR-021 | T012, T027 |
 | FR-022 | T029 |
 | FR-023 | T017 |
@@ -241,11 +242,11 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 | FR-026 | T027, T032 |
 | FR-027 | T018, T039, T072 |
 | FR-028 | T009, T065 |
-| FR-029 | T009, T021, T022, T024 |
+| FR-029 | T009, T021, T022, T024, T025 |
 | FR-030 | T007, T010 |
 | FR-031 | T011, T021 |
 | FR-032 | T012, T013 |
-| FR-033 | T017, T021, T025 |
+| FR-033 | T017, T025 |
 | FR-034 | T020 |
 | FR-035 | T013, T048, T049 |
 | FR-036, FR-037 | T048 |
@@ -272,10 +273,10 @@ Probed 2026-11-12 in `/storage/project/cloud-native-ai/spec-kit` on `master`（s
 | FR-059 | T044 |
 | FR-060 | T045, T046 |
 | FR-061 | T002, T070 |
-| FR-062 | T003, T061, T062 |
+| FR-062 | T003, T061, T062, T077 |
 | FR-063 | T063 |
 | FR-064 | T064, T071 |
-| FR-065 | T061, T065 |
+| FR-065 | T065 |
 | FR-066 | T066, T071 |
 | FR-067 | T067, T075 |
 | FR-068 | T061, T068, T069 |

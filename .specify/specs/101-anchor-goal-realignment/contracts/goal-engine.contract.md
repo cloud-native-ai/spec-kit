@@ -40,7 +40,7 @@ two or more → exit 2 `scope-ambiguous` naming the layers. `auto` is read-only:
 | anchor (existing semantics, anchor store) | `create`, `status`, `objective`, `criteria`, `migrate` | `.specify/anchoring/**` definitions (+ the team inline reference for `migrate`) |
 | goal (new, clearly prefixed) | `goal-create`, `goal-list`, `goal-view`, `goal-modify`, `goal-status` | `.specify/goals/**` only |
 | cleanup (new, independently named) | `cleanup --check` / `cleanup --apply` | `.specify/anchoring|goals|archive/anchoring` + team frontmatter (see C-35) |
-| shared reads | `list`, `validate`, `binding`, `targets`, `run-checks`, `command-family`, `handoff-decision`, `probe-residual`, `resolve-scope` | none |
+| shared reads | `list`, `validate`, `binding`, `targets`, `run-checks`, `command-family`, `command-mode`, `handoff-decision`, `probe-residual`, `resolve-scope` | none |
 | shared writes | `bind`, `handoff-ref`, `migrate-archive`, `backfill-bindings`, `check-statement` | the layer named by `--kind` / the declared target |
 
 No action in one group may write another group's store. `goal-*` actions default `--scope goals`;
@@ -137,7 +137,14 @@ key are updated in the same change (C-32).
 
 `-h` / `--help` and `--version` answer without acting; an undeclared option is rejected
 (Constitution XXI, FR-034). The `_sig_guard` declared-option list gains exactly: `--classification`,
-`--guidance`, `--done`, `--clear-done`. `--check` / `--apply` already exist and are reused.
+`--guidance`, `--done`, `--clear-done`, `--command`, `--mode`. `--check` / `--apply` already exist and
+are reused.
+
+`command-mode` (C-15's executable subject) derives both mode sets from the canonical templates'
+`argument-hint` — one owner for "which modes a command declares", never a second hard-coded list — and
+writes nothing: exit 0 for a mode the named command declares, exit 2 with `anchor-only-mode` +
+`/speckit.anchor` on stderr for a Goal invocation of an Anchor-only mode, and exit 2 `unknown-mode` for
+a mode neither command declares.
 
 ## C-35 — Cleanup write matrix (group boundary)
 

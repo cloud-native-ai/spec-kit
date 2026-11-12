@@ -1,7 +1,18 @@
 # live-surface old-semantic scan — baseline before implement (2026-11-12)
-# inline python scan; 20 dirs + 8 files as roots; 2638 files scanned
-# excluded dir names (any depth): __pycache__, archive, feedback, history, node_modules, notes, public, runs, session, summary, test-evidence
-# excluded files: .specify/features.md
+# RE-MEASURED at the analyze gate round-1 repair (MEDIUM-1) on the declared roots as they stand:
+# 21 dirs + 9 files; 2650 files scanned. `.specify/features.md` is a root (its 041 row is counted
+# where classes C3/C4/C7 apply).
+# The superseded reading in this file's first version used 20 dirs + 8 files and excluded
+# `.specify/features.md`; that root set is not the declaration in research.md § Live-surface roots,
+# so it under-counted C3 by one and C4 by one (both the 041 index row). Supersession is recorded in
+# notes/analyze-repair.md.
+# C1's first pattern was also corrected at this repair: the previous form could not match a prose
+# line (its prefix was a bracket character class), so `docs/reference/commands/goal.md:12`
+# ("A goal is a project-level ...") was missed by the pattern though present in every earlier
+# reading. The corrected pattern tolerates the article-space slot; C1 reads 4 again.
+# inline python scan; excluded dir names (any depth): __pycache__, archive, feedback, history,
+# node_modules, notes, public, runs, session, summary, test-evidence
+# excluded files: .specify/features/**/*.md (recorded exclusion, research.md § Live-surface roots)
 # class definitions, roots and exclusions: research.md § Live-surface roots (SC-001 declaration)
 
 ## C1  count=4
@@ -12,16 +23,18 @@ shared/definitions/derivation-definitions.md:414: | **Goal** | Project-level aut
 
 ## C2  count=0
 
-## C3  count=7
+## C3  count=8
 .claude/commands/speckit.goal.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
 .github/prompts/speckit.goal.prompt.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
 .opencode/command/speckit.goal.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
 .qoder/commands/speckit.goal.md:17: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+.specify/features.md:50: | 041 | Goal Registry | Project-level goal as a first-class concept: today goal is only a team field, duplicated per team (frontmatter `goal:` + `## Goal` body — 4 teams write 8 copies) with no definition file behind requirement 036's `goal_slug` aggregation key. Introduces 
 .specify/skills/internal/manage-goal/SKILL.md:15: Own and execute the operations behind `/speckit.goal` — the **sole authoring entry** for
 skills/internal/manage-goal/SKILL.md:15: Own and execute the operations behind `/speckit.goal` — the **sole authoring entry** for
 templates/commands/goal.md:19: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
 
-## C4  count=15
+## C4  count=16
+.specify/features.md:50: | 041 | Goal Registry | Project-level goal as a first-class concept: today goal is only a team field, duplicated per team (frontmatter `goal:` + `## Goal` body — 4 teams write 8 copies) with no definition file behind requirement 036's `goal_slug` aggregation key. Introduces 
 .specify/memory/tools/build-summary-input.py.md:35: - Writes ONLY `--out` (default `.specify/goal/<goal-slug>/summary/data/project-input.yaml`)
 .specify/skills/internal/create-team/SKILL.md:202: - **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team
 .specify/skills/internal/create-team/references/create-mode.md:119: delivery_dir: .specify/goal/<goal-slug>/summary/   # derived from goal_slug, never from the team slug
@@ -38,4 +51,4 @@ skills/internal/create-team/references/summary-mapping.md:12: | **goal 索引** 
 skills/internal/create-team/references/summary-mapping.md:167: | **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/goal/<goal-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/goal/<goal-slug>/goal.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、
 skills/internal/create-team/scripts/build-summary-input.py:14: * `.specify/goal/<goal-slug>/summary/`      goal index — the sole complete summary
 
-## TOTAL  count=26
+## TOTAL  count=28

@@ -25,10 +25,15 @@ An invocation naming any Anchor-only mode — `targets`, `migrate`, `migrate-arc
 as the correct entry, MUST exit non-zero (2), and MUST write nothing. It MUST NOT fall back to
 `view` or to any read rendering (FR-020, SC-002).
 
-The rejection is the **command's** behaviour; a contract test invokes
-`/speckit.goal <anchor-only-mode>` in a fixture repository, asserts exit ≠ 0, asserts stderr
-contains both `anchor-only-mode` and `/speckit.anchor`, and asserts the store trees are unchanged
-(mtime + content digest).
+The rejection is the **command's** behaviour, and it MUST have a deterministic executable subject: the
+engine exposes a read-only action `command-mode --command <anchor|goal> --mode <mode>` (listed under
+shared reads, C-26; zero writes). For `--command goal` it exits 0 on `create` / `view` / `modify` /
+`status` and exits 2 with stderr containing both `anchor-only-mode` and `/speckit.anchor` on `targets` /
+`migrate` / `migrate-archive` / `coordinate`; `--command anchor` exits 0 on the seven Anchor modes. A
+mode outside the named command's set exits 2 `unknown-mode`. The contract test subprocesses
+`python3 scripts/python/goal-utils.py command-mode --command goal --mode <anchor-only-mode>` in a
+fixture repository, asserts exit 2, asserts stderr contains both literals, and asserts the store trees
+are unchanged (mtime + content digest).
 
 ## C-16 — Mode behaviours
 
