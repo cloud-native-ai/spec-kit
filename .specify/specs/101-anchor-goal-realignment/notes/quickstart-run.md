@@ -127,6 +127,18 @@ Raw-hit attribution (the quickstart's own note says C6 is measured by the declar
 
 **Disposition**: definition surfaces are clean; the raw-grep deviation is bounded and classified above.
 
+### `.specify/goal/**` in live team frontmatter — write prohibitions, classified not edited
+
+12 live `team.md` files carry `.specify/goal/**` (some with the comment "authored:只经 /speckit.goal
+引擎渲染") inside their `forbidden_paths` block — a **write prohibition**, not a binding and not a definition
+reference. The closed residue classes do not cover this shape: C5's second pattern would match the pointer
+but C5 is scoped to anchor definition files by the declaration, and C6 is the command-mode pointer pattern.
+Classification therefore: *stale address inside a prohibition field of the team-definition schema*, owner =
+the team-definition surface (`.specify/teams/`, written through the engine / team management, not through
+this package). A natural successor fix would list `.specify/goals/**` and `.specify/anchoring/**` instead of
+the retired singular root — recorded here, **not edited**, because team definitions are outside WP-05's
+write territory and the dispatch forbids changing a team definition for this finding.
+
 ## S-7 — Protected history is untouched — LIVE, pass
 
 `git diff --name-status d7c9da7a3 -- .specify/specs .specify/archive .specify/history docs/notes .specify/teams`

@@ -99,6 +99,11 @@ expectation moved (`REQUIRED_GROUPS`, the regex, docstrings). Before: 2 failed /
 - `goal_slug` raw-grep hits on live roots are confined to dated `runs/**`, receipt `before` fields, generated
   `project-input.yaml`, the create-team scripts' declared legacy tolerance, and the `handoff/v1` contract key
   (owner: `create-team` skill). No residue class covers them; recorded, not edited.
+- 12 live `team.md` files carry `.specify/goal/**` inside `forbidden_paths` — a write prohibition, not a
+  binding or definition ref. C1–C7 do not cover prohibition fields (C5 is scoped to anchor definitions, C6
+  to command-mode pointers), so it is classified as a stale address in a prohibition field, owner = the
+  team-definition surface; recorded in `notes/quickstart-run.md` § S-6, not edited (team definitions are
+  outside this package's territory).
 
 ## 7. Wrap-up engines
 
