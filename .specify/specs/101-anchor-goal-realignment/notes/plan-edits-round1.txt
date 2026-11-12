@@ -1,0 +1,8 @@
+PLAN-EDIT: 101-101 — .specify/specs/101-anchor-goal-realignment/plan.md — checklist round-1 repair: F-1/F-2/F-4/F-5/F-10 plan WP, gate, EP and evidence alignment; see notes/checklist-repair.md §1.
+PLAN-EDIT: 101-102 — .specify/specs/101-anchor-goal-realignment/data-model.md — checklist round-1 repair: F-9 Goal entity and forbidden Anchor-key row; see notes/checklist-repair.md §1 F-9.
+PLAN-EDIT: 101-103 — .specify/specs/101-anchor-goal-realignment/contracts/goal-command.contract.md — checklist round-1 repair: F-9 Goal↔Anchor relation (C-20); see notes/checklist-repair.md §1 F-9.
+PLAN-EDIT: 101-104 — .specify/specs/101-anchor-goal-realignment/contracts/goal-engine.contract.md — checklist round-1 repair: F-10 engine user-facing output and key alignment (C-26/C-33); see notes/checklist-repair.md §1 F-10.
+PLAN-EDIT: 101-105 — .specify/specs/101-anchor-goal-realignment/contracts/migration-cleanup.contract.md — checklist round-1 repair: F-1/F-3/F-4/F-8 normalization, idempotency, R3 and single-writer rules (C-38/C-41/C-47/C-49); see notes/checklist-repair.md §1.
+PLAN-EDIT: 101-106 — .specify/specs/101-anchor-goal-realignment/quickstart.md — checklist round-1 repair: scenario alignment for F-1/F-3/F-4/F-10; see notes/checklist-repair.md §1.
+PLAN-EDIT: 101-107 — .specify/specs/101-anchor-goal-realignment/feature-ref.md — checklist round-1 repair: F-2/F-4/F-10 trace alignment (R-18/R-20/R-22); see notes/checklist-repair.md §1.
+PLAN-EDIT: 101-108 — .specify/specs/101-anchor-goal-realignment/research.md — checklist round-1 repair: F-1/F-2/F-10 residue classes C5/C6/C7; see notes/checklist-repair.md §1.
