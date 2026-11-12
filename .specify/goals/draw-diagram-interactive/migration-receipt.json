@@ -1,0 +1,16 @@
+{
+  "schema": "101-migration-receipt/v1",
+  "action": "migrate-action-goal",
+  "source_path": ".specify/anchoring/draw-diagram-interactive/goal.md",
+  "target_path": ".specify/goals/draw-diagram-interactive/goal.md",
+  "concept_digest_source": "8bdc7d333a2ca67ad8d814896ffd3cf38c37703192ef6ca9e27fa257c8cc9ff3",
+  "concept_digest_target": "8bdc7d333a2ca67ad8d814896ffd3cf38c37703192ef6ca9e27fa257c8cc9ff3",
+  "mapping_version": "101-mapping-v1",
+  "result_identity": "draw-diagram-interactive",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "delete_policy": "archive-not-delete",
+  "targets": [],
+  "summary": "moved",
+  "phase": "complete"
+}

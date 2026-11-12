@@ -1,0 +1,14 @@
+{
+  "schema": "101-disposition-receipt/v1",
+  "team_slug": "post-refactor-mechanism-integrity",
+  "bound_slug": "post-refactor-mechanism-integrity",
+  "disposition": "R3",
+  "state": "apply",
+  "reason": "verification chain keyed to an achieved one-off entry",
+  "acted": [
+    "lifecycle_state: archived",
+    "binding line removed"
+  ],
+  "timestamp": "2026-11-12T11:41:01Z",
+  "engine": "goal-utils.py 0.0.22"
+}

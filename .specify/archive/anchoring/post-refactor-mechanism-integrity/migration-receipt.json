@@ -1,0 +1,22 @@
+{
+  "schema": "101-migration-receipt/v1",
+  "action": "archive-obsolete",
+  "source_path": ".specify/anchoring/post-refactor-mechanism-integrity/goal.md",
+  "target_path": ".specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md",
+  "concept_digest_source": "5c0a61664543ba69bc8968740fa3a622079d69693c084d83853b4e6e3259e84c",
+  "concept_digest_target": "5c0a61664543ba69bc8968740fa3a622079d69693c084d83853b4e6e3259e84c",
+  "mapping_version": "101-mapping-v1",
+  "result_identity": "post-refactor-mechanism-integrity",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "delete_policy": "archive-not-delete",
+  "targets": [
+    {
+      "id": "T-001",
+      "statement": "客户项目中的旧 .specify 目录结构,在新版本 specify init 执行升级后,依然可以保证正常运转",
+      "status": "done"
+    }
+  ],
+  "summary": "moved",
+  "phase": "complete"
+}

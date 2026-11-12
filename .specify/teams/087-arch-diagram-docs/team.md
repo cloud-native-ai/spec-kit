@@ -10,7 +10,7 @@ goal: >-
   carries an architecture diagram or a named exemption" a decidable fact, wire the obligation into the
   existing create-docs / improve-docs flows and the /speckit.docs command, and reuse the draw-diagram
   front door without introducing a second engine, routing table or delivery contract.
-goal_slug: 087-arch-diagram-docs
+anchor_slug: 087-arch-diagram-docs
 territory:
   write:
     - .specify/specs/087-arch-diagram-docs/**

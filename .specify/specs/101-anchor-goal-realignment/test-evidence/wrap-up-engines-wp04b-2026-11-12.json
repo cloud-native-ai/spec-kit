@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-12",
+  "run_id": "r20261112T064607Z-b101",
+  "unit_id": "skill:implement-feature",
+  "unit_type": "skill",
+  "engines": [
+    {
+      "engine": "run-determination.py",
+      "action": "determine",
+      "first": {
+        "persisted": true,
+        "path": ".specify/memory/session/20261112T121621Z-run-determination-skill-implement-feature-r20261112t064607z.md",
+        "verdicts": {
+          "token_consumption": "not_evaluated",
+          "elapsed": "not_evaluated",
+          "artifact_correctness": "not_evaluated",
+          "satisfaction": "not_evaluated"
+        },
+        "qualification": "qualified",
+        "complexity": "complex",
+        "trigger_feedback": false
+      },
+      "second": {
+        "duplicate": true,
+        "note": "this (unit_id, run_id) was already determined"
+      }
+    },
+    {
+      "engine": "exec-quant.py",
+      "action": "collect",
+      "first": {
+        "record": ".specify/memory/exec-quant/records/20261112T121621450662Z-d45de0c4.json",
+        "resolution": "explicit"
+      },
+      "second": {
+        "duplicate": true,
+        "note": "duplicate record for (skill:implement-feature, r20261112T064607Z-b101); no second row written"
+      },
+      "records_for_run": 1
+    },
+    {
+      "engine": "feedback-utils.py",
+      "action": "record",
+      "first": {
+        "id": "20261112T121643Z-skill-implement-feature",
+        "path": ".specify/memory/feedback/20261112T121643Z-skill-implement-feature.md",
+        "duplicate": false,
+        "count_since_submission": 483,
+        "threshold": 10,
+        "should_prompt": true
+      },
+      "second": {
+        "duplicate": true,
+        "same_path": true
+      }
+    }
+  ],
+  "dedupe_key": "(unit_id, run_id)",
+  "note": "three /speckit.implement wrap-up engines were each run twice; the second invocation of every engine reported duplicate/no-new-row on the same (unit_id, run_id). The review text lives in the feedback record and in this evidence; no synthetic run id was invented."
+}

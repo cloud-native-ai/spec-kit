@@ -1,0 +1,23 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "091-auto-git-closeout",
+  "bound_slug": "091-auto-git-closeout",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/091-auto-git-closeout/team.md",
+      "line": 14,
+      "rule": "C-45",
+      "before": "goal_slug: 091-auto-git-closeout",
+      "after": "anchor_slug: 091-auto-git-closeout"
+    },
+    {
+      "path": ".specify/teams/091-auto-git-closeout/team.md",
+      "line": 132,
+      "rule": "N-9",
+      "before": "`.specify/workflow/git.md`; the goal definition at `.specify/anchoring/091-auto-git-closeout/goal.md`",
+      "after": "`.specify/workflow/git.md`; the goal definition at `.specify/goals/091-auto-git-closeout/goal.md`"
+    }
+  ]
+}

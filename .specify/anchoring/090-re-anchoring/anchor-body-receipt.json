@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/090-re-anchoring/anchor.md",
+  "concept_digest_before_normalization": "9a81b82bc95c87c31b202578a40ccf5ad27597e5c7307a0e3ee31a116baa2b8d",
+  "concept_digest_after_normalization": "9a81b82bc95c87c31b202578a40ccf5ad27597e5c7307a0e3ee31a116baa2b8d",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/090-re-anchoring/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: Re-Anchoring（不忘初心 · 温故而知新）",
+      "after": "# Anchor: Re-Anchoring（不忘初心 · 温故而知新）"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "status": "produced",
+  "form": ".specify/anchoring/skill-layer-install-separation/summary/data/project-input.yaml",
+  "delivery_dir": ".specify/anchoring/skill-layer-install-separation/summary",
+  "goal_slug": "skill-layer-install-separation",
+  "goal_identity": "explicit",
+  "contributing_teams": [
+    "skill-layer-install-separation"
+  ],
+  "inferred_fields": [
+    {
+      "field": "people[agent-team-supervisor-template].owner_name",
+      "inferred_from": "名册引用的 agent 定义未找到,按 FR-004 记为未记录"
+    }
+  ],
+  "material_gaps": [
+    "skill-layer-install-separation: agent definition agent-team-supervisor-template unresolved; owner recorded as 未记录",
+    "团队内联 goal 与被引用的定义不一致,以定义为权威(FR-012);不一致的团队:skill-layer-install-separation"
+  ],
+  "declined": false,
+  "goal_source": "definition",
+  "goal_definition": ".specify/anchoring/skill-layer-install-separation/anchor.md",
+  "roster": [
+    {
+      "team": "skill-layer-install-separation",
+      "territory": {
+        "write": [
+          ".claude/commands/**",
+          ".github/prompts/**",
+          ".opencode/command/**",
+          ".qoder/commands/**",
+          ".specify/instructions.md",
+          ".specify/memory/feedback/**",
+          ".specify/memory/glossary.md",
+          ".specify/memory/register.md",
+          ".specify/shared/**",
+          ".specify/skills/**",
+          ".specify/teams/skill-layer-install-separation/**",
+          ".specify/templates/**",
+          "docs/**",
+          "pyproject.toml",
+          "scripts/python/**",
+          "shared/**",
+          "skills/**",
+          "src/hatch_build.py",
+          "src/specify_cli/**",
+          "templates/**",
+          "tests/**"
+        ],
+        "read": [
+          ".specify/goal/skill-layer-install-separation/**",
+          ".specify/shared/**",
+          "docs/**",
+          "scripts/**",
+          "skills/**",
+          "src/**",
+          "tests/**"
+        ],
+        "forbidden": [
+          ".github/skills",
+          ".qoder/agents/**",
+          ".qoder/settings.local.json",
+          ".qoder/skills/**",
+          ".specify/goal/**",
+          ".specify/memory/feedback/probe-map.md",
+          "AGENTS.md, CLAUDE.md, QODER.md, .github/copilot-instructions.md",
+          "skills/self-improvement/**",
+          "templates/commands/improve.md"
+        ],
+        "non_path": [
+          {
+            "type": "dispatch-modality",
+            "target": "并发是硬要求（用户 2026-10-09 指令「team 需要进行多 subagent 协作，并发处理」）：framework-engineer / structure-adjuster / skill-verifier 三席均已安装到宿主注册面（.qoder/agents/），MUST 以 **native** 派发；阶段内独立单元 MUST 在**同一响应块内并发派发**（多调用）；同一席位的多重 Execution 并发合法（各自独立 territory）。virtual 仅作宿主不可用时的降级并须披露。supervisor 由编排会话承担（virtual 角色、不发任务给自身）"
+          },
+          {
+            "type": "write-authority",
+            "target": "消解条款（skills/create-team/references/conceptual-model.md §消解条款）在本团队的落法：业务路径（engines/CLI/tests/docs）由 Worker 在 territory 内**直写**；**定义类文件**（SKILL.md / team.md / agent 定义 / 命令模板）由 Worker 产出**工作区补丁**、MUST 由唯一 Meta supervisor 落 canonical。违反即越权"
+          },
+          {
+            "type": "handover",
+            "target": "本团队承接旧团队 command-logic-as-classified-skills 的「run-2 扩展切片」剩余批次 B2c/B2e/B3/B4/B5/B6/B7（用户 2026-10-09 指令转换为新 goal+team）。已完成批次 B1/B2a/B2b/B2d 的产线与记录留在旧团队；旧团队保留 S1–S3（其 S1 起点依赖本团队 S-B 落地，跨团队交接以旧团队 progress 为准）"
+          },
+          {
+            "type": "ceiling",
+            "target": "门控预算——`python3 .specify/scripts/python/scan-confirmation-gates.py` 的 total MUST 保持 ≤ 23（as-of 2026-10-09 实测 23；不写字面量当常量，以重跑命令为准）。易变测量值（技能数、测试数）一律以可重跑命令 + as-of 基线表达"
+          },
+          {
+            "type": "regeneration",
+            "target": "canonical 落盘（含本团队任一业务路径写入）后 MUST 依序跑两再生成引擎并 `--check` 退出 0：`scripts/python/sync-mirrors.py` 与 `scripts/python/regen-command-copies.py`（自 canonical 副本调用）；镜像不删旧投影——退役/改名条目按「回收操作」手工清除并在报告披露（缺口已记入 feedback 20261009T064957Z）"
+          },
+          {
+            "type": "checkpoint",
+            "target": "起步状态（2026-10-09 移交时）：树全绿（两引擎 --check 0、门控 23、docs/sanitize 套件 99P、宽子集 703P、关联子集 305P）；B2b 批次未提交（40 项），提交时点由用户定"
+          }
+        ]
+      },
+      "identity_type": "explicit",
+      "advancing": true,
+      "participation": "active"
+    }
+  ],
+  "overlaps": [],
+  "contested_areas": [],
+  "entity_counts": {
+    "phases": 5,
+    "work_items": 6,
+    "milestones": 6,
+    "people": 4,
+    "features": 0,
+    "sources": 1
+  }
+}

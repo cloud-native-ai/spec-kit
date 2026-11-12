@@ -7,19 +7,19 @@ project:
   repos: []
 phases:
 - phase_id: skill-layer-install-separation.S-A-skill-pair-decouple
-  phase_name: skill-layer-install-separation · stage decouple
+  phase_name: skill-layer-install-separation · S-A 技能对去 .specify 化
   phase_order: 1
 - phase_id: skill-layer-install-separation.S-B-rehome-and-refs
-  phase_name: skill-layer-install-separation · stage refs
+  phase_name: skill-layer-install-separation · S-B 源树重家与引用适配
   phase_order: 2
 - phase_id: skill-layer-install-separation.S-C-toolchain-split
-  phase_name: skill-layer-install-separation · stage split
+  phase_name: skill-layer-install-separation · S-C 工具链分流
   phase_order: 3
 - phase_id: skill-layer-install-separation.S-D-tests-and-guards
-  phase_name: skill-layer-install-separation · stage guards
+  phase_name: skill-layer-install-separation · S-D 测试适配与守卫
   phase_order: 4
 - phase_id: skill-layer-install-separation.S-E-runtime-refresh
-  phase_name: skill-layer-install-separation · stage refresh
+  phase_name: skill-layer-install-separation · S-E 运行时刷新与终验
   phase_order: 5
 work_items:
 - item_id: skill-layer-install-separation.TI-0001
@@ -54,13 +54,34 @@ work_items:
   source: .specify/teams/skill-layer-install-separation/runs/20261011T021003Z-report.md#result-summary
 milestones:
 - milestone_id: MS-0001
-  milestone_name: '源树与运行时双布局按内外两层一致落地:全仓引用与所在层匹配;镜像、安装、打包三引擎按两层映射工作,各自 --check '
+  milestone_name: 源树与运行时双布局按内外两层一致落地:全仓引用与所在层匹配;镜像、安装、打包三引擎按两层映射工作,各自 --check 退出 0
   anchor_item_id: skill-layer-install-separation.TI-0001
-  source: .specify/goal/skill-layer-install-separation/goal.md
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md
 - milestone_id: MS-0002
-  milestone_name: 分流行为可验证:平铺发现面只注册 external 技能、internal 技能经 .specify/skills/in
+  milestone_name: 分流行为可验证:平铺发现面只注册 external 技能、internal 技能经 .specify/skills/internal/ 显式路径可解析(两条守卫测试为证);全量测试同口径
+    A/B 零新增失败,门控扫描 total ≤ 23
   anchor_item_id: skill-layer-install-separation.TI-0001
-  source: .specify/goal/skill-layer-install-separation/goal.md
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md
+- milestone_id: MS-0003
+  milestone_name: create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  status: achieved
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md#T-001
+- milestone_id: MS-0004
+  milestone_name: 技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  status: achieved
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md#T-002
+- milestone_id: MS-0005
+  milestone_name: 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  status: achieved
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md#T-003
+- milestone_id: MS-0006
+  milestone_name: 测试适配、两条守卫测试与本仓自用运行时刷新全部落地
+  anchor_item_id: skill-layer-install-separation.TI-0001
+  status: achieved
+  source: .specify/anchoring/skill-layer-install-separation/anchor.md#T-004
 people:
 - owner_id: agent-team-supervisor-template
   owner_name: 未记录
@@ -95,28 +116,65 @@ targets:
   items:
   - id: T-001
     statement: create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选
-    authored_status: open
+    authored_status: done
     attributed_items: 0
     completed_items: 0
     pending_approval: false
   - id: T-002
     statement: 技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配
-    authored_status: open
+    authored_status: done
     attributed_items: 0
     completed_items: 0
     pending_approval: false
   - id: T-003
     statement: 镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽
-    authored_status: open
+    authored_status: done
     attributed_items: 0
     completed_items: 0
     pending_approval: false
   - id: T-004
     statement: 测试适配、两条守卫测试与本仓自用运行时刷新全部落地
-    authored_status: open
+    authored_status: done
     attributed_items: 0
     completed_items: 0
     pending_approval: false
-  coverage: 0/4 done
+  coverage: 4/4 done
   unattributed_to_target: 6
   invalid_refs: 0
+inferred_fields:
+- field: milestones[MS-0001].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Success Criteria（生成器按 60
+    字符截断）
+- field: milestones[MS-0002].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Success Criteria（生成器按 60
+    字符截断）
+- field: milestones[MS-0003].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Targets T-001（生成器按 60 字符截断）
+- field: milestones[MS-0004].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Targets T-002（生成器按 60 字符截断）
+- field: milestones[MS-0005].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Targets T-003（生成器按 60 字符截断）
+- field: milestones[MS-0006].milestone_name
+  inferred_from: .specify/anchoring/skill-layer-install-separation/anchor.md §Targets T-004（生成器按 60 字符截断）
+- field: phases[skill-layer-install-separation.S-A-skill-pair-decouple].phase_name
+  inferred_from: prior committed summary-report stage names (same phase id)
+- field: phases[skill-layer-install-separation.S-B-rehome-and-refs].phase_name
+  inferred_from: prior committed summary-report stage names (same phase id)
+- field: phases[skill-layer-install-separation.S-C-toolchain-split].phase_name
+  inferred_from: prior committed summary-report stage names (same phase id)
+- field: phases[skill-layer-install-separation.S-D-tests-and-guards].phase_name
+  inferred_from: prior committed summary-report stage names (same phase id)
+- field: phases[skill-layer-install-separation.S-E-runtime-refresh].phase_name
+  inferred_from: prior committed summary-report stage names (same phase id)
+- field: milestones[MS-0003].source
+  inferred_from: retired delivery path normalized to anchor.md (builder emitted legacy goal-target source;
+    WP-04 N-9 form)
+- field: milestones[MS-0004].source
+  inferred_from: retired delivery path normalized to anchor.md (builder emitted legacy goal-target source;
+    WP-04 N-9 form)
+- field: milestones[MS-0005].source
+  inferred_from: retired delivery path normalized to anchor.md (builder emitted legacy goal-target source;
+    WP-04 N-9 form)
+- field: milestones[MS-0006].source
+  inferred_from: retired delivery path normalized to anchor.md (builder emitted legacy goal-target source;
+    WP-04 N-9 form)

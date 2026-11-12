@@ -10,7 +10,7 @@ goal: >-
   -h/--help and --version with zero side effects, unknown options fail non-zero, the rule lands in
   the framework constitution/instructions templates and this repo's constitution, and a deterministic
   checker reports zero violations.
-goal_slug: script-interface-contract
+anchor_slug: script-interface-contract
 territory:
   write:
     - .specify/specs/089-script-interface-contract/**

@@ -1,0 +1,16 @@
+{
+  "schema": "101-migration-receipt/v1",
+  "action": "migrate-action-goal",
+  "source_path": ".specify/anchoring/091-auto-git-closeout/goal.md",
+  "target_path": ".specify/goals/091-auto-git-closeout/goal.md",
+  "concept_digest_source": "fe1414d716daad43500979d3957b2f83c019ee9574eaf7b1304cdbf7c13b5e84",
+  "concept_digest_target": "fe1414d716daad43500979d3957b2f83c019ee9574eaf7b1304cdbf7c13b5e84",
+  "mapping_version": "101-mapping-v1",
+  "result_identity": "091-auto-git-closeout",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "delete_policy": "archive-not-delete",
+  "targets": [],
+  "summary": "absent",
+  "phase": "complete"
+}

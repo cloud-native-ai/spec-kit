@@ -1,0 +1,13 @@
+{
+  "schema": "101-disposition-receipt/v1",
+  "team_slug": "091-auto-git-closeout",
+  "bound_slug": "091-auto-git-closeout",
+  "disposition": "R3",
+  "state": "apply",
+  "reason": "team.md already carries lifecycle_state: archived but still carries its goal_slug binding and has no disposition receipt; R3 terminal state (archived + binding removed + disposition-receipt.json) is not yet met",
+  "acted": [
+    "binding line removed"
+  ],
+  "timestamp": "2026-11-12T11:41:01Z",
+  "engine": "goal-utils.py 0.0.22"
+}

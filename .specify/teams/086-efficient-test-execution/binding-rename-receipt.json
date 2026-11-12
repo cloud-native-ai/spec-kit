@@ -1,0 +1,16 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "086-efficient-test-execution",
+  "bound_slug": "086-efficient-test-execution",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/teams/086-efficient-test-execution/team.md",
+      "line": 13,
+      "rule": "C-45",
+      "before": "goal_slug: 086-efficient-test-execution",
+      "after": "anchor_slug: 086-efficient-test-execution"
+    }
+  ]
+}

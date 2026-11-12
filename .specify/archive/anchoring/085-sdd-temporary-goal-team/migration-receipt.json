@@ -1,0 +1,16 @@
+{
+  "schema": "101-migration-receipt/v1",
+  "action": "archive-obsolete",
+  "source_path": ".specify/anchoring/085-sdd-temporary-goal-team/goal.md",
+  "target_path": ".specify/archive/anchoring/085-sdd-temporary-goal-team/goal.md",
+  "concept_digest_source": "9e9a7dacaf4533b15e57fc1062df85bfb114369b47e65c6ad9d50b33f63fe53b",
+  "concept_digest_target": "9e9a7dacaf4533b15e57fc1062df85bfb114369b47e65c6ad9d50b33f63fe53b",
+  "mapping_version": "101-mapping-v1",
+  "result_identity": "085-sdd-temporary-goal-team",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "delete_policy": "archive-not-delete",
+  "targets": [],
+  "summary": "absent",
+  "phase": "complete"
+}

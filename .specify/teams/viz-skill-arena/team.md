@@ -12,7 +12,7 @@ goal: >
   无回退)合并回对应 canonical 技能目录并同步镜像；(3) 加权评分维度：语义保真 0.30 / 视觉质量 0.30 /
   需求契合 0.25 / 可复现可维护 0.15，冠军 = 该轮最高加权分(≥0.85 采纳线)；技能变更采纳门 = 重绘后加权分
   ≥ 第一轮自身分(无回退)；(4) 分离纪律：SDS 不得含引擎语法，语法层不得自行改写语义(几何/权重偏离必须声明)。
-goal_slug: visualization-skill-selection
+anchor_slug: visualization-skill-selection
 territory:
   write:
     - skills/draw-diagram/**

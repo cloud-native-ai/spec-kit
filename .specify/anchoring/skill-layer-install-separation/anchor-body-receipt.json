@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/skill-layer-install-separation/anchor.md",
+  "concept_digest_before_normalization": "3a78feafc0fccee1eef4a87907a2e9dd2d6ec8efbb673ca4cce300074e35a7c1",
+  "concept_digest_after_normalization": "3a78feafc0fccee1eef4a87907a2e9dd2d6ec8efbb673ca4cce300074e35a7c1",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/skill-layer-install-separation/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: skill-layer-install-separation",
+      "after": "# Anchor: skill-layer-install-separation"
+    }
+  ]
+}

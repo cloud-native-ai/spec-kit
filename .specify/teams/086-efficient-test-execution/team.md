@@ -10,7 +10,7 @@ goal: >-
   suite runs concurrently by default with a serial fallback and name-level failure parity, the
   principle is distributed through the constitution and instructions, and 085's temporary Goal/Team
   and concurrency mechanisms are exercised without regression.
-goal_slug: 086-efficient-test-execution
+anchor_slug: 086-efficient-test-execution
 territory:
   write:
     - .specify/specs/086-efficient-test-execution/**

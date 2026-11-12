@@ -1,0 +1,75 @@
+{
+  "mode": "load",
+  "db": ".specify/anchoring/session-driven-self-improvement/summary/data/project.db",
+  "rows": {
+    "people": 3,
+    "phases": 5,
+    "work_items": 5,
+    "work_item_deps": 0,
+    "milestones": 2,
+    "features": 0,
+    "sources": 1,
+    "source_covers": 3,
+    "repos": 0,
+    "repo_derive_fields": 0,
+    "coverage": 1,
+    "git_window": 0,
+    "status_map": 0,
+    "project": 1,
+    "inferred_fields": 6
+  },
+  "check": {
+    "tool": "project-db/v1",
+    "schema_version": "project-db/v1",
+    "foreign_keys_pragma": 1,
+    "entity_counts": {
+      "phases": 5,
+      "work_items": 5,
+      "milestones": 2,
+      "people": 3,
+      "features": 0,
+      "sources": 1,
+      "work_item_deps": 0,
+      "repos": 0
+    },
+    "findings": [],
+    "status": "ok",
+    "unknown_schedule": [
+      {
+        "item_id": "session-driven-self-improvement.TIX-3dfddbb0",
+        "item_name": "run 20261005T172252Z",
+        "row_order": 1
+      },
+      {
+        "item_id": "session-driven-self-improvement.TIX-6730c24c",
+        "item_name": "run 20261007T170045Z",
+        "row_order": 2
+      },
+      {
+        "item_id": "session-driven-self-improvement.TIX-4e67a199",
+        "item_name": "run 20261008T025904Z",
+        "row_order": 3
+      },
+      {
+        "item_id": "session-driven-self-improvement.TIX-6ccb2680",
+        "item_name": "run 20261008T073900Z",
+        "row_order": 4
+      },
+      {
+        "item_id": "session-driven-self-improvement.TIX-3344086d",
+        "item_name": "run 20261008T090000Z",
+        "row_order": 5
+      },
+      {
+        "item_id": "MS-0001",
+        "item_name": "一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(名字级失败集差集为空,且每条返回绿的检查留有红先行取证或变异演练),语义正确性不在本判据内。",
+        "row_order": 1
+      },
+      {
+        "item_id": "MS-0002",
+        "item_name": "本目标为长期目标,不设算出的终止判据:achieved 是一次刻意的人工判定,而非由度量得出的结论。",
+        "row_order": 2
+      }
+    ]
+  }
+}

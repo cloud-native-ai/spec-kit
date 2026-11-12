@@ -301,7 +301,7 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **SC-002**: 命令面分割完整——`/speckit.anchor` 恰好暴露七模式、`/speckit.goal` 恰好暴露四模式，四个 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）经 `/speckit.goal` 调用时全部具名拒绝并指向 `/speckit.anchor`；删除任一 canonical 模板或模式行时契约测试转红。 **Path**: final
 - **SC-003**: 档案纯度可测量——14 个条目逐条有分类记录；`.specify/anchoring/` 中 `action-goal` 条目数为 0；每个被判 `action-goal` 的条目在 `.specify/goals/` 中恰有一份定义；过期条目全部位于 `.specify/archive/anchoring/`；读数写入 test-evidence，不以暂定数字充当实测。 **Path**: final
 - **SC-004**: 零丢失可复核——每条被迁移/归档条目有回执；概念摘要在动作前后相等；删除数为 0；受保护日期化路径的逐文件哈希与特性前提交一致。 **Path**: final
-- **SC-005**: 绑定完整性——活团队定义中 `goal_slug` 计数为 0；每个 `anchor_slug` 可解析；每个受影响团队有一条处置记录。仍有绑定的团队（含 R2 后的 `viz-skill-arena`）在 `goal-utils.py run-checks <team> --json` 下 `verdict: ok`、`blocked: false`、exit 0，未给 `--target` 时 ②–④ 如实报 `not-evaluated`（无判定主体，不是失败）；R3 归档团队（`088-reporting-dogfood`、`091-auto-git-closeout`、`085-sdd-temporary-goal-team`、`post-refactor-mechanism-integrity`、`draw-diagram-interactive`、`demo-seat-dispatch`）无绑定行，无 `--target` 调用时返回 `verdict: no-goal-definition`、`blocked: false`、exit 0——这是归档后的预期终态，MUST NOT 被记作"五查通过"。 **Path**: final
+- **SC-005**: 绑定完整性——活团队定义中 `goal_slug` 计数为 0；每个 `anchor_slug` 可解析；每个受影响团队有一条处置记录。仍有绑定的团队在 `goal-utils.py run-checks <team> --json` 下按所绑定 Anchor 的生命周期读数：Anchor 未处终态者（含 R2 后的 `viz-skill-arena`）`verdict: ok`、`blocked: false`、exit 0，未给 `--target` 时 ②–④ 如实报 `not-evaluated`（无判定主体，不是失败）；Anchor 已处 `achieved` 终态者 `verdict: goal-terminal`、`blocked: true`、exit 5，这是绑定成立且定义已达成的正确读数（完全由未改动的 Anchor 生命周期派生），MUST NOT 被记作绑定缺陷、MUST NOT 触发改绑或复活——实测 4 个：`087-arch-diagram-docs`、`draw-two-layer-structure`、`session-driven-self-improvement`、`skill-layer-install-separation`；R3 归档团队（`088-reporting-dogfood`、`091-auto-git-closeout`、`085-sdd-temporary-goal-team`、`post-refactor-mechanism-integrity`、`draw-diagram-interactive`、`demo-seat-dispatch`）与 4 个无绑定团队无绑定行，无 `--target` 调用时返回 `verdict: no-goal-definition`、`blocked: false`、exit 0——这是归档/无绑定后的预期终态，MUST NOT 被记作"五查通过"。 **Path**: final
 - **SC-006**: 单写者成立——静态审计显示锚点档案与 Goal 存档各只有引擎一个**定义**写者（`summary/**` 为派生子树，由既有总结流写入，不在定义写者之列）；两写者模拟在同一层写不同 slug 时落到不同路径；在引擎外注入一次定义写入后审计转红。 **Path**: final
 - **SC-007**: 幂等与可续做——迁移成功后重跑零新增 diff、零重复回执；`already-*` 只在目标存在、回执存在、摘要相等三条件同时成立时给出，摘要不等 MUST 报 exit 4 `conflict` 且不改写；在"源已归档、目标未写"处中断后重入，从报告阶段续做且完成状态可判定。 **Path**: supporting
 - **SC-008**: 交付面齐备——`anchor.md` 参考页存在、`goal.md` 参考页已重写、flow-class 台账含两命令行、探针编译含 `/speckit.anchor` 面；任一项缺失使守卫转红。文档站构建 limb MUST 附 EP-006 读数（Hugo v0.141.0 对既有 `.Site.Language.Locale` 退出 1）并报 `not-evaluated`，MUST NOT 被记成通过，也不得因此把其余 limb 一并记成未评估。 **Path**: supporting
@@ -314,7 +314,7 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **SC-002 Source**: 契约测试解析 canonical 模板的 `argument-hint` 与模式表，并以子进程调用引擎只读动作 `python3 scripts/python/goal-utils.py command-mode --command goal --mode <mode>`（四个 Goal 模式 exit 0；四个 Anchor-only 模式 exit 2、stderr 含 `anchor-only-mode` 与 `/speckit.anchor`、零写入），采集退出码、stderr 与零写入断言。
 - **SC-003 Source**: 分类记录（逐条 markdown/JSON）与两次目录枚举读数（清理前、清理后）；`find`/`glob` 计数与 `goal-utils.py list --scope anchor|goals` 输出交叉核对。
 - **SC-004 Source**: 回执文件逐条读取；概念摘要由引擎在动作前后各计算一次并写入回执；受保护路径哈希由 `git hash-object` 或 `sha256sum` 在特性前提交与实现后各采集一次。
-- **SC-005 Source**: 对 `.specify/teams/*/team.md` 的 frontmatter 扫描；`goal-utils.py run-checks <team> --json` 逐团队采集 `verdict` / `blocked` / 退出码；五查集合与各检查名的唯一 owner 是 `skills/internal/run-team/SKILL.md` § 2 Preview（五查预检），SC 不复述其条目；处置记录清单。
+- **SC-005 Source**: 对 `.specify/teams/*/team.md` 的 frontmatter 扫描；`goal-utils.py run-checks <team> --json` 逐团队采集 `verdict` / `blocked` / 退出码；五查集合与各检查名的唯一 owner 是 `skills/internal/run-team/SKILL.md` § 2 Preview（五查预检），SC 不复述其条目；`run-checks` 的 verdict 由绑定 Anchor 的生命周期派生（`achieved` → `goal-terminal`），SC 按该派生关系判读读数，不另立生命周期规则；处置记录清单。
 - **SC-006 Source**: 静态审计（对仓储代码路径的写入面扫描，含镜像树）加两分支夹具模拟；审计在 `tests/contract/` 中执行。
 - **SC-007 Source**: 迁移夹具上的两次 apply 与一次中断注入；diff 与回执计数。
 - **SC-008 Source**: 文件存在性 + `flow-class-check.py --action check` 退出码 + 探针编译命令；文档站构建按 EP-006 记录的命令执行并抄录退出码与首条错误，读数落 `test-evidence/`，结论按实际读数写 `pass` 或 `not-evaluated`。
@@ -366,6 +366,11 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 **Checklist-round-1 corrections（2026-11-12 `checklist` 门修复轮；逐条 `rebaseline` 事件与下游影响见 `notes/checklist-repair.md`）**：本轮按 CHK 发现收敛了 FR-004 / FR-005 / FR-010 / FR-016 / FR-019 / FR-020 / FR-023 / FR-031 / FR-033 / FR-038 / FR-043 / FR-046 / FR-061 / FR-065 与 SC-001 / SC-005 / SC-007 / SC-008 / SC-009、D-4；计数不变（71 FR / 10 SC / 8 STR）。
 
 **Analyze-round-1 corrections（2026-11-12 `analyze` 门修复轮；逐条 `rebaseline` 事件与下游影响见 `notes/analyze-repair.md`）**：FR-020 增加可判定的执行主体（引擎只读动作 `command-mode`），SC-002 的度量来源由不可执行的聊天命令改为对该动作的子进程调用；四模式集合、四个具名拒绝与零写入要求本身不变。下游同步：C-15、plan § Testing Strategy G-2、tasks T018 / T063 / GATE-7、`quickstart.md` S-4。计数不变（71 FR / 10 SC / 8 STR）。
+
+**Implement-round corrections（`PLAN-EDIT:`，2026-11-12 WP-04b implement 裁定；逐条记录与下游影响见 `notes/wp04-decision-resolution.md`）**：
+
+- `PLAN-EDIT: SC-005` — 原文要求每个仍有绑定的团队读 `ok/false/0`，但 4 个绑定团队的 Anchor 在分类时已为 `achieved`，`run-checks` 据未改动的 Anchor 生命周期派生 `goal-terminal/true/5`；把这一读数判成绑定缺陷会迫使改绑或复活一个已达成 Anchor，违反生命周期的唯一 owner → SC-005 收敛为"按 Anchor 生命周期判读"（未终态 `ok/false/0`；已 `achieved` 为 `goal-terminal/true/5`）。生命周期本身未改。
+- `PLAN-EDIT: C-46（规范化改写表）` — 声明的团队归一化表扩展 N-8…N-10（frontmatter `goal_slug`、两种形式的定义文件引用、`delivery_dir`），使 FR-047 / FR-058 / FR-066 的 0 残留目标对实测面可达；FR / SC 文本除本节的 SC-005 外不变。计数不变（71 FR / 10 SC / 8 STR）。
 
 ## Non-Goals & Boundaries *(informative)*
 

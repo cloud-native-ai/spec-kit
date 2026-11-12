@@ -1,0 +1,30 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "094-goal-team-parallel",
+  "bound_slug": "094-goal-team-parallel",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/094-goal-team-parallel/team.md",
+      "line": 12,
+      "rule": "C-45",
+      "before": "goal_slug: 094-goal-team-parallel",
+      "after": "anchor_slug: 094-goal-team-parallel"
+    },
+    {
+      "path": ".specify/teams/094-goal-team-parallel/team.md",
+      "line": 135,
+      "rule": "N-5",
+      "before": "goal/team 与 spec(SDD) 平行；.specify/goal|teams 统一归档；复杂工作由 spec 设计、goal+team 执行。目标定义在",
+      "after": "goal/team 与 spec(SDD) 平行；.specify/anchoring|teams 统一归档；复杂工作由 spec 设计、goal+team 执行。目标定义在"
+    },
+    {
+      "path": ".specify/teams/094-goal-team-parallel/team.md",
+      "line": 136,
+      "rule": "N-9",
+      "before": "`.specify/anchoring/094-goal-team-parallel/goal.md`，本节只作可读呈现。",
+      "after": "`.specify/anchoring/094-goal-team-parallel/anchor.md`，本节只作可读呈现。"
+    }
+  ]
+}

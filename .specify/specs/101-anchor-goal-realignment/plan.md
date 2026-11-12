@@ -403,8 +403,9 @@ The executable contract is `contracts/migration-cleanup.contract.md`; this secti
   the live directory listing before any write (C-36).
 - **Phases (P1→P8)**: anchor renames **+ declared anchor body normalization (A-N-1…A-N-4,
   `anchor-body-receipt.json`)** → Goal migrations + obsolete archival (with receipts) → R2 Anchor
-  creation → summary moves → team structural rename (one line per file) → team body normalization
-  (declared table N-1…N-7, per-line receipts) → R3 dispositions → self-checks. Each phase is
+  creation → summary moves → team structural rename (one line per file) → team normalization
+  (declared table N-1…N-10: body N-1…N-7, then definition-wide N-8…N-10, per-line receipts) → R3
+  dispositions → self-checks. Each phase is
   per-entry resumable. The anchor rename carries the byte-identity assertion; the normalization that
   follows it is a separate declared rewrite with its own per-line receipt, which is what keeps both
   "rename only" and "the archive speaks Anchor" true at once.

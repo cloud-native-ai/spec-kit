@@ -1,13 +1,13 @@
 ---
 name: 重构后机制完整性团队
 slug: post-refactor-mechanism-integrity
+lifecycle_state: archived
 description: serial 三阶段链(S1 修复与端态回归测试 → S2 升级仿真独立验证 → S3 判据对账与收口),把「反向迁移缺口修复 + 全 .specify 面机制对账」从设计落到验证闭合;阶段内 native 并发派发,每次交接独立验证门
 goal: >
-  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/anchoring/post-refactor-mechanism-integrity/goal.md)。
+  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md)。
   本字段仅为可读性渲染,与定义不一致时以定义为准。终态:客户项目旧 .specify 结构经新版 specify init 升级后正常运转
   (平铺 internal 残留清除、用户技能红线不动、内部技能不可见);且 .specify 除 skills/ 外全部目录与文件均有机制支撑,无无主文件。
   **成功判据以定义为准,本团队不复述其文本**(定义持有 1 条)。
-goal_slug: post-refactor-mechanism-integrity
 territory:
   write:
     - src/specify_cli/**            # F1/F2 升级迁移时序与双存语义(单引擎文件)
@@ -85,7 +85,7 @@ config:
 summary:
     enabled: true
     every: 1
-    delivery_dir: .specify/goal/post-refactor-mechanism-integrity/summary/
+    delivery_dir: .specify/archive/anchoring/post-refactor-mechanism-integrity/summary/
     interactive: false
 binding:
   owner: human
@@ -95,7 +95,7 @@ binding:
 
 ## Goal
 
-**权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`goal_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。
+**权威定义**:`.specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md`(`anchor_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。
 
 ## Static Structure
 
@@ -158,7 +158,7 @@ binding:
 
 **失败策略**:retry-once-then-escalate;MUST NOT 用 retry 承载单元累积。
 
-**Summary 刷新**:每阶段交接验证通过后刷新一次(`every: 1`)→ `.specify/goal/post-refactor-mechanism-integrity/summary/`;门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。
+**Summary 刷新**:每阶段交接验证通过后刷新一次(`every: 1`)→ `.specify/archive/anchoring/post-refactor-mechanism-integrity/summary/`;门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。
 
 ## Self-Improvement Contract
 

@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/session-driven-self-improvement/anchor.md",
+  "concept_digest_before_normalization": "29f28a0117b31b8bd91a80ce29e13f00ba5e2c37e200be8367eb6890b9f4c967",
+  "concept_digest_after_normalization": "29f28a0117b31b8bd91a80ce29e13f00ba5e2c37e200be8367eb6890b9f4c967",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/session-driven-self-improvement/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: session-driven-self-improvement",
+      "after": "# Anchor: session-driven-self-improvement"
+    }
+  ]
+}

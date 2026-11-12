@@ -4,12 +4,11 @@ slug: 088-reporting-dogfood
 description: Spec-local dogfood team proving the reporting obligation end to end — a real >90 s verification run with a reporter seat emitting attributed status lines on cadence.
 scope: spec
 spec_dir: .specify/specs/088-speckit-visualization
-lifecycle_state: active
+lifecycle_state: archived
 goal: >-
   Prove the reporting obligation end to end: a real >90 s verification task runs while a
   reporter seat emits attributed status lines on the 30-second long-run cadence, and the
   run record names the carrier.
-goal_slug: 088-speckit-visualization
 territory:
   write:
     - test-evidence/dogfood-worker-*

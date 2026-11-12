@@ -1,6 +1,6 @@
 ---
 slug: demo-seat-dispatch
-goal_slug: demo-seat-dispatch
+lifecycle_state: archived
 pattern: serial
 created: 2026-10-08
 updated: 2026-10-08

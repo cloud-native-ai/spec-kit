@@ -10,7 +10,7 @@ goal: >-
   re-loaded and evaluated at every core step in T0/T1/T2 tiers (rule-first five questions, three-value
   verdict), the five rule faces exist and cross-reference by pointer, and the count pins and their
   guards move together — measured by the guard tests the spec names, not by the presence of definitions.
-goal_slug: 090-re-anchoring
+anchor_slug: 090-re-anchoring
 territory:
   write:
     - .specify/specs/090-re-anchoring/**
@@ -134,7 +134,7 @@ binding:
 ## Goal
 
 Deliver the remaining stages of Feature 090 through a spec-local temporary team. The spec-local goal definition is
-`.specify/anchoring/090-re-anchoring/goal.md`; this section is readability rendering only, and the
+`.specify/anchoring/090-re-anchoring/anchor.md`; this section is readability rendering only, and the
 definition is authoritative.
 
 Success is judged by the goal's four criteria: the five rule faces exist and cross-reference (SC-001), the five
@@ -206,5 +206,5 @@ session for this spec-local team), so run reports are written by the driver unde
 - Subject: this persisted team definition; member executions are evidence.
 - Observe: completed run reports under `runs/` and the per-stage checkpoints under `.specify/specs/090-re-anchoring/checkpoints/`.
 - Improve: follow `.specify/shared/workflow/self-improvement-workflow.md`; route through `improve-team` (the checkpoint's single configuration proposal is the entry, cap one change per stage).
-- Boundary: preserve team authority, the verifier's independence, the stage sequence, and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/goal/**`.
+- Boundary: preserve team authority, the verifier's independence, the stage sequence, and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/anchoring/**`.
 - Verify: validate now (`skills/internal/create-team/scripts/validate-roster.py`) and wait for a comparable later run before claiming improvement.

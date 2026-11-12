@@ -9,7 +9,7 @@ goal: >-
   goal/team 与 spec(SDD) 成为平行执行线：goal/team 可在 /speckit.* 命令运行中创建并归档到 .specify/goal|teams；
   spec 与 goal+team 各自可设计/执行，复杂工作由 spec 设计、goal+team 执行；用 owner/lifecycle/write-scope
   绑定模型替代「临时/全局」。
-goal_slug: 094-goal-team-parallel
+anchor_slug: 094-goal-team-parallel
 territory:
   write:
     - .specify/specs/094-goal-team-parallel/**
@@ -132,8 +132,8 @@ binding:
 
 ## Goal
 
-goal/team 与 spec(SDD) 平行；.specify/goal|teams 统一归档；复杂工作由 spec 设计、goal+team 执行。目标定义在
-`.specify/anchoring/094-goal-team-parallel/goal.md`，本节只作可读呈现。
+goal/team 与 spec(SDD) 平行；.specify/anchoring|teams 统一归档；复杂工作由 spec 设计、goal+team 执行。目标定义在
+`.specify/anchoring/094-goal-team-parallel/anchor.md`，本节只作可读呈现。
 
 ## Static Structure
 

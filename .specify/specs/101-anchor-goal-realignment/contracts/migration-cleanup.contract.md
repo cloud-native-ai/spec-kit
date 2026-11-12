@@ -128,12 +128,12 @@ write nothing (exit 4). Never overwrite, never pick a winner, never fall back to
 | P3 | R2 Anchor creation for `viz-skill-arena` (engine `migrate`) | one team |
 | P4 | summary moves for migrated/archived entries (FR-049) | one entry |
 | P5 | team structural rename for all 16 bound teams (C-45) | one team |
-| P6 | team body normalization (C-46) | one team, one line |
+| P6 | team normalization (C-46): body rules N-1…N-7, then definition-wide N-8…N-10 | one team, one line |
 | P7 | team dispositions R3 (C-47) | one team |
 | P8 | self-checks: zero `action-goal` left in `.specify/anchoring/`, every `anchor_slug` resolves, every receipt present, no orphan `summary/` | whole run |
 
 P2 precedes P3/P6 because normalized references and the R2 binding must point at existing targets.
-P5 precedes P6 because the body rewrite must not race the frontmatter edit.
+P5 precedes P6 because the rewrite must not race the frontmatter edit.
 
 ## C-45 — Structural rename (byte assertion)
 
@@ -145,27 +145,47 @@ line per file and that line is the binding line. The 4 unbound teams are byte-id
 For a team whose disposition is R3, the renamed line is removed by P7; the receipt records
 `bound_slug`, so provenance survives and the FR-066 resolution assertion stays satisfiable.
 
-## C-46 — Body normalization (declared rewrite table, line-scoped)
+## C-46 — Team normalization (declared rewrite table, line-scoped)
 
 Only lines matching this table are rewritten; every rewrite is recorded in the team's
 `binding-rename-receipt.json` as `{path, line, rule, before, after}`.
 
-| Rule | Match | Rewrite |
-|------|-------|---------|
-| N-1 | `\bgoal_slug\b` in body text | `anchor_slug` |
-| N-2 | `.specify/goal/<slug>/goal.md` | anchor class → `.specify/anchoring/<slug>/anchor.md`; action-goal → `.specify/goals/<slug>/goal.md`; obsolete → `.specify/archive/anchoring/<slug>/goal.md` |
-| N-3 | `.specify/goal/<slug>/summary/` | anchor → `.specify/anchoring/<slug>/summary/`; action-goal → `.specify/goals/<slug>/summary/`; obsolete → `.specify/archive/anchoring/<slug>/summary/` |
-| N-4 | `.specify/goal/<slug>/**` | same layer mapping, `**` preserved |
-| N-5 | `.specify/goal/**` (no slug) | `.specify/anchoring/**` |
-| N-6 | `/speckit.goal` on a line that also matches N-1…N-5 or contains `goal.md` | `/speckit.anchor` |
-| N-7 | `/speckit.goal` followed by `targets` / `migrate` / `migrate-archive` / `coordinate` (`/speckit\.goal\s+(targets\|migrate\|migrate-archive\|coordinate)\b`) | `/speckit.anchor` — an Anchor-only mode pointer is retired text whichever line it sits on; without this rule residue class C6 cannot reach 0 |
+N-1…N-7 are **body-scoped** (after the frontmatter block); N-8…N-10 cover the **whole
+definition** — including frontmatter prose, where the WP-04 measurement found retired tokens the
+body-only pass could not reach (ruling 2026-11-12, checkpoint 16). P6 runs the body pass first and
+the definition-wide pass second, over the result; the C-45 binding line is already renamed by then,
+so N-8 cannot collide with it.
+
+| Rule | Zone | Match | Rewrite |
+|------|------|-------|---------|
+| N-1 | body | `\bgoal_slug\b` | `anchor_slug` |
+| N-2 | body | `.specify/goal/<slug>/goal.md` | anchor class → `.specify/anchoring/<slug>/anchor.md`; action-goal → `.specify/goals/<slug>/goal.md`; obsolete → `.specify/archive/anchoring/<slug>/goal.md` |
+| N-3 | body | `.specify/goal/<slug>/summary/` | anchor → `.specify/anchoring/<slug>/summary/`; action-goal → `.specify/goals/<slug>/summary/`; obsolete → `.specify/archive/anchoring/<slug>/summary/` |
+| N-4 | body | `.specify/goal/<slug>/**` | same layer mapping, `**` preserved |
+| N-5 | body | `.specify/goal/**` (no slug) | `.specify/anchoring/**` |
+| N-6 | body | `/speckit.goal` on a line that also matches N-1…N-5 or contains `goal.md` | `/speckit.anchor` |
+| N-7 | body | `/speckit.goal` followed by `targets` / `migrate` / `migrate-archive` / `coordinate` (`/speckit\.goal\s+(targets\|migrate\|migrate-archive\|coordinate)\b`) | `/speckit.anchor` — an Anchor-only mode pointer is retired text whichever line it sits on; without this rule residue class C6 cannot reach 0 |
+| N-8 | whole definition | `\bgoal_slug\b` | `anchor_slug` — FR-047/FR-066 forbid the retired key in frontmatter **and** body; the 2 measured frontmatter prose tokens are exactly this rule's surface |
+| N-9 | whole definition | `.specify/goal/<slug>/goal.md` **or** `.specify/anchoring/<slug>/goal.md` | the definition file's post-cleanup path: anchor class (and any unclassified slug under `.specify/anchoring/`) → `.specify/anchoring/<slug>/anchor.md`; action-goal → `.specify/goals/<slug>/goal.md`; obsolete → `.specify/archive/anchoring/<slug>/goal.md`. The already-anchored form is the 15 measured lines; without this rule a live definition points at a file P1 renamed |
+| N-10 | whole definition | frontmatter `delivery_dir` value `.specify/goal/<slug>/summary/` | same layer mapping as N-3 (anchor → `.specify/anchoring/<slug>/summary/`; action-goal → `.specify/goals/<slug>/summary/`; obsolete → the archive destination). The 5 measured values are exactly this rule's surface; FR-058 forbids the retired root as a delivery path |
 
 N-6 and N-7 are order-free: a line matching both receives the same rewrite once. After the table, no
 live team definition may still route an Anchor-only mode to `/speckit.goal` (C6, `research.md` §5).
 
-Out of scope by decision (recorded, not silently skipped): a team's `forbidden` list gains no new
-`.specify/goals/**` entry; the engine's sole-writer invariant, not team territory, is what protects
-the Goal store (`research.md` R-05 / FR-032).
+**Receipt continuity.** A team receipt is the append-only record of every declared rewrite that team
+has received. A declared rule added later (this section's N-8…N-10, ruling 2026-11-12) appends rows;
+an exact duplicate appends nothing; a measured rewrite that reappears because a line was reverted is
+re-applied to the definition without duplicating the row. The definition is written only when at
+least one measured rewrite exists, which is what keeps a second `--apply` at zero writes (SC-007).
+
+Out of scope by decision (recorded, not silently skipped): in the **frontmatter zone** only
+N-8…N-10 apply. N-4/N-5 do not rewrite a territory entry's `**` root (`.specify/goal/**`), and
+N-6/N-7 do not rewrite a `/speckit.goal` pointer there, for two reasons: a territory entry is a
+permission scope, and repointing a dead root would change what a team may write; and the frontmatter
+prose includes quoted dated user directives and handovers
+(`command-logic-as-classified-skills/team.md:77`, `post-refactor-mechanism-integrity/team.md:39`)
+that a rewrite would falsify (RS-1). The `.specify/goals/**` store stays protected by the engine's
+sole-writer invariant instead (`research.md` R-05 / FR-032).
 
 ## C-47 — Team dispositions (FR-046 / FR-048)
 

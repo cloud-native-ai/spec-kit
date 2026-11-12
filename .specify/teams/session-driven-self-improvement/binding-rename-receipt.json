@@ -1,0 +1,65 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "session-driven-self-improvement",
+  "bound_slug": "session-driven-self-improvement",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 15,
+      "rule": "C-45",
+      "before": "goal_slug: session-driven-self-improvement",
+      "after": "anchor_slug: session-driven-self-improvement"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 179,
+      "rule": "N-1",
+      "before": "**权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 185,
+      "rule": "N-6",
+      "before": "这四项在 `/speckit.goal` 收窄终态时被刻意从 `## Objective` 移出（决策 D9，账本：`.specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.md`），由本团队承接。D1 全文仍逐字保存在 goal.md 的 `## History`，但那是 dated record，不作为当前现实被引用 —— 故在此落为团队的可执行输入。",
+      "after": "这四项在 `/speckit.anchor` 收窄终态时被刻意从 `## Objective` 移出（决策 D9，账本：`.specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.md`），由本团队承接。D1 全文仍逐字保存在 goal.md 的 `## History`，但那是 dated record，不作为当前现实被引用 —— 故在此落为团队的可执行输入。"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 286,
+      "rule": "N-1+N-3",
+      "before": "**Summary 边界**：每个 stage 交接验证通过后刷新 goal summary，交付目录 `.specify/goal/session-driven-self-improvement/summary/`（由 `goal_slug` 派生，不由团队 slug 派生）；门序为 Budget → Cadence → Material → Overlap，两次交接紧邻时合并为一次刷新；有界 pattern 默认 `every: 1`。首次刷新需声明 summary 机制已激活及其生效 cadence。",
+      "after": "**Summary 边界**：每个 stage 交接验证通过后刷新 goal summary，交付目录 `.specify/anchoring/session-driven-self-improvement/summary/`（由 `anchor_slug` 派生，不由团队 slug 派生）；门序为 Budget → Cadence → Material → Overlap，两次交接紧邻时合并为一次刷新；有界 pattern 默认 `every: 1`。首次刷新需声明 summary 机制已激活及其生效 cadence。"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 9,
+      "rule": "N-9",
+      "before": "  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/goal.md）。",
+      "after": "  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/anchor.md）。"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 40,
+      "rule": "N-9",
+      "before": "    - .specify/goal/session-driven-self-improvement/goal.md   # authored：只经 /speckit.goal 的引擎渲染",
+      "after": "    - .specify/anchoring/session-driven-self-improvement/anchor.md   # authored：只经 /speckit.goal 的引擎渲染"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 169,
+      "rule": "N-10",
+      "before": "    delivery_dir: .specify/goal/session-driven-self-improvement/summary/",
+      "after": "    delivery_dir: .specify/anchoring/session-driven-self-improvement/summary/"
+    },
+    {
+      "path": ".specify/teams/session-driven-self-improvement/team.md",
+      "line": 179,
+      "rule": "N-9",
+      "before": "**权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/session-driven-self-improvement/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 ---
 name: 绘图技能交互图表能力建设团队
 slug: draw-diagram-interactive
+lifecycle_state: archived
 description: 以 iteration 闭环为 draw-diagram 技能建设可交互图表绘制能力(图表随用户输入调整,网页格式交付)
 goal: >
   draw-diagram 技能具备绘制可交互图表的能力:图表可根据用户输入做出调整(通常是网页格式)。
-  权威定义见 goal_slug 指向的 .specify/anchoring/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
-goal_slug: draw-diagram-interactive
+  权威定义见 anchor_slug 指向的 .specify/goals/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
 territory:
   write:
     - skills/external/draw-diagram/**
@@ -68,7 +68,7 @@ binding:
 
 - **判据(1 条,权威见 goal 定义)**:通过 draw-diagram 技能能够绘制出可交互的图表(通常是网页格式)。判据按程度测量,达标线由本团队 `config.threshold` 承载(加权评分 ≥ 0.8)。
 - **边界**:「动态」仅指图表随用户输入做出调整(交互的结果),**不含**动画/动图/视频等形式上的动态。
-- **权威性**:goal 内容的单一事实源是 `goal_slug` 指向的定义文件;本节为可读性渲染,不一致时以定义为准并显式报出。
+- **权威性**:goal 内容的单一事实源是 `anchor_slug` 指向的定义文件;本节为可读性渲染,不一致时以定义为准并显式报出。
 
 > 静态结构(谁参与)与动态结构(怎么协作)都仅为达成此 goal 而存在。
 
@@ -118,7 +118,7 @@ flowchart TD
 | 相 | 内容 |
 |----|------|
 | **WHEN** | 用户发起 `/speckit.team run draw-diagram-interactive` |
-| **SEE** | goal 定义(`.specify/anchoring/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |
+| **SEE** | goal 定义(`.specify/goals/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |
 | **DO** | 一个迭代代:派 builder 改目标副本 → verifier 以副本执行技能产出交互图表 → 三维评分 |
 | **CHECK** | 加权评分(交互 0.45/正确 0.25/整合 0.30)+ verifier 判据「经技能能绘制出随输入调整的网页图表」+ 既有静态路径回归 |
 | **STOP** | threshold 0.8 达标 / iteration ≥ 5 / 连续 2 代回归(regression_limit) |

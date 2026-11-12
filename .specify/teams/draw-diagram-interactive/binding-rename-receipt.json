@@ -1,0 +1,37 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "draw-diagram-interactive",
+  "bound_slug": "draw-diagram-interactive",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/draw-diagram-interactive/team.md",
+      "line": 8,
+      "rule": "C-45",
+      "before": "goal_slug: draw-diagram-interactive",
+      "after": "anchor_slug: draw-diagram-interactive"
+    },
+    {
+      "path": ".specify/teams/draw-diagram-interactive/team.md",
+      "line": 71,
+      "rule": "N-1",
+      "before": "- **权威性**:goal 内容的单一事实源是 `goal_slug` 指向的定义文件;本节为可读性渲染,不一致时以定义为准并显式报出。",
+      "after": "- **权威性**:goal 内容的单一事实源是 `anchor_slug` 指向的定义文件;本节为可读性渲染,不一致时以定义为准并显式报出。"
+    },
+    {
+      "path": ".specify/teams/draw-diagram-interactive/team.md",
+      "line": 8,
+      "rule": "N-8+N-9",
+      "before": "  权威定义见 goal_slug 指向的 .specify/anchoring/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。",
+      "after": "  权威定义见 anchor_slug 指向的 .specify/goals/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。"
+    },
+    {
+      "path": ".specify/teams/draw-diagram-interactive/team.md",
+      "line": 121,
+      "rule": "N-9",
+      "before": "| **SEE** | goal 定义(`.specify/anchoring/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |",
+      "after": "| **SEE** | goal 定义(`.specify/goals/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |"
+    }
+  ]
+}

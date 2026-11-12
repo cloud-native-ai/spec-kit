@@ -1,0 +1,77 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_goal_migration.py tests/contract/test_goal_definition.py tests/contract/test_goal_writeset.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..................................F.....s..........F....F                [100%]
+=================================== FAILURES ===================================
+_ TestInvariantGroups.test_mapping_declares_the_definition_is_not_writable_by_the_refresh _
+[gw53] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_goal_writeset.TestInvariantGroups object at 0x7f19877c8bd0>
+
+    def test_mapping_declares_the_definition_is_not_writable_by_the_refresh(self):
+        """The distinguishing 037 rule: the authored definition is off-limits."""
+        text = _read(CANONICAL_MAPPING)
+>       assert re.search(r"goal\.md", text), "goal.md not mentioned in summary-mapping.md"
+E       AssertionError: goal.md not mentioned in summary-mapping.md
+E       assert None
+E        +  where None = <function search at 0x7f198e1fe3e0>('goal\\.md', '# 团队 → 项目管理概念映射(summary 机制的单一事实源)\n\n> **定位**:本文件是 `036-team-summary` 机制中「团队词汇 → `summarize-project` 项目管理实体」映射的**单一事实...interactive-call — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).\n')
+E        +    where <function search at 0x7f198e1fe3e0> = re.search
+
+tests/contract/test_goal_writeset.py:86: AssertionError
+_____ TestInvariantGroups.test_mapping_names_each_invariant_group[goal.md] _____
+[gw48] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_goal_writeset.TestInvariantGroups object at 0x7efe91263fd0>
+group = 'goal.md'
+
+    @pytest.mark.parametrize("group", REQUIRED_GROUPS)
+    def test_mapping_names_each_invariant_group(self, group):
+        text = _read(CANONICAL_MAPPING)
+>       assert group in text, (
+            f"summary-mapping.md must name '{group}' among the write-set invariants"
+        )
+E       AssertionError: summary-mapping.md must name 'goal.md' among the write-set invariants
+E       assert 'goal.md' in '# 团队 → 项目管理概念映射(summary 机制的单一事实源)\n\n> **定位**:本文件是 `036-team-summary` 机制中「团队词汇 → `summarize-project` 项目管理实体」映射的**单一事实...interactive-call — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).\n'
+
+tests/contract/test_goal_writeset.py:79: AssertionError
+___ TestLiveSurfacesAreMigrated.test_no_live_face_file_retains_the_old_path ____
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_goal_migration.TestLiveSurfacesAreMigrated object at 0x7fe385ad8190>
+
+    def test_no_live_face_file_retains_the_old_path(self):
+        """Catches live surfaces the explicit list above does not enumerate."""
+        offenders = [
+            p for p in _tracked_files_containing(OLD_PATH_NEEDLE)
+            if not _is_historical(p) and not _is_guard(p) and not _is_ignored_log(p)
+            and not _is_test_evidence_log(p)
+        ]
+>       assert offenders == [], (
+            "live-face files still reference the pre-migration path "
+            f"(historical faces, the {len(GUARD_FILES)} migration guards and "
+            "git-ignored *.log run scratch and test-evidence run logs are excluded by design):\n  "
+            + "\n  ".join(offenders)
+        )
+E       AssertionError: live-face files still reference the pre-migration path (historical faces, the 4 migration guards and git-ignored *.log run scratch and test-evidence run logs are excluded by design):
+E           .specify/.tmp/sdd-loop/tmp/101-anchor-goal-realignment/raw-101-anchor-goal-realignment-clarify.jsonl
+E           .specify/.tmp/sdd-loop/tmp/101-anchor-goal-realignment/raw-101-anchor-goal-realignment-plan.jsonl
+E           .specify/.tmp/sdd-loop/tmp/101-anchor-goal-realignment/raw-101-anchor-goal-realignment-requirements.jsonl
+E           .specify/features/027-team-management.md
+E           .specify/features/041-goal-registry.md
+E           .specify/specs/094-goal-team-parallel/test-evidence/plan-baseline-46.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/plan-baseline-run.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/wp05-contract-entry.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/wp07-closure-suite.out
+E       assert ['.specify/.t...-46.out', ...] == []
+E         
+E         Left contains 9 more items, first extra item: '.specify/.tmp/sdd-loop/tmp/101-anchor-goal-realignment/raw-101-anchor-goal-realignment-clarify.jsonl'
+E         Use -v to get more diff
+
+tests/contract/test_goal_migration.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_goal_writeset.py::TestInvariantGroups::test_mapping_declares_the_definition_is_not_writable_by_the_refresh
+FAILED tests/contract/test_goal_writeset.py::TestInvariantGroups::test_mapping_names_each_invariant_group[goal.md]
+FAILED tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+3 failed, 53 passed, 1 skipped in 6.30s

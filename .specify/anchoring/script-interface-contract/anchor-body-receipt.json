@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/script-interface-contract/anchor.md",
+  "concept_digest_before_normalization": "71033bb07ad58c8f6c581a44f5726a15d5f5fcbc15bfd2860f2f32abde243463",
+  "concept_digest_after_normalization": "71033bb07ad58c8f6c581a44f5726a15d5f5fcbc15bfd2860f2f32abde243463",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/script-interface-contract/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: 脚本接口契约（Script Interface Contract）",
+      "after": "# Anchor: 脚本接口契约（Script Interface Contract）"
+    }
+  ]
+}

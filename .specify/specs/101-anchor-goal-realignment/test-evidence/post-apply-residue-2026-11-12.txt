@@ -1,0 +1,45 @@
+# Post-apply live residue measurement (base 9997e91bf, run r20261112T064607Z-b101)
+# attribution: FM = inside first ---...--- block; BODY = after it
+
+## A. retired key token goal_slug
+.specify/teams/command-logic-as-classified-skills/team.md: FM line 72: - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidde
+.specify/teams/draw-diagram-interactive/team.md: FM line 8: 权威定义见 goal_slug 指向的 .specify/anchoring/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
+A total: 2 line(s)
+
+## B. references to a goal.md under .specify/anchoring or .specify/goals
+.specify/teams/090-re-anchoring/team.md: BODY line 137: `.specify/anchoring/090-re-anchoring/goal.md`; this section is readability rendering only, and the
+.specify/teams/091-auto-git-closeout/team.md: BODY line 132: `.specify/workflow/git.md`; the goal definition at `.specify/anchoring/091-auto-git-closeout/goal.md`
+.specify/teams/094-goal-team-parallel/team.md: BODY line 136: `.specify/anchoring/094-goal-team-parallel/goal.md`，本节只作可读呈现。
+.specify/teams/command-logic-as-classified-skills/team.md: FM line 6: 承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/goal.md）。
+.specify/teams/command-logic-as-classified-skills/team.md: BODY line 151: **权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+.specify/teams/draw-diagram-interactive/team.md: FM line 8: 权威定义见 goal_slug 指向的 .specify/anchoring/draw-diagram-interactive/goal.md,本字段仅为可读性渲染。
+.specify/teams/draw-diagram-interactive/team.md: BODY line 121: | **SEE** | goal 定义(`.specify/anchoring/draw-diagram-interactive/goal.md`)+ 上轮 `runs/` 报告与评分历史 |
+.specify/teams/draw-two-layer-structure/team.md: FM line 6: 承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/goal.md）。
+.specify/teams/draw-two-layer-structure/team.md: BODY line 112: **权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+.specify/teams/post-refactor-mechanism-integrity/team.md: FM line 7: 承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/anchoring/post-refactor-mechanism-integrity/goal.md)。
+.specify/teams/post-refactor-mechanism-integrity/team.md: BODY line 98: **权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`anchor_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、
+.specify/teams/session-driven-self-improvement/team.md: FM line 9: 承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/goal.md）。
+.specify/teams/session-driven-self-improvement/team.md: BODY line 179: **权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+.specify/teams/skill-layer-install-separation/team.md: FM line 6: 承接已定义 Goal `skill-layer-install-separation`（权威定义：.specify/anchoring/skill-layer-install-separation/goal.md）。
+.specify/teams/skill-layer-install-separation/team.md: BODY line 124: **权威定义**：`.specify/anchoring/skill-layer-install-separation/goal.md`（`anchor_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级
+B total: 15 line(s)
+
+## C. frontmatter delivery_dir pointing at the retired .specify/goal/ path
+.specify/teams/command-logic-as-classified-skills/team.md: FM line 141: delivery_dir: .specify/goal/command-logic-as-classified-skills/summary/ [RETIRED]
+.specify/teams/draw-two-layer-structure/team.md: FM line 102: delivery_dir: .specify/goal/draw-two-layer-structure/summary/ [RETIRED]
+.specify/teams/post-refactor-mechanism-integrity/team.md: FM line 88: delivery_dir: .specify/goal/post-refactor-mechanism-integrity/summary/ [RETIRED]
+.specify/teams/session-driven-self-improvement/team.md: FM line 169: delivery_dir: .specify/goal/session-driven-self-improvement/summary/ [RETIRED]
+.specify/teams/skill-layer-install-separation/team.md: FM line 114: delivery_dir: .specify/goal/skill-layer-install-separation/summary/ [RETIRED]
+C total: 5 line(s)
+
+## D. unresolved anchor_slug values
+.specify/teams/086-efficient-test-execution/team.md: anchor_slug=086-efficient-test-execution resolves=True
+.specify/teams/087-arch-diagram-docs/team.md: anchor_slug=087-arch-diagram-docs resolves=True
+.specify/teams/089-script-interface-contract/team.md: anchor_slug=script-interface-contract resolves=True
+.specify/teams/090-re-anchoring/team.md: anchor_slug=090-re-anchoring resolves=True
+.specify/teams/094-goal-team-parallel/team.md: anchor_slug=094-goal-team-parallel resolves=True
+.specify/teams/command-logic-as-classified-skills/team.md: anchor_slug=command-logic-as-classified-skills resolves=True
+.specify/teams/draw-two-layer-structure/team.md: anchor_slug=draw-two-layer-structure resolves=True
+.specify/teams/session-driven-self-improvement/team.md: anchor_slug=session-driven-self-improvement resolves=True
+.specify/teams/skill-layer-install-separation/team.md: anchor_slug=skill-layer-install-separation resolves=True
+.specify/teams/viz-skill-arena/team.md: anchor_slug=visualization-skill-selection resolves=True

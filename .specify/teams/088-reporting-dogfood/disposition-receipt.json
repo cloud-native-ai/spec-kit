@@ -1,0 +1,14 @@
+{
+  "schema": "101-disposition-receipt/v1",
+  "team_slug": "088-reporting-dogfood",
+  "bound_slug": "088-speckit-visualization",
+  "disposition": "R3",
+  "state": "apply",
+  "reason": "one-off dogfood proof; no covering Anchor; theme fails FR-036(c)",
+  "acted": [
+    "lifecycle_state: archived",
+    "binding line removed"
+  ],
+  "timestamp": "2026-11-12T11:41:01Z",
+  "engine": "goal-utils.py 0.0.22"
+}

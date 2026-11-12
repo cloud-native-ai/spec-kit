@@ -1,0 +1,100 @@
+{
+  "mode": "load",
+  "db": ".specify/anchoring/skill-layer-install-separation/summary/data/project.db",
+  "rows": {
+    "people": 4,
+    "phases": 5,
+    "work_items": 6,
+    "work_item_deps": 0,
+    "milestones": 6,
+    "features": 0,
+    "sources": 1,
+    "source_covers": 3,
+    "repos": 0,
+    "repo_derive_fields": 0,
+    "coverage": 1,
+    "git_window": 0,
+    "status_map": 0,
+    "project": 1,
+    "inferred_fields": 11
+  },
+  "check": {
+    "tool": "project-db/v1",
+    "schema_version": "project-db/v1",
+    "foreign_keys_pragma": 1,
+    "entity_counts": {
+      "phases": 5,
+      "work_items": 6,
+      "milestones": 6,
+      "people": 4,
+      "features": 0,
+      "sources": 1,
+      "work_item_deps": 0,
+      "repos": 0
+    },
+    "findings": [],
+    "status": "ok",
+    "unknown_schedule": [
+      {
+        "item_id": "skill-layer-install-separation.TI-0001",
+        "item_name": "S-A 技能对去 .specify 化(create-skills + improve-skills;virtual 降级执行,verifier PASS)",
+        "row_order": 1
+      },
+      {
+        "item_id": "skill-layer-install-separation.TI-0002",
+        "item_name": "S-B 源树重家(32→17/15)+ 全引用面适配(命令树/技能包/文档面;G1 裁定放行)",
+        "row_order": 2
+      },
+      {
+        "item_id": "skill-layer-install-separation.TI-0003",
+        "item_name": "S-C 工具链分流(sync-mirrors 两对/CLI 两层复制+迁移+rewrite 两分支/打包验证;verifier 5/5)",
+        "row_order": 3
+      },
+      {
+        "item_id": "skill-layer-install-separation.TI-0004",
+        "item_name": "S-D 测试面全量适配 + 两条守卫(红绿演练)+ 全量 A/B 零新增(verifier 4/4)",
+        "row_order": 4
+      },
+      {
+        "item_id": "skill-layer-install-separation.TI-0005",
+        "item_name": "S-E 运行时刷新与 goal 判据终验(ACCEPT 2/2)",
+        "row_order": 5
+      },
+      {
+        "item_id": "skill-layer-install-separation.TI-0006",
+        "item_name": "收尾闭合:终检全绿 + T1 关闭(clarify frontmatter 内部技能按名引用删除)+ /tmp 泄漏回收 43G + pycache 清理",
+        "row_order": 6
+      },
+      {
+        "item_id": "MS-0001",
+        "item_name": "源树与运行时双布局按内外两层一致落地:全仓引用与所在层匹配;镜像、安装、打包三引擎按两层映射工作,各自 --check 退出 0",
+        "row_order": 1
+      },
+      {
+        "item_id": "MS-0002",
+        "item_name": "分流行为可验证:平铺发现面只注册 external 技能、internal 技能经 .specify/skills/internal/ 显式路径可解析(两条守卫测试为证);全量测试同口径 A/B 零新增失败,门控扫描 total ≤ 23",
+        "row_order": 2
+      },
+      {
+        "item_id": "MS-0003",
+        "item_name": "create-skills 与 improve-skills 完成去 .specify 化,技能以通用 skills 根为主、Spec Kit 集成为可选",
+        "row_order": 3
+      },
+      {
+        "item_id": "MS-0004",
+        "item_name": "技能源树完成 internal/external 双层重家(32 实体各归其位),重家后引用面完成全量适配",
+        "row_order": 4
+      },
+      {
+        "item_id": "MS-0005",
+        "item_name": "镜像、安装与打包工具链完成两层映射与旧装迁移,两布局各自自洽",
+        "row_order": 5
+      },
+      {
+        "item_id": "MS-0006",
+        "item_name": "测试适配、两条守卫测试与本仓自用运行时刷新全部落地",
+        "row_order": 6
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "command-logic-as-classified-skills",
+  "bound_slug": "command-logic-as-classified-skills",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 11,
+      "rule": "C-45",
+      "before": "goal_slug: command-logic-as-classified-skills",
+      "after": "anchor_slug: command-logic-as-classified-skills"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 151,
+      "rule": "N-1",
+      "before": "**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 268,
+      "rule": "N-7",
+      "before": "**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.goal targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**",
+      "after": "**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.anchor targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 270,
+      "rule": "N-1+N-3",
+      "before": "**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/goal/command-logic-as-classified-skills/summary/`（由 `goal_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。",
+      "after": "**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/anchoring/command-logic-as-classified-skills/summary/`（由 `anchor_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 6,
+      "rule": "N-9",
+      "before": "  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/goal.md）。",
+      "after": "  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/anchor.md）。"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 46,
+      "rule": "N-9",
+      "before": "    - .specify/goal/command-logic-as-classified-skills/goal.md   # authored：只经 /speckit.goal 引擎渲染",
+      "after": "    - .specify/anchoring/command-logic-as-classified-skills/anchor.md   # authored：只经 /speckit.goal 引擎渲染"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 69,
+      "rule": "N-9",
+      "before": "    - { type: classification, target: internal / external 的**含义**真源是 .specify/goal/command-logic-as-classified-skills/goal.md；**术语与消歧**（含与需求 039「通用技能=宿主中立」的区分）真源是 .specify/memory/glossary.md 的 技能分类标注 条。「两个取值只是标识、不对外呈现」与「不标注会干扰既有技能分发与处理体系」两条来自用户 2026-10-05 口述，goal.md 未承载其因果——引用时 MUST 标为用户口述而非制品事实 }",
+      "after": "    - { type: classification, target: internal / external 的**含义**真源是 .specify/anchoring/command-logic-as-classified-skills/anchor.md；**术语与消歧**（含与需求 039「通用技能=宿主中立」的区分）真源是 .specify/memory/glossary.md 的 技能分类标注 条。「两个取值只是标识、不对外呈现」与「不标注会干扰既有技能分发与处理体系」两条来自用户 2026-10-05 口述，goal.md 未承载其因果——引用时 MUST 标为用户口述而非制品事实 }"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 72,
+      "rule": "N-8",
+      "before": "    - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidden，才可派发其第二次累积；因其 write 含 skills/*/SKILL.md 与 skills/*/references|templates|scripts/**，与本团队 write 构成已知前向冲突。具名目录今日尚不存在，故本条目是**待触发的义务**而非已落地的排除；触发时 MUST NOT 静默双写。机械事实（引用、不复述）：shipped 校验器只比 write×write、从不减 forbidden，故 write∩forbidden 的排除式解法在同 goal_slug 下仍会报 overlap——该缺口由对方团队 non_path 的 cross-goal-write 条目持有并已记入 feedback；本团队今日无同 goal_slug 的兄弟团队，故不触发 }",
+      "after": "    - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidden，才可派发其第二次累积；因其 write 含 skills/*/SKILL.md 与 skills/*/references|templates|scripts/**，与本团队 write 构成已知前向冲突。具名目录今日尚不存在，故本条目是**待触发的义务**而非已落地的排除；触发时 MUST NOT 静默双写。机械事实（引用、不复述）：shipped 校验器只比 write×write、从不减 forbidden，故 write∩forbidden 的排除式解法在同 anchor_slug 下仍会报 overlap——该缺口由对方团队 non_path 的 cross-goal-write 条目持有并已记入 feedback；本团队今日无同 anchor_slug 的兄弟团队，故不触发 }"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 141,
+      "rule": "N-10",
+      "before": "    delivery_dir: .specify/goal/command-logic-as-classified-skills/summary/",
+      "after": "    delivery_dir: .specify/anchoring/command-logic-as-classified-skills/summary/"
+    },
+    {
+      "path": ".specify/teams/command-logic-as-classified-skills/team.md",
+      "line": 151,
+      "rule": "N-9",
+      "before": "**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    }
+  ]
+}

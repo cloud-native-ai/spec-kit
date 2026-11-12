@@ -3,11 +3,11 @@ name: 绘图双层结构重构团队
 slug: draw-two-layer-structure
 description: 以 serial 三阶段链（重构 → 净室自测 → 评价采集）推进 skills/draw-diagram 语义前门与 skills/draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml} 语法引擎的两层自治结构；每次交接有独立验证门
 goal: >
-  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/goal.md）。
+  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/anchor.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：调用 draw-diagram 不必告知「画什么」（它据上下文
   与补充说明自行分析语义、辨识层级/依赖/上下关系、抽象图表并选定结构类型后委派渲染）；调用五个 draw-* 引擎
   不必告知布局、线段绘制与渲染等实现细节；每次出图后主动征询用户评价并据以调整。
-goal_slug: draw-two-layer-structure
+anchor_slug: draw-two-layer-structure
 territory:
   write:
     - skills/draw-diagram/**
@@ -30,7 +30,7 @@ territory:
     - .specify/memory/feedback/**
   forbidden:
     - .specify/teams/viz-skill-arena/**          # 保留的 arena 团队（D5：逐步不用、不废弃），本团队不得触碰
-    - .specify/goal/draw-two-layer-structure/goal.md   # authored：只经 /speckit.goal 的引擎渲染
+    - .specify/anchoring/draw-two-layer-structure/anchor.md   # authored：只经 /speckit.goal 的引擎渲染
     - shared/definitions/goal-definitions.md    # Goal 概念 owner；用户裁定属性 2 遵循原设定，本次明确不改
     - .specify/shared/definitions/goal-definitions.md   # 同上（镜像）
     - .specify/shared/definitions/probe-definitions.md  # 镜像由 sync-mirrors 生成，不手改
@@ -99,7 +99,7 @@ config:
   summary:
     enabled: true
     every: 1                           # bounded pattern 默认每阶段边界刷新一次
-    delivery_dir: .specify/goal/draw-two-layer-structure/summary/
+    delivery_dir: .specify/anchoring/draw-two-layer-structure/summary/
     interactive: false
 binding:
   owner: human
@@ -109,7 +109,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/draw-two-layer-structure/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 **终态**：绘图能力呈两层自治结构 —— `skills/draw-diagram` 是唯一入口且自行完成语义分析，`skills/draw-{d3js,echarts,excalidraw,mermaid,plantuml}` 各自归位语法实现，用户两层都不必补齐细节；出图后主动征询评价并据以调整。
 
@@ -282,7 +282,7 @@ SUPERVISOR: 读 goal.md 判据 + progress 文件 → 取拓扑序中全部 block
   │  核验征询面就位 + 入账口径可执行 → channel-check.md
   │
   ▼ SUPERVISOR: 写 run report（runs/<UTC>-report.md）+ progress 文件
-                + summary 输入（.specify/goal/draw-two-layer-structure/summary/）
+                + summary 输入（.specify/anchoring/draw-two-layer-structure/summary/）
 ```
 
 **交接验证纪律**：serial 的每次交接**必须**有一次轻量验证（针对下游 `inputs_from` 契约的定向检查，不是重新全面评估）；验证失败先走 `failure_strategy`，再决定是否解锁下游。全程 file-path-only handoff，不传递上下文正文。

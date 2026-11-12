@@ -2636,6 +2636,14 @@ _RETIRED_TEAM_FIELD = re.compile(r"\bgoal_slug\b")
 #: `migrate-archive` and leave `-archive` behind.
 _TEAM_MODE_HINT = re.compile(
     r"/speckit\.goal\s+(?P<mode>targets|migrate-archive|migrate|coordinate)\b")
+#: C-46 N-9 — a team-definition reference to a definition file, in both the retired
+#: root form and the already-anchored form. `.specify/goals/` (plural) never matches.
+_TEAM_DEFINITION_REF = re.compile(
+    r"\.specify/(?P<root>goal|anchoring)/(?P<slug>[A-Za-z0-9_.-]+)/goal\.md")
+#: C-46 N-10 — the frontmatter delivery directory forged on the retired root.
+_TEAM_DELIVERY_DIR = re.compile(
+    r"(?P<lead>^\s*delivery_dir:\s*)"
+    r"\.specify/goal/(?P<slug>[A-Za-z0-9_.-]+)/summary/")
 
 
 class _CleanupInterrupted(Exception):
@@ -3222,6 +3230,65 @@ def _map_team_body(body: str, *, first_line: int = 1, path: str = "",
     return "".join(out), records
 
 
+def _definition_destination(classes: dict, slug: str, where: str, *,
+                            strict: bool) -> tuple[str, str]:
+    """The definition file's post-cleanup root and filename for a referenced slug.
+
+    An `.specify/anchoring/<slug>/goal.md` reference is in the Anchor store by
+    construction, so an unclassified slug still maps to the Anchor form; a retired
+    root reference has no such anchor, so an unclassified slug is an input error.
+    """
+    layer = (_class_for_slug(classes, slug, where) if strict
+             else classes.get(slug))
+    if layer is None:
+        return ".specify/anchoring", "anchor.md"
+    root, renames = _TEAM_LAYER_TARGETS[layer]
+    return root, "anchor.md" if renames else "goal.md"
+
+
+def _map_team_definition_line(line: str, classes: dict, *,
+                              path: str = "") -> tuple[str, list[str]]:
+    """Apply C-46 N-8…N-10 to ONE line of the whole definition (frontmatter too)."""
+    rules: list[str] = []
+    new = line
+    if _RETIRED_TEAM_FIELD.search(new):
+        new = _RETIRED_TEAM_FIELD.sub("anchor_slug", new)
+        rules.append("N-8")
+    while True:
+        match = _TEAM_DEFINITION_REF.search(new)
+        if not match:
+            break
+        slug = match.group("slug")
+        root, filename = _definition_destination(
+            classes, slug, path or "a team definition",
+            strict=match.group("root") == "goal")
+        new = new[:match.start()] + f"{root}/{slug}/{filename}" + new[match.end():]
+        rules.append("N-9")
+    delivery = _TEAM_DELIVERY_DIR.search(new)
+    if delivery:
+        slug = delivery.group("slug")
+        root, _filename = _definition_destination(
+            classes, slug, path or "a team definition", strict=True)
+        new = (new[:delivery.start()] + delivery.group("lead")
+               + f"{root}/{slug}/summary/" + new[delivery.end():])
+        rules.append("N-10")
+    return new, rules
+
+
+def _map_team_definition(text: str, *, path: str = "",
+                         classes: dict) -> tuple[str, list[dict]]:
+    """C-46 N-8…N-10 over the whole definition; N-1…N-7 stay body-scoped."""
+    out: list[str] = []
+    records: list[dict] = []
+    for line_no, line in enumerate(text.splitlines(keepends=True), 1):
+        new, rules = _map_team_definition_line(line, classes, path=path)
+        if new != line:
+            records.append({"path": path, "line": line_no, "rule": "+".join(rules),
+                            "before": line.rstrip("\n"), "after": new.rstrip("\n")})
+        out.append(new)
+    return "".join(out), records
+
+
 def _team_cleanup_scope(repo_root: Path, data: dict) -> list[tuple[str, str]]:
     """(team_slug, bound_slug) for every team this cleanup touches, in slug order.
 
@@ -3297,19 +3364,22 @@ def _plan_team_step(repo_root: Path, team_slug: str, bound: str, classes: dict) 
         body, first_line=front.count("\n") + 1, path=rel_path, classes=classes)
     if body_records:
         new_text = new_text[:len(new_text) - len(body)] + mapped_body
-    records = ([rename] if rename else []) + body_records
-    if rename and body_records:
+    new_text, definition_records = _map_team_definition(
+        new_text, path=rel_path, classes=classes)
+    records = ([rename] if rename else []) + body_records + definition_records
+    if rename and (body_records or definition_records):
         result = "rename+normalize"
     elif rename:
         result = "rename"
-    elif body_records:
+    elif body_records or definition_records:
         result = "normalize"
     else:
         result = "already-normalized"
+    normalized_lines = len({record["line"] for record in body_records + definition_records})
     receipt_path = path.parent / BINDING_RENAME_RECEIPT_NAME
     return {
         "kind": "team", "slug": team_slug, "bound_slug": bound, "result": result,
-        "rename": rename, "normalized_lines": len(body_records),
+        "rename": rename, "normalized_lines": normalized_lines,
         "receipt_path": _relative(repo_root, receipt_path),
         "_path": path, "_text": text, "_new_text": new_text, "_records": records,
         "_receipt": receipt_path,
@@ -3317,24 +3387,31 @@ def _plan_team_step(repo_root: Path, team_slug: str, bound: str, classes: dict) 
 
 
 def _apply_team_step(repo_root: Path, row: dict) -> None:
-    """Write the renamed/normalized definition and its per-line receipt (idempotent)."""
+    """Write the renamed/normalized definition and its per-line receipt (idempotent).
+
+    The receipt is the append-only record of every declared rewrite this team has
+    received, so a later declared rule (a C-46 extension) adds rows instead of being
+    refused. An exact duplicate adds nothing; the definition is still rewritten when
+    a measured rewrite reappears (a reverted line is repaired, not re-recorded).
+    """
     if not row["_records"]:
         return
     existing = _read_json_file(row["_receipt"])
-    if existing is not None and existing.get("lines") != row["_records"]:
-        raise GoalInvalid(
-            f"conflict: {row['_path']} does not match its receipt "
-            f"{row['receipt_path']} (the recorded line set differs from the one measured "
-            "now); the definition is not rewritten")
+    prior = [] if existing is None else list(existing.get("lines") or [])
+    known = {(r.get("path"), r.get("line"), r.get("rule"),
+              r.get("before"), r.get("after")) for r in prior}
+    additions = [r for r in row["_records"]
+                 if (r["path"], r["line"], r["rule"], r["before"], r["after"])
+                 not in known]
     _atomic_write_text(row["_path"], row["_new_text"])
-    if existing is None:
+    if existing is None or additions:
         _write_json(row["_receipt"], {
             "schema": BINDING_RENAME_RECEIPT_SCHEMA,
             "team_slug": row["slug"],
             "bound_slug": row["bound_slug"],
             "engine": _engine_identity(),
             "timestamp": _utc_now(),
-            "lines": row["_records"],
+            "lines": prior + additions,
         })
 
 

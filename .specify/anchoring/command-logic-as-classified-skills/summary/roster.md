@@ -7,9 +7,7 @@
 
 | 团队 | 身份 | 是否推进 | 声明的 Write Scope |
 |------|------|---------|--------------------|
-| command-logic-as-classified-skills | explicit | 是 | team.md `territory.write`（templates/commands/*.md、skills/**、.specify/skills/**、四套命令副本树、.specify/teams/command-logic-as-classified-skills/**、.specify/memory/feedback/**、src/specify_cli/**、src/hatch_build.py、scripts/python/sync-mirrors.py、tests/**、docs/**、templates/skills.md 等 26 条，全文以 team.md frontmatter 为准） |
-
-> 更正记录（2026-10-12）：生成器的 team.md frontmatter 解析失败（YAML 流式映射解析错误于 non_path 条目），本表曾误记身份为 inferred、Write Scope 为未声明；本次刷新按 team.md frontmatter 显式声明（`goal_slug: command-logic-as-classified-skills`、`territory.write`）更正为 explicit 与已声明范围。
+| command-logic-as-classified-skills | explicit | 是 | .claude/commands/**、.github/prompts/**、.opencode/command/**、.qoder/commands/**、.specify/docs/**、.specify/memory/feedback/**、.specify/memory/glossary.md、.specify/skills/**、.specify/teams/command-logic-as-classified-skills/**、docs/**、scripts/python/sync-mirrors.py、shared/definitions/framework-map.md、shared/definitions/probe-definitions.md、shared/workflow/artifact-commit-step.md、skills/**、src/hatch_build.py、src/specify_cli/**、templates/commands/*.md、templates/docs-target-structure-template.md、templates/instructions-template.md、templates/skills.md、tests/** |
 
 ## 重叠检测
 

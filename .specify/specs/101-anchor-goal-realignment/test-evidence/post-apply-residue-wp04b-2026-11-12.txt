@@ -1,0 +1,2 @@
+# Post-apply residue measurement (WP-04b, run r20261112T064607Z-b101)
+counts: {'A_goal_slug': 0, 'B_stale_definition_ref': 0, 'C_retired_delivery_dir': 0}

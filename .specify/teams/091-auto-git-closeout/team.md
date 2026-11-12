@@ -11,7 +11,6 @@ goal: >-
   models reproduce their sequences in fixture repositories, ask/absent policy presents and waits, push
   rejection or merge conflict stops at the first failure without force-push or a second retry, and the
   artifact commands and unattended runs use the same close-out step (no second mechanism).
-goal_slug: 091-auto-git-closeout
 territory:
   write:
     - .specify/specs/091-auto-git-closeout/**
@@ -130,7 +129,7 @@ binding:
 ## Goal
 
 Every retained write ends with one git close-out (commit -> merge -> push) derived from the model declared in
-`.specify/workflow/git.md`; the goal definition at `.specify/anchoring/091-auto-git-closeout/goal.md`
+`.specify/workflow/git.md`; the goal definition at `.specify/goals/091-auto-git-closeout/goal.md`
 is authoritative and this section is readability rendering only.
 
 Success is judged by the goal's four criteria: the four workflow models reproduce their sequences in fixture

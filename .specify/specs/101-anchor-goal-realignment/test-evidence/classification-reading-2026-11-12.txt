@@ -1,0 +1,16 @@
+command: python3 <inline reader> ; date 2026-11-12 ; root .specify/anchoring
+slug                                          status    T_live sum   class       rule       T_cls sum_cls
+085-sdd-temporary-goal-team                   active    0      False obsolete    FR-036(b)  0    False
+086-efficient-test-execution                  active    0      False anchor      FR-036(c)  0    False
+087-arch-diagram-docs                         achieved  0      False anchor      FR-036(c)  0    False
+088-speckit-visualization                     active    2      False action-goal FR-036(a)  2    False
+090-re-anchoring                              active    0      False anchor      FR-036(c)  0    False
+091-auto-git-closeout                         active    0      False action-goal FR-036(a)  0    False
+094-goal-team-parallel                        active    0      False anchor      FR-036(c)  0    False
+command-logic-as-classified-skills            active    3      True  anchor      FR-036(c)  3    True
+draw-diagram-interactive                      active    0      True  action-goal FR-036(a)  0    True
+draw-two-layer-structure                      achieved  3      False anchor      FR-036(c)  3    False
+post-refactor-mechanism-integrity             achieved  1      True  obsolete    FR-036(b)  1    True
+script-interface-contract                     active    0      False anchor      FR-036(c)  0    False
+session-driven-self-improvement               achieved  0      True  anchor      FR-036(c)  0    True
+skill-layer-install-separation                achieved  4      True  anchor      FR-036(c)  4    True

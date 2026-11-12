@@ -48,13 +48,13 @@ work_items:
   source: .specify/teams/session-driven-self-improvement/runs/20261008T090000Z-report.md
 milestones:
 - milestone_id: MS-0001
-  milestone_name: 一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(
+  milestone_name: 一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(名字级失败集差集为空,且每条返回绿的检查留有红先行取证或变异演练),语义正确性不在本判据内。
   anchor_item_id: session-driven-self-improvement.TIX-3dfddbb0
-  source: .specify/goal/session-driven-self-improvement/goal.md
+  source: .specify/anchoring/session-driven-self-improvement/anchor.md
 - milestone_id: MS-0002
   milestone_name: 本目标为长期目标,不设算出的终止判据:achieved 是一次刻意的人工判定,而非由度量得出的结论。
   anchor_item_id: session-driven-self-improvement.TIX-3dfddbb0
-  source: .specify/goal/session-driven-self-improvement/goal.md
+  source: .specify/anchoring/session-driven-self-improvement/anchor.md
 people:
 - owner_id: agent-team-supervisor-template
   owner_name: 未记录
@@ -80,3 +80,7 @@ coverage:
   granularity_truncated: 0
   unattributed: 0
   source_label: 团队条目台账 items.jsonl
+inferred_fields:
+- field: milestones[MS-0001].milestone_name
+  inferred_from: .specify/anchoring/session-driven-self-improvement/anchor.md §Success Criteria（生成器按 60
+    字符截断）

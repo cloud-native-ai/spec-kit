@@ -1,0 +1,30 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "090-re-anchoring",
+  "bound_slug": "090-re-anchoring",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/090-re-anchoring/team.md",
+      "line": 13,
+      "rule": "C-45",
+      "before": "goal_slug: 090-re-anchoring",
+      "after": "anchor_slug: 090-re-anchoring"
+    },
+    {
+      "path": ".specify/teams/090-re-anchoring/team.md",
+      "line": 209,
+      "rule": "N-5",
+      "before": "- Boundary: preserve team authority, the verifier's independence, the stage sequence, and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/goal/**`.",
+      "after": "- Boundary: preserve team authority, the verifier's independence, the stage sequence, and the sentinel literals; this team never writes `.specify/teams/**` or `.specify/anchoring/**`."
+    },
+    {
+      "path": ".specify/teams/090-re-anchoring/team.md",
+      "line": 137,
+      "rule": "N-9",
+      "before": "`.specify/anchoring/090-re-anchoring/goal.md`; this section is readability rendering only, and the",
+      "after": "`.specify/anchoring/090-re-anchoring/anchor.md`; this section is readability rendering only, and the"
+    }
+  ]
+}

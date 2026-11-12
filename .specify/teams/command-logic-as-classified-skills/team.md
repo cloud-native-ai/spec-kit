@@ -3,12 +3,12 @@ name: 命令逻辑技能化与分类标注团队
 slug: command-logic-as-classified-skills
 description: 以 serial 五阶段链（命令普查裁定 → 提炼建技能并标注 → 契约齐备 → 结构对齐 → 命令瘦身）把命令模板的核心逻辑下沉为技能，并给每个技能打 internal / external 标注；每次交接有独立验证门，每次 canonical 落盘后有再生成步
 goal: >
-  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/goal.md）。
+  承接已定义 Goal `command-logic-as-classified-skills`（权威定义：.specify/anchoring/command-logic-as-classified-skills/anchor.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：spec-kit 的命令核心逻辑尽可能由技能承载——
   命令模板只保留入口与委派，可执行的核心逻辑落在 skills/ 下的技能里；每个技能的元数据都带 internal 或
   external 标注，标注如实表达它与 spec-kit 的依赖关系，使后续按标注分流的处理有据可依。
   **成功判据以定义为准，本团队不复述其文本**（定义持有 1 条；判据是 achieved 的唯一权威）。
-goal_slug: command-logic-as-classified-skills
+anchor_slug: command-logic-as-classified-skills
 territory:
   write:
     - templates/commands/*.md              # T-003 瘦身写面；受模板中立性约束（见 non_path），且 MUST 跳过 templates/commands/improve.md（见 forbidden）
@@ -43,7 +43,7 @@ territory:
     - docs/reference/commands/**
     - scripts/python/**
   forbidden:
-    - .specify/goal/command-logic-as-classified-skills/goal.md   # authored：只经 /speckit.goal 引擎渲染
+    - .specify/anchoring/command-logic-as-classified-skills/anchor.md   # authored：只经 /speckit.goal 引擎渲染
     - templates/constitution-template.md   # 模板中立性 + 不在本目标范围
     - templates/skills-template.md
     - templates/agents/**
@@ -66,10 +66,10 @@ territory:
   non_path:
     - { type: framework-convention, target: 命令=编排、技能=实现的职责边界；瘦身后的命令模板 MUST NOT 嵌入本仓专属内容（模板中立性，真源 docs/reference/history/00-cross-cutting-lessons.md:124） }
     - { type: ceiling, target: 确认门控预算——`python3 .specify/scripts/python/scan-confirmation-gates.py` 的 total MUST 保持 ≤ 23（as-of 2026-10-07 实测 23 = destructive 13 + governance_kept 10，余量 0）。本团队 12 个 write 条目中只有 5 个落在 SCAN_DIRS（templates/commands 与 skills/**），其余 7 个是 .specify/ 或按工具分的副本树、被扫描器 SKIP_DIR_PARTS 跳过；钉住该 total 的契约测试有多处，数目以 `grep -rl '== 23' tests/` 重跑为准，MUST NOT 写字面量 }
-    - { type: classification, target: internal / external 的**含义**真源是 .specify/goal/command-logic-as-classified-skills/goal.md；**术语与消歧**（含与需求 039「通用技能=宿主中立」的区分）真源是 .specify/memory/glossary.md 的 技能分类标注 条。「两个取值只是标识、不对外呈现」与「不标注会干扰既有技能分发与处理体系」两条来自用户 2026-10-05 口述，goal.md 未承载其因果——引用时 MUST 标为用户口述而非制品事实 }
+    - { type: classification, target: internal / external 的**含义**真源是 .specify/anchoring/command-logic-as-classified-skills/anchor.md；**术语与消歧**（含与需求 039「通用技能=宿主中立」的区分）真源是 .specify/memory/glossary.md 的 技能分类标注 条。「两个取值只是标识、不对外呈现」与「不标注会干扰既有技能分发与处理体系」两条来自用户 2026-10-05 口述，goal.md 未承载其因果——引用时 MUST 标为用户口述而非制品事实 }
     - { type: progression, target: T-001 → T-002 → T-003 的递进序由本团队计划承载；goal 层的 Target 集无序、无依赖边，顺序在那里没有落点 }
     - { type: boundary-ruling, target: 已裁定 2026-10-07（用户明示）——goal.md 的 Boundaries 所排除的「依据 internal / external 标注进行的任何差异化处理」指**分发/处理体系按标注分流**（用户原话「根据不同的标注进行不同的处理」），技能自身的结构契合属 T-002、不在排除之列。故 Boundaries 与 T-002 **不冲突**，S2b 正常派发修补，不停报告态。**该裁定无法写回 goal.md**——goal-utils.py 无 boundary 动作、且定义文件禁手写，故只在此记账；凡引用 goal.md 的 Boundaries 者 MUST 连本条一起读，否则会把它读成比裁定更宽 }
-    - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidden，才可派发其第二次累积；因其 write 含 skills/*/SKILL.md 与 skills/*/references|templates|scripts/**，与本团队 write 构成已知前向冲突。具名目录今日尚不存在，故本条目是**待触发的义务**而非已落地的排除；触发时 MUST NOT 静默双写。机械事实（引用、不复述）：shipped 校验器只比 write×write、从不减 forbidden，故 write∩forbidden 的排除式解法在同 goal_slug 下仍会报 overlap——该缺口由对方团队 non_path 的 cross-goal-write 条目持有并已记入 feedback；本团队今日无同 goal_slug 的兄弟团队，故不触发 }
+    - { type: cross-goal-forward-conflict, target: 对方团队 session-driven-self-improvement 的 S4 已记录——其技能侧落点名一经定下，MUST 先经 /speckit.team modify 把该**具名**目录追加进本团队 forbidden，才可派发其第二次累积；因其 write 含 skills/*/SKILL.md 与 skills/*/references|templates|scripts/**，与本团队 write 构成已知前向冲突。具名目录今日尚不存在，故本条目是**待触发的义务**而非已落地的排除；触发时 MUST NOT 静默双写。机械事实（引用、不复述）：shipped 校验器只比 write×write、从不减 forbidden，故 write∩forbidden 的排除式解法在同 anchor_slug 下仍会报 overlap——该缺口由对方团队 non_path 的 cross-goal-write 条目持有并已记入 feedback；本团队今日无同 anchor_slug 的兄弟团队，故不触发 }
     - { type: dispatch-modality, target: 本团队四个席位里只有 structure-adjuster 能在 Qoder CLI 下**原生**派发——.qoder/agents/ 只注册了 skill-verifier 与 structure-adjuster 两个类型，而 agent-team-supervisor-template / agent-stage-executor-template / agent-stage-evaluator-template 只存在于 skills/create-team/templates/agents/、未安装到宿主注册面，只能 **virtual** 派发（无隔离、无并行、消耗本会话上下文，真源 .specify/shared/definitions/subagent-definitions.md）。故各 stage 批规模 MUST 按 virtual 保守估；要改为原生须先经 /speckit.agents 实例化到 .specify/agents/instances/ 再跑 /speckit.instructions 接线，那是机制侧改动、不在本团队写面内 }
     - { type: run-2-ruling-boundary, target: 2026-10-09 用户裁定（明示）：goal.md Boundaries 的「留待后续」差异化处理现已启动，本轮范围为「技能内外分层 + 安装/可见性分流」——internal = 一切配合 .specify 结构的技能（含全部工作流技能），external = 与 .specify 无关的通用技能；internal 对客户 agent 不可见（输出至 `.specify/skills/internal/`，由 /speckit.* 工作流按显式路径引用），external 经 .qoder/skills 等既有机制扩散到用户 agent。goal.md 文本仍不可经引擎改写（无 boundary 动作），本裁定只在此记账（先例 2026-10-07） }
     - { type: run-2-ruling-a1, target: "2026-10-09 用户裁定：A1（templates/commands/goal.md :17「No skill, script, or other command may write into the goal archive」）按「授权顺手修复」处置——该句已就地补注（sole writing path = 引擎；经其承载的委派逻辑不排除）；S0 裁定表 #10（manage-goal）条件解除" }
@@ -138,7 +138,7 @@ config:
   summary:
     enabled: true
     every: 1                             # bounded pattern 默认每阶段边界刷新一次
-    delivery_dir: .specify/goal/command-logic-as-classified-skills/summary/
+    delivery_dir: .specify/anchoring/command-logic-as-classified-skills/summary/
     interactive: false
 binding:
   owner: human
@@ -148,7 +148,7 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/command-logic-as-classified-skills/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 - **终态**：命令核心逻辑尽可能由技能承载；每个技能元数据带 internal / external 标注，标注如实表达它与 spec-kit 的依赖关系。
 - **判据**：定义持有 1 条，**本文件不复述其文本** —— 判据是 `achieved` 的唯一权威，本团队 MUST NOT 自行增补或转写口径；需要口径时读定义。
@@ -265,9 +265,9 @@ flowchart LR
 
 **跨会话续跑**：progress 文件存在即解析 stage 表定位状态，从第一个未完成 stage 继续；每个 stage 的累积批次以「已声明批次名在产物中可检索」为准，桩文件不算完成。
 
-**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.goal targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**
+**run-2 扩展切片（2026-10-09 用户裁定）**：新增「技能内外分层 + 安装/可见性分流」工作切片——源树 `skills/` 增 `internal/`+`external/` 层；internal 技能输出至 `.specify/skills/internal/`（对客户 agent 不可见），由 /speckit.* 工作流按显式路径引用；external 维持既有分发机制。实施序：**S-layer（分层迁移 + 镜像/发现/引用/测试适配 + 安装分流）先行，S1 起新技能直落分层树**。裁定记账见 non_path 的 `run-2-ruling-boundary` / `run-2-ruling-a1` 两条；设计产物见工作区 `.specify/teams/.work/command-logic-as-classified-skills/layering-design.md`。目标层追踪（T-004）由用户经 `/speckit.anchor targets --add` 决定，本团队不代拟。分类经 2026-10-09 修订（v2）：external 17 / internal 15，并含 git 四技能 → `git-workspace` 合并（记账见 non_path `run-3-ruling-classification-v2`）。**2026-10-09 用户指令：该扩展切片的剩余批次（B2c/B2e/B3–B7）移交新 goal/团队 `skill-layer-install-separation`（native 并发团队）；本团队保留 S1–S3，S1 起点依赖其 S-B 落地（跨团队依赖，看对方 progress）。**
 
-**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/goal/command-logic-as-classified-skills/summary/`（由 `goal_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。
+**Summary 刷新**：每个 stage 交接验证通过后刷新一次（`every: 1`），交付目录 `.specify/anchoring/command-logic-as-classified-skills/summary/`（由 `anchor_slug` 派生，不由团队 slug 派生），非交互调用。门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有，run report 里 MUST 出现且只出现一条 `Summary:` 状态行。
 
 ## Self-Improvement Contract
 

@@ -1,0 +1,147 @@
+{
+  "status": "produced",
+  "form": ".specify/anchoring/session-driven-self-improvement/summary/data/project-input.yaml",
+  "delivery_dir": ".specify/anchoring/session-driven-self-improvement/summary",
+  "goal_slug": "session-driven-self-improvement",
+  "goal_identity": "explicit",
+  "contributing_teams": [
+    "session-driven-self-improvement"
+  ],
+  "inferred_fields": [
+    {
+      "field": "people[agent-team-supervisor-template].owner_name",
+      "inferred_from": "名册引用的 agent 定义未找到,按 FR-004 记为未记录"
+    },
+    {
+      "field": "people[agent-stage-executor-template].owner_name",
+      "inferred_from": "名册引用的 agent 定义未找到,按 FR-004 记为未记录"
+    },
+    {
+      "field": "people[agent-stage-evaluator-template].owner_name",
+      "inferred_from": "名册引用的 agent 定义未找到,按 FR-004 记为未记录"
+    },
+    {
+      "field": "work_items[session-driven-self-improvement.TIX-3dfddbb0].item_id",
+      "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"
+    },
+    {
+      "field": "work_items[session-driven-self-improvement.TIX-6730c24c].item_id",
+      "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"
+    },
+    {
+      "field": "work_items[session-driven-self-improvement.TIX-4e67a199].item_id",
+      "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"
+    },
+    {
+      "field": "work_items[session-driven-self-improvement.TIX-6ccb2680].item_id",
+      "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"
+    },
+    {
+      "field": "work_items[session-driven-self-improvement.TIX-3344086d].item_id",
+      "inferred_from": "台账发放显式 ID 之前的历史条目,身份由标题+阶段派生(FR-027)"
+    }
+  ],
+  "material_gaps": [
+    "session-driven-self-improvement: 20261005T172252Z-report.md does not follow the documented Report contract (no **Outcome** field); item state recorded as unknown rather than guessed",
+    "session-driven-self-improvement: 20261005T172252Z-report.md declares no deliverables; run recorded as one item",
+    "session-driven-self-improvement: 20261007T170045Z-report.md does not follow the documented Report contract (no **Outcome** field); item state recorded as unknown rather than guessed",
+    "session-driven-self-improvement: 20261007T170045Z-report.md declares no deliverables; run recorded as one item",
+    "session-driven-self-improvement: 20261008T025904Z-report.md does not follow the documented Report contract (no **Outcome** field); item state recorded as unknown rather than guessed",
+    "session-driven-self-improvement: 20261008T025904Z-report.md declares no deliverables; run recorded as one item",
+    "session-driven-self-improvement: 20261008T073900Z-report.md does not follow the documented Report contract (no **Outcome** field); item state recorded as unknown rather than guessed",
+    "session-driven-self-improvement: 20261008T073900Z-report.md declares no deliverables; run recorded as one item",
+    "session-driven-self-improvement: 20261008T090000Z-report.md does not follow the documented Report contract (no **Outcome** field); item state recorded as unknown rather than guessed",
+    "session-driven-self-improvement: 20261008T090000Z-report.md declares no deliverables; run recorded as one item",
+    "session-driven-self-improvement: no item ledger; history backfilled from runs/ with inferred identities",
+    "session-driven-self-improvement: agent definition agent-team-supervisor-template unresolved; owner recorded as 未记录",
+    "session-driven-self-improvement: agent definition agent-stage-executor-template unresolved; owner recorded as 未记录",
+    "session-driven-self-improvement: agent definition agent-stage-evaluator-template unresolved; owner recorded as 未记录",
+    "团队内联 goal 与被引用的定义不一致,以定义为权威(FR-012);不一致的团队:session-driven-self-improvement"
+  ],
+  "declined": false,
+  "goal_source": "definition",
+  "goal_definition": ".specify/anchoring/session-driven-self-improvement/anchor.md",
+  "roster": [
+    {
+      "team": "session-driven-self-improvement",
+      "territory": {
+        "write": [
+          ".specify/teams/session-driven-self-improvement/**",
+          "docs/concepts/critique-and-self-critique.md",
+          "scripts/python/**",
+          "shared/guidelines/critique-and-self-critique.md",
+          "shared/workflow/feedback-step.md",
+          "shared/workflow/self-improvement-workflow.md",
+          "skills/self-improvement/**",
+          "templates/commands/improve.md",
+          "templates/instructions-template.md",
+          "tests/contract/**"
+        ],
+        "read": [
+          ".specify/agents/**",
+          ".specify/goal/command-logic-as-classified-skills/**",
+          ".specify/goal/session-driven-self-improvement/**",
+          ".specify/memory/evidence/**",
+          ".specify/memory/feedback/**",
+          ".specify/memory/session/**",
+          ".specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.dag.json",
+          ".specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.md",
+          ".specify/shared/**",
+          "shared/**"
+        ],
+        "forbidden": [
+          ".specify/anchoring/session-driven-self-improvement/anchor.md",
+          ".specify/instructions.md",
+          ".specify/memory/feedback/probe-map.md",
+          ".specify/scripts/**",
+          ".specify/shared/**",
+          ".specify/teams/command-logic-as-classified-skills/**",
+          ".specify/teams/draw-two-layer-structure/**",
+          ".specify/teams/viz-skill-arena/**",
+          ".specify/templates/**",
+          "shared/definitions/goal-definitions.md",
+          "shared/guidelines/proactive-trigger.md"
+        ],
+        "non_path": [
+          {
+            "type": "scope-set",
+            "target": "提升对象的开放集合 —— 包括但不限于命令、skills、memory（D9 细节 4）。命令与 memory 今天在 SI-4 路由表里无归口，归口方式由 S1 契约决定，不在本文件预设"
+          },
+          {
+            "type": "framework-convention",
+            "target": "feedback 四条红线保持不动；改点是流程内的观察 sensor，不充当干预台账 —— SI-7 的 intervention.json 留在基线证据运行目录。wholesale 归一 self-improvement→feedback 不做（三处结构冲突：红线 2 可删除性、红线 3 打包上送会把仅本仓可解析的 run id 带进上游 bundle、sensor never a mutation authority）"
+          },
+          {
+            "type": "naming",
+            "target": "机制已定名「运行判定 (Run Determination)」—— 经用户批准通道定名（2026-10-06），glossary 词条 origin=user / status=confirmed。占位形「判断逻辑」退役为变体；「断言」因与本仓契约测试断言（四条归因轴之一、空真断言、反空真哨兵、可断言面、053 特性主题）冲突而弃用，且刻意不登记为变体，以免词汇表把契约测试语境的正当用法误纠过来。英文形避开 assessment，因 情境评估 (Situational Assessment) 已被 proactive-trigger 占用"
+          },
+          {
+            "type": "ceiling",
+            "target": "确认门控预算 —— scan-confirmation-gates.py 的 total MUST 保持 ≤ 23（as-of 2026-10-06 实测 23，余量 0，violations 0）。本团队 6 个 write 目标里有 4 个落在 SCAN_DIRS（templates/commands、skills、shared）或 SCAN_ROOT_FILES（templates/*.md）内，故 S3/S4 任何新增 BLOCKING_PATTERNS 命中会同时打爆两个契约测试。易误踩的模式：confirmation gate、确认门禁、确认门控、after confirmation、Confirm before、inviting the user to submit collected feedback。落盘前 MUST 跑一次扫描器并附 total 读数"
+          },
+          {
+            "type": "cross-goal-write",
+            "target": "templates/commands/improve.md 的写权归本团队 S4。command-logic-as-classified-skills 团队的 templates/commands/*.md 经用户明示授权（2026-10-06）已在其 territory.forbidden 中排除该文件，其 T-003 命令瘦身 MUST 跳过它；本团队 S4 则按其 T-003 约定出生即为入口+委派薄壳，两个目标互相合成而非互相覆盖。**该裁定对机器不可见** —— build-summary-input.py 的 _write_intersections 只比 write×write、从不减 forbidden，故 create-mode schema 允许的「forbidden-write entry」解法在 shipped 校验器下仍会报 overlap；此缺口已记入 feedback"
+          },
+          {
+            "type": "cross-goal",
+            "target": "/speckit.improve 命令属 Requirement 平面（litmus test 5：约束本项目源码实现什么），其规格入口是 /speckit.requirements；本团队只按既有约定落其框架源文本，不代替该平面做需求决策"
+          }
+        ]
+      },
+      "identity_type": "explicit",
+      "advancing": true,
+      "participation": "active"
+    }
+  ],
+  "overlaps": [],
+  "contested_areas": [],
+  "entity_counts": {
+    "phases": 5,
+    "work_items": 5,
+    "milestones": 2,
+    "people": 3,
+    "features": 0,
+    "sources": 1
+  }
+}

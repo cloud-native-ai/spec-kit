@@ -2,7 +2,7 @@
   "engine": "progress-engine/v1",
   "input_schema": "project-input/v1",
   "baseline": "2026-10-08",
-  "input": ".specify/goal/session-driven-self-improvement/summary/data/project.db",
+  "input": ".specify/anchoring/session-driven-self-improvement/summary/data/project.db",
   "options": {
     "count_deferred": false,
     "strict": false
@@ -500,7 +500,7 @@
     },
     {
       "id": "MS-0001",
-      "name": "一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(",
+      "name": "一套新的运行判定,统一「token 消耗」「耗时」「正确性」与「满意度」四个量;其中「正确性」只涵盖**制品正确性**(名字级失败集差集为空,且每条返回绿的检查留有红先行取证或变异演练),语义正确性不在本判据内。",
       "type": "milestone",
       "parent": null,
       "phase_id": null,
@@ -531,7 +531,7 @@
         "锚定 session-driven-self-improvement.TIX-3dfddbb0 但该工作项无计划/实际完成日，锚定日不可换算",
         "无计划日期（无绝对锚定日、无可换算的锚定工作项），无法判定延期"
       ],
-      "source": ".specify/goal/session-driven-self-improvement/goal.md",
+      "source": ".specify/anchoring/session-driven-self-improvement/anchor.md",
       "progress_bar": null
     },
     {
@@ -567,7 +567,7 @@
         "锚定 session-driven-self-improvement.TIX-3dfddbb0 但该工作项无计划/实际完成日，锚定日不可换算",
         "无计划日期（无绝对锚定日、无可换算的锚定工作项），无法判定延期"
       ],
-      "source": ".specify/goal/session-driven-self-improvement/goal.md",
+      "source": ".specify/anchoring/session-driven-self-improvement/anchor.md",
       "progress_bar": null
     }
   ],
@@ -798,6 +798,11 @@
   ],
   "inferred_fields": [
     {
+      "field": "milestones[MS-0001].milestone_name",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/session-driven-self-improvement/anchor.md §Success Criteria（生成器按 60 字符截断）"
+    },
+    {
       "field": "phases[session-driven-self-improvement.PH-0001].source",
       "inferred_value": ".specify/teams/session-driven-self-improvement/（user-form）",
       "inferred_from": "条目未写来源，按 sources[] 声明推断"
@@ -833,7 +838,7 @@
       "排期材料不足：无任何计划日期或工期依据 → 甘特不出图"
     ]
   },
-  "baseline_source": "--baseline",
-  "db": ".specify/goal/session-driven-self-improvement/summary/data/project.db",
+  "baseline_source": "project.baseline_date",
+  "db": ".specify/anchoring/session-driven-self-improvement/summary/data/project.db",
   "db_schema_version": "project-db/v1"
 }

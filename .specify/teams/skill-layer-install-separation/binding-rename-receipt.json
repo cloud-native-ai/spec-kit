@@ -1,0 +1,51 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "skill-layer-install-separation",
+  "bound_slug": "skill-layer-install-separation",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 11,
+      "rule": "C-45",
+      "before": "goal_slug: skill-layer-install-separation",
+      "after": "anchor_slug: skill-layer-install-separation"
+    },
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 124,
+      "rule": "N-1",
+      "before": "**权威定义**：`.specify/anchoring/skill-layer-install-separation/goal.md`（`goal_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。",
+      "after": "**权威定义**：`.specify/anchoring/skill-layer-install-separation/goal.md`（`anchor_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。"
+    },
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 212,
+      "rule": "N-3",
+      "before": "**Summary 刷新**：每阶段交接验证通过后刷新一次（`every: 1`）→ `.specify/goal/skill-layer-install-separation/summary/`；门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。",
+      "after": "**Summary 刷新**：每阶段交接验证通过后刷新一次（`every: 1`）→ `.specify/anchoring/skill-layer-install-separation/summary/`；门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。"
+    },
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 6,
+      "rule": "N-9",
+      "before": "  承接已定义 Goal `skill-layer-install-separation`（权威定义：.specify/anchoring/skill-layer-install-separation/goal.md）。",
+      "after": "  承接已定义 Goal `skill-layer-install-separation`（权威定义：.specify/anchoring/skill-layer-install-separation/anchor.md）。"
+    },
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 114,
+      "rule": "N-10",
+      "before": "    delivery_dir: .specify/goal/skill-layer-install-separation/summary/",
+      "after": "    delivery_dir: .specify/anchoring/skill-layer-install-separation/summary/"
+    },
+    {
+      "path": ".specify/teams/skill-layer-install-separation/team.md",
+      "line": 124,
+      "rule": "N-9",
+      "before": "**权威定义**：`.specify/anchoring/skill-layer-install-separation/goal.md`（`anchor_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。",
+      "after": "**权威定义**：`.specify/anchoring/skill-layer-install-separation/anchor.md`（`anchor_slug` 引用，非内容副本）。终态与判据以定义为准；本文件不复述判据文本。判据覆盖缺口的如实记账：目标判据 2 条覆盖双布局一致与分流可验证两面；各 stage 级 `quality_gate` 承担其余面（如技能对解耦的如实性、测试同口径 A/B），与 goal 级判据权威层级不同，MUST NOT 混称。"
+    }
+  ]
+}

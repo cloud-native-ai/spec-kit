@@ -1,0 +1,32 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/094-goal-team-parallel/anchor.md",
+  "concept_digest_before_normalization": "7820c35ab0023530f48acf3acc055ea1a3977104ddcedcf10c73ed0c84a1843f",
+  "concept_digest_after_normalization": "7820c35ab0023530f48acf3acc055ea1a3977104ddcedcf10c73ed0c84a1843f",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/094-goal-team-parallel/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: 094-goal-team-parallel",
+      "after": "# Anchor: 094-goal-team-parallel"
+    },
+    {
+      "path": ".specify/anchoring/094-goal-team-parallel/anchor.md",
+      "line": 15,
+      "rule": "A-N-2",
+      "before": "让 goal/team 与 spec(SDD) 成为平行执行线：goal/team 可在 /speckit.* 命令运行中创建并归档到 .specify/goal|teams；spec 与 goal+team 各自可设计/执行，复杂工作由 spec 设计、goal+team 执行；用 owner/lifecycle/write-scope 绑定模型替代「临时/全局」。",
+      "after": "让 goal/team 与 spec(SDD) 成为平行执行线：goal/team 可在 /speckit.* 命令运行中创建并归档到 .specify/anchoring|teams；spec 与 goal+team 各自可设计/执行，复杂工作由 spec 设计、goal+team 执行；用 owner/lifecycle/write-scope 绑定模型替代「临时/全局」。"
+    },
+    {
+      "path": ".specify/anchoring/094-goal-team-parallel/anchor.md",
+      "line": 19,
+      "rule": "A-N-2",
+      "before": "1. goal/team 可由 /speckit.* 命令运行创建并归档到 .specify/goal|teams。",
+      "after": "1. goal/team 可由 /speckit.* 命令运行创建并归档到 .specify/anchoring|teams。"
+    }
+  ]
+}

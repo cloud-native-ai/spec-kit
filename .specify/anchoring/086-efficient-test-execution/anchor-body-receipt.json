@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/086-efficient-test-execution/anchor.md",
+  "concept_digest_before_normalization": "ec8d1c1a790a524c863fb49245bed1b9e8b1d398645ff151ca613b5ae81ff832",
+  "concept_digest_after_normalization": "ec8d1c1a790a524c863fb49245bed1b9e8b1d398645ff151ca613b5ae81ff832",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/086-efficient-test-execution/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: 086-efficient-test-execution",
+      "after": "# Anchor: 086-efficient-test-execution"
+    }
+  ]
+}

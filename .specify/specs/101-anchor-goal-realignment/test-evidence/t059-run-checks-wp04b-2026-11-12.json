@@ -1,0 +1,1067 @@
+{
+  "tool": "goal-utils.py run-checks",
+  "date": "2026-11-12",
+  "unit": "T059",
+  "teams": {
+    "085-sdd-temporary-goal-team": {
+      "rc": 0,
+      "out": {
+        "team_slug": "085-sdd-temporary-goal-team",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "085-sdd-temporary-goal-team"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "086-efficient-test-execution": {
+      "rc": 0,
+      "out": {
+        "team_slug": "086-efficient-test-execution",
+        "anchor_slug": "086-efficient-test-execution",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "086-efficient-test-execution"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "087-arch-diagram-docs": {
+      "rc": 5,
+      "out": {
+        "team_slug": "087-arch-diagram-docs",
+        "anchor_slug": "087-arch-diagram-docs",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "087-arch-diagram-docs"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "goal-terminal",
+            "message": "goal '087-arch-diagram-docs' 处于终态 'achieved',终态 goal 只读,拒绝指派"
+          }
+        ],
+        "verdict": "goal-terminal",
+        "blocked": true
+      },
+      "stderr": ""
+    },
+    "088-reporting-dogfood": {
+      "rc": 0,
+      "out": {
+        "team_slug": "088-reporting-dogfood",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "088-speckit-visualization"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "089-script-interface-contract": {
+      "rc": 0,
+      "out": {
+        "team_slug": "089-script-interface-contract",
+        "anchor_slug": "script-interface-contract",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "089-script-interface-contract"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "090-re-anchoring": {
+      "rc": 0,
+      "out": {
+        "team_slug": "090-re-anchoring",
+        "anchor_slug": "090-re-anchoring",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "090-re-anchoring"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "091-auto-git-closeout": {
+      "rc": 0,
+      "out": {
+        "team_slug": "091-auto-git-closeout",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "091-auto-git-closeout"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "094-goal-team-parallel": {
+      "rc": 0,
+      "out": {
+        "team_slug": "094-goal-team-parallel",
+        "anchor_slug": "094-goal-team-parallel",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": "094-goal-team-parallel"
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "command-logic-as-classified-skills": {
+      "rc": 0,
+      "out": {
+        "team_slug": "command-logic-as-classified-skills",
+        "anchor_slug": "command-logic-as-classified-skills",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "cws-workspace-cluster": {
+      "rc": 0,
+      "out": {
+        "team_slug": "cws-workspace-cluster",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "demo-seat-dispatch": {
+      "rc": 0,
+      "out": {
+        "team_slug": "demo-seat-dispatch",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "draw-diagram-interactive": {
+      "rc": 0,
+      "out": {
+        "team_slug": "draw-diagram-interactive",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "draw-plantuml-optimizer": {
+      "rc": 0,
+      "out": {
+        "team_slug": "draw-plantuml-optimizer",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "draw-two-layer-structure": {
+      "rc": 5,
+      "out": {
+        "team_slug": "draw-two-layer-structure",
+        "anchor_slug": "draw-two-layer-structure",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "goal-terminal",
+            "message": "goal 'draw-two-layer-structure' 处于终态 'achieved',终态 goal 只读,拒绝指派"
+          }
+        ],
+        "verdict": "goal-terminal",
+        "blocked": true
+      },
+      "stderr": ""
+    },
+    "post-refactor-mechanism-integrity": {
+      "rc": 0,
+      "out": {
+        "team_slug": "post-refactor-mechanism-integrity",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "requirement-implement-monitor": {
+      "rc": 0,
+      "out": {
+        "team_slug": "requirement-implement-monitor",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "session-driven-self-improvement": {
+      "rc": 5,
+      "out": {
+        "team_slug": "session-driven-self-improvement",
+        "anchor_slug": "session-driven-self-improvement",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "goal-terminal",
+            "message": "goal 'session-driven-self-improvement' 处于终态 'achieved',终态 goal 只读,拒绝指派"
+          }
+        ],
+        "verdict": "goal-terminal",
+        "blocked": true
+      },
+      "stderr": ""
+    },
+    "skill-layer-install-separation": {
+      "rc": 5,
+      "out": {
+        "team_slug": "skill-layer-install-separation",
+        "anchor_slug": "skill-layer-install-separation",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "goal-terminal",
+            "message": "goal 'skill-layer-install-separation' 处于终态 'achieved',终态 goal 只读,拒绝指派"
+          }
+        ],
+        "verdict": "goal-terminal",
+        "blocked": true
+      },
+      "stderr": ""
+    },
+    "summarize-project-optimizer": {
+      "rc": 0,
+      "out": {
+        "team_slug": "summarize-project-optimizer",
+        "anchor_slug": null,
+        "identity_kind": "none",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "no-goal-definition",
+            "message": "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义"
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "not-evaluated",
+            "message": "无 goal 定义可读,goal 终态检查无判定主体"
+          }
+        ],
+        "verdict": "no-goal-definition",
+        "blocked": false
+      },
+      "stderr": ""
+    },
+    "viz-skill-arena": {
+      "rc": 0,
+      "out": {
+        "team_slug": "viz-skill-arena",
+        "anchor_slug": "visualization-skill-selection",
+        "identity_kind": "explicit",
+        "binding": {
+          "owner": "human",
+          "owner_id": "human",
+          "origin": null
+        },
+        "resolution": {
+          "effective": null,
+          "source": "none",
+          "declared_focus": null
+        },
+        "checks": [
+          {
+            "id": 1,
+            "name": "goal-binding",
+            "verdict": "ok",
+            "message": ""
+          },
+          {
+            "id": 2,
+            "name": "dangling",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,悬空检查无判定主体"
+          },
+          {
+            "id": 3,
+            "name": "target-terminal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,终态引用检查无判定主体"
+          },
+          {
+            "id": 4,
+            "name": "cross-goal",
+            "verdict": "not-evaluated",
+            "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+          },
+          {
+            "id": 5,
+            "name": "goal-terminal",
+            "verdict": "ok",
+            "message": ""
+          }
+        ],
+        "verdict": "ok",
+        "blocked": false
+      },
+      "stderr": ""
+    }
+  }
+}

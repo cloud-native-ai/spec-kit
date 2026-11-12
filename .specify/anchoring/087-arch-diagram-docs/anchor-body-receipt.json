@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/087-arch-diagram-docs/anchor.md",
+  "concept_digest_before_normalization": "619fc857b76ed5b8e871196b77a84df7d422b3ffcf68ca5bf22e8cc2a7d817d9",
+  "concept_digest_after_normalization": "619fc857b76ed5b8e871196b77a84df7d422b3ffcf68ca5bf22e8cc2a7d817d9",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/087-arch-diagram-docs/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: 087 — Architecture-Diagram-Centric Documentation",
+      "after": "# Anchor: 087 — Architecture-Diagram-Centric Documentation"
+    }
+  ]
+}

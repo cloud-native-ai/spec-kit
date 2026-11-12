@@ -1,0 +1,374 @@
+{
+  "action": "cleanup",
+  "mode": "apply",
+  "decisions": [
+    {
+      "kind": "action-goal",
+      "slug": "088-speckit-visualization",
+      "source_path": ".specify/anchoring/088-speckit-visualization/goal.md",
+      "target_path": ".specify/goals/088-speckit-visualization/goal.md",
+      "action": "noop",
+      "result": "already-migrated"
+    },
+    {
+      "kind": "action-goal",
+      "slug": "091-auto-git-closeout",
+      "source_path": ".specify/anchoring/091-auto-git-closeout/goal.md",
+      "target_path": ".specify/goals/091-auto-git-closeout/goal.md",
+      "action": "noop",
+      "result": "already-migrated"
+    },
+    {
+      "kind": "action-goal",
+      "slug": "draw-diagram-interactive",
+      "source_path": ".specify/anchoring/draw-diagram-interactive/goal.md",
+      "target_path": ".specify/goals/draw-diagram-interactive/goal.md",
+      "action": "noop",
+      "result": "already-migrated"
+    },
+    {
+      "kind": "anchor",
+      "slug": "086-efficient-test-execution",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/086-efficient-test-execution/goal.md",
+      "target_path": ".specify/anchoring/086-efficient-test-execution/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "087-arch-diagram-docs",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/087-arch-diagram-docs/goal.md",
+      "target_path": ".specify/anchoring/087-arch-diagram-docs/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "090-re-anchoring",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/090-re-anchoring/goal.md",
+      "target_path": ".specify/anchoring/090-re-anchoring/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "094-goal-team-parallel",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/094-goal-team-parallel/goal.md",
+      "target_path": ".specify/anchoring/094-goal-team-parallel/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "command-logic-as-classified-skills",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "regenerate",
+      "source_path": ".specify/anchoring/command-logic-as-classified-skills/goal.md",
+      "target_path": ".specify/anchoring/command-logic-as-classified-skills/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "draw-two-layer-structure",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/draw-two-layer-structure/goal.md",
+      "target_path": ".specify/anchoring/draw-two-layer-structure/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "script-interface-contract",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "absent",
+      "source_path": ".specify/anchoring/script-interface-contract/goal.md",
+      "target_path": ".specify/anchoring/script-interface-contract/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "session-driven-self-improvement",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "regenerate",
+      "source_path": ".specify/anchoring/session-driven-self-improvement/goal.md",
+      "target_path": ".specify/anchoring/session-driven-self-improvement/anchor.md"
+    },
+    {
+      "kind": "anchor",
+      "slug": "skill-layer-install-separation",
+      "action": "noop",
+      "result": "already-normalized",
+      "summary": "regenerate",
+      "source_path": ".specify/anchoring/skill-layer-install-separation/goal.md",
+      "target_path": ".specify/anchoring/skill-layer-install-separation/anchor.md"
+    },
+    {
+      "kind": "obsolete",
+      "slug": "085-sdd-temporary-goal-team",
+      "source_path": ".specify/anchoring/085-sdd-temporary-goal-team/goal.md",
+      "target_path": ".specify/archive/anchoring/085-sdd-temporary-goal-team/goal.md",
+      "action": "noop",
+      "result": "already-archived"
+    },
+    {
+      "kind": "obsolete",
+      "slug": "post-refactor-mechanism-integrity",
+      "source_path": ".specify/anchoring/post-refactor-mechanism-integrity/goal.md",
+      "target_path": ".specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md",
+      "action": "noop",
+      "result": "already-archived"
+    }
+  ],
+  "teams": [
+    {
+      "kind": "team",
+      "slug": "085-sdd-temporary-goal-team",
+      "bound_slug": "085-sdd-temporary-goal-team",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/085-sdd-temporary-goal-team/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "086-efficient-test-execution",
+      "bound_slug": "086-efficient-test-execution",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/086-efficient-test-execution/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "087-arch-diagram-docs",
+      "bound_slug": "087-arch-diagram-docs",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/087-arch-diagram-docs/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "088-reporting-dogfood",
+      "bound_slug": "088-speckit-visualization",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/088-reporting-dogfood/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "089-script-interface-contract",
+      "bound_slug": "script-interface-contract",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/089-script-interface-contract/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "090-re-anchoring",
+      "bound_slug": "090-re-anchoring",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 1,
+      "receipt_path": ".specify/teams/090-re-anchoring/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "091-auto-git-closeout",
+      "bound_slug": "091-auto-git-closeout",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 1,
+      "receipt_path": ".specify/teams/091-auto-git-closeout/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "094-goal-team-parallel",
+      "bound_slug": "094-goal-team-parallel",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 1,
+      "receipt_path": ".specify/teams/094-goal-team-parallel/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "command-logic-as-classified-skills",
+      "bound_slug": "command-logic-as-classified-skills",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 6,
+      "receipt_path": ".specify/teams/command-logic-as-classified-skills/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "demo-seat-dispatch",
+      "bound_slug": "demo-seat-dispatch",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/demo-seat-dispatch/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "draw-diagram-interactive",
+      "bound_slug": "draw-diagram-interactive",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 2,
+      "receipt_path": ".specify/teams/draw-diagram-interactive/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "draw-two-layer-structure",
+      "bound_slug": "draw-two-layer-structure",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 4,
+      "receipt_path": ".specify/teams/draw-two-layer-structure/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "post-refactor-mechanism-integrity",
+      "bound_slug": "post-refactor-mechanism-integrity",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 3,
+      "receipt_path": ".specify/teams/post-refactor-mechanism-integrity/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "session-driven-self-improvement",
+      "bound_slug": "session-driven-self-improvement",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 4,
+      "receipt_path": ".specify/teams/session-driven-self-improvement/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "skill-layer-install-separation",
+      "bound_slug": "skill-layer-install-separation",
+      "result": "normalize",
+      "rename": null,
+      "normalized_lines": 3,
+      "receipt_path": ".specify/teams/skill-layer-install-separation/binding-rename-receipt.json"
+    },
+    {
+      "kind": "team",
+      "slug": "viz-skill-arena",
+      "bound_slug": "visualization-skill-selection",
+      "result": "already-normalized",
+      "rename": null,
+      "normalized_lines": 0,
+      "receipt_path": ".specify/teams/viz-skill-arena/binding-rename-receipt.json"
+    }
+  ],
+  "dispositions": [
+    {
+      "team_slug": "085-sdd-temporary-goal-team",
+      "bound_slug": "085-sdd-temporary-goal-team",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "spec-scoped team of a delivered feature under a superseded model",
+      "acted": [],
+      "receipt_path": ".specify/teams/085-sdd-temporary-goal-team/disposition-receipt.json"
+    },
+    {
+      "team_slug": "088-reporting-dogfood",
+      "bound_slug": "088-speckit-visualization",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "one-off dogfood proof; no covering Anchor; theme fails FR-036(c)",
+      "acted": [],
+      "receipt_path": ".specify/teams/088-reporting-dogfood/disposition-receipt.json"
+    },
+    {
+      "team_slug": "091-auto-git-closeout",
+      "bound_slug": "091-auto-git-closeout",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "team.md already carries lifecycle_state: archived but still carries its goal_slug binding and has no disposition receipt; R3 terminal state (archived + binding removed + disposition-receipt.json) is not yet met",
+      "acted": [],
+      "receipt_path": ".specify/teams/091-auto-git-closeout/disposition-receipt.json"
+    },
+    {
+      "team_slug": "demo-seat-dispatch",
+      "bound_slug": "demo-seat-dispatch",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "one-off SC-002 demonstration for spec 054",
+      "acted": [],
+      "receipt_path": ".specify/teams/demo-seat-dispatch/disposition-receipt.json"
+    },
+    {
+      "team_slug": "draw-diagram-interactive",
+      "bound_slug": "draw-diagram-interactive",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "bounded iteration over one skill; no covering Anchor; theme fails FR-036(c)",
+      "acted": [],
+      "receipt_path": ".specify/teams/draw-diagram-interactive/disposition-receipt.json"
+    },
+    {
+      "team_slug": "post-refactor-mechanism-integrity",
+      "bound_slug": "post-refactor-mechanism-integrity",
+      "rule": "R3",
+      "state": "already-satisfied",
+      "reason": "verification chain keyed to an achieved one-off entry",
+      "acted": [],
+      "receipt_path": ".specify/teams/post-refactor-mechanism-integrity/disposition-receipt.json"
+    },
+    {
+      "team_slug": "viz-skill-arena",
+      "bound_slug": "visualization-skill-selection",
+      "rule": "R2",
+      "state": "already-satisfied",
+      "reason": "continuous threshold-free optimization theme passes FR-036(c); anchor to be created by engine migrate",
+      "acted": [],
+      "receipt_path": ".specify/teams/viz-skill-arena/disposition-receipt.json"
+    }
+  ],
+  "self_checks": [
+    {
+      "name": "anchor-store-purity",
+      "ok": true,
+      "detail": "no goal.md remains in the Anchor store"
+    },
+    {
+      "name": "bindings-resolve",
+      "ok": true,
+      "detail": "every anchor_slug resolves"
+    },
+    {
+      "name": "receipts-complete",
+      "ok": true,
+      "detail": "every owed receipt is present"
+    },
+    {
+      "name": "orphan-summary",
+      "ok": true,
+      "detail": "no summary tree outlives its definition"
+    }
+  ],
+  "verdict": "ok",
+  "counts": {
+    "already-archived": 2,
+    "already-migrated": 3,
+    "already-normalized": 9
+  },
+  "team_counts": {
+    "already-normalized": 7,
+    "normalize": 9
+  },
+  "disposition_counts": {
+    "apply": 0,
+    "already-satisfied": 7
+  }
+}

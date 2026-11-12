@@ -1,0 +1,14 @@
+{
+  "schema": "101-disposition-receipt/v1",
+  "team_slug": "demo-seat-dispatch",
+  "bound_slug": "demo-seat-dispatch",
+  "disposition": "R3",
+  "state": "apply",
+  "reason": "one-off SC-002 demonstration for spec 054",
+  "acted": [
+    "lifecycle_state: archived",
+    "binding line removed"
+  ],
+  "timestamp": "2026-11-12T11:41:01Z",
+  "engine": "goal-utils.py 0.0.22"
+}

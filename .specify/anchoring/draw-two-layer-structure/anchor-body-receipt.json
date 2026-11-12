@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/draw-two-layer-structure/anchor.md",
+  "concept_digest_before_normalization": "e094f308f6eb10a38b79e7870f649b64ef191ca9d9d897fc0a70776d34e9fb31",
+  "concept_digest_after_normalization": "e094f308f6eb10a38b79e7870f649b64ef191ca9d9d897fc0a70776d34e9fb31",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/draw-two-layer-structure/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: draw-two-layer-structure",
+      "after": "# Anchor: draw-two-layer-structure"
+    }
+  ]
+}

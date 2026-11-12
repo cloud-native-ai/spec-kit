@@ -1,0 +1,51 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "post-refactor-mechanism-integrity",
+  "bound_slug": "post-refactor-mechanism-integrity",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 10,
+      "rule": "C-45",
+      "before": "goal_slug: post-refactor-mechanism-integrity",
+      "after": "anchor_slug: post-refactor-mechanism-integrity"
+    },
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 98,
+      "rule": "N-1",
+      "before": "**权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`goal_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。",
+      "after": "**权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`anchor_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。"
+    },
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 161,
+      "rule": "N-3",
+      "before": "**Summary 刷新**:每阶段交接验证通过后刷新一次(`every: 1`)→ `.specify/goal/post-refactor-mechanism-integrity/summary/`;门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。",
+      "after": "**Summary 刷新**:每阶段交接验证通过后刷新一次(`every: 1`)→ `.specify/archive/anchoring/post-refactor-mechanism-integrity/summary/`;门控顺序与状态行口径由 `skills/internal/create-team/SKILL.md` §Summary Refresh 持有。"
+    },
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 7,
+      "rule": "N-9",
+      "before": "  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/anchoring/post-refactor-mechanism-integrity/goal.md)。",
+      "after": "  承接已定义 Goal `post-refactor-mechanism-integrity`(权威定义:.specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md)。"
+    },
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 88,
+      "rule": "N-10",
+      "before": "    delivery_dir: .specify/goal/post-refactor-mechanism-integrity/summary/",
+      "after": "    delivery_dir: .specify/archive/anchoring/post-refactor-mechanism-integrity/summary/"
+    },
+    {
+      "path": ".specify/teams/post-refactor-mechanism-integrity/team.md",
+      "line": 98,
+      "rule": "N-9",
+      "before": "**权威定义**:`.specify/anchoring/post-refactor-mechanism-integrity/goal.md`(`anchor_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。",
+      "after": "**权威定义**:`.specify/archive/anchoring/post-refactor-mechanism-integrity/goal.md`(`anchor_slug` 引用,非内容副本)。终态与判据以定义为准;本文件不复述判据文本。可达成性分析(创建时):单团队短期可达成——工程切片 = 已设计 F1–F3(小改、单引擎文件),判据对账面可枚举。"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+约束违规（数据库拒绝写入）：phases(phase_id='command-logic-as-classified-skills.S1-extract-annotate')：phase_id='command-logic-as-classified-skills.S1-extract-annotate' 在本实体内重复 —— DDL 约束 PRIMARY KEY（同一实体不得两行同号）。

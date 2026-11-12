@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-12",
+  "unit": "T060",
+  "files_hashed": 185,
+  "non_noop_decisions": 0,
+  "changed_paths": [],
+  "hashes_identical": true,
+  "verdict": "ok",
+  "counts": {
+    "already-archived": 2,
+    "already-migrated": 3,
+    "already-normalized": 9
+  },
+  "self_checks": [
+    {
+      "name": "anchor-store-purity",
+      "ok": true,
+      "detail": "no goal.md remains in the Anchor store"
+    },
+    {
+      "name": "bindings-resolve",
+      "ok": true,
+      "detail": "every anchor_slug resolves"
+    },
+    {
+      "name": "receipts-complete",
+      "ok": true,
+      "detail": "every owed receipt is present"
+    },
+    {
+      "name": "orphan-summary",
+      "ok": true,
+      "detail": "no summary tree outlives its definition"
+    }
+  ],
+  "disposition_counts": {
+    "apply": 0,
+    "already-satisfied": 7
+  },
+  "note": "second apply recorded in cleanup-apply-2-wp04b-2026-11-12.json (0 non-noop decisions); this third verification run re-ran the same apply and the pre/post SHA-256 manifests are identical"
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "draw-two-layer-structure",
+  "bound_slug": "draw-two-layer-structure",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:56:05Z",
+  "lines": [
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 10,
+      "rule": "C-45",
+      "before": "goal_slug: draw-two-layer-structure",
+      "after": "anchor_slug: draw-two-layer-structure"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 112,
+      "rule": "N-1",
+      "before": "**权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 285,
+      "rule": "N-3",
+      "before": "                + summary 输入（.specify/goal/draw-two-layer-structure/summary/）",
+      "after": "                + summary 输入（.specify/anchoring/draw-two-layer-structure/summary/）"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 6,
+      "rule": "N-9",
+      "before": "  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/goal.md）。",
+      "after": "  承接已定义 Goal `draw-two-layer-structure`（权威定义：.specify/anchoring/draw-two-layer-structure/anchor.md）。"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 33,
+      "rule": "N-9",
+      "before": "    - .specify/goal/draw-two-layer-structure/goal.md   # authored：只经 /speckit.goal 的引擎渲染",
+      "after": "    - .specify/anchoring/draw-two-layer-structure/anchor.md   # authored：只经 /speckit.goal 的引擎渲染"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 102,
+      "rule": "N-10",
+      "before": "    delivery_dir: .specify/goal/draw-two-layer-structure/summary/",
+      "after": "    delivery_dir: .specify/anchoring/draw-two-layer-structure/summary/"
+    },
+    {
+      "path": ".specify/teams/draw-two-layer-structure/team.md",
+      "line": 112,
+      "rule": "N-9",
+      "before": "**权威定义**：`.specify/anchoring/draw-two-layer-structure/goal.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。",
+      "after": "**权威定义**：`.specify/anchoring/draw-two-layer-structure/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。"
+    }
+  ]
+}

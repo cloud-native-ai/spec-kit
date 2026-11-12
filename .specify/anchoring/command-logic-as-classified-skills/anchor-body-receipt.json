@@ -1,0 +1,18 @@
+{
+  "schema": "101-anchor-body-receipt/v1",
+  "action": "anchor-body-normalization",
+  "path": ".specify/anchoring/command-logic-as-classified-skills/anchor.md",
+  "concept_digest_before_normalization": "c98d81b0fc547168e5f312bebedb566de08c8ae69ad89b729566077d01fdd0e3",
+  "concept_digest_after_normalization": "c98d81b0fc547168e5f312bebedb566de08c8ae69ad89b729566077d01fdd0e3",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/anchoring/command-logic-as-classified-skills/anchor.md",
+      "line": 11,
+      "rule": "A-N-1",
+      "before": "# Goal: command-logic-as-classified-skills",
+      "after": "# Anchor: command-logic-as-classified-skills"
+    }
+  ]
+}

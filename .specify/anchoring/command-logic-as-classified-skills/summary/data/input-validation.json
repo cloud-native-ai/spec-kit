@@ -1,0 +1,348 @@
+{
+  "schema": "project-input/v1",
+  "db_schema_version": "project-db/v1",
+  "project": {
+    "project_name": "command-logic-as-classified-skills",
+    "project_desc": "spec-kit 的命令核心逻辑尽可能由技能承载 —— 命令模板只保留入口与委派,可执行的核心逻辑落在 skills/ 下的技能里;每个技能的元数据都带 internal 或 external 标注,标注如实表达它与 spec-kit 的依赖关系(internal:只服务 spec-kit 框架自身逻辑;external:与 spec-kit 无依赖,任何项目皆可直接使用),使后续按标注分流的处理有据可依",
+    "baseline_date": "2026-10-12",
+    "project_start": null,
+    "repos": []
+  },
+  "phases": [
+    {
+      "phase_id": "command-logic-as-classified-skills.S0-command-census",
+      "phase_name": "command-logic-as-classified-skills · S0 命令普查裁定",
+      "phase_order": 1
+    },
+    {
+      "phase_id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "phase_name": "command-logic-as-classified-skills · S1 提炼建技能并标注",
+      "phase_order": 2
+    },
+    {
+      "phase_id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "phase_name": "command-logic-as-classified-skills · S2a 契约齐备",
+      "phase_order": 3
+    },
+    {
+      "phase_id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "phase_name": "command-logic-as-classified-skills · S2b 结构对齐",
+      "phase_order": 4
+    },
+    {
+      "phase_id": "command-logic-as-classified-skills.S3-command-thinning",
+      "phase_name": "command-logic-as-classified-skills · S3 命令瘦身",
+      "phase_order": 5
+    }
+  ],
+  "work_items": [
+    {
+      "item_id": "command-logic-as-classified-skills.TI-0001",
+      "item_name": "S0 命令普查裁定(25 命令 × 5 批;20 新建行 + 5 维持行)",
+      "phase_id": "command-logic-as-classified-skills.S0-command-census",
+      "owner_id": "agent-stage-executor-template",
+      "status": "已完成",
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables",
+      "actual_start": "2026-10-09",
+      "actual_end": "2026-10-09"
+    },
+    {
+      "item_id": "command-logic-as-classified-skills.TI-0002",
+      "item_name": "S1 完成:20 技能包(17 新批 + 3 存量)落 skills/internal/ + 25 存量 SKILL.md 补 classification 标注",
+      "phase_id": "command-logic-as-classified-skills.S1-extract-annotate",
+      "owner_id": "agent-stage-executor-template",
+      "status": "已完成",
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1",
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0001"
+      ]
+    },
+    {
+      "item_id": "command-logic-as-classified-skills.TI-0003",
+      "item_name": "S2a 完成:46 技能契约齐备判定(45 pass/1 gap,archive-session 描述补丁落地)",
+      "phase_id": "command-logic-as-classified-skills.S2a-contract-conformance",
+      "owner_id": "agent-stage-executor-template",
+      "status": "已完成",
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a",
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0002"
+      ]
+    },
+    {
+      "item_id": "command-logic-as-classified-skills.TI-0004",
+      "item_name": "S2b 完成:46 技能结构对齐判定(8 补丁落地:draw-diagram 运行模式门/manage-agents×3/archive-session skill_id/improve-docs/git-workspace/pycache)",
+      "phase_id": "command-logic-as-classified-skills.S2b-structure-alignment",
+      "owner_id": "structure-adjuster",
+      "status": "已完成",
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b",
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0003"
+      ]
+    },
+    {
+      "item_id": "command-logic-as-classified-skills.TI-0005",
+      "item_name": "S3 完成:25 命令模板瘦身(净 −2368 行)+ 123 契约测试归因修复,终态 2051 passed/0 failed",
+      "phase_id": "command-logic-as-classified-skills.S3-command-thinning",
+      "owner_id": "agent-stage-executor-template",
+      "status": "已完成",
+      "source": ".specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3",
+      "actual_start": "2026-10-12",
+      "actual_end": "2026-10-12",
+      "depends_on": [
+        "command-logic-as-classified-skills.TI-0004"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "milestone_id": "MS-0001",
+      "milestone_name": "command 中只包含该调用哪些 skill 以及如何调用 skill,不包含具体的实现细节,所有的细节都在 skill 中",
+      "owner_id": null,
+      "status": null,
+      "source": ".specify/anchoring/command-logic-as-classified-skills/anchor.md",
+      "actual_date": "2026-10-12",
+      "anchor_item_id": "command-logic-as-classified-skills.TI-0005",
+      "achieved_evidence": "S3 判定 contract-checker PASS;终态契约测试 2051 passed / 0 failed;goal 判据咨询评估「已达成」(runs/20261012T115331Z-report.md,2026-10-12)"
+    }
+  ],
+  "people": [
+    {
+      "owner_id": "agent-team-supervisor-template",
+      "owner_name": "未记录",
+      "owner_role": "team-supervisor(serial Lead 与唯一 Meta 落盘者)"
+    },
+    {
+      "owner_id": "agent-stage-executor-template",
+      "owner_name": "未记录",
+      "owner_role": "skill-author(S0/S1/S2a/S3 产出者)"
+    },
+    {
+      "owner_id": "structure-adjuster",
+      "owner_name": "Structure Adjuster",
+      "owner_role": "structure-aligner(S2b 结构对齐)"
+    },
+    {
+      "owner_id": "agent-stage-evaluator-template",
+      "owner_name": "未记录",
+      "owner_role": "contract-checker(每次交接独立判定席)"
+    }
+  ],
+  "features": [],
+  "sources": [
+    {
+      "source_id": "S-0001",
+      "source_kind": "user-form",
+      "source_ref": ".specify/teams/command-logic-as-classified-skills/",
+      "covers": [
+        "people",
+        "phases",
+        "work_items"
+      ]
+    }
+  ],
+  "inferred_fields": [
+    {
+      "field": "people[agent-stage-evaluator-template].owner_role",
+      "inferred_value": null,
+      "inferred_from": "团队定义 members 声明（既有总结流先前版本同源）"
+    },
+    {
+      "field": "people[structure-adjuster].owner_role",
+      "inferred_value": null,
+      "inferred_from": "团队定义 members 声明（既有总结流先前版本同源）"
+    },
+    {
+      "field": "people[agent-stage-executor-template].owner_role",
+      "inferred_value": null,
+      "inferred_from": "团队定义 members 声明（既有总结流先前版本同源）"
+    },
+    {
+      "field": "people[agent-team-supervisor-template].owner_role",
+      "inferred_value": null,
+      "inferred_from": "团队定义 members 声明（既有总结流先前版本同源）"
+    },
+    {
+      "field": "milestones[MS-0001].milestone_name",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/command-logic-as-classified-skills/anchor.md §Success Criteria（生成器按 60 字符截断）"
+    },
+    {
+      "field": "milestones[MS-0001].achieved_evidence",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/command-logic-as-classified-skills/anchor.md §Success Criteria 与团队 runs 报告（既有总结流先前版本同源）"
+    },
+    {
+      "field": "milestones[MS-0001].actual_date",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/command-logic-as-classified-skills/anchor.md §Success Criteria 与团队 runs 报告（既有总结流先前版本同源）"
+    },
+    {
+      "field": "milestones[MS-0001].anchor_item_id",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/command-logic-as-classified-skills/anchor.md §Success Criteria 与团队 runs 报告（既有总结流先前版本同源）"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0005].depends_on",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0005].actual_end",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0005].actual_start",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0005].owner_id",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s3）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0004].depends_on",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0004].actual_end",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0004].actual_start",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0004].owner_id",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2b）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0003].depends_on",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0003].actual_end",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0003].actual_start",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0003].owner_id",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s2a）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0002].depends_on",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0002].actual_end",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0002].actual_start",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0002].owner_id",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261012T115331Z-report.md#s1）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0001].actual_end",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0001].actual_start",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables）与既有总结流先前版本"
+    },
+    {
+      "field": "work_items[command-logic-as-classified-skills.TI-0001].owner_id",
+      "inferred_value": null,
+      "inferred_from": "团队 runs 报告（.specify/teams/command-logic-as-classified-skills/runs/20261009T032057Z-report.md#deliverables）与既有总结流先前版本"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S3-command-thinning].phase_name",
+      "inferred_value": null,
+      "inferred_from": "团队条目台账 phase_ref 对应的既有阶段名（既有总结流先前版本）"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2b-structure-alignment].phase_name",
+      "inferred_value": null,
+      "inferred_from": "团队条目台账 phase_ref 对应的既有阶段名（既有总结流先前版本）"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2a-contract-conformance].phase_name",
+      "inferred_value": null,
+      "inferred_from": "团队条目台账 phase_ref 对应的既有阶段名（既有总结流先前版本）"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S1-extract-annotate].phase_name",
+      "inferred_value": null,
+      "inferred_from": "团队条目台账 phase_ref 对应的既有阶段名（既有总结流先前版本）"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S0-command-census].phase_name",
+      "inferred_value": null,
+      "inferred_from": "团队条目台账 phase_ref 对应的既有阶段名（既有总结流先前版本）"
+    },
+    {
+      "field": "project.project_desc",
+      "inferred_value": null,
+      "inferred_from": ".specify/anchoring/command-logic-as-classified-skills/anchor.md §Objective（既有总结流先前版本已按同源补填；生成器按 180 字符截断）"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S0-command-census].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S1-extract-annotate].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2a-contract-conformance].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S2b-structure-alignment].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    },
+    {
+      "field": "phases[command-logic-as-classified-skills.S3-command-thinning].source",
+      "inferred_value": ".specify/teams/command-logic-as-classified-skills/（user-form）",
+      "inferred_from": "条目未写来源，按 sources[] 声明推断"
+    }
+  ],
+  "coverage": {
+    "candidate_total": 5,
+    "excluded": 0,
+    "granularity_truncated": 0,
+    "unattributed": 0,
+    "source_label": "团队条目台账 items.jsonl"
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "command-logic-as-classified-skills",
+    "changes": [
+      "project.project_desc",
+      "phase:command-logic-as-classified-skills.S0-command-census",
+      "phase:command-logic-as-classified-skills.S1-extract-annotate",
+      "phase:command-logic-as-classified-skills.S2a-contract-conformance",
+      "phase:command-logic-as-classified-skills.S2b-structure-alignment",
+      "phase:command-logic-as-classified-skills.S3-command-thinning",
+      "item:command-logic-as-classified-skills.TI-0001.owner_id",
+      "item:command-logic-as-classified-skills.TI-0001.actual_start",
+      "item:command-logic-as-classified-skills.TI-0001.actual_end",
+      "item:command-logic-as-classified-skills.TI-0002.owner_id",
+      "item:command-logic-as-classified-skills.TI-0002.actual_start",
+      "item:command-logic-as-classified-skills.TI-0002.actual_end",
+      "item:command-logic-as-classified-skills.TI-0002.depends_on",
+      "item:command-logic-as-classified-skills.TI-0003.owner_id",
+      "item:command-logic-as-classified-skills.TI-0003.actual_start",
+      "item:command-logic-as-classified-skills.TI-0003.actual_end",
+      "item:command-logic-as-classified-skills.TI-0003.depends_on",
+      "item:command-logic-as-classified-skills.TI-0004.owner_id",
+      "item:command-logic-as-classified-skills.TI-0004.actual_start",
+      "item:command-logic-as-classified-skills.TI-0004.actual_end",
+      "item:command-logic-as-classified-skills.TI-0004.depends_on",
+      "item:command-logic-as-classified-skills.TI-0005.owner_id",
+      "item:command-logic-as-classified-skills.TI-0005.actual_start",
+      "item:command-logic-as-classified-skills.TI-0005.actual_end",
+      "item:command-logic-as-classified-skills.TI-0005.depends_on",
+      "ms:MS-0001.anchor_item_id",
+      "ms:MS-0001.actual_date",
+      "ms:MS-0001.achieved_evidence",
+      "ms:MS-0001.name",
+      "ms:MS-0001.criterion",
+      "person:agent-team-supervisor-template",
+      "person:agent-stage-executor-template",
+      "person:structure-adjuster",
+      "person:agent-stage-evaluator-template"
+    ]
+  },
+  {
+    "slug": "session-driven-self-improvement",
+    "changes": [
+      "ms:MS-0001.criterion"
+    ]
+  },
+  {
+    "slug": "skill-layer-install-separation",
+    "changes": [
+      "ms:MS-0001.criterion",
+      "ms:MS-0002.criterion",
+      "ms:MS-0003.target=T-001",
+      "ms:MS-0004.target=T-002",
+      "ms:MS-0005.target=T-003",
+      "ms:MS-0006.target=T-004"
+    ]
+  }
+]

@@ -4,12 +4,11 @@ slug: 085-sdd-temporary-goal-team
 description: Run-scoped SDD team for Feature 085 — stage-specific agents, explicit concurrency, per-agent worktrees and checkpoints.
 scope: spec
 spec_dir: .specify/specs/085-sdd-temporary-goal-team
-lifecycle_state: active
+lifecycle_state: archived
 goal: >-
   Deliver Feature 085 through the full SDD chain: a spec-local spec-scoped Goal and team, stage-specific agents,
   explicit concurrency (default 24), per-agent worktrees with an integration queue, and stage checkpoints
   that propose at most one evidence-driven configuration change.
-goal_slug: 085-sdd-temporary-goal-team
 territory:
   write:
     - .specify/specs/085-sdd-temporary-goal-team/**

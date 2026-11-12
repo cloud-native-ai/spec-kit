@@ -6,13 +6,13 @@ description: >
   在框架源码中建立一套 improve 流程；交付物是定义类文件，故 Worker 只产补丁到工作区，
   canonical 落盘由唯一 Meta supervisor 执行，每次交接有独立验证门
 goal: >
-  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/goal.md）。
+  承接已定义 Goal `session-driven-self-improvement`（权威定义：.specify/anchoring/session-driven-self-improvement/anchor.md）。
   本字段仅为可读性渲染，与定义不一致时以定义为准。终态：框架中有一套 improve 流程，含两个方面 ——
   主动触发（通过 improve 命令）与被动触发（通过运行判定的结果触发 feedback 流程）。
   成功判据以定义为准，本团队不复述其文本；其主体是「一套新的运行判定，统一 token 消耗、耗时、
   正确性与满意度四个量」。本目标只**建立**该流程，不**进行**提升 —— 提升的发生由流程建成后的
   日常运行承载，不是本团队的交付物。
-goal_slug: session-driven-self-improvement
+anchor_slug: session-driven-self-improvement
 territory:
   write:
     - templates/commands/improve.md                # S4 主动触发入口（尚不存在，本团队创建）
@@ -37,7 +37,7 @@ territory:
     - .specify/shared/**                           # 运行时镜像，只读
     - .specify/agents/**
   forbidden:
-    - .specify/goal/session-driven-self-improvement/goal.md   # authored：只经 /speckit.goal 的引擎渲染
+    - .specify/anchoring/session-driven-self-improvement/anchor.md   # authored：只经 /speckit.goal 的引擎渲染
     - .specify/shared/**                           # 镜像：由 sync-mirrors 生成，不手改
     - .specify/templates/**                        # 镜像：同上
     - .specify/scripts/**                          # 镜像：同上
@@ -166,7 +166,7 @@ config:
   summary:
     enabled: true
     every: 1
-    delivery_dir: .specify/goal/session-driven-self-improvement/summary/
+    delivery_dir: .specify/anchoring/session-driven-self-improvement/summary/
     interactive: false
 binding:
   owner: human
@@ -176,13 +176,13 @@ binding:
 
 ## Goal
 
-**权威定义**：`.specify/anchoring/session-driven-self-improvement/goal.md`（`goal_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
+**权威定义**：`.specify/anchoring/session-driven-self-improvement/anchor.md`（`anchor_slug` 引用，非内容副本）。以下为本团队视角的渲染，与定义冲突时以定义为准。
 
 终态是框架中有一套 improve 流程，含两个方面：**主动触发**（通过 improve 命令）与**被动触发**（通过运行判定的结果触发 feedback 流程）。本目标只**建立**该流程，不**进行**提升。
 
 ### 本团队承接的四项细节（D9）
 
-这四项在 `/speckit.goal` 收窄终态时被刻意从 `## Objective` 移出（决策 D9，账本：`.specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.md`），由本团队承接。D1 全文仍逐字保存在 goal.md 的 `## History`，但那是 dated record，不作为当前现实被引用 —— 故在此落为团队的可执行输入。
+这四项在 `/speckit.anchor` 收窄终态时被刻意从 `## Objective` 移出（决策 D9，账本：`.specify/memory/session/2026-10-05-goal-session-driven-self-improvement-interview.md`），由本团队承接。D1 全文仍逐字保存在 goal.md 的 `## History`，但那是 dated record，不作为当前现实被引用 —— 故在此落为团队的可执行输入。
 
 1. **证据来源（三个）** — Session 历史记录（`.specify/memory/session/`）、用户输入、大语言模型调查结论（`.specify/memory/evidence/`，106 文件，MUST 走摘要/字段投影）。三者是运行判定的读取面，由 S1 契约规定各自口径。
 2. **主动流程的内部形状 why → what → how** — why：当前的问题是什么（如 token 消耗过多、耗时过长、问题没有解决、用户不满意），即为什么要触发自我提升，由 session 历史获取；what：需要进行哪些提升，分析哪些方面需要提升；how：该如何进行提升 —— 分析问题、探索思路、实施改造。**这三段是主动 improve 流程自身的内部结构，不是本团队的 stage 计划，也不是 Goal 的 Target**（D3 裁定：阶段不进 Goal，`goal-definitions.md` 属性 2 不改）。本团队的 stage 是「建立这套流程」的工序，与流程内部的三段不同轴。
@@ -283,7 +283,7 @@ graph LR
 
 **Progress**：`.specify/teams/.work/session-driven-self-improvement/progress.md`（stage 表 + Handoff Log）。跨 session 续跑时先解析该表，从第一个未完成 stage 继续。
 
-**Summary 边界**：每个 stage 交接验证通过后刷新 goal summary，交付目录 `.specify/goal/session-driven-self-improvement/summary/`（由 `goal_slug` 派生，不由团队 slug 派生）；门序为 Budget → Cadence → Material → Overlap，两次交接紧邻时合并为一次刷新；有界 pattern 默认 `every: 1`。首次刷新需声明 summary 机制已激活及其生效 cadence。
+**Summary 边界**：每个 stage 交接验证通过后刷新 goal summary，交付目录 `.specify/anchoring/session-driven-self-improvement/summary/`（由 `anchor_slug` 派生，不由团队 slug 派生）；门序为 Budget → Cadence → Material → Overlap，两次交接紧邻时合并为一次刷新；有界 pattern 默认 `every: 1`。首次刷新需声明 summary 机制已激活及其生效 cadence。
 
 ## Self-Improvement Contract
 

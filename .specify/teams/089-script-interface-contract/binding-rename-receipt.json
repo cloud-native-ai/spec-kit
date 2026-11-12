@@ -1,0 +1,16 @@
+{
+  "schema": "101-binding-rename-receipt/v1",
+  "team_slug": "089-script-interface-contract",
+  "bound_slug": "script-interface-contract",
+  "engine": "goal-utils.py 0.0.22",
+  "timestamp": "2026-11-12T11:41:01Z",
+  "lines": [
+    {
+      "path": ".specify/teams/089-script-interface-contract/team.md",
+      "line": 13,
+      "rule": "C-45",
+      "before": "goal_slug: script-interface-contract",
+      "after": "anchor_slug: script-interface-contract"
+    }
+  ]
+}

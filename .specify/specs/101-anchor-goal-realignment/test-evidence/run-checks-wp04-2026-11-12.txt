@@ -1,0 +1,22 @@
+# goal-utils.py run-checks <team> --json — WP-04 post-apply readings (read-only)
+# verdict/blocked/rc; SC-005 expectation: bound teams ok/false; R3 archived teams no-goal-definition/false, rc 0
+085-sdd-temporary-goal-team: verdict=no-goal-definition blocked=False rc=0
+086-efficient-test-execution: verdict=ok blocked=False rc=0
+087-arch-diagram-docs: verdict=goal-terminal blocked=True rc=5
+088-reporting-dogfood: verdict=no-goal-definition blocked=False rc=0
+089-script-interface-contract: verdict=ok blocked=False rc=0
+090-re-anchoring: verdict=ok blocked=False rc=0
+091-auto-git-closeout: verdict=no-goal-definition blocked=False rc=0
+094-goal-team-parallel: verdict=ok blocked=False rc=0
+command-logic-as-classified-skills: verdict=ok blocked=False rc=0
+cws-workspace-cluster: verdict=no-goal-definition blocked=False rc=0
+demo-seat-dispatch: verdict=no-goal-definition blocked=False rc=0
+draw-diagram-interactive: verdict=no-goal-definition blocked=False rc=0
+draw-plantuml-optimizer: verdict=no-goal-definition blocked=False rc=0
+draw-two-layer-structure: verdict=goal-terminal blocked=True rc=5
+post-refactor-mechanism-integrity: verdict=no-goal-definition blocked=False rc=0
+requirement-implement-monitor: verdict=no-goal-definition blocked=False rc=0
+session-driven-self-improvement: verdict=goal-terminal blocked=True rc=5
+skill-layer-install-separation: verdict=goal-terminal blocked=True rc=5
+summarize-project-optimizer: verdict=no-goal-definition blocked=False rc=0
+viz-skill-arena: verdict=ok blocked=False rc=0
