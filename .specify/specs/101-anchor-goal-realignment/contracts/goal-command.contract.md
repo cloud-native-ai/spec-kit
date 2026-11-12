@@ -63,6 +63,12 @@ No command path may make a Goal resolvable through `anchor_slug`: the engine's t
 resolution reads the anchor store only (FR-023). A team declaring a Goal slug gets a named failure
 from `run-checks`; the disposition step never repoints a binding to a Goal.
 
+A Goal carries **no Anchor pointer**: its schema declares no `anchor_ref` (nor any key naming an
+Anchor), and an undeclared key is rejected by the engine's declared-option guard (exit 2, C-34).
+The only cross-reference a Goal records is its binding `origin` — the source spec directory. A Goal
+is never team-bound, sits outside the control hierarchy, and does not replace the SDD spec / plan /
+tasks artifacts; Anchors bind teams, Goals guide action (FR-004, FR-023).
+
 ## C-21 — Wrap-up and registration
 
 The `/speckit.goal` probe object and binding are **retained** (unit-id unchanged); the compiled

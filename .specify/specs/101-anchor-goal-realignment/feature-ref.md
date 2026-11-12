@@ -49,14 +49,14 @@ new surface and needs a plan revision.
 
 | SC | Sensor | Reading (plan-time) | Artifact |
 |----|--------|--------------------|----------|
-| SC-001 | `tests/contract/test_live_semantic_residue.py` over the roots declared in `research.md` §5 | C1 4 · C2 0 · C3 7 · C4 15 · total 26 | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt` |
+| SC-001 | `tests/contract/test_live_semantic_residue.py` over the roots declared in `research.md` §5 | C1 4 · C2 0 · C3 7 · C4 15 · total 26; C5 16 (11 in the 9 retained anchors) · C6 40 · C7 3 | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt`; `test-evidence/checklist-repair-residue-baseline-2026-11-12.txt` |
 | SC-002 | Template `argument-hint` parse + subprocess refusal probes | both templates today carry the old surface (expected) | contract tests C-1/C-14 |
 | SC-003 | `classification.json` + `cleanup --check` enumeration | 9 anchor / 3 action-goal / 2 obsolete across 14 entries | `classification.json`; `research.md` §3 |
 | SC-004 | Receipts + digest equality + protected-path hashes | no receipts exist yet (nothing migrated) | `test-evidence/plan-baseline-*` (pre) |
-| SC-005 | `team.md` frontmatter scan + `run-checks` per team | 16 bound / 4 unbound; 2 dangling (`viz-skill-arena`, `demo-seat-dispatch`) | `classification.json` `teams`; `research.md` §4 |
+| SC-005 | `team.md` frontmatter scan + `run-checks --json` per team | 16 bound / 4 unbound; 2 dangling (`viz-skill-arena`, `demo-seat-dispatch`); measured `089` → `ok/false` (①②–④=not-evaluated), `091` → `ok/false`, `demo` → `no-goal-definition/false` | `classification.json` `teams`; `research.md` §4 |
 | SC-006 | Static write-surface audit + two-writer fixture | engine is sole writer today | `contracts/goal-engine.contract.md` C-31 |
 | SC-007 | Two applies + one interruption injection on a fixture | n/a before implement | `contracts/migration-cleanup.contract.md` C-41/C-42 |
-| SC-008 | File existence, `flow-class-check.py`, probe compile, docs build | flow-class clean (89 units); **docs build fails** (Hugo exit 1, EP-006) | `test-evidence/plan-baseline-*`; EP-006 |
+| SC-008 | File existence, `flow-class-check.py`, probe compile, docs build | flow-class clean (89 units); **docs build fails** (Hugo exit 1, EP-006) → limb reports `not-evaluated` | `test-evidence/plan-baseline-*`; EP-006 |
 | SC-009 | `git hash-object` set vs `d7c9da7a3` | protected roots equal at plan entry | `test-evidence/plan-baseline-*` |
 | SC-010 | Reader restatement record | not evaluated at plan time | `research.md` §7 |
 
@@ -84,12 +84,24 @@ feature (`.Site.Language.Locale`); it reports `not-evaluated` rather than a fabr
 | R-15 | `list` is not given a team-reading surface: `--scope teams list` exits 2 `scope-not-applicable`, and today's `list` ignoring `--scope` is recorded as measured rather than "fixed" | `contracts/goal-engine.contract.md` C-27 |
 | R-16 | The `.specify/archive/**` equality assertion covers **baseline-existing entries**; the new `.specify/archive/anchoring/**` subtree is an addition evidenced by receipts | PLAN-EDIT 4; C-49; G-8 |
 
+**Checklist-round-1 rulings (F-1…F-11, 2026-11-12; detail in `notes/checklist-repair.md`)**
+
+| ID | Ruling | Where |
+|----|--------|-------|
+| R-17 | Retained anchors get a **declared body normalization** after the rename: A-N-1…A-N-4, per-line `anchor-body-receipt.json`, digest computed through the same mapping | C-38; C-39; C-44 P1; FR-005 / FR-038 |
+| R-18 | `.specify/features.md` is a live root (class C7); `.specify/features/**/*.md` is a recorded exclusion — delivery records, corrected by dated successor note, never rewritten | `research.md` §5; WP-03 |
+| R-19 | Idempotency is three conditions (target + receipt + digest equality); a mismatch is exit 4 `conflict` | FR-043; C-41; SC-007 |
+| R-20 | R3 terminal state = archived + binding removed + `disposition-receipt.json`; `091-auto-git-closeout` is corrected from `already-satisfied` to `apply` | FR-046; C-47; `classification.json` |
+| R-21 | SC-005 reads `run-checks` per team instead of demanding "five checks pass": bound teams must read `ok/false`, R3 teams `no-goal-definition/false` (expected terminal state, never recorded as a pass) | SC-005; C-47 |
+| R-22 | Engine user-facing strings and the `run-checks` JSON key are in scope: hints → `/speckit.anchor`, key → `anchor_slug` (class C6) | FR-016; C-26; C-33 |
+
 **Plan-stage corrections to requirements (declared, four):** (1–3) FR-011 / FR-028 / SC-006 scope the
 single-writer invariant to **definition files** and name `summary/**` as a derived exception — forced by a
 pre-existing writer (`build-summary-input.py`) that no requirement had accounted for; (4) FR-061 / SC-009
 scope the `.specify/archive/**` byte-equality to **baseline-existing entries**, because FR-041 mandates
 creating the new `.specify/archive/anchoring/**` subtree in the same change. Requirements were re-validated
-after each (`0 error / 0 warning`).
+after each (`0 error / 0 warning`). The checklist repair added no FR/SC count change (71 / 10 / 8); its
+edits are the R-17…R-22 rulings above and the § Checklist-round-1 corrections block in `requirements.md`.
 
 **Not evaluated at plan time** (reported, never assumed): SC-010 reader restatement; SC-007 idempotency
 (the mechanism does not exist yet); SC-004 receipts.

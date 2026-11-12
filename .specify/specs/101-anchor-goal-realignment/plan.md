@@ -19,7 +19,9 @@ four-member set, and two new action groups appear (action-level Goal, and an ind
 
 The technical approach is deliberately conservative: zero new dependencies, zero new binaries, zero
 deletions, and every dated record byte-identical to `d7c9da7a3`. Convergence is made decidable by a
-measured residue baseline (26 line-hits today) and by contract tests that turn red on the old semantics.
+measured residue baseline (C1–C4 = 26 line-hits; C5 = 16 lines, 11 of them in the 9 retained anchors;
+C6 = 40 line-hits; C7 = 3 index rows — `research.md` §5) and by contract tests that turn red on the old
+semantics.
 
 ## Technical Context
 
@@ -295,13 +297,17 @@ baseline. Its load-bearing outputs:
 2. **Classification** — 14 rows decided at plan with rule id and evidence; the deviation from the A-5
    provisional baseline is **none** (9 anchor / 3 action-goal / 2 obsolete; Targets ledger recorded).
    `classification.json` is the machine-readable carrier and the engine's only classification input.
-3. **Team dispositions** — R3 for `088-reporting-dogfood`, `085-sdd-temporary-goal-team`,
-   `post-refactor-mechanism-integrity`, `draw-diagram-interactive`, `demo-seat-dispatch`;
-   R3-already-satisfied for `091-auto-git-closeout`; **R2** for `viz-skill-arena` (create
-   `visualization-skill-selection` through the engine `migrate` action). No team qualifies for R1.
+3. **Team dispositions** — R3 for `088-reporting-dogfood`, `091-auto-git-closeout`,
+   `085-sdd-temporary-goal-team`, `post-refactor-mechanism-integrity`, `draw-diagram-interactive`,
+   `demo-seat-dispatch`; **R2** for `viz-skill-arena` (create `visualization-skill-selection` through
+   the engine `migrate` action). No team qualifies for R1. `091-auto-git-closeout` was first recorded
+   `already-satisfied`; the checklist repair corrected it to `apply` — it already carries
+   `lifecycle_state: archived` but still carries its binding line and has no receipt, and R3's terminal
+   state (archived + binding removed + `disposition-receipt.json`) is what the criterion reads.
 4. **Live-surface roots** — the SC-001 declaration (directories, files, closed exclusion list) and the
-   class definitions C1–C4 with the narrowed baseline patterns; baseline reading
-   `C1 4 · C2 0 · C3 7 · C4 15 · total 26`.
+   class definitions C1–C7 with the narrowed baseline patterns; baseline readings
+   `C1 4 · C2 0 · C3 7 · C4 15 · total 26`, plus `C5 16 / C6 40 / C7 3` from the checklist repair
+   (`test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`).
 5. **Rulings R-01…R-15** — each gap the research found and the reading it closed it with (mirrored in
    `feature-ref.md` §5).
 6. **Not evaluated** — SC-010 reader restatement, SC-007 idempotency, SC-004 receipts: the mechanisms do
@@ -313,6 +319,11 @@ Four requirements corrections were made at this stage and are declared in `requi
 `.specify/archive/**` equality assertion to **baseline-existing entries**, because FR-041 mandates creating
 the new `.specify/archive/anchoring/**` subtree in the same change. Validator re-run: 0 error / 0 warning.
 
+The checklist gate's round-1 repair then closed eleven findings (F-1…F-11) across requirements, contracts,
+data model, research, tasks and `classification.json`; each resolution, its owner and its evidence are
+recorded in `notes/checklist-repair.md`, and the affected requirement edits appear in `requirements.md`
+§ Checklist-round-1 corrections.
+
 ## Decomposition & Ceiling
 
 Six work packages, ordered by dependency. Each names its scope, inputs, outputs, write territory and the
@@ -320,10 +331,10 @@ fence it obeys. Territories are **file-level** where two packages share a direct
 
 | WP | Scope | Inputs | Outputs | Write territory | Depends on |
 |----|-------|--------|---------|-----------------|-----------|
-| **WP-01** | Concept owners + engine | FR-001…FR-009, FR-028…FR-034; `contracts/goal-engine.contract.md`; T-001/T-004 | `anchor-definitions.md` (new), `goal-definitions.md` (rewritten), engine layer parameter + two action groups + four-member `--scope`, consumer updates | `shared/definitions/anchor-definitions.md`, `shared/definitions/goal-definitions.md`, `scripts/python/goal-utils.py`, `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`, `skills/external/sdd-project-setup/scripts/logical-framework.py`, `skills/external/sdd-house-keeping/scripts/logical-framework.py`, `skills/internal/create-team/scripts/build-summary-input.py`, `src/specify_cli/__init__.py`, + their `.specify/` mirrors | — |
+| **WP-01** | Concept owners + engine | FR-001…FR-009, FR-028…FR-034; `contracts/goal-engine.contract.md`; T-001/T-004 | `anchor-definitions.md` (new), `goal-definitions.md` (rewritten), engine layer parameter + two action groups + four-member `--scope`, engine user-facing hints repointed to `/speckit.anchor` and `run-checks` JSON key `anchor_slug`, consumer updates | `shared/definitions/anchor-definitions.md`, `shared/definitions/goal-definitions.md`, `scripts/python/goal-utils.py`, `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`, `skills/external/sdd-project-setup/scripts/logical-framework.py`, `skills/external/sdd-house-keeping/scripts/logical-framework.py`, `skills/internal/create-team/scripts/build-summary-input.py`, `src/specify_cli/__init__.py`, + their `.specify/` mirrors | — |
 | **WP-02** | Command surface | FR-010…FR-027; `contracts/anchor-command.contract.md`; `contracts/goal-command.contract.md` | `templates/commands/anchor.md` (new), `goal.md` (rewritten), `manage-anchor` skill (new), `manage-goal` skill (rewritten), four per-tool copies, two reference pages | `templates/commands/anchor.md`, `templates/commands/goal.md`, `skills/internal/manage-anchor/**`, `skills/internal/manage-goal/**`, the four per-tool copy directories, `docs/reference/commands/anchor.md`, `docs/reference/commands/goal.md`, + mirrors | WP-01 (mode semantics) |
-| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping}/**`, `skills/internal/{create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, + mirrors | WP-01, WP-02 |
-| **WP-04** | Cleanup, migration, dispositions | FR-035…FR-049; `classification.json`; `contracts/migration-cleanup.contract.md`; T-003 | 9 renames, 3 migrations, 2 archival moves with receipts, 16 structural renames, body normalization, 6 R3 dispositions + 1 R2 anchor | `.specify/anchoring/**`, `.specify/goals/**` (new), `.specify/archive/anchoring/**`, `.specify/teams/*/team.md` + receipt files, no other file | WP-01 (engine actions) |
+| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials, and the three live feature-index rows (C7: 027 / 041 / 094) plus the 094 detail-page successor note | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping}/**`, `skills/internal/{create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, `.specify/features.md` (three rows), `.specify/features/094-goal-team-parallel.md` (successor note only), + mirrors | WP-01, WP-02 |
+| **WP-04** | Cleanup, migration, dispositions | FR-035…FR-049; `classification.json`; `contracts/migration-cleanup.contract.md`; T-003 | 9 renames + anchor body normalization (A-N-1…A-N-4), 3 migrations, 2 archival moves with receipts, 16 structural renames, team body normalization, 6 R3 dispositions + 1 R2 anchor | `.specify/anchoring/**`, `.specify/goals/**` (new), `.specify/archive/anchoring/**`, `.specify/teams/*/team.md` + receipt files, no other file | WP-01 (engine actions) |
 | **WP-05** | Guards and evidence | FR-061…FR-071; `contracts/` C-31/C-41/C-49 | contract guards per class, migration/idempotency/resume suite, protected-path guard, convergence integration test, fixtures, all readings | `tests/contract/**`, `tests/integration/**`, `tests/fixtures/anchor-goal-realignment/**`, `test-evidence/**` of this spec | WP-01…WP-04 |
 | **WP-06** | Registry and close | FR-071; `feature-ref.md` | registry row + feature detail status, cross-references, final readings | `.specify/features.md`, `.specify/features/101-anchor-goal-realignment.md` | WP-05 |
 
@@ -358,8 +369,8 @@ tree where the subject is fine" is not evidence.
 | G-2 | Goal command surface + refusal | `tests/contract/test_goal_command_surface.py` | modes ≠ 4; an Anchor-only mode is accepted, or refused without the literal `anchor-only-mode` naming `/speckit.anchor`; a refusal writes anything |
 | G-3 | Store purity | `tests/contract/test_anchor_definitions.py` | any `.specify/anchoring/*/` lacks `anchor.md`; an entry classified `action-goal` is still there |
 | G-4 | Single writer + two-writer simulation | `tests/contract/test_goal_store_write_boundary.py` | any non-engine code path writes either definition store; two simulated writers on different slugs land on one path |
-| G-5 | Binding completeness | `tests/contract/test_binding_rename.py` | any live `team.md` contains `goal_slug`; any `anchor_slug` fails to resolve; an affected team has no disposition record; the two dangling bindings are unresolved |
-| G-6 | Live-semantic residue | `tests/contract/test_live_semantic_residue.py` | C1/C3/C4 counts ≠ 0 over the declared roots; the injection case does not turn the scan red |
+| G-5 | Binding completeness | `tests/contract/test_binding_rename.py` | any live `team.md` contains `goal_slug`; any `anchor_slug` fails to resolve; an affected team has no disposition record; the two dangling bindings are unresolved; an R3 team still carries a binding line or lacks `disposition-receipt.json` |
+| G-6 | Live-semantic residue | `tests/contract/test_live_semantic_residue.py` | any declared class C1–C7 counts ≠ 0 over the declared roots (`C5` scoped to the anchor store, `C6` mode pointers, `C7` the feature index); the injection case does not turn the scan red |
 | G-7 | Migration semantics | `tests/contract/test_cleanup_idempotency.py`, `tests/contract/test_cleanup_resume.py` | a second apply adds a diff or a receipt; digest mismatch passes; a dropped Target passes; I5 is silently repaired; a receipt-less deletion exists |
 | G-8 | Protected history | `tests/integration/test_101_protected_paths.py` | any **baseline-existing** protected path's `hash-object` differs from `d7c9da7a3`, or one is deleted (run at implement entry **and** at close); additions under `.specify/archive/anchoring/**` are listed separately and are not failures |
 | G-9 | Convergence | `tests/integration/test_101_convergence.py` | on a fixture tree: an action-level entry left in the anchor store, a `goal_slug` survivor, or a dangling `anchor_slug` |
@@ -386,9 +397,13 @@ The executable contract is `contracts/migration-cleanup.contract.md`; this secti
 - **Input**: `classification.json` (14 entries, 7 team dispositions, `mapping_version: 101-mapping-v1`),
   read verbatim; the engine validates schema, class/rule pairs, `mapping_version` and completeness against
   the live directory listing before any write (C-36).
-- **Phases (P1→P8)**: anchor renames → Goal migrations + obsolete archival (with receipts) → R2 Anchor
-  creation → summary moves → team structural rename (one line per file) → body normalization (declared
-  table N-1…N-6, per-line receipts) → R3 dispositions → self-checks. Each phase is per-entry resumable.
+- **Phases (P1→P8)**: anchor renames **+ declared anchor body normalization (A-N-1…A-N-4,
+  `anchor-body-receipt.json`)** → Goal migrations + obsolete archival (with receipts) → R2 Anchor
+  creation → summary moves → team structural rename (one line per file) → team body normalization
+  (declared table N-1…N-6, per-line receipts) → R3 dispositions → self-checks. Each phase is
+  per-entry resumable. The anchor rename carries the byte-identity assertion; the normalization that
+  follows it is a separate declared rewrite with its own per-line receipt, which is what keeps both
+  "rename only" and "the archive speaks Anchor" true at once.
 - **Zero-loss evidence**: one JSON receipt per acted entry co-located with the target, carrying source and
   target paths, the concept digest computed through the declared mapping (equal before/after), engine
   identity, result identity, `delete_policy: archive-not-delete` (C-38…C-40).

@@ -23,7 +23,7 @@
   ],
   "teams": [
     {"slug": "088-reporting-dogfood", "bound_slug": "088-speckit-visualization", "disposition": "R3", "state": "apply", "reason": "one-off dogfood proof; no covering Anchor; theme fails FR-036(c)"},
-    {"slug": "091-auto-git-closeout", "bound_slug": "091-auto-git-closeout", "disposition": "R3", "state": "already-satisfied", "reason": "team.md already carries lifecycle_state: archived"},
+    {"slug": "091-auto-git-closeout", "bound_slug": "091-auto-git-closeout", "disposition": "R3", "state": "apply", "reason": "team.md already carries lifecycle_state: archived but still carries its goal_slug binding and has no disposition receipt; R3 terminal state (archived + binding removed + disposition-receipt.json) is not yet met"},
     {"slug": "085-sdd-temporary-goal-team", "bound_slug": "085-sdd-temporary-goal-team", "disposition": "R3", "state": "apply", "reason": "spec-scoped team of a delivered feature under a superseded model"},
     {"slug": "post-refactor-mechanism-integrity", "bound_slug": "post-refactor-mechanism-integrity", "disposition": "R3", "state": "apply", "reason": "verification chain keyed to an achieved one-off entry"},
     {"slug": "draw-diagram-interactive", "bound_slug": "draw-diagram-interactive", "disposition": "R3", "state": "apply", "reason": "bounded iteration over one skill; no covering Anchor; theme fails FR-036(c)"},

@@ -183,8 +183,8 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **FR-001**: 框架 MUST 把 **Anchor（锚点）** 定义为**项目级、长周期、跨交付物持续追求**的远期目标（authored end state），并在 `.specify/shared/definitions/anchor-definitions.md` 建立其唯一 owner。
 - **FR-002**: Anchor owner MUST 在同一处承载 Anchor 的构成（目标叙述 + 可验证成功判据 + 生命周期）、它的档案层与定义文件 [[STR-001]]、**共享绑定记录与生命周期表的唯一 owner**、Target 分解与 Anchor–Team 绑定；其他面（含 Goal owner）MUST 只按路径引用，MUST NOT 复述这些事实。
 - **FR-003**: 框架 MUST 把 **Goal（目标）** 重新定义为**行动级、短周期、可执行的实际指导**，并把 `.specify/shared/definitions/goal-definitions.md` 重写为它的唯一 owner。
-- **FR-004**: Goal owner MUST 定义 Goal 的构成（指导叙述——MAY 是步骤形；至少一条可验证的完成条件；生命周期）、存档 [[STR-002]] 与身份文法，并按路径引用 FR-002 的绑定记录与生命周期 owner；它 MUST NOT 复述三键或生命周期表，MUST NOT 定义 Targets、团队绑定、coordinate 或任何控制层级位置。
-- **FR-005**: 任何活文档 MUST NOT 保留与本规格 FR-001 / FR-003 相反的定义；"a Goal is a project-level end state"及其等价中文表述 MUST 从全部活面消失。
+- **FR-004**: Goal owner MUST 定义 Goal 的构成（指导叙述——MAY 是步骤形；至少一条可验证的完成条件；生命周期）、存档 [[STR-002]] 与身份文法，并按路径引用 FR-002 的绑定记录与生命周期 owner；它 MUST NOT 复述三键或生命周期表，MUST NOT 定义 Targets、团队绑定、coordinate 或任何控制层级位置。Goal MUST NOT 携带任何指向 Anchor 的指针：其 schema MUST NOT 声明 `anchor_ref`（或任何以 Anchor 命名的键），未声明键 MUST 按 FR-034 的接口契约以 exit 2 拒绝；两者唯一允许的交叉引用是绑定记录 `origin` 中的来源 spec 目录。Goal 与 SDD 的关系 MUST 为并列而非从属：spec/plan/tasks 承载交付物设计，Goal 只承载行动级指导，二者互不解析彼此身份。
+- **FR-005**: 任何活文档 MUST NOT 保留与本规格 FR-001 / FR-003 相反的定义；"a Goal is a project-level end state"及其等价中文表述 MUST 从全部活面消失。判为 `anchor` 的既有定义本身就是活面：其 `# Goal:` 标题与正文中的退役 `.specify/goal|teams` 引用 MUST 按 FR-038 的声明式正文归一化改写，MUST NOT 以"只改名"为由保留旧措辞；日期化记录按 FR-018 / FR-061 保持原字节。
 - **FR-006**: 现有 `goal-definitions.md` 中描述项目级概念的内容 MUST 以**保留 git 历史的方式**移入 Anchor owner；该文件随后 MUST 被重写为 Goal owner；两个概念的正文 MUST NOT 在仓内留下第二份副本。
 - **FR-007**: Anchor 身份 MUST 为 `.specify/anchoring/` 下的目录 slug（`anchor-slug`），其定义文件 MUST 为 `anchor.md`（由 `goal.md` 改名，[[STR-001]]）；Goal 身份 MUST 为 `.specify/goals/` 下的目录 slug（`goal-slug`），其定义文件 MUST 为 `goal.md`（[[STR-002]]）。
 - **FR-008**: 两个概念 MUST 复用同一套生命周期取值 `active` / `achieved` / `abandoned` 与同一条三键绑定记录（`owner` / `owner_id` / `origin`）；MUST NOT 引入第二套生命周期或第二份 schema。
@@ -192,23 +192,23 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 
 #### B. Anchor command surface
 
-- **FR-010**: `/speckit.anchor` MUST 由 canonical `templates/commands/anchor.md` 交付，并 MUST 恰好暴露从旧 `/speckit.goal` 继承的七模式：`create` / `view` / `modify` / `targets` / `migrate` / `migrate-archive` / `coordinate`。
+- **FR-010**: `/speckit.anchor` MUST 由 canonical `templates/commands/anchor.md` 交付，并 MUST 恰好暴露从旧 `/speckit.goal` 继承的七模式：`create` / `view` / `modify` / `targets` / `migrate` / `migrate-archive` / `coordinate`；`modify` 清空目标叙述或成功判据 MUST 要求显式用户批准，MUST NOT 静默清空。
 - **FR-011**: `/speckit.anchor` MUST 是锚点档案的唯一撰写入口；除引擎外，任何命令、技能、脚本或运行 MUST NOT 写入 `.specify/anchoring/**` 的定义文件（`anchor.md`）；派生的 `summary/**` 由既有总结流刷新（FR-038），不属于定义撰写面。
 - **FR-012**: 命令 MUST 把七模式语义委派给名字与 Anchor 概念一致的技能（`manage-anchor`）；模板 MUST 只保留入口、用户输入处理、glossary 前置与 wrap-up，MUST NOT 复述技能的模式表。
 - **FR-013**: 命令 MUST 经既有镜像模型交付（canonical 模板 → `.specify/` 镜像 → 各受支持工具的命令副本），其参考页 MUST 为 `docs/reference/commands/anchor.md`；MUST NOT 手写任何副本。
 - **FR-014**: `/speckit.anchor` MUST 在探针登记处拥有一个 wrap-up 探针对象与绑定，并以 `/speckit.anchor` 为 unit-id 把 run determination / exec quant / feedback / docs-sync 编译进模板。
 - **FR-015**: `targets` 与 `coordinate` MUST 作用于 Anchor 的 Targets 与绑定该 Anchor 的团队；`migrate` MUST 从团队内联目标派生 Anchor；`migrate-archive` MUST 继续作为 spec-local 遗留定义树的唯一显式迁移入口，archive-not-delete。
-- **FR-016**: 所有描述项目级概念的活面 MUST 指向 `/speckit.anchor`：团队创建、团队执行、团队改进、SDD 驱动检查点、项目 setup、house-keeping、interview pattern、命令参考与教程。
+- **FR-016**: 所有描述项目级概念的活面 MUST 指向 `/speckit.anchor`：团队创建、团队执行、团队改进、SDD 驱动检查点、项目 setup、house-keeping、interview pattern、命令参考与教程。该义务同时覆盖**引擎面向用户的输出**：提示中引导 `targets` / `migrate` / `migrate-archive` / `coordinate` 的字符串 MUST 写 `/speckit.anchor`，`run-checks` 的绑定字段 JSON 键 MUST 为 `anchor_slug`（[[STR-003]]），MUST NOT 继续发出 `goal_slug`。
 - **FR-017**: "团队绑定一个项目级 Goal"这一退役读法 MUST NOT 留在活面；团队侧 MUST 表述为绑定 Anchor。
 - **FR-018**: 以旧语义引用 `/speckit.goal` 的**日期化记录** MUST 保持原字节，并按其日期解读；MUST NOT 被本特性回写。
 
 #### C. Goal command surface
 
-- **FR-019**: `/speckit.goal` MUST 只服务行动级 Goal，由重写后的 canonical `templates/commands/goal.md` 交付，并 MUST 恰好暴露四模式 `create` / `view` / `modify` / `status`；`view` 无 slug 时 MUST 列出 Goal 存档且 MUST 只读；`status` MUST 报告并转换生命周期状态（`active` / `achieved` / `abandoned`，终态保留，`reopen` 仅限 `owner: human` 且追加历史行）；`modify` MUST 编辑指导叙述与完成条件。
-- **FR-020**: 命名 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）的调用 MUST 以具名拒绝（[[STR-007]]）失败、指向 `/speckit.anchor`、非零退出且零写入；MUST NOT 静默回退到 `view`。
+- **FR-019**: `/speckit.goal` MUST 只服务行动级 Goal，由重写后的 canonical `templates/commands/goal.md` 交付，并 MUST 恰好暴露四模式 `create` / `view` / `modify` / `status`；`view` 无 slug 时 MUST 列出 Goal 存档且 MUST 只读；`status` MUST 报告并转换生命周期状态（`active` / `achieved` / `abandoned`，终态保留，`reopen` 仅限 `owner: human` 且追加历史行）；`modify` MUST 编辑指导叙述与完成条件，清空完成条件集 MUST 要求显式用户批准。
+- **FR-020**: 命名 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）的调用 MUST 以具名拒绝（[[STR-007]]）失败、以 exit 2 退出、指向 `/speckit.anchor`、且零写入；MUST NOT 静默回退到 `view`。
 - **FR-021**: `/speckit.goal` MUST 只经引擎写 `.specify/goals/<goal-slug>/goal.md`（[[STR-002]]），MUST NOT 写锚点档案或任何团队定义。
 - **FR-022**: `/speckit.goal` MUST 委派给四模式的 `manage-goal` 技能；该技能 MUST NOT 暴露 Targets、迁移、coordinate 或团队操作。
-- **FR-023**: Goal MUST NOT 被解析为 Anchor 身份：只存在于 Goal 存档的 slug MUST 无法通过 `anchor_slug`（[[STR-003]]）解析，且任何团队 MUST NOT 绑定它。
+- **FR-023**: Goal MUST NOT 被解析为 Anchor 身份：只存在于 Goal 存档的 slug MUST 无法通过 `anchor_slug`（[[STR-003]]）解析，且任何团队 MUST NOT 绑定它。Goal 与 SDD/Team 的关系 MUST 一并写明：Goal 不进入控制层级、不被团队绑定、不替代 spec/plan/tasks 制品；团队绑定与切片协调始终由 Anchor + Team 承载。
 - **FR-024**: Goal 撰写 MUST 接受行动/步骤形文本，MUST NOT 对其施加 Anchor 的 `outcome, not steps`（GD-2）形状校验；Anchor 撰写 MUST 继续拒绝任务清单形目标。
 - **FR-025**: Goal 生命周期迁移 MUST 使用共享三值；终态 Goal MUST 保留在存档中，MUST NOT 被删除。
 - **FR-026**: `docs/reference/commands/goal.md` MUST 被重写为新概念与四模式；其任何活段落 MUST NOT 再把 `/speckit.goal` 描述为项目级目标或锚点档案的撰写入口。
@@ -219,9 +219,9 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **FR-028**: `scripts/python/goal-utils.py` MUST 继续作为锚点档案与 Goal 存档的**唯一引擎与唯一写者**（定义文件层面；派生的 `summary/**` 由既有总结流写入，不是定义写者）；本特性 MUST NOT 新增第二套引擎、第二份 schema 或并行的迁移工具。
 - **FR-029**: 引擎 MUST 按层解析定义文件名（`anchor.md` / `goal.md` / `team.md`）；引擎及其消费者 MUST NOT 假定单一全局文件名常量。
 - **FR-030**: `--scope` 取值 MUST 变为封闭四成员 [[STR-004]]（`anchor` / `teams` / `goals` / `auto`）；该取值集的唯一 owner MUST 为 `anchor-definitions.md` § Archive Layers，其他面（含引擎 `--help`）MUST 只按路径引用；退役成员 `goal` MUST 以非法取值失败（exit 2），MUST NOT 被静默别名。
-- **FR-031**: `--scope auto` MUST 在三个层之间解析，并在 slug 不存在于任何层、或在多于一层存在时以 exit 2 报错，MUST NOT 猜测。
+- **FR-031**: `--scope auto` MUST 在三个层之间解析，并在 slug 不存在于任何层、或在多于一层存在时以 exit 2 报错，MUST NOT 猜测。`auto` MUST 只读：任何写动作在 `auto` 下 MUST 以 exit 2 `scope-read-only` 拒绝并零写入（该语义对三个层一致，不因层而异）。
 - **FR-032**: 行动级 Goal 操作 MUST 是同一可执行体内一个独立、清晰命名的动作组；分类、迁移与归档清理 MUST 是同一可执行体内另一个独立命名的动作组，并 MUST 提供 `--check` 与 `--apply`；任一组动作 MUST NOT 写入另一组的存储层。
-- **FR-033**: 既有动作（`list` / `validate` / `binding` / `targets` / `run-checks` / `command-family` / `handoff-decision` / `handoff-ref` / `probe-residual`）MUST 在其所服务的层上保持原语义，只按新名称、文件名与绑定字段（`anchor_slug`）适配。
+- **FR-033**: 既有动作（`list` / `validate` / `binding` / `targets` / `run-checks` / `command-family` / `handoff-decision` / `handoff-ref` / `probe-residual`）MUST 在其所服务的层上保持原语义，只按新名称、文件名与绑定字段（`anchor_slug`）适配。该清单是示例而非封闭集：未列出的既有动作 MUST 同样保持其所服务层的原语义，新增适配 MUST NOT 顺带改变行为。
 - **FR-034**: 引擎 MUST 继续在不动作的情况下回答 `-h` / `--help` 与 `--version`，并拒绝未声明选项，符合 script-interface 契约。
 
 #### E. Classification, cleanup, migration
@@ -229,15 +229,15 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **FR-035**: `.specify/anchoring/` 下每个条目 MUST 得到 `anchor` / `action-goal` / `obsolete` 之一的最终分类，并记录规则 id 与所用证据。
 - **FR-036**: 分类规则 MUST 为：目标绑定单一交付物、有有限完成事件且验证为有限通过/不通过集 → `action-goal`；主题被后续模型取代或记录的是已完成的一次性检查 → `obsolete`；其余 → `anchor`。判不准的条目 MUST 只有在记录理由后才可取 `anchor`。
 - **FR-037**: § Assumptions 的暂定清单 MUST 作为期望基线；与之不同的最终判决 MUST 记录规则 id 与证据，MUST NOT 静默改判。
-- **FR-038**: 判为 `anchor` 的条目 MUST 留在 `.specify/anchoring/<slug>/` 并持有 `anchor.md`（[[STR-001]]）；其派生 `summary/` MUST 被重生成，MUST NOT 手改。
+- **FR-038**: 判为 `anchor` 的条目 MUST 留在 `.specify/anchoring/<slug>/` 并持有 `anchor.md`（[[STR-001]]）；其派生 `summary/` MUST 被重生成，MUST NOT 手改。改名步骤 MUST 只改文件名，除该步骤外其余字节逐字节保持；随后 MUST 有一个独立的**声明式正文归一化**步骤：命中 `^# Goal:` 的标题行 MUST 改为 `# Anchor:`，正文中退役的 `.specify/goal|teams` 引用 MUST 改为 `.specify/anchoring|teams`，命中行的 `/speckit.goal` 引导 MUST 改为 `/speckit.anchor`；该步骤只改声明规则命中的行，逐行记入 `.specify/anchoring/<slug>/anchor-body-receipt.json`（`path` / `line` / `rule` / `before` / `after`），未命中行 MUST 逐字节不变，且概念摘要按 FR-043 的同一映射重算后 MUST 仍与迁移前相等。
 - **FR-039**: 判为 `action-goal` 的条目 MUST 迁入 `.specify/goals/<slug>/goal.md`（[[STR-002]]），保留目标叙述、成功判据（作为完成条件）、生命周期状态、时间戳与 History；字段映射 MUST 限于：文件位置、`## Objective` → `## Guidance`、`## Success Criteria` → `## Completion Conditions`，其余 frontmatter（`status` / `created` / `updated` / `binding`）与 `## Boundaries` / `## History` 正文逐字节不变；`## Targets` 按 FR-040 处置。
 - **FR-040**: Target MUST NOT 丢失：带 `## Targets` 的条目 MUST 要么保留为 Anchor，要么把每个 Target 语句原样保留在迁移后的 Goal 正文中，并在回执中记录其身份。
 - **FR-041**: 判为 `obsolete` 的条目 MUST 经引擎的归档动作连同回执归档到 `.specify/archive/anchoring/<slug>/`（[[STR-006]]），MUST NOT 被删除，MUST NOT 用手工 `git mv` 替代引擎动作。
 - **FR-042**: 每个被迁移或归档的条目 MUST 有一条回执，记录源路径、目标路径、概念摘要（概念载荷哈希）、时间戳、引擎标识、结果身份与 `delete_policy: archive-not-delete`（[[STR-005]]）；回执 MUST 为逐条、机器可读的 JSON，并落在动作目标内（迁移 → `.specify/goals/<slug>/migration-receipt.json`，归档 → `.specify/archive/anchoring/<slug>/migration-receipt.json`），MUST NOT 写入任何共享聚合文件。
-- **FR-043**: 概念摘要 MUST 为声明映射后归一化投影的 `sha256`（投影 = FR-039 映射后的正文 + `status` / `created` / `updated` / `binding` frontmatter；`## Targets` 由 FR-040 单独记账）；回执 MUST 同时记录源摘要、目标摘要与映射版本，动作前后按同一映射计算的摘要 MUST 相等。迁移与归档 MUST 幂等：第二次运行 MUST 报 `already-migrated` / `already-archived`（判据：目标存在且回执存在），不写第二份回执，且零新增 diff。
+- **FR-043**: 概念摘要 MUST 为声明映射后归一化投影的 `sha256`（投影 = FR-039 映射后的正文 + `status` / `created` / `updated` / `binding` frontmatter；`## Targets` 由 FR-040 单独记账；对 `anchor` 条目，映射还包含 FR-038 的正文归一化规则，因此迁移前按同一映射计算的源摘要与归一化后的目标摘要相等）；回执 MUST 同时记录源摘要、目标摘要与映射版本。迁移与归档 MUST 幂等，判据 MUST 为三个条件同时成立：**目标存在、回执存在、回执中目标摘要与当前目标重算摘要相等**；三者成立时第二次运行 MUST 报 `already-migrated` / `already-archived`，不写第二份回执，且零新增 diff。目标存在而回执缺失 MUST 报 exit 4 `half-state`；目标与回执均存在但摘要不等 MUST 报 exit 4 `conflict` 并指名两侧路径，MUST NOT 覆盖、MUST NOT 改写回执。
 - **FR-044**: 迁移与归档 MUST 可中断续做：中断 MUST 报告所处阶段与实际状态，重新调用 MUST 从该阶段续做；MUST NOT 存在无回执的删除。
 - **FR-045**: 冲突（目标 slug 已存在且概念载荷不等价）MUST 停下、指名两个候选、MUST NOT 覆盖或择一胜出。
-- **FR-046**: 被迁移或归档条目所绑定的团队 MUST 逐条处置，处置顺序 MUST 为：R1 改绑到覆盖其主题的既有 Anchor（记录证据与理由）→ R2 主题通过 FR-036 的 `anchor` 判据时经引擎 `migrate` 落成 Anchor → R3 否则连同回执归档该团队；R1–R3 均无法由团队定义与档案证据判定时 MUST 停下并具名报告。
+- **FR-046**: 被迁移或归档条目所绑定的团队 MUST 逐条处置，处置顺序 MUST 为：R1 改绑到覆盖其主题的既有 Anchor（记录证据与理由）→ R2 主题通过 FR-036 的 `anchor` 判据时经引擎 `migrate` 落成 Anchor → R3 否则连同回执归档该团队；R1–R3 均无法由团队定义与档案证据判定时 MUST 停下并具名报告。R3 的终态 MUST 为：目录仍位于 `.specify/teams/<slug>/`，`team.md` frontmatter 带 `lifecycle_state: archived`，绑定行 MUST 被移除，处置回执 MUST 落在 `.specify/teams/<slug>/disposition-receipt.json`（含 `bound_slug` / `reason` / `acted`，`acted` 记录本次实际执行的动作）；归档后的 `team.md` 仍是 FR-047 意义上的活团队定义，MUST NOT 被移入任何 archive 目录。
 - **FR-047**: `team.md` 的 frontmatter 绑定键 `goal_slug` MUST 经引擎改名为 `anchor_slug`（[[STR-003]]），该结构性步骤 MUST 只改这一行、其余字节逐字节保持；活团队定义正文中对绑定字段与 `.specify/goal/<slug>/summary/` 交付路径的引用 MUST 在随后的术语归一化步骤中更新（FR-058），该步骤逐行记入回执。『活团队定义』= `.specify/teams/**/team.md`（不因 `lifecycle_state: archived` 豁免）；日期化 `runs/**` 不是定义，不在此列（FR-061）。退役键 `goal_slug`（[[STR-008]]）MUST NOT 留在任何活团队定义的 frontmatter 或正文中。
 - **FR-048**: 本特性完成后，任何团队的 `anchor_slug`（[[STR-003]]）MUST 能解析到既有 Anchor；现存两处悬空绑定——`viz-skill-arena` → 缺失的 `visualization-skill-selection`、`demo-seat-dispatch` → 缺失的 `demo-seat-dispatch`——MUST 按 FR-046 的 R1–R3 顺序处置（D-5：前者持续按度优化的主题按 R2 经引擎 `migrate` 落成 Anchor，后者一次性演示主题按 R3 连同回执归档团队），MUST NOT 留下无法解析的绑定。4 个无绑定字段的团队（`cws-workspace-cluster`、`draw-plantuml-optimizer`、`requirement-implement-monitor`、`summarize-project-optimizer`）MUST 保持字节不变，并在证据中登记为「无绑定」。
 - **FR-049**: 被迁移/归档条目的派生 `summary/` MUST 随定义处置（目标层支持时）或连同回执归档；定义已不存在的孤立 `summary/` MUST NOT 留在锚点档案中。
@@ -255,14 +255,14 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **FR-058**: 团队域参考（`create-team` / `improve-team` / `run-team` / `summarize-project` 及其脚本）MUST 使用 Anchor 术语、`anchor_slug` 与 `.specify/anchoring/<slug>/summary/` 作为交付目录；任何活页面 MUST NOT 继续把 `.specify/goal/<slug>/summary/` 当交付路径。
 - **FR-059**: `shared/patterns/interview-pattern.md` 及其他引用旧入口的活 pattern / 定义页 MUST 把锚点撰写指向 `/speckit.anchor`，只把行动级指导指向 `/speckit.goal`。
 - **FR-060**: 非一次性处置回顾面成员 MUST 被更新：`.specify/anchoring` 与 `.specify/goals` 成为成员，历史成员 `.specify/goal` 退役并在 owner 声明（`shared/declarations/facts/non-disposable-review-surface.yaml#/statement`，含镜像副本）中记录退役理由。
-- **FR-061**: 日期化记录 MUST NOT 被重写：037、038、042、074、085、094、全部日期化 spec 目录、`.specify/teams/**/runs/**`、`.specify/archive/**`（**基线时已存在的条目**：逐字节不变且不得删除；本特性按 FR-041 / [[STR-006]] 新建的 `.specify/archive/anchoring/**` 子树属于新增，不在等值断言内，由 FR-042 回执覆盖）、`.specify/history/**`、`docs/notes/**` 与日期化 test-evidence MUST 保持逐字节不变。
+- **FR-061**: 日期化记录 MUST NOT 被重写：037、038、042、074、085、094、全部日期化 spec 目录、`.specify/teams/**/runs/**`、`.specify/archive/**`（**基线 `d7c9da7a3` 时已存在的条目**：逐字节不变且不得删除；本特性按 FR-041 / [[STR-006]] 新建的 `.specify/archive/anchoring/**` 子树属于新增，不在等值断言内，由 FR-042 回执覆盖）、`.specify/history/**`、`docs/notes/**` 与日期化 test-evidence（**同样限于基线 `d7c9da7a3` 时已存在的文件**）MUST 保持逐字节不变。本特性自身在 `.specify/specs/101-anchor-goal-realignment/` 下新建的制品与读数（FR-071）属于新增，不在等值断言内。
 
 #### G. Verification and guard obligations
 
 - **FR-062**: 契约测试 MUST 在 `templates/commands/anchor.md` 缺失、未暴露恰好七模式、或复述 `--scope` 取值集而非引用 owner 时转红。
 - **FR-063**: 契约测试 MUST 在 `goal` 模板把 Anchor-only 模式当作可接受模式、或 Anchor-only 调用未被具名拒绝（[[STR-007]]）时转红。
 - **FR-064**: 契约测试 MUST 在任一 `.specify/anchoring/*/` 缺 `anchor.md`（[[STR-001]]）、或分类记录标为 `action-goal` 的条目仍留在那里时转红。
-- **FR-065**: 契约测试 MUST 在引擎之外的任何代码路径写入锚点存档或 Goal 存档时转红；两写者模拟 MUST 证明不同 slug 落到不同路径。
+- **FR-065**: 契约测试 MUST 在引擎之外的任何代码路径写入锚点档案或 Goal 存档的**定义文件**（`anchor.md` / `goal.md`）时转红；派生的 `summary/**` 由既有总结流（`build-summary-input.py`）写入，属于允许的派生写者，不在本断言内；两写者模拟 MUST 证明不同 slug 落到不同路径。
 - **FR-066**: 契约测试 MUST 在任一活团队定义（frontmatter 或正文，含 `lifecycle_state: archived` 的 `team.md`；`runs/**` 除外）仍含 `goal_slug`（[[STR-008]]）、或任一 `anchor_slug`（[[STR-003]]）无法解析时转红。
 - **FR-067**: 契约测试 MUST 在活面仍把 Goal 定义为项目级、仍把 `/speckit.goal` 当锚点档案入口、或仍使用 `.specify/goal/<slug>/summary/` 交付路径时转红。
 - **FR-068**: 迁移测试 MUST 断言幂等、中断续做、回执完整、概念摘要相等与零删除；注入重复回执或丢弃一个 Target MUST 使套件转红。
@@ -297,27 +297,27 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 
 ### Measurable Outcomes
 
-- **SC-001**: 语义一致性可判定——对声明的活根执行残留扫描，"Goal = 项目级"与"Anchor 从属于 Goal"两类表述计数为 0；向任一活面注入一句旧语义后扫描转红；日期化根不计入且保持原字节。 **Path**: final
+- **SC-001**: 语义一致性可判定——对 `research.md` §5 声明的活根与残留类执行扫描，每类计数为 0（含保留 Anchor 的正文归一化残留、引擎把退役模式指向 `/speckit.goal` 的提示、活 feature 索引行残留的旧模型陈述）；向任一活面注入一句旧语义后扫描转红；日期化根不计入且保持原字节。 **Path**: final
 - **SC-002**: 命令面分割完整——`/speckit.anchor` 恰好暴露七模式、`/speckit.goal` 恰好暴露四模式，四个 Anchor-only 模式（`targets` / `migrate` / `migrate-archive` / `coordinate`）经 `/speckit.goal` 调用时全部具名拒绝并指向 `/speckit.anchor`；删除任一 canonical 模板或模式行时契约测试转红。 **Path**: final
 - **SC-003**: 档案纯度可测量——14 个条目逐条有分类记录；`.specify/anchoring/` 中 `action-goal` 条目数为 0；每个被判 `action-goal` 的条目在 `.specify/goals/` 中恰有一份定义；过期条目全部位于 `.specify/archive/anchoring/`；读数写入 test-evidence，不以暂定数字充当实测。 **Path**: final
 - **SC-004**: 零丢失可复核——每条被迁移/归档条目有回执；概念摘要在动作前后相等；删除数为 0；受保护日期化路径的逐文件哈希与特性前提交一致。 **Path**: final
-- **SC-005**: 绑定完整性——活团队定义中 `goal_slug` 计数为 0；每个 `anchor_slug` 可解析；每个受影响团队有一条处置记录；`viz-skill-arena` 与 `demo-seat-dispatch` 的五查通过。 **Path**: final
+- **SC-005**: 绑定完整性——活团队定义中 `goal_slug` 计数为 0；每个 `anchor_slug` 可解析；每个受影响团队有一条处置记录。仍有绑定的团队（含 R2 后的 `viz-skill-arena`）在 `goal-utils.py run-checks <team> --json` 下 `verdict: ok`、`blocked: false`、exit 0，未给 `--target` 时 ②–④ 如实报 `not-evaluated`（无判定主体，不是失败）；R3 归档团队（`088-reporting-dogfood`、`091-auto-git-closeout`、`085-sdd-temporary-goal-team`、`post-refactor-mechanism-integrity`、`draw-diagram-interactive`、`demo-seat-dispatch`）无绑定行，无 `--target` 调用时返回 `verdict: no-goal-definition`、`blocked: false`、exit 0——这是归档后的预期终态，MUST NOT 被记作"五查通过"。 **Path**: final
 - **SC-006**: 单写者成立——静态审计显示锚点档案与 Goal 存档各只有引擎一个**定义**写者（`summary/**` 为派生子树，由既有总结流写入，不在定义写者之列）；两写者模拟在同一层写不同 slug 时落到不同路径；在引擎外注入一次定义写入后审计转红。 **Path**: final
-- **SC-007**: 幂等与可续做——迁移成功后重跑零新增 diff、零重复回执；在"源已归档、目标未写"处中断后重入，从报告阶段续做且完成状态可判定。 **Path**: supporting
-- **SC-008**: 交付面齐备——`anchor.md` 参考页存在、`goal.md` 参考页已重写、flow-class 台账含两命令行、探针编译含 `/speckit.anchor` 面、文档站构建通过；任一缺失使守卫转红。 **Path**: supporting
-- **SC-009**: 历史不可改写——037 / 038 / 042 / 074 / 085 / 094、全部日期化 spec 目录、`.specify/teams/**/runs/**`、`.specify/archive/**`、`.specify/history/**`、`docs/notes/**` 的哈希集合与基线 `d7c9da7a3` 相等（`.specify/archive/**` 按**基线时已存在的文件**逐文件比较；本特性新增的 `.specify/archive/anchoring/**` 不计入等值集合并单独列示）。 **Path**: supporting
+- **SC-007**: 幂等与可续做——迁移成功后重跑零新增 diff、零重复回执；`already-*` 只在目标存在、回执存在、摘要相等三条件同时成立时给出，摘要不等 MUST 报 exit 4 `conflict` 且不改写；在"源已归档、目标未写"处中断后重入，从报告阶段续做且完成状态可判定。 **Path**: supporting
+- **SC-008**: 交付面齐备——`anchor.md` 参考页存在、`goal.md` 参考页已重写、flow-class 台账含两命令行、探针编译含 `/speckit.anchor` 面；任一项缺失使守卫转红。文档站构建 limb MUST 附 EP-006 读数（Hugo v0.141.0 对既有 `.Site.Language.Locale` 退出 1）并报 `not-evaluated`，MUST NOT 被记成通过，也不得因此把其余 limb 一并记成未评估。 **Path**: supporting
+- **SC-009**: 历史不可改写——037 / 038 / 042 / 074 / 085 / 094、全部日期化 spec 目录（**基线 `d7c9da7a3` 时已存在者**）、`.specify/teams/**/runs/**`、`.specify/archive/**`、`.specify/history/**`、`docs/notes/**` 与日期化 test-evidence（同限于基线已存在文件）的哈希集合与基线 `d7c9da7a3` 相等（`.specify/archive/**` 按**基线时已存在的文件**逐文件比较；本特性新增的 `.specify/archive/anchoring/**` 与 101 spec 目录自身的新增读数不计入等值集合并单独列示）。 **Path**: supporting
 - **SC-010**: 读者可分辨——按 glossary 与两份 owner，未参与本轮的读者能正确复述 Anchor、anchoring archive、Re-Anchoring 与行动级 Goal 的对象与所在目录；复述失败即判定不通过。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 残留扫描脚本对本规格 § Live-surface roots 声明的活根做正则计数，输出每类命中路径；注入用例在测试夹具中执行。活根集合在 plan 的 `research.md` 中声明，测试读取该声明而非各自硬编码。
+- **SC-001 Source**: 残留扫描脚本对 `research.md` §5 声明的活根与类定义做逐类计数，输出每类命中路径；注入用例在测试夹具中执行。活根集合与类定义在 `research.md` §5 中声明，测试读取该声明而非各自硬编码。
 - **SC-002 Source**: 契约测试解析 canonical 模板的 `argument-hint` 与模式表，并对 `/speckit.goal <anchor-only-mode>` 做子进程调用，采集退出码、stderr 与零写入断言。
 - **SC-003 Source**: 分类记录（逐条 markdown/JSON）与两次目录枚举读数（清理前、清理后）；`find`/`glob` 计数与 `goal-utils.py list --scope anchor|goals` 输出交叉核对。
 - **SC-004 Source**: 回执文件逐条读取；概念摘要由引擎在动作前后各计算一次并写入回执；受保护路径哈希由 `git hash-object` 或 `sha256sum` 在特性前提交与实现后各采集一次。
-- **SC-005 Source**: 对 `.specify/teams/*/team.md` 的 frontmatter 扫描；`goal-utils.py run-checks <team>` 逐团队退出码；处置记录清单。
+- **SC-005 Source**: 对 `.specify/teams/*/team.md` 的 frontmatter 扫描；`goal-utils.py run-checks <team> --json` 逐团队采集 `verdict` / `blocked` / 退出码；五查集合与各检查名的唯一 owner 是 `skills/internal/run-team/SKILL.md` § 2 Preview（五查预检），SC 不复述其条目；处置记录清单。
 - **SC-006 Source**: 静态审计（对仓储代码路径的写入面扫描，含镜像树）加两分支夹具模拟；审计在 `tests/contract/` 中执行。
 - **SC-007 Source**: 迁移夹具上的两次 apply 与一次中断注入；diff 与回执计数。
-- **SC-008 Source**: 文件存在性 + `flow-class-check.py --action check` 退出码 + 探针编译命令 + docs 构建命令的退出码。
+- **SC-008 Source**: 文件存在性 + `flow-class-check.py --action check` 退出码 + 探针编译命令；文档站构建按 EP-006 记录的命令执行并抄录退出码与首条错误，读数落 `test-evidence/`，结论按实际读数写 `pass` 或 `not-evaluated`。
 - **SC-009 Source**: 受保护路径的 `git hash-object` 集合对比（基线 = 特性前提交 `d7c9da7a3`）。
 - **SC-010 Source**: 一次基准读者复述记录，落在 `test-evidence/`；复述文本与三词条的对照由评审者判定。
 
@@ -345,7 +345,7 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - Q: Which Feature owns this specification — a new Feature or an extension of 041 Goal Registry? → A: 新 Feature **101 "Anchor / Goal Realignment"**；041 保持 `Implemented` 与其日期化记录，只增加一条反向交叉引用。D-1
 - Q: `goal_slug` 退役与"其余字节逐字节相同"如何同时成立？ → A: 分两步——结构性迁移只改 frontmatter 绑定键一行，逐字节断言只作用于该步；正文中的 `goal_slug` 与 `.specify/goal/<slug>/summary/` 引用由随后的术语归一化步骤逐行改写并记入回执；日期化 `runs/**` 不属于活团队定义，保持原字节。D-2
 - Q: 新 `/speckit.goal` 的 `status` 模式做什么？ → A: 报告并转换生命周期状态（`active` / `achieved` / `abandoned`，终态保留，`reopen` 仅限 `owner: human` 且追加历史行），复用既有生命周期 owner 与引擎 `status` 动作；`view` 只读，`modify` 编辑指导与完成条件。D-3
-- Q: 清理/迁移以什么形态执行，回执与概念摘要如何判定？ → A: 作为 `goal-utils.py` 内独立命名的清理动作组（`--check` / `--apply`），不新增 `/speckit.anchor` 模式（七模式上限不变）；回执为逐条 JSON 落在动作目标内（`migration-receipt.json`），不写共享聚合；概念摘要为声明映射后归一化投影的 `sha256`，回执记录源/目标摘要与映射版本；幂等判据为"目标存在且回执存在"。D-4
+- Q: 清理/迁移以什么形态执行，回执与概念摘要如何判定？ → A: 作为 `goal-utils.py` 内独立命名的清理动作组（`--check` / `--apply`），不新增 `/speckit.anchor` 模式（七模式上限不变）；回执为逐条 JSON 落在动作目标内（`migration-receipt.json`），不写共享聚合；概念摘要为声明映射后归一化投影的 `sha256`，回执记录源/目标摘要与映射版本；幂等判据为**三条件**"目标存在 + 回执存在 + 摘要相等"，目标存在而回执缺失报 `half-state`、摘要不等报 `conflict`（均 exit 4）。D-4
 - Q: 两个悬空团队绑定如何处置，哪些日期化路径需要保护？ → A: 处置顺序 R1 改绑到覆盖其主题的既有 Anchor（记录证据）→ R2 主题通过 `anchor` 判据则经引擎 `migrate` 落成 Anchor → R3 否则连同回执归档团队；无法判定即停并具名报告。`viz-skill-arena` 的持续按度优化主题按 R2 落成 `visualization-skill-selection`；`demo-seat-dispatch` 的一次性演示主题按 R3 归档。受保护日期化路径增加 `.specify/teams/**/runs/**` 与全部日期化 spec 目录，基线为 `d7c9da7a3`。D-5
 
 **In-pass corrections（本轮就地纠正，均与已记录意图一致）**：
@@ -362,6 +362,8 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - `PLAN-EDIT: FR-028` — "唯一写者"同一处冲突 → 加上"定义文件层面"限定，与 FR-011 用同一措辞。
 - `PLAN-EDIT: SC-006` — 审计对象同步收敛为"定义写者"，`summary/**` 明确列在定义写者之外；注入用例仍针对定义写入。
 - `PLAN-EDIT: FR-061 / SC-009` — 原文把 `.specify/archive/**` 整树纳入"逐字节不变 / 哈希集合相等"，与该规格 FR-041 / [[STR-006]]（本特性 MUST 新建 `.specify/archive/anchoring/<slug>/` 归档目的地）不可同时满足 → 等值断言收敛为**基线时已存在的条目**（不变、不删）；本特性新增的归档子树不计入等值集合、单独列示，并由 FR-042 的逐条回执承担零丢失证明。注入/守卫两侧仍按基线文件清单逐文件比较。
+
+**Checklist-round-1 corrections（2026-11-12 `checklist` 门修复轮；逐条 `rebaseline` 事件与下游影响见 `notes/checklist-repair.md`）**：本轮按 CHK 发现收敛了 FR-004 / FR-005 / FR-010 / FR-016 / FR-019 / FR-020 / FR-023 / FR-031 / FR-033 / FR-038 / FR-043 / FR-046 / FR-061 / FR-065 与 SC-001 / SC-005 / SC-007 / SC-008 / SC-009、D-4；计数不变（71 FR / 10 SC / 8 STR）。
 
 ## Non-Goals & Boundaries *(informative)*
 

@@ -52,7 +52,7 @@ the rule text. `Targets` is the count of `## Targets` rows read from the definit
 | 4 | `088-speckit-visualization` | active | 2 | action-goal | FR-036(a) | Single capability delivery (088 visualization/reporting) with 2 open Targets; Targets preserved per FR-040. |
 | 5 | `090-re-anchoring` | active | 0 | anchor | FR-036(c) | A run-wide discipline that applies to every future run; no bounded completion. |
 | 6 | `091-auto-git-closeout` | active | 0 | action-goal | FR-036(a) | Single mechanism delivery; its team is already `lifecycle_state: archived`. |
-| 7 | `094-goal-team-parallel` | active | 0 | anchor | FR-036(c) | Defines the durable goal/team model; ongoing reference for every team run. |
+| 7 | `094-goal-team-parallel` | active | 0 | anchor | FR-036(c) | Defines the durable binding model behind goal/team (now Anchor/Team); ongoing reference for every team run. |
 | 8 | `command-logic-as-classified-skills` | active | 3 | anchor | FR-036(c) | Framework-wide structural direction; 3 open Targets are slices of one continuous theme. |
 | 9 | `draw-diagram-interactive` | active | 0 | action-goal | FR-036(a) | Single capability deliverable (interactive charts); its team runs a bounded iteration (`max_iterations: 5`). |
 | 10 | `draw-two-layer-structure` | achieved | 3 | anchor | FR-036(c) | Two-layer drawing architecture is a standing structural invariant; `achieved` lifecycle retained. |
@@ -120,6 +120,7 @@ live_surface_roots:
     - .specify/scripts/     # runtime mirror
     - .specify/teams/       # live team definitions (team.md and references)
     - .specify/anchoring/   # anchor definitions (anchor.md), excluding summary/
+    - .specify/features/    # live feature detail pages — see the recorded exclusion below
     - .specify/memory/      # knowledge/tools/templates; session+feedback excluded
     - .specify/workflow/    # git workflow declaration
     - .claude/commands/     # generated per-tool copies
@@ -135,6 +136,7 @@ live_surface_roots:
     - .specify/instructions.md
     - .specify/skills.md
     - .specify/tools.md
+    - .specify/features.md
   excluded_dirs_any_depth:
     - runs/              # dated team run records (FR-061 protects .specify/teams/**/runs/**)
     - session/           # dated memory session notes
@@ -146,9 +148,14 @@ live_surface_roots:
     - test-evidence/     # dated evidence records
     - __pycache__/, node_modules/, public/
   excluded_files:
-    - .specify/features.md   # hand-maintained registry: rows record features as delivered (041's
-                             # row states the project-level Goal it *was*); the live correction is
-                             # the 101 row + 041's successor note + the rewritten owners.
+    - .specify/features/**/*.md
+      # CLOSED, RECORDED EXCLUSION (FR-005's definitional test still applies): a feature detail page
+      # is an append-only delivery record — what a feature delivered, in its own words, at its own
+      # date. It is not a definitional page and rewriting it is the dated-record damage FR-061
+      # forbids. The current-facing claim lives in the index row (root above, class C7) and the
+      # correction arrives as a dated successor note inside the page (041 already carries one; 094
+      # gains one in WP-03). This exemption is never available to a *definitional* page (a
+      # `shared/definitions/**` owner, a glossary/instruction surface, or a canonical template).
     # all dated spec dirs (.specify/specs/**) are outside every root above, by construction.
 ```
 
@@ -161,6 +168,9 @@ live_surface_roots:
 | C2 | Anchor subordinate to Goal | `(?i)\b(goal\|目标)\b[^\n]{0,30}\b(top of\|highest (level\|layer)\|最高层)\b[^\n]{0,30}\b(anchor\|锚点)\b`; `(?i)\b(anchor\|锚点)\b[^\n]{0,40}\b(is\|as)\s+(a\s+)?(sub-?goal\|child goal\|goal slice\|下级目标)\b` |
 | C3 | `/speckit.goal` as the anchor-archive authoring entry | `(?i)speckit\.goal[^\n]{0,160}(sole authoring\|only authoring\|唯一撰写)`; `(?i)(sole authoring entry\|唯一撰写入口)[^\n]{0,160}speckit\.goal`; `speckit\.goal[^\n]{0,120}(锚点档案\|anchoring archive)`; `(锚点档案\|anchoring archive)[^\n]{0,120}speckit\.goal` |
 | C4 | `.specify/goal/<slug>/summary/` as delivery path | `\.specify/goal/<[^>]+>/summary/` |
+| C5 | A retained anchor's own body still speaks the retired terminology | `^\#\s*Goal:`; `\.specify/goal(?![a-z])` — **scoped to `.specify/anchoring/*/goal.md` / `anchor.md`** (the normalization target of C-38 A-N-1…A-N-4) |
+| C6 | A live surface still sends the user to `/speckit.goal` for an Anchor-only mode | `/speckit\.goal\s+(targets\|migrate\|migrate-archive\|coordinate)\b` |
+| C7 | A live feature-index row still states the retired model | `.specify/features.md` only: `\.specify/goal/<[^>]+>`; `\.specify/anchoring/<[^>]+>/goal\.md`; `(?i)project-level goal`; `goal\s*=\s*设计师` |
 
 **Baseline reading before implement** (`test-evidence/live-semantic-scan-baseline-2026-11-12.txt`):
 C1 **4** · C2 **0** · C3 **7** · C4 **15** · total **26** lines over the roots above. C1's four
@@ -170,6 +180,24 @@ lines are the glossary `Goal` row, the derivation table row (×2 mirror), and
 Zero C2 lines means the hierarchy inversion lives in prose shapes this baseline does not catch —
 the hierarchy itself is asserted by `sdd-routing-definitions.md` (FR-052) and by the C1 rows, so
 C2 is a regression net, not the convergence target.
+
+**Classes added by the checklist repair (F-1 / F-2 / F-10), measured 2026-11-12** (full readings:
+`test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`): **C5 16** lines over the store as
+it stands (14 entry directories, of which 5 leave the store with their migrated/archived entries);
+the **11** lines that survive into the 9 retained anchors are the 9 `# Goal:` headings plus 2
+retired-path lines in `094-goal-team-parallel` — that 11 is the convergence target, and C-38's A-N
+table is the only mechanism allowed to reach it. **C6 40** line-hits: 16 in the engine (8 × two
+mirror layers), 16 in team-domain skills/references (8 × two layers: create-mode 3, run-team 1,
+goal 1, execution-guide 1, summary-mapping 1, goal-editing 1), 2 in
+`docs/reference/commands/team.md`, 2 in `.specify/glossary.md`, 1 in `src/specify_cli/__init__.py`,
+1 in a live team definition, 1 in `docs/reference/commands/seal.md`, 1 in `.specify/features.md`.
+**C7 3** rows of `.specify/features.md` (rows 027, 041, 094) — rewriting those three rows is a WP-03
+deliverable, and the 101 row written at close must not reintroduce the patterns.
+
+C6 is deliberately a **pointer** class, not a literal `.specify/goal/` sweep: the retired directory
+name also appears in historical narrative that must stay, so a path-literal sweep measured 84
+line-hits and was rejected as too broad (it would have demanded rewriting dated prose). The mode
+pointer is the behaviourally wrong text — a user following it reaches a command that refuses.
 
 Pattern precision is part of the criterion: an over-broad pattern (`goal` … `project-level` within
 80 chars) matched 16 lines including `shared/workflow/feedback-step.md`'s unrelated "goal model's

@@ -42,7 +42,26 @@ the identity record). A migration that would drop a statement is a hard failure,
 For `obsolete`: identity mapping (no section rename); `targets` recorded in the receipt; the whole
 directory tree moves.
 
-For `anchor`: the rename is the only change; bytes are otherwise identical.
+For `anchor`, two declared sub-steps, in this order:
+
+1. **Rename (structural, byte-asserted)**: `goal.md` → `anchor.md`; the rename is the only change and
+   every other byte is identical. The verifier asserts the two trees differ by file name only.
+2. **Body normalization (line-scoped, receipted)** — the rule table below. Only matching lines are
+   rewritten; each rewrite is recorded in
+   `.specify/anchoring/<slug>/anchor-body-receipt.json` as `{path, line, rule, before, after}`, and a
+   non-matching line MUST be byte-identical. This step is what makes FR-005 / SC-001 satisfiable for
+   the retained anchors: without it the archive would keep speaking the retired terminology.
+
+| Rule | Match | Rewrite |
+|------|-------|---------|
+| A-N-1 | `^\#\s*Goal:` | `# Anchor:` |
+| A-N-2 | `.specify/goal\|teams` | `.specify/anchoring\|teams` |
+| A-N-3 | `.specify/goal/<slug>/**` (incl. `/goal.md`, `/summary/`) | `.specify/anchoring/<slug>/**` |
+| A-N-4 | `/speckit.goal` on a line that also matches A-N-1…A-N-3 | `/speckit.anchor` |
+
+Measured surface at plan time: **9** A-N-1 lines (one per retained anchor) and **4** A-N-2/A-N-3
+hits, all four inside `094-goal-team-parallel`. Zero hits means the step is a no-op for that entry,
+recorded as `already-normalized` (exit 0).
 
 ## C-39 — Concept digest
 
@@ -61,8 +80,11 @@ digest(text) := sha256( projection(text).encode("utf-8") ).hexdigest()
 ```
 
 `concept_digest_source` is computed from the source **through the same mapping** used for the target,
-which is what makes equality meaningful. Both the source and the target digest are written to the
-receipt; a mismatch after the move is a hard failure (exit 4) and the source is not removed.
+which is what makes equality meaningful. For `anchor` entries that mapping includes the A-N rules, so
+the digest is computed **before** the normalization step on the projected text and again after it —
+the two readings MUST be equal, and the receipt records that pair. Both the source and the target
+digest are written to the receipt; a mismatch after the move is a hard failure (exit 4) and the source
+is not removed.
 
 ## C-40 — Receipt
 
@@ -101,7 +123,7 @@ write nothing (exit 4). Never overwrite, never pick a winner, never fall back to
 
 | Phase | Work | Resumable unit |
 |-------|------|----------------|
-| P1 | anchor renames (9 entries) | one entry |
+| P1 | anchor renames (9 entries) **and** the declared body normalization (C-38 A-N-1…A-N-4) | one entry, one line |
 | P2 | action-goal migrations (3) and obsolete archival (2) | one entry |
 | P3 | R2 Anchor creation for `viz-skill-arena` (engine `migrate`) | one team |
 | P4 | summary moves for migrated/archived entries (FR-049) | one entry |
@@ -151,8 +173,10 @@ the Goal store (`research.md` R-05 / FR-032).
   team serves nothing, and FR-066 requires every `anchor_slug` on disk to resolve — repointing to an
   Anchor that does not cover the team's theme would be a false claim, and leaving the line would
   leave a dangling reference. Provenance lives in `disposition-receipt.json` (`bound_slug`, `reason`,
-  `acted`). `091-auto-git-closeout` is `already-satisfied`: only its binding line is removed and the
-  receipt records the pre-existing `lifecycle_state: archived`.
+  `acted`). `091-auto-git-closeout` already carries `lifecycle_state: archived` but still carries its
+  binding line and has no receipt; `classification.json` therefore records it as `apply`, and P7
+  removes the binding line and writes the receipt — R3's terminal state includes the removal, and
+  `already-satisfied` would have been a green on a team still holding a retired field.
 - An undecidable disposition (not in the input file) is exit 2; the engine never guesses.
 
 ## C-48 — Summary trees (FR-049)
@@ -170,9 +194,14 @@ the Goal store (`research.md` R-05 / FR-032).
   `test-evidence/cleanup-check-<date>.json` at first run (Single-Run Evidence); the apply run and a
   second apply are captured the same way.
 - Guards: FR-064 (no `goal.md` remains in the anchor store, no action-goal entry left), FR-065
-  (single writer), FR-066 (no `goal_slug`, every `anchor_slug` resolves), FR-068 (idempotency,
-  interruption, receipt completeness, digest equality, zero deletions), FR-069 (protected paths equal to
-  `d7c9da7a3` — **baseline-existing entries only**; the `.specify/archive/anchoring/**` subtree this
-  feature creates is an addition and is listed separately by the guard, per PLAN-EDIT 4).
+  (single **definition-file** writer; `summary/**` is the declared derived exception), FR-066 (no
+  `goal_slug`, every `anchor_slug` resolves), FR-068 (idempotency, interruption, receipt completeness,
+  digest equality, zero deletions), FR-069 (protected paths equal to `d7c9da7a3` —
+  **baseline-existing entries only**; the `.specify/archive/anchoring/**` subtree this feature creates
+  is an addition and is listed separately by the guard, per PLAN-EDIT 4).
+- Post-convergence residue classes C5 (retained-anchor body: `^# Goal:` / retired `.specify/goal`
+  refs), C6 (retired-mode hints still naming `/speckit.goal`) and C7 (`.specify/features.md` rows
+  stating the old model) are declared with roots and baselines in `research.md` §5 and asserted by
+  `tests/contract/test_live_semantic_residue.py`; the cleanup's own output is not exempt from them.
 - `git status --porcelain` over the four stores before and after a second apply shows no new entry
   (the only allowed change between runs is nothing at all).

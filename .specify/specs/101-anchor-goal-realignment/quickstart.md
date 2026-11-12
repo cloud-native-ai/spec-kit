@@ -112,7 +112,9 @@ python3 .specify/scripts/python/goal-utils.py cleanup --apply \
 
 **Expected**: the check names 9 `anchor` / 3 `action-goal` / 2 `obsolete` entries plus the team
 dispositions, with zero writes; the first apply performs the actions and writes one receipt per acted
-entry; the second apply reports every entry `already-*`, exits 0, and produces **no diff** (SC-007).
+entry (retained anchors additionally get `anchor-body-receipt.json` for the A-N rewrites); the second
+apply reports every entry `already-*`, exits 0, and produces **no diff** (SC-007). A digest mismatch
+is exit 4 `conflict` naming both paths, never a silent rewrite.
 **Pin**: `tests/contract/test_cleanup_idempotency.py` (two applies, no second write) and
 `tests/contract/test_cleanup_resume.py` (interrupted before `remove-source`, and after
 `write-receipt`; I5 state is exit 4 and is never silently repaired).
@@ -124,8 +126,13 @@ entry; the second apply reports every entry `already-*`, exits 0, and produces *
 ls .specify/anchoring/*/goal.md 2>/dev/null            # expect: nothing
 grep -rn "goal_slug" .specify/teams .specify/anchoring .specify/goals .specify/agents \
   .specify/skills .specify/teams.md 2>/dev/null        # expect: nothing
+grep -rn '^# Goal:' .specify/anchoring 2>/dev/null     # expect: nothing (C-38 A-N-1 applied)
 python3 .specify/scripts/python/goal-utils.py --scope anchor binding <anchor> --json
 ```
+
+**Note**: do not hand-roll a `.specify/goal targets` grep here — dated records quote the retired
+pointer legitimately. Class C6 is measured by the declared scan in S-8, whose roots and exclusions
+are owned by `research.md` §5.
 
 **Expected**: no action-level definition remains in the anchor store; no `goal_slug` remains on a live
 definition surface; every `anchor_slug` on disk resolves to an existing `anchor.md`. An **archived**
@@ -154,9 +161,12 @@ to rewrite it.
 bash scripts/bash/run-tests.sh tests/contract/test_live_semantic_residue.py -q
 ```
 
-**Expected** at implement exit: the four classes read `C1 0 · C2 0 · C3 0 · C4 0` over the live roots
-declared in `research.md` §5, against the plan-time baseline `C1 4 · C2 0 · C3 7 · C4 15 · total 26`
-(`test-evidence/live-semantic-scan-baseline-2026-11-12.txt`). The test file **does not exist at plan
+**Expected** at implement exit: every declared class reads 0 — `C1 0 · C2 0 · C3 0 · C4 0` over the
+live roots, `C5 0` in the anchor store (from 11 lines in the 9 retained anchors), `C6 0` (from 40
+line-hits) and `C7 0` in `.specify/features.md` (from 3 rows) — against the plan-time baseline
+`C1 4 · C2 0 · C3 7 · C4 15 · C5 16 (11 in retained anchors) · C6 40 · C7 3`
+(`test-evidence/live-semantic-scan-baseline-2026-11-12.txt` and
+`test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`). The test file **does not exist at plan
 entry** — G-6 creates it in WP-05 with the injection case. The scan roots, the excluded sets and the
 patterns have one owner (that declaration + the contract test); adding a root or an exclusion is a plan
 revision, never an ad-hoc exemption. The **injection case** must still fire: a freshly injected

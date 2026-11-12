@@ -61,9 +61,9 @@ keys and the same binding record; only their **location**, their **section headi
 | Required frontmatter | `status`, `created`, `updated`, `binding` (E-3) |
 | Required sections | `## Guidance` (steps allowed), `## Completion Conditions` (≥1, verifiable), `## History` |
 | Optional | `## Migrated Targets` (only for a definition migrated by this feature, R-07) |
-| Forbidden | `## Targets` as a live mechanism, team binding inbound, any position in the control hierarchy |
+| Forbidden | `## Targets` as a live mechanism, team binding inbound, any position in the control hierarchy, any Anchor pointer (`anchor_ref` or a key naming an Anchor — undeclared keys are rejected, exit 2, per FR-004 / C-20) |
 | Mutators | `/speckit.goal` → `manage-goal` → `goal-utils.py` |
-| Invariants | MUST NOT be resolvable as an Anchor identity (FR-023); no GD-2 shape check on guidance (FR-024); terminal states retained (FR-025) |
+| Invariants | MUST NOT be resolvable as an Anchor identity (FR-023); no GD-2 shape check on guidance (FR-024); terminal states retained (FR-025); the only cross-reference is binding `origin` |
 
 ### E-3 Binding record (shared)
 

@@ -1,0 +1,89 @@
+# Residue baselines added by checklist repair round 1 (F-1 / F-2 / F-10)
+
+Measured 2026-11-12 on working tree at stage base `07cb00451` (plan stage, checklist gate round 1).
+Roots and class definitions: `research.md` §5. Read-only measurements; no file was modified.
+
+## C5 — retained-anchor body speaks the retired terminology
+
+Pattern: `^\#\s*Goal:` OR `\.specify/goal(?![a-z])`, scoped to `.specify/anchoring/*/goal.md`.
+
+```
+085-sdd-temporary-goal-team               1   (leaves the store: obsolete)
+086-efficient-test-execution              1
+087-arch-diagram-docs                     1
+088-speckit-visualization                 1   (leaves the store: action-goal)
+090-re-anchoring                          1
+091-auto-git-closeout                     1   (leaves the store: action-goal)
+094-goal-team-parallel                    3   (1 heading + 2 retired `.specify/goal|teams` lines)
+command-logic-as-classified-skills        1
+draw-diagram-interactive                  1   (leaves the store: action-goal)
+draw-two-layer-structure                  1
+post-refactor-mechanism-integrity         1   (leaves the store: obsolete)
+script-interface-contract                 1
+session-driven-self-improvement           1
+skill-layer-install-separation            1
+----------------------------------------------
+store as it stands (14 dirs)             16
+retained 9 anchors                        11   <-- convergence target
+```
+
+The 11 retained lines = 9 `# Goal:` H1 headings + 2 lines in `094-goal-team-parallel`
+(L15 and L19, both `.specify/goal|teams`).
+
+## C6 — live surface still routes an Anchor-only mode to `/speckit.goal`
+
+Pattern: `/speckit\.goal\s+(targets|migrate|migrate-archive|coordinate)\b` over the roots in
+`research.md` §5 (exclusions applied).
+
+```
+scripts/python/goal-utils.py                                 8
+.specify/scripts/python/goal-utils.py                        8
+skills/internal/create-team/references/create-mode.md        3
+.specify/skills/internal/create-team/references/create-mode.md 3
+docs/reference/commands/team.md                              2
+.specify/glossary.md                                         2
+skills/internal/run-team/SKILL.md                            1
+skills/internal/create-team/references/goal.md               1
+skills/internal/create-team/references/execution-guide.md    1
+skills/internal/create-team/references/summary-mapping.md    1
+skills/internal/improve-team/references/goal-editing.md      1
+src/specify_cli/__init__.py                                  1
+docs/reference/commands/seal.md                              1
+.specify/skills/internal/run-team/SKILL.md                   1
+.specify/skills/internal/create-team/references/goal.md      1
+.specify/skills/internal/create-team/references/execution-guide.md 1
+.specify/skills/internal/create-team/references/summary-mapping.md 1
+.specify/skills/internal/improve-team/references/goal-editing.md 1
+.specify/teams/command-logic-as-classified-skills/team.md    1
+.specify/features.md                                         1
+----------------------------------------------------------------
+total line-hits                                             40
+```
+
+Engine sites (8, canonical): `goal-utils.py:1274, 1294, 1304, 1310, 1360, 1363, 1377, 1393`.
+
+## C7 — live feature-index row states the retired model
+
+Patterns over `.specify/features.md` only: `\.specify/goal/<[^>]+>` |
+`\.specify/anchoring/<[^>]+>/goal\.md` | `(?i)project-level goal` | `goal\s*=\s*设计师`.
+
+```
+line 36   row 027  `.specify/goal/<goal-slug>/` (036 extension narrative)
+line 50   row 041  "Project-level goal", `.specify/goal/<goal-slug>/goal.md`
+line 103  row 094  `.specify/anchoring/<slug>/goal.md`, "goal=设计师"
+------------------------------------------------------------------
+3 rows
+```
+
+## Rejected alternative (recorded so it is not re-proposed)
+
+A literal `.specify/goal/` sweep over all live roots measured **84 line-hits**, most of them dated
+narrative that FR-061 forbids rewriting. C6 is the behavioural class (a user following the pointer
+reaches a refusing command); the path literal is not.
+
+## Readings this file feeds
+
+- SC-001 final readings (T075): C1 4 · C2 0 · C3 7 · C4 15 = 26; C5 16 (11 retained) · C6 40 · C7 3.
+- T050 evidence: C5 11 → 0 in the 9 retained anchors.
+- T042 / T078 evidence: C7 3 → 0 (three index rows + two successor notes).
+- T017 / T044 evidence: C6 40 → 0.

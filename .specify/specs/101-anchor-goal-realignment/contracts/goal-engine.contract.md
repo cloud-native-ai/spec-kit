@@ -46,6 +46,13 @@ two or more → exit 2 `scope-ambiguous` naming the layers. `auto` is read-only:
 No action in one group may write another group's store. `goal-*` actions default `--scope goals`;
 a caller passing `--scope anchor` to a `goal-*` write gets `cross-layer-write` (exit 2).
 
+**Cross-cutting message rule (FR-016)**: every user-facing string this engine emits names the command
+that owns the action under the split — hints for `targets` / `migrate` / `migrate-archive` /
+`coordinate` say `/speckit.anchor` and never `/speckit.goal`. The sites measured today are eight hints
+in `run-checks` / `preview-target-check` (`goal-utils.py:1274, 1294, 1304, 1310, 1360, 1363, 1377,
+1393`) plus the mirrored copy; residue class C6 (`research.md` §5) is the guard, so a new hint that
+regresses the wording turns the scan red rather than relying on a hand-kept list.
+
 ## C-27 — Anchor group (adapted, same semantics)
 
 | Action | Change from today |
@@ -121,6 +128,11 @@ to `in_family`.
 `resolve-scope`, `handoff-decision`, `probe-residual` keep their shapes; `handoff-ref` validates
 `anchor_slug` / `team_slug` and writes the reverse `handoff_ref`.
 
+`run-checks` emits the binding identity under the key `anchor_slug` (FR-016 / FR-033). The pre-change
+key `goal_slug` MUST NOT survive in its JSON payload; `team_slug`, `identity_kind`, `binding`,
+`resolution`, `checks`, `verdict` and `blocked` keep their names and meanings. Callers that read the old
+key are updated in the same change (C-32).
+
 ## C-34 — Interface contract
 
 `-h` / `--help` and `--version` answer without acting; an undeclared option is rejected
@@ -132,6 +144,7 @@ to `in_family`.
 | Step | Writes | Must not write |
 |------|--------|----------------|
 | anchor rename (`goal.md` → `anchor.md`) | `.specify/anchoring/<slug>/` | any other store |
+| anchor body normalization (A-N-1…A-N-4) | matching lines in `.specify/anchoring/<slug>/anchor.md` + `anchor-body-receipt.json` | any non-matching line; any other store |
 | action-goal migration | `.specify/goals/<slug>/**` | the anchor store |
 | obsolete archival | `.specify/archive/anchoring/<slug>/**` | any live store |
 | team structural rename | one frontmatter line in `.specify/teams/<slug>/team.md` | body lines |
