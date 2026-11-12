@@ -83,7 +83,7 @@ bindings. Every disposition carries its own receipt in the team directory
 | Team | Bound slug | Disposition | Evidence |
 |------|-----------|-------------|----------|
 | `088-reporting-dogfood` | `088-speckit-visualization` (action-goal) | **R3** archive team | Purpose is a one-off dogfood proof (`scope: spec`, single >90 s reporting run); no existing Anchor covers "progress reporting"; no continuous-by-degree theme to promote. |
-| `091-auto-git-closeout` | `091-auto-git-closeout` (action-goal) | **R3, already satisfied** — record only | `team.md` carries `lifecycle_state: archived`; the disposition receipt cites that line instead of writing it again. |
+| `091-auto-git-closeout` | `091-auto-git-closeout` (action-goal) | **R3** archive team (apply) | `team.md` carries `lifecycle_state: archived`, but the binding line is still present; apply removes it and writes a `disposition-receipt.json` in the team directory per C-47. |
 | `085-sdd-temporary-goal-team` | `085-sdd-temporary-goal-team` (obsolete) | **R3** archive team | Spec-scoped SDD team of a delivered feature; the model it was built for is superseded. |
 | `post-refactor-mechanism-integrity` | `post-refactor-mechanism-integrity` (obsolete) | **R3** archive team | Three-stage verification chain keyed to the achieved one-off entry; terminal by construction. |
 | `draw-diagram-interactive` | `draw-diagram-interactive` (action-goal) | **R3** archive team | Bounded iteration (`max_iterations: 5`, threshold 0.8) over one skill; no existing Anchor covers it and the theme does not pass the `anchor` criterion. |

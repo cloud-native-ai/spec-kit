@@ -59,8 +59,8 @@ For `anchor`, two declared sub-steps, in this order:
 | A-N-3 | `.specify/goal/<slug>/**` (incl. `/goal.md`, `/summary/`) | `.specify/anchoring/<slug>/**` |
 | A-N-4 | `/speckit.goal` on a line that also matches A-N-1…A-N-3 | `/speckit.anchor` |
 
-Measured surface at plan time: **9** A-N-1 lines (one per retained anchor) and **4** A-N-2/A-N-3
-hits, all four inside `094-goal-team-parallel`. Zero hits means the step is a no-op for that entry,
+Measured surface at plan time: **9** A-N-1 lines (one per retained anchor) and **2** A-N-2 lines
+inside `094-goal-team-parallel`; A-N-3 hits are **0**. Zero hits means the step is a no-op for that entry,
 recorded as `already-normalized` (exit 0).
 
 ## C-39 — Concept digest
