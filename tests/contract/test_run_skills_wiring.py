@@ -45,7 +45,7 @@ BASELINE_INTERNAL = [
     "collect-evidence", "create-agent", "create-checklist", "create-plan",
     "create-requirements", "create-tasks", "create-team", "create-tools",
     "derive-architecture", "implement-feature", "improve-agent", "improve-team",
-    "improve-tools", "manage-agents", "manage-constitution", "manage-features",
+    "improve-tools", "manage-agents", "manage-anchor", "manage-constitution", "manage-features",
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",

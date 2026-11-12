@@ -289,6 +289,10 @@ GOAL_CANONICAL = REPO_ROOT / "templates/commands/goal.md"
 # destructive-write disclosure moved into the manage-goal skill. The pins below follow
 # the content to its owner file.
 GOAL_SKILL = REPO_ROOT / "skills/internal/manage-goal/SKILL.md"
+# 2026-11-12 (Feature 101): the Targets surface moved with the seven-mode command — the
+# mode table and its engine examples are owned by the Anchor authoring skill now;
+# manage-goal must carry neither (FR-022).
+ANCHOR_SKILL = REPO_ROOT / "skills/internal/manage-anchor/SKILL.md"
 GOAL_PER_TOOL_COPIES = (
     REPO_ROOT / ".claude/commands/speckit.goal.md",
     REPO_ROOT / ".github/prompts/speckit.goal.prompt.md",
@@ -369,14 +373,17 @@ def test_command_links_to_the_concept_authority():
 # --------------------------------------------------------------------------
 
 def test_targets_mode_row_is_documented():
-    text = GOAL_SKILL.read_text(encoding="utf-8")
-    assert "| `targets` |" in text, "Modes table must carry a targets row"
+    text = ANCHOR_SKILL.read_text(encoding="utf-8")
+    assert "| `targets` |" in text, "the seven-mode table must carry a targets row"
+    assert "| `targets` |" not in GOAL_SKILL.read_text(encoding="utf-8"), (
+        "manage-goal must not expose Targets (FR-022)"
+    )
 
 
 def test_engine_invocation_examples_cover_the_targets_action_group():
-    text = GOAL_SKILL.read_text(encoding="utf-8")
-    for example in ("targets <goal-slug> --add", "targets <goal-slug> --list",
-                    "targets <goal-slug> --set"):
+    text = ANCHOR_SKILL.read_text(encoding="utf-8")
+    for example in ("targets <anchor-slug> --add", "targets <anchor-slug> --list",
+                    "targets <anchor-slug> --set"):
         assert example in text, f"engine example missing: {example}"
 
 

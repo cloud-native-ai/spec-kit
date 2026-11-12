@@ -108,8 +108,12 @@ WIRING_SKILLS = (
 # 2026-11-11 (Feature 099): 30 -> 31. FR-021 adds `/speckit.seal` (`seal.md`, the
 # review-conclusion seal and merge-back command). Same clause, same guard: only the
 # sanctioned addition is enumerated.
+# 2026-11-12 (Feature 101): 31 -> 32. FR-010 adds `/speckit.anchor` (`anchor.md`), the
+# seven-mode anchor-archive authoring entry split out of the retired project-level
+# `/speckit.goal`; `/speckit.goal` itself is rewritten to four modes, not removed.
 FROZEN_COMMANDS = (
     "agents",
+    "anchor",
     "analyze",
     "checklist",
     "clarify",
@@ -170,6 +174,9 @@ FROZEN_COMMANDS = (
 # 2026-11-11 (harness binding): 57 -> 58 = 18 external + 40 internal; the new unit is
 # `internal/debt-audit`, the tech-debt inventory skill bound to the sdd-debt-governor
 # agent template. It names the agent and owners by path only; the roster moves.
+# 2026-11-12 (Feature 101): 58 -> 59 = 18 external + 41 internal; the new unit is
+# `internal/manage-anchor`, the seven-mode anchor-archive authoring skill (FR-012).
+# It names the engine by relative path only (no C-5 wiring token), so the roster moves.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -207,6 +214,7 @@ FROZEN_SKILLS = (
     "internal/improve-team",
     "internal/improve-tools",
     "internal/manage-agents",
+    "internal/manage-anchor",
     "internal/manage-constitution",
     "internal/manage-features",
     "internal/manage-feedback",

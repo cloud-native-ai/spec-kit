@@ -101,9 +101,12 @@ ENGINE_REF = "flow-class-check.py"
 # 2026-11-11 (Feature 099): 30 -> 31 commands and 56 -> 57 skills. `/speckit.seal`
 # and `skill:seal-artifact` (FR-021/C-041) ship inside the same staged payload, so
 # both rosters and both pinned lengths move together again.
+# 2026-11-12 (Feature 101): 31 -> 32 commands and 58 -> 59 skills. `/speckit.anchor`
+# (FR-010) and `skill:manage-anchor` (FR-012) ship inside the same staged payload, so
+# both rosters and both pinned lengths move together again.
 COMMAND_BASELINE = frozenset(
     {
-        "agents", "analyze", "checklist", "clarify", "constitution", "derive",
+        "agents", "anchor", "analyze", "checklist", "clarify", "constitution", "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
         "implement", "improve", "instructions", "interview", "measure",
         "migrate", "plan",
@@ -121,7 +124,7 @@ SKILL_BASELINE = frozenset(
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",
         "debt-audit", "derive-architecture", "implement-feature", "improve-agent",
-        "improve-team", "improve-tools", "manage-agents",
+        "improve-team", "improve-tools", "manage-agents", "manage-anchor",
         "manage-constitution", "manage-features", "manage-feedback",
         "manage-goal", "manage-history", "manage-instructions", "manage-todo",
         "memory-recall", "memory-record", "research-feature",
@@ -131,8 +134,8 @@ SKILL_BASELINE = frozenset(
         "study-online", "study-kb", "summarize-project",
     }
 )
-assert len(COMMAND_BASELINE) == 31
-assert len(SKILL_BASELINE) == 58
+assert len(COMMAND_BASELINE) == 32
+assert len(SKILL_BASELINE) == 59
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

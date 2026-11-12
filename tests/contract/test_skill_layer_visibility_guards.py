@@ -64,7 +64,7 @@ INTERNAL_SKILLS = {
     "collect-evidence", "create-agent", "create-checklist", "create-plan",
     "create-requirements", "create-tasks", "create-team", "create-tools",
     "derive-architecture", "implement-feature", "improve-agent", "improve-team",
-    "improve-tools", "manage-agents", "manage-constitution", "manage-features",
+    "improve-tools", "manage-agents", "manage-anchor", "manage-constitution", "manage-features",
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
@@ -114,8 +114,9 @@ def test_flat_discovery_surfaces_external_layer_only():
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
     # 2026-11-11：Feature 099 新增 internal/seal-artifact（`/speckit.seal` 内部技能），内部 38 -> 39
-    assert len(internal_nested) == 40, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 40 — "
+    # 2026-11-12：Feature 101 新增 internal/manage-anchor（`/speckit.anchor` 七模式内部技能），39 -> 40
+    assert len(internal_nested) == 41, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 41 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

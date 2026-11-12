@@ -11,7 +11,9 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 ## Positioning
 
-`/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill, script, or other command may write into that store **directly** — the goal engine (`goal-utils.py`) is its sole writing path, whether driven by this entry or carried as delegated logic behind it. The same entry is the **only command entry** for the one-time migration of spec-local goal/team trees into the unified archive (`migrate-archive` mode); `/speckit.sanitize` offers only the read-only residual probe.
+`/speckit.goal` is the **sole authoring entry** for **action-level Goal** definitions — short-horizon, step-shaped practical guidance stored at `.specify/goals/<goal-slug>/goal.md`. It is not the entry for a project-level end state: that long-horizon concept is the **Anchor**, served by `/speckit.anchor`, and no paragraph of this command makes a Goal project-level or an anchor-archive entry. No skill, script, or other command may write a Goal definition **directly** — the definition engine (`goal-utils.py`) is its sole writing path, whether driven by this entry or carried as delegated logic behind it.
+
+**Write boundary**: this command writes only the Goal store. It never writes the anchor store and never writes a team definition (FR-021); a caller naming the anchor layer gets the engine's cross-layer refusal (exit 2), and the command never silently redirects the write.
 
 ## Glossary
 
@@ -19,23 +21,23 @@ Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`:
 
 ## Outline
 
-一次调用 = 委派 **`manage-goal`** 技能执行全部目标操作。Goal 的概念(构成、生命周期、档案层、与 Requirement 的边界、判据权威性、单一定位、团队绑定)定义于 `.specify/shared/definitions/goal-definitions.md`,确定性规则(身份文法、三段结构、生命周期表、变更历史、档案枚举)在引擎 `.specify/scripts/python/goal-utils.py` —— 均以技能与该两处为单一事实源,本模板引用而不复述。
+一次调用 = 委派 **`manage-goal`** 技能执行全部行动级 Goal 操作。Goal 的概念(构成、生命周期、存档与身份、与 Anchor / SDD / Team 的边界)定义于 `.specify/shared/definitions/goal-definitions.md`,确定性规则(身份文法、三段结构、生命周期表、变更历史、档案枚举)在引擎 `.specify/scripts/python/goal-utils.py` —— 均以技能与该两处为单一事实源,本模板引用而不复述。
 
-**Delegation (mandatory)**: load `.specify/skills/internal/manage-goal/SKILL.md` and execute per its Workflow。七模式(`create` / `view` / `modify` / `targets` / `migrate` / `migrate-archive` / `coordinate`)的模式表、读写分组与退出码裁决、唯一破坏性写(`criteria --clear` 需用户明示批准)、`create` 四要素访谈、执行顺序与 Boundaries 全部由该技能承载。
+**Delegation (mandatory)**: load `.specify/skills/internal/manage-goal/SKILL.md` and execute per its Workflow。四模式(`create` / `view` / `modify` / `status`)的模式表、读写分组与退出码裁决、唯一破坏性写(完成条件集清空需用户明示批准)、`create` 访谈、执行顺序与 Boundaries 全部由该技能承载 —— 本模板不复述它们。
 
-**`migrate-archive` mode**: the one-time move of spec-local goal/team definitions into the unified archive, both kinds in one explicit call, archive-not-delete (a source tree is archived, never deleted). It is explicit and never invoked implicitly by a run; `/speckit.sanitize` only renders the read-only residual reading. The mode's flags, receipt shape and exit codes are owned by the engine's action table (`python3 .specify/scripts/python/goal-utils.py --help`); this template restates none of them.
+**Anchor-only modes are named-refused**: an invocation naming `targets`, `migrate`, `migrate-archive` or `coordinate` MUST fail with the literal `anchor-only-mode`, MUST name `/speckit.anchor` as the correct entry, MUST exit 2, and MUST write nothing — it never falls back to `view` or to any read rendering. The executable subject of this refusal is the engine's read-only action `command-mode --command goal --mode <mode>`: it exits 0 for the four Goal modes, exits 2 with `anchor-only-mode` and `/speckit.anchor` on stderr for the four Anchor-only modes, and writes nothing. Never reinterpret the refusal as a read request.
 
-**Scope**: pass `--scope` and `--spec-dir <path>` through to the goal engine. The closed scope value set, what each member names, and the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers — this template cites that owner and enumerates none of it. `--spec-dir` is accepted for `origin` resolution and `auto` validity only; it never decides where a definition lands. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+**Scope**: pass `--scope` and `--spec-dir <path>` through to the engine. The closed scope value set is owned by `.specify/shared/definitions/anchor-definitions.md` § Archive Layers — this template cites that owner and enumerates none of it. The path rule is owned by the engine's `resolve-scope` action; this template cites it and defines none of it.
 
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 
-- Intent:七模式之一,可选 goal-slug / team-slug;歧义回退只读的 `view`;模式每次运行披露。
+- Intent: 四模式之一,可选 goal-slug;歧义回退只读的 `view`;模式每次运行披露。
 - Glossary 前置已由本命令完成(见上)。
 
 ### 技能产出
 
-- 定义文件本身—— 写 `.specify/anchoring/<slug>/goal.md`(goal 档案层;仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)——与受影响 `team.md`(migrate / coordinate 经用户批准后)。
-- `coordinate` 的领地重划分提案(批准前不写入);收尾执行报告。
+- 定义文件本身—— 写 `.specify/goals/<goal-slug>/goal.md`(仅经引擎写入;其余写入均直接执行,按执行报告呈现,事后经 `/speckit.goal` modify 修改)。
+- `status` 的报告或生命周期转换结果;收尾执行报告。
 
 ## Wrap-up
 
@@ -52,6 +54,6 @@ Consult `.specify/glossary.md` and apply `.specify/shared/workflow/glossary.md`:
 
 ## Handoffs
 
-**Before**: none — a goal may be archived at any time, with or without teams.
+**Before**: none — an action-level Goal needs no team and no Anchor.
 
-**After**: bind a team by declaring `goal_slug` in its `team.md` (see `/speckit.team`). Once two or more teams share a goal, run `coordinate` to keep their territories disjoint.
+**After**: none by design. Work that needs scope slices or coordination across teams belongs to an Anchor bound to those teams (`/speckit.anchor`, `/speckit.team`); a Goal is not team-bound and does not enter the control hierarchy.

@@ -1,113 +1,103 @@
 # `/speckit.goal`
 
-Author and manage **project-level goal definitions**: the sole entry for creating, viewing, modifying, and migrating a goal, plus coordinating teams that share one.
+Author and manage **action-level Goal definitions** — the sole entry for creating, viewing, modifying, and reporting or transitioning the lifecycle state of short-horizon practical guidance.
 
 - **Source of truth**: `templates/commands/goal.md`
-- **Engine**: `scripts/python/goal-utils.py`
+- **Engine**: `scripts/python/goal-utils.py` (sole definition writer)
 - **Concept authority**: `.specify/shared/definitions/goal-definitions.md` (read-only — the command links to it and never restates it)
-- **Feature**: 041 Goal Registry · **Requirement**: `037-goal-registry`
+- **Delegated skill**: `skills/internal/manage-goal/SKILL.md` (mode mechanics)
 
-## What a goal is, in one paragraph
+## What a Goal is, in one paragraph
 
-A goal is a project-level **authored fact source** stating a desired end outcome and how to tell it has been reached. It is composed of exactly three parts — objective narrative, zero-or-more verifiable success criteria, and lifecycle state — with identity carried by its directory name. It is not a requirement: a requirement binds what this project's code must implement, while a goal's object is unrestricted and may target the framework itself, codebase-wide convention convergence, or a runtime outcome. The two sit on different planes with no hierarchy and no connecting field.
+A Goal is an **action-level, short-horizon authored fact source**: the executable practical guidance a run follows next, plus at least one verifiable completion condition and a lifecycle state. Guidance **may be step-shaped** — a numbered sequence is a legitimate Goal shape here, because a Goal tells a run what to do rather than where the project ends up. The project-level, long-horizon end state is a different concept with a different entry: `/speckit.anchor`. Composition, identity, the store, the section layout and the neighbours are owned by the concept authority above; this page describes only the command surface and links there for every fact.
 
 ## Archive layout
 
 ```text
-.specify/goal/
+.specify/goals/
 └── <goal-slug>/
-    ├── goal.md        # authored definition — never written by a derived flow
-    └── summary/       # derived: the goal-indexed summary, roster, and charts
+    └── goal.md        # authored definition — never written by a derived flow
 ```
 
-`goal.md` and `summary/` are two faces of one object. The summary refresh's write-set is an allow-list of `summary/**`, which is what makes "the definition is never rewritten" mechanically checkable.
+The store and the identity grammar are owned by the concept authority; the engine is the only writer.
 
-## Modes
+## Modes (exactly four)
 
 | Mode | Purpose | Writes |
 |------|---------|--------|
-| `create` | archive a new definition | `goal.md` |
-| `view` | list the archive or show one goal | nothing |
-| `modify` | change objective, criteria, lifecycle state, or Targets | `goal.md` |
-| `targets` | add / list / transition the goal's Targets (scope slices) | `goal.md` |
-| `migrate` | derive a definition from a team's inline goal and switch the team to a reference | `goal.md` + that `team.md` |
-| `coordinate` | propose a territory re-division across teams sharing a goal | nothing until ratified |
+| `create` | archive a new action-level Goal | `goal.md` |
+| `view` | list the Goal archive, or show one Goal | nothing |
+| `modify` | change the guidance narrative or the completion conditions | `goal.md` |
+| `status` | report lifecycle state, or transition it | `goal.md` (`--set` only) |
 
-Every write passes a preview → confirm gate. `view` is read-only and is the fallback when input is ambiguous.
+Every write is previewed before it lands (preview is disclosure, not a blocking gate); `view` and a `status` report are read-only, and `view` is the fallback when input is ambiguous.
+
+## Anchor-only modes are refused by name
+
+`targets`, `migrate`, `migrate-archive` and `coordinate` belong to `/speckit.anchor`. Naming one of them on `/speckit.goal` fails with a **named refusal** (`anchor-only-mode`), exits `2`, writes nothing, and points at `/speckit.anchor` — it never silently falls back to `view`. The executable subject of that refusal is the engine's read-only `command-mode --command goal --mode <mode>` action; the declared mode set itself is read from this command's `argument-hint`.
 
 ## Identity
 
-The identity is the directory name: first character alphanumeric, remaining characters limited to `[A-Za-z0-9_.-]`, and a safe path segment. This is the same `goal_slug` grammar the summary generator enforces — one grammar, deliberately not two.
+The identity is the directory name (`goal-slug`). The grammar and path-safety rules are the engine's (`python3 scripts/python/goal-utils.py --help`); there is one identity grammar shared by the archive layers, not one per command.
 
 ## Lifecycle
 
-```text
-(none) ──create──▶ active ──achieve──▶ achieved   (terminal, retained)
-                     └─────abandon──▶ abandoned   (terminal, retained)
-```
-
-There is no `superseded` state, and deletion is not a transition — terminal goals remain in the archive as the project's goal history.
+`active` / `achieved` / `abandoned` — the shared value set and its transition discipline are owned by `.specify/shared/definitions/anchor-definitions.md` and cited from the concept authority. Terminal Goals are retained in the archive; deletion is not a lifecycle transition. Reopening a terminal Goal (`--set active`) is allowed only for a human-owned Goal — the engine enforces it and every transition appends a history line.
 
 ## Engine reference
 
 ```bash
-# archive a goal
-python3 scripts/python/goal-utils.py create framework-stays-current \
-  --objective "The framework this project consumes stays continuously current." \
-  --criterion "No pending upstream release older than 30 days." --json
+# archive a Goal
+python3 scripts/python/goal-utils.py goal-create tighten-local-loops \
+  --guidance "1. Collect the slow-loop samples. 2. Cut the per-cycle overhead." \
+  --done "All sampled loops finish under one second." --json
 
-python3 scripts/python/goal-utils.py list                       # enumerate the archive
-python3 scripts/python/goal-utils.py validate <goal-slug>        # check one definition
-python3 scripts/python/goal-utils.py status   <goal-slug> --set achieved
-python3 scripts/python/goal-utils.py criteria <goal-slug> --criterion "<new criterion>"
-python3 scripts/python/goal-utils.py targets  <goal-slug> --add "<sub-outcome statement>"
-python3 scripts/python/goal-utils.py targets  <goal-slug> --list
-python3 scripts/python/goal-utils.py targets  <goal-slug> --set done --id T-001
+python3 scripts/python/goal-utils.py goal-list                      # enumerate the Goal archive
+python3 scripts/python/goal-utils.py goal-view <goal-slug>          # render one Goal
+python3 scripts/python/goal-utils.py goal-status <goal-slug>        # report lifecycle state
+python3 scripts/python/goal-utils.py goal-status <goal-slug> --set achieved
+python3 scripts/python/goal-utils.py goal-modify <goal-slug> --guidance "<revised guidance>"
+python3 scripts/python/goal-utils.py goal-modify <goal-slug> --done "<replacement condition>"
 ```
 
-`--repo-root` and `--json` are accepted both before and after the subcommand.
+`--repo-root` and `--json` are accepted both before and after the subcommand. `--scope` accepts the closed member set owned by `.specify/shared/definitions/anchor-definitions.md` § Archive Layers — this page does not enumerate it; `--scope auto` is read-only and every write action refuses under it. For a bare slug the engine resolves the Goal layer with `--scope goals`.
 
 | Exit | Meaning |
 |------|---------|
 | `0` | ok |
-| `2` | input error — invalid identity, duplicate, or a rejected objective |
-| `3` | goal not found |
+| `2` | input error — invalid identity, duplicate, undeclared key, or a refusal |
+| `3` | not found |
 | `4` | validation failed |
+| `5` | blocked |
 
 ## Rejections you should expect
 
 | Situation | Result |
-|-----------|--------|
+|-----------|---------|
 | identity already exists | refused, pointing at the modify path; the existing definition is never overwritten |
-| identity breaks the grammar or path safety | refused, naming the rule |
-| objective written as a task list | refused as **GD-2** — state the outcome, not the steps |
-| objective bundling several objectives | refused as **GD-3** — split into separate goals |
-| reopening a terminal goal | refused; terminal goals are retained, not reopened |
+| `create` without a completion condition | refused — at least one `--done` is required |
+| an argument-less `goal-modify` | exits `2`; it is never read as a view entry and never empties anything |
+| emptying the completion conditions | requires the explicit `--clear-done` flag **and** the user's approval (`--clear-done` together with `--done` also exits `2`) |
+| reopening a terminal Goal owned by a tool | refused; only a human-owned Goal may be reopened |
+| an undeclared key such as `anchor_ref` | refused with exit `2` — a Goal carries no pointer to an Anchor |
+| naming an Anchor-only mode | named refusal, exit `2`, zero writes, pointing at `/speckit.anchor` |
 
-Changing criteria never silently replaces them: the prior value is appended to `## History`, so drift stays traceable.
+Changing the guidance or the conditions never silently replaces them: the prior value is appended to `## History`, so drift stays traceable.
 
-## Empty criteria are legal
+## Step-shaped guidance is legal
 
-A goal may carry an objective and no criteria. The archive records `None provided.`, and consumers must declare the absence rather than inventing criteria. Milestones derived from that goal will be an empty group, honestly labelled.
+A Goal's guidance is practical instruction — it may be a sequence of steps, and no `outcome, not steps` check runs on it. The shape check applies to the completion conditions only, which must be verifiable and non-empty at create time. A condition whose measurement route is a named human reviewer is as legitimate as one a program measures.
 
-## Relationship to teams
+## Relationship to SDD and teams
 
-A team references a goal by declaring `goal_slug` in its `team.md` — identity only, never a copy of the objective. The binding is **N teams : 1 goal**, one-way; the goal side learns its teams by derivation, not by storage. A team serves exactly one goal at a time.
+A Goal is **parallel to** SDD, not above it: spec/plan/tasks carry deliverable design, a Goal carries action-level guidance, and neither parses the other's identity. A Goal does not enter the control hierarchy, is never bound by a team, and never substitutes for spec artifacts. Team binding and slice coordination are always carried by Anchor + Team (`/speckit.anchor`, `/speckit.team`).
 
-Once two or more teams share a goal, their declared territories must not overlap on writes. `coordinate` detects overlap and proposes a re-division; a human ratifies it, and the ratified division is written back into each `team.md`.
+## Write boundary
 
-## Targets (scope slices)
-
-A goal MAY additionally carry **Targets** — run-assignable scope slices (`T-<nnn>`, three states, engine-rendered `## Targets` section). The concept — identity grammar, lifecycle, boundary against the criteria axis — is defined once in the concept authority (Target Decomposition); this command owns only the operations: `targets <slug> --add/--list/--set`. Statements pass the same GD-2/GD-3 shape check at slice scale and must not restate a success criterion; terminal goals are read-only; terminal identities are never reused. Runs consume an authorized slice via `/speckit.team run <team> --target T-<nnn>`; a terminal-state reference triggers the review bifurcation (verify by hand; reopen via `--set open` if evidence contradicts) — there is no terminal-execution bypass.
-
-The `create` interview collects Targets as its fourth, **optional** item: after objective, criteria, and identity, the user may state zero or more sub-outcome statements (zero is legal — a goal without Targets is fully valid, and the item may be skipped entirely). Stated slices land after the definition is created — `targets <slug> --check "<statement>"` for the dry-run verdict, then `targets <slug> --add "<statement>"` to authorize — never hand-written into `goal.md`. A rejected statement is reported as a verdict; the user rewords or drops it while the created goal stands.
-
-## Out of scope
-
-Driving a host CLI's own goal mechanism from an archived definition is deliberately **not** part of this command. Official documentation confirms the host CLI's `/goal set` accepts inline text only, with no file or identity option, so that integration needs its own requirement.
+`.specify/goals/<goal-slug>/goal.md` definitions are written only through this command and the engine. This command never writes the anchor archive or any team definition; those belong to `/speckit.anchor`'s surface.
 
 ## See also
 
 - `.specify/shared/definitions/goal-definitions.md` — the concept authority
-- `docs/reference/commands/team.md` — the team side of the binding
-- `.specify/features/041-goal-registry.md` — Feature detail
+- `docs/reference/commands/anchor.md` — the Anchor command (seven modes)
+- `docs/reference/commands/team.md` — team definition and binding
