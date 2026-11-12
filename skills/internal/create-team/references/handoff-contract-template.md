@@ -15,10 +15,13 @@ names and no second location (C-53; ruling N-3 of `tasks.md` puts this template 
   carry this file; an unexpected one is reported (`handoff-without-handoff-decision`) and
   is never consumed as authority (C-69).
 - **Refused at creation when a key does not resolve**: `goal_slug` and `team_slug` are
-  validated against `.specify/anchoring/<goal_slug>/goal.md` and
+  validated against `.specify/anchoring/<goal_slug>/anchor.md` and
   `.specify/teams/<team_slug>/team.md` through the engine; an unresolvable key exits 2
   with `handoff-dangling-key` naming the key (C-58). The reverse `handoff_ref` is written
   on both definitions by the engine's binding action, never by this file alone (C-59).
+  The frontmatter key `goal_slug` is this artifact's schema key owned by the 094 contract
+  (C-55/C-56/C-58); it names the bound Anchor but is not the team definition's binding
+  field, which is `anchor_slug`.
 - **`implement` refuses to start** a handoff-mode run when the contract is `abandoned` or
   when either key no longer resolves; it MUST NOT repair the contract itself (C-70).
 
@@ -47,12 +50,12 @@ crew; design authority stays on the spec side (C-64).
 
 ## Goal
 
-Cite by `goal_slug` only: <goal-slug>. Never restate the goal's objective or criteria —
+Cite by `goal_slug` only: <goal-slug>. Never restate the anchor's objective or criteria —
 the definition is authoritative (C-56).
 
 ## Targets
 
-The goal's `T-NNN` ids the crew may advance (cite, never restate their statements):
+The anchor's `T-NNN` ids the crew may advance (cite, never restate their statements):
 
 - T-NNN — <one-line id citation only>
 
@@ -85,7 +88,7 @@ a commit message or a summary (C-66).
 
 ## Crew
 
-Cite by `team_slug` only: <team-slug>. Never restate the team's roster or its goal
+Cite by `team_slug` only: <team-slug>. Never restate the team's roster or its anchor
 content.
 ```
 
@@ -100,10 +103,10 @@ content.
   remain spec-side writes; the crew's delivery is the writeback set plus patches inside
   its territory, and it MUST NOT mark a task complete in the task table (C-67).
 - **Territory expansion**: on activation `## Territory` is expanded into the
-  `territory.write` of **every** team bound to that `goal_slug` as an explicit,
+  `territory.write` of **every** team bound to that Anchor as an explicit,
   disclosed `improve-team` modification — one record per team, never an optimizer guess
   (C-61). Granted entries stay inside the spec directory and MUST NOT name
   `.specify/anchoring/**` or `.specify/teams/**` (C-63).
-- **No task rows, no goal prose**: `## Goal` and `## Crew` cite identities; `## Targets`
-  and `## Task Reference` cite ids. Copying task rows or restating goal content is a
+- **No task rows, no anchor prose**: `## Goal` and `## Crew` cite identities; `## Targets`
+  and `## Task Reference` cite ids. Copying task rows or restating anchor content is a
   defect, not a richer contract (C-56/C-57).

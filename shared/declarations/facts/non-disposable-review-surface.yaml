@@ -7,14 +7,17 @@
 # the carrier reaches it by
 # `shared/declarations/facts/non-disposable-review-surface.yaml#/statement`.
 #
-# Measured 2026-11-09 on this tree (ten roots, all present): archive 66 / derive 2 / goal 55 /
-# history 7 / memory 1225 / project 10 / review 1 / specs 2926 / state 27 / teams 74.
+# Measured 2026-11-12 on this tree (eleven declared roots; `.specify/goals`,
+# `.specify/project` and `.specify/review` are currently absent and are reported
+# declared-but-absent): anchoring 63 / archive 337 / derive 2 / history 12 /
+# memory 1592 / specs 4205 / state 167 / teams 82.
 fact: non-disposable-review-surface
 kind: closed-set
 statement:
+  - .specify/anchoring
   - .specify/archive
   - .specify/derive
-  - .specify/goal
+  - .specify/goals
   - .specify/history
   - .specify/memory
   - .specify/project
@@ -26,4 +29,4 @@ consumers:
   - scripts/python/non-disposable-check.py
 former_carriers:
   - shared/definitions/non-disposable-definitions.md
-note: "Order is part of the value: the coverage declaration renders these roots in this order and the ten are a closed set, so a directory outside it is an undeclared sibling (a hint, never a candidate) and a member that is absent is reported with its reason instead of being counted as zero."
+note: "Order is part of the value: the coverage declaration renders these roots in this order and the eleven are a closed set, so a directory outside it is an undeclared sibling (a hint, never a candidate) and a member that is absent is reported with its reason instead of being counted as zero. Retired member: `.specify/goal` (singular) left the surface in feature 101 — project-level anchors now live under `.specify/anchoring` and action-level guidance under `.specify/goals`; the retired root is recorded here, not carried as a member."

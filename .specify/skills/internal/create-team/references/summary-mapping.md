@@ -9,25 +9,25 @@
 | 索引 | 路径 | 内容 | 回答的问题 |
 |------|------|------|-----------|
 | **team 索引** | `.specify/teams/<team-slug>/` | 运行信息(事实源):`runs/` / `STATE.md` / `run-log.jsonl` / `items.jsonl` / `constraints.md` | 这个团队在怎么运行 |
-| **goal 索引** | `.specify/goal/<goal-slug>/summary/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
+| **anchor 索引** | `.specify/anchoring/<anchor-slug>/summary/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
 
 团队目录 MUST NOT 承载完整总结产物(FR-017)。总结步骤期间团队目录 MUST 保持字节不变(FR-020)。
 
 ## 1. 聚合范围
 
-映射的对象是**一个 goal**,而非一个团队。设该 goal 下有 N 个团队(N ≥ 1,即声明了同一 `goal_slug` 的全部团队),下表来源在这 N 个团队上取并集,`project` 与 `milestones` 取自 goal 本身。
+映射的对象是**一个 anchor**,而非一个团队。设该 anchor 下有 N 个团队(N ≥ 1,即声明了同一 `anchor_slug` 的全部团队),下表来源在这 N 个团队上取并集,`project` 与 `milestones` 取自 anchor 本身。
 
-某团队本次未参与刷新 MUST NOT 导致其此前贡献的工作项从总结中消失(FR-032)——每次刷新都从该 goal 下全部团队的台账重新折叠。
+某团队本次未参与刷新 MUST NOT 导致其此前贡献的工作项从总结中消失(FR-032)——每次刷新都从该 anchor 下全部团队的台账重新折叠。
 
 ## 2. 七实体来源表(FR-007:每个实体要么有来源,要么有显式缺席降级)
 
 | 实体 | 团队侧来源 | 缺席降级 |
 |------|-----------|---------|
-| `project` | **goal 级**:`project_name` ← 解析出的 goal 身份;`project_desc` ← 该 goal 的**定义** `.specify/goal/<goal-slug>/goal.md` 的目标叙述(定义存在时),无定义时回退到团队内联 goal 正文;`baseline_date` ← 本次触发运行/cycle 的时间戳(FR-005,不依赖被调技能读系统时钟);`repos` 恒为空(不 opt-in 扫仓) | 不可缺席(R 档) |
+| `project` | **anchor 级**:`project_name` ← 解析出的 anchor 身份;`project_desc` ← 该 anchor 的**定义** `.specify/anchoring/<anchor-slug>/anchor.md` 的目标叙述(定义存在时),无定义时回退到团队内联 anchor 正文;`baseline_date` ← 本次触发运行/cycle 的时间戳(FR-005,不依赖被调技能读系统时钟);`repos` 恒为空(不 opt-in 扫仓) | 不可缺席(R 档) |
 | `people` | N 个团队名册行的**并集**;`owner_id` ← 名册 agent slug;`owner_name` ← 所引用 agent 定义的 frontmatter `name`(解析顺序见 §5);`owner_role` ← 名册 `role`。同一 agent slug 出现在多个团队 → 归并为一人 | 解析不到定义 → `owner_name` 记 `未记录`,不臆造(FR-004) |
 | `phases` | N 个团队各自的阶段单位,**按团队命名空间化**(见 §3) | 无阶段材料 → 该团队单一阶段并声明 |
 | `work_items` | N 个团队 `items.jsonl` 台账的**并集**(权威结构面,见 §6) | 全部团队台账为空且 `runs/` 亦无交付物 → 拒绝出总结(`declined(no-material)`) |
-| `milestones` | **goal 级,只一套**:定义存在时逐条映射该 goal **定义**的成功判据(`source` 指向 `goal.md`);无定义时回退到解析内联 goal 正文的判据(FR-013);`anchor_item_id` 锚到对应工作项(FR-003) | 定义判据为空(`None provided.`)或内联无判据 → 该组为空并显式声明,依赖 `work_items` 满足 R 档组级约束 |
+| `milestones` | **anchor 级,只一套**:定义存在时逐条映射该 anchor **定义**的成功判据(`source` 指向 `anchor.md`);无定义时回退到解析内联 anchor 正文的判据(FR-013);`anchor_item_id` 锚到对应工作项(FR-003) | 定义判据为空(`None provided.`)或内联无判据 → 该组为空并显式声明,依赖 `work_items` 满足 R 档组级约束 |
 | `features` | N 个团队产出的能力/交付物类目并集 | 无类目材料 → 空,《需求与特性》按既有降级只留声明 |
 | `sources` | 每个团队每组信息一条声明,`source_kind: user-form`,`source_ref` 指向该团队的 tracked 工件路径 | 不可缺席(否则条目 `source` 无法推断) |
 
@@ -54,7 +54,7 @@
 | `serial` | stage | 各 stage 的交付物 |
 | `parallel` | 派发批次 | 各 territory(领地) |
 
-**阶段 MUST 按团队命名空间化**:`phase_id` 形如 `<team-slug>.PH-<nnnn>`、`phase_name` 形如 `<team-slug> · <单位>`。同一 goal 下的团队可能模式不同、阶段单位不同,混为一条有序序列会断言一个并不存在的顺序。
+**阶段 MUST 按团队命名空间化**:`phase_id` 形如 `<team-slug>.PH-<nnnn>`、`phase_name` 形如 `<team-slug> · <单位>`。同一 anchor 下的团队可能模式不同、阶段单位不同,混为一条有序序列会断言一个并不存在的顺序。
 
 ## 4. 状态归一(FR-006)
 
@@ -97,7 +97,7 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 | `supersedes` | string | 否 | 被本行归并的推断身份 ID,用于两态交接 |
 | `excluded_reason` | string | 否 | 计入被排除口径的理由;非空即不计入延期/未完成 |
 | `maturity_at_event` | string | 否 | 事件发生时的成熟度(L1/L2/L3),锚定状态语义 |
-| `target_ref` | string | 否 | 归属的 Target 身份(038)。**局部形** `T-\d{3}`,goal 由团队绑定隐含;缺省 = 归属 goal 整体。见 §6.5 |
+| `target_ref` | string | 否 | 归属的 Target 身份(038)。**局部形** `T-\d{3}`,anchor 由团队绑定隐含;缺省 = 归属 anchor 整体。见 §6.5 |
 
 示例行:
 
@@ -122,12 +122,12 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 | 工作项(显式) | `TI-<nnnn>`,零填充四位,团队内单调递增 | 团队主管,写台账时发放 |
 | 工作项(推断) | `TIX-<8hex>`,`sha256(title + "\u0000" + phase_ref)` 前 8 位小写十六进制 | 生成器,回填历史条目时确定性计算 |
 | 阶段 | `PH-<nnnn>` | 生成器,按阶段单位序号 |
-| 里程碑 | `MS-<nnnn>` | 生成器,按 goal 判据序号 |
+| 里程碑 | `MS-<nnnn>` | 生成器,按 anchor 判据序号 |
 | 人员 | 名册 agent slug 原文 | 既有(已合法) |
 
 **中文标题 MUST NOT 直接作为 ID**;推断身份必须先经上述哈希。
 
-**聚合下的唯一性(重要)**:N 个团队的台账装载进**同一个** `project.db`,而 `entity_ids` 是**全局** ID 命名空间(跨实体唯一,由触发器强制)。团队内单调递增的 `TI-<nnnn>` 因此会跨团队撞号(实测:两个团队各自的 `TI-0001` 同时入库 → 退出码 3,`item_id='TI-0001' 在本实体内重复`)。生成器 MUST 在折叠时为工作项与阶段 ID 加团队命名空间前缀(`<team-slug>.TI-0007` / `<team-slug>.PH-0002`;`.` 属允许字符),使聚合后仍全局唯一;该前缀同时承载归属(FR-033)。**此约束只作用于聚合层——团队台账内部仍写不带前缀的 `TI-<nnnn>`**,以免团队侧发放逻辑依赖 goal 拓扑。
+**聚合下的唯一性(重要)**:N 个团队的台账装载进**同一个** `project.db`,而 `entity_ids` 是**全局** ID 命名空间(跨实体唯一,由触发器强制)。团队内单调递增的 `TI-<nnnn>` 因此会跨团队撞号(实测:两个团队各自的 `TI-0001` 同时入库 → 退出码 3,`item_id='TI-0001' 在本实体内重复`)。生成器 MUST 在折叠时为工作项与阶段 ID 加团队命名空间前缀(`<team-slug>.TI-0007` / `<team-slug>.PH-0002`;`.` 属允许字符),使聚合后仍全局唯一;该前缀同时承载归属(FR-033)。**此约束只作用于聚合层——团队台账内部仍写不带前缀的 `TI-<nnnn>`**,以免团队侧发放逻辑依赖 anchor 拓扑。
 
 ### 6.3 两态交接(FR-027)
 
@@ -142,14 +142,14 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 
 ### 6.5 `target_ref` 归属折叠(038)
 
-可选 [[STR-003]] 把条目归属到绑定 goal 的一个 Target(目标切片,概念见 `.specify/shared/definitions/goal-definitions.md` Target Decomposition,授权面是 `/speckit.goal targets`):
+可选 [[STR-003]] 把条目归属到绑定 anchor 的一个 Target(目标切片,概念见 `.specify/shared/definitions/anchor-definitions.md` Target Decomposition,授权面是 `/speckit.anchor targets`):
 
-- **归属**:行携带合法局部形且该身份存在于绑定 goal 的 `## Targets` 节 → 计入该 Target 的归属集合;末行定态语义(IL-2)不变——同一 `item_id` 以最后事件为准。
-- **降级**:指向不存在身份(或限定形等非法形态)→ 按 goal 整体降级计入,表单 `targets.invalid_refs` 计数并显式声明;MUST NOT 臆造 Target(FR-014)。
-- **缺省**:无 `target_ref` → 归属 goal 整体(`targets.unattributed_to_target` 计数);存量行语义不变。
+- **归属**:行携带合法局部形且该身份存在于绑定 anchor 的 `## Targets` 节 → 计入该 Target 的归属集合;末行定态语义(IL-2)不变——同一 `item_id` 以最后事件为准。
+- **降级**:指向不存在身份(或限定形等非法形态)→ 按 anchor 整体降级计入,表单 `targets.invalid_refs` 计数并显式声明;MUST NOT 臆造 Target(FR-014)。
+- **缺省**:无 `target_ref` → 归属 anchor 整体(`targets.unattributed_to_target` 计数);存量行语义不变。
 - **正交性**:团队命名空间前缀(`<team-slug>.TI-nnnn`,§6.2)照常加;`target_ref` 仍为局部形,二者互不影响。
-- **表单产出**:goal 定义存在 `## Targets` 节 → 表单新增 `targets:` 块——每 Target 的 `authored_status` / `attributed_items` / `completed_items` / `pending_approval`、按 authored 终态计的 `coverage`(n/m)、`unattributed_to_target`、`invalid_refs`。切片轴与判据轴**分列**,MUST NOT 由 Target 完成度推导 goal `achieved`(SC-005)。authored 与证据不一致(open/全完成 或 done/未完成)→ `pending_approval: true` 并列为待批准/复核项,两侧均不自动翻转(FR-015)。
-- **无节 goal**:表单 MUST 不含 `targets:` 块,既有输出逐字节不变(SC-002)。
+- **表单产出**:anchor 定义存在 `## Targets` 节 → 表单新增 `targets:` 块——每 Target 的 `authored_status` / `attributed_items` / `completed_items` / `pending_approval`、按 authored 终态计的 `coverage`(n/m)、`unattributed_to_target`、`invalid_refs`。切片轴与判据轴**分列**,MUST NOT 由 Target 完成度推导 anchor `achieved`(SC-005)。authored 与证据不一致(open/全完成 或 done/未完成)→ `pending_approval: true` 并列为待批准/复核项,两侧均不自动翻转(FR-015)。
+- **无节 anchor**:表单 MUST 不含 `targets:` 块,既有输出逐字节不变(SC-002)。
 
 ## 7. 出处纪律(FR-010 / FR-011)
 
@@ -164,7 +164,7 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 
 | 阶段 | 允许写入 | 说明 |
 |------|---------|------|
-| **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/goal/<goal-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/goal/<goal-slug>/goal.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、③ 被监控目标、④ `summarize-project` 技能自身文件、⑤ `.specify/agents/**`、⑥ `.specify/project/**`(`manage-project` 时代的既有产物,其下已不再有任何 goal 内容) |
+| **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/anchoring/<anchor-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/anchoring/<anchor-slug>/anchor.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、③ 被监控目标、④ `summarize-project` 技能自身文件、⑤ `.specify/agents/**`、⑥ `.specify/project/**`(`manage-project` 时代的既有产物,其下已不再有任何 anchor 内容) |
 | **团队正常 cycle 写入**(ACT / CRITIQUE / REPORT 等) | `STATE.md`、`items.jsonl`、`run-log.jsonl`、`runs/<ts>-report.md`、结果清单 | 不受上表限制。团队主管在这些相里按 FR-026 发放条目 ID、追加台账事件、写运行报告(含总结状态行) |
 
 - **只有团队主管写 tracked 工件**:`team.md` / `STATE.md` / `run-log.jsonl` / `items.jsonl` / `runs/` 与 tracked 的总结产物一律只由团队主管(orchestrator)写入。**子代理 MUST NOT 写入任何 tracked 工件**——子代理在隔离上下文中运行,并发写会竞争,半写会损坏持久记录;它们只往 git-ignored 的运行工作区写结果清单,由主管汇总(FR-021)。
@@ -174,42 +174,42 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 
 上一版总结中的 `## 附注` 节由被调技能的既有刷新行为原样保留,团队侧 **MUST NOT** 重复实现(FR-018)。
 
-## 10. goal 索引的机制细节(FR-030 … FR-036)
+## 10. anchor 索引的机制细节(FR-030 … FR-036)
 
-### 10.1 goal 身份解析
+### 10.1 anchor 身份解析
 
-1. `team.md` frontmatter 声明了 `goal_slug` → 取其值,身份类型 `explicit`。
+1. `team.md` frontmatter 声明了 `anchor_slug` → 取其值,身份类型 `explicit`。
 2. 未声明 → 取该团队自身的 `slug`,身份类型 `inferred`,并在派生数据的 `inferred_fields` 与报告元信息中标记为推断(FR-034)。
 
-`goal_slug` MUST 同时满足 §6.2 的 DDL 字面量文法与路径片段安全(不含 `/`、不为 `.` / `..`)。
+`anchor_slug` MUST 同时满足 §6.2 的 DDL 字面量文法与路径片段安全(不含 `/`、不为 `.` / `..`)。
 
 > 042 note: team.md 的可选字段 `focus_target`(默认聚焦 Target)**不参与**本节两级身份解析——它只是 run 级 `--target` 的预填,不构成第三级,也不影响 summary 归属与交付目录。
 
 **不变式**:
-- **GI-1**:取值 MUST NOT 由 goal 正文派生。改写 goal 正文不改变它,故不迁移交付目录(FR-019);正文变更本身记入元信息。
-- **GI-2**:一个团队在任一时刻只属于一个 goal。改绑时原 goal 目录保留其历史贡献并标注其已不再参与,新 goal 目录自改绑时点起接收新贡献。
-- **GI-3**:推断身份升为显式身份时归并到显式 goal 目录并保留历史,不留两份并列总结。
-- **GI-4**:两团队声明同一 `goal_slug` 但 goal 正文实质不同时,**以显式声明为准**(声明即同一 goal),正文差异记入元信息供人裁决——机制不自行判定"其实不是同一目标"。
+- **GI-1**:取值 MUST NOT 由 anchor 正文派生。改写 anchor 正文不改变它,故不迁移交付目录(FR-019);正文变更本身记入元信息。
+- **GI-2**:一个团队在任一时刻只属于一个 anchor。改绑时原 anchor 目录保留其历史贡献并标注其已不再参与,新 anchor 目录自改绑时点起接收新贡献。
+- **GI-3**:推断身份升为显式身份时归并到显式 anchor 目录并保留历史,不留两份并列总结。
+- **GI-4**:两团队声明同一 `anchor_slug` 但 anchor 正文实质不同时,**以显式声明为准**(声明即同一 anchor),正文差异记入元信息供人裁决——机制不自行判定"其实不是同一目标"。
 
 ### 10.2 聚合与归属
 
-- 触发刷新的团队只是**触发者**;刷新范围恒为该 goal 下的**全部**团队。团队从不单独出总结。
+- 触发刷新的团队只是**触发者**;刷新范围恒为该 anchor 下的**全部**团队。团队从不单独出总结。
 - 某团队本次未参与刷新 MUST NOT 使其历史贡献消失——每次都从全部团队台账重新折叠(FR-032)。
 - 归属由两处冗余承载且都不得丢:工作项 ID 的 `<team-slug>.` 前缀,以及 `source` 出处路径的 `.specify/teams/<team-slug>/` 前缀(FR-033)。
 - 归属以 **team slug** 呈现,不以代理 id / 结果清单路径等内部标识符呈现(FR-022)。
 
 ### 10.3 与既有产物共存
 
-`.specify/project/` 已存在 `manage-project` 时代的历史产物(`project.md` 与 wbs / gantt / milestones 图表)。`goal/` 子树平级新增,MUST NOT 覆盖或迁移既有内容(FR-036)。被调技能对 SpecKit 项目的默认交付目录 `.specify/project/summary/` 亦为平级,互不冲突。
+`.specify/project/` 已存在 `manage-project` 时代的历史产物(`project.md` 与 wbs / gantt / milestones 图表)。`anchor/` 子树平级新增,MUST NOT 覆盖或迁移既有内容(FR-036)。被调技能对 SpecKit 项目的默认交付目录 `.specify/project/summary/` 亦为平级,互不冲突。
 
 ### 10.4 并发刷新串行化(FR-035)
 
-同一 goal 下多个团队邻近触发时:
+同一 anchor 下多个团队邻近触发时:
 
 - 刷新以交付目录级互斥锁(`data/.refresh.lock`)**串行化为一次成功刷新**;让位的那次以 `skipped(serialized)` 退出并由调用方在其运行报告中记录状态行,MUST NOT 静默 no-op。
 - 写入是**原子**的(临时文件 + 同目录替换):刷新要么完整落盘,要么保留上一版总结。半写的交付目录是被禁止的状态(WS-13)。
 - 让位的刷新 MUST NOT 改动既有产物。
-- 陈旧锁(超过阈值)按被遗弃处理并回收,避免死掉的运行永久堵住该 goal。
+- 陈旧锁(超过阈值)按被遗弃处理并回收,避免死掉的运行永久堵住该 anchor。
 
 ## 9. 调用方式
 

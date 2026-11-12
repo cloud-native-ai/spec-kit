@@ -223,15 +223,17 @@ def test_signal_backed_goal_keeps_its_confidence(tmp_path):
 
 
 def test_goal_md_zero_write_red_line_is_stated():
-    """C-5 write confinement: the goal-based create branch never writes goal.md.
+    """C-5 write confinement: the anchor-based create branch never writes anchor.md.
 
     Branch-procedure content moved into the create-team skill at S3 (team.md's
-    entry delegates to it), so the red line is pinned at its new owner.
+    entry delegates to it), so the red line is pinned at its new owner. Feature
+    101 renamed the definition file to `anchor.md`; the reference filename
+    (`references/goal.md`) is unchanged.
     """
     text = GOAL_REF.read_text(encoding="utf-8")
-    assert "goal.md" in text, "goal.md write-face rule missing"
+    assert "anchor.md" in text, "anchor.md write-face rule missing"
     assert "零写入" in text or "零写" in text, (
-        "the create branch MUST declare zero writes to goal.md"
+        "the create branch MUST declare zero writes to anchor.md"
     )
 
 

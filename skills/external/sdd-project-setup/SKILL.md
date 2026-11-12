@@ -1,11 +1,11 @@
 ---
 name: sdd-project-setup
-description: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deterministic absent/degraded/partial/complete）、specify CLI 安装（python 解析阶梯 + 三源 pip 回退；Python 全缺绝不自动安装、报错退出）、specify init / instructions 刷新、constitution 与首批内容（feature/docs/goal/agents/team 按需），随后把周期性调协、强化、验证、记录回收与候选清单 handoff 给 sdd-house-keeping。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册；项目已初始化且本次只需维护时，直接加载 sdd-house-keeping。
+description: SDD 项目框架 bootstrap 手册（可独立运行）——把目标项目（本地或远端）安装或刷新到 `.specify/` 基线：机制盘点（deterministic absent/degraded/partial/complete）、specify CLI 安装（python 解析阶梯 + 三源 pip 回退；Python 全缺绝不自动安装、报错退出）、specify init / instructions 刷新、constitution 与首批内容（feature/docs/anchor/goal/agents/team 按需），随后把周期性调协、强化、验证、记录回收与候选清单 handoff 给 sdd-house-keeping。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册；项目已初始化且本次只需维护时，直接加载 sdd-house-keeping。
 skill_id: "<SKILL:.specify/skills/sdd-project-setup/SKILL.md>"
 classification: external
 ---
 
-> **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 运行时依赖、任何宿主 agent 可直接加载；其内容编排 spec-kit 框架的安装与首批内容建设（语义耦合在此显式声明），该耦合只体现在它指挥宿主 agent 在目标项目执行 `specify init` / 少量 `/speckit.*` bootstrap 命令，不构成本 skill 的运行时依赖。**三技能软协同**：本 skill = 一次性 bootstrap（init/refresh + constitution + 首次 feature/docs/goal/agents/team）；`sdd-house-keeping` = bootstrap 之后的周期性调协、强化、验证、记录回收与候选清单；`sdd-loop-driver` = SDD 开发阶段循环。三者各自可独立运行，互不强依赖。
+> **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 运行时依赖、任何宿主 agent 可直接加载；其内容编排 spec-kit 框架的安装与首批内容建设（语义耦合在此显式声明），该耦合只体现在它指挥宿主 agent 在目标项目执行 `specify init` / 少量 `/speckit.*` bootstrap 命令，不构成本 skill 的运行时依赖。**三技能软协同**：本 skill = 一次性 bootstrap（init/refresh + constitution + 首次 feature/docs/anchor/goal/agents/team）；`sdd-house-keeping` = bootstrap 之后的周期性调协、强化、验证、记录回收与候选清单；`sdd-loop-driver` = SDD 开发阶段循环。三者各自可独立运行，互不强依赖。
 
 > **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
@@ -13,7 +13,7 @@ classification: external
 
 把「让一个项目进入 spec-kit 框架的可用基线」固化为 **bootstrap 程序**：先做确定性盘点定缺口，再安装/刷新，随后完成 constitution 与首批内容，最后把周期性维护 handoff 给 `sdd-house-keeping`。本 skill **不执行**周期性 reconcile/strengthen/verify/report，也不执行任何破坏性清理；这些归 house-keeping 的 H1–H5。
 
-bootstrap 对象是**双层框架**：**物理机制**（`.specify/` 目录/脚本/链接）与**逻辑框架**（instructions / feature / docs 为必选层，goal / agent / team 按需层）。只把目录铺齐而逻辑资产缺位，不算 bootstrap 完成。两层各有确定性盘点：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py`。
+bootstrap 对象是**双层框架**：**物理机制**（`.specify/` 目录/脚本/链接）与**逻辑框架**（instructions / feature / docs 为必选层，anchor / goal / agent / team 按需层）。只把目录铺齐而逻辑资产缺位，不算 bootstrap 完成。两层各有确定性盘点：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py`。
 
 **幂等契约**：本技能对同一项目可多次执行——每次执行先 S1 盘点定缺口，S2/S2.5 只执行缺口项；稳定态（机制 complete 且首批内容在位）上的重复执行零结构写动作、零内容重建；`specify` 在位即跳过安装。收敛语义见 `references/setup-recipes.md`。
 
@@ -55,8 +55,10 @@ S2.4 MIGRATE （按需）旧版 workspace 收尾：S2 之后、S2.5 之前判定
              （本技能只决定调用时机，不复述其步骤与四值退出码）
 S2.5 BOOTSTRAP 首批内容（只补缺失项，不做完整维护）：
              /speckit.constitution（缺失时）→ /speckit.feature（注册表缺失时
-             种子）→ /speckit.docs（docs 树缺失时）→ /speckit.goal（缺失时定义
-             3–5 个目标）→ /speckit.agents / /speckit.team（用户明确需要时）
+             种子）→ /speckit.docs（docs 树缺失时）→ /speckit.anchor（锚点存档
+             `.specify/anchoring/` 缺失时定义 3–5 个锚点；七模式）→
+             /speckit.goal（需要行动级指导时，四模式）→ /speckit.agents /
+             /speckit.team（用户明确需要时）
 HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首次维护；
              house-keeping 不可用时返回 bootstrap-complete / maintenance-pending，
              不冒充 ready；候选清单由 house-keeping H5 产出
@@ -85,7 +87,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 11. **目录创建限于规范落点**：bootstrap 的目录创建 MUST 限于框架既有落点（`specify init` 产物、`.specify/.tmp/`、目标项目治理文档声明的目录）；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根；临时数据按目标项目纪律（无则框架 `temp-directory-discipline`）落位，并在首次写入前确认 `.gitignore` 覆盖。
 12. **Bootstrap 后 handoff**：S2.5 完成后，周期性调协、强化、验证、记录回收与候选清单 MUST handoff 给 `sdd-house-keeping`；本 skill MUST NOT 复制其 H1–H5 执行细则。目标项目已初始化且本次只需维护时，直接加载 `sdd-house-keeping`，不重跑 `specify init`。
 13. **无破坏性动作**：本 skill MUST NOT 执行 `/speckit.sanitize`、retention apply 或任何删除/归档；破坏性门归 house-keeping 调用的 sanitize。setup 只做可逆的安装/刷新/内容初始化。
-14. **不做 SDD 阶段推进**：本技能不做任何 SDD 阶段推进；requirements → … → review 归 `sdd-loop-driver`；S2.5 只调用 bootstrap 内容类命令（constitution/feature/docs/goal/agents/team）。
+14. **不做 SDD 阶段推进**：本技能不做任何 SDD 阶段推进；requirements → … → review 归 `sdd-loop-driver`；S2.5 只调用 bootstrap 内容类命令（constitution/feature/docs/anchor/goal/agents/team）。
 15. **远端命令经 ssh-utils 承载**：任何远端执行 MUST 使用 `ssh-utils` 的 `scripts/ssh-exec.py`（或等价地带 `-o RemoteCommand=none` 的形态）；MUST NOT 手写裸 `ssh <alias> "..."`——目标主机可能在 ssh_config 预置 `RemoteCommand`，与命令行冲突。传输失败先跑 `ssh-exec.py --check` 诊断。
 
 ## Discipline Defaults
@@ -117,9 +119,9 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 
 ## Boundary
 
-- 只做 bootstrap：install/refresh + constitution + 首次 feature/docs/goal/agents/team + handoff；**不做**完整 reconcile、强化、验证、记录回收或候选清单。
+- 只做 bootstrap：install/refresh + constitution + 首次 feature/docs/anchor/goal/agents/team + handoff；**不做**完整 reconcile、强化、验证、记录回收或候选清单。
 - 不执行任何破坏性动作；不调用 `/speckit.sanitize`、不调用 retention apply。
-- 不推进任何 SDD 开发阶段；bootstrap 内容命令仅限 constitution/feature/docs/goal/agents/team。
+- 不推进任何 SDD 开发阶段；bootstrap 内容命令仅限 constitution/feature/docs/anchor/goal/agents/team。
 - 目标项目已是 complete：仍可执行 S1 检查与 S2.5 缺失项；稳定态零写，随后 handoff 给 house-keeping 做 H1–H5。
 - 执行侧未安装 `specify` CLI：S2 CLI 层在该环境自动安装；**Python 三级全缺则报错退出，绝不自动安装 Python**。
 - 编排侧（本地宿主 agent）**不需要 speckit 框架**；python 解析 / CLI 安装 / specify init 只发生在执行侧。
@@ -127,7 +129,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 2845f5641171 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 

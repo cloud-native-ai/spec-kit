@@ -1,19 +1,19 @@
 # 「优化」类目标的途径与策略（操作规范）
 
-**Owner**: the team domain (`create-team`). 当 team 的 [goal](goal.md) 主题为**「优化」**时，用本文的分类与策略来选择团队形态。本文只讲**优化类目标的团队形态选择**;goal 概念本身(定义、作用对象、判据权威)见 `.specify/shared/definitions/goal-definitions.md`,经 [goal.md](goal.md) 转引,不在此另述。
+**Owner**: the team domain (`create-team`). 当 team 的 [anchor](goal.md) 主题为**「优化」**时，用本文的分类与策略来选择团队形态。本文只讲**优化类目标的团队形态选择**;anchor 概念本身(定义、作用对象、判据权威)见 `.specify/shared/definitions/anchor-definitions.md`,经 [goal.md](goal.md) 转引,不在此另述。
 
 ## 1. 一次性 vs 持续优化（先分类）
 
-| 类型 | goal 语义 | 停止条件 | 团队形态 |
+| 类型 | anchor 语义 | 停止条件 | 团队形态 |
 |------|-----------|----------|----------|
 | **一次性（one-time）** | 把某物从 A 提升到 B，**一次达标即止** | 达到目标质量（或有限轮次）即交付 | 一次 **iteration** 到阈值即停；或串行「评估 → 改进 → 复核」 |
 | **持续（continuous）** | **不断提升 / 长期维持**某质量 | 达到高标准阈值，或收敛 / 资源上限 | **continuous** 运营循环（见 [`operating-loops.md`](operating-loops.md)）：按 cadence 长期运行，从 L1 起步，需可复现、可复盘、有护栏 |
 
-**判定**：词面**初筛** —— goal 含「持续 / 不断 / 长期维持 / keep improving」→ 倾向持续；否则按一次性处理。**词面命中不等于 continuous 团队形态**：最终判据（工作主体是按 cadence 到达的流 / 被长期维持的质量，还是一次性交付物改动）由 [`patterns.md`](patterns.md) § Q1 判据 持有，本节与它冲突时以它为准 —— 一个措辞长期、工作主体却是有界交付物的 goal 走一次性形态，长期性由 Goal lifecycle 承载。
+**判定**：词面**初筛** —— anchor 含「持续 / 不断 / 长期维持 / keep improving」→ 倾向持续；否则按一次性处理。**词面命中不等于 continuous 团队形态**：最终判据（工作主体是按 cadence 到达的流 / 被长期维持的质量，还是一次性交付物改动）由 [`patterns.md`](patterns.md) § Q1 判据 持有，本节与它冲突时以它为准 —— 一个措辞长期、工作主体却是有界交付物的 anchor 走一次性形态，长期性由 Anchor lifecycle 承载。
 
 ## 2. 持续优化的两种策略
 
-两者都围绕**可度量 goal**（评分维度 + 阈值）组织，但选择压力与目标结构不同：
+两者都围绕**可度量 anchor**（评分维度 + 阈值）组织，但选择压力与目标结构不同：
 
 | 维度 | ① 淘汰（Elimination / Tournament） | ② 渐进（Progressive / Incremental） |
 |------|-------------------------------------|--------------------------------------|
@@ -32,7 +32,7 @@
 - **花名册样例**（`variants: 3`，可直接实例化）：3 个 variant-optimizer（各持一个改进角度，如布局向/风格向/语义分解向）+ 1 个 renderer（Worker，用各变体的 target 副本重生成被评制品）+ 1 个 scorer（evaluator，统一按 `quality_dimensions` 打分并给出每变体「最大可改进点」）。完整可 re-run 的实例见 `.specify/teams/draw-plantuml-optimizer/team.md`。
 - **动态结构（iteration）**：每代 → 各变体**改进目标(target)** → **由目标重生成被评制品** → 统一评分 → **保留最高分为下一代种子、淘汰最低分** → 重复。
 - **config**：`quality_dimensions[]`（Σ=1.0）、`threshold`、`max_iterations`、`regression_limit`；若优化对象是可复用目标，设 `optimization_target`（技能/实现/配置的真实路径）；**收敛判据**（连续 N 代无提升）作为除达标外的停止条件。
-- **多目标协同（`co_targets`）**：当优化对象是多个需协同演进的目标（如主技能 + 配套技能/命令），不要临时发明键——用 `config.co_targets` 列出各目标路径，并在 goal 或 config 中声明**分层原则**（哪类内容归哪个目标）；评分仍是单一加权总分，但每轮改动必须按分层原则路由到正确目标。单目标场景继续用 `optimization_target`。
+- **多目标协同（`co_targets`）**：当优化对象是多个需协同演进的目标（如主技能 + 配套技能/命令），不要临时发明键——用 `config.co_targets` 列出各目标路径，并在 anchor 或 config 中声明**分层原则**（哪类内容归哪个目标）；评分仍是单一加权总分，但每轮改动必须按分层原则路由到正确目标。单目标场景继续用 `optimization_target`。
 - **目标引用用路径语义，不用技能名语义**：当 target 是会被复制到工作副本或 standalone 部署的技能时，目标解析与其内部自指引用一律按**「当前加载目录」的路径语义**（如 `${SKILL_HOME}/...`）而非按技能名解析——按名解析在多副本环境（工作副本 vs 真实路径 vs standalone 安装）下有歧义。跨技能机制委托（A 技能的 feedback 交 B 技能处理）同理：落点写路径，不写名字。
 - **关键设计**：把上一代评分器的「最大可改进点」反馈注入下一代变异，使进化有方向。
 - **种子嫁接**：下一代的种子不只是「克隆最优」——以最高分变体为种子主体，**嫁接亚军变体评分最高的单一改动**（如亚军在某一维度上反超冠军的具体改法）。纯精英保留容易陷入冠军变体的局部最优；嫁接保留了亚军的差异化探索（实测 gen-1 0.763 → gen-2 0.859 的跃升来自此组合）。

@@ -38,16 +38,16 @@ Persistent teams own a directory `.specify/teams/<slug>/` — the definition liv
 
 The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the three recognized capabilities (create / modify / run) and requests the missing intent — it never guesses silently. A `modify`/`run` targeting a team that does not exist reports **"team not found"** and offers to `create` it.
 
-### Goal-based creation (create with an archived goal)
+### Anchor-based creation (create with an archived anchor)
 
-When the input names a goal that is already archived under `.specify/goal/` (exact slug match, confirmed with you), create runs the **goal-based branch** instead of re-eliciting the goal as free text:
+When the input names an anchor that is already archived under `.specify/anchoring/<slug>/` (exact slug match, confirmed with you), create runs the **anchor-based branch** instead of re-eliciting the anchor as free text:
 
-1. **Load & restate** — the definition (objective, criteria, lifecycle, existing Targets) is loaded via the `goal-utils.py` engine and restated for your confirmation. A dangling name stops with the verbatim error prefix `goal 未定义:` and points to `/speckit.goal create`; a terminal goal (`achieved`/`abandoned`) is refused outright.
+1. **Load & restate** — the definition (objective, criteria, lifecycle, existing Targets) is loaded via the `goal-utils.py` engine and restated for your confirmation. A dangling name stops with the verbatim error prefix `goal 未定义:` and points to `/speckit.anchor create`; a terminal anchor (`achieved`/`abandoned`) is refused outright.
 2. **Four-element analysis** — dimension, criteria coverage (missing criteria declared, never invented), existing Targets, and single-team achievability, each with rationale. The conclusion is advisory: you adjudicate single-team vs decomposition.
-3. **Decomposition proposal (optional)** — on the decomposition path, a proposal set is drafted (outcome-form statements, no criteria restatement), each statement dry-run validated by `goal-utils.py targets <slug> --check` (zero writes) before presentation; one merged confirmation lands them per-statement via the existing `targets --add` authorization surface. The team side never writes `goal.md`.
-4. **One team per Target (N teams : 1 Goal)** — each open Target gets a team: all declare the same `goal_slug`, each carries `focus_target: T-<nnn>` (its default focus), slugs derive as `<goal-slug>-t<nnn>` with uniqueness checks, and a pairwise-disjoint territory proposal is verified by `skills/internal/create-team/scripts/verify-territory-disjoint.py` before landing — known overlaps are disclosed and handed to `/speckit.goal coordinate`, never landed silently.
+3. **Decomposition proposal (optional)** — on the decomposition path, a proposal set is drafted (outcome-form statements, no criteria restatement), each statement dry-run validated by `goal-utils.py targets <slug> --check` (zero writes) before presentation; one merged confirmation lands them per-statement via the existing `targets --add` authorization surface. The team side never writes `anchor.md`.
+4. **One team per Target (N teams : 1 Anchor)** — each open Target gets a team: all declare the same `anchor_slug`, each carries `focus_target: T-<nnn>` (its default focus), slugs derive as `<anchor-slug>-t<nnn>` with uniqueness checks, and a pairwise-disjoint territory proposal is verified by `skills/internal/create-team/scripts/verify-territory-disjoint.py` before landing — known overlaps are disclosed and handed to `/speckit.anchor coordinate`, never landed silently.
 
-Concepts (Goal / Target / binding / decomposition) are defined once in `.specify/shared/definitions/goal-definitions.md`.
+Concepts (Anchor / Target / binding) are defined once in `.specify/shared/definitions/anchor-definitions.md`; decomposition is owned by `skills/internal/create-team/references/conceptual-model.md`.
 
 ## Run Mode: preview → confirm → execute
 
@@ -56,8 +56,8 @@ The **run** mode never executes before you confirm:
 1. **Load** the team from `.specify/teams/<slug>/team.md`.
 2. **Render Static Structure** — the Role × Stage × Type roster matrix.
 3. **Render Dynamic Structure** — the pattern, its parallelism/DAG/loop settings, and an execution flow diagram.
-4. **Confirmation gate** — you review the goal and both structures and explicitly confirm. Only then does orchestration run (territory validation for parallel, DAG no-cycle + per-handoff verification for serial, max-iteration cap for iteration, and — for **continuous** — read `constraints.md` + budget + kill-switch and run exactly **one cycle** at the declared maturity level with an independent verifier at L2+; file-path-only handoff throughout). Declining stops without executing.
-5. **Report** — after execution, a dated report is written to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (goal, timing, result summary, process detail). Run intermediates stay in the git-ignored `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths.
+4. **Confirmation gate** — you review the anchor and both structures and explicitly confirm. Only then does orchestration run (territory validation for parallel, DAG no-cycle + per-handoff verification for serial, max-iteration cap for iteration, and — for **continuous** — read `constraints.md` + budget + kill-switch and run exactly **one cycle** at the declared maturity level with an independent verifier at L2+; file-path-only handoff throughout). Declining stops without executing.
+5. **Report** — after execution, a dated report is written to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (anchor, timing, result summary, process detail). Run intermediates stay in the git-ignored `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths.
 
 ### Target-focused runs (`--target`)
 
@@ -65,13 +65,13 @@ The **run** mode never executes before you confirm:
 /speckit.team run <team-slug> --target T-001
 ```
 
-A run MAY focus on one authorized **Target** (scope slice) of the bound goal — see [`/speckit.goal`](goal.md) → Targets for the authorization side. The parameter is validated in preview, before the gate: dangling references stop with a pointer to `/speckit.goal targets --add`; cross-goal references and terminal goals are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.goal targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. On success the gate discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 goal 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior. **All five preview checks are available as one machine-readable, zero-write call** — `python3 scripts/python/goal-utils.py run-checks <team-slug> [--target <T-<nnn>>] --json` — whose exit code IS the verdict (`0` pass / `2` bad argument / `3` no such team / `4` definition unusable / `5` blocked), with a per-check `not-evaluated` value for any check whose precondition did not hold. The five checks, their judgment order and the meaning of each verdict are owned by the `/speckit.team` command reference and the engine; this page names the call rather than restating a second criterion.
+A run MAY focus on one authorized **Target** (scope slice) of the bound anchor — see [`/speckit.anchor`](anchor.md) → Targets for the authorization side. The parameter is validated in preview, before the gate: dangling references stop with a pointer to `/speckit.anchor targets --add`; cross-anchor references and terminal anchors are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.anchor targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. On success the gate discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 anchor 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior. **All five preview checks are available as one machine-readable, zero-write call** — `python3 scripts/python/goal-utils.py run-checks <team-slug> [--target <T-<nnn>>] --json` — whose exit code IS the verdict (`0` pass / `2` bad argument / `3` no such team / `4` definition unusable / `5` blocked), with a per-check `not-evaluated` value for any check whose precondition did not hold. The five checks, their judgment order and the meaning of each verdict are owned by the `/speckit.team` command reference and the engine; this page names the call rather than restating a second criterion.
 
-**Default focus (`focus_target`, 042).** A team created through the goal-based branch may declare `focus_target: T-<nnn>` in its frontmatter — the team's default focus Target. Resolution order is **explicit `--target` > `focus_target` > none**: a run without `--target` resolves to the declared Target and discloses the source with the `(团队默认)` marker (`本次 Target: T-003 — <statement>(open)(团队默认)`); an explicit `--target` always overrides; teams without the field behave exactly as before (byte-equivalent). `focus_target` is a prefill of `--target` — not a write-scope claim and not a binding change; the five preview checks apply unchanged to the resolved value (a terminal default Target is intercepted the same way; re-focus via `improve-team`, reopen via `/speckit.goal`).
+**Default focus (`focus_target`, 042).** A team created through the anchor-based branch may declare `focus_target: T-<nnn>` in its frontmatter — the team's default focus Target. Resolution order is **explicit `--target` > `focus_target` > none**: a run without `--target` resolves to the declared Target and discloses the source with the `(团队默认)` marker (`本次 Target: T-003 — <statement>(open)(团队默认)`); an explicit `--target` always overrides; teams without the field behave exactly as before (byte-equivalent). `focus_target` is a prefill of `--target` — not a write-scope claim and not a binding change; the five preview checks apply unchanged to the resolved value (a terminal default Target is intercepted the same way; re-focus via `improve-team`, reopen via `/speckit.anchor`).
 
 ## Collaboration Patterns
 
-Four patterns; the goal decides which fits. The first three are **bounded** (run once and stop); `continuous` is **unbounded** (operates on a cadence). Pick with the decision tree in [`docs/teams/orchestration.md`](../teams/orchestration.md).
+Four patterns; the anchor decides which fits. The first three are **bounded** (run once and stop); `continuous` is **unbounded** (operates on a cadence). Pick with the decision tree in [`docs/teams/orchestration.md`](../teams/orchestration.md).
 
 - **parallel** (效率优先) — independent Workers dispatched together with disjoint write territories
 - **serial** (质量优先) — an ordered DAG chain where each stage's output feeds the next via file-path-only handoff, with a simple verification between each step and its predecessor
@@ -86,22 +86,22 @@ Four patterns; the goal decides which fits. The first three are **bounded** (run
 | Item ledger (all patterns) | `.specify/teams/<slug>/items.jsonl` | tracked, append-only |
 | Continuous operating spine (continuous only) | `.specify/teams/<slug>/{constraints.md,STATE.md,run-log.jsonl}` | tracked |
 | Run reports (per execution) | `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` | tracked |
-| **Goal summary** (per goal, not per team) | `.specify/goal/<goal-slug>/summary/` (`summary.md` + `assets/` + `data/`) | tracked |
+| **Anchor summary** (per anchor, not per team) | `.specify/anchoring/<slug>/summary/` (`summary.md` + `assets/` + `data/`) | tracked |
 | Deliverables (standard output) | declared target path (real project path) | tracked |
 | Run intermediates | `.specify/teams/.work/<slug>/` | git-ignored |
 
-## Goal Summary
+## Anchor Summary
 
-A team's execution flow periodically produces a **goal-level summary** — the team treated
+A team's execution flow periodically produces an **anchor-level summary** — the team treated
 as a project — by driving the `summarize-project` skill. Output is **dual-indexed**:
 
 | Index | Path | Answers |
 |-------|------|---------|
 | **team** | `.specify/teams/<team-slug>/` | how is this team running |
-| **goal** | `.specify/goal/<goal-slug>/summary/` | how far has this goal progressed |
+| **anchor** | `.specify/anchoring/<anchor-slug>/summary/` | how far has this anchor progressed |
 
-The goal directory holds the single complete summary and aggregates **every** team that
-declares the same `goal_slug`, so a goal outlives any individual team's rebuild or rename.
+The anchor directory holds the single complete summary and aggregates **every** team that
+declares the same `anchor_slug`, so an anchor outlives any individual team's rebuild or rename.
 The team directory keeps run information only.
 
 ### Trigger boundaries
@@ -112,7 +112,7 @@ The team directory keeps run information only.
 | `iteration` | after each generation's DECIDE phase |
 | `serial` | after each stage handoff verification passes |
 | `parallel` | after cross-verification and result aggregation |
-| all | terminal summary on goal met / converged / halt / manual stop |
+| all | terminal summary on anchor met / converged / halt / manual stop |
 
 Gates are evaluated in a fixed order — **budget → cadence → material** — and every run
 records the outcome in its report:
@@ -123,12 +123,12 @@ Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
 
 That line is mandatory: it is what makes "not observed" distinguishable from "observed,
 no progress". The run-mode confirmation gate discloses the summary decision, the resolved
-goal identity, and the target directory before you confirm, so the cost is known up front.
+anchor identity, and the target directory before you confirm, so the cost is known up front.
 
 ### Configuration
 
 ```yaml
-goal_slug: my-goal        # frontmatter — the GOAL's identity; distinct from `slug`
+anchor_slug: my-anchor     # frontmatter — the ANCHOR's identity; distinct from `slug`
 config:
   summary:
     enabled: true         # omit the whole block and the summary is still enabled
@@ -136,10 +136,10 @@ config:
     interactive: false
 ```
 
-`goal_slug` is optional: a team that omits it falls back to its own slug as an *inferred*
-goal identity, so pre-existing teams need no migration. Editing the goal prose never moves
+`anchor_slug` is optional: a team that omits it falls back to its own slug as an *inferred*
+anchor identity, so pre-existing teams need no migration. Editing the anchor prose never moves
 the delivery directory, because identity is declared rather than derived. Concurrent
-refreshes of one goal serialize into a single atomic write.
+refreshes of one anchor serialize into a single atomic write.
 
 Details: `skills/internal/create-team/references/summary-mapping.md`.
 

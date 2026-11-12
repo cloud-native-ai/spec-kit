@@ -77,6 +77,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 
 | object_id | class_id | unit | lifecycle_point |
 |-----------|----------|------|-----------------|
+| speckit-anchor-wrapup | command-wrapup | /speckit.anchor | wrap-up |
 | speckit-analyze-wrapup | command-wrapup | /speckit.analyze | wrap-up |
 | speckit-checklist-wrapup | command-wrapup | /speckit.checklist | wrap-up |
 | speckit-clarify-wrapup | command-wrapup | /speckit.clarify | wrap-up |
@@ -281,6 +282,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-token-reflection | @point:wrap-up | all | owner 链:Token 效率自评在 Reflection procedure step 2 |
 | h-closeout | @point:wrap-up | all | 091 收口步骤:每单元 wrap-up 在 Run Determination / exec-quant / Feedback 与 Documentation 步骤之后执行提交-合并-推送序列,行为归 artifact-commit-step.md § Close-out |
 | h-docs-sync-eval | @point:wrap-up | skill-humanize-wrapup | humanize 技能的 Documentation 面(062;技能侧首个 docs 绑定) |
+| h-docs-sync-eval | @point:wrap-up | speckit-anchor-wrapup | /speckit.anchor 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-analyze-wrapup | /speckit.analyze 的 Documentation 面(T019 矩阵;正枚举,免扣减语义) |
 | h-docs-sync-eval | @point:wrap-up | speckit-checklist-wrapup | /speckit.checklist 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-clarify-wrapup | /speckit.clarify 的 Documentation 面 |

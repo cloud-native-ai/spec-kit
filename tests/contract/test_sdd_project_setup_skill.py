@@ -157,7 +157,7 @@ def test_suggestion_not_mandate_redline():
 def test_no_sdd_stage_advancement_and_bootstrap_command_set():
     text = _skill()
     assert "不做任何 SDD 阶段推进" in text
-    assert "constitution/feature/docs/goal/agents/team" in text
+    assert "constitution/feature/docs/anchor/goal/agents/team" in text
 
 
 def test_setup_creates_specify_and_does_not_require_it():

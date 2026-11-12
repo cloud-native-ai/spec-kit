@@ -1,6 +1,6 @@
 # Maintenance Recipes — H1–H5 执行细则
 
-> 本文件是 `sdd-house-keeping` 的操作手册。Bootstrap（install/refresh/constitution/首次 goal/agents/team）归 `sdd-project-setup`；本文件只覆盖 bootstrap 之后的周期性维护。命令形态全部参数化：`<project-dir>` `<alias>` `<run-user>` `<tool>`。
+> 本文件是 `sdd-house-keeping` 的操作手册。Bootstrap（install/refresh/constitution/首次 anchor/goal/agents/team）归 `sdd-project-setup`；本文件只覆盖 bootstrap 之后的周期性维护。命令形态全部参数化：`<project-dir>` `<alias>` `<run-user>` `<tool>`。
 >
 > **三段循环对照**：setup = S0–S2 + HANDOFF；house-keeping = H0–H5；loop-driver = U0–U6。
 > 目标解析唯一契约：`.specify/shared/workflow/target-resolution.md`。
@@ -18,7 +18,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <projec
 ```
 
 - 物理矩阵：const / feat / gloss / fb / reg / kb / session / tools / skills / tmpl / specs / src / compat；分级 `absent | degraded | partial | complete`。
-- 逻辑矩阵：required（instructions / features / docs）、recommended（goals / glossary / register / knowledge）、conditional（agents / teams）。
+- 逻辑矩阵：required（instructions / features / docs）、recommended（anchors / glossary / register / knowledge）、conditional（agents / teams）。`anchors` 层以 `.specify/anchoring/*/anchor.md` 为准（历史 `.specify/goal/` 路径不是交付面）。
 - 退出码：logical `0` required 全 ok；`1` required 缺口；`2` 非 Spec Kit 项目。`--strict` 把 recommended 缺口也计为失败。
 - 两层都跑完才算 H1 完成；缺口凭据是**本次**结果。
 
@@ -61,8 +61,8 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <projec
 | 4 | `/speckit.feature` | 注册表稀疏或调研揭示缺口 | 生成/补齐特性条目 |
 
 - 依赖：history → docs；research → feature。不并行。
-- `/speckit.goal`、`/speckit.agents`、`/speckit.team` 的首次定义归 setup；本 skill 只检查存在性。
-- **Bootstrap-gap 回交**：若 H1 显示 goal/agents/team 缺失，MUST NOT 静默跳过——记录 `bootstrap-gap` 并回交 `sdd-project-setup`，除非用户明确要求本 skill 维护。首次定义仍归 setup。
+- `/speckit.anchor`（七模式）、`/speckit.goal`（四模式）、`/speckit.agents`、`/speckit.team` 的首次定义归 setup；本 skill 只检查存在性。
+- **Bootstrap-gap 回交**：若 H1 显示 `anchors`/`goals`/`agents`/`teams` 缺失，MUST NOT 静默跳过——记录 `bootstrap-gap` 并回交 `sdd-project-setup`，除非用户明确要求本 skill 维护。首次定义仍归 setup。
 - 强化产物进入 H5 候选清单；不推进任何 SDD 开发阶段。
 
 ## H4 VERIFY

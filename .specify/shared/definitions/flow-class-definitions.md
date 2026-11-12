@@ -10,7 +10,7 @@
 四个共享字面量（`execution` / `expression` / `flow_class` / `未声明·按默认`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
-清单规模（实测 2026-10-30：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。
+清单规模（实测 2026-11-12：`ls templates/commands/*.md | wc -l` → 32；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 59）：命令 32 + 技能 59 = **91 行台账**。
 
 **不在本文件**（只给指针，不复述）：
 
@@ -143,6 +143,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | unit_id | flow_class | basis | neutral | notes |
 | --- | --- | --- | --- | --- |
 | /speckit.agents | execution | behavior-oracle |  | 交付代理定义与调度结果；以派发后的行为与 agent 校验判定 |
+| /speckit.anchor | execution | behavior-oracle |  | 交付锚点定义、Targets 与绑定操作结果；由 goal 引擎校验与命令族读取判定 |
 | /speckit.analyze | execution | behavior-oracle |  | 交付一致性分析结论；可重跑复算并作为门禁裁决 |
 | /speckit.checklist | execution | behavior-oracle |  | 交付需求质量清单；条目被后续门禁机器消费 |
 | /speckit.clarify | execution | behavior-oracle |  | 交付写回规格的裁定；由 validator 与下游流程读取判定 |
@@ -151,7 +152,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | /speckit.docs | expression | reader-oracle |  | 首批成员；文档内容由读者与外部事实判定（FR-025） |
 | /speckit.feature | execution | behavior-oracle |  | 交付特性注册行与详情；由命令读取与状态机脚本判定 |
 | /speckit.feedback | execution | behavior-oracle |  | 交付反馈条目与分流结果；路由与打包结果可判定 |
-| /speckit.goal | execution | behavior-oracle |  | 交付目标定义与共用关系；由 goal 引擎校验判定 |
+| /speckit.goal | execution | behavior-oracle |  | 交付行动级 Goal 定义与共享生命周期结果；由 goal 引擎校验判定（四模式，Anchor-only 模式被具名拒绝） |
 | /speckit.history | execution | behavior-oracle |  | 交付 manifest 与主题知识；增量与去重可机器判定 |
 | /speckit.humanize | expression | reader-oracle |  | 首批成员；保真与自然度由读者判定（FR-025） |
 | /speckit.implement | execution | mixed-oracle |  | 代码须运行、规格回填须读者核；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
@@ -208,10 +209,11 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:improve-team | execution | behavior-oracle |  | 交付改进后的团队；以运行与阈值判定 |
 | skill:improve-tools | execution | behavior-oracle |  | 交付改进后的 Tool 记录；以校验与调用判定 |
 | skill:manage-agents | execution | behavior-oracle |  | 交付多 Agent 接线状态；由接线脚本核验判定 |
+| skill:manage-anchor | execution | behavior-oracle |  | 交付锚点撰写与 Targets/绑定操作指导；以再运行与引擎校验判定 |
 | skill:manage-constitution | execution | mixed-oracle |  | 治理文本由读者判、版本与校验由引擎判；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
 | skill:manage-features | execution | behavior-oracle |  | 交付特性注册与详情；由状态机脚本判定 |
 | skill:manage-feedback | execution | behavior-oracle | yes | 类中立（feedback）：分流调用方的反馈条目，无自身交付物 |
-| skill:manage-goal | execution | behavior-oracle |  | 交付目标定义；由 goal 引擎校验判定 |
+| skill:manage-goal | execution | behavior-oracle |  | 交付行动级 Goal 的四模式指导；由 goal 引擎校验判定 |
 | skill:manage-history | execution | behavior-oracle |  | 交付知识库与 manifest；增量与去重可机器判定 |
 | skill:manage-instructions | execution | mixed-oracle |  | 指令文本由读者判、符号链接由脚本判；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |
 | skill:manage-todo | execution | behavior-oracle |  | 交付 TODO 块与搁置条目；由扫描器判定 |

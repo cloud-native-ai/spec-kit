@@ -40,8 +40,11 @@ ROUTING = REPO_ROOT / "shared/definitions/sdd-routing-definitions.md"
 SCAN_DIRS = ("shared", "skills", "scripts", "templates", "src")
 SCAN_SUFFIXES = {".md", ".py", ".sh", ".bash", ".yaml", ".yml"}
 
-#: The one file allowed to name the retired terms: the concept owner's historical record.
-HISTORICAL_RECORD = "shared/definitions/goal-definitions.md"
+#: The files allowed to name the retired terms: the concept owner's historical record,
+#: which feature 101 split — the Anchor owner carries the retired-name map-forward and the
+#: action-level Goal owner keeps its own boundary record.
+HISTORICAL_RECORD = ("shared/definitions/goal-definitions.md",
+                     "shared/definitions/anchor-definitions.md")
 
 TEMP_DIR_TOKENS = (".specify/.tmp", "temp-directory", "运行临时区")
 
@@ -66,7 +69,7 @@ def _criterion_hits():
             if not path.is_file() or path.suffix not in SCAN_SUFFIXES:
                 continue
             rel = path.relative_to(REPO_ROOT).as_posix()
-            if rel == HISTORICAL_RECORD:
+            if rel in HISTORICAL_RECORD:
                 continue
             try:
                 text = path.read_text(encoding="utf-8")

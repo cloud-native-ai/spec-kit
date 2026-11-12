@@ -52,7 +52,7 @@ python3 <skill>/scripts/logical-framework.py --project <project-dir> --json
 `python3 <ssh-utils>/scripts/ssh-exec.py --host <alias> --user <run-user> --cwd <project-dir> --script <skill>/scripts/logical-framework.py --script-arg=--project --script-arg=<project-dir> --json`
 拓扑形态仍是 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；`ssh-exec.py` 固定带 `-o RemoteCommand=none`（主机预置 `RemoteCommand` 时裸 ssh 会与命令行冲突）。通用远端命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md`。
 
-逻辑矩阵：required（instructions / features / docs）、recommended（goals / glossary / register /
+逻辑矩阵：required（instructions / features / docs）、recommended（anchors / glossary / register /
 knowledge）、conditional（agents / teams）。退出码 `0` required 全 ok；`1` required 缺口；`2` 非
 Spec Kit 项目。`--strict` 把 recommended 缺口也计为失败。**缺≠错**：recommended/conditional
 缺口按项目语境声明，不自动算 fail。
@@ -103,8 +103,9 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 | 1 | `/speckit.constitution` | `const` 缺 | 宪法 bootstrap（模板→项目语境→版本裁决） |
 | 2 | `/speckit.feature` | `feat` 缺 | 注册表种子（对既有代码 reconcile） |
 | 3 | `/speckit.docs` | `docs/` 缺 | 文档空间基线树 |
-| 4 | `/speckit.goal` | goals 缺 | 定义 3–5 个项目目标 |
-| 5 | `/speckit.agents` / `/speckit.team` | **按需**：用户明确需要 | 代理/团队定义；未使用则保持 `not-configured` |
+| 4 | `/speckit.anchor` | `anchors` 缺（`.specify/anchoring/` 无 `*/anchor.md`） | 定义 3–5 个项目锚点（七模式：create/view/modify/targets/migrate/migrate-archive/coordinate） |
+| 5 | `/speckit.goal` | **按需**：需要短周期行动级指导 | 行动级 Goal（四模式：create/view/modify/status），不进入控制层级 |
+| 6 | `/speckit.agents` / `/speckit.team` | **按需**：用户明确需要 | 代理/团队定义；未使用则保持 `not-configured` |
 
 **Carrier**：本地每个命令的派发 MUST 缺省用 **fork 承载**（同族 `qodercli` 子进程经
 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
@@ -114,9 +115,9 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。底层 SSH 传输一律经
 `ssh-utils`，见下节。
 
-S2.5 完成后，**首次 goal/agents/team 不得悬空**：目标项目若仍缺 goal 且用户未明确要求跳过，
-setup 必须在 handoff 前完成或把 `bootstrap-gap: goal` 写入 handoff 凭证，由 house-keeping H3
-回交 setup；house-keeping 不静默跳过。
+S2.5 完成后，**首次 anchor/goal/agents/team 不得悬空**：目标项目若仍缺锚点且用户未明确要求跳过，
+setup 必须在 handoff 前完成或把 `bootstrap-gap: anchors|goals|agents|teams` 写入 handoff 凭证，由
+house-keeping H3 回交 setup；house-keeping 不静默跳过。
 
 ## SSH 传输约定（owner: ssh-utils）
 
@@ -157,14 +158,15 @@ setup 必须在 handoff 前完成或把 `bootstrap-gap: goal` 写入 handoff 凭
 | `/speckit.constitution`（S2.5） | 宪法在位 → 跳过；不重写已 ratify 的宪法 |
 | `/speckit.feature`（S2.5） | 注册表在位 → 不重建；house-keeping H2 负责 drift reconcile |
 | `/speckit.docs`（S2.5） | docs 树在位 → 不重建；house-keeping H2 负责漂移收敛 |
-| `/speckit.goal`（S2.5） | goal 在位（3–5 个）→ 跳过 |
+| `/speckit.anchor`（S2.5） | 锚点存档在位（3–5 个 `*/anchor.md`）→ 跳过 |
+| `/speckit.goal`（S2.5） | 无行动级需求 → 跳过 |
 | `/speckit.agents` / `/speckit.team`（S2.5） | 未使用 → 跳过；不预建 |
 
 ## 软协同契约（三技能）
 
 - **非强绑定**：三个技能各自可独立运行。
 - **setup → house-keeping**：bootstrap 完成后 handoff H0–H4；ready 凭证来自 H4。
-- **house-keeping → setup**：目标项目缺 `.specify/`/constitution，或 H3 发现 goal/agents/team
+- **house-keeping → setup**：目标项目缺 `.specify/`/constitution，或 H3 发现 anchor/goal/agents/team
   bootstrap-gap 时回交 setup。
 - **setup → sdd-loop-driver**：候选工作清单由 house-keeping H5 提供，是建议而非强制；不携带
   任何「必须调用 sdd-loop-driver」的语义。

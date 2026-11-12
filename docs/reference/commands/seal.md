@@ -137,7 +137,7 @@ The engine's `archive-gate` action is the single owner of the retirement admissi
 - `/speckit.feature` keeps ownership of the feature-registry reconcile and its declaration semantics; the seal run writes only its own transition and records.
 - `/speckit.review` owns review records and verdicts — the seal run reads them.
 - `/speckit.sanitize` and `/speckit.docs` keep ownership of retirement and documentation-space actions.
-- `/speckit.goal migrate-archive` keeps ownership of spec-local goal/team tree migration; seal neither migrates nor deletes those trees.
+- `/speckit.anchor migrate-archive` keeps ownership of spec-local anchor/team tree migration; seal neither migrates nor deletes those trees.
 
 ## Related
 

@@ -6,8 +6,10 @@ overlap grammar (expand_scopes / scopes_overlap / overlap_verdict /
 detect_overlaps semantics) is IMPORTED from build-summary-input.py — zero
 second grammar (042 creation-territory-disjoint.contract.md §Authority).
 
-Checked set = proposed teams ∪ existing teams under the same `goal_slug`
-(read from `.specify/teams/*/team.md` frontmatter; an undeclared territory is
+Checked set = proposed teams ∪ existing teams under the same anchor identity
+(`anchor_slug` in the proposal, legacy `goal_slug` still accepted; read from
+`.specify/teams/*/team.md` frontmatter with the same precedence; an undeclared
+territory is
 `undecidable`, never guessed). A valid repo root without `.specify/teams/` is
 a fresh project: zero existing teams, proposals only. A slug present on BOTH
 sides is one party, not two: such a self-pair is skipped, because a scope
@@ -51,9 +53,9 @@ def _validate(payload: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(payload, dict):
         return ["input root must be a JSON object"]
-    goal_slug = payload.get("goal_slug")
-    if not isinstance(goal_slug, str) or not goal_slug.strip():
-        errors.append("goal_slug must be a non-empty string")
+    identity = payload.get("anchor_slug", payload.get("goal_slug"))
+    if not isinstance(identity, str) or not identity.strip():
+        errors.append("anchor_slug (legacy goal_slug) must be a non-empty string")
     teams = payload.get("teams")
     if not isinstance(teams, list) or not teams:
         return errors + ["teams must be a non-empty list"]
@@ -73,14 +75,15 @@ def _validate(payload: Any) -> list[str]:
     return errors
 
 
-def _existing_territories(repo_root: Path, goal_slug: str) -> list[tuple[str, Any]]:
+def _existing_territories(repo_root: Path, identity: str) -> list[tuple[str, Any]]:
     teams_dir = repo_root / ".specify" / "teams"
     out: list[tuple[str, Any]] = []
     if not teams_dir.is_dir():
         return out
     for team_md in sorted(teams_dir.glob("*/team.md")):
         fm = bsi.split_frontmatter(team_md.read_text(encoding="utf-8"))
-        if str(fm.get("goal_slug") or "").strip() != goal_slug:
+        bound = str(fm.get("anchor_slug") or fm.get("goal_slug") or "").strip()
+        if bound != identity:
             continue
         out.append((str(fm.get("slug") or team_md.parent.name), fm.get("territory")))
     return out
@@ -115,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
         emit({"error": f"repo root does not exist: {repo_root}"})
         return EXIT_ROOT_ERROR
 
-    goal_slug = payload["goal_slug"].strip()
+    identity = payload.get("anchor_slug", payload.get("goal_slug")).strip()
     proposed = [
         (team["slug"],
          {"write": list(team.get("write", [])),
@@ -124,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
           "non_path": list(team.get("non_path", []))})
         for team in payload["teams"]
     ]
-    all_teams = proposed + _existing_territories(repo_root, goal_slug)
+    all_teams = proposed + _existing_territories(repo_root, identity)
 
     verdicts: list[dict] = []
     for i in range(len(all_teams)):

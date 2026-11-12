@@ -21,7 +21,8 @@
 |------|--------|
 | 复杂度层级名、判定信号与思考深度处方 | `.specify/shared/guidelines/task-complexity-rubric.md` |
 | 质量门与确认门集合 | `.specify/shared/guidelines/confirmation-gates.md` 与宪法质量原则 |
-| Goal / Target 的身份、状态机与绑定 | `shared/definitions/goal-definitions.md` |
+| Anchor / Target 的身份、状态机与绑定 | `shared/definitions/anchor-definitions.md` |
+| 行动级 Goal 的构成与存储（不在控制层级内） | `shared/definitions/goal-definitions.md` |
 | 驱动的阶段名册、状态脊、哨兵、U0–U6 | `skills/external/sdd-loop-driver/SKILL.md` |
 | 反嵌套义务与其派发前探针 | `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation；`skills/internal/run-agent/SKILL.md` |
 | 中立元数据键集（`[[STR-001]]` 的取值域与缺省） | `src/specify_cli/__init__.py` `NEUTRAL_AGENT_METADATA_KEYS` |
@@ -31,14 +32,16 @@
 
 控制层级只有一条，且有唯一一条边界：
 
-1. **Goal** 是最高层：它陈述一个目标与可验证的成功判据（身份与状态机归 `shared/definitions/goal-definitions.md`）。
-2. **Team** 绑定一个 Goal，编排 Agent 成员；Team 不重写 Goal，只把 Goal 拆成成员职责。
+1. **Anchor** 是最高层：它陈述一个项目级、长期、跨交付物的终点状态与可验证的成功判据（身份、状态机与绑定归 `shared/definitions/anchor-definitions.md`）。
+2. **Team** 绑定一个 Anchor，编排 Agent 成员；Team 不重写 Anchor，只把 Anchor 拆成成员职责。
 3. **Agent** 执行一条职责（duty）；职责是路由与授权的计量单位——一次裁决对应一条职责，而不是一个文件或一次提交。
 4. **SDD 运行**（`sdd-loop-driver`）是从属执行路径：它由**已获有效授权的 Agent** 启动，为一条职责产出 SDD 工件链，并在 review 完成后交回 handoff。
 
-**边界**: 下层不得改写上层的定义。**一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义**——需要改变既有定义的动作 MUST 返回给上层执行者（Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
+**不在层级内**: **行动级 Goal** 不是本层级的成员——它是短周期的可执行指导与完成条件，由 `/speckit.goal` 的四模式管理，构成归 `shared/definitions/goal-definitions.md`。把 Goal 放回控制层级、或把它读作项目级目标，都是层级缺陷。
 
-**平行线 carve-out（追加）**: 上句治理的是**共享档案中已有的定义**，不是禁止运行拥有定义。一次运行——SDD 运行与命令运行同规——MAY 创建归本次运行所有的定义并写入两条档案层：goal 档案 `.specify/anchoring/<slug>/goal.md`、team 档案 `.specify/teams/<slug>/team.md`；归属由绑定记录回答，其构成与取值域归 `shared/definitions/goal-definitions.md` § The Binding Record，team 侧归 `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model——本段只是路由层的 carve-out，不复述任何 value domain。哪些命令运行 MAY 创建定义由声明层与 goal 引擎的 `command-family` 动作判定，本段不设第二份清单。
+**边界**: 下层不得改写上层的定义。**一次 SDD 运行 MUST NOT 创建/重绑/改范围/终止共享档案中的既有定义**——需要改变既有定义的动作 MUST 返回给上层执行者（锚点侧共享定义归 `/speckit.anchor`，行动级 Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
+
+**平行线 carve-out（追加）**: 上句治理的是**共享档案中已有的定义**，不是禁止运行拥有定义。一次运行——SDD 运行与命令运行同规——MAY 创建归本次运行所有的定义并写入两条档案层：anchor 档案 `.specify/anchoring/<slug>/anchor.md`、team 档案 `.specify/teams/<slug>/team.md`；归属由绑定记录回答，其构成与取值域归 `shared/definitions/anchor-definitions.md` § The Binding Record，team 侧归 `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model——本段只是路由层的 carve-out，不复述任何 value domain。哪些命令运行 MAY 创建定义由声明层与 goal 引擎的 `command-family` 动作判定，本段不设第二份清单。
 
 ## Direct modification
 

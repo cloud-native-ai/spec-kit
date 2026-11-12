@@ -31,15 +31,15 @@ Whether the invoking command run may own a goal/team is decided by the declared 
 Complex work is handed to a crew through `<spec-dir>/handoff.md`, whose shape and rules are authored once in [`references/handoff-contract-template.md`](references/handoff-contract-template.md) — cite it, never restate it.
 
 - **Production** — the `tasks` stage produces the contract only after `python3 scripts/python/goal-utils.py handoff-decision --tasks <spec-dir>/tasks.md --json` returns `handoff`; `plan` never produces one and `implement` consumes it (C-68).
-- **Key discipline** — `goal_slug` and `team_slug` are validated against `.specify/anchoring/<goal_slug>/goal.md` and `.specify/teams/<team_slug>/team.md` through the engine; an unresolvable key is refused at creation with `handoff-dangling-key` (exit 2) naming the key, and the reverse `handoff_ref` on both definitions is written by the engine's binding action — never by the contract file alone (C-58/C-59).
-- **Territory** — on activation the contract's `## Territory` expands into the `territory.write` of every team bound to that `goal_slug` as an explicit `improve-team` modification, one record per team; `requirements.md`, `tasks.md`, `verification.md` and `handoff.md` stay in `territory.forbidden`, and the refusal is mechanical via [`scripts/territory-check.py`](scripts/territory-check.py) (C-61/C-62).
+- **Key discipline** — `anchor_slug` and `team_slug` are validated against `.specify/anchoring/<anchor_slug>/anchor.md` and `.specify/teams/<team_slug>/team.md` through the engine; an unresolvable key is refused at creation with `handoff-dangling-key` (exit 2) naming the key, and the reverse `handoff_ref` on both definitions is written by the engine's binding action — never by the contract file alone (C-58/C-59).
+- **Territory** — on activation the contract's `## Territory` expands into the `territory.write` of every team bound to that `anchor_slug` as an explicit `improve-team` modification, one record per team; `requirements.md`, `tasks.md`, `verification.md` and `handoff.md` stay in `territory.forbidden`, and the refusal is mechanical via [`scripts/territory-check.py`](scripts/territory-check.py) (C-61/C-62).
 - **Writeback** — the crew delivers one record per completed task under `<spec-dir>/writeback/<T-NNN>.yaml`; the task table stays spec-side (C-65/C-67).
 
 ## Team Definition & Persistence (create mode)
 
 Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/team.md`. Establish the goal first, then derive both structures from it. Full procedure, schema, and persistence rules: [`references/create-mode.md`](references/create-mode.md).
 
-**Goal-based branch (before step 1)**: when a token in the input exactly matches an archived goal slug — verified deterministically via `python3 scripts/python/goal-utils.py list --json`, never guessed — offer to enter the **goal-based create branch**: load the definition via `parse_goal`, present the four-element analysis (维度 / 判据覆盖 / 既有 Target / 可达成性 — advisory, the user adjudicates), then derive the team from the loaded goal. Dangling references stop with the verbatim prefix `goal 未定义:`; terminal goals (`achieved`/`abandoned`) are rejected. Full branch procedure: [`references/create-mode.md`](references/create-mode.md) → *Goal-based create branch*.
+**Anchor-based branch (before step 1)**: when a token in the input exactly matches an archived anchor slug — verified deterministically via `python3 scripts/python/goal-utils.py list --json`, never guessed — offer to enter the **anchor-based create branch**: load the definition via `parse_goal`, present the four-element analysis (维度 / 判据覆盖 / 既有 Target / 可达成性 — advisory, the user adjudicates), then derive the team from the loaded anchor. Dangling references stop with the verbatim prefix `goal 未定义:`; terminal anchors (`achieved`/`abandoned`) are rejected. Full branch procedure: [`references/create-mode.md`](references/create-mode.md) → *Anchor-based create branch*.
 
 1. **Establish the goal** — extract/establish a verifiable goal from `$ARGUMENTS`/context.
 2. **Match presets** — run `${SKILL_HOME}/scripts/match-team-preset.py --goal "<text>"` and act on its `confidence`.
@@ -52,7 +52,7 @@ Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/tea
 
 **Member class and stated concurrency capability (成员类别与并发能力声明)**: every `members[]` row MUST carry a **class** drawn from `shared/declarations/facts/concurrency-class.yaml` (a pointer — the class table is never copied here), and the team MUST state **how many of its members can run concurrently**; that statement MUST be derivable from the member classes and the slot cap read at execution time (`shared/declarations/facts/concurrency-slot-and-reserve.yaml`), never asserted independently. The team MUST NOT be instantiated with more concurrent members than the statement supports: the roster step reads each member's dispatch-capability verdict (the capability judgement reads the existing `capability-tools` frontmatter key — no new key is introduced) and **reports the reduction** when it applies. Per-seat **territories are judged at binding time** — intersecting or undeclared territories are red before any run (`references/conceptual-model.md` § Seat territories judged at binding time).
 
-`goal_slug` identifies the **goal**, not the team slug; it is a different axis from `slug` (the team's identity). See `references/goal.md` and `references/summary-mapping.md`.
+`anchor_slug` identifies the **anchor**, not the team slug; it is a different axis from `slug` (the team's identity). See `references/goal.md` and `references/summary-mapping.md`.
 
 ## Execution (run mode)
 
@@ -151,7 +151,7 @@ Select from four collaboration patterns, each with a distinct priority: **parall
 
 ## Summary Refresh (all patterns)
 
-Every run refreshes a **goal-level summary** by driving `summarize-project` non-interactively (`--load`). Concept mapping and provenance rules live in `references/summary-mapping.md`.
+Every run refreshes an **anchor-level summary** by driving `summarize-project` non-interactively (`--load`). Concept mapping and provenance rules live in `references/summary-mapping.md`.
 
 ### Trigger boundaries
 
@@ -170,7 +170,7 @@ Evaluate in order; the first blocking gate determines the recorded status. **Bud
 1. **Budget** — at report-only tier or kill-switch set → skip, record `skipped(budget)`.
 2. **Cadence** — not at an Nth boundary → skip, record `skipped(cadence)`.
 3. **Material** — no item ledger and no run reports in the goal → decline, record `declined(no-material)`.
-4. **Overlap detection** — detect write-scope overlap across teams sharing this `goal_slug`; record contested areas; do not rewrite any `team.md`.
+4. **Overlap detection** — detect write-scope overlap across teams sharing this `anchor_slug`; record contested areas; do not rewrite any `team.md`.
 5. Otherwise → refresh, record `produced`.
 
 ### Status line (mandatory in every run report)
@@ -199,7 +199,7 @@ All patterns share file-path-only handoffs, progress tracking, structured result
 - **File-path-only handoff** — never paste content between agents
 - **Context isolation** — each agent invocation is a fresh subagent; the continuous **verifier MUST be a separate sub-agent** from the implementer
 - **Idempotent execution** — stages/iterations/cycles can be re-run safely
-- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team additionally keeps the tracked item ledger `items.jsonl`, and continuous teams also keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl`, in the team directory. The summary delivery directory is **not** in the team directory — it belongs to the goal index `.specify/goal/<goal-slug>/summary/`
+- **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team additionally keeps the tracked item ledger `items.jsonl`, and continuous teams also keep tracked `constraints.md` / `STATE.md` / `run-log.jsonl`, in the team directory. The summary delivery directory is **not** in the team directory — it belongs to the anchor index `.specify/anchoring/<anchor-slug>/summary/`
 - **Every run writes a dated report** to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` per the Report contract, including its mandatory `## Verification` section (口径见上,不复述)
 - **Every persisted team contains `## Self-Improvement Contract` exactly once**; one-shot teams do not claim subject identity
 
@@ -268,7 +268,7 @@ A persisted `team.md` is an Execution Subject; a one-shot team and individual me
 
 ## Wrap-up
 
-<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 4682b9e38032 — do not edit; edit the registry, then recompile -->
+<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 2845f5641171 — do not edit; edit the registry, then recompile -->
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 

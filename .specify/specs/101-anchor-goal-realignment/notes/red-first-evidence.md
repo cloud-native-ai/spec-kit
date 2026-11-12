@@ -161,3 +161,35 @@ classification module alone: **2 failed, 34 passed**.
   `::test_complex_set_equals_measured_feedback_carriers` — the anchor feedback-face
   assertions, T040-owned until the compiled face lands.
 - nothing else moved. Full record: `test-evidence/implement-wp02b.md`.
+
+## WP-03 (T035–T047) — live-surface convergence, mirrors, red-first test updates
+
+Red-first captures taken with `bash scripts/bash/run-tests.sh` before each correction.
+
+### Pre-edit (red) readings
+
+| Module / batch | Reading | Red ids |
+|---|---|---|
+| `tests/contract/test_team_command_routing.py` | 1 failed, 31 passed | `::test_goal_md_zero_write_red_line_is_stated` — `goal.md write-face rule missing` (create-team `references/goal.md` rewritten to `anchor.md`) |
+| framework-map + setup + criterion + flow-class + glossary + declaration + reference-matrix batch | 6 failed, 52 passed | `test_framework_map_archive_row.py::test_the_framework_map_names_the_unified_archive_and_drops_spec_local_goal_team` (no `Goals` row); `test_flow_class_ledger.py::{test_ledger_has_79_rows_covering_inventory_bidirectionally,test_templates_and_skills_never_assign_class_key,test_check_reports_79_units_and_zero_gaps}` (89 vs 91); `test_sdd_project_setup_skill.py::test_no_sdd_stage_advancement_and_bootstrap_command_set` (pin `constitution/feature/docs/goal/agents/team`); `test_criterion_vocabulary_scan.py::test_no_runtime_surface_uses_temporary_or_global_as_a_criterion` (6 hits incl. 5 in the renamed `anchor-definitions.md`) |
+| handoff batch (`test_handoff_contract.py` + `test_handoff_territory.py` + `tests/integration/test_goal_reference.py`) | 9 failed, 3 passed; 5 of the 9 are E2 baseline (`test_goal_reference.py` lines 137–141) | 4 package-caused: `::test_the_contract_carries_its_eight_sections_in_order` (`goal_slug` missing), `::test_the_three_way_keys_resolve_in_both_directions` (`KeyError: 'goal_slug'`), `::test_the_contract_cites_and_never_copies_task_rows` (`## Goal` cites `anchor_slug`), `::test_a_dangling_handoff_key_is_refused_at_creation` (engine rc 2, `goal_slug ''` unresolved) |
+| probe batch (`test_run_skills_wiring.py` + `test_compile_propagation_order.py` + `test_feedback_command_classification.py`) | 3 failed, 45 passed | `compile-embeds` drift in 85/85 units (registry fingerprint moved after WP-02's registry edit; `templates/commands/anchor.md` carried only the reserved empty `## Wrap-up`); `test_c9_compile_embeds_zero_drift_75_units` pinned `84 units`, engine reported 85 after recompile |
+| `test_non_disposable_check.py` | 4 failed | all four ids are E2 baseline lines 80–83 — untouched |
+| `test_shared_reference_rewrite.py` | 2 failed | both ids are E2 baseline lines 96–97 — untouched |
+| `test_criterion_vocabulary_scan.py` after the owner-file exemption update | 1 failed | same baseline id; residual 2 hits are the pre-existing `skills/external/sdd-loop-driver/references/decomposition-model.md:362,369` |
+
+### Post-edit (green) readings
+
+- `test_team_command_routing.py` + `test_handoff_contract.py` + `test_handoff_territory.py` + `test_sdd_house_keeping_skill.py` + `test_feedback_step_reference_form.py`: **316 passed**.
+- `test_run_skills_wiring.py` + `test_compile_propagation_order.py` + `test_feedback_command_classification.py`: **48 passed**.
+- `test_criterion_vocabulary_scan.py`: 2 passed, 1 failed (baseline id only; 6 hits → 2 pre-existing hits).
+- Consolidated 20-module reading: **12 failed, 591 passed**, and every one of the 12 ids is present in `test-evidence/suite-baseline-entry.txt` (4 × `test_non_disposable_check.py`, 2 × `test_shared_reference_rewrite.py`, 5 × `tests/integration/test_goal_reference.py`, 1 × `test_criterion_vocabulary_scan.py`). No new id outside the E2 baseline.
+
+### Updated surfaces (T047)
+
+1. `tests/contract/test_framework_map_archive_row.py` — rows retargeted to `Anchor archive` / `Goal archive` / `Team archive` / `Anchor archive destination`, asserting `.specify/anchoring/<slug>/`, `.specify/goals/<slug>/`, `.specify/teams/<slug>/`, `.specify/archive/anchoring/<slug>/` and the absence of the retired singular `.specify/goal/`.
+2. `tests/contract/test_sdd_project_setup_skill.py` — command-set pin `constitution/feature/docs/goal/agents/team` → `constitution/feature/docs/anchor/goal/agents/team`.
+3. `tests/contract/test_flow_class_ledger.py` — four pins 89 → 91 and composition 31+58 → 32+59 (`/speckit.anchor` + `skill:manage-anchor`), with dated stale-pin notes.
+4. `tests/contract/test_run_skills_wiring.py` — compile census pin 84 → 85 units (`templates/commands/anchor.md` now carries its compiled face).
+5. `tests/contract/test_team_command_routing.py` — zero-write red line retargeted from `goal.md` to `anchor.md` (reference filename unchanged).
+6. `tests/contract/test_criterion_vocabulary_scan.py` — historical-record exemption widened to the renamed owner pair (`goal-definitions.md` + `anchor-definitions.md`); the baseline id stays red on its pre-existing `decomposition-model.md` hits, status unchanged.

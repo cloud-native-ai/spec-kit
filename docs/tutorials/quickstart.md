@@ -220,7 +220,8 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 | `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](../reference/commands/feature.md) |
 | `/speckit.agents` | Generate role-based agents or create custom agents | [details →](../reference/commands/agents.md) |
 | `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](../reference/commands/team.md) |
-| `/speckit.goal` | Author project-level goal definitions and coordinate teams sharing one | [details →](../reference/commands/goal.md) |
+| `/speckit.anchor` | Author project-level Anchor definitions; Targets, migration, archive migration and team-coordination modes | [details →](../reference/commands/anchor.md) |
+| `/speckit.goal` | Author action-level Goal guidance — short-horizon steps with a verifiable completion condition | [details →](../reference/commands/goal.md) |
 | `/speckit.skills` | Manage specialized skills | [details →](../reference/commands/skills.md) |
 | `/speckit.tools` | Define/discover reusable tools with behavioral rules | [details →](../reference/commands/tools.md) |
 | `/speckit.instructions` | Generate AI agent instructions and symlinks | [details →](../reference/commands/instructions.md) |
@@ -241,7 +242,9 @@ Commands follow a natural order. The table below shows common prerequisites and 
 | `/speckit.feature` | (Optional) `/speckit.constitution` | `/speckit.requirements` |
 | `/speckit.requirements` | (Optional) `/speckit.feature` | `/speckit.clarify`, `/speckit.plan` |
 | `/speckit.clarify` | `/speckit.requirements` | `/speckit.plan` |
-| `/speckit.interview` | None (commonly `/speckit.clarify` hitting its question cap) | Depends on the converged artifact: `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.goal` |
+| `/speckit.interview` | None (commonly `/speckit.clarify` hitting its question cap) | Depends on the converged artifact: `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`, `/speckit.anchor` (project-level end state), `/speckit.goal` (action-level guidance) |
+| `/speckit.anchor` | (Optional) `/speckit.constitution`, `/speckit.feature` | `/speckit.team`, `/speckit.anchor targets` |
+| `/speckit.goal` | None | `/speckit.anchor` for the project-level end state |
 | `/speckit.research` | `/speckit.requirements` or `/speckit.plan` | `/speckit.plan` |
 | `/speckit.derive` | None (a topic and, ideally, a source list) | `/speckit.plan`, `/speckit.clarify` for its open questions |
 | `/speckit.plan` | `/speckit.requirements` (clarify done if needed) | `/speckit.tasks`, `/speckit.checklist` |

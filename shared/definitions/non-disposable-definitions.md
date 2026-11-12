@@ -162,16 +162,18 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 ## Review Surface
 
-**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的十个历史根**（FR-036）：
+**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的十一个历史根**（FR-036）：
 
 ```text
-.specify/archive  .specify/derive  .specify/goal  .specify/history  .specify/memory
-.specify/project  .specify/review  .specify/specs  .specify/state  .specify/teams
+.specify/anchoring  .specify/archive  .specify/derive  .specify/goals  .specify/history
+.specify/memory  .specify/project  .specify/review  .specify/specs  .specify/state
+.specify/teams
 ```
 
 成员与次序由 `shared/declarations/facts/non-disposable-review-surface.yaml#/statement` 拥有
-（`kind: closed-set`），引擎经 `scripts/python/declaration_reader.py` 读出；本节**不复述**那十个字符串作为
-第二个定义点，只负责说明它们的语义与边界。
+（`kind: closed-set`），引擎经 `scripts/python/declaration_reader.py` 读出；本节**不复述**那十一个字符串作为
+第二个定义点，只负责说明它们的语义与边界。`.specify/goal`（单数）是已退役成员：项目级锚点存于
+`.specify/anchoring`、行动级指导存于 `.specify/goals`，退役理由记录在声明文件的 `note` 中。
 
 **边界一：回顾不读 git 历史。** 不看 commit、不 blame、不 diff 旧版本。只在 git 历史里存在的旧措辞 MUST
 产生零条目（SC-002）。理由：本文档要管的是"树上现在有什么"，而不是"曾经有什么"；把 git 历史纳入回顾面，
@@ -682,7 +684,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 | 处置集 owner | 同文件的 `DISPOSITIONS`（`delete` / `archive` / `repair` / `delegate` / `dismiss`，5 值） | 本节所属文档 § Disposition Set（4 值） |
 | 状态集 | 同文件的 `STATES` | `data-model.md` E-1 的条目状态机 |
 | 判定主体 | 同文件的 `DETECTIONS` | 本节所属文档 § Detection Subject（同名同义，按指针引用） |
-| 回顾面 | 调用方给定的路径 | 声明层 `non-disposable-review-surface` 的十个根 |
+| 回顾面 | 调用方给定的路径 | 声明层 `non-disposable-review-surface` 的十一个根 |
 | 写盘 | 按处置执行 | **零写盘**：只产出报告与建议处置 |
 
 **唯一裁决规则**：同一个候选被两个引擎同时看见时，由**检出它的那个引擎**决定处置词汇。本特性 MUST NOT
