@@ -80,7 +80,9 @@ disclosed here rather than repaired (an engine change, forbidden in this seat).
   (`fr 71 / sc 10 / tasks 81 / files 13`).
 - `audit-plan-changes.py --repo . --base e8775df5b --head HEAD --plan-owned … --declarations notes/plan-edits-analyze-round1.txt`
   → `classification=declared`, `undeclared=false`, 8 touched plan-owned paths, 8 declaration lines,
-  cumulative diff 85 added / 53 deleted (uncommitted at reading time: the same 8 paths).
+  cumulative diff 85 added / 53 deleted (uncommitted at reading time: the same 8 paths). Re-run
+  after the repair commit `1ad5b63ab`: same verdict — `classification=declared`, `undeclared=false`,
+  8 touched / 8 declarations, 85 added / 53 deleted, uncommitted 0.
 - C1–C4 re-measured: `2650` files scanned over 21 dirs + 9 files → C1 4 · C2 0 · C3 8 · C4 16 = 28.
 
 ## Corrections applied in passing (disclosed)
