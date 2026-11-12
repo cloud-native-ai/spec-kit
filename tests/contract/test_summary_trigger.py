@@ -225,13 +225,15 @@ def test_present_and_execute_discloses_the_summary_decision(path: Path) -> None:
 )
 def test_gate_discloses_goal_identity_and_target_directory(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    # 094 (T075) moved the truth source to the anchoring archive layer; the retired
-    # `.specify/goal/<goal-slug>/summary/` literal must not be pinned as current.
-    assert ".specify/anchoring/<goal-slug>/summary/" in text, (
-        f"{path.name} does not name the goal delivery directory"
+    # 094 (T075) moved the truth source to the anchoring archive layer; 101 (WP-03)
+    # renamed the team binding placeholder goal-slug -> anchor-slug because a team binds
+    # an Anchor. The retired `.specify/goal/<goal-slug>/summary/` literal stays unpinned
+    # as current, and the delivery directory is the anchor archive's summary subtree.
+    assert ".specify/anchoring/<anchor-slug>/summary/" in text, (
+        f"{path.name} does not name the anchor delivery directory"
     )
-    assert "project/goal" not in text, (
-        f"{path.name} still names the pre-migration delivery directory"
+    assert ".specify/goal/" not in text, (
+        f"{path.name} still names the retired goal delivery directory"
     )
 
 

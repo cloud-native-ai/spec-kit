@@ -57,7 +57,7 @@ def _binding_block(owner: str = "command-run", owner_id: str = RUN_ID) -> str:
 
 def _seed_goal(root: Path, slug: str = "alpha", *, owner: str = "command-run",
                layer: str = ".specify/anchoring") -> Path:
-    path = root / layer / slug / "goal.md"
+    path = root / layer / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "---\n"
@@ -77,7 +77,7 @@ def _seed_goal(root: Path, slug: str = "alpha", *, owner: str = "command-run",
     return path
 
 
-def _seed_team(root: Path, slug: str = "crew", *, goal_slug: str = "alpha",
+def _seed_team(root: Path, slug: str = "crew", *, anchor_slug: str = "alpha",
                owner: str = "sdd-run", lifecycle: str = "active",
                layer: str = ".specify/teams") -> Path:
     path = root / layer / slug / "team.md"
@@ -87,7 +87,7 @@ def _seed_team(root: Path, slug: str = "crew", *, goal_slug: str = "alpha",
         f"name: {slug}\n"
         f"slug: {slug}\n"
         f"lifecycle_state: {lifecycle}\n"
-        f"goal_slug: {goal_slug}\n"
+        f"anchor_slug: {anchor_slug}\n"
         f"{_binding_block(owner, OTHER_RUN_ID)}"
         "---\n\n"
         f"# Team: {slug}\n",
@@ -145,7 +145,7 @@ def test_neither_line_requires_the_other_to_exist(sandbox):
     assert _payload(_run(peer, "binding", "goal", "alpha"))["owner"] == "command-run"
     assert _payload(_run(peer, "binding", "team", "crew"))["owner"] == "sdd-run"
     checks = _payload(_run(peer, "run-checks", "crew"))
-    assert checks["goal_slug"] == "alpha"
+    assert checks["anchor_slug"] == "alpha"
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +166,7 @@ def test_no_owner_is_derived_from_a_path_prefix(sandbox):
         "the archive record answers, not the spec-local copy that happens to share the slug")
     assert team["owner"] == "sdd-run"
     assert goal["archive_layer"] == "goal" and team["archive_layer"] == "teams"
-    assert goal["path"] == ".specify/anchoring/alpha/goal.md"
+    assert goal["path"] == ".specify/anchoring/alpha/anchor.md"
 
     # The read action routes through the record reader the engine already owns; no
     # second ownership computation lives beside it.
@@ -202,8 +202,8 @@ def test_many_teams_may_bind_one_goal_and_no_goal_content_is_copied(sandbox):
         row = _payload(_run(sandbox, "binding", "team", slug))
         assert row["owner"] in ("sdd-run", "command-run")
         checks = _payload(_run(sandbox, "run-checks", slug))
-        assert checks["goal_slug"] == "alpha", (
-            "both teams resolve the one goal through goal_slug — the only binding axis")
+        assert checks["anchor_slug"] == "alpha", (
+            "both teams resolve the one anchor through anchor_slug — the only binding axis")
 
     for path in (crew_a, crew_b):
         text = path.read_text(encoding="utf-8")
@@ -230,7 +230,7 @@ def _seed_authorizable(root: Path) -> tuple[Path, str]:
         "---\n"
         "name: crew\n"
         "slug: crew\n"
-        "goal_slug: alpha\n"
+        "anchor_slug: alpha\n"
         "seats:\n"
         "  seat-driver:\n"
         "    sdd-invocation: allowed\n"

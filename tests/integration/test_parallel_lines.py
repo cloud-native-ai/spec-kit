@@ -72,7 +72,7 @@ def _tasks_file(directory: Path, count: int) -> Path:
 
 
 def _seed_bound_goal(root: Path, slug: str = "alpha") -> Path:
-    path = root / ".specify/anchoring" / slug / "goal.md"
+    path = root / ".specify/anchoring" / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "---\n"
@@ -95,13 +95,13 @@ def _seed_bound_goal(root: Path, slug: str = "alpha") -> Path:
     return path
 
 
-def _seed_bound_team(root: Path, slug: str = "crew", goal_slug: str = "alpha") -> Path:
+def _seed_bound_team(root: Path, slug: str = "crew", anchor_slug: str = "alpha") -> Path:
     path = root / ".specify/teams" / slug / "team.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "---\n"
         "lifecycle_state: active\n"
-        f"goal_slug: {goal_slug}\n"
+        f"anchor_slug: {anchor_slug}\n"
         "binding:\n"
         "  owner: command-run\n"
         f"  owner_id: {RUN_ID}\n"
@@ -175,8 +175,8 @@ def test_both_peer_fixtures_deliver_independently(sandbox):
     verdict = json.loads(checks.stdout)
     assert verdict["verdict"] == "ok" and verdict["blocked"] is False, (
         f"run-checks must resolve on the standalone team: {verdict!r}")
-    assert verdict["goal_slug"] == "alpha", (
-        "the team's identity is its goal_slug, resolved from the record")
+    assert verdict["anchor_slug"] == "alpha", (
+        "the team's identity is its anchor_slug, resolved from the record")
 
     assert not (crew / ".specify/specs").exists(), (
         "no line created a spec directory to satisfy the other")

@@ -151,12 +151,21 @@ BASELINE_COMMIT = "c1cd4600"
 # still removes exactly the one card, the files stay wired, and the pinned value is
 # the post-093 bytes. The assertion is unchanged: *stripping the card restores the
 # pinned bytes*, and `docs`/`humanize` still gain no wiring card.
+#
+# 2026-11-12 `clarify` and `checklist` re-measured (Feature 101, commit 5a091f693):
+# the WP-03 registry convergence added the goal/teams binding rows and recompiled the
+# Wrap-up banner fingerprint 4682b9e38032 -> 2845f5641171 in the command templates.
+# Measured with this module's own `strip_wiring` + `_sha256_text`: swapping the live
+# banner back to 4682b9e38032 restores each previously pinned value byte for byte, so
+# the ONLY delta outside the authored text is the machine-owned banner line and the
+# assertion keeps its shape: *stripping the card restores the pinned bytes*. The other
+# five rows are left exactly as they were — their drift predates this feature.
 BASELINE_SHA256 = {
     "requirements": "2af13a138821a5786a80aeb419fa854e67e19769743e070cd51c6f154ff86acb",
-    "clarify": "ec1b73759c377da78c88c6684b23ba4de4cc77f0137dbc7c62cc3630d3aac835",
+    "clarify": "1126d90a4581defef71e645eb65834c3893c74c2695775c179c9ff13bb771058",
     "plan": "8882270821dadf2203a545fcf0fc9677692b485875d85b85bc67bb176091022c",
     "tasks": "231b28881969a302e7c51ed9e8ec6fa39f5caa4275fe4379c539a9f0ad0c6d65",
-    "checklist": "eaa2620129ee83bc5b33e26873fe2f350273da56db5cb34c6eb66eecc6d987a1",
+    "checklist": "9bcce3262e1bee566e470f011d247ccdf5ded16d28243b575eca138b7f3b794d",
     "analyze": "724366ac72fb0be4ae1b7a680309323c66d6b3801c479ea8994705f01f112939",
     "implement": "dd672990245e1df8e137dfcd67198fd351e6afe9d95b1a191c04dbd83546293c",
 }

@@ -186,6 +186,12 @@ def pointer_base(plan_path: Path) -> Path:
     cannot find the owner — which is exactly why the pointer must be repo-root-relative.
     """
     for parent in plan_path.parents:
+        if parent.name == ".specify":
+            # Known pre-existing untracked artifact: `.specify/.specify/` (recorded, never
+            # deleted). It makes the nearest-ancestor rule self-match from inside the
+            # runtime tree, the same path-resolution trap AGENTS.md names for engines —
+            # a plan's repo root is never derived from a directory inside `.specify/`.
+            continue
         if (parent / ".specify").is_dir():
             return parent
     raise AssertionError(f"no ancestor of {plan_path} carries a .specify/ directory")

@@ -137,8 +137,11 @@ def test_command_baseline_contains_migrate_at_the_new_length() -> None:
     assert "migrate" in module.COMMAND_BASELINE, (
         "COMMAND_BASELINE must carry `migrate` (FR-021)"
     )
-    assert len(module.COMMAND_BASELINE) == 31, (
-        f"COMMAND_BASELINE length must be the pinned 31, got {len(module.COMMAND_BASELINE)}"
+    # Live fact update (Feature 101, 2026-11-12): `/speckit.anchor` joined the shipped
+    # command set, so the baseline list grew 31 -> 32. The pin follows the measured list
+    # in test_migration_distribution.py, whose own header asserts 32.
+    assert len(module.COMMAND_BASELINE) == 32, (
+        f"COMMAND_BASELINE length must be the pinned 32, got {len(module.COMMAND_BASELINE)}"
     )
 
 

@@ -129,7 +129,7 @@ def test_every_source_tree_stays_readable_after_migration(tmp_path):
         "after migration the residual count is zero (SC-003)")
 
     for spec, (goal_slug, team_slug, _lifecycle) in SHAPE.items():
-        goal_target = tmp_path / ".specify/anchoring" / goal_slug / "goal.md"
+        goal_target = tmp_path / ".specify/anchoring" / goal_slug / "anchor.md"
         team_target = tmp_path / ".specify/teams" / team_slug / "team.md"
         assert goal_target.is_file(), f"unified definition missing: {goal_target}"
         assert team_target.is_file(), f"unified definition missing: {team_target}"

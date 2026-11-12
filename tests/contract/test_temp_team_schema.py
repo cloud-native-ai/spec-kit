@@ -1,9 +1,10 @@
 """Contract tests for the migrated team schema (Feature 085, T030/T032).
 
-Rewritten by Feature 094 (FR-041 / SC-010, disposal row 3): the team definition now
-lives in the unified archive and its ownership is answered by the `binding` block. The
-schema survives — stage seats, concurrency bounds and `lifecycle_state` unchanged; the
-retired spec-scoped resolution is refused by the parser.
+Rewritten by Feature 094 (FR-041 / SC-010, disposal row 3) and re-targeted by Feature
+101 (the team binding key is `anchor_slug` — teams bind an Anchor, never a Goal): the
+team definition lives in the unified archive and its ownership is answered by the
+`binding` block. The schema survives — stage seats, concurrency bounds and
+`lifecycle_state` unchanged; the retired spec-scoped resolution is refused by the parser.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SLUG = "085-sdd-temporary-goal-team"
+SLUG = "086-efficient-test-execution"
 TEAM_MD = REPO_ROOT / f".specify/teams/{SLUG}/team.md"
 GOAL_UTILS = REPO_ROOT / "scripts/python/goal-utils.py"
 SDD_ROUTE = REPO_ROOT / "scripts/python/sdd-route.py"
@@ -80,8 +81,10 @@ def test_binding_and_lifecycle_fields():
     fm = "\n".join(_frontmatter(_text()))
     assert "binding:" in fm, "the archive definition carries its binding block"
     assert "owner: human" in fm
-    assert "origin: 085-sdd-temporary-goal-team" in fm
-    assert "goal_slug: 085-sdd-temporary-goal-team" in fm
+    assert "origin: 086-efficient-test-execution" in fm
+    assert "anchor_slug: 086-efficient-test-execution" in fm
+    assert "goal_slug:" not in fm, (
+        "the retired team binding key is replaced in place, not carried beside anchor_slug")
     assert "lifecycle_state: active" in fm
     assert "isolation: worktree" in fm
     assert "requested: 24" in fm
@@ -132,7 +135,7 @@ def test_run_checks_resolves_the_team_from_the_archive():
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["verdict"] == "ok"
-    assert payload["goal_slug"] == SLUG
+    assert payload["anchor_slug"] == SLUG
 
 
 def test_authorize_resolves_the_team_from_the_archive():

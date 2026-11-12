@@ -99,6 +99,10 @@ SCAN_SKIP_PATHS = {
     REPO_ROOT / ".specify" / "skills",
     REPO_ROOT / ".specify" / "templates",
     REPO_ROOT / ".specify" / "agents" / "templates",
+    # `.specify/.tmp/` is the sanctioned agent scratch root (AGENTS.md, temp-directory
+    # discipline). Mid-run sandboxes copy distribution files, so scanning them judged a
+    # throwaway copy as a second carrier; the tree is not part of the document surface.
+    REPO_ROOT / ".specify" / ".tmp",
 }
 
 

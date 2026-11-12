@@ -5,7 +5,7 @@
 sub-check 1 — specify init builds a `.specify/` tree from the checkout's own templates
   $ specify init smoke-081 --ai claude --no-git --script sh --ignore-agent-tools   # cwd: <tmp_path>
   exit 0
-  generated: .specify/.gitignore, .specify/agents, .specify/memory, .specify/scripts, .specify/shared, .specify/skills, .specify/source.json, .specify/templates
+  generated: .specify/.gitignore, .specify/agents, .specify/constitution.md, .specify/features, .specify/features.md, .specify/memory, .specify/scripts, .specify/shared, .specify/skills, .specify/source.json, .specify/templates, .specify/tools.md, .specify/workflow
 
 
 sub-check 2 — the closure checker on both fixture sets

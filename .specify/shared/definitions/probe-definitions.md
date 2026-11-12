@@ -189,6 +189,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-create-tasks-wrapup | skill-wrapup | skill:create-tasks | wrap-up |
 | skill-derive-architecture-wrapup | skill-wrapup | skill:derive-architecture | wrap-up |
 | skill-implement-feature-wrapup | skill-wrapup | skill:implement-feature | wrap-up |
+| skill-manage-anchor-wrapup | skill-wrapup | skill:manage-anchor | wrap-up |
 | skill-manage-constitution-wrapup | skill-wrapup | skill:manage-constitution | wrap-up |
 | skill-manage-features-wrapup | skill-wrapup | skill:manage-features | wrap-up |
 | skill-manage-feedback-wrapup | skill-wrapup | skill:manage-feedback | wrap-up |

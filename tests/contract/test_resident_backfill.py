@@ -4,6 +4,10 @@ Feature 094, `contracts/unified-archive-and-migration.md` C-112 / C-113;
 tasks rows T081 and T082 (FR-043, SC-012). Every assertion runs through the
 engine CLI; the exhaustiveness sensor is exercised against a fixture copy so
 the module itself proves it can turn red (no tree edit).
+
+Feature 101 re-points the Anchor resident's filename to `anchor.md` (the archive
+layer's definition filename); the legacy `goal.md` filename remains a readable
+retained-source shape for the membership check the engine documents.
 """
 
 from __future__ import annotations
@@ -30,11 +34,11 @@ created: 2026-10-04
 updated: 2026-10-05
 ---
 
-# Goal: {slug}
+# Anchor: {slug}
 
 ## Objective
 
-Hold a resident definition that predates the binding model.
+Hold a resident Anchor definition that predates the binding model.
 
 ## Success Criteria
 
@@ -77,7 +81,7 @@ def _payload(proc: subprocess.CompletedProcess) -> dict:
 
 
 def _seed_goal(root: Path, slug: str, status: str = "active") -> Path:
-    path = root / ".specify/anchoring" / slug / "goal.md"
+    path = root / ".specify/anchoring" / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(GOAL_RESIDENT.format(slug=slug, status=status), encoding="utf-8")
     return path
@@ -118,7 +122,7 @@ def _hash_minus_binding(path: Path) -> str:
 
 def _assert_every_resident_bound(root: Path) -> None:
     """The exhaustiveness sensor: every resident answers the binding read action."""
-    residents = [(path, "goal") for path in sorted((root / ".specify/anchoring").glob("*/goal.md"))]
+    residents = [(path, "goal") for path in sorted((root / ".specify/anchoring").glob("*/anchor.md"))]
     residents += [(path, "teams") for path in sorted((root / ".specify/teams").glob("*/team.md"))]
     assert residents, "the fixture must contain residents to judge"
     for path, kind in residents:
@@ -171,7 +175,7 @@ def test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding(tmp_
     assert _snapshot(tmp_path) == before, "a second backfill performs zero writes"
 
     # C-113 — an incomplete binding block is refused, named, and not overwritten.
-    incomplete = tmp_path / ".specify/anchoring/broken/goal.md"
+    incomplete = tmp_path / ".specify/anchoring/broken/anchor.md"
     incomplete.parent.mkdir(parents=True)
     incomplete.write_text(
         GOAL_RESIDENT.format(slug="broken", status="active")
@@ -215,7 +219,7 @@ def test_every_archive_resident_carries_a_binding_after_backfill(tmp_path):
     # binding block and prove the same sensor turns red.
     mutated = tmp_path / "mutated"
     shutil.copytree(tmp_path / ".specify", mutated / ".specify")
-    victim = mutated / ".specify/anchoring/terminal-resident/goal.md"
+    victim = mutated / ".specify/anchoring/terminal-resident/anchor.md"
     text = victim.read_text(encoding="utf-8")
     victim.write_text(text.replace(BINDING, ""), encoding="utf-8")
     with pytest.raises(AssertionError):

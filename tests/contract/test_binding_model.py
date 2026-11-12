@@ -566,19 +566,30 @@ def test_the_three_management_skills_cite_owners_and_restate_no_arguments():
             r"(?:\.specify/specs/[^\s`'\"]+|<spec-dir>)/(?:goal|team)\b", text)
         assert not spec_local, (
             f"{label} names a spec-local goal/team store: {spec_local}")
+
+    # The team landing point belongs to the two team-side skills. Feature 101 separated
+    # the layers: a Goal is never bound by a team (`goal-definitions.md`
+    # § Relationship to Its Neighbours), so manage-goal states the Goal archive instead
+    # and names the team surfaces as Anchor-side.
+    for label, text in (("run-team", run), ("improve-team", improve)):
         assert ".specify/teams/<slug>" in text, (
             f"{label} must state the team archive landing point")
+    assert ".specify/teams/<slug>" not in manage, (
+        "manage-goal must not claim a team landing point — teams bind Anchors")
+    assert ".specify/goals/<goal-slug>/goal.md" in manage, (
+        "manage-goal must state the Goal archive landing point")
+    assert ".specify/goals/" in manage
 
-    # manage-goal owns the goal-side procedure: it cites the concept owner, the archive
-    # layer section and the engine's help as the argument owner, and it carries the
-    # `migrate-archive` mode the command template delegates to it.
+    # manage-goal owns the goal-side procedure: it cites the concept owner (the Goal
+    # schema owner) and the Anchor owner for the shared lifecycle, and cites the
+    # engine's help as the action-argument owner. The Anchor-only modes are named as
+    # refusals in the Anchor owner's hands, not implemented here.
     assert "shared/definitions/goal-definitions.md" in manage
-    assert "§ Archive Layers" in manage
+    assert "shared/definitions/anchor-definitions.md" in manage
     assert "goal-utils.py" in manage and "--help" in manage, (
         "manage-goal must cite the engine's help as the action-argument owner")
-    assert ".specify/anchoring/<slug>/goal.md" in manage or ".specify/anchoring/" in manage
-    assert "migrate-archive" in manage, (
-        "the goal skill must carry the `migrate-archive` mode the template exposes")
+    assert "migrate-archive" in manage and "`/speckit.anchor`" in manage, (
+        "the goal skill names the Anchor-only modes it refuses and their owner")
 
     # run-team cites the action and concept owners and documents the additive
     # `binding` key of the run-checks payload (T048's documentation half).
