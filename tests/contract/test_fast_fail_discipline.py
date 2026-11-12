@@ -60,7 +60,9 @@ CONST_TPL = ROOT / "templates" / "constitution-template.md"
 # delegation only); the command-side double-landing pins follow the content to
 # that new owner, in the same extraction form the double-landing guard uses.
 CONST_SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
-CONST_LIVE = ROOT / ".specify" / "memory" / "constitution.md"
+# Repaired 2026-11-12: the stale `.specify/memory/` literal made every live-facing
+# check baseline-red; the live constitution is `.specify/constitution.md`.
+CONST_LIVE = ROOT / ".specify" / "constitution.md"
 PLAN_TPL = ROOT / "templates" / "plan-template.md"
 
 SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
@@ -1086,11 +1088,12 @@ def test_x5_live_version_minor_bump():
     Script Interface Contract amendment; raised to 1.19.0 on 2026-11-09 by Feature 090's
     Re-Anchoring amendment; raised to 1.19.1 on 2026-11-10 by the verification-carrier
     correction amendment; raised to 1.19.2 on 2026-11-10 by Feature 099's lifecycle-narrative
-    convergence amendment)."""
+    convergence amendment; raised to 1.20.0 on 2026-11-12 by the AI-Generated Code Review
+    Policy amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.19.2", f"C-5: live version is {m.group(1)}; expected 1.19.2"
+    assert m.group(1) == "1.20.0", f"C-5: live version is {m.group(1)}; expected 1.20.0"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
@@ -1269,7 +1272,8 @@ def test_x15_watchlist_gains_principle_title():
     Self-Explanatory Structure entry (2026-11-05, T016) extended it to 6; Feature 086's
     Efficient Test Execution entry (2026-11-06, T028) extended it to 7; Feature 089's
     Script Interface Contract entry (2026-11-09, T017) extended it to 8; Feature 090's
-    Re-Anchoring entry (2026-11-09) extends it to 9."""
+    Re-Anchoring entry (2026-11-09) extends it to 9; the AI-Generated Code Review Policy
+    amendment (2026-11-12) extends it to 10."""
     src = _text(DOUBLE_LANDING_TEST)
     m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
     assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
@@ -1279,7 +1283,7 @@ def test_x15_watchlist_gains_principle_title():
     # derived from the owner -- the last watchlist entry, which every amendment appends to.
     newest = entries[-1]
     assert newest not in ("", None), "C-15: the watchlist's last entry is empty"
-    assert len(entries) == 9, f"C-15: the watchlist holds {len(entries)} entries; expected 9"
+    assert len(entries) == 10, f"C-15: the watchlist holds {len(entries)} entries; expected 10"
     assert newest in _text(CONST_TPL), (
         f"C-15: the newest watchlist entry {newest!r} is not a template title -- the append "
         "did not land on the surface it is supposed to guard"
@@ -1324,10 +1328,11 @@ def test_x18_downstream_gate_rows_15_to_16():
     the Efficient Test Execution amendment added one row (20 / 19). Stale-pin update
     (2026-11-09, Feature 089): the Script Interface Contract amendment added one row
     (21 / 20). Stale-pin update (2026-11-09, Feature 090): the Re-Anchoring amendment
-    added one row (22 / 21)."""
+    added one row (22 / 21). The AI-Generated Code Review Policy amendment (2026-11-12)
+    added one row (23 / 22)."""
     live = _text(CONST_LIVE)
     rows = PRINCIPLE_RE.findall(live)
-    assert len(rows) == 22, f"C-18: the enumeration yields {len(rows)} gate rows; expected 22"
+    assert len(rows) == 23, f"C-18: the enumeration yields {len(rows)} gate rows; expected 23"
     # the 15 side is measured, not asserted from memory: drop this principle's block.
     # The boundary is the next principle OR the next H2 -- keying on H2 alone would
     # swallow any principle appended after this one (Directory Governance, 2026-10-27).
@@ -1337,7 +1342,7 @@ def test_x18_downstream_gate_rows_15_to_16():
              if lines[k].startswith("### ") or lines[k].startswith("## "))
     sample = "\n".join(lines[:i] + lines[j:])
     before = PRINCIPLE_RE.findall(sample)
-    assert len(before) == 21, f"C-18: without this principle the enumeration yields {len(before)}; expected 21"
+    assert len(before) == 22, f"C-18: without this principle the enumeration yields {len(before)}; expected 22"
     # sentinel: the enumeration is not returning 16 for a trivial reason
     assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
     assert not any(title == PRINCIPLE_TITLE for _n, title in before), (

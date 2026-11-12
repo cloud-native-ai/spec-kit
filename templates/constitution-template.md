@@ -413,6 +413,29 @@ Rationale: a long run's most expensive failure is silent drift — the loop keep
 the original direction has been lost. Rules loaded once at the start do not survive compaction;
 a persisted anchor plus a periodic review does, and it costs one cheap reload per core step.
 
+### XXII. AI-Generated Code Review Policy
+Code review follows the authorship of the change, so that a reviewer can always judge the
+work it reviews:
+- Human-written changes MUST be reviewed by humans through the git-branch-based review flow:
+  the change is proposed on a feature branch and merged only after human review approval.
+- AI-written changes MUST be reviewed by AI; that review flow is a direct merge to the
+  declared trunk, with no pull request opened, followed by an AI review pass that reads the
+  merged git history.
+- A change with mixed human and AI authorship MUST follow the human review flow.
+- The declared trunk, branch model and close-out discipline MUST be read from
+  `.specify/workflow/git.md`; this principle states who reviews, never which branch exists.
+- An AI review MUST read the merged git history (commits, diffs and messages) as its review
+  record, and MUST NOT depend on a separate review ledger or approval gate.
+- This policy MUST be the single authoritative statement of review ownership; any
+  instructions-level review policy MUST point to this principle instead of restating a
+  divergent rule. It governs the git-level review flow only; SDD artifact reviews and
+  quality gates remain in force.
+
+Rationale: review is useful only when the reviewer can judge the work, and authorship is the
+stable discriminator between human and AI changes. Collapsing both flows into one either
+burdens humans with reviewing machine output they did not write or lets AI-generated changes
+bypass review entirely; matching the review to the author keeps both flows accountable.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

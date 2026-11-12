@@ -1,5 +1,20 @@
 <!--
 Sync Impact Report
+- Version change: 1.19.2 → 1.20.0 (MINOR; new Principle XXIII added, 2026-11-12)
+- Added principles: XXIII. AI-Generated Code Review Policy — human-written changes are reviewed by humans through the git-branch-based review flow; AI-written changes are reviewed by AI through a direct merge to the declared trunk followed by an AI review of the merged git history; authorship decides the review flow and any instructions-level policy MUST point to this principle
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XXII. AI-Generated Code Review Policy; principles 21 → 22
+  ✅ skills/internal/manage-constitution/SKILL.md (+ .specify/skills mirror) — MUST-include list 14 → 15 entries
+  ✅ tests/contract/test_constitution_double_landing.py — template 22 / live 23 / skill 15; watchlist 9 → 10
+  ✅ tests/contract/test_fast_fail_discipline.py — live version pin 1.19.2 → 1.20.0; gate rows 22 → 23 (before-state 21 → 22); watchlist 9 → 10; the stale `.specify/memory/constitution.md` literal repaired to `.specify/constitution.md` so the live-facing checks actually run
+- Follow-up TODOs: (a) the routing engine returned `sdd` (`sdd-traceability-required`) for this amendment; the direct amendment is an explicit user-directed deviation from the SDD flow, logged here per the Dogfooding deviation-logging rule; (b) the live roster carries this principle as XXIII while the template roster carries it as XXII — per-surface numbering is normal per `contracts/governance-landing.contract.md#C-25`
+- Preserved by design: the policy names the git workflow declaration as the owner of branch and trunk facts, and adds no second review ledger, approval gate or tracking surface
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.19.1 → 1.19.2 (PATCH; lifecycle narrative convergence, 2026-11-10)
 - Modified principles: None (no principle text changes)
 - Modified sections: Feature Governance → Feature Lifecycle Management — `Sealed` is added as the terminal status for new work, and `Completed` is marked legacy-only (closed for new work; no retroactive rewrite, no downgrade). The value domain and the `Ready for Review → Sealed` transition stay owned by `shared/workflow/acceptance-hardening.md` § Feature Status; this narrative converges to that owner and restates no transition rule (Feature 099 T014, FR-003 / C-027)
@@ -541,6 +556,29 @@ Rationale: a long run's most expensive failure is silent drift — the loop keep
 the original direction has been lost. Rules loaded once at the start do not survive compaction;
 a persisted anchor plus a periodic review does, and it costs one cheap reload per core step.
 
+### XXIII. AI-Generated Code Review Policy
+Code review follows the authorship of the change, so that a reviewer can always judge the
+work it reviews:
+- Human-written changes MUST be reviewed by humans through the git-branch-based review flow:
+  the change is proposed on a feature branch and merged only after human review approval.
+- AI-written changes MUST be reviewed by AI; that review flow is a direct merge to the
+  declared trunk, with no pull request opened, followed by an AI review pass that reads the
+  merged git history.
+- A change with mixed human and AI authorship MUST follow the human review flow.
+- The declared trunk, branch model and close-out discipline MUST be read from
+  `.specify/workflow/git.md`; this principle states who reviews, never which branch exists.
+- An AI review MUST read the merged git history (commits, diffs and messages) as its review
+  record, and MUST NOT depend on a separate review ledger or approval gate.
+- This policy MUST be the single authoritative statement of review ownership; any
+  instructions-level review policy MUST point to this principle instead of restating a
+  divergent rule. It governs the git-level review flow only; SDD artifact reviews and
+  quality gates remain in force.
+
+Rationale: review is useful only when the reviewer can judge the work, and authorship is the
+stable discriminator between human and AI changes. Collapsing both flows into one either
+burdens humans with reviewing machine output they did not write or lets AI-generated changes
+bypass review entirely; matching the review to the author keeps both flows accountable.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -592,4 +630,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.19.2 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-10
+**Version**: 1.20.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-12

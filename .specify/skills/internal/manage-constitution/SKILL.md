@@ -268,6 +268,12 @@ Before processing the template, scan the project to understand its actual contex
     definition lives at `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be
     referenced, not restated. This principle adds a reviewing habit, not machinery: it MUST NOT
     justify a new scorer, ledger, scheduler or second checkpoint system.
+  - **AI-Generated Code Review Policy** — code review follows authorship: human-written changes
+    are reviewed by humans through the git-branch-based review flow, while AI-written changes
+    are reviewed by AI after a direct merge to the declared trunk by reading the merged git
+    history. The policy lives in the constitution's principle roster and MUST be referenced,
+    not restated. This principle adds a review-ownership rule, not machinery: it MUST NOT
+    justify a second review ledger, an approval gate or a tracking system.
 - Ensure the Governance section lists amendment procedure, versioning policy, and compliance
   review expectations.
 
