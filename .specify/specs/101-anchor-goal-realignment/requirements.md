@@ -279,6 +279,20 @@ Measurement basis: directory listing of `.specify/anchoring/*/`, `goal.md` prese
 - **Migration / archive receipt**: 逐条动作回执；记录源、目标、概念摘要、时间戳、引擎身份、结果身份与 `delete_policy: archive-not-delete`。
 - **Classification record**: 每个条目一条的判决记录；字段至少含 slug、`classification`、规则 id、证据指针与日期。
 
+### Runtime Stack & Dependency Ownership
+
+`execution` 类特性必填；本特性不新增运行时依赖——它消费既有的 Python 解释器、pytest 运行器、既有 goal 引擎与既有镜像/分类引擎。表中每一行可机械判；零散文声明。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | CPython `>=3.8` 标准库文件系统与路径解析（命令脚手架、档案扫描、迁移与回执写入） | signed-contract | CPython 上游（本仓只消费，不打包） | `pyproject.toml` 中既有的 `requires-python` 声明；本特性零新增第三方依赖 | `pyproject.toml` | 新增命令/迁移/守卫脚本在 `>=3.8` 解释器上通过定向测试与 `--help`/`--version` 契约；静态 import 清单为零 | FR-062, FR-071 | EP-001 |
+| RS-002 | `pytest` 测试运行器（契约测试、双写者夹具、迁移夹具） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 中既有的 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `bash scripts/bash/run-tests.sh` 通过；新增 `tests/contract/` 守卫在 `>=3.8` 上执行 | FR-062, FR-063, FR-064, FR-065, FR-066, FR-067, FR-068 | EP-002 |
+| RS-003 | 既有 `goal-utils.py` 引擎的扩展面（anchor/goal 双档案、`anchor_slug`、迁移动作） | in-scope | 本特性自身修订的 `scripts/python/goal-utils.py` | 不适用（无外部版本面） | `scripts/python/goal-utils.py` | 引擎 `--help`/`--version` 仍满足宪法 XXI；新动作的退出码与两写者审计被契约测试钉住 | FR-047, FR-048, FR-049 | EP-003 |
+| RS-004 | 既有镜像/命令副本/流程分类引擎（`sync-mirrors.py`、`regen-command-copies.py`、`flow-class-check.py`） | in-scope | 本特性自身修订的台账与模板；引擎只消费 | 不适用（无外部版本面） | `scripts/python/sync-mirrors.py` | `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均 exit 0；`flow-class-check.py` 对新旧两命令行均可解析 | FR-054, FR-057, FR-070 | EP-004 |
+| RS-005 | `git`（受保护日期化路径的 `hash-object` 基线比较与工作树状态读取） | signed-contract | git 上游（本仓只消费） | 本仓无版本声明；pin 由 `git --version` 在 test-evidence 的首次采集记录提供 | `scripts/bash/common.sh` | 受保护路径哈希集合与特性前提交 `d7c9da7a3` 相等；迁移前后 `git status --porcelain` 增量为空 | FR-061, FR-069 | EP-005 |
+
+**Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；其余引用是证据，不是第二契约。RS-003/RS-004 的 in-scope 义务在 tasks 阶段由任务行引用其 FR，在 closure 阶段由 `verification.md` 的点名联合验收行闭合。
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
