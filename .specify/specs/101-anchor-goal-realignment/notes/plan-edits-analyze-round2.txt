@@ -1,0 +1,1 @@
+PLAN-EDIT: 101-109 — .specify/specs/101-anchor-goal-realignment/plan.md — analyze round-2 LOW-6: WP-05/WP-06 territory alignment for notes/quickstart-run.md, test-evidence/final-suite-*.txt and verification.md; see notes/analyze-round2-fixes.md.
