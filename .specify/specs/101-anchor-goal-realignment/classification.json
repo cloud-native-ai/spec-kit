@@ -1,0 +1,33 @@
+{
+  "schema": "101-classification/v1",
+  "spec": "101-anchor-goal-realignment",
+  "decided_on": "2026-11-12",
+  "baseline_commit": "d7c9da7a3",
+  "mapping_version": "101-mapping-v1",
+  "rule_owner": "requirements.md#FR-036",
+  "entries": [
+    {"slug": "085-sdd-temporary-goal-team", "class": "obsolete", "rule": "FR-036(b)", "targets": 0, "summary": false},
+    {"slug": "086-efficient-test-execution", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": false},
+    {"slug": "087-arch-diagram-docs", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": false},
+    {"slug": "088-speckit-visualization", "class": "action-goal", "rule": "FR-036(a)", "targets": 2, "summary": false},
+    {"slug": "090-re-anchoring", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": false},
+    {"slug": "091-auto-git-closeout", "class": "action-goal", "rule": "FR-036(a)", "targets": 0, "summary": false},
+    {"slug": "094-goal-team-parallel", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": false},
+    {"slug": "command-logic-as-classified-skills", "class": "anchor", "rule": "FR-036(c)", "targets": 3, "summary": true},
+    {"slug": "draw-diagram-interactive", "class": "action-goal", "rule": "FR-036(a)", "targets": 0, "summary": true},
+    {"slug": "draw-two-layer-structure", "class": "anchor", "rule": "FR-036(c)", "targets": 3, "summary": false},
+    {"slug": "post-refactor-mechanism-integrity", "class": "obsolete", "rule": "FR-036(b)", "targets": 1, "summary": true},
+    {"slug": "script-interface-contract", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": false},
+    {"slug": "session-driven-self-improvement", "class": "anchor", "rule": "FR-036(c)", "targets": 0, "summary": true},
+    {"slug": "skill-layer-install-separation", "class": "anchor", "rule": "FR-036(c)", "targets": 4, "summary": true}
+  ],
+  "teams": [
+    {"slug": "088-reporting-dogfood", "bound_slug": "088-speckit-visualization", "disposition": "R3", "state": "apply", "reason": "one-off dogfood proof; no covering Anchor; theme fails FR-036(c)"},
+    {"slug": "091-auto-git-closeout", "bound_slug": "091-auto-git-closeout", "disposition": "R3", "state": "already-satisfied", "reason": "team.md already carries lifecycle_state: archived"},
+    {"slug": "085-sdd-temporary-goal-team", "bound_slug": "085-sdd-temporary-goal-team", "disposition": "R3", "state": "apply", "reason": "spec-scoped team of a delivered feature under a superseded model"},
+    {"slug": "post-refactor-mechanism-integrity", "bound_slug": "post-refactor-mechanism-integrity", "disposition": "R3", "state": "apply", "reason": "verification chain keyed to an achieved one-off entry"},
+    {"slug": "draw-diagram-interactive", "bound_slug": "draw-diagram-interactive", "disposition": "R3", "state": "apply", "reason": "bounded iteration over one skill; no covering Anchor; theme fails FR-036(c)"},
+    {"slug": "viz-skill-arena", "bound_slug": "visualization-skill-selection", "disposition": "R2", "state": "apply", "reason": "continuous threshold-free optimization theme passes FR-036(c); anchor to be created by engine migrate"},
+    {"slug": "demo-seat-dispatch", "bound_slug": "demo-seat-dispatch", "disposition": "R3", "state": "apply", "reason": "one-off SC-002 demonstration for spec 054"}
+  ]
+}

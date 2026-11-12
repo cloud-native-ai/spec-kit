@@ -1,0 +1,41 @@
+# live-surface old-semantic scan — baseline before implement (2026-11-12)
+# inline python scan; 20 dirs + 8 files as roots; 2638 files scanned
+# excluded dir names (any depth): __pycache__, archive, feedback, history, node_modules, notes, public, runs, session, summary, test-evidence
+# excluded files: .specify/features.md
+# class definitions, roots and exclusions: research.md § Live-surface roots (SC-001 declaration)
+
+## C1  count=4
+.specify/glossary.md:36: | Goal | 项目级目标, 目标定义, project goal | 项目级一等概念:归档于 .specify/goal/<goal-slug>/ 的目标定义(目标叙述 + 可验证成功判据 + 生命周期状态),作用对象不限于本项目代码(可指向框架自身/代码规范收敛/能力运行结果等任意维度);与 Requirement(只描述本项目源码/配置要实现的 feature)分属不同层面、无必然上下层关
+.specify/shared/definitions/derivation-definitions.md:414: | **Goal** | Project-level authored end state, measured by degree — a different plane entirely | `goal-definitions.md` |
+docs/reference/commands/goal.md:12: A goal is a project-level **authored fact source** stating a desired end outcome and how to tell it has been reached. It is composed of exactly three parts — objective narrative, zero-or-more verifiab
+shared/definitions/derivation-definitions.md:414: | **Goal** | Project-level authored end state, measured by degree — a different plane entirely | `goal-definitions.md` |
+
+## C2  count=0
+
+## C3  count=7
+.claude/commands/speckit.goal.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+.github/prompts/speckit.goal.prompt.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+.opencode/command/speckit.goal.md:14: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+.qoder/commands/speckit.goal.md:17: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+.specify/skills/internal/manage-goal/SKILL.md:15: Own and execute the operations behind `/speckit.goal` — the **sole authoring entry** for
+skills/internal/manage-goal/SKILL.md:15: Own and execute the operations behind `/speckit.goal` — the **sole authoring entry** for
+templates/commands/goal.md:19: `/speckit.goal` is the **sole authoring entry** for goal definitions in the goal archive (the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers). No skill,
+
+## C4  count=15
+.specify/memory/tools/build-summary-input.py.md:35: - Writes ONLY `--out` (default `.specify/goal/<goal-slug>/summary/data/project-input.yaml`)
+.specify/skills/internal/create-team/SKILL.md:202: - **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team
+.specify/skills/internal/create-team/references/create-mode.md:119: delivery_dir: .specify/goal/<goal-slug>/summary/   # derived from goal_slug, never from the team slug
+.specify/skills/internal/create-team/references/execution-guide.md:20: - The team directory `.specify/teams/<slug>/` holds the team's own tracked run information — `team.md`, `runs/`, the append-only item ledger `items.jsonl`, and (continuous only) `constraints.md` / `ST
+.specify/skills/internal/create-team/references/summary-mapping.md:12: | **goal 索引** | `.specify/goal/<goal-slug>/summary/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
+.specify/skills/internal/create-team/references/summary-mapping.md:167: | **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/goal/<goal-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/goal/<goal-slug>/goal.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、
+.specify/skills/internal/create-team/scripts/build-summary-input.py:14: * `.specify/goal/<goal-slug>/summary/`      goal index — the sole complete summary
+docs/reference/commands/team.md:89: | **Goal summary** (per goal, not per team) | `.specify/goal/<goal-slug>/summary/` (`summary.md` + `assets/` + `data/`) | tracked |
+docs/reference/commands/team.md:101: | **goal** | `.specify/goal/<goal-slug>/summary/` | how far has this goal progressed |
+skills/internal/create-team/SKILL.md:202: - **Run intermediates confined** to `.specify/teams/.work/<slug>/` (git-ignored); only declared final deliverables (standard output) persist to real target paths — never the team directory. Every team
+skills/internal/create-team/references/create-mode.md:119: delivery_dir: .specify/goal/<goal-slug>/summary/   # derived from goal_slug, never from the team slug
+skills/internal/create-team/references/execution-guide.md:20: - The team directory `.specify/teams/<slug>/` holds the team's own tracked run information — `team.md`, `runs/`, the append-only item ledger `items.jsonl`, and (continuous only) `constraints.md` / `ST
+skills/internal/create-team/references/summary-mapping.md:12: | **goal 索引** | `.specify/goal/<goal-slug>/summary/` | **唯一的完整总结**(派生物、自包含交付目录) | 这个目标推进到哪里 |
+skills/internal/create-team/references/summary-mapping.md:167: | **总结步骤**(SUMMARIZE) | **白名单**:仅 `.specify/goal/<goal-slug>/summary/**` 与反馈存量 | 纯派生步骤。此期间**六组** MUST 保持字节不变:① `.specify/goal/<goal-slug>/goal.md`(被撰写的定义——刷新写到它即为写入面违规,而非"顺带更新")、② `.specify/teams/**`、
+skills/internal/create-team/scripts/build-summary-input.py:14: * `.specify/goal/<goal-slug>/summary/`      goal index — the sole complete summary
+
+## TOTAL  count=26

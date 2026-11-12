@@ -3,9 +3,9 @@
 **Feature ID**: 101
 **Name**: Anchor / Goal Realignment
 **Description**: 语义反转 + 命令面清理（Plan B）：Anchor 成为项目级远期目标（`.specify/anchoring/<slug>/anchor.md`，`/speckit.anchor` 接管旧 `/speckit.goal` 的七模式），Goal 降为行动级实际指导（`.specify/goals/<slug>/goal.md`，`/speckit.goal` 四模式 `create` / `view` / `modify` / `status`）；团队绑定字段 `goal_slug` → `anchor_slug`；`.specify/anchoring` 逐条分类、迁移、归档（archive-not-delete，逐条回执）；日期化记录不改写。
-**Status**: Draft
+**Status**: Planned
 **Created**: 2026-11-12
-**Last Updated**: 2026-11-12（`/speckit.clarify` 登记：Feature 绑定裁定为新 Feature 101；71 FR / 10 SC 结构保持，`validate-requirements.py` 0 error；决策 D-1…D-5 见 requirements `## Clarifications`，证据 `.specify/specs/101-anchor-goal-realignment/test-evidence/clarify-2026-11-12.md`）
+**Last Updated**: 2026-11-12（`/speckit.plan`：`plan.md` + `research.md` + `classification.json` + `data-model.md` + `contracts/`（4 页 49 条款）+ `quickstart.md` + `feature-ref.md` 落地；状态 Draft → Planned。此前 `/speckit.clarify` 登记：Feature 绑定裁定为新 Feature 101；71 FR / 10 SC 结构保持，`validate-requirements.py` 0 error；决策 D-1…D-5 见 requirements `## Clarifications`，证据 `.specify/specs/101-anchor-goal-realignment/test-evidence/clarify-2026-11-12.md`）
 
 ## Overview
 
@@ -31,6 +31,15 @@
 - **041 Goal Registry**（`.specify/features/041-goal-registry.md`）：本特性是其概念与命令面的语义反转，作为独立 Feature 登记，不是 041 的增量扩展。
 - **094 Goal-Team Parallel**：`.specify/anchoring/` 的目录改名来源；本特性完成其未落地的命令面与文件名改名。
 - **090 Re-Anchoring**：保留其运行内纪律；本特性只做术语消歧（Anchor / anchoring archive / Re-Anchoring）。
+
+## Plan Notes
+
+- **方案（planned 2026-11-12）**：`plan.md` + `research.md`（R-01…R-16 实测基线）+ `classification.json`（14 条目 + 7 团队处置，schema `101-classification/v1`）+ `data-model.md`（11 实体 E-1…E-11）+ `contracts/`（4 页 49 条款：anchor-command C-1…C-12 / goal-command C-13…C-22 / goal-engine C-23…C-35 / migration-cleanup C-36…C-49）+ `quickstart.md`（9 走查 S-0…S-8，逐条标注 `[today]` / `[premise]` / `[pin]`）+ `feature-ref.md`（FR 71/71 与 SC 10/10 映射 + 16 条裁决）。
+- **合规**：Constitution 23 项全 Pass；Complexity Tracking 无 violation；`validate-decision-tensions.py` ok（4 records / 0 error）；Execution Premises EP-001…EP-005 verified、EP-006 falsified（Hugo 文档站构建预存失败，Decision `fallback`，SC-008 构建腿报 `not-evaluated`）；Inherited Blockers 声明六依赖、抽出 4 条记录（2 resolved / 2 not-applicable）。
+- **分类基线**：14 条 = 9 anchor / 2 action-goal / 2 obsolete（与 A-5 暂定清单零偏差）；团队 20 个定义、16 个带绑定；处置 6 条 R3（其中 1 条 already-satisfied）+ 1 条 R2（`viz-skill-arena` → 新建 `visualization-skill-selection`），无 R1。
+- **清理纪律**：迁移/归档幂等判据「目标存在且回执存在且摘要相等」；中断续做 I1–I5（I5 = exit 4）；冲突 exit 4 点名两候选；archive-not-delete；每个动作目标内一条回执。
+- **承重裁决**：T-001 单引擎加层参数而非第二引擎；T-002 命令面拆分而非单命令加 `--layer`；T-003 归档而非删除；T-004 退役取值与退役模式不设别名。
+- **requirements 订正**：4 条 `PLAN-EDIT:`（FR-011 / FR-028 / SC-006 把单写者不变量限定到定义文件，`summary/**` 是派生例外；FR-061 / SC-009 把 `.specify/archive/**` 等值断言限定为基线时已存在条目，新增 `.specify/archive/anchoring/**` 不计入）；`validate-requirements.py` 复核 0 error / 0 warning。
 
 ## Notes
 

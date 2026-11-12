@@ -1,0 +1,53 @@
+# plan-stage baseline readings — 2026-11-12
+
+## git
+d3f85f059
+d7c9da7a3
+git version 2.43.5
+dirty-path-count: 2
+
+## interpreter
+Python 3.11.11
+pytest 8.4.2
+
+## engine
+goal-utils.py 0.0.22
+help-exit=0
+
+## mirrors
+sync-check-exit=0
+regen-check-exit=0
+
+## flow-class
+flow-class check: 89 unit(s) scanned, 0 finding(s) [matched=89 inventory_units=89, clean]
+coverage: ledger_rows=89 matched=89 inventory_units=89 gaps=0 parse_errors=0 floor=39
+flow-class-exit=0
+
+## hugo
+hugo v0.141.0-e7bd51698e5c3778a86003018702b1a7dcb9559a+extended linux/amd64 BuildDate=2025-01-16T13:11:18Z VendorInfo=gohugoio
+# correction (same day): the first reading was taken through `hugo ... | head`, so `$?` was
+# head's status, not hugo's. Re-measured with a redirect:
+#   (cd docs && hugo --quiet > /tmp/hugo101.out 2>&1; echo $?)
+hugo-exit=1
+hugo-stderr-on-full-run: .Site.Language.Locale: can't evaluate field Locale in type *langs.Language
+# => EP-006 is falsified; SC-008's docs-build limb reports not-evaluated (Decision: fallback).
+
+## engine surface (supports EP-003)
+goal-utils.py subcommands: resolve-scope create validate check-statement list status objective criteria
+  migrate bind binding targets run-checks probe-residual command-family handoff-decision handoff-ref
+  migrate-archive backfill-bindings   (20 actions; measured 2026-11-12)
+--scope members: {goal, teams, auto}                      (goal-utils.py --help)
+create flags: --objective --title --criterion --boundary  (positional slug)
+status flags: --set {active,achieved,abandoned}           (positional slug)
+targets flags: --add --check --list --set {open,done,dropped} --id  (positional slug)
+bind / binding: positional layer {goal,team,teams} + --owner --owner-id --origin
+constants: ARCHIVE_DIRNAME=".specify/anchoring" TEAM_DIRNAME=".specify/teams"
+  DEFINITION_FILENAME="goal.md" SUMMARY_DIRNAME="summary"
+  ARCHIVE_SCOPES=("goal","teams","auto")                   (goal-utils.py:72-82)
+# => C-23's target: DEFINITION_FILENAME as a single global must not survive.
+
+## protected sample
+.specify/specs/037-goal-registry bytes=220196 files=14
+.specify/archive bytes=4092721 files=337
+.specify/history bytes=107645 files=12
+docs/notes bytes=64264 files=7
