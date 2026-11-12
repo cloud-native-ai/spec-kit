@@ -10,12 +10,12 @@ that a team never has to: it folds every tracked artifact of every team sharing 
 into one form, deterministically, with no model in the loop.
 
 Indexing is dual:
-  * `.specify/teams/<team-slug>/`             team index — run info (read-only here)
-  * `.specify/goal/<goal-slug>/summary/`      goal index — the sole complete summary
+  * `.specify/teams/<team-slug>/`                 team index — run info (read-only here)
+  * `.specify/anchoring/<anchor-slug>/summary/`   Anchor index — the sole complete summary
 
-The goal archive holds both faces of one object: `<goal-slug>/goal.md` is the authored
-definition and is NEVER written here; `<goal-slug>/summary/` is the derived subtree and
-is the only surface this script may touch.
+The Anchor archive holds both faces of one object: `<anchor-slug>/anchor.md` is the
+authored definition and is NEVER written here; `<anchor-slug>/summary/` is the derived
+subtree and is the only surface this script may touch.
 
 Exit codes: 0 form written | 2 input error | 3 no execution material (declined).
 """
@@ -148,8 +148,9 @@ class Team:
 
     @property
     def goal_identity(self) -> tuple[str, str]:
-        """FG-13 — explicit `goal_slug` wins, else the team slug marked inferred."""
-        declared = self.fm.get("goal_slug")
+        """FG-13 — explicit `anchor_slug` wins (legacy `goal_slug` tolerated), else the
+        team slug marked inferred."""
+        declared = self.fm.get("anchor_slug") or self.fm.get("goal_slug")
         if declared:
             return str(declared), "explicit"
         return self.slug, "inferred"
@@ -393,7 +394,11 @@ def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | No
     This reader renders the reference into member names and never validates it: an
     unresolvable or empty subject set is `goal-utils.py validate`'s to report.
     """
-    path = repo_root / ARCHIVE_DIRNAME / goal_slug / "goal.md"
+    path = repo_root / ARCHIVE_DIRNAME / goal_slug / "anchor.md"
+    if not path.is_file():
+        # FR-029 — the filename is resolved per layer; `goal.md` is the un-migrated
+        # fallback only, so a pre-rename tree still yields the same form.
+        path = repo_root / ARCHIVE_DIRNAME / goal_slug / "goal.md"
     if not path.is_file():
         return None
     text = path.read_text(encoding="utf-8")
@@ -420,7 +425,7 @@ def load_goal_definition(repo_root: Path, goal_slug: str) -> dict[str, Any] | No
             if stripped:
                 criteria.append(expand_subjects(stripped, repo_root))
     return {
-        "relpath": f"{ARCHIVE_DIRNAME}/{goal_slug}/goal.md",
+        "relpath": path.relative_to(repo_root).as_posix(),
         "objective": " ".join(section("## Objective").split()),
         "criteria": criteria,
         "targets": _parse_targets_section(section("## Targets")),
@@ -873,11 +878,12 @@ def build_form(repo_root: Path, goal_slug: str, kind: str, teams: list[Team],
         # Reported only once the project has adopted the concept (the archive
         # exists), so a pure-036 project that never defined a goal is untouched.
         if (repo_root / ARCHIVE_DIRNAME).is_dir():
-            declared = sorted(t.slug for t in teams if t.fm.get("goal_slug"))
+            declared = sorted(t.slug for t in teams
+                              if t.fm.get("anchor_slug") or t.fm.get("goal_slug"))
             if declared:
                 gaps.append(
-                    f"断链引用(FR-010):团队 {', '.join(declared)} 声明了 goal_slug "
-                    f"'{goal_slug}',但 {ARCHIVE_DIRNAME}/{goal_slug}/goal.md 不存在;"
+                    f"断链引用(FR-010):团队 {', '.join(declared)} 声明了 anchor_slug "
+                    f"'{goal_slug}',但 {ARCHIVE_DIRNAME}/{goal_slug}/anchor.md 不存在;"
                     "已回退到内联目标,未降级为空目标"
                 )
         # GI-4 — without a definition, differing inline wordings need arbitration.

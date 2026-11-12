@@ -1,0 +1,1788 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_goal_utils.py tests/unit/test_goal_scope_engine.py tests/contract/test_script_interface_contract.py tests/contract/test_goal_definition.py tests/contract/test_goal_targets_engine.py tests/contract/test_archive_migration.py tests/contract/test_migration_interruption.py tests/contract/test_binding_model.py tests/contract/test_scope_resolution.py tests/integration/test_goal_migration_path.py tests/integration/test_archive_migration_real_data.py tests/contract/test_goal_command_template.py tests/contract/test_run_checks.py tests/contract/test_focus_target_resolution.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 20%]
+.......................................................F..F..........F.. [ 41%]
+...........F.......F.F..FF..F..F......F.F.FF.FFFF.....F.F.F...FF..FFFF.. [ 61%]
+....F.FF..s...F........F...F....F.F.F...F....FF..FFF.F..FF.F............ [ 82%]
+.....F......F.......F...............FF.F........FF.....F.....F           [100%]
+=================================== FAILURES ===================================
+____________________________ test_teams_scope_paths ____________________________
+[gw87] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw87/test_teams_scope_paths0')
+
+    def test_teams_scope_paths(tmp_path: Path):
+        spec = _seed(tmp_path)
+        scope = goal_utils.resolve_scope(tmp_path, "teams", spec)
+        assert scope.scope == "teams"
+>       assert scope.goal_root == tmp_path / ".specify/anchoring"
+               ^^^^^^^^^^^^^^^
+E       AttributeError: 'Scope' object has no attribute 'goal_root'
+
+tests/unit/test_goal_scope_engine.py:57: AttributeError
+___________ test_auto_with_team_identity_resolves_the_only_candidate ___________
+[gw94] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw94/test_auto_with_team_identity_r0')
+
+    def test_auto_with_team_identity_resolves_the_only_candidate(tmp_path: Path):
+        _seed(tmp_path, team_layer=True)
+>       scope = goal_utils.resolve_scope(tmp_path, "auto", None, team_slug="archive-team")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: resolve_scope() got an unexpected keyword argument 'team_slug'
+
+tests/unit/test_goal_scope_engine.py:99: TypeError
+______________ test_auto_resolves_the_single_non_empty_goal_layer ______________
+[gw91] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw91/test_auto_resolves_the_single_0')
+
+    def test_auto_resolves_the_single_non_empty_goal_layer(tmp_path: Path):
+        _seed(tmp_path, goal_layer=True)
+        scope = goal_utils.resolve_scope(tmp_path, "auto", tmp_path / ".specify/specs/absent")
+>       assert scope.scope == "goal"
+E       AssertionError: assert 'anchor' == 'goal'
+E         
+E         - goal
+E         + anchor
+
+tests/unit/test_goal_scope_engine.py:80: AssertionError
+_________________ test_create_writes_the_three_part_structure __________________
+[gw27] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_create_writes_the_three_p0')
+
+    def test_create_writes_the_three_part_structure(tmp_path):
+        path = goal_utils.create_goal(
+            tmp_path, "demo-goal", "Reach a stable release.", ["All suites green.", "Docs current."]
+        )
+        text = path.read_text(encoding="utf-8")
+>       assert path == tmp_path / ".specify/anchoring/demo-goal/goal.md"
+E       AssertionError: assert PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_create_writes_the_three_p0/.specify/anchoring/demo-goal/anchor.md') == (PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_create_writes_the_three_p0') / '.specify/anchoring/demo-goal/goal.md')
+
+tests/unit/test_goal_utils.py:113: AssertionError
+______________________ test_engine_exists_with_its_mirror ______________________
+[gw53] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_engine_exists_with_its_mirror():
+        assert ENGINE.is_file()
+        assert ENGINE_MIRROR.is_file(), "run sync-mirrors.py --write"
+>       assert ENGINE.read_bytes() == ENGINE_MIRROR.read_bytes()
+E       AssertionError: assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 2481 diff: b'h' != b'u'
+E         Use -v to get more diff
+
+tests/contract/test_goal_targets_engine.py:339: AssertionError
+____________ test_owner_outside_the_closed_three_values_is_refused _____________
+[gw77] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw77/test_owner_outside_the_closed_0')
+
+    def test_owner_outside_the_closed_three_values_is_refused(tmp_path: Path):
+        _seed_goal(tmp_path)
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "robot",
+                    "--owner-id", RUN_ID)
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw77/test_owner_outside_the_closed_0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:150: AssertionError
+_______ test_the_two_owners_cite_each_other_and_restate_no_value_domain ________
+[gw89] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_two_owners_cite_each_other_and_restate_no_value_domain():
+        goal_text = _owner_text(GOAL_OWNER)
+        team_text = _owner_text(TEAM_OWNER)
+    
+        # Each cites the other by path and section.
+>       assert "skills/internal/create-team/references/conceptual-model.md" in goal_text
+E       assert 'skills/internal/create-team/references/conceptual-model.md' in "# Goal Definitions Reference\n\nCanonical definition of the **action-level Goal** (行动级目标) in Spec Kit: short-horizon,...up's names, flags and exit codes; this document defines what the words mean and cites the engine for how to call it.\n"
+
+tests/contract/test_binding_model.py:502: AssertionError
+_____ test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures ______
+[gw88] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures():
+        text = _owner_text(GOAL_OWNER)
+    
+        # The four owned concept faces are present by name.
+>       assert "### Archive Layers" in text, "the archive-layer vocabulary lives here"
+E       AssertionError: the archive-layer vocabulary lives here
+E       assert '### Archive Layers' in "# Goal Definitions Reference\n\nCanonical definition of the **action-level Goal** (行动级目标) in Spec Kit: short-horizon,...up's names, flags and exit codes; this document defines what the words mean and cites the engine for how to call it.\n"
+
+tests/contract/test_binding_model.py:469: AssertionError
+________________________ test_list_global_is_unchanged _________________________
+[gw96] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw96/test_list_global_is_unchanged0')
+
+    def test_list_global_is_unchanged(tmp_path: Path):
+        _seed(tmp_path)
+        proc = _run(tmp_path, "list")
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert [row["slug"] for row in payload["goals"]] == ["archive-goal"]
+E       AssertionError: assert [] == ['archive-goal']
+E         
+E         Right contains one more item: 'archive-goal'
+E         Use -v to get more diff
+
+tests/contract/test_scope_resolution.py:81: AssertionError
+____ test_goal_write_leaves_the_team_store_byte_identical_and_no_spec_path _____
+[gw99] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw99/test_goal_write_leaves_the_tea0')
+
+    def test_goal_write_leaves_the_team_store_byte_identical_and_no_spec_path(tmp_path: Path):
+        spec = _seed(tmp_path)
+        team_store = tmp_path / ".specify/teams/archive-team/team.md"
+        before = team_store.read_bytes()
+        spec_paths_before = {p for p in tmp_path.rglob("*") if ".specify/specs" in p.parts}
+        proc = _run(tmp_path, "create", "new-goal", "--scope", "goal",
+                    "--spec-dir", str(spec), "--objective", "an archive-layer outcome")
+>       assert proc.returncode == 0, proc.stdout + proc.stderr
+E       AssertionError: usage: -c create [-h] [--repo-root REPO_ROOT] [--json]
+E                          [--scope {anchor,teams,goals,auto}] [--spec-dir SPEC_DIR]
+E                          --objective OBJECTIVE [--title TEXT] [--criterion CRITERION]
+E                          [--boundary TEXT]
+E                          slug
+E         -c create: error: argument --scope: invalid choice: 'goal' (choose from 'anchor', 'teams', 'goals', 'auto')
+E         
+E       assert 2 == 0
+E        +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'create', 'new-goal',... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw99/test_goal_write_leaves_the_tea0', '--json'] returncode=2>.returncode
+
+tests/contract/test_scope_resolution.py:107: AssertionError
+_______________ test_a_terminal_goal_refuses_a_new_team_binding ________________
+[gw82] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw82/test_a_terminal_goal_refuses_a0')
+
+    def test_a_terminal_goal_refuses_a_new_team_binding(tmp_path: Path):
+        _seed_goal(tmp_path, status="achieved")
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "sdd-run",
+                    "--owner-id", RUN_ID)
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw82/test_a_terminal_goal_refuses_a0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:271: AssertionError
+_______________________________ test_goal_scope ________________________________
+[gw91] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw91/test_goal_scope0')
+
+    def test_goal_scope(tmp_path: Path):
+        spec = _seed(tmp_path)
+        proc = _run(tmp_path, "resolve-scope", "--scope", "goal", "--spec-dir", str(spec))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: usage: -c resolve-scope [-h] [--repo-root REPO_ROOT] [--json]
+E                                 [--scope {anchor,teams,goals,auto}]
+E                                 [--spec-dir SPEC_DIR] [--team TEAM]
+E         -c resolve-scope: error: argument --scope: invalid choice: 'goal' (choose from 'anchor', 'teams', 'goals', 'auto')
+E         
+E       assert 2 == 0
+E        +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'resolve-scope', '--s...cs/084-sample', '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw91/test_goal_scope0', '--json'] returncode=2>.returncode
+
+tests/contract/test_scope_resolution.py:44: AssertionError
+_______________________________ test_teams_scope _______________________________
+[gw92] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw92/test_teams_scope0')
+
+    def test_teams_scope(tmp_path: Path):
+        _seed(tmp_path)
+        proc = _run(tmp_path, "resolve-scope", "--scope", "teams")
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+        assert payload["scope"] == "teams"
+>       assert payload["goal_root"].endswith("/.specify/anchoring")
+               ^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'goal_root'
+
+tests/contract/test_scope_resolution.py:57: KeyError
+__________ test_a_conflict_names_both_candidates_and_never_overwrites __________
+[gw66] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw66/test_a_conflict_names_both_can0')
+
+    def test_a_conflict_names_both_candidates_and_never_overwrites(tmp_path):
+        spec = "093-fixture"
+        source = _seed_spec_goal(tmp_path, spec, slug="gamma",
+                                 objective="Move the fixture without losing a byte.")
+        target = tmp_path / ".specify/anchoring/gamma/goal.md"
+        target.parent.mkdir(parents=True)
+        target.write_text(
+            GOAL_SOURCE.format(status="active", slug="gamma",
+                               objective="A different outcome entirely.",
+                               criterion="The definition survives the move."),
+            encoding="utf-8")
+        before = target.read_text(encoding="utf-8")
+    
+        proc = _run(tmp_path, "migrate-archive", "--apply")
+>       assert proc.returncode == 4, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+E       AssertionError: stdout='{\n  "action": "migrate-archive",\n  "mode": "apply",\n  "decisions": [\n    {\n      "kind": "goal",\n      "slug": "gamma",\n      "source_spec": "093-fixture",\n      "source_path": ".specify/specs/093-fixture/goal/gamma/goal.md",\n      "target_path": ".specify/anchoring/gamma/anchor.md",\n      "archived_path": ".specify/archive/goal-team/trees/093-fixture/goal/gamma",\n      "concept_digest": "sha256:230d1d72de6adaa201cf4030571ee5add417cf55673e912146df27a342f1ee98",\n      "binding": {\n        "owner": "human",\n        "owner_id": "human",\n        "origin": "093-fixture"\n      },\n      "action": "migrate",\n      "result": "migrated",\n      "receipt": {\n        "kind": "goal",\n        "source_spec": "093-fixture",\n        "source_slug": "gamma",\n        "target_slug": "gamma",\n        "target_path": ".specify/anchoring/gamma/anchor.md",\n        "archived_path": ".specify/archive/goal-team/trees/093-fixture/goal/gamma",\n        "concept_digest": "sha256:230d1d72de6adaa201cf4030571ee5add417cf55673e912146df27a342f1ee98",\n        "result": "migrated",\n        "at": "2026-11-12T09:38:58Z",\n        "delete_policy": "archive-not-delete"\n      }\n    }\n  ],\n  "counts": {\n    "migrated": 1,\n    "noop": 0,\n    "conflict": 0,\n    "interrupted": 0\n  }\n}\n' stderr=''
+E       assert 0 == 4
+E        +  where 0 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'migrate-archive', '-... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw66/test_a_conflict_names_both_can0', '--json'] returncode=0>.returncode
+
+tests/contract/test_archive_migration.py:233: AssertionError
+________ test_ownership_is_answered_by_the_read_action_not_by_the_path _________
+[gw83] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw83/test_ownership_is_answered_by_0')
+
+    def test_ownership_is_answered_by_the_read_action_not_by_the_path(tmp_path: Path):
+        _seed_goal(tmp_path, binding=_binding_block("command-run", RUN_ID, "null"))
+        # A same-named definition at the retired spec-local position must not answer for it.
+        spec_goal = tmp_path / ".specify/specs/900-fixture/goal/alpha/goal.md"
+        spec_goal.parent.mkdir(parents=True, exist_ok=True)
+        spec_goal.write_text(
+            GOAL_TEMPLATE.format(status="active", binding=_binding_block("human", "human", "null")),
+            encoding="utf-8")
+    
+        proc = _run(tmp_path, "binding", "goal", "alpha")
+>       assert proc.returncode == 0, proc.stdout + proc.stderr
+E       AssertionError: {
+E           "error": "goal definition not found: alpha (/tmp/pytest-of-agent/pytest-10186/popen-gw83/test_ownership_is_answered_by_0/.specify/anchoring/alpha/anchor.md)"
+E         }
+E         
+E       assert 3 == 0
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'binding', 'goal', 'a... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw83/test_ownership_is_answered_by_0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:298: AssertionError
+______ test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only _______
+[gw85] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw85/test_both_archive_roots_resolv0')
+
+    def test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only(tmp_path: Path):
+        _seed_goal(tmp_path)
+        _seed_team(tmp_path)
+    
+        for layer in ("goal", "teams"):
+            proc = _run(tmp_path, "resolve-scope", "--scope", layer)
+>           assert proc.returncode == 0, proc.stdout + proc.stderr
+E           AssertionError: usage: -c resolve-scope [-h] [--repo-root REPO_ROOT] [--json]
+E                                     [--scope {anchor,teams,goals,auto}]
+E                                     [--spec-dir SPEC_DIR] [--team TEAM]
+E             -c resolve-scope: error: argument --scope: invalid choice: 'goal' (choose from 'anchor', 'teams', 'goals', 'auto')
+E             
+E           assert 2 == 0
+E            +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'resolve-scope', '--s... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw85/test_both_archive_roots_resolv0', '--json'] returncode=2>.returncode
+
+tests/contract/test_binding_model.py:360: AssertionError
+_________________ test_a_bound_goal_is_writable_only_by_human __________________
+[gw87] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw87/test_a_bound_goal_is_writable_0')
+
+    def test_a_bound_goal_is_writable_only_by_human(tmp_path: Path):
+        _seed_goal(tmp_path)
+        _seed_team(tmp_path)  # team t1 names goal_slug: alpha
+    
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "sdd-run",
+                    "--owner-id", RUN_ID)
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw87/test_a_bound_goal_is_writable_0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:435: AssertionError
+_________ test_origin_naming_a_non_existent_spec_directory_is_refused __________
+[gw79] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw79/test_origin_naming_a_non_exist0')
+
+    def test_origin_naming_a_non_existent_spec_directory_is_refused(tmp_path: Path):
+        _seed_goal(tmp_path)
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "command-run",
+                    "--owner-id", RUN_ID, "--origin", "999-no-such-spec")
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw79/test_origin_naming_a_non_exist0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:188: AssertionError
+____ test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt ____
+[gw64] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw64/test_migration_moves_the_tree_0')
+
+    def test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt(tmp_path):
+        spec = "091-fixture"
+        _seed_spec_goal(tmp_path, spec, slug="alpha")
+        _seed_spec_team(tmp_path, spec, slug="crew", goal_slug="alpha")
+    
+        proc = _run(tmp_path, "migrate-archive", "--apply")
+        assert proc.returncode == 0, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+    
+        # C-31 — the two archive rows are the only landing points.
+        goal_target = tmp_path / ".specify/anchoring/alpha/goal.md"
+        team_target = tmp_path / ".specify/teams/crew/team.md"
+>       assert goal_target.is_file()
+E       AssertionError: assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw64/test_migration_moves_the_tree_0/.specify/anchoring/alpha/goal.md').is_file
+
+tests/contract/test_archive_migration.py:153: AssertionError
+_________________ test_definition_lands_at_the_contracted_path _________________
+[gw191] linux -- Python 3.11.11 /usr/local/bin/python3
+
+archived = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw191/test_definition_lands_at_the_c0/.specify/anchoring/structure-probe/anchor.md')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw191/test_definition_lands_at_the_c0')
+
+    def test_definition_lands_at_the_contracted_path(archived, tmp_path):
+>       assert archived == tmp_path / ".specify/anchoring/structure-probe/goal.md"
+E       AssertionError: assert PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw191/test_definition_lands_at_the_c0/.specify/anchoring/structure-probe/anchor.md') == (PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw191/test_definition_lands_at_the_c0') / '.specify/anchoring/structure-probe/goal.md')
+
+tests/contract/test_goal_definition.py:77: AssertionError
+___________________ test_spec_dir_never_decides_the_listing ____________________
+[gw97] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw97/test_spec_dir_never_decides_th0')
+
+    def test_spec_dir_never_decides_the_listing(tmp_path: Path):
+        spec = _seed(tmp_path)
+        proc = _run(tmp_path, "list", "--scope", "goal", "--spec-dir", str(spec))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: usage: -c list [-h] [--repo-root REPO_ROOT] [--json]
+E                        [--scope {anchor,teams,goals,auto}] [--spec-dir SPEC_DIR]
+E         -c list: error: argument --scope: invalid choice: 'goal' (choose from 'anchor', 'teams', 'goals', 'auto')
+E         
+E       assert 2 == 0
+E        +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'list', '--scope', 'g... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw97/test_spec_dir_never_decides_th0', '--json'] returncode=2>.returncode
+
+tests/contract/test_scope_resolution.py:87: AssertionError
+__________________ test_rebind_changes_only_the_binding_block __________________
+[gw80] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw80/test_rebind_changes_only_the_b0')
+
+    def test_rebind_changes_only_the_binding_block(tmp_path: Path):
+        (tmp_path / ".specify/specs/900-fixture").mkdir(parents=True)
+        path = _seed_goal(tmp_path, binding=_binding_block("command-run", RUN_ID, "900-fixture"))
+        before_hash = _hash_minus_binding(path)
+        before_text = path.read_text(encoding="utf-8")
+    
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "sdd-run",
+                    "--owner-id", OTHER_RUN_ID, "--origin", "900-fixture")
+>       assert proc.returncode == 0, proc.stdout + proc.stderr
+E       AssertionError: {
+E           "error": "goal definition not found: alpha (/tmp/pytest-of-agent/pytest-10186/popen-gw80/test_rebind_changes_only_the_b0/.specify/anchoring/alpha/anchor.md)"
+E         }
+E         
+E       assert 3 == 0
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw80/test_rebind_changes_only_the_b0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:217: AssertionError
+_____________________ test_add_appends_the_d6_history_line _____________________
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw42/test_add_appends_the_d6_histor0')
+
+    def test_add_appends_the_d6_history_line(repo):
+        _run("targets", "sliced-goal", "--add", "日志组件拆分完成",
+             "--repo-root", str(repo))
+>       text = _goal_path(repo).read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw42/test_add_appends_the_d6_histor0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw42/test_add_appends_the_d6_histor0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+slug: sliced-goal
+added: T-001
+__ test_owner_id_is_validated_by_shape_and_the_grammar_is_cited_not_restated ___
+[gw78] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw78/test_owner_id_is_validated_by_0')
+
+    def test_owner_id_is_validated_by_shape_and_the_grammar_is_cited_not_restated(tmp_path: Path):
+        _seed_goal(tmp_path)
+        proc = _run(tmp_path, "bind", "goal", "alpha", "--owner", "sdd-run",
+                    "--owner-id", "not-a-run-id")
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'bind', 'goal', 'alph... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw78/test_owner_id_is_validated_by_0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:165: AssertionError
+___________ test_a_hand_edited_binding_block_is_reported_not_trusted ___________
+[gw81] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw81/test_a_hand_edited_binding_blo0')
+
+    def test_a_hand_edited_binding_block_is_reported_not_trusted(tmp_path: Path):
+        # Wrong key order.
+        _seed_goal(tmp_path, binding=(
+            "binding:\n"
+            f"  owner_id: {RUN_ID}\n"
+            "  owner: command-run\n"
+            "  origin: null\n"))
+        proc = _run(tmp_path, "binding", "goal", "alpha")
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'binding', 'goal', 'a... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw81/test_a_hand_edited_binding_blo0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:244: AssertionError
+________________ test_scope_spec_is_removed_and_no_alias_exists ________________
+[gw84] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw84/test_scope_spec_is_removed_and0')
+
+    def test_scope_spec_is_removed_and_no_alias_exists(tmp_path: Path):
+        _seed_goal(tmp_path)
+        for retired in ("spec", "global"):
+            proc = _run(tmp_path, "resolve-scope", "--scope", retired)
+            assert proc.returncode == 2, f"--scope {retired} was accepted"
+            assert "invalid choice" in proc.stderr
+        # An unregistered value is refused the same way — no alias exists.
+        proc = _run(tmp_path, "resolve-scope", "--scope", "goal-archive")
+        assert proc.returncode == 2
+        assert "invalid choice" in proc.stderr
+    
+        # The three living members resolve.
+        for live in ("goal", "teams"):
+            proc = _run(tmp_path, "resolve-scope", "--scope", live)
+>           assert proc.returncode == 0, proc.stdout + proc.stderr
+E           AssertionError: usage: -c resolve-scope [-h] [--repo-root REPO_ROOT] [--json]
+E                                     [--scope {anchor,teams,goals,auto}]
+E                                     [--spec-dir SPEC_DIR] [--team TEAM]
+E             -c resolve-scope: error: argument --scope: invalid choice: 'goal' (choose from 'anchor', 'teams', 'goals', 'auto')
+E             
+E           assert 2 == 0
+E            +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'resolve-scope', '--s... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw84/test_scope_spec_is_removed_and0', '--json'] returncode=2>.returncode
+
+tests/contract/test_binding_model.py:339: AssertionError
+_______ test_a_definition_without_a_complete_binding_is_uninterpretable ________
+[gw76] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw76/test_a_definition_without_a_co0')
+
+    def test_a_definition_without_a_complete_binding_is_uninterpretable(tmp_path: Path):
+        _seed_goal(tmp_path, binding="")
+        proc = _run(tmp_path, "binding", "goal", "alpha")
+>       assert proc.returncode == 2
+E       AssertionError: assert 3 == 2
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'binding', 'goal', 'a... '--repo-root', '/tmp/pytest-of-agent/pytest-10186/popen-gw76/test_a_definition_without_a_co0', '--json'] returncode=3>.returncode
+
+tests/contract/test_binding_model.py:125: AssertionError
+_____________ test_add_issues_open_target_and_renders_the_section ______________
+[gw39] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw39/test_add_issues_open_target_an0')
+
+    def test_add_issues_open_target_and_renders_the_section(repo):
+        code = _run("targets", "sliced-goal", "--add", "日志组件拆分完成",
+                    "--repo-root", str(repo))
+        assert code == 0
+>       text = _goal_path(repo).read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw39/test_add_issues_open_target_an0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw39/test_add_issues_open_target_an0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+slug: sliced-goal
+added: T-001
+_________________ test_origin_is_set_and_no_lineage_is_rebuilt _________________
+[gw70] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw70/test_origin_is_set_and_no_line0')
+
+    def test_origin_is_set_and_no_lineage_is_rebuilt(tmp_path):
+        spec = "096-fixture"
+        goal_tree = _seed_spec_goal(tmp_path, spec, slug="eta")
+        team_tree = _seed_spec_team(tmp_path, spec, slug="eta-crew", goal_slug="eta")
+        goal_body = _body(goal_tree.joinpath("goal.md").read_text(encoding="utf-8"))
+        team_body = _body(team_tree.joinpath("team.md").read_text(encoding="utf-8"))
+    
+        assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
+    
+        goal_target = tmp_path / ".specify/anchoring/eta/goal.md"
+        team_target = tmp_path / ".specify/teams/eta-crew/team.md"
+>       assert _body(goal_target.read_text(encoding="utf-8")) == goal_body
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_archive_migration.py:324: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw70/test_origin_is_set_and_no_line0/.specify/anchoring/eta/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw70/test_origin_is_set_and_no_line0/.specify/anchoring/eta/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_____________________ test_validate_still_owns_exit_code_4 _____________________
+[gw44] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw44/test_validate_still_owns_exit_0')
+
+    def test_validate_still_owns_exit_code_4(repo):
+        path = _goal_path(repo)
+>       text = path.read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw44/test_validate_still_owns_exit_0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw44/test_validate_still_owns_exit_0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_transition_appends_the_d6_history_line __________________
+[gw43] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw43/test_transition_appends_the_d60')
+
+    def test_transition_appends_the_d6_history_line(repo):
+        _run("targets", "sliced-goal", "--add", "一个切片", "--repo-root", str(repo))
+        _run("targets", "sliced-goal", "--set", "done", "--id", "T-001",
+             "--repo-root", str(repo))
+>       text = _goal_path(repo).read_text(encoding="utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw43/test_transition_appends_the_d60/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw43/test_transition_appends_the_d60/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+slug: sliced-goal
+added: T-001
+slug: sliced-goal
+id: T-001
+status: done
+_________ test_c1_the_action_exists_and_the_roster_grew_by_exactly_one _________
+[gw109] linux -- Python 3.11.11 /usr/local/bin/python3
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7effca3167d0>
+
+    def test_c1_the_action_exists_and_the_roster_grew_by_exactly_one(capsys):
+        mod = _load()
+        with pytest.raises(SystemExit):
+            mod.main(["--help"])
+        out = capsys.readouterr().out
+        choices = [m.group(1) for m in re.finditer(r"\{([a-z,-]+)\}", out)]
+        names = next((c.split(",") for c in choices if "run-checks" in c), [])
+        assert names, f"no action choices row in --help:\n{out}"
+        assert "run-checks" in names, f"run-checks is not an action: {names}"
+>       assert len(names) == len(ACTIONS) == 11, (
+            f"the roster was 10 before this feature and must be exactly 11 now: {names}"
+        )
+E       AssertionError: the roster was 10 before this feature and must be exactly 11 now: ['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', 'objective', 'criteria', 'migrate', 'bind', 'binding', 'targets', 'run-checks', 'probe-residual', 'command-family', 'handoff-decision', 'handoff-ref', 'migrate-archive', 'backfill-bindings', 'goal-create', 'goal-list', 'goal-view', 'goal-modify', 'goal-status', 'cleanup']
+E       assert 25 == 11
+E        +  where 25 = len(['resolve-scope', 'create', 'validate', 'check-statement', 'list', 'status', ...])
+E        +  and   11 = len(['create', 'validate', 'check-statement', 'list', 'status', 'objective', ...])
+
+tests/contract/test_run_checks.py:267: AssertionError
+______________ test_c26_generator_skill_carries_the_mandate_entry ______________
+[gw100] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c26_generator_skill_carries_the_mandate_entry():
+        assert SKILL.is_file(), f"missing: {SKILL.relative_to(ROOT)}"
+        block = _must_include_block(_text(SKILL))
+        names = [m.group(1).strip() for m in SKILL_ENTRY_RE.finditer(block)]
+        assert PRINCIPLE_TITLE in names, (
+            f"the `- **MUST include**` block carries no {PRINCIPLE_TITLE!r} sub-entry; entries: "
+            f"{names[-3:]}"
+        )
+>       assert len(names) == 14, (
+            f"the mandate list holds {len(names)} entries after the landing; expected 14 "
+            "(13 after 089 + 090's Re-Anchoring entry). A count that stays behind is how the "
+            "guard goes red on nothing"
+        )
+E       AssertionError: the mandate list holds 15 entries after the landing; expected 14 (13 after 089 + 090's Re-Anchoring entry). A count that stays behind is how the guard goes red on nothing
+E       assert 15 == 14
+E        +  where 15 = len(['Documentation-First', 'Feature-centric development', 'Code as the Single Source of Truth', 'Documentation Naming & Location Conventions', 'Better-Harness Orientation', 'One Source of Truth (Authority & Reference Discipline)', ...])
+
+tests/contract/test_script_interface_contract.py:367: AssertionError
+____________________________ test_goal_scope_paths _____________________________
+[gw86] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw86/test_goal_scope_paths0')
+
+    def test_goal_scope_paths(tmp_path: Path):
+>       scope = goal_utils.resolve_scope(tmp_path, "goal")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_goal_scope_engine.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo_root = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw86/test_goal_scope_paths0')
+scope = 'goal', spec_dir = None, identity_slug = None
+
+    def resolve_scope(repo_root: Path, scope: str = "anchor",
+                      spec_dir: str | os.PathLike | None = None,
+                      identity_slug: str | None = None) -> Scope:
+        """Resolve the three archive-layer roots. The path rule has exactly one owner: this function.
+    
+        `scope` is the closed archive-layer set `anchor` / `teams` / `goals` / `auto` (C-24).
+        The three layer members always return ALL roots in one `Scope` object, so a caller
+        never needs two calls; `auto` is a read-only resolver that picks the single layer
+        containing the requested identity (or the single non-empty layer when no identity is
+        requested) and refuses — exit 2, no guessing — when that is not decidable.
+        """
+        repo_root = Path(repo_root)
+        anchor_path = repo_root / ARCHIVE_DIRNAME
+        goals_path = repo_root / GOALS_DIRNAME
+        team_path = repo_root / TEAM_DIRNAME
+        if scope not in ARCHIVE_SCOPES:
+>           raise ScopeError(
+                f"scope {scope!r} is outside the closed set {' / '.join(ARCHIVE_SCOPES)}")
+E           goal_utils_scope.ScopeError: scope 'goal' is outside the closed set anchor / teams / goals / auto
+
+scripts/python/goal-utils.py:206: ScopeError
+_________________ test_spec_dir_must_live_under_specify_specs __________________
+[gw90] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw90/test_spec_dir_must_live_under_0')
+
+    def test_spec_dir_must_live_under_specify_specs(tmp_path: Path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        with pytest.raises(goal_utils.ScopeError, match="under .specify/specs/"):
+>           goal_utils.resolve_scope(tmp_path, "goal", outside)
+
+tests/unit/test_goal_scope_engine.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo_root = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw90/test_spec_dir_must_live_under_0')
+scope = 'goal'
+spec_dir = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw90/test_spec_dir_must_live_under_0/outside')
+identity_slug = None
+
+    def resolve_scope(repo_root: Path, scope: str = "anchor",
+                      spec_dir: str | os.PathLike | None = None,
+                      identity_slug: str | None = None) -> Scope:
+        """Resolve the three archive-layer roots. The path rule has exactly one owner: this function.
+    
+        `scope` is the closed archive-layer set `anchor` / `teams` / `goals` / `auto` (C-24).
+        The three layer members always return ALL roots in one `Scope` object, so a caller
+        never needs two calls; `auto` is a read-only resolver that picks the single layer
+        containing the requested identity (or the single non-empty layer when no identity is
+        requested) and refuses — exit 2, no guessing — when that is not decidable.
+        """
+        repo_root = Path(repo_root)
+        anchor_path = repo_root / ARCHIVE_DIRNAME
+        goals_path = repo_root / GOALS_DIRNAME
+        team_path = repo_root / TEAM_DIRNAME
+        if scope not in ARCHIVE_SCOPES:
+>           raise ScopeError(
+                f"scope {scope!r} is outside the closed set {' / '.join(ARCHIVE_SCOPES)}")
+E           goal_utils_scope.ScopeError: scope 'goal' is outside the closed set anchor / teams / goals / auto
+
+scripts/python/goal-utils.py:206: ScopeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw90/test_spec_dir_must_live_under_0')
+
+    def test_spec_dir_must_live_under_specify_specs(tmp_path: Path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+>       with pytest.raises(goal_utils.ScopeError, match="under .specify/specs/"):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'under .specify/specs/'
+E        Input: "scope 'goal' is outside the closed set anchor / teams / goals / auto"
+
+tests/unit/test_goal_scope_engine.py:73: AssertionError
+__________ test_a_cross_layer_write_is_refused_and_names_both_layers ___________
+[gw86] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw86/test_a_cross_layer_write_is_re0')
+
+    def test_a_cross_layer_write_is_refused_and_names_both_layers(tmp_path: Path):
+        goal = _seed_goal(tmp_path)
+        _seed_team(tmp_path)
+    
+        proc = _run(tmp_path, "status", "alpha", "--set", "achieved", "--scope", "teams")
+        assert proc.returncode == 2
+        error = _error(proc)
+        assert "cross-layer-write" in error
+>       assert "goal" in error and "teams" in error
+E       AssertionError: assert ('goal' in 'cross-layer-write: this write targets the teams archive layer but the definition resolves to the anchor archive layer; both layers are named so the caller can address the right one')
+
+tests/contract/test_binding_model.py:414: AssertionError
+_______________ test_migration_preserves_the_resolved_objective ________________
+[gw100] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw100/test_migration_preserves_the_r0')
+
+    def test_migration_preserves_the_resolved_objective(tmp_path):
+        _team(tmp_path, "legacy", inline="Reach a reviewed, stable release.")
+        # before: resolves from the inline goal
+        before = _refresh(tmp_path, "legacy")
+        assert before["goal_source"] == "inline"
+        before_desc = yaml.safe_load(
+>           (tmp_path / ".specify/goal/legacy/summary/data/project-input.yaml").read_text()
+        )["project"]["project_desc"]
+
+tests/integration/test_goal_migration_path.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw100/test_migration_preserves_the_r0/.specify/goal/legacy/summary/data/project-input.yaml')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw100/test_migration_preserves_the_r0/.specify/goal/legacy/summary/data/project-input.yaml'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________ test_add_sequence_is_monotone_and_terminal_not_reused _____________
+[gw38] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw38/test_add_sequence_is_monotone_0')
+
+    def test_add_sequence_is_monotone_and_terminal_not_reused(repo):
+        for statement in ("切片一", "切片二", "切片三"):
+            assert _run("targets", "sliced-goal", "--add", statement,
+                        "--repo-root", str(repo)) == 0
+        _run("targets", "sliced-goal", "--set", "dropped", "--id", "T-002",
+             "--repo-root", str(repo))
+        assert _run("targets", "sliced-goal", "--add", "切片四",
+                    "--repo-root", str(repo)) == 0
+>       data = goal_utils.parse_goal(_goal_path(repo))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:215: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw38/test_add_sequence_is_monotone_0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw38/test_add_sequence_is_monotone_0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+slug: sliced-goal
+added: T-001
+slug: sliced-goal
+added: T-002
+slug: sliced-goal
+added: T-003
+slug: sliced-goal
+id: T-002
+status: dropped
+slug: sliced-goal
+added: T-004
+__________________ test_illegal_transition_is_rejected_exit_2 __________________
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw36/test_illegal_transition_is_rej0')
+
+    def test_illegal_transition_is_rejected_exit_2(repo):
+>       tid = goal_utils.add_target(_goal_path(repo), "一个切片")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw36/test_illegal_transition_is_rej0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw36/test_illegal_transition_is_rej0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________________ test_set_without_id_is_an_input_error _____________________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw26/test_set_without_id_is_an_inpu0')
+
+    def test_set_without_id_is_an_input_error(repo):
+>       goal_utils.add_target(_goal_path(repo), "先有的切片")
+
+tests/contract/test_goal_targets_engine.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw26/test_set_without_id_is_an_inpu0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw26/test_set_without_id_is_an_inpu0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________ test_c6_resolution_is_reported_with_all_three_subkeys _____________
+[gw114] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw114/test_c6_resolution_is_reported0')
+
+    def test_c6_resolution_is_reported_with_all_three_subkeys(tmp_path):
+        root = _repo(tmp_path, focus="T-001")
+>       p = _checks(root, "run-checks", "t1", expect=0)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_run_checks.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_run_checks.py:162: in _checks
+    r = _run(root, *args, "--json", expect=expect)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw114/test_c6_resolution_is_reported0/repo')
+expect = 0, args = ('run-checks', 't1', '--json'), action = 'run-checks'
+rest = ('t1', '--json')
+
+    def _run(root, *args, expect=None):
+        # `--repo-root` goes AFTER the action on purpose. It is declared on a parser shared by
+        # the top level and every subparser, and argparse lets the subparser's own default
+        # overwrite a value the top level already set — so `--repo-root X <action>` silently
+        # resolves to the cwd. Pre-existing in this binary, measured, escalated as research.md
+        # A-9; this feature must not change flag precedence for nine existing actions in passing.
+        action, rest = args[0], args[1:]
+        r = run_engine_in_process(GOAL_UTILS, [action, "--repo-root", str(root), *rest])
+        if expect is not None:
+>           assert r.returncode == expect, (
+                f"{' '.join(args)} -> exit {r.returncode}, expected {expect}\n"
+                f"stdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+            )
+E           AssertionError: run-checks t1 --json -> exit 5, expected 0
+E             stdout:
+E             {
+E               "team_slug": "t1",
+E               "goal_slug": "g1",
+E               "identity_kind": "explicit",
+E               "binding": null,
+E               "resolution": {
+E                 "effective": "T-001",
+E                 "source": "team-default",
+E                 "declared_focus": "T-001"
+E               },
+E               "checks": [
+E                 {
+E                   "id": 1,
+E                   "name": "goal-binding",
+E                   "verdict": "no-goal-definition",
+E                   "message": "绑定 goal 'g1' 无定义文件;先经 /speckit.goal migrate 落为定义"
+E                 },
+E                 {
+E                   "id": 2,
+E                   "name": "dangling",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可查,悬空检查无判定主体"
+E                 },
+E                 {
+E                   "id": 3,
+E                   "name": "target-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可查,终态引用检查无判定主体"
+E                 },
+E                 {
+E                   "id": 4,
+E                   "name": "cross-goal",
+E                   "verdict": "not-evaluated",
+E                   "message": "引用不是限定形 <goal-slug>.T-<nnn>,无跨 goal 前缀可比"
+E                 },
+E                 {
+E                   "id": 5,
+E                   "name": "goal-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可读,goal 终态检查无判定主体"
+E                 }
+E               ],
+E               "verdict": "no-goal-definition",
+E               "blocked": true
+E             }
+E             
+E             stderr:
+E             
+E           assert 5 == 0
+E            +  where 5 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'run-checks', '--repo...t', '/tmp/pytest-of-agent/pytest-10186/popen-gw114/test_c6_resolution_is_reported0/repo', 't1', '--json'] returncode=5>.returncode
+
+tests/contract/test_run_checks.py:154: AssertionError
+_____________________ test_unknown_id_is_not_found_exit_3 ______________________
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw35/test_unknown_id_is_not_found_e0')
+
+    def test_unknown_id_is_not_found_exit_3(repo):
+>       goal_utils.add_target(_goal_path(repo), "一个切片")
+
+tests/contract/test_goal_targets_engine.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw35/test_unknown_id_is_not_found_e0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw35/test_unknown_id_is_not_found_e0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_terminal_goal_is_read_only_for_set ____________________
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw30/test_terminal_goal_is_read_onl0')
+
+    def test_terminal_goal_is_read_only_for_set(repo):
+>       tid = goal_utils.add_target(_goal_path(repo), "一个切片")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw30/test_terminal_goal_is_read_onl0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw30/test_terminal_goal_is_read_onl0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________ test_noop_set_returns_zero_and_writes_no_history _______________
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw37/test_noop_set_returns_zero_and0')
+
+    def test_noop_set_returns_zero_and_writes_no_history(repo):
+>       tid = goal_utils.add_target(_goal_path(repo), "一个切片")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_goal_targets_engine.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw37/test_noop_set_returns_zero_and0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw37/test_noop_set_returns_zero_and0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________________ test_id_without_set_is_an_input_error _____________________
+[gw27] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_id_without_set_is_an_inpu0')
+
+    def test_id_without_set_is_an_input_error(repo):
+>       goal_utils.add_target(_goal_path(repo), "先有的切片")
+
+tests/contract/test_goal_targets_engine.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1267: in add_target
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_id_without_set_is_an_inpu0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw27/test_id_without_set_is_an_inpu0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_terminal_goal_is_read_only_for_add ____________________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+repo = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw29/test_terminal_goal_is_read_onl0')
+
+    def test_terminal_goal_is_read_only_for_add(repo):
+>       goal_utils.set_status(_goal_path(repo), "achieved")
+
+tests/contract/test_goal_targets_engine.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/python/goal-utils.py:1182: in set_status
+    data = parse_goal(path)
+           ^^^^^^^^^^^^^^^^
+scripts/python/goal-utils.py:1017: in parse_goal
+    text = Path(path).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw29/test_terminal_goal_is_read_onl0/.specify/anchoring/sliced-goal/goal.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-10186/popen-gw29/test_terminal_goal_is_read_onl0/.specify/anchoring/sliced-goal/goal.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+____________ test_every_source_tree_stays_readable_after_migration _____________
+[gw106] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw106/test_every_source_tree_stays_r0')
+
+    def test_every_source_tree_stays_readable_after_migration(tmp_path):
+        slugs = _build_shape(tmp_path)
+    
+        before = _payload(_run(tmp_path, "probe-residual"))
+        assert before["counts"] == {"goal": len(SHAPE), "teams": len(SHAPE)}
+    
+        applied = _run(tmp_path, "migrate-archive", "--apply")
+        assert applied.returncode == 0, applied.stdout + applied.stderr
+    
+        after = _payload(_run(tmp_path, "probe-residual"))
+        assert after["counts"] == {"goal": 0, "teams": 0}, (
+            "after migration the residual count is zero (SC-003)")
+    
+        for spec, (goal_slug, team_slug, _lifecycle) in SHAPE.items():
+            goal_target = tmp_path / ".specify/anchoring" / goal_slug / "goal.md"
+            team_target = tmp_path / ".specify/teams" / team_slug / "team.md"
+>           assert goal_target.is_file(), f"unified definition missing: {goal_target}"
+E           AssertionError: unified definition missing: /tmp/pytest-of-agent/pytest-10186/popen-gw106/test_every_source_tree_stays_r0/.specify/anchoring/085-sdd-temporary-goal-team/goal.md
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw106/test_every_source_tree_stays_r0/.specify/anchoring/085-sdd-temporary-goal-team/goal.md').is_file
+
+tests/integration/test_archive_migration_real_data.py:134: AssertionError
+_ test_c7_without_a_target_two_three_four_are_not_evaluated_and_one_five_still_are _
+[gw115] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw115/test_c7_without_a_target_two_t0')
+
+    def test_c7_without_a_target_two_three_four_are_not_evaluated_and_one_five_still_are(tmp_path):
+        root = _repo(tmp_path)                       # no focus_target, no --target
+        p = _checks(root, "run-checks", "t1", expect=0)
+        assert p["resolution"]["source"] == "none" and p["resolution"]["effective"] is None
+        got = _by_name(p)
+        for name in ("dangling", "target-terminal", "cross-goal"):
+            assert got[name]["verdict"] == NOT_EVALUATED, (
+                f"{name} has no judgment subject without a target, so it must be "
+                f"{NOT_EVALUATED} — reporting `ok` for a check that never ran is exactly the "
+                f"shape this feature exists to remove: {got[name]}"
+            )
+        for name in ("goal-binding", "goal-terminal"):
+            assert got[name]["verdict"] != NOT_EVALUATED, (
+                f"{name} depends only on the team/goal binding, so C-7 requires it to be "
+                f"evaluated even with no target: {got[name]}"
+            )
+>           assert got[name]["verdict"] == "ok", got[name]
+E           AssertionError: {'id': 1, 'message': "绑定 goal 'g1' 无定义文件;先经 /speckit.goal migrate 落为定义", 'name': 'goal-binding', 'verdict': 'no-goal-definition'}
+E           assert 'no-goal-definition' == 'ok'
+E             
+E             - ok
+E             + no-goal-definition
+
+tests/contract/test_run_checks.py:368: AssertionError
+____________ test_c18_the_three_tiers_are_mutually_distinguishable _____________
+[gw127] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw127/test_c18_the_three_tiers_are_m0')
+
+    def test_c18_the_three_tiers_are_mutually_distinguishable(tmp_path):
+        # blocked -> 5: the referenced Target is in a terminal state
+        blocked = _repo(tmp_path / "b", targets=(("T-001", "done"),))
+        _run(blocked, "run-checks", "t1", "--target", "T-001", expect=5)
+        # input error -> 2: the reference does not match the grammar
+        bad_input = _repo(tmp_path / "i")
+        _run(bad_input, "run-checks", "t1", "--target", "not-a-target", expect=2)
+        # invalid -> 4: the goal definition itself fails validation
+        invalid = _repo(tmp_path / "v", goal_body=GOAL_TMPL.format(
+            status="finished", slug="g1", rows="| T-001 | slice | open |"))
+        r = _run(invalid, "run-checks", "t1", "--target", "T-001")
+>       assert r.returncode == 4, (
+            f"an unusable definition is the `invalid` tier, distinct from both a blocking "
+            f"verdict and a bad argument: got {r.returncode}\n{r.stdout}\n{r.stderr}"
+        )
+E       AssertionError: an unusable definition is the `invalid` tier, distinct from both a blocking verdict and a bad argument: got 5
+E         team: t1   goal: g1   identity: explicit
+E         target: T-001   source: explicit   declared focus: None
+E           1. goal-binding     no-goal-definition — 绑定 goal 'g1' 无定义文件;先经 /speckit.goal migrate 落为定义
+E           2. dangling         not-evaluated — 无 goal 定义可查,悬空检查无判定主体
+E           3. target-terminal  not-evaluated — 无 goal 定义可查,终态引用检查无判定主体
+E           4. cross-goal       not-evaluated — 引用不是限定形 <goal-slug>.T-<nnn>,无跨 goal 前缀可比
+E           5. goal-terminal    not-evaluated — 无 goal 定义可读,goal 终态检查无判定主体
+E         verdict: no-goal-definition   blocked: true
+E         
+E         
+E       assert 5 == 4
+E        +  where 5 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'run-checks', '--repo...est-of-agent/pytest-10186/popen-gw127/test_c18_the_three_tiers_are_m0/v/repo', 't1', '--target', 'T-001'] returncode=5>.returncode
+
+tests/contract/test_run_checks.py:591: AssertionError
+__________ test_c16_one_check_raising_leaves_the_other_four_reported ___________
+[gw125] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw125/test_c16_one_check_raising_lea0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc4785b34d0>
+
+    def test_c16_one_check_raising_leaves_the_other_four_reported(tmp_path, monkeypatch):
+        """C-16: an exception in one check must not swallow the whole verdict."""
+        mod = _load()
+        root = _repo(tmp_path, focus="T-001")
+    
+        def _boom(_ctx):
+            raise RuntimeError("injected failure inside one of the five checks")
+    
+        monkeypatch.setattr(mod, "_cross_goal_check", _boom)
+        payload = mod.run_checks(root, "t1")
+        assert len(payload["checks"]) == 5, (
+            f"one check raising must still leave a five-element array: {payload['checks']}"
+        )
+        got = {c["name"]: c for c in payload["checks"]}
+        assert got["cross-goal"]["verdict"] == NOT_EVALUATED, got["cross-goal"]
+        assert got["cross-goal"]["message"], "the reason must be carried, not swallowed"
+        others = [n for n in FIVE_NAMES if n != "cross-goal"]
+>       assert all(got[n]["verdict"] != NOT_EVALUATED for n in others), (
+            f"the exception swallowed checks that could have been evaluated: "
+            f"{[(n, got[n]['verdict']) for n in others]}"
+        )
+E       AssertionError: the exception swallowed checks that could have been evaluated: [('goal-binding', 'no-goal-definition'), ('dangling', 'not-evaluated'), ('target-terminal', 'not-evaluated'), ('goal-terminal', 'not-evaluated')]
+E       assert False
+E        +  where False = all(<generator object test_c16_one_check_raising_leaves_the_other_four_reported.<locals>.<genexpr> at 0x7fc478552a40>)
+
+tests/contract/test_run_checks.py:553: AssertionError
+____________ test_c20_the_existing_zero_and_two_branches_still_hold ____________
+[gw129] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw129/test_c20_the_existing_zero_and0')
+
+    def test_c20_the_existing_zero_and_two_branches_still_hold(tmp_path):
+        # S3 thinning moved team.md's goal-based create branch into create-team's create-mode
+        # reference; the dry-run gate's 0/2 branch semantics are pinned at that new owner so
+        # C-17's code choices stay compatible with their documented caller.
+        text = CREATE_MODE.read_text(encoding="utf-8")
+        for needle in ("MUST pass (exit 0) before it is presented",
+                       "exit-2 rejection is reported verbatim",
+                       "never bypass the engine"):
+            assert needle in text, (
+                f"the dry-run gate branches on 0 and 2; the branch text moved or was "
+                f"rewritten, so C-17's code choices would no longer be compatible: {needle!r}"
+            )
+        mod = _load()
+        assert mod.EXIT_OK == 0 and mod.EXIT_INPUT_ERROR == 2, (
+            "the meanings of 0 and 2 must be untouched for the existing caller"
+        )
+        # behaviorally, on the real read-only dry-run path. The old probe goal
+        # (draw-two-layer-structure) was deliberately closed (`achieved`), and a terminal goal
+        # refuses the dry run with the INVALID tier (4), so the live 0/2 probe targets the one
+        # still-active real goal; 0 = candidate accepted, 2 = rejected verbatim.
+        root = ROOT
+        good = _run(root, "targets", "command-logic-as-classified-skills", "--check", "T-001")
+>       assert good.returncode in (0, 2), good.returncode
+E       AssertionError: 3
+E       assert 3 in (0, 2)
+E        +  where 3 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'targets', '--repo-root', '/storage/project/cloud-native-ai/spec-kit', 'command-logic-as-classified-skills', '--check', 'T-001'] returncode=3>.returncode
+
+tests/contract/test_run_checks.py:634: AssertionError
+__________ test_c13_a_short_circuited_check_is_not_evaluated_never_ok __________
+[gw122] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw122/test_c13_a_short_circuited_che0')
+
+    def test_c13_a_short_circuited_check_is_not_evaluated_never_ok(tmp_path):
+        """SC-008: one precondition fails, that check says so, the other four still report.
+    
+        The sample is a LOCAL-form reference: cross-goal compares a qualified reference's
+        prefix against the bound goal, so with `T-001` there is no prefix and no question to
+        answer — exactly one check loses its subject and the other four are evaluated.
+        """
+        root = _repo(tmp_path)
+>       p = _checks(root, "run-checks", "t1", "--target", "T-001", expect=0)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_run_checks.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_run_checks.py:162: in _checks
+    r = _run(root, *args, "--json", expect=expect)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw122/test_c13_a_short_circuited_che0/repo')
+expect = 0, args = ('run-checks', 't1', '--target', 'T-001', '--json')
+action = 'run-checks', rest = ('t1', '--target', 'T-001', '--json')
+
+    def _run(root, *args, expect=None):
+        # `--repo-root` goes AFTER the action on purpose. It is declared on a parser shared by
+        # the top level and every subparser, and argparse lets the subparser's own default
+        # overwrite a value the top level already set — so `--repo-root X <action>` silently
+        # resolves to the cwd. Pre-existing in this binary, measured, escalated as research.md
+        # A-9; this feature must not change flag precedence for nine existing actions in passing.
+        action, rest = args[0], args[1:]
+        r = run_engine_in_process(GOAL_UTILS, [action, "--repo-root", str(root), *rest])
+        if expect is not None:
+>           assert r.returncode == expect, (
+                f"{' '.join(args)} -> exit {r.returncode}, expected {expect}\n"
+                f"stdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+            )
+E           AssertionError: run-checks t1 --target T-001 --json -> exit 5, expected 0
+E             stdout:
+E             {
+E               "team_slug": "t1",
+E               "goal_slug": "g1",
+E               "identity_kind": "explicit",
+E               "binding": null,
+E               "resolution": {
+E                 "effective": "T-001",
+E                 "source": "explicit",
+E                 "declared_focus": null
+E               },
+E               "checks": [
+E                 {
+E                   "id": 1,
+E                   "name": "goal-binding",
+E                   "verdict": "no-goal-definition",
+E                   "message": "绑定 goal 'g1' 无定义文件;先经 /speckit.goal migrate 落为定义"
+E                 },
+E                 {
+E                   "id": 2,
+E                   "name": "dangling",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可查,悬空检查无判定主体"
+E                 },
+E                 {
+E                   "id": 3,
+E                   "name": "target-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可查,终态引用检查无判定主体"
+E                 },
+E                 {
+E                   "id": 4,
+E                   "name": "cross-goal",
+E                   "verdict": "not-evaluated",
+E                   "message": "引用不是限定形 <goal-slug>.T-<nnn>,无跨 goal 前缀可比"
+E                 },
+E                 {
+E                   "id": 5,
+E                   "name": "goal-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可读,goal 终态检查无判定主体"
+E                 }
+E               ],
+E               "verdict": "no-goal-definition",
+E               "blocked": true
+E             }
+E             
+E             stderr:
+E             
+E           assert 5 == 0
+E            +  where 5 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'run-checks', '--repo...gent/pytest-10186/popen-gw122/test_c13_a_short_circuited_che0/repo', 't1', '--target', 'T-001', '--json'] returncode=5>.returncode
+
+tests/contract/test_run_checks.py:154: AssertionError
+______ test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker _______
+[gw158] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker():
+        """C-33/C-38: the mirrors are generated, and each projected one carries one marker."""
+        engine = _sync_module()
+        # C-38: the marker is READ BACK OUT of the mirrors on disk — never authored here. The
+        # marker text comes from the engine, the counts from the files, and the two must meet.
+        for mirror, kind, _source in engine.PROJECTED_FILES:
+            text = (ROOT / mirror).read_text(encoding="utf-8")
+            # The marker is compared by its BODY: the emitted line carries a `# ` comment
+            # prefix, which is the comment syntax the projection puts it in.
+            marker = engine._marker(kind)
+            hits = [line for line in text.splitlines()
+                    if line.strip().lstrip("#").strip() == marker]
+            assert len(hits) == 1, (
+                f"C-38: {mirror} MUST carry exactly one {kind!r} marker line; found {len(hits)}"
+            )
+            # The claim is judged on COMMENT lines only, which is the surface a reader sees: a
+            # string literal or an identifier is a different thing, and the engine's own frame
+            # check reads the same lines.
+            comments = [line.lower() for line in text.splitlines()
+                        if line.lstrip().startswith("#")]
+            assert not any("byte-identical" in line for line in comments), (
+                f"C-38: {mirror} MUST NOT claim byte identity with its source"
+            )
+        # C-33: no mirror is hand-edited. The engine reproduces every projected byte from its
+        # source, so a hand-written mirror is exactly a mirror the projection cannot reproduce.
+        proc = _run_sync("--check")
+>       assert "DIFF" not in proc.stdout, (
+            "C-33: a mirror that departs from its declared projection is hand-edited; "
+            f"`--check` reports:\n{proc.stdout[-2000:]}"
+        )
+E       AssertionError: C-33: a mirror that departs from its declared projection is hand-edited; `--check` reports:
+E         ok    templates/ == .specify/templates/ (23 files, byte-identical)
+E         ok    skills/external/ == .specify/skills/ (429 files, byte-identical)
+E         ok    skills/internal/ == .specify/skills/internal/ (137 files, byte-identical)
+E         ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+E         DIFF .specify/scripts/python/goal-utils.py
+E         projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+E         projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+E         projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+E         projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+E         projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+E         projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+E         MISS  .specify/shared/definitions/anchor-definitions.md
+E         DIFF .specify/shared/definitions/goal-definitions.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 'DIFF' not in 'ok    templ...py --write\n'
+E         
+E         'DIFF' is contained here:
+E           dentical)
+E           DIFF .specify/scripts/python/goal-utils.py
+E         ? ++++
+E           projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+E           projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/contract/test_script_interface_contract.py:3155: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OK: all per-tool command copies match the source templates.
+_________ test_c35_the_check_asserts_the_projection_and_names_its_kind _________
+[gw155] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c35_the_check_asserts_the_projection_and_names_its_kind():
+        """C-35: `--check` compares `mirror == project(source)` and names the kind per pair."""
+        engine = _sync_module()
+        proc = _run_sync("--check")
+>       assert proc.returncode == 0, (
+            "C-35: the repository's own mirrors MUST pass `--check` (exit 0); got "
+            f"{proc.returncode}\n{proc.stdout[-3000:]}\n{proc.stderr[-1500:]}"
+        )
+E       AssertionError: C-35: the repository's own mirrors MUST pass `--check` (exit 0); got 2
+E         ok    templates/ == .specify/templates/ (23 files, byte-identical)
+E         ok    skills/external/ == .specify/skills/ (429 files, byte-identical)
+E         ok    skills/internal/ == .specify/skills/internal/ (137 files, byte-identical)
+E         ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+E         DIFF .specify/scripts/python/goal-utils.py
+E         projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+E         projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+E         projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+E         projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+E         projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+E         projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+E         MISS  .specify/shared/definitions/anchor-definitions.md
+E         DIFF .specify/shared/definitions/goal-definitions.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E         
+E       assert 2 == 0
+E        +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py', '--check'] returncode=2>.returncode
+
+tests/contract/test_script_interface_contract.py:3009: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OK: all per-tool command copies match the source templates.
+__________ test_the_composed_verdict_agrees_with_preview_target_check __________
+[gw139] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10186/popen-gw139/test_the_composed_verdict_agre0')
+
+    def test_the_composed_verdict_agrees_with_preview_target_check(tmp_path):
+        """The wrapper reports; the existing gate decides. They must not diverge.
+    
+        `preview_target_check` is the authoritative single-verdict gate the run mode already
+        uses. The five-check array is a projection of it, so for every scenario where both are
+        defined they must name the same verdict — otherwise this action has quietly become a
+        second grammar, which is what C-5 forbids.
+        """
+        mod = _load()
+        cases = [
+            ({"targets": (("T-001", "open"),)}, "T-001"),
+            ({"targets": (("T-001", "done"),)}, "T-001"),
+            ({"targets": (("T-002", "open"),)}, "T-001"),
+            ({"targets": (("T-001", "open"),)}, "g1.T-001"),
+            ({"targets": (("T-001", "open"),)}, "other.T-001"),
+            ({"targets": (("T-001", "open"),)}, "bogus"),
+            ({"goal_status": "achieved", "targets": (("T-001", "open"),)}, "T-001"),
+            ({"goal": False, "targets": (("T-001", "open"),)}, "T-001"),
+            ({"goal_slug": None, "targets": (("T-001", "open"),)}, "T-001"),
+        ]
+        for index, (kwargs, reference) in enumerate(cases):
+            root = _repo(tmp_path / f"c{index}", **kwargs)
+            authoritative = mod.preview_target_check(root, "t1", reference)
+            payload = mod.run_checks(root, "t1", reference)
+            assert payload["verdict"] == authoritative["verdict"], (
+                f"case {index} ({kwargs}, {reference!r}): the wrapper says "
+                f"{payload['verdict']!r} while the engine's own gate says "
+                f"{authoritative['verdict']!r}"
+            )
+            # and the array really is a projection of that verdict, not decoration beside it:
+            # the top level is either the grammar rejection (which is not one of the five) or
+            # the first non-ok check in the gate's own priority order
+            projected = mod._compose_verdict(payload["checks"], "local")
+            by_id = {c["id"]: c["verdict"] for c in payload["checks"]}
+            first_non_ok = next(
+                (by_id[cid] for cid in mod._TOP_VERDICT_ORDER
+                 if by_id[cid] not in ("ok", mod.NOT_EVALUATED)), "ok")
+            assert projected == first_non_ok, (payload["checks"], projected, first_non_ok)
+>           assert payload["verdict"] in (projected, "input-error"), (
+                f"case {index}: the reported verdict {payload['verdict']!r} is neither the "
+                f"projection of the array ({projected!r}) nor the grammar rejection"
+            )
+E           AssertionError: case 4: the reported verdict 'cross-goal' is neither the projection of the array ('no-goal-definition') nor the grammar rejection
+E           assert 'cross-goal' in ('no-goal-definition', 'input-error')
+
+tests/contract/test_run_checks.py:817: AssertionError
+_____________ test_the_real_bound_team_reports_the_measured_state ______________
+[gw140] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_real_bound_team_reports_the_measured_state():
+        """A real-tree run, read-only, asserting only what was measured — never a fabricated
+        verdict. The real goal draw-two-layer-structure was deliberately closed (`achieved`;
+        T-001 done, T-002/T-003 dropped — see the 2026-10-12 goal-close commit), so the
+        goal-terminal check now blocks every run against it: no target -> goal-terminal and
+        blocked; a done Target -> target-terminal on top; the unbound team stays unblocked,
+        because no goal definition blocks only when a --target is specified.
+        """
+>       p = _checks(ROOT, "run-checks", REAL_TEAM_BOUND, expect=5)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_run_checks.py:831: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_run_checks.py:162: in _checks
+    r = _run(root, *args, "--json", expect=expect)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/storage/project/cloud-native-ai/spec-kit'), expect = 5
+args = ('run-checks', 'draw-two-layer-structure', '--json')
+action = 'run-checks', rest = ('draw-two-layer-structure', '--json')
+
+    def _run(root, *args, expect=None):
+        # `--repo-root` goes AFTER the action on purpose. It is declared on a parser shared by
+        # the top level and every subparser, and argparse lets the subparser's own default
+        # overwrite a value the top level already set — so `--repo-root X <action>` silently
+        # resolves to the cwd. Pre-existing in this binary, measured, escalated as research.md
+        # A-9; this feature must not change flag precedence for nine existing actions in passing.
+        action, rest = args[0], args[1:]
+        r = run_engine_in_process(GOAL_UTILS, [action, "--repo-root", str(root), *rest])
+        if expect is not None:
+>           assert r.returncode == expect, (
+                f"{' '.join(args)} -> exit {r.returncode}, expected {expect}\n"
+                f"stdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+            )
+E           AssertionError: run-checks draw-two-layer-structure --json -> exit 0, expected 5
+E             stdout:
+E             {
+E               "team_slug": "draw-two-layer-structure",
+E               "goal_slug": "draw-two-layer-structure",
+E               "identity_kind": "explicit",
+E               "binding": {
+E                 "owner": "human",
+E                 "owner_id": "human",
+E                 "origin": null
+E               },
+E               "resolution": {
+E                 "effective": null,
+E                 "source": "none",
+E                 "declared_focus": null
+E               },
+E               "checks": [
+E                 {
+E                   "id": 1,
+E                   "name": "goal-binding",
+E                   "verdict": "no-goal-definition",
+E                   "message": "绑定 goal 'draw-two-layer-structure' 无定义文件;先经 /speckit.goal migrate 落为定义"
+E                 },
+E                 {
+E                   "id": 2,
+E                   "name": "dangling",
+E                   "verdict": "not-evaluated",
+E                   "message": "无有效 Target 引用,悬空检查无判定主体"
+E                 },
+E                 {
+E                   "id": 3,
+E                   "name": "target-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无有效 Target 引用,终态引用检查无判定主体"
+E                 },
+E                 {
+E                   "id": 4,
+E                   "name": "cross-goal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无有效 Target 引用,跨 goal 检查无判定主体"
+E                 },
+E                 {
+E                   "id": 5,
+E                   "name": "goal-terminal",
+E                   "verdict": "not-evaluated",
+E                   "message": "无 goal 定义可读,goal 终态检查无判定主体"
+E                 }
+E               ],
+E               "verdict": "no-goal-definition",
+E               "blocked": false
+E             }
+E             
+E             stderr:
+E             
+E           assert 0 == 5
+E            +  where 0 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/goal-utils.py', 'run-checks', '--repo-root', '/storage/project/cloud-native-ai/spec-kit', 'draw-two-layer-structure', '--json'] returncode=0>.returncode
+
+tests/contract/test_run_checks.py:154: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_goal_scope_engine.py::test_teams_scope_paths - Attribu...
+FAILED tests/unit/test_goal_scope_engine.py::test_auto_with_team_identity_resolves_the_only_candidate
+FAILED tests/unit/test_goal_scope_engine.py::test_auto_resolves_the_single_non_empty_goal_layer
+FAILED tests/unit/test_goal_utils.py::test_create_writes_the_three_part_structure
+FAILED tests/contract/test_goal_targets_engine.py::test_engine_exists_with_its_mirror
+FAILED tests/contract/test_binding_model.py::test_owner_outside_the_closed_three_values_is_refused
+FAILED tests/contract/test_binding_model.py::test_the_two_owners_cite_each_other_and_restate_no_value_domain
+FAILED tests/contract/test_binding_model.py::test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures
+FAILED tests/contract/test_scope_resolution.py::test_list_global_is_unchanged
+FAILED tests/contract/test_scope_resolution.py::test_goal_write_leaves_the_team_store_byte_identical_and_no_spec_path
+FAILED tests/contract/test_binding_model.py::test_a_terminal_goal_refuses_a_new_team_binding
+FAILED tests/contract/test_scope_resolution.py::test_goal_scope - AssertionEr...
+FAILED tests/contract/test_scope_resolution.py::test_teams_scope - KeyError: ...
+FAILED tests/contract/test_archive_migration.py::test_a_conflict_names_both_candidates_and_never_overwrites
+FAILED tests/contract/test_binding_model.py::test_ownership_is_answered_by_the_read_action_not_by_the_path
+FAILED tests/contract/test_binding_model.py::test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only
+FAILED tests/contract/test_binding_model.py::test_a_bound_goal_is_writable_only_by_human
+FAILED tests/contract/test_binding_model.py::test_origin_naming_a_non_existent_spec_directory_is_refused
+FAILED tests/contract/test_archive_migration.py::test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt
+FAILED tests/contract/test_goal_definition.py::test_definition_lands_at_the_contracted_path
+FAILED tests/contract/test_scope_resolution.py::test_spec_dir_never_decides_the_listing
+FAILED tests/contract/test_binding_model.py::test_rebind_changes_only_the_binding_block
+FAILED tests/contract/test_goal_targets_engine.py::test_add_appends_the_d6_history_line
+FAILED tests/contract/test_binding_model.py::test_owner_id_is_validated_by_shape_and_the_grammar_is_cited_not_restated
+FAILED tests/contract/test_binding_model.py::test_a_hand_edited_binding_block_is_reported_not_trusted
+FAILED tests/contract/test_binding_model.py::test_scope_spec_is_removed_and_no_alias_exists
+FAILED tests/contract/test_binding_model.py::test_a_definition_without_a_complete_binding_is_uninterpretable
+FAILED tests/contract/test_goal_targets_engine.py::test_add_issues_open_target_and_renders_the_section
+FAILED tests/contract/test_archive_migration.py::test_origin_is_set_and_no_lineage_is_rebuilt
+FAILED tests/contract/test_goal_targets_engine.py::test_validate_still_owns_exit_code_4
+FAILED tests/contract/test_goal_targets_engine.py::test_transition_appends_the_d6_history_line
+FAILED tests/contract/test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one
+FAILED tests/contract/test_script_interface_contract.py::test_c26_generator_skill_carries_the_mandate_entry
+FAILED tests/unit/test_goal_scope_engine.py::test_goal_scope_paths - goal_uti...
+FAILED tests/unit/test_goal_scope_engine.py::test_spec_dir_must_live_under_specify_specs
+FAILED tests/contract/test_binding_model.py::test_a_cross_layer_write_is_refused_and_names_both_layers
+FAILED tests/integration/test_goal_migration_path.py::test_migration_preserves_the_resolved_objective
+FAILED tests/contract/test_goal_targets_engine.py::test_add_sequence_is_monotone_and_terminal_not_reused
+FAILED tests/contract/test_goal_targets_engine.py::test_illegal_transition_is_rejected_exit_2
+FAILED tests/contract/test_goal_targets_engine.py::test_set_without_id_is_an_input_error
+FAILED tests/contract/test_run_checks.py::test_c6_resolution_is_reported_with_all_three_subkeys
+FAILED tests/contract/test_goal_targets_engine.py::test_unknown_id_is_not_found_exit_3
+FAILED tests/contract/test_goal_targets_engine.py::test_terminal_goal_is_read_only_for_set
+FAILED tests/contract/test_goal_targets_engine.py::test_noop_set_returns_zero_and_writes_no_history
+FAILED tests/contract/test_goal_targets_engine.py::test_id_without_set_is_an_input_error
+FAILED tests/contract/test_goal_targets_engine.py::test_terminal_goal_is_read_only_for_add
+FAILED tests/integration/test_archive_migration_real_data.py::test_every_source_tree_stays_readable_after_migration
+FAILED tests/contract/test_run_checks.py::test_c7_without_a_target_two_three_four_are_not_evaluated_and_one_five_still_are
+FAILED tests/contract/test_run_checks.py::test_c18_the_three_tiers_are_mutually_distinguishable
+FAILED tests/contract/test_run_checks.py::test_c16_one_check_raising_leaves_the_other_four_reported
+FAILED tests/contract/test_run_checks.py::test_c20_the_existing_zero_and_two_branches_still_hold
+FAILED tests/contract/test_run_checks.py::test_c13_a_short_circuited_check_is_not_evaluated_never_ok
+FAILED tests/contract/test_script_interface_contract.py::test_c33_no_mirror_is_hand_edited_and_c38_each_carries_one_marker
+FAILED tests/contract/test_script_interface_contract.py::test_c35_the_check_asserts_the_projection_and_names_its_kind
+FAILED tests/contract/test_run_checks.py::test_the_composed_verdict_agrees_with_preview_target_check
+FAILED tests/contract/test_run_checks.py::test_the_real_bound_team_reports_the_measured_state
+56 failed, 293 passed, 1 skipped in 9.34s

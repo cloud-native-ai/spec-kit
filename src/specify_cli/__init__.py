@@ -3363,15 +3363,17 @@ def migrate_is_destructive(item) -> bool:
 
 
 # E-9: a constant, non-probed pointer. goal/team archive migration stays owned
-# by /speckit.goal `migrate-archive`; this command never detects or disposes it.
+# by /speckit.anchor `migrate-archive`; this command never detects or disposes it.
 MIGRATE_STATIC_POINTERS = (
     {
         "topic": "goal-team-archive-migration",
-        "ownerCommand": "/speckit.goal",
+        "ownerCommand": "/speckit.anchor",
         "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
         "note": (
-            "goal/team archive migration is owned by /speckit.goal "
-            "(migrate-archive); specify migrate neither detects nor disposes it"
+            "goal/team archive migration is owned by /speckit.anchor "
+            "(migrate-archive); specify migrate neither detects nor disposes it. "
+            "/speckit.goal serves action-level, step-shaped guidance only and "
+            "carries no migrate-archive mode"
         ),
     },
 )
@@ -4449,7 +4451,7 @@ def _migrate_emit(plan, outcome, exit_code, receipt, receipt_path, output_format
     if plan.pointers:
         text += (
             "pointer: goal/team archive migration stays with "
-            "/speckit.goal migrate-archive\n"
+            "/speckit.anchor migrate-archive\n"
         )
     if outcome == "planned":
         text += (
@@ -5249,8 +5251,8 @@ def init(
         highlight=False,
     )
     console.print(
-        "  Optional: /speckit.agents /speckit.analyze /speckit.checklist /speckit.clarify "
-        "/speckit.derive /speckit.docs /speckit.feedback /speckit.goal "
+        "  Optional: /speckit.agents /speckit.analyze /speckit.anchor /speckit.checklist "
+        "/speckit.clarify /speckit.derive /speckit.docs /speckit.feedback /speckit.goal "
         "/speckit.history /speckit.instructions /speckit.interview "
         "/speckit.research /speckit.review /speckit.sanitize /speckit.session "
         "/speckit.skills /speckit.team /speckit.todo /speckit.tools",

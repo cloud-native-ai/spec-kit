@@ -6,13 +6,13 @@
 
 The physical inventory (`mechanism-inventory.py`) answers "are the mechanism
 directories installed". This one answers the complement: "is the project's
-logical framework configured" — instructions, goals, features, docs, plus the
+logical framework configured" — instructions, anchors, features, docs, plus the
 conditional layers (teams, agents) and the advisory knowledge assets.
 
 Three readiness tiers (absence is not automatically a defect):
 
   required      instructions.md, features registry + detail files, docs tree
-  recommended   goals, glossary, register, knowledge
+  recommended   anchors, glossary, register, knowledge
   conditional   teams, agent instances/templates (not-configured is legitimate)
 
 Exit codes: 0 required tier ok; 1 a required gap; 2 usage/parse error.
@@ -116,13 +116,17 @@ def check_docs(project: Path):
 
 
 def check_goals(project: Path):
-    goals = project / ".specify" / "goal"
-    if not goals.is_dir():
-        return {"status": GAP, "detail": "no .specify/goal/ definitions"}
-    defined = sorted(p.parent.name for p in goals.glob("*/goal.md"))
+    # FR-058 — the Anchor archive is the definition store; the retired singular
+    # `.specify/goal/` path is not a delivery surface. `goal.md` stays readable as the
+    # un-migrated fallback: FR-029 resolves the filename per layer, never assumes it.
+    anchors = project / ".specify" / "anchoring"
+    if not anchors.is_dir():
+        return {"status": GAP, "detail": "no .specify/anchoring/ definitions"}
+    defined = sorted({p.parent.name for name in ("anchor.md", "goal.md")
+                      for p in anchors.glob(f"*/{name}")})
     if not defined:
-        return {"status": GAP, "detail": "goal/ exists but no */goal.md"}
-    note = f"{len(defined)} goals"
+        return {"status": GAP, "detail": "anchoring/ exists but no */anchor.md"}
+    note = f"{len(defined)} anchors"
     if len(defined) < 3:
         note += " (recommended range 3-5)"
     return {"status": OK, "detail": note + ": " + ", ".join(defined)}
@@ -163,7 +167,7 @@ def build_report(project: Path, strict: bool):
         "instructions": dict(check_instructions(project), tier=REQUIRED),
         "features": dict(check_features(project), tier=REQUIRED),
         "docs": dict(check_docs(project), tier=REQUIRED),
-        "goals": dict(check_goals(project), tier=RECOMMENDED),
+        "anchors": dict(check_goals(project), tier=RECOMMENDED),
     }
     for key, value in check_advisory(project).items():
         checks[key] = dict(value, tier=RECOMMENDED)

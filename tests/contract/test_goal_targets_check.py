@@ -61,7 +61,7 @@ def _run(*argv) -> int:
 
 
 def _goal_path(repo) -> Path:
-    return repo / ".specify/anchoring/sliced-goal/goal.md"
+    return repo / ".specify/anchoring/sliced-goal/anchor.md"
 
 
 VALID = "评测引擎的会话取证链路拆分完成"
@@ -142,10 +142,10 @@ def test_terminal_goal_is_exit_4(terminal_repo):
     """Contract §C-1: the goal-state rejection is EXIT_INVALID (4), distinct
     from statement rejections (2) — a proposal has nowhere to land on a
     terminal goal."""
-    before = (terminal_repo / ".specify/anchoring/done-goal/goal.md").read_bytes()
+    before = (terminal_repo / ".specify/anchoring/done-goal/anchor.md").read_bytes()
     assert _run("targets", "done-goal", "--check", VALID,
                 "--repo-root", str(terminal_repo)) == 4
-    assert (terminal_repo / ".specify/anchoring/done-goal/goal.md").read_bytes() == before
+    assert (terminal_repo / ".specify/anchoring/done-goal/anchor.md").read_bytes() == before
 
 
 # --------------------------------------------------------------------------

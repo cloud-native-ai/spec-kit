@@ -110,7 +110,7 @@ def test_create_writes_the_three_part_structure(tmp_path):
         tmp_path, "demo-goal", "Reach a stable release.", ["All suites green.", "Docs current."]
     )
     text = path.read_text(encoding="utf-8")
-    assert path == tmp_path / ".specify/anchoring/demo-goal/goal.md"
+    assert path == tmp_path / ".specify/anchoring/demo-goal/anchor.md"
     assert "status: active" in text
     assert "## Objective" in text
     assert "## Success Criteria" in text
@@ -193,11 +193,11 @@ def test_criteria_change_preserves_the_prior_value(tmp_path):
 
 
 def test_validate_flags_a_missing_criteria_section(tmp_path):
-    path = tmp_path / ".specify/anchoring/broken/goal.md"
+    path = tmp_path / ".specify/anchoring/broken/anchor.md"
     path.parent.mkdir(parents=True)
     path.write_text(
         "---\nstatus: active\ncreated: 2026-08-05\nupdated: 2026-08-05\n---\n\n"
-        "# Goal: broken\n\n## Objective\n\nAn outcome.\n\n## History\n\n- 2026-08-05 — created.\n",
+        "# Anchor: broken\n\n## Objective\n\nAn outcome.\n\n## History\n\n- 2026-08-05 — created.\n",
         encoding="utf-8",
     )
     ok, problems = goal_utils.validate_goal(path)
@@ -472,7 +472,7 @@ def test_title_defaults_to_the_slug_and_round_trips(tmp_path):
     plain = goal_utils.create_goal(tmp_path, "plain", "An outcome.", [])
     assert goal_utils.parse_goal(plain)["title"] == "plain"
     titled = goal_utils.create_goal(tmp_path, "titled", "An outcome.", [], title="可读标题")
-    assert "# Goal: 可读标题" in titled.read_text(encoding="utf-8")
+    assert "# Anchor: 可读标题" in titled.read_text(encoding="utf-8")
     data = goal_utils.parse_goal(titled)
     assert data["title"] == "可读标题"
     assert data["slug"] == "titled", "identity stays the directory name"

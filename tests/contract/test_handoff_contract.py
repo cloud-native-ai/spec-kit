@@ -135,7 +135,7 @@ def _binding_block(owner: str, owner_id: str, origin: str = "null") -> str:
 
 
 def _seed_goal(root: Path, slug: str, *, handoff_ref: str | None = None) -> Path:
-    path = root / ".specify/anchoring" / slug / "goal.md"
+    path = root / ".specify/anchoring" / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     ref_line = f"handoff_ref: {handoff_ref}\n" if handoff_ref else ""
     path.write_text(
@@ -146,7 +146,7 @@ def _seed_goal(root: Path, slug: str, *, handoff_ref: str | None = None) -> Path
         f"{_binding_block('human', 'human')}"
         f"{ref_line}"
         "---\n\n"
-        f"# Goal: {slug}\n\n"
+        f"# Anchor: {slug}\n\n"
         "## Objective\n\nHold the fixture goal still while the contract cites it.\n\n"
         "## Success Criteria\n\n1. The contract resolves.\n",
         encoding="utf-8")
@@ -197,7 +197,7 @@ def test_the_three_way_keys_resolve_in_both_directions(sandbox):
 
     front = _frontmatter(handoff.read_text(encoding="utf-8"))
     # Forward direction: the contract names both definitions; each key resolves (C-58).
-    resolved_goal = sandbox / ".specify/anchoring" / front["goal_slug"] / "goal.md"
+    resolved_goal = sandbox / ".specify/anchoring" / front["goal_slug"] / "anchor.md"
     resolved_team = sandbox / ".specify/teams" / front["team_slug"] / "team.md"
     assert resolved_goal.is_file(), (
         f"goal_slug {front['goal_slug']!r} does not resolve under .specify/anchoring/")
@@ -321,7 +321,7 @@ def test_a_dangling_handoff_key_is_refused_at_creation(sandbox):
     # Once both keys resolve, the reverse handoff_ref lands on both definitions and
     # every other byte of each file stays identical (C-6's discipline applied to C-59).
     team_path = _seed_team(sandbox, TEAM_SLUG, goal_slug=GOAL_SLUG)
-    goal_path = sandbox / ".specify/anchoring" / GOAL_SLUG / "goal.md"
+    goal_path = sandbox / ".specify/anchoring" / GOAL_SLUG / "anchor.md"
     before = {goal_path: goal_path.read_text(encoding="utf-8").splitlines(),
               team_path: team_path.read_text(encoding="utf-8").splitlines()}
 

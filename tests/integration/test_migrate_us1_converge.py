@@ -94,7 +94,7 @@ def _assert_static_pointer(payload):
     matches = [p for p in pointers if p.get("topic") == POINTER_TOPIC]
     assert matches, f"E-9 static pointer missing: {pointers!r}"
     pointer = matches[0]
-    assert pointer["ownerCommand"] == "/speckit.goal"
+    assert pointer["ownerCommand"] == "/speckit.anchor"
     assert "migrate-archive" in pointer["ownerEngine"]
     assert pointer.get("note")
 

@@ -1031,9 +1031,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--agent", help="agent definition (.agent.md) carrying the capability")
     parser.add_argument("--team", help="team slug — the first authorization coordinate")
     parser.add_argument("--seat", help="seat slug — the second authorization coordinate")
-    parser.add_argument("--scope", choices=("goal", "teams", "auto"), default="auto",
-                        help="archive layer the team row resolves through: goal, teams, "
-                             "or auto (the single layer containing the team, the default)")
+    parser.add_argument("--scope", choices=("anchor", "goals", "teams", "auto"),
+                        default="auto",
+                        help="archive layer the team row resolves through: the anchor "
+                             "layer, the action-level Goal layer, the team layer, or auto "
+                             "(the single layer containing the team, the default)")
     parser.add_argument("--spec-dir", default=None,
                         help="spec directory used to resolve origin and validate auto "
                              "inputs; it never decides where a definition lands")

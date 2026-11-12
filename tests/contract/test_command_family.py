@@ -77,7 +77,9 @@ def sandbox():
 
 def _seed_bound_goal(root: Path, slug: str = "alpha") -> Path:
     """A definition in the engine-written canonical binding form (post-create state)."""
-    path = root / ".specify/anchoring" / slug / "goal.md"
+    # 101 rename: the Anchor store's definition file is `anchor.md`; the retired
+    # `goal.md` name no longer resolves, so the fixture seeds the post-split form.
+    path = root / ".specify/anchoring" / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "---\n"
@@ -89,7 +91,7 @@ def _seed_bound_goal(root: Path, slug: str = "alpha") -> Path:
         f"  owner_id: {RUN_ID}\n"
         "  origin: null\n"
         "---\n\n"
-        f"# Goal: {slug}\n\n"
+        f"# Anchor: {slug}\n\n"
         "## Objective\n\n"
         "Stand alone while a command run reads it.\n\n"
         "## Success Criteria\n\n"

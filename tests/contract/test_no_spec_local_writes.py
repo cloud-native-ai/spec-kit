@@ -41,6 +41,8 @@ SANCTIONED_ROOTS = {
 EXPECTED_WRITE_ACTIONS = {
     "create", "status", "objective", "criteria", "targets", "migrate", "bind",
     "migrate-archive", "backfill-bindings", "handoff-ref",
+    # Feature 101: the action-level Goal layer and the classified cleanup write actions.
+    "goal-create", "goal-modify", "goal-status", "cleanup",
 }
 
 WRITE_PRIMITIVES = {

@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
-"""Goal definition engine for `/speckit.goal` (requirement 037, Feature 041).
+"""Definition engine for two layers — the Anchor layer and the action-level Goal layer
+(101, FR-032).
 
-The command owns the interaction; this engine owns the deterministic parts —
+The commands own the interaction; this engine owns the deterministic parts —
 identity grammar, the three-part structure, the lifecycle table, change history,
 and anchoring enumeration. Fixed rules belong in a program, not in a model
 (Constitution Principle XII / token-efficiency Program-First).
 
-A Goal is composed of exactly three parts: objective narrative, zero-or-more
-verifiable success criteria, and lifecycle state. Identity is the directory name;
-timestamps are change-traceability metadata, never a fourth part.
+Two layers, one schema, one writer:
+  Anchor layer  `.specify/anchoring/<slug>/anchor.md` — long-horizon project
+                objective; `/speckit.anchor` owns it (create/status/objective/
+                criteria/migrate, and the Targets mechanism).
+  Goal layer    `.specify/goals/<slug>/goal.md` — short-horizon, action-level
+                guidance; `/speckit.goal` owns it (goal-create/goal-list/
+                goal-view/goal-modify/goal-status). No Targets, no team binding.
 
-Concept authority: shared/definitions/goal-definitions.md (read-only).
-File contract:  .specify/specs/037-goal-registry/contracts/goal-definition.contract.md
+Each definition is composed of exactly three parts: an outcome/guidance narrative,
+zero-or-more verifiable criteria, and lifecycle state. Identity is the directory
+name; timestamps are change-traceability metadata, never a fourth part.
+
+Concept authority: shared/definitions/anchor-definitions.md (Anchor layer),
+shared/definitions/goal-definitions.md (action-level Goal layer) — read-only.
+File contract:  .specify/specs/101-anchor-goal-realignment/contracts/goal-engine.contract.md
 
 Actions, grouped by whether they write:
 
@@ -23,6 +33,7 @@ Read group (zero writes):
   run-checks      <team-slug> [--target T-nnn | <goal-slug>.T-nnn]
   binding         <goal|teams> <slug>
   command-family  --command <name>      (094: family verdict from the declared class)
+  command-mode    --command <anchor|goal> --mode <mode>   (101: mode membership, zero writes)
   handoff-decision --tasks <path>       (094: direct | handoff from the declared threshold)
   probe-residual  (094: enumerate the spec-local goal/team residuals)
 
@@ -34,6 +45,14 @@ Write group (mutates one definition file):
   targets   <slug> --add TEXT | --set STATE --id T-nnn
   migrate   <team-slug> [--keep-inline/--drop-inline]
   bind      <goal|teams> <slug> --owner V --owner-id V [--origin V]
+
+Write group (action-level Goal layer, `.specify/goals/`):
+  goal-create <slug> --guidance TEXT --done TEXT ...
+  goal-modify <slug> --guidance TEXT | --done TEXT ... | --clear-done
+  goal-status <slug> --set STATE
+
+Write group (classification-driven cleanup):
+  cleanup   --check | --apply --classification PATH [--guidance PATH]
 
 Write group (094 unified archive; explicit actions, never implicit):
   migrate-archive   --dry-run | --apply   (move spec-local trees, archive-not-delete)
@@ -290,7 +309,9 @@ _SECTION_BOUNDARIES = "## Boundaries"
 _SECTION_HISTORY = "## History"
 _SECTION_TARGETS = "## Targets"
 
-_TITLE_LINE = re.compile(r"^#\s+Goal:\s*(.+?)\s*$", re.M)
+#: Both headings are accepted on read so an un-normalized anchor (or a Goal) still
+#: parses; the layer decides what is written (C-38 A-N-1, C-5).
+_TITLE_LINE = re.compile(r"^#\s+(?:Anchor|Goal):\s*(.+?)\s*$", re.M)
 
 #: Target (038): run-assignable scope slices under a goal. [[STR-002]] three states.
 TARGET_STATES = ("open", "done", "dropped")
@@ -597,7 +618,11 @@ def _validate_binding_values(repo_root: Path, owner: str, owner_id: str,
 
 
 def bound_team_slugs(repo_root: Path, goal_slug: str) -> list[str]:
-    """Every team in the team archive row whose `goal_slug` names this goal (C-14)."""
+    """Every team in the team archive row whose binding names this slug (C-14).
+
+    Reads the transitional key pair: `anchor_slug` is the live field, `goal_slug`
+    the retired one still carried by teams the cleanup has not reached yet.
+    """
     root = Path(repo_root) / TEAM_DIRNAME
     if not root.is_dir():
         return []
@@ -611,7 +636,8 @@ def bound_team_slugs(repo_root: Path, goal_slug: str) -> list[str]:
     rows: list[str] = []
     for slug, path in candidates:
         meta, _start, _end = read_frontmatter_subset(path.read_text(encoding="utf-8"))
-        if str(meta.get("goal_slug") or "").strip() == goal_slug:
+        declared = str(meta.get("anchor_slug") or meta.get("goal_slug") or "").strip()
+        if declared == goal_slug:
             rows.append(slug)
     return rows
 
@@ -844,7 +870,7 @@ def _render(objective: str, criteria: list[str], status: str, created: str,
         frontmatter += "\n".join(binding_lines) + "\n"
     return (
         f"---\n{frontmatter}---\n\n"
-        f"# Goal: {title}\n\n"
+        f"# Anchor: {title}\n\n"
         f"{_SECTION_OBJECTIVE}\n\n{objective.strip()}\n\n"
         f"{_SECTION_CRITERIA}\n\n{body}\n\n"
         f"{boundaries_block}"
@@ -1315,9 +1341,12 @@ def set_target_status(path: Path, tid: str, new_status: str) -> Path:
 
 
 def resolve_team_goal_identity(repo_root: Path, team_slug: str) -> tuple[str | None, str]:
-    """Two-level goal identity resolution (036 §10.1) — explicit `goal_slug`
-    wins, else the team slug when it names an anchored definition. No third
-    level (038 contract §2.1)."""
+    """Two-level identity resolution (036 §10.1) — a declared binding wins, else the
+    team slug when it names an anchored definition. No third level (038 contract §2.1).
+
+    The declared binding is read transition-tolerantly: `anchor_slug` first, then the
+    retired `goal_slug` carried by teams the cleanup has not renamed yet.
+    """
     root = team_root(repo_root)
     team_md = root / "team.md"
     if not team_md.is_file():
@@ -1325,7 +1354,7 @@ def resolve_team_goal_identity(repo_root: Path, team_slug: str) -> tuple[str | N
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
     meta, _ = _split_frontmatter(team_md.read_text(encoding="utf-8"))
-    declared = str(meta.get("goal_slug") or "").strip()
+    declared = str(meta.get("anchor_slug") or meta.get("goal_slug") or "").strip()
     if declared:
         return declared, "explicit"
     if definition_path(repo_root, team_slug).is_file():
@@ -1347,7 +1376,7 @@ def preview_target_check(repo_root: Path, team_slug: str, reference: str) -> dic
     if goal_slug is None:
         return {**base, "verdict": "no-goal-definition",
                 "message": ("Target 依赖 goal 定义——该团队没有绑定的 goal 定义;"
-                            "先经 /speckit.goal migrate 将内联 goal 落为定义")}
+                            "先经 /speckit.anchor migrate 将内联 goal 落为定义")}
 
     qualified = _QUALIFIED_TARGET.match(reference)
     if qualified:
@@ -1367,7 +1396,7 @@ def preview_target_check(repo_root: Path, team_slug: str, reference: str) -> dic
     if not goal_path.is_file():
         return {**base, "verdict": "no-goal-definition",
                 "message": (f"绑定 goal {goal_slug!r} 无定义文件;先经 "
-                            "/speckit.goal migrate 落为定义")}
+                            "/speckit.anchor migrate 落为定义")}
     data = parse_goal(goal_path)
     if data["status"] in TERMINAL_STATES:
         return {**base, "verdict": "goal-terminal",
@@ -1377,13 +1406,13 @@ def preview_target_check(repo_root: Path, team_slug: str, reference: str) -> dic
     if row is None:
         return {**base, "verdict": "dangling",
                 "message": (f"悬空引用 {tid}:goal {goal_slug!r} 无此 Target;"
-                            "先经 /speckit.goal targets --add 添加")}
+                            "先经 /speckit.anchor targets --add 添加")}
     if row["status"] in ("done", "dropped"):
         return {**base, "verdict": "target-terminal", "status": row["status"],
                 "statement": row["statement"],
                 "message": (f"Target {tid} 处于终态 {row['status']!r},run 停止——"
                             "复核二分:属实则返回报告结束;证据不符则经 "
-                            f"/speckit.goal targets --set open --id {tid} 重开后"
+                            f"/speckit.anchor targets --set open --id {tid} 重开后"
                             "重新发起 run。不提供终态执行旁路")}
     return {**base, "verdict": "ok", "status": row["status"],
             "statement": row["statement"], "target_id": tid, "message": ""}
@@ -1433,10 +1462,10 @@ def _goal_binding_check(ctx: dict) -> tuple[str, str]:
     goal_slug, _kind = resolve_team_goal_identity(ctx["repo_root"], ctx["team_slug"])
     if goal_slug is None:
         return "no-goal-definition", (
-            "该团队没有绑定的 goal 定义;先经 /speckit.goal migrate 将内联 goal 落为定义")
+            "该团队没有绑定的 goal 定义;先经 /speckit.anchor migrate 将内联 goal 落为定义")
     if not definition_path(ctx["repo_root"], goal_slug).is_file():
         return "no-goal-definition", (
-            f"绑定 goal {goal_slug!r} 无定义文件;先经 /speckit.goal migrate 落为定义")
+            f"绑定 goal {goal_slug!r} 无定义文件;先经 /speckit.anchor migrate 落为定义")
     return "ok", ""
 
 
@@ -1450,7 +1479,7 @@ def _dangling_check(ctx: dict) -> tuple[str, str]:
     if row is None:
         return "dangling", (
             f"悬空引用 {ctx['tid']}:goal {ctx['goal_slug']!r} 无此 Target;"
-            "先经 /speckit.goal targets --add 添加")
+            "先经 /speckit.anchor targets --add 添加")
     return "ok", ""
 
 
@@ -1466,7 +1495,7 @@ def _target_terminal_check(ctx: dict) -> tuple[str, str]:
     if row["status"] in ("done", "dropped"):
         return "target-terminal", (
             f"Target {ctx['tid']} 处于终态 {row['status']!r},run 停止——复核二分:属实则返回"
-            f"报告结束;证据不符则经 /speckit.goal targets --set open --id {ctx['tid']} 重开后"
+            f"报告结束;证据不符则经 /speckit.anchor targets --set open --id {ctx['tid']} 重开后"
             "重新发起 run。不提供终态执行旁路")
     return "ok", ""
 
@@ -1644,7 +1673,9 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
 
     return {
         "team_slug": team_slug,
-        "goal_slug": goal_slug,
+        # C-26/T017 — the payload names the field of the split: `anchor_slug`, never
+        # the retired `goal_slug`; the internal variable keeps its historical name.
+        "anchor_slug": goal_slug,
         "identity_kind": identity_kind,
         "binding": binding,
         "resolution": {k: resolution.get(k) for k in ("effective", "source", "declared_focus")},
@@ -1655,11 +1686,12 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
 
 
 def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -> tuple[Path, str]:
-    """Derive a goal definition from a team's inline goal and switch it to a reference.
+    """Derive an Anchor definition from a team's inline goal and switch it to a reference.
 
     Per-team and optional (FR-016..FR-019). The inline goal is kept by default —
     removal is the user's choice, never forced. Semantics are preserved: the objective
-    the team resolved before migration is the objective the definition carries after.
+    the team resolved before migration is the objective the Anchor carries after
+    (101 FR-015 — the derived definition is an Anchor, never an action-level Goal).
     """
     team_md = team_root(repo_root) / team_slug / "team.md"
     if not team_md.is_file():
@@ -1667,36 +1699,78 @@ def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -
     text = team_md.read_text(encoding="utf-8")
     fm, body = _split_frontmatter(text)
 
-    inline = str(fm.get("goal") or "").strip()
+    # A folded block scalar (`goal: >`) is the common form; `_split_frontmatter` is a
+    # line reader and would hand back the marker itself, so the engine's own folder
+    # supplies the resolved objective (FR-016 "preserves the resolved objective").
+    inline = _raw_frontmatter_value(text, "goal").strip()
+    if len(inline) >= 2 and inline[0] == inline[-1] and inline[0] in "\"'":
+        inline = inline[1:-1].strip()
     if not inline:
         raise GoalError(f"team {team_slug!r} has no inline goal to migrate")
 
-    # objective = first sentence/line of the inline goal; criteria = 成功标准/success lines
+    # objective = the resolved inline goal; criteria = the 成功标准/success items
     objective = " ".join(inline.split())
     criteria: list[str] = []
     goal_body = _section(body, "## Goal")
+    collecting = False
     for line in goal_body.splitlines():
         stripped = re.sub(r"^\s*(?:\d+[.)]|[-*+])\s*", "", line).strip()
-        if stripped and re.search(r"成功标准|success crit|criteri|判据|阈值|threshold", stripped, re.I):
+        if not stripped:
+            collecting = False
+            continue
+        named = re.search(r"成功标准|success crit|criteri|判据|阈值|threshold",
+                          stripped, re.I)
+        if named:
+            # A colon-terminated line is a label that introduces the items; recording
+            # the label itself would carry a heading into the definition's criteria.
+            collecting = stripped.endswith(("：", ":"))
+            if not collecting:
+                criteria.append(stripped)
+            continue
+        if collecting:
+            if stripped.startswith(("**", "#", "|")):
+                collecting = False
+                continue
             criteria.append(stripped)
 
-    identity = str(fm.get("goal_slug") or team_slug)
-    if definition_path(repo_root, identity).exists():
-        raise GoalError(
-            f"a definition for {identity!r} already exists; migration would overwrite it — "
-            "resolve manually via the modify path"
-        )
-    created = create_goal(repo_root, identity, objective, criteria)
+    identity = str(fm.get("anchor_slug") or fm.get("goal_slug") or team_slug)
+    target = definition_path(repo_root, identity)
+    if target.exists():
+        # T019 / FR-045 — an existing definition is compared by concept payload. An
+        # equivalent payload means the team merely lacks the reference; a non-equivalent
+        # one stops with both candidates named and writes nothing (never overwrite,
+        # never pick a winner, never fall back to a suffix).
+        existing = _goal_concept_payload(target)
+        derived = {"objective": objective,
+                   "criteria": [" ".join(c.split()) for c in criteria],
+                   "status": "active",
+                   "targets": []}
+        if existing != derived:
+            raise GoalInvalid(
+                f"conflict: migration of team {team_slug!r} derives anchor {identity!r}, "
+                f"but {target} already exists with a non-equivalent concept payload — "
+                f"candidate A: {target} (objective {existing['objective']!r}, "
+                f"{len(existing['criteria'])} criteria, status {existing['status']!r}); "
+                f"candidate B: {team_md} (derived objective {objective!r}, "
+                f"{len(criteria)} criteria). Both candidates are named; nothing is "
+                "overwritten and neither is chosen — resolve manually."
+            )
+        created = target
+    else:
+        created = create_goal(repo_root, identity, objective, criteria)
 
-    # set goal_slug on the team, preserving the rest of the file verbatim
-    if "goal_slug:" in text:
-        new_text = re.sub(r"(?m)^goal_slug:.*$", f"goal_slug: {identity}", text)
+    # T019 — the team field is `anchor_slug`; a legacy `goal_slug` line is renamed in
+    # place so the team carries exactly one reference key, never both.
+    if "anchor_slug:" in text:
+        new_text = re.sub(r"(?m)^anchor_slug:.*$", f"anchor_slug: {identity}", text)
+    elif "goal_slug:" in text:
+        new_text = re.sub(r"(?m)^goal_slug:.*$", f"anchor_slug: {identity}", text)
     else:
         # insert right after the `goal:` line (or its folded block's first line)
-        new_text = re.sub(r"(?m)^(goal:.*\n(?:\s+.*\n)*)", r"\1" + f"goal_slug: {identity}\n",
-                          text, count=1)
-        if "goal_slug:" not in new_text:  # no goal line matched; append to frontmatter
-            new_text = text.replace("---\n", f"---\ngoal_slug: {identity}\n", 1)
+        new_text = re.sub(r"(?m)^(goal:.*\n(?:\s+.*\n)*)",
+                          r"\1" + f"anchor_slug: {identity}\n", text, count=1)
+        if "anchor_slug:" not in new_text:  # no goal line matched; append to frontmatter
+            new_text = text.replace("---\n", f"---\nanchor_slug: {identity}\n", 1)
     if not keep_inline:
         # the caller explicitly opted to drop the inline copy
         new_text = re.sub(r"(?m)^goal:.*(?:\n\s+.*)*\n", "", new_text, count=1)
@@ -2526,6 +2600,11 @@ CLEANUP_DONE_RESULTS = {"migrate": "already-migrated", "archive": "already-archi
 TEAM_DISPOSITIONS = ("R1", "R2", "R3")
 TEAM_DISPOSITION_STATES = ("apply", "already-satisfied")
 DISPOSITION_RECEIPT_NAME = "disposition-receipt.json"
+DISPOSITION_RECEIPT_SCHEMA = "101-disposition-receipt/v1"
+BINDING_RENAME_RECEIPT_NAME = "binding-rename-receipt.json"
+BINDING_RENAME_RECEIPT_SCHEMA = "101-binding-rename-receipt/v1"
+#: C-45 — the one frontmatter line a structural rename touches.
+_TEAM_BINDING_KEYS = ("goal_slug", "anchor_slug")
 
 #: C-42 phases. `READ`/`PROJECT` leave nothing on disk; the three that do are the seam.
 CLEANUP_PHASES = ("read", "project", "write-target", "write-receipt", "remove-source")
@@ -2541,6 +2620,22 @@ _RETIRED_COMMAND = re.compile(r"/speckit\.goal\b")
 #: C-38 field mapping: exactly the two section renames, nothing else.
 _GOAL_HEADING_MAP = {"## Objective": "## Guidance",
                      "## Success Criteria": "## Completion Conditions"}
+
+#: C-46 N-2…N-4 — a retired `.specify/goal/<slug>/` reference in a team body.
+#: `.specify/goals/` (plural) never matches, and the tail selects the rule id.
+_TEAM_GOAL_PATH = re.compile(
+    r"\.specify/goal/(?P<slug>[A-Za-z0-9_.-]+)/(?P<tail>goal\.md|summary/|\*\*)")
+_TEAM_TAIL_RULES = {"goal.md": "N-2", "summary/": "N-3", "**": "N-4"}
+#: C-46 — the destination root per classification class, and whether the file name
+#: moves with it (`anchor.md` only where the destination is the Anchor store).
+_TEAM_LAYER_TARGETS = {"anchor": (".specify/anchoring", True),
+                       "action-goal": (".specify/goals", False),
+                       "obsolete": (".specify/archive/anchoring", False)}
+_RETIRED_TEAM_FIELD = re.compile(r"\bgoal_slug\b")
+#: C-46 N-7 — longest alternative first, or `migrate` would match inside
+#: `migrate-archive` and leave `-archive` behind.
+_TEAM_MODE_HINT = re.compile(
+    r"/speckit\.goal\s+(?P<mode>targets|migrate-archive|migrate|coordinate)\b")
 
 
 class _CleanupInterrupted(Exception):
@@ -2655,7 +2750,13 @@ def _classification_problems(repo_root: Path, data: dict) -> list[str]:
         if not isinstance(entry.get("summary"), bool):
             problems.append(f"{where}.summary must be a boolean")
     live = _live_anchor_slugs(repo_root)
-    missing = sorted(live - seen)
+    # C-47 R2 — the Anchor an R2 disposition creates is accounted for by that row,
+    # not by an entry. C-31's single-writer invariant is what makes existence at the
+    # R2 bound slug a sufficient account: only this engine writes the Anchor store.
+    r2_created = {str(row.get("bound_slug") or "")
+                  for row in (data.get("teams") or [])
+                  if isinstance(row, dict) and row.get("disposition") == "R2"}
+    missing = sorted(live - seen - r2_created)
     gone = sorted(seen - live)
     # C-41 — an entry that already moved is absent from the anchor store BY CONTRACT;
     # it is accounted for by its target + receipt, which is what keeps a second run
@@ -2906,19 +3007,25 @@ def _plan_anchor_entry(repo_root: Path, entry: dict, paths: dict) -> dict:
     _mapped, records = _map_anchor_body(
         body, first_line=text[:len(text) - len(body)].count("\n") + 1,
         path=_relative(repo_root, target))
+    # C-48 — an Anchor's derived tree is neither moved nor hand-edited here; the
+    # summary flow regenerates it, and the check output says so.
+    summary_marker = ("regenerate"
+                      if (paths["source_dir"] / SUMMARY_DIRNAME).is_dir()
+                      or (target.parent / SUMMARY_DIRNAME).is_dir()
+                      else "absent")
     receipt = _read_json_file(paths["receipt"])
     if target.is_file():
         after = migration_digest(text, mapping="anchor")
         if receipt is None:
             if records:
                 return {"kind": "anchor", "slug": slug, "action": "normalize",
-                        "result": "normalize",
+                        "result": "normalize", "summary": summary_marker,
                         "source_path": _relative(repo_root, source),
                         "target_path": _relative(repo_root, target),
                         "note": "receipt absent; the normalization resumes",
                         "_paths": paths}
             return {"kind": "anchor", "slug": slug, "action": "noop",
-                    "result": "already-normalized",
+                    "result": "already-normalized", "summary": summary_marker,
                     "source_path": _relative(repo_root, source),
                     "target_path": _relative(repo_root, target), "_paths": paths}
         recorded = receipt.get("concept_digest_after_normalization")
@@ -2928,12 +3035,13 @@ def _plan_anchor_entry(repo_root: Path, entry: dict, paths: dict) -> dict:
                 f"{_relative(repo_root, paths['receipt'])} (recorded digest {recorded}, "
                 f"measured {after}); the file is not rewritten")
         return {"kind": "anchor", "slug": slug, "action": "noop",
-                "result": "already-normalized",
+                "result": "already-normalized", "summary": summary_marker,
                 "source_path": _relative(repo_root, source),
                 "target_path": _relative(repo_root, target), "_paths": paths}
     return {"kind": "anchor", "slug": slug,
             "action": "rename+normalize" if records else "rename",
             "result": "rename+normalize" if records else "rename",
+            "summary": summary_marker,
             "source_path": _relative(repo_root, source),
             "target_path": _relative(repo_root, target), "_paths": paths,
             "_records": records}
@@ -3035,6 +3143,394 @@ def _plan_cleanup_entry(repo_root: Path, entry: dict) -> dict:
                                 mapping="action-goal", move_summary=True)
     return _plan_move_entry(repo_root, entry, paths, action="archive",
                             mapping="obsolete", move_summary=False)
+
+
+# ---- C-45…C-47: team steps --------------------------------------------------
+
+def _team_definition(repo_root: Path, team_slug: str) -> Path:
+    return team_root(repo_root) / team_slug / "team.md"
+
+
+def _frontmatter_key_line(text: str, key: str) -> int | None:
+    """The 1-based line number of the first top-level `key:` line, or None."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    for index in range(1, len(lines)):
+        if lines[index].strip() == "---":
+            return None
+        if lines[index].startswith(key + ":"):
+            return index + 1
+    return None
+
+
+def _class_for_slug(classes: dict, slug: str, where: str) -> str:
+    layer = classes.get(slug)
+    if layer is None:
+        raise GoalInvalid(
+            f"conflict: {where} names {slug!r} under its retired `.specify/goal/` "
+            "address, but no classification entry classifies that slug; the line cannot "
+            "be mapped to a layer, so nothing is written")
+    return layer
+
+
+def _map_team_line(line: str, classes: dict, *, path: str = "") -> tuple[str, list[str]]:
+    """Apply C-46 N-1…N-7 to ONE team body line; returns (new line, rules that fired)."""
+    rules: list[str] = []
+    new = line
+    if _RETIRED_TEAM_FIELD.search(new):
+        new = _RETIRED_TEAM_FIELD.sub("anchor_slug", new)
+        rules.append("N-1")
+    while True:
+        match = _TEAM_GOAL_PATH.search(new)
+        if not match:
+            break
+        slug, tail = match.group("slug"), match.group("tail")
+        root, renames = _TEAM_LAYER_TARGETS[
+            _class_for_slug(classes, slug, path or "a team body")]
+        new_tail = "anchor.md" if renames and tail == "goal.md" else tail
+        new = new[:match.start()] + f"{root}/{slug}/{new_tail}" + new[match.end():]
+        rules.append(_TEAM_TAIL_RULES[tail])
+    if _RETIRED_GOAL_PATH.search(new):
+        # N-5 — a retired root with no slug; `.specify/goals/` stays untouched.
+        new = _RETIRED_GOAL_PATH.sub(".specify/anchoring", new)
+        rules.append("N-5")
+    # N-6 and N-7 are order-free: both are decided on the pre-rewrite text and the
+    # line receives the command rewrite once.
+    n6 = bool(_RETIRED_COMMAND.search(new)) and (bool(rules) or "goal.md" in new)
+    n7 = bool(_TEAM_MODE_HINT.search(new))
+    if n6 or n7:
+        new = _RETIRED_COMMAND.sub("/speckit.anchor", new)
+        if n6:
+            rules.append("N-6")
+        if n7:
+            rules.append("N-7")
+    return new, rules
+
+
+def _map_team_body(body: str, *, first_line: int = 1, path: str = "",
+                   classes: dict) -> tuple[str, list[dict]]:
+    out: list[str] = []
+    records: list[dict] = []
+    for offset, line in enumerate(body.splitlines(keepends=True)):
+        new, rules = _map_team_line(line, classes, path=path)
+        if new != line:
+            records.append({"path": path, "line": first_line + offset,
+                            "rule": "+".join(rules),
+                            "before": line.rstrip("\n"), "after": new.rstrip("\n")})
+        out.append(new)
+    return "".join(out), records
+
+
+def _team_cleanup_scope(repo_root: Path, data: dict) -> list[tuple[str, str]]:
+    """(team_slug, bound_slug) for every team this cleanup touches, in slug order.
+
+    A team that carries neither a binding nor a classification row is never touched
+    (C-45: the 4 unbound teams stay byte-identical). A classified team keeps its row
+    after R3 removed the binding, so a second run still reports it.
+    """
+    live = _team_binding_slugs(Path(repo_root))
+    classified = {row["slug"]: row for row in data.get("teams") or []
+                  if isinstance(row, dict)}
+    rows: list[tuple[str, str]] = []
+    for team_slug in sorted(set(live) | set(classified)):
+        bound = live.get(team_slug)
+        if bound is None and team_slug in classified:
+            bound = str(classified[team_slug].get("bound_slug") or "")
+        if bound is None:
+            continue
+        rows.append((team_slug, bound))
+    return rows
+
+
+def _set_frontmatter_scalar(text: str, key: str, value: str) -> tuple[str, bool]:
+    """Set one top-level frontmatter scalar in place; a missing key lands after `slug:`."""
+    line_no = _frontmatter_key_line(text, key)
+    lines = text.splitlines(keepends=True)
+    if line_no is not None:
+        old = lines[line_no - 1]
+        ending = "\n" if old.endswith("\n") else ""
+        new = f"{key}: {value}{ending}"
+        if old == new:
+            return text, False
+        lines[line_no - 1] = new
+        return "".join(lines), True
+    anchor_line = _frontmatter_key_line(text, "slug") or 1
+    ending = "\n" if lines[anchor_line - 1].endswith("\n") else "\n"
+    lines.insert(anchor_line, f"{key}: {value}{ending}")
+    return "".join(lines), True
+
+
+def _remove_binding_line(text: str) -> tuple[str, int | None]:
+    """Remove the single frontmatter binding line, whichever key it still carries."""
+    for key in _TEAM_BINDING_KEYS:
+        line_no = _frontmatter_key_line(text, key)
+        if line_no is None:
+            continue
+        lines = text.splitlines(keepends=True)
+        del lines[line_no - 1]
+        return "".join(lines), line_no
+    return text, None
+
+
+def _plan_team_step(repo_root: Path, team_slug: str, bound: str, classes: dict) -> dict:
+    """C-45 / C-46 — the structural rename and the body normalization for one team."""
+    path = _team_definition(repo_root, team_slug)
+    if not path.is_file():
+        raise GoalNotFound(f"source-missing: {_relative(repo_root, path)} is absent")
+    text = path.read_text(encoding="utf-8")
+    front, body = _frontmatter_span(text)
+    if not front:
+        raise GoalInvalid(f"invalid-state: {_relative(repo_root, path)} has no "
+                          "frontmatter block, so the binding cannot be addressed")
+    rel_path = _relative(repo_root, path)
+    rename_line = _frontmatter_key_line(text, "goal_slug")
+    rename = None
+    new_text = text
+    if rename_line is not None:
+        old = front.splitlines(keepends=True)[rename_line - 1]
+        after = re.sub(r"^goal_slug:", "anchor_slug:", old, count=1)
+        rename = {"path": rel_path, "line": rename_line, "rule": "C-45",
+                  "before": old.rstrip("\n"), "after": after.rstrip("\n")}
+        new_text = text.replace(old, after, 1)
+    mapped_body, body_records = _map_team_body(
+        body, first_line=front.count("\n") + 1, path=rel_path, classes=classes)
+    if body_records:
+        new_text = new_text[:len(new_text) - len(body)] + mapped_body
+    records = ([rename] if rename else []) + body_records
+    if rename and body_records:
+        result = "rename+normalize"
+    elif rename:
+        result = "rename"
+    elif body_records:
+        result = "normalize"
+    else:
+        result = "already-normalized"
+    receipt_path = path.parent / BINDING_RENAME_RECEIPT_NAME
+    return {
+        "kind": "team", "slug": team_slug, "bound_slug": bound, "result": result,
+        "rename": rename, "normalized_lines": len(body_records),
+        "receipt_path": _relative(repo_root, receipt_path),
+        "_path": path, "_text": text, "_new_text": new_text, "_records": records,
+        "_receipt": receipt_path,
+    }
+
+
+def _apply_team_step(repo_root: Path, row: dict) -> None:
+    """Write the renamed/normalized definition and its per-line receipt (idempotent)."""
+    if not row["_records"]:
+        return
+    existing = _read_json_file(row["_receipt"])
+    if existing is not None and existing.get("lines") != row["_records"]:
+        raise GoalInvalid(
+            f"conflict: {row['_path']} does not match its receipt "
+            f"{row['receipt_path']} (the recorded line set differs from the one measured "
+            "now); the definition is not rewritten")
+    _atomic_write_text(row["_path"], row["_new_text"])
+    if existing is None:
+        _write_json(row["_receipt"], {
+            "schema": BINDING_RENAME_RECEIPT_SCHEMA,
+            "team_slug": row["slug"],
+            "bound_slug": row["bound_slug"],
+            "engine": _engine_identity(),
+            "timestamp": _utc_now(),
+            "lines": row["_records"],
+        })
+
+
+def _plan_disposition(repo_root: Path, team_slug: str, bound: str, row: dict) -> dict:
+    """C-47 — the projected post-state of one team disposition (P7's decision)."""
+    rule = row["disposition"]
+    path = _team_definition(repo_root, team_slug)
+    if not path.is_file():
+        raise GoalNotFound(f"source-missing: {_relative(repo_root, path)} is absent")
+    text = path.read_text(encoding="utf-8")
+    binding_present = any(_frontmatter_key_line(text, key) is not None
+                          for key in _TEAM_BINDING_KEYS)
+    meta, _start, _end = read_frontmatter_subset(text)
+    archived = str(meta.get("lifecycle_state") or "").strip() == "archived"
+    anchor = definition_path(repo_root, bound)
+    acted: list[str] = []
+    if rule == "R1":
+        # No team qualifies in this feature; the rule still refuses a repoint onto a
+        # definition that does not exist rather than recording a false claim.
+        if not anchor.is_file():
+            raise GoalInvalid(
+                f"conflict: R1 for team {team_slug!r} names {bound!r} but no Anchor "
+                f"exists at {_relative(repo_root, anchor)}")
+        needed = False
+    elif rule == "R2":
+        needed = not anchor.is_file()
+        if needed:
+            acted.append("Anchor created")
+    else:
+        needed = not archived or binding_present
+        if not archived:
+            acted.append("lifecycle_state: archived")
+        if binding_present:
+            acted.append("binding line removed")
+    receipt_path = path.parent / DISPOSITION_RECEIPT_NAME
+    if not receipt_path.is_file():
+        needed = True
+    return {"team_slug": team_slug, "bound_slug": bound, "rule": rule,
+            "state": "apply" if needed else "already-satisfied",
+            "reason": " ".join(str(row.get("reason") or "").split()),
+            "acted": acted, "receipt_path": _relative(repo_root, receipt_path),
+            "_path": path, "_receipt": receipt_path}
+
+
+def _apply_disposition(repo_root: Path, row: dict) -> None:
+    """Write the disposition's terminal state, then its receipt (never the reverse).
+
+    R2's Anchor was created by P3 before this phase runs; here only the receipt lands.
+    """
+    path = row["_path"]
+    text = path.read_text(encoding="utf-8")
+    acted = list(row["acted"])
+    if row["rule"] == "R3":
+        meta, _start, _end = read_frontmatter_subset(text)
+        if str(meta.get("lifecycle_state") or "").strip() != "archived":
+            text, changed = _set_frontmatter_scalar(text, "lifecycle_state", "archived")
+            if changed and "lifecycle_state: archived" not in acted:
+                acted.append("lifecycle_state: archived")
+        text, removed = _remove_binding_line(text)
+        if removed is not None and "binding line removed" not in acted:
+            acted.append("binding line removed")
+        if text != path.read_text(encoding="utf-8"):
+            _atomic_write_text(path, text)
+    if not row["_receipt"].is_file():
+        _write_json(row["_receipt"], {
+            "schema": DISPOSITION_RECEIPT_SCHEMA,
+            "team_slug": row["team_slug"],
+            "bound_slug": row["bound_slug"],
+            "disposition": row["rule"],
+            "state": "apply",
+            "reason": row["reason"],
+            "acted": acted,
+            "timestamp": _utc_now(),
+            "engine": _engine_identity(),
+        })
+
+
+# ---- C-44 P8: self-checks (whole run) ---------------------------------------
+
+def _exists_after(path: Path, removed: set, created: set) -> bool:
+    """Path existence in the projected post-state (a removed ancestor removes children)."""
+    if path in created:
+        return True
+    for candidate in (path, *path.parents):
+        if candidate in removed:
+            return False
+    return path.exists()
+
+
+def _cleanup_projection(repo_root: Path, decisions: list[dict], team_rows: list[dict],
+                        dispositions: list[dict]) -> tuple[set, set]:
+    """The paths the plan removes and creates, so `--check` judges the post-state."""
+    removed: set = set()
+    created: set = set()
+    for row in decisions:
+        paths = row.get("_paths") or {}
+        action = row.get("action")
+        if action in ("migrate", "archive", "resume-receipt", "resume-remove"):
+            removed.add(paths["source"])
+            removed.add(paths["source_dir"])
+            created.add(paths["target"])
+            created.add(paths["receipt"])
+            if row.get("_move_summary"):
+                source_summary = paths["source_dir"] / SUMMARY_DIRNAME
+                if source_summary.is_dir():
+                    removed.add(source_summary)
+                    created.add(paths["target"].parent / SUMMARY_DIRNAME)
+        elif action in ("rename", "rename+normalize"):
+            removed.add(paths["source"])
+            created.add(paths["target"])
+            if action == "rename+normalize":
+                created.add(paths["receipt"])
+        elif action == "normalize":
+            created.add(paths["receipt"])
+    for row in team_rows:
+        if row["_records"]:
+            created.add(row["_receipt"])
+    for row in dispositions:
+        created.add(row["_receipt"])
+        if row["rule"] == "R2" and "Anchor created" in row["acted"]:
+            created.add(definition_path(repo_root, row["bound_slug"]))
+    return removed, created
+
+
+def _cleanup_self_checks(repo_root: Path, decisions: list[dict], team_rows: list[dict],
+                         dispositions: list[dict]) -> list[dict]:
+    """C-44 P8 — four whole-run assertions over the projected post-state."""
+    repo_root = Path(repo_root)
+    removed, created = _cleanup_projection(repo_root, decisions, team_rows, dispositions)
+    checks: list[dict] = []
+
+    # FR-064 — no retired definition file survives in the Anchor store.
+    root = anchor_root(repo_root)
+    leftover = sorted(
+        _relative(repo_root, child / "goal.md")
+        for child in (sorted(root.iterdir()) if root.is_dir() else [])
+        if child.is_dir() and _exists_after(child / "goal.md", removed, created))
+    checks.append({"name": "anchor-store-purity", "ok": not leftover,
+                   "detail": ("no goal.md remains in the Anchor store" if not leftover
+                              else "goal.md remains: " + ", ".join(leftover))})
+
+    # FR-066 — every binding that survives the cleanup resolves to an Anchor.
+    unresolved: list[str] = []
+    rules = {row["team_slug"]: row["rule"] for row in dispositions}
+    for row in team_rows:
+        if rules.get(row["slug"]) == "R3":
+            continue      # C-47 removes the binding line; nothing is left to resolve
+        anchor = definition_path(repo_root, row["bound_slug"])
+        if not _exists_after(anchor, removed, created):
+            unresolved.append(f"{row['slug']} -> {row['bound_slug']}")
+    checks.append({"name": "bindings-resolve", "ok": not unresolved,
+                   "detail": ("every anchor_slug resolves" if not unresolved
+                              else "unresolved: " + ", ".join(unresolved))})
+
+    # FR-068 — every receipt the plan owes exists after the run.
+    missing: list[str] = []
+    receipt_actions = ("migrate", "archive", "resume-receipt", "resume-remove",
+                       "rename+normalize", "normalize")
+    for row in decisions:
+        if row.get("action") in receipt_actions:
+            receipt = row["_paths"]["receipt"]
+            if not _exists_after(receipt, removed, created):
+                missing.append(_relative(repo_root, receipt))
+    for row in team_rows:
+        if row["_records"] and not _exists_after(row["_receipt"], removed, created):
+            missing.append(row["receipt_path"])
+    for row in dispositions:
+        if not _exists_after(row["_receipt"], removed, created):
+            missing.append(row["receipt_path"])
+    checks.append({"name": "receipts-complete", "ok": not missing,
+                   "detail": ("every owed receipt is present" if not missing
+                              else "missing: " + ", ".join(missing))})
+
+    # FR-049 / C-48 — a derived tree never outlives its definition.
+    orphans: list[str] = []
+    for store_root, definition_name in (
+            (anchor_root(repo_root), definition_filename("anchor")),
+            (goals_root(repo_root), definition_filename("goals")),
+            (_cleanup_archive_root(repo_root), definition_filename("goals"))):
+        if not store_root.is_dir():
+            continue
+        for child in sorted(store_root.iterdir()):
+            summary = child / SUMMARY_DIRNAME
+            if not child.is_dir() or not _exists_after(summary, removed, created):
+                continue
+            if not _exists_after(child / definition_name, removed, created):
+                orphans.append(_relative(repo_root, summary))
+    checks.append({"name": "orphan-summary", "ok": not orphans,
+                   "detail": ("no summary tree outlives its definition" if not orphans
+                              else "orphan-summary: " + ", ".join(orphans))})
+    return checks
+
+
+def _self_check_error(checks: list[dict]) -> str:
+    return "; ".join(f"{check['name']}: {check['detail']}"
+                     for check in checks if not check["ok"])
 
 
 # ---- applying --------------------------------------------------------------
@@ -3187,11 +3683,32 @@ def _cleanup_public(row: dict) -> dict:
 
 
 def cleanup_store(repo_root: Path, *, apply: bool, classification_path: Path) -> dict:
-    """C-29 / C-36…C-45 — plan every entry, then (on apply) act in C-42 phase order."""
+    """C-29 / C-36…C-49 — plan every entry and team, then (on apply) act in C-44 order."""
     repo_root = Path(repo_root)
     data = load_classification(repo_root, Path(classification_path))
     decisions = [_plan_cleanup_entry(repo_root, entry) for entry in data["entries"]]
     decisions.sort(key=lambda row: (row["kind"], row["slug"]))
+
+    # C-46 — the layer a body reference maps to is the class the classification gave
+    # its slug; an R2 Anchor does not exist yet but is an Anchor by construction.
+    classes = {entry["slug"]: entry["class"] for entry in data["entries"]}
+    disposition_input = {row["slug"]: row for row in data["teams"]}
+    for row in disposition_input.values():
+        if row["disposition"] == "R2":
+            classes.setdefault(str(row.get("bound_slug") or ""), "anchor")
+
+    scope = _team_cleanup_scope(repo_root, data)
+    team_rows = [_plan_team_step(repo_root, team_slug, bound, classes)
+                 for team_slug, bound in scope]
+    dispositions = [_plan_disposition(repo_root, team_slug, bound,
+                                      disposition_input[team_slug])
+                    for team_slug, bound in scope if team_slug in disposition_input]
+
+    # C-48 — an orphan or a non-resolvable projection refuses the run before any write.
+    checks = _cleanup_self_checks(repo_root, decisions, team_rows, dispositions)
+    if apply and any(not check["ok"] for check in checks):
+        raise GoalInvalid(f"invalid-state: the projected post-state fails its own "
+                          f"self-checks ({_self_check_error(checks)}); nothing is written")
 
     interrupted: dict | None = None
     if apply:
@@ -3223,13 +3740,37 @@ def cleanup_store(repo_root: Path, *, apply: bool, classification_path: Path) ->
         else:
             decisions = done
 
+    if apply and interrupted is None:
+        # P3 — R2's Anchor is created through the engine's own `migrate` action.
+        for row in dispositions:
+            if row["rule"] == "R2" and "Anchor created" in row["acted"]:
+                migrate_team(repo_root, row["team_slug"])
+        # P5 / P6 — structural rename, then body normalization, per team.
+        for row in team_rows:
+            _apply_team_step(repo_root, row)
+        # P7 — dispositions last: the receipt records a state the file already holds.
+        for row in dispositions:
+            _apply_disposition(repo_root, row)
+        checks = _cleanup_self_checks(repo_root, decisions, team_rows, dispositions)
+
     results = sorted({row["result"] for row in decisions})
+    team_results = sorted({row["result"] for row in team_rows})
     payload: dict = {
         "action": "cleanup",
         "mode": "apply" if apply else "check",
         "decisions": [_cleanup_public(row) for row in decisions],
+        "teams": [_cleanup_public(row) for row in team_rows],
+        "dispositions": [{key: value for key, value in row.items()
+                          if not key.startswith("_")} for row in dispositions],
+        "self_checks": checks,
+        "verdict": "ok" if all(check["ok"] for check in checks) else "self-check-failed",
         "counts": {name: sum(1 for row in decisions if row["result"] == name)
                    for name in results},
+        "team_counts": {name: sum(1 for row in team_rows if row["result"] == name)
+                        for name in team_results},
+        "disposition_counts": {state: sum(1 for row in dispositions
+                                          if row["state"] == state)
+                               for state in TEAM_DISPOSITION_STATES},
     }
     if interrupted:
         payload.update(interrupted)
@@ -3253,6 +3794,18 @@ DECLARED_SUBSET = "declaration-subset/v1"
 DEGRADED_OWNER = "owner-unavailable"
 DECLARATION_INVALID = "declaration-invalid"
 TASK_ROW_LINE = re.compile(r"^- \[[ xX>~]\]\s+\S+")
+
+#: 101 C-33 — contract layer key -> the command stem that owns that layer. Grounded in
+#: the definition filename mapping (`DEFINITION_FILENAMES`), so it is a projection, not a
+#: second command list: the anchor layer's entry command is `anchor`, and so on.
+LAYER_ENTRY_COMMANDS = {key: Path(definition_filename(layer)).stem
+                        for key, layer in (("anchor", "anchor"), ("goal", "goals"),
+                                           ("team", "teams"))}
+MODE_COMMANDS = ("anchor", "goal")
+ANCHOR_ONLY_MODE = "anchor-only-mode"
+GOAL_ONLY_MODE = "goal-only-mode"
+UNKNOWN_MODE = "unknown-mode"
+ARGUMENT_HINT_LINE = re.compile(r"(?m)^argument-hint:\s*(?P<hint>.+)$")
 
 
 def _declaration_reader():
@@ -3339,6 +3892,19 @@ def _flow_class_lookup(repo_root: Path, unit_id: str):
     return record, None, None, EXIT_OK
 
 
+def _family_member(repo_root: Path, command: str, additions: list[str]) -> bool:
+    """C-71/C-72 in one predicate: carrier present AND (ledger row OR declared addition).
+
+    It never re-implements the class table — the verdict comes from `_flow_class_lookup`.
+    """
+    carrier = (repo_root / "templates" / "commands" / f"{command}.md").is_file()
+    record, _label, _detail, lookup_exit = _flow_class_lookup(
+        repo_root, f"{UNIT_ID_PREFIX}{command}")
+    if lookup_exit != EXIT_OK or record is None:
+        return False
+    return bool(carrier and (record.get("source") == "ledger" or command in additions))
+
+
 def command_family(repo_root: Path, command: str):
     """(payload, exit) for `command-family --command <name>` (C-71…C-77).
 
@@ -3347,6 +3913,12 @@ def command_family(repo_root: Path, command: str):
     whose carrier exists (C-77); an absent carrier keeps a command out of the
     family without failing the read (C-72/C-75), and a degraded lookup refuses
     with exit 2 rather than guessing.
+
+    `layers` (101 C-33 / FR-027) answers the same question per definition layer instead
+    of once: a layer is live for this command when the named command is a family member
+    and that layer's own entry command is one too. The entry command is the stem of the
+    layer's definition filename (grounded naming), so no second command list exists and
+    the disjunction of the three flags stays equal to `in_family`.
     """
     repo_root = Path(repo_root)
     unit_id = f"{UNIT_ID_PREFIX}{command}"
@@ -3369,7 +3941,6 @@ def command_family(repo_root: Path, command: str):
         else:
             additions = [str(name) for name in statement]
     record, lookup_label, lookup_detail, lookup_exit = _flow_class_lookup(repo_root, unit_id)
-    carrier = (repo_root / "templates" / "commands" / f"{command}.md").is_file()
     payload = {
         "command": command,
         "unit_id": unit_id,
@@ -3384,9 +3955,85 @@ def command_family(repo_root: Path, command: str):
     if lookup_exit != EXIT_OK:
         payload["error"] = {"label": lookup_label, "detail": lookup_detail}
         return payload, EXIT_INPUT_ERROR
-    payload["in_family"] = bool(carrier and (payload["source"] == "ledger"
-                                             or command in additions))
+    payload["in_family"] = _family_member(repo_root, command, additions)
+    layers = {key: False for key in LAYER_ENTRY_COMMANDS}
+    if payload["in_family"]:
+        for key, stem in LAYER_ENTRY_COMMANDS.items():
+            layers[key] = _family_member(repo_root, stem, additions)
+    payload["layers"] = layers
     return payload, EXIT_OK
+
+
+def _declared_modes(repo_root: Path, command: str) -> tuple[Path, list[str]]:
+    """The mode set a canonical command template declares, read from its `argument-hint`.
+
+    One owner for "which modes a command declares": the template frontmatter. This
+    action never carries a second mode list, so a mode added to a template is accepted
+    here without touching the engine and a mode removed there stops being accepted.
+    """
+    path = Path(repo_root) / "templates" / "commands" / f"{command}.md"
+    if not path.is_file():
+        raise GoalError(
+            f"template-missing: {path} — command-mode derives both mode sets from the "
+            "canonical templates' argument-hint and carries no second list")
+    match = ARGUMENT_HINT_LINE.search(path.read_text(encoding="utf-8"))
+    if match is None:
+        raise GoalError(
+            f"mode-list-unavailable: {path} declares no argument-hint line, so the mode "
+            "set cannot be derived")
+    bracket = re.search(r"\[([^\]]+)\]", match.group("hint"))
+    if bracket is None:
+        raise GoalError(
+            f"mode-list-unavailable: {path}'s argument-hint carries no bracketed mode "
+            "group")
+    modes = [part.strip().strip("[]<>") for part in bracket.group(1).split("|")]
+    return path, [mode for mode in modes if mode]
+
+
+def command_mode(repo_root: Path, command: str, mode: str):
+    """(payload, exit) for `command-mode --command <anchor|goal> --mode <mode>` (C-15).
+
+    Zero writes. The two mode sets come from the canonical templates' `argument-hint`;
+    a mode the named command declares exits 0, a mode the OTHER command declares is the
+    named rejection (`anchor-only-mode` + `/speckit.anchor` on stderr), and a mode
+    neither declares is `unknown-mode`. Nothing here ever falls back to a read rendering.
+    """
+    repo_root = Path(repo_root)
+    template, modes = _declared_modes(repo_root, command)
+    try:
+        template_ref = template.relative_to(repo_root).as_posix()
+    except ValueError:
+        template_ref = str(template)
+    payload = {"command": command, "mode": mode, "template": template_ref,
+               "modes": modes, "verdict": None, "message": ""}
+    if mode in modes:
+        payload["verdict"] = "ok"
+        return payload, EXIT_OK
+    other = "goal" if command == "anchor" else "anchor"
+    try:
+        _other_template, other_modes = _declared_modes(repo_root, other)
+    except GoalError:
+        # The other command's template may not exist yet (the surface is being split);
+        # an absent set declares nothing, so the mode falls through to `unknown-mode`
+        # rather than turning a classification question into a missing-file error.
+        other_modes = []
+    if mode in other_modes:
+        if command == "goal":
+            literal, correct_entry = ANCHOR_ONLY_MODE, "/speckit.anchor"
+        else:
+            literal, correct_entry = GOAL_ONLY_MODE, "/speckit.goal"
+        payload["verdict"] = literal
+        payload["message"] = (
+            f"{literal}: mode {mode!r} is an Anchor-only mode — it is declared by "
+            f"{correct_entry} and not by /speckit.{command}; invoke {correct_entry} "
+            "instead. Nothing is written and the call never falls back to a read view.")
+        return payload, EXIT_INPUT_ERROR
+    payload["verdict"] = UNKNOWN_MODE
+    payload["message"] = (
+        f"{UNKNOWN_MODE}: mode {mode!r} is declared by neither /speckit.{command} nor "
+        f"/speckit.{other}; the declared sets come from the canonical templates' "
+        "argument-hint (nothing is written)")
+    return payload, EXIT_INPUT_ERROR
 
 
 def handoff_decision(repo_root: Path, tasks_path: Path):
@@ -3606,11 +4253,32 @@ def _run_cleanup_action(args, repo_root: Path) -> int:
     _emit(payload, args.json)
     if payload.get("result") == "interrupted":
         return EXIT_NOT_FOUND
+    if payload.get("verdict") == "self-check-failed":
+        return EXIT_INVALID
     return EXIT_OK
 
 
 def _run_declaration_action(args, repo_root: Path) -> int:
-    """Dispatch the 094 declaration read actions; they touch no archive layer."""
+    """Dispatch the 094/101 declaration read actions; they touch no archive layer."""
+    if args.action == "command-mode":
+        try:
+            payload, code = command_mode(repo_root, args.command_name, args.mode)
+        except GoalError as exc:
+            _emit({"error": str(exc)}, args.json)
+            return EXIT_INPUT_ERROR
+        if code != EXIT_OK:
+            # C-15: the refusal literal and the correct entry MUST reach stderr even
+            # when --json is in play — the caller's branch reads the stream, not the JSON.
+            print(payload["message"], file=sys.stderr)
+            if args.json:
+                print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return code
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(f"/speckit.{args.command_name} {args.mode}: declared "
+                  f"(modes: {', '.join(payload['modes'])})")
+        return EXIT_OK
     if args.action == "command-family":
         payload, code = command_family(repo_root, args.command_name)
     else:
@@ -3637,7 +4305,7 @@ def _run_handoff_action(args, repo_root: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks', '--handoff', '--classification', '--guidance', '--done', '--clear-done'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks', '--handoff', '--classification', '--guidance', '--done', '--clear-done', '--mode'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -3694,7 +4362,9 @@ def main(argv: list[str] | None = None) -> int:
     p_check_stmt.add_argument("statement", help="candidate Target statement")
 
     sub.add_parser("list", parents=[common],
-                   help="read: enumerate the anchoring archive")
+                   help="read: enumerate the anchor store (default) or, with "
+                        "--scope goals, the action-level Goal store; --scope teams "
+                        "is refused as scope-not-applicable")
 
     p_status = sub.add_parser("status", parents=[common],
                               help="write: change lifecycle state")
@@ -3719,8 +4389,8 @@ def main(argv: list[str] | None = None) -> int:
                                  f"existing criteria with {NO_CRITERIA_MARKER!r}")
 
     p_migrate = sub.add_parser("migrate", parents=[common],
-                               help="write: derive a definition from a team's inline goal "
-                                    "and reference it")
+                               help="write: derive an Anchor definition from a team's "
+                                    "inline goal and reference it as anchor_slug")
     p_migrate.add_argument("team_slug")
     p_migrate.add_argument("--drop-inline", action="store_true",
                            help="remove the team's inline goal after migrating (default: keep)")
@@ -3790,6 +4460,16 @@ def main(argv: list[str] | None = None) -> int:
              "(zero writes; 094)")
     p_handoff.add_argument("--tasks", dest="tasks_path", required=True, metavar="PATH",
                            help="path to the tasks file whose task rows are counted")
+
+    p_mode = sub.add_parser(
+        "command-mode", parents=[common],
+        help="read: does the named command declare this mode? (zero writes; the mode "
+             "sets are derived from the canonical templates' argument-hint; 101 FR-020)")
+    p_mode.add_argument("--command", dest="command_name", required=True,
+                        choices=MODE_COMMANDS,
+                        help="the command whose declared mode set answers (anchor | goal)")
+    p_mode.add_argument("--mode", required=True, metavar="MODE",
+                        help="the mode to judge against that declaration")
 
     p_handoff_ref = sub.add_parser(
         "handoff-ref", parents=[common],
@@ -3885,7 +4565,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.action in ("probe-residual", "migrate-archive", "backfill-bindings"):
         return _run_archive_action(args, repo_root)
-    if args.action in ("command-family", "handoff-decision"):
+    if args.action in ("command-family", "command-mode", "handoff-decision"):
         return _run_declaration_action(args, repo_root)
     if args.action == "handoff-ref":
         return _run_handoff_action(args, repo_root)
@@ -3974,7 +4654,19 @@ def main(argv: list[str] | None = None) -> int:
                 _emit(result, args.json)
                 return EXIT_INVALID
         elif args.action == "list":
-            result = {"goals": list_goals(repo_root)}
+            # C-27 — the layer selector decides which store is enumerated: the Anchor
+            # store by default, the Goal store on `--scope goals`. No team-listing
+            # surface exists, so `--scope teams` is refused rather than invented.
+            if scope_obj.scope == "teams":
+                _emit({"error": "scope-not-applicable: list enumerates the anchor or the "
+                                "Goal store; no team-listing surface exists and this "
+                                "feature does not invent one — nothing is written"},
+                      args.json)
+                return EXIT_INPUT_ERROR
+            if scope_obj.scope == "goals":
+                result = {"goals": list_action_goals(repo_root)}
+            else:
+                result = {"goals": list_goals(repo_root)}
         elif args.action == "status":
             path = _resolve(repo_root, args.slug)
             if not path.is_file():
@@ -4010,7 +4702,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.action == "migrate":
             created, identity = migrate_team(
                 repo_root, args.team_slug, keep_inline=not args.drop_inline)
-            result = {"migrated_team": args.team_slug, "goal_slug": identity,
+            # T019 — the payload names the field of the split: `anchor_slug`, never the
+            # retired `goal_slug` (FR-016).
+            result = {"migrated_team": args.team_slug, "anchor_slug": identity,
                       "created": str(created.relative_to(repo_root)),
                       "inline_kept": not args.drop_inline}
         elif args.action == "bind":
@@ -4176,7 +4870,7 @@ def _emit(payload: dict, as_json: bool) -> None:
         return
     if "checks" in payload and "team_slug" in payload:
         res = payload.get("resolution") or {}
-        print(f"team: {payload['team_slug']}   goal: {payload['goal_slug']}   "
+        print(f"team: {payload['team_slug']}   anchor: {payload['anchor_slug']}   "
               f"identity: {payload['identity_kind']}")
         print(f"target: {res.get('effective')}   source: {res.get('source')}   "
               f"declared focus: {res.get('declared_focus')}")
@@ -4197,10 +4891,26 @@ def _emit(payload: dict, as_json: bool) -> None:
         for row in payload["decisions"]:
             print(f"{row['kind']}\t{row['slug']}\t{row['result']}\t"
                   f"{row.get('source_path', '')} -> {row.get('target_path', '')}")
+        for row in payload.get("teams") or []:
+            rename = row.get("rename") or {}
+            tail = (f"\t{rename.get('before', '')} -> {rename.get('after', '')}"
+                    if rename else "")
+            print(f"team\t{row['slug']}\t{row['result']}\t"
+                  f"normalized={row.get('normalized_lines', 0)}{tail}")
+        for row in payload.get("dispositions") or []:
+            print(f"disposition\t{row['team_slug']}\t{row['rule']}\t{row['state']}\t"
+                  f"acted={'; '.join(row.get('acted') or []) or 'none'}")
+        for check in payload.get("self_checks") or []:
+            print(f"self-check\t{check['name']}\t"
+                  f"{'ok' if check['ok'] else 'FAILED'}\t{check['detail']}")
         counts = payload.get("counts") or {}
         if counts:
             print("counts: " + " ".join(f"{name}={value}"
                                         for name, value in counts.items()))
+        team_counts = payload.get("team_counts") or {}
+        if team_counts:
+            print("team counts: " + " ".join(f"{name}={value}"
+                                            for name, value in team_counts.items()))
         return
     if "definitions" in payload:
         for row in payload["definitions"]:

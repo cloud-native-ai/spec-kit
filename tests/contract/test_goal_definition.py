@@ -74,7 +74,7 @@ def archived(tmp_path):
 
 
 def test_definition_lands_at_the_contracted_path(archived, tmp_path):
-    assert archived == tmp_path / ".specify/anchoring/structure-probe/goal.md"
+    assert archived == tmp_path / ".specify/anchoring/structure-probe/anchor.md"
 
 
 def test_frontmatter_carries_status_created_updated(archived):
@@ -151,11 +151,11 @@ def test_reject_composite_objective(tmp_path):
 
 
 def test_missing_criteria_section_is_invalid(tmp_path):
-    path = tmp_path / ".specify/anchoring/nosec/goal.md"
+    path = tmp_path / ".specify/anchoring/nosec/anchor.md"
     path.parent.mkdir(parents=True)
     path.write_text(
         "---\nstatus: active\ncreated: 2026-08-05\nupdated: 2026-08-05\n---\n\n"
-        "# Goal: nosec\n\n## Objective\n\nAn outcome.\n\n## History\n\n- x\n",
+        "# Anchor: nosec\n\n## Objective\n\nAn outcome.\n\n## History\n\n- x\n",
         encoding="utf-8",
     )
     ok, problems = goal_utils.validate_goal(path)

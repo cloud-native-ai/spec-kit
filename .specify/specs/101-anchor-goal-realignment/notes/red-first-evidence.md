@@ -52,3 +52,53 @@ which is the measured shape of "content changed owner, not content was rewritten
 
 Result: **PASS** — the rename is recorded with 100% similarity, and the old path has no second
 live copy at this commit (T008 recreates the Goal owner as a new action-level file).
+
+# Red-first evidence — WP-01b (T016–T025)
+
+Run `r20261112T064607Z-b101`, package WP-01b, same E2 baseline
+(`test-evidence/suite-baseline-entry.txt`, rc=1, 192 pre-existing failure ids) as the
+comparison point; the full suite was **not** re-run.
+
+## Red-before capture
+
+`bash scripts/bash/run-tests.sh <14 modules from the WP-01a measurement> -q` →
+`test-evidence/wp01b-red-before.txt`: **rc=1, 56 failed, 293 passed, 1 skipped**. The
+count is unchanged from WP-01a because no test had yet been updated for the rename.
+
+## Red → green after T025
+
+Every reading below is a command actually executed through the project runner.
+
+| Module | Red before | After | What the red was |
+|---|---|---|---|
+| `tests/contract/test_binding_model.py` | 14 | 0 | seeds at `anchoring/<slug>/goal.md` with `# Goal:`; retired `--scope goal`; owner tests pointed at the Goal owner |
+| `tests/contract/test_scope_resolution.py` | 5 | 0 | `--scope goal`, old `Scope` API (`goal_root`), `list` answering for the anchor store |
+| `tests/unit/test_goal_scope_engine.py` | 5 | 0 | old `Scope` API; `auto` naming a `goal` layer |
+| `tests/contract/test_goal_targets_engine.py` | 13 | 0 | fixture path `anchoring/<slug>/goal.md` (incl. the mirror-parity case) |
+| `tests/contract/test_goal_definition.py` | 1 | 0 | `create_goal` lands at `anchor.md` (`# Anchor:`) |
+| `tests/unit/test_goal_utils.py` | 1 | 0 | heading `# Anchor:` (plus one path fixture) |
+| `tests/contract/test_archive_migration.py` | 3 | 0 | migration target is `anchoring/<slug>/anchor.md`; conflict seeds at the live path |
+| `tests/integration/test_goal_migration_path.py` | 1 | 0 | summary under `anchoring/<slug>/summary/`; `anchor_slug` payload key; non-equivalent target refusal is exit 4 |
+| `tests/contract/test_script_interface_contract.py` | 3 | 0 | `sync-mirrors --check` drift (closed by T024), not by a test edit |
+| `tests/contract/test_run_checks.py` | 9 | 3 | fixture `anchor.md` + `TOP_KEYS='anchor_slug'`; 3 remain (see below) |
+| `tests/integration/test_archive_migration_real_data.py` | 1 | 1 | live tree awaits the applied migration (T049–T054) |
+| `tests/contract/test_goal_targets_check.py` | 6 | 0 | same fixture path rename (module outside the 14-module capture) |
+| `tests/contract/test_handoff_contract.py` | 1 | 0 | goal fixture seeded at `goal.md`; engine resolves `anchor.md` |
+| `tests/contract/test_no_spec_local_writes.py` | 1 | 0 | the engine's docstring action table lacked the goal-* / `cleanup` write rows; added, and the module's pinned write set grew to match the parser |
+
+Final targeted reading (22 modules):
+`429 passed, 6 failed, 2 skipped, rc=1`.
+
+## The 6 remaining reds and their owners
+
+| Failure id | Class |
+|---|---|
+| `test_run_checks.py::test_c1_the_action_exists_and_the_roster_grew_by_exactly_one` | E2 baseline (line 91) — pre-existing |
+| `test_script_interface_contract.py::test_c26_generator_skill_carries_the_mandate_entry` | E2 baseline (line 92) — pre-existing |
+| `test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path` | E2 baseline (line 56) — pre-existing |
+| `test_run_checks.py::test_c20_the_existing_zero_and_two_branches_still_hold` | live tree awaits the applied migration — T049–T054 |
+| `test_run_checks.py::test_the_real_bound_team_reports_the_measured_state` | live tree awaits the applied migration — T049–T054 |
+| `test_archive_migration_real_data.py::test_every_source_tree_stays_readable_after_migration` | live tree awaits the applied migration — T049–T054 |
+
+No rename-caused red remains in this package's reach; the three live-tree cases turn green only
+after the real `.specify/anchoring/*/goal.md` definitions are migrated by T049–T054.

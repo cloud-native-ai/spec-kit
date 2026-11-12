@@ -27,7 +27,7 @@ def _team(root, slug, *, goal_slug=None, inline="An inline outcome."):
     d.mkdir(parents=True, exist_ok=True)
     fm = [f"slug: {slug}", f"name: {slug}", f"goal: {inline}"]
     if goal_slug:
-        fm.append(f"goal_slug: {goal_slug}")
+        fm.append(f"anchor_slug: {goal_slug}")
     fm.append("pattern: continuous")
     (d / "team.md").write_text("---\n" + "\n".join(fm) + f"\n---\n\n## Goal\n\n{inline}\n",
                                encoding="utf-8")
@@ -57,19 +57,19 @@ def test_migration_preserves_the_resolved_objective(tmp_path):
     before = _refresh(tmp_path, "legacy")
     assert before["goal_source"] == "inline"
     before_desc = yaml.safe_load(
-        (tmp_path / ".specify/goal/legacy/summary/data/project-input.yaml").read_text()
+        (tmp_path / ".specify/anchoring/legacy/summary/data/project-input.yaml").read_text()
     )["project"]["project_desc"]
 
     proc = _migrate(tmp_path, "legacy")
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["goal_slug"] == "legacy"
+    assert payload["anchor_slug"] == "legacy"
 
     # after: resolves from the definition, same objective
     after = _refresh(tmp_path, "legacy")
     assert after["goal_source"] == "definition"
     after_desc = yaml.safe_load(
-        (tmp_path / ".specify/goal/legacy/summary/data/project-input.yaml").read_text()
+        (tmp_path / ".specify/anchoring/legacy/summary/data/project-input.yaml").read_text()
     )["project"]["project_desc"]
     assert after_desc == before_desc == "Reach a reviewed, stable release."
 
@@ -79,14 +79,14 @@ def test_inline_goal_is_kept_by_default(tmp_path):
     _migrate(tmp_path, "keep")
     team_md = (tmp_path / ".specify/teams/keep/team.md").read_text(encoding="utf-8")
     assert "goal: An outcome worth keeping inline." in team_md, "inline goal must be retained"
-    assert "goal_slug: keep" in team_md, "the team must now reference the definition"
+    assert "anchor_slug: keep" in team_md, "the team must now reference the definition"
 
 
 def test_inline_goal_removed_only_on_explicit_opt_in(tmp_path):
     _team(tmp_path, "drop", inline="An outcome to drop inline.")
     _migrate(tmp_path, "drop", drop=True)
     team_md = (tmp_path / ".specify/teams/drop/team.md").read_text(encoding="utf-8")
-    assert "goal_slug: drop" in team_md
+    assert "anchor_slug: drop" in team_md
     assert "goal: An outcome to drop inline." not in team_md
 
 
@@ -114,4 +114,7 @@ def test_migrating_an_existing_definition_is_refused(tmp_path):
         ["create", "already", "--objective", "Pre-existing.", "--repo-root", str(tmp_path)],
     ).check_returncode()
     proc = _migrate(tmp_path, "dup")
-    assert proc.returncode == 2, "migrating onto an existing definition must be refused"
+    assert proc.returncode == 4, (
+        "migrating onto an existing definition with a non-equivalent payload must be refused")
+    error = json.loads(proc.stdout)["error"]
+    assert ".specify/anchoring/already/anchor.md" in error, error

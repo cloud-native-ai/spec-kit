@@ -47,7 +47,7 @@ created: 2026-11-09
 updated: 2026-11-09
 {binding}---
 
-# Goal: alpha
+# Anchor: alpha
 
 ## Objective
 
@@ -65,7 +65,7 @@ Hold the fixture still while the engine reads its binding.
 
 def _seed_goal(root: Path, slug: str = "alpha", *, binding: str | None = None,
                status: str = "active") -> Path:
-    path = root / ".specify/anchoring" / slug / "goal.md"
+    path = root / ".specify/anchoring" / slug / "anchor.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         GOAL_TEMPLATE.format(status=status,
@@ -81,7 +81,7 @@ def _seed_team(root: Path, slug: str = "t1", *, binding: str | None = None,
     path.write_text(
         "---\n"
         f"lifecycle_state: {lifecycle}\n"
-        f"goal_slug: {goal_slug}\n"
+        f"anchor_slug: {goal_slug}\n"
         f"{_binding_block('sdd-run') if binding is None else binding}"
         "---\n\n"
         f"# Team: {slug}\n",
@@ -302,7 +302,7 @@ def test_ownership_is_answered_by_the_read_action_not_by_the_path(tmp_path: Path
     assert payload["owner"] == "command-run"
     assert payload["owner_id"] == RUN_ID
     assert payload["origin"] is None
-    assert payload["path"].endswith(".specify/anchoring/alpha/goal.md")
+    assert payload["path"].endswith(".specify/anchoring/alpha/anchor.md")
     assert payload["archive_layer"] == "goal"
     assert payload["lifecycle"] == "active"
 
@@ -324,7 +324,8 @@ def test_ownership_is_answered_by_the_read_action_not_by_the_path(tmp_path: Path
 
 def test_scope_spec_is_removed_and_no_alias_exists(tmp_path: Path):
     _seed_goal(tmp_path)
-    for retired in ("spec", "global"):
+    # `goal` is the retired position-named member beside the older `spec` / `global`.
+    for retired in ("goal", "spec", "global"):
         proc = _run(tmp_path, "resolve-scope", "--scope", retired)
         assert proc.returncode == 2, f"--scope {retired} was accepted"
         assert "invalid choice" in proc.stderr
@@ -333,8 +334,8 @@ def test_scope_spec_is_removed_and_no_alias_exists(tmp_path: Path):
     assert proc.returncode == 2
     assert "invalid choice" in proc.stderr
 
-    # The three living members resolve.
-    for live in ("goal", "teams"):
+    # The four living members resolve (auto resolves in the seeded single layer).
+    for live in ("anchor", "goals", "teams"):
         proc = _run(tmp_path, "resolve-scope", "--scope", live)
         assert proc.returncode == 0, proc.stdout + proc.stderr
 
@@ -343,6 +344,8 @@ def test_scope_spec_is_removed_and_no_alias_exists(tmp_path: Path):
     source = ENGINE.read_text(encoding="utf-8")
     assert not re.search(r"[\"']global[\"']", source), "retired scope value 'global' survives"
     assert not re.search(r"[\"']spec[\"']", source), "retired scope value 'spec' survives"
+    assert 'ARCHIVE_SCOPES = ("anchor", "teams", "goals", "auto")' in source, (
+        "the closed scope set carries no retired member")
     assert "--scope global" not in source
     assert "--scope spec" not in source
 
@@ -355,12 +358,13 @@ def test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only(tmp_path: 
     _seed_goal(tmp_path)
     _seed_team(tmp_path)
 
-    for layer in ("goal", "teams"):
+    for layer in ("anchor", "goals", "teams"):
         proc = _run(tmp_path, "resolve-scope", "--scope", layer)
         assert proc.returncode == 0, proc.stdout + proc.stderr
         payload = json.loads(proc.stdout)
         assert payload["scope"] == layer
-        assert Path(payload["goal_root"]).name == "anchoring"
+        assert Path(payload["anchor_root"]).name == "anchoring"
+        assert Path(payload["goals_root"]).name == "goals"
         assert Path(payload["team_root"]).name == "teams"
 
     # auto resolves the single layer that contains the requested slug.
@@ -374,7 +378,7 @@ def test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only(tmp_path: 
     assert proc.returncode == 2
     error = json.loads(proc.stdout)["error"]
     assert "scope-ambiguous" in error
-    assert "goal" in error and "teams" in error
+    assert "anchor" in error and "teams" in error
 
     # Zero candidate layers is `not-found`, not a default.
     empty = tmp_path / "empty"
@@ -387,14 +391,14 @@ def test_both_archive_roots_resolve_in_one_call_and_auto_is_read_only(tmp_path: 
     proc = _run(tmp_path, "status", "alpha", "--set", "achieved", "--scope", "auto")
     assert proc.returncode == 2
     assert "scope-read-only" in _error(proc)
-    assert "status: active" in (tmp_path / ".specify/anchoring/alpha/goal.md").read_text(
+    assert "status: active" in (tmp_path / ".specify/anchoring/alpha/anchor.md").read_text(
         encoding="utf-8")
 
     # --spec-dir outside .specify/specs/ is refused by the named reason, not by a
     # generic failure, and no scope makes it acceptable.
     outside = tmp_path / "outside"
     outside.mkdir()
-    proc = _run(tmp_path, "resolve-scope", "--scope", "goal", "--spec-dir", str(outside))
+    proc = _run(tmp_path, "resolve-scope", "--scope", "anchor", "--spec-dir", str(outside))
     assert proc.returncode == 2
     assert "spec-dir-unresolvable" in _error(proc)
 
@@ -411,15 +415,15 @@ def test_a_cross_layer_write_is_refused_and_names_both_layers(tmp_path: Path):
     assert proc.returncode == 2
     error = _error(proc)
     assert "cross-layer-write" in error
-    assert "goal" in error and "teams" in error
+    assert "anchor" in error and "teams" in error
     assert "status: active" in goal.read_text(encoding="utf-8")
 
     proc = _run(tmp_path, "bind", "teams", "t1", "--owner", "sdd-run",
-                "--owner-id", RUN_ID, "--origin", "null", "--scope", "goal")
+                "--owner-id", RUN_ID, "--origin", "null", "--scope", "anchor")
     assert proc.returncode == 2
     error = _error(proc)
     assert "cross-layer-write" in error
-    assert "goal" in error and "teams" in error
+    assert "anchor" in error and "teams" in error
 
 
 # ---------------------------------------------------------------------------
@@ -443,9 +447,12 @@ def test_a_bound_goal_is_writable_only_by_human(tmp_path: Path):
 
 
 # ---------------------------------------------------------------------------
-# T067 / C-88 — the goal owner owns the concepts, not the action signatures
+# T067 / C-88 — the Anchor owner owns the concepts, not the action signatures
+# (Feature 101 moved the binding record and the shared lifecycle here; the Goal
+# owner now cites this file for both.)
 # ---------------------------------------------------------------------------
 
+ANCHOR_OWNER = REPO_ROOT / "shared/definitions/anchor-definitions.md"
 GOAL_OWNER = REPO_ROOT / "shared/definitions/goal-definitions.md"
 TEAM_OWNER = REPO_ROOT / "skills/internal/create-team/references/conceptual-model.md"
 
@@ -462,21 +469,22 @@ def _section(text: str, heading: str) -> str:
     return tail[: end.start()] if end else tail
 
 
-def test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures():
-    text = _owner_text(GOAL_OWNER)
+def test_the_anchor_owner_owns_the_concepts_and_not_the_action_signatures():
+    text = _owner_text(ANCHOR_OWNER)
 
-    # The four owned concept faces are present by name.
+    # The owned concept faces are present by name.
     assert "### Archive Layers" in text, "the archive-layer vocabulary lives here"
     assert "### The Binding Record" in text, "the binding record's meaning lives here"
-    assert "### Goal Lifecycle" in text, "the lifecycle names live here"
+    assert "### Lifecycle" in text, "the shared lifecycle names live here"
     assert "origin" in _section(text, "### The Binding Record"), (
         "the origin semantics are owned by the binding-record section")
     for value in ("`active`", "`achieved`", "`abandoned`"):
-        assert value in _section(text, "### Goal Lifecycle"), (
-            f"the goal lifecycle names are owned here: {value}")
-    assert "retained" in _section(text, "### Goal Lifecycle") and "reopen" in text, (
+        assert value in _section(text, "### Lifecycle"), (
+            f"the shared lifecycle names are owned here: {value}")
+    assert "retained" in _section(text, "### Lifecycle") and "reopen" in text, (
         "the terminal-retained and reopen rules are stated")
-    assert ".specify/anchoring/<slug>/goal.md" in text and ".specify/teams/<slug>/team.md" in text
+    assert ".specify/anchoring/<anchor-slug>/anchor.md" in text
+    assert ".specify/teams/<slug>/team.md" in text
 
     # The legacy-key removal point is recorded in § Terminology Boundaries (C-23).
     boundaries = _section(text, "## Terminology Boundaries")
@@ -494,34 +502,44 @@ def test_the_goal_owner_owns_the_concepts_and_not_the_action_signatures():
 # T068 / C-89 / C-90 — the two owners cite each other, neither restates the other
 # ---------------------------------------------------------------------------
 
-def test_the_two_owners_cite_each_other_and_restate_no_value_domain():
+def test_the_concept_owners_cite_each_other_and_restate_no_value_domain():
+    anchor_text = _owner_text(ANCHOR_OWNER)
     goal_text = _owner_text(GOAL_OWNER)
     team_text = _owner_text(TEAM_OWNER)
 
-    # Each cites the other by path and section.
-    assert "skills/internal/create-team/references/conceptual-model.md" in goal_text
-    assert "§ The Team Definition and the Binding Model" in goal_text, (
-        "the goal owner cites the team owner's section explicitly")
-    assert "shared/definitions/goal-definitions.md" in team_text
+    # The Anchor owner cites the team owner's section; the Goal owner cites the
+    # Anchor owner for the binding record it no longer owns.
+    assert "skills/internal/create-team/references/conceptual-model.md" in anchor_text
+    assert "§ The Team Definition and the Binding Model" in anchor_text, (
+        "the Anchor owner cites the team owner's section explicitly")
+    assert "shared/definitions/anchor-definitions.md" in goal_text
+    assert "§ The Binding Record" in goal_text, (
+        "the Goal owner cites the binding-record owner explicitly")
+
+    # The team owner cites the binding-record owner. The team model still points at
+    # the retired Goal-owner path; accepting either keeps this test green until that
+    # model is re-pointed (T043's territory), and the section name is asserted either way.
+    assert ("shared/definitions/anchor-definitions.md" in team_text
+            or "shared/definitions/goal-definitions.md" in team_text)
     assert "§ The Binding Record" in team_text, (
         "the team owner cites the binding-record section explicitly")
 
     # The team owner owns binding / handoff_ref / the crew notion without restating
-    # the goal-side value domains.
+    # the definition-side value domains.
     assert "handoff_ref" in team_text and "crew" in team_text.lower()
     for goal_domain in ("achieved", "abandoned", "sdd-run", "command-run",
                         "`human`", "`goal` / `teams` / `auto`"):
         assert goal_domain not in team_text, (
-            f"the team owner restates a goal-side domain value: {goal_domain!r}")
+            f"the team owner restates a definition-side domain value: {goal_domain!r}")
     # The team key may be named only inside a citation of its owner, never defined here.
-    for line in goal_text.splitlines():
+    for line in anchor_text.splitlines():
         if "handoff_ref" in line:
             assert "conceptual-model.md" in line, (
-                "the goal owner names the team key only while citing the team owner")
+                "the Anchor owner names the team key only while citing the team owner")
 
-    # The goal owner does not restate the team lifecycle pair.
-    assert "active` / `archived" not in goal_text and "`archived`" not in goal_text, (
-        "the goal owner must cite the team lifecycle, not enumerate it")
+    # The Anchor owner does not restate the team lifecycle pair.
+    assert "active` / `archived" not in anchor_text and "`archived`" not in anchor_text, (
+        "the Anchor owner must cite the team lifecycle, not enumerate it")
 
 
 # ---------------------------------------------------------------------------

@@ -85,7 +85,7 @@ ACTIONS = [
 
 CHECK_KEYS = {"id", "name", "verdict", "message"}
 TOP_KEYS = {
-    "team_slug", "goal_slug", "identity_kind", "binding", "resolution",
+    "team_slug", "anchor_slug", "identity_kind", "binding", "resolution",
     "checks", "verdict", "blocked",
 }
 RESOLUTION_KEYS = {"effective", "source", "declared_focus"}
@@ -175,7 +175,7 @@ created: 2026-01-01
 updated: 2026-01-02
 ---
 
-# Goal: {slug}
+# Anchor: {slug}
 
 ## Objective
 
@@ -211,9 +211,9 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
           targets=(("T-001", "open"), ("T-002", "done")), team: bool = True,
           team_slug: str = "t1", goal_slug: str = "g1", goal_dir: str | None = None,
           focus=None, goal_body: str | None = None) -> Path:
-    """A throwaway repository: `.specify/anchoring/<dir>/goal.md` + `.specify/teams/<slug>/team.md`.
+    """A throwaway repository: `.specify/anchoring/<dir>/anchor.md` + `.specify/teams/<slug>/team.md`.
 
-    `goal_slug` is the team's DECLARED binding (None = no `goal_slug` line, so identity
+    `goal_slug` is the team's DECLARED binding (None = no `anchor_slug` line, so identity
     resolution falls through to the team-slug inference and then to none); `goal_dir` is
     which definition directory to create, and defaults to the declared binding. Splitting
     the two is what makes an unbound-team fixture possible without dropping the definition.
@@ -223,7 +223,7 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
     (root / ".specify" / "anchoring").mkdir(parents=True, exist_ok=True)
     (root / ".specify" / "teams" / team_slug).mkdir(parents=True, exist_ok=True)
     if team:
-        binding = f"goal_slug: {goal_slug}\n" if goal_slug else ""
+        binding = f"anchor_slug: {goal_slug}\n" if goal_slug else ""
         if focus:
             binding += f"focus_target: {focus}\n"
         (root / ".specify" / "teams" / team_slug / "team.md").write_text(
@@ -235,7 +235,7 @@ def _repo(tmp_path: Path, *, goal: bool = True, goal_status: str = "active",
         text = goal_body if goal_body is not None else GOAL_TMPL.format(
             status=goal_status, slug=directory, rows=rows.rstrip("\n")
         )
-        (root / ".specify" / "anchoring" / directory / "goal.md").write_text(text, encoding="utf-8")
+        (root / ".specify" / "anchoring" / directory / "anchor.md").write_text(text, encoding="utf-8")
     return root
 
 
@@ -829,7 +829,7 @@ def test_the_real_bound_team_reports_the_measured_state():
     because no goal definition blocks only when a --target is specified.
     """
     p = _checks(ROOT, "run-checks", REAL_TEAM_BOUND, expect=5)
-    assert p["goal_slug"] == REAL_GOAL and p["identity_kind"] == "explicit"
+    assert p["anchor_slug"] == REAL_GOAL and p["identity_kind"] == "explicit"
     assert p["resolution"]["source"] == "none"
     got = _by_name(p)
     assert got["goal-binding"]["verdict"] == "ok"

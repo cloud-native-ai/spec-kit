@@ -1133,13 +1133,19 @@ def find_fourth_sources(repo, keys, allowed):
 
 
 def read_goal_targets(repo):
-    """``[(goal slug, [(target id, status)])]`` from the anchoring goal definitions."""
+    """``[(anchor slug, [(target id, status)])]`` from the anchoring definitions.
+
+    FR-029 — the definition filename is resolved per layer, never assumed: the Anchor
+    layer's file is `anchor.md`; `goal.md` is read only as the un-migrated fallback.
+    """
     goals = []
     anchoring = repo / ".specify" / "anchoring"
     if not anchoring.is_dir():
         return goals
     for goal_dir in sorted(p for p in anchoring.iterdir() if p.is_dir()):
-        goal_file = goal_dir / "goal.md"
+        goal_file = goal_dir / "anchor.md"
+        if not goal_file.is_file():
+            goal_file = goal_dir / "goal.md"
         if not goal_file.is_file():
             continue
         targets = []

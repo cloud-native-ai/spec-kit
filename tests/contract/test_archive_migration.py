@@ -148,7 +148,7 @@ def test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt(tmp_p
     assert proc.returncode == 0, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
 
     # C-31 — the two archive rows are the only landing points.
-    goal_target = tmp_path / ".specify/anchoring/alpha/goal.md"
+    goal_target = tmp_path / ".specify/anchoring/alpha/anchor.md"
     team_target = tmp_path / ".specify/teams/crew/team.md"
     assert goal_target.is_file()
     assert team_target.is_file()
@@ -176,7 +176,7 @@ def test_migration_moves_the_tree_and_leaves_an_archive_not_delete_receipt(tmp_p
     assert goal_receipt["source_spec"] == spec
     assert goal_receipt["source_slug"] == "alpha"
     assert goal_receipt["target_slug"] == "alpha"
-    assert goal_receipt["target_path"] == ".specify/anchoring/alpha/goal.md"
+    assert goal_receipt["target_path"] == ".specify/anchoring/alpha/anchor.md"
     assert goal_receipt["archived_path"] == f".specify/archive/goal-team/trees/{spec}/goal/alpha"
     assert re.match(r"^sha256:[0-9a-f]{64}$", goal_receipt["concept_digest"])
     assert goal_receipt["result"] == "migrated"
@@ -220,7 +220,7 @@ def test_a_conflict_names_both_candidates_and_never_overwrites(tmp_path):
     spec = "093-fixture"
     source = _seed_spec_goal(tmp_path, spec, slug="gamma",
                              objective="Move the fixture without losing a byte.")
-    target = tmp_path / ".specify/anchoring/gamma/goal.md"
+    target = tmp_path / ".specify/anchoring/gamma/anchor.md"
     target.parent.mkdir(parents=True)
     target.write_text(
         GOAL_SOURCE.format(status="active", slug="gamma",
@@ -232,7 +232,7 @@ def test_a_conflict_names_both_candidates_and_never_overwrites(tmp_path):
     proc = _run(tmp_path, "migrate-archive", "--apply")
     assert proc.returncode == 4, f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
     error = _payload(proc)["error"]
-    assert ".specify/anchoring/gamma/goal.md" in error, error
+    assert ".specify/anchoring/gamma/anchor.md" in error, error
     assert ".specify/specs/093-fixture/goal/gamma/goal.md" in error, error
     assert target.read_text(encoding="utf-8") == before, "the target must not be overwritten"
     assert (source / "goal.md").is_file(), "the source must stay readable after a refusal"
@@ -244,7 +244,7 @@ def test_a_binding_only_difference_is_not_a_conflict(tmp_path):
     """C-40's last sentence: the binding block is excluded from the comparison."""
     spec = "093b-fixture"
     source = _seed_spec_goal(tmp_path, spec, slug="delta")
-    target = tmp_path / ".specify/anchoring/delta/goal.md"
+    target = tmp_path / ".specify/anchoring/delta/anchor.md"
     target.parent.mkdir(parents=True)
     target.write_text(
         source.joinpath("goal.md").read_text(encoding="utf-8")
@@ -319,7 +319,7 @@ def test_origin_is_set_and_no_lineage_is_rebuilt(tmp_path):
 
     assert _run(tmp_path, "migrate-archive", "--apply").returncode == 0
 
-    goal_target = tmp_path / ".specify/anchoring/eta/goal.md"
+    goal_target = tmp_path / ".specify/anchoring/eta/anchor.md"
     team_target = tmp_path / ".specify/teams/eta-crew/team.md"
     assert _body(goal_target.read_text(encoding="utf-8")) == goal_body
     assert _body(team_target.read_text(encoding="utf-8")) == team_body
