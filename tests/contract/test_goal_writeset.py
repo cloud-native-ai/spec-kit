@@ -4,8 +4,9 @@ Source contract: .specify/specs/037-goal-registry/contracts/goal-writeset-migrat
 
 The summary/SUMMARIZE step writes ONLY into the goal's derived subtree. This suite
 pins the allow-list formulation and the six invariant groups it protects — in
-particular that the authored ``goal.md`` is itself an invariant group, which is the
-new constraint requirement 037 adds on top of 036's deny-list.
+particular that the authored ``anchor.md`` is itself an invariant group, which is the
+new constraint requirement 037 adds on top of 036's deny-list (the definition file name
+follows feature 101: the anchor store's definition is ``anchor.md``).
 """
 
 from __future__ import annotations
@@ -63,10 +64,10 @@ class TestWriteSetAllowList:
 
 
 class TestInvariantGroups:
-    """WS-2: the write-set table must name every protected group, goal.md included."""
+    """WS-2: the write-set table must name every protected group, anchor.md included."""
 
     REQUIRED_GROUPS = (
-        "goal.md",
+        "anchor.md",
         ".specify/teams",
         "summarize-project",
         ".specify/agents",
@@ -83,12 +84,12 @@ class TestInvariantGroups:
     def test_mapping_declares_the_definition_is_not_writable_by_the_refresh(self):
         """The distinguishing 037 rule: the authored definition is off-limits."""
         text = _read(CANONICAL_MAPPING)
-        assert re.search(r"goal\.md", text), "goal.md not mentioned in summary-mapping.md"
+        assert re.search(r"anchor\.md", text), "anchor.md not mentioned in summary-mapping.md"
         window = "\n".join(
-            line for line in text.splitlines() if "goal.md" in line
+            line for line in text.splitlines() if "anchor.md" in line
         )
         assert re.search(r"MUST NOT|不变|不得|禁", window), (
-            "summary-mapping.md mentions goal.md but states no prohibition on writing it;\n"
+            "summary-mapping.md mentions anchor.md but states no prohibition on writing it;\n"
             f"matched lines:\n{window}"
         )
 

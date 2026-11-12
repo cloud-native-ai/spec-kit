@@ -1,0 +1,30 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_101_protected_paths.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_every_baseline_protected_path_is_unchanged_and_present __________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_baseline_protected_path_is_unchanged_and_present():
+        assert ENTRY.is_file(), f"missing T002 entry baseline {ENTRY}"
+        baseline, prefixes = read_entry(ENTRY)
+        assert len(baseline) > 1000, f"only {len(baseline)} baseline rows"
+        assert prefixes, "the entry baseline names no new-archive subtree prefix"
+    
+        current = git_hashes(ROOT, list(baseline))
+        changed, deleted = compare(baseline, current)
+        assert deleted == [], f"protected paths were deleted: {deleted[:10]}"
+>       assert changed == [], f"protected paths changed: {changed[:10]}"
+E       AssertionError: protected paths changed: ['.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt']
+E       assert ['.specify/sp...moke-081.txt'] == []
+E         
+E         Left contains one more item: '.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt'
+E         Use -v to get more diff
+
+tests/integration/test_101_protected_paths.py:103: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_101_protected_paths.py::test_every_baseline_protected_path_is_unchanged_and_present
+1 failed, 2 passed in 6.30s

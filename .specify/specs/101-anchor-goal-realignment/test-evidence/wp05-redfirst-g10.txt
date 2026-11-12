@@ -1,0 +1,36 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_command_family_101.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+....FF.                                                                  [100%]
+=================================== FAILURES ===================================
+____________________ test_ledger_carries_both_command_rows _____________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ledger_carries_both_command_rows():
+>       assert ledger_problems(LEDGER.read_text(encoding="utf-8")) == []
+E       AssertionError: assert ['the ledger ...t.anchor row'] == []
+E         
+E         Left contains one more item: 'the ledger has no /speckit.anchor row'
+E         Use -v to get more diff
+
+tests/contract/test_command_family_101.py:122: AssertionError
+___________ test_command_family_answers_per_definition_layer[anchor] ___________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+command = 'anchor'
+
+    @pytest.mark.parametrize("command", ["anchor", "goal"])
+    def test_command_family_answers_per_definition_layer(command):
+>       assert family_shape_problems(_family(command)) == []
+E       AssertionError: assert ['the command...amily at all'] == []
+E         
+E         Left contains one more item: 'the command is not in the family at all'
+E         Use -v to get more diff
+
+tests/contract/test_command_family_101.py:132: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_command_family_101.py::test_ledger_carries_both_command_rows
+FAILED tests/contract/test_command_family_101.py::test_command_family_answers_per_definition_layer[anchor]
+2 failed, 5 passed in 6.64s

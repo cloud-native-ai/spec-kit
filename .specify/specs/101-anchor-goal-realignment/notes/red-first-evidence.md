@@ -193,3 +193,31 @@ Red-first captures taken with `bash scripts/bash/run-tests.sh` before each corre
 4. `tests/contract/test_run_skills_wiring.py` — compile census pin 84 → 85 units (`templates/commands/anchor.md` now carries its compiled face).
 5. `tests/contract/test_team_command_routing.py` — zero-write red line retargeted from `goal.md` to `anchor.md` (reference filename unchanged).
 6. `tests/contract/test_criterion_vocabulary_scan.py` — historical-record exemption widened to the renamed owner pair (`goal-definitions.md` + `anchor-definitions.md`); the baseline id stays red on its pre-existing `decomposition-model.md` hits, status unchanged.
+
+## WP-05 (T061–T077) — guards G-1…G-10, red-first and injection
+
+Every guard was shown able to fail: the subject was broken in an isolated scratch tree and the guard was
+run through `bash scripts/bash/run-tests.sh` with `SPECKIT_GUARD_ROOT` pointing at it. The scratch is a
+full copy of the working tree under `.specify/.tmp/wp05/rf` (a nested `git init` was added for the
+git-hash guard); each mutation was reverted by copying the original file back.
+
+| Guard | Mutation (broken subject) | Red ids observed | Evidence |
+|---|---|---|---|
+| G-1 / T062 | `templates/commands/anchor.md` `argument-hint` loses `coordinate` | `::test_hint_declares_exactly_the_seven_modes`, `::test_generated_copies_carry_the_inherited_positioning` | `test-evidence/wp05-redfirst-g1.txt` |
+| G-2 / T063 | `templates/commands/goal.md` hint adds `targets` | `::test_goal_hint_declares_the_four_goal_modes`, `::test_anchor_only_modes_are_refused_by_the_subprocess_action` (the guard cross-checks hint vs engine refusal) | `test-evidence/wp05-redfirst-g2.txt` |
+| G-3 / T064 | delete `.specify/anchoring/086-efficient-test-execution/anchor.md` | `::test_live_anchor_store_is_converged`, `::test_every_anchor_definition_is_non_empty_and_titled` | `test-evidence/wp05-redfirst-g3.txt` |
+| G-4 / T065 | no root hook (module audits `REPO_ROOT` directly); red path exercised by the module's own injections | `::test_injection_out_of_engine_definition_write_is_red`, `::test_injection_derived_writer_escape_is_red` (pass in the final run) | `test-evidence/implement-wp05-targeted-tests.txt` |
+| G-5 / T066 | insert `goal_slug: draw-two-layer-structure` into `.specify/teams/draw-two-layer-structure/team.md` frontmatter | `::test_live_bindings_are_converged`, `::test_live_teams_carry_no_old_binding_key` | `test-evidence/wp05-redfirst-g5.txt` |
+| G-6 / T067 | append `A goal is a project-level objective.` to `docs/reference/commands/anchor.md` | `::test_live_tree_has_no_old_semantic_residue` (C1) | `test-evidence/wp05-redfirst-g6.txt` |
+| G-7a / T068 | second-apply no-op / receipt set / digest / target set | `::test_a_duplicate_receipt_turns_the_guard_red`, `::test_a_mismatched_digest_turns_the_guard_red`, `::test_a_dropped_target_turns_the_guard_red` (in-suite injections, real engine) | `test-evidence/implement-wp05-targeted-tests.txt` |
+| G-7b / T069 | phase faults `GOAL_UTILS_CLEANUP_FAULT_AFTER=write-target|write-receipt`, receipt-less target | the three tests themselves assert the interrupted / resumed / I5 half-state behaviour, each with a real engine subprocess | `test-evidence/implement-wp05-targeted-tests.txt` |
+| G-8 / T070 | append a byte to `.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt` in the isolated git scratch | `::test_every_baseline_protected_path_is_unchanged_and_present` (`protected paths changed: [...smoke-081.txt]`) | `test-evidence/wp05-redfirst-g8.txt` |
+| G-9 / T071 | delete `tests/fixtures/…/pre-convergence/.specify/anchoring/draw-two-layer-structure/goal.md` | `::test_the_fixture_tree_converges` (apply exits nonzero on the missing definition) | `test-evidence/wp05-redfirst-g9.txt` |
+| G-10 / T072 | drop the `| /speckit.anchor |` row from `shared/definitions/flow-class-definitions.md` | `::test_ledger_carries_both_command_rows`, `::test_command_family_answers_per_definition_layer[anchor]` | `test-evidence/wp05-redfirst-g10.txt` |
+
+Two first attempts were inconclusive and are disclosed rather than hidden: (a) mutating the protected
+path under `SPECKIT_GUARD_ROOT` first stayed green because `git hash-object --stdin-paths` resolves paths
+against the enclosing repository root, so the guard read the live file — fixed by giving the scratch its
+own `git init`; (b) setting a dangling `goal_slug` inside the pre-convergence fixture stayed green because
+the cleanup's binding rename rewrites the value from the classification, so the mutation was overwritten —
+the definition-deletion mutation above is the red path.

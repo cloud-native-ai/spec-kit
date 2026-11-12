@@ -1,0 +1,33 @@
+# SC-008 docs-build limb — `not-evaluated` (EP-006 re-measurement, T073)
+
+- date: 2026-11-12
+- subject: the documentation site build on this tree (`docs/`)
+- command: `hugo --source docs --renderToMemory --cacheDir .specify/.tmp/wp05/hugo/cache` (run from the repository root)
+- tool: `hugo v0.141.0-e7bd51698e5c3778a86003018702b1a7dcb9559a+extended linux/amd64`
+- exit code: **1**
+
+## First error, verbatim
+
+```text
+Error: error building site: render: failed to render pages: render of "/" failed: "/storage/project/cloud-native-ai/spec-kit/docs/layouts/_default/baseof.html:2:20": execute of template failed: template: index.html:2:20: executing "index.html" at <.Site.Language.Locale>: can't evaluate field Locale in type *langs.Language
+```
+
+The same `.Site.Language.Locale` failure repeats per page (`docs/reference/commands/docs.md`,
+`docs/reference/cli/supported-agent-tools.md`, `docs/decisions/index.md`,
+`docs/concepts/better-harness.md`, …); the run ends `Total in 116 ms` after reporting the
+build error. Zero pages are rendered.
+
+## Reading
+
+- **docs-build limb: `not-evaluated`.** EP-006 (plan.md) recorded this exact failure at plan
+  time as a pre-existing condition of the tree, unrelated to this feature; the premise that a
+  site build can be read pass/fail is falsified on hugo 0.141.0. Recording `pass` would be a
+  fabricated reading; recording `fail` would attribute a pre-existing template defect to this
+  feature. The limb is therefore `not-evaluated` with this measurement attached — not waived.
+- **The other SC-008 limbs stay measured** and are covered by G-10
+  (`tests/contract/test_command_family_101.py`): the `docs/reference/commands/anchor.md` page
+  exists and documents all seven modes; the flow-class ledger carries the `/speckit.anchor`
+  row; `goal-utils.py command-family` answers per definition layer. The probe limb reading is
+  in `test-evidence/implement-wp04.md` (T040 compile + copies check).
+- Re-measuring the site build is a later feature's task, as EP-006 states; this record exists
+  so no later reader mistakes the limb for a silent pass.

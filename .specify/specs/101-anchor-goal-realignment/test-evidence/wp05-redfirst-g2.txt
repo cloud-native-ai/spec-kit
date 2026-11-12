@@ -1,0 +1,39 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_goal_command_surface.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..F.F...                                                                 [100%]
+=================================== FAILURES ===================================
+_________________ test_goal_hint_declares_the_four_goal_modes __________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_goal_hint_declares_the_four_goal_modes() -> None:
+        text = TEMPLATE.read_text(encoding="utf-8")
+        hint = next(line for line in text.splitlines() if line.startswith("argument-hint:"))
+        modes = [part.strip() for part in hint.split("[", 1)[1].split("]", 1)[0].split("|")]
+>       assert sorted(modes) == sorted(GOAL_MODES), modes
+E       AssertionError: ['create', 'view', 'modify', 'status', 'targets']
+E       assert ['create', 'm...gets', 'view'] == ['create', 'm...atus', 'view']
+E         
+E         At index 3 diff: 'targets' != 'view'
+E         Left contains one more item: 'view'
+E         Use -v to get more diff
+
+tests/contract/test_goal_command_surface.py:81: AssertionError
+_________ test_anchor_only_modes_are_refused_by_the_subprocess_action __________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_anchor_only_modes_are_refused_by_the_subprocess_action() -> None:
+        for mode in ANCHOR_ONLY_MODES:
+            result = _run("command-mode", "--command", "goal", "--mode", mode, "--json")
+>           assert result.returncode == 2, f"{mode}: expected exit 2, got {result.returncode}"
+E           AssertionError: targets: expected exit 2, got 0
+E           assert 0 == 2
+E            +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/wp05/rf/scri...\n    "view",\n    "modify",\n    "status",\n    "targets"\n  ],\n  "verdict": "ok",\n  "message": ""\n}\n', stderr='').returncode
+
+tests/contract/test_goal_command_surface.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_goal_command_surface.py::test_goal_hint_declares_the_four_goal_modes
+FAILED tests/contract/test_goal_command_surface.py::test_anchor_only_modes_are_refused_by_the_subprocess_action
+2 failed, 6 passed in 6.80s

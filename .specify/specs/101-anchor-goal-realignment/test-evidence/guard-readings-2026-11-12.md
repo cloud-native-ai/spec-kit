@@ -1,0 +1,29 @@
+# Guard readings index (T077) — FR-062 … FR-071
+
+Date: 2026-11-12 · run `r20261112T064607Z-b101` · base `570622221` + WP-05 working tree.
+Runner: `bash scripts/bash/run-tests.sh` only. Every row below has a reading; a criterion without one would
+read `not-evaluated` (none does except the SC-008 build limb, attached to FR-071's row).
+
+Final targeted set (11 guard modules + the two base-red modules): **110 passed, 1 failed** —
+the single failure is the live residue scan, i.e. FR-067's reading.
+Evidence: `test-evidence/implement-wp05-targeted-tests.txt` (+ `…-run1.txt` for the earlier 6-module capture).
+
+| FR | Criterion (short) | Sensor / guard | Reading | Evidence |
+|---|---|---|---|---|
+| FR-062 | Anchor command template: exists, exactly seven modes, scope cited not restated → red otherwise | G-1 `tests/contract/test_anchor_command_surface.py` (9 tests, incl. 3 injections) | **pass** — 9 passed; red-first: dropping `coordinate` fails `test_hint_declares_exactly_the_seven_modes` + copies test | module; `test-evidence/wp05-redfirst-g1.txt` |
+| FR-063 | Goal template never accepts an Anchor-only mode; refusal is named (`anchor-only-mode`, `/speckit.anchor`) | G-2 `tests/contract/test_goal_command_surface.py` (8 tests, incl. 2 injections + real-subprocess refusal) | **pass** — 8 passed; red-first: adding `targets` to the hint fails 2 tests | module; `test-evidence/wp05-redfirst-g2.txt` |
+| FR-064 | Every `.specify/anchoring/*/` has `anchor.md`; no `action-goal` entry remains → red otherwise | G-3 `tests/contract/test_anchor_definitions.py` (5) + G-9 `tests/integration/test_101_convergence.py` (1) | **pass** — 5 + 1 passed; red-first: deleted `anchor.md` fails 2 tests; deleted fixture definition breaks convergence | modules; `test-evidence/wp05-redfirst-g3.txt`, `…-g9.txt` |
+| FR-065 | Only the engine writes `anchor.md` / `goal.md`; derived `summary/**` writer allowed; two writers → distinct paths | G-4 `tests/contract/test_goal_store_write_boundary.py` (9, incl. 2 injections, 2 two-writer simulations) | **pass** — 9 passed; no `SPECKIT_GUARD_ROOT` hook in this module (it audits `REPO_ROOT` by design), red path covered by its own injection tests | module; `test-evidence/implement-wp05-targeted-tests.txt` |
+| FR-066 | No live team definition (frontmatter/body, archived included, `runs/**` excluded) carries `goal_slug`; every `anchor_slug` resolves | G-5 `tests/contract/test_binding_rename.py` (6) + convergence binding assertion | **pass** — 6 + 1 passed; red-first: re-inserted `goal_slug` fails 2 tests | modules; `test-evidence/wp05-redfirst-g5.txt` |
+| FR-067 | Live surfaces define Goal as project-level, call `/speckit.goal` the anchor-archive entry, or use `.specify/goal/<slug>/summary/` → red | G-6 `tests/contract/test_live_semantic_residue.py` (7) | **FAIL** — `test_live_tree_has_no_old_semantic_residue` lists **C1 (2)** `shared/definitions/derivation-definitions.md` + `.specify/shared/` mirror, **C4 (1)** `.specify/memory/tools/build-summary-input.py.md:35`; C2/C3/C5/C6/C7 = 0; corpus + injection + determinism tests pass | `test-evidence/residue-scan-2026-11-12.txt`, `test-evidence/implement-wp05-targeted-tests.txt`; red-first `…-g6.txt` |
+| FR-068 | Migration: idempotent, resumable, receipts complete, digests equal, zero deletes; duplicate receipt or dropped Target → red | G-7a `tests/contract/test_cleanup_idempotency.py` (5) + G-7b `tests/contract/test_cleanup_resume.py` (3) | **pass** — 8 passed; injections (duplicate receipt / drifted concept / dropped target) each go red; I5 half-state rc 4, resume phases `write-receipt` → `remove-source` | modules; `test-evidence/implement-wp05-targeted-tests.txt` |
+| FR-069 | Protected dated paths vs pre-feature baseline `d7c9da7a3`: any byte change → red; captured at entry and close-out | G-8 `tests/integration/test_101_protected_paths.py` (3) over `test-evidence/protected-paths-entry.txt` | **pass** — entry capture (T002): 4550 rows, 0 deleted, 1 changed (`smoke-081.txt`, pre-existing uncommitted, disclosed in the artifact) ; close-out: 3 passed, no baseline path changed/deleted; the one addition bucket is `.specify/archive/anchoring/`; red-first: byte appended to `smoke-081.txt` fails the guard | module; entry artifact; `test-evidence/wp05-redfirst-g8.txt` |
+| FR-070 | Command-surface drift: flow-class ledger rows, reference page coverage, command-family verdict — missing `/speckit.anchor` row/page → red | G-10 `tests/contract/test_command_family_101.py` (7, incl. 3 injections; live `command-family --command anchor|goal`) | **pass** — 7 passed; red-first: dropped ledger row fails 2 tests | module; `test-evidence/wp05-redfirst-g10.txt` |
+| FR-071 | Own readings under `test-evidence/`; no reading → `not-evaluated`, never pass | this index + T073–T076 artifacts | **pass with one `not-evaluated` limb** — all readings present; **SC-008 docs-build limb = `not-evaluated`** (hugo v0.141.0 `--renderToMemory` exits 1 with `.Site.Language.Locale: can't evaluate field Locale in type *langs.Language`; EP-006, pre-existing); other SC-008 limbs measured by G-10/T040 | `test-evidence/docs-build-2026-11-12.txt`, `test-evidence/reader-restatement-2026-11-12.md`, `notes/quickstart-run.md`, `test-evidence/residue-scan-2026-11-12.txt`, `test-evidence/cleanup-check-wp05-2026-11-12.json` |
+
+## Unmet criteria carried as anomalies
+
+| Criterion | Fact | Owner / routing |
+|---|---|---|
+| FR-067 (and SC-001) | C1 = 2 at `shared/definitions/derivation-definitions.md:414` + its `.specify/shared/` mirror (Goal defined as project-level) | owner of `derivation-definitions.md`; outside WP-05 write territory, not edited |
+| FR-067 (and SC-001) | C4 = 1 at `.specify/memory/tools/build-summary-input.py.md:35` (stale `--out` default) | Tool-record owner (`/speckit.tools`); outside WP-05 write territory, not edited |

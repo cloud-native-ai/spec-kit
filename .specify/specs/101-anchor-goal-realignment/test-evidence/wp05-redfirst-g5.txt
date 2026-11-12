@@ -1,0 +1,32 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_binding_rename.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+....FF                                                                   [100%]
+=================================== FAILURES ===================================
+_______________________ test_live_bindings_are_converged _______________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_bindings_are_converged() -> None:
+        problems = binding_problems(ROOT, _load(CLASSIFICATION))
+>       assert not problems, problems
+E       AssertionError: ['.specify/teams/draw-two-layer-structure/team.md: still carries goal_slug']
+E       assert not ['.specify/teams/draw-two-layer-structure/team.md: still carries goal_slug']
+
+tests/contract/test_binding_rename.py:111: AssertionError
+___________________ test_live_teams_carry_no_old_binding_key ___________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_teams_carry_no_old_binding_key() -> None:
+        offenders = [str(path.relative_to(ROOT)) for path in team_files(ROOT)
+                     if OLD_KEY in path.read_text(encoding="utf-8")]
+>       assert not offenders, offenders
+E       AssertionError: ['.specify/teams/draw-two-layer-structure/team.md']
+E       assert not ['.specify/teams/draw-two-layer-structure/team.md']
+
+tests/contract/test_binding_rename.py:117: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_binding_rename.py::test_live_bindings_are_converged
+FAILED tests/contract/test_binding_rename.py::test_live_teams_carry_no_old_binding_key
+2 failed, 4 passed in 6.20s

@@ -1,0 +1,52 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_anchor_definitions.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...FF                                                                    [100%]
+=================================== FAILURES ===================================
+_____________________ test_live_anchor_store_is_converged ______________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_live_anchor_store_is_converged() -> None:
+        problems = anchor_store_problems(ROOT, _load(CLASSIFICATION))
+>       assert not problems, problems
+E       AssertionError: ['.specify/anchoring/086-efficient-test-execution: no anchor.md']
+E       assert not ['.specify/anchoring/086-efficient-test-execution: no anchor.md']
+
+tests/contract/test_anchor_definitions.py:73: AssertionError
+_____________ test_every_anchor_definition_is_non_empty_and_titled _____________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_anchor_definition_is_non_empty_and_titled() -> None:
+        for slug in anchor_store_slugs(ROOT):
+>           text = (ROOT / ANCHOR_STORE / slug / "anchor.md").read_text(encoding="utf-8")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_anchor_definitions.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/wp05/rf/.specify/anchoring/086-efficient-test-execution/anchor.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/wp05/rf/.specify/anchoring/086-efficient-test-execution/anchor.md'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/contract/test_anchor_definitions.py::test_live_anchor_store_is_converged
+FAILED tests/contract/test_anchor_definitions.py::test_every_anchor_definition_is_non_empty_and_titled
+2 failed, 3 passed in 6.20s

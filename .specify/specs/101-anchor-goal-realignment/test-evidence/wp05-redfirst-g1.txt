@@ -1,0 +1,32 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_anchor_command_surface.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.......FF                                                                [100%]
+=================================== FAILURES ===================================
+____________ test_generated_copies_carry_the_inherited_positioning _____________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_generated_copies_carry_the_inherited_positioning() -> None:
+        missing = [copy for copy in COPIES if not (ROOT / copy).is_file()]
+>       assert not missing, f"generated per-tool copies missing: {missing}"
+E       AssertionError: generated per-tool copies missing: ['.claude/commands/speckit.anchor.md', '.github/prompts/speckit.anchor.prompt.md', '.qoder/commands/speckit.anchor.md', '.opencode/command/speckit.anchor.md']
+E       assert not ['.claude/commands/speckit.anchor.md', '.github/prompts/speckit.anchor.prompt.md', '.qoder/commands/speckit.anchor.md', '.opencode/command/speckit.anchor.md']
+
+tests/contract/test_anchor_command_surface.py:129: AssertionError
+__________________ test_hint_declares_exactly_the_seven_modes __________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_hint_declares_exactly_the_seven_modes() -> None:
+        modes = hint_modes(_read(TEMPLATE))
+>       assert len(modes) == 7, f"expected 7 modes, read {len(modes)}: {modes}"
+E       AssertionError: expected 7 modes, read 6: ['create', 'view', 'modify', 'targets', 'migrate', 'migrate-archive']
+E       assert 6 == 7
+E        +  where 6 = len(['create', 'view', 'modify', 'targets', 'migrate', 'migrate-archive'])
+
+tests/contract/test_anchor_command_surface.py:101: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_anchor_command_surface.py::test_generated_copies_carry_the_inherited_positioning
+FAILED tests/contract/test_anchor_command_surface.py::test_hint_declares_exactly_the_seven_modes
+2 failed, 7 passed in 6.21s
