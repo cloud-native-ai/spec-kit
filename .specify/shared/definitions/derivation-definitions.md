@@ -411,5 +411,5 @@ Both are git-tracked. The library is cross-topic; each topic directory holds one
 | **Open Question** (`Q-k`) | A recorded gap where grounded premises ran out — never silently filled | here |
 | **Research** | Feature-scoped evidence gathering and decision rationale | `/speckit.research`; `.specify/specs/<key>/research.md` |
 | **Plan** | Feature-scoped implementation approach; MAY cite an `A-k`, never the reverse | `/speckit.plan` |
-| **Goal** | Project-level authored end state, measured by degree — a different plane entirely | `goal-definitions.md` |
+| **Anchor** | Project-level authored end state, measured by degree — a different plane entirely | `anchor-definitions.md` |
 | **"derive" elsewhere** | `derive` as an ordinary verb in other engines (generating a view from a truth source, e.g. a probe map or a feature index) — **unrelated** to this concept | their owning docs |
