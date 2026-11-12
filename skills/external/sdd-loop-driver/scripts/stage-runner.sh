@@ -192,6 +192,14 @@ case "$DETACHED" in yes|no) ;; *) die_usage "--detached must be yes|no" ;; esac
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 DERIVE="$SCRIPT_DIR/derive-live-log.py"
 mkdir -p "$STATE_DIR"
+case "$STATE_DIR" in
+  /*) ;;
+  *) STATE_DIR="$(cd "$STATE_DIR" && pwd)" ;;
+esac
+case "$PROJECT_DIR" in
+  /*) ;;
+  *) PROJECT_DIR="$(cd "$PROJECT_DIR" && pwd)" ;;
+esac
 
 pidf="$STATE_DIR/pid-$LINE-$STAGE"
 statusf="$STATE_DIR/status-$LINE-$STAGE"
@@ -228,6 +236,40 @@ atomic_write "$hb" "at=$(now_epoch) line=$LINE stage=$STAGE event=heartbeat"
   done ) >/dev/null 2>&1 &
 hb_pid=$!
 disown "$hb_pid" 2>/dev/null || true
+
+# Best-effort execution-body registration: a live stage runner (and its CLI
+# child) must be visible in the line registry so the status digest never
+# reports "no live executor" while this process is running. The update is
+# advisory — a missing registry or a failed lookup never affects the stage.
+if [ -f "$SCRIPT_DIR/line-registry.py" ]; then
+  (
+    _run_line="$LINE"
+    _run_stage="$STAGE"
+    _run_cli="$(basename "$CLI")"
+    _reg_prompt="$PROMPT_FILE"
+    case "$_reg_prompt" in
+      /*) ;;
+      *) _reg_prompt="$PROJECT_DIR/$_reg_prompt" ;;
+    esac
+    _cli_pid=""
+    _n=0
+    while [ "$_n" -lt 100 ]; do
+      _cli_pid=$(pgrep -P "$runner_pid" -f "$_run_cli" 2>/dev/null | head -n 1 || true)
+      [ -n "$_cli_pid" ] && break
+      sleep 0.2
+      _n=$((_n + 1))
+    done
+    if [ -n "$_cli_pid" ]; then
+      python3 "$SCRIPT_DIR/line-registry.py" --action update \
+        --line-id "$_run_line" --stage "$_run_stage" \
+        --runner-pid "$runner_pid" --cli-pid "$_cli_pid" \
+        --prompt-path "$_reg_prompt" --status-path "$statusf" \
+        --log-path "$live" --heartbeat-path "$hb" \
+        --last-event "/speckit.$_run_stage" >/dev/null 2>&1 || true
+    fi
+  ) >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+fi
 
 split_args() {
   local text="$1" current="" quote="" char index=0 out=()

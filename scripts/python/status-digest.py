@@ -1280,8 +1280,9 @@ def read_executors(workspace, entries, now):
     """
     state_dir = Path(workspace) / ".specify" / "state"
     out = []
-    if not state_dir.is_dir():
-        return out
+    # The registry's runner_pid/cli_pid are read even when no legacy pid-* file
+    # exists: a live stage runner must never be invisible just because its runtime
+    # pid files live elsewhere (the sanctioned .specify/.tmp/sdd-loop/... root).
     by_line = {str(e.get("line_id")): e for e in entries if str(e.get("state")) != "closed"}
     known = set()
 
@@ -1333,7 +1334,9 @@ def read_executors(workspace, entries, now):
             return None
 
     for entry in by_line.values():
-        for key in ("cli_pid", "runner_pid"):
+        # Runner first: the CLI child's parent is the runner, so this order keeps
+        # one row per dispatch instead of counting both.
+        for key in ("runner_pid", "cli_pid"):
             pid = entry.get(key)
             if not (isinstance(pid, int) or (isinstance(pid, str) and pid.isdigit())):
                 continue
