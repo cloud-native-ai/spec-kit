@@ -74,3 +74,10 @@ Not yet reviewed. Registered as Draft during `/speckit.clarify` for requirement 
 - .specify/specs/037-goal-registry/requirements.md — Goal as a project-level first-class concept (Draft; clarified 2026-08-05).
 - .specify/specs/038-goal-target/requirements.md — Target decomposition: run-assignable scope slices under Goal (Planned 2026-08-11; extends this Feature's implemented surface in place).
 - Cross-reference: Feature 027 (Team Management) owns the team side of the binding; requirement 036 established the `goal_slug` aggregation semantics this Feature supplies the definition source for.
+
+## Successor Note — 2026-11-12 (Feature 101)
+
+Successor: **Feature 101 — Anchor / Goal Realignment** (`.specify/features/101-anchor-goal-realignment.md`; spec `.specify/specs/101-anchor-goal-realignment/`). One-way back reference; this Feature's status and every dated record above are unchanged.
+
+- The project-level, long-horizon concept this Feature registered under the name "Goal" now belongs to **Anchor**, owned by `shared/definitions/anchor-definitions.md`, and is authored through `/speckit.anchor`. The retired sense survives here only as the delivery record of the pre-inversion model.
+- The definition file in the archive is renamed by 101 (`goal.md` → `anchor.md`); the team binding field `goal_slug` becomes `anchor_slug`. Feature 101's spec and the two definition pages it names are the owners of those rules; this note restates none of them.

@@ -1,0 +1,22 @@
+teams 20 bound 10 unbound 10 legacy_goal_slug 0 dangling 0
+binding axis: anchor_slug; target = .specify/anchoring/<slug>/anchor.md
+{"team": "085-sdd-temporary-goal-team", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "086-efficient-test-execution", "anchor_slug": "086-efficient-test-execution", "legacy_goal_slug": null, "target_exists": true}
+{"team": "087-arch-diagram-docs", "anchor_slug": "087-arch-diagram-docs", "legacy_goal_slug": null, "target_exists": true}
+{"team": "088-reporting-dogfood", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "089-script-interface-contract", "anchor_slug": "script-interface-contract", "legacy_goal_slug": null, "target_exists": true}
+{"team": "090-re-anchoring", "anchor_slug": "090-re-anchoring", "legacy_goal_slug": null, "target_exists": true}
+{"team": "091-auto-git-closeout", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "094-goal-team-parallel", "anchor_slug": "094-goal-team-parallel", "legacy_goal_slug": null, "target_exists": true}
+{"team": "command-logic-as-classified-skills", "anchor_slug": "command-logic-as-classified-skills", "legacy_goal_slug": null, "target_exists": true}
+{"team": "cws-workspace-cluster", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "demo-seat-dispatch", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "draw-diagram-interactive", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "draw-plantuml-optimizer", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "draw-two-layer-structure", "anchor_slug": "draw-two-layer-structure", "legacy_goal_slug": null, "target_exists": true}
+{"team": "post-refactor-mechanism-integrity", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "requirement-implement-monitor", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "session-driven-self-improvement", "anchor_slug": "session-driven-self-improvement", "legacy_goal_slug": null, "target_exists": true}
+{"team": "skill-layer-install-separation", "anchor_slug": "skill-layer-install-separation", "legacy_goal_slug": null, "target_exists": true}
+{"team": "summarize-project-optimizer", "anchor_slug": null, "legacy_goal_slug": null, "target_exists": null}
+{"team": "viz-skill-arena", "anchor_slug": "visualization-skill-selection", "legacy_goal_slug": null, "target_exists": true}

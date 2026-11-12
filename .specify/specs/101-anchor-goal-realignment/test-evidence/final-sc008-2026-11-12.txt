@@ -1,0 +1,14 @@
+== SC-008 limbs measured 2026-11-12T21:24:16+08:00 ==
+file-exists docs/reference/commands/anchor.md yes
+file-exists docs/reference/commands/goal.md yes
+-- flow-class ledger rows --
+146:| /speckit.anchor | execution | behavior-oracle |  | 交付锚点定义、Targets 与绑定操作结果；由 goal 引擎校验与命令族读取判定 |
+155:| /speckit.goal | execution | behavior-oracle |  | 交付行动级 Goal 定义与共享生命周期结果；由 goal 引擎校验判定（四模式，Anchor-only 模式被具名拒绝） |
+-- probe compile check --
+compile-embeds --check: 85 units, zero drift
+probe_compile_rc=0
+-- docs build (pre-existing EP-006) --
+  row; `goal-utils.py command-family` answers per definition layer. The probe limb reading is
+  in `test-evidence/implement-wp04.md` (T040 compile + copies check).
+- Re-measuring the site build is a later feature's task, as EP-006 states; this record exists
+  so no later reader mistakes the limb for a silent pass.

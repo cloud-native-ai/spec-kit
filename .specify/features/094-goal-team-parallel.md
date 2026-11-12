@@ -70,3 +70,11 @@
   世代名改为 `SDD Temporary Team 094`，`territory.write` 的 `.specify/goal/**` 改为 `.specify/anchoring/**`、
   `.specify/memory/features/092.md` 改为 `.specify/.specify/features/094-goal-team-parallel.md`；C-107 的扫描面不含
   `.specify/specs/**` 这一事实不变。
+
+## Successor Note — 2026-11-12 (Feature 101)
+
+Successor: **Feature 101 — Anchor / Goal Realignment** (`.specify/features/101-anchor-goal-realignment.md`; spec `.specify/specs/101-anchor-goal-realignment/`). One-way back reference; this Feature's status and every dated record above are unchanged.
+
+- This Feature renamed the directory `.specify/goal/` → `.specify/anchoring/` but deliberately left two surfaces untouched: the definition file name (`goal.md`) and the scope value set (`goal` / `teams` / `auto`). Feature 101 completes both — the definition file inside each slug directory is `anchor.md`, and the archive member of the scope value set is `anchor`; action-level Goal definitions live in the separate `.specify/goals/<slug>/goal.md` store.
+- The team binding field `goal_slug` becomes `anchor_slug`; the three-value scope grammar and the archive layout otherwise keep the shape this Feature declared.
+- The owners are Feature 101's spec and the two definition pages it names; this note restates none of their rules.

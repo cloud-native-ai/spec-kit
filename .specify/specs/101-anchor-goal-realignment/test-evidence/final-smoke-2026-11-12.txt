@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_anchor_command_surface.py tests/contract/test_goal_command_surface.py tests/contract/test_scope_resolution.py tests/contract/test_cleanup_idempotency.py tests/integration/test_101_convergence.py tests/integration/test_101_protected_paths.py tests/contract/test_live_semantic_residue.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...........................................                              [100%]
+43 passed in 12.94s
