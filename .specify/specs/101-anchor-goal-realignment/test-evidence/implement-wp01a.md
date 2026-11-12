@@ -36,3 +36,19 @@ pure rename so the T006 evidence obligation is measurable. T008 recreates the Go
 | SC-010 restatement material | each of the four confusable terms has exactly one dedicated table row: `**Anchor** (锚点)` → 1, `**anchoring archive** (锚点档案)` → 1, `**Re-Anchoring** (重新锚定)` → 1, `**action-level Goal** (行动级目标)` → 1; each row states both the referent and what it is NOT |
 | Scope ownership | § Archive Layers carries the four-member closed set `anchor` / `teams` / `goals` / `auto`, states the retired member `goal` fails as an invalid value with no alias, and says the engine `--help` cites this section by path |
 | Sole-owner split | binding record (three keys) and lifecycle (three values + transition discipline) are declared owned here; the Goal owner is cited by path and MUST NOT restate them |
+
+## T008 — Goal owner rewrite (FR-003, FR-004, FR-005, FR-024)
+
+Rebuilt from the pre-move blob (`3e1c0a4f0`) as a **new** action-level file; the pre-move
+content stays readable on the Anchor path through the T006 rename.
+
+| Field | Value |
+|-------|-------|
+| Command | C1 residue patterns (research §5, four regexes) over `shared/definitions/goal-definitions.md` and over the pre-move blob; plus retired-path / authoring-entry greps |
+| rc | 0 |
+| Selected paths | `shared/definitions/goal-definitions.md` |
+| Result — C1 | pre-move blob **0**, rewritten file **0** (these regexes never matched this file's old "first-class concept" phrasing; the convergence is the semantic rewrite, recorded below) |
+| Result — semantic residue | `first-class` → **0** occurrences; `project-level` / `long-horizon` occur only where they name the **Anchor** as the different concept or in the retirement mapping — never as a predicate of a Goal |
+| Result — retired paths | `.specify/goal` (not followed by `s`) → **0**; `/speckit.goal` → **0** |
+| Result — schema closure | frontmatter key set `status` / `created` / `updated` / `binding`; section set `## Guidance` / `## Completion Conditions` / `## History` required, `## Migrated Targets` / `## Boundaries` carry-over only; the file states the `anchor_ref` refusal and exit 2 |
+| Result — no restatement | the three-key record and the lifecycle table are cited to `anchor-definitions.md` § The Binding Record / § Lifecycle; no key domain or transition is re-enumerated in this file |
