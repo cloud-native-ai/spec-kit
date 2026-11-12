@@ -102,7 +102,7 @@ write nothing (exit 4). Never overwrite, never pick a winner, never fall back to
 | Phase | Work | Resumable unit |
 |-------|------|----------------|
 | P1 | anchor renames (9 entries) | one entry |
-| P2 | action-goal migrations (2) and obsolete archival (2) | one entry |
+| P2 | action-goal migrations (3) and obsolete archival (2) | one entry |
 | P3 | R2 Anchor creation for `viz-skill-arena` (engine `migrate`) | one team |
 | P4 | summary moves for migrated/archived entries (FR-049) | one entry |
 | P5 | team structural rename for all 16 bound teams (C-45) | one team |

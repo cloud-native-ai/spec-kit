@@ -51,7 +51,7 @@ new surface and needs a plan revision.
 |----|--------|--------------------|----------|
 | SC-001 | `tests/contract/test_live_semantic_residue.py` over the roots declared in `research.md` §5 | C1 4 · C2 0 · C3 7 · C4 15 · total 26 | `test-evidence/live-semantic-scan-baseline-2026-11-12.txt` |
 | SC-002 | Template `argument-hint` parse + subprocess refusal probes | both templates today carry the old surface (expected) | contract tests C-1/C-14 |
-| SC-003 | `classification.json` + `cleanup --check` enumeration | 9 anchor / 2 action-goal / 2 obsolete across 14 entries | `classification.json`; `research.md` §3 |
+| SC-003 | `classification.json` + `cleanup --check` enumeration | 9 anchor / 3 action-goal / 2 obsolete across 14 entries | `classification.json`; `research.md` §3 |
 | SC-004 | Receipts + digest equality + protected-path hashes | no receipts exist yet (nothing migrated) | `test-evidence/plan-baseline-*` (pre) |
 | SC-005 | `team.md` frontmatter scan + `run-checks` per team | 16 bound / 4 unbound; 2 dangling (`viz-skill-arena`, `demo-seat-dispatch`) | `classification.json` `teams`; `research.md` §4 |
 | SC-006 | Static write-surface audit + two-writer fixture | engine is sole writer today | `contracts/goal-engine.contract.md` C-31 |

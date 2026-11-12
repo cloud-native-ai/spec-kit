@@ -110,7 +110,7 @@ python3 .specify/scripts/python/goal-utils.py cleanup --apply \
   --classification .specify/specs/101-anchor-goal-realignment/classification.json --json
 ```
 
-**Expected**: the check names 9 `anchor` / 2 `action-goal` / 2 `obsolete` entries plus the team
+**Expected**: the check names 9 `anchor` / 3 `action-goal` / 2 `obsolete` entries plus the team
 dispositions, with zero writes; the first apply performs the actions and writes one receipt per acted
 entry; the second apply reports every entry `already-*`, exits 0, and produces **no diff** (SC-007).
 **Pin**: `tests/contract/test_cleanup_idempotency.py` (two applies, no second write) and

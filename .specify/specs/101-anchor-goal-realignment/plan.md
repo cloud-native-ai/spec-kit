@@ -37,7 +37,7 @@ the archival destination
 single `cleanup --apply` is expected to finish in seconds
 **Constraints**: no new dependency; no second engine or writer; archive-not-delete; dated records never
 rewritten; every mirror pair delivered in the same change
-**Scale/Scope**: 14 anchor entries (9 / 2 / 2), 20 team definitions (16 bound, 4 unbound), 71 FR, 6 work
+**Scale/Scope**: 14 anchor entries (9 / 3 / 2), 20 team definitions (16 bound, 4 unbound), 71 FR, 6 work
 packages, 4 contract files (49 clauses)
 
 ## Constitution Check
@@ -197,17 +197,20 @@ shared/definitions/                  # Concept owners
 shared/patterns/interview-pattern.md # anchor authoring pointer
 skills/internal/
 ├── manage-anchor/                   # NEW — seven-mode skill
-└── manage-goal/                     # REWRITTEN — four-mode skill
+├── manage-goal/                     # REWRITTEN — four-mode skill
+└── create-team/ improve-team/ run-team/ summarize-project/   # Anchor terminology + team-domain paths
 skills/external/
 ├── sdd-project-setup/               # archive check instead of the retired path
-├── sdd-house-keeping/               # archive check instead of the retired path
-├── create-team/ improve-team/ run-team/ summarize-project/   # Anchor terminology + team-domain paths
+└── sdd-house-keeping/               # archive check instead of the retired path
 templates/commands/
 ├── anchor.md                        # NEW — canonical seven-mode template
 └── goal.md                          # REWRITTEN — canonical four-mode template
 scripts/python/
 ├── goal-utils.py                    # layer parameter, two new action groups, four-member --scope
-├── sdd-route.py concurrency-check.py logical-framework.py build-summary-input.py   # consumers
+├── sdd-route.py concurrency-check.py                          # consumers (scope projection, layout probe)
+skills/external/sdd-project-setup/scripts/logical-framework.py # consumer (Anchor paths/labels)
+skills/external/sdd-house-keeping/scripts/logical-framework.py # consumer (Anchor paths/labels)
+skills/internal/create-team/scripts/build-summary-input.py     # consumer (summary input paths)
 src/specify_cli/__init__.py          # MIGRATE_STATIC_POINTERS ownerCommand + command list
 docs/reference/commands/
 ├── anchor.md                        # NEW reference page
@@ -317,9 +320,9 @@ fence it obeys. Territories are **file-level** where two packages share a direct
 
 | WP | Scope | Inputs | Outputs | Write territory | Depends on |
 |----|-------|--------|---------|-----------------|-----------|
-| **WP-01** | Concept owners + engine | FR-001…FR-009, FR-028…FR-034; `contracts/goal-engine.contract.md`; T-001/T-004 | `anchor-definitions.md` (new), `goal-definitions.md` (rewritten), engine layer parameter + two action groups + four-member `--scope`, consumer updates | `shared/definitions/anchor-definitions.md`, `shared/definitions/goal-definitions.md`, `scripts/python/goal-utils.py`, `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`, `scripts/python/logical-framework.py`, `scripts/python/build-summary-input.py`, `src/specify_cli/__init__.py`, + their `.specify/` mirrors | — |
+| **WP-01** | Concept owners + engine | FR-001…FR-009, FR-028…FR-034; `contracts/goal-engine.contract.md`; T-001/T-004 | `anchor-definitions.md` (new), `goal-definitions.md` (rewritten), engine layer parameter + two action groups + four-member `--scope`, consumer updates | `shared/definitions/anchor-definitions.md`, `shared/definitions/goal-definitions.md`, `scripts/python/goal-utils.py`, `scripts/python/sdd-route.py`, `scripts/python/concurrency-check.py`, `skills/external/sdd-project-setup/scripts/logical-framework.py`, `skills/external/sdd-house-keeping/scripts/logical-framework.py`, `skills/internal/create-team/scripts/build-summary-input.py`, `src/specify_cli/__init__.py`, + their `.specify/` mirrors | — |
 | **WP-02** | Command surface | FR-010…FR-027; `contracts/anchor-command.contract.md`; `contracts/goal-command.contract.md` | `templates/commands/anchor.md` (new), `goal.md` (rewritten), `manage-anchor` skill (new), `manage-goal` skill (rewritten), four per-tool copies, two reference pages | `templates/commands/anchor.md`, `templates/commands/goal.md`, `skills/internal/manage-anchor/**`, `skills/internal/manage-goal/**`, the four per-tool copy directories, `docs/reference/commands/anchor.md`, `docs/reference/commands/goal.md`, + mirrors | WP-01 (mode semantics) |
-| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping,create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, + mirrors | WP-01, WP-02 |
+| **WP-03** | Live-surface convergence | FR-050…FR-060; `research.md` §5; T-002 | framework-map, glossary, routing hierarchy, re-anchoring, flow-class, probe, non-disposable, interview pattern, setup / house-keeping, four team-domain skills, tutorials | the remaining `shared/definitions/*.md` (6 files), `shared/patterns/interview-pattern.md`, `skills/external/{sdd-project-setup,sdd-house-keeping}/**`, `skills/internal/{create-team,improve-team,run-team,summarize-project}/**`, `docs/tutorials/**`, + mirrors | WP-01, WP-02 |
 | **WP-04** | Cleanup, migration, dispositions | FR-035…FR-049; `classification.json`; `contracts/migration-cleanup.contract.md`; T-003 | 9 renames, 3 migrations, 2 archival moves with receipts, 16 structural renames, body normalization, 6 R3 dispositions + 1 R2 anchor | `.specify/anchoring/**`, `.specify/goals/**` (new), `.specify/archive/anchoring/**`, `.specify/teams/*/team.md` + receipt files, no other file | WP-01 (engine actions) |
 | **WP-05** | Guards and evidence | FR-061…FR-071; `contracts/` C-31/C-41/C-49 | contract guards per class, migration/idempotency/resume suite, protected-path guard, convergence integration test, fixtures, all readings | `tests/contract/**`, `tests/integration/**`, `tests/fixtures/anchor-goal-realignment/**`, `test-evidence/**` of this spec | WP-01…WP-04 |
 | **WP-06** | Registry and close | FR-071; `feature-ref.md` | registry row + feature detail status, cross-references, final readings | `.specify/features.md`, `.specify/features/101-anchor-goal-realignment.md` | WP-05 |
