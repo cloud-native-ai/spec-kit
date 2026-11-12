@@ -62,6 +62,10 @@ DOCS_STEP_EXCLUDED = {
     # the same measured reason as history. Subscribe the binding (and recompile the
     # global fingerprint) to move it into COMPLEX_COMMANDS.
     "seal": "no-documentation-section",
+    # 2026-11-12 (Feature 101): anchor is Complex in the classification overlay but its
+    # reserved `## Wrap-up` is not compiled yet; T040 adds the face. If that face carries
+    # a Docs Sync Eval line, test_c2a fails and forces this entry into COMPLEX_COMMANDS.
+    "anchor": "no-documentation-section",
 }
 
 # Anti-vacuity sentinel: an empty or truncated scope list would make every

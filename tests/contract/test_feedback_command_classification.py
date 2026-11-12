@@ -10,6 +10,11 @@ enumeration, which is what the contract's own ``## Maintenance`` bullet asks for
 Deriving makes the table load-bearing, so the parse is guarded by an anti-vacuity
 floor (``MIN_COMMANDS``) and an explicit coverage assertion: "zero gap because the
 table is complete" must stay distinguishable from "zero gap because no row parsed".
+
+The 027 contract is a **dated record** (FR-061 holds it byte-identical), so it cannot
+absorb commands delivered after it. Those are declared in ``LIVE_OVERLAY`` below: the
+live expected set is the baseline rows plus the overlay, while the contract and its
+``**Result**`` line stay the frozen historical reading.
 """
 from __future__ import annotations
 
@@ -66,9 +71,22 @@ def _parse_table() -> dict[str, str]:
     return rows
 
 
-TABLE = _parse_table()
+BASELINE_TABLE = _parse_table()
+
+# Commands delivered after the dated 027 record. Additive only: a baseline row is never
+# overridden here (asserted below), because reclassifying history belongs to a new record.
+LIVE_OVERLAY: dict[str, str] = {
+    # 2026-11-12 (Feature 101): /speckit.anchor joins as Complex — it delegates the
+    # seven-mode definition engine, produces anchor definitions and team handoffs that
+    # /speckit.team and its runs consume, and consumes the anchor archive.
+    "anchor": "Complex",
+}
+
+TABLE = {**BASELINE_TABLE, **LIVE_OVERLAY}
 COMPLEX_COMMANDS = sorted(c for c, k in TABLE.items() if k == "Complex")
 SIMPLE_COMMANDS = sorted(c for c, k in TABLE.items() if k == "Simple")
+BASELINE_COMPLEX_COMMANDS = sorted(c for c, k in BASELINE_TABLE.items() if k == "Complex")
+BASELINE_SIMPLE_COMMANDS = sorted(c for c, k in BASELINE_TABLE.items() if k == "Simple")
 
 # `team` was reclassified simple → complex on 2026-09-23 (user-adjudicated,
 # introspection-20260923T120035Z#F-02); the criteria are recorded in its table row.
@@ -101,8 +119,18 @@ def test_classification_counts():
     # 2026-11-10 (Feature 097): 25 + 4 -> 25 + 5 — `/speckit.migrate` joins as Simple
     # (thin wrapper over the CLI subcommand; no own script, no downstream consumer).
     # 2026-11-11 (Feature 099): 25 + 5 -> 26 + 5 — `/speckit.seal` joins as Complex.
-    assert len(COMPLEX_COMMANDS) == 26
+    # 2026-11-12 (Feature 101): 26 + 5 -> 27 + 5 in the LIVE set — `/speckit.anchor`
+    # joins as Complex through LIVE_OVERLAY. The dated 027 contract stays frozen at
+    # 26 + 5 (FR-061); test_result_line_matches_the_counted_rows keeps checking that
+    # historical baseline, so the live count is stated here and nowhere else.
+    assert len(COMPLEX_COMMANDS) == 27
     assert len(SIMPLE_COMMANDS) == 5
+    assert len(BASELINE_COMPLEX_COMMANDS) == 26
+    assert len(BASELINE_SIMPLE_COMMANDS) == 5
+    assert not set(LIVE_OVERLAY) & set(BASELINE_TABLE), (
+        "LIVE_OVERLAY must only add commands the dated 027 table cannot carry; "
+        "overriding a baseline row here would silently reclassify history"
+    )
 
 
 def test_table_covers_every_command_template():
@@ -127,10 +155,13 @@ def test_complex_set_equals_measured_feedback_carriers():
 
 
 def test_result_line_matches_the_counted_rows():
+    """Frozen historical check: the dated contract's Result line against its own rows."""
     m = RESULT_LINE.search(CONTRACT.read_text(encoding="utf-8"))
     assert m, "contract lost its **Result** count line"
-    assert int(m.group(1)) == len(COMPLEX_COMMANDS), "**Result** complex count != counted rows"
-    assert int(m.group(2)) == len(SIMPLE_COMMANDS), "**Result** simple count != counted rows"
+    assert int(m.group(1)) == len(BASELINE_COMPLEX_COMMANDS), \
+        "**Result** complex count != the dated table's own rows"
+    assert int(m.group(2)) == len(BASELINE_SIMPLE_COMMANDS), \
+        "**Result** simple count != the dated table's own rows"
 
 
 @pytest.mark.contract

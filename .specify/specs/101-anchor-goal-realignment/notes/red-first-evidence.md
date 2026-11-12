@@ -148,3 +148,16 @@ modules: **16 new ids, 10 closed in-package, 6 still owned elsewhere**.
 `…::test_wc07_skill_body_budget`, `…::test_wc10_feature_062_status_held`, `…::test_wc11_feature_row_name_description`,
 `…::test_wc13_stage_class_pin_remeasured`, `test_qoder_command_frontmatter.py::test_every_template_has_short_description`
 (`research.md`, 78 chars) — all present verbatim in the pre-edit capture / E2 baseline.
+
+## WP-02b (classification live overlay) — decision repair
+
+Same 13-module set, same runner. Pre-edit (red-first): **rc=1, 15 failed, 525 passed**
+(reproduces the WP-02 reading id-for-id). Post-edit: **rc=1, 16 failed, 525 passed**;
+classification module alone: **2 failed, 34 passed**.
+
+- closed: `test_feedback_command_classification.py::test_table_covers_every_command_template`
+  (the WP-02 decision red).
+- new: `::test_complex_command_carries_feedback_step[anchor]` and
+  `::test_complex_set_equals_measured_feedback_carriers` — the anchor feedback-face
+  assertions, T040-owned until the compiled face lands.
+- nothing else moved. Full record: `test-evidence/implement-wp02b.md`.
