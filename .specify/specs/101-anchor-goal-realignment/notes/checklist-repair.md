@@ -67,12 +67,38 @@ Counts are unchanged: **71 FR / 10 SC / 8 STR**. `validate-requirements.py` re-r
 
 | Gate | Command | Reading |
 |------|---------|---------|
-| Requirements | `python3 scripts/python/validate-requirements.py .specify/specs/101-anchor-goal-realignment/requirements.md` | see § 4 |
-| Tasks | `python3 scripts/python/validate-tasks.py .specify/specs/101-anchor-goal-realignment/tasks.md` | see § 4 |
-| Pre-analyze (requirements / plan / tasks) | `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir … --stage <stage> --repo .` | see § 4 |
-| Plan-change audit | `python3 .specify/skills/sdd-loop-driver/scripts/audit-plan-changes.py …` | see § 4 |
+| Requirements | `python3 scripts/python/validate-requirements.py <spec>/requirements.md` | **pass** — 375 lines, 81 definition rows, 8 shared strings; **0 error / 0 warning** |
+| Tasks | `python3 scripts/python/validate-tasks.py <spec>/tasks.md` | **PASS** — 0 error(s), 0 warning(s) |
+| Pre-analyze (requirements) | `pre-analyze-check.py --stage requirements --repo .` | `decision=pass errors=0 advisories=138 waived=0` |
+| Pre-analyze (plan) | `pre-analyze-check.py --stage plan --repo .` | `decision=pass errors=0 advisories=138 waived=0` |
+| Pre-analyze (tasks) | `pre-analyze-check.py --stage tasks --repo .` | `decision=pass errors=0 advisories=138 waived=0` |
+| Plan-change audit | `audit-plan-changes.py --base 07cb00451 --head HEAD …` | `undeclared=false`, 9 touched plan-owned paths, 9 declaration lines, uncommitted in scope `[]`, cumulative diff **153 added / 40 deleted** |
+
+`<spec>` = `.specify/specs/101-anchor-goal-realignment`. The audit's `classification` field stays
+with the driver (U4); this repair only asserts the mechanical verdict above.
 
 ## 4. Recorded readings
 
-Filled by the round-1 repair run after the edits; see the final block of the stage report and
-`test-evidence/checklist-repair-residue-baseline-2026-11-12.txt` for the measured residue baselines.
+**Residue baselines** (measured, see `test-evidence/checklist-repair-residue-baseline-2026-11-12.txt`):
+
+| Class | Surface | Baseline | Target |
+|-------|---------|----------|--------|
+| C1–C4 | pre-existing classes, unchanged by this round | 26 | as declared in `research.md` §5 |
+| C5 | retained-anchor bodies (`^# Goal:` / `.specify/goal`) | 16 store-wide, **11** in the 9 retained anchors (9 headings + 2 lines in `094-goal-team-parallel`) | 0 |
+| C6 | `/speckit.goal (targets\|migrate\|migrate-archive\|coordinate)` over live roots | **40** line-hits (8 engine sites × 2 mirrors, 16 team-domain refs, 2 docs/glossary, 2 src/team, 1 team index, 1 other) | 0 |
+| C7 | `.specify/features.md` old-model rows | 3 (027 / 041 / 094) | 0 |
+
+The rejected alternative is recorded with its measurement: a literal `.specify/goal` sweep returns
+**84 hits**, most in dated prose that this feature must not rewrite — hence the C5 scope is narrowed
+to the anchor store and the dated surface is left to its own successor notes.
+
+**Wrap-up records** (mandatory three engines, `/speckit.plan` identity, run `r20261112T064607Z-b101`):
+
+| Engine | Result | Record |
+|--------|--------|--------|
+| `run-determination.py --action determine` | `duplicate: true` — this (unit_id, run_id) was already determined in the plan stage run; idempotent, nothing new written | `.specify/memory/session/20261112T073235Z-run-determination-speckit-plan-r20261112t064607z-b101.md` |
+| `exec-quant.py --action collect` | duplicate record for (`/speckit.plan`, `r20261112T064607Z-b101`); no second row written | `.specify/memory/exec-quant/records` |
+| `feedback-utils.py --action record` | `duplicate: true`, entry id `20261112T073308Z-speckit-plan`; `count_since_submission: 480`, threshold 10 → `should_prompt: true` (non-blocking notice only, never auto-transmits) | `.specify/memory/feedback/20261112T073308Z-speckit-plan.md` |
+
+Duplicate verdicts are the engines' own idempotency guarantee for a re-entered run id, not a
+failure: each emitted path already holds this run's single record from the same stage run.
