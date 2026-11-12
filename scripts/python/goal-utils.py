@@ -53,6 +53,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -67,19 +68,34 @@ EXIT_INVALID = 4
 #: keep working unchanged.
 EXIT_BLOCKED = 5
 
-#: The two archive rows a definition can live in (STR-002). `goal` names the goal row
-#: (directory `.specify/anchoring/`, file `goal.md`); `teams` names the team row.
+#: The three archive layers (owner: shared/definitions/anchor-definitions.md § Archive
+#: Layers). A layer is an archive row with its own store and its own definition filename.
 ARCHIVE_DIRNAME = ".specify/anchoring"
+GOALS_DIRNAME = ".specify/goals"
 TEAM_DIRNAME = ".specify/teams"
 #: The retired spec-local layout: a migration SOURCE only, never a write target.
 SPEC_GOAL_DIRNAME = "goal"
 SPEC_TEAM_DIRNAME = "team"
-DEFINITION_FILENAME = "goal.md"
 SUMMARY_DIRNAME = "summary"
 
-#: The closed archive-layer value set (C-9). `auto` is a read-only resolver, never a
-#: write target; the retired position-named member does not exist and has no alias.
-ARCHIVE_SCOPES = ("goal", "teams", "auto")
+#: C-23 — layer -> definition filename. This mapping is the single source; no module-level
+#: single-filename constant survives, and `definition_filename()` is its only accessor.
+DEFINITION_FILENAMES = {"anchor": "anchor.md", "goals": "goal.md", "teams": "team.md"}
+
+#: The closed archive-layer value set (C-24; owner: the Anchor owner's § Archive Layers).
+#: `auto` is a read-only resolver, never a write target; the retired member `goal` does
+#: not exist and has no alias.
+ARCHIVE_SCOPES = ("anchor", "teams", "goals", "auto")
+
+
+def definition_filename(layer: str) -> str:
+    """The definition filename of one archive layer (C-23) — the only accessor."""
+    try:
+        return DEFINITION_FILENAMES[layer]
+    except KeyError:
+        raise GoalError(
+            f"layer {layer!r} is outside the closed set "
+            f"{' / '.join(DEFINITION_FILENAMES)}") from None
 
 #: Resolved once per CLI invocation by `resolve_scope`; direct API callers leave it None,
 #: which keeps the default archive roots for the two-archive model.
@@ -91,24 +107,30 @@ class ScopeError(Exception):
 
 
 class Scope:
-    """The two archive-layer roots resolved for one CLI invocation.
+    """The three archive-layer roots resolved for one CLI invocation.
 
-    `goal_root` keeps its attribute name because the stored definition is still `goal.md`;
-    its directory is the anchoring archive (`ARCHIVE_DIRNAME`).
+    Each layer keeps its own root and resolves its own filename through
+    `definition_filename`, so no caller — and no attribute — assumes one file name for
+    every store (C-23).
     """
 
-    __slots__ = ("scope", "repo_root", "spec_dir", "goal_root", "team_root")
+    __slots__ = ("scope", "repo_root", "spec_dir", "anchor_root", "goals_root",
+                 "team_root")
 
     def __init__(self, scope: str, repo_root: Path, spec_dir: Path | None,
-                 goal_root: Path, team_root: Path):
+                 anchor_root: Path, goals_root: Path, team_root: Path):
         self.scope = scope
         self.repo_root = Path(repo_root)
         self.spec_dir = spec_dir
-        self.goal_root = Path(goal_root)
+        self.anchor_root = Path(anchor_root)
+        self.goals_root = Path(goals_root)
         self.team_root = Path(team_root)
 
+    def anchor_definition(self, slug: str) -> Path:
+        return self.anchor_root / slug / definition_filename("anchor")
+
     def goal_definition(self, slug: str) -> Path:
-        return self.goal_root / slug / DEFINITION_FILENAME
+        return self.goals_root / slug / definition_filename("goals")
 
     def team_definition(self, slug: str) -> Path:
         # The single default team of a spec lives at `<team-root>/team.md`; only an
@@ -123,19 +145,34 @@ class Scope:
         row = {
             "scope": self.scope,
             "spec_dir": str(self.spec_dir) if self.spec_dir else None,
-            "goal_root": str(self.goal_root),
+            "anchor_root": str(self.anchor_root),
+            "goals_root": str(self.goals_root),
             "team_root": str(self.team_root),
         }
         if slug:
+            row["anchor_definition"] = str(self.anchor_definition(slug))
             row["goal_definition"] = str(self.goal_definition(slug))
             row["team_definition"] = str(self.team_definition(slug))
         return row
 
 
-def _has_any_definition(root: Path) -> bool:
+def _has_any_definition(root: Path, layer: str) -> bool:
     if not root.is_dir():
         return False
-    return any(child.is_dir() and (child / DEFINITION_FILENAME).is_file()
+    filename = definition_filename(layer)
+    return any(child.is_dir() and (child / filename).is_file()
+               for child in root.iterdir())
+
+
+def _anchor_layer_contains(root: Path, slug: str | None = None) -> bool:
+    """Anchor-layer membership by either filename: before its cleanup renames it, a
+    retained Anchor of the archive still lives as `goal.md` (it is still THIS layer)."""
+    if not root.is_dir():
+        return False
+    names = (definition_filename("anchor"), "goal.md")
+    if slug:
+        return any((root / slug / name).is_file() for name in names)
+    return any(child.is_dir() and any((child / name).is_file() for name in names)
                for child in root.iterdir())
 
 
@@ -150,51 +187,56 @@ def _has_team(root: Path, slug: str | None) -> bool:
                for child in root.iterdir())
 
 
-def resolve_scope(repo_root: Path, scope: str = "goal",
+def resolve_scope(repo_root: Path, scope: str = "anchor",
                   spec_dir: str | os.PathLike | None = None,
-                  team_slug: str | None = None) -> Scope:
-    """Resolve the two archive-layer roots. The path rule has exactly one owner: this function.
+                  identity_slug: str | None = None) -> Scope:
+    """Resolve the three archive-layer roots. The path rule has exactly one owner: this function.
 
-    `scope` is the closed archive-layer set `goal` / `teams` / `auto` (C-9). `goal` and
-    `teams` always return BOTH roots in one `Scope` object, so a caller never needs two
-    calls; `auto` is a read-only resolver that picks the single layer containing the
-    requested slug (or the single non-empty layer when no slug is requested).
+    `scope` is the closed archive-layer set `anchor` / `teams` / `goals` / `auto` (C-24).
+    The three layer members always return ALL roots in one `Scope` object, so a caller
+    never needs two calls; `auto` is a read-only resolver that picks the single layer
+    containing the requested identity (or the single non-empty layer when no identity is
+    requested) and refuses — exit 2, no guessing — when that is not decidable.
     """
     repo_root = Path(repo_root)
-    goal_root = repo_root / ARCHIVE_DIRNAME
-    team_root_path = repo_root / TEAM_DIRNAME
+    anchor_path = repo_root / ARCHIVE_DIRNAME
+    goals_path = repo_root / GOALS_DIRNAME
+    team_path = repo_root / TEAM_DIRNAME
     if scope not in ARCHIVE_SCOPES:
         raise ScopeError(
             f"scope {scope!r} is outside the closed set {' / '.join(ARCHIVE_SCOPES)}")
 
     resolved_spec = _resolve_spec_dir(repo_root, spec_dir)
-    if scope == "goal":
-        return Scope("goal", repo_root, resolved_spec, goal_root, team_root_path)
-    if scope == "teams":
-        return Scope("teams", repo_root, resolved_spec, goal_root, team_root_path)
+    if scope in ARCHIVE_SCOPES and scope != "auto":
+        return Scope(scope, repo_root, resolved_spec, anchor_path, goals_path, team_path)
 
-    # `auto` (C-11): ONE candidate layer or a named refusal. Never writes.
+    # `auto` (C-25): ONE candidate layer or a named refusal. Never writes.
     candidates: list[str] = []
-    if team_slug:
-        if (goal_root / team_slug / DEFINITION_FILENAME).is_file():
-            candidates.append("goal")
-        if _team_layer_contains(team_root_path, team_slug):
+    if identity_slug:
+        if _anchor_layer_contains(anchor_path, identity_slug):
+            candidates.append("anchor")
+        if (goals_path / identity_slug / definition_filename("goals")).is_file():
+            candidates.append("goals")
+        if _team_layer_contains(team_path, identity_slug):
             candidates.append("teams")
     else:
-        if _has_any_definition(goal_root):
-            candidates.append("goal")
-        if _has_team(team_root_path, None):
+        if _anchor_layer_contains(anchor_path):
+            candidates.append("anchor")
+        if _has_any_definition(goals_path, "goals"):
+            candidates.append("goals")
+        if _has_team(team_path, None):
             candidates.append("teams")
     if not candidates:
-        subject = f"slug {team_slug!r}" if team_slug else "any definition"
+        subject = f"slug {identity_slug!r}" if identity_slug else "any definition"
         raise ScopeError(
             f"not-found: no archive layer contains {subject} "
-            f"(checked {ARCHIVE_DIRNAME} and {TEAM_DIRNAME})")
+            f"(checked {ARCHIVE_DIRNAME}, {GOALS_DIRNAME} and {TEAM_DIRNAME})")
     if len(candidates) > 1:
         raise ScopeError(
-            f"scope-ambiguous: both archive layers contain the requested slug "
-            f"({', '.join(candidates)}); pass --scope goal or --scope teams")
-    return Scope(candidates[0], repo_root, resolved_spec, goal_root, team_root_path)
+            "scope-ambiguous: more than one archive layer contains the requested "
+            f"identity ({', '.join(candidates)}); name the layer with --scope "
+            + " or --scope ".join(("anchor", "teams", "goals")))
+    return Scope(candidates[0], repo_root, resolved_spec, anchor_path, goals_path, team_path)
 
 
 def _resolve_spec_dir(repo_root: Path,
@@ -345,27 +387,41 @@ def is_valid_identity(slug: str) -> bool:
     return bool(_IDENTITY.match(slug))
 
 
-def archive_root(repo_root: Path) -> Path:
-    """The global anchoring archive root (`.specify/anchoring/`), or the active spec's
-    `goal/` subtree when a spec scope is resolved."""
+def layer_root(repo_root: Path, layer: str = "anchor") -> Path:
+    """One archive layer's root, honouring the resolved scope when a CLI invocation set it."""
+    if layer not in DEFINITION_FILENAMES:
+        raise GoalError(
+            f"layer {layer!r} is outside the closed set "
+            f"{' / '.join(DEFINITION_FILENAMES)}")
     if _ACTIVE_SCOPE is not None:
-        return _ACTIVE_SCOPE.goal_root
-    return Path(repo_root) / ARCHIVE_DIRNAME
+        return Path(getattr(_ACTIVE_SCOPE, {"anchor": "anchor_root",
+                                            "goals": "goals_root",
+                                            "teams": "team_root"}[layer]))
+    return Path(repo_root) / {"anchor": ARCHIVE_DIRNAME, "goals": GOALS_DIRNAME,
+                              "teams": TEAM_DIRNAME}[layer]
+
+
+def anchor_root(repo_root: Path) -> Path:
+    """The anchoring archive root (`.specify/anchoring/`)."""
+    return layer_root(repo_root, "anchor")
+
+
+def goals_root(repo_root: Path) -> Path:
+    """The action-level Goal archive root (`.specify/goals/`)."""
+    return layer_root(repo_root, "goals")
 
 
 def team_root(repo_root: Path) -> Path:
-    if _ACTIVE_SCOPE is not None:
-        return _ACTIVE_SCOPE.team_root
-    return Path(repo_root) / TEAM_DIRNAME
+    return layer_root(repo_root, "teams")
 
 
-def definition_path(repo_root: Path, slug: str) -> Path:
-    return archive_root(repo_root) / slug / DEFINITION_FILENAME
+def definition_path(repo_root: Path, slug: str, layer: str = "anchor") -> Path:
+    return layer_root(repo_root, layer) / slug / definition_filename(layer)
 
 
-def summary_dir(repo_root: Path, slug: str) -> Path:
-    """The derived subtree — the only surface a refresh may write."""
-    return archive_root(repo_root) / slug / SUMMARY_DIRNAME
+def summary_dir(repo_root: Path, slug: str, layer: str = "anchor") -> Path:
+    """The derived subtree — the only surface a refresh may write. Layer-aware (C-23)."""
+    return definition_path(repo_root, slug, layer).parent / SUMMARY_DIRNAME
 
 
 # --------------------------------------------------------------------------
@@ -795,6 +851,26 @@ def _render(objective: str, criteria: list[str], status: str, created: str,
         f"{targets_block}"
         f"{_SECTION_HISTORY}\n\n{hist}\n"
     )
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    """One replace, so a definition is never observed half-written."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def _frontmatter_span(text: str) -> tuple[str, str]:
+    """Split the `---…---` block from the body, preserving the block's bytes."""
+    lines = text.splitlines(keepends=True)
+    if not lines or lines[0].strip() != "---":
+        return "", text
+    for index in range(1, len(lines)):
+        if lines[index].strip() == "---":
+            return "".join(lines[:index + 1]), "".join(lines[index + 1:])
+    return "", text
 
 
 def _split_frontmatter(text: str) -> tuple[dict, str]:
@@ -1629,12 +1705,12 @@ def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -
 
 
 def list_goals(repo_root: Path) -> list[dict]:
-    root = archive_root(repo_root)
+    root = anchor_root(repo_root)
     if not root.is_dir():
         return []
     rows = []
     for child in sorted(root.iterdir()):
-        definition = child / DEFINITION_FILENAME
+        definition = child / definition_filename("anchor")
         if child.is_dir() and definition.is_file():
             data = parse_goal(definition)
             rows.append({
@@ -1644,6 +1720,248 @@ def list_goals(repo_root: Path) -> list[dict]:
                 "updated": data["updated"],
             })
     return rows
+
+
+# --------------------------------------------------------------------------
+# action-level Goal group (101, FR-019…FR-027; contracts/goal-engine C-28)
+# --------------------------------------------------------------------------
+
+GOAL_SECTION_GUIDANCE = "## Guidance"
+GOAL_SECTION_DONE = "## Completion Conditions"
+GOAL_SECTION_MIGRATED = "## Migrated Targets"
+
+#: FR-004 — a Goal carries no Anchor pointer. The binding record's `origin` is the only
+#: cross-reference; a key named after an Anchor is undeclared and rejected (exit 2).
+_ANCHOR_POINTER_KEY = re.compile(r"(?i)^anchor(?:_|$)")
+
+#: C-28 — the collision refusal names both stores because they are distinct namespaces.
+GOAL_ACTIONS = ("goal-create", "goal-list", "goal-view", "goal-modify", "goal-status")
+
+
+def _binding_values(text: str) -> dict | None:
+    """The binding record's three values, or None when the block is absent."""
+    start, block, _end = _binding_block_lines(text)
+    if start is None:
+        return None
+    values: dict = {"owner": None, "owner_id": None, "origin": None}
+    for line in block[1:]:
+        key, _, value = line.strip().partition(":")
+        if key in values:
+            values[key] = None if value.strip() in ("", "null") else value.strip()
+    return values
+
+
+def _render_action_goal(*, title: str, guidance: str, conditions: list[str],
+                        status: str, created: str, updated: str,
+                        history: list[str], migrated: list[str] | None = None,
+                        boundaries: list[str] | None = None,
+                        binding_lines: list[str] | None = None) -> str:
+    frontmatter = f"status: {status}\ncreated: {created}\nupdated: {updated}\n"
+    if binding_lines:
+        frontmatter += "\n".join(binding_lines) + "\n"
+    done_block = ("\n".join(f"{i}. {c}" for i, c in enumerate(conditions, 1))
+                  if conditions else NO_CRITERIA_MARKER)
+    sections = [
+        f"{GOAL_SECTION_GUIDANCE}\n\n{guidance.strip()}",
+        f"{GOAL_SECTION_DONE}\n\n{done_block}",
+    ]
+    if migrated:
+        sections.append(f"{GOAL_SECTION_MIGRATED}\n\n"
+                        + "\n".join(f"- {statement}" for statement in migrated))
+    if boundaries:
+        sections.append(f"{_SECTION_BOUNDARIES}\n\n"
+                        + "\n".join(f"- {b}" for b in boundaries))
+    sections.append(f"{_SECTION_HISTORY}\n\n" + "\n".join(history))
+    return (f"---\n{frontmatter}---\n\n# Goal: {title}\n\n"
+            + "\n\n".join(sections) + "\n")
+
+
+def parse_action_goal(path: Path) -> dict:
+    """Interpret one Goal. A schema violation is exit 4 (the file exists but is unusable)."""
+    path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    meta, body = _split_frontmatter(text)
+    offending = sorted(key for key in meta if _ANCHOR_POINTER_KEY.match(key))
+    if offending:
+        raise GoalInvalid(
+            f"goal-schema: {_relative(_repo_root_for(path), path)} declares Anchor pointer "
+            f"key(s) {', '.join(offending)}; an action-level Goal carries no Anchor "
+            "reference — the only cross-reference is the binding record's origin")
+    status = str(meta.get("status") or "").strip()
+    if status not in LIFECYCLE_STATES:
+        raise GoalInvalid(
+            f"goal-schema: status {status!r} in {_relative(_repo_root_for(path), path)} is "
+            f"outside the shared lifecycle {LIFECYCLE_STATES}")
+    raw_conditions = _section(body, GOAL_SECTION_DONE)
+    conditions: list[str] = []
+    if raw_conditions.strip() and raw_conditions.strip() != NO_CRITERIA_MARKER:
+        for line in raw_conditions.splitlines():
+            stripped = re.sub(r"^\s*(?:\d+[.)]|[-*+])\s*", "", line).strip()
+            if stripped:
+                conditions.append(stripped)
+    return {
+        "slug": path.parent.name,
+        "title": _title_from_body(body),
+        "status": status,
+        "created": str(meta.get("created") or "").strip(),
+        "updated": str(meta.get("updated") or "").strip(),
+        "guidance": _section(body, GOAL_SECTION_GUIDANCE),
+        "conditions": conditions,
+        "migrated_targets": _parse_bullets(_section(body, GOAL_SECTION_MIGRATED)),
+        "boundaries": _parse_bullets(_section(body, _SECTION_BOUNDARIES)),
+        "history": _parse_bullets(_section(body, _SECTION_HISTORY)),
+        "path": str(path),
+    }
+
+
+def _assert_goal_identity_free(repo_root: Path, slug: str) -> Path:
+    """C-28 — refuse a slug the anchor store already owns, naming both candidates.
+
+    Both filenames are read: before the cleanup renames it, a retained Anchor still
+    lives as `goal.md`, and a collision is a collision either way.
+    """
+    anchor_dir = layer_root(repo_root, "anchor") / slug
+    goal_path = definition_path(repo_root, slug, "goals")
+    for filename in ("goal.md", definition_filename("anchor")):
+        occupied = anchor_dir / filename
+        if occupied.is_file():
+            raise GoalError(
+                f"cross-layer-collision: slug {slug!r} already names the Anchor "
+                f"{_relative(repo_root, occupied)}; the two stores are distinct "
+                f"namespaces and a collision is an authoring error, not a merge — "
+                f"{_relative(repo_root, goal_path)} is refused and nothing is written")
+    return goal_path
+
+
+def create_action_goal(repo_root: Path, slug: str, guidance: str,
+                       conditions: list[str], *, title: str | None = None) -> Path:
+    """C-28 — write an action-level Goal. Guidance gets no GD-2 shape check (FR-024)."""
+    if not is_valid_identity(slug):
+        raise GoalError(
+            f"identity {slug!r} is invalid: the first character must be alphanumeric, "
+            "the rest limited to [A-Za-z0-9_.-], and it must be a safe path segment")
+    if not " ".join(guidance.split()):
+        raise GoalError(
+            "goal-create requires --guidance: an action-level Goal states the practical "
+            "action it guides")
+    if not conditions:
+        raise GoalError(
+            "goal-create requires at least one --done: a Goal needs at least one "
+            "verifiable completion condition (FR-024)")
+    path = _assert_goal_identity_free(repo_root, slug)
+    if path.exists():
+        raise GoalError(
+            f"goal {slug!r} already exists at {_relative(repo_root, path)}; use "
+            "goal-modify — the existing definition is never overwritten")
+    today = _today()
+    heading = " ".join((title or "").split()) or slug
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_write_text(path, _render_action_goal(
+        title=heading, guidance=guidance,
+        conditions=[" ".join(c.split()) for c in conditions],
+        status="active", created=today, updated=today,
+        history=[f"- {today} — created."],
+        binding_lines=_render_binding_block(dict(RESIDENT_BINDING)).splitlines()))
+    read_binding(path)
+    return path
+
+
+def list_action_goals(repo_root: Path) -> list[dict]:
+    root = goals_root(repo_root)
+    if not root.is_dir():
+        return []
+    rows = []
+    for child in sorted(root.iterdir()):
+        definition = child / definition_filename("goals")
+        if child.is_dir() and definition.is_file():
+            data = parse_action_goal(definition)
+            rows.append({"slug": data["slug"], "status": data["status"],
+                         "done_count": len(data["conditions"]),
+                         "updated": data["updated"]})
+    return rows
+
+
+def modify_action_goal(path: Path, *, guidance: str | None = None,
+                       conditions: list[str] | None = None,
+                       clear: bool = False) -> dict:
+    """C-28 — prior values stay traceable in History; `--clear-done` is the one
+    destructive write and needs its explicit flag (and at least one replacement when
+    it leaves the Goal with nothing)."""
+    path = Path(path)
+    data = parse_action_goal(path)
+    if data["status"] in TERMINAL_STATES:
+        raise GoalError(
+            f"terminal-goal: {data['slug']!r} is {data['status']} and terminal is "
+            "absorbing for writes; only a human-owned reopen (`goal-status --set active`) "
+            "makes it writable again")
+    today = _today()
+    history = list(data["history"])
+    if guidance is not None:
+        if not " ".join(guidance.split()):
+            raise GoalError("goal-modify --guidance must not be empty")
+        history.append(f"- {today} — guidance changed; prior value: "
+                       + " ".join(data["guidance"].split()))
+        data["guidance"] = guidance
+    if clear or conditions is not None:
+        prior = data["conditions"] or [NO_CRITERIA_MARKER]
+        history.append(f"- {today} — completion conditions changed; prior value: "
+                       + " | ".join(prior))
+    if clear:
+        data["conditions"] = []
+    elif conditions is not None:
+        data["conditions"] = [" ".join(c.split()) for c in conditions]
+    binding_lines = None
+    if _binding_values(path.read_text(encoding="utf-8")):
+        binding_lines = _binding_block_lines(path.read_text(encoding="utf-8"))[1]
+    _atomic_write_text(path, _render_action_goal(
+        title=data["title"] or data["slug"], guidance=data["guidance"],
+        conditions=data["conditions"], status=data["status"],
+        created=data["created"], updated=today, history=history,
+        migrated=data["migrated_targets"], boundaries=data["boundaries"],
+        binding_lines=binding_lines))
+    return {"slug": data["slug"], "conditions": data["conditions"],
+            "path": str(path)}
+
+
+def action_goal_status(path: Path, target: str | None = None) -> dict:
+    """C-28 — without `--set` this reports only; terminal states are retained, and a
+    reopen is allowed for a human-owned Goal alone (D-3)."""
+    path = Path(path)
+    data = parse_action_goal(path)
+    current = data["status"]
+    if target is None or target == current:
+        return {"slug": data["slug"], "status": current, "changed": False}
+    if target not in LIFECYCLE_STATES:
+        raise GoalError(f"status {target!r} is outside the shared lifecycle "
+                        f"{LIFECYCLE_STATES}")
+    if current in TERMINAL_STATES:
+        binding = _binding_values(path.read_text(encoding="utf-8")) or {}
+        if target != "active" or binding.get("owner") != "human":
+            raise GoalError(
+                f"transition {current!r} -> {target!r} is not defined; terminal Goals are "
+                "retained, and only a human-owned Goal may be reopened (D-3)")
+    elif not transition_allowed(current, target):
+        raise GoalError(
+            f"transition {current!r} -> {target!r} is not defined by the shared lifecycle")
+    today = _today()
+    history = list(data["history"])
+    history.append(f"- {today} — status {current} -> {target}.")
+    _atomic_write_text(path, _render_action_goal(
+        title=data["title"] or data["slug"], guidance=data["guidance"],
+        conditions=data["conditions"], status=target, created=data["created"],
+        updated=today, history=history, migrated=data["migrated_targets"],
+        boundaries=data["boundaries"],
+        binding_lines=_binding_block_lines(path.read_text(encoding="utf-8"))[1]))
+    return {"slug": data["slug"], "status": target, "changed": True}
+
+
+def _resolve_action_goal(repo_root: Path, slug: str) -> Path:
+    path = definition_path(repo_root, slug, "goals")
+    if not path.is_file():
+        raise GoalNotFound(
+            f"goal not found: {_relative(repo_root, path)} (the action-level Goal store "
+            "is .specify/goals/; Anchors live in .specify/anchoring/)")
+    return path
 
 
 # --------------------------------------------------------------------------
@@ -1664,8 +1982,9 @@ MIGRATION_RESULTS = ("migrated", "noop", "conflict", "interrupted")
 
 #: C-43 — the spec-local forms the residual probe enumerates. These are migration
 #: SOURCES, never write targets; `.specify/.tmp/` is outside `.specify/specs/` entirely.
+#: The filename is frozen to the retired legacy layout: a dated source is not a layer.
 RESIDUAL_FORMS = {
-    "goal": ("goal", DEFINITION_FILENAME),
+    "goal": ("goal", "goal.md"),
     "teams": ("team", "team.md"),
 }
 
@@ -1707,7 +2026,7 @@ def _archived_tree_path(repo_root: Path, spec: str, kind: str, slug: str) -> Pat
 def _target_definition_path(repo_root: Path, kind: str, slug: str) -> Path:
     """C-31 — the two unified-archive landing points, and nothing else."""
     if kind == "goal":
-        return Path(repo_root) / ARCHIVE_DIRNAME / slug / DEFINITION_FILENAME
+        return Path(repo_root) / ARCHIVE_DIRNAME / slug / definition_filename("anchor")
     return Path(repo_root) / TEAM_DIRNAME / slug / "team.md"
 
 
@@ -1969,7 +2288,7 @@ def _orphan_decisions(repo_root: Path, covered: set) -> list[dict]:
             if not kind_dir.is_dir():
                 continue
             for tree in sorted(path for path in kind_dir.iterdir() if path.is_dir()):
-                definition = tree / (DEFINITION_FILENAME if kind == "goal" else "team.md")
+                definition = tree / ("goal.md" if kind == "goal" else "team.md")
                 if not definition.is_file() or (kind, tree.name) in covered:
                     continue
                 receipt = _receipt_path(repo_root, kind, tree.name)
@@ -2184,6 +2503,737 @@ def backfill_bindings(repo_root: Path, *, apply: bool) -> dict:
                                          if row["result"] == "backfilled"),
                        "already-bound": sum(1 for row in rows
                                             if row["result"] == "already-bound")}}
+
+
+# --------------------------------------------------------------------------
+# definition cleanup group (101, FR-032…FR-045; migration-cleanup C-36…C-49)
+# --------------------------------------------------------------------------
+
+CLEANUP_SCHEMA = "101-classification/v1"
+CLEANUP_MAPPING_VERSION = "101-mapping-v1"
+CLEANUP_CLASSES = ("anchor", "action-goal", "obsolete")
+#: FR-036's three decision rules, paired with the class each one decides.
+CLEANUP_RULES = {"anchor": "FR-036(c)", "action-goal": "FR-036(a)",
+                 "obsolete": "FR-036(b)"}
+CLEANUP_ARCHIVE_DIRNAME = ".specify/archive/anchoring"
+MIGRATION_RECEIPT_NAME = "migration-receipt.json"
+MIGRATION_RECEIPT_SCHEMA = "101-migration-receipt/v1"
+BODY_RECEIPT_NAME = "anchor-body-receipt.json"
+BODY_RECEIPT_SCHEMA = "101-anchor-body-receipt/v1"
+#: E-8's `action` literals and C-41's idempotent result literals.
+RECEIPT_ACTIONS = {"migrate": "migrate-action-goal", "archive": "archive-obsolete"}
+CLEANUP_DONE_RESULTS = {"migrate": "already-migrated", "archive": "already-archived"}
+TEAM_DISPOSITIONS = ("R1", "R2", "R3")
+TEAM_DISPOSITION_STATES = ("apply", "already-satisfied")
+DISPOSITION_RECEIPT_NAME = "disposition-receipt.json"
+
+#: C-42 phases. `READ`/`PROJECT` leave nothing on disk; the three that do are the seam.
+CLEANUP_PHASES = ("read", "project", "write-target", "write-receipt", "remove-source")
+#: T069's two declared injection points (unset in production, side-effect-free).
+CLEANUP_FAULT_ENV = "GOAL_UTILS_CLEANUP_FAULT_AFTER"
+CLEANUP_FAULT_STEPS = ("write-target", "write-receipt")
+
+#: C-38 A-N. `.specify/goals` is the NEW store and MUST NOT be rewritten.
+_RETIRED_GOAL_PATH = re.compile(r"\.specify/goal(?![a-z])")
+_ANCHOR_TITLE = re.compile(r"^#\s*Goal:")
+_RETIRED_COMMAND = re.compile(r"/speckit\.goal\b")
+
+#: C-38 field mapping: exactly the two section renames, nothing else.
+_GOAL_HEADING_MAP = {"## Objective": "## Guidance",
+                     "## Success Criteria": "## Completion Conditions"}
+
+
+class _CleanupInterrupted(Exception):
+    def __init__(self, phase: str, row: dict):
+        super().__init__(phase)
+        self.phase = phase
+        self.row = row
+
+
+def _cleanup_archive_root(repo_root: Path) -> Path:
+    return Path(repo_root) / CLEANUP_ARCHIVE_DIRNAME
+
+
+def _engine_identity() -> str:
+    try:
+        from script_interface_cli import version_text
+        return version_text("goal-utils.py")
+    except Exception:  # a sandbox copy carries the engine but not the helper
+        return "goal-utils.py unknown"
+
+
+def _load_cleanup_json(path: Path) -> dict:
+    try:
+        raw = Path(path).read_text(encoding="utf-8")
+    except OSError as exc:
+        raise GoalError(f"classification-unreadable: {path} cannot be read ({exc}); "
+                        "nothing is written") from None
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise GoalError(f"classification-invalid: {path} is not JSON ({exc}); nothing "
+                        "is written") from None
+    if not isinstance(data, dict):
+        raise GoalError(f"classification-invalid: {path} must hold one JSON object")
+    return data
+
+
+def _live_anchor_slugs(repo_root: Path) -> set:
+    root = anchor_root(repo_root)
+    if not root.is_dir():
+        return set()
+    return {child.name for child in root.iterdir()
+            if child.is_dir() and ((child / "goal.md").is_file()
+                                   or (child / definition_filename("anchor")).is_file())}
+
+
+def _team_binding_slugs(repo_root: Path) -> dict:
+    """team slug -> the slug its frontmatter binds (goal_slug or anchor_slug), or None."""
+    root = team_root(repo_root)
+    rows: dict = {}
+    if not root.is_dir():
+        return rows
+    for definition in sorted(root.glob("*/team.md")):
+        meta, _start, _end = read_frontmatter_subset(
+            definition.read_text(encoding="utf-8"))
+        bound = meta.get("anchor_slug") or meta.get("goal_slug")
+        rows[definition.parent.name] = str(bound).strip() if bound else None
+    return rows
+
+
+def _disposition_receipt(repo_root: Path, team_slug: str) -> dict | None:
+    path = team_root(repo_root) / team_slug / DISPOSITION_RECEIPT_NAME
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"unreadable": True}
+
+
+def _classification_problems(repo_root: Path, data: dict) -> list[str]:
+    problems: list[str] = []
+    if data.get("schema") != CLEANUP_SCHEMA:
+        problems.append(f"schema must be {CLEANUP_SCHEMA!r}, found {data.get('schema')!r}")
+    if data.get("mapping_version") != CLEANUP_MAPPING_VERSION:
+        problems.append(f"mapping_version must be {CLEANUP_MAPPING_VERSION!r}, found "
+                        f"{data.get('mapping_version')!r}")
+    baseline = str(data.get("baseline_commit") or "").strip()
+    if not baseline:
+        problems.append("baseline_commit is absent")
+    else:
+        resolved = subprocess.run(
+            ["git", "-C", str(repo_root), "rev-parse", "--verify", f"{baseline}^{{commit}}"],
+            capture_output=True, text=True)
+        if resolved.returncode != 0:
+            problems.append(f"baseline_commit {baseline!r} does not resolve in this repo")
+
+    entries = data.get("entries")
+    if not isinstance(entries, list):
+        problems.append("entries must be a list")
+        entries = []
+    seen: set = set()
+    for index, entry in enumerate(entries):
+        where = f"entries[{index}]"
+        if not isinstance(entry, dict):
+            problems.append(f"{where} must be an object")
+            continue
+        slug = str(entry.get("slug") or "")
+        if not is_valid_identity(slug):
+            problems.append(f"{where}.slug {slug!r} is not a valid identity")
+        elif slug in seen:
+            problems.append(f"{where}.slug {slug!r} is duplicated")
+        seen.add(slug)
+        cls = entry.get("class")
+        if cls not in CLEANUP_CLASSES:
+            problems.append(f"{where}.class {cls!r} is outside {CLEANUP_CLASSES}")
+        elif entry.get("rule") != CLEANUP_RULES[cls]:
+            problems.append(f"{where}.rule must be {CLEANUP_RULES[cls]!r} for class "
+                            f"{cls!r}, found {entry.get('rule')!r}")
+        if not isinstance(entry.get("targets"), int) or entry.get("targets") < 0:
+            problems.append(f"{where}.targets must be a non-negative integer")
+        if not isinstance(entry.get("summary"), bool):
+            problems.append(f"{where}.summary must be a boolean")
+    live = _live_anchor_slugs(repo_root)
+    missing = sorted(live - seen)
+    gone = sorted(seen - live)
+    # C-41 — an entry that already moved is absent from the anchor store BY CONTRACT;
+    # it is accounted for by its target + receipt, which is what keeps a second run
+    # complete instead of reporting its own success as missing input.
+    settled: set = set()
+    for entry in entries:
+        if not isinstance(entry, dict) or entry.get("class") == "anchor":
+            continue
+        slug = entry.get("slug")
+        if slug not in gone:
+            continue
+        paths = _cleanup_paths(repo_root, entry)
+        # A receipt-less target is still accounted for on disk: the plan turns that
+        # state into the exit-4 half-state (or the resumable receipt write), never
+        # into a coverage complaint that hides the real defect.
+        if paths["target"].is_file():
+            settled.add(slug)
+    unsettled = sorted(set(gone) - settled)
+    if missing or unsettled:
+        problems.append("entries do not cover the live anchor store exactly"
+                        + (f"; unclassified: {', '.join(missing)}" if missing else "")
+                        + (f"; not on disk: {', '.join(unsettled)}" if unsettled else ""))
+
+    teams = data.get("teams")
+    if not isinstance(teams, list):
+        problems.append("teams must be a list")
+        teams = []
+    classified: set = set()
+    for index, row in enumerate(teams):
+        where = f"teams[{index}]"
+        if not isinstance(row, dict):
+            problems.append(f"{where} must be an object")
+            continue
+        slug = str(row.get("slug") or "")
+        if not is_valid_identity(slug):
+            problems.append(f"{where}.slug {slug!r} is not a valid identity")
+        elif slug in classified:
+            problems.append(f"{where}.slug {slug!r} is duplicated")
+        classified.add(slug)
+        if row.get("disposition") not in TEAM_DISPOSITIONS:
+            problems.append(f"{where}.disposition {row.get('disposition')!r} is outside "
+                            f"{TEAM_DISPOSITIONS}")
+        if row.get("state") not in TEAM_DISPOSITION_STATES:
+            problems.append(f"{where}.state {row.get('state')!r} is outside "
+                            f"{TEAM_DISPOSITION_STATES}")
+        if not " ".join(str(row.get("reason") or "").split()):
+            problems.append(f"{where}.reason must name the measured basis")
+
+    live_teams = _team_binding_slugs(repo_root)
+    unknown = sorted(slug for slug in classified if slug not in live_teams)
+    if unknown:
+        problems.append(f"classified team(s) not found on disk: {', '.join(unknown)}")
+    non_anchor = {entry["slug"] for entry in entries
+                  if isinstance(entry, dict) and entry.get("class") in ("action-goal", "obsolete")}
+    affected = {slug for slug, bound in live_teams.items()
+                if bound and (bound in non_anchor or bound not in live)}
+    # C-47's R3 removes the binding; a team that already carries its disposition
+    # receipt is accounted for, which keeps a post-apply re-read complete.
+    affected |= {slug for slug in classified if _disposition_receipt(repo_root, slug)}
+    if affected != classified:
+        missing = sorted(affected - classified)
+        extra = sorted(classified - affected)
+        problems.append("team set is incomplete against the live bindings"
+                        + (f"; unclassified: {', '.join(missing)}" if missing else "")
+                        + (f"; not affected: {', '.join(extra)}" if extra else ""))
+    return problems
+
+
+def load_classification(repo_root: Path, path: Path) -> dict:
+    """C-36 — read and adjudicate the input before any decision or write."""
+    data = _load_cleanup_json(path)
+    problems = _classification_problems(Path(repo_root), data)
+    if problems:
+        raise GoalError("classification-invalid: " + "; ".join(problems)
+                        + " — nothing is written")
+    return data
+
+
+# ---- C-38 / C-39: the two declared mappings and the concept digest ----------
+
+def _map_anchor_line(line: str) -> tuple[str, list[str]]:
+    """Apply A-N-1…A-N-4 to ONE line; returns (new line, rules that matched)."""
+    rules: list[str] = []
+    new = line
+    if _ANCHOR_TITLE.match(new):
+        new = _ANCHOR_TITLE.sub("# Anchor:", new, count=1)
+        rules.append("A-N-1")
+    if _RETIRED_GOAL_PATH.search(new):
+        rule = "A-N-3" if re.search(r"\.specify/goal/", new) else "A-N-2"
+        new = _RETIRED_GOAL_PATH.sub(".specify/anchoring", new)
+        rules.append(rule)
+    if rules and _RETIRED_COMMAND.search(new):
+        new = _RETIRED_COMMAND.sub("/speckit.anchor", new)
+        rules.append("A-N-4")
+    return new, rules
+
+
+def _map_anchor_body(body: str, *, first_line: int = 1,
+                     path: str = "") -> tuple[str, list[dict]]:
+    out: list[str] = []
+    records: list[dict] = []
+    for offset, line in enumerate(body.splitlines(keepends=True)):
+        new, rules = _map_anchor_line(line)
+        if new != line:
+            records.append({"path": path, "line": first_line + offset,
+                            "rule": "+".join(rules),
+                            "before": line.rstrip("\n"), "after": new.rstrip("\n")})
+        out.append(new)
+    return "".join(out), records
+
+
+def _extract_targets_section(lines: list[str]) -> tuple[int | None, int, list[dict]]:
+    """Locate the `## Targets` section and parse its rows (C-38 / FR-040)."""
+    start = None
+    end = len(lines)
+    for index, line in enumerate(lines):
+        if line.strip() == _SECTION_TARGETS:
+            start = index
+            for later in range(index + 1, len(lines)):
+                if lines[later].startswith("## "):
+                    end = later
+                    break
+            break
+    if start is None:
+        return None, end, []
+    targets: list[dict] = []
+    for line in lines[start + 1:end]:
+        stripped = line.strip()
+        if not stripped or stripped == _TARGETS_HEADER or stripped == _TARGETS_SEPARATOR:
+            continue
+        match = _TARGET_ROW.match(stripped)
+        if not match:
+            # FR-040: a line the grammar cannot carry would be dropped — hard failure.
+            raise GoalInvalid(
+                "migration-target-loss: the ## Targets section holds a line the table "
+                f"grammar cannot carry ({stripped!r}); refusing rather than dropping it")
+        targets.append({"id": match.group(1), "statement": match.group(2),
+                        "status": match.group(3)})
+    return start, end, targets
+
+
+def _map_goal_body(body: str) -> tuple[str, list[dict], bool]:
+    """C-38 action-goal mapping: the two section renames plus Targets re-rendering."""
+    renamed: list[str] = []
+    for line in body.splitlines(keepends=True):
+        stripped = line.strip()
+        renamed.append(_GOAL_HEADING_MAP[stripped] + "\n"
+                       if stripped in _GOAL_HEADING_MAP else line)
+    start, end, targets = _extract_targets_section(renamed)
+    if start is None:
+        return "".join(renamed), [], False
+    if not targets:
+        return "".join(renamed[:start] + renamed[end:]), [], True
+    block = ([f"{GOAL_SECTION_MIGRATED}\n", "\n"]
+             + [f"- {row['statement']}\n" for row in targets] + ["\n"])
+    return "".join(renamed[:start] + block + renamed[end:]), targets, True
+
+
+def _remove_section(body: str, heading: str) -> str:
+    out: list[str] = []
+    skipping = False
+    for line in body.split("\n"):
+        if line.strip() == heading:
+            skipping = True
+            continue
+        if skipping and line.startswith("## "):
+            skipping = False
+        if not skipping:
+            out.append(line)
+    return "\n".join(out)
+
+
+def _normalized_projection(text: str) -> str:
+    lines = [line.rstrip() for line in
+             text.replace("\r\n", "\n").replace("\r", "\n").split("\n")]
+    return "\n".join(lines).strip("\n") + "\n"
+
+
+def concept_projection(text: str, *, mapping: str) -> str:
+    """C-39 — the digest input. `mapping` is the class the entry is acted under."""
+    meta, _start, _end = read_frontmatter_subset(text)
+    rows = [f"status: {str(meta.get('status') or '')}",
+            f"created: {str(meta.get('created') or '')}",
+            f"updated: {str(meta.get('updated') or '')}"]
+    values = _binding_values(text)
+    rows.append(_render_binding_block(values).rstrip("\n")
+                if values is not None else "(no binding block)")
+    _frontmatter, body = _frontmatter_span(text)
+    if mapping == "action-goal":
+        body, _targets, _present = _map_goal_body(body)
+    elif mapping == "anchor":
+        body, _records = _map_anchor_body(body)
+    body = _remove_section(body, _SECTION_TARGETS)
+    body = _remove_section(body, GOAL_SECTION_MIGRATED)
+    return _normalized_projection("\n\n".join(["\n".join(rows), body]))
+
+
+def migration_digest(text: str, *, mapping: str) -> str:
+    return hashlib.sha256(
+        concept_projection(text, mapping=mapping).encode("utf-8")).hexdigest()
+
+
+# ---- planning --------------------------------------------------------------
+
+def _cleanup_paths(repo_root: Path, entry: dict) -> dict:
+    slug = entry["slug"]
+    source_dir = anchor_root(repo_root) / slug
+    source = source_dir / "goal.md"
+    if entry["class"] == "anchor":
+        target = source_dir / "anchor.md"
+        receipt = source_dir / BODY_RECEIPT_NAME
+    elif entry["class"] == "action-goal":
+        target = goals_root(repo_root) / slug / "goal.md"
+        receipt = target.parent / MIGRATION_RECEIPT_NAME
+    else:
+        target_dir = _cleanup_archive_root(repo_root) / slug
+        target = target_dir / "goal.md"
+        receipt = target_dir / MIGRATION_RECEIPT_NAME
+    return {"source_dir": source_dir, "source": source, "target": target,
+            "receipt": receipt}
+
+
+def _read_json_file(path: Path) -> dict | None:
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        raise GoalInvalid(f"invalid-state: {path} exists but cannot be read as a receipt")
+
+
+def _plan_anchor_entry(repo_root: Path, entry: dict, paths: dict) -> dict:
+    slug, source, target = entry["slug"], paths["source"], paths["target"]
+    if source.is_file() and target.is_file():
+        raise GoalInvalid(
+            f"conflict: {_relative(repo_root, source)} and "
+            f"{_relative(repo_root, target)} both exist; the rename would overwrite one "
+            "of them, so nothing is written")
+    if target.is_file():
+        text = target.read_text(encoding="utf-8")
+    elif source.is_file():
+        text = source.read_text(encoding="utf-8")
+    else:
+        raise GoalNotFound(
+            f"source-missing: {_relative(repo_root, source)} is declared but absent and "
+            f"no receipt at {_relative(repo_root, paths['receipt'])} explains it")
+    _front, body = _frontmatter_span(text)
+    _mapped, records = _map_anchor_body(
+        body, first_line=text[:len(text) - len(body)].count("\n") + 1,
+        path=_relative(repo_root, target))
+    receipt = _read_json_file(paths["receipt"])
+    if target.is_file():
+        after = migration_digest(text, mapping="anchor")
+        if receipt is None:
+            if records:
+                return {"kind": "anchor", "slug": slug, "action": "normalize",
+                        "result": "normalize",
+                        "source_path": _relative(repo_root, source),
+                        "target_path": _relative(repo_root, target),
+                        "note": "receipt absent; the normalization resumes",
+                        "_paths": paths}
+            return {"kind": "anchor", "slug": slug, "action": "noop",
+                    "result": "already-normalized",
+                    "source_path": _relative(repo_root, source),
+                    "target_path": _relative(repo_root, target), "_paths": paths}
+        recorded = receipt.get("concept_digest_after_normalization")
+        if recorded != after:
+            raise GoalInvalid(
+                f"conflict: {_relative(repo_root, target)} does not match its body receipt "
+                f"{_relative(repo_root, paths['receipt'])} (recorded digest {recorded}, "
+                f"measured {after}); the file is not rewritten")
+        return {"kind": "anchor", "slug": slug, "action": "noop",
+                "result": "already-normalized",
+                "source_path": _relative(repo_root, source),
+                "target_path": _relative(repo_root, target), "_paths": paths}
+    return {"kind": "anchor", "slug": slug,
+            "action": "rename+normalize" if records else "rename",
+            "result": "rename+normalize" if records else "rename",
+            "source_path": _relative(repo_root, source),
+            "target_path": _relative(repo_root, target), "_paths": paths,
+            "_records": records}
+
+
+def _plan_move_entry(repo_root: Path, entry: dict, paths: dict, *,
+                     action: str, mapping: str, move_summary: bool) -> dict:
+    """Shared C-41 state table for the two moving classes.
+
+    `source present, target present, no receipt` is a resumable state (C-42): the target
+    is re-derived from the source and the move continues. A receipt-less target with no
+    source is the half state C-41 refuses (I5).
+    """
+    slug, source, target = entry["slug"], paths["source"], paths["target"]
+    receipt = _read_json_file(paths["receipt"])
+    base = {"kind": entry["class"], "slug": slug,
+            "source_path": _relative(repo_root, source),
+            "target_path": _relative(repo_root, target), "_paths": paths,
+            "_action_name": action, "_mapping": mapping,
+            "_move_summary": move_summary}
+
+    source_text = source.read_text(encoding="utf-8") if source.is_file() else None
+    source_digest = (migration_digest(source_text, mapping=mapping)
+                     if source_text is not None else None)
+    if source_text is not None:
+        body = _frontmatter_span(source_text)[1]
+        if mapping == "action-goal":
+            _mapped, targets, _present = _map_goal_body(body)
+            if len(targets) != entry["targets"]:
+                raise GoalInvalid(
+                    f"migration-target-loss: {_relative(repo_root, source)} declares "
+                    f"{entry['targets']} Target(s) but {len(targets)} could be carried "
+                    "into the migration; a migration that drops a statement is a hard "
+                    "failure (FR-040)")
+        else:
+            targets = _parse_targets_text(_section(body, _SECTION_TARGETS))
+
+    if target.is_file():
+        target_digest = migration_digest(target.read_text(encoding="utf-8"),
+                                         mapping=mapping)
+        if receipt is None:
+            if source_text is None:
+                raise GoalInvalid(
+                    f"half-state: {_relative(repo_root, target)} exists without "
+                    f"{_relative(repo_root, paths['receipt'])} and its source is gone; "
+                    "a receipt-less target is a defect the action refuses to bless "
+                    "(C-41 I5)")
+            if target_digest != source_digest:
+                raise GoalInvalid(
+                    f"conflict: {_relative(repo_root, source)} and "
+                    f"{_relative(repo_root, target)} hold different concept payloads "
+                    f"({source_digest} vs {target_digest}); no winner is picked and "
+                    "nothing is written")
+            base.update({"action": "resume-receipt", "result": action,
+                         "resumed_at": "write-receipt",
+                         "_source_text": source_text, "_source_digest": source_digest,
+                         "_targets": targets, "_resume": "write-receipt"})
+            return base
+        recorded = receipt.get("concept_digest_target")
+        if recorded != target_digest:
+            raise GoalInvalid(
+                f"conflict: {_relative(repo_root, target)} does not match its receipt "
+                f"{_relative(repo_root, paths['receipt'])} (recorded digest {recorded}, "
+                f"measured {target_digest}); both paths are named and nothing is rewritten")
+        if source_text is None:
+            return {**base, "action": "noop",
+                    "result": CLEANUP_DONE_RESULTS[action]}
+        if source_digest != target_digest:
+            raise GoalInvalid(
+                f"conflict: {_relative(repo_root, source)} and "
+                f"{_relative(repo_root, target)} hold different concept payloads "
+                f"({source_digest} vs {target_digest}); no winner is picked")
+        base.update({"action": "resume-remove",
+                     "result": CLEANUP_DONE_RESULTS[action],
+                     "resumed_at": "remove-source",
+                     "_targets": targets, "_resume": "remove-source"})
+        return base
+
+    if source_text is None:
+        raise GoalNotFound(
+            f"source-missing: {_relative(repo_root, source)} is declared but absent and "
+            f"no receipt at {_relative(repo_root, paths['receipt'])} explains it")
+    if target.parent.exists():
+        raise GoalInvalid(
+            f"conflict: {_relative(repo_root, target.parent)} already exists without "
+            f"{_relative(repo_root, target)}; the migration refuses to merge into it")
+    base.update({"action": action, "result": action,
+                 "_source_text": source_text, "_source_digest": source_digest,
+                 "_targets": targets})
+    return base
+
+
+def _plan_cleanup_entry(repo_root: Path, entry: dict) -> dict:
+    paths = _cleanup_paths(repo_root, entry)
+    if entry["class"] == "anchor":
+        return _plan_anchor_entry(repo_root, entry, paths)
+    if entry["class"] == "action-goal":
+        return _plan_move_entry(repo_root, entry, paths, action="migrate",
+                                mapping="action-goal", move_summary=True)
+    return _plan_move_entry(repo_root, entry, paths, action="archive",
+                            mapping="obsolete", move_summary=False)
+
+
+# ---- applying --------------------------------------------------------------
+
+def _fault_cleanup() -> str | None:
+    value = os.environ.get(CLEANUP_FAULT_ENV)
+    return value if value in CLEANUP_FAULT_STEPS else None
+
+
+def _migration_receipt_body(row: dict, *, digest_source: str, digest_target: str,
+                            summary: str, phase: str = "complete") -> dict:
+    return {
+        "schema": MIGRATION_RECEIPT_SCHEMA,
+        "action": RECEIPT_ACTIONS[row["_action_name"]],
+        "source_path": row["source_path"],
+        "target_path": row["target_path"],
+        "concept_digest_source": digest_source,
+        "concept_digest_target": digest_target,
+        "mapping_version": CLEANUP_MAPPING_VERSION,
+        "result_identity": row["slug"],
+        "engine": _engine_identity(),
+        "timestamp": _utc_now(),
+        "delete_policy": DELETE_POLICY,
+        "targets": row.get("_targets", []),
+        "summary": summary,
+        "phase": phase,
+    }
+
+
+def _move_summary_tree(source_dir: Path, target_dir: Path) -> str:
+    summary = source_dir / SUMMARY_DIRNAME
+    if not summary.is_dir():
+        return "absent"
+    destination = target_dir / SUMMARY_DIRNAME
+    if destination.exists():
+        raise GoalInvalid(
+            f"conflict: summary trees exist at both {summary} and {destination}; the "
+            "move refuses to merge or overwrite them")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(summary), str(destination))
+    return "moved"
+
+
+def _write_json(path: Path, body: dict) -> None:
+    _atomic_write_text(path, json.dumps(body, ensure_ascii=False, indent=2) + "\n")
+
+
+def _apply_anchor(repo_root: Path, row: dict) -> None:
+    paths = row["_paths"]
+    source, target = paths["source"], paths["target"]
+    if source.is_file() and not target.is_file():
+        # C-38 sub-step 1: the rename changes the file name and nothing else.
+        source.rename(target)
+    text = target.read_text(encoding="utf-8")
+    front, body = _frontmatter_span(text)
+    mapped_body, records = _map_anchor_body(
+        body, first_line=front.count("\n") + 1, path=row["target_path"])
+    if not records:
+        return
+    before_digest = migration_digest(text, mapping="anchor")
+    after_digest = migration_digest(front + mapped_body, mapping="anchor")
+    if before_digest != after_digest:
+        raise GoalInvalid(
+            f"digest-mismatch: normalizing {row['target_path']} changed the concept "
+            f"projection ({before_digest} -> {after_digest}); the source is left as it was")
+    _atomic_write_text(target, front + mapped_body)
+    _write_json(paths["receipt"], {
+        "schema": BODY_RECEIPT_SCHEMA,
+        "action": "anchor-body-normalization",
+        "path": row["target_path"],
+        "concept_digest_before_normalization": before_digest,
+        "concept_digest_after_normalization": after_digest,
+        "engine": _engine_identity(),
+        "timestamp": _utc_now(),
+        "lines": records,
+    })
+    row["normalized_lines"] = len(records)
+
+
+def _apply_move(repo_root: Path, row: dict) -> None:
+    paths = row["_paths"]
+    source, target = paths["source"], paths["target"]
+    fault = _fault_cleanup()
+    action = row["action"]
+    if action == "noop":
+        return
+    if action in ("migrate", "archive", "resume-receipt"):
+        if not target.is_file():
+            # C-42 `write-target`: the archive copy is the whole tree, the migration's
+            # is the mapped definition.
+            if row["_action_name"] == "archive":
+                if target.parent.exists():
+                    raise GoalInvalid(
+                        f"conflict: {_relative(repo_root, target.parent)} exists; the "
+                        "archive copy refuses to overwrite it")
+                target.parent.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(paths["source_dir"], target.parent)
+            else:
+                text = row["_source_text"]
+                front, body = _frontmatter_span(text)
+                mapped_body, _targets, _present = _map_goal_body(body)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                _atomic_write_text(target, front + mapped_body)
+            if fault == "write-target":
+                raise _CleanupInterrupted("write-target", row)
+        if row["_move_summary"]:
+            if (paths["source_dir"] / SUMMARY_DIRNAME).is_dir():
+                row["summary"] = _move_summary_tree(paths["source_dir"], target.parent)
+            elif (target.parent / SUMMARY_DIRNAME).is_dir():
+                row["summary"] = "moved"
+            else:
+                row["summary"] = "absent"
+        else:
+            row["summary"] = ("moved" if (target.parent / SUMMARY_DIRNAME).is_dir()
+                              else "absent")
+        if not paths["receipt"].is_file():
+            # C-42 `write-receipt`: never before the target, never after the removal.
+            if row.get("_source_digest") is None:
+                row["_source_digest"] = migration_digest(
+                    source.read_text(encoding="utf-8"), mapping=row["_mapping"])
+            target_digest = migration_digest(target.read_text(encoding="utf-8"),
+                                             mapping=row["_mapping"])
+            if row["_source_digest"] != target_digest:
+                raise GoalInvalid(
+                    f"digest-mismatch: {row['source_path']} projects to "
+                    f"{row['_source_digest']} but {row['target_path']} projects to "
+                    f"{target_digest}; the source is not removed")
+            _write_json(paths["receipt"], _migration_receipt_body(
+                row, digest_source=row["_source_digest"],
+                digest_target=target_digest, summary=row["summary"]))
+            if fault == "write-receipt":
+                raise _CleanupInterrupted("write-receipt", row)
+    if row["_action_name"] == "archive":
+        # The whole tree moved; the source copy goes only after the target + receipt exist.
+        if paths["source_dir"].is_dir():
+            shutil.rmtree(paths["source_dir"])
+        elif source.is_file():
+            source.unlink()
+    else:
+        if source.is_file():
+            source.unlink()
+        try:
+            paths["source_dir"].rmdir()
+        except OSError:
+            row["source_dir_remaining"] = _relative(repo_root, paths["source_dir"])
+
+
+def _cleanup_public(row: dict) -> dict:
+    return {key: value for key, value in row.items() if not key.startswith("_")}
+
+
+def cleanup_store(repo_root: Path, *, apply: bool, classification_path: Path) -> dict:
+    """C-29 / C-36…C-45 — plan every entry, then (on apply) act in C-42 phase order."""
+    repo_root = Path(repo_root)
+    data = load_classification(repo_root, Path(classification_path))
+    decisions = [_plan_cleanup_entry(repo_root, entry) for entry in data["entries"]]
+    decisions.sort(key=lambda row: (row["kind"], row["slug"]))
+
+    interrupted: dict | None = None
+    if apply:
+        done: list[dict] = []
+        for row in decisions:
+            try:
+                if row["kind"] == "anchor":
+                    _apply_anchor(repo_root, row)
+                else:
+                    _apply_move(repo_root, row)
+            except _CleanupInterrupted as exc:
+                receipt_path = exc.row["_paths"]["receipt"]
+                interrupted = {
+                    "result": "interrupted",
+                    "error": (f"interrupted: {exc.row['kind']} {exc.row['slug']!r} stopped "
+                              f"after the {exc.phase} phase; a second call resumes at "
+                              f"the next phase ({', '.join(CLEANUP_PHASES)})"),
+                    "reached_phase": exc.phase,
+                    "target_path": exc.row["target_path"],
+                    "receipt_path": _relative(repo_root, receipt_path),
+                    "target_exists": exc.row["_paths"]["target"].is_file(),
+                }
+                row_copy = dict(_cleanup_public(row))
+                row_copy["result"] = "interrupted"
+                done.append(row_copy)
+                decisions = done
+                break
+            done.append(row)
+        else:
+            decisions = done
+
+    results = sorted({row["result"] for row in decisions})
+    payload: dict = {
+        "action": "cleanup",
+        "mode": "apply" if apply else "check",
+        "decisions": [_cleanup_public(row) for row in decisions],
+        "counts": {name: sum(1 for row in decisions if row["result"] == name)
+                   for name in results},
+    }
+    if interrupted:
+        payload.update(interrupted)
+    return payload
 
 
 # --------------------------------------------------------------------------
@@ -2445,7 +3495,7 @@ def handoff_ref(repo_root: Path, handoff_path: Path) -> dict:
     meta, _start, _end = read_frontmatter_subset(text)
     resolved: dict[str, Path] = {}
     unresolved: list[str] = []
-    for key, layer, filename in (("goal_slug", ARCHIVE_DIRNAME, DEFINITION_FILENAME),
+    for key, layer, filename in (("goal_slug", ARCHIVE_DIRNAME, definition_filename("anchor")),
                                  ("team_slug", TEAM_DIRNAME, "team.md")):
         value = str(meta.get(key) or "").strip()
         path = (Path(repo_root) / layer / value / filename
@@ -2539,6 +3589,26 @@ def _run_archive_action(args, repo_root: Path) -> int:
     return EXIT_OK
 
 
+def _run_cleanup_action(args, repo_root: Path) -> int:
+    """Dispatch the cleanup group; its exit codes are C-30's single meanings."""
+    try:
+        payload = cleanup_store(repo_root, apply=bool(args.apply),
+                                classification_path=Path(args.classification))
+    except GoalNotFound as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_NOT_FOUND
+    except GoalInvalid as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INVALID
+    except GoalError as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INPUT_ERROR
+    _emit(payload, args.json)
+    if payload.get("result") == "interrupted":
+        return EXIT_NOT_FOUND
+    return EXIT_OK
+
+
 def _run_declaration_action(args, repo_root: Path) -> int:
     """Dispatch the 094 declaration read actions; they touch no archive layer."""
     if args.action == "command-family":
@@ -2567,7 +3637,7 @@ def _run_handoff_action(args, repo_root: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks', '--handoff'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks', '--handoff', '--classification', '--guidance', '--done', '--clear-done'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -2581,22 +3651,26 @@ def main(argv: list[str] | None = None) -> int:
     common.add_argument("--repo-root", default=None, help="repository root (default: cwd)")
     common.add_argument("--json", action="store_true", help="machine-readable output")
     common.add_argument("--scope", choices=ARCHIVE_SCOPES, default=None,
-                        help="archive layer: goal (.specify/anchoring/), teams "
-                             "(.specify/teams/), or auto (read-only single-layer resolution)")
+                        help="archive layer: anchor (.specify/anchoring/anchor.md), "
+                             "goals (.specify/goals/goal.md), teams (.specify/teams/), "
+                             "or auto (read-only single-layer resolution); the closed "
+                             "member set is owned by shared/definitions/"
+                             "anchor-definitions.md § Archive Layers")
     common.add_argument("--spec-dir", default=None,
                         help="the spec directory used to resolve origin and validate auto "
                              "inputs (repo-relative or absolute); never decides a landing point")
 
     parser = argparse.ArgumentParser(
-        description="Anchoring (goal) definition engine — stores goal.md definitions "
-                    "in the .specify/anchoring archive and team.md in .specify/teams/.",
+        description="Definition engine — stores anchor.md in the .specify/anchoring "
+                    "archive, goal.md in the .specify/goals archive, and team.md in "
+                    ".specify/teams/.",
         parents=[common],
     )
     _sig_configure(parser)
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_scope = sub.add_parser("resolve-scope", parents=[common],
-                             help="read: resolve the goal/teams/auto archive-layer roots")
+                             help="read: resolve the anchor/goals/teams/auto archive-layer roots")
     p_scope.add_argument("--team", default=None, help="optional team slug for identity-aware auto")
 
     p_create = sub.add_parser("create", parents=[common],
@@ -2747,6 +3821,61 @@ def main(argv: list[str] | None = None) -> int:
     backfill_mode.add_argument("--apply", dest="apply", action="store_true",
                                help="insert the binding record on every unbound resident")
 
+    # C-28 — the action-level Goal group: a separate, clearly named group in this one
+    # executable; it writes `.specify/goals/<slug>/goal.md` and nothing else.
+    p_goal_create = sub.add_parser(
+        "goal-create", parents=[common],
+        help="write: add an action-level Goal to .specify/goals/<goal-slug>/goal.md "
+             "(requires at least one --done; guidance gets no GD-2 shape check)")
+    p_goal_create.add_argument("slug")
+    p_goal_create.add_argument("--guidance", required=True, metavar="TEXT",
+                               help="the practical action this Goal guides (step-shaped "
+                                    "text is accepted)")
+    p_goal_create.add_argument("--done", dest="done", action="append", default=[],
+                               metavar="TEXT",
+                               help="one verifiable completion condition; repeatable, "
+                                    "at least one required")
+    p_goal_create.add_argument("--title", default=None, metavar="TEXT",
+                               help="human-readable heading; falls back to the slug")
+
+    sub.add_parser("goal-list", parents=[common],
+                   help="read: enumerate the action-level Goal store")
+
+    p_goal_view = sub.add_parser("goal-view", parents=[common],
+                                 help="read: render one action-level Goal (exit 3 when absent)")
+    p_goal_view.add_argument("slug")
+
+    p_goal_modify = sub.add_parser(
+        "goal-modify", parents=[common],
+        help="write: change guidance or completion conditions, recording the prior value")
+    p_goal_modify.add_argument("slug")
+    p_goal_modify.add_argument("--guidance", default=None, metavar="TEXT")
+    p_goal_modify.add_argument("--done", dest="done", action="append", default=[],
+                               metavar="TEXT", help="replacement completion conditions")
+    p_goal_modify.add_argument("--clear-done", dest="clear_done", action="store_true",
+                               help="deliberately empty the completion conditions")
+
+    p_goal_status = sub.add_parser(
+        "goal-status", parents=[common],
+        help="read (no --set) | write (--set): shared lifecycle; terminal is retained")
+    p_goal_status.add_argument("slug")
+    p_goal_status.add_argument("--set", dest="target_state", default=None,
+                               choices=LIFECYCLE_STATES)
+
+    # C-29 — the cleanup group: its own name, its own input, `--scope` inapplicable.
+    p_cleanup = sub.add_parser(
+        "cleanup", parents=[common],
+        help="read (--check) | write (--apply): the classified definition cleanup "
+             "(anchor rename/normalization, action-goal migration, obsolete archival)")
+    cleanup_mode = p_cleanup.add_mutually_exclusive_group(required=True)
+    cleanup_mode.add_argument("--check", dest="check", action="store_true",
+                              help="perform every read and decision; write nothing")
+    cleanup_mode.add_argument("--apply", dest="apply", action="store_true",
+                              help="execute the plan in the declared phase order")
+    p_cleanup.add_argument("--classification", required=True, metavar="PATH",
+                           help="the classification record read verbatim "
+                                "(schema 101-classification/v1)")
+
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
     if getattr(args, "kind", None) == "team":
@@ -2760,13 +3889,25 @@ def main(argv: list[str] | None = None) -> int:
         return _run_declaration_action(args, repo_root)
     if args.action == "handoff-ref":
         return _run_handoff_action(args, repo_root)
+    if args.action == "cleanup":
+        # C-29 — the group spans the stores it cleans by design; a layer selector would
+        # contradict that, so it is refused before any read or write.
+        if args.scope is not None:
+            _emit({"error": "scope-not-applicable: the cleanup group spans the anchor, "
+                            "Goal and archive stores by design; --scope does not apply to "
+                            "it and nothing is written"}, args.json)
+            return EXIT_INPUT_ERROR
+        return _run_cleanup_action(args, repo_root)
 
     global _ACTIVE_SCOPE
     _ACTIVE_SCOPE = None
     write_action = args.action in ("create", "status", "objective", "criteria",
-                                   "migrate", "bind")
+                                   "migrate", "bind", "goal-create", "goal-modify",
+                                   "goal-status")
     if args.action == "targets":
         write_action = bool(args.add_statement or args.set_state)
+    if args.action == "goal-status":
+        write_action = args.target_state is not None
     requested_scope = args.scope
     if requested_scope is None:
         if args.action == "resolve-scope":
@@ -2774,18 +3915,25 @@ def main(argv: list[str] | None = None) -> int:
         elif args.action == "run-checks":
             requested_scope = "teams"
         elif args.action in ("bind", "binding"):
-            requested_scope = args.kind
+            # The legacy actions keep their own kind vocabulary; only `--scope` is the
+            # closed four-member surface, so the old kind names translate here instead
+            # of being retired out from under an existing caller.
+            requested_scope = {"goal": "anchor", "team": "teams",
+                               "teams": "teams"}[args.kind]
+        elif args.action in GOAL_ACTIONS:
+            requested_scope = "goals"
         else:
-            requested_scope = "goal"
+            requested_scope = "anchor"
     if requested_scope == "auto" and write_action:
         _emit({"error": "scope-read-only: --scope auto resolves a single archive layer "
-                        "for reads only; name the layer with --scope goal or --scope teams "
-                        "for a write"},
+                        "for reads only; name the layer with --scope anchor, --scope "
+                        "goals or --scope teams for a write"},
               args.json)
         return EXIT_INPUT_ERROR
     team_slug = getattr(args, "team_slug", None) or getattr(args, "team", None)
+    identity_slug = team_slug or getattr(args, "slug", None)
     try:
-        scope_obj = resolve_scope(repo_root, requested_scope, args.spec_dir, team_slug)
+        scope_obj = resolve_scope(repo_root, requested_scope, args.spec_dir, identity_slug)
     except ScopeError as exc:
         _emit({"error": str(exc)}, args.json)
         return EXIT_INPUT_ERROR
@@ -2796,11 +3944,14 @@ def main(argv: list[str] | None = None) -> int:
     # to; the two layers are named so the caller can correct the address.
     action_layer = None
     if args.action in ("bind", "binding"):
-        action_layer = args.kind
+        action_layer = {"goal": "anchor", "team": "teams",
+                        "teams": "teams"}[args.kind]
     elif args.action == "run-checks":
         action_layer = "teams"
+    elif args.action in GOAL_ACTIONS:
+        action_layer = "goals"
     elif write_action:
-        action_layer = "goal"
+        action_layer = "anchor"
     if write_action and action_layer and scope_obj.scope != action_layer:
         _emit({"error": f"cross-layer-write: this write targets the {scope_obj.scope} "
                         f"archive layer but the definition resolves to the {action_layer} "
@@ -2945,6 +4096,37 @@ def main(argv: list[str] | None = None) -> int:
             if payload["verdict"] == "input-error":
                 return EXIT_INPUT_ERROR
             return EXIT_BLOCKED if payload["blocked"] else EXIT_OK
+        elif args.action == "goal-create":
+            path = create_action_goal(repo_root, args.slug, args.guidance,
+                                      list(args.done), title=args.title)
+            result = {"created": _relative(repo_root, path), "slug": args.slug,
+                      "status": "active"}
+        elif args.action == "goal-list":
+            result = {"goals": list_action_goals(repo_root)}
+        elif args.action == "goal-view":
+            path = _resolve_action_goal(repo_root, args.slug)
+            data = parse_action_goal(path)
+            data["path"] = _relative(repo_root, path)
+            result = data
+        elif args.action == "goal-modify":
+            path = _resolve_action_goal(repo_root, args.slug)
+            if args.clear_done and args.done:
+                _emit({"error": "--clear-done and --done contradict each other in one "
+                                "call; pass one of them"}, args.json)
+                return EXIT_INPUT_ERROR
+            if args.guidance is None and not args.done and not args.clear_done:
+                _emit({"error": "goal-modify needs at least one of --guidance / --done / "
+                                "--clear-done; an argument-less call would be a write "
+                                "with no instruction"}, args.json)
+                return EXIT_INPUT_ERROR
+            result = modify_action_goal(
+                path, guidance=args.guidance,
+                conditions=list(args.done) if args.done else None,
+                clear=args.clear_done)
+            result["path"] = _relative(repo_root, path)
+        elif args.action == "goal-status":
+            path = _resolve_action_goal(repo_root, args.slug)
+            result = action_goal_status(path, args.target_state)
         else:  # pragma: no cover - argparse guards this
             parser.error(f"unknown action {args.action}")
     except GoalNotFound as exc:
@@ -2976,7 +4158,13 @@ def _emit(payload: dict, as_json: bool) -> None:
         return
     if "goals" in payload:
         if not payload["goals"]:
-            print("(anchoring archive is empty)")
+            print("(no definitions in this archive layer)")
+            return
+        if "done_count" in payload["goals"][0]:
+            for row in payload["goals"]:
+                print(f"{row['slug']:<32} {row['status']:<10} "
+                      f"done={row['done_count']:<3} updated={row['updated']}")
+            return
         for row in payload["goals"]:
             print(f"{row['slug']:<32} {row['status']:<10} "
                   f"criteria={row['criteria_count']:<3} updated={row['updated']}")
