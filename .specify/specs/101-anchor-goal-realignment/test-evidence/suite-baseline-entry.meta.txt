@@ -1,0 +1,4 @@
+command: bash scripts/bash/run-tests.sh --full --names-out .specify/specs/101-anchor-goal-realignment/test-evidence/suite-baseline-entry.txt
+rc: 1
+duration_s: 82
+at: 2026-11-12T09:09:28Z
