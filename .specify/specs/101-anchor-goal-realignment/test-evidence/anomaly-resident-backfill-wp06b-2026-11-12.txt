@@ -1,0 +1,72 @@
+# engine: scripts/python/goal-utils.py backfill-bindings --dry-run
+{
+  "action": "backfill-bindings",
+  "mode": "dry-run",
+  "definitions": [
+    {
+      "kind": "teams",
+      "slug": "085-sdd-temporary-goal-team",
+      "path": ".specify/teams/085-sdd-temporary-goal-team/team.md",
+      "result": "already-bound"
+    },
+    {
+      "kind": "teams",
+      "slug": "086-efficient-test-execution",
+      "path": ".specify/teams/086-efficient-test-execution/team.md",
+      "result": "already-bound"
+    },
+    {
+      "kind": "teams",
+      "slug": "087-arch-diagram-docs",
+      "path": ".specify/teams/087-arch-diagram-docs/team.md",
+      "result": "already-bound"
+    },
+    {
+      "kind": "teams",
+      "slug": "088-reporting-dogfood",
+      "path": ".specify/teams/088-reporting-dogfood/team.md",
+      "result": "already-bound"
+    },
+    {
+      "kind": "teams",
+      "slug": "089-script-interface-contract",
+      "path": ".specify/teams/089-script-interface-contract/team.md",
+      "result": "already-bound"
+    },
+    {
+      "kind": "teams",
+      "slug": "090-re-anchoring",
+      "path": ".specify/teams/090-re-anchoring/team.md",
+      "result": "already-bound"
+    },
+
+# live symptom: unbound anchor.md residents
+.specify/anchoring/visualization-skill-selection/anchor.md
+
+# enumerator source (read-only citation)
+    elif conflicts:
+        payload["error"] = "conflict: " + "; ".join(
+            f"target {row['target_path']} already exists with a different concept "
+            f"payload than the source {row['source_path']} — the migration refuses to "
+            "overwrite and names both candidates (C-40)" for row in conflicts)
+    return payload
+
+
+def _resident_definitions(repo_root: Path) -> list[dict]:
+    """C-112 — every definition already living in the unified archive."""
+    rows = []
+    for path in sorted((Path(repo_root) / ARCHIVE_DIRNAME).glob("*/goal.md")):
+        rows.append({"kind": "goal", "slug": path.parent.name, "path": path})
+    for path in sorted((Path(repo_root) / TEAM_DIRNAME).glob("*/team.md")):
+        rows.append({"kind": "teams", "slug": path.parent.name, "path": path})
+    return rows
+
+
+def backfill_bindings(repo_root: Path, *, apply: bool) -> dict:
+    """C-112/C-113 — insert the recorded binding on every unbound archive resident.
+
+    Every refusal is computed before the first write, so an incomplete or hand-edited
+    block leaves the whole tree untouched rather than half-backfilled.
+    """
+    repo_root = Path(repo_root)
+    planned: list[dict] = []

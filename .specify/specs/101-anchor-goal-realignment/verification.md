@@ -88,19 +88,27 @@ SC-010_note=`test-evidence/reader-restatement-2026-11-12.md` — all four verdic
 RS-003_joint_acceptance=pass — `goal-utils.py --help`/`--version` still satisfy Constitution XXI; new actions' exit codes and the two-writer audit are pinned by contract tests with zero failures in the final suite; the engine remains the single definition writer.
 RS-004_joint_acceptance=pass — `sync-mirrors.py --check` ok (114 files byte-identical); `regen-command-copies.py --check` ok; `flow-class-check.py` resolves both command rows (ledger carries `/speckit.anchor` and `/speckit.goal`).
 
-# -- Final suite gate (T080, single run) --
+# -- Final suite gate (T080 WP-06 reading; closure-repair rerun recorded by WP-06b) --
 
 final_suite_command=bash scripts/bash/run-tests.sh --full --names-out .specify/specs/101-anchor-goal-realignment/test-evidence/final-suite-2026-11-12.txt
 final_suite_exit_code=1
-final_suite_result=228 failed / 8936 passed / 3 skipped (9167 collected, passes=2 tier=full, 81s)
+final_suite_result=193 failed / 8972 passed / 3 skipped (9168 collected + 1 serial, passes=2 tier=full, 56.23s)
 final_suite_baseline_result=192 failed / 8900 passed / 3 skipped (9095 collected)
-final_suite_new_failure_ids=37
-final_suite_fixed_ids=1
+final_suite_new_failure_ids=3
+final_suite_fixed_ids=2
 final_suite_new_failure_ids_source=.specify/specs/101-anchor-goal-realignment/test-evidence/final-suite-2026-11-12.txt
-final_suite_full_output=.specify/specs/101-anchor-goal-realignment/test-evidence/final-suite-2026-11-12.output.txt
-gate1_verdict=FAIL
+final_suite_full_output=.specify/specs/101-anchor-goal-realignment/test-evidence/final-suite-2026-11-12.log
+final_suite_new_ids_disposition=2 blocked on scripts/python/goal-utils.py:_resident_definitions (anchor.md never enumerated; out of this package's write territory); 1 self-inflicted census mismatch (test_inprocess_conversion_contract.py::test_c001) repaired in tests/** after the run and re-verified by a targeted module pair (16 passed / 1 pre-existing baseline red)
+gate1_verdict=FAIL (residual new set: the 2 test_resident_backfill ids)
 
-# -- Guard and delivery readings (T080, re-run after the registry write) --
+# -- WP-06b closure repair (2026-11-12) --
+
+closure_repair_closed_ids=35 of 37
+closure_repair_blocked_ids=2 (test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill, ::test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding)
+closure_repair_blocked_at=scripts/python/goal-utils.py:2528 _resident_definitions globs only */goal.md while every reader resolves anchor.md (sibling _anchor_layer_contains:186 already allows both); live symptom .specify/anchoring/visualization-skill-selection/anchor.md has no binding and backfill-bindings --dry-run plans zero goal rows
+closure_repair_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/implement-wp06b.md
+
+# -- Guard and delivery readings (WP-06 T080; re-read by WP-06b after the repair) --
 
 mirror_check=ok (shared/ == .specify/shared/, 114 files byte-identical)
 mirror_check_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/final-mirror-check-2026-11-12.txt
@@ -108,6 +116,20 @@ copy_check=ok (all per-tool command copies match the source templates)
 copy_check_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/final-copy-check-2026-11-12.txt
 residue_after_registry=C1=0 C2=0 C3=0 C4=0 C5=0 C6=0 C7=0
 residue_after_registry_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/final-residue-scan-2026-11-12.txt
+wp06b_mirror_check=ok (rc 0, shared/ 114 files byte-identical, five projections ok)
+wp06b_copy_check=ok (rc 0)
+wp06b_residue=C1=0 C2=0 C3=0 C4=0 C5=0 C6=0 C7=0
+wp06b_smoke_exit_code=0 (43 passed in 12.85s)
+wp06b_smoke_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/final-smoke-wp06b-2026-11-12.txt
+wp06b_targeted_result=11 failed / 274 passed — every red is a baseline id except the 2 blocked resident ids
+wp06b_targeted_evidence=.specify/specs/101-anchor-goal-realignment/test-evidence/implement-wp06b-targeted-tests.txt
+
+# -- Coverage baseline (T004, frozen by WP-06b) --
+
+coverage_baseline_command=python scripts/python/account-clause-coverage.py --freeze --spec-dir .specify/specs/101-anchor-goal-realignment --corpus-root .specify/specs
+coverage_baseline_file=.specify/specs/101-anchor-goal-realignment/coverage-baseline.txt (673 frozen names, base-sha b9f6a0edb)
+coverage_live_reading=722 uncovered clause names: 673 baseline-internal + 49 beyond baseline, all 49 being this feature's own contracts/*.md#C-1…C-49 with no [green:] claim surface; 48 uncovered FRs; no other spec gained an uncovered clause
+coverage_live_command=python scripts/python/account-clause-coverage.py --spec-dir .specify/specs/101-anchor-goal-realignment --corpus-root .specify/specs (rc 1, status uncovered)
 
 # -- Closure judgement (read, not authored) --
 
@@ -121,6 +143,9 @@ closure_check_command=python3 scripts/python/closure-acceptance-check.py --spec-
 wrapup_determine=.specify/specs/101-anchor-goal-realignment/test-evidence/final-wrapup-determine-2026-11-12.json (duplicate: true)
 wrapup_execquant=.specify/specs/101-anchor-goal-realignment/test-evidence/final-wrapup-execquant-2026-11-12.txt (duplicate record; no second row)
 wrapup_feedback=.specify/specs/101-anchor-goal-realignment/test-evidence/final-wrapup-feedback-2026-11-12.json (duplicate: true)
+wp06b_wrapup_determine=.specify/specs/101-anchor-goal-realignment/test-evidence/wrap-up-determine-wp06b-2026-11-12.json (rc 0, duplicate: true)
+wp06b_wrapup_execquant=.specify/specs/101-anchor-goal-realignment/test-evidence/wrap-up-execquant-wp06b-2026-11-12.json (rc 0, duplicate record; no second row)
+wp06b_wrapup_feedback=.specify/specs/101-anchor-goal-realignment/test-evidence/wrap-up-feedback-wp06b-2026-11-12.json (rc 0, duplicate: true, count_since_submission 485, should_prompt true)
 
 ## Human view (rendered from the block above)
 
@@ -137,62 +162,59 @@ wrapup_feedback=.specify/specs/101-anchor-goal-realignment/test-evidence/final-w
 | SC-009 | supporting | pass | protected hashes equal `d7c9da7a3` |
 | SC-010 | supporting | pass | reader restates all four terms |
 
-## GATE-1 — final suite vs E2 baseline by failure id: FAIL
+## GATE-1 — final suite vs E2 baseline by failure id: FAIL (2 residual ids)
 
-Compared by **failure-id names** (not counts, not parallel-mode readings): `comm -13`
-gives 37 ids that are red in the final run and absent from the E2 baseline; `comm -23`
-gives 1 id that was red at baseline and is green now.
+Compared by **failure-id names** (not counts, not parallel-mode readings).
 
-The 37 ids group into three causes (evidence: the per-test tracebacks in
-`final-suite-2026-11-12.output.txt`):
+**WP-06 entry reading** (`final-suite-2026-11-12.output.txt`, the pre-repair run): `comm -13`
+gave 37 ids red in the final run and absent from the E2 baseline; `comm -23` gave 1 fixed id.
 
-1. **Stale-surface test alignment (29 ids)** — pre-existing tests that still assert the
-   retired surface; the product change is the intended one, the tests were not re-pointed
-   by the package that moved the surface:
-   - `tests/contract/test_criterion_subject.py` (11) — the owner fixture still reads
-     `shared/definitions/goal-definitions.md`; the `## 判据主体指代形 (Criterion Subject Reference)`
-     section now lives in `shared/definitions/anchor-definitions.md`.
-   - `tests/contract/test_temp_goal_contract.py` (6), `tests/integration/test_archive_migration_real_data.py` (1) —
-     expect `.specify/anchoring/<slug>/goal.md`; the definition file is `anchor.md`.
-   - `tests/contract/test_parallel_lines.py` (3) + `tests/integration/test_parallel_lines.py` (1),
-     `tests/contract/test_temp_team_schema.py` (2), `tests/contract/test_resident_backfill.py` (2) —
-     expect the retired `goal_slug` key; the engine and definitions now emit `anchor_slug`.
-   - `tests/contract/test_migrate_distribution_assembly.py` (1) — `COMMAND_BASELINE` is pinned
-     at 31 commands; the `anchor` command makes it 32.
-   - `tests/contract/test_stage_class_wiring.py` (2: `clarify`, `tasks`) — the compiled Wrap-up
-     fingerprint legitimately moved, but the pinned stripped-bytes SHA was not re-pinned.
-2. **Live-surface gaps (6 ids)** — product-side omissions this package may not edit:
-   - `tests/contract/test_git_workflow_observe.py::test_registry_validation_and_wrap_up_face_stay_green` —
-     `probe-utils.py probes --validate` reports `embed without probe object: skill:manage-anchor`.
-   - `tests/contract/test_docs_step_injection.py` (2) — `anchor.md`'s compiled Wrap-up carries the
-     Docs Sync Eval line, but `COMPLEX_COMMANDS` / `DOCS_STEP_EXCLUDED` were not moved with it.
-   - `tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments` —
-     the rewritten `manage-goal` SKILL.md no longer states the `.specify/teams/<slug>` landing point.
-   - `tests/contract/test_summary_trigger.py` (2) — `run-team` SKILL.md no longer states
-     `.specify/anchoring/<goal-slug>/summary/`.
-3. **Workspace-residue artifacts (2 ids)** — filesystem state, not product regressions:
-   - `tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_template_is_pointer_not_copy_and_path_resolves` —
-     the untracked `.specify/.specify/` directory (dated 2026-11-09, off-limits per this
-     dispatch) makes `pointer_base` stop at `.specify` and resolve the repo-root pointer under
-     `.specify/.specify/`.
-   - `tests/contract/test_isomorphism_map.py::test_no_second_map_or_boundary_table_exists` —
-     the scan walks `.specify/.tmp/` and read a parallel worker's `s094` sandbox mid-run.
+**WP-06b closure-repair reading** (the single rerun; full account in
+`test-evidence/implement-wp06b.md`): 193 failed / 8972 passed / 3 skipped; `comm -13`
+gives **3** ids, `comm -23` gives 2 fixed ids.
 
-None of the 37 lies in WP-06's write territory, and none was edited. WP-06 stops here and
-reports the set rather than touching tests or sources (fast-fail: this is a decision about
-which package owns the repair, not a local correction).
+1. **35 of the 37 closed in-territory** by moving live tests / live owners to the new
+   Anchor–Goal model, never by weakening an assertion: `test_criterion_subject` (11),
+   `test_temp_goal_contract` (6), `test_parallel_lines` (3 contract + 1 integration),
+   `test_temp_team_schema` (2), `test_stage_class_wiring` (2 — re-pinned after proving the
+   only delta is the machine-owned banner fingerprint), `test_archive_migration_real_data`
+   (1), `test_migrate_distribution_assembly` (1 — 31 → 32 with a dated rationale), the
+   probe-registry object for `skill:manage-anchor` (1), `test_docs_step_injection` (2),
+   `test_binding_model` (1), `test_summary_trigger` (2), and the two workspace-residue
+   artifacts: `.specify/.specify/` excluded by skipping `.specify` ancestors (artifact
+   never deleted) and `.specify/.tmp` added to the sanctioned skip set.
+2. **1 suite-time id was self-inflicted and repaired after the run**: the rewritten
+   `test_temp_goal_contract.py` collapsed four classified subprocess sites into a `_run`
+   helper, tripping the 098 in-process census (`test_inprocess_conversion_contract.py::test_c001`).
+   Calls were inlined into their owning tests and the census-named test restored; verified
+   green by a targeted module pair (no second full suite — the closure-repair rerun was
+   already spent).
+3. **2 ids remain blocked** — `test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill`
+   and `::test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding`.
+   The aligned subject exposes a real engine gap, not a test defect:
+   `scripts/python/goal-utils.py:2528 _resident_definitions` enumerates archive residents
+   with `glob("*/goal.md")` (the retired filename) while every reader resolves `anchor.md`
+   via `definition_filename("anchor")` (sibling `_anchor_layer_contains:186` already allows
+   both names). Live symptom: `.specify/anchoring/visualization-skill-selection/anchor.md`
+   carries no `binding:` block and `backfill-bindings --dry-run` plans **zero** goal rows,
+   so C-112's exhaustiveness claim is silently violated. The fix is two lines in that
+   engine, outside this package's write territory; the run reports the path and evidence
+   (`test-evidence/anomaly-resident-backfill-wp06b-2026-11-12.txt`) instead of editing it
+   or weakening the guard.
 
 ## Named residuals (disclosed, not smoothed over)
 
-- **Feature status held at `Planned`.** `tasks.md` still carries 81 open rows — condition ① of
+- **Feature status held at `Planned`.** `tasks.md` still carries open rows — condition ① of
   `Planned → Implemented` is closed by the stage integrator's task-sigil sweep, outside this
   package's territory. Closure/acceptance judgement belongs to the review stage.
-- **GATE-1 fails** with the 37-id set above; the repair split (test re-pointing vs live-surface
-  fixes) is a driver decision.
-- **T004 never froze `coverage-baseline.txt`** (`account-clause-coverage.py --freeze` was not run at
-  SETUP). The FR-071 "no clause-coverage regression" comparison is therefore `not-evaluated`;
-  only a same-instant coverage reading exists. The missing baseline is not reconstructed after
-  the fact.
+- **GATE-1 fails on exactly the 2 resident ids above**; the engine fix (`_resident_definitions`
+  must enumerate `anchor.md` alongside legacy `goal.md`) is a driver decision and is the only
+  remaining blocker to a zero-new-id reading.
+- **T004 is closed** — `coverage-baseline.txt` was frozen by WP-06b (673 names, base-sha
+  `b9f6a0edb`); the live accounting shows 673 baseline-internal uncovered names and 49 beyond
+  baseline, all 49 this feature's own unclaimed `contracts/*.md#C-1…C-49`; no other spec
+  gained an uncovered clause. FR-071 is now measurable; the 49 are a claim-surface gap in
+  `tasks.md` (`[green:]` declarations), not a coverage regression.
 - **SC-008 build limb** remains `not-evaluated` (EP-006, pre-existing Hugo failure).
 - **12 live `team.md` `forbidden_paths`** still list `.specify/goal/**` — classified as stale
   address in a prohibition field and deliberately not edited.

@@ -42,11 +42,6 @@ def _load_engine():
 goal_utils = _load_engine()
 
 
-def _run(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(ENGINE), *args],
-                          capture_output=True, text=True, cwd=REPO_ROOT)
-
-
 def test_goal_lives_in_the_goal_archive_and_not_the_spec_tree():
     assert GOAL_MD.is_file(), f"goal-archive definition missing: {GOAL_MD}"
     assert not SPEC_LOCAL_TREE.exists(), (
@@ -75,8 +70,10 @@ def test_the_definition_carries_its_binding_record():
         "the migrated definition records its source spec directory as origin")
 
 
-def test_goal_engine_reads_the_archive_definition():
-    proc = _run("goal-view", SLUG, "--scope", "goals", "--json")
+def test_goal_engine_validates_the_archive_definition():
+    proc = subprocess.run([sys.executable, str(ENGINE), "goal-view", SLUG,
+                           "--scope", "goals", "--json"],
+                          capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["slug"] == SLUG
@@ -89,14 +86,17 @@ def test_the_archived_source_copy_stays_readable():
 
 
 def test_list_names_the_migrated_goal_and_never_the_spec_tree():
-    proc = _run("goal-list", "--json")
+    proc = subprocess.run([sys.executable, str(ENGINE), "goal-list", "--json"],
+                          capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert SLUG in [row["slug"] for row in payload["goals"]]
 
 
 def test_resolve_scope_returns_the_archive_roots():
-    proc = _run("resolve-scope", "--scope", "goals", "--spec-dir", str(SPEC_DIR), "--json")
+    proc = subprocess.run([sys.executable, str(ENGINE), "resolve-scope", "--scope", "goals",
+                           "--spec-dir", str(SPEC_DIR), "--json"],
+                          capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["scope"] == "goals"
@@ -106,6 +106,8 @@ def test_resolve_scope_returns_the_archive_roots():
 
 
 def test_retired_spec_scope_is_refused():
-    proc = _run("goal-list", "--scope", "spec", "--spec-dir", str(SPEC_DIR), "--json")
+    proc = subprocess.run([sys.executable, str(ENGINE), "goal-list", "--scope", "spec",
+                           "--spec-dir", str(SPEC_DIR), "--json"],
+                          capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 2
     assert "invalid choice" in (proc.stderr + proc.stdout)

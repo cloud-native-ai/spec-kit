@@ -5,7 +5,7 @@
 **Description**: 语义反转 + 命令面清理（Plan B）：Anchor 成为项目级远期目标（`.specify/anchoring/<slug>/anchor.md`，`/speckit.anchor` 接管旧 `/speckit.goal` 的七模式），Goal 降为行动级实际指导（`.specify/goals/<slug>/goal.md`，`/speckit.goal` 四模式 `create` / `view` / `modify` / `status`）；团队绑定字段 `goal_slug` → `anchor_slug`；`.specify/anchoring` 逐条分类、迁移、归档（archive-not-delete，逐条回执）；日期化记录不改写。
 **Status**: Planned
 **Created**: 2026-11-12
-**Last Updated**: 2026-11-12（`/speckit.implement` WP-01…WP-06 收尾：语义反转、七/四模式命令面、双存储引擎、`.specify/anchoring` 14 条分类清理（9 保留 / 3 迁移 / 2 归档，逐条回执）、16 个团队绑定改名 + 6×R3 + 1×R2 处置、G-1…G-10 守卫、收尾全量与 `verification.md` 读数落盘。状态停在 `Planned`：`Planned → Implemented` 的第①条「tasks 零开放行」不在本包的写域内，由阶段集成器的 task-sigil sweep 随后关闭；闭包判定与状态翻转归 review 阶段。此前 `/speckit.plan`：`plan.md` + `research.md` + `classification.json` + `data-model.md` + `contracts/`（4 页 49 条款）+ `quickstart.md` + `feature-ref.md` 落地；Draft → Planned。此前 `/speckit.clarify`：Feature 绑定裁定为新 Feature 101；71 FR / 10 SC 保持；决策 D-1…D-5 见 requirements `## Clarifications`，证据 `test-evidence/clarify-2026-11-12.md`）
+**Last Updated**: 2026-11-12（`/speckit.implement` WP-06b 闭包修复：37 个新增失败 id 中 35 个在写域内闭合（活测试/活 owner 对齐、probe 登记 `skill:manage-anchor`、`.specify/.specify/` 与 `.specify/.tmp` 按既定口径排除，未削弱断言）；唯一一次闭包修复全量重跑 193 failed / 8972 passed / 3 skipped，按失败 id 名新增 3、残余 **2**；T004 覆盖基线冻结；镜像/副本/残留/冒烟全绿。状态仍为 `Planned`：`Planned → Implemented` 第①条由阶段集成器 sigil sweep 关闭，闭包与状态翻转归 review 阶段。此前 `/speckit.implement` WP-01…WP-06 收尾：语义反转、七/四模式命令面、双存储引擎、`.specify/anchoring` 14 条分类清理（9 保留 / 3 迁移 / 2 归档，逐条回执）、16 个团队绑定改名 + 6×R3 + 1×R2 处置、G-1…G-10 守卫、收尾全量与 `verification.md` 读数落盘。此前 `/speckit.plan`：`plan.md` + `research.md` + `classification.json` + `data-model.md` + `contracts/`（4 页 49 条款）+ `quickstart.md` + `feature-ref.md` 落地；Draft → Planned。此前 `/speckit.clarify`：Feature 绑定裁定为新 Feature 101；71 FR / 10 SC 保持；决策 D-1…D-5 见 requirements `## Clarifications`，证据 `test-evidence/clarify-2026-11-12.md`）
 
 ## Overview
 
@@ -33,7 +33,8 @@
 - **单写者不变量**：两层定义文件的定义写者只有 `goal-utils.py`；派生 `summary/**` 由既有总结流写入，明确列在定义写者之外（G-4 静态审计 + 两写者模拟）。
 - **archive-not-delete**：迁移/归档逐条 JSON 回执，幂等判据为「目标存在 + 回执存在 + 摘要相等」；第二次 apply 记录 0 非 no-op 决策、185 文件哈希前后一致；I5 半状态 exit 4 `half-state`。受保护日期化路径以 `d7c9da7a3` 为基线逐文件 `git hash-object` 比较（G-8）。
 - **WP-05b 两处活面纠正**：`shared/definitions/derivation-definitions.md` 的 `Goal` 行改为 `Anchor`，`.specify/memory/tools/build-summary-input.py.md` 的默认 `--out` 对齐 `.specify/anchoring/<slug>/summary/`；镜像仅经 `sync-mirrors.py --write` 刷新。
-- **披露的残余**：12 个活 `team.md` 的 `forbidden_paths` 仍列 `.specify/goal/**`——记录为分类后的陈旧地址（禁止字段），未编辑；SC-008 文档站构建腿 = `not-evaluated`（EP-006：Hugo v0.141.0 对 `.Site.Language.Locale` exit 1，特性前既有）；T004 的 `coverage-baseline.txt` 在 setup 阶段未落盘，收尾的条款覆盖仅能给出同刻读数，不能声称实现前后无退化（详见 `verification.md`）。
+- **WP-06b 闭包修复**：37 个 WP-06 新增失败 id 中 35 个在写域内闭合——29 个陈旧断言按新 Anchor/Goal 模型重指（保留断言主体，日期化 pin 换新活事实并留证），6 个活面缺口以活 owner 修复（probe 登记 `skill:manage-anchor` 并重编译；docs-step 注入面；`manage-goal` 的 teams 落点改由 `run-team`/`improve-team` 断言并点名 Anchor 侧拒绝；summary 指针改 `.specify/anchoring/<anchor-slug>/summary/`），2 个工作树残留按既定口径处理（`.specify` 祖先跳过以避开预存 `.specify/.specify/`，未删除；`.specify/.tmp` 进豁免集）。唯一一次闭包修复全量重跑新增 3 个 id：1 个为改写 temp-goal 模块时自伤的 098 普查不一致，已于重跑后定向修复并验证；**剩余 2 个 `test_resident_backfill` id 阻塞于写域外引擎缺陷**（`goal-utils.py:2528 _resident_definitions` 只 glob `*/goal.md`），只报告路径与证据，未改源码、未削弱守卫。
+- **披露的残余**：12 个活 `team.md` 的 `forbidden_paths` 仍列 `.specify/goal/**`——记录为分类后的陈旧地址（禁止字段），未编辑；SC-008 文档站构建腿 = `not-evaluated`（EP-006：Hugo v0.141.0 对 `.Site.Language.Locale` exit 1，特性前既有）；GATE-1 残余 2 个 id 指向引擎枚举缺陷（上述）；T004 已闭合——`coverage-baseline.txt` 已冻结（673 名，base-sha `b9f6a0edb`），活读数为基线内 673 + 基线外 49（全为本特性自身未 `[green:]` 声明的 C-1…C-49），无其他 spec 新增未覆盖条款。
 
 ## Status Tracking
 
@@ -44,7 +45,7 @@
 - **Ready for Review**: 延后任务全部解除或豁免、review 证据产生、当前代码段记录无 `blocking` 条目、且无 `final` 判据停在 `blocked` / `deferred` / `fail`（除非用户显式豁免）。
 - **Sealed**: review 结论完成、验收记录齐备、合并回写完成。**Completed** 仅为遗留记录值，新工作不得落入。
 
-**当前读数（2026-11-12，WP-06 交回时）**：第②③④条由 `verification.md` 与收尾读数支撑；第①条不满足——`tasks.md` 的 81 行在本包写域之外，由阶段集成器随后做 sigil sweep。**收尾全量套件 GATE-1 判 FAIL**：37 个新增失败 id 超出实现入口基线（归因见 `verification.md` § GATE-1），修复归属需由驱动方裁定；`closure-acceptance-check.py` 对当前记录报 `accept`（final 6/6 pass，claimed `Planned`）。因此状态停在 `Planned`，`Planned → Implemented` 的闭包判定与翻转归 review 阶段，本包不自行改写状态。
+**当前读数（2026-11-12，WP-06b 交回时）**：第②③④条由 `verification.md` 与收尾读数支撑；第①条不满足——`tasks.md` 仍有开放行，由阶段集成器做 sigil sweep。**GATE-1 仍判 FAIL，但残余已从 37 收到 2**：两个 `test_resident_backfill` id 指向 `scripts/python/goal-utils.py:2528 _resident_definitions` 只枚举 `goal.md`、从不枚举 `anchor.md` 的引擎缺陷（活证：`.specify/anchoring/visualization-skill-selection/anchor.md` 无 binding，`backfill-bindings --dry-run` 计划零 goal 行）；该修复在图外，本包按纪律只报告路径与证据。`closure-acceptance-check.py` 对当前记录报 `accept`（final 6/6 pass，claimed `Planned`）。因此状态停在 `Planned`，闭包判定与状态翻转归 review 阶段，本包不自行改写状态。
 
 ## Related Specifications/Requirements
 

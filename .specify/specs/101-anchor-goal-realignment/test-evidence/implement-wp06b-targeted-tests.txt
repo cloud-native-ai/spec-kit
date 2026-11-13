@@ -1,0 +1,349 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_criterion_subject.py tests/contract/test_temp_goal_contract.py tests/contract/test_parallel_lines.py tests/integration/test_parallel_lines.py tests/contract/test_temp_team_schema.py tests/contract/test_resident_backfill.py tests/contract/test_stage_class_wiring.py tests/integration/test_archive_migration_real_data.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_binding_model.py tests/contract/test_summary_trigger.py tests/contract/test_docs_step_injection.py tests/contract/test_git_workflow_observe.py tests/contract/test_decision_tension_contract.py tests/contract/test_isomorphism_map.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 25%]
+.......................F.........F........F.....................F....... [ 50%]
+......F.FF.F...................F........................................ [ 75%]
+.......................F...............................F.............    [100%]
+=================================== FAILURES ===================================
+_________ test_every_archive_resident_carries_a_binding_after_backfill _________
+[gw43] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10447/popen-gw43/test_every_archive_resident_ca0')
+
+    def test_every_archive_resident_carries_a_binding_after_backfill(tmp_path):
+        _seed_goal(tmp_path, "resident")
+        _seed_goal(tmp_path, "terminal-resident", status="achieved")
+        _seed_team(tmp_path, "resident-crew", goal_slug="resident")
+        _seed_team(tmp_path, "archived-crew", goal_slug="resident", lifecycle="archived")
+    
+        applied = _run(tmp_path, "backfill-bindings", "--apply")
+        assert applied.returncode == 0, applied.stdout + applied.stderr
+        counts = _payload(applied)["counts"]
+>       assert counts["backfilled"] == 4
+E       assert 2 == 4
+
+tests/contract/test_resident_backfill.py:206: AssertionError
+________ test_stripping_the_card_restores_the_baseline_bytes[implement] ________
+[gw107] linux -- Python 3.11.11 /usr/local/bin/python3
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+        stripped, block = strip_wiring(text)
+    
+        assert block.strip(), (
+            "%s: the strip found an empty block — the guard would spin green on an "
+            "unwired template (C-013's anti-empty-green clause)" % stem
+        )
+        assert stripped != text, (
+            "%s: stripping changed nothing, so the byte judge measured the unwired file "
+            "against itself" % stem
+        )
+>       assert _sha256_text(stripped) == BASELINE_SHA256[stem], (
+            "%s: stripping the wiring card must restore %s byte for byte (C-007); the "
+            "execution-class behaviour difference this feature is allowed to introduce "
+            "is exactly zero" % (stem, BASELINE_COMMIT)
+        )
+E       AssertionError: implement: stripping the wiring card must restore c1cd4600 byte for byte (C-007); the execution-class behaviour difference this feature is allowed to introduce is exactly zero
+E       assert '4ad3b0c76242...0d66fa79618b6' == 'dd672990245e...4dbd83546293c'
+E         
+E         - dd672990245e1df8e137dfcd67198fd351e6afe9d95b1a191c04dbd83546293c
+E         + 4ad3b0c76242b294b700433ec68ada227194792184e26245e610d66fa79618b6
+
+tests/contract/test_stage_class_wiring.py:516: AssertionError
+_________ test_stripping_the_card_restores_the_baseline_bytes[analyze] _________
+[gw106] linux -- Python 3.11.11 /usr/local/bin/python3
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+        stripped, block = strip_wiring(text)
+    
+        assert block.strip(), (
+            "%s: the strip found an empty block — the guard would spin green on an "
+            "unwired template (C-013's anti-empty-green clause)" % stem
+        )
+        assert stripped != text, (
+            "%s: stripping changed nothing, so the byte judge measured the unwired file "
+            "against itself" % stem
+        )
+>       assert _sha256_text(stripped) == BASELINE_SHA256[stem], (
+            "%s: stripping the wiring card must restore %s byte for byte (C-007); the "
+            "execution-class behaviour difference this feature is allowed to introduce "
+            "is exactly zero" % (stem, BASELINE_COMMIT)
+        )
+E       AssertionError: analyze: stripping the wiring card must restore c1cd4600 byte for byte (C-007); the execution-class behaviour difference this feature is allowed to introduce is exactly zero
+E       assert '8af8f63b3002...d85adb9cc4d2d' == '724366ac72fb...705f01f112939'
+E         
+E         - 724366ac72fb0be4ae1b7a680309323c66d6b3801c479ea8994705f01f112939
+E         + 8af8f63b30020024d4f1c5ae87ef49feb1dbb16a8e87b780164d85adb9cc4d2d
+
+tests/contract/test_stage_class_wiring.py:516: AssertionError
+__________ test_stripping_the_card_restores_the_baseline_bytes[tasks] __________
+[gw104] linux -- Python 3.11.11 /usr/local/bin/python3
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+        stripped, block = strip_wiring(text)
+    
+        assert block.strip(), (
+            "%s: the strip found an empty block — the guard would spin green on an "
+            "unwired template (C-013's anti-empty-green clause)" % stem
+        )
+        assert stripped != text, (
+            "%s: stripping changed nothing, so the byte judge measured the unwired file "
+            "against itself" % stem
+        )
+>       assert _sha256_text(stripped) == BASELINE_SHA256[stem], (
+            "%s: stripping the wiring card must restore %s byte for byte (C-007); the "
+            "execution-class behaviour difference this feature is allowed to introduce "
+            "is exactly zero" % (stem, BASELINE_COMMIT)
+        )
+E       AssertionError: tasks: stripping the wiring card must restore c1cd4600 byte for byte (C-007); the execution-class behaviour difference this feature is allowed to introduce is exactly zero
+E       assert '78b522f81b7a...35e9834d5f531' == '231b28881969...9a9f0ad0c6d65'
+E         
+E         - 231b28881969a302e7c51ed9e8ec6fa39f5caa4275fe4379c539a9f0ad0c6d65
+E         + 78b522f81b7a82fc3f665d717dbb2b697680f64aaf8e5ebb76435e9834d5f531
+
+tests/contract/test_stage_class_wiring.py:516: AssertionError
+_______ test_clarify_is_inside_and_the_other_entry_points_are_untouched ________
+[gw93] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_clarify_is_inside_and_the_other_entry_points_are_untouched():
+        assert "clarify" in STAGE_STEMS, (
+            "clarify must be wired: the gate owner registers two operator rows for it"
+        )
+        for stem in UNCHANGED_STEMS:
+            path = _stage_path(stem)
+            assert path.is_file(), "sentinel: %s moved" % path.relative_to(REPO_ROOT)
+>           assert _sha256_text(_read(path)) == UNCHANGED_SHA256[stem], (
+                "%s is a non-wiring entry point whose bytes are pinned; a mismatch "
+                "means either an unregistered edit or a stale pin (see UNCHANGED_SHA256)"
+                % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: templates/commands/docs.md is a non-wiring entry point whose bytes are pinned; a mismatch means either an unregistered edit or a stale pin (see UNCHANGED_SHA256)
+E           assert 'd171da766047...092d743aefc92' == '45a9542ea596...6f09093ca5e18'
+E             
+E             - 45a9542ea596538be85539e7698debb42131f19e70ad35ffb0e6f09093ca5e18
+E             + d171da76604790b95ce5b17ac6491331d46d15ceb519841151c092d743aefc92
+
+tests/contract/test_stage_class_wiring.py:468: AssertionError
+______ test_stripping_the_card_restores_the_baseline_bytes[requirements] _______
+[gw101] linux -- Python 3.11.11 /usr/local/bin/python3
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+        stripped, block = strip_wiring(text)
+    
+        assert block.strip(), (
+            "%s: the strip found an empty block — the guard would spin green on an "
+            "unwired template (C-013's anti-empty-green clause)" % stem
+        )
+        assert stripped != text, (
+            "%s: stripping changed nothing, so the byte judge measured the unwired file "
+            "against itself" % stem
+        )
+>       assert _sha256_text(stripped) == BASELINE_SHA256[stem], (
+            "%s: stripping the wiring card must restore %s byte for byte (C-007); the "
+            "execution-class behaviour difference this feature is allowed to introduce "
+            "is exactly zero" % (stem, BASELINE_COMMIT)
+        )
+E       AssertionError: requirements: stripping the wiring card must restore c1cd4600 byte for byte (C-007); the execution-class behaviour difference this feature is allowed to introduce is exactly zero
+E       assert '4eaebcf41aa8...0d7d2ca963ca6' == '2af13a138821...c6f154ff86acb'
+E         
+E         - 2af13a138821a5786a80aeb419fa854e67e19769743e070cd51c6f154ff86acb
+E         + 4eaebcf41aa89de6dc30e645ae7d623614574292566d3fe62520d7d2ca963ca6
+
+tests/contract/test_stage_class_wiring.py:516: AssertionError
+___ test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding ____
+[gw42] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10447/popen-gw42/test_a_second_backfill_writes_0')
+
+    def test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding(tmp_path):
+        goal = _seed_goal(tmp_path, "resident")
+        team = _seed_team(tmp_path, "resident-crew")
+        original_goal = _hash_minus_binding(goal)
+        original_team = _hash_minus_binding(team)
+    
+        dry = _run(tmp_path, "backfill-bindings", "--dry-run")
+        assert dry.returncode == 0, dry.stdout + dry.stderr
+        planned = _payload(dry)["definitions"]
+>       assert {(row["kind"], row["slug"], row["result"]) for row in planned} == {
+            ("goal", "resident", "backfilled"),
+            ("teams", "resident-crew", "backfilled"),
+        }
+E       AssertionError: assert {('teams', 'r...'backfilled')} == {('goal', 're...'backfilled')}
+E         
+E         Extra items in the right set:
+E         ('goal', 'resident', 'backfilled')
+E         Use -v to get more diff
+
+tests/contract/test_resident_backfill.py:152: AssertionError
+__________ test_stripping_the_card_restores_the_baseline_bytes[plan] ___________
+[gw103] linux -- Python 3.11.11 /usr/local/bin/python3
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+        stripped, block = strip_wiring(text)
+    
+        assert block.strip(), (
+            "%s: the strip found an empty block — the guard would spin green on an "
+            "unwired template (C-013's anti-empty-green clause)" % stem
+        )
+        assert stripped != text, (
+            "%s: stripping changed nothing, so the byte judge measured the unwired file "
+            "against itself" % stem
+        )
+>       assert _sha256_text(stripped) == BASELINE_SHA256[stem], (
+            "%s: stripping the wiring card must restore %s byte for byte (C-007); the "
+            "execution-class behaviour difference this feature is allowed to introduce "
+            "is exactly zero" % (stem, BASELINE_COMMIT)
+        )
+E       AssertionError: plan: stripping the wiring card must restore c1cd4600 byte for byte (C-007); the execution-class behaviour difference this feature is allowed to introduce is exactly zero
+E       assert 'fb5e324b69c7...acb8f2c8260da' == '8882270821da...7bb176091022c'
+E         
+E         - 8882270821dadf2203a545fcf0fc9677692b485875d85b85bc67bb176091022c
+E         + fb5e324b69c725be7083db53f133369eb4f357f4da5f045a391acb8f2c8260da
+
+tests/contract/test_stage_class_wiring.py:516: AssertionError
+_______ TestScenarioFTerminologyZeroHit.test_a3_alias_list_still_exists ________
+[gw60] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_decision_tension_contract.TestScenarioFTerminologyZeroHit object at 0x7f8a92be8250>
+
+    def test_a3_alias_list_still_exists(self):
+        aliases = a3_aliases()
+        assert aliases == EXPECTED_ALIASES, (
+            "the positive control failed: A3's alias list was renamed, reordered or emptied "
+            f"({aliases!r}); the zero-hit scan below would otherwise look for nothing"
+        )
+        assert len(set(aliases)) == len(aliases) == 5, (
+            f"A3 must enumerate five distinct aliases; got {aliases!r}"
+        )
+        # The ruling still declares the whitelist as exactly two places and names the second.
+        line = a3_line()
+        assert "白名单只有两处" in line, (
+            "A3 must keep declaring a two-place whitelist; a widened whitelist is a contract "
+            "change, not a wording tweak"
+        )
+>       assert ".specify/features/076-decision-tension-contract.md" in line, (
+            "A3 must keep naming the feature-detail appendix as the second whitelisted place"
+        )
+E       AssertionError: A3 must keep naming the feature-detail appendix as the second whitelisted place
+E       assert '.specify/features/076-decision-tension-contract.md' in '- **A3（术语裁决）**：对外一律工程词——DTR、反题（antithesis）、反指标（落在 `expected_sacrifice`）、判别性证据（`discriminating_evidence`）、重开条件（`revisi...tures/076.md` § 附「内部别名映射（仅供理解，不进用户界面）」；该文件是 Feature 详情，不在 `shared/`、`templates/`、`skills/` 三棵分发面内，因此不参与 SC-007 的零命中计数。'
+
+tests/contract/test_decision_tension_contract.py:1865: AssertionError
+_ TestScenarioBAnalyzeStructuralChannel.test_channel_only_add_allowed_delta_enumeration _
+[gw46] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x7f9eedd942d0>
+
+    def test_channel_only_add_allowed_delta_enumeration(self):
+        detection = read(ANALYZE_DETECTION)
+    
+        # (1) The count heading changes by exactly one, and the new channel letter is unique.
+        count_headings = [line for line in detection.splitlines()
+                          if line.startswith("## The ") and line.endswith("passes")]
+        assert count_headings == ["## The eight passes"], (
+            "C-5: the count heading must carry the new channel; found "
+            f"{count_headings!r}"
+        )
+        subsections = [line for line in detection.splitlines()
+                       if re.match(r"^### [A-Z]\. ", line)]
+        letters = [re.match(r"^### ([A-Z])\. ", line).group(1) for line in subsections]
+        assert letters == ["A", "B", "C", "D", "E", "F", "G", "I"], (
+            f"C-5: the channel letters must be A-G plus I (H is the checklist pass); {letters!r}"
+        )
+        assert len(set(letters)) == len(letters), f"C-5: a channel letter repeats: {letters!r}"
+    
+        # (2) The declared allowed delta is exactly 「the new channel section + the count line」.
+        removed, added = diff_lines(ANALYZE_DETECTION)
+        assert removed == ["## The seven passes"], (
+            "C-5: the delta set declares ZERO deleted or rewritten lines outside the count "
+            f"line; removed {removed!r}"
+        )
+        assert added == ["## The eight passes"] + channel_section_lines(), (
+            "C-5: every added line must belong to the new channel section or be the count "
+            "heading; the comparison unit is 「existing paragraph / new paragraph」"
+        )
+    
+        # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only
+        # deltas are the pass-enumeration paragraph, the `## Rounds` section (added by
+        # Feature 081c, f892c8a8, 2026-11-03 — the two-round adjudication; see
+        # rounds_section_lines), the compiled Wrap-up banner (see compiled_banner_delta
+        # below) and the compiled close-out step line (added by Feature 091, the
+        # singular close-out that appended one wrap-up handler row to the registry this
+        # face is compiled from; see closeout_step_delta below — both machine-owned).
+        # The added-line multiset must equal paragraph-delta ∪ Rounds-section ∪
+        # banner-line ∪ close-out-line exactly (hunk order is file order, so the
+        # comparison is order-free); any fifth delta stays red.
+        old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
+        new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
+        old_banner, new_banner = compiled_banner_delta(ANALYZE_SKILL)
+        _, closeout_step = closeout_step_delta(ANALYZE_SKILL)
+        removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
+>       assert removed_skill == (
+            [line for line in old_paragraph if line not in new_paragraph]
+            + [old_banner]
+        ), (
+            "C-5: SKILL.md must change only inside its pass-enumeration paragraph and its "
+            f"compiled Wrap-up banner; removed {removed_skill!r}"
+        )
+E       AssertionError: C-5: SKILL.md must change only inside its pass-enumeration paragraph and its compiled Wrap-up banner; removed ['- **Constitution authority**: `.specify/memory/constitution.md` is non-negotiable in this', '`.specify/memory/features.md` (if present); `FEATURE_DETAILS_DIR` =', '`.specify/memory/features/` (if present) — the index rows live in `features.md`, the', 'matching detail file at `features/<ID>.md`, and the install-shipped sample at', '| constitution | `.specify/memory/constitution.md` for principle validation |', 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment', '· E coverage gaps · F inconsistency · G feature relevance & accuracy) plus one checklist', 'pass (H), the same-author delegation rule, the stale-copy decision test, and the', 'do-not-flag noise floor:', '<!-- AUTO-GENERATED by probe-utils.py --action compile-embeds — truth source: .specify/shared/definitions/probe-definitions.md (## Handler / ## HandlerBinding) — fingerprint: 7877db82c58c — do not edit; edit the registry, then recompile -->']
+E       assert ['- **Constit...ignment', ...] == ['Seven passe...ecompile -->']
+E         
+E         At index 0 diff: '- **Constitution authority**: `.specify/memory/constitution.md` is non-negotiable in this' != 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment'
+E         Left contains 5 more items, first extra item: 'Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment'
+E         Use -v to get more diff
+
+tests/contract/test_decision_tension_contract.py:1151: AssertionError
+______________ test_c19_the_gate_budget_survives_the_new_section _______________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c19_the_gate_budget_survives_the_new_section():
+        r = run_engine_in_process(
+            ROOT / "scripts" / "python" / "scan-confirmation-gates.py", ["--summary"]
+        )
+        assert r.returncode == 0, r.stdout + r.stderr
+        total = int(re.search(r"blocking confirmation gates:\s*(\d+)", r.stdout).group(1))
+        violations = int(re.search(r"violations[^:]*:\s*(\d+)", r.stdout).group(1))
+        # stale-pin update (067 T025, 2026-10-22): owner fact = live scan total, 23 -> 27
+        # via pre-067 gate additions (27 already at branch point 7f9033ec).
+>       assert total == 27, (
+            f"the owner doc sits in shared/, inside the scanned surface, and the integer "
+            f"headroom is 0: total moved to {total}"
+        )
+E       AssertionError: the owner doc sits in shared/, inside the scanned surface, and the integer headroom is 0: total moved to 31
+E       assert 31 == 27
+
+tests/contract/test_criterion_subject.py:560: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_resident_backfill.py::test_every_archive_resident_carries_a_binding_after_backfill
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_clarify_is_inside_and_the_other_entry_points_are_untouched
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[requirements]
+FAILED tests/contract/test_resident_backfill.py::test_a_second_backfill_writes_nothing_and_refuses_an_incomplete_binding
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[plan]
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_a3_alias_list_still_exists
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+FAILED tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section
+11 failed, 274 passed in 7.55s
