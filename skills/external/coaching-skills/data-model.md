@@ -11,8 +11,8 @@ restate the run-artifact schema or the workflow here.
   started_at, run_dir}`; one run owns the four ordered artifacts in `run_dir`. For a
   direct run `chain = <coach> → <trainee>` and `subject == trainee`; for a nested run
   `chain = <coach> → <trainee> → <subject>` and `subject` is the skill the Trainee writes.
-- **DispatchRecord** — the `## Dispatch` block in `observation.md`:
-  `{mode, dispatched_at, payload_ref, returned, anomaly_line, failure_coordinates}`.
+- **TraineeExecutionRecord** — the `## Trainee Execution` block in `observation.md`:
+  `{carrier, started_at, work_ref, returned, anomaly_line, failure_coordinates}`.
 - **Claim** — one per **subject**, not per run: `{subject_slug, trainee_slug, run_id,
   subject_path, trainee_path, chain, created_at}` stored at the claim path below.
 - **RunStatus** — the pair `{run, optimization}` recorded once in
@@ -47,8 +47,8 @@ written:
 - **Direct run** (Trainee is the subject; the optimization edits it after the plan): create
   the claim after `improvement-plan.md` is on disk and immediately before invoking
   `improve-skills`. No earlier and no later.
-- **Nested run** (Trainee is a meta-skill; the subject is written *inside* the dispatch):
-  create the claim after `expectation.md` is on disk and immediately **before dispatching**.
+- **Nested run** (Trainee is a meta-skill; the subject is written *inside* the Trainee execution):
+  create the claim after `expectation.md` is on disk and immediately **before the execution begins**.
   The optimization step that follows re-enters the same claim (same `run_id` → continue).
   Taking it after the plan would guard a write that already happened.
 
@@ -105,10 +105,10 @@ Evaluate `failed` → `partial` → `success`; the first matching value wins.
   regardless of the quality of the others.
 - **partial** — the four artifacts exist, but the Trainee's primary artifact is absent
   or cannot be verified, or the observation carries no collected evidence, or the
-  dispatch failed / timed out / was refused, or the Trainee flow stopped mid-way with
+  execution failed / timed out / was refused / was interrupted, or the Trainee flow stopped mid-way with
   partial artifacts. A return that claims completion without the Trainee's primary
   artifact is `partial`, never `success`.
-- **success** — the four artifacts exist, the dispatch returned completed, the
+- **success** — the four artifacts exist, the execution returned completed, the
   Trainee's primary artifact exists, and the Trainee flow reached its declared
   terminal success state.
 
