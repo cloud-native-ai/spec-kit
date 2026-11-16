@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T00:33:46Z"
 summary: "four-segment review of 090 with ARC; review.md exposes one unfalsifiable SC-002 leg, a two-owner rule-anchor member set, and a silently-skipped foreign guard leg"
+introspection_ref: "introspection-20261116T141525Z#F-11"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-11"
 ---
 
 ## Review

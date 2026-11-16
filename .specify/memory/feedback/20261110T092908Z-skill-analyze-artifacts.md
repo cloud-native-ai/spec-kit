@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T09:29:08Z"
 summary: "W1 并发波（analyze）：对 requirements.md 与需求质量清单做只读检测，产出 18 条 findings（3 HIGH / 12 MEDIUM / 3 LOW），未修改任何制品；清单 [Gap] 7 项全部处置（6 raised / 1 covered-by），阻断计数 0。"
+introspection_ref: "introspection-20261116T141525Z#F-36"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-36"
 ---
 
 ## Review

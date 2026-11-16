@@ -8,9 +8,12 @@ probe: "skill-create-tasks-wrapup"
 kind: "internal"
 slice: "skills"
 feature_id: "093"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:27:47Z"
 summary: "create-tasks Step 5 drove the artefact to validate-tasks exit 0; Steps 1-4 produced the phase/story layout and the DoD/Gate blocks without rework."
+introspection_ref: "introspection-20261116T141525Z#F-19"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-19"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T06:56:14Z"
 summary: "clarify stage on a requirements spec that needed 13 closed decisions; validation loop needed several renumber/pass passes"
+introspection_ref: "introspection-20261116T141525Z#F-24"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-24"
 ---
 
 ## Review

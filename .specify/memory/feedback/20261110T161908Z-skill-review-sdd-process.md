@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "097-speckit-migrate-command"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:19:08Z"
 summary: "Process segment round 2: 20-row timeline; findings F1-F7 (P1: owner-conflict repair loop, ignored analyze M/L backlog, receipt range trap; P2: uncommitted checkpoints, incomplete constitution carrier "
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

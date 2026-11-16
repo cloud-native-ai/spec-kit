@@ -197,3 +197,49 @@
 | 2026-11-08 | introspection `introspection-20261108T192504Z` — F-12 | 088 spec text drifts from owner-side facts (de-dup claim, undeclared bounds, contract headers say 087) | speckit-requirements | `.specify/specs/088-speckit-visualization/requirements.md`; `.specify/specs/088-speckit-visualization/contracts/**` | **open** | — |
 | 2026-11-08 | introspection `introspection-20261108T192504Z` — F-13 | check-prerequisites lacks explicit spec selection (entry's SyntaxError premise is false) | direct-fix | `scripts/bash/check-prerequisites.sh`; `scripts/bash/common.sh` | **open** | — |
 | 2026-11-08 | introspection `introspection-20261108T192504Z` — F-14 | implement does not consume the obligation JSON via a summary-first projection | improve-skills | `skills/internal/implement-feature/SKILL.md` | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-01 | 文档化调用形式与引擎实际语法漂移（--spec vs --spec-dir、非法 --stage），且无跨检闸 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-02 | analyze 修复循环的账本没有 owner：finding index 未定义、修复 sweep 无归口、run-id 后缀与注册表语法冲突 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-03 | 第二轮 analyze brief 是无 owner 的投影：字段无定义、wave 内无共享确定性采集，每轮重解析 CHK 行 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-04 | analyze 的闸没有接入 driver 的下一阶段判定：clause-coverage 交给不存在的 gate，task-graph 解析器从未被强制 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-05 | 制品在需要机器可读指针处写散文处置与被复述的 owner 事实，同一根目录事实还落在两个载体上 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-06 | 需求/条款行语法有三个 owner（模板沉默、checker 独有、两个扫描器互不认同），unit-id 与 decision/FR 判定无闸可读 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-07 | code-review receipt 二次解析 diff base，不消费调用方已定的 range，收据与评审对同一 slice 不一致 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-08 | rotation/baseline 处理偏离 owner 声明的基线，且迟到基线的 guard 健康度不披露 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-09 | 声称的特性状态/验收不与被绑定的 Feature 详情及 §Related Feature 层级核对 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-10 | analyze 的 finding 与 owner 冲突在 review 内没有下游通道（无 route-to-owner、无 M/L analyze 泳道、无证据指针检查） | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-11 | 评审记录不暴露机器可读处置：重要项无答复载体、无第一轮账本槽位、无可证伪臂、不报告触发的优先级规则 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-12 | 守卫按裸 token 匹配标识与选项行，选项逐行书写即可通过，P0 waiver 命中裸 id 会同时处置两个 slice | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-13 | loop-state/checkpoint 状态在 U0 写一次且与提交树无绑定，评审轮次无法对账 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-14 | 评审报告缺少再评审/出处载体（第一轮账本摘要、正面义务槽位），同根发现跨段重复计数 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-15 | 验收/评审记录没有机器读入口：修复前读数无 supersession，SC 值与 smoke 字面量无人核对 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-16 | 收尾时的特性状态/DoD 翻转既无强制也无清扫清单 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-17 | 计数（任务行、评审通过数、上限）是重打散文，而非从 classification/readings 派生 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-18 | FR/SC→任务行的追溯靠人工推演，无抽取器，runtime-stack FR-id 规则在作者侧无对应条款 | improve-tools | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-19 | [green:]/green-tag 语法无法解析行内 id，且在 tasks、tasks-skill、analyze 三处划分不一致 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-20 | clause-coverage 基线按设计排除本特性 spec，但 accountant 泳道语义每轮重新推导 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-21 | 父目录回溯对下游客户项目会解析出 .specify，导致工作区状态写进框架库 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-22 | 铸造出的持久 id 与开放项未在铸造时刻登记（F-1(092) 从未登记，FR 泳道无基线） | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-23 | SC 来源与验收排序没有编写规则，已落地守卫只解决一侧 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-24 | STR 条款引用写在 code span 内对 STR 扫描器不可见，模板未声明该约定 | improve-docs | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-25 | Feature Linkage 的延迟约定与 clarify 声明的写作用域冲突 | improve-docs | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-26 | 派发 brief 手抄未经测量或已过期的前提，且无阅读理由索引 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-27 | pre-analyze 排除规则在各扫描器间不对称（history 标题 vs overlap 检查） | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-28 | 没有单一的闸调用/收尾参数契约：参数形状各异、两位数正则在某处产出 0、收尾参数集分散 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-29 | runner/watcher 的证据契约不完整，run-determination 结算写一次且由调用方自由分类 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-30 | 闸的字面匹配语法无法区分"文档中的示例"与"真实使用" | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-31 | status digest 的投影身份是零散拼接，标签与派生值的矛盾静默渲染 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-32 | 套件读数不带树戳，收尾套件无法与该树对账 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-33 | 载体名在四处被复述而非引用 | improve-docs | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-34 | 引擎变更清单缺少 run-checks/migrate 的进程内 smoke | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-35 | history 豁免/不可变性前提仍以散落文本承载，未成为 checker 读取的声明式豁免集 | speckit-requirements | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-36 | 闸的判定语义未进入消费技能（CHK→finding 反向指针、fr-uncovered 红判决、模板缺 Runtime Stack/STR 约定） | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-37 | gate/seam 中止的运行没有 wrap-up/独占规则，seam 快照把同侪写入当违规 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-38 | 闸脚本以朴素 Markdown 解析，没有反空泛下限：单元格内竖线移位、引用块行不可见、零定义行判绿 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-39 | decision-tension 形式由引擎强制，但未投影到消费技能与派发 brief | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-40 | 收尾/推送指南缺无 run-id 分支与非 origin 远端分支 | improve-docs | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-41 | improve-skills 付不起自己的形状债：shape gate 6818 > 5000（exit 10），playbook 债未偿 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-42 | 制品阶段检测器整篇读取上游并无限报告 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-43 | checklist 阶段的自检对自己的主题失明：无条目级检查、.specify 下重复面通过、reader 不读 CHK 锚点、RS-002 计数不符 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-44 | --names-current 被描述成列表实为文件路径；两个校验器对 tasks 行语法不一致；tasks 闸要求实现阶段证据 | direct-fix | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-45 | checklist 阶段没有 program-first 摘要/校验器，readings pin 与词汇表不是技能义务 | improve-skills | 见报告证据锚点 | **open** | — |
+| 2026-11-17 | introspection `introspection-20261116T141525Z` — F-46 | 需求把可判定事实与传感器留给下游：canonical clause form MUST 无 checker，缺 propagation-check/live-set 对账 | speckit-requirements | 见报告证据锚点 | **open** | — |

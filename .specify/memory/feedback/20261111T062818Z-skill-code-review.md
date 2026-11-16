@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:28:18Z"
 summary: "Code segment round 2: new record 361 changed / 27 judged / 334 legal skips / 0 gap, zero blocking, two important answered in the report."
+introspection_ref: "introspection-20261116T141525Z#F-07"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-07"
 ---
 
 ## Review

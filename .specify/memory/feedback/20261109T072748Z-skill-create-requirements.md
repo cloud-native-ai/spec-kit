@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "093-concurrency-by-default"
+disposition: "processed"
 partial: false
 created: "2026-11-09T07:27:48Z"
 summary: "Wrote .specify/specs/093-concurrency-by-default/requirements.md (36 FR / 12 SC) from the 093 design brief; both deterministic gates green (validate-requirements.py status ok 0/0; pre-analyze-check.py "
+introspection_ref: "introspection-20261116T141525Z#F-38"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-38"
 ---
 
 ## Review

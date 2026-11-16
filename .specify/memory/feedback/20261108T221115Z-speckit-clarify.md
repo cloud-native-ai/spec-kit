@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "090-re-anchoring"
+disposition: "processed"
 partial: false
 created: "2026-11-08T22:11:15Z"
 summary: "clarify settled 9 questions and 6 assumptions; two pre-existing guard failures disclosed"
+disposition_reason: "excluded by introspection-20261116T141525Z: rule-first 顺序断言已存在，已过时"
 ---
 
 ## Review

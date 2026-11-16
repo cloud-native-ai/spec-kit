@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:28:53Z"
 summary: "requirements 阶段：097 spec 生成并验证（25 FR / 9 SC，checker 0 error）；入口形态按简报先调查后裁定为 CLI 子命令 + 运行期模板双面一引擎；6 项自行裁决入 Clarifications，假设 A1–A11。"
+introspection_ref: "introspection-20261116T141525Z#F-48"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-48"
 ---
 
 ## Review

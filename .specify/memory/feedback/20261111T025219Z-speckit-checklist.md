@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "100-seal-slice-archive"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-11T02:52:19Z"
 summary: "Checklist 阶段完成：36 条 CHK（CHK001–CHK036 连续、Req 锚 36/36、FR 28/28、SC 10/10；pass 7 / fail 11 / 观察 18）。同一作者门禁成立，缺口发现由两个 fresh-context 只读 SDD Analysis Worker 分域承担（需求内部 22 条候选 / 跨制品 15 条），逐条复核后剔除或降级 9 条。运行判定四"
+introspection_ref: "introspection-20261116T141525Z#F-45"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-45"
 ---
 
 ## Review

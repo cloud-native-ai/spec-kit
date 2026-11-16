@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-16T09:48:06Z"
 summary: "W1 requirements domain: 1 HIGH (independently confirmed), 9 MEDIUM, 4 LOW, 0 CRITICAL; deterministic validate-requirements.py status ok reproduced"
+introspection_ref: "introspection-20261116T141525Z#F-05"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-05"
 ---
 
 ## Review

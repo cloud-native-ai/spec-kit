@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:19:29Z"
 summary: "Process segment produced 12 findings (1 P0, 3 P1, 8 P2); the P0 (implement status flip missing) was confirmed by an independent read-only validator; the process timeline was reconstructed from 51 comm"
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

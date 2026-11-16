@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "096-sdd-observer-agent"
 feature_id: "096"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:37:14Z"
 summary: "clarify Mode A for 096-sdd-observer-agent: pre-plan detected, writability probe pass, same-author coverage scan delegated to a fresh-context detector plus an independent boundary fact-gatherer (two pa"
+introspection_ref: "introspection-20261116T141525Z#F-42"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-42"
 ---
 
 ## Review

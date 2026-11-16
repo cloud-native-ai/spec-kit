@@ -8,9 +8,11 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "086-script-interface-contract"
+disposition: "processed"
 partial: false
 created: "2026-11-06T09:04:55Z"
 summary: "086 analyze 只读跨产物分析: 5 HIGH / 10 MEDIUM / 6 LOW; 零 CRITICAL; analyze gate 不通过, 需回环修 requirements 与设计文档的 clause 映射"
+disposition_reason: "excluded by introspection-20261116T141525Z: 086 残留已由 baseline freeze owner 承接，已过时"
 ---
 
 ## Review

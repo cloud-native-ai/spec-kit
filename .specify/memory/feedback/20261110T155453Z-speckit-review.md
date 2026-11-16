@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:54:53Z"
 summary: "Composed four-segment review of 097 + ARC. Process 6 findings (P1×3/P2×3); artifact 9/9 expected members, blocked (P0×1/A1 validated confirm, P1×4, P2×4); implementation pass with 1 P1; ARC pass 4/blo"
+introspection_ref: "introspection-20261116T141525Z#F-10"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-10"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-coaching-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T16:15:57Z"
 summary: "coaching success: /speckit.status delivered the digest verbatim (exit 0) and its wrap-up records; two Trainee improvements planned; optimization skipped"
+introspection_ref: "introspection-20261116T141525Z#F-40"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-40"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "086-script-interface-contract"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:08:45Z"
 summary: "086 clarify (Mode A, zero questions): resolved nine pre-plan open points and encoded them into requirements.md — candidate surface derived from git ls-files minus .gitignore plus a coverage assertion;"
+introspection_ref: "introspection-20261116T141525Z#F-06"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-06"
 ---
 
 ## Review

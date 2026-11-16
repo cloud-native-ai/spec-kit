@@ -8,9 +8,11 @@ probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T13:39:40Z"
 summary: "status digest exit 0; 101 line active but no registered live executor (stage-runner pids are not line-registry execution bodies); 074 stalled; last completion 098"
+disposition_reason: "excluded by introspection-20261116T141525Z: Optimization Points: None，无优化点"
 ---
 
 ## Review

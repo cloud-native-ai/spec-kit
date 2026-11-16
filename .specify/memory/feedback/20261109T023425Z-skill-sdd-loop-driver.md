@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T02:34:25Z"
 summary: "Clarify stage on a 27-FR spec: 16 adjudications landed in place (FR-028, SC-008, 3 edge cases, 9 assumptions), the declaration artifact was created after measuring that the overlap gate was green whil"
+introspection_ref: "introspection-20261116T141525Z#F-30"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-30"
 ---
 
 ## Review

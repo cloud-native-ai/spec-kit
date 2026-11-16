@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T02:48:02Z"
 summary: "Plan stage on the 28-FR / 8-SC 091 spec produced plan.md plus the full Phase 1 set (research R1-R12, data model 6 entities / 14 rules, 4 contract pages / 26 clauses, quickstart 8 scenarios) and refine"
+introspection_ref: "introspection-20261116T141525Z#F-38"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-38"
 ---
 
 ## Review

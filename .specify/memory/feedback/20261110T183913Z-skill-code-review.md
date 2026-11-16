@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T18:39:13Z"
 summary: "blocked — gate deny, 1 blocking (split-parent P0), 1 important (atomic batch in-flight restore), 1 suggestion, 1 praise; coverage receipt 451/29/422/0."
+introspection_ref: "introspection-20261116T141525Z#F-07"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-07"
 ---
 
 ## Review

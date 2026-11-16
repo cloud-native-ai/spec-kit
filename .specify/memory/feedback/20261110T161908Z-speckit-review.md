@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "097-speckit-migrate-command"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:19:08Z"
 summary: "Composed four-segment review round 2 of 097 + ARC against da34a3d44. Process 7 findings (P1x3/P2x4); artifact pass 9/9 (A1-A9 closed); implementation pass (smoke 105 passed/exit 0); code record not-ev"
+introspection_ref: "introspection-20261116T141525Z#F-10"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-10"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T07:20:37Z"
 summary: "create-checklist executed end to end for 095: setup via check-prerequisites (REQUIREMENTS_DIR + AVAILABLE_DOCS), intent clarification skipped because the stage arguments pre-answered scope/depth/audie"
+introspection_ref: "introspection-20261116T141525Z#F-42"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-42"
 ---
 
 ## Review

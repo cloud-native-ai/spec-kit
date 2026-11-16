@@ -8,9 +8,12 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T08:00:59Z"
 summary: "Checklist stage executed against Feature 101 with 71 FR and 10 SC. Produced a new dated requirements-quality checklist with 37 items (15 pass / 11 fail / 11 observation), 100 percent requirement-ancho"
+introspection_ref: "introspection-20261116T141525Z#F-46"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-46"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-history-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T18:09:53Z"
 summary: "history run completed: 108/125 qoder sessions distilled into five threads; 5 repair groups executed with honest partial closures (G2 10/10, G4 9/105, G3 137/153 live-surface; G1/G5 mechanism-blocked)"
+introspection_ref: "introspection-20261116T141525Z#F-35"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-35"
 ---
 
 ## Review

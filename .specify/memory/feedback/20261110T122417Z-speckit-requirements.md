@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "099-speckit-seal"
+disposition: "processed"
 partial: false
 created: "2026-11-10T12:24:17Z"
 summary: "pass — requirements.md landed for 099-speckit-seal (28 FR / 9 SC / 3 STR; Flow Class execution); validate-requirements status ok (0 error / 0 warning); pre-analyze requirements decision=pass (1 future"
+introspection_ref: "introspection-20261116T141525Z#F-48"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-48"
 ---
 
 ## Review

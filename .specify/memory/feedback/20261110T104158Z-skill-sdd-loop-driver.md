@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T10:41:58Z"
 summary: "4-line unattended run (095-098): analyze gate stopped all four lines; fork carriers, read-domain waves, validation waves and per-stage gates otherwise worked."
+introspection_ref: "introspection-20261116T141525Z#F-29"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-29"
 ---
 
 ## Review

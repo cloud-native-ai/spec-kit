@@ -8,9 +8,11 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T08:38:45Z"
 summary: "Analyze stage of 101-anchor-goal-realignment completed read-only over requirements, plan, data-model, the four contracts, tasks, quickstart, feature-ref, research and classification. FR and SC coverag"
+disposition_reason: "excluded by introspection-20261116T141525Z: HIGH-1/HIGH-2 已修复，问题已过时"
 ---
 
 ## Review

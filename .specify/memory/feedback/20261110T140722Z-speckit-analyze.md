@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T14:07:22Z"
 summary: "conditional — /speckit.analyze 对 099-speckit-seal 完成全 spec 首轮 merged 分析：12 findings（0 CRITICAL / 7 HIGH（全部 proposed，独立复核波未运行）/ 5 MEDIUM / 0 LOW）；其中 10 条逐条对应上游 checklist 的 10 条 fail（B-01、C-01…C-04、E-01"
+introspection_ref: "introspection-20261116T141525Z#F-04"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-04"
 ---
 
 ## Review

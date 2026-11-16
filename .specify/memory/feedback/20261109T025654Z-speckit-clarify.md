@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "092-non-disposable"
+disposition: "processed"
 partial: false
 created: "2026-11-09T02:56:54Z"
 summary: "8 decisions settled; 65 FR / 20 SC; disposition vocabulary mapping closed"
+introspection_ref: "introspection-20261116T141525Z#F-48"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-48"
 ---
 
 ## Review

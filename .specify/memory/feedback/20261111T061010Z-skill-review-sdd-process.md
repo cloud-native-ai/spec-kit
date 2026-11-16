@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "100-seal-slice-archive"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:10:10Z"
 summary: "Process segment: clean execution; one P1 (analyze missed a cross-clause contradiction) and three P2 process gaps recorded in review.md."
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

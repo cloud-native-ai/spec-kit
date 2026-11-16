@@ -8,9 +8,11 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "086-script-interface-contract"
+disposition: "processed"
 partial: false
 created: "2026-11-06T09:44:56Z"
 summary: "086 analyze round 3 (closure): CRITICAL 0 / HIGH 0 / MEDIUM 8 / LOW 10; gate GREEN. Round-2 HIGH H-01..H-04 all closed (SC-012 mutants, feature-ref FR map, FR-028 tombstone citation, sandbox exit 1). "
+disposition_reason: "excluded by introspection-20261116T141525Z: 086 特性本地点已结清，已过时"
 ---
 
 ## Review

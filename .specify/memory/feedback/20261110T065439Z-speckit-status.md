@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T06:54:39Z"
 summary: "No-argument digest ran cleanly: status-digest.py --action digest rendered the bounded current-state summary and exited 0. All wrap-up engine calls succeeded (run-determination skipped as simple-unit b"
+disposition_reason: "excluded by introspection-20261116T141525Z: 无显著点，已过时"
 ---
 
 ## Review

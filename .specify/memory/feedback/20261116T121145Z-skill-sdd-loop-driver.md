@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-16T12:11:45Z"
 summary: "SDD run 102 landed: requirements/clarify/plan/tasks/checklist/analyze/implement/review, analyze 4 rounds to zero blocking, closure 0 new failures, merged locally."
+introspection_ref: "introspection-20261116T141525Z#F-29"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-29"
 ---
 
 ## Review

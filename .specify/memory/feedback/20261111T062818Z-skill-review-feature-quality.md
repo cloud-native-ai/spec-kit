@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-feature-quality-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:28:18Z"
 summary: "Artifact segment 9/9 pass with F8 open; implementation segment pass with smoke 54 passed and the affected suite at baseline."
+introspection_ref: "introspection-20261116T141525Z#F-16"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-16"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "090-re-anchoring"
+disposition: "processed"
 partial: false
 created: "2026-11-08T23:24:15Z"
 summary: "37-item requirements-quality checklist; checker gates recorded; 20 fails handed to analyze"
+introspection_ref: "introspection-20261116T141525Z#F-43"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-43"
 ---
 
 ## Review

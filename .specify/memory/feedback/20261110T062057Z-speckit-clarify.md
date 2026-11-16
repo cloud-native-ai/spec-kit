@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T06:20:57Z"
 summary: "Clarify 095 resolved 10 underspecified areas — the brief's 7 focus areas plus Feature Linkage, out-of-scope and terminology — tightened FR-003/004/005/017/034/038 in place (counts unchanged: 38 FR / 1"
+introspection_ref: "introspection-20261116T141525Z#F-25"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-25"
 ---
 
 ## Review

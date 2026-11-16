@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T19:10:54Z"
 summary: "Segment A pass: 9/9 expected members present; F2 wording convergence verified; F4/F5/F6/F10 persist as P2. Segment B pass: smoke 5/5 exit 0; F1 fix verified end to end; F9 remains as P2."
+introspection_ref: "introspection-20261116T141525Z#F-47"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-47"
 ---
 
 ## Review

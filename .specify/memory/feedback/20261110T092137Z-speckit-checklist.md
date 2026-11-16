@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "096-sdd-observer-agent"
 feature_id: "096"
+disposition: "processed"
 partial: false
 created: "2026-11-10T09:21:37Z"
 summary: "Generated a dated 38-item requirements-quality checklist for 096 from three fresh-context read-only detectors split by disjoint FR ranges (lifecycle/failure, journal objectivity, role/boundaries); all"
+introspection_ref: "introspection-20261116T141525Z#F-45"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-45"
 ---
 
 ## Review

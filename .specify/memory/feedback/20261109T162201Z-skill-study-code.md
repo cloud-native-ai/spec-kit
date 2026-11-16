@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-study-code-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T16:22:01Z"
 summary: "Five-step study-code run completed on a 120-file TypeScript research prototype. Core concepts, architecture, components and key implementations are grounded in file:line evidence; the final report pas"
+introspection_ref: "introspection-20261116T141525Z#F-44"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-44"
 ---
 
 ## Review

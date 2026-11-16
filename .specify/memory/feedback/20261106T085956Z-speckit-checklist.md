@@ -8,9 +8,11 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "086-script-interface-contract"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:59:56Z"
 summary: "086 checklist: 60 requirements-quality items CHK001-CHK060 across ten dimensions, 60/60 traced, zero prohibited openers, in checklists/contract-integrity-2026-11-06.md (the existing checklists/require"
+disposition_reason: "excluded by introspection-20261116T141525Z: 086 已承载高效测试、过期计数已消失，已过时"
 ---
 
 ## Review

@@ -8,9 +8,11 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T06:59:05Z"
 summary: "requirements stage: 71 FRs authored for the Plan B Anchor/Goal realignment; pre-analyze Runtime Stack section missing and repaired; decomposition gate proceed"
+disposition_reason: "excluded by introspection-20261116T141525Z: Optimization Points: None，无优化点"
 ---
 
 ## Review

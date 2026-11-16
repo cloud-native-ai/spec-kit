@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T02:26:54Z"
 summary: "091 requirements 阶段完成：新建 .specify/specs/091-auto-git-closeout/requirements.md（27 FR / 7 SC / 5 用户故事 / 6 共享字符串 / 3 行 Runtime Stack / 12 条 Assumptions）。validate-requirements.py status=ok（0 error 0 warni"
+introspection_ref: "introspection-20261116T141525Z#F-40"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-40"
 ---
 
 ## Review

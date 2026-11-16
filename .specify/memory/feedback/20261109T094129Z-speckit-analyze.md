@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "093-concurrency-by-default"
+disposition: "processed"
 partial: false
 created: "2026-11-09T09:41:29Z"
 summary: "analyze-repair closed the CRITICAL and all three HIGH findings in one mechanical pass (FR lane 25/33 -> 35/35) and encoded two dated user rulings as first-class requirements (FR-034 analyze-stage conc"
+introspection_ref: "introspection-20261116T141525Z#F-06"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-06"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "100-seal-slice-archive"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:10:10Z"
 summary: "Code segment: 354 changed / 26 judged / 328 legal skips / 0 gap; 0 blocking, 3 important (answered), 1 suggestion, 1 nitpick, 1 praise; gate allow."
+introspection_ref: "introspection-20261116T141525Z#F-07"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-07"
 ---
 
 ## Review

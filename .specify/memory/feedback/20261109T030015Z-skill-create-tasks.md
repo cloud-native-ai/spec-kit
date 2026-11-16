@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T03:00:15Z"
 summary: "Tasks stage on the 28-FR / 8-SC / 26-clause 091 spec produced `.specify/specs/091-auto-git-closeout/tasks.md` — 60 dependency-ordered rows across 8 phases (Setup 7, Foundational 8, US1 9, US2 9, US3 6"
+introspection_ref: "introspection-20261116T141525Z#F-44"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-44"
 ---
 
 ## Review

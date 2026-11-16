@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T07:05:58Z"
 summary: "Clarify run on 101 requirements (Mode A): resolved Feature linkage to new Feature 101 with registry row, detail file and 041 reverse cross-reference; recorded five decisions (D-1 Feature binding, D-2 "
+disposition_reason: "excluded by introspection-20261116T141525Z: migration contract 已 pin、矛盾已修正，已过时"
 ---
 
 ## Review

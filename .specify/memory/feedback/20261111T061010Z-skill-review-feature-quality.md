@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "100-seal-slice-archive"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:10:10Z"
 summary: "Artifact and implementation segments: 9/9 artifacts present; one P1 contract-precision finding and P2 record-accuracy gaps recorded."
+introspection_ref: "introspection-20261116T141525Z#F-14"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-14"
 ---
 
 ## Review

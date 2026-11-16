@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T02:43:00Z"
 summary: "digest rendered exit 0; P-1 registry-header optimization implemented and pinned; execution structure restored to the full wrap-up chain"
+disposition_reason: "excluded by introspection-20261116T141525Z: P-2 已落地，已过时"
 ---
 
 ## Review

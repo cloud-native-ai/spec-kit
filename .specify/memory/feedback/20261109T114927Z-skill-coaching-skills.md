@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-coaching-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T11:49:27Z"
 summary: "pass"
+disposition_reason: "excluded by introspection-20261116T141525Z: D-1/D-2 已落地，已过时"
 ---
 
 ## Review

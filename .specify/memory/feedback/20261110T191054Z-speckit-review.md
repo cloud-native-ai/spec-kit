@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T19:10:54Z"
 summary: "allowed — four segments + ARC completed; Implemented → Ready for Review judged legal and applied; code segment not-evaluated (changed/judged/skipped/gap = 485/5/480/0) with zero blocking and one answe"
+introspection_ref: "introspection-20261116T141525Z#F-07"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-07"
 ---
 
 ## Review

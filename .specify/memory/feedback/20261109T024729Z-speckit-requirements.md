@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "092-non-disposable"
+disposition: "processed"
 partial: false
 created: "2026-11-09T02:47:29Z"
 summary: "41 FR / 14 SC; gates pass; A-H mapped as the validation corpus"
+introspection_ref: "introspection-20261116T141525Z#F-27"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-27"
 ---
 
 ## Review

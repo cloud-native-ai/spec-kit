@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T07:47:03Z"
 summary: "Analyze stage integrator: merged the 3-worker wave (W1 29 + W2 12 + W3 10 = 51 findings: 2 CRITICAL / 10 HIGH / 31 MEDIUM / 8 LOW) into test-evidence/analyze-merged-2026-11-10.md; appended a serial cr"
+introspection_ref: "introspection-20261116T141525Z#F-03"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-03"
 ---
 
 ## Review

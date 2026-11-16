@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:28:55Z"
 summary: "create-requirements 执行：脚手架 097-speckit-migrate-command；house 约定对齐 094；验证器首跑 status=ok（0 error / 0 warning）；流程检查清单已盖章。"
+disposition_reason: "excluded by introspection-20261116T141525Z: 未主张任何缺陷，不成立"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T18:39:06Z"
 summary: "refused — four segments + ARC completed; Implemented → Ready for Review refused (blocking-unresolved): the current code-review.md carries one blocking entry (split-parent seal P0 gate reads only the p"
+introspection_ref: "introspection-20261116T141525Z#F-07"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-07"
 ---
 
 ## Review

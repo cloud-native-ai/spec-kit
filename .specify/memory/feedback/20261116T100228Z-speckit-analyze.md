@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-16T10:02:28Z"
 summary: "tasks/design-domain analyze round 2 (worker W3): 11 findings, 3 HIGH (T044 mirror --only skills matches no pair; T050 scope audit blind to untracked new files; T054 decomposition gate missing --requir"
+introspection_ref: "introspection-20261116T141525Z#F-48"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-48"
 ---
 
 ## Review

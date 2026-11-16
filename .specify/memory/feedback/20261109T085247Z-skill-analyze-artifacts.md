@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:52:47Z"
 summary: "The skill's seven detection passes covered duplication, ambiguity, underspecification, inconsistency and constitution conflict well; the gap was coverage: the skill's coverage step consumes account-cl"
+introspection_ref: "introspection-20261116T141525Z#F-36"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-36"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "101-anchor-goal-realignment"
+disposition: "processed"
 partial: false
 created: "2026-11-12T09:35:49Z"
 summary: "WP-01a (T009-T015) landed the layer-parameterized filenames, the closed four-member --scope with auto read-only resolution, the action-level Goal group and the classified cleanup with digests, receipt"
+introspection_ref: "introspection-20261116T141525Z#F-34"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-34"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "092"
+disposition: "processed"
 partial: false
 created: "2026-11-09T06:45:15Z"
 summary: "neutral"
+introspection_ref: "introspection-20261116T141525Z#F-28"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-28"
 ---
 
 ## Review

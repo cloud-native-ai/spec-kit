@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-implement-feature-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-12T12:16:43Z"
 summary: "WP-04b resumed the halted WP-04: the C-46 normalization surface was extended (N-8 frontmatter goal_slug, N-9 anchored goal.md refs, N-10 frontmatter delivery_dir) in goal-utils.py; cleanup --check the"
+disposition_reason: "excluded by introspection-20261116T141525Z: cleanup --check/--apply 已进引擎，已过时"
 ---
 
 ## Review

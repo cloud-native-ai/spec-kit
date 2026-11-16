@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:16:31Z"
 summary: "Round-2 analyze integrator: deterministically merged the three worker findings (W1 26 / W2 11 / W3 4 rows; 0C/4H/26M/11L), ran the cross-artifact consistency pass over requirements/plan/tasks/data-mod"
+introspection_ref: "introspection-20261116T141525Z#F-02"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-02"
 ---
 
 ## Review

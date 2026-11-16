@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T07:31:48Z"
 summary: "Analyze W1 (concurrent wave) completed over requirements.md and the requirements-quality checklist: 29 findings (2 CRITICAL / 4 HIGH / 20 MEDIUM / 3 LOW); checklist accountability 39 = 29 raised + 10 "
+introspection_ref: "introspection-20261116T141525Z#F-03"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-03"
 ---
 
 ## Review

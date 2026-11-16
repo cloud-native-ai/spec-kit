@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:52:43Z"
 summary: "analyze delivered a NOT-READY verdict with a one-reading repair brief and ruled both carried findings. Friction: the account-clause-coverage FR lane is red for a structural reason (citation groups) th"
+disposition_reason: "excluded by introspection-20261116T141525Z: citation-group 规则已由 owner 文档拥有，已过时"
 ---
 
 ## Review

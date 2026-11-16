@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "092-goal-team-parallel"
 feature_id: "092"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:42:59Z"
 summary: "Analyze round 2 on 092: independently verified the 14-item round-1 repair and delivered a NOT-READY verdict (1 CRITICAL + 4 HIGH + 4 MEDIUM + 3 LOW). 11 of 14 closure rows held. The finding that matte"
+introspection_ref: "introspection-20261116T141525Z#F-06"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-06"
 ---
 
 ## Review

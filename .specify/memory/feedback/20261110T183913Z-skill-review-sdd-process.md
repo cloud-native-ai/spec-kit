@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T18:39:13Z"
 summary: "pass — process segment completed; the single P0 finding was confirmed by an independent read-only validator; four segments composed in the fixed order."
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

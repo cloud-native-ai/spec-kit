@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:05:05Z"
 summary: "pass — /speckit.analyze 对 099-speckit-seal 完成 Round 3（r2 修复面复裁 + r2 findings 全严重度复裁 + 新检测）：r2 唯一 HIGH（F-05，plan P8 验收锚旧口径）closed——plan.md:310 与特性详情 :39 回修锚点逐字复核，8 式短语全链扫描 ZERO-LIVE-HITS；r1 已关闭 7 条（B-0"
+introspection_ref: "introspection-20261116T141525Z#F-01"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-01"
 ---
 
 ## Review

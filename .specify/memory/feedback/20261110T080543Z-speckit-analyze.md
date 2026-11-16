@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:05:43Z"
 summary: "Round-2 analyze worker W2: re-adjudicated the round-1 W2 finding set (W2-01…W2-12) and X-01/X-02/X-03 in-domain parts, then ran the full-severity scan over the 8-file read domain (plan, data-model, qu"
+introspection_ref: "introspection-20261116T141525Z#F-03"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-03"
 ---
 
 ## Review

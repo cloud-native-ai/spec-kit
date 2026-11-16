@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "096-sdd-observer-agent"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:21:25Z"
 summary: "Requirements stage for 096-sdd-observer-agent (execution class): scaffolded 096-sdd-observer-agent (number derived from the 095-superagent-role branch reservation), authored a 23-FR / 7-SC spec with R"
+introspection_ref: "introspection-20261116T141525Z#F-24"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-24"
 ---
 
 ## Review

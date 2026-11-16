@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-plan-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:11:35Z"
 summary: "pass-with-disclosed-gaps: plan artefacts landed and the three structural gates pass; the overlap engine's verdict was not usable inside the worktree and was replaced by a file-level adjudication (F-09"
+introspection_ref: "introspection-20261116T141525Z#F-39"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-39"
 ---
 
 ## Review

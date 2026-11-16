@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T07:20:29Z"
 summary: "Checklist stage completed: new dated requirements-quality checklist checklists/requirements-quality-2026-11-10.md — 39 CHK items in 7 sections, 100% traceability, under the 40 soft cap — grounded in r"
+introspection_ref: "introspection-20261116T141525Z#F-43"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-43"
 ---
 
 ## Review

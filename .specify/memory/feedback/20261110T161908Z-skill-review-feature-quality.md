@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "097-speckit-migrate-command"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:19:08Z"
 summary: "Artifact segment: pass, 9/9 expected members, all round-1 findings A1-A9 verified closed, all nine verification evidence sha256 values match. Implementation segment: pass; smoke literal byte-identical"
+introspection_ref: "introspection-20261116T141525Z#F-15"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-15"
 ---
 
 ## Review

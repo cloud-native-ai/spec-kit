@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T03:09:51Z"
 summary: "create-checklist 阶段顺：模板/Methodology/create-checklist SKILL 三处口径一致，gate 集合可判定；reader face 与 requirements 面联动失效、run-determination 的两处接口形状是本阶段主要摩擦。"
+introspection_ref: "introspection-20261116T141525Z#F-44"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-44"
 ---
 
 ## Review

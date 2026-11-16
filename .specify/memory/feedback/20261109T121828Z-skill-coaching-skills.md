@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-coaching-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T12:18:28Z"
 summary: "pass"
+introspection_ref: "introspection-20261116T141525Z#F-37"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-37"
 ---
 
 ## Review

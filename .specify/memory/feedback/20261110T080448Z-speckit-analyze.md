@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:04:48Z"
 summary: "pass"
+introspection_ref: "introspection-20261116T141525Z#F-03"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-03"
 ---
 
 ## Review

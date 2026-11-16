@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "096-sdd-observer-agent"
 feature_id: "096"
+disposition: "processed"
 partial: false
 created: "2026-11-10T09:11:20Z"
 summary: "Produced a 47-row, dependency-ordered tasks.md from the 096 design artifacts: format owner fact and fixture builder as Foundational; US1 engine core; US2 objectivity checker; US3 driver lifecycle; US4"
+introspection_ref: "introspection-20261116T141525Z#F-42"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-42"
 ---
 
 ## Review

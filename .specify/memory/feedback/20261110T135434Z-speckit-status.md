@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T13:54:34Z"
 summary: "digest verified live: five executors, closed hidden, one row per execution"
+disposition_reason: "excluded by introspection-20261116T141525Z: dedupe/silence 已落地，已过时"
 ---
 
 ## Review

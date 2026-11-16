@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T03:24:55Z"
 summary: "Analyze-repair slice for 091: resolved the CRITICAL and all four HIGH findings, re-cut the contract clause set 26 -> 32, and brought FR coverage 24/28 -> 28/28. Five required gates green before and af"
+introspection_ref: "introspection-20261116T141525Z#F-29"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-29"
 ---
 
 ## Review

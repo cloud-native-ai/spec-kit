@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "096-sdd-observer-agent"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:21:26Z"
 summary: "create-requirements executed for 096-sdd-observer-agent: short-name plumbing, scaffold, concept-owner check against the current three-layer agent model (095 not on baseline), reserved-identifier check"
+introspection_ref: "introspection-20261116T141525Z#F-36"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-36"
 ---
 
 ## Review

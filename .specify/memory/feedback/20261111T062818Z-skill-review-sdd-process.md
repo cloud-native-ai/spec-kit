@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-11T06:28:18Z"
 summary: "Process segment round 2: re-verified the two round-1 P1 fixes from their dispositions and evidence, re-confirmed F3-F9, and raised F10-F12."
+introspection_ref: "introspection-20261116T141525Z#F-17"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-17"
 ---
 
 ## Review

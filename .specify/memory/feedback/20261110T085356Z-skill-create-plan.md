@@ -8,9 +8,12 @@ probe: "skill-create-plan-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "096-sdd-observer-agent"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:53:56Z"
 summary: "create-plan executed for 096: in-place template fill, dynamically rendered 22-principle Constitution Check (all pass), 5 decision tensions, Phase 0 research R-01..R-14, Phase 1 five-artifact set, feat"
+introspection_ref: "introspection-20261116T141525Z#F-39"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-39"
 ---
 
 ## Review

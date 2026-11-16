@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "091-auto-git-closeout"
 feature_id: "091"
+disposition: "processed"
 partial: false
 created: "2026-11-09T03:30:42Z"
 summary: "Analyze round 2 over the repaired 091-auto-git-closeout spec set at 35248f14. All 20 round-1 findings verified"
+introspection_ref: "introspection-20261116T141525Z#F-29"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-29"
 ---
 
 ## Review

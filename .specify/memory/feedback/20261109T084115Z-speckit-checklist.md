@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:41:15Z"
 summary: "needs-improvement"
+introspection_ref: "introspection-20261116T141525Z#F-43"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-43"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T06:09:33Z"
 summary: "Requirements 095 authored the relative super-agent model: 38 FRs / 10 SCs covering the edge predicate and depth, super↔sub protocol, role-transition payload, concurrency, state sync/recovery, visualiz"
+introspection_ref: "introspection-20261116T141525Z#F-42"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-42"
 ---
 
 ## Review

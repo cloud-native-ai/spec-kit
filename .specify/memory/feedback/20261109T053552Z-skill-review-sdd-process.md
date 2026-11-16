@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T05:35:52Z"
 summary: "process segment of the 091 review: the live template still routes the code segment through a shell script that is fed to python3 by the wrapper; gates that report process success alongside a blocking "
+introspection_ref: "introspection-20261116T141525Z#F-14"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-14"
 ---
 
 ## Review

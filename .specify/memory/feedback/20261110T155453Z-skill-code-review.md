@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:54:53Z"
 summary: "Text-mode code review of 123 files: 97 judged, 26 skipped (generated), 0 gap. Counts: blocking 1 (us2:273 unfailable zero-write test), important 2 (help zero-side-effect limb; -h contract/docs drift),"
+introspection_ref: "introspection-20261116T141525Z#F-11"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-11"
 ---
 
 ## Review

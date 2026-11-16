@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:36:04Z"
 summary: "digest rendered verbatim, exit 0; worktree-based lines absent from the projection"
+disposition_reason: "excluded by introspection-20261116T141525Z: worktree-registered 行已按项目渲染，已过时"
 ---
 
 ## Review

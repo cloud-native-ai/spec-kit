@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T14:25:11Z"
 summary: "conditional — /speckit.analyze 对 099-speckit-seal 完成 Round 2（全量复裁：r1 findings 全严重度 + 新检测）：r1 的 7 条 HIGH 全部 closed（B-01、C-03、C-04、E-01、F-01、F-02、F-04，逐条锚点直读复核）；新发现 1 条 HIGH（F-05：plan.md:310 P8 验收锚仍写「FR"
+introspection_ref: "introspection-20261116T141525Z#F-01"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-01"
 ---
 
 ## Review

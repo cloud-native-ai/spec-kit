@@ -8,9 +8,11 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "090-re-anchoring"
+disposition: "processed"
 partial: false
 created: "2026-11-08T23:28:18Z"
 summary: "pass"
+disposition_reason: "excluded by introspection-20261116T141525Z: points 槽位只含叙述、无优化点，不成立"
 ---
 
 ## Review

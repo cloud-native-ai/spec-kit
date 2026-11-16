@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T07:54:39Z"
 summary: "not_evaluated: 本阶段未取得满意度信号（无人值守、无用户回合）"
+introspection_ref: "introspection-20261116T141525Z#F-27"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-27"
 ---
 
 ## Review

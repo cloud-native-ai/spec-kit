@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-16T08:39:28Z"
 summary: "Requirements stage for 102: created branch 102-line-registry-registration and a validator-green requirements.md (32 definition rows, 8 shared strings, 0 clarification markers). The brief's three corre"
+introspection_ref: "introspection-20261116T141525Z#F-24"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-24"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-feature-quality-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:54:53Z"
 summary: "Artifact segment: expected set 9/9 (standard seven plus plan-declared research.md and feature-ref.md); verdict blocked by P0 A1; findings A1-A9. Implementation segment: base b3da3a26d..head 3195519e2,"
+introspection_ref: "introspection-20261116T141525Z#F-42"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-42"
 ---
 
 ## Review

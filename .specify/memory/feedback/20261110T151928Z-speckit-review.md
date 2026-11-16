@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:19:28Z"
 summary: "Four-segment review of 095-superagent-role completed in the fixed order; ARC copied the checker record verbatim; the status transition was refused for three named conditions (2 blocking code entries, "
+introspection_ref: "introspection-20261116T141525Z#F-09"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-09"
 ---
 
 ## Review

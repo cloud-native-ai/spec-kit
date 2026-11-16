@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "097-speckit-migrate-command"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:19:08Z"
 summary: "Text-mode code review round 2: 147 files, 107 judged, 40 skipped (legal generated), 0 gap; blocking 0, important 0, suggestion 6, nitpick 1, praise 1; segment verdict not-evaluated per C-37 (skips wit"
+introspection_ref: "introspection-20261116T141525Z#F-08"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-08"
 ---
 
 ## Review

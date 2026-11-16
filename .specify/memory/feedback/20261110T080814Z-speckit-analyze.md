@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T08:08:14Z"
 summary: "Round-2 analyze worker W1: re-adjudicated the round-1 W1 set against current requirements.md and the requirements-quality checklist; delivered test-evidence/analyze-findings-round2-W1.md. 29 prior fin"
+introspection_ref: "introspection-20261116T141525Z#F-03"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-03"
 ---
 
 ## Review

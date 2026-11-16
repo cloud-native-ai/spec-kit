@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:01:08Z"
 summary: "pass"
+introspection_ref: "introspection-20261116T141525Z#F-11"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-11"
 ---
 
 ## Review

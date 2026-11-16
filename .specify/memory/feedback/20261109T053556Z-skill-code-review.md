@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T05:35:56Z"
 summary: "code segment: three verifiable defects in the 091 delta (inverted read-only exclusion in the fixture plan, an unsatisfiable pointer assertion in the SC-005 guard, a smoke evidence file whose content i"
+introspection_ref: "introspection-20261116T141525Z#F-11"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-11"
 ---
 
 ## Review

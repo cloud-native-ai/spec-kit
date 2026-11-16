@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T19:10:54Z"
 summary: "run completed: 485 changed / 5 judged / 480 skipped / 0 gap; verdict not-evaluated (legal skips, zero blocking); gate=allow; the round-1 blocking F1 is verified repaired; important F9 answered (agreed"
+introspection_ref: "introspection-20261116T141525Z#F-12"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-12"
 ---
 
 ## Review

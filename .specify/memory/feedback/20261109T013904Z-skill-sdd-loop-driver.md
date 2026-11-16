@@ -8,9 +8,11 @@ probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
 feature: "090-re-anchoring"
+disposition: "processed"
 partial: false
 created: "2026-11-09T01:39:04Z"
 summary: "unattended chain for 090 completed end to end; closure accept"
+disposition_reason: "excluded by introspection-20261116T141525Z: 三点全部修复，已过时"
 ---
 
 ## Review

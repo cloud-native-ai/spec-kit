@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T07:34:04Z"
 summary: "analyze W3 on 095 tasks.md: 10 findings (3 HIGH / 4 MEDIUM / 3 LOW); validate-tasks PASS (0/0); coverage accountant exit 1 (status uncovered; 29 clauses beyond baseline; 19/38 FRs). Read-only; no arti"
+introspection_ref: "introspection-20261116T141525Z#F-01"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-01"
 ---
 
 ## Review

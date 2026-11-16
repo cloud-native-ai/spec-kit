@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T12:45:14Z"
 summary: "Round-4 analyze (single worker; effective=1, budget-reserve): re-adjudicated the r3 41-row baseline and verified the r4 repair surface end-to-end. R3-01 closed as fixed on anchor evidence: SC-001 now "
+introspection_ref: "introspection-20261116T141525Z#F-02"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-02"
 ---
 
 ## Review

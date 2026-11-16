@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T16:01:04Z"
 summary: "pass"
+introspection_ref: "introspection-20261116T141525Z#F-14"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-14"
 ---
 
 ## Review

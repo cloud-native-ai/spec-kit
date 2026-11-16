@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-10T09:31:03Z"
 summary: "W3 并发波（analyze）：对 tasks.md 做只读检测，产出 6 条 findings（2 HIGH / 3 MEDIUM / 1 LOW），未修改任何制品；行级依赖图无环、47 个 ID 无重复、54 条 green 归属无碰撞；W3-01（包级顺序）与 W3-04（共享 red-first 证据文件）为 HIGH，待独立校验波确认。"
+introspection_ref: "introspection-20261116T141525Z#F-04"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-04"
 ---
 
 ## Review

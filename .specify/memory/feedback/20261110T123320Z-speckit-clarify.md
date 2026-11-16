@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "099-speckit-seal"
+disposition: "processed"
 partial: false
 created: "2026-11-10T12:33:20Z"
 summary: "pass — clarify write-back landed for 099-speckit-seal requirements.md (Mode A); 5 self-adjudicated closed questions + 1 user directive integrated; validator status ok (0 error / 0 warning; 37 definiti"
+introspection_ref: "introspection-20261116T141525Z#F-25"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-25"
 ---
 
 ## Review

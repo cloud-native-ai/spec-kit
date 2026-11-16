@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T19:10:54Z"
 summary: "round 2 process segment complete; the seven surviving P2 findings (F4–F10) were re-confirmed with unchanged anchors; no new process finding; the round-1 P0/P1 triage is closed."
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

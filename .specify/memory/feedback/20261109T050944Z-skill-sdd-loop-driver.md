@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T05:09:44Z"
 summary: "negative"
+introspection_ref: "introspection-20261116T141525Z#F-32"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-32"
 ---
 
 ## Review

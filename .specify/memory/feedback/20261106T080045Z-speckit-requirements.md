@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "086-script-interface-contract"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:00:45Z"
 summary: "086 requirements: the user's incident (generate-instructions.sh ignored --help and ran a reconcile) distilled into a framework-level script interface contract — every directly executable *.sh/*.py MUS"
+introspection_ref: "introspection-20261116T141525Z#F-26"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-26"
 ---
 
 ## Review

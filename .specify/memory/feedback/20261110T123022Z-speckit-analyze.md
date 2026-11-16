@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T12:30:22Z"
 summary: "Round-3 analyze (single worker; effective=1, budget-reserve): re-adjudicated round-2's 44-row baseline, verified the r3 repair surface on all six resolved rows (W1-30/W1-31/W1-32/W2-13 plus in-passing"
+introspection_ref: "introspection-20261116T141525Z#F-02"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-02"
 ---
 
 ## Review

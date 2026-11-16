@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T03:13:08Z"
 summary: "analyze 阶段完成：跨产物一致性分析产出 18 条 findings（C-01、H-01..H-04、M-01..M-09、L-01..L-04），checklist 15 条 fail 逐条裁决；检测为单上下文受限直读（本执行体无派发权），C/H 校验波未执行。"
+introspection_ref: "introspection-20261116T141525Z#F-01"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-01"
 ---
 
 ## Review

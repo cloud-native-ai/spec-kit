@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-16T10:00:18Z"
 summary: "requirements-domain analyze round 2 (worker W1): 11 findings, 1 HIGH (US2 scenario 4 vs FR-012/FR-013 conflicting outcomes), 0 CRITICAL"
+introspection_ref: "introspection-20261116T141525Z#F-05"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-05"
 ---
 
 ## Review

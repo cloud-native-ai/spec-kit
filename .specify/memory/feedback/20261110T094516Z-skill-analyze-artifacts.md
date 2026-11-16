@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "097-speckit-migrate-command"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-10T09:45:16Z"
 summary: "analyze 阶段：三路 fresh-context worker（W1 requirements+checklist、W2 plan+设计制品、W3 tasks）共返回 24/13/14 行；集成者确定性归并为 test-evidence/analyze-merged-2026-11-10.md（51 行 = 2 CRITICAL / 9 HIGH / 27 MEDIUM / 13 LOW，重"
+introspection_ref: "introspection-20261116T141525Z#F-48"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-48"
 ---
 
 ## Review

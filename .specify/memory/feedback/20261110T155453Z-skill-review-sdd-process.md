@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:54:53Z"
 summary: "Process segment: 16-event timeline reconstructed from git; findings F1-F6 (P1: stale state spine, owner-conflict repair loop, ignored analyze M/L backlog; P2: uncommitted stage checkpoints, incomplete"
+introspection_ref: "introspection-20261116T141525Z#F-13"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-13"
 ---
 
 ## Review

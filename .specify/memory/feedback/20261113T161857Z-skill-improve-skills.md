@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-13T16:18:57Z"
 summary: "improve-skills self-improvement loop (user-directed): added the Core Action Self-Optimization Grant (尝试→记录→优化→沉淀, 一回生二回熟) with reference self-optimization-grant.md; the grant assessment is a standing "
+introspection_ref: "introspection-20261116T141525Z#F-41"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-41"
 ---
 
 ## Review

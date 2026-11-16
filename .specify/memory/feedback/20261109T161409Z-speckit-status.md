@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-status-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-09T16:14:09Z"
 summary: "Trainee run of /speckit.status in its no-argument form (digest action). status-digest.py exited 0 and rendered the bounded current-state summary verbatim: 8 registry lines (cap 20), all beyond the 15m"
+introspection_ref: "introspection-20261116T141525Z#F-31"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-31"
 ---
 
 ## Review

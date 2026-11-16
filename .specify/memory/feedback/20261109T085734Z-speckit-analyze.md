@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "092-goal-team-parallel"
 feature_id: "092"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:57:34Z"
 summary: "Analyze-repair round 2 on the MAIN tree closed the assigned 1 CRITICAL + 4 HIGH + 1 MEDIUM. The load-bearing lesson: two of the six findings (H-2 stale generated map, H-5 a decision record disagreeing"
+introspection_ref: "introspection-20261116T141525Z#F-19"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-19"
 ---
 
 ## Review

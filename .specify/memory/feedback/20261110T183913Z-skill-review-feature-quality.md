@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "099-speckit-seal"
 feature_id: "099"
+disposition: "processed"
 partial: false
 created: "2026-11-10T18:39:13Z"
 summary: "blocked — artifact segment blocked on the FR-006 vs C-013/C-021 contradiction plus supporting P2s; implementation segment blocked on the split-parent P0; smoke 5/5 and the P8b repair reproduced."
+introspection_ref: "introspection-20261116T141525Z#F-47"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-47"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T11:30:07Z"
 summary: "pass"
+disposition_reason: "excluded by introspection-20261116T141525Z: slash Trainee/optional work 已实现，已过时"
 ---
 
 ## Review

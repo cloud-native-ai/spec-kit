@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-16T12:08:33Z"
 summary: "Code segment of 102: 124 changed / 11 judged / 113 skipped / 0 gap; 0 blocking, 2 important, 4 suggestion, 1 nitpick, 2 question, 1 praise; gate allow; segment not-evaluated because legal skips earn n"
+introspection_ref: "introspection-20261116T141525Z#F-12"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-12"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:19:37Z"
 summary: "Code segment over b3da3a26d..6c48e9c25: 313 changed files, 13 judged, 300 skipped with legal reasons, 0 gaps; 2 blocking, 6 important, 5 suggestion, 1 praise; gate deny (blocking-unresolved); capture "
+introspection_ref: "introspection-20261116T141525Z#F-08"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-08"
 ---
 
 ## Review

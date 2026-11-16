@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-clarify-artifact-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T07:54:43Z"
 summary: "not_evaluated"
+disposition_reason: "excluded by introspection-20261116T141525Z: deferred-by-assumption 已闭合（gate rule 7），已过时"
 ---
 
 ## Review

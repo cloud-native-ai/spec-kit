@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "095-superagent-role"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-10T15:19:35Z"
 summary: "Artifact and implementation segments: coverage 11/11 with no missing member; artifact verdict blocked on three P1s; implementation verdict blocked on scope (7 non-095 commits) and regression (18 in-ra"
+disposition_reason: "excluded by introspection-20261116T141525Z: C-1 read-twice 已加守卫，feature detail 已有 Status/Latest Review"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T06:29:34Z"
 summary: "091 auto-git-closeout closed through the SDD chain and a 3-package concurrent worktree fix loop: closure-acceptance-check accept (final_path 6/6); final serial suite 44 failed / 8064 passed; NEW 16 al"
+introspection_ref: "introspection-20261116T141525Z#F-32"
+disposition_reason: "introspection:introspection-20261116T141525Z#F-32"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-16T08:58:09Z"
 summary: "无人值守 clarify（Mode A）：12 个候选问题全部裁决，0 遗留标记；独立 fresh-context 子代理扫描发现 12 条与引擎/digest 事实冲突或欠指定的问题，全部整合（0 downgraded）。"
+disposition_reason: "excluded by introspection-20261116T141525Z: 四项引擎事实经核实全部成立，无可行动点"
 ---
 
 ## Review

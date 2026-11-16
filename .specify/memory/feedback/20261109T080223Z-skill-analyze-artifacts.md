@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-09T08:02:23Z"
 summary: "not_evaluated"
+disposition_reason: "excluded by introspection-20261116T141525Z: not_evaluated 复核且无主张，不成立"
 ---
 
 ## Review
