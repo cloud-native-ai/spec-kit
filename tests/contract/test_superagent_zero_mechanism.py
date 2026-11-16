@@ -109,8 +109,8 @@ FORBIDDEN_RULE_LITERALS = (
     "汇报内容下限",
     "四要素",
     "sdd-capability-or-contract-change",
-    "38400",
-    "38,400",
+    "38912",
+    "38,912",
     "INSTRUCTIONS_BUDGET_BYTES",
 )
 

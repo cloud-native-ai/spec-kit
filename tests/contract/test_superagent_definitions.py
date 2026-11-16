@@ -87,8 +87,8 @@ POINTER_OWNERS = (
 )
 
 FORBIDDEN_PAGE_TEXT = (
-    "38400",
-    "38,400",
+    "38912",
+    "38,912",
     "INSTRUCTIONS_BUDGET_BYTES",
     "先想并发",
     "串行须具名理由并记读数",
