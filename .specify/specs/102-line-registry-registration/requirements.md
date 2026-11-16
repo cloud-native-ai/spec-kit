@@ -166,6 +166,21 @@
 - **包装器调用**：一次 `line-run.sh --line-id … --run-id … -- <command…>` 运行；产生登记 → 执行 → 关闭三事件，失败与 SIGKILL 各留下可判定的残留形态。
 - **Digest 读数**：`/speckit.status` 对 registry 的单次只读投影；[[STR-006]] 是空集合的显式渲染。
 
+### Runtime Stack & Dependency Ownership
+
+`execution` 类特性必填；本特性不新增运行时依赖、不新增第三方包——它交付一个 bash 包装器与一个只读扫描器，并消费既有的 Python 解释器、pytest 运行器、既有 line-registry 引擎与既有 status-digest 引擎。每行可机械判定，零散文声明。表中 `Premises` 引用的 `EP-NNN` 由 plan 阶段 `## Execution Premises` 定义（本阶段不建 premises 表）。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | CPython `>=3.8` 标准库（扫描器的目录遍历与文本判定、测试夹具生成与 registry 条目读取） | signed-contract | CPython 上游（本仓只消费，不打包） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 扫描器与新增测试在 `>=3.8` 解释器上经唯一入口 `scripts/bash/run-tests.sh` 通过；本特性新增第三方 import 为零 | FR-012, FR-015 | EP-001, EP-002 |
+| RS-002 | POSIX `bash` 运行时（包装器本体及其对被包装命令的子进程调用） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 本仓无版本声明；pin 由 `bash --version` 在 test-evidence 的首次采集记录提供 | `scripts/bash/common.sh` | 包装器在 `bash scripts/bash/line-run.sh` 下完成登记→执行→关闭全程；`-h` / `--version` 退出 0 且零 registry 写入 | FR-003, FR-021 | EP-005 |
+| RS-003 | `pytest` 测试运行器（契约测试、行为测试与扫描器 fixture 正反例） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `scripts/bash/run-tests.sh` 运行新增 `contract` / `integration` 测试，结果集相对 implement 入口基线零新增红 | FR-015, FR-016, FR-021 | EP-002 |
+| RS-004 | 既有 line-registry 引擎的写入面（`register` / `update` / `deregister`） | signed-contract | 既有 sdd-loop-driver 引擎（本特性只消费，不修改其动作集与状态词） | 仓内既有实现，无外部版本面；pin 由 `--help` 声明的动作集与退出码闭集固定 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | 隔离 `$SPECIFY_LINE_REGISTRY_DIR` 下成功/失败/SIGKILL 三形态在引擎条目上留下 [[STR-007]]、`state` 与 reason；包装器不引用 `journal-utils.py` | FR-004, FR-005, FR-008, FR-009, FR-010 | EP-003 |
+| RS-005 | 既有 status-digest 引擎（digest 只读读数的唯一来源） | signed-contract | 既有 `/speckit.status` 摘要引擎（本特性只读消费，不修改动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 FR-020 的闭集不变断言固定 | `scripts/python/status-digest.py` | 隔离 registry 上运行期间与结束后各读一次 digest，读数与 registry 条目一致；本特性对其零修改 | FR-001, FR-020 | EP-004 |
+| RS-006 | 包装器 `line-run.sh`（本特性交付的登记→执行→关闭载体） | in-scope | 本特性自身新增的 framework 源脚本 | 不适用（无外部版本面） | `scripts/bash/line-run.sh` | `-h` / `--help`、`--version` 退出 0 且零 registry 写入；登记失败不执行被包装命令；退出码原样传播；SIGKILL 后条目残留 `active` | FR-003, FR-006, FR-007, FR-011 | EP-005 |
+
+**Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-006` 指向本特性的交付面（tasks 阶段创建），不是第二契约。`RS-004` / `RS-005` 的引擎本特性零修改，义务只在其既有契约上被消费与断言。
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
