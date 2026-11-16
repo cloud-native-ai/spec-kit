@@ -68,13 +68,13 @@ SC-008_value=five surfaces resolve by path; a fresh-context reader who took no p
 SC-008_note=`test-evidence/sc008-recitation-2026-11-16.txt` carries the reader's two sentences and the path locators.
 
 SC-009_status=partial
-SC-009_value=changeset 92 paths, 90 after subtracting the two pre-existing untracked scripts, 86 mapped to the 24 declared paths, 4 outside them (all from ratified D-102-01), 0 unexplained; the two pre-existing scripts stay untracked; no push
-SC-009_note=`test-evidence/polish-scope.txt`: the subset claim is literally false for four paths even though every one of them is attributable to the user-ratified budget change D-102-01.
-SC-009_blocked_at=2026-11-16 D-102-01 (U5 stall decision, status decided-ratified in .specify/register.md)
+SC-009_value=post-repair re-reading: changeset 104 paths, 102 after subtracting the two pre-existing untracked scripts, 97 mapped to the 24 declared paths, 5 outside them (4 from ratified D-102-01 and 1 from the closure-repair observer-guard window fix at 44e3636cd), 0 unexplained; the two pre-existing scripts stay untracked; no push
+SC-009_note=`test-evidence/polish-scope.txt` records the pre-repair 92/90/86/4 reading; the post-repair re-reading (review artifact segment, F-ART) is 104/102/97/5, and the fifth outside path (`tests/contract/test_sdd_observer_lifecycle.py`) is attributable to the closure repair, not to D-102-01. The containment claim remains literally false for five paths, so the criterion stays `partial`.
+SC-009_blocked_at=2026-11-16 D-102-01 (U5 stall decision, status decided-ratified in .specify/register.md) + the closure-repair path `tests/contract/test_sdd_observer_lifecycle.py`
 SC-009_reduced_measurement=path-by-path attribution of the full changeset (diff plus untracked) against the 24 declared delivery paths, with the two pre-existing untracked scripts subtracted, plus git status and git log checks for untracked state and absence of push
 SC-009_reduced_measurement_run=yes
-SC-009_why_reduced_insufficient=attribution explains each outside path but does not make the containment claim true: four files are outside the declared surface, so the criterion cannot be recorded as a pass on its written terms
-SC-009_unblock=a user waiver naming SC-009 for D-102-01, or a plan and feature-ref amendment adding generate-instructions.sh and its two superagent guard tests to the declared delivery surface, then a re-run of the scope audit
+SC-009_why_reduced_insufficient=attribution explains each outside path but does not make the containment claim true: five files are outside the declared surface, so the criterion cannot be recorded as a pass on its written terms
+SC-009_unblock=a user waiver naming SC-009 for D-102-01 and the closure-repair path, or a plan and feature-ref amendment adding generate-instructions.sh, its two superagent guard tests, and tests/contract/test_sdd_observer_lifecycle.py to the declared delivery surface, then a re-run of the scope audit
 
 # -- Joint acceptance (one row per `in-scope` runtime-stack row) --
 
