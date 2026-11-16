@@ -1,0 +1,66 @@
+# Mirror / distribution baseline — 102-line-registry-registration (implement, package 1)
+
+Captured at HEAD `e0ab20bdf` on 2026-11-16, **before** any file this feature adds or edits.
+rc 2 from the full `sync-mirrors.py --check` is the pre-existing baseline (5 `DIFF` + 2
+`ORPHAN`), not drift introduced by this feature.
+
+## B-1 — `python3 scripts/python/sync-mirrors.py --check`
+
+Command:
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+```
+
+rc = 2. Verbatim stdout:
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+DIFF .specify/skills/coaching-skills/SKILL.md
+DIFF .specify/skills/coaching-skills/data-model.md
+DIFF .specify/skills/coaching-skills/references/prompt-templates.md
+DIFF .specify/skills/create-skills/SKILL.md
+DIFF .specify/skills/sdd-loop-driver/references/cli/qodercli.md
+ok    skills/internal/ == .specify/skills/internal/ (138 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (129 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ORPHAN .specify/scripts/line-registry.py (no canonical scripts/ source)
+ORPHAN .specify/scripts/stage-runner.sh (no canonical scripts/ source)
+ok    shared/ == .specify/shared/ (114 files, byte-identical)
+ORPHANS detected — a mirror-only file cannot be distributed by `specify init`, which only copies canonical source -> mirror.
+  Fix by either: (a) adding the canonical source (e.g. scripts/bash/<name>.sh) if the file should ship to downstream projects, or (b) deleting the mirror copy if it is a superseded leftover.
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+```
+
+Counts: `DIFF` = 5, `ORPHAN` = 2.
+
+## B-2 — `python3 scripts/python/regen-command-copies.py --check`
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+rc = 0.
+
+## B-3 — `python3 scripts/python/flow-class-check.py --action check`
+
+```text
+flow-class check: 91 unit(s) scanned, 0 finding(s) [matched=91 inventory_units=91, clean]
+coverage: ledger_rows=91 matched=91 inventory_units=91 gaps=0 parse_errors=0 floor=39
+```
+
+rc = 0; 91 units.
+
+## Comparison rule for this feature
+
+SC-006 is judged as **no new drift relative to B-1/B-2/B-3**: the pairs this feature touches
+(`scripts/` → `.specify/scripts/`, `shared/` → `.specify/shared/`, `skills/internal/` →
+`.specify/skills/internal/`, `templates/` → `.specify/templates/`) must read `ok`, the copy
+generator must keep rc 0, and the `DIFF`/`ORPHAN` rows above must stay exactly the same set.

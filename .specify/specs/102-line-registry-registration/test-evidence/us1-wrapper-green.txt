@@ -1,0 +1,44 @@
+# US1 wrapper — green reading (T013)
+
+Run 2026-11-16 at HEAD `e0ab20bdf` + this package's uncommitted work, through the unique entry.
+
+## Command
+
+```bash
+bash scripts/bash/run-tests.sh \
+  tests/contract/test_line_run_contract.py \
+  tests/integration/test_line_run_behavior.py \
+  -q --names-out .specify/specs/102-line-registry-registration/test-evidence/us1-failed.txt
+```
+
+## Reading
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_line_run_contract.py tests/integration/test_line_run_behavior.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+..................                                                       [100%]
+18 passed in 5.40s
+# failed-name list written: .specify/specs/102-line-registry-registration/test-evidence/us1-failed.txt (0 entries) passes=1
+```
+
+| Quantity | Value |
+|----------|-------|
+| rc | 0 |
+| passed | 18 (10 contract + 8 integration) |
+| failed | 0 |
+| pytest duration | 5.40 s (wall 7.25 s including the runner's node start-up) |
+| `--names-out` entries | 0 (file empty) |
+| new failures vs `baseline-failed.txt` | 0 — `LC_ALL=C comm -13 baseline-failed.txt us1-failed.txt` is empty (baseline names: 241) |
+
+## Coverage ledger (FR-021, five wrapper forms)
+
+| Form | Pinned by |
+|------|-----------|
+| success | `test_success_registers_active_runs_the_command_and_closes_completed` |
+| command failure | `test_failed_command_propagates_its_status_and_closes_failed` |
+| registration failure | `test_registration_failure_never_starts_the_command` |
+| double failure (×2, A-24) | `test_double_failure_keeps_the_command_status_and_surfaces_the_close_failure`, `test_close_failure_over_a_successful_command_exits_with_the_engine_status` |
+| SIGKILL residue | `test_a_killed_wrapper_leaves_the_entry_active_and_visible` |
+
+Plus the run-time/after digest pair, the non-git identity exit 4, and the seven contract cases
+(help ×2, version, C-02, C-03, C-04 ×3, C-19).

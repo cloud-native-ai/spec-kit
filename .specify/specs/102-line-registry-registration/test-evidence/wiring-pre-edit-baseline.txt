@@ -1,0 +1,28 @@
+# Wiring pre-edit baseline — four surfaces, all zero hits (2026-11-16, HEAD e0ab20bdf)
+
+Each count is the number of lines matching the pattern in that file **before** this feature
+edits anything. Zero hits makes `grep -c` exit 1, so every line below ended with `|| true`
+and the chain was never interrupted.
+
+```bash
+for f in templates/instructions-template.md .specify/instructions.md skills/internal/run-team/SKILL.md; do
+    printf '%s: ' "$f"; grep -c "line-run.sh" "$f" || true
+done
+printf 'templates/commands/status.md "Single source": '; grep -c "Single source" templates/commands/status.md || true
+printf '.gitignore .tmp line: '; grep -n "^\.tmp/" .specify/.gitignore
+```
+
+Readout:
+
+```text
+templates/instructions-template.md: 0
+.specify/instructions.md: 0
+skills/internal/run-team/SKILL.md: 0
+templates/commands/status.md "Single source": 0
+.gitignore .tmp line: 30:.tmp/
+```
+
+## Premise recorded for FR-015 / FR-019
+
+`.specify/.gitignore` matches `.tmp/` on line 30, so the fixture root
+`.specify/.tmp/line-registry-registration/` is git-ignored as A-21 assumes.
