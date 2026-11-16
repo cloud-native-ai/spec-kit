@@ -80,7 +80,8 @@
 
 ### Related Specifications
 
-- `.specify/specs/088-speckit-visualization/requirements.md`（本 Feature 的首个也是当前唯一的规格）
+- `.specify/specs/088-speckit-visualization/requirements.md`（本 Feature 的首个规格）
+- `.specify/specs/102-line-registry-registration/requirements.md`（2026-11-16 `/speckit.clarify` 绑定为 slice 行 102：向本 Feature owns 的 `reporting-obligations.md` § 九 追加「长任务必须登记 line」判据并交付 `line-run.sh` 载体与扫描器；父行状态不回退（仍 Completed），102 行以 Draft 登记）
 
 ### Consuming / Consumed Owners
 
