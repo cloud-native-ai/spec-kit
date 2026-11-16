@@ -11,7 +11,7 @@
 
 ## Requirement Completeness
 
-- [ ] CHK001 Is the long-task obligation stated once in full — register at start, heartbeat at stage boundaries, close at end — together with the consequence of not registering? [Completeness, Req §FR-001]
+- [ ] CHK001 Is the long-task obligation stated once in full — register at start, heartbeat at stage boundaries, close at end — together with the consequence of not registering? [Completeness, Req §FR-001] — pass
 - [ ] CHK002 Is the judgment owner of the 5-minute threshold named, so the criterion can be applied without inventing one? [Completeness, Req §FR-001, A-1] — in-round fixed（阈值判定者 = 运行者，启动时按预期时长）
 - [ ] CHK003 Is the mechanical projection enumerated as a closed set with exactly one machine-readable owner, and does the owner-skip rule name how it is reported? [Completeness, Req §FR-002, A-15] — pass
 - [ ] CHK004 Are all four delivery surfaces named with bounded duties, so no surface silently carries a second copy? [Completeness, Req §Overview 3, FR-017…FR-019] — pass
