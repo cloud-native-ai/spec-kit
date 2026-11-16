@@ -1,0 +1,46 @@
+# T037 — US3 wiring guard segment 1 turns green (2026-11-16)
+
+Unique entry (parallel default), full capture in `us3-wiring-green-full.txt`:
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_line_registration_wiring.py -q \
+    --names-out .specify/specs/102-line-registry-registration/test-evidence/us3-wiring-green-failed.txt
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_line_registration_wiring.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+.........                                                                [100%]
+9 passed in 1.96s
+# failed-name list written: .../us3-wiring-green-failed.txt (0 entries) passes=1
+rc = 0
+```
+
+Name-level new-failure comparison against the implement baseline (241 names):
+
+```text
+$ comm -13 .specify/specs/102-line-registry-registration/baseline-failed.txt \
+           .specify/specs/102-line-registry-registration/test-evidence/us3-wiring-green-failed.txt | wc -l
+0
+```
+
+Coverage of this run: the 7 nodes that were red in R-5 (`us3-wiring-red-failed.txt`) plus the two
+vacuous negative guards — 9 nodes, all green.
+
+## Correction applied before this green reading (disclosed)
+
+The first run of this package reported `1 failed, 8 passed`. The failing node was
+`test_c06_the_status_template_keeps_its_action_set_and_adds_no_second_surface`:
+
+```text
+E       AssertionError: the action set must stay the closed three, got
+        ['collect', 'compile-embeds', 'determine', 'digest', 'guard', 'record', 'report']
+tests/contract/test_line_registration_wiring.py:137: AssertionError
+```
+
+Root cause (test defect, not a surface defect): `_action_set` scanned the **whole** template with
+`--action\s+([a-z][a-z-]*)`, so the machine-generated `## Wrap-up` block (probe engine:
+`determine` / `collect` / `record` / `compile-embeds`) was mixed into the status command's own
+action set. The node was therefore already failing for the wrong cause during the R-5 red run
+(a vacuous red leg). Fix: `_action_set` now reads only the authored body — everything before
+`## Wrap-up` — which is the region C-06 speaks about. The surface itself was not changed.
+
+After the fix: `9 passed`, rc 0 (reading above). The `## Wrap-up` block is untouched and still
+contains its probe calls.

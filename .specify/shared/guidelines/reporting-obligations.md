@@ -156,6 +156,16 @@
 - **存储缺失或为空渲染 `no measurements`**:这是**存储可用性**状态,不是某个步骤的标记;此时行与摘要的其余内容(单位、内容下限、排序、上限、退出码)与不带本维度的渲染逐字一致,并且它不是错误。
 - **越界就整体退让**:token 与调用次数只在整段元素容得下时才追加;容不下时从**该次渲染的每一个步骤**上一起撤下,并在该渲染**已有的**省略汇总里点名被撤下的量。两个步骤被描述成两种深度,是不可比的,属于缺陷。
 
+### 9.2 长任务登记判据(Long-task registration criterion)
+
+**本小节是下列阈值与判定边界的唯一 owner 承载点**;其它表面(`templates/commands/status.md`、`templates/instructions-template.md` 及其投影、`skills/internal/run-team/SKILL.md`、测试)只以路径抵达本小节,MUST NOT 复述阈值或判定边界。
+
+- **判据(人工阈值)**:一次运行**预计超过 5 分钟**,或**含后台批量 apply / verify**(含长时间测试、无人值守批处理)时,它就是一个长任务。判定者是运行者,在启动时按预期时长判断。
+- **义务**:长任务 MUST 在**启动时**登记一条 line、在**每个阶段边界**刷新该 line 的最近事件、在**结束时**关闭它。哪些脚本内容算长任务、什么调用形态算已登记,这两种机械可判定的投影由扫描器模块常量唯一拥有(`scripts/python/line-registration-scan.py`),本小节只抵达、不复述。
+- **载体**:让登记顺手发生的载体是 `scripts/bash/line-run.sh`(register → 执行 → 按结果 close;无法收尾时条目保留 `active`)。registry 的写入方是 `line-registry.py`;`scripts/python/journal-utils.py` 与 registry 零关系,MUST NOT 被用来写 registry。
+- **未登记即不可见**:digest 的 line 可见性唯一来源是 registry;未登记的运行不进入 digest,因此 `nothing-running` 是「registry 里没有活着的 line」的**准确结论**,不是漏报。任何 liveness 探测只作用于**已登记条目记录的 PID**,绝不发现未登记进程;把 digest 改成发现未登记进程,是用猜测替换确定性,属禁令。
+- **不新增机制**:本判据 MUST NOT 引入调度器、定时器、常驻进程、心跳文件或第二条 liveness 通道;阶段刷新是运行自身步骤边界上的事件,不是时钟。§ 十一 的零新增机制禁令照旧。
+
 ## 十 · 汇报失败要上浮,不得吞掉(A reporting failure is surfaced)
 
 - **发出流程自己的汇报循环** MUST NOT 吞掉自己的失败:一轮运行在预期 tick 无法发出汇报时,MUST 把这件事作为一条**点名的条件**上浮(以 `trigger: reporter-failure` 的那条行),并 MUST NOT 继续把运行说成健康。**「没有行」绝不可被读作「在推进」。**

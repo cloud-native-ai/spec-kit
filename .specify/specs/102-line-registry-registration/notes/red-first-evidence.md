@@ -261,6 +261,56 @@ the edits and must keep holding after them — they are deliberately not counted
 T030–T036 land the four edits; T037 turns these seven nodes green. Segment 2 (C-10…C-13,
 run-team) is appended by T039 and has its own red reading.
 
+## R-6 — Wiring guard segment 2 is red before the run-team skill is wired (T040)
+
+Recorded 2026-11-16, after T039 appended the C-10…C-13 segment to
+`tests/contract/test_line_registration_wiring.py` and **before** any edit to
+`skills/internal/run-team/SKILL.md` (T041–T043 belong to the next package). Full capture:
+`test-evidence/us4-wiring-red-full.txt`.
+
+```bash
+$ bash scripts/bash/run-tests.sh tests/contract/test_line_registration_wiring.py \
+    -q --names-out .specify/specs/102-line-registry-registration/test-evidence/us4-wiring-red-failed.txt
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+```
+
+Representative failure (the §7 body carries none of the close obligation):
+
+```text
+    def test_c12_section_7_closes_before_the_report_and_carries_the_line_id():
+        body = _subsection(_read(RUN_TEAM), "### 7.")
+>       assert "deregister" in body, "§7 must close the run's line through the engine (C-12)"
+E       AssertionError: §7 must close the run's line through the engine (C-12)
+E       assert 'deregister' in '### 7. Report\n\n执行结束后把带日期的运行报告写入 ...'
+tests/contract/test_line_registration_wiring.py:288: AssertionError
+```
+
+Summary:
+
+```text
+FAILED ...::test_c10_section_5_fails_closed_before_dispatching_any_seat
+FAILED ...::test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel
+FAILED ...::test_c10_section_5_registers_the_line_at_both_engine_candidates
+FAILED ...::test_c12_section_7_closes_before_the_report_and_carries_the_line_id
+4 failed, 11 passed in 2.00s
+```
+
+rc = 1; the four failed names were written to `test-evidence/us4-wiring-red-failed.txt` (4 entries).
+The 11 passes are segment 1 (green since T037) plus the two C-13 negative guards
+(`…create_team_report_contract_is_not_touched`, `…skill_carries_no_engine_parameter_table`), which
+hold **vacuously** before the wiring lands — they are drift guards, deliberately not counted as red
+legs (same disclosure shape as R-5).
+
+Why this is a true red leg: each of the four failing nodes asserts a positive fact that only the
+§5 register / §6 update / §7 close steps can supply — engine candidate paths, `RUN_ID_RE`, `--help`
+pointer, fail-closed before dispatch, `--last-event` refresh with the no-second-channel sentence,
+`deregister` plus the `line_id` report obligation. The skill still carries none of them (measured
+2026-11-16). T041–T043 land the wiring; T045 records the green reading and the removal injections.
+
+Re-confirmed in attempt 2 of this package from the resumed tree (rc 1; 4 failed, 11 passed; the same
+four names, recorded in `test-evidence/implement-p4.jsonl`).
+
+
 ## Post-red tightening (disclosed)
 
 After the implementation landed, two stderr assertions in R-2 were strengthened to the measured

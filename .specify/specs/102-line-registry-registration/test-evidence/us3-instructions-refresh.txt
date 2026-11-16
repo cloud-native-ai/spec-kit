@@ -1,0 +1,75 @@
+# T036 — `/speckit.instructions` section-level refresh (2026-11-16)
+
+Intent handed to the command: targeted partial update — "only `## Progress Reporting Discipline`;
+after the `Exemptions and precedence` bullet, add the template's one pointer bullet; do not touch
+any other section". Executed by the `manage-instructions` reconcile engine (Actions 1–7), not by a
+free-hand patch of the live file.
+
+## Action 1 — Setup
+
+```text
+$ bash scripts/bash/generate-instructions.sh
+... section table ... (row of interest below)
+| Progress Reporting Discipline                   | 1644   | 1921   | -277  | no          | no            |
+[info] Existing instructions kept as the refresh base (not overwritten).
+[info] Updating symlinks for AI tools...
+[success] Instructions generated/updated at .specify/instructions.md
+rc = 0
+```
+
+Safety net written by the script: `.specify/instructions.md-2026-11-16-185853`
+(matched by root `.gitignore:68` `.specify/instructions.md-*`).
+Non-destructive proof: `diff -q .specify/instructions.md .specify/instructions.md-2026-11-16-185853`
+→ identical, and `git status --porcelain .specify/instructions.md` → empty right after setup.
+
+Snapshot row consumed as-is: live 1644 B / template 1921 B / delta −277 B / placeholder=no /
+project-owned=no. The −277 B is exactly the directed convergence target (the template bullet).
+
+## Action 2/3 — Base, history, loss detection
+
+- The live file **is** the refresh base (not regenerated from the template).
+- Backups present: `2026-11-09-075033`, `2026-11-09-075116`, `2026-11-16-185853`.
+- Scripted loss scan (every `- ` bullet in each backup, looked up in the live file) yields two
+  differing bullets, both **not losses**:
+  - `Rhythm (沉默有上限)`: live carries the backup sentence **plus** the unattended-exemption
+    clause → superset, no recovery.
+  - `Test Framework`: live has no such bullet because the template replaced it with the richer
+    `**Testing**` entry (live `:258`) → stale auto-derived fact already refreshed, no recovery.
+- No section heading present in a backup is absent from the live file.
+- Result: no additive recovery; Action 5 proceeds.
+
+## Action 5 — Section-by-section convergence (the only directed edit)
+
+Appended after the `Exemptions and precedence` bullet, byte-identical to
+`templates/instructions-template.md` § `## Progress Reporting Discipline`:
+
+```text
+- **Long tasks must register a line (长任务须登记)**: a long-running task that registers no line is invisible to `/speckit.status`, so wrap it with `scripts/bash/line-run.sh`; the criterion and its bounds are owned by `shared/guidelines/reporting-obligations.md` § 九.
+```
+
+No other section was touched (tolerance band: every other row's content unchanged).
+
+## Action 6 — Validation
+
+```text
+template headings: 37 | live headings: 38 | template headings absent from live: []
+section byte-identical to the template section: True
+live bullet count in `## Progress Reporting Discipline`: 1
+AGENTS.md -> .specify/instructions.md : 1
+CLAUDE.md -> .specify/instructions.md : 1
+QODER.md -> .specify/instructions.md : 1
+.github/copilot-instructions.md -> ../.specify/instructions.md : 1
+(counts above = occurrences of the bullet seen through each symlink)
+```
+
+The live section now equals the template section byte-for-byte, so the four symlinks show the same
+bullet exactly once. Evidence for C-09 (`tests/contract/test_line_registration_wiring.py`).
+
+## Residual report (Action 7)
+
+- Converged: `## Progress Reporting Discipline` (1 bullet).
+- Tolerated: every other section (delta 0 or pre-existing project-owned content).
+- Recovered: none needed (see Action 3).
+- Pending: none.
+- Backup keep-set: newest 5 (3 exist); prunable: none.
+- Budget: script reported rc 0; no size-budget route (R1/R2) was triggered for this run.

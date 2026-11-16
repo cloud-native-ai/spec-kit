@@ -1,0 +1,116 @@
+# P4 blocker — the ambient bullet crosses the instructions size budget (2026-11-16)
+
+This file records a **load-bearing conflict** found while verifying the package. Nothing here is
+worked around: the implementation of FR-019 is in place and its guard is green; the conflict is
+between two recorded intents, so it is surfaced rather than repaired.
+
+## Reading (measured)
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_reporting_obligations.py \
+    tests/contract/test_progress_reporting.py \
+    tests/contract/test_instructions_section_propagation.py \
+    tests/contract/test_instructions_size_budget.py \
+    tests/contract/test_instructions_budget_superagent_section.py \
+    tests/contract/test_status_digest.py \
+    tests/contract/test_mirror_parity_suite.py \
+    tests/contract/test_sync_mirrors_only.py -q \
+    --names-out .specify/specs/102-line-registry-registration/test-evidence/p4-adjacent-failed.txt
+8 failed, 994 passed in 17.30s        rc = 1
+(full capture: p4-adjacent-full.txt)
+```
+
+Name-level comparison against the implement baseline (241 names):
+
+```text
+$ comm -13 baseline-failed.txt p4-adjacent-failed.txt
+tests/contract/test_instructions_budget_superagent_section.py::test_generated_size_stays_under_the_script_owned_budget
+tests/contract/test_instructions_size_budget.py::test_c17_real_tree_live_size_is_within_the_raised_budget
+2 names
+```
+
+The other six failures are pre-existing names (5 `skills/external/` mirror DIFFs + 1 pair-strictness
+row), all present in `baseline-failed.txt`.
+
+Both new failures carry the same assertion:
+
+```text
+AssertionError: the live instructions file is 38578 B; the generator's verdict is `over` at
+38400 B, so the last admissible byte is 38399 B
+AssertionError: live instructions are 38578 B against a budget of 38400 B ... Run
+/speckit.instructions to converge the file, or raise INSTRUCTIONS_BUDGET_BYTES in
+scripts/bash/generate-instructions.sh with the recorded reason
+```
+
+## Arithmetic
+
+```text
+bullet (C-07 verbatim, C-09 once in live): 277 B
+live before this package:                  38301 B   (headroom 99 B)
+live after the section-level refresh:      38578 B   (over by 178 B; last admissible 38399 B)
+bytes that must be reclaimed in-delta:     179 B
+budget owner:                              scripts/bash/generate-instructions.sh
+                                           INSTRUCTIONS_BUDGET_BYTES=38400
+```
+
+## Why the convergence routes cannot reclaim 179 B
+
+Section table consumed as-is from the setup run (`us3-instructions-budget-snapshot.txt`), R1 pool =
+rows with `delta>0`, `placeholder=no`, `project-owned=no`:
+
+| Section | live | tmpl | delta | What the delta actually is | R1 verdict |
+|---------|------|------|-------|----------------------------|------------|
+| `Re-Anchoring` | 976 | 648 | +328 | the **Non-Disposable** summary+pointer paragraph, which the template carries under `## Knowledge Recording & Promotion` (live 364 vs tmpl 691, −327). The live file relocated it; content is not unique. | Moving it back is a placement repair that changes **zero bytes**; deleting it drops a normative ambient rule the template itself carries. Not a byte source. |
+| `AI Tool Compatibility` | 374 | 228 | +146 | a **fact refresh**: the template's literal agent list is stale; live points at `AGENT_CONFIG` / supported-agent-tools.md. Live matches reality; the template does not. | Compressing to the template's shape is a correctness regression, and its maximum yield (146 B) is below the 179 B needed anyway. |
+
+Every other positive-delta row is `placeholder=yes` (project-filled: Documentation Map +2247, Tech
+Stack +1268, Project Overview +200) and is excluded from R1 by the skill's own filter. The only
+`project-owned=yes` row (`Recurring Operational Lessons`, 646 B) is far below R2's 4 KB relocation
+threshold. `Recurring Operational Lessons` also carries no stale paths, and the Documentation Map's
+one "missing" location is the intentional `<ID>.md` pattern, not a dead row.
+
+So: no sanctioned in-delta trim exists, and the generator's own recorded policy is explicit —
+*"No existing section was trimmed to make room: the instruction file belongs to its project."*
+(raise records for Features 082, 089, 090).
+
+## The conflict
+
+Two recorded intents cannot both hold:
+
+1. **FR-019 / C-09**: the live instructions MUST carry the ambient bullet (hence +277 B).
+2. **SC-009 / feature-ref.md § Delivery surface**: the change set MUST stay inside the 24 declared
+   paths, and that list **explicitly** places `scripts/bash/generate-instructions.sh` outside the
+   delta. Its own documented remedy for a new ambient section is to raise
+   `INSTRUCTIONS_BUDGET_BYTES` with a recorded reason.
+
+This is a decision (two readings, no artifact picks one), not a correction — so this package stops
+here instead of choosing unilaterally.
+
+## Proposed change (substantive — needs adjudication)
+
+`scripts/bash/generate-instructions.sh`:
+
+- add a `Raise record (Feature 102 — long-task line registration ambient bullet)` block in the
+  existing format, with `measured live size after injection: 38578 B (this repository, 2026-11-16)`
+  and the reason "the new pointer bullet in `## Progress Reporting Discipline`; no existing section
+  was trimmed, following the owner's own policy";
+- apply the owner's recorded rule — the smallest `N*1024` with `(N*1024 - 1) - 38578 >= 1024`:
+  `38912` leaves 333 B (fails); **`39936` leaves 1357 B (first that passes)** — so
+  `INSTRUCTIONS_BUDGET_BYTES=38400` → `39936`;
+- add that one path to `feature-ref.md` § Delivery surface (item 25) so SC-009's closed set stays
+  truthful (a PLAN-EDIT, classification=substantive).
+
+Effect: the generator's size report is advisory (it always exits 0); the constant bounds the live
+file for this repo and downstream projects. No behaviour, no dependency, no mechanism is added.
+
+Rejected alternative: delete the Non-Disposable paragraph or compress the AI Tool Compatibility
+line. Both delete/regress real content, and the budget owner's own policy forbids trimming sections
+to make room.
+
+## State left on disk
+
+Everything else in T030–T040 is implemented and green: owner § 9.2, both mirrors, the status
+sentence with four regenerated copies, the template bullet, the section-level refresh (live section
+byte-identical to the template), segment 1 of the wiring guard (`9 passed`), the status-surface
+check, and the segment-2 red reading (`4 failed, 11 passed`, the four declared red legs).
+Only this size-budget regression remains, and it is not repairable inside the declared delta.

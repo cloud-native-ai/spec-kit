@@ -1,0 +1,59 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_line_registration_wiring.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...........FFFF                                                          [100%]
+=================================== FAILURES ===================================
+__ test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel ___
+[gw11] linux -- Python 3.11.0 /usr/local/bin/python3
+
+    def test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel():
+        body = _subsection(_read(RUN_TEAM), "### 6.")
+>       assert "update" in body, "§6 must refresh the line through the engine's update action"
+E       AssertionError: §6 must refresh the line through the engine's update action
+E       assert 'update' in '### 6. Orchestrate(按团队 pattern 编排)\n\n- **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess...守其 Visibility Contract;派发携带快速失败注入子句并要求显式异常回传行(沉默不读作干净,判据 `.specify/shared/guidelines/fast-fail.md`)。\n- 用户可在执行中随时中止。\n'
+
+tests/contract/test_line_registration_wiring.py:275: AssertionError
+_____ test_c12_section_7_closes_before_the_report_and_carries_the_line_id ______
+[gw12] linux -- Python 3.11.0 /usr/local/bin/python3
+
+    def test_c12_section_7_closes_before_the_report_and_carries_the_line_id():
+        body = _subsection(_read(RUN_TEAM), "### 7.")
+>       assert "deregister" in body, "§7 must close the run's line through the engine (C-12)"
+E       AssertionError: §7 must close the run's line through the engine (C-12)
+E       assert 'deregister' in '### 7. Report\n\n执行结束后把带日期的运行报告写入 `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md`(**每次运行强制**,报告契约真源:create-tea...告带固定字段,逐字形态:`**Target 指派**: T-<nnn>(<statement>)` 或 `无(goal 整体)`,团队默认路径追加 `(团队默认)`;新台账条目带 `"target_ref": "T-<nnn>"`。\n'
+
+tests/contract/test_line_registration_wiring.py:288: AssertionError
+_________ test_c10_section_5_fails_closed_before_dispatching_any_seat __________
+[gw10] linux -- Python 3.11.0 /usr/local/bin/python3
+
+    def test_c10_section_5_fails_closed_before_dispatching_any_seat():
+        body = _subsection(_read(RUN_TEAM), "### 5.")
+        fail_closed = ("fail-closed" in body) or ("fail closed" in body) or ("登记失败" in body)
+>       assert fail_closed, "§5 must fail closed when the registration fails (C-10)"
+E       AssertionError: §5 must fail closed when the registration fails (C-10)
+E       assert False
+
+tests/contract/test_line_registration_wiring.py:266: AssertionError
+_______ test_c10_section_5_registers_the_line_at_both_engine_candidates ________
+[gw9] linux -- Python 3.11.0 /usr/local/bin/python3
+
+    def test_c10_section_5_registers_the_line_at_both_engine_candidates():
+        body = _subsection(_read(RUN_TEAM), "### 5.")
+        for candidate in ENGINE_CANDIDATES:
+>           assert candidate in body, (
+                f"§5 must name the A-17 engine candidate {candidate!r} (framework source first, "
+                "then the downstream-only copy)"
+            )
+E           AssertionError: §5 must name the A-17 engine candidate 'skills/external/sdd-loop-driver/scripts/line-registry.py' (framework source first, then the downstream-only copy)
+E           assert 'skills/external/sdd-loop-driver/scripts/line-registry.py' in '### 5. Present & Execute\n\n呈现 **anchor** 与两个结构后**直接执行**——呈现是披露,不是阻断门禁(事后修改途径:`/speckit.team` modify / improve-team;判... 时:`本次 Target: T-<nnn> — <statement>(open)(团队默认)`\n\n(表单真源:`skills/internal/create-team/SKILL.md` → Summary Refresh)\n'
+
+tests/contract/test_line_registration_wiring.py:245: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_line_registration_wiring.py::test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel
+FAILED tests/contract/test_line_registration_wiring.py::test_c12_section_7_closes_before_the_report_and_carries_the_line_id
+FAILED tests/contract/test_line_registration_wiring.py::test_c10_section_5_fails_closed_before_dispatching_any_seat
+FAILED tests/contract/test_line_registration_wiring.py::test_c10_section_5_registers_the_line_at_both_engine_candidates
+4 failed, 11 passed in 1.96s
+# failed-name list written: .specify/specs/102-line-registry-registration/test-evidence/us4-wiring-red-failed.txt (4 entries) passes=1

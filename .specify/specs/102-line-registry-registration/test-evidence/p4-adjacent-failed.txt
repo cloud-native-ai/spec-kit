@@ -1,0 +1,6 @@
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/SKILL.md->.specify/skills/coaching-skills/SKILL.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/data-model.md->.specify/skills/coaching-skills/data-model.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/references/prompt-templates.md->.specify/skills/coaching-skills/references/prompt-templates.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/create-skills/SKILL.md->.specify/skills/create-skills/SKILL.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/sdd-loop-driver/references/cli/qodercli.md->.specify/skills/sdd-loop-driver/references/cli/qodercli.md]
+tests/contract/test_mirror_parity_suite.py::test_pair_mirror_extras_match_engine_strictness[scripts->.specify/scripts]

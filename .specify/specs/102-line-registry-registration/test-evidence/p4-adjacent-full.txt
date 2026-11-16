@@ -1,0 +1,236 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_reporting_obligations.py tests/contract/test_progress_reporting.py tests/contract/test_instructions_section_propagation.py tests/contract/test_instructions_size_budget.py tests/contract/test_instructions_budget_superagent_section.py tests/contract/test_status_digest.py tests/contract/test_mirror_parity_suite.py tests/contract/test_sync_mirrors_only.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  7%]
+...........F.......................F.............F...................... [ 14%]
+........................................................................ [ 21%]
+......................F................................................. [ 28%]
+........................................................................ [ 35%]
+........................................................................ [ 43%]
+.......................................................F................ [ 50%]
+........................................................................ [ 57%]
+........................................................................ [ 64%]
+........................................................................ [ 71%]
+........................................................................ [ 79%]
+........................................................................ [ 86%]
+........................................................................ [ 93%]
+.F................................................................       [100%]
+=================================== FAILURES ===================================
+_ test_mirror_file_byte_identical[skills/external/coaching-skills/SKILL.md->.specify/skills/coaching-skills/SKILL.md] _
+[gw22] linux -- Python 3.11.0 /usr/local/bin/python3
+
+file_pair = (PosixPath('/cws_data/cloud-native-ai/spec-kit/skills/external'), PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/skills'), PosixPath('coaching-skills/SKILL.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+        projected = _projected_pairs().get((src / rel).resolve())
+        if projected is not None:
+            # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+            # equality. The expected bytes come from the engine's own rule, so this suite and
+            # `--check` cannot disagree about what the projection is.
+            _mirror_rel, kind = projected
+            source_text = (src / rel).read_text(encoding="utf-8")
+            expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+            assert applied is True, (
+                f"C-34: the projection of {src / rel} was refused: {expected}"
+            )
+            assert mirror.read_text(encoding="utf-8") == expected, (
+                f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+                f"`source + {kind}` (engine --check reports DIFF[projected])"
+            )
+            return
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/coaching-skills/SKILL.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'---\nname: ...-out` step"\n' == b'---\nname: ...-out` step"\n'
+E         
+E         At index 175 diff: b'f' != b'd'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:112: AssertionError
+_ test_mirror_file_byte_identical[skills/external/coaching-skills/data-model.md->.specify/skills/coaching-skills/data-model.md] _
+[gw22] linux -- Python 3.11.0 /usr/local/bin/python3
+
+file_pair = (PosixPath('/cws_data/cloud-native-ai/spec-kit/skills/external'), PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/skills'), PosixPath('coaching-skills/data-model.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+        projected = _projected_pairs().get((src / rel).resolve())
+        if projected is not None:
+            # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+            # equality. The expected bytes come from the engine's own rule, so this suite and
+            # `--check` cannot disagree about what the projection is.
+            _mirror_rel, kind = projected
+            source_text = (src / rel).read_text(encoding="utf-8")
+            expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+            assert applied is True, (
+                f"C-34: the projection of {src / rel} was refused: {expected}"
+            )
+            assert mirror.read_text(encoding="utf-8") == expected, (
+                f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+                f"`source + {kind}` (engine --check reports DIFF[projected])"
+            )
+            return
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/coaching-skills/data-model.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Coaching ...ombination.\n' == b'# Coaching ...ombination.\n'
+E         
+E         At index 701 diff: b'T' != b'D'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:112: AssertionError
+_ test_mirror_file_byte_identical[skills/external/coaching-skills/references/prompt-templates.md->.specify/skills/coaching-skills/references/prompt-templates.md] _
+[gw22] linux -- Python 3.11.0 /usr/local/bin/python3
+
+file_pair = (PosixPath('/cws_data/cloud-native-ai/spec-kit/skills/external'), PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/skills'), PosixPath('coaching-skills/references/prompt-templates.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+        projected = _projected_pairs().get((src / rel).resolve())
+        if projected is not None:
+            # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+            # equality. The expected bytes come from the engine's own rule, so this suite and
+            # `--check` cannot disagree about what the projection is.
+            _mirror_rel, kind = projected
+            source_text = (src / rel).read_text(encoding="utf-8")
+            expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+            assert applied is True, (
+                f"C-34: the projection of {src / rel} was refused: {expected}"
+            )
+            assert mirror.read_text(encoding="utf-8") == expected, (
+                f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+                f"`source + {kind}` (engine --check reports DIFF[projected])"
+            )
+            return
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/coaching-skills/references/prompt-templates.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Coaching ...te it here.\n' == b'# Coaching ...te it here.\n'
+E         
+E         At index 291 diff: b'T' != b'd'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:112: AssertionError
+_ test_mirror_file_byte_identical[skills/external/create-skills/SKILL.md->.specify/skills/create-skills/SKILL.md] _
+[gw25] linux -- Python 3.11.0 /usr/local/bin/python3
+
+file_pair = (PosixPath('/cws_data/cloud-native-ai/spec-kit/skills/external'), PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/skills'), PosixPath('create-skills/SKILL.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+        projected = _projected_pairs().get((src / rel).resolve())
+        if projected is not None:
+            # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+            # equality. The expected bytes come from the engine's own rule, so this suite and
+            # `--check` cannot disagree about what the projection is.
+            _mirror_rel, kind = projected
+            source_text = (src / rel).read_text(encoding="utf-8")
+            expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+            assert applied is True, (
+                f"C-34: the projection of {src / rel} was refused: {expected}"
+            )
+            assert mirror.read_text(encoding="utf-8") == expected, (
+                f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+                f"`source + {kind}` (engine --check reports DIFF[projected])"
+            )
+            return
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/create-skills/SKILL.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'---\nname: ...-out` step"\n' == b'---\nname: ...-out` step"\n'
+E         
+E         At index 8030 diff: b'`' != b' '
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:112: AssertionError
+_ test_mirror_file_byte_identical[skills/external/sdd-loop-driver/references/cli/qodercli.md->.specify/skills/sdd-loop-driver/references/cli/qodercli.md] _
+[gw21] linux -- Python 3.11.0 /usr/local/bin/python3
+
+file_pair = (PosixPath('/cws_data/cloud-native-ai/spec-kit/skills/external'), PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/skills'), PosixPath('sdd-loop-driver/references/cli/qodercli.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+        projected = _projected_pairs().get((src / rel).resolve())
+        if projected is not None:
+            # C-35: a projected mirror is asserted as `mirror == project(source)`, never as byte
+            # equality. The expected bytes come from the engine's own rule, so this suite and
+            # `--check` cannot disagree about what the projection is.
+            _mirror_rel, kind = projected
+            source_text = (src / rel).read_text(encoding="utf-8")
+            expected, applied = SYNC_MIRRORS.project_source(source_text, kind)
+            assert applied is True, (
+                f"C-34: the projection of {src / rel} was refused: {expected}"
+            )
+            assert mirror.read_text(encoding="utf-8") == expected, (
+                f"projection drift: {mirror.relative_to(REPO_ROOT)} is not "
+                f"`source + {kind}` (engine --check reports DIFF[projected])"
+            )
+            return
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/sdd-loop-driver/references/cli/qodercli.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# qodercli ...2\x80\x94 |\n' == b'# qodercli ...2\x80\x94 |\n'
+E         
+E         At index 7916 diff: b'#' != b' '
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:112: AssertionError
+__ test_pair_mirror_extras_match_engine_strictness[scripts->.specify/scripts] __
+[gw19] linux -- Python 3.11.0 /usr/local/bin/python3
+
+src = PosixPath('/cws_data/cloud-native-ai/spec-kit/scripts')
+dst = PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/scripts')
+strict_extras = True, exclude_parts = set()
+
+    @pytest.mark.parametrize("src,dst,strict_extras,exclude_parts", _pair_params())
+    def test_pair_mirror_extras_match_engine_strictness(src, dst, strict_extras, exclude_parts):
+        if not src.exists():
+            # Engine main() skips a placeholder-only source pair (mirror is canonical).
+            pytest.skip(f"placeholder-only source pair: {src} (engine skips; mirror canonical)")
+        _missing, _differing, extra = SYNC_MIRRORS.compare_pair(src, dst, exclude_parts)
+        if strict_extras:
+>           assert not extra, (
+                "mirror-only ORPHAN files in a strict pair (engine --check exits 2): "
+                + ", ".join(f"{dst}/{rel}" for rel in extra)
+            )
+E           AssertionError: mirror-only ORPHAN files in a strict pair (engine --check exits 2): /cws_data/cloud-native-ai/spec-kit/.specify/scripts/line-registry.py, /cws_data/cloud-native-ai/spec-kit/.specify/scripts/stage-runner.sh
+E           assert not [PosixPath('line-registry.py'), PosixPath('stage-runner.sh')]
+
+tests/contract/test_mirror_parity_suite.py:138: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/SKILL.md->.specify/skills/coaching-skills/SKILL.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/data-model.md->.specify/skills/coaching-skills/data-model.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/references/prompt-templates.md->.specify/skills/coaching-skills/references/prompt-templates.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/create-skills/SKILL.md->.specify/skills/create-skills/SKILL.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/sdd-loop-driver/references/cli/qodercli.md->.specify/skills/sdd-loop-driver/references/cli/qodercli.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_pair_mirror_extras_match_engine_strictness[scripts->.specify/scripts]
+6 failed, 996 passed in 17.47s
+# failed-name list written: .specify/specs/102-line-registry-registration/test-evidence/p4-adjacent-failed.txt (6 entries) passes=1

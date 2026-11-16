@@ -79,7 +79,14 @@ def _section(text: str, heading_prefix: str) -> str:
 
 
 def _action_set(text: str) -> set:
-    return set(re.findall(r"--action\s+([a-z][a-z-]*)", text))
+    """The command's own action set, read from the authored body.
+
+    The ``## Wrap-up`` block is machine-generated (probe-utils) and names the
+    probe engine's actions, which are not this command's actions; scanning them
+    would compare an unrelated closed set (C-06 speaks of the status command).
+    """
+    authored = text.split("\n## Wrap-up", 1)[0]
+    return set(re.findall(r"--action\s+([a-z][a-z-]*)", authored))
 
 
 # ------------------------------------------------------------------ C-01…C-04 owner document
@@ -187,4 +194,129 @@ def test_c09_the_live_instructions_carry_the_bullet_once_and_the_links_resolve()
         assert os.path.realpath(link) == live_real, f"{name} must resolve to {LIVE}"
         assert link.read_text(encoding="utf-8").count(AMBIENT_BULLET) == 1, (
             f"{name} must show the bullet through the live file"
+        )
+
+
+# ======================================================================
+# Segment 2 — C-10…C-13: the run-team skill's §5 / §6 / §7 steps (US4)
+# ======================================================================
+RUN_TEAM = REPO_ROOT / "skills" / "internal" / "run-team" / "SKILL.md"
+CREATE_TEAM = REPO_ROOT / "skills" / "internal" / "create-team" / "SKILL.md"
+
+ENGINE_CANDIDATES = (
+    "skills/external/sdd-loop-driver/scripts/line-registry.py",
+    ".specify/skills/sdd-loop-driver/scripts/line-registry.py",
+)
+
+#: Engine options that a restated parameter table would enumerate (C-13).
+ENGINE_OPTIONS = (
+    "--action",
+    "--line-id",
+    "--run-id",
+    "--last-event",
+    "--state",
+    "--reason",
+    "--project-dir",
+    "--repo-root",
+)
+
+
+def _subsection(text: str, heading_prefix: str) -> str:
+    """Return the subsection whose heading starts with ``heading_prefix``."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith(heading_prefix):
+            start = index
+            break
+    assert start is not None, f"subsection heading {heading_prefix!r} not found"
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or lines[index].startswith("### "):
+            end = index
+            break
+    return "\n".join(lines[start:end])
+
+
+# ---------------------------------------------------------------------------- C-10 §5 register
+def test_c10_section_5_registers_the_line_at_both_engine_candidates():
+    body = _subsection(_read(RUN_TEAM), "### 5.")
+    for candidate in ENGINE_CANDIDATES:
+        assert candidate in body, (
+            f"§5 must name the A-17 engine candidate {candidate!r} (framework source first, "
+            "then the downstream-only copy)"
+        )
+    assert "register" in body, "§5 must register the run's line through the engine's register action"
+    assert "<team-slug>-<run-id>" in body, (
+        "§5 must compose the registry id as <team-slug>-<run-id> (A-18)"
+    )
+    assert "RUN_ID_RE" in body, (
+        "§5 must generate the run id in the engine-valid form and point at RUN_ID_RE, never a "
+        "bare UTC timestamp (A-18)"
+    )
+    assert "--help" in body, (
+        "§5 must read the engine's actions, parameters and exit codes from its --help rather "
+        "than restating them (C-10)"
+    )
+
+
+def test_c10_section_5_fails_closed_before_dispatching_any_seat():
+    body = _subsection(_read(RUN_TEAM), "### 5.")
+    fail_closed = ("fail-closed" in body) or ("fail closed" in body) or ("登记失败" in body)
+    assert fail_closed, "§5 must fail closed when the registration fails (C-10)"
+    assert "派发" in body or "dispatch" in body, (
+        "§5 must place the registration before any seat is dispatched"
+    )
+
+
+# ----------------------------------------------------------------- C-11 §6 step-boundary update
+def test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel():
+    body = _subsection(_read(RUN_TEAM), "### 6.")
+    assert "update" in body, "§6 must refresh the line through the engine's update action"
+    assert "--last-event" in body, (
+        "§6 must carry the step label as the refreshed last event at each orchestration step "
+        "boundary (C-11)"
+    )
+    assert "定时器" in body, "§6 must state that no timer exists"
+    assert "守护" in body, "§6 must state that no daemon exists"
+    assert "第二" in body, "§6 must state that no second liveness channel exists"
+
+
+# ------------------------------------------------------------------------ C-12 §7 close+line_id
+def test_c12_section_7_closes_before_the_report_and_carries_the_line_id():
+    body = _subsection(_read(RUN_TEAM), "### 7.")
+    assert "deregister" in body, "§7 must close the run's line through the engine (C-12)"
+    assert "line_id" in body, (
+        "§7 must require the composed line_id to appear in the report body (C-12, STR-007)"
+    )
+    assert "关闭失败" in body or "close failure" in body, (
+        "§7 must name a close failure as an outcome it handles"
+    )
+    assert "写明" in body or "stated" in body, (
+        "§7 must require a close failure to be stated in the report, never swallowed"
+    )
+
+
+# -------------------------------------------------------------------- C-13 no leak, no option table
+def test_c13_the_create_team_report_contract_is_not_touched():
+    text = _read(CREATE_TEAM)
+    report = _subsection(text, "### Report contract")
+    assert "line_id" not in report, (
+        "the Report contract belongs to create-team; the line_id obligation is carried by "
+        "run-team §7 (C-13)"
+    )
+    assert "line-registry.py" not in report, (
+        "the create-team Report contract must not reach for the registry engine (C-13)"
+    )
+
+
+def test_c13_the_skill_carries_no_engine_parameter_table():
+    text = _read(RUN_TEAM)
+    for number, line in enumerate(text.splitlines(), start=1):
+        if not line.lstrip().startswith("|"):
+            continue
+        named = [option for option in ENGINE_OPTIONS if option in line]
+        assert len(named) < 2, (
+            f"{RUN_TEAM}:{number} enumerates engine options {named}; §5/§6/§7 must read the "
+            "engine's parameters from --help, not restate a table (C-13)"
         )

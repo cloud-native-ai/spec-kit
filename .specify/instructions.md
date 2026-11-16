@@ -163,6 +163,7 @@ A long-running task owes the user a periodic sign of life: minutes of silence ar
 - **Measured, not invented (数字须可溯源)**: take figures from an artifact this run actually produced; if no such sensor exists, say the progress cannot be quantified and label any estimate as one.
 - **Boundary-respecting (不打断原子步骤、不当确认门)**: land reports at step boundaries, never split an indivisible step; a report is a statement, not an approval request, and approving a destructive action keeps its own front-loaded criterion.
 - **Exemptions and precedence (短任务豁免、异常优先)**: a task ending before the first interval produces no periodic report; surface anomalies immediately per the Fast Fail Discipline; an orchestrator carries the reporting duty into every long-running subagent dispatch.
+- **Long tasks must register a line (长任务须登记)**: a long-running task that registers no line is invisible to `/speckit.status`, so wrap it with `scripts/bash/line-run.sh`; the criterion and its bounds are owned by `shared/guidelines/reporting-obligations.md` § 九.
 
 ## Run Determination
 

@@ -1,0 +1,67 @@
+# T038 — the status command surface moved only by the C-05 sentence (2026-11-16)
+
+## 1. Diff of the authored template
+
+```text
+$ git diff -- templates/commands/status.md
+@@ -49,6 +49,8 @@ Run the action the input selects, print the script's output verbatim, and report
+  idle repository answers explicitly with status `3`, and that is the correct answer, not a failure.
+ 
++**Single source**: line visibility comes solely from the Line Registry — the digest's liveness probe is limited to PIDs already recorded on a registry entry and never discovers an unregistered process, so it MUST NOT be changed to discover unregistered processes; the obligation is owned by `shared/guidelines/reporting-obligations.md` § 九 and is reached by path, never restated here.
++
+  ## Wrap-up
+```
+
+One added paragraph; no other line changed. The `## Wrap-up` block (machine-generated) is untouched.
+
+## 2. Digest engine untouched
+
+```text
+$ git diff --stat -- scripts/python/status-digest.py
+(no output)
+```
+
+Action set and exit-code closed set are therefore the shipped ones; `nothing-running` rendering is
+unchanged because the script was not edited by this feature.
+
+## 3. `--help` answers zero and writes nothing
+
+```text
+$ python3 scripts/python/status-digest.py --help
+usage: status-digest.py [-h] --action {digest,guard,report}
+                        [--format {table,json}] [--workspace WORKSPACE]
+                        [--cap CAP] [--stale-bound STALE_BOUND] ...
+help rc = 0
+```
+
+Action set read from the engine's own help: `{digest, guard, report}` (the closed three).
+
+Registry write probe (environment registry `/home/agent/.local/state/spec-kit/lines`):
+
+```text
+default registry listing count before=9 after=9
+default registry listing unchanged: yes        (sorted listing sha256 equal)
+```
+
+Isolated registry probe (`SPECIFY_LINE_REGISTRY_DIR=.specify/.tmp/line-registry-registration/t038-registry`,
+created empty for this run, removed afterwards):
+
+```text
+isolated help rc = 0
+isolated registry entries after help: 0
+```
+
+## 4. Per-tool copies (owned by T033, re-read here)
+
+```text
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.        rc = 0
+
+.claude/commands/speckit.status.md: 1
+.github/prompts/speckit.status.prompt.md: 1
+.qoder/commands/speckit.status.md: 1
+.opencode/command/speckit.status.md: 1        (counts of the `Single source` sentence)
+```
+
+Verdict: the status surface gained exactly the one C-05 sentence; its action set, exit-status
+closed set and `nothing-running` rendering are unchanged (FR-018, FR-020).
