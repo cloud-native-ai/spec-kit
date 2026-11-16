@@ -83,6 +83,7 @@
 - `.specify/specs/088-speckit-visualization/requirements.md`（本 Feature 的首个规格）
 - `.specify/specs/102-line-registry-registration/requirements.md`（2026-11-16 `/speckit.clarify` 绑定为 slice 行 102：向本 Feature owns 的 `reporting-obligations.md` § 九 追加「长任务必须登记 line」判据并交付 `line-run.sh` 载体与扫描器；父行状态不回退（仍 Completed），102 行以 Draft 登记）
 - `.specify/specs/102-line-registry-registration/plan.md` (+ `research.md` / `data-model.md` / `contracts/` ×3 / `quickstart.md` / `feature-ref.md`) — 2026-11-16 `/speckit.plan` 产出的设计产物面：owner § 九 判据、`line-run.sh` 包装器契约（19 条款）、只读扫描器契约（17 条款）、四表面接线契约（16 条款）；Constitution Check 23/23 Pass（T-001/T-002 承重决策记录）、EP-001…EP-005 全 verified、Dependency set none、pre-analyze plan decision=pass（errors=0）；102 行 `Draft → Planned`，父行状态保持 `Completed`。
+- `.specify/specs/102-line-registry-registration/tasks.md` — 2026-11-16 `/speckit.tasks` 的任务分解面：57 行（Setup 5 / US1 包装器 13 / US2 扫描器 9 / US3 owner+指针面 11 / US4 run-team 接线 8 / Polish 11），Tests Mode ON（宪法 Principle IV），`validate-tasks.py` 0 error / 0 warning、`decomposition-check --mode tasks` proceed（57 ≤ 160）、`pre-analyze-check --stage tasks` pass（errors=0）；本切片 Status 维持 Planned，父行保持 `Completed`。
 
 ### Consuming / Consumed Owners
 
