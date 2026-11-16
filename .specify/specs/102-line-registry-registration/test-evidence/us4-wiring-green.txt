@@ -1,0 +1,52 @@
+# US4 wiring green + removal injections (T045)
+
+Recorded 2026-11-16 after T041–T044 landed. Unique entry: `scripts/bash/run-tests.sh`
+(parallel default, `-q`). Full injection log: `us4-injections-full.txt`.
+
+## Green reading
+
+```bash
+$ bash scripts/bash/run-tests.sh tests/contract/test_line_registration_wiring.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+...............                                                          [100%]
+15 passed in 1.97s
+```
+
+rc = 0. All 15 nodes pass: segment 1 (C-01…C-09, green since T037) plus segment 2
+(C-10…C-13, red in R-6 before T041–T043).
+
+## Removal injections (each observed red, then restored)
+
+Each injection deletes exactly one authored line, runs the same contract file, then restores the
+file from a scratch backup and compares `sha256sum` before/after.
+
+| # | Surface removed | Failing guard(s) after removal | Reading | Restore (sha256) |
+|---|-----------------|-------------------------------|---------|------------------|
+| I1 | `skills/internal/run-team/SKILL.md` §5 register paragraph | `test_c10_section_5_registers_the_line_at_both_engine_candidates`, `test_c10_section_5_fails_closed_before_dispatching_any_seat` | 2 failed, 13 passed (rc 1) | identical (82f2edf…ced49) |
+| I2 | §6 `update --last-event` bullet | `test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel` | 1 failed, 14 passed (rc 1) | identical |
+| I3 | §7 close-before-report paragraph | `test_c12_section_7_closes_before_the_report_and_carries_the_line_id` | 1 failed, 14 passed (rc 1) | identical |
+| I4 | `templates/commands/status.md` C-05 sentence | `test_c05_the_status_template_carries_the_single_source_sentence_verbatim`, `test_c06_the_status_template_keeps_its_action_set_and_adds_no_second_surface` | 2 failed, 13 passed (rc 1) | identical (8dbda3b…6b091) |
+| I5 | `templates/instructions-template.md` ambient bullet | `test_c07_the_template_has_exactly_one_pointer_bullet_after_exemptions` | 1 failed, 14 passed (rc 1) | identical (daf8a45…06f40) |
+
+Every injected surface is guarded by at least one positive assertion (C-14's clause, read across
+C-01/C-05/C-07/C-10/C-11/C-12: the §5, §6 and §7 clauses are covered by I1–I3; the two downstream
+surfaces by I4–I5).
+
+## Restore verification
+
+```text
+-- git diff (touched committed surfaces) --        (empty)   rc 0
+-- command copies (.claude/.github/.qoder/.opencode) --      (empty)   rc 0
+-- diff -q skills/internal/run-team/SKILL.md ↔ .specify mirror --  (empty)  rc 0
+-- diff -q templates/instructions-template.md ↔ .specify mirror -- (empty)  rc 0
+```
+
+Final green after all restores:
+
+```text
+...............                                                          [100%]
+15 passed in 1.96s
+```
+
+rc = 0. The run-team source still carries the authored edits (uncommitted at this point); the
+mirror is byte-identical to it, so no injection residue survives in either copy.

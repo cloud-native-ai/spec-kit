@@ -47,6 +47,8 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 
 ### 5. Present & Execute
 
+**Run line 登记（任何席位派发之前）**: 呈现 anchor 与两个结构之前，先为本轮登记一条 run line。run-id 按本仓 requirements 102 的 A-18 生成——形如 `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，MUST 匹配引擎的 `RUN_ID_RE`；本技能既有的裸 UTC 时间戳 MUST NOT 充当 run-id（§7 报告文件名里的时间戳只是文件名成分，不是 run-id）。registry `line_id` 按 A-18 合成为 `<team-slug>-<run-id>`。引擎按 A-17 的有序候选解析：先 `skills/external/sdd-loop-driver/scripts/line-registry.py`，其次 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`（下游项目只持有后者）。用引擎的 `register` 动作把该 line 登记为 `active`；动作、参数与退出码一律从引擎 `--help` 读取，本技能不复述参数表。**登记失败即 fail-closed**：具名引擎退出码后停下，不派发任何席位。§2 五查判 `blocked` 时流程在 §2 停止，不进入本步骤、不登记，避免留下悬空 line。
+
 呈现 **anchor** 与两个结构后**直接执行**——呈现是披露,不是阻断门禁(事后修改途径:`/speckit.team` modify / improve-team;判据:`.specify/shared/guidelines/confirmation-gates.md`)。同时披露 summary 判定(refresh 或 suppressed;周期总结落锚点档案的 `.specify/anchoring/<anchor-slug>/summary/`,**从不**落团队目录;档案层归 `.specify/shared/definitions/anchor-definitions.md` § Archive Layers)与 Target 指派行,逐字形态:
 
 - `本次 Target: T-<nnn> — <statement>(open)`
@@ -63,9 +65,12 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 - 迭代(iteration):强制最大迭代上限。
 - 持续(continuous):每轮 run 一个 cycle,按声明成熟度运行,独立校验者(独立 verifier)在 L2+ 常驻。
 - 成员派发模态按 `.specify/shared/definitions/subagent-definitions.md`;外部 CLI 派发遵守其 Visibility Contract;派发携带快速失败注入子句并要求显式异常回传行(沉默不读作干净,判据 `.specify/shared/guidelines/fast-fail.md`)。
+- **Run line 刷新（每步边界一次）**: 在 §5 登记的同一条 line 上（引擎为 §5 按有序候选解析到的 `line-registry.py`），每个编排步骤边界调一次引擎 `update --last-event <step-label>`（步骤标签取当前编排步骤名），刷新该 line 的最近活动；不存在定时器、守护进程、心跳文件或第二 liveness 通道——line 的活动只由这些显式刷新写入。
 - 用户可在执行中随时中止。
 
 ### 7. Report
+
+**先关闭 run line，再写报告**: 经引擎 `line-registry.py` 的 `deregister` 动作关闭 §5 登记的那条 line（`reason` 取值按引擎 `--help` 的动作表读取），报告正文 MUST 携带该 line 合成的 `line_id`（`<team-slug>-<run-id>`，即 STR-007 的值）。关闭失败 MUST NOT 被吞掉——在报告中写明关闭失败与引擎退出码，报告照常落盘。
 
 执行结束后把带日期的运行报告写入 `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md`(**每次运行强制**,报告契约真源:create-team SKILL.md → Report;含 `## Verification` 节)。Target 指派的运行报告带固定字段,逐字形态:`**Target 指派**: T-<nnn>(<statement>)` 或 `无(goal 整体)`,团队默认路径追加 `(团队默认)`;新台账条目带 `"target_ref": "T-<nnn>"`。
 

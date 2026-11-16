@@ -131,3 +131,86 @@ rm -rf .specify/.tmp/line-registry-registration
 `pgrep -P "$wpid"` after the child kill printed nothing ("no surviving child of wrapper"),
 and the scratch root was removed with the command above after the SC readings were captured
 (T017 evidence). Nothing was written outside `.specify/.tmp/`.
+
+---
+
+# Quickstart run — S-4, S-5, S-6 (102, T047)
+
+Executed 2026-11-16 on the same branch, after US2 (scanner) and US3/US4 wiring landed.
+
+## S-4 — Prove the scanner has teeth (both legs)
+
+Scratch root: `.specify/.tmp/line-registry-registration/` (git-ignored).
+
+Leg 1 — marker present, no compliant invocation (fixture built from `LONG_TASK_MARKERS[0]`):
+
+```bash
+$ python3 scripts/python/line-registration-scan.py --root .specify/.tmp/line-registry-registration
+.specify/.tmp/line-registry-registration/fixture.sh:2: criterion=content-marker terraform apply
+root: .specify/.tmp/line-registry-registration (files: 2)
+scanned: 2 files
+violations: 1
+owner-skipped: 0
+```
+
+Exit `1`. One violation naming the fixture with `criterion=content-marker` — as expected.
+
+Leg 2 — **same** fixture rewritten to keep the marker and go through the wrapper:
+
+```bash
+$ python3 scripts/python/line-registration-scan.py --root .specify/.tmp/line-registry-registration
+root: .specify/.tmp/line-registry-registration (files: 2)
+scanned: 2 files
+violations: 0
+owner-skipped: 0
+```
+
+Exit `0`, `violations: 0`. The file still contains `terraform apply`, so only the compliant
+invocation explains the clean verdict. (Both legs scanned the same two files; the second file was
+this package's scratch injection driver, which carries no marker and no wrapper call.)
+
+## S-5 — The live repository reads clean
+
+```bash
+$ python3 scripts/python/line-registration-scan.py
+root: scripts/bash (files: 17)
+root: scripts/python (files: 49)
+root: skills (files: 93)
+scanned: 159 files
+violations: 0
+owner-skipped: 1
+```
+
+Exit `0`; the reading names the three declared roots, reports `violations: 0` and
+`owner-skipped: 1` (the scanner itself). `scripts/bash` holds 17 files now instead of the
+generation-time 16 because `scripts/bash/line-run.sh` exists (T009). This reading is also saved
+as `test-evidence/line-registration-scan-live.txt` by the live integration test.
+
+## S-6 — Check the wiring surfaces
+
+```bash
+$ grep -n "Single source" templates/commands/status.md
+52:**Single source**: line visibility comes solely from the Line Registry — the digest's ...
+
+$ grep -n "line-run.sh" templates/instructions-template.md .specify/instructions.md
+templates/instructions-template.md:152:- **Long tasks must register a line (长任务须登记)**: a ...
+.specify/instructions.md:166:- **Long tasks must register a line (长任务须登记)**: a long-runn ...
+
+$ grep -n "line-registry.py" skills/internal/run-team/SKILL.md
+50:**Run line 登记（任何席位派发之前）**
+68:- **Run line 刷新（每步边界一次）**
+73:**先关闭 run line，再写报告**
+```
+
+One hit each for the first two patterns in their files; three hits for the engine path in run-team
+(register / update / close), plus the `line_id` mention in §7 (see
+`test-evidence/us4-run-team-locators.txt`).
+
+## Teardown
+
+```bash
+rm -rf .specify/.tmp/line-registry-registration
+```
+
+The scratch root (fixture plus this package's injection driver and its restore backups) was
+removed after the readings above. Nothing was written outside `.specify/.tmp/`.

@@ -1,0 +1,20 @@
+# US4 run-team locator readings (T046) — 2026-11-16
+
+## `grep -n "line-registry.py" skills/internal/run-team/SKILL.md`
+50:**Run line 登记（任何席位派发之前）**: 呈现 anchor 与两个结构之前，先为本轮登记一条 run line。run-id 按本仓 requirements 102 的 A-18 生成——形如 `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，MUST 匹配引擎的 `RUN_ID_RE`；本技能既有的裸 UTC 时间戳 MUST NOT 充当 run-id（§7 报告文件名里的时间戳只是文件名成分，不是 run-id）。registry `line_id` 按 A-18 合成为 `<team-slug>-<run-id>`。引擎按 A-17 的有序候选解析：先 `skills/external/sdd-loop-driver/scripts/line-registry.py`，其次 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`（下游项目只持有后者）。用引擎的 `register` 动作把该 line 登记为 `active`；动作、参数与退出码一律从引擎 `--help` 读取，本技能不复述参数表。**登记失败即 fail-closed**：具名引擎退出码后停下，不派发任何席位。§2 五查判 `blocked` 时流程在 §2 停止，不进入本步骤、不登记，避免留下悬空 line。
+68:- **Run line 刷新（每步边界一次）**: 在 §5 登记的同一条 line 上（引擎为 §5 按有序候选解析到的 `line-registry.py`），每个编排步骤边界调一次引擎 `update --last-event <step-label>`（步骤标签取当前编排步骤名），刷新该 line 的最近活动；不存在定时器、守护进程、心跳文件或第二 liveness 通道——line 的活动只由这些显式刷新写入。
+73:**先关闭 run line，再写报告**: 经引擎 `line-registry.py` 的 `deregister` 动作关闭 §5 登记的那条 line（`reason` 取值按引擎 `--help` 的动作表读取），报告正文 MUST 携带该 line 合成的 `line_id`（`<team-slug>-<run-id>`，即 STR-007 的值）。关闭失败 MUST NOT 被吞掉——在报告中写明关闭失败与引擎退出码，报告照常落盘。
+
+hit lines: 3 (register=L50, update=L68, close=L73)
+
+## `grep -n "line_id" skills/internal/run-team/SKILL.md`
+50:**Run line 登记（任何席位派发之前）**: 呈现 anchor 与两个结构之前，先为本轮登记一条 run line。run-id 按本仓 requirements 102 的 A-18 生成——形如 `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，MUST 匹配引擎的 `RUN_ID_RE`；本技能既有的裸 UTC 时间戳 MUST NOT 充当 run-id（§7 报告文件名里的时间戳只是文件名成分，不是 run-id）。registry `line_id` 按 A-18 合成为 `<team-slug>-<run-id>`。引擎按 A-17 的有序候选解析：先 `skills/external/sdd-loop-driver/scripts/line-registry.py`，其次 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`（下游项目只持有后者）。用引擎的 `register` 动作把该 line 登记为 `active`；动作、参数与退出码一律从引擎 `--help` 读取，本技能不复述参数表。**登记失败即 fail-closed**：具名引擎退出码后停下，不派发任何席位。§2 五查判 `blocked` 时流程在 §2 停止，不进入本步骤、不登记，避免留下悬空 line。
+73:**先关闭 run line，再写报告**: 经引擎 `line-registry.py` 的 `deregister` 动作关闭 §5 登记的那条 line（`reason` 取值按引擎 `--help` 的动作表读取），报告正文 MUST 携带该 line 合成的 `line_id`（`<team-slug>-<run-id>`，即 STR-007 的值）。关闭失败 MUST NOT 被吞掉——在报告中写明关闭失败与引擎退出码，报告照常落盘。
+
+## Referenced engine actions
+- 登记: `register` (§5, fail-closed before dispatch)
+- 刷新: `update --last-event <step-label>` (§6, once per orchestration step boundary)
+- 关闭: `deregister` (§7, before the report is written; close failure stated in the report)
+
+## Mirror parity
+diff-rc=0

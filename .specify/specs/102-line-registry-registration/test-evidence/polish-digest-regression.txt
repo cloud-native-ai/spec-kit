@@ -1,0 +1,45 @@
+# Digest regression — T048 (102, 2026-11-16)
+
+The existing digest suites must keep passing and the digest engine must stay untouched
+(FR-020, SC-007). Unique entry: `scripts/bash/run-tests.sh` (parallel default).
+
+## Command and reading
+
+```bash
+$ bash scripts/bash/run-tests.sh tests/contract/test_status_digest.py \
+    tests/contract/test_status_digest_roles.py tests/unit/test_status_digest_unit.py \
+    -q --names-out .specify/specs/102-line-registry-registration/test-evidence/polish-digest-names.txt
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+........................................................................ [ 69%]
+...............................                                          [100%]
+103 passed in 2.83s
+# failed-name list written: .../polish-digest-names.txt (0 entries) passes=1
+```
+
+rc = 0; 103 passed, 0 failed, 0 skipped.
+
+## Name-level zero-new-red
+
+```bash
+$ sort test-evidence/polish-digest-names.txt > /tmp/cur.sorted
+$ sort baseline-failed.txt                     > /tmp/base.sorted
+$ comm -13 /tmp/base.sorted /tmp/cur.sorted | wc -l
+0
+```
+
+Current failed-name list is empty (0 entries), so the `comm -13` difference is 0 by construction —
+no failure name was added, rather than a count comparison.
+
+## `scripts/python/status-digest.py` is unchanged
+
+```bash
+$ git diff --stat e0ab20bdf..HEAD -- scripts/python/status-digest.py
+(no output)
+$ git diff --stat -- scripts/python/status-digest.py
+(no output)
+$ git status --porcelain -- scripts/python/status-digest.py
+(no output)
+```
+
+No committed or uncommitted change to the digest engine since the approved plan baseline
+(`e0ab20bdf`). All three commands exited 0.

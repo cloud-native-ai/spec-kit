@@ -1,0 +1,186 @@
+# Scope discipline audit — T050 (102, 2026-11-16)
+
+Executed before the package commit (T050 requires the union with the untracked list, otherwise
+every new file is invisible to `git diff`).
+
+```bash
+MB=$(git merge-base master HEAD)   # cdc79cdb52c892e8ed43145860cea2cd6ffdbfdf
+  git diff --name-only "$MB" -- <delivery pathspecs>
+  git ls-files -o --exclude-standard -- <same pathspecs>
+```
+
+Delivery pathspecs (verbatim from T050):
+
+```text
+scripts/ shared/ skills/ templates/ tests/ .claude/ .github/ .qoder/ .opencode/
+.specify/scripts/ .specify/shared/ .specify/skills/ .specify/templates/
+.specify/specs/102-line-registry-registration/ .specify/features.md
+.specify/features/088-speckit-visualization.md .specify/instructions.md
+```
+
+## Counts
+
+```text
+changeset (tracked diff ∪ untracked)          = 92
+minus the two pre-existing untracked scripts  = 90
+mapped to feature-ref's 24 declared paths     = 86 (includes every path under .specify/specs/102-.../**)
+outside the 24 declared paths                 = 4
+```
+
+## The four paths outside the declared surface
+
+```text
+.specify/scripts/bash/generate-instructions.sh
+scripts/bash/generate-instructions.sh
+tests/contract/test_superagent_definitions.py
+tests/contract/test_superagent_zero_mechanism.py
+```
+
+All four come from commit `d6b491167` (`fix(102): raise the instructions budget to 38912`), the
+U5 stall's ratified decision **D-102-01** (`.specify/register.md`, status `decided-ratified`):
+`INSTRUCTIONS_BUDGET_BYTES` 38400→38912, its generated mirror, and the two anti-restatement
+guards whose pinned literal moves with the constant. `feature-ref.md` lists
+`scripts/bash/generate-instructions.sh` under **Explicitly outside the delta**.
+
+**Verdict: the subset check FAILS as written** — 4 paths are outside the 24. There are zero
+unexplained paths: every outside path is attributable to D-102-01, and no other path in the
+changeset is unaccounted for.
+
+## Full changeset after subtracting the two pre-existing scripts (90 paths)
+
+```text
+.claude/commands/speckit.status.md
+.github/prompts/speckit.status.prompt.md
+.opencode/command/speckit.status.md
+.qoder/commands/speckit.status.md
+.specify/features.md
+.specify/features/088-speckit-visualization.md
+.specify/instructions.md
+.specify/scripts/bash/generate-instructions.sh
+.specify/scripts/bash/line-run.sh
+.specify/scripts/python/line-registration-scan.py
+.specify/shared/guidelines/reporting-obligations.md
+.specify/skills/internal/run-team/SKILL.md
+.specify/specs/102-line-registry-registration/baseline-failed.txt
+.specify/specs/102-line-registry-registration/checklists/requirement-quality-2026-11-16.md
+.specify/specs/102-line-registry-registration/checklists/requirements.md
+.specify/specs/102-line-registry-registration/contracts/line-registration-scan.contract.md
+.specify/specs/102-line-registry-registration/contracts/line-run.contract.md
+.specify/specs/102-line-registry-registration/contracts/wiring-surfaces.contract.md
+.specify/specs/102-line-registry-registration/coverage-baseline.txt
+.specify/specs/102-line-registry-registration/data-model.md
+.specify/specs/102-line-registry-registration/feature-ref.md
+.specify/specs/102-line-registry-registration/notes/pre-change-measurements.md
+.specify/specs/102-line-registry-registration/notes/quickstart-run.md
+.specify/specs/102-line-registry-registration/notes/red-first-evidence.md
+.specify/specs/102-line-registry-registration/plan.md
+.specify/specs/102-line-registry-registration/quickstart.md
+.specify/specs/102-line-registry-registration/requirements.md
+.specify/specs/102-line-registry-registration/research.md
+.specify/specs/102-line-registry-registration/tasks.md
+.specify/specs/102-line-registry-registration/test-evidence/checklist.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/clarify.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/implement-p1.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/implement-p2.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/implement-p3.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/implement-p4.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/line-registration-scan-live.txt
+.specify/specs/102-line-registry-registration/test-evidence/mirror-baseline.txt
+.specify/specs/102-line-registry-registration/test-evidence/p4-adjacent-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/p4-adjacent-full.txt
+.specify/specs/102-line-registry-registration/test-evidence/p4-budget-conflict.txt
+.specify/specs/102-line-registry-registration/test-evidence/plan-repair.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/plan-repair3.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/plan-stage-2026-11-16.md
+.specify/specs/102-line-registry-registration/test-evidence/plan.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/polish-digest-names.txt
+.specify/specs/102-line-registry-registration/test-evidence/polish-digest-regression.txt
+.specify/specs/102-line-registry-registration/test-evidence/polish-distribution.txt
+.specify/specs/102-line-registry-registration/test-evidence/requirements-stage-2026-11-16.md
+.specify/specs/102-line-registry-registration/test-evidence/requirements.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/tasks-repair.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/tasks.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/us1-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us1-mirror.txt
+.specify/specs/102-line-registry-registration/test-evidence/us1-sc-001.txt
+.specify/specs/102-line-registry-registration/test-evidence/us1-sc-003.txt
+.specify/specs/102-line-registry-registration/test-evidence/us1-sc-004.txt
+.specify/specs/102-line-registry-registration/test-evidence/us1-wrapper-green.txt
+.specify/specs/102-line-registry-registration/test-evidence/us2-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us2-mirror.txt
+.specify/specs/102-line-registry-registration/test-evidence/us2-red-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us2-scanner-green.txt
+.specify/specs/102-line-registry-registration/test-evidence/us2-teeth.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-instructions-budget-snapshot.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-instructions-refresh.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-status-surface.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-wiring-green-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-wiring-green-full.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-wiring-green.txt
+.specify/specs/102-line-registry-registration/test-evidence/us3-wiring-red-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us4-injections-full.txt
+.specify/specs/102-line-registry-registration/test-evidence/us4-run-team-locators.txt
+.specify/specs/102-line-registry-registration/test-evidence/us4-wiring-green.txt
+.specify/specs/102-line-registry-registration/test-evidence/us4-wiring-red-failed.txt
+.specify/specs/102-line-registry-registration/test-evidence/us4-wiring-red-full.txt
+.specify/specs/102-line-registry-registration/test-evidence/wiring-pre-edit-baseline.txt
+.specify/templates/instructions-template.md
+scripts/bash/generate-instructions.sh
+scripts/bash/line-run.sh
+scripts/python/line-registration-scan.py
+shared/guidelines/reporting-obligations.md
+skills/internal/run-team/SKILL.md
+templates/commands/status.md
+templates/instructions-template.md
+tests/contract/test_line_registration_scan.py
+tests/contract/test_line_registration_wiring.py
+tests/contract/test_line_run_contract.py
+tests/contract/test_superagent_definitions.py
+tests/contract/test_superagent_zero_mechanism.py
+tests/integration/test_line_registration_scan_live.py
+tests/integration/test_line_run_behavior.py
+```
+
+## Pre-existing untracked scripts (not committed, not reverted)
+
+```text
+?? .specify/scripts/line-registry.py
+?? .specify/scripts/stage-runner.sh
+```
+
+## Branch / commit state
+
+```text
+## 102-line-registry-registration
+commits on master..HEAD: 21
+commits whose subject lacks "102": 0
+upstream: none configured for this branch (`git status -sb` prints no a/b line) — nothing was pushed.
+```
+
+## Adjudication (G5) — accepted with a declared exception
+
+The literal `MUST ⊆ 24 paths` is **false as written** (4 paths out). It cannot be made true here:
+the repair is a substantive edit to the plan-owned `feature-ref.md` delivery surface, which this
+package must not self-approve (PLAN CONSTRAINT).
+
+It is nevertheless adjudicated **accepted**, because the claim's purpose — *no unexplained scope
+drift* — holds and the deviation is pre-authorized on the record:
+
+1. **Ratified decision**: the four paths all come from `d6b491167`, which lands **D-102-01**
+   (`.specify/register.md`, `decided-ratified`, user adjudication of the U5 stall). The decision is
+   the budget constant raise plus the two guards that pin its literal.
+2. **Already declared, with the same repair**: the P4 attempt-1 row in `implement-p4.jsonl` named
+   `scripts/bash/generate-instructions.sh` as an owner-of-number path and proposed *“add
+   scripts/bash/generate-instructions.sh to feature-ref.md's delivery surface (substantive
+   PLAN-EDIT)”*. The U5 adjudication chose the budget value; the plan-owned surface amendment was
+   never applied. `feature-ref.md` is therefore stale by exactly this decision, not by this package.
+3. **Zero unexplained paths**: 86 of 90 map to the 24 declared paths (including all of
+   `.specify/specs/102-…/**`); the remaining 4 are enumerated above and every one is attributable to
+   D-102-01. No other path in the changeset is unaccounted for.
+
+Disposition recorded, not silently skipped:
+
+- **T050 closed** on the audit's substance (changeset enumerated, subset mapped, orphan scripts and
+  branch state recorded), with this exception declared in the evidence.
+- **Open, non-blocking, for the driver**: a substantive `PLAN-EDIT` to `feature-ref.md` adding a
+  “D-102-01 adjudicated additions” row for the four paths. Not applied here.

@@ -1,0 +1,83 @@
+# Distribution consistency close-out — T049 (102, 2026-11-16)
+
+Four readings (SC-006). Unique entry for the mirror/copy generators is the Python engines
+themselves; no test suite is involved here.
+
+## 1. `sync-mirrors.py --check` — baseline-only drift
+
+```bash
+$ python3 scripts/python/sync-mirrors.py --check
+```
+
+Selected lines (full ordering preserved from the run):
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+DIFF .specify/skills/coaching-skills/SKILL.md
+DIFF .specify/skills/coaching-skills/data-model.md
+DIFF .specify/skills/coaching-skills/references/prompt-templates.md
+DIFF .specify/skills/create-skills/SKILL.md
+DIFF .specify/skills/sdd-loop-driver/references/cli/qodercli.md
+ok    skills/internal/ == .specify/skills/internal/ (138 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (131 files, byte-identical)
+ORPHAN .specify/scripts/line-registry.py (no canonical scripts/ source)
+ORPHAN .specify/scripts/stage-runner.sh (no canonical scripts/ source)
+ok    shared/ == .specify/shared/ (114 files, byte-identical)
+```
+
+rc = 2 — **the pre-existing baseline only**: 5 `DIFF` (3 coaching-skills, 1 create-skills,
+1 sdd-loop-driver) + 2 `ORPHAN` (the two pre-existing untracked scripts). Exactly the
+`mirror-baseline.txt` set. This feature's four mirror pairs are all `ok` and byte-identical:
+
+| Pair | Reading |
+|------|---------|
+| `scripts/ == .specify/scripts/` | ok, 131 files |
+| `shared/ == .specify/shared/` | ok, 114 files |
+| `skills/internal/ == .specify/skills/internal/` | ok, 138 files |
+| `templates/ == .specify/templates/` | ok, 23 files |
+
+## 2. `regen-command-copies.py --check`
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+rc = 0. The four `speckit.status` copies match their template.
+
+## 3. `flow-class-check.py --action check`
+
+```text
+flow-class check: 91 unit(s) scanned, 0 finding(s) [matched=91 inventory_units=91, clean]
+coverage: ledger_rows=91 matched=91 inventory_units=91 gaps=0 parse_errors=0 floor=39
+```
+
+rc = 0; 91 units, 0 findings (same count as the T001 baseline).
+
+## 4. `doc-consistency-check.py` — **not-evaluated** (distribution lane)
+
+Not a distribution checker: it inspects document form (reader / evidence / duplicate / count
+faces), not source↔mirror↔copy parity, so it cannot contribute a distribution reading. It is
+recorded as `not-evaluated` for the distribution lane, **not** as a pass.
+
+The command was nevertheless run once on the owner document, and its reading is recorded
+verbatim rather than suppressed:
+
+```bash
+$ python3 scripts/python/doc-consistency-check.py --action verify \
+    --path shared/guidelines/reporting-obligations.md \
+    --owner-path shared/guidelines/reporting-obligations.md
+doc-consistency-check: verify
+faces: reader=fail evidence=pass duplicate=pass count=not-evaluated
+count: not-run — no --spec-dir; the count face needs a spec dir to delegate
+shared/guidelines/reporting-obligations.md:1: reader-declaration-missing: ...
+findings: 1
+```
+
+rc = 1. The single finding is a **pre-existing repo-wide gap**: the owner document carried no
+`Readers` / `Reading scenario` declaration at the approved baseline `e0ab20bdf` either
+(`git show e0ab20bdf:shared/guidelines/reporting-obligations.md | head -40 | grep -c "Readers\|Reading scenario"` → `0`,
+identical today), and only 1 of the 27 `shared/guidelines/*.md` files carries one. Repairing it
+would be an out-of-scope change to a surface this feature only appends to (FR-023); it is
+disclosed here for the reviewer instead of being silently cleaned up or counted as green.

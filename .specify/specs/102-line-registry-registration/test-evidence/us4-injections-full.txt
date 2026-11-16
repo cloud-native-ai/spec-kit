@@ -1,0 +1,44 @@
+## Baseline: all green before injections
+...............                                                          [100%]
+15 passed in 1.97s
+baseline-rc=0
+===== INJECTION I1-§5-register — removed line containing: **Run line 登记（任何席位派发之前）**
+FAILED tests/contract/test_line_registration_wiring.py::test_c10_section_5_fails_closed_before_dispatching_any_seat
+FAILED tests/contract/test_line_registration_wiring.py::test_c10_section_5_registers_the_line_at_both_engine_candidates
+2 failed, 13 passed in 2.03s
+inject-run-rc=1
+restore-sha256: before=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 after=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 identical=yes
+===== INJECTION I2-§6-update — removed line containing: - **Run line 刷新（每步边界一次）**
+FAILED tests/contract/test_line_registration_wiring.py::test_c11_section_6_refreshes_at_each_step_boundary_with_no_second_channel
+1 failed, 14 passed in 1.96s
+inject-run-rc=1
+restore-sha256: before=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 after=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 identical=yes
+===== INJECTION I3-§7-close — removed line containing: **先关闭 run line，再写报告**
+FAILED tests/contract/test_line_registration_wiring.py::test_c12_section_7_closes_before_the_report_and_carries_the_line_id
+1 failed, 14 passed in 2.01s
+inject-run-rc=1
+restore-sha256: before=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 after=82f2edfdd534455e2a49a3bfcfc7fcab151fbe535c4a06129512fb7c0bfced49 identical=yes
+===== INJECTION I4-status-sentence — removed line containing: **Single source**: line visibility comes solely
+FAILED tests/contract/test_line_registration_wiring.py::test_c05_the_status_template_carries_the_single_source_sentence_verbatim
+FAILED tests/contract/test_line_registration_wiring.py::test_c06_the_status_template_keeps_its_action_set_and_adds_no_second_surface
+2 failed, 13 passed in 1.99s
+inject-run-rc=1
+restore-sha256: before=8dbda3b40ec29b50afd6b8cdac7a26ca5a900d2002fb82f776d80e0aaab6b091 after=8dbda3b40ec29b50afd6b8cdac7a26ca5a900d2002fb82f776d80e0aaab6b091 identical=yes
+===== INJECTION I5-ambient-bullet — removed line containing: - **Long tasks must register a line (长任务须登记)**
+FAILED tests/contract/test_line_registration_wiring.py::test_c07_the_template_has_exactly_one_pointer_bullet_after_exemptions
+1 failed, 14 passed in 1.99s
+inject-run-rc=1
+restore-sha256: before=daf8a45f33d1d8ccacb784883dec90fb911b4e63a097a9835e6cc4ccdf006f40 after=daf8a45f33d1d8ccacb784883dec90fb911b4e63a097a9835e6cc4ccdf006f40 identical=yes
+===== RESTORE VERIFICATION
+-- git diff (touched committed surfaces) --
+git-diff-rc=0
+-- command copies --
+copies-diff-rc=0
+-- skill mirror parity --
+skill-mirror-diff-rc=0
+-- template mirror parity --
+template-mirror-diff-rc=0
+-- final green --
+...............                                                          [100%]
+15 passed in 1.96s
+final-rc=0
