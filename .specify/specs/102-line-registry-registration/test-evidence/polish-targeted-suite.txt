@@ -1,0 +1,59 @@
+# Closing targeted suite — T056 (102, 2026-11-16)
+
+One invocation through the unique entry `scripts/bash/run-tests.sh` (parallel default), covering
+this feature's five new test files plus the three pre-existing digest guards.
+
+## Command
+
+```bash
+$ bash scripts/bash/run-tests.sh \
+    tests/contract/test_line_run_contract.py \
+    tests/contract/test_line_registration_scan.py \
+    tests/contract/test_line_registration_wiring.py \
+    tests/integration/test_line_run_behavior.py \
+    tests/integration/test_line_registration_scan_live.py \
+    tests/contract/test_status_digest.py \
+    tests/contract/test_status_digest_roles.py \
+    tests/unit/test_status_digest_unit.py \
+    -q --names-out .specify/specs/102-line-registry-registration/final-failed.txt
+```
+
+## Reading
+
+```text
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" <the eight files> -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 47%]
+........................................................................ [ 94%]
+.........                                                                [100%]
+153 passed in 5.49s
+# failed-name list written: .specify/specs/102-line-registry-registration/final-failed.txt (0 entries) passes=1
+```
+
+| Quantity | Value |
+|----------|-------|
+| rc | 0 |
+| passed | 153 |
+| failed | 0 |
+| skipped | 0 |
+| pytest duration | 5.49 s |
+| `--names-out` entries | 0 (empty file) |
+
+Composition: 18 (US1 wrapper contract + behaviour) + 17 (US2 scanner contract + live) +
+15 (wiring contract) + 103 (the three existing digest suites) = 153.
+
+## Name-level zero-new-failure against the implement baseline
+
+```bash
+$ wc -l < .specify/specs/102-line-registry-registration/baseline-failed.txt
+241
+$ LC_ALL=C comm -13 <(sort baseline-failed.txt) <(sort final-failed.txt) | wc -l
+0
+```
+
+`final-failed.txt` is empty, so the difference set is 0 by construction: this run added no
+failure name. The 241-name baseline (driver's single full-suite slot) is unchanged and was not
+re-run — this targeted reading is the package's E3 record (`test-evidence/implement-p6.jsonl`).

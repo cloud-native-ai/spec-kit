@@ -1,0 +1,71 @@
+# Commit record — T057 (102, 2026-11-16)
+
+Explicit-path `git add` only; no `git add -A`. The framework sources, mirrors, generated
+copies and the five test files landed in packages 1–5 (`3bbe083a9` … `a026be9ff`); this commit
+carries the remaining spec-directory products and the Feature registry surfaces.
+
+## Explicit paths staged
+
+```text
+.specify/features.md
+.specify/features/088-speckit-visualization.md
+.specify/specs/102-line-registry-registration/tasks.md
+.specify/specs/102-line-registry-registration/verification.md
+.specify/specs/102-line-registry-registration/final-failed.txt
+.specify/specs/102-line-registry-registration/notes/red-first-evidence.md
+.specify/specs/102-line-registry-registration/test-evidence/implement-p6.jsonl
+.specify/specs/102-line-registry-registration/test-evidence/polish-commit.txt
+.specify/specs/102-line-registry-registration/test-evidence/polish-gates.txt
+.specify/specs/102-line-registry-registration/test-evidence/polish-targeted-suite.txt
+.specify/specs/102-line-registry-registration/test-evidence/polish-zero-machinery.txt
+.specify/specs/102-line-registry-registration/test-evidence/sc008-recitation-2026-11-16.txt
+.specify/specs/102-line-registry-registration/test-evidence/line-registration-scan-live.txt
+```
+
+## Deliberately excluded
+
+```text
+.specify/memory/**                     # runtime records (feedback / session / exec-quant); never committed
+.specify/scripts/line-registry.py      # pre-existing untracked; neither committed nor reverted
+.specify/scripts/stage-runner.sh       # pre-existing untracked; neither committed nor reverted
+.specify/state/**                      # git-ignored runtime state
+.specify/.tmp/**                       # git-ignored scratch
+```
+
+## Pre-commit reading (delivery pathspec only)
+
+```bash
+$ git status --porcelain -- .specify/features.md \
+    .specify/features/088-speckit-visualization.md \
+    .specify/specs/102-line-registry-registration
+ M .specify/features.md
+ M .specify/features/088-speckit-visualization.md
+ M .specify/specs/102-line-registry-registration/notes/red-first-evidence.md
+ M .specify/specs/102-line-registry-registration/tasks.md
+ M .specify/specs/102-line-registry-registration/test-evidence/line-registration-scan-live.txt
+?? .specify/specs/102-line-registry-registration/final-failed.txt
+?? .specify/specs/102-line-registry-registration/verification.md
+?? .specify/specs/102-line-registry-registration/test-evidence/implement-p6.jsonl
+?? .specify/specs/102-line-registry-registration/test-evidence/polish-gates.txt
+?? .specify/specs/102-line-registry-registration/test-evidence/polish-targeted-suite.txt
+?? .specify/specs/102-line-registry-registration/test-evidence/polish-zero-machinery.txt
+?? .specify/specs/102-line-registry-registration/test-evidence/sc008-recitation-2026-11-16.txt
+```
+
+(The `polish-commit.txt` entry appears in the staged set after this file is written; it is the
+thirteenth path above.)
+
+## Commit message (single line, `templates/commit-template.md` form)
+
+```text
+feat(102-line-registry-registration): close the implement stage with verification and gates (T051-T057)
+```
+
+## Post-commit checks (recorded here as the intended checks)
+
+- `git status --porcelain` shows only the pre-existing untracked scripts and the
+  `.specify/memory/**` runtime records — no feature artifact left uncommitted.
+- `git log master..HEAD --oneline` contains this feature's commits only; nothing was pushed
+  (the branch declares no upstream).
+- The resulting commit sha is reported in the package return payload and the state spine; this
+  file is frozen **before** the commit so the committed tree stays clean.

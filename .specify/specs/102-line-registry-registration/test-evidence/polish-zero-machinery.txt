@@ -1,0 +1,149 @@
+# Zero-new-machinery audit — T051 (102, 2026-11-16)
+
+Static audit of the two authored runtime files, the dependency manifest and the test imports.
+No test suite is involved: FR-022 is a claim about what the delivery does **not** contain, and
+the reading is a grep over the authored text plus a diff of the manifest.
+
+Baseline for the diff: `git merge-base master HEAD` = `cdc79cdb52c892e8ed43145860cea2cd6ffdbfdf`.
+
+## 1. Dependency manifest
+
+```bash
+$ git diff --name-only "$(git merge-base master HEAD)" -- pyproject.toml
+(no output)
+$ git status --porcelain -- pyproject.toml
+(no output)
+$ git diff "$(git merge-base master HEAD)" -- pyproject.toml | wc -l
+0
+```
+
+`pyproject.toml` is untouched by this feature: zero declared dependencies added, removed or
+re-pinned.
+
+## 2. Third-party imports
+
+Scanner:
+
+```bash
+$ grep -n "^import \|^from " scripts/python/line-registration-scan.py
+14:from __future__ import annotations
+16:import os
+17:import sys
+```
+
+Standard library only (`os`, `sys`, plus `__future__`).
+
+Wrapper: no language imports; it executes only `git rev-parse --show-toplevel` and `python3
+<engine>`:
+
+```bash
+$ grep -nE "^(command |exec )|python3 |git " scripts/bash/line-run.sh
+85:project_root="$(git rev-parse --show-toplevel 2>/dev/null)" || project_root=""
+122:register_payload="$(python3 "$engine" --action register \
+147:close_payload="$(python3 "$engine" --action deregister \
+```
+
+The five test files import only `pytest` (existing dev dependency) plus the standard library
+(`os`, `sys`, `re`, `json`, `shlex`, `signal`, `subprocess`, `time`, `hashlib`, `uuid`,
+`datetime`, `importlib.util`, `pathlib`, `shutil`).
+
+```bash
+$ grep -hnE "^(import|from) " tests/contract/test_line_run_contract.py \
+    tests/contract/test_line_registration_scan.py \
+    tests/contract/test_line_registration_wiring.py \
+    tests/integration/test_line_run_behavior.py \
+    tests/integration/test_line_registration_scan_live.py | sort -u
+# → __future__ / datetime / hashlib / importlib.util / json / os / pathlib / re / shlex /
+#   shutil / signal / subprocess / sys / time / uuid / pytest
+```
+
+## 3. No scheduler, timer, daemon or heartbeat file
+
+```bash
+$ grep -nE "cron|systemd|launchd|schedule|timer|daemon|nohup|setsid|while true|at -|heartbeat|pid-" \
+    scripts/bash/line-run.sh scripts/python/line-registration-scan.py
+scripts/bash/line-run.sh:10:# itself, keeps no heartbeat file and installs no signal trap: it emits exactly two engine
+```
+
+The single hit is the comment that states the absence. Confirmed structurally:
+
+```bash
+$ grep -nE "trap | &$|sleep |watch |retry" scripts/bash/line-run.sh
+(no output; rc 1)
+```
+
+No signal trap, no background job, no sleep, no watch/retry loop. The wrapper is a straight
+line: register → run the child in the foreground → close.
+
+## 4. One registry, one state spine, no ledger
+
+```bash
+$ grep -nE "registry|journal|state-spine|ledger" scripts/bash/line-run.sh \
+    scripts/python/line-registration-scan.py
+line-run.sh:5      # contract path (documentation reference)
+line-run.sh:9      # "Registry writes go only through the engine line-registry.py"
+line-run.sh:38     # --help effects string
+line-run.sh:104-105# the two declared engine candidates (skills/external/…, .specify/skills/…)
+line-run.sh:112    # error text naming the tried candidates
+scanner:9          # contract path (documentation reference)
+scanner:26-28      # COMPLIANT_INVOCATIONS members ("line-registry.py", register/update/deregister)
+```
+
+Every hit is either a doc path, the existing engine's two declared candidates, or the
+criterion constant that names the engine's compliant invocations. No second registry path, no
+journal writer, no ledger.
+
+```bash
+$ grep -c "\.specify/state" scripts/bash/line-run.sh scripts/python/line-registration-scan.py
+scripts/bash/line-run.sh:0
+scripts/python/line-registration-scan.py:0
+```
+
+Neither file reads or writes the human state spine (`.specify/state/`). The wrapper has
+exactly two engine events:
+
+```bash
+$ grep -n "action register\|action deregister\|action update" scripts/bash/line-run.sh
+122:register_payload="$(python3 "$engine" --action register \
+147:close_payload="$(python3 "$engine" --action deregister \
+```
+
+No `--action update`, no third call.
+
+## 5. No store of its own
+
+```bash
+$ grep -nE "open\(.*w|>\s*\"|>>|write\(|mkdir|makedirs|touch" scripts/bash/line-run.sh \
+    scripts/python/line-registration-scan.py
+scanner:191  sys.stderr.write(...)   # input-error diagnostic
+scanner:198  sys.stdout.write(USAGE) # help text
+scanner:243  sys.stdout.write(...)   # the reading itself
+```
+
+The only `write(` hits are stdout/stderr on the scanner; the wrapper writes no file. Neither
+file creates a directory or a heartbeat/lease artifact. (The registry entry is written by the
+existing engine, not by either new file.)
+
+## 6. Scripts touched by this feature
+
+```bash
+$ git diff --name-only "$(git merge-base master HEAD)" -- scripts/
+scripts/bash/generate-instructions.sh      # D-102-01 budget 38400→38912 (ratified U5 decision)
+scripts/bash/line-run.sh                   # the wrapper
+scripts/python/line-registration-scan.py   # the scanner
+```
+
+`generate-instructions.sh` is the ratified D-102-01 constant change, not a new mechanism: no
+new script, executable, service unit or timer is introduced anywhere in the delivery.
+
+## Verdict
+
+- scheduler / timer / cron / systemd / launchd: **absent** (grep rc 1 on the pattern set)
+- daemon / background job / watchdog: **absent**
+- heartbeat or pid file written by the delivery: **absent**
+- second registry / second state spine / ledger: **absent** (0 `.specify/state` references;
+  all registry access is the existing engine's `register` + `deregister`)
+- third-party dependency added: **zero** (`pyproject.toml` diff 0 lines; scanner stdlib-only;
+  tests use the existing `pytest` dev dependency)
+
+Verdict: `pass` for FR-022.

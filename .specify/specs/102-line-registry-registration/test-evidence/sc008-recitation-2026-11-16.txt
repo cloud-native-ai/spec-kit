@@ -1,0 +1,58 @@
+# SC-008 — knowledge reachability and recitation (102, 2026-11-16)
+
+Two limbs: (1) every surface is locatable by path; (2) an independent reader who did not take
+part in this feature answers two questions correctly.
+
+## 1. Path locators (recorded 2026-11-16)
+
+```bash
+$ grep -n "line-run.sh\|nothing-running\|未登记" shared/guidelines/reporting-obligations.md
+143:- 存在一个**显式的「无人在跑」状态** `nothing-running`: ...
+165:- **载体**: ... `scripts/bash/line-run.sh`(register → 执行 → 按结果 close; ...)
+166:- **未登记即不可见**: digest 的 line 可见性唯一来源是 registry; ... 绝不发现未登记进程 ...
+
+$ grep -n "Single source" templates/commands/status.md
+52:**Single source**: line visibility comes solely from the Line Registry — ...
+
+$ grep -n "Long tasks must register" templates/instructions-template.md .specify/instructions.md
+templates/instructions-template.md:152:- **Long tasks must register a line (长任务须登记)**: ...
+.specify/instructions.md:166:- **Long tasks must register a line (长任务须登记)**: ...
+
+$ grep -n "line-registry.py\|deregister\|last-event\|line_id" skills/internal/run-team/SKILL.md
+50: §5 **Run line 登记（任何席位派发之前）** — register / fail-closed / no dangling line
+68: §6 **Run line 刷新（每步边界一次）** — `update --last-event`
+73: §7 **先关闭 run line，再写报告** — `deregister`, report carries the composed `line_id`
+```
+
+All five surfaces resolve by path. The owner owns the criterion; the other four are pointers.
+
+## 2. Recitation check (fresh-context reader)
+
+Method: one read-only subagent (Explore) that had no part in this feature was given only the
+five paths above and asked two questions. It was not told the expected answers, and it was
+instructed to answer only from those files.
+
+Question A — *why does a long-running task that never registers a line keep showing
+`nothing-running` while it is actually running?* Reader's sentence:
+
+> Because line visibility in `/speckit.status` comes solely from the Line Registry — the
+> digest's liveness probe only checks PIDs already recorded on a registry entry and never
+> discovers an unregistered process — so a run that never registers is absent from the digest,
+> and `nothing-running` is an accurate statement that no live line exists in the registry, not a
+> missed report.
+
+Question B — *what must a batch script's operator do so that the running batch script becomes
+visible in that digest?* Reader's sentence:
+
+> The operator must wrap the batch script with `scripts/bash/line-run.sh` (register → execute →
+> close by result), which registers a line in the registry at start, so the registered entry —
+> not process scanning — makes the run visible.
+
+The reader also located every surface (owner § 九/§ 9.2, status template line 52, template
+bullet, live bullet, run-team §5/§6/§7) with no surface reported as "none found".
+
+Judgement (baseline reader per `shared/guidelines/user-facing-comprehension.md`): both
+sentences are correct — neither claims the digest scans processes, and both name the carrier
+plus the registry as the sole visibility source.
+
+Verdict: SC-008 `pass`.

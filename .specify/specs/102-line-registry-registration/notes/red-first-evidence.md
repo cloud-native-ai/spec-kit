@@ -318,3 +318,38 @@ engine status: the double-failure leg now asserts `engine exit 6` is visible, an
 close-failure-with-child-0 leg asserts the wrapper's status equals `6` (observed: engine
 `EXIT_IO`). Both changes only add assertions; the red legs above still fail on them for the
 same missing-wrapper cause.
+
+## T055 — completeness cross-check (2026-11-16)
+
+Every red point is checked for the three pieces FR-021 requires — a command, its real output
+and an exit code — and for the post-implementation green reading that closes it. Nothing below
+is a "the suite is green today" substitute: each row names the file that carries the reading.
+
+| Red point | Command (unique entry) | Red reading | Green reading |
+|-----------|------------------------|-------------|---------------|
+| R-1 (contract, 10 nodes) | `run-tests.sh tests/contract/test_line_run_contract.py -q` | 10 failed, rc 1 (R-1 block) | `us1-wrapper-green.txt`: 18 passed, rc 0 — its 10 contract nodes are exactly R-1's set |
+| R-2 (behaviour, 8 nodes) | `run-tests.sh tests/integration/test_line_run_behavior.py -q` | 8 failed, rc 1 (R-2 block) | `us1-wrapper-green.txt`: 18 passed, rc 0 — its 8 integration nodes are exactly R-2's set |
+| R-3 (failure-close injection) | one node through `run-tests.sh` after flipping `close_reason="failed"` | 1 failed, rc 1 (`'completed' == 'failed'`) | same node after byte-exact restore: 1 passed, rc 0 (R-3 § 5) |
+| R-4 (scanner, 17 nodes) | `run-tests.sh <scan contract> <scan live> -q --names-out us2-red-failed.txt` | 17 failed, rc 1 | `us2-scanner-green.txt`: 17 passed, rc 0; its failed-name list is empty, so every R-4 name passed |
+| R-5 (wiring segment 1, 7 nodes) | `run-tests.sh tests/contract/test_line_registration_wiring.py -q --names-out us3-wiring-red-failed.txt` | 7 failed / 2 passed, rc 1 | `us3-wiring-green.txt`: 9 passed, rc 0 — the 7 red nodes plus the 2 vacuous negative guards |
+| R-6 (wiring segment 2, 4 nodes) | same file after segment 2 was appended, `--names-out us4-wiring-red-failed.txt` | 4 failed / 11 passed, rc 1 | `us4-wiring-green.txt`: 15 passed, rc 0 (segment 1 + segment 2) |
+
+Mechanical name check (`python3` over the two `--names-out` files and the current test
+sources, 2026-11-16):
+
+```text
+red name files checked: 3
+missing (renamed/deleted) node names: 0
+```
+
+Every node that was red still exists under the same name in the current suite, so a zero-failure
+reading on those files is a statement about the same nodes — no red name was quietly renamed,
+deleted or skipped out of the set. R-1/R-2's node names are listed in the R-1/R-2 blocks above
+and were confirmed present by direct `grep` of the two test files.
+
+The final targeted reading that re-runs all five files in one invocation is T056
+(`test-evidence/polish-targeted-suite.txt`); it is a closing reading, not a replacement for the
+per-red-point evidence above.
+
+Gap found by this review: none — all six red points carry a command, output, exit code and a
+green counterpart.

@@ -1,0 +1,66 @@
+# Closing gates — T054 (102, 2026-11-16)
+
+Three gates exactly as the task row spells them, plus the closure verdict the Pre-Status-Flip
+Gate calls. Each row records the exit code and the raw output's first line; nothing was
+rewritten to make a reading fit.
+
+## Gate 1 — `validate-tasks.py`
+
+```bash
+$ python3 .specify/scripts/python/validate-tasks.py \
+    .specify/specs/102-line-registry-registration/tasks.md
+PASS: .specify/specs/102-line-registry-registration/tasks.md — 0 error(s), 0 warning(s)
+```
+
+`rc = 0`; expected rc 0 — **pass**.
+
+## Gate 2 — `pre-analyze-check.py --stage tasks`
+
+```bash
+$ python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/102-line-registry-registration \
+    --stage tasks --repo /cws_data/cloud-native-ai/spec-kit
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=5 waived=0
+```
+
+`rc = 0`; expected `decision=pass` with `errors=0` — **pass**.
+
+The five advisories are the same missing-path class recorded at the tasks stage (candidate fact
+path, `.specify/teams/.work/`, the retired `.specify/templates/commands/`, and the git-ignored
+fixture registry); none is an error. Summary: `fr=23 sc=9 tasks=57 files=12`.
+
+## Gate 3 — `decomposition-check.py --mode tasks`
+
+```bash
+$ python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+    --requirements .specify/specs/102-line-registry-registration/requirements.md \
+    --tasks .specify/specs/102-line-registry-registration/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 23, "task_count": 57, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-16T11:35:45Z"}
+```
+
+`rc = 0`; the JSON carries `"decision": "proceed"` — **pass** (measured `fr_count=23`,
+`task_count=57`, exactly the values the task row records).
+
+## Closure verdict — `closure-acceptance-check.py`
+
+Called by the Pre-Status-Flip Gate (read-only; no `--json-out`, so nothing was written):
+
+```bash
+$ python3 scripts/python/closure-acceptance-check.py \
+    --spec-dir .specify/specs/102-line-registry-registration \
+    --repo /cws_data/cloud-native-ai/spec-kit
+verdict: accept
+spec_dir: /cws_data/cloud-native-ai/spec-kit/.specify/specs/102-line-registry-registration
+flow_class: execution
+claimed_status: Planned
+final_path: pass=3 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=3
+reason: none
+```
+
+`rc = 0`; verdict `accept`, `final_path` 3/3 pass (SC-001, SC-002, SC-003). `SC-009` is
+`partial` on the supporting path, so it does not enter the final-path count and the partial row
+carries all five ladder fields (`verification.md`).
+
+## Verdict
+
+Three gates **pass** as written; the closure verdict is **accept**. No criterion was rewritten.
