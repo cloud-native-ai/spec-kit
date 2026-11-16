@@ -118,6 +118,29 @@ Additional 1.1.76 observations:
 | liveness signal | `~/.qoder/logs/latest` can lag behind the live run; judge liveness by `kill -0 <pid>` plus child processes, not by log mtime alone | 2026-10-22 implement stage: log mtime 36 min stale while jest children were active |
 | permission mode | `--permission-mode auto` is mandatory for SDD stages; `accept_edits` denies git/build commands | 2026-10-22 UI requirements run: 6 git commands denied under the default mode |
 
+### 1.1.87 observation — shell-inherited `QODER_CONFIG_DIR` (2026-11-11)
+
+In the Qoder Desktop app on macOS, the tool shell inherits the **desktop** config
+root (`QODER_CONFIG_DIR=/Users/<user>/.qoder`), which holds desktop auth and not
+the CLI credential store. A headless probe started from that shell fails with
+`NonInteractiveAuthRequiredError: Not logged in · Please run /login` even though
+the machine is logged in. The interactive qodercli sessions launched by the app
+run with `QODER_IDE=1` and `QODER_CONFIG_DIR=/Users/<user>/.qoder-cli`.
+
+Required action (in addition to the four unset variables): pass the CLI root
+explicitly — `QODER_CONFIG_DIR=<home>/.qoder-cli`. Verified 2026-11-11:
+desktop root → auth error; CLI root → `PROBE-OK`.
+
+```bash
+env -u QODER_AGENT_SDK_ENTRYPOINT -u QODER_AGENT_SDK_VERSION \
+    -u QODER_SDK_AUTH_PAYLOAD_FILE -u QODER_SDK_CUSTOM_BASE_URL_BYOK \
+    QODER_CONFIG_DIR="$HOME/.qoder-cli" \
+  qodercli -w <project> --permission-mode auto -p
+```
+
+Do **not** conclude "CLI not logged in" from a failure under the desktop root;
+check `ps eww` of a running qodercli first.
+
 ## Defects
 
 | id | status | fixed_in | evidence |

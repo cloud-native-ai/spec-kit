@@ -1,0 +1,3108 @@
+{
+  "projectProfile": {
+    "schemaVersion": 1,
+    "kind": "project-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "projectInfo": {
+      "name": "🌱 Spec Kit",
+      "description": "",
+      "readmeTitle": "🌱 Spec Kit",
+      "evidence": [
+        "README.md:h1"
+      ],
+      "primaryLanguages": [
+        {
+          "language": "python",
+          "sourceFiles": 247,
+          "testFiles": 584
+        },
+        {
+          "language": "javascript",
+          "sourceFiles": 150,
+          "testFiles": 14
+        },
+        {
+          "language": "typescript",
+          "sourceFiles": 0,
+          "testFiles": 1
+        }
+      ],
+      "frameworks": [],
+      "sourceFiles": 397,
+      "testFiles": 599,
+      "measuredSourceLines": null,
+      "sourceLineStatus": "skipped",
+      "sourceLineMethod": "not measured by default; use --measure-source-lines to count tracked readable primary source files only",
+      "sourceRoots": [
+        {
+          "path": ".specify",
+          "files": 197
+        },
+        {
+          "path": "scripts",
+          "files": 115
+        },
+        {
+          "path": "skills",
+          "files": 82
+        },
+        {
+          "path": "src",
+          "files": 3
+        }
+      ],
+      "entryCandidates": [
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+          "language": "javascript",
+          "score": 65
+        }
+      ],
+      "manifests": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "kind": "python",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "build",
+            "start"
+          ]
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "start"
+          ]
+        },
+        {
+          "path": "pyproject.toml",
+          "kind": "toml",
+          "scripts": []
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "kind": "python",
+          "scripts": []
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "build",
+            "start"
+          ]
+        }
+      ]
+    },
+    "agentInstructions": {
+      "count": 1,
+      "rootCount": 1,
+      "nestedCount": 0,
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "scope": "."
+        }
+      ],
+      "status": "thin",
+      "suggestedMinimum": 2,
+      "suggestedAdditional": 1,
+      "sourceFilesPerInstruction": 397,
+      "sourceFilesUnderNestedInstructions": 0,
+      "nestedSourceFileCoveragePercent": 0,
+      "suggestedScopes": [
+        {
+          "path": ".specify/scripts",
+          "sourceFiles": 115
+        },
+        {
+          "path": ".specify/skills",
+          "sourceFiles": 82
+        },
+        {
+          "path": "skills/external",
+          "sourceFiles": 69
+        },
+        {
+          "path": "scripts/js",
+          "sourceFiles": 66
+        },
+        {
+          "path": "scripts/python",
+          "sourceFiles": 49
+        },
+        {
+          "path": "skills/internal",
+          "sourceFiles": 13
+        },
+        {
+          "path": "src/specify_cli",
+          "sourceFiles": 2
+        },
+        {
+          "path": "src",
+          "sourceFiles": 1
+        }
+      ],
+      "reasons": [
+        "root AGENTS.md present",
+        "AGENTS.md count 1 is below suggested minimum 2 for source scale",
+        "large source tree has no nested AGENTS.md coverage"
+      ]
+    },
+    "languages": [
+      {
+        "language": "python",
+        "files": 831,
+        "sourceFiles": 247,
+        "testFiles": 584,
+        "roots": [
+          {
+            "name": "tests/contract",
+            "count": 370
+          },
+          {
+            "name": "tests/integration",
+            "count": 95
+          },
+          {
+            "name": ".specify/skills",
+            "count": 73
+          },
+          {
+            "name": "tests/unit",
+            "count": 71
+          },
+          {
+            "name": "skills/external",
+            "count": 60
+          },
+          {
+            "name": ".specify/scripts",
+            "count": 49
+          },
+          {
+            "name": "scripts/python",
+            "count": 49
+          },
+          {
+            "name": "tests/fixtures",
+            "count": 40
+          }
+        ]
+      },
+      {
+        "language": "javascript",
+        "files": 164,
+        "sourceFiles": 150,
+        "testFiles": 14,
+        "roots": [
+          {
+            "name": ".specify/scripts",
+            "count": 66
+          },
+          {
+            "name": "scripts/js",
+            "count": 66
+          },
+          {
+            "name": "tests/js",
+            "count": 14
+          },
+          {
+            "name": ".specify/skills",
+            "count": 9
+          },
+          {
+            "name": "skills/external",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "language": "typescript",
+        "files": 1,
+        "sourceFiles": 0,
+        "testFiles": 1,
+        "roots": [
+          {
+            "name": "tests/fixtures",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "manifests": [
+      {
+        "path": ".specify/scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "build",
+          "start"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      },
+      {
+        "path": "pyproject.toml",
+        "kind": "toml",
+        "scripts": []
+      },
+      {
+        "path": "scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": "skills/external/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "build",
+          "start"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "sourceRoots": [
+      {
+        "path": ".specify",
+        "files": 197
+      },
+      {
+        "path": "scripts",
+        "files": 115
+      },
+      {
+        "path": "skills",
+        "files": 82
+      },
+      {
+        "path": "src",
+        "files": 3
+      }
+    ],
+    "entryCandidates": [
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/server.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/server.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      }
+    ],
+    "corePathHints": [],
+    "totals": {
+      "trackedFiles": 10167,
+      "trackedFilesBeforeFilters": 10167,
+      "sourceFiles": 397,
+      "testFiles": 599,
+      "generatedOrDependencyFiles": 58,
+      "sourceLines": null,
+      "sourceLineMeasurement": "skipped",
+      "readableSourceFiles": 0,
+      "unreadableSourceFiles": 0
+    }
+  },
+  "gitHistoryProfile": {
+    "schemaVersion": 1,
+    "kind": "git-history-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "range": {
+      "maxCommits": 500,
+      "analyzedCommits": 500,
+      "newest": "4fc05a5",
+      "oldest": "29c3aa0"
+    },
+    "confidence": {
+      "confidence": "low",
+      "reasons": [
+        "history span is only 4 days",
+        "bounded at maxCommits=500"
+      ]
+    },
+    "historyWindows": [
+      {
+        "days": 30,
+        "since": "2026-10-14T16:15:05.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "recent-hotspots",
+        "interpretation": "recent window for spotting recent hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": ".specify/scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": "scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": ".specify/scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 11,
+            "added": 2215,
+            "deleted": 184,
+            "churn": 2399,
+            "lastTouched": "dae8a94"
+          },
+          {
+            "path": "scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 3577,
+            "deleted": 217,
+            "churn": 3794,
+            "lastTouched": "a8965b0"
+          },
+          {
+            "path": "scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 1597,
+            "deleted": 46,
+            "churn": 1643,
+            "lastTouched": "27ef043"
+          },
+          {
+            "path": ".specify/scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 4045,
+            "deleted": 215,
+            "churn": 4260,
+            "lastTouched": "866fe91"
+          },
+          {
+            "path": ".specify/scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1592,
+            "deleted": 41,
+            "churn": 1633,
+            "lastTouched": "aac8834"
+          },
+          {
+            "path": ".specify/scripts/python/validate-tasks.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 78,
+            "deleted": 16,
+            "churn": 94,
+            "lastTouched": "aac8834"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 33,
+            "added": 210,
+            "deleted": 79,
+            "churn": 289,
+            "lastTouched": "8b90303"
+          },
+          {
+            "path": ".specify/specs/098-suite-speed-optimizations/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 508,
+            "deleted": 101,
+            "churn": 609,
+            "lastTouched": "1990e4e"
+          },
+          {
+            "path": ".specify/state/094-goal-team-parallel.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 46,
+            "deleted": 112,
+            "churn": 158,
+            "lastTouched": "29c3aa0"
+          },
+          {
+            "path": ".specify/specs/099-speckit-seal/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 14,
+            "added": 457,
+            "deleted": 83,
+            "churn": 540,
+            "lastTouched": "4f1ef12"
+          },
+          {
+            "path": ".specify/specs/096-sdd-observer-agent/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 503,
+            "deleted": 103,
+            "churn": 606,
+            "lastTouched": "492353d"
+          },
+          {
+            "path": ".specify/specs/097-speckit-migrate-command/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 452,
+            "deleted": 72,
+            "churn": 524,
+            "lastTouched": "ca86639"
+          },
+          {
+            "path": ".specify/specs/100-seal-slice-archive/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 460,
+            "deleted": 92,
+            "churn": 552,
+            "lastTouched": "d238683"
+          },
+          {
+            "path": ".specify/specs/095-superagent-role/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 435,
+            "deleted": 94,
+            "churn": 529,
+            "lastTouched": "82f046a"
+          },
+          {
+            "path": ".specify/state/093-concurrency-by-default.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 54,
+            "deleted": 153,
+            "churn": 207,
+            "lastTouched": "c5abfaa"
+          },
+          {
+            "path": ".specify/skills/sdd-loop-driver/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 94,
+            "deleted": 28,
+            "churn": 122,
+            "lastTouched": "cb34019"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 54
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 46
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 11
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "skills/external",
+            "commits": 5
+          },
+          {
+            "path": "skills/internal",
+            "commits": 3
+          }
+        ]
+      },
+      {
+        "days": 90,
+        "since": "2026-08-15T16:15:05.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "sustained-hotspots",
+        "interpretation": "sustained window for spotting sustained hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": ".specify/scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": "scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": ".specify/scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 11,
+            "added": 2215,
+            "deleted": 184,
+            "churn": 2399,
+            "lastTouched": "dae8a94"
+          },
+          {
+            "path": "scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 3577,
+            "deleted": 217,
+            "churn": 3794,
+            "lastTouched": "a8965b0"
+          },
+          {
+            "path": "scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 1597,
+            "deleted": 46,
+            "churn": 1643,
+            "lastTouched": "27ef043"
+          },
+          {
+            "path": ".specify/scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 4045,
+            "deleted": 215,
+            "churn": 4260,
+            "lastTouched": "866fe91"
+          },
+          {
+            "path": ".specify/scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1592,
+            "deleted": 41,
+            "churn": 1633,
+            "lastTouched": "aac8834"
+          },
+          {
+            "path": ".specify/scripts/python/validate-tasks.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 78,
+            "deleted": 16,
+            "churn": 94,
+            "lastTouched": "aac8834"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 33,
+            "added": 210,
+            "deleted": 79,
+            "churn": 289,
+            "lastTouched": "8b90303"
+          },
+          {
+            "path": ".specify/specs/098-suite-speed-optimizations/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 508,
+            "deleted": 101,
+            "churn": 609,
+            "lastTouched": "1990e4e"
+          },
+          {
+            "path": ".specify/state/094-goal-team-parallel.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 46,
+            "deleted": 112,
+            "churn": 158,
+            "lastTouched": "29c3aa0"
+          },
+          {
+            "path": ".specify/specs/099-speckit-seal/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 14,
+            "added": 457,
+            "deleted": 83,
+            "churn": 540,
+            "lastTouched": "4f1ef12"
+          },
+          {
+            "path": ".specify/specs/096-sdd-observer-agent/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 503,
+            "deleted": 103,
+            "churn": 606,
+            "lastTouched": "492353d"
+          },
+          {
+            "path": ".specify/specs/097-speckit-migrate-command/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 452,
+            "deleted": 72,
+            "churn": 524,
+            "lastTouched": "ca86639"
+          },
+          {
+            "path": ".specify/specs/100-seal-slice-archive/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 460,
+            "deleted": 92,
+            "churn": 552,
+            "lastTouched": "d238683"
+          },
+          {
+            "path": ".specify/specs/095-superagent-role/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 435,
+            "deleted": 94,
+            "churn": 529,
+            "lastTouched": "82f046a"
+          },
+          {
+            "path": ".specify/state/093-concurrency-by-default.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 54,
+            "deleted": 153,
+            "churn": 207,
+            "lastTouched": "c5abfaa"
+          },
+          {
+            "path": ".specify/skills/sdd-loop-driver/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 94,
+            "deleted": 28,
+            "churn": 122,
+            "lastTouched": "cb34019"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 54
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 46
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 11
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "skills/external",
+            "commits": 5
+          },
+          {
+            "path": "skills/internal",
+            "commits": 3
+          }
+        ]
+      },
+      {
+        "days": 180,
+        "since": "2026-05-17T16:15:05.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "legacy-or-long-range-hotspots",
+        "interpretation": "long-range window for spotting legacy or long range hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": ".specify/scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": "scripts/python/seal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 13,
+            "added": 4924,
+            "deleted": 238,
+            "churn": 5162,
+            "lastTouched": "34f2a40"
+          },
+          {
+            "path": ".specify/scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "scripts/python/status-digest.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 12,
+            "added": 899,
+            "deleted": 349,
+            "churn": 1248,
+            "lastTouched": "da3f62b"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 11,
+            "added": 2215,
+            "deleted": 184,
+            "churn": 2399,
+            "lastTouched": "dae8a94"
+          },
+          {
+            "path": "scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 3577,
+            "deleted": 217,
+            "churn": 3794,
+            "lastTouched": "a8965b0"
+          },
+          {
+            "path": "scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 9,
+            "added": 1597,
+            "deleted": 46,
+            "churn": 1643,
+            "lastTouched": "27ef043"
+          },
+          {
+            "path": ".specify/scripts/python/goal-utils.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 4045,
+            "deleted": 215,
+            "churn": 4260,
+            "lastTouched": "866fe91"
+          },
+          {
+            "path": ".specify/scripts/python/concurrency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1592,
+            "deleted": 41,
+            "churn": 1633,
+            "lastTouched": "aac8834"
+          },
+          {
+            "path": ".specify/scripts/python/validate-tasks.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 78,
+            "deleted": 16,
+            "churn": 94,
+            "lastTouched": "aac8834"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 33,
+            "added": 210,
+            "deleted": 79,
+            "churn": 289,
+            "lastTouched": "8b90303"
+          },
+          {
+            "path": ".specify/specs/098-suite-speed-optimizations/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 508,
+            "deleted": 101,
+            "churn": 609,
+            "lastTouched": "1990e4e"
+          },
+          {
+            "path": ".specify/state/094-goal-team-parallel.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 46,
+            "deleted": 112,
+            "churn": 158,
+            "lastTouched": "29c3aa0"
+          },
+          {
+            "path": ".specify/specs/099-speckit-seal/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 14,
+            "added": 457,
+            "deleted": 83,
+            "churn": 540,
+            "lastTouched": "4f1ef12"
+          },
+          {
+            "path": ".specify/specs/096-sdd-observer-agent/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 503,
+            "deleted": 103,
+            "churn": 606,
+            "lastTouched": "492353d"
+          },
+          {
+            "path": ".specify/specs/097-speckit-migrate-command/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 452,
+            "deleted": 72,
+            "churn": 524,
+            "lastTouched": "ca86639"
+          },
+          {
+            "path": ".specify/specs/100-seal-slice-archive/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 460,
+            "deleted": 92,
+            "churn": 552,
+            "lastTouched": "d238683"
+          },
+          {
+            "path": ".specify/specs/095-superagent-role/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 435,
+            "deleted": 94,
+            "churn": 529,
+            "lastTouched": "82f046a"
+          },
+          {
+            "path": ".specify/state/093-concurrency-by-default.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 54,
+            "deleted": 153,
+            "churn": 207,
+            "lastTouched": "c5abfaa"
+          },
+          {
+            "path": ".specify/skills/sdd-loop-driver/SKILL.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 12,
+            "added": 94,
+            "deleted": 28,
+            "churn": 122,
+            "lastTouched": "cb34019"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 54
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 46
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 11
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "skills/external",
+            "commits": 5
+          },
+          {
+            "path": "skills/internal",
+            "commits": 3
+          }
+        ]
+      }
+    ],
+    "languageTouchCounts": [
+      {
+        "language": "python",
+        "touches": 176
+      }
+    ],
+    "hotFiles": [
+      {
+        "path": ".specify/scripts/python/seal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 13,
+        "added": 4924,
+        "deleted": 238,
+        "churn": 5162,
+        "lastTouched": "34f2a40"
+      },
+      {
+        "path": "scripts/python/seal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 13,
+        "added": 4924,
+        "deleted": 238,
+        "churn": 5162,
+        "lastTouched": "34f2a40"
+      },
+      {
+        "path": ".specify/scripts/python/status-digest.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 12,
+        "added": 899,
+        "deleted": 349,
+        "churn": 1248,
+        "lastTouched": "da3f62b"
+      },
+      {
+        "path": "scripts/python/status-digest.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 12,
+        "added": 899,
+        "deleted": 349,
+        "churn": 1248,
+        "lastTouched": "da3f62b"
+      },
+      {
+        "path": "src/specify_cli/__init__.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 11,
+        "added": 2215,
+        "deleted": 184,
+        "churn": 2399,
+        "lastTouched": "dae8a94"
+      },
+      {
+        "path": "scripts/python/goal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 9,
+        "added": 3577,
+        "deleted": 217,
+        "churn": 3794,
+        "lastTouched": "a8965b0"
+      },
+      {
+        "path": "scripts/python/concurrency-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 9,
+        "added": 1597,
+        "deleted": 46,
+        "churn": 1643,
+        "lastTouched": "27ef043"
+      },
+      {
+        "path": ".specify/scripts/python/goal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 8,
+        "added": 4045,
+        "deleted": 215,
+        "churn": 4260,
+        "lastTouched": "866fe91"
+      },
+      {
+        "path": ".specify/scripts/python/concurrency-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 1592,
+        "deleted": 41,
+        "churn": 1633,
+        "lastTouched": "aac8834"
+      },
+      {
+        "path": ".specify/scripts/python/validate-tasks.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 78,
+        "deleted": 16,
+        "churn": 94,
+        "lastTouched": "aac8834"
+      },
+      {
+        "path": "scripts/python/validate-tasks.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 78,
+        "deleted": 16,
+        "churn": 94,
+        "lastTouched": "aac8834"
+      },
+      {
+        "path": ".specify/scripts/python/role-edge-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 1015,
+        "deleted": 10,
+        "churn": 1025,
+        "lastTouched": "68f8968"
+      },
+      {
+        "path": "scripts/python/role-edge-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 1015,
+        "deleted": 10,
+        "churn": 1025,
+        "lastTouched": "68f8968"
+      },
+      {
+        "path": ".specify/scripts/python/journal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 886,
+        "deleted": 7,
+        "churn": 893,
+        "lastTouched": "3fd3c41"
+      },
+      {
+        "path": "scripts/python/journal-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 886,
+        "deleted": 7,
+        "churn": 893,
+        "lastTouched": "81f46a3"
+      },
+      {
+        "path": ".specify/scripts/python/anchor-layout-migrate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 547,
+        "deleted": 37,
+        "churn": 584,
+        "lastTouched": "129aced"
+      },
+      {
+        "path": "scripts/python/anchor-layout-migrate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 547,
+        "deleted": 37,
+        "churn": 584,
+        "lastTouched": "129aced"
+      },
+      {
+        "path": ".specify/skills/internal/create-team/scripts/territory-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 566,
+        "deleted": 0,
+        "churn": 566,
+        "lastTouched": "179a18f"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/wp-gate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 143,
+        "deleted": 3,
+        "churn": 146,
+        "lastTouched": "cb34019"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 101,
+        "deleted": 7,
+        "churn": 108,
+        "lastTouched": "f4523d4"
+      },
+      {
+        "path": ".specify/scripts/python/renumber-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 39,
+        "deleted": 5,
+        "churn": 44,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "scripts/python/renumber-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 39,
+        "deleted": 5,
+        "churn": 44,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/scripts/python/sdd-route.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 25,
+        "deleted": 16,
+        "churn": 41,
+        "lastTouched": "76a527f"
+      },
+      {
+        "path": "scripts/python/sdd-route.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 25,
+        "deleted": 16,
+        "churn": 41,
+        "lastTouched": "91a69ed"
+      },
+      {
+        "path": ".specify/skills/sdd-house-keeping/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 21,
+        "deleted": 16,
+        "churn": 37,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/skills/sdd-project-setup/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 21,
+        "deleted": 16,
+        "churn": 37,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "skills/external/sdd-house-keeping/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 21,
+        "deleted": 16,
+        "churn": 37,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "skills/external/sdd-project-setup/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 21,
+        "deleted": 16,
+        "churn": 37,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/scripts/python/closure-acceptance-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 11,
+        "deleted": 9,
+        "churn": 20,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "scripts/python/closure-acceptance-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 11,
+        "deleted": 9,
+        "churn": 20,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/scripts/python/non-disposable-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 7,
+        "deleted": 4,
+        "churn": 11,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "scripts/python/non-disposable-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 7,
+        "deleted": 4,
+        "churn": 11,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/skills/sdd-house-keeping/scripts/mechanism-inventory.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 5,
+        "deleted": 5,
+        "churn": 10,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/skills/sdd-project-setup/scripts/mechanism-inventory.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 5,
+        "deleted": 5,
+        "churn": 10,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "skills/external/sdd-house-keeping/scripts/mechanism-inventory.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 5,
+        "deleted": 5,
+        "churn": 10,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "skills/external/sdd-project-setup/scripts/mechanism-inventory.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 5,
+        "deleted": 5,
+        "churn": 10,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/scripts/python/git-workflow-observe.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 411,
+        "deleted": 0,
+        "churn": 411,
+        "lastTouched": "0232fcd"
+      },
+      {
+        "path": "scripts/python/git-workflow-observe.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 411,
+        "deleted": 0,
+        "churn": 411,
+        "lastTouched": "0232fcd"
+      },
+      {
+        "path": "skills/internal/create-team/scripts/territory-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 283,
+        "deleted": 0,
+        "churn": 283,
+        "lastTouched": "990f49f"
+      },
+      {
+        "path": ".specify/scripts/python/trigger-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 78,
+        "deleted": 0,
+        "churn": 78,
+        "lastTouched": "0232fcd"
+      }
+    ],
+    "supportingHotFiles": [
+      {
+        "path": ".specify/features.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 33,
+        "added": 210,
+        "deleted": 79,
+        "churn": 289,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/specs/098-suite-speed-optimizations/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 17,
+        "added": 508,
+        "deleted": 101,
+        "churn": 609,
+        "lastTouched": "1990e4e"
+      },
+      {
+        "path": ".specify/state/094-goal-team-parallel.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 17,
+        "added": 46,
+        "deleted": 112,
+        "churn": 158,
+        "lastTouched": "29c3aa0"
+      },
+      {
+        "path": ".specify/specs/099-speckit-seal/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 14,
+        "added": 457,
+        "deleted": 83,
+        "churn": 540,
+        "lastTouched": "4f1ef12"
+      },
+      {
+        "path": ".specify/specs/096-sdd-observer-agent/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 503,
+        "deleted": 103,
+        "churn": 606,
+        "lastTouched": "492353d"
+      },
+      {
+        "path": ".specify/specs/097-speckit-migrate-command/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 452,
+        "deleted": 72,
+        "churn": 524,
+        "lastTouched": "ca86639"
+      },
+      {
+        "path": ".specify/specs/100-seal-slice-archive/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 460,
+        "deleted": 92,
+        "churn": 552,
+        "lastTouched": "d238683"
+      },
+      {
+        "path": ".specify/specs/095-superagent-role/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 435,
+        "deleted": 94,
+        "churn": 529,
+        "lastTouched": "82f046a"
+      },
+      {
+        "path": ".specify/state/093-concurrency-by-default.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 54,
+        "deleted": 153,
+        "churn": 207,
+        "lastTouched": "c5abfaa"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 94,
+        "deleted": 28,
+        "churn": 122,
+        "lastTouched": "cb34019"
+      },
+      {
+        "path": ".specify/features/099-speckit-seal.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 98,
+        "deleted": 10,
+        "churn": 108,
+        "lastTouched": "749b613"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 85,
+        "deleted": 20,
+        "churn": 105,
+        "lastTouched": "a1e0435"
+      },
+      {
+        "path": "tests/contract/test_fast_fail_discipline.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 12,
+        "added": 57,
+        "deleted": 36,
+        "churn": 93,
+        "lastTouched": "dd7cbba"
+      },
+      {
+        "path": ".specify/register.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 58,
+        "deleted": 18,
+        "churn": 76,
+        "lastTouched": "fc4a469"
+      },
+      {
+        "path": ".specify/memory/register.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 11,
+        "added": 49,
+        "deleted": 36,
+        "churn": 85,
+        "lastTouched": "29c3aa0"
+      },
+      {
+        "path": "tests/contract/test_status_digest.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 9,
+        "added": 258,
+        "deleted": 83,
+        "churn": 341,
+        "lastTouched": "da3f62b"
+      },
+      {
+        "path": ".specify/memory/features.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 10,
+        "deleted": 132,
+        "churn": 142,
+        "lastTouched": "29c3aa0"
+      },
+      {
+        "path": ".specify/features/095-superagent-role.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 106,
+        "deleted": 9,
+        "churn": 115,
+        "lastTouched": "4c515c0"
+      },
+      {
+        "path": ".specify/shared/definitions/flow-class-definitions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 15,
+        "deleted": 7,
+        "churn": 22,
+        "lastTouched": "8012a9e"
+      },
+      {
+        "path": ".specify/shared/definitions/probe-definitions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 14,
+        "deleted": 2,
+        "churn": 16,
+        "lastTouched": "8012a9e"
+      },
+      {
+        "path": ".specify/specs/098-suite-speed-optimizations/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 344,
+        "deleted": 0,
+        "churn": 344,
+        "lastTouched": "0d1f7a1"
+      },
+      {
+        "path": ".specify/constitution.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 141,
+        "deleted": 15,
+        "churn": 156,
+        "lastTouched": "dd7cbba"
+      },
+      {
+        "path": ".specify/skills/internal/sanitize-materials/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 110,
+        "deleted": 43,
+        "churn": 153,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "skills/internal/sanitize-materials/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 110,
+        "deleted": 43,
+        "churn": 153,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": ".specify/specs/093-concurrency-by-default/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 78,
+        "deleted": 52,
+        "churn": 130,
+        "lastTouched": "1f435d5"
+      },
+      {
+        "path": "tests/contract/test_expression_compatibility.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 8,
+        "added": 63,
+        "deleted": 11,
+        "churn": 74,
+        "lastTouched": "dae8a94"
+      },
+      {
+        "path": ".specify/skills/internal/create-team/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 42,
+        "deleted": 11,
+        "churn": 53,
+        "lastTouched": "cb34019"
+      },
+      {
+        "path": ".specify/features/086-efficient-test-execution.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 34,
+        "deleted": 12,
+        "churn": 46,
+        "lastTouched": "8b90303"
+      },
+      {
+        "path": "shared/definitions/flow-class-definitions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 15,
+        "deleted": 7,
+        "churn": 22,
+        "lastTouched": "dae8a94"
+      },
+      {
+        "path": "shared/definitions/probe-definitions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 14,
+        "deleted": 2,
+        "churn": 16,
+        "lastTouched": "dae8a94"
+      },
+      {
+        "path": ".specify/specs/099-speckit-seal/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 680,
+        "deleted": 0,
+        "churn": 680,
+        "lastTouched": "93843c5"
+      },
+      {
+        "path": ".specify/specs/101-anchor-goal-realignment/plan.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 484,
+        "deleted": 44,
+        "churn": 528,
+        "lastTouched": "4b3c690"
+      },
+      {
+        "path": ".specify/specs/101-anchor-goal-realignment/requirements.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 444,
+        "deleted": 63,
+        "churn": 507,
+        "lastTouched": "3f4fdba"
+      },
+      {
+        "path": "skills/external/study-code/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 84,
+        "deleted": 221,
+        "churn": 305,
+        "lastTouched": "cde73a9"
+      },
+      {
+        "path": ".specify/specs/095-superagent-role/plan.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 268,
+        "deleted": 21,
+        "churn": 289,
+        "lastTouched": "448c1f3"
+      },
+      {
+        "path": "templates/commands/goal.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 32,
+        "deleted": 26,
+        "churn": 58,
+        "lastTouched": "8183093"
+      },
+      {
+        "path": "tests/contract/test_migration_distribution.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 7,
+        "added": 28,
+        "deleted": 18,
+        "churn": 46,
+        "lastTouched": "37aad29"
+      },
+      {
+        "path": ".specify/skills/sdd-house-keeping/SKILL.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 25,
+        "deleted": 20,
+        "churn": 45,
+        "lastTouched": "cb34019"
+      },
+      {
+        "path": ".claude/commands/speckit.goal.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 26,
+        "deleted": 18,
+        "churn": 44,
+        "lastTouched": "cb34019"
+      },
+      {
+        "path": ".github/prompts/speckit.goal.prompt.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 7,
+        "added": 26,
+        "deleted": 18,
+        "churn": 44,
+        "lastTouched": "cb34019"
+      }
+    ],
+    "hotPaths": [
+      {
+        "path": "scripts/python",
+        "commits": 54
+      },
+      {
+        "path": ".specify/scripts",
+        "commits": 46
+      },
+      {
+        "path": "src/specify_cli",
+        "commits": 11
+      },
+      {
+        "path": ".specify/skills",
+        "commits": 8
+      },
+      {
+        "path": "skills/external",
+        "commits": 5
+      },
+      {
+        "path": "skills/internal",
+        "commits": 3
+      }
+    ],
+    "supportingHotPaths": [
+      {
+        "path": ".specify/specs",
+        "commits": 2121
+      },
+      {
+        "path": ".specify/memory",
+        "commits": 461
+      },
+      {
+        "path": "tests/fixtures",
+        "commits": 431
+      },
+      {
+        "path": "tests/contract",
+        "commits": 370
+      },
+      {
+        "path": ".specify/archive",
+        "commits": 306
+      },
+      {
+        "path": ".specify/skills",
+        "commits": 295
+      },
+      {
+        "path": ".specify/features",
+        "commits": 204
+      },
+      {
+        "path": "skills/internal",
+        "commits": 165
+      },
+      {
+        "path": "skills/external",
+        "commits": 121
+      },
+      {
+        "path": ".claude/commands",
+        "commits": 120
+      },
+      {
+        "path": ".github/prompts",
+        "commits": 120
+      },
+      {
+        "path": ".opencode/command",
+        "commits": 120
+      },
+      {
+        "path": ".specify/shared",
+        "commits": 100
+      },
+      {
+        "path": "templates/commands",
+        "commits": 93
+      },
+      {
+        "path": ".specify/teams",
+        "commits": 80
+      },
+      {
+        "path": ".specify",
+        "commits": 70
+      },
+      {
+        "path": ".specify/state",
+        "commits": 68
+      },
+      {
+        "path": ".specify/anchoring",
+        "commits": 59
+      },
+      {
+        "path": "tests/integration",
+        "commits": 55
+      },
+      {
+        "path": "shared/definitions",
+        "commits": 50
+      },
+      {
+        "path": "tests/unit",
+        "commits": 42
+      },
+      {
+        "path": "docs/reference",
+        "commits": 29
+      },
+      {
+        "path": ".specify/agents",
+        "commits": 27
+      },
+      {
+        "path": ".specify/templates",
+        "commits": 24
+      },
+      {
+        "path": "shared/declarations",
+        "commits": 22
+      },
+      {
+        "path": "templates",
+        "commits": 21
+      },
+      {
+        "path": ".specify/goals",
+        "commits": 19
+      },
+      {
+        "path": ".specify/studies",
+        "commits": 18
+      },
+      {
+        "path": "shared/guidelines",
+        "commits": 11
+      },
+      {
+        "path": "shared/workflow",
+        "commits": 11
+      }
+    ],
+    "coChangePaths": [
+      {
+        "paths": [
+          ".specify/scripts",
+          "scripts/python"
+        ],
+        "commits": 40
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          ".specify/skills"
+        ],
+        "commits": 5
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "src/specify_cli"
+        ],
+        "commits": 5
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "src/specify_cli"
+        ],
+        "commits": 5
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "scripts/python"
+        ],
+        "commits": 4
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/external"
+        ],
+        "commits": 4
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "skills/external"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "skills/external"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/internal"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "src/specify_cli"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          "skills/external",
+          "src/specify_cli"
+        ],
+        "commits": 2
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "skills/internal"
+        ],
+        "commits": 1
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "skills/internal"
+        ],
+        "commits": 1
+      },
+      {
+        "paths": [
+          "skills/external",
+          "skills/internal"
+        ],
+        "commits": 1
+      },
+      {
+        "paths": [
+          "skills/internal",
+          "src/specify_cli"
+        ],
+        "commits": 1
+      }
+    ]
+  },
+  "dependencyGovernance": {
+    "schemaVersion": "1.0.0",
+    "kind": "dependency-governance",
+    "status": "ok",
+    "repoRoot": ".",
+    "analyzerVersion": "v5",
+    "elapsedMs": 231.905,
+    "source": {
+      "fileListStrategy": "git-ls-files",
+      "fileCount": 10167,
+      "staleDays": 180,
+      "now": "2026-11-13T16:15:05.210Z"
+    },
+    "summary": {
+      "ecosystemCount": 2,
+      "ecosystems": [
+        "node",
+        "python"
+      ],
+      "manifestCount": 46,
+      "lockfileCount": 2,
+      "dependencyFileCount": 48,
+      "staleDependencyFiles": [],
+      "updateAutomation": {
+        "count": 0,
+        "files": []
+      },
+      "auditSignals": {
+        "count": 0,
+        "files": []
+      },
+      "alertEvidence": {
+        "status": "unverified",
+        "count": 0,
+        "files": []
+      },
+      "findings": [
+        {
+          "id": "dependency-update-automation-missing",
+          "severity": "Medium",
+          "evidenceStrength": "Static configuration evidence",
+          "title": "No dependency update automation config found",
+          "passCheck": "Add or cite Dependabot, Renovate, Snyk, or an equivalent host-native dependency update workflow."
+        }
+      ],
+      "riskLevel": "medium"
+    },
+    "files": {
+      "manifests": [
+        {
+          "path": ".specify/archive/specs/092-non-disposable/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/specs/071-review-code-integration/test-evidence/requirements-remediation-validate.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/074-goal-team-sdd-unification/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/078-coaching-skills/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/080-humanize-run-output/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/085-sdd-temporary-goal-team/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/086-efficient-test-execution/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-repair-analyze-loop1.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-repair-round3.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-revision-2026-11-06.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-unit-correction-2026-11-06.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/089-script-interface-contract/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/091-auto-git-closeout/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/094-goal-team-parallel/test-evidence/requirements-baseline-probe.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-flow-class.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-validator-initial.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-flow-class-lookup.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-sc-map.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-flow-class-lookup.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/098-suite-speed-optimizations/test-evidence/requirements-baseline-probe.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/100-seal-slice-archive/test-evidence/requirements-measurements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "test-evidence/requirements-gate-repair.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        }
+      ],
+      "lockfiles": [
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        }
+      ],
+      "dependency": [
+        {
+          "path": ".specify/archive/specs/092-non-disposable/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-09T20:32:51+08:00",
+          "lastTouchedAgeDays": 4,
+          "stale": false
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 107,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 148,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/071-review-code-integration/test-evidence/requirements-remediation-validate.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-27T15:13:09+08:00",
+          "lastTouchedAgeDays": 17,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/074-goal-team-sdd-unification/slices/074b-nested-governance/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-11T13:23:41+08:00",
+          "lastTouchedAgeDays": 2,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/074-goal-team-sdd-unification/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-11T01:14:48+08:00",
+          "lastTouchedAgeDays": 2,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/078-coaching-skills/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-30T14:24:07+08:00",
+          "lastTouchedAgeDays": 14,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/080-humanize-run-output/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-31T14:07:12+08:00",
+          "lastTouchedAgeDays": 13,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T20:24:57+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T20:24:57+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T20:24:57+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T20:24:57+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T20:24:57+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/085-sdd-temporary-goal-team/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-06T10:56:07+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/086-efficient-test-execution/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-06T12:07:00+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-repair-analyze-loop1.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-07T00:13:44+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-repair-round3.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-07T00:13:44+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-revision-2026-11-06.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-07T00:13:44+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/088-speckit-visualization/test-evidence/requirements-unit-correction-2026-11-06.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-07T00:13:44+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/089-script-interface-contract/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-09T03:10:14+08:00",
+          "lastTouchedAgeDays": 4,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/091-auto-git-closeout/test-evidence/requirements-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-09T10:27:03+08:00",
+          "lastTouchedAgeDays": 4,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/094-goal-team-parallel/test-evidence/requirements-baseline-probe.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-09T17:39:02+08:00",
+          "lastTouchedAgeDays": 4,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-flow-class.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T14:09:10+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T14:09:10+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T14:09:10+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-validator-initial.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T14:09:10+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/095-superagent-role/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T14:09:10+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-flow-class-lookup.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:23:00+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:23:00+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:23:00+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-sc-map.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T23:28:16+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/096-sdd-observer-agent/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:23:00+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-flow-class-lookup.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:30:53+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-glossary-add.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:30:53+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-glossary-conflict.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:30:53+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/097-speckit-migrate-command/test-evidence/requirements-validator.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:30:53+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/098-suite-speed-optimizations/test-evidence/requirements-baseline-probe.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:33:32+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/100-seal-slice-archive/test-evidence/requirements-measurements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-11T09:55:01+08:00",
+          "lastTouchedAgeDays": 2,
+          "stale": false
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T22:00:59+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 107,
+          "stale": false
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-11T10:36:48+08:00",
+          "lastTouchedAgeDays": 33,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 32,
+          "stale": false
+        },
+        {
+          "path": "test-evidence/requirements-gate-repair.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-10T16:36:17+08:00",
+          "lastTouchedAgeDays": 3,
+          "stale": false
+        }
+      ]
+    },
+    "availableVersions": [
+      "v1",
+      "v2",
+      "v3",
+      "v4",
+      "v5"
+    ]
+  }
+}
