@@ -2,8 +2,10 @@
 
 Pins ``contracts/line-registration-scan.contract.md`` **C-04, C-05, C-06, C-12, C-13, C-15**
 against the declared live roots (FR-013 / FR-016). The scanner is read-only, so the reading is
-persisted by this test — never by the scanner itself — under the feature's ``test-evidence/``
-directory (the path T020 names).
+persisted by this test — never by the scanner itself — into pytest's ``tmp_path``: writing under
+``.specify/specs/**`` at suite time would race the accountant's corpus-stability clause (c20).
+The committed ``test-evidence/line-registration-scan-live.txt`` is produced by the implementation
+stage, not by this test run.
 
 The test must collect before the scanner exists and fail with a named message; it never turns
 a missing scanner into a clean reading, because ``--root`` on an absent directory is an input
@@ -24,14 +26,6 @@ pytestmark = pytest.mark.integration
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCANNER = REPO_ROOT / "scripts" / "python" / "line-registration-scan.py"
-READING_PATH = (
-    REPO_ROOT
-    / ".specify"
-    / "specs"
-    / "102-line-registry-registration"
-    / "test-evidence"
-    / "line-registration-scan-live.txt"
-)
 
 
 def _run(*args: str) -> subprocess.CompletedProcess:
@@ -57,7 +51,7 @@ def _require_scanner() -> None:
     )
 
 
-def test_the_declared_live_roots_read_clean_and_the_reading_is_recorded():
+def test_the_declared_live_roots_read_clean_and_the_reading_is_recorded(tmp_path):
     _require_scanner()
     proc = _run()
     combined = (proc.stdout or "") + (proc.stderr or "")
@@ -74,8 +68,12 @@ def test_the_declared_live_roots_read_clean_and_the_reading_is_recorded():
         )
 
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    READING_PATH.parent.mkdir(parents=True, exist_ok=True)
-    READING_PATH.write_text(
+    # Never write under .specify/specs/** during the suite: the accountant's corpus-stability
+    # clause (c20) reads that tree concurrently. The committed evidence file is produced by the
+    # implementation stage, not by this test run.
+    reading_path = tmp_path / "line-registration-scan-live.txt"
+    reading_path.parent.mkdir(parents=True, exist_ok=True)
+    reading_path.write_text(
         "\n".join(
             [
                 "# Live long-task scan reading (102, T020)",

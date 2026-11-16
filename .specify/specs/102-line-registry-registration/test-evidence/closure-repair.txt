@@ -1,0 +1,50 @@
+# Closure repair — implement P6 attempt 2 (102, 2026-11-16)
+
+Trigger: closure-repair (closure full-suite comparison showed 2 new failures against
+`baseline-failed.txt`).
+
+## Repairs (tests only; no implementation, plan-owned artifact or budget constant touched)
+
+1. `tests/contract/test_sdd_observer_lifecycle.py::test_boundary_carriers_are_unchanged_against_the_implement_entry_base`
+   - Root cause: the guard froze CARRIERS against 096's implement-entry base `..HEAD`; this
+     feature legitimately edits `shared/guidelines/reporting-obligations.md` § 九, so any later
+     HEAD comparison must go red.
+   - Fix: compare within 096's own window —
+     `git diff --name-only <implement-entry-base>..36a34242b1a5bb25fe5dcaa02c2f46db7ab94364 -- <CARRIERS>`.
+     Assertion and CARRIERS list unchanged; one-line comment records the window's scope.
+
+2. `tests/integration/test_line_registration_scan_live.py`
+   - Root cause: the test wrote its live reading into
+     `.specify/specs/102-line-registry-registration/test-evidence/line-registration-scan-live.txt`
+     at suite time; c20 md5-sums the whole `.specify/specs` corpus before/after and raced that
+     writer under parallel execution.
+   - Fix: the reading is now written to pytest `tmp_path` and asserted there. The committed
+     evidence file `test-evidence/line-registration-scan-live.txt` is untouched (produced by the
+     implementation stage). c20's corpus-stability assertion was not weakened.
+
+## Targeted reruns (entry: scripts/bash/run-tests.sh)
+
+- Command:
+  `bash scripts/bash/run-tests.sh -q "tests/contract/test_sdd_observer_lifecycle.py::test_boundary_carriers_are_unchanged_against_the_implement_entry_base" tests/integration/test_line_registration_scan_live.py tests/integration/test_line_run_behavior.py tests/contract/test_line_run_contract.py tests/contract/test_line_registration_scan.py tests/contract/test_line_registration_wiring.py`
+  - rc=0, 51 passed, 0 failed (mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0)
+- Command:
+  `bash scripts/bash/run-tests.sh --full -q "tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus"`
+  - rc=0, 1 passed, 0 failed (tier=full; c20 is slow-marked)
+
+## Closure in-slot rerun
+
+- Command:
+  `bash scripts/bash/run-tests.sh --full --names-out .specify/specs/102-line-registry-registration/final-failed.txt`
+- rc=1 (pytest exit code; the baseline itself carries 241 known failures)
+- Result line: `241 failed, 8974 passed, 6 skipped, 192 warnings in 147.89s`
+- baseline names: 241
+- final names: 241
+- Name-level comparison:
+  - `LC_ALL=C comm -13 <(sort -u baseline-failed.txt) <(sort -u final-failed.txt)` → 0 lines
+  - `LC_ALL=C comm -23 <(sort -u baseline-failed.txt) <(sort -u final-failed.txt)` → 0 lines
+- new-failures = 0
+
+## Verdict
+
+Zero name-level new failures against the baseline. Both repaired guards are green on their own
+targeted reruns, and the full-tier closure rerun reproduces exactly the baseline failure set.

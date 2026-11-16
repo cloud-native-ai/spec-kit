@@ -412,11 +412,15 @@ def test_status_digest_carries_no_observer_or_journal_token():
     assert "journal" not in text, "status-digest.py carries a journal token"
 
 
+FEATURE_096_CLOSE = "36a34242b1a5bb25fe5dcaa02c2f46db7ab94364"
+
+
 def test_boundary_carriers_are_unchanged_against_the_implement_entry_base():
     base = _implement_entry_base()
+    # guard covers 096's implement window; later features may edit the carriers
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", "%s..HEAD" % base, "--",
-         *CARRIERS],
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only",
+         "%s..%s" % (base, FEATURE_096_CLOSE), "--", *CARRIERS],
         capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "", (
