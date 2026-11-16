@@ -1,0 +1,79 @@
+# SC-004 — interface and failure forms (102, T017)
+
+Recorded 2026-11-16 against `scripts/bash/line-run.sh`, isolated registries under
+`.specify/.tmp/line-registry-registration/`. Every reading is a subprocess exit code, an
+stderr excerpt or a registry snapshot comparison.
+
+## 1 — Answering flags: rc 0, zero registry writes
+
+```text
+-h rc=0
+--help rc=0
+--version rc=0
+registry snapshot unchanged        # find <registry> -mindepth 1 before/after: diff empty
+```
+
+## 2 — Usage refusal: rc 2, command never executed
+
+```text
+$ line-run.sh --line-id demo --run-id r20261116T090000Z-a004 --bogus -- bash -c 'touch …/ran-undeclared'
+rc=2
+command not executed
+```
+
+## 3 — Registration refused: fail-closed, rc = engine status
+
+Registry chmod 500 before the run:
+
+```text
+rc=6
+error: line-run.sh: register failed for demo-denied-r20261116T090000Z-a005 (engine exit 6):
+{"error": {"code": 6, "message": "registry dir is not writable", "path": "/cws_data/cloud-native-ai/spec-kit/.specify/.tmp/line-registry-registration/registry-denied"}, "ok": false}
+line-run.sh: the command was not run
+command not executed
+```
+
+## 4 — No git toplevel: rc 4, command never executed
+
+Run from a scratch directory with `GIT_CEILING_DIRECTORIES` set to the scratch root (so the
+repository's `.git` is unreachable):
+
+```text
+rc=4
+command not executed
+```
+
+No entry was written for `demo-nogit-r20261116T090000Z-a006`.
+
+## 5 — Exit status propagation
+
+Successful command: wrapper rc 0. Failing command `bash -c 'exit 7'`: wrapper rc 7 (the
+child's own status, unchanged).
+
+## 6 — A-24 double failure: both sides readable
+
+```text
+rc=5
+error: line-run.sh: close failed for demo-double-r20261116T090000Z-a007 (engine exit 6) after the command exited 5:
+{"error": {"code": 6, "message": "registry dir is not writable", "path": "/cws_data/cloud-native-ai/spec-kit/.specify/.tmp/line-registry-registration/registry-double"}, "ok": false}
+```
+
+Exit code = the child's 5; stderr names the close failure and the engine status 6.
+
+## 7 — Close failure over a successful child: rc = engine status
+
+```text
+rc=6
+error: line-run.sh: close failed for demo-closedeny-r20261116T090000Z-a008 (engine exit 6):
+{"error": {"code": 6, "message": "registry dir is not writable", …}, "ok": false}
+```
+
+## 8 — SIGKILL residue
+
+Entry after `kill -9` of the wrapper: `state=active`, `last_event=registered` (S-3, see
+`us1-sc-001.txt` § 3). No fabricated close.
+
+## Verdict
+
+SC-004 (`supporting` path): every listed form is decided by a subprocess exit code, an stderr
+text or a registry entry; none rests on prose. `pass`.

@@ -1,0 +1,69 @@
+# SC-001 — visibility loop (102, T017)
+
+Readings taken 2026-11-16 from digest stdout, registry entry JSON and wrapper exit codes
+themselves. Isolated registry: `.specify/.tmp/line-registry-registration/registry`
+(`SPECIFY_LINE_REGISTRY_DIR`); workspace always `--workspace /cws_data/cloud-native-ai/spec-kit`
+(the git toplevel the wrapper registers as `project_dir` / `repo_root`).
+
+## 1 — A wrapped command is listed while it runs
+
+Command: `line-run.sh --line-id batch-apply --run-id r20261116T090000Z-a001 -- bash batch.sh`
+(child keeps running for 2 s so the sample lands before the close).
+
+```text
+状态摘要 · 生成于 2026-11-16T10:44:29.982236Z（UTC）· 最多 20 条 · 注册目录 /cws_data/cloud-native-ai/spec-kit/.specify/.tmp/line-registry-registration/registry
+
+执行体             所属 spec                           父边  角色  深度  在做什么  状态  已执行时间
+-----------------  ----------------------------------  ----  ----  ----  --------  ----  ----------
+—（无存活执行体）  batch-apply-r20261116T090000Z-a001  -     -     -     -         活跃  0 秒  efficiency=unit=/speckit.analyze elapsed=not-evaluated tokens=not-evaluated invocations=not-evaluated
+```
+
+digest rc = 0; state column reads `活跃` (active); wrapper rc = 0.
+
+## 2 — The entry closes with the outcome's reason
+
+```text
+state=closed  last_event=completed  run_history[-1].outcome=completed
+(line_id batch-apply-r20261116T090000Z-a001, run_id r20261116T090000Z-a001)
+```
+
+Failure path (S-2): wrapper rc = 7; `state=closed  last_event=failed
+run_history[-1].outcome=failed`.
+
+After the only line closed, the digest renders its existing empty set: `nothing-running`, rc 3.
+
+## 3 — SIGKILL leaves the entry active and visible
+
+Wrapper pid 2578657 killed with `kill -9` (rc 137); child `sleep 60` (pid 2578668) killed
+afterwards. Entry:
+
+```text
+state=active  last_event=registered
+```
+
+Digest after the kill (rc 0):
+
+```text
+执行体             所属 spec                         父边  角色  深度  在做什么  状态  已执行时间
+-----------------  --------------------------------  ----  ----  ----  --------  ----  ----------
+—（无存活执行体）  demo-kill-r20261116T090000Z-a003  -     -     -     -         活跃  0 秒  efficiency=unit=/speckit.analyze elapsed=not-evaluated tokens=not-evaluated invocations=not-evaluated
+最近完成：last_completion=line_id=demo-fail-r20261116T090000Z-a002 age=5s
+```
+
+The `最近完成` trailer comes from the closed S-2 entry; the killed wrapper wrote no close.
+
+## 4 — The equivalent unregistered command stays invisible
+
+A bare `bash -c 'sleep 2'` while a digest sample is taken, with an empty isolated registry:
+
+```text
+nothing-running
+unwrapped_digest_rc=3
+```
+
+This is the mechanism gap the feature names: unregistered ⇒ not in the digest.
+
+## Verdict
+
+SC-001 readings: run-time listing `pass`; close-with-reason `pass`; SIGKILL visibility `pass`;
+unregistered equivalence `pass`. All values are pasted outputs, none estimated.

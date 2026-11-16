@@ -1,0 +1,72 @@
+# SC-003 — registry single write dialect (102, T017)
+
+Recorded 2026-11-16. Every registry write below went through `line-registry.py`; the wrapper
+never wrote a registry file itself and never touched the observer journal.
+
+## 1 — Successful entry carries the composed id, state and reason
+
+```text
+{
+  "claimed_ns": 1794825909928169290,
+  "cli": "qodercli",
+  "closed_at": "2026-11-16T10:45:09Z",
+  "created_at": "2026-11-16T10:45:09Z",
+  "driver_session": "pid:2580292",
+  "last_event": "completed",
+  "lease": null,
+  "line_id": "demo-journal-r20261116T090000Z-a009",
+  "project_dir": "/cws_data/cloud-native-ai/spec-kit",
+  "repo_root": "/cws_data/cloud-native-ai/spec-kit",
+  "run_history": [
+    {
+      "ended_at": "2026-11-16T10:45:09Z",
+      "outcome": "completed",
+      "run_id": "r20261116T090000Z-a009",
+      "started_at": "2026-11-16T10:45:09Z"
+    }
+  ],
+  "run_id": "r20261116T090000Z-a009",
+  "schema_version": 1,
+  "state": "closed",
+  "updated_at": "2026-11-16T10:45:09Z",
+  "write_line": false
+}
+```
+
+Failure path entry (S-2): `line_id=demo-fail-r20261116T090000Z-a002`, `state=closed`,
+`last_event=failed`, `run_history[-1].outcome=failed`.
+
+## 2 — Exit-code matrix (one run per row)
+
+| Situation | Command shape | Wrapper rc |
+|-----------|---------------|------------|
+| command 0, close ok | `-- true` | `0` |
+| command non-zero, close ok | `-- bash -c 'exit 7'` | `7` |
+| usage error (undeclared option) | `--line-id demo --run-id … --bogus -- …` | `2` |
+| no git toplevel | run under `GIT_CEILING_DIRECTORIES=<scratch>` | `4` |
+| registration refused (registry read-only) | `registry chmod 500` | `6` (engine status) |
+| double failure | child `exit 5` after chmod 500 | `5`, stderr names `engine exit 6` |
+| close failed with child at 0 | child chmod 500, exit 0 | `6` |
+| wrapper SIGKILL | `kill -9 <wrapper pid>` | `137` (signal status), entry `active` |
+
+## 3 — Static write-surface audit
+
+```bash
+$ grep -c 'journal-utils.py' scripts/bash/line-run.sh
+0
+```
+
+The wrapper's only engine invocations are `--action register` and `--action deregister`; it
+writes no JSON, reads no digest state and creates no heartbeat file.
+
+## 4 — Journal path gains nothing
+
+```bash
+$ find . -path ./.git -prune -o -name journal.md -print | wc -l   # before a wrapper run
+0
+$ line-run.sh --line-id demo-journal --run-id r20261116T090000Z-a009 -- true   # rc 0
+$ find . -path ./.git -prune -o -name journal.md -print | wc -l   # after
+0
+```
+
+0 new journal files. The observer journal is a different store and stays untouched.
