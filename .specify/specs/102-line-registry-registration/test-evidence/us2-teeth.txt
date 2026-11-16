@@ -1,0 +1,124 @@
+# US2 scanner — teeth and load-bearing constants (T027, SC-002)
+
+Recorded 2026-11-16 through the unique entry (`scripts/bash/run-tests.sh`) and the scanner
+itself. Every fixture lives under the sanctioned, git-ignored scratch root
+`.specify/.tmp/line-registry-registration/`; the live-root injection lands in the tracked
+`scripts/bash/` and is removed in the same run.
+
+Baseline scanner digest used throughout this record (source and generated mirror):
+
+```text
+171ec5d00ed162e16027c02aad3fad1d8d8d7ce3bef8216f8855d66ce8165981  scripts/python/line-registration-scan.py
+171ec5d00ed162e16027c02aad3fad1d8d8d7ce3bef8216f8855d66ce8165981  .specify/scripts/python/line-registration-scan.py
+```
+
+## 1. Live tracked root — a violating script turns the reading red (N-5 discipline)
+
+```bash
+# inject: a script carrying LONG_TASK_MARKERS[0] ("terraform apply"), no compliant invocation
+$ python3 scripts/python/line-registration-scan.py --root scripts/bash
+scripts/bash/zz-scan-red-leg.sh:2: criterion=content-marker terraform apply
+root: scripts/bash (files: 18)
+scanned: 18 files
+violations: 1
+owner-skipped: 0
+```
+
+Exit **1**, naming the injected file and `criterion=content-marker`. The file was removed in
+the same run:
+
+```bash
+$ rm scripts/bash/zz-scan-red-leg.sh
+$ python3 scripts/python/line-registration-scan.py --root scripts/bash
+root: scripts/bash (files: 17)
+scanned: 17 files
+violations: 0
+owner-skipped: 0
+$ git status --porcelain scripts/bash/
+# (no output)
+```
+
+Exit **0**; `git status --porcelain scripts/bash/` is empty — the restoration evidence.
+
+## 2. Injection A — deleting a `COMPLIANT_INVOCATIONS` member makes the compliant leg red
+
+Fixture (single member, so exactly one member is under test):
+
+```bash
+$ python3 scripts/python/line-registration-scan.py --root .specify/.tmp/line-registry-registration/teeth/compliant
+root: .specify/.tmp/line-registry-registration/teeth/compliant (files: 1)
+scanned: 1 files
+violations: 0
+owner-skipped: 0
+```
+
+Exit **0** (clean). `compliant.sh` carries the marker **and** the wrapper form
+`scripts/bash/line-run.sh …`, so only compliant-invocation detection can explain the clean
+verdict.
+
+Injection: the line `    "scripts/bash/line-run.sh",` was removed from
+`COMPLIANT_INVOCATIONS` (one member; assertion-guarded edit, count == 1). Same fixture, same
+command:
+
+```text
+.specify/.tmp/line-registry-registration/teeth/compliant/compliant.sh:2: criterion=content-marker terraform apply
+root: .specify/.tmp/line-registry-registration/teeth/compliant (files: 1)
+scanned: 1 files
+violations: 1
+owner-skipped: 0
+```
+
+Exit **1** — the compliant leg is red. Restore from the sanctioned backup
+(`.specify/.tmp/scan-teeth-backup.py`) returned the file to the recorded digest
+(`sha256sum` of source and mirror both `171ec5d0…65981`), and the same fixture read exit **0**
+again.
+
+**Mechanism note (disclosed, not hidden).** The committed node
+`test_c10_the_same_file_with_a_compliant_invocation_is_clean` builds its fixture with
+`_compliant_block(module)`, which renders the *current* constant — so a constant deletion
+shrinks the fixture together with the detector and that node stays green (measured: `1 passed
+in 2.02s`). The literal "fixture leg turns red" is therefore demonstrated on a pinned
+single-member fixture above, which is the only reading in which the member's load-bearing role
+is observable. The node that **does** respond to a deletion of the recognition code is the
+self-declaration node in §3.
+
+## 3. Injection B — removing self-declaration recognition turns the committed node red
+
+Fixture (marker line only, no content marker, no compliant invocation):
+
+```bash
+$ python3 scripts/python/line-registration-scan.py --root .specify/.tmp/line-registry-registration/teeth/declared
+.specify/.tmp/line-registry-registration/teeth/declared/declared.sh:2: criterion=self-declaration # line-run-required
+root: .specify/.tmp/line-registry-registration/teeth/declared (files: 1)
+scanned: 1 files
+violations: 1
+owner-skipped: 0
+```
+
+Exit **1**. Injection: the recognition line in `_first_hit` was disabled
+(`if line.lstrip().startswith("#") and …` → `if False and …`; assertion-guarded edit, count
+== 1). Same fixture read exit **0** (`violations: 0`), and the committed node turned red:
+
+```text
+E        +  where 0 = CompletedProcess(...).returncode
+tests/contract/test_line_registration_scan.py:280: AssertionError
+FAILED tests/contract/test_line_registration_scan.py::test_c10_self_declaration_is_a_hit_not_an_exemption
+1 failed in 2.28s
+```
+
+rc = 1. Restore returned the scanner to the recorded digest (`171ec5d0…65981`, source and
+mirror), and the fixture read exit **1** again. `git diff` is vacuous for this not-yet-committed
+file (it is untracked at this point), so the digest comparison is the restore proof here.
+
+## 4. Disposition of the readings
+
+| Leg | Baseline | Under injection | After restore |
+|-----|----------|-----------------|---------------|
+| live tracked root (`scripts/bash`) | 0 (exit 0) | injected file → 1 (exit 1) | 0 (exit 0), `git status` empty |
+| compliant fixture | 0 (exit 0) | member deleted → 1 (exit 1) | 0 (exit 0) |
+| self-declaration fixture | 1 (exit 1) | recognition off → 0 (exit 0) | 1 (exit 1) |
+| committed self-declaration node | pass | **FAILED** (`1 failed in 2.28s`) | restored digest |
+
+Neither shape is permanently red or permanently green: each reading moves with the subject it
+claims to pin (SC-002, DoD-4). All scratch fixtures and the injection backup were removed in
+the same session.

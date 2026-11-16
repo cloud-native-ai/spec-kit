@@ -1,0 +1,78 @@
+# US2 scanner — mirror projection and verification (T026)
+
+Recorded 2026-11-16, through the generator only (the mirror is never hand-edited).
+
+## 1. Projection
+
+```bash
+python3 scripts/python/sync-mirrors.py --write --only scripts
+```
+
+rc = 0. The run re-emits the three projected `bash-version-guard` pairs, the three projected
+`python-version-bridge` pairs and the two pre-existing ORPHANs; the new file lands as
+`.specify/scripts/python/line-registration-scan.py`.
+
+## 2. Scoped verification
+
+```bash
+python3 scripts/python/sync-mirrors.py --check --only scripts
+```
+
+rc = **2**, and the whole reading is:
+
+```text
+scope --only: scripts
+ok    scripts/ == .specify/scripts/ (131 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ORPHAN .specify/scripts/line-registry.py (no canonical scripts/ source)
+ORPHAN .specify/scripts/stage-runner.sh (no canonical scripts/ source)
+```
+
+The pair line is `ok … (131 files, byte-identical)` — 130 files before this package plus the
+new scanner. rc 2 comes **only** from the two pre-existing ORPHANs that are part of the
+recorded baseline (`test-evidence/mirror-baseline.txt`), never from this feature's pair.
+
+```bash
+diff -q scripts/python/line-registration-scan.py .specify/scripts/python/line-registration-scan.py
+```
+
+Empty output, rc = 0.
+
+## 3. The mirror executes with the corrected self-location
+
+Running the generated mirror exercises the `.specify` branch of the repo-root rule
+(`python` → `scripts` → `.specify` → one level up):
+
+```text
+$ python3 .specify/scripts/python/line-registration-scan.py
+root: scripts/bash (files: 17)
+root: scripts/python (files: 50)
+root: skills (files: 93)
+scanned: 160 files
+violations: 0
+owner-skipped: 0
+```
+
+Exit 0. `owner-skipped: 0` is correct: the mirror lives in `.specify/scripts/python/`, which
+is outside the declared default roots, so the owner file never falls inside a root (C-12
+"else 0"). The framework source scanner *is* inside `scripts/python/` and is counted there as
+a judged file; it reads clean because its own text carries a compliant invocation member (the
+rule is purely textual), which is why the total is 160 rather than 159.
+
+## 4. Shape failure is an input error, not a guess
+
+A copy placed outside the `python` → `scripts` shape must refuse to infer a repository root:
+
+```text
+$ cp scripts/python/line-registration-scan.py .specify/.tmp/line-registry-registration/scan-copy.py
+$ python3 .specify/.tmp/line-registry-registration/scan-copy.py
+line-registration-scan.py: input error: repo-root-unresolved: /cws_data/cloud-native-ai/spec-kit/.specify/.tmp/line-registry-registration/scan-copy.py
+```
+
+Exit 2 with the required reason token and the scanner path (FR-013). The copy was removed in
+the same run.

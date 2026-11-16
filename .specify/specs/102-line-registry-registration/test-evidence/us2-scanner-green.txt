@@ -1,0 +1,68 @@
+# US2 scanner — green reading (T025)
+
+Run 2026-11-16 at HEAD `49bcbcfcf` + this package's uncommitted work, through the unique
+entry `scripts/bash/run-tests.sh` (parallel default).
+
+## Command
+
+```bash
+bash scripts/bash/run-tests.sh \
+  tests/contract/test_line_registration_scan.py \
+  tests/integration/test_line_registration_scan_live.py \
+  -q --names-out .specify/specs/102-line-registry-registration/test-evidence/us2-failed.txt
+```
+
+## Reading
+
+```text
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+.................                                                        [100%]
+17 passed in 2.27s
+# failed-name list written: .specify/specs/102-line-registry-registration/test-evidence/us2-failed.txt (0 entries) passes=1
+```
+
+| Quantity | Value |
+|----------|-------|
+| rc | 0 |
+| passed | 17 (15 contract + 2 integration) |
+| failed | 0 |
+| pytest duration | 2.27 s |
+| `--names-out` entries | 0 |
+| new failures vs `baseline-failed.txt` | 0 — `LC_ALL=C comm -13 baseline-failed.txt us2-failed.txt` is empty (baseline names: 241) |
+
+The 17 nodes are exactly the 17 names recorded red in `notes/red-first-evidence.md` R-4, so
+every red node from the pre-implementation leg is now green; nothing was renamed or dropped.
+
+## Live reading written by the integration test (FR-016)
+
+`test_the_declared_live_roots_read_clean_and_the_reading_is_recorded` persisted the scanner's
+stdout to `test-evidence/line-registration-scan-live.txt` (the scanner itself writes nothing):
+
+```text
+root: scripts/bash (files: 17)
+root: scripts/python (files: 49)
+root: skills (files: 93)
+scanned: 159 files
+violations: 0
+owner-skipped: 1
+```
+
+`scripts/python/` counts 49 judged files: the 48 pre-existing scripts plus this scanner, which
+is skipped as the criterion owner (`owner-skipped: 1`) and therefore not counted in `scanned`.
+
+## Contract coverage ledger (C-01…C-17)
+
+| Clause | Node(s) |
+|--------|---------|
+| C-01 surface / help | `test_c01_help_answers_zero_and_names_the_root_option` |
+| C-02 undeclared / missing value | `test_c02_undeclared_option_exits_two`, `test_c02_missing_option_value_exits_two` |
+| C-03 read-only | `test_c13_and_c14_the_reading_is_deterministic_and_read_only` (snapshot) |
+| C-05 root predicate (missing / non-dir / outside / empty) | four `test_c05_*` nodes |
+| C-06 roots printed | `test_c10_marker_without_a_compliant_invocation_is_a_violation` (`root:` line) |
+| C-07 judged surface (.md / symlink) | `test_c07_*` ×2 |
+| C-08 constants | `test_c08_the_four_criterion_constants_exist_and_are_populated` |
+| C-10 verdict | `test_c10_*` ×3 |
+| C-12 owner skip | `test_c12_owner_skip_is_named_on_the_declared_roots`, live test |
+| C-13 / C-14 reading shape + determinism | `test_c13_and_c14_*` |
+| C-15 / C-16 exit status | every node's exit-code assertion; live test exit 0 |
+| C-17 fixture use | all fixture nodes under `.specify/.tmp/line-registry-registration/` |

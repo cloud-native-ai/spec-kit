@@ -211,6 +211,56 @@ failures.
 After the scanner lands (T022–T025), this same command must turn green; that reading belongs to
 the next package.
 
+## R-5 — Wiring guard segment 1 is red before the four surfaces are edited (T029)
+
+Recorded 2026-11-16, after T028 authored the first segment of
+`tests/contract/test_line_registration_wiring.py` (C-01…C-09) and **before** any of the four
+surfaces was edited. The pre-edit baseline is `0` hits for every pinned pattern
+(`test-evidence/wiring-pre-edit-baseline.txt`; contract E-2).
+
+```bash
+$ bash scripts/bash/run-tests.sh tests/contract/test_line_registration_wiring.py \
+    -q --names-out .specify/specs/102-line-registry-registration/test-evidence/us3-wiring-red-failed.txt
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+```
+
+Representative failure (the live instructions carry no pointer bullet yet):
+
+```text
+    def test_c09_the_live_instructions_carry_the_bullet_once_and_the_links_resolve():
+>       assert section.count(AMBIENT_BULLET) == 1, (
+E       AssertionError: .specify/instructions.md must carry the pointer bullet exactly once (via the
+E       section-level refresh, never a hand edit)
+E       assert 0 == 1
+tests/contract/test_line_registration_wiring.py:179: AssertionError
+```
+
+Summary:
+
+```text
+FAILED ...::test_c01_c03_the_owner_section_states_the_criterion_and_its_boundary
+FAILED ...::test_c01_the_owner_names_the_carrier_and_the_registry_writer
+FAILED ...::test_c03_the_owner_states_the_digest_invariant
+FAILED ...::test_c05_the_status_template_carries_the_single_source_sentence_verbatim
+FAILED ...::test_c06_the_status_template_keeps_its_action_set_and_adds_no_second_surface
+FAILED ...::test_c07_the_template_has_exactly_one_pointer_bullet_after_exemptions
+FAILED ...::test_c09_the_live_instructions_carry_the_bullet_once_and_the_links_resolve
+7 failed, 2 passed in 1.97s
+```
+
+rc = 1; the seven failed names were written to `test-evidence/us3-wiring-red-failed.txt`.
+
+Why this is a true red leg: each of the seven nodes asserts a **positive** surface fact (owner
+§ 九 carries the criterion and threshold; status template carries the verbatim C-05 sentence;
+template carries the verbatim C-07 bullet immediately after `Exemptions and precedence`; live
+file carries it exactly once), and none of them can pass while the surfaces are unedited. The
+two passing nodes are negative-only assertions (`test_c03_…restate_the_mechanical_marker_members`,
+`test_c08_…does_not_restate_the_criterion`): they are drift guards that hold vacuously before
+the edits and must keep holding after them — they are deliberately not counted as red legs.
+
+T030–T036 land the four edits; T037 turns these seven nodes green. Segment 2 (C-10…C-13,
+run-team) is appended by T039 and has its own red reading.
+
 ## Post-red tightening (disclosed)
 
 After the implementation landed, two stderr assertions in R-2 were strengthened to the measured
