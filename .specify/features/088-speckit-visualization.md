@@ -82,6 +82,7 @@
 
 - `.specify/specs/088-speckit-visualization/requirements.md`（本 Feature 的首个规格）
 - `.specify/specs/102-line-registry-registration/requirements.md`（2026-11-16 `/speckit.clarify` 绑定为 slice 行 102：向本 Feature owns 的 `reporting-obligations.md` § 九 追加「长任务必须登记 line」判据并交付 `line-run.sh` 载体与扫描器；父行状态不回退（仍 Completed），102 行以 Draft 登记）
+- `.specify/specs/102-line-registry-registration/plan.md` (+ `research.md` / `data-model.md` / `contracts/` ×3 / `quickstart.md` / `feature-ref.md`) — 2026-11-16 `/speckit.plan` 产出的设计产物面：owner § 九 判据、`line-run.sh` 包装器契约（19 条款）、只读扫描器契约（17 条款）、四表面接线契约（16 条款）；Constitution Check 23/23 Pass（T-001/T-002 承重决策记录）、EP-001…EP-005 全 verified、Dependency set none、pre-analyze plan decision=pass（errors=0）；102 行 `Draft → Planned`，父行状态保持 `Completed`。
 
 ### Consuming / Consumed Owners
 
