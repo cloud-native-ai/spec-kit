@@ -20,7 +20,7 @@ The spec's Shared Strings are referenced as `[[STR-NNN]]`; their literals are ow
 
 ## R-03 — Registry line id composition (A-18)
 
-- **Decision**: the wrapper passes `--line-id "<line-id>-<run-id>"` and `--run-id "<run-id>"`. The composed id must satisfy the engine's own `LINE_ID_RE` (engine line 42) and the run id its `RUN_ID_RE` (line 43); the grammars are referenced by constant name and not restated here. The wrapper validates neither grammar itself — the engine is the validator — and a rejected id is a registration failure with the command not executed.
+- **Decision**: the wrapper passes `--line-id "<line-id>-<run-id>"` and `--run-id "<run-id>"`. The composed id must satisfy the engine's own `LINE_ID_RE` (engine line 42) and the run id its `RUN_ID_RE` (line 43); the grammars are referenced by constant name and not restated here. The wrapper validates neither grammar itself — the engine is the validator — and a rejected id is a registration failure with the command not executed. run-team generates its run id in the same engine-valid form (A-18: `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 lowercase hex>`); the bare UTC timestamp the skill uses today is not a run id.
 - **Alternative rejected**: a fixed id per slug — `closed` is terminal and the entry file is never reused (`update` refuses any transition out of `closed`, engine line 818), so a fixed id would make the second run of the same script fail permanently.
 - **Evidence**: the spec's example `batch-apply-r20261116T090000Z-a001` is 34 characters and matches `LINE_ID_RE`; a live register/deregister round with a composed-shape id succeeded (see § Baseline measurements).
 
@@ -89,7 +89,7 @@ The spec's Shared Strings are referenced as `[[STR-NNN]]`; their literals are ow
 | ID | Question | Adjudication | Reason |
 |----|----------|--------------|--------|
 | U-1 | Which exit code for engine-unavailable / non-git-repo? | `4`, wrapper-owned | Keeps `2` exclusively for usage and lets tests separate "you typed it wrong" from "the environment cannot register"; engine failures still propagate their own codes (A-24). |
-| U-2 | Where may the self-declaration marker appear? | A standalone comment line anywhere in the file | The criterion owner stays four constants; a positional window would need a fifth owned threshold for no adjudicated need. |
+| U-2 | Where may the self-declaration marker appear? | On any standalone comment line (first non-whitespace character `#`) whose text contains the literal, case-sensitive | The criterion owner stays four constants; one textual predicate (comment line + literal containment) needs no positional window and therefore no fifth owned threshold. |
 | U-3 | Does the read-only scanner need `--version`? | No; `-h`/`--help` yes (argparse default) | The Script Interface Contract places read-only scripts outside the required set; help and unknown-option rejection (exit 2) are kept because they cost nothing and improve diagnosis. |
 | U-4 | Is `--line-id=<value>` accepted by the wrapper? | No | The shared bash guard judges `-*` tokens whole; the usage line states the separated form. |
 | U-5 | Where do engine payloads go? | stderr only | The wrapped command owns stdout; a caller parsing its output must never see registry JSON interleaved. |

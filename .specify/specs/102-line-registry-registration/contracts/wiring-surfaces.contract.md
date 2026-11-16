@@ -8,7 +8,7 @@
 
 C-01 The digest contract MUST gain one long-task registration criterion: a run meeting the criterion MUST register a line at start, refresh it at stage boundaries and close it at the end; an unregistered run never enters the digest, so `[[STR-006]]` is an accurate conclusion, not a missed report.
 C-02 The criterion MUST name the carrier (`[[STR-001]]`) and MUST state that the registry writer is the engine (`[[STR-002]]`) — never `scripts/python/journal-utils.py`.
-C-03 The threshold value and the adjudication boundary MUST be stated and owned in this document. No other surface of this contract restates them.
+C-03 The threshold value and the adjudication boundary MUST be stated and owned in this document. It MUST also state the digest invariant on which the criterion rests: line visibility comes solely from the registry, any liveness probe is limited to PIDs already recorded on a registry entry, and no unregistered process is ever discovered. No other surface of this contract restates them.
 C-04 The section MUST NOT add a scheduler, daemon, threshold table or second liveness channel; § 十一 remains in force.
 
 ## C-05 — `/speckit.status` command template (`templates/commands/status.md`)
@@ -16,7 +16,7 @@ C-04 The section MUST NOT add a scheduler, daemon, threshold table or second liv
 C-05 The template MUST contain exactly this sentence, verbatim:
 
 ```text
-**Single source**: the digest reads the Line Registry and nothing else — it MUST NOT be changed to scan processes, because determinism is the contract; the obligation is owned by `shared/guidelines/reporting-obligations.md` § 九 and is reached by path, never restated here.
+**Single source**: line visibility comes solely from the Line Registry — the digest's liveness probe is limited to PIDs already recorded on a registry entry and never discovers an unregistered process, so it MUST NOT be changed to discover unregistered processes; the obligation is owned by `shared/guidelines/reporting-obligations.md` § 九 and is reached by path, never restated here.
 ```
 
 C-06 The template MUST NOT gain a second renderer, a process-scanning step, a restatement of § 九's criterion bullets, or a change to the script's action set.
@@ -34,7 +34,7 @@ C-09 `.specify/instructions.md` MUST carry the same bullet exactly once, obtaine
 
 ## C-10 — run-team (`skills/internal/run-team/SKILL.md`)
 
-C-10 At the top of **§5 Present & Execute** the skill MUST register the run's line through the line-registry engine at its A-17 candidates — `skills/external/sdd-loop-driver/scripts/line-registry.py`, then `.specify/skills/sdd-loop-driver/scripts/line-registry.py` (a downstream project holds only the second) — with the composed `<team-slug>-<run-id>` id, and MUST fail closed before dispatching any seat. The site MUST read the engine's actions, parameters and exit codes from its `--help` rather than restating them.
+C-10 At the top of **§5 Present & Execute** the skill MUST register the run's line through the line-registry engine at its A-17 candidates — `skills/external/sdd-loop-driver/scripts/line-registry.py`, then `.specify/skills/sdd-loop-driver/scripts/line-registry.py` (a downstream project holds only the second) — with the composed `<team-slug>-<run-id>` id, where the run id is generated in the engine-valid form owned by requirement A-18 (never the skill's bare UTC timestamp), and MUST fail closed before dispatching any seat. The site MUST read the engine's actions, parameters and exit codes from its `--help` rather than restating them.
 C-11 Inside **§6 Orchestrate** the skill MUST refresh the run line's last event at each orchestration step boundary via the engine's `update`, and MUST state that no timer, daemon or second channel exists.
 C-12 At the start of **§7 Report** the skill MUST close the run's line through the engine and MUST require the composed `[[STR-007]]` to appear in the report body. A close failure MUST be stated in the report, not swallowed.
 C-13 The skill MUST NOT modify `skills/internal/create-team`'s Report contract, and MUST NOT add an engine parameter table.
@@ -42,7 +42,7 @@ C-13 The skill MUST NOT modify `skills/internal/create-team`'s Report contract, 
 ## C-14 — Cross-surface invariants
 
 C-14 Removing any one of C-01, C-05, C-07, C-10, C-11 or C-12 MUST turn its guarding test red.
-C-15 The four surfaces MUST agree on the same owner path and the same carrier path; a divergent path is a defect of the surface, not of the owner.
+C-15 The four surfaces MUST agree on the same owner path and the same carrier path, and none may state a false digest invariant. The only invariant a surface may name is the one owned by § 九: line visibility comes solely from the registry; any liveness probe is limited to PIDs already recorded on a registry entry; no unregistered process is ever discovered. A divergent path or a different invariant is a defect of the surface, not of the owner.
 C-16 None of the four surfaces may be edited only in a mirror: each authored edit lands in the framework source and is projected by `sync-mirrors.py` / `regen-command-copies.py` / the `/speckit.instructions` refresh.
 
 ## Examples

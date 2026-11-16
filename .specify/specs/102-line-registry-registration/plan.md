@@ -8,12 +8,12 @@
 
 ## Summary
 
-`/speckit.status`'s digest reads the environment Line Registry and never scans processes, so any long task that registers no line answers `[[STR-006]]` — an accurate conclusion about an invisible run. This feature closes the gap with one criterion, one carrier and two teeth:
+`/speckit.status`'s digest takes line visibility solely from the environment Line Registry: its liveness probe is limited to PIDs already recorded on a registry entry (reading `.specify/state/pid-*`, `/proc` and `os.kill`) and it never discovers an unregistered process, so any long task that registers no line answers `[[STR-006]]` — an accurate conclusion about an invisible run. This feature closes the gap with one criterion, one carrier and two teeth:
 
 1. the criterion lands in the owner document `shared/guidelines/reporting-obligations.md` § 九 (register at start, heartbeat at stage boundaries, close at the end; unregistered ⇒ not in the digest);
 2. the carrier is a new bash wrapper `[[STR-001]]` — `register → execute → close`, fail-closed on registration, `completed` / `failed` on close, `active` residue when it cannot finish;
 3. the teeth are a deterministic read-only scanner `[[STR-009]]` whose mechanical criterion is owned by four module constants, plus the behavioural/contract tests that prove the wrapper's lifecycle and the scanner's red leg;
-4. the wiring is textual and pointer-only: `templates/commands/status.md` (registry-only sentence), `templates/instructions-template.md` (one ambient bullet), `skills/internal/run-team/SKILL.md` (register / heartbeat / close).
+4. the wiring is textual and pointer-only: `templates/commands/status.md` (line-visibility single-source sentence), `templates/instructions-template.md` (one ambient bullet), `skills/internal/run-team/SKILL.md` (register / heartbeat / close).
 
 No scheduler, daemon, dependency, second registry or status spine is introduced; the digest engine and the registry engine are consumed unchanged.
 
@@ -115,7 +115,7 @@ scripts/bash/            # line-run.sh (new wrapper) beside the shared script-in
 scripts/python/          # line-registration-scan.py (new read-only scanner)
 shared/guidelines/       # reporting-obligations.md § 九 gains the criterion (owner edit)
 skills/internal/run-team/# SKILL.md gains register / heartbeat / close at §5 / §6 / §7
-templates/commands/      # status.md gains the registry-only sentence
+templates/commands/      # status.md gains the line-visibility single-source sentence
 templates/               # instructions-template.md gains one ambient bullet
 tests/contract/          # CLI contracts + wiring guards (3 new files)
 tests/integration/       # wrapper/digest behaviour + live reading (2 new files)
@@ -146,7 +146,7 @@ Owner of this table's shape, its `Status` / `Decision` value domains and its inv
 | EP-001 | A CPython interpreter `>=3.8` is available and the scanner is implementable with the standard library only. | `pyproject.toml:5` (`requires-python = ">=3.8"`); `python3 --version` → 3.11.0rc1; scan design imports only `os`/`re`/`pathlib`/`argparse`-class stdlib. | verified | — |
 | EP-002 | The unique test entry is `scripts/bash/run-tests.sh`, pytest is installed, and new tests can be parallel-safe through per-test temp registries. | `pyproject.toml:21` (`pytest`); `python3 -m pytest --version` → 9.0.3; runner header (parallel default, `--names-out`); `tests/fixtures/line_fixtures.py:50-58` isolates `SPECIFY_LINE_REGISTRY_DIR`. | verified | — |
 | EP-003 | The registry engine at both declared candidates exposes `register` / `update` / `deregister` with the documented requirements and terminal-state rule. | `skills/external/sdd-loop-driver/scripts/line-registry.py:81-94,576-700,808-900`; both candidates answer `--version` (`line-registry.py 0.0.22`); `register` requires `--project-dir`/`--repo-root`; `deregister` requires `--reason`; `closed` is terminal. | verified | — |
-| EP-004 | The digest reads only the registry, hides closed lines, renders the empty set explicitly, and owns the stale bound. | `scripts/python/status-digest.py:74,81-91,985-989,1097`; executed lifecycle on 2026-11-16: empty → `nothing-running` rc 3, active → listed rc 0, closed → `nothing-running` rc 3. | verified | — |
+| EP-004 | The digest takes line visibility solely from the registry, hides closed lines, renders the empty set explicitly, and owns the stale bound; its liveness probe is limited to PIDs already recorded on a registry entry and never discovers an unregistered process. | `scripts/python/status-digest.py:74,81-91,985-989,1097` (registry read, closed-line filter, empty rendering, stale bound) and `:888,1265,1304,1330` (`.specify/state/pid-*` read plus `/proc` / `os.kill` liveness probe, gated on an existing registry entry); executed lifecycle on 2026-11-16: empty → `nothing-running` rc 3, active → listed rc 0, closed → `nothing-running` rc 3. | verified | — |
 | EP-005 | A POSIX `bash` plus the shared script-interface guard is available, and the wrapper needs no other runtime. | `bash --version` → 5.1.16(1)-release; `scripts/bash/script-interface.sh` present and already consumed by `scripts/bash/run-tests.sh`; no third-party import planned. | verified | — |
 
 ## Inherited Blockers

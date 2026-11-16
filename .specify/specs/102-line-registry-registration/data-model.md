@@ -20,6 +20,7 @@ Validation rules: none are added by this feature. The engine validates ids, stat
 
 - **Form**: `<line-id>-<run-id>` (e.g. `batch-apply-r20261116T090000Z-a001`).
 - **Validation**: the engine's own `LINE_ID_RE` / `RUN_ID_RE` (engine source lines 42-43) decide; the wrapper validates neither. The grammars are the engine's, referenced by constant name, not restated here.
+- **Run-id generation**: `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 lowercase hex>` (e.g. `r20261116T090000Z-a001`, A-18); it must match the engine's `RUN_ID_RE`. A bare UTC timestamp is not a run id.
 - **Uniqueness**: each run yields a new id; a retried run id equals a repeated registration and fails closed on the engine's `line already exists` — never overwrite, never delete.
 - **Consumers**: the wrapper (creates and closes), run-team §7 (records it in the report body), tests (read the entry by this id).
 
@@ -73,7 +74,7 @@ A file enters judgement iff **all** hold: it is a regular file (symlinks skipped
 | Constant | Role | Member literals |
 |----------|------|-----------------|
 | `LONG_TASK_MARKERS` | content strings that make a file a long task | `[[STR-004]]`, `[[STR-005]]` |
-| `SELF_DECLARATION_MARKER` | a comment line by which a file declares itself a long task | `[[STR-003]]` |
+| `SELF_DECLARATION_MARKER` | a standalone comment line (first non-whitespace character `#`) whose text contains the literal, case-sensitive | `[[STR-003]]` |
 | `COMPLIANT_INVOCATIONS` | invocation forms that discharge the registration duty | wrapper form (`[[STR-001]]`); engine `register` / `update` / `deregister` (`[[STR-002]]`) |
 | `DEFAULT_SCAN_ROOTS` | the declared live roots | members owned by the constant; the set is the one A-21 declares |
 

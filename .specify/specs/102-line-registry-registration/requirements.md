@@ -7,7 +7,7 @@
 **Flow Type**: -
 **Readers**: 框架维护者（编写/修订 `shared/guidelines/**`、`scripts/bash/**`、`scripts/python/**`、`templates/commands/**`、`templates/instructions-template.md`、`skills/internal/**` 与 `.specify/specs/**` 的维护者）与下游项目中运行无人值守长任务、使用 `/speckit.status` 判定「现在到底有没有东西在跑」的维护者——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
 **Reading scenario**: 当需要判定「为什么一个正在跑的后台批量 apply/verify 或长时间测试在 digest 里显示 `nothing-running`」「哪些任务算长任务、这条判据归谁拥有」「`line-run.sh` 登记什么、失败与 SIGKILL 时留下什么」「registry 的写入方到底是谁」「扫描器判什么、凭什么算有牙、活仓库扫描根为何必须是可跟踪路径」「常驻小节里的提醒为什么只有一句指针」时打开本规格，据 FR-001…FR-023 与 SC-001…SC-009 决定 `/speckit.clarify` 与后续实现是否放行
-**Input**: User description: "固化「长任务必须登记 line、否则立即变红」的机制边界。/speckit.status 的当前态摘要（digest）只读环境级 Line Registry、从不扫进程，因此任何未登记 line 的长任务（后台批量 apply/verify、长时间测试、无人值守批处理）在 digest 中必然显示 nothing-running——这是「未登记即不可见」的机制缺口，不是漏报。本特性交付：① owner 文档 shared/guidelines/reporting-obligations.md § 九 新增判据（预计超过 5 分钟或含后台批量 apply/verify 的任务 MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记即不进入 digest，nothing-running 是准确结论）；② framework 源新增 scripts/bash/line-run.sh 包装器（register → 执行 → 按结果 close；被 SIGKILL 等无法收尾时保留 active 供 digest 显示；registry 写入方是 line-registry.py，不是 journal-utils.py）；③ 接线：run-team 技能在运行前登记 line、执行中 heartbeat、报告时关闭并记录 line_id；templates/commands/status.md 声明 digest 以 registry 为唯一来源、不得改为扫进程；.specify/instructions.md 增加一条指针式环境提醒（经模板同步落地，不复述判据）；④ 契约与行为测试：脚本接口（-h/--version 退出 0、拒绝未声明选项）、临时 registry 下的成功/失败登记行为、扫描器 fixture 正反例（在 .specify/.tmp/ 下造一个含 terraform apply 且未登记的脚本判红，包上 line-run.sh 后判干净）、活仓库可跟踪扫描根干净。所有对外分发的改动落在 framework 源（scripts/、shared/、templates/、skills/）并经 sync-mirrors 投影，不只手改 .specify/ 运行时。"
+**Input**: User description: "固化「长任务必须登记 line、否则立即变红」的机制边界。/speckit.status 的当前态摘要（digest）只读环境级 Line Registry、从不扫进程，因此任何未登记 line 的长任务（后台批量 apply/verify、长时间测试、无人值守批处理）在 digest 中必然显示 nothing-running——这是「未登记即不可见」的机制缺口，不是漏报。本特性交付：① owner 文档 shared/guidelines/reporting-obligations.md § 九 新增判据（预计超过 5 分钟或含后台批量 apply/verify 的任务 MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记即不进入 digest，nothing-running 是准确结论）；② framework 源新增 scripts/bash/line-run.sh 包装器（register → 执行 → 按结果 close；被 SIGKILL 等无法收尾时保留 active 供 digest 显示；registry 写入方是 line-registry.py，不是 journal-utils.py）；③ 接线：run-team 技能在运行前登记 line、执行中 heartbeat、报告时关闭并记录 line_id；templates/commands/status.md 声明 digest 以 registry 为唯一来源、不得改为扫进程；.specify/instructions.md 增加一条指针式环境提醒（经模板同步落地，不复述判据）；④ 契约与行为测试：脚本接口（-h/--version 退出 0、拒绝未声明选项）、临时 registry 下的成功/失败登记行为、扫描器 fixture 正反例（在 .specify/.tmp/ 下造一个含 terraform apply 且未登记的脚本判红，包上 line-run.sh 后判干净）、活仓库可跟踪扫描根干净。所有对外分发的改动落在 framework 源（scripts/、shared/、templates/、skills/）并经 sync-mirrors 投影，不只手改 .specify/ 运行时。" **输入前提纠正（P4，2026-11-16，以代码为权威）**：`scripts/python/status-digest.py` 除 registry 外还读取 `.specify/state/pid-*`，并对已登记条目的 PID 做 `/proc` / `os.kill` 存活探测（行 888、1265、1304、1330）。因此本规格采用的真实不变量是「line 可见性唯一来源是 registry；存活探测仅限已登记 PID；绝不发现未登记进程」；上文引述的用户原始描述中「只读 registry、从不扫进程」一句按此纠正。
 
 ## Related Feature *(mandatory)*
 
@@ -17,13 +17,13 @@
 
 ## Overview
 
-`/speckit.status` 的当前态摘要（digest）在 087 落地时被固定为**只读环境级 Line Registry、从不扫进程**（`scripts/python/status-digest.py`，owner `shared/guidelines/reporting-obligations.md` § 九）。这条只读边界让 digest 具备确定性，但也让一条未登记 line 的长任务在摘要里**必然**显示 [[STR-006]]：这不是漏报，而是「未登记即不可见」的机制缺口。长任务目前不登记的原因不是没有载体，而是没有一条判据说「必须登记」，也没有一个让登记**顺手发生**的包装器。
+`/speckit.status` 的当前态摘要（digest）的 line 可见性在 087 落地时被固定为**唯一来源是环境级 Line Registry**（`scripts/python/status-digest.py`，owner `shared/guidelines/reporting-obligations.md` § 九）：它会对**已登记条目记录的 PID** 做存活探测（读取 `.specify/state/pid-*`，并用 `/proc` 与 `os.kill` 判断存活），但**绝不发现未登记进程**。这条边界让 digest 具备确定性，也让一条未登记 line 的长任务在摘要里**必然**显示 [[STR-006]]：这不是漏报，而是「未登记即不可见」的机制缺口。长任务目前不登记的原因不是没有载体，而是没有一条判据说「必须登记」，也没有一个让登记**顺手发生**的包装器。
 
 本特性固化一条判据与一个载体，使「长任务不登记 line」在本仓**立即变红**，而不是等 status 与事实不符时才被发现：
 
 1. **判据**落在 owner 文档 `shared/guidelines/reporting-obligations.md` § 九：预计超过 5 分钟、或含后台批量 apply/verify 的运行（含长时间测试与无人值守批处理）MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记即不进 digest，[[STR-006]] 是准确结论而非漏报。判据的**判定边界**由该文件拥有，`/speckit.status` 只按路径引用、不复述。
 2. **载体**是 framework 源新增的 [[STR-001]] 包装器：`register → 执行 → 按结果 close`；被 SIGKILL 等无法收尾时**保留 active**，让 digest 显示它。任何批量脚本改成 `line-run.sh --line-id <slug> --run-id <id> -- bash batch.sh` 即自动登记，不再依赖 agent 记得手动调引擎。
-3. **接线**覆盖三处：`skills/internal/run-team/SKILL.md` 在运行前登记、执行中 heartbeat、报告时关闭并记录 [[STR-007]]；`templates/commands/status.md` 增一句声明 digest 以 registry 为唯一来源、不得改为扫进程；`templates/instructions-template.md` 的既有常驻小节 `## Progress Reporting Discipline` 内、`Exemptions and precedence` 之后追加一条**指针式** bullet（一句话 + owner 路径），经模板同步投影到 `.specify/instructions.md` 及其符号链接。
+3. **接线**覆盖三处：`skills/internal/run-team/SKILL.md` 在运行前登记、执行中 heartbeat、报告时关闭并记录 [[STR-007]]；`templates/commands/status.md` 增一句声明 line 可见性以 registry 为唯一来源、存活探测仅限已登记 PID、绝不发现未登记进程（保持确定性）；`templates/instructions-template.md` 的既有常驻小节 `## Progress Reporting Discipline` 内、`Exemptions and precedence` 之后追加一条**指针式** bullet（一句话 + owner 路径），经模板同步投影到 `.specify/instructions.md` 及其符号链接。
 4. **契约与行为测试**证明载体可用且判据有牙：脚本接口、临时 registry 下的成功/失败登记、SIGKILL 残留、扫描器 fixture 正反例、活仓库可跟踪扫描根干净。
 
 **必须纠正的三项前提（不得静默沿用原始方案）**：
@@ -32,7 +32,7 @@
 - **P2 扫描判据不得是空判**：`.specify/teams/.work/**` 是本仓当前为空的运行期目录，以它作唯一扫描根、以 `terraform apply` 作唯一模式会让测试永远绿。扫描根 MUST 是可跟踪路径，扫描器 MUST 用 fixture 证明有牙。见 FR-012…FR-016。
 - **P3 常驻提醒是指针不是副本**：`## Progress Reporting Discipline` 常驻小节里的提醒只给一句话 + owner 路径，不复述判据；落地经 `templates/instructions-template.md` 模板同步（不手改再生成产物）。见 FR-019。
 
-**不做什么**：不引入调度器、定时器服务、常驻进程、第三方依赖、第二份 registry、第二份状态脊或任何台账（`reporting-obligations.md` § 十一 的禁令）；不把 digest 改成扫进程；不新建自动 stale 清理；不改 `status-digest.py` 的动作集、退出码闭集与 [[STR-006]] 渲染；不新建第二条 liveness 通道；不推送远端。
+**不做什么**：不引入调度器、定时器服务、常驻进程、第三方依赖、第二份 registry、第二份状态脊或任何台账（`reporting-obligations.md` § 十一 的禁令）；不把 digest 改成发现未登记进程（存活探测仅限已登记 PID）；不新建自动 stale 清理；不改 `status-digest.py` 的动作集、退出码闭集与 [[STR-006]] 渲染；不新建第二条 liveness 通道；不推送远端。
 
 ## Assumptions & Decisions *(adjudicated here, not asked)*
 
@@ -55,7 +55,7 @@
 | **A-15** | **机械判据的机器可读 owner = 扫描器模块内常量**（长任务标记集、自声明标记、合规形态、默认扫描根各一个模块级常量）；测试以 `import` 读取，owner 文档只按路径引用、不复述成员。扫描器按解析路径跳过**自身文件**（owner 是判据的声明者而非执行者），并在读数中具名 `owner-skipped`，MUST NOT 把它计入干净命中。否决的替代：声明层 fact——它会新增 fact 注册并突破 FR-022 的「新增物仅限…」与 SC-009 的封闭 delta；若未来第二个引擎也要消费该判据，重开此抉择。 | One Source Of Truth（代码优先）+ 最小交付面；自跳过是具名豁免，不是隐藏。 |
 | **A-16** | **扫描器路径本阶段固定**为 [[STR-009]] `scripts/python/line-registration-scan.py`，镜像到 `.specify/scripts/python/`；接口：只读、`--root <path>` 可重复、缺省用 A-21 的默认根、退出码 0/1/2。不新增 fixture 辅助脚本——fixture 由测试在 A-21 的临时根内生成并清理。 | FR-015/SC-002 的测试必须点名可执行路径；留给 plan 会让测试硬编码一个猜测。 |
 | **A-17** | **引擎路径唯一规则（有序候选，首个可读者胜）**：(1) `<repo-root>/skills/external/sdd-loop-driver/scripts/line-registry.py`；(2) `<repo-root>/.specify/skills/sdd-loop-driver/scripts/line-registry.py`。`<repo-root>` 由包装器自身路径解析（`scripts/bash/` 或 `.specify/scripts/bash/` 的上两级；若该级目录名为 `.specify` 再上移一级，与 `status-digest.py` 的守卫同形）。两者都不可读 → 登记失败（A-5）：不执行被包装命令、非零退出并具名两个候选路径。MUST NOT 使用 `.specify/scripts/line-registry.py`（未跟踪本机副本）、MUST NOT 经 `PATH` 查找、不新增引擎路径环境变量。 | 与 digest 的引擎解析同向（framework 源优先），且两顶帽子各有一支；客户端项目只存在候选 (2)。 |
-| **A-18** | **身份输入与 registry `line_id`**：包装器用 `git rev-parse --show-toplevel` 取绝对 repo root，同时作为引擎的 `--project-dir` 与 `--repo-root`（不得用 `$PWD`；digest 按这两个字段匹配工作区）；非 git 仓库 → 登记失败（A-5）。registry 条目 id 由包装器合成为 `<--line-id>-<--run-id>`（例：`batch-apply-r20261116T090000Z-a001`），使同一 slug 的每次运行天然唯一；该 id 已存在（同一 run 重试）→ 引擎的 `line already exists` 上浮并按 A-5 闭合，MUST NOT 覆盖或删除既有条目。包装器 MUST NOT 放松引擎的 `line_id` / `run_id` 正则，不合规即登记失败、命令不执行。测试与运行报告记录的是合成 id（[[STR-007]] 的值）。 | 引擎的 `closed` 是终态且条目文件不删除（`update` 的 `a new attempt requires a new line`），固定 id 会让第二次运行永远失败；合成 id 保住「同一命令形状反复运行」的人机接口。 |
+| **A-18** | **身份输入与 registry `line_id`**：包装器用 `git rev-parse --show-toplevel` 取绝对 repo root，同时作为引擎的 `--project-dir` 与 `--repo-root`（不得用 `$PWD`；digest 按这两个字段匹配工作区）；非 git 仓库 → 登记失败（A-5）。registry 条目 id 由包装器合成为 `<--line-id>-<--run-id>`（例：`batch-apply-r20261116T090000Z-a001`），使同一 slug 的每次运行天然唯一；该 id 已存在（同一 run 重试）→ 引擎的 `line already exists` 上浮并按 A-5 闭合，MUST NOT 覆盖或删除既有条目。包装器 MUST NOT 放松引擎的 `line_id` / `run_id` 正则，不合规即登记失败、命令不执行。run-team 的 run-id 生成规则：形如 `r<UTC 日期 yyyymmdd>T<UTC 时间 hhmmss>Z-<4 位小写十六进制>`（例 `r20261116T090000Z-a001`），MUST 匹配引擎 `RUN_ID_RE`；run-team 现有的裸 UTC 时间戳 MUST NOT 作为 run-id。测试与运行报告记录的是合成 id（[[STR-007]] 的值）。 | 引擎的 `closed` 是终态且条目文件不删除（`update` 的 `a new attempt requires a new line`），固定 id 会让第二次运行永远失败；合成 id 保住「同一命令形状反复运行」的人机接口。 |
 | **A-19** | **heartbeat 形态 = 步骤边界事件，无时间间隔**：包装器只产生两个引擎事件——register（`registered`）与关闭（`completed` / `failed`）；它观察不到被包装命令的内部阶段，故不刷新中间事件（A-13）。run-team 在 §6 的每个编排步骤边界调一次 `update --last-event <step-label>`（标签取技能小节名/阶段名）。不存在定时器、守护进程、心跳文件或第二通道；时间上的「过期」只由 digest 的既有 stale 界判定（A-20）。 | 「按阶段 heartbeat」是可判定的事件序列而非时钟；§ 十一 禁止新守护进程。 |
 | **A-20** | **SIGKILL 残留的过期界限只引用既有 owner**：残留 `active` 条目由 digest 依 `scripts/python/status-digest.py` 的 `DEFAULT_STALE_BOUND_SECONDS`（可经 `--stale-bound` 覆盖）标记 stale 并显示时长；本特性不新增阈值、不做自动清理、不删除条目。残留处置走既有流程（既有 `deregister --reason stale-cleanup` 等动作由操作者或既有流程调用）。 | FR-020 要求 digest 闭集不变；§ 十一 禁止清理守护进程；阈值保持单 owner。 |
 | **A-21** | **活仓库扫描根 = `scripts/bash/`、`scripts/python/`、`skills/`**（递归；`templates/` 无可执行脚本，不列入）。**被判定文件面 = 常规文件且满足其一：`.sh` / `.bash` / `.py` 扩展名，或首行 shebang**；符号链接一律跳过（不跟随），永不越出 repo root。缺失的默认根 → 退出 2 并具名该根，MUST NOT 把缺失或空目录渲染成干净。fixture 根 = `.specify/.tmp/line-registry-registration/`（已被 `.specify/.gitignore` 的 `.tmp/` 覆盖），由测试生成并清理。 | 排除 `tests/` 与散文文档后，`skills/` 内 [[STR-005]] 的既有命中（`references/*.md`）不再是脚本，活仓库读数可为零；根清单与文件面同属 A-15 的常量 owner。 |
@@ -101,7 +101,7 @@
 
 ### User Story 3 - 判据有唯一 owner，下游表面只给指针 (Priority: P2)
 
-维护者要回答「这条判据是谁定的、改一次要改几个文件」。答案必须是：owner 文档 `shared/guidelines/reporting-obligations.md` § 九 拥有判据与判定边界；机械投影的常量 owner 在扫描器模块内（A-15）；`templates/commands/status.md` 只声明 digest 以 registry 为唯一来源、不得扫进程；常驻小节（`templates/instructions-template.md` 的 `## Progress Reporting Discipline` 投影到 `.specify/instructions.md` 与其符号链接）只有一句指针提醒；技能与测试只按路径引用。删掉任一表面或把 owner 的判据复述进下游，契约测试转红。
+维护者要回答「这条判据是谁定的、改一次要改几个文件」。答案必须是：owner 文档 `shared/guidelines/reporting-obligations.md` § 九 拥有判据与判定边界；机械投影的常量 owner 在扫描器模块内（A-15）；`templates/commands/status.md` 只声明 line 可见性以 registry 为唯一来源、存活探测仅限已登记 PID、绝不发现未登记进程；常驻小节（`templates/instructions-template.md` 的 `## Progress Reporting Discipline` 投影到 `.specify/instructions.md` 与其符号链接）只有一句指针提醒；技能与测试只按路径引用。删掉任一表面或把 owner 的判据复述进下游，契约测试转红。
 
 **Why this priority**: 判据一旦在多处复述就会漂移；而常驻小节是让每个会话第一眼就看到提醒的唯一位置，必须是指针而不是副本。
 
@@ -110,7 +110,7 @@
 **Acceptance Scenarios**:
 
 1. **Given** 本特性落地后的仓库，**When** 阅读 `shared/guidelines/reporting-obligations.md` § 九，**Then** 判据（>5 分钟 / 后台批量 apply/verify、启动登记、阶段 heartbeat、结束 close、未登记即 [[STR-006]]）与判定边界在此，且是唯一详细定义点。
-2. **Given** `templates/commands/status.md`，**When** 阅读它，**Then** 它含一句「digest 以 registry 为唯一来源、不得改为扫进程」，且未复述 § 九 的判据条目或增加渲染逻辑。
+2. **Given** `templates/commands/status.md`，**When** 阅读它，**Then** 它含一句「line 可见性以 registry 为唯一来源、存活探测仅限已登记 PID、绝不发现未登记进程」，且未复述 § 九 的判据条目或增加渲染逻辑。
 3. **Given** `templates/instructions-template.md` 的 `## Progress Reporting Discipline`，**When** 阅读它，**Then** 在 `Exemptions and precedence` bullet 之后含**一条**一句话指针 + owner 路径（不新建小节，A-22），且 `.specify/instructions.md` 中该句与模板投影一致（经再生成，不是手改）。
 
 ---
@@ -148,7 +148,7 @@
 
 ### Functional Requirements
 
-- **FR-001**: 系统 MUST 在 owner 文档 `shared/guidelines/reporting-obligations.md` § 九（当前态摘要契约）新增长任务判据：预计超过 5 分钟、或含后台批量 apply/verify 的运行（含长时间测试、无人值守批处理）MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记的运行不进入 digest，[[STR-006]] 是准确结论而非漏报。阈值判定者为运行者，在启动时按预期时长判断（A-1 的人工阈值；机械可判定投影见 FR-002）。判定边界由该文件拥有。
+- **FR-001**: 系统 MUST 在 owner 文档 `shared/guidelines/reporting-obligations.md` § 九（当前态摘要契约）新增长任务判据：预计超过 5 分钟、或含后台批量 apply/verify 的运行（含长时间测试、无人值守批处理）MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记的运行不进入 digest，[[STR-006]] 是准确结论而非漏报。阈值判定者为运行者，在启动时按预期时长判断（A-1 的人工阈值；机械可判定投影见 FR-002）。判定边界由该文件拥有；§ 九 同时声明 digest 的真实不变量：line 可见性唯一来源是 registry；存活探测仅限已登记 PID；绝不发现未登记进程。
 - **FR-002**: 长任务判据的**机械可判定投影**（脚本内容含 [[STR-004]]、调用 [[STR-005]]、或头部标记 [[STR-003]]）MUST 恰好有一个机器可读 owner：扫描器模块内的判据常量（A-15）；扫描器、测试与文档 MUST 引用它（测试以 `import` 读取），MUST NOT 各自复述该封闭集。扫描器 MUST 按解析路径跳过该 owner 文件本身，并在读数中具名 `owner-skipped`。
 - **FR-003**: framework 源 MUST 新增包装器 [[STR-001]]，并经 `scripts/python/sync-mirrors.py` 投影到 `.specify/scripts/bash/`；镜像 MUST NOT 手改。
 - **FR-004**: 包装器 MUST 在被包装命令启动前，经 registry 引擎 [[STR-002]] 把 line 登记为 `active`（引擎按 A-17 的有序候选解析；`--project-dir` / `--repo-root` 与 registry `line_id` 按 A-18 派生/合成）；执行 `--` 之后的命令；按结果关闭：退出 0 → reason `completed`，非零 → reason `failed`。终止 reason 取值域见 [[STR-008]]。
@@ -165,9 +165,9 @@
 - **FR-015**: 测试 MUST 在 `.specify/.tmp/line-registry-registration/`（A-21 的 fixture 根，已被 `.gitignore` 覆盖）下生成含 [[STR-004]]、未登记的临时脚本，断言扫描器 [[STR-009]] 报违规；再把同一脚本改为经 [[STR-001]] 调用，断言扫描器判干净；另对同一根内一个带头部标记 [[STR-003]] 且无合规调用的脚本断言判违规（自声明不豁免）（fixture 有牙，正反与自声明三例都断言；测试结束清理该根）。
 - **FR-016**: 对活仓库声明的扫描根，扫描器 MUST 给出零违规读数，且该读数（根清单、扫描文件数、命中数、`owner-skipped`）MUST 由测试经唯一入口运行时记录到 `test-evidence/`（扫描器自身保持只读、不写任何文件）；读数 MUST NOT 以暂定数字冒充实测。
 - **FR-017**: `skills/internal/run-team/SKILL.md` MUST 在运行开始前登记 line、在执行期按阶段 heartbeat、在 Report 步骤关闭 line 并把 [[STR-007]] 写入运行报告（落点按 A-7 的现有小节名）；三处 MUST 以路径引用引擎，MUST NOT 复述引擎参数表。
-- **FR-018**: `templates/commands/status.md` MUST 增一句声明：digest 以 Line Registry 为唯一来源，MUST NOT 改为扫进程（保持确定性）；该句 MUST NOT 复述 § 九 的判据条目，MUST NOT 增加渲染逻辑。
+- **FR-018**: `templates/commands/status.md` MUST 增一句声明：line 可见性以 Line Registry 为唯一来源——存活探测仅限已登记 PID，MUST NOT 改为发现未登记进程（保持确定性）；该句 MUST NOT 复述 § 九 的判据条目，MUST NOT 增加渲染逻辑。
 - **FR-019**: `templates/instructions-template.md` 的 `## Progress Reporting Discipline` 常驻小节内、`Exemptions and precedence` bullet 之后 MUST 增一条**指针式**提醒（一句话 + owner 路径），不新建小节、不改其它 bullet（A-22）；`.specify/instructions.md` 及其符号链接 MUST 经再生成获得该句，MUST NOT 手改（A-6）。
-- **FR-020**: `/speckit.status` 的 digest MUST 保持只读 registry、零进程派生、动作集与退出码闭集不变，[[STR-006]] 的显式渲染不变；本特性 MUST NOT 引入第二个 parser 或第二个 renderer。
+- **FR-020**: `/speckit.status` 的 digest MUST 保持 line 可见性唯一来源为 registry、存活探测仅限已登记 PID、绝不发现未登记进程，零进程派生、动作集与退出码闭集不变，[[STR-006]] 的显式渲染不变；本特性 MUST NOT 引入第二个 parser 或第二个 renderer。
 - **FR-021**: 测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 运行（缺省并行形态，路径与参数原样转交），并按 `contract` / `integration` 标记归档；执行记录（命令、退出码、完整输出、耗时）MUST 留证。包装器五形态（成功 / 命令失败 / 登记失败 / 双失败 / SIGKILL 残留）与扫描器 fixture 正反例、自声明例、活仓库读数 MUST 各有自动测试覆盖。
 - **FR-022**: 本特性 MUST NOT 引入调度器、定时器服务、常驻进程、第三方依赖、第二份 registry、第二份状态脊或台账（`reporting-obligations.md` § 十一 禁令）；新增物仅限包装器、扫描器、测试与文本接线。
 - **FR-023**: 变更 MUST 只提交本特性产物；既有未跟踪文件（`.specify/scripts/line-registry.py`、`.specify/scripts/stage-runner.sh`）MUST NOT 被提交或还原；MUST NOT 推送远端。
@@ -175,10 +175,10 @@
 ### Key Entities *(include if required)*
 
 - **Line（登记的工作单元）**：`line_id`、`run_id`、`state`（取值域归 `line-registry.py`）、`last_event`、`updated_at`，以及既有引擎字段（`driver_session`、`claimed_ns` 等）；由引擎拥有身份与状态。
-- **Registry 条目**：环境级 registry 目录下每线一个 `<line_id>.json`；digest 的唯一读取源。
-- **长任务脚本**：落在声明扫描根内、命中长任务机械判据的文件；合规形态为经包装器调用、直接调引擎登记、或自身带头部标记。
+- **Registry 条目**：环境级 registry 目录下每线一个 `<line_id>.json`；line 可见性的唯一读取源。
+- **长任务脚本**：落在声明扫描根内、命中长任务机械判据的文件；合规形态只有两类——经包装器调用，或直接调引擎登记；头部标记 [[STR-003]] 是**命中判据**（宣布「我是长任务」），不构成合规豁免。
 - **包装器调用**：一次 `line-run.sh --line-id … --run-id … -- <command…>` 运行；产生登记 → 执行 → 关闭三事件，失败与 SIGKILL 各留下可判定的残留形态。
-- **Digest 读数**：`/speckit.status` 对 registry 的单次只读投影；[[STR-006]] 是空集合的显式渲染。
+- **Digest 读数**：`/speckit.status` 对 registry 的只读投影（line 可见性），并在已登记条目记录的 PID 上叠加存活探测；[[STR-006]] 是空集合的显式渲染。
 
 ### Runtime Stack & Dependency Ownership
 
@@ -190,7 +190,7 @@
 | RS-002 | POSIX `bash` 运行时（包装器本体及其对被包装命令的子进程调用） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 不新增显式版本下限；包装器须在 bash 3.2（macOS 系统 bash）及以上可用；pin 由 `bash --version` 在 test-evidence 的首次采集记录提供 | `scripts/bash/common.sh` | 包装器在 `bash scripts/bash/line-run.sh` 下完成登记→执行→关闭全程；`-h` / `--version` 退出 0 且零 registry 写入 | FR-003, FR-021 | EP-005 |
 | RS-003 | `pytest` 测试运行器（契约测试、行为测试与扫描器 fixture 正反例） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `scripts/bash/run-tests.sh` 运行新增 `contract` / `integration` 测试，结果集相对 implement 入口基线零新增红 | FR-015, FR-016, FR-021 | EP-002 |
 | RS-004 | 既有 line-registry 引擎的写入面（`register` / `update` / `deregister`） | signed-contract | 既有 sdd-loop-driver 引擎（本特性只消费，不修改其动作集与状态词） | 仓内既有实现，无外部版本面；pin 由 `--help` 声明的动作集与退出码闭集固定 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | 隔离 `$SPECIFY_LINE_REGISTRY_DIR` 下成功/失败/SIGKILL 三形态在引擎条目上留下 [[STR-007]]、`state` 与 reason；包装器不引用 `journal-utils.py` | FR-004, FR-005, FR-008, FR-009, FR-010 | EP-003 |
-| RS-005 | 既有 status-digest 引擎（digest 只读读数的唯一来源） | signed-contract | 既有 `/speckit.status` 摘要引擎（本特性只读消费，不修改动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 FR-020 的闭集不变断言固定 | `scripts/python/status-digest.py` | 隔离 registry 上运行期间与结束后各读一次 digest，读数与 registry 条目一致；本特性对其零修改 | FR-001, FR-020 | EP-004 |
+| RS-005 | 既有 status-digest 引擎（digest 当前态读数的唯一来源） | signed-contract | 既有 `/speckit.status` 摘要引擎（本特性只读消费，不修改动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 FR-020 的闭集不变断言固定 | `scripts/python/status-digest.py` | 隔离 registry 上运行期间与结束后各读一次 digest，读数与 registry 条目一致；本特性对其零修改 | FR-001, FR-020 | EP-004 |
 | RS-006 | 包装器 `line-run.sh`（本特性交付的登记→执行→关闭载体） | in-scope | 本特性自身新增的 framework 源脚本 | 不适用（无外部版本面） | `scripts/bash/line-run.sh` | `-h` / `--help`、`--version` 退出 0 且零 registry 写入；登记失败不执行被包装命令；退出码原样传播；SIGKILL 后条目残留 `active` | FR-003, FR-006, FR-007, FR-011 | EP-005 |
 
 **Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-006` 指向本特性的交付面（tasks 阶段创建），不是第二契约。`RS-004` / `RS-005` 的引擎本特性零修改，义务只在其既有契约上被消费与断言。
@@ -203,9 +203,9 @@
 - **SC-002**: 未登记即变红——扫描器 [[STR-009]] 对 `.specify/.tmp/line-registry-registration/` 下含 [[STR-004]] 且未登记的 fixture 判违规（退出 1 并给路径），改为经包装器调用后判干净（退出 0）；活仓库声明的可跟踪扫描根（`scripts/bash/`、`scripts/python/`、`skills/`，脚本文件面）读数为 0 违规，根清单、文件数、命中数与 `owner-skipped` 计数写入 `test-evidence/`。删除 `COMPLIANT_INVOCATIONS` 的任一成员、或使自声明不再被识别时，fixture 正反两腿与自声明腿必须转红；在既有可跟踪根注入一个未登记长任务脚本时，读数转红；缺失的默认根必须报输入错误而不是干净。 **Path**: final
 - **SC-003**: registry 单一写入方言——行为测试显示成功/失败两条路径都在 registry 引擎条目上留下 [[STR-007]]、state 与 reason [[STR-008]]；observer journal 路径零新增；静态审计显示 [[STR-001]] 不引用 `journal-utils.py`，且 registry 写入只经 [[STR-002]]。 **Path**: final
 - **SC-004**: 接口与失败形态可判定——`-h/--help`、`--version` 退出 0 且 registry 零写入；未声明选项非零拒绝且命令未执行；登记失败时命令未执行；被包装命令退出码在正常路径原样传播；双失败时按 A-24 的优先级退出且双方结果都可读到；SIGKILL 模拟后条目仍 `active`。以上均由子进程退出码、stderr 文本与 registry 条目断言给出。 **Path**: supporting
-- **SC-005**: 长任务登记不再依赖记忆——run-team 的登记/heartbeat/关闭三处步骤、`templates/commands/status.md` 的 registry-only 一句、`templates/instructions-template.md` 的指针行均存在且可按路径定位；删除任一处使契约测试转红（红腿注入）。 **Path**: supporting
+- **SC-005**: 长任务登记不再依赖记忆——run-team 的登记/heartbeat/关闭三处步骤、`templates/commands/status.md` 的 `Single source` 一句（line 可见性以 registry 为唯一来源、存活探测仅限已登记 PID、绝不发现未登记进程）、`templates/instructions-template.md` 的指针行均存在且可按路径定位；删除任一处使契约测试转红（红腿注入）。 **Path**: supporting
 - **SC-006**: 分发一致性——`python3 scripts/python/sync-mirrors.py --check` 相对特性前基线**无新增漂移**（基线为 5 条 `DIFF` + 2 条 `ORPHAN`，读数逐字记录；本特性改动的四对镜像行为 `ok`），`python3 scripts/python/flow-class-check.py --action check` 退出 0；`python3 scripts/python/doc-consistency-check.py` 由实现者判定是否适用（判定依据写进读数），适用则退出 0，不适用 MUST 记录 `not-evaluated` 与原因，MUST NOT 记成通过。 **Path**: supporting
-- **SC-007**: digest 无回归——既有 `tests/contract/test_status_digest*.py` 与 `tests/unit/test_status_digest_unit.py` 全绿；digest 仍不派生进程、动作集与退出码闭集不变，[[STR-006]] 渲染逐字不变。 **Path**: supporting
+- **SC-007**: digest 无回归——既有 `tests/contract/test_status_digest*.py` 与 `tests/unit/test_status_digest_unit.py` 全绿；digest 仍不派生进程、存活探测仅限已登记 PID、绝不发现未登记进程、动作集与退出码闭集不变，[[STR-006]] 渲染逐字不变。 **Path**: supporting
 - **SC-008**: 知识可达——owner § 九 判据、status 命令一句、常驻小节指针、run-team 三处步骤均可由路径定位；未参与本轮的读者能正确复述「为什么未登记的长任务显示 [[STR-006]]」与「一个批量脚本如何变为可见」；复述判定：一名未参与本轮的基准读者各写一句答案，两句都正确即 `pass`，任一句错误即 `fail`，无法执行时记 `not-evaluated` 与原因。 **Path**: supporting
 - **SC-009**: 范围克制——相对特性前基线提交，变更文件集 ⊆ 本规格声明的交付面（包装器、扫描器与其测试、owner 文档、status 命令、instructions 模板、run-team 技能、镜像与文档同步产物、本 spec 目录，以及生命周期登记所必需的 Feature 注册表文件 `.specify/features.md` 与绑定 Feature 的 detail 文件）；既有未跟踪文件保持未跟踪；无 push。允许的 delta 集合由 plan 声明的交付文件清单给出，plan 之外的新增文件视为违规。 **Path**: supporting
 

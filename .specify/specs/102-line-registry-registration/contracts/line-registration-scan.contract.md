@@ -31,11 +31,15 @@ The module carries exactly these module-level constants; tests import them and n
 | Constant | Role |
 |----------|------|
 | `LONG_TASK_MARKERS` | content strings whose presence makes a judged file a long task (`[[STR-004]]`, `[[STR-005]]`) |
-| `SELF_DECLARATION_MARKER` | a standalone comment line by which a file declares itself a long task (`[[STR-003]]`) |
+| `SELF_DECLARATION_MARKER` | a comment line whose text contains the literal `[[STR-003]]` and which declares the file a long task |
 | `COMPLIANT_INVOCATIONS` | invocation forms that discharge the duty: the `[[STR-001]]` wrapper form, and `[[STR-002]]` with action `register` / `update` / `deregister` |
 | `DEFAULT_SCAN_ROOTS` | the declared live roots used when `--root` is absent |
 
-C-09 Matching is case-sensitive literal containment; the scanner MUST NOT interpret the surrounding code, and MUST NOT add a second criterion outside these constants.
+C-09 One predicate decides every match, and it is purely textual:
+
+- **Content marker** (`LONG_TASK_MARKERS` member): the literal appears anywhere in the file, case-sensitive.
+- **Self-declaration** (`SELF_DECLARATION_MARKER`): a standalone comment line — a line whose first non-whitespace character is `#` — whose text contains the literal, case-sensitive.
+- Neither predicate interprets the surrounding code, and neither adds a criterion outside these constants.
 
 ## C-10 — Verdict
 

@@ -157,20 +157,20 @@
 
 ## Phase 4: User Story 3 — 判据有唯一 owner，下游表面只给指针 (Priority: P2)
 
-**Goal**: owner 文档 § 九 拥有判据与判定边界；`status.md` 只声明 digest 只读 registry；常驻小节只有一句指针；三处下游面都不复述阈值或机械字面量。
+**Goal**: owner 文档 § 九 拥有判据与判定边界（唯一承载点）；`status.md` 只声明 line 可见性以 registry 为唯一来源；常驻小节只有一句指针；除 owner 文档外的三处下游面都不复述阈值或机械字面量。
 
 **Independent Test**: 阅读四个表面的文本与引用方向，并对「删掉常驻提醒」与「在 status.md 里复述判据」各做一次篡改注入，断言守卫测试各自转红。
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T028 [P] [US3] 编写接线契约测试 `tests/contract/test_line_registration_wiring.py` 的第一段（契约 C-01…C-09）：`shared/guidelines/reporting-obligations.md` § 九 含判据与判定边界并点名载体与引擎写入方、`templates/commands/status.md` 含逐字 `Single source` 句且无第二渲染面/进程扫描、`templates/instructions-template.md` 在 `Exemptions and precedence` 之后恰有一条指针 bullet、`.specify/instructions.md` 同句恰好一次且四个符号链接解析到它、四个面都不复述阈值与机械字面量（FR-001, FR-018, FR-019）。write: `tests/contract/test_line_registration_wiring.py`
+- [ ] T028 [P] [US3] 编写接线契约测试 `tests/contract/test_line_registration_wiring.py` 的第一段（契约 C-01…C-09）：`shared/guidelines/reporting-obligations.md` § 九 含判据与判定边界并点名载体与引擎写入方、`templates/commands/status.md` 含逐字 `Single source` 句且无第二渲染面/进程发现逻辑、`templates/instructions-template.md` 在 `Exemptions and precedence` 之后恰有一条指针 bullet、`.specify/instructions.md` 同句恰好一次且四个符号链接解析到它；断言面收窄为**除 owner 文档外的三个下游面**（`templates/commands/status.md`、`templates/instructions-template.md`、`.specify/instructions.md`/符号链接）都不复述阈值与机械字面量——owner 文档 § 九 是唯一承载点（T030），不在此断言（FR-001, FR-018, FR-019）。write: `tests/contract/test_line_registration_wiring.py`
 - [ ] T029 [US3] 跑 T028 的第一段并记录红（四个面尚未编辑）到 `notes/red-first-evidence.md`（FR-021）。write: `.specify/specs/102-line-registry-registration/notes/red-first-evidence.md` [blockedBy: T028]
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] 在 `shared/guidelines/reporting-obligations.md` § 九 追加长任务登记判据：预计超过 5 分钟或含后台批量 apply/verify 的运行 MUST 启动时登记、按阶段刷新、结束时关闭；未登记即不入 digest，`[[STR-006]]` 是准确结论而非漏报；阈值与判定边界在本文件拥有，载体是 `scripts/bash/line-run.sh`、registry 写入方是 `line-registry.py`（不是 `journal-utils.py`），§ 十一 的零新增机制禁令照旧（FR-001, FR-005）。write: `shared/guidelines/reporting-obligations.md` [blockedBy: T029]
+- [ ] T030 [US3] 在 `shared/guidelines/reporting-obligations.md` § 九 追加长任务登记判据：预计超过 5 分钟或含后台批量 apply/verify 的运行 MUST 启动时登记、按阶段刷新、结束时关闭；未登记即不入 digest，`[[STR-006]]` 是准确结论而非漏报；同时声明 digest 的真实不变量（line 可见性唯一来源是 registry；存活探测仅限已登记 PID；绝不发现未登记进程）；阈值与判定边界在本文件拥有，**本行是该阈值与判定边界的唯一 owner 承载点**，下游三个面只按路径引用；载体是 `scripts/bash/line-run.sh`、registry 写入方是 `line-registry.py`（不是 `journal-utils.py`），§ 十一 的零新增机制禁令照旧（FR-001, FR-005）。write: `shared/guidelines/reporting-obligations.md` [blockedBy: T029]
 - [ ] T031 [US3] 投影 owner 文档镜像：`python3 scripts/python/sync-mirrors.py --write --only shared` 把 `shared/guidelines/reporting-obligations.md` 落到 `.specify/shared/guidelines/reporting-obligations.md`，以 `--check` 的 `shared/` 行 `ok` 与 `diff -q` 空输出验收（FR-001）。write: `.specify/shared/guidelines/reporting-obligations.md` [blockedBy: T030]
-- [ ] T032 [US3] 在 `templates/commands/status.md` 的 Delegation 段落加且只加一句逐字的 registry-only 声明（digest 只读 Line Registry、不得改为扫进程、义务按路径引用 owner § 九），不新增渲染逻辑、不改动作集（FR-018）。write: `templates/commands/status.md` [blockedBy: T029]
+- [ ] T032 [US3] 在 `templates/commands/status.md` 的 Delegation 段落加且只加一句逐字的 `Single source` 声明（line 可见性以 Line Registry 为唯一来源、存活探测仅限已登记 PID、绝不发现未登记进程、义务按路径引用 owner § 九），不新增渲染逻辑、不改动作集（FR-018）。write: `templates/commands/status.md` [blockedBy: T029]
 - [ ] T033 [US3] 经 `python3 scripts/python/regen-command-copies.py` 再生成四份 per-tool 命令副本（`.claude/commands/speckit.status.md`、`.github/prompts/speckit.status.prompt.md`、`.qoder/commands/speckit.status.md`、`.opencode/command/speckit.status.md`）并以 `--check` rc 0 验收，四个副本 `grep -c "Single source"` 各为 1（FR-018）。write: `.claude/commands/speckit.status.md` [blockedBy: T032]
 - [ ] T034 [US3] 在 `templates/instructions-template.md` 的 `## Progress Reporting Discipline` 内、`Exemptions and precedence` bullet 之后追加**恰好一条**指针 bullet（一句话 + `shared/guidelines/reporting-obligations.md` § 九 路径），不新建小节、不改其它 bullet、不含阈值与机械字面量（FR-019）。write: `templates/instructions-template.md` [blockedBy: T029]
 - [ ] T035 [US3] 投影模板镜像：`python3 scripts/python/sync-mirrors.py --write --only templates` 把该模板落到 `.specify/templates/instructions-template.md`，以 `--check` 的 `templates/` 行 `ok` 与 `diff -q` 空输出验收（FR-019）。write: `.specify/templates/instructions-template.md` [blockedBy: T034]
@@ -195,7 +195,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] 在 `skills/internal/run-team/SKILL.md` §5 Present & Execute 顶部加登记步骤：composed `<team-slug>-<run-id>` 经引擎 `register` 登记为 `active`，登记失败在任何席位派发之前 fail-closed 停下；§2 五查判 `blocked` 时不登记，避免留下悬空 line；引擎动作与参数按其 `--help` 读取，技能内不复述参数表（FR-017）。write: `skills/internal/run-team/SKILL.md` [blockedBy: T040]
+- [ ] T041 [US4] 在 `skills/internal/run-team/SKILL.md` §5 Present & Execute 顶部加登记步骤：按 A-18 的 run-id 生成规则（`r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，必须匹配引擎 `RUN_ID_RE`；不得沿用裸 UTC 时间戳）生成 run-id，并以 A-18 的合成规则组成 `<team-slug>-<run-id>`，经引擎 `register` 登记为 `active`，登记失败在任何席位派发之前 fail-closed 停下；§2 五查判 `blocked` 时不登记，避免留下悬空 line；引擎动作与参数按其 `--help` 读取，技能内不复述参数表（FR-017）。write: `skills/internal/run-team/SKILL.md` [blockedBy: T040]
 - [ ] T042 [US4] 在 `skills/internal/run-team/SKILL.md` §6 Orchestrate 指明：每个编排步骤边界调一次引擎 `update --last-event <step-label>` 刷新同一条 line，且不存在定时器、守护进程、心跳文件或第二 liveness 通道（FR-017）。write: `skills/internal/run-team/SKILL.md` [blockedBy: T041]
 - [ ] T043 [US4] 在 `skills/internal/run-team/SKILL.md` §7 Report 写明：写报告之前经引擎关闭该 line，报告正文携带 composed `line_id`，关闭失败必须在报告中写明而不是吞掉（FR-017）。write: `skills/internal/run-team/SKILL.md` [blockedBy: T042]
 - [ ] T044 [US4] 投影技能镜像：`python3 scripts/python/sync-mirrors.py --write --only skills` 把 `skills/internal/run-team/SKILL.md` 落到 `.specify/skills/internal/run-team/SKILL.md`，以 `--check` 的 `skills/internal/` 行 `ok` 与 `diff -q` 空输出验收（FR-017）。write: `.specify/skills/internal/run-team/SKILL.md` [blockedBy: T043]

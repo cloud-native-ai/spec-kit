@@ -11,7 +11,7 @@
 | Owner-doc criterion (C-01…C-04) | § 九 digest contract | append one criterion — no rewrite of the contract |
 | Wrapper `line-run.sh` | § 九's "reads state artifacts" premise | supplies the missing carrier so a long task can enter the registry |
 | Scanner | § 九's freshness and explicit-emptiness claims | makes "unregistered ⇒ invisible" mechanically visible |
-| `status.md` sentence | the thin-entry / single-renderer rule | restates nothing; pins registry-only reading |
+| `status.md` sentence | the thin-entry / single-renderer rule | restates nothing; pins registry-as-sole-line-visibility-source with a PID-bounded liveness probe |
 | Ambient bullet | `## Progress Reporting Discipline` | one pointer so every session sees the duty |
 | run-team wiring | § 八 three modes / two carriers | the executor carries the duty with it |
 
