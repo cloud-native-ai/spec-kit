@@ -41,7 +41,7 @@
 | **A-1** | **长任务判据 = 人工阈值 + 机械可判定投影**。人工阈值：预计超过 5 分钟、或含后台批量 apply/verify（含长时间测试、无人值守批处理）。机械投影（扫描器判定的封闭集）：脚本内容含 [[STR-004]]、调用 [[STR-005]]、或头部显式标记 [[STR-003]]。 | 人类判据无法对文件机械判定；扫描器只对可判定的投影负责，两者由同一 owner 声明，扫描器不另立语义。 |
 | **A-2** | **机械判据只有一份机器可读 owner**：声明层 fact（候选 `shared/declarations/facts/long-task-criteria.yaml`）或扫描器内常量，二者**择一**由 plan 定稿；其余位置（owner 文档、测试、包装器）只引用，不复述封闭集。→ **已定稿**：取「扫描器内常量」一支，见 A-15。 | One Source Of Truth；brief §4 要求「判据写成单一 owner（常量或声明）」。 |
 | **A-3** | **扫描根 = 可跟踪路径**：`scripts/bash/` 必选，`templates/`、`skills/` 由 plan 按信噪比定稿；`.specify/teams/.work/**` 一类运行期目录 MUST NOT 作为唯一扫描根。→ **已定稿**：具体根集合与被判定文件面见 A-21。 | 运行期目录为空且不受跟踪，以它为唯一根等于空判（brief §4 P2）。 |
-| **A-4** | **包装器参数形**：[[STR-001]] `--line-id <slug> --run-id <id> [-- <command…>]`。终止 reason 闭集 = [[STR-008]]（`completed` / `failed`）；条目 state 仍由引擎拥有为 `closed`，本规格不新增状态词。→ **已补齐**：引擎路径规则见 A-17，身份输入与 registry `line_id` 合成规则见 A-18。 | 复用 `line-registry.py` 既有 `register` / `deregister --reason` 语义，不新增状态机。 |
+| **A-4** | **包装器参数形**：[[STR-001]] `--line-id <slug> --run-id <id> -- <command…>`（裸 `--` 与被包装命令均为必填；缺 `--` 或空命令属用法错误）。终止 reason 闭集 = [[STR-008]]（`completed` / `failed`）；条目 state 仍由引擎拥有为 `closed`，本规格不新增状态词。→ **已补齐**：引擎路径规则见 A-17，身份输入与 registry `line_id` 合成规则见 A-18。 | 复用 `line-registry.py` 既有 `register` / `deregister --reason` 语义，不新增状态机。 |
 | **A-5** | **失败闭合（fail closed）**：登记失败时包装器 MUST NOT 执行被包装命令并 MUST 非零退出、具名原因；执行后关闭失败 MUST 上浮为非零退出，且不得遮蔽被包装命令的结果。 | 若登记失败仍执行，长任务又回到不可见状态，判据失去牙齿；关闭失败则 digest 仍显示 active，必须让操作者看到。 |
 | **A-6** | **常驻小节落点**：`templates/instructions-template.md` 既有 `## Progress Reporting Discipline` 小节内加**一条** bullet（一句话 + `shared/guidelines/reporting-obligations.md` § 九 路径）；`.specify/instructions.md` 由 `/speckit.instructions` 再生成，MUST NOT 手改。→ **精确落点**见 A-22（`Exemptions and precedence` 之后，不新建小节）。 | brief §4 P3；手改 live 文件会在下次再生成时丢失，且破坏符号链接模型的单一来源。 |
 | **A-7** | **run-team 接线按现有小节名，不复制简报的旧 PHASE 编号**：在 §1 Load 之后、§6 Orchestrate 之前登记 line；§6 执行期按阶段 heartbeat；§7 Report 关闭并记录 [[STR-007]]。→ **精确落点**见 A-23（§5 顶部登记）。 | brief 写的「PHASE 1 / PHASE 3/4 / Report」与当前技能小节编号（1 Load … 6 Orchestrate、7 Report）不一致；意图明确（开始登记、执行中心跳、报告时关闭），按现有小节名落地方可被维护者定位。 |
@@ -71,11 +71,11 @@
 
 **Why this priority**: 这是用户诉求的第一句——长任务不登记是根本问题；包装器让登记顺手发生，否则判据只是又一条靠记忆执行的义务。
 
-**Independent Test**: 在隔离的 `$SPECIFY_LINE_REGISTRY_DIR` 下运行包装器包住一个短命令：运行期间以 `--workspace <repo-root>` 读一次 digest，断言条目出现且 `state=active`；结束后读 registry 条目文件，断言 `state=closed` 且 reason 按结果取值（digest 按既有规则不列 `closed` 条目；若它是唯一 line，digest 渲染 [[STR-006]]——这是既有行为，不是本特性的断言面）；再模拟 SIGKILL，断言条目残留 `active` 且 digest 列出它。
+**Independent Test**: 在隔离的 `$SPECIFY_LINE_REGISTRY_DIR` 下运行包装器包住一个短命令（须保持运行到采样完成，例如 `bash -c 'sleep 2'`；瞬时命令 `true` 不足以采样）：运行期间以 `--workspace <repo-root>` 读一次 digest，断言条目出现且 `state=active`；结束后读 registry 条目文件，断言 `state=closed` 且 reason 按结果取值（digest 按既有规则不列 `closed` 条目；若它是唯一 line，digest 渲染 [[STR-006]]——这是既有行为，不是本特性的断言面）；再模拟 SIGKILL，断言条目残留 `active` 且 digest 列出它。
 
 **Acceptance Scenarios**:
 
-1. **Given** 隔离 registry 与一个成功的被包装命令，**When** 运行 `line-run.sh --line-id demo-batch --run-id r20261116T090000Z-a001 -- true`，**Then** registry 中出现 `line_id=demo-batch-r20261116T090000Z-a001` 的条目（A-18），运行期间其 `state` 为 `active`，结束后 `state` 为 `closed` 且 reason 为 `completed`，包装器退出 0。
+1. **Given** 隔离 registry 与一个成功的被包装命令，**When** 运行 `line-run.sh --line-id demo-batch --run-id r20261116T090000Z-a001 -- bash -c 'sleep 2'`，**Then** registry 中出现 `line_id=demo-batch-r20261116T090000Z-a001` 的条目（A-18），运行期间（采样完成前命令保持运行）其 `state` 为 `active`，结束后 `state` 为 `closed` 且 reason 为 `completed`，包装器退出 0。
 2. **Given** 同一隔离 registry 与一个失败命令，**When** 运行 `line-run.sh --line-id demo-fail --run-id r20261116T090000Z-a002 -- false`，**Then** 包装器以被包装命令的非零退出码退出，条目 `state` 为 `closed` 且 reason 为 `failed`。
 3. **Given** 一个运行中的包装器被 SIGKILL，**When** 读取 registry 与 digest，**Then** 条目仍为 `active`（不被删除、不被标 closed），digest 列出它并显示其最近活动时长。
 4. **Given** registry 目录不可写，**When** 运行包装器，**Then** 被包装命令**未被执行**，包装器非零退出并具名报告登记失败。
@@ -139,7 +139,7 @@
 - **registry 根被 `$SPECIFY_LINE_REGISTRY_DIR` 指向不存在或不可写的目录**：登记失败即不执行（A-5）；错误信息点名该路径。
 - **包装器自身被 SIGKILL / 宿主机掉电**：条目保持 `active`；digest 按过期界限将其标记 stale 并显示时长（A-10），不自动删除。
 - **被包装命令以信号终止**：非零退出按 `failed` 关闭；若包装器自身无法捕获而退出，条目残留 `active`。
-- **扫描器的误报**：判据是内容匹配，注释里出现 [[STR-004]] 也会命中。合规途径有二：经包装器调用、或加头部标记 [[STR-003]] 并把该文件纳入长任务登记；扫描根刻意不含 `tests/` 等夹具目录，且只判定脚本文件面（扩展名或 shebang），避免把测试样本与散文文档判成产线违规（A-1/A-21）。
+- **扫描器的误报**：判据是内容匹配，注释里出现 [[STR-004]] 也会命中。合规途径只有一条：文件含合规调用（经包装器调用，或直接调引擎 register/update/deregister）；头部标记 [[STR-003]] 只宣布「我是长任务」，不构成豁免；扫描根刻意不含 `tests/` 等夹具目录，且只判定脚本文件面（扩展名或 shebang），避免把测试样本与散文文档判成产线违规（A-1/A-21）。
 - **扫描器扫到自身**：判据常量所在文件是声明的 owner、不是长任务执行者，按解析路径跳过并在读数中具名 `owner-skipped`；该计数 MUST NOT 被计入「干净」证据（A-15）。
 - **`run-tests.sh` 自身提供 `--full` 路径**：它不得仅因「支持 `--full`」被判违规；只有调用方脚本（或显式头标记）进入长任务集合（A-1）。
 - **常驻提醒再生成**：手改 `.specify/instructions.md` 会在 `/speckit.instructions` 再生成时丢失；改动只落模板（A-6/A-22）。
@@ -148,7 +148,7 @@
 
 ### Functional Requirements
 
-- **FR-001**: 系统 MUST 在 owner 文档 `shared/guidelines/reporting-obligations.md` § 九（当前态摘要契约）新增长任务判据：预计超过 5 分钟、或含后台批量 apply/verify 的运行（含长时间测试、无人值守批处理）MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记的运行不进入 digest，[[STR-006]] 是准确结论而非漏报。判定边界由该文件拥有。
+- **FR-001**: 系统 MUST 在 owner 文档 `shared/guidelines/reporting-obligations.md` § 九（当前态摘要契约）新增长任务判据：预计超过 5 分钟、或含后台批量 apply/verify 的运行（含长时间测试、无人值守批处理）MUST 在启动时登记 line、按阶段 heartbeat、结束时 close；未登记的运行不进入 digest，[[STR-006]] 是准确结论而非漏报。阈值判定者为运行者，在启动时按预期时长判断（A-1 的人工阈值；机械可判定投影见 FR-002）。判定边界由该文件拥有。
 - **FR-002**: 长任务判据的**机械可判定投影**（脚本内容含 [[STR-004]]、调用 [[STR-005]]、或头部标记 [[STR-003]]）MUST 恰好有一个机器可读 owner：扫描器模块内的判据常量（A-15）；扫描器、测试与文档 MUST 引用它（测试以 `import` 读取），MUST NOT 各自复述该封闭集。扫描器 MUST 按解析路径跳过该 owner 文件本身，并在读数中具名 `owner-skipped`。
 - **FR-003**: framework 源 MUST 新增包装器 [[STR-001]]，并经 `scripts/python/sync-mirrors.py` 投影到 `.specify/scripts/bash/`；镜像 MUST NOT 手改。
 - **FR-004**: 包装器 MUST 在被包装命令启动前，经 registry 引擎 [[STR-002]] 把 line 登记为 `active`（引擎按 A-17 的有序候选解析；`--project-dir` / `--repo-root` 与 registry `line_id` 按 A-18 派生/合成）；执行 `--` 之后的命令；按结果关闭：退出 0 → reason `completed`，非零 → reason `failed`。终止 reason 取值域见 [[STR-008]]。
@@ -156,19 +156,19 @@
 - **FR-006**: 登记失败时，包装器 MUST NOT 执行被包装命令，MUST 以非零退出并具名报告失败原因（fail closed，A-5）。
 - **FR-007**: 包装器 MUST 原样传播被包装命令的退出状态；执行后关闭失败 MUST 上浮为非零退出，并同时指名命令结果与 registry 失败，MUST NOT 遮蔽或改写任一方。双失败时的退出码优先级按 A-24：命令非零 → 命令退出码 + stderr 关闭失败；命令为 0 且关闭失败 → 引擎的失败退出码。
 - **FR-008**: 包装器被 SIGKILL 等无法收尾时，其 line 条目 MUST 保持 `active`（不被删除、不被改写为 `closed`），使 digest 可见（A-10）。
-- **FR-009**: 包装器 MUST 在运行开始与结束时经引擎刷新该 line 的末次事件（register 与关闭事件）；当它能观察到阶段边界时，MUST 在每个边界刷新一次（A-8/A-19；不存在时间间隔）。MUST NOT 新增心跳文件或第二 liveness 通道。
+- **FR-009**: 包装器 MUST 在运行开始与结束时经引擎写入该 line 的两个事件（register 与关闭），且 MUST NOT 写中间事件（A-19：包装器观察不到被包装命令的内部阶段）；按阶段 heartbeat 由 run-team 在编排步骤边界承担（FR-017），不存在时间间隔。MUST NOT 新增心跳文件或第二 liveness 通道。
 - **FR-010**: 包装器 MUST 遵守既有的 registry 目录解析顺序（`$SPECIFY_LINE_REGISTRY_DIR` → `$XDG_STATE_HOME/spec-kit/lines` → `~/.local/state/spec-kit/lines`），使测试可用环境变量隔离；MUST NOT 引入新的 registry 根覆盖变量。
 - **FR-011**: [[STR-001]] MUST 满足 Script Interface Contract：`-h` / `--help` 与 `--version` 回答后退出 0 且零 registry 写入；未声明选项 MUST 被非零拒绝且不执行被包装命令；MUST NOT 联网、MUST NOT push。
 - **FR-012**: 系统 MUST 提供确定性、只读的扫描器 [[STR-009]]（`scripts/python/line-registration-scan.py`）：扫描声明的可跟踪根，对每个命中长任务机械判据（FR-002）却未经包装器调用、也未直接调用 [[STR-002]] 的 register/update/deregister 的文件报违规，输出文件路径与命中的判据；干净退出 0、有违规退出 1、输入错误退出 2；MUST 支持 `--root <path>`（可重复）覆盖扫描根以服务 fixture；MUST NOT 写入、派生进程或联网。
-- **FR-013**: 扫描器 [[STR-009]] 的活仓库扫描根 MUST 是可跟踪路径，且固定为 `scripts/bash/`、`scripts/python/`、`skills/`（`templates/` 无可执行脚本不列入）；被判定文件面 = 常规文件且满足 `.sh` / `.bash` / `.py` 扩展名或首行 shebang，符号链接一律跳过（A-21）；运行期目录（如 `.specify/teams/.work/**`）MUST NOT 作为扫描根，缺失或空目录 MUST NOT 被渲染成干净证据（A-3）。
-- **FR-014**: 扫描器 MUST 认可以下两类合规形态：文件经 [[STR-001]] 调用；或文件直接调用 [[STR-002]] 的 register/update/deregister。头部标记 [[STR-003]] 用于让一个**本身**构成长任务的脚本声明自己，避免把仅提供长任务路径的脚本（如 `run-tests.sh` 的 `--full` 选项）误判。
-- **FR-015**: 测试 MUST 在 `.specify/.tmp/line-registry-registration/`（A-21 的 fixture 根，已被 `.gitignore` 覆盖）下生成含 [[STR-004]]、未登记的临时脚本，断言扫描器 [[STR-009]] 报违规；再把同一脚本改为经 [[STR-001]] 调用，断言扫描器判干净（fixture 有牙，正反两例都断言；测试结束清理该根）。
-- **FR-016**: 对活仓库声明的扫描根，扫描器 MUST 给出零违规读数，且该读数（根清单、扫描文件数、命中数）MUST 写入 `test-evidence/`；读数 MUST NOT 以暂定数字冒充实测。
+- **FR-013**: 扫描器 [[STR-009]] 的活仓库扫描根 MUST 是可跟踪路径，且固定为 `scripts/bash/`、`scripts/python/`、`skills/`（`templates/` 无可执行脚本不列入）；被判定文件面 = 常规文件且满足 `.sh` / `.bash` / `.py` 扩展名或首行 shebang，符号链接一律跳过（A-21）；运行期目录（如 `.specify/teams/.work/**`）MUST NOT 作为扫描根；缺失根与空根（存在但零个被判定文件）MUST 按输入错误退出 2 并具名该根，MUST NOT 被渲染成干净证据（A-3）。
+- **FR-014**: 扫描器 MUST 认可以下两类合规形态：文件经 [[STR-001]] 调用；或文件直接调用 [[STR-002]] 的 register/update/deregister。头部标记 [[STR-003]] 是**命中判据**而非合规豁免：本身构成长任务、但内容不含其它判据成员的脚本用它声明自己，声明后仍须具备合规调用才判干净；仅提供长任务路径的脚本（如 `run-tests.sh` 的 `--full` 选项）不因「提供该路径」被判违规——判据按内容字面匹配。
+- **FR-015**: 测试 MUST 在 `.specify/.tmp/line-registry-registration/`（A-21 的 fixture 根，已被 `.gitignore` 覆盖）下生成含 [[STR-004]]、未登记的临时脚本，断言扫描器 [[STR-009]] 报违规；再把同一脚本改为经 [[STR-001]] 调用，断言扫描器判干净；另对同一根内一个带头部标记 [[STR-003]] 且无合规调用的脚本断言判违规（自声明不豁免）（fixture 有牙，正反与自声明三例都断言；测试结束清理该根）。
+- **FR-016**: 对活仓库声明的扫描根，扫描器 MUST 给出零违规读数，且该读数（根清单、扫描文件数、命中数、`owner-skipped`）MUST 由测试经唯一入口运行时记录到 `test-evidence/`（扫描器自身保持只读、不写任何文件）；读数 MUST NOT 以暂定数字冒充实测。
 - **FR-017**: `skills/internal/run-team/SKILL.md` MUST 在运行开始前登记 line、在执行期按阶段 heartbeat、在 Report 步骤关闭 line 并把 [[STR-007]] 写入运行报告（落点按 A-7 的现有小节名）；三处 MUST 以路径引用引擎，MUST NOT 复述引擎参数表。
 - **FR-018**: `templates/commands/status.md` MUST 增一句声明：digest 以 Line Registry 为唯一来源，MUST NOT 改为扫进程（保持确定性）；该句 MUST NOT 复述 § 九 的判据条目，MUST NOT 增加渲染逻辑。
 - **FR-019**: `templates/instructions-template.md` 的 `## Progress Reporting Discipline` 常驻小节内、`Exemptions and precedence` bullet 之后 MUST 增一条**指针式**提醒（一句话 + owner 路径），不新建小节、不改其它 bullet（A-22）；`.specify/instructions.md` 及其符号链接 MUST 经再生成获得该句，MUST NOT 手改（A-6）。
 - **FR-020**: `/speckit.status` 的 digest MUST 保持只读 registry、零进程派生、动作集与退出码闭集不变，[[STR-006]] 的显式渲染不变；本特性 MUST NOT 引入第二个 parser 或第二个 renderer。
-- **FR-021**: 测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 运行（缺省并行形态，路径与参数原样转交），并按 `contract` / `integration` 标记归档；执行记录（命令、退出码、完整输出、耗时）MUST 留证。
+- **FR-021**: 测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 运行（缺省并行形态，路径与参数原样转交），并按 `contract` / `integration` 标记归档；执行记录（命令、退出码、完整输出、耗时）MUST 留证。包装器五形态（成功 / 命令失败 / 登记失败 / 双失败 / SIGKILL 残留）与扫描器 fixture 正反例、自声明例、活仓库读数 MUST 各有自动测试覆盖。
 - **FR-022**: 本特性 MUST NOT 引入调度器、定时器服务、常驻进程、第三方依赖、第二份 registry、第二份状态脊或台账（`reporting-obligations.md` § 十一 禁令）；新增物仅限包装器、扫描器、测试与文本接线。
 - **FR-023**: 变更 MUST 只提交本特性产物；既有未跟踪文件（`.specify/scripts/line-registry.py`、`.specify/scripts/stage-runner.sh`）MUST NOT 被提交或还原；MUST NOT 推送远端。
 
@@ -186,8 +186,8 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | CPython `>=3.8` 标准库（扫描器的目录遍历与文本判定、测试夹具生成与 registry 条目读取） | signed-contract | CPython 上游（本仓只消费，不打包） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 扫描器与新增测试在 `>=3.8` 解释器上经唯一入口 `scripts/bash/run-tests.sh` 通过；本特性新增第三方 import 为零 | FR-012, FR-015 | EP-001, EP-002 |
-| RS-002 | POSIX `bash` 运行时（包装器本体及其对被包装命令的子进程调用） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 本仓无版本声明；pin 由 `bash --version` 在 test-evidence 的首次采集记录提供 | `scripts/bash/common.sh` | 包装器在 `bash scripts/bash/line-run.sh` 下完成登记→执行→关闭全程；`-h` / `--version` 退出 0 且零 registry 写入 | FR-003, FR-021 | EP-005 |
+| RS-001 | CPython `>=3.8` 标准库（扫描器的目录遍历与文本判定、测试夹具生成与 registry 条目读取） | signed-contract | CPython 上游（本仓只消费，不打包） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 扫描器与新增测试在 `>=3.8` 解释器上经唯一入口 `scripts/bash/run-tests.sh` 通过；本特性新增第三方 import 为零 | FR-012, FR-013, FR-014, FR-015, FR-016 | EP-001, EP-002 |
+| RS-002 | POSIX `bash` 运行时（包装器本体及其对被包装命令的子进程调用） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 不新增显式版本下限；包装器须在 bash 3.2（macOS 系统 bash）及以上可用；pin 由 `bash --version` 在 test-evidence 的首次采集记录提供 | `scripts/bash/common.sh` | 包装器在 `bash scripts/bash/line-run.sh` 下完成登记→执行→关闭全程；`-h` / `--version` 退出 0 且零 registry 写入 | FR-003, FR-021 | EP-005 |
 | RS-003 | `pytest` 测试运行器（契约测试、行为测试与扫描器 fixture 正反例） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `scripts/bash/run-tests.sh` 运行新增 `contract` / `integration` 测试，结果集相对 implement 入口基线零新增红 | FR-015, FR-016, FR-021 | EP-002 |
 | RS-004 | 既有 line-registry 引擎的写入面（`register` / `update` / `deregister`） | signed-contract | 既有 sdd-loop-driver 引擎（本特性只消费，不修改其动作集与状态词） | 仓内既有实现，无外部版本面；pin 由 `--help` 声明的动作集与退出码闭集固定 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | 隔离 `$SPECIFY_LINE_REGISTRY_DIR` 下成功/失败/SIGKILL 三形态在引擎条目上留下 [[STR-007]]、`state` 与 reason；包装器不引用 `journal-utils.py` | FR-004, FR-005, FR-008, FR-009, FR-010 | EP-003 |
 | RS-005 | 既有 status-digest 引擎（digest 只读读数的唯一来源） | signed-contract | 既有 `/speckit.status` 摘要引擎（本特性只读消费，不修改动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 FR-020 的闭集不变断言固定 | `scripts/python/status-digest.py` | 隔离 registry 上运行期间与结束后各读一次 digest，读数与 registry 条目一致；本特性对其零修改 | FR-001, FR-020 | EP-004 |
@@ -200,13 +200,13 @@
 ### Measurable Outcomes
 
 - **SC-001**: 可见性闭环可复现——在隔离 registry 下，被包装命令运行期间 digest 列出该 line 且 `state=active`；结束后 registry 条目为 `closed` 且 reason 为 `completed` / `failed`（digest 按既有规则不列 `closed` 条目；若它是唯一 line，digest 渲染 [[STR-006]]，属既有行为）；SIGKILL 后条目仍为 `active` 且 digest 可见；等价未登记命令运行期间 digest 仍渲染 [[STR-006]]。读数全部取自 digest（`--workspace <repo-root>`）、registry 文件与包装器退出码本身，不靠人工转述。 **Path**: final
-- **SC-002**: 未登记即变红——扫描器 [[STR-009]] 对 `.specify/.tmp/line-registry-registration/` 下含 [[STR-004]] 且未登记的 fixture 判违规（退出 1 并给路径），改为经包装器调用后判干净（退出 0）；活仓库声明的可跟踪扫描根（`scripts/bash/`、`scripts/python/`、`skills/`，脚本文件面）读数为 0 违规，根清单、文件数、命中数与 `owner-skipped` 计数写入 `test-evidence/`。删除判据 owner 中的任一成员或在既有可跟踪根注入一个未登记长任务脚本时，读数转红；缺失的默认根必须报输入错误而不是干净。 **Path**: final
+- **SC-002**: 未登记即变红——扫描器 [[STR-009]] 对 `.specify/.tmp/line-registry-registration/` 下含 [[STR-004]] 且未登记的 fixture 判违规（退出 1 并给路径），改为经包装器调用后判干净（退出 0）；活仓库声明的可跟踪扫描根（`scripts/bash/`、`scripts/python/`、`skills/`，脚本文件面）读数为 0 违规，根清单、文件数、命中数与 `owner-skipped` 计数写入 `test-evidence/`。删除 `COMPLIANT_INVOCATIONS` 的任一成员、或使自声明不再被识别时，fixture 正反两腿与自声明腿必须转红；在既有可跟踪根注入一个未登记长任务脚本时，读数转红；缺失的默认根必须报输入错误而不是干净。 **Path**: final
 - **SC-003**: registry 单一写入方言——行为测试显示成功/失败两条路径都在 registry 引擎条目上留下 [[STR-007]]、state 与 reason [[STR-008]]；observer journal 路径零新增；静态审计显示 [[STR-001]] 不引用 `journal-utils.py`，且 registry 写入只经 [[STR-002]]。 **Path**: final
 - **SC-004**: 接口与失败形态可判定——`-h/--help`、`--version` 退出 0 且 registry 零写入；未声明选项非零拒绝且命令未执行；登记失败时命令未执行；被包装命令退出码在正常路径原样传播；双失败时按 A-24 的优先级退出且双方结果都可读到；SIGKILL 模拟后条目仍 `active`。以上均由子进程退出码、stderr 文本与 registry 条目断言给出。 **Path**: supporting
 - **SC-005**: 长任务登记不再依赖记忆——run-team 的登记/heartbeat/关闭三处步骤、`templates/commands/status.md` 的 registry-only 一句、`templates/instructions-template.md` 的指针行均存在且可按路径定位；删除任一处使契约测试转红（红腿注入）。 **Path**: supporting
-- **SC-006**: 分发一致性——`python3 scripts/python/sync-mirrors.py --check` 与 `python3 scripts/python/flow-class-check.py --action check` 退出 0；`python3 scripts/python/doc-consistency-check.py` 若适用则退出 0，若不适用 MUST 记录 `not-evaluated` 与原因，MUST NOT 记成通过。 **Path**: supporting
+- **SC-006**: 分发一致性——`python3 scripts/python/sync-mirrors.py --check` 相对特性前基线**无新增漂移**（基线为 5 条 `DIFF` + 2 条 `ORPHAN`，读数逐字记录；本特性改动的四对镜像行为 `ok`），`python3 scripts/python/flow-class-check.py --action check` 退出 0；`python3 scripts/python/doc-consistency-check.py` 由实现者判定是否适用（判定依据写进读数），适用则退出 0，不适用 MUST 记录 `not-evaluated` 与原因，MUST NOT 记成通过。 **Path**: supporting
 - **SC-007**: digest 无回归——既有 `tests/contract/test_status_digest*.py` 与 `tests/unit/test_status_digest_unit.py` 全绿；digest 仍不派生进程、动作集与退出码闭集不变，[[STR-006]] 渲染逐字不变。 **Path**: supporting
-- **SC-008**: 知识可达——owner § 九 判据、status 命令一句、常驻小节指针、run-team 三处步骤均可由路径定位；未参与本轮的读者能正确复述「为什么未登记的长任务显示 [[STR-006]]」与「一个批量脚本如何变为可见」；复述失败即不通过。 **Path**: supporting
+- **SC-008**: 知识可达——owner § 九 判据、status 命令一句、常驻小节指针、run-team 三处步骤均可由路径定位；未参与本轮的读者能正确复述「为什么未登记的长任务显示 [[STR-006]]」与「一个批量脚本如何变为可见」；复述判定：一名未参与本轮的基准读者各写一句答案，两句都正确即 `pass`，任一句错误即 `fail`，无法执行时记 `not-evaluated` 与原因。 **Path**: supporting
 - **SC-009**: 范围克制——相对特性前基线提交，变更文件集 ⊆ 本规格声明的交付面（包装器、扫描器与其测试、owner 文档、status 命令、instructions 模板、run-team 技能、镜像与文档同步产物、本 spec 目录，以及生命周期登记所必需的 Feature 注册表文件 `.specify/features.md` 与绑定 Feature 的 detail 文件）；既有未跟踪文件保持未跟踪；无 push。允许的 delta 集合由 plan 声明的交付文件清单给出，plan 之外的新增文件视为违规。 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
