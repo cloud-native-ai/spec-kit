@@ -1,3 +1,154 @@
+#!/usr/bin/env python3
+"""Fill a form that has no interactive fields by adding free-text annotations.
+
+Operands: input PDF, fields.json, output PDF. fields.json declares the geometry
+of every page and the text to place on it:
+
+    pages        one record per page: page_number plus EITHER pdf_width and
+                 pdf_height (boxes are top-down PDF points) OR image_width and
+                 image_height (boxes are pixels of a rendered page image).
+                 The presence of pdf_width is what selects the coordinate
+                 space; a file must not mix the two.
+    form_fields  page_number, description, label_bounding_box,
+                 entry_bounding_box and entry_text {text, font, font_size,
+                 font_color}. Only entry_text.text is written -- the label box
+                 is documentation and review material, not ink.
+
+Boxes are [x0, y0, x1, y1] with y growing downward. The PDF's own user space
+grows upward from the bottom-left corner, so every box is flipped on the way in:
+the annotation rectangle becomes (left, pdf_height - y1, right, pdf_height - y0).
+Pixel boxes are additionally scaled by pdf_width / image_width and
+pdf_height / image_height. A field with no text, or an empty string, is skipped
+without error -- that is how an author leaves a field blank.
+
+Each value becomes a FreeText annotation with no border and no background, so
+the result reads as text printed on the form rather than as a sticky note. The
+annotations are ordinary PDF content: they survive merging and printing, and the
+document stays a plain PDF with no AcroForm.
+
+Defaults when entry_text omits them: font "Arial", font_size 14, font_color
+"000000" (hex RGB, no leading #).
+
+Exit 1 means the output was not written: wrong operand count, unreadable input,
+a page_number with no matching page record, or a missing pypdf.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import json
+import sys
+
+USAGE = "Usage: fill_pdf_form_with_annotations.py [input pdf] [fields.json] [output pdf]"
+
+DEFAULT_FONT = "Arial"
+DEFAULT_FONT_SIZE = 14
+DEFAULT_FONT_COLOR = "000000"
+
+
+def transform_from_image_coords(bbox, image_width, image_height, pdf_width, pdf_height):
+    """Pixel box -> PDF rectangle (left, bottom, right, top), flipping y."""
+    x_scale = pdf_width / image_width
+    y_scale = pdf_height / image_height
+    left = bbox[0] * x_scale
+    right = bbox[2] * x_scale
+    top = pdf_height - bbox[1] * y_scale
+    bottom = pdf_height - bbox[3] * y_scale
+    return left, bottom, right, top
+
+
+def transform_from_pdf_coords(bbox, pdf_height):
+    """Top-down PDF point box -> PDF rectangle (left, bottom, right, top)."""
+    return bbox[0], pdf_height - bbox[3], bbox[2], pdf_height - bbox[1]
+
+
+def _page_record(pages, page_number):
+    for record in pages:
+        if record["page_number"] == page_number:
+            return record
+    return None
+
+
+def _entry_rectangle(field, page_info, pdf_width, pdf_height):
+    box = field["entry_bounding_box"]
+    if "pdf_width" in page_info:
+        return transform_from_pdf_coords(box, pdf_height)
+    return transform_from_image_coords(
+        box, page_info["image_width"], page_info["image_height"], pdf_width, pdf_height
+    )
+
+
+def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path) -> int:
+    """Place every non-empty entry text as an annotation; return how many."""
+    from pypdf import PdfReader, PdfWriter
+    from pypdf.annotations import FreeText
+
+    with open(fields_json_path, encoding="utf-8") as stream:
+        data = json.load(stream)
+
+    reader = PdfReader(input_pdf_path)
+    if reader.is_encrypted:
+        reader.decrypt("")
+    writer = PdfWriter(clone_from=reader)
+    dimensions = {
+        number: (float(page.mediabox.width), float(page.mediabox.height))
+        for number, page in enumerate(reader.pages, start=1)
+    }
+
+    added = 0
+    for field in data["form_fields"]:
+        entry_text = field.get("entry_text") or {}
+        text = entry_text.get("text")
+        if not text:
+            continue
+
+        page_number = field["page_number"]
+        if page_number not in dimensions:
+            raise ValueError(
+                f"page_number {page_number} is outside the document (1-{len(dimensions)})"
+            )
+        page_info = _page_record(data["pages"], page_number)
+        if page_info is None:
+            raise ValueError(f"no pages record for page_number {page_number}")
+        pdf_width, pdf_height = dimensions[page_number]
+
+        annotation = FreeText(
+            text=text,
+            rect=_entry_rectangle(field, page_info, pdf_width, pdf_height),
+            font=entry_text.get("font", DEFAULT_FONT),
+            font_size=f"{entry_text.get('font_size', DEFAULT_FONT_SIZE)}pt",
+            font_color=entry_text.get("font_color", DEFAULT_FONT_COLOR),
+            border_color=None,
+            background_color=None,
+        )
+        writer.add_annotation(page_number=page_number - 1, annotation=annotation)
+        added += 1
+
+    with open(output_pdf_path, "wb") as stream:
+        writer.write(stream)
+    print(f"Successfully filled PDF form and saved to {output_pdf_path}")
+    print(f"Added {added} text annotations")
+    return added
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 3:
+        print(USAGE)
+        return 1
+    try:
+        fill_pdf_form(args[0], args[1], args[2])
+    except ImportError as exc:
+        print(
+            f"ERROR: annotation filling needs pypdf ({exc}). "
+            "Install it with: pip install pypdf",
+            file=sys.stderr,
+        )
+        return 1
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print(f"ERROR: cannot fill {args[0]}: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,110 +264,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-import json
-import sys
-
-from pypdf import PdfReader, PdfWriter
-from pypdf.annotations import FreeText
-
-
-
-
-def transform_from_image_coords(bbox, image_width, image_height, pdf_width, pdf_height):
-    x_scale = pdf_width / image_width
-    y_scale = pdf_height / image_height
-
-    left = bbox[0] * x_scale
-    right = bbox[2] * x_scale
-
-    top = pdf_height - (bbox[1] * y_scale)
-    bottom = pdf_height - (bbox[3] * y_scale)
-
-    return left, bottom, right, top
-
-
-def transform_from_pdf_coords(bbox, pdf_height):
-    left = bbox[0]
-    right = bbox[2]
-
-    pypdf_top = pdf_height - bbox[1]      
-    pypdf_bottom = pdf_height - bbox[3]   
-
-    return left, pypdf_bottom, right, pypdf_top
-
-
-def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path):
-    
-    with open(fields_json_path, "r") as f:
-        fields_data = json.load(f)
-    
-    reader = PdfReader(input_pdf_path)
-    writer = PdfWriter()
-    
-    writer.append(reader)
-    
-    pdf_dimensions = {}
-    for i, page in enumerate(reader.pages):
-        mediabox = page.mediabox
-        pdf_dimensions[i + 1] = [mediabox.width, mediabox.height]
-    
-    annotations = []
-    for field in fields_data["form_fields"]:
-        page_num = field["page_number"]
-
-        page_info = next(p for p in fields_data["pages"] if p["page_number"] == page_num)
-        pdf_width, pdf_height = pdf_dimensions[page_num]
-
-        if "pdf_width" in page_info:
-            transformed_entry_box = transform_from_pdf_coords(
-                field["entry_bounding_box"],
-                float(pdf_height)
-            )
-        else:
-            image_width = page_info["image_width"]
-            image_height = page_info["image_height"]
-            transformed_entry_box = transform_from_image_coords(
-                field["entry_bounding_box"],
-                image_width, image_height,
-                float(pdf_width), float(pdf_height)
-            )
-        
-        if "entry_text" not in field or "text" not in field["entry_text"]:
-            continue
-        entry_text = field["entry_text"]
-        text = entry_text["text"]
-        if not text:
-            continue
-        
-        font_name = entry_text.get("font", "Arial")
-        font_size = str(entry_text.get("font_size", 14)) + "pt"
-        font_color = entry_text.get("font_color", "000000")
-
-        annotation = FreeText(
-            text=text,
-            rect=transformed_entry_box,
-            font=font_name,
-            font_size=font_size,
-            font_color=font_color,
-            border_color=None,
-            background_color=None,
-        )
-        annotations.append(annotation)
-        writer.add_annotation(page_number=page_num - 1, annotation=annotation)
-        
-    with open(output_pdf_path, "wb") as output:
-        writer.write(output)
-    
-    print(f"Successfully filled PDF form and saved to {output_pdf_path}")
-    print(f"Added {len(annotations)} text annotations")
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: fill_pdf_form_with_annotations.py [input pdf] [fields.json] [output pdf]")
-        sys.exit(1)
-    input_pdf = sys.argv[1]
-    fields_json = sys.argv[2]
-    output_pdf = sys.argv[3]
-    
-    fill_pdf_form(input_pdf, fields_json, output_pdf)
+    sys.exit(main())

@@ -1,420 +1,306 @@
-# PptxGenJS Tutorial
+# Creating Presentations with python-pptx
 
-## Setup & Basic Structure
+Build a deck from code when there is no template to start from. When a template
+exists, edit it instead -- the unpack/edit/pack route in
+[pptx-editing.md](./pptx-editing.md) keeps the template's own masters, layouts and
+theme, which a generated deck cannot reproduce.
 
-```javascript
-const pptxgen = require("pptxgenjs");
+Everything below runs on [python-pptx](https://python-pptx.readthedocs.io/) (MIT).
+Lengths are English Metric Units (EMU): 914400 per inch, 12700 per point. The
+`Inches`, `Pt` and `Emu` helpers convert for you, so never write a raw number
+where a length belongs.
 
-let pres = new pptxgen();
-pres.layout = 'LAYOUT_16x9';  // or 'LAYOUT_16x10', 'LAYOUT_4x3', 'LAYOUT_WIDE'
-pres.author = 'Your Name';
-pres.title = 'Presentation Title';
+## Install and import
 
-let slide = pres.addSlide();
-slide.addText("Hello World!", { x: 0.5, y: 0.5, fontSize: 36, color: "363636" });
-
-pres.writeFile({ fileName: "Presentation.pptx" });
+```bash
+python -m pip install python-pptx
 ```
 
-## Layout Dimensions
-
-Slide dimensions (coordinates in inches):
-- `LAYOUT_16x9`: 10" × 5.625" (default)
-- `LAYOUT_16x10`: 10" × 6.25"
-- `LAYOUT_4x3`: 10" × 7.5"
-- `LAYOUT_WIDE`: 13.3" × 7.5"
-
----
-
-## Text & Formatting
-
-```javascript
-// Basic text
-slide.addText("Simple Text", {
-  x: 1, y: 1, w: 8, h: 2, fontSize: 24, fontFace: "Arial",
-  color: "363636", bold: true, align: "center", valign: "middle"
-});
-
-// Character spacing (use charSpacing, not letterSpacing which is silently ignored)
-slide.addText("SPACED TEXT", { x: 1, y: 1, w: 8, h: 1, charSpacing: 6 });
-
-// Rich text arrays
-slide.addText([
-  { text: "Bold ", options: { bold: true } },
-  { text: "Italic ", options: { italic: true } }
-], { x: 1, y: 3, w: 8, h: 1 });
-
-// Multi-line text (requires breakLine: true)
-slide.addText([
-  { text: "Line 1", options: { breakLine: true } },
-  { text: "Line 2", options: { breakLine: true } },
-  { text: "Line 3" }  // Last item doesn't need breakLine
-], { x: 0.5, y: 0.5, w: 8, h: 2 });
-
-// Text box margin (internal padding)
-slide.addText("Title", {
-  x: 0.5, y: 0.3, w: 9, h: 0.6,
-  margin: 0  // Use 0 when aligning text with other elements like shapes or icons
-});
+```python
+from pptx import Presentation
+from pptx.util import Inches, Pt, Emu
+from pptx.dml.color import RGBColor
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+from pptx.enum.shapes import MSO_SHAPE
 ```
 
-**Tip:** Text boxes have internal margin by default. Set `margin: 0` when you need text to align precisely with shapes, lines, or icons at the same x-position.
+## The deck and its canvas
 
----
-
-## Lists & Bullets
-
-```javascript
-// ✅ CORRECT: Multiple bullets
-slide.addText([
-  { text: "First item", options: { bullet: true, breakLine: true } },
-  { text: "Second item", options: { bullet: true, breakLine: true } },
-  { text: "Third item", options: { bullet: true } }
-], { x: 0.5, y: 0.5, w: 8, h: 3 });
-
-// ❌ WRONG: Never use unicode bullets
-slide.addText("• First item", { ... });  // Creates double bullets
-
-// Sub-items and numbered lists
-{ text: "Sub-item", options: { bullet: true, indentLevel: 1 } }
-{ text: "First", options: { bullet: { type: "number" }, breakLine: true } }
+```python
+prs = Presentation()                      # built-in starter deck, 10 x 7.5 in (4:3)
+prs.slide_width = Inches(13.333)          # 16:9
+prs.slide_height = Inches(7.5)
 ```
 
----
+Set the canvas before adding slides. Shapes are positioned in EMU from the
+top-left corner, so a layout designed for 4:3 leaves a wide empty band on 16:9.
+
+`Presentation("template.pptx")` opens an existing file instead of the starter
+deck; its layouts and theme come with it.
+
+## Slides and layouts
+
+A slide is always created *from a layout*. The layout supplies the placeholders,
+the background and the inherited fonts; the slide supplies the content.
+
+```python
+for index, layout in enumerate(prs.slide_layouts):
+    print(index, layout.name)
+
+slide = prs.slides.add_slide(prs.slide_layouts[1])   # "Title and Content"
+```
+
+The starter deck's layouts, by index:
+
+| Index | Name | Use |
+|-------|------|-----|
+| 0 | Title Slide | opening, closing |
+| 1 | Title and Content | one idea plus a body |
+| 2 | Section Header | divider between parts |
+| 3 | Two Content | side-by-side comparison |
+| 4 | Comparison | two labelled columns |
+| 5 | Title Only | a title over your own shapes |
+| 6 | Blank | full manual composition |
+| 7 | Content with Caption | picture plus explanation |
+| 8 | Picture with Caption | picture-led slide |
+
+A template's own layouts are different -- list them rather than assuming an
+index. Vary the layouts across a deck; repeating one layout for every slide is
+the most common way a generated deck looks generated.
+
+### Placeholders are addressed by idx, not by position
+
+```python
+slide.shapes.title.text = "Quarterly review"
+
+for ph in slide.placeholders:
+    print(ph.placeholder_format.idx, ph.placeholder_format.type, ph.name)
+
+body = slide.placeholders[1]              # idx 1 on "Title and Content"
+body.text_frame.text = "First point"
+```
+
+`idx` is the placeholder's identity inside the layout and survives reordering;
+the position in `slide.placeholders` does not. `slide.shapes.title` is the
+shortcut for the title placeholder and is `None` on a layout without one.
+
+## Text
+
+A shape's `text_frame` holds paragraphs; a paragraph holds runs. A run is the
+unit that carries formatting, so mixed formatting means multiple runs.
+
+```python
+tf = body.text_frame
+tf.text = "First paragraph"               # replaces everything in the frame
+
+p = tf.add_paragraph()
+p.text = "Second paragraph"
+p.level = 1                               # indent level, 0-8
+p.alignment = PP_ALIGN.LEFT
+p.space_after = Pt(6)
+p.line_spacing = 1.2                      # a multiple, or Pt(...) for an exact height
+
+run = p.add_run()
+run.text = " with a bold tail"
+run.font.bold = True
+run.font.italic = True
+run.font.size = Pt(16)
+run.font.name = "Calibri"
+run.font.color.rgb = RGBColor(0x1F, 0x4E, 0x79)
+```
+
+Frame-level settings:
+
+```python
+tf.word_wrap = True
+tf.vertical_anchor = MSO_ANCHOR.TOP       # TOP, MIDDLE, BOTTOM
+tf.margin_left = Inches(0.1)
+tf.margin_right = Inches(0.1)
+tf.auto_size = MSO_AUTO_SIZE.NONE         # keep the box; let the text overflow visibly
+```
+
+`MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE` shrinks text to fit, which hides an overlong
+slide until someone opens it. Prefer `NONE` and fix the content or the box.
+
+Bullets come from the layout. Setting `p.level` moves a paragraph through the
+layout's list levels; do not paste a bullet character into the text, because it
+will not align with the list indent and will not survive a theme change.
 
 ## Shapes
 
-```javascript
-slide.addShape(pres.shapes.RECTANGLE, {
-  x: 0.5, y: 0.8, w: 1.5, h: 3.0,
-  fill: { color: "FF0000" }, line: { color: "000000", width: 2 }
-});
-
-slide.addShape(pres.shapes.OVAL, { x: 4, y: 1, w: 2, h: 2, fill: { color: "0000FF" } });
-
-slide.addShape(pres.shapes.LINE, {
-  x: 1, y: 3, w: 5, h: 0, line: { color: "FF0000", width: 3, dashType: "dash" }
-});
-
-// With transparency
-slide.addShape(pres.shapes.RECTANGLE, {
-  x: 1, y: 1, w: 3, h: 2,
-  fill: { color: "0088CC", transparency: 50 }
-});
-
-// Rounded rectangle (rectRadius only works with ROUNDED_RECTANGLE, not RECTANGLE)
-// ⚠️ Don't pair with rectangular accent overlays — they won't cover rounded corners. Use RECTANGLE instead.
-slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
-  x: 1, y: 1, w: 3, h: 2,
-  fill: { color: "FFFFFF" }, rectRadius: 0.1
-});
-
-// With shadow
-slide.addShape(pres.shapes.RECTANGLE, {
-  x: 1, y: 1, w: 3, h: 2,
-  fill: { color: "FFFFFF" },
-  shadow: { type: "outer", color: "000000", blur: 6, offset: 2, angle: 135, opacity: 0.15 }
-});
+```python
+card = slide.shapes.add_shape(
+    MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.5), Inches(1.5), Inches(3), Inches(1.2)
+)
+card.fill.solid()
+card.fill.fore_color.rgb = RGBColor(0x02, 0x80, 0x90)
+card.line.color.rgb = RGBColor(0x01, 0x50, 0x5A)
+card.line.width = Pt(1.5)
+card.shadow.inherit = False               # the starter theme adds a shadow otherwise
 ```
 
-Shadow options:
+`MSO_SHAPE` names the preset geometry (RECTANGLE, OVAL, CHEVRON, RIGHT_ARROW,
+CLOUD, ...). `card.text_frame` works exactly like a placeholder's, so a shape can
+carry its own label. `fill.background()` makes the fill transparent.
 
-| Property | Type | Range | Notes |
-|----------|------|-------|-------|
-| `type` | string | `"outer"`, `"inner"` | |
-| `color` | string | 6-char hex (e.g. `"000000"`) | No `#` prefix, no 8-char hex — see Common Pitfalls |
-| `blur` | number | 0-100 pt | |
-| `offset` | number | 0-200 pt | **Must be non-negative** — negative values corrupt the file |
-| `angle` | number | 0-359 degrees | Direction the shadow falls (135 = bottom-right, 270 = upward) |
-| `opacity` | number | 0.0-1.0 | Use this for transparency, never encode in color string |
+For a free-form text box with no geometry:
 
-To cast a shadow upward (e.g. on a footer bar), use `angle: 270` with a positive offset — do **not** use a negative offset.
-
-**Note**: Gradient fills are not natively supported. Use a gradient image as a background instead.
-
----
-
-## Images
-
-### Image Sources
-
-```javascript
-// From file path
-slide.addImage({ path: "images/chart.png", x: 1, y: 1, w: 5, h: 3 });
-
-// From URL
-slide.addImage({ path: "https://example.com/image.jpg", x: 1, y: 1, w: 5, h: 3 });
-
-// From base64 (faster, no file I/O)
-slide.addImage({ data: "image/png;base64,iVBORw0KGgo...", x: 1, y: 1, w: 5, h: 3 });
+```python
+box = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(6), Inches(0.8))
+box.text_frame.paragraphs[0].add_run().text = "A caption"
 ```
 
-### Image Options
+## Pictures
 
-```javascript
-slide.addImage({
-  path: "image.png",
-  x: 1, y: 1, w: 5, h: 3,
-  rotate: 45,              // 0-359 degrees
-  rounding: true,          // Circular crop
-  transparency: 50,        // 0-100
-  flipH: true,             // Horizontal flip
-  flipV: false,            // Vertical flip
-  altText: "Description",  // Accessibility
-  hyperlink: { url: "https://example.com" }
-});
+```python
+pic = slide.shapes.add_picture("chart.png", Inches(7), Inches(1.5), width=Inches(4))
 ```
 
-### Image Sizing Modes
+Give **one** of `width` or `height` and python-pptx keeps the aspect ratio; give
+both and the picture is stretched. To fit a box without distortion, compute the
+limiting dimension first:
 
-```javascript
-// Contain - fit inside, preserve ratio
-{ sizing: { type: 'contain', w: 4, h: 3 } }
+```python
+from PIL import Image
 
-// Cover - fill area, preserve ratio (may crop)
-{ sizing: { type: 'cover', w: 4, h: 3 } }
-
-// Crop - cut specific portion
-{ sizing: { type: 'crop', x: 0.5, y: 0.5, w: 2, h: 2 } }
+def fit(path, box_w, box_h):
+    with Image.open(path) as im:
+        scale = min(box_w / im.width, box_h / im.height)
+    return int(im.width * scale), int(im.height * scale)
 ```
 
-### Calculate Dimensions (preserve aspect ratio)
+Cropping is fractional, per edge, and does not change the frame:
 
-```javascript
-const origWidth = 1978, origHeight = 923, maxHeight = 3.0;
-const calcWidth = maxHeight * (origWidth / origHeight);
-const centerX = (10 - calcWidth) / 2;
-
-slide.addImage({ path: "image.png", x: centerX, y: 1.2, w: calcWidth, h: maxHeight });
+```python
+pic.crop_left = 0.1
+pic.crop_right = 0.1
 ```
 
-### Supported Formats
-
-- **Standard**: PNG, JPG, GIF (animated GIFs work in Microsoft 365)
-- **SVG**: Works in modern PowerPoint/Microsoft 365
-
----
-
-## Icons
-
-Use react-icons to generate SVG icons, then rasterize to PNG for universal compatibility.
-
-### Setup
-
-```javascript
-const React = require("react");
-const ReactDOMServer = require("react-dom/server");
-const sharp = require("sharp");
-const { FaCheckCircle, FaChartLine } = require("react-icons/fa");
-
-function renderIconSvg(IconComponent, color = "#000000", size = 256) {
-  return ReactDOMServer.renderToStaticMarkup(
-    React.createElement(IconComponent, { color, size: String(size) })
-  );
-}
-
-async function iconToBase64Png(IconComponent, color, size = 256) {
-  const svg = renderIconSvg(IconComponent, color, size);
-  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
-  return "image/png;base64," + pngBuffer.toString("base64");
-}
-```
-
-### Add Icon to Slide
-
-```javascript
-const iconData = await iconToBase64Png(FaCheckCircle, "#4472C4", 256);
-
-slide.addImage({
-  data: iconData,
-  x: 1, y: 1, w: 0.5, h: 0.5  // Size in inches
-});
-```
-
-**Note**: Use size 256 or higher for crisp icons. The size parameter controls the rasterization resolution, not the display size on the slide (which is set by `w` and `h` in inches).
-
-### Icon Libraries
-
-Install: `npm install -g react-icons react react-dom sharp`
-
-Popular icon sets in react-icons:
-- `react-icons/fa` - Font Awesome
-- `react-icons/md` - Material Design
-- `react-icons/hi` - Heroicons
-- `react-icons/bi` - Bootstrap Icons
-
----
-
-## Slide Backgrounds
-
-```javascript
-// Solid color
-slide.background = { color: "F1F1F1" };
-
-// Color with transparency
-slide.background = { color: "FF3399", transparency: 50 };
-
-// Image from URL
-slide.background = { path: "https://example.com/bg.jpg" };
-
-// Image from base64
-slide.background = { data: "image/png;base64,iVBORw0KGgo..." };
-```
-
----
+python-pptx embeds PNG, JPEG, GIF, BMP, TIFF and WMF. Convert anything else
+first; an embedded SVG is not supported.
 
 ## Tables
 
-```javascript
-slide.addTable([
-  ["Header 1", "Header 2"],
-  ["Cell 1", "Cell 2"]
-], {
-  x: 1, y: 1, w: 8, h: 2,
-  border: { pt: 1, color: "999999" }, fill: { color: "F1F1F1" }
-});
+```python
+table = slide.shapes.add_table(
+    rows=3, cols=3, left=Inches(0.5), top=Inches(3.2), width=Inches(6), height=Inches(1.5)
+).table
 
-// Advanced with merged cells
-let tableData = [
-  [{ text: "Header", options: { fill: { color: "6699CC" }, color: "FFFFFF", bold: true } }, "Cell"],
-  [{ text: "Merged", options: { colspan: 2 } }]
-];
-slide.addTable(tableData, { x: 1, y: 3.5, w: 8, colW: [4, 4] });
+table.columns[0].width = Inches(2.5)
+table.cell(0, 0).text = "Region"
+table.cell(1, 0).text = "EMEA"
 ```
 
----
+Row heights and column widths are set individually; the `width`/`height` of the
+frame are divided evenly at creation. Cell text is a text frame, so the same run
+formatting applies. A table inherits its banding from the theme -- set
+`table.first_row = True` for a header row, and style cells explicitly when the
+theme's banding is not what you want.
 
 ## Charts
 
-```javascript
-// Bar chart
-slide.addChart(pres.charts.BAR, [{
-  name: "Sales", labels: ["Q1", "Q2", "Q3", "Q4"], values: [4500, 5500, 6200, 7100]
-}], {
-  x: 0.5, y: 0.6, w: 6, h: 3, barDir: 'col',
-  showTitle: true, title: 'Quarterly Sales'
-});
+```python
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 
-// Line chart
-slide.addChart(pres.charts.LINE, [{
-  name: "Temp", labels: ["Jan", "Feb", "Mar"], values: [32, 35, 42]
-}], { x: 0.5, y: 4, w: 6, h: 3, lineSize: 3, lineSmooth: true });
+data = CategoryChartData()
+data.categories = ["Q1", "Q2", "Q3"]
+data.add_series("Revenue", (12.5, 15.0, 18.25))
+data.add_series("Cost", (8.0, 9.5, 10.0))
 
-// Pie chart
-slide.addChart(pres.charts.PIE, [{
-  name: "Share", labels: ["A", "B", "Other"], values: [35, 45, 20]
-}], { x: 7, y: 1, w: 5, h: 4, showPercent: true });
+chart = slide.shapes.add_chart(
+    XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(7), Inches(3.2), Inches(5.5), Inches(3), data
+).chart
+
+chart.has_legend = True
+chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+chart.legend.include_in_layout = False
 ```
 
-### Better-Looking Charts
+The chart is a real embedded workbook, so it stays editable in PowerPoint.
+`XL_CHART_TYPE` covers column, bar, line, pie, area, scatter and their stacked
+variants. Axis titles, number formats and series colours are reachable through
+`chart.category_axis`, `chart.value_axis` and `chart.series[i].format`.
 
-Default charts look dated. Apply these options for a modern, clean appearance:
+## Backgrounds and speaker notes
 
-```javascript
-slide.addChart(pres.charts.BAR, chartData, {
-  x: 0.5, y: 1, w: 9, h: 4, barDir: "col",
+```python
+slide.background.fill.solid()
+slide.background.fill.fore_color.rgb = RGBColor(0xF7, 0xF7, 0xF5)
 
-  // Custom colors (match your presentation palette)
-  chartColors: ["0D9488", "14B8A6", "5EEAD4"],
-
-  // Clean background
-  chartArea: { fill: { color: "FFFFFF" }, roundedCorners: true },
-
-  // Muted axis labels
-  catAxisLabelColor: "64748B",
-  valAxisLabelColor: "64748B",
-
-  // Subtle grid (value axis only)
-  valGridLine: { color: "E2E8F0", size: 0.5 },
-  catGridLine: { style: "none" },
-
-  // Data labels on bars
-  showValue: true,
-  dataLabelPosition: "outEnd",
-  dataLabelColor: "1E293B",
-
-  // Hide legend for single series
-  showLegend: false,
-});
+slide.notes_slide.notes_text_frame.text = "Say the number, then the reason for it."
 ```
 
-**Key styling options:**
-- `chartColors: [...]` - hex colors for series/segments
-- `chartArea: { fill, border, roundedCorners }` - chart background
-- `catGridLine/valGridLine: { color, style, size }` - grid lines (`style: "none"` to hide)
-- `lineSmooth: true` - curved lines (line charts)
-- `legendPos: "r"` - legend position: "b", "t", "l", "r", "tr"
+A slide background overrides the layout's. Setting it on every slide is how a
+deck loses the theme's dark/light structure -- prefer changing the layout when
+the whole section should change.
 
----
+## Masters, layouts and themes
 
-## Slide Masters
+`prs.slide_masters[0]` is the master; `master.slide_layouts` are its layouts.
+Editing a master or layout placeholder changes every slide that inherits it,
+which is the cheap way to restyle a whole deck.
 
-```javascript
-pres.defineSlideMaster({
-  title: 'TITLE_SLIDE', background: { color: '283A5E' },
-  objects: [{
-    placeholder: { options: { name: 'title', type: 'title', x: 1, y: 2, w: 8, h: 2 } }
-  }]
-});
+python-pptx does **not** create layouts or masters, and it does not edit a theme
+part (`ppt/theme/theme1.xml`: colour scheme, font scheme, format scheme). For
+those, use the XML route: unpack the deck, edit the part, clean, pack -- see
+[pptx-editing.md](./pptx-editing.md). The palette and typography notes in
+`../themes/` are starting points for that edit.
 
-let titleSlide = pres.addSlide({ masterName: "TITLE_SLIDE" });
-titleSlide.addText("My Title", { placeholder: "title" });
+## What python-pptx cannot do
+
+| Need | Route |
+|------|-------|
+| Delete or reorder slides | edit `<p:sldIdLst>` in `ppt/presentation.xml`, then `clean.py` |
+| Add a slide to an unpacked tree | `scripts/pptx/add_slide.py` |
+| Create a layout or master | copy an existing layout part and rewire its relationships |
+| Change theme colours or fonts | edit `ppt/theme/theme1.xml` |
+| Animations, transitions, SmartArt | not modelled; edit the XML or use PowerPoint |
+
+`Slides` has no `remove()`. Deleting a slide means removing its `<p:sldId>` from
+the slide list; the part, its relationships and its media are then orphaned, and
+`scripts/pptx/clean.py` reclaims them.
+
+## Save and verify
+
+```python
+prs.save("output.pptx")
 ```
 
----
+Saving is not verification. Render the deck and look at it
+([pptx-qa.md](./pptx-qa.md)): overflow, collisions and inherited formatting are
+invisible in the object model.
 
-## Common Pitfalls
+## Pitfalls
 
-⚠️ These issues cause file corruption, visual bugs, or broken output. Avoid them.
+- **Raw numbers as lengths.** `left=914400` works, `left=1` puts the shape one
+  EMU from the edge. Always use `Inches()` or `Pt()`.
+- **`tf.text = ...` after building runs.** Assigning `.text` replaces the whole
+  frame, discarding the runs and their formatting.
+- **Placeholder index assumptions.** `slide.placeholders[1]` raises `KeyError`
+  on a layout whose body placeholder has a different idx. List them first.
+- **Both width and height on a picture.** That stretches it; pass one.
+- **Text that fits in code but not on the slide.** Font metrics differ between
+  the renderer and PowerPoint. Leave headroom, and render to check.
+- **Forgetting the canvas.** A 4:3 composition on a 16:9 canvas leaves a band.
+- **Shadow inheritance.** The starter theme gives shapes a shadow; set
+  `shape.shadow.inherit = False` for a flat look.
 
-1. **NEVER use "#" with hex colors** - causes file corruption
-   ```javascript
-   color: "FF0000"      // ✅ CORRECT
-   color: "#FF0000"     // ❌ WRONG
-   ```
+## Quick reference
 
-2. **NEVER encode opacity in hex color strings** - 8-char colors (e.g., `"00000020"`) corrupt the file. Use the `opacity` property instead.
-   ```javascript
-   shadow: { type: "outer", blur: 6, offset: 2, color: "00000020" }          // ❌ CORRUPTS FILE
-   shadow: { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.12 }  // ✅ CORRECT
-   ```
-
-3. **Use `bullet: true`** - NEVER unicode symbols like "•" (creates double bullets)
-
-4. **Use `breakLine: true`** between array items or text runs together
-
-5. **Avoid `lineSpacing` with bullets** - causes excessive gaps; use `paraSpaceAfter` instead
-
-6. **Each presentation needs fresh instance** - don't reuse `pptxgen()` objects
-
-7. **NEVER reuse option objects across calls** - PptxGenJS mutates objects in-place (e.g. converting shadow values to EMU). Sharing one object between multiple calls corrupts the second shape.
-   ```javascript
-   const shadow = { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 };
-   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });  // ❌ second call gets already-converted values
-   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });
-
-   const makeShadow = () => ({ type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 });
-   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });  // ✅ fresh object each time
-   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });
-   ```
-
-8. **Don't use `ROUNDED_RECTANGLE` with accent borders** - rectangular overlay bars won't cover rounded corners. Use `RECTANGLE` instead.
-   ```javascript
-   // ❌ WRONG: Accent bar doesn't cover rounded corners
-   slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
-
-   // ✅ CORRECT: Use RECTANGLE for clean alignment
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
-   ```
-
----
-
-## Quick Reference
-
-- **Shapes**: RECTANGLE, OVAL, LINE, ROUNDED_RECTANGLE
-- **Charts**: BAR, LINE, PIE, DOUGHNUT, SCATTER, BUBBLE, RADAR
-- **Layouts**: LAYOUT_16x9 (10"×5.625"), LAYOUT_16x10, LAYOUT_4x3, LAYOUT_WIDE
-- **Alignment**: "left", "center", "right"
-- **Chart data labels**: "outEnd", "inEnd", "center"
+| Task | Call |
+|------|------|
+| New deck | `Presentation()` |
+| Open a deck | `Presentation("file.pptx")` |
+| Canvas | `prs.slide_width`, `prs.slide_height` |
+| Add slide | `prs.slides.add_slide(prs.slide_layouts[i])` |
+| Title | `slide.shapes.title.text` |
+| Body | `slide.placeholders[idx].text_frame` |
+| Text box | `slide.shapes.add_textbox(l, t, w, h)` |
+| Shape | `slide.shapes.add_shape(MSO_SHAPE.X, l, t, w, h)` |
+| Picture | `slide.shapes.add_picture(path, l, t, width=...)` |
+| Table | `slide.shapes.add_table(rows, cols, l, t, w, h).table` |
+| Chart | `slide.shapes.add_chart(XL_CHART_TYPE.X, l, t, w, h, data).chart` |
+| Notes | `slide.notes_slide.notes_text_frame.text` |
+| Background | `slide.background.fill` |
+| Save | `prs.save("out.pptx")` |

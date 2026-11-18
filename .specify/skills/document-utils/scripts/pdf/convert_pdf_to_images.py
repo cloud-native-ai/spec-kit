@@ -1,3 +1,96 @@
+#!/usr/bin/env python3
+"""Render every page of a PDF to a PNG that an agent can read in one look.
+
+Operands: input PDF, output directory. The directory is created when it does not
+exist. Pages are written in document order as page_1.png, page_2.png, ... and
+each write is reported on stdout, followed by a total:
+
+    Saved page 1 as <dir>/page_1.png (size: (850, 1100))
+    Converted 2 pages to PNG images
+
+Rendering runs at 200 dpi through pypdfium2, the PDFium binding, so no external
+binary (poppler, Ghostscript, LibreOffice) has to be installed. A page whose
+longer side exceeds max_dim -- 1000 pixels by default -- is scaled down
+proportionally before it is saved; smaller pages keep their rendered size. The
+cap keeps a full page inside one image an agent can inspect without tiling,
+while 200 dpi keeps small print legible before the downscale.
+
+Exit 1 means nothing was rendered: wrong operand count, unreadable PDF, or a
+missing renderer. The renderer is imported inside the function so that -h,
+--help and --version still answer on a host without pypdfium2.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import os
+import sys
+
+USAGE = "Usage: convert_pdf_to_images.py [input pdf] [output directory]"
+
+#: Rendering resolution. PDF user space is 72 units per inch, so the scale
+#: handed to PDFium is dpi / 72.
+RENDER_DPI = 200
+PDF_UNITS_PER_INCH = 72.0
+DEFAULT_MAX_DIM = 1000
+
+
+def _fit_within(image, max_dim):
+    """Shrink proportionally so neither side exceeds max_dim; never enlarge."""
+    width, height = image.size
+    if width <= max_dim and height <= max_dim:
+        return image
+    from PIL import Image
+
+    factor = min(max_dim / width, max_dim / height)
+    size = (max(1, int(width * factor)), max(1, int(height * factor)))
+    return image.resize(size, Image.LANCZOS)
+
+
+def convert(pdf_path, output_dir, max_dim=DEFAULT_MAX_DIM) -> int:
+    """Write one PNG per page; return the number of pages written."""
+    import pypdfium2 as pdfium
+
+    os.makedirs(output_dir, exist_ok=True)
+    document = pdfium.PdfDocument(pdf_path)
+    written = 0
+    try:
+        for index in range(len(document)):
+            page = document[index]
+            bitmap = page.render(scale=RENDER_DPI / PDF_UNITS_PER_INCH)
+            try:
+                image = _fit_within(bitmap.to_pil(), max_dim)
+            finally:
+                bitmap.close()
+                page.close()
+            target = os.path.join(output_dir, f"page_{index + 1}.png")
+            image.save(target)
+            written += 1
+            print(f"Saved page {index + 1} as {target} (size: {image.size})")
+    finally:
+        document.close()
+    print(f"Converted {written} pages to PNG images")
+    return written
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 2:
+        print(USAGE)
+        return 1
+    try:
+        convert(args[0], args[1])
+    except ImportError as exc:
+        print(
+            f"ERROR: PDF rendering needs pypdfium2 ({exc}). "
+            "Install it with: pip install pypdfium2",
+            file=sys.stderr,
+        )
+        return 1
+    except Exception as exc:  # unreadable PDF, unwritable directory, bad render
+        print(f"ERROR: cannot convert {args[0]}: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,36 +206,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-import os
-import sys
-
-from pdf2image import convert_from_path
-
-
-
-
-def convert(pdf_path, output_dir, max_dim=1000):
-    images = convert_from_path(pdf_path, dpi=200)
-
-    for i, image in enumerate(images):
-        width, height = image.size
-        if width > max_dim or height > max_dim:
-            scale_factor = min(max_dim / width, max_dim / height)
-            new_width = int(width * scale_factor)
-            new_height = int(height * scale_factor)
-            image = image.resize((new_width, new_height))
-        
-        image_path = os.path.join(output_dir, f"page_{i+1}.png")
-        image.save(image_path)
-        print(f"Saved page {i+1} as {image_path} (size: {image.size})")
-
-    print(f"Converted {len(images)} pages to PNG images")
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: convert_pdf_to_images.py [input pdf] [output directory]")
-        sys.exit(1)
-    pdf_path = sys.argv[1]
-    output_directory = sys.argv[2]
-    convert(pdf_path, output_directory)
+    sys.exit(main())

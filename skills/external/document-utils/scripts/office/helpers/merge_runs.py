@@ -1,11 +1,17 @@
-"""Merge adjacent runs with identical formatting in DOCX.
+"""Collapse neighbouring Word runs that carry the same formatting.
 
-Merges adjacent <w:r> elements that have identical <w:rPr> properties.
-Works on runs in paragraphs and inside tracked changes (<w:ins>, <w:del>).
+Original implementation, MIT licensed. A run (``w:r``) is a span of text with
+one property set. Editors and generators emit many tiny runs for one visual
+span, which makes a redlined document hard to read and hard to edit. This
+helper joins runs that a reader would see as one span:
 
-Also:
-- Removes rsid attributes from runs (revision metadata that doesn't affect rendering)
-- Removes proofErr elements (spell/grammar markers that block merging)
+* adjacent siblings only, with nothing but whitespace between them,
+* identical run properties (``w:rPr``), compared without layout whitespace,
+* inside any container, so runs wrapped in ``w:ins`` / ``w:del`` join too.
+
+Two kinds of noise are removed first because they block joining without
+changing what the document shows: spell/grammar markers (``w:proofErr``) and
+revision-save identifiers (``w:rsid*`` attributes) on runs.
 """
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
@@ -125,190 +131,106 @@ if __name__ == "__main__":
 
 from pathlib import Path
 
-import defusedxml.minidom
+try:  # package-relative import, then the flat script directory
+    from .. import ooxml as ox
+except ImportError:  # pragma: no cover - depends on how the caller set sys.path
+    import ooxml as ox
 
 
 def merge_runs(input_dir: str) -> tuple[int, str]:
+    """Join same-format runs in ``word/document.xml``; return (count, message)."""
     doc_xml = Path(input_dir) / "word" / "document.xml"
-
     if not doc_xml.exists():
         return 0, f"Error: {doc_xml} not found"
 
     try:
-        dom = defusedxml.minidom.parseString(doc_xml.read_text(encoding="utf-8"))
-        root = dom.documentElement
+        doc = ox.parse_file(doc_xml)
+        root = doc.documentElement
 
-        _remove_elements(root, "proofErr")
-        _strip_run_rsid_attrs(root)
+        for marker in list(ox.iter_elements(root, "proofErr")):
+            ox.remove_node(marker)
+        for run in list(ox.iter_elements(root, "r")):
+            for index in range(run.attributes.length - 1, -1, -1):
+                attr = run.attributes.item(index)
+                if "rsid" in ox.local_name(attr).lower():
+                    run.removeAttribute(attr.name)
 
-        containers = {run.parentNode for run in _find_elements(root, "r")}
+        containers = {run.parentNode for run in ox.iter_elements(root, "r")}
+        merged = sum(_merge_within(container) for container in containers)
 
-        merge_count = 0
-        for container in containers:
-            merge_count += _merge_runs_in(container)
-
-        doc_xml.write_bytes(dom.toxml(encoding="UTF-8"))
-        return merge_count, f"Merged {merge_count} runs"
-
-    except Exception as e:
-        return 0, f"Error: {e}"
-
-
-
-
-def _find_elements(root, tag: str) -> list:
-    results = []
-
-    def traverse(node):
-        if node.nodeType == node.ELEMENT_NODE:
-            name = node.localName or node.tagName
-            if name == tag or name.endswith(f":{tag}"):
-                results.append(node)
-            for child in node.childNodes:
-                traverse(child)
-
-    traverse(root)
-    return results
+        ox.write_document(doc_xml, doc)
+        return merged, f"Merged {merged} runs"
+    except Exception as exc:
+        return 0, f"Error: {exc}"
 
 
-def _get_child(parent, tag: str):
-    for child in parent.childNodes:
-        if child.nodeType == child.ELEMENT_NODE:
-            name = child.localName or child.tagName
-            if name == tag or name.endswith(f":{tag}"):
-                return child
-    return None
+def _properties_signature(run):
+    """A run's formatting, normalized so indentation cannot mask equality."""
+    properties = ox.first_child(run, "rPr")
+    if properties is None:
+        return None
+    clone = properties.cloneNode(deep=True)
+    for element in ox.iter_elements(clone):
+        for kid in list(element.childNodes):
+            if kid.nodeType == kid.TEXT_NODE and not kid.data.strip():
+                element.removeChild(kid)
+    return clone.toxml()
 
 
-def _get_children(parent, tag: str) -> list:
-    results = []
-    for child in parent.childNodes:
-        if child.nodeType == child.ELEMENT_NODE:
-            name = child.localName or child.tagName
-            if name == tag or name.endswith(f":{tag}"):
-                results.append(child)
-    return results
+def _joinable(first, second) -> bool:
+    if not ox.is_element(second, "r"):
+        return False
+    if not ox.adjacent(first, second):
+        return False
+    return _properties_signature(first) == _properties_signature(second)
 
 
-def _is_adjacent(elem1, elem2) -> bool:
-    node = elem1.nextSibling
-    while node:
-        if node == elem2:
-            return True
-        if node.nodeType == node.ELEMENT_NODE:
-            return False
-        if node.nodeType == node.TEXT_NODE and node.data.strip():
-            return False
-        node = node.nextSibling
-    return False
-
-
-
-
-def _remove_elements(root, tag: str):
-    for elem in _find_elements(root, tag):
-        if elem.parentNode:
-            elem.parentNode.removeChild(elem)
-
-
-def _strip_run_rsid_attrs(root):
-    for run in _find_elements(root, "r"):
-        for attr in list(run.attributes.values()):
-            if "rsid" in attr.name.lower():
-                run.removeAttribute(attr.name)
-
-
-
-
-def _merge_runs_in(container) -> int:
-    merge_count = 0
-    run = _first_child_run(container)
-
-    while run:
+def _merge_within(container) -> int:
+    merged = 0
+    for run in ox.element_children(container, "r"):
         while True:
-            next_elem = _next_element_sibling(run)
-            if next_elem and _is_run(next_elem) and _can_merge(run, next_elem):
-                _merge_run_content(run, next_elem)
-                container.removeChild(next_elem)
-                merge_count += 1
-            else:
+            sibling = _next_element(run)
+            if sibling is None or not _joinable(run, sibling):
                 break
-
-        _consolidate_text(run)
-        run = _next_sibling_run(run)
-
-    return merge_count
-
-
-def _first_child_run(container):
-    for child in container.childNodes:
-        if child.nodeType == child.ELEMENT_NODE and _is_run(child):
-            return child
-    return None
+            for kid in list(sibling.childNodes):
+                if ox.is_element(kid, "rPr"):
+                    continue
+                run.appendChild(kid)
+            container.removeChild(sibling)
+            merged += 1
+        _join_text_nodes(run)
+    return merged
 
 
-def _next_element_sibling(node):
+def _next_element(node):
     sibling = node.nextSibling
-    while sibling:
+    while sibling is not None:
         if sibling.nodeType == sibling.ELEMENT_NODE:
             return sibling
         sibling = sibling.nextSibling
     return None
 
 
-def _next_sibling_run(node):
-    sibling = node.nextSibling
-    while sibling:
-        if sibling.nodeType == sibling.ELEMENT_NODE:
-            if _is_run(sibling):
-                return sibling
-        sibling = sibling.nextSibling
-    return None
+def _join_text_nodes(run) -> None:
+    """Fold adjacent w:t siblings into one, keeping whitespace semantics."""
+    while True:
+        texts = ox.element_children(run, "t")
+        folded = False
+        for previous, current in zip(texts, texts[1:]):
+            if not ox.adjacent(previous, current):
+                continue
+            combined = ox.text_of(previous) + ox.text_of(current)
+            ox.set_text(previous, combined)
+            if combined[:1] in (" ", "\t") or combined[-1:] in (" ", "\t"):
+                previous.setAttribute("xml:space", "preserve")
+            elif ox.has_attr(previous, "space"):
+                previous.removeAttribute("xml:space")
+            run.removeChild(current)
+            folded = True
+            break
+        if not folded:
+            return
 
 
-def _is_run(node) -> bool:
-    name = node.localName or node.tagName
-    return name == "r" or name.endswith(":r")
-
-
-def _can_merge(run1, run2) -> bool:
-    rpr1 = _get_child(run1, "rPr")
-    rpr2 = _get_child(run2, "rPr")
-
-    if (rpr1 is None) != (rpr2 is None):
-        return False
-    if rpr1 is None:
-        return True
-    return rpr1.toxml() == rpr2.toxml()  
-
-
-def _merge_run_content(target, source):
-    for child in list(source.childNodes):
-        if child.nodeType == child.ELEMENT_NODE:
-            name = child.localName or child.tagName
-            if name != "rPr" and not name.endswith(":rPr"):
-                target.appendChild(child)
-
-
-def _consolidate_text(run):
-    t_elements = _get_children(run, "t")
-
-    for i in range(len(t_elements) - 1, 0, -1):
-        curr, prev = t_elements[i], t_elements[i - 1]
-
-        if _is_adjacent(prev, curr):
-            prev_text = prev.firstChild.data if prev.firstChild else ""
-            curr_text = curr.firstChild.data if curr.firstChild else ""
-            merged = prev_text + curr_text
-
-            if prev.firstChild:
-                prev.firstChild.data = merged
-            else:
-                prev.appendChild(run.ownerDocument.createTextNode(merged))
-
-            if merged.startswith(" ") or merged.endswith(" "):
-                prev.setAttribute("xml:space", "preserve")
-            elif prev.hasAttribute("xml:space"):
-                prev.removeAttribute("xml:space")
-
-            run.removeChild(curr)
+if __name__ == "__main__":
+    raise RuntimeError("This module is a library; run office/unpack.py instead.")

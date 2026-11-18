@@ -1,3 +1,176 @@
+#!/usr/bin/env python3
+"""Recover the geometry of a form that has no interactive fields of its own.
+
+Operands: input PDF, output JSON path. A scanned or flattened form still has
+structure -- printed labels, ruled lines, small square boxes -- and that
+structure is enough to place text accurately without guessing from a picture.
+pdfplumber exposes the page's word, line and rectangle inventory; this script
+filters that inventory into the four things a form filler needs and writes them
+as JSON, alongside one record per page:
+
+    pages          page_number, width, height (PDF points)
+    labels         every extracted word: page, text, x0, top, x1, bottom
+    lines          horizontal rules spanning more than half the page width:
+                   page, y, x0, x1
+    checkboxes     near-square rectangles 5-15 points a side: page, x0, top,
+                   x1, bottom, center_x, center_y
+    row_boundaries consecutive rule pairs per page: page, row_top, row_bottom,
+                   row_height
+
+Coordinates are top-down: the origin is the page's top-left corner and y grows
+downward, which is the opposite of the PDF's own bottom-up user space. Every
+number is rounded to one decimal. That convention is what lets the values be
+used directly as the bounding boxes of fields.json with pdf_width/pdf_height
+declared -- see references/pdf-forms.md.
+
+The filters are deliberately conservative. A rule shorter than half the page
+width is usually a cell divider or an underline, not a row boundary; a rectangle
+outside the 5-15 point square window is usually a table cell or a decoration.
+Round boxes, faint graphics and anything drawn as an image are not detected at
+all, so a page can need visual estimation for some fields even when this script
+succeeds -- the workflow's hybrid route covers that case.
+
+Exit 1 means nothing was written: wrong operand count, unreadable PDF, or a
+missing pdfplumber.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import json
+import sys
+
+USAGE = "Usage: extract_form_structure.py <input.pdf> <output.json>"
+
+#: A horizontal rule must span more than this fraction of the page width.
+MIN_LINE_SPAN = 0.5
+#: Side window for a rectangle to be read as a checkbox, in PDF points.
+BOX_MIN_SIDE = 5.0
+BOX_MAX_SIDE = 15.0
+#: How far from square a checkbox may be and still count.
+BOX_SQUARE_TOLERANCE = 2.0
+#: Decimal places kept for every coordinate.
+PRECISION = 1
+
+
+def _coord(value) -> float:
+    return round(float(value), PRECISION)
+
+
+def _is_row_rule(line, page_width) -> bool:
+    span = abs(float(line["x1"]) - float(line["x0"]))
+    return span > page_width * MIN_LINE_SPAN
+
+
+def _is_checkbox(rect) -> bool:
+    width = float(rect["x1"]) - float(rect["x0"])
+    height = float(rect["bottom"]) - float(rect["top"])
+    return (
+        BOX_MIN_SIDE <= width <= BOX_MAX_SIDE
+        and BOX_MIN_SIDE <= height <= BOX_MAX_SIDE
+        and abs(width - height) < BOX_SQUARE_TOLERANCE
+    )
+
+
+def _row_boundaries(lines) -> list:
+    """Pair consecutive distinct rule heights into rows, page by page."""
+    heights = {}
+    for line in lines:
+        heights.setdefault(line["page"], set()).add(line["y"])
+    rows = []
+    for page in sorted(heights):
+        ordered = sorted(heights[page])
+        for top, bottom in zip(ordered, ordered[1:]):
+            rows.append({
+                "page": page,
+                "row_top": top,
+                "row_bottom": bottom,
+                "row_height": round(bottom - top, PRECISION),
+            })
+    return rows
+
+
+def extract_form_structure(pdf_path) -> dict:
+    """Return the page/label/line/checkbox/row inventory of a PDF."""
+    import pdfplumber
+
+    structure = {"pages": [], "labels": [], "lines": [], "checkboxes": [], "row_boundaries": []}
+    with pdfplumber.open(pdf_path) as document:
+        for number, page in enumerate(document.pages, start=1):
+            structure["pages"].append({
+                "page_number": number,
+                "width": float(page.width),
+                "height": float(page.height),
+            })
+
+            for word in page.extract_words():
+                structure["labels"].append({
+                    "page": number,
+                    "text": word["text"],
+                    "x0": _coord(word["x0"]),
+                    "top": _coord(word["top"]),
+                    "x1": _coord(word["x1"]),
+                    "bottom": _coord(word["bottom"]),
+                })
+
+            for line in page.lines:
+                if not _is_row_rule(line, float(page.width)):
+                    continue
+                structure["lines"].append({
+                    "page": number,
+                    "y": _coord(line["top"]),
+                    "x0": _coord(line["x0"]),
+                    "x1": _coord(line["x1"]),
+                })
+
+            for rect in page.rects:
+                if not _is_checkbox(rect):
+                    continue
+                x0, x1 = float(rect["x0"]), float(rect["x1"])
+                top, bottom = float(rect["top"]), float(rect["bottom"])
+                structure["checkboxes"].append({
+                    "page": number,
+                    "x0": _coord(x0),
+                    "top": _coord(top),
+                    "x1": _coord(x1),
+                    "bottom": _coord(bottom),
+                    "center_x": _coord((x0 + x1) / 2),
+                    "center_y": _coord((top + bottom) / 2),
+                })
+
+    structure["row_boundaries"] = _row_boundaries(structure["lines"])
+    return structure
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 2:
+        print(USAGE)
+        return 1
+    pdf_path, output_path = args
+    print(f"Extracting structure from {pdf_path}...")
+    try:
+        structure = extract_form_structure(pdf_path)
+        with open(output_path, "w", encoding="utf-8") as stream:
+            json.dump(structure, stream, indent=2)
+    except ImportError as exc:
+        print(
+            f"ERROR: structure extraction needs pdfplumber ({exc}). "
+            "Install it with: pip install pdfplumber",
+            file=sys.stderr,
+        )
+        return 1
+    except Exception as exc:  # unreadable PDF, unwritable output
+        print(f"ERROR: cannot extract structure from {pdf_path}: {exc}", file=sys.stderr)
+        return 1
+    print("Found:")
+    print(f"  - {len(structure['pages'])} pages")
+    print(f"  - {len(structure['labels'])} text labels")
+    print(f"  - {len(structure['lines'])} horizontal lines")
+    print(f"  - {len(structure['checkboxes'])} checkboxes")
+    print(f"  - {len(structure['row_boundaries'])} row boundaries")
+    print(f"Saved to {output_path}")
+    return 0
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,118 +286,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-"""
-Extract form structure from a non-fillable PDF.
-
-This script analyzes the PDF to find:
-- Text labels with their exact coordinates
-- Horizontal lines (row boundaries)
-- Checkboxes (small rectangles)
-
-Output: A JSON file with the form structure that can be used to generate
-accurate field coordinates for filling.
-
-Usage: python extract_form_structure.py <input.pdf> <output.json>
-"""
-
-import json
-import sys
-import pdfplumber
-
-
-def extract_form_structure(pdf_path):
-    structure = {
-        "pages": [],
-        "labels": [],
-        "lines": [],
-        "checkboxes": [],
-        "row_boundaries": []
-    }
-
-    with pdfplumber.open(pdf_path) as pdf:
-        for page_num, page in enumerate(pdf.pages, 1):
-            structure["pages"].append({
-                "page_number": page_num,
-                "width": float(page.width),
-                "height": float(page.height)
-            })
-
-            words = page.extract_words()
-            for word in words:
-                structure["labels"].append({
-                    "page": page_num,
-                    "text": word["text"],
-                    "x0": round(float(word["x0"]), 1),
-                    "top": round(float(word["top"]), 1),
-                    "x1": round(float(word["x1"]), 1),
-                    "bottom": round(float(word["bottom"]), 1)
-                })
-
-            for line in page.lines:
-                if abs(float(line["x1"]) - float(line["x0"])) > page.width * 0.5:
-                    structure["lines"].append({
-                        "page": page_num,
-                        "y": round(float(line["top"]), 1),
-                        "x0": round(float(line["x0"]), 1),
-                        "x1": round(float(line["x1"]), 1)
-                    })
-
-            for rect in page.rects:
-                width = float(rect["x1"]) - float(rect["x0"])
-                height = float(rect["bottom"]) - float(rect["top"])
-                if 5 <= width <= 15 and 5 <= height <= 15 and abs(width - height) < 2:
-                    structure["checkboxes"].append({
-                        "page": page_num,
-                        "x0": round(float(rect["x0"]), 1),
-                        "top": round(float(rect["top"]), 1),
-                        "x1": round(float(rect["x1"]), 1),
-                        "bottom": round(float(rect["bottom"]), 1),
-                        "center_x": round((float(rect["x0"]) + float(rect["x1"])) / 2, 1),
-                        "center_y": round((float(rect["top"]) + float(rect["bottom"])) / 2, 1)
-                    })
-
-    lines_by_page = {}
-    for line in structure["lines"]:
-        page = line["page"]
-        if page not in lines_by_page:
-            lines_by_page[page] = []
-        lines_by_page[page].append(line["y"])
-
-    for page, y_coords in lines_by_page.items():
-        y_coords = sorted(set(y_coords))
-        for i in range(len(y_coords) - 1):
-            structure["row_boundaries"].append({
-                "page": page,
-                "row_top": y_coords[i],
-                "row_bottom": y_coords[i + 1],
-                "row_height": round(y_coords[i + 1] - y_coords[i], 1)
-            })
-
-    return structure
-
-
-def main():
-    if len(sys.argv) != 3:
-        print("Usage: extract_form_structure.py <input.pdf> <output.json>")
-        sys.exit(1)
-
-    pdf_path = sys.argv[1]
-    output_path = sys.argv[2]
-
-    print(f"Extracting structure from {pdf_path}...")
-    structure = extract_form_structure(pdf_path)
-
-    with open(output_path, "w") as f:
-        json.dump(structure, f, indent=2)
-
-    print(f"Found:")
-    print(f"  - {len(structure['pages'])} pages")
-    print(f"  - {len(structure['labels'])} text labels")
-    print(f"  - {len(structure['lines'])} horizontal lines")
-    print(f"  - {len(structure['checkboxes'])} checkboxes")
-    print(f"  - {len(structure['row_boundaries'])} row boundaries")
-    print(f"Saved to {output_path}")
-
-
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

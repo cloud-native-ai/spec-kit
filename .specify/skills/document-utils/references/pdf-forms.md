@@ -1,294 +1,387 @@
-**CRITICAL: You MUST complete these steps in order. Do not skip ahead to writing code.**
+# Filling a PDF form
 
-If you need to fill out a PDF form, first check to see if the PDF has fillable form fields. Run this script from this file's directory:
- `python ${SKILL_HOME}/scripts/pdf/check_fillable_fields <file.pdf>`, and depending on the result go to either the "Fillable fields" or "Non-fillable fields" and follow those instructions.
+Two kinds of PDF arrive with the word "form" on them. One carries interactive
+fields that a viewer can edit; the other is a picture of a form, with nothing to
+type into. The routes are different, the coordinate systems are different, and
+mixing them is the usual cause of text landing in the wrong place. Work out
+which kind you have first, then follow that route end to end.
 
-# Fillable fields
-If the PDF has fillable form fields:
-- Run this script from this file's directory: `python ${SKILL_HOME}/scripts/pdf/extract_form_field_info.py <input.pdf> <field_info.json>`. It will create a JSON file with a list of fields in this format:
+Every script below lives in `${SKILL_HOME}/scripts/pdf/` and takes positional
+operands only. Run them with the interpreter that has the skill's dependencies
+installed (`pypdf`, `pdfplumber`, `pypdfium2`, `Pillow`). Each script answers
+`-h` / `--help` and `--version` without touching a file.
+
+## Step 0 — choose the route
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/check_fillable_fields.py form.pdf
 ```
-[
-  {
-    "field_id": (unique ID for the field),
-    "page": (page number, 1-based),
-    "rect": ([left, bottom, right, top] bounding box in PDF coordinates, y=0 is the bottom of the page),
-    "type": ("text", "checkbox", "radio_group", or "choice"),
-  },
-  // Checkboxes have "checked_value" and "unchecked_value" properties:
-  {
-    "field_id": (unique ID for the field),
-    "page": (page number, 1-based),
-    "type": "checkbox",
-    "checked_value": (Set the field to this value to check the checkbox),
-    "unchecked_value": (Set the field to this value to uncheck the checkbox),
-  },
-  // Radio groups have a "radio_options" list with the possible choices.
-  {
-    "field_id": (unique ID for the field),
-    "page": (page number, 1-based),
-    "type": "radio_group",
-    "radio_options": [
-      {
-        "value": (set the field to this value to select this radio option),
-        "rect": (bounding box for the radio button for this option)
-      },
-      // Other radio options
-    ]
-  },
-  // Multiple choice fields have a "choice_options" list with the possible choices:
-  {
-    "field_id": (unique ID for the field),
-    "page": (page number, 1-based),
-    "type": "choice",
-    "choice_options": [
-      {
-        "value": (set the field to this value to select this option),
-        "text": (display text of the option)
-      },
-      // Other choice options
-    ],
-  }
-]
-```
-- Convert the PDF to PNGs (one image for each page) with this script (run from this file's directory):
-`python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py <file.pdf> <output_directory>`
-Then analyze the images to determine the purpose of each form field (make sure to convert the bounding box PDF coordinates to image coordinates).
-- Create a `field_values.json` file in this format with the values to be entered for each field:
-```
-[
-  {
-    "field_id": "last_name", // Must match the field_id from `extract_form_field_info.py`
-    "description": "The user's last name",
-    "page": 1, // Must match the "page" value in field_info.json
-    "value": "Simpson"
-  },
-  {
-    "field_id": "Checkbox12",
-    "description": "Checkbox to be checked if the user is 18 or over",
-    "page": 1,
-    "value": "/On" // If this is a checkbox, use its "checked_value" value to check it. If it's a radio button group, use one of the "value" values in "radio_options".
-  },
-  // more fields
-]
-```
-- Run the `fill_fillable_fields.py` script from this file's directory to create a filled-in PDF:
-`python ${SKILL_HOME}/scripts/pdf/fill_fillable_fields.py <input pdf> <field_values.json> <output pdf>`
-This script will verify that the field IDs and values you provide are valid; if it prints error messages, correct the appropriate fields and try again.
 
-# Non-fillable fields
-If the PDF doesn't have fillable form fields, you'll add text annotations. First try to extract coordinates from the PDF structure (more accurate), then fall back to visual estimation if needed.
+One line comes back, and it is the branch condition:
 
-## Step 1: Try Structure Extraction First
+| Printed line | Route |
+|--------------|-------|
+| `This PDF has fillable form fields` | Route 1 — write into the document's own fields |
+| `This PDF does not have fillable form fields; you will need to visually determine where to enter data` | Route 2 — place text annotations |
 
-Run this script to extract text labels, lines, and checkboxes with their exact PDF coordinates:
-`python ${SKILL_HOME}/scripts/pdf/extract_form_structure.py <input.pdf> form_structure.json`
-
-This creates a JSON file containing:
-- **labels**: Every text element with exact coordinates (x0, top, x1, bottom in PDF points)
-- **lines**: Horizontal lines that define row boundaries
-- **checkboxes**: Small square rectangles that are checkboxes (with center coordinates)
-- **row_boundaries**: Row top/bottom positions calculated from horizontal lines
-
-**Check the results**: If `form_structure.json` has meaningful labels (text elements that correspond to form fields), use **Approach A: Structure-Based Coordinates**. If the PDF is scanned/image-based and has few or no labels, use **Approach B: Visual Estimation**.
+Do not skip this step and do not infer the answer from the file name. A form
+that looks interactive in a viewer may be a flattened export, and a plain-looking
+scan may still carry an invisible field layer.
 
 ---
 
-## Approach A: Structure-Based Coordinates (Preferred)
+## Route 1 — the PDF has fields
 
-Use this when `extract_form_structure.py` found text labels in the PDF.
+### 1.1 Describe the fields
 
-### A.1: Analyze the Structure
+```bash
+python ${SKILL_HOME}/scripts/pdf/extract_form_field_info.py form.pdf field_info.json
+```
 
-Read form_structure.json and identify:
+`field_info.json` is a list in reading order: page ascending, then top to bottom,
+then left to right. One record per fillable field:
 
-1. **Label groups**: Adjacent text elements that form a single label (e.g., "Last" + "Name")
-2. **Row structure**: Labels with similar `top` values are in the same row
-3. **Field columns**: Entry areas start after label ends (x0 = label.x1 + gap)
-4. **Checkboxes**: Use the checkbox coordinates directly from the structure
+| Key | Meaning |
+|-----|---------|
+| `field_id` | Qualified name. A nested field is joined with dots (`address.street`); this exact string addresses the value |
+| `type` | `text`, `checkbox`, `choice`, `radio_group`, or `unknown (/FT)` for a type this toolset does not fill |
+| `page` | 1-based page holding the widget |
+| `rect` | `[left, bottom, right, top]` in PDF user space — **y=0 is the bottom of the page** |
 
-**Coordinate system**: PDF coordinates where y=0 is at TOP of page, y increases downward.
+Type-specific members:
 
-### A.2: Check for Missing Elements
+```json
+[
+  {"field_id": "last_name", "type": "text", "page": 1, "rect": [150, 672, 350, 688]},
+  {"field_id": "agree", "type": "checkbox", "page": 1, "rect": [72, 602, 84, 614],
+   "checked_value": "/Yes", "unchecked_value": "/Off"},
+  {"field_id": "country", "type": "choice", "page": 1, "rect": [150, 562, 310, 578],
+   "choice_options": [{"value": "US", "text": "United States"},
+                      {"value": "CA", "text": "Canada"}]},
+  {"field_id": "plan", "type": "radio_group", "page": 1,
+   "radio_options": [{"value": "/basic", "rect": [72, 522, 84, 534]},
+                     {"value": "/pro", "rect": [140, 522, 152, 534]}]}
+]
+```
 
-The structure extraction may not detect all form elements. Common cases:
-- **Circular checkboxes**: Only square rectangles are detected as checkboxes
-- **Complex graphics**: Decorative elements or non-standard form controls
-- **Faded or light-colored elements**: May not be extracted
+Write the `value` a record asks for, never the display text: `"/Yes"` for a
+checkbox, one of `radio_options[].value` for a radio group, one of
+`choice_options[].value` for a dropdown. The leading slash on button states is
+part of the name.
 
-If you see form fields in the PDF images that aren't in form_structure.json, you'll need to use **visual analysis** for those specific fields (see "Hybrid Approach" below).
+A field the script could not locate is reported on stdout and omitted from the
+JSON. If a field you can see in the viewer is missing, the document's field tree
+is unusual — fall back to Route 2 for that page rather than guessing an id.
 
-### A.3: Create fields.json with PDF Coordinates
+### 1.2 Learn what each field asks
 
-For each field, calculate entry coordinates from the extracted structure:
+The field id is a name, not a question. Render the pages and read them:
 
-**Text fields:**
-- entry x0 = label x1 + 5 (small gap after label)
-- entry x1 = next label's x0, or row boundary
-- entry top = same as label top
-- entry bottom = row boundary line below, or label bottom + row_height
+```bash
+python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py form.pdf images/
+```
 
-**Checkboxes:**
-- Use the checkbox rectangle coordinates directly from form_structure.json
-- entry_bounding_box = [checkbox.x0, checkbox.top, checkbox.x1, checkbox.bottom]
+One PNG per page (`images/page_1.png`, ...), rendered at 200 dpi and capped at
+1000 pixels on the long side. Match each rendered widget to its `field_info.json`
+record by position. The two coordinate spaces differ, so convert before
+comparing:
 
-Create fields.json using `pdf_width` and `pdf_height` (signals PDF coordinates):
+```
+scale        = image_width / pdf_page_width
+image_x      = pdf_x * scale
+image_y      = (pdf_page_height - pdf_y) * scale      # y flips
+```
+
+`rect` is bottom-up; the image is top-down. A widget at `rect[1] = 672` on a
+792-point page sits near the **top** of the image, at `y ≈ (792 - 688) * scale`.
+
+### 1.3 Author the value file
+
+`field_values.json` is a list. `field_id` and `page` must agree with
+`field_info.json`; `description` is for the human reading the file and is not
+written into the PDF. A record may omit `value` — it is then checked but left
+blank, which is useful for validating a partly-decided form.
+
+```json
+[
+  {"field_id": "last_name", "description": "Family name", "page": 1, "value": "Simpson"},
+  {"field_id": "agree", "description": "Over 18", "page": 1, "value": "/Yes"},
+  {"field_id": "country", "description": "Country of residence", "page": 1, "value": "CA"},
+  {"field_id": "plan", "description": "Subscription tier", "page": 1, "value": "/pro"},
+  {"field_id": "notes", "description": "Free text", "page": 2, "value": "None"}
+]
+```
+
+### 1.4 Fill, and let the validator argue
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/fill_fillable_fields.py form.pdf field_values.json filled.pdf
+```
+
+Nothing is written until every record passes three checks: the id exists, the
+page matches the widget's page, and the value is legal for the type. Each failure
+prints one line and the run exits 1 with no output file:
+
+```
+ERROR: `nope` is not a valid field ID
+ERROR: Incorrect page number for `last_name` (got 2, expected 1)
+ERROR: Invalid value "/Maybe" for checkbox field "agree". The checked value is "/Yes" and the unchecked value is "/Off"
+ERROR: Invalid value "MX" for choice field "country". Valid values are: ['US', 'CA']
+```
+
+Fix the value file and run again; do not edit the PDF to make an error go away.
+
+On success the document keeps its field layer — the result is still fillable —
+and `NeedAppearances` is set so the viewer redraws each widget from its new
+value. That flag is what makes checkboxes and radio buttons show up reliably
+across viewers; a tool that strips it can leave a filled field looking empty.
+
+### 1.5 Verify
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py filled.pdf verify/
+```
+
+Read the images, and read the values back:
+
+```python
+from pypdf import PdfReader
+
+for name, field in (PdfReader("filled.pdf").get_fields() or {}).items():
+    print(name, field.get("/V"))
+```
+
+A value that reads back correctly but renders blank is an appearance problem,
+not a data problem: confirm `/NeedAppearances` is true in the document's
+`/AcroForm`, and open the file in a second viewer before concluding the fill
+failed.
+
+---
+
+## Route 2 — the PDF has no fields
+
+Text is placed as free-text annotations at coordinates you supply. Accuracy
+comes from the document's own geometry where it exists, and from measured pixels
+where it does not. Try the structure first; it is exact, and it is cheaper than
+looking at pictures.
+
+### 2.1 Recover the geometry
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/extract_form_structure.py form.pdf structure.json
+```
+
+The JSON carries five inventories, all in **top-down PDF points** (origin at the
+page's top-left, y growing downward, one decimal place):
+
+| Key | Contents | How to use it |
+|-----|----------|---------------|
+| `pages` | `page_number`, `width`, `height` | Copy into `fields.json` as `pdf_width` / `pdf_height` |
+| `labels` | Every extracted word with `x0`, `top`, `x1`, `bottom` | Find the label of each field; adjacent words form one label |
+| `lines` | Horizontal rules spanning over half the page width: `y`, `x0`, `x1` | Row separators and the underline a value sits on |
+| `checkboxes` | Near-square rectangles 5–15 pt a side, with `center_x` / `center_y` | Tick boxes, usable as an entry box directly |
+| `row_boundaries` | Consecutive rule pairs: `row_top`, `row_bottom`, `row_height` | How tall an entry box may be |
+
+If `labels` holds the form's own words, continue with 2.2. If the page is a scan
+— no labels, or text like `(cid:12)` — go to 2.3.
+
+The filters are conservative on purpose. Round boxes, faint rules, table cells
+and anything drawn as part of an image are not reported. Missing elements are
+normal; 2.4 covers the mixed case.
+
+### 2.2 Boxes from the structure (preferred)
+
+Derive each entry box from the geometry around it:
+
+* **Text field** — `x0` a few points right of the label's `x1`; `x1` at the next
+  label's `x0` or the row's right edge; `top` aligned with the label's `top`;
+  `bottom` at the rule below, or `top + row_height`. Keep the box at least as
+  tall as the font size you will write with.
+* **Checkbox** — use the reported rectangle verbatim:
+  `[x0, top, x1, bottom]`. Write `X` into it, or leave it empty.
+* **Multi-line area** — span several `row_boundaries` entries; the text is drawn
+  from the top of the box.
+
+Declare the space with `pdf_width` / `pdf_height`. That pair is the switch the
+filler reads: with it, boxes are treated as top-down PDF points and no scaling
+happens.
+
 ```json
 {
-  "pages": [
-    {"page_number": 1, "pdf_width": 612, "pdf_height": 792}
-  ],
+  "pages": [{"page_number": 1, "pdf_width": 612, "pdf_height": 792}],
   "form_fields": [
     {
       "page_number": 1,
-      "description": "Last name entry field",
+      "description": "Family name entry",
       "field_label": "Last Name",
-      "label_bounding_box": [43, 63, 87, 73],
-      "entry_bounding_box": [92, 63, 260, 79],
-      "entry_text": {"text": "Smith", "font_size": 10}
+      "label_bounding_box": [72, 63, 128, 75],
+      "entry_bounding_box": [140, 62, 290, 78],
+      "entry_text": {"text": "Simpson", "font_size": 11}
     },
     {
       "page_number": 1,
-      "description": "US Citizen Yes checkbox",
+      "description": "Consent tick box",
       "field_label": "Yes",
-      "label_bounding_box": [260, 200, 280, 210],
-      "entry_bounding_box": [285, 197, 292, 205],
-      "entry_text": {"text": "X"}
+      "label_bounding_box": [90, 196, 110, 208],
+      "entry_bounding_box": [72, 198, 82, 208],
+      "entry_text": {"text": "X", "font_size": 10}
     }
   ]
 }
 ```
 
-**Important**: Use `pdf_width`/`pdf_height` and coordinates directly from form_structure.json.
+`label_bounding_box` is not ink. It exists so the audit and the overlay can show
+you which label each entry belongs to.
 
-### A.4: Validate Bounding Boxes
+### 2.3 Boxes from measured pixels (scanned pages)
 
-Before filling, check your bounding boxes for errors:
-`python ${SKILL_HOME}/scripts/pdf/check_bounding_boxes.py fields.json`
+Render, estimate, then refine by cropping. Estimating on a full page is accurate
+to about a centimetre; cropping is what turns that into a pixel-exact box.
 
-This checks for intersecting bounding boxes and entry boxes that are too small for the font size. Fix any reported errors before filling.
-
----
-
-## Approach B: Visual Estimation (Fallback)
-
-Use this when the PDF is scanned/image-based and structure extraction found no usable text labels (e.g., all text shows as "(cid:X)" patterns).
-
-### B.1: Convert PDF to Images
-
-`python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py <input.pdf> <images_dir/>`
-
-### B.2: Initial Field Identification
-
-Examine each page image to identify form sections and get **rough estimates** of field locations:
-- Form field labels and their approximate positions
-- Entry areas (lines, boxes, or blank spaces for text input)
-- Checkboxes and their approximate locations
-
-For each field, note approximate pixel coordinates (they don't need to be precise yet).
-
-### B.3: Zoom Refinement (CRITICAL for accuracy)
-
-For each field, crop a region around the estimated position to refine coordinates precisely.
-
-**Create a zoomed crop using ImageMagick:**
 ```bash
-magick <page_image> -crop <width>x<height>+<x>+<y> +repage <crop_output.png>
+python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py form.pdf images/
 ```
 
-Where:
-- `<x>, <y>` = top-left corner of crop region (use your rough estimate minus padding)
-- `<width>, <height>` = size of crop region (field area plus ~50px padding on each side)
+Look at `images/page_1.png` and note a rough region per field. Crop that region
+with generous padding and measure inside the crop; keep the crops in their own
+directory (`mkdir -p crops`):
 
-**Example:** To refine a "Name" field estimated around (100, 150):
-```bash
-magick images_dir/page_1.png -crop 300x80+50+120 +repage crops/name_field.png
+```python
+from PIL import Image
+
+page = Image.open("images/page_1.png")
+offset = (50, 120)                       # crop origin in full-page pixels
+page.crop((offset[0], offset[1], offset[0] + 300, offset[1] + 90)).save("crops/name.png")
 ```
 
-(Note: if the `magick` command isn't available, try `convert` with the same arguments).
+Read `crops/name.png`, find the exact edges of the entry area, then add the
+offset back: a box starting at `(52, 18)` inside that crop is `(102, 138)` on the
+full page. Group neighbouring fields into one crop when they fit; the offset
+arithmetic is the same.
 
-**Examine the cropped image** to determine precise coordinates:
-1. Identify the exact pixel where the entry area begins (after the label)
-2. Identify where the entry area ends (before next field or edge)
-3. Identify the top and bottom of the entry line/box
+Record the **full-page pixel** size of the image you measured, not the PDF size:
 
-**Convert crop coordinates back to full image coordinates:**
-- full_x = crop_x + crop_offset_x
-- full_y = crop_y + crop_offset_y
-
-Example: If the crop started at (50, 120) and the entry box starts at (52, 18) within the crop:
-- entry_x0 = 52 + 50 = 102
-- entry_top = 18 + 120 = 138
-
-**Repeat for each field**, grouping nearby fields into single crops when possible.
-
-### B.4: Create fields.json with Refined Coordinates
-
-Create fields.json using `image_width` and `image_height` (signals image coordinates):
 ```json
 {
-  "pages": [
-    {"page_number": 1, "image_width": 1700, "image_height": 2200}
-  ],
+  "pages": [{"page_number": 1, "image_width": 1700, "image_height": 2200}],
   "form_fields": [
     {
       "page_number": 1,
-      "description": "Last name entry field",
+      "description": "Family name entry",
       "field_label": "Last Name",
-      "label_bounding_box": [120, 175, 242, 198],
-      "entry_bounding_box": [255, 175, 720, 218],
-      "entry_text": {"text": "Smith", "font_size": 10}
+      "label_bounding_box": [200, 175, 355, 208],
+      "entry_bounding_box": [390, 172, 800, 216],
+      "entry_text": {"text": "Simpson", "font_size": 11}
     }
   ]
 }
 ```
 
-**Important**: Use `image_width`/`image_height` and the refined pixel coordinates from the zoom analysis.
+`image_width` / `image_height` tell the filler to scale by
+`pdf_width / image_width` and `pdf_height / image_height` before flipping y. If
+the numbers do not match the image you actually measured, every box on the page
+shifts by the same ratio — the first thing to check when output is uniformly
+misplaced.
 
-### B.5: Validate Bounding Boxes
+### 2.4 Mixing the two sources
 
-Before filling, check your bounding boxes for errors:
-`python ${SKILL_HOME}/scripts/pdf/check_bounding_boxes.py fields.json`
+Use structure boxes for what the structure found and measured pixels for the
+rest, but convert the pixel boxes into points before writing the file:
 
-This checks for intersecting bounding boxes and entry boxes that are too small for the font size. Fix any reported errors before filling.
+```
+pdf_x = image_x * (pdf_width / image_width)
+pdf_y = image_y * (pdf_height / image_height)
+```
+
+Then declare `pdf_width` / `pdf_height` for the page and keep every box in that
+one space. A page record selects one space for the whole page; there is no
+per-field override.
+
+### 2.5 Audit the boxes
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/check_bounding_boxes.py fields.json
+```
+
+Two rules are checked: rectangles on one page must not overlap (a label inside
+its own entry area, or two fields claiming the same area), and an entry box must
+be at least as tall as its `entry_text.font_size` (14 when omitted). The report
+opens with `Read N fields` and ends with `SUCCESS: All bounding boxes are valid`
+or one `FAILURE:` line per problem, each naming the fields and the numbers
+involved. After 20 lines it stops and says so.
+
+The verdict is in the text: a completed audit exits 0 even when it reports
+failures. Read the lines, fix `fields.json`, and run it again until it prints
+SUCCESS.
+
+### 2.6 Look at the boxes
+
+Arithmetic cannot tell you that a box sits over the wrong line. Draw the boxes
+on the page image and look:
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/create_validation_image.py 1 fields.json images/page_1.png review/page_1_boxes.png
+```
+
+Operands are the 1-based page number, the fields file, the input image and the
+output image. Every field on that page contributes two outlines — **red** for
+`entry_bounding_box`, **blue** for `label_bounding_box` — and the script reports
+how many it drew. The input image must be in the same space as the boxes: for
+pixel boxes use the rendered page at its rendered size; for point boxes render at
+72 dpi so one point is one pixel.
+
+### 2.7 Fill
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/fill_pdf_form_with_annotations.py form.pdf fields.json filled.pdf
+```
+
+The filler picks the coordinate space from the page record, flips y into PDF
+user space, and adds one borderless, background-free free-text annotation per
+non-empty `entry_text.text`. A field with no text, or an empty string, is skipped
+silently — that is how a blank is left blank. Defaults are font `Arial`, size 14,
+colour `000000`; `font_color` is hex RGB without a leading `#`.
+
+The output has no AcroForm: the values are page content, which survives merging,
+printing and flattening, and cannot be edited by clicking on the form.
+
+### 2.8 Verify, and what to check when it is wrong
+
+```bash
+python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py filled.pdf verify/
+```
+
+| Symptom | First thing to check |
+|---------|----------------------|
+| Everything on a page shifted by a constant ratio | `image_width` / `image_height` do not match the image you measured |
+| Text mirrored vertically, or at the bottom of the page | Boxes were written bottom-up; this route needs top-down y |
+| Text clipped at the box's bottom edge | Box shorter than the font size — the audit reports this |
+| Text over a neighbouring field | Overlapping boxes — the audit reports this; the overlay shows it |
+| Nothing drawn for one field | `entry_text.text` missing or empty, or `page_number` has no `pages` record |
+| Values correct but invisible in one viewer | Font substitution: try `Helvetica`, or embed a font when creating the PDF |
+
+Page rotation is not compensated by these scripts: a page with `/Rotate 90`
+needs its boxes measured on the rendered (rotated) image, with the rendered
+pixel size declared.
 
 ---
 
-## Hybrid Approach: Structure + Visual
+## Coordinate spaces at a glance
 
-Use this when structure extraction works for most fields but misses some elements (e.g., circular checkboxes, unusual form controls).
+| Space | Origin | y direction | Where it appears |
+|-------|--------|-------------|------------------|
+| PDF user space | bottom-left | up | `field_info.json` `rect`, annotation rectangles, `mediabox` |
+| Top-down points | top-left | down | `structure.json`, `fields.json` with `pdf_width`/`pdf_height` |
+| Image pixels | top-left | down | rendered PNGs, `fields.json` with `image_width`/`image_height` |
 
-1. **Use Approach A** for fields that were detected in form_structure.json
-2. **Convert PDF to images** for visual analysis of missing fields
-3. **Use zoom refinement** (from Approach B) for the missing fields
-4. **Combine coordinates**: For fields from structure extraction, use `pdf_width`/`pdf_height`. For visually-estimated fields, you must convert image coordinates to PDF coordinates:
-   - pdf_x = image_x * (pdf_width / image_width)
-   - pdf_y = image_y * (pdf_height / image_height)
-5. **Use a single coordinate system** in fields.json - convert all to PDF coordinates with `pdf_width`/`pdf_height`
+Conversions: top-down points → user space is `y' = page_height - y`; pixels →
+points is a scale by `page_size / image_size` on each axis, then the same flip.
+One file, one space, one page record.
 
----
+## Dependencies
 
-## Step 2: Validate Before Filling
-
-**Always validate bounding boxes before filling:**
-`python ${SKILL_HOME}/scripts/pdf/check_bounding_boxes.py fields.json`
-
-This checks for:
-- Intersecting bounding boxes (which would cause overlapping text)
-- Entry boxes that are too small for the specified font size
-
-Fix any reported errors in fields.json before proceeding.
-
-## Step 3: Fill the Form
-
-The fill script auto-detects the coordinate system and handles conversion:
-`python ${SKILL_HOME}/scripts/pdf/fill_pdf_form_with_annotations.py <input.pdf> fields.json <output.pdf>`
-
-## Step 4: Verify Output
-
-Convert the filled PDF to images and verify text placement:
-`python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py <output.pdf> <verify_images/>`
-
-If text is mispositioned:
-- **Approach A**: Check that you're using PDF coordinates from form_structure.json with `pdf_width`/`pdf_height`
-- **Approach B**: Check that image dimensions match and coordinates are accurate pixels
-- **Hybrid**: Ensure coordinate conversions are correct for visually-estimated fields
+`pypdf` reads and writes the field layer and the annotations; `pdfplumber`
+recover the geometry of a field-less form; `pypdfium2` renders pages to images;
+`Pillow` draws the review overlay and crops regions for measurement. Licences
+and versions: [pdf-reference.md](./pdf-reference.md) § Dependencies and licences.
+Everyday PDF work outside form filling: [pdf-operations.md](./pdf-operations.md).

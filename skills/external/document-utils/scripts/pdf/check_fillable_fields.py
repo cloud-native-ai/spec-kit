@@ -1,3 +1,60 @@
+#!/usr/bin/env python3
+"""Decide which form-filling route a PDF needs: its own fields, or annotations.
+
+Operand: one PDF path. The script prints exactly one verdict line and exits 0:
+
+    This PDF has fillable form fields
+    This PDF does not have fillable form fields; you will need to visually
+    determine where to enter data   (one line, no wrap)
+
+Those two strings are the branch condition of the form workflow in
+references/pdf-forms.md: the first routes to field extraction and value filling,
+the second routes to geometry recovery and free-text annotations. A PDF counts
+as fillable when its AcroForm declares at least one named field, whether or not
+any value has been entered yet.
+
+Exit 1 means the question could not be answered: wrong operand count, missing
+file, or a PDF that pypdf cannot parse or decrypt.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import sys
+
+USAGE = "Usage: check_fillable_fields.py [file.pdf]"
+
+FILLABLE = "This PDF has fillable form fields"
+NOT_FILLABLE = (
+    "This PDF does not have fillable form fields; "
+    "you will need to visually determine where to enter data"
+)
+
+
+def has_fillable_fields(pdf_path) -> bool:
+    """True when the document declares at least one interactive form field."""
+    from pypdf import PdfReader
+
+    reader = PdfReader(pdf_path)
+    if reader.is_encrypted:
+        # An empty user password is the common "permissions only" case; anything
+        # stronger stays unreadable and is reported by the caller.
+        reader.decrypt("")
+    return bool(reader.get_fields())
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 1:
+        print(USAGE)
+        return 1
+    try:
+        fillable = has_fillable_fields(args[0])
+    except Exception as exc:  # pypdf raises several distinct types on bad input
+        print(f"ERROR: cannot read {args[0]}: {exc}", file=sys.stderr)
+        return 1
+    print(FILLABLE if fillable else NOT_FILLABLE)
+    return 0
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,14 +170,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-import sys
-from pypdf import PdfReader
-
-
-
-
-reader = PdfReader(sys.argv[1])
-if (reader.get_fields()):
-    print("This PDF has fillable form fields")
-else:
-    print("This PDF does not have fillable form fields; you will need to visually determine where to enter data")
+if __name__ == "__main__":
+    sys.exit(main())

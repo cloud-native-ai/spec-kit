@@ -1,234 +1,211 @@
-# Creating New DOCX Documents
+# Creating a New Word Document
 
-Generate `.docx` files with JavaScript using `docx-js`, then validate the output.
+This guide covers building a `.docx` from nothing. The stack is Python:
+**python-docx** (MIT) writes the package, and the skill's own `office/` scripts
+check it afterwards. The JavaScript route this skill used before (`docx-js`) is
+no longer part of it — every example here runs in the same interpreter as the
+rest of the workflow, with no Node toolchain and no second language to install.
 
 ## Setup
 
-```javascript
-const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun,
-        Header, Footer, AlignmentType, PageOrientation, LevelFormat, ExternalHyperlink,
-        TableOfContents, HeadingLevel, BorderStyle, WidthType, ShadingType,
-        VerticalAlign, PageNumber, PageBreak } = require('docx');
-
-const doc = new Document({ sections: [{ children: [/* content */] }] });
-Packer.toBuffer(doc).then(buffer => fs.writeFileSync("doc.docx", buffer));
+```bash
+python3 -m pip install python-docx        # pulls lxml (BSD-3-Clause) with it
 ```
 
-## Validation
+Python 3.10 or newer. `python-docx` is optional for *editing* an existing file
+(the unpack/edit/pack road needs only the standard library), but it is the
+recommended way to create one: it owns the package inventories, the numbering
+definitions and the style table, which are tedious to write by hand.
 
-After creating the file, validate it. If validation fails, unpack, fix the XML, and repack.
+## Validate what you wrote
 
 ```bash
-python ${SKILL_HOME}/scripts/office/validate.py doc.docx
+python3 "${SKILL_HOME}/scripts/office/validate.py" report.docx --verbose
 ```
 
-## Page Size
+The check is structural: well-formed parts, declared namespaces, unique and
+in-range identifiers, relationship and content-type inventories that agree with
+the parts on disk, plus a round trip that re-opens the file with python-docx.
+XSD schema validation is no longer shipped with this skill; the round trip and
+the structural checks are what replace it. A file that passes them opens in
+Word and in LibreOffice.
 
-```javascript
-// CRITICAL: docx-js defaults to A4, not US Letter
-// Always set page size explicitly for consistent results
-sections: [{
-  properties: {
-    page: {
-      size: {
-        width: 12240,   // 8.5 inches in DXA
-        height: 15840   // 11 inches in DXA
-      },
-      margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } // 1 inch margins
-    }
-  },
-  children: [/* content */]
-}]
+## Page size and margins
+
+```python
+from docx import Document
+from docx.shared import Mm
+
+document = Document()
+section = document.sections[0]
+section.page_width, section.page_height = Mm(210), Mm(297)   # A4 portrait
+section.left_margin = section.right_margin = Mm(25)
+section.top_margin = section.bottom_margin = Mm(20)
 ```
 
-**Common page sizes (DXA units, 1440 DXA = 1 inch):**
+For US Letter use `Inches(8.5)` by `Inches(11)`. Set the section before adding
+content: a page break inherits the section it lands in.
 
-| Paper | Width | Height | Content Width (1" margins) |
-|-------|-------|--------|---------------------------|
-| US Letter | 12,240 | 15,840 | 9,360 |
-| A4 (default) | 11,906 | 16,838 | 9,026 |
+## Styles, including the built-in headings
 
-**Landscape orientation:** docx-js swaps width/height internally, so pass portrait dimensions and let it handle the swap:
+Restyle the built-in names rather than inventing parallel ones, so the navigation
+pane and a table of contents still recognise the hierarchy.
 
-```javascript
-size: {
-  width: 12240,   // Pass SHORT edge as width
-  height: 15840,  // Pass LONG edge as height
-  orientation: PageOrientation.LANDSCAPE  // docx-js swaps them in the XML
-},
-// Content width = 15840 - left margin - right margin (uses the long edge)
+```python
+from docx.shared import Pt, RGBColor
+
+styles = document.styles
+normal = styles["Normal"]
+normal.font.name = "Calibri"
+normal.font.size = Pt(11)
+
+for name, size in (("Heading 1", 18), ("Heading 2", 14), ("Heading 3", 12)):
+    style = styles[name]
+    style.font.size = Pt(size)
+    style.font.bold = True
+    style.font.color.rgb = RGBColor(0x1F, 0x3B, 0x57)
+
+document.add_heading("Quarterly report", level=1)
+document.add_paragraph("Summary of the period.", style="Normal")
 ```
 
-## Styles (Override Built-in Headings)
+East Asian text needs the east-Asian font attribute as well; set it on the
+style's element when the document is bilingual:
 
-Use Arial as the default font (universally supported). Keep titles black for readability.
+```python
+from docx.oxml.ns import qn
 
-```javascript
-const doc = new Document({
-  styles: {
-    default: { document: { run: { font: "Arial", size: 24 } } }, // 12pt default
-    paragraphStyles: [
-      // IMPORTANT: Use exact IDs to override built-in styles
-      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 32, bold: true, font: "Arial" },
-        paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 } }, // outlineLevel required for TOC
-      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 28, bold: true, font: "Arial" },
-        paragraph: { spacing: { before: 180, after: 180 }, outlineLevel: 1 } },
-    ]
-  },
-  sections: [{
-    children: [
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Title")] }),
-    ]
-  }]
-});
+normal.element.rPr.rFonts.set(qn("w:eastAsia"), "SimSun")
 ```
 
-## Lists (NEVER use unicode bullets)
+## Lists
 
-```javascript
-// WRONG - never manually insert bullet characters
-new Paragraph({ children: [new TextRun("* Item")] })  // BAD
-new Paragraph({ children: [new TextRun("• Item")] })  // BAD
+Use real numbering, never a typed bullet character. A bullet glyph in the text
+cannot be re-leveled, cannot continue across paragraphs, and reads aloud as
+punctuation.
 
-// CORRECT - use numbering config with LevelFormat.BULLET
-const doc = new Document({
-  numbering: {
-    config: [
-      { reference: "bullets",
-        levels: [{ level: 0, format: LevelFormat.BULLET, text: "*", alignment: AlignmentType.LEFT,
-          style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      { reference: "numbers",
-        levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT,
-          style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-    ]
-  },
-  sections: [{
-    children: [
-      new Paragraph({ numbering: { reference: "bullets", level: 0 },
-        children: [new TextRun("Bullet item")] }),
-      new Paragraph({ numbering: { reference: "numbers", level: 0 },
-        children: [new TextRun("Numbered item")] }),
-    ]
-  }]
-});
-
-// Each reference creates INDEPENDENT numbering
-// Same reference = continues (1,2,3 then 4,5,6)
-// Different reference = restarts (1,2,3 then 1,2,3)
+```python
+document.add_paragraph("First point", style="List Bullet")
+document.add_paragraph("Second point", style="List Bullet")
+document.add_paragraph("Step one", style="List Number")
+document.add_paragraph("Step two", style="List Number")
 ```
+
+For a nested level, use `List Bullet 2` / `List Number 2`. When a document needs
+several independent numbered sequences, define a new abstract numbering in
+`word/numbering.xml` (see `docx-xml-reference.md`) instead of restarting one
+shared list.
 
 ## Tables
 
-**CRITICAL: Tables need dual widths** - set both `columnWidths` on the table AND `width` on each cell. Without both, tables render incorrectly on some platforms.
+```python
+table = document.add_table(rows=1, cols=3)
+table.style = "Table Grid"
+header = table.rows[0].cells
+for cell, title in zip(header, ("Region", "Revenue", "Change")):
+    cell.text = title
 
-```javascript
-// CRITICAL: Always set table width for consistent rendering
-// CRITICAL: Use ShadingType.CLEAR (not SOLID) to prevent black backgrounds
-const border = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
-const borders = { top: border, bottom: border, left: border, right: border };
-
-new Table({
-  width: { size: 9360, type: WidthType.DXA }, // Always use DXA (percentages break in Google Docs)
-  columnWidths: [4680, 4680], // Must sum to table width (DXA: 1440 = 1 inch)
-  rows: [
-    new TableRow({
-      children: [
-        new TableCell({
-          borders,
-          width: { size: 4680, type: WidthType.DXA }, // Also set on each cell
-          shading: { fill: "D5E8F0", type: ShadingType.CLEAR }, // CLEAR not SOLID
-          margins: { top: 80, bottom: 80, left: 120, right: 120 }, // Cell padding (internal, not added to width)
-          children: [new Paragraph({ children: [new TextRun("Cell")] })]
-        })
-      ]
-    })
-  ]
-})
+for region, revenue, change in (("North", "1.2M", "+4%"), ("South", "0.9M", "-2%")):
+    row = table.add_row().cells
+    row[0].text, row[1].text, row[2].text = region, revenue, change
 ```
 
-**Table width calculation:**
+Set column widths on every cell of a column, not only the first: Word derives a
+column's width from its cells, and a single wide cell can stretch the table past
+the margin.
 
-Always use `WidthType.DXA` -- `WidthType.PERCENTAGE` breaks in Google Docs.
+```python
+from docx.shared import Cm
 
-```javascript
-// Table width = sum of columnWidths = content width
-// US Letter with 1" margins: 12240 - 2880 = 9360 DXA
-width: { size: 9360, type: WidthType.DXA },
-columnWidths: [7000, 2360]  // Must sum to table width
+for row in table.rows:
+    row.cells[0].width = Cm(6)
+    row.cells[1].width = Cm(4)
+    row.cells[2].width = Cm(4)
 ```
-
-**Width rules:**
-- **Always use `WidthType.DXA`** -- never `WidthType.PERCENTAGE` (incompatible with Google Docs)
-- Table width must equal the sum of `columnWidths`
-- Cell `width` must match corresponding `columnWidth`
-- Cell `margins` are internal padding - they reduce content area, not add to cell width
-- For full-width tables: use content width (page width minus left and right margins)
 
 ## Images
 
-```javascript
-// CRITICAL: type parameter is REQUIRED
-new Paragraph({
-  children: [new ImageRun({
-    type: "png", // Required: png, jpg, jpeg, gif, bmp, svg
-    data: fs.readFileSync("image.png"),
-    transformation: { width: 200, height: 150 },
-    altText: { title: "Title", description: "Desc", name: "Name" } // All three required
-  })]
-})
+```python
+from docx.shared import Inches
+
+document.add_picture("chart.png", width=Inches(5.5))
 ```
 
-## Page Breaks
+Give one dimension and let the other follow, so the aspect ratio survives.
+python-docx registers the image part, its relationship and its content type; if
+you add an image by editing XML instead, all three must be added by hand or the
+document reports itself corrupt.
 
-```javascript
-// CRITICAL: PageBreak must be inside a Paragraph
-new Paragraph({ children: [new PageBreak()] })
+## Page breaks
 
-// Or use pageBreakBefore
-new Paragraph({ pageBreakBefore: true, children: [new TextRun("New page")] })
+```python
+document.add_page_break()
 ```
 
-## Table of Contents
+A break is a run containing `<w:br w:type="page"/>`. Prefer it over empty
+paragraphs used as spacing: empty paragraphs move when the text above them
+reflows.
 
-```javascript
-// CRITICAL: Headings must use HeadingLevel ONLY - no custom styles
-new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-3" })
+## Table of contents
+
+Word builds the contents from the heading styles when it updates fields, so the
+document carries a field rather than a frozen list.
+
+```python
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+
+paragraph = document.add_paragraph()
+field = OxmlElement("w:fldSimple")
+field.set(qn("w:instr"), r'TOC \o "1-3" \h \z \u')
+paragraph._p.append(field)
 ```
 
-## Headers/Footers
+The field shows its result after an update in Word, or after a LibreOffice
+round trip (`office/soffice.py convert`). State in the document that the contents
+update on open if the reader may see an empty field first.
 
-```javascript
-sections: [{
-  properties: {
-    page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } // 1440 = 1 inch
-  },
-  headers: {
-    default: new Header({ children: [new Paragraph({ children: [new TextRun("Header")] })] })
-  },
-  footers: {
-    default: new Footer({ children: [new Paragraph({
-      children: [new TextRun("Page "), new TextRun({ children: [PageNumber.CURRENT] })]
-    })] })
-  },
-  children: [/* content */]
-}]
+## Headers and footers
+
+```python
+section = document.sections[0]
+section.header.paragraphs[0].text = "Internal draft"
+footer = section.footer.paragraphs[0]
+footer.text = "Page "
 ```
 
-## Critical Rules for docx-js
+A page-number field goes into the footer as a field, not as a literal:
 
-- **Set page size explicitly** - docx-js defaults to A4; use US Letter (12240 x 15840 DXA) for US documents
-- **Landscape: pass portrait dimensions** - docx-js swaps width/height internally; pass short edge as `width`, long edge as `height`, and set `orientation: PageOrientation.LANDSCAPE`
-- **Never use `\n`** - use separate Paragraph elements
-- **Never use unicode bullets** - use `LevelFormat.BULLET` with numbering config
-- **PageBreak must be in Paragraph** - standalone creates invalid XML
-- **ImageRun requires `type`** - always specify png/jpg/etc
-- **Always set table `width` with DXA** - never use `WidthType.PERCENTAGE` (breaks in Google Docs)
-- **Tables need dual widths** - `columnWidths` array AND cell `width`, both must match
-- **Table width = sum of columnWidths** - for DXA, ensure they add up exactly
-- **Always add cell margins** - use `margins: { top: 80, bottom: 80, left: 120, right: 120 }` for readable padding
-- **Use `ShadingType.CLEAR`** - never SOLID for table shading
-- **TOC requires HeadingLevel only** - no custom styles on heading paragraphs
-- **Override built-in styles** - use exact IDs: "Heading1", "Heading2", etc.
-- **Include `outlineLevel`** - required for TOC (0 for H1, 1 for H2, etc.)
+```python
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+
+run = footer.add_run()
+field = OxmlElement("w:fldSimple")
+field.set(qn("w:instr"), "PAGE")
+run._r.append(field)
+```
+
+## Saving, then checking
+
+```python
+document.save("report.docx")
+```
+
+```bash
+python3 "${SKILL_HOME}/scripts/office/validate.py" report.docx --verbose
+```
+
+When the document must carry tracked changes or comments, create it here first
+and then add the revisions through the unpack/edit/pack road described in
+`docx-editing.md`: python-docx writes clean content, and the revision markup is
+easier to place deliberately than to generate.
+
+## Rules that keep a generated document readable
+
+- Restyle built-in style names; do not clone them under new names.
+- Real numbering for lists, real fields for page numbers and contents.
+- One dimension for an image, explicit widths for every cell of a table column.
+- Section geometry first, content second.
+- Validate before handing the file over; a package that fails its inventories
+  opens as "corrupt" even when every paragraph is correct.

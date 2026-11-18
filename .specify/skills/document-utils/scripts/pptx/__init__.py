@@ -1,3 +1,12 @@
+"""PPTX entry points: add a slide, reclaim orphaned parts, render thumbnails.
+
+The scripts in this package work on an unpacked OPC directory (``add_slide``,
+``clean``) or on a packaged .pptx (``thumbnail``); ``ooxml_parts`` owns the part
+plumbing they share.  Each script is runnable on its own and importable as a
+module, so a caller can drive one slide operation without a subprocess.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing

@@ -113,138 +113,228 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-"""Accept all tracked changes in a DOCX file using LibreOffice.
+"""Accept every tracked change in a DOCX, in Python, without LibreOffice.
 
-Requires LibreOffice (soffice) to be installed.
+Original implementation, MIT licensed.
+
+Usage:
+    python accept_changes.py <input_file> <output_file>
+
+Accepting a revision means applying it to the markup: an insertion keeps its
+content and loses its wrapper, a deletion loses its content, a moved span is
+treated as the insertion/deletion pair it is, and a formatting revision keeps
+the new formatting and loses the record of the old one. A deleted paragraph
+mark joins that paragraph to the one after it, which is what a reader sees when
+the revision is accepted in an editor.
+
+The input package is never modified: parts are read, the prose parts are
+transformed, and a new package is written to the output path. Parts without
+revisions are copied byte-for-byte.
 """
 
 import argparse
-import logging
-import shutil
-import subprocess
+import re
+import sys
+import zipfile
 from pathlib import Path
 
-from office.soffice import get_soffice_env
+# The shared OOXML helpers live in the sibling office/ directory. That directory
+# (not scripts/) is what goes on sys.path: scripts/ also holds a package named
+# docx, which would shadow the python-docx library.
+_OFFICE_DIR = Path(__file__).resolve().parent.parent / "office"
+if str(_OFFICE_DIR) not in sys.path:
+    sys.path.insert(0, str(_OFFICE_DIR))
 
-logger = logging.getLogger(__name__)
+import ooxml as ox  # noqa: E402 - path bootstrap above must run first
 
-LIBREOFFICE_PROFILE = "/tmp/libreoffice_docx_profile"
-MACRO_DIR = f"{LIBREOFFICE_PROFILE}/user/basic/Standard"
+INSERTIONS = {"ins", "moveTo"}
+DELETIONS = {"del", "moveFrom"}
+RANGE_MARKERS = {
+    "moveFromRangeStart",
+    "moveFromRangeEnd",
+    "moveToRangeStart",
+    "moveToRangeEnd",
+    "customXmlInsRangeStart",
+    "customXmlInsRangeEnd",
+    "customXmlDelRangeStart",
+    "customXmlDelRangeEnd",
+}
+PROPERTY_REVISIONS = {
+    "pPrChange",
+    "rPrChange",
+    "sectPrChange",
+    "tblPrChange",
+    "tblGridChange",
+    "trPrChange",
+    "tcPrChange",
+    "numberingChange",
+}
+CELL_MARKERS = {"cellIns", "cellMerge"}
+PROSE_PART = re.compile(r"^word/(document|footnotes|endnotes|comments|header\d*|footer\d*)\.xml$")
 
-ACCEPT_CHANGES_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic">
-    Sub AcceptAllTrackedChanges()
-        Dim document As Object
-        Dim dispatcher As Object
 
-        document = ThisComponent.CurrentController.Frame
-        dispatcher = createUnoService("com.sun.star.frame.DispatchHelper")
+def accept_changes(input_file: str, output_file: str) -> tuple[None, str]:
+    """Write a revision-free copy of a DOCX; return (None, message)."""
+    source = Path(input_file)
+    target = Path(output_file)
 
-        dispatcher.executeDispatch(document, ".uno:AcceptAllTrackedChanges", "", 0, Array())
-        ThisComponent.store()
-        ThisComponent.close(True)
-    End Sub
-</script:module>"""
-
-
-def accept_changes(
-    input_file: str,
-    output_file: str,
-) -> tuple[None, str]:
-    input_path = Path(input_file)
-    output_path = Path(output_file)
-
-    if not input_path.exists():
+    if not source.exists():
         return None, f"Error: Input file not found: {input_file}"
-
-    if not input_path.suffix.lower() == ".docx":
+    if source.suffix.lower() != ".docx":
         return None, f"Error: Input file is not a DOCX file: {input_file}"
 
     try:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(input_path, output_path)
-    except Exception as e:
-        return None, f"Error: Failed to copy input file to output location: {e}"
+        with zipfile.ZipFile(source, "r") as archive:
+            parts = {
+                info.filename: archive.read(info.filename)
+                for info in archive.infolist()
+                if not info.is_dir()
+            }
+    except zipfile.BadZipFile:
+        return None, f"Error: {input_file} is not a valid DOCX package"
+    except OSError as exc:
+        return None, f"Error: Failed to read input file: {exc}"
 
-    if not _setup_libreoffice_macro():
-        return None, "Error: Failed to setup LibreOffice macro"
+    accepted = 0
+    for name in sorted(parts):
+        if not PROSE_PART.match(name):
+            continue
+        try:
+            doc = ox.parse_string(parts[name])
+        except Exception:
+            continue
+        count = accept_all(doc.documentElement)
+        if count:
+            parts[name] = ox.document_bytes(doc)
+            accepted += count
 
-    cmd = [
-        "soffice",
-        "--headless",
-        f"-env:UserInstallation=file://{LIBREOFFICE_PROFILE}",
-        "--norestore",
-        "vnd.sun.star.script:Standard.Module1.AcceptAllTrackedChanges?language=Basic&location=application",
-        str(output_path.absolute()),
+    try:
+        ox.write_package(target, parts)
+    except OSError as exc:
+        return None, f"Error: Failed to write output file: {exc}"
+
+    problem = _verify_readable(target)
+    if problem:
+        return None, f"Error: {problem}"
+
+    return None, f"Successfully accepted all tracked changes: {input_file} -> {output_file}"
+
+
+def accept_all(root) -> int:
+    """Apply every revision under one element; return how many were applied."""
+    applied = 0
+    for marker in _live(root, RANGE_MARKERS):
+        ox.remove_node(marker)
+        applied += 1
+
+    applied += _join_deleted_paragraph_marks(root)
+    applied += _drop_deleted_cells(root)
+
+    for element in _live(root, PROPERTY_REVISIONS | CELL_MARKERS):
+        ox.remove_node(element)
+        applied += 1
+
+    for element in _live(root, DELETIONS):
+        ox.remove_node(element)
+        applied += 1
+
+    for element in _live(root, INSERTIONS):
+        ox.unwrap_node(element)
+        applied += 1
+
+    return applied
+
+
+def _attached(root, node) -> bool:
+    """Whether a node is still in the tree (an earlier phase may have dropped it)."""
+    current = node
+    while current is not None:
+        if current is root:
+            return True
+        current = current.parentNode
+    return False
+
+
+def _live(root, names):
+    """Elements with one of ``names`` that are still attached, in document order."""
+    return [
+        element
+        for element in ox.iter_elements(root)
+        if ox.local_name(element) in names and _attached(root, element)
     ]
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            check=False,
-            env=get_soffice_env(),
-        )
-    except subprocess.TimeoutExpired:
-        return (
-            None,
-            f"Successfully accepted all tracked changes: {input_file} -> {output_file}",
-        )
 
-    if result.returncode != 0:
-        return None, f"Error: LibreOffice failed: {result.stderr}"
-
-    return (
-        None,
-        f"Successfully accepted all tracked changes: {input_file} -> {output_file}",
-    )
-
-
-def _setup_libreoffice_macro() -> bool:
-    macro_dir = Path(MACRO_DIR)
-    macro_file = macro_dir / "Module1.xba"
-
-    if macro_file.exists() and "AcceptAllTrackedChanges" in macro_file.read_text():
-        return True
-
-    if not macro_dir.exists():
-        subprocess.run(
-            [
-                "soffice",
-                "--headless",
-                f"-env:UserInstallation=file://{LIBREOFFICE_PROFILE}",
-                "--terminate_after_init",
-            ],
-            capture_output=True,
-            timeout=10,
-            check=False,
-            env=get_soffice_env(),
-        )
-        macro_dir.mkdir(parents=True, exist_ok=True)
-
-    try:
-        macro_file.write_text(ACCEPT_CHANGES_MACRO)
-        return True
-    except Exception as e:
-        logger.warning(f"Failed to setup LibreOffice macro: {e}")
+def _paragraph_mark_deleted(paragraph) -> bool:
+    properties = ox.first_child(paragraph, "pPr")
+    if properties is None:
         return False
+    run_properties = ox.first_child(properties, "rPr")
+    if run_properties is None:
+        return False
+    return any(ox.is_element(kid, "del") for kid in run_properties.childNodes)
+
+
+def _join_deleted_paragraph_marks(root) -> int:
+    """A deleted paragraph mark merges its paragraph into the next one."""
+    joined = 0
+    for paragraph in reversed(list(ox.iter_elements(root, "p"))):
+        if not _paragraph_mark_deleted(paragraph):
+            continue
+        following = paragraph.nextSibling
+        while following is not None and not ox.is_element(following, "p"):
+            following = following.nextSibling
+        if following is None:
+            continue
+        anchor = next(
+            (kid for kid in following.childNodes if ox.is_element(kid) and not ox.is_element(kid, "pPr")),
+            None,
+        )
+        for kid in list(paragraph.childNodes):
+            if ox.is_element(kid, "pPr"):
+                continue
+            if anchor is None:
+                following.appendChild(kid)
+            else:
+                following.insertBefore(kid, anchor)
+        ox.remove_node(paragraph)
+        joined += 1
+    return joined
+
+
+def _drop_deleted_cells(root) -> int:
+    dropped = 0
+    for cell in list(ox.iter_elements(root, "tc")):
+        properties = ox.first_child(cell, "tcPr")
+        if properties is None:
+            continue
+        if any(ox.is_element(kid, "cellDel") for kid in properties.childNodes):
+            ox.remove_node(cell)
+            dropped += 1
+    return dropped
+
+
+def _verify_readable(target: Path):
+    """Open the result with python-docx when it is installed; report why not."""
+    try:
+        import docx as python_docx
+    except ImportError:
+        return None
+    if not hasattr(python_docx, "Document"):
+        return None
+    try:
+        python_docx.Document(str(target))
+    except Exception as exc:
+        return f"the written package does not open: {exc}"
+    return None
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Accept all tracked changes in a DOCX file"
-    )
-    parser.add_argument("input_file", help="Input DOCX file with tracked changes")
-    parser.add_argument(
-        "output_file", help="Output DOCX file (clean, no tracked changes)"
-    )
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Accept all tracked changes in a DOCX file")
+    parser.add_argument("input_file", help="Input DOCX carrying tracked changes")
+    parser.add_argument("output_file", help="Output DOCX with the changes applied")
+    arguments = parser.parse_args()
 
-    _, message = accept_changes(args.input_file, args.output_file)
-    print(message)
-
-    if "Error" in message:
-        raise SystemExit(1)
+    _, report = accept_changes(arguments.input_file, arguments.output_file)
+    print(report)
+    if "Error" in report:
+        sys.exit(1)

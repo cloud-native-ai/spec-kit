@@ -1,3 +1,37 @@
+"""Recalculate every formula in a workbook, then report the errors it produced.
+
+Usage: python recalc.py <excel_file> [timeout_seconds]
+
+openpyxl writes a formula as text and leaves the cached value empty, so a
+workbook built by a script shows blanks until something evaluates it.  This
+script asks LibreOffice to do that evaluation in place: a short StarBasic macro
+calls ``calculateAll()`` and stores the document, run headless against the
+caller's file.  The workbook keeps its formulas -- only the cached values change.
+
+Afterwards the saved file is read twice with openpyxl: once for values, to find
+cells that evaluated to an Excel error, and once for formulas, to count them.
+The result is a JSON object on stdout:
+
+    status          "success" or "errors_found"
+    total_errors    number of cells holding an error value
+    total_formulas  number of formula cells in the workbook
+    error_summary   per error type: count and up to 20 "Sheet!Cell" locations
+
+A run that could not start reports {"error": "..."} instead.  The exit status is
+0 for both shapes: the JSON is the result, and a caller reads the verdict there.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import platform
+import subprocess
+import sys
+from pathlib import Path
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -54,6 +88,7 @@ def _bridge_main():
 
 _bridge_main()
 del _bridge_main
+
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
 # `shared/definitions/script-interface-definitions.md`, its executable form by
 # `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
@@ -113,187 +148,255 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-"""
-Excel Formula Recalculation Script
-Recalculates all formulas in an Excel file using LibreOffice
-"""
+SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPTS_DIR = SCRIPT_DIR.parent
 
-import json
-import os
-import platform
-import subprocess
-import sys
-from pathlib import Path
+#: Where a LibreOffice user profile keeps its Standard Basic library.
+PROFILE_BASIC = {
+    "Darwin": "~/Library/Application Support/LibreOffice/4/user/basic/Standard",
+    "Linux": "~/.config/libreoffice/4/user/basic/Standard",
+}
+DEFAULT_BASIC = "~/.config/libreoffice/4/user/basic/Standard"
 
-from office.soffice import get_soffice_env
+MODULE_NAME = "Module1"
+SUB_NAME = "RecalculateAndSave"
 
-from openpyxl import load_workbook
+#: The macro itself.  ``calculateAll`` forces a full recalculation regardless of
+#: the document's own recalc-on-load setting; ``store`` writes the cached values
+#: back to the same file; ``close`` releases it so the process can exit.
+MACRO_BODY = (
+    f"Sub {SUB_NAME}\n"
+    "  Dim document As Object\n"
+    "  document = ThisComponent\n"
+    "  document.calculateAll()\n"
+    "  document.store()\n"
+    "  document.close(True)\n"
+    "End Sub\n"
+)
 
-MACRO_DIR_MACOS = "~/Library/Application Support/LibreOffice/4/user/basic/Standard"
-MACRO_DIR_LINUX = "~/.config/libreoffice/4/user/basic/Standard"
-MACRO_FILENAME = "Module1.xba"
+MODULE_TEMPLATE = (
+    '<?xml version="1.0" encoding="UTF-8"?>\n'
+    '<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" '
+    '"module.dtd">\n'
+    '<script:module xmlns:script="http://openoffice.org/2000/script" '
+    f'script:name="{MODULE_NAME}" script:language="StarBasic">\n'
+    "{body}"
+    "</script:module>\n"
+)
 
-RECALCULATE_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic">
-    Sub RecalculateAndSave()
-      ThisComponent.calculateAll()
-      ThisComponent.store()
-      ThisComponent.close(True)
-    End Sub
-</script:module>"""
+#: The macro URL LibreOffice resolves against the application's Basic libraries.
+MACRO_URL = (
+    f"vnd.sun.star.script:Standard.{MODULE_NAME}.{SUB_NAME}"
+    "?language=Basic&location=application"
+)
+
+#: Excel's error values.  A cell is counted once, under the first token it holds.
+ERROR_TOKENS = (
+    "#VALUE!",
+    "#DIV/0!",
+    "#REF!",
+    "#NAME?",
+    "#NULL!",
+    "#NUM!",
+    "#N/A",
+)
+
+#: Locations reported per error type; the count stays complete.
+LOCATION_CAP = 20
+
+DEFAULT_TIMEOUT = 30
 
 
-def has_gtimeout():
+def _soffice_env() -> dict:
+    """The environment LibreOffice runs in, as the office wrapper defines it."""
+    if str(SCRIPTS_DIR) not in sys.path:
+        sys.path.insert(0, str(SCRIPTS_DIR))
     try:
-        subprocess.run(
-            ["gtimeout", "--version"], capture_output=True, timeout=1, check=False
-        )
+        from office.soffice import get_soffice_env
+    except ImportError:
+        return os.environ.copy()
+    return get_soffice_env()
+
+
+def macro_directory() -> Path:
+    """The Standard Basic library directory of this user's LibreOffice profile."""
+    template = PROFILE_BASIC.get(platform.system(), DEFAULT_BASIC)
+    return Path(os.path.expanduser(template))
+
+
+def install_macro() -> bool:
+    """Make the recalculation macro available to LibreOffice.  True on success.
+
+    An existing module is never clobbered: when it already defines the sub it is
+    reused, and when it defines something else the sub is appended to it.  A
+    profile that does not exist yet is initialized first, because LibreOffice
+    creates the Standard library itself and a hand-made directory would not be
+    registered in it.
+    """
+    directory = macro_directory()
+    module = directory / f"{MODULE_NAME}.xba"
+
+    if module.is_file():
+        try:
+            text = module.read_text(encoding="utf-8")
+        except OSError:
+            return False
+        if SUB_NAME in text:
+            return True
+        closing = "</script:module>"
+        if closing not in text:
+            return False
+        try:
+            module.write_text(text.replace(closing, MACRO_BODY + closing), encoding="utf-8")
+        except OSError:
+            return False
         return True
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+
+    if not directory.is_dir():
+        try:
+            subprocess.run(
+                ["soffice", "--headless", "--terminate_after_init"],
+                capture_output=True,
+                timeout=60,
+                env=_soffice_env(),
+                check=False,
+            )
+            directory.mkdir(parents=True, exist_ok=True)
+        except (OSError, subprocess.SubprocessError):
+            return False
+
+    try:
+        module.write_text(MODULE_TEMPLATE.format(body=MACRO_BODY), encoding="utf-8")
+    except OSError:
         return False
+    return True
 
 
-def setup_libreoffice_macro():
-    macro_dir = os.path.expanduser(
-        MACRO_DIR_MACOS if platform.system() == "Darwin" else MACRO_DIR_LINUX
-    )
-    macro_file = os.path.join(macro_dir, MACRO_FILENAME)
+def run_recalculation(path: Path, timeout: int) -> dict | None:
+    """Ask LibreOffice to recalculate and store ``path``.  None when it ran.
 
-    if (
-        os.path.exists(macro_file)
-        and "RecalculateAndSave" in Path(macro_file).read_text()
-    ):
-        return True
-
-    if not os.path.exists(macro_dir):
-        subprocess.run(
-            ["soffice", "--headless", "--terminate_after_init"],
+    A timeout is not treated as failure: the macro stores the document before it
+    closes it, so a process that outlived the budget may already have written the
+    values.  The scan that follows reads whatever is on disk.
+    """
+    command = ["soffice", "--headless", "--norestore", MACRO_URL, str(path)]
+    try:
+        finished = subprocess.run(
+            command,
             capture_output=True,
-            timeout=10,
-            env=get_soffice_env(),
+            text=True,
+            timeout=timeout,
+            env=_soffice_env(),
+            check=False,
         )
-        os.makedirs(macro_dir, exist_ok=True)
+    except subprocess.TimeoutExpired:
+        return None
+    except OSError as exc:
+        return {"error": f"LibreOffice could not be started: {exc}"}
 
+    if finished.returncode != 0:
+        detail = (finished.stderr or finished.stdout or "").strip()
+        return {"error": detail or "Unknown error during recalculation"}
+    return None
+
+
+def _openpyxl():
+    """The workbook reader, or a plain statement of what is missing."""
     try:
-        Path(macro_file).write_text(RECALCULATE_MACRO)
-        return True
-    except Exception:
-        return False
+        import openpyxl
+    except ImportError as exc:
+        raise RuntimeError(
+            "openpyxl is required to read the recalculated workbook; install it "
+            "with 'python -m pip install openpyxl'"
+        ) from exc
+    return openpyxl
 
 
-def recalc(filename, timeout=30):
-    if not Path(filename).exists():
+def scan_workbook(path: Path) -> dict:
+    """Read the saved workbook for error values and for the formula count."""
+    openpyxl = _openpyxl()
+    values = openpyxl.load_workbook(path, data_only=True)
+    locations: dict[str, list[str]] = {token: [] for token in ERROR_TOKENS}
+    try:
+        for sheet in values.worksheets:
+            for row in sheet.iter_rows():
+                for cell in row:
+                    if not isinstance(cell.value, str):
+                        continue
+                    for token in ERROR_TOKENS:
+                        if token in cell.value:
+                            locations[token].append(f"{sheet.title}!{cell.coordinate}")
+                            break
+    finally:
+        values.close()
+
+    total_errors = sum(len(items) for items in locations.values())
+    summary = {
+        token: {"count": len(items), "locations": items[:LOCATION_CAP]}
+        for token, items in locations.items()
+        if items
+    }
+
+    formulas = openpyxl.load_workbook(path, data_only=False)
+    try:
+        total_formulas = sum(
+            1
+            for sheet in formulas.worksheets
+            for row in sheet.iter_rows()
+            for cell in row
+            if cell.data_type == "f"
+        )
+    finally:
+        formulas.close()
+
+    return {
+        "status": "success" if total_errors == 0 else "errors_found",
+        "total_errors": total_errors,
+        "error_summary": summary,
+        "total_formulas": total_formulas,
+    }
+
+
+def recalc(filename, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """Recalculate one workbook and report what its formulas evaluated to."""
+    path = Path(filename)
+    if not path.is_file():
         return {"error": f"File {filename} does not exist"}
 
-    abs_path = str(Path(filename).absolute())
-
-    if not setup_libreoffice_macro():
+    if not install_macro():
         return {"error": "Failed to setup LibreOffice macro"}
 
-    cmd = [
-        "soffice",
-        "--headless",
-        "--norestore",
-        "vnd.sun.star.script:Standard.Module1.RecalculateAndSave?language=Basic&location=application",
-        abs_path,
-    ]
-
-    if platform.system() == "Linux":
-        cmd = ["timeout", str(timeout)] + cmd
-    elif platform.system() == "Darwin" and has_gtimeout():
-        cmd = ["gtimeout", str(timeout)] + cmd
-
-    result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
-
-    if result.returncode != 0 and result.returncode != 124:  
-        error_msg = result.stderr or "Unknown error during recalculation"
-        if "Module1" in error_msg or "RecalculateAndSave" not in error_msg:
-            return {"error": "LibreOffice macro not configured properly"}
-        return {"error": error_msg}
+    failure = run_recalculation(path.resolve(), timeout)
+    if failure is not None:
+        return failure
 
     try:
-        wb = load_workbook(filename, data_only=True)
-
-        excel_errors = [
-            "#VALUE!",
-            "#DIV/0!",
-            "#REF!",
-            "#NAME?",
-            "#NULL!",
-            "#NUM!",
-            "#N/A",
-        ]
-        error_details = {err: [] for err in excel_errors}
-        total_errors = 0
-
-        for sheet_name in wb.sheetnames:
-            ws = wb[sheet_name]
-            for row in ws.iter_rows():
-                for cell in row:
-                    if cell.value is not None and isinstance(cell.value, str):
-                        for err in excel_errors:
-                            if err in cell.value:
-                                location = f"{sheet_name}!{cell.coordinate}"
-                                error_details[err].append(location)
-                                total_errors += 1
-                                break
-
-        wb.close()
-
-        result = {
-            "status": "success" if total_errors == 0 else "errors_found",
-            "total_errors": total_errors,
-            "error_summary": {},
-        }
-
-        for err_type, locations in error_details.items():
-            if locations:
-                result["error_summary"][err_type] = {
-                    "count": len(locations),
-                    "locations": locations[:20],  
-                }
-
-        wb_formulas = load_workbook(filename, data_only=False)
-        formula_count = 0
-        for sheet_name in wb_formulas.sheetnames:
-            ws = wb_formulas[sheet_name]
-            for row in ws.iter_rows():
-                for cell in row:
-                    if (
-                        cell.value
-                        and isinstance(cell.value, str)
-                        and cell.value.startswith("=")
-                    ):
-                        formula_count += 1
-        wb_formulas.close()
-
-        result["total_formulas"] = formula_count
-
-        return result
-
-    except Exception as e:
-        return {"error": str(e)}
+        return scan_workbook(path)
+    except Exception as exc:  # a workbook LibreOffice wrote but openpyxl cannot read
+        return {"error": str(exc)}
 
 
-def main():
-    if len(sys.argv) < 2:
+def main(argv: list[str]) -> int:
+    if not argv:
         print("Usage: python recalc.py <excel_file> [timeout_seconds]")
-        print("\nRecalculates all formulas in an Excel file using LibreOffice")
-        print("\nReturns JSON with error details:")
-        print("  - status: 'success' or 'errors_found'")
-        print("  - total_errors: Total number of Excel errors found")
-        print("  - total_formulas: Number of formulas in the file")
-        print("  - error_summary: Breakdown by error type with locations")
-        print("    - #VALUE!, #DIV/0!, #REF!, #NAME?, #NULL!, #NUM!, #N/A")
-        sys.exit(1)
+        print("\nRecalculates every formula in a workbook with LibreOffice, in place.")
+        print("\nPrints a JSON result:")
+        print("  status          'success' or 'errors_found'")
+        print("  total_errors    cells holding an Excel error value")
+        print("  total_formulas  formula cells in the workbook")
+        print("  error_summary   per error type: count and up to 20 locations")
+        print("    " + ", ".join(ERROR_TOKENS))
+        return 1
 
-    filename = sys.argv[1]
-    timeout = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+    try:
+        timeout = int(argv[1]) if len(argv) > 1 else DEFAULT_TIMEOUT
+    except ValueError:
+        sys.stderr.write("Error: timeout_seconds must be an integer\n")
+        return 1
 
-    result = recalc(filename, timeout)
-    print(json.dumps(result, indent=2))
+    print(json.dumps(recalc(argv[0], timeout), indent=2))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv[1:]))

@@ -1,30 +1,93 @@
+#!/usr/bin/env python3
+"""Draw the declared rectangles of one page onto that page's image for review.
+
+Operands, in order: page number (1-based), fields.json path, input image path,
+output image path. For every form_fields entry whose page_number matches, two
+outlines are drawn on a copy of the input image:
+
+    red   -- entry_bounding_box, where the value will be written
+    blue  -- label_bounding_box, the text the entry belongs to
+
+Both outlines are two pixels wide. The result is written to the output path in
+the format its extension implies, and one line is printed:
+
+    Created validation image at <output> with <n> bounding boxes
+
+<n> counts rectangles, not fields: a matched field contributes two. Looking at
+the overlay is how an author catches a box that drifted off its label or covers
+a neighbouring field before any PDF is produced -- check_bounding_boxes.py
+catches the arithmetic conflicts, this catches the ones only an eye can see.
+
+This script is a registered entry in the script-interface contract: -h, --help
+and --version answer before Pillow is imported, and an undeclared option is
+refused. Its operands are positional; it declares no options of its own.
+
+Exit 1 means no image was written: wrong operand count, a page number that is
+not an integer, or unreadable input.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
 import json
 import sys
 
-from PIL import Image, ImageDraw
+USAGE = (
+    "Usage: create_validation_image.py [page number] [fields.json file] "
+    "[input image path] [output image path]"
+)
+
+ENTRY_OUTLINE = "red"
+LABEL_OUTLINE = "blue"
+OUTLINE_WIDTH = 2
 
 
+def create_validation_image(page_number, fields_json_path, input_path, output_path) -> int:
+    """Overlay one page's rectangles; return the number of rectangles drawn."""
+    from PIL import Image, ImageDraw
+
+    with open(fields_json_path, encoding="utf-8") as stream:
+        fields = json.load(stream)["form_fields"]
+
+    image = Image.open(input_path)
+    try:
+        draw = ImageDraw.Draw(image)
+        drawn = 0
+        for field in fields:
+            if field["page_number"] != page_number:
+                continue
+            draw.rectangle(field["entry_bounding_box"], outline=ENTRY_OUTLINE, width=OUTLINE_WIDTH)
+            draw.rectangle(field["label_bounding_box"], outline=LABEL_OUTLINE, width=OUTLINE_WIDTH)
+            drawn += 2
+        image.save(output_path)
+    finally:
+        image.close()
+    print(f"Created validation image at {output_path} with {drawn} bounding boxes")
+    return drawn
 
 
-def create_validation_image(page_number, fields_json_path, input_path, output_path):
-    with open(fields_json_path, 'r') as f:
-        data = json.load(f)
-
-        img = Image.open(input_path)
-        draw = ImageDraw.Draw(img)
-        num_boxes = 0
-        
-        for field in data["form_fields"]:
-            if field["page_number"] == page_number:
-                entry_box = field['entry_bounding_box']
-                label_box = field['label_bounding_box']
-                draw.rectangle(entry_box, outline='red', width=2)
-                draw.rectangle(label_box, outline='blue', width=2)
-                num_boxes += 2
-        
-        img.save(output_path)
-        print(f"Created validation image at {output_path} with {num_boxes} bounding boxes")
-
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 4:
+        print(USAGE)
+        return 1
+    try:
+        page_number = int(args[0])
+    except ValueError:
+        print(USAGE)
+        return 1
+    try:
+        create_validation_image(page_number, args[1], args[2], args[3])
+    except ImportError as exc:
+        print(
+            f"ERROR: drawing the overlay needs Pillow ({exc}). "
+            "Install it with: pip install Pillow",
+            file=sys.stderr,
+        )
+        return 1
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print(f"ERROR: cannot create validation image: {exc}", file=sys.stderr)
+        return 1
+    return 0
 
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
@@ -142,11 +205,4 @@ if __name__ == "__main__":
 # script-interface:86:end
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Usage: create_validation_image.py [page number] [fields.json file] [input image path] [output image path]")
-        sys.exit(1)
-    page_number = int(sys.argv[1])
-    fields_json_path = sys.argv[2]
-    input_image_path = sys.argv[3]
-    output_image_path = sys.argv[4]
-    create_validation_image(page_number, fields_json_path, input_image_path, output_image_path)
+    sys.exit(main())

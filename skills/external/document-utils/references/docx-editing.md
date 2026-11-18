@@ -1,100 +1,143 @@
-# Editing Existing DOCX Documents
+# Editing an Existing Word Document
 
-## Common Operations
+Two roads lead through an existing `.docx`. Pick by the size of the change:
 
-### Converting .doc to .docx
+| Change | Road |
+|--------|------|
+| Read text, append paragraphs, restyle, add a table | python-docx directly on the file |
+| Tracked changes, comments, surgical markup edits | unpack → edit the XML → pack |
 
-Legacy `.doc` files must be converted before editing:
+The second road exists because a revision is a statement about *who changed
+what*, and that statement lives in markup python-docx does not model. Everything
+below runs on Python 3.10+; only the optional round-trip check needs python-docx.
 
-```bash
-python ${SKILL_HOME}/scripts/office/soffice.py --headless --convert-to docx document.doc
-```
+## Getting the file into a usable shape
 
-### Reading Content
-
-```bash
-# Text extraction with tracked changes
-pandoc --track-changes=all document.docx -o output.md
-
-# Raw XML access
-python ${SKILL_HOME}/scripts/office/unpack.py document.docx unpacked/
-```
-
-### Converting to Images
+A legacy `.doc` is not an OPC package. Convert it first:
 
 ```bash
-python ${SKILL_HOME}/scripts/office/soffice.py --headless --convert-to pdf document.docx
-pdftoppm -jpeg -r 150 document.pdf page
+python3 "${SKILL_HOME}/scripts/office/soffice.py" --headless --convert-to docx legacy.doc
 ```
 
-### Accepting Tracked Changes
+`soffice.py` is the LibreOffice wrapper: it selects the headless VCL plugin and
+gives each run its own user profile, so two conversions at once do not collide.
+As a Python API it also offers `convert()`, `thumbnail()` and `recalc()`.
+LibreOffice must be installed; where a sandbox forbids AF_UNIX sockets,
+`af_unix_available()` reports False and the conversion cannot run there.
 
-To produce a clean document with all tracked changes accepted (requires LibreOffice):
+## Reading content
+
+```python
+from docx import Document
+
+document = Document("report.docx")
+for paragraph in document.paragraphs:
+    print(paragraph.style.name, paragraph.text)
+```
+
+`paragraph.text` shows the accepted view: it includes inserted text and omits
+deleted text. To see the revisions themselves, read the markup:
 
 ```bash
-python ${SKILL_HOME}/scripts/docx/accept_changes.py input.docx output.docx
+python3 "${SKILL_HOME}/scripts/office/unpack.py" report.docx unpacked/
 ```
 
-## Editing Workflow
-
-**Follow all 3 steps in order.**
-
-### Step 1: Unpack
+## Rendering for a visual check
 
 ```bash
-python ${SKILL_HOME}/scripts/office/unpack.py document.docx unpacked/
+python3 "${SKILL_HOME}/scripts/office/soffice.py" --headless --convert-to pdf report.docx
 ```
 
-Extracts XML, pretty-prints, merges adjacent runs, and converts smart quotes to XML entities (`&#x201C;` etc.) so they survive editing. Use `--merge-runs false` to skip run merging.
+Then use the PDF tools in `scripts/pdf/` to rasterise pages. For a single
+first-page image, `soffice.thumbnail("report.docx", outdir="preview/")` converts
+straight to PNG.
 
-### Step 2: Edit XML
-
-Edit files in `unpacked/word/`. See [docx-xml-reference.md](./docx-xml-reference.md) for patterns.
-
-**Use "Claude" as the author** for tracked changes and comments, unless the user explicitly requests use of a different name.
-
-**Use the Edit tool directly for string replacement. Do not write Python scripts.** Scripts introduce unnecessary complexity. The Edit tool shows exactly what is being replaced.
-
-**CRITICAL: Use smart quotes for new content.** When adding text with apostrophes or quotes, use XML entities to produce smart quotes:
-
-```xml
-<!-- Use these entities for professional typography -->
-<w:t>Here&#x2019;s a quote: &#x201C;Hello&#x201D;</w:t>
-```
-
-| Entity | Character |
-|--------|-----------|
-| `&#x2018;` | ' (left single) |
-| `&#x2019;` | ' (right single / apostrophe) |
-| `&#x201C;` | " (left double) |
-| `&#x201D;` | " (right double) |
-
-**Adding comments:** Use `comment.py` to handle boilerplate across multiple XML files (text must be pre-escaped XML):
+## Accepting every tracked change
 
 ```bash
-python ${SKILL_HOME}/scripts/docx/comment.py unpacked/ 0 "Comment text with &amp; and &#x2019;"
-python ${SKILL_HOME}/scripts/docx/comment.py unpacked/ 1 "Reply text" --parent 0  # reply to comment 0
-python ${SKILL_HOME}/scripts/docx/comment.py unpacked/ 0 "Text" --author "Custom Author"  # custom author name
+python3 "${SKILL_HOME}/scripts/docx/accept_changes.py" redlined.docx clean.docx
 ```
 
-Then add markers to document.xml (see Comments in [docx-xml-reference.md](./docx-xml-reference.md)).
+This is a Python transformation, not a LibreOffice macro: insertions keep their
+content and lose their wrapper, deletions lose their content, moves are applied
+as the insertion/deletion pair they are, formatting revisions keep the new
+formatting, and a deleted paragraph mark joins its paragraph to the next one.
+The input file is never modified; parts without revisions are copied unchanged.
 
-### Step 3: Pack
+## The unpack → edit → pack road
+
+### 1. Unpack
 
 ```bash
-python ${SKILL_HOME}/scripts/office/pack.py unpacked/ output.docx --original document.docx
+python3 "${SKILL_HOME}/scripts/office/unpack.py" report.docx unpacked/
 ```
 
-Validates with auto-repair, condenses XML, and creates DOCX. Use `--validate false` to skip.
+The parts are extracted, every XML part is indented for reading, and two
+tidying passes run on a DOCX:
 
-**Auto-repair will fix:**
-- `durableId` >= 0x7FFFFFFF (regenerates valid ID)
-- Missing `xml:space="preserve"` on `<w:t>` with whitespace
+- adjacent revision wrappers by one author are joined (`--simplify-redlines false` to keep them),
+- adjacent runs with identical formatting are joined (`--merge-runs false` to keep them).
 
-**Auto-repair won't fix:**
-- Malformed XML, invalid element nesting, missing relationships, schema violations
+Both passes are cosmetic: they change how many elements carry a change, never
+what the document says. Curly quotes are written as numeric character references
+so a later re-save cannot alter them.
 
-## Common Pitfalls
+### 2. Edit the markup
 
-- **Replace entire `<w:r>` elements**: When adding tracked changes, replace the whole `<w:r>...</w:r>` block with `<w:del>...<w:ins>...` as siblings. Don't inject tracked change tags inside a run.
-- **Preserve `<w:rPr>` formatting**: Copy the original run's `<w:rPr>` block into your tracked change runs to maintain bold, font size, etc.
+Work in `unpacked/word/document.xml`. The rules that matter:
+
+- Wrap every edit in a revision. An unwrapped edit is invisible to a reviewer
+  and fails the comparison against the original.
+- Use one author name consistently — the default is `Claude`, or the name the
+  user asks for. Pass the same name to `validate.py --author`.
+- Deleted text goes in `w:delText`, never `w:t`, inside `w:del`.
+- A run's text that begins or ends with a space needs `xml:space="preserve"`.
+- Comment markers are children of `w:p`, never of `w:r`.
+
+`docx-xml-reference.md` carries the markup patterns, including how to reject
+another author's insertion and how to restore another author's deletion.
+
+To add a comment, let the script write the four comment parts and their
+registrations, then place the markers it prints:
+
+```bash
+python3 "${SKILL_HOME}/scripts/docx/comment.py" unpacked/ 0 "Check this figure" --author "Claude"
+python3 "${SKILL_HOME}/scripts/docx/comment.py" unpacked/ 1 "Agreed" --parent 0
+```
+
+### 3. Pack
+
+```bash
+python3 "${SKILL_HOME}/scripts/office/pack.py" unpacked/ report-edited.docx --original report.docx
+```
+
+With `--original`, the tree is checked and mechanically repairable defects are
+fixed before anything is written; a failed check means no output file. Packing
+removes the indentation unpack added, keeps text runs byte-exact, and writes
+`[Content_Types].xml` as the first member. Use `--validate false` only when the
+tree is knowingly incomplete.
+
+### 4. Check the result on its own
+
+```bash
+python3 "${SKILL_HOME}/scripts/office/validate.py" report-edited.docx --original report.docx --verbose
+```
+
+`--auto-repair` fixes whitespace preservation and out-of-range identifiers in an
+unpacked tree. The paragraph census at the end (`Paragraphs: 12 -> 14 (+2)`) is
+informational: a surprising delta is worth a look, not a failure by itself.
+
+## Pitfalls that cost the most time
+
+- **Editing inside someone else's revision.** Their insertion is their
+  statement; to remove it, nest your `w:del` inside their `w:ins`.
+- **`w:t` inside `w:del`.** Word shows the deleted text as live text. Use
+  `w:delText`.
+- **Lost spaces.** Merging runs or re-indenting a part can drop a leading space
+  unless the run carries `xml:space="preserve"`.
+- **Identifiers out of range.** `w14:paraId` must stay below `0x80000000` and
+  `w16cid:durableId` below `0x7FFFFFFF`; `--auto-repair` rewrites offenders.
+- **Unreferenced parts.** Adding a part without a relationship, or leaving a
+  part behind after deleting its relationship, makes the package look corrupt.
+- **Skipping the comparison.** Packing without `--original` writes whatever the
+  tree says, including edits nobody tracked.

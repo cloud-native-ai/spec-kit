@@ -1,87 +1,123 @@
-# PPTX Design Guide
+# Designing Slides That Carry the Content
 
-Don't create boring slides. Plain bullets on a white background won't impress anyone. Consider ideas from this list for each slide.
+A deck is read at a distance, in seconds, by people who did not write it. Every
+choice below serves that: one idea per slide, a visual anchor for it, and enough
+contrast and space to read it from the back of a room.
 
-## Before Starting
+The failure mode to avoid is the default deck -- white background, black bullets,
+one layout repeated twenty times. It is not neutral; it reads as unfinished.
 
-- **Pick a bold, content-informed color palette**: The palette should feel designed for THIS topic. If swapping your colors into a completely different presentation would still "work," you haven't made specific enough choices.
-- **Dominance over equality**: One color should dominate (60-70% visual weight), with 1-2 supporting tones and one sharp accent. Never give all colors equal weight.
-- **Dark/light contrast**: Dark backgrounds for title + conclusion slides, light for content ("sandwich" structure). Or commit to dark throughout for a premium feel.
-- **Commit to a visual motif**: Pick ONE distinctive element and repeat it -- rounded image frames, icons in colored circles, thick single-side borders. Carry it across every slide.
+## Decide four things before the first slide
 
-## Color Palettes
+1. **A palette that belongs to this subject.** Test it by imagining the same
+   colours on an unrelated deck. If they would work equally well there, the
+   choice is generic. A talk about soil health and a talk about payment
+   infrastructure should not share a palette.
+2. **A hierarchy inside the palette.** One colour carries most of the surface
+   (roughly two thirds), one or two support it, and a single accent is reserved
+   for the thing you want looked at. Equal weights give the eye nowhere to land.
+3. **A light/dark structure.** Dark opening and closing slides with light
+   content between them gives the deck a shape; an all-dark deck reads as
+   premium and continuous. Pick one and hold it.
+4. **One repeated motif.** A corner radius, an icon inside a filled circle, a
+   thick left edge on cards, a numbered chip. Repeat it on every slide so the
+   deck looks like one object rather than a collection.
 
-Choose colors that match your topic -- don't default to generic blue. Use these palettes as inspiration:
+## Palette starting points
 
-| Theme | Primary | Secondary | Accent |
-|-------|---------|-----------|--------|
-| **Midnight Executive** | `1E2761` (navy) | `CADCFC` (ice blue) | `FFFFFF` (white) |
-| **Forest & Moss** | `2C5F2D` (forest) | `97BC62` (moss) | `F5F5F5` (cream) |
-| **Coral Energy** | `F96167` (coral) | `F9E795` (gold) | `2F3C7E` (navy) |
-| **Warm Terracotta** | `B85042` (terracotta) | `E7E8D1` (sand) | `A7BEAE` (sage) |
-| **Ocean Gradient** | `065A82` (deep blue) | `1C7293` (teal) | `21295C` (midnight) |
-| **Charcoal Minimal** | `36454F` (charcoal) | `F2F2F2` (off-white) | `212121` (black) |
-| **Teal Trust** | `028090` (teal) | `00A896` (seafoam) | `02C39A` (mint) |
-| **Berry & Cream** | `6D2E46` (berry) | `A26769` (dusty rose) | `ECE2D0` (cream) |
-| **Sage Calm** | `84B59F` (sage) | `69A297` (eucalyptus) | `50808E` (slate) |
-| **Cherry Bold** | `990011` (cherry) | `FCF6F5` (off-white) | `2F3C7E` (navy) |
+Use these as directions, not as a fixed list. Adjust to the subject and check
+contrast against the background you will actually use.
 
-## For Each Slide
+| Direction | Base | Support | Accent |
+|-----------|------|---------|--------|
+| Deep water | `0B2545` | `8DA9C4` | `EEF4ED` |
+| Kiln and clay | `8C3B2E` | `E4D5C3` | `5E7A6B` |
+| Signal green | `14532D` | `A7C957` | `F2F0EB` |
+| Graphite paper | `2B2D31` | `D8DADF` | `E4572E` |
+| Plum and linen | `4A2545` | `C9ADA7` | `F5EBE0` |
+| Cold steel | `1F3A5F` | `6E8CA0` | `F4A259` |
+| Ink and citrus | `101418` | `BFC0C0` | `FFB627` |
 
-**Every slide needs a visual element** -- image, chart, icon, or shape. Text-only slides are forgettable.
+Two checks before committing: body text against its background should reach at
+least 4.5:1 contrast, and the accent should still be distinguishable for a
+reader with red-green colour vision deficiency (vary lightness, not only hue).
 
-**Layout options:**
-- Two-column (text left, illustration on right)
-- Icon + text rows (icon in colored circle, bold header, description below)
-- 2x2 or 2x3 grid (image on one side, grid of content blocks on other)
-- Half-bleed image (full left or right side) with content overlay
+## Every slide needs something to look at
 
-**Data display:**
-- Large stat callouts (big numbers 60-72pt with small labels below)
-- Comparison columns (before/after, pros/cons, side-by-side options)
-- Timeline or process flow (numbered steps, arrows)
+An image, a chart, a diagram, an icon, or a deliberately composed shape. A slide
+of only text is a paragraph with a title, and the audience reads ahead instead
+of listening.
 
-**Visual polish:**
-- Icons in small colored circles next to section headers
-- Italic accent text for key stats or taglines
+Compositions that work:
+
+- **Split**: text on one side, a picture or diagram on the other.
+- **Icon rows**: a filled circle with an icon, a bold label, one line of detail.
+- **Card grid**: two by two, or three across, each card one claim.
+- **Half-bleed picture**: the image runs to the slide edge, text sits on the
+  calm half or on a scrim.
+- **Number first**: one large figure with a short label under it.
+- **Sequence**: numbered steps along a line, with the current step emphasised.
+- **Before / after**: two columns with the same structure, so the difference is
+  the only thing that changes.
+
+Vary the composition across the deck. Three consecutive slides with the same
+structure is where attention drops.
 
 ## Typography
 
-**Choose an interesting font pairing** -- don't default to Arial. Pick a header font with personality and pair it with a clean body font.
+Pair a header face with a body face that disagrees with it in a useful way -- a
+serif header over a sans body, or a heavy grotesque over a light one. Two faces
+are enough; a third is usually a mistake.
 
-| Header Font | Body Font |
-|-------------|-----------|
-| Georgia | Calibri |
-| Arial Black | Arial |
-| Calibri | Calibri Light |
-| Cambria | Calibri |
-| Trebuchet MS | Calibri |
-| Impact | Arial |
-| Palatino | Garamond |
-| Consolas | Calibri |
+| Header | Body | Character |
+|--------|------|-----------|
+| Georgia | Calibri | editorial, warm |
+| Cambria | Calibri | formal, report-like |
+| Arial Black | Arial | blunt, high impact |
+| Trebuchet MS | Calibri | friendly, informal |
+| Consolas | Calibri | technical, product |
+| Palatino Linotype | Garamond | literary, long-form |
 
-| Element | Size |
-|---------|------|
-| Slide title | 36-44pt bold |
-| Section header | 20-24pt bold |
-| Body text | 14-16pt |
-| Captions | 10-12pt muted |
+Sizes for a projected deck:
 
-## Spacing
+| Element | Size | Weight |
+|---------|------|--------|
+| Slide title | 32-44 pt | bold |
+| Section header inside a slide | 20-26 pt | bold |
+| Body | 16-20 pt | regular |
+| Caption, source, footnote | 10-13 pt | regular, muted |
+| Big number callout | 60-96 pt | bold |
 
-- 0.5" minimum margins
-- 0.3-0.5" between content blocks
-- Leave breathing room--don't fill every inch
+The gap between title and body matters more than the absolute sizes: a 20 pt
+title over 18 pt body has no hierarchy at all. Below 14 pt, text stops being
+readable from a distance -- if it does not fit, cut content rather than shrink.
 
-## Avoid (Common Mistakes)
+## Space
 
-- **Don't repeat the same layout** -- vary columns, cards, and callouts across slides
-- **Don't center body text** -- left-align paragraphs and lists; center only titles
-- **Don't skimp on size contrast** -- titles need 36pt+ to stand out from 14-16pt body
-- **Don't default to blue** -- pick colors that reflect the specific topic
-- **Don't mix spacing randomly** -- choose 0.3" or 0.5" gaps and use consistently
-- **Don't style one slide and leave the rest plain** -- commit fully or keep it simple throughout
-- **Don't create text-only slides** -- add images, icons, charts, or visual elements; avoid plain title + bullets
-- **Don't forget text box padding** -- when aligning lines or shapes with text edges, set `margin: 0` on the text box or offset the shape to account for padding
-- **Don't use low-contrast elements** -- icons AND text need strong contrast against the background; avoid light text on light backgrounds or dark text on dark backgrounds
-- **NEVER use accent lines under titles** -- these are a hallmark of AI-generated slides; use whitespace or background color instead
+- Keep at least half an inch between content and the slide edge.
+- Use one gap value between blocks (0.3 in or 0.5 in) and repeat it. Mixed gaps
+  read as misalignment even when nothing is actually misaligned.
+- Leave a region deliberately empty. A slide filled edge to edge has no place
+  for the eye to rest, and the important item loses its emphasis.
+- Text boxes carry internal padding. When aligning a rule or a shape to the
+  *text* edge, either zero the frame's margins or offset the shape by the
+  padding; aligning to the box edge leaves a visible stagger.
+
+## Mistakes worth naming
+
+- **One layout for the whole deck.** Vary columns, cards and callouts.
+- **Centred body text.** Left-align paragraphs and lists; centre titles and
+  single-line callouts only.
+- **A thin rule under every title.** It is decoration that adds no information
+  and dates the deck. Separate with space or a background block instead.
+- **Low contrast anywhere.** Light grey on cream, a dark icon on a dark panel,
+  a coloured label on a same-tone card. Check icons as well as text.
+- **Uneven emphasis.** Styling the opening slide carefully and leaving the rest
+  plain is worse than a consistently plain deck.
+- **Bullet characters typed into text.** Use the layout's list formatting; a
+  pasted glyph will not align with the indent.
+- **Content that overflows its box.** Longer text than the template slot was
+  designed for wraps or spills. Render and look -- see
+  [pptx-qa.md](./pptx-qa.md).
+- **Decoration that survives its content.** When a template slot loses its
+  item, delete the picture and the caption with the text, not just the text.

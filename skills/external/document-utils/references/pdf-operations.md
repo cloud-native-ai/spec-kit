@@ -1,329 +1,333 @@
-# PDF Operations Reference
+# Everyday PDF operations
 
-Essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see [`pdf-reference.md`](./pdf-reference.md). For filling PDF forms, see [`pdf-forms.md`](./pdf-forms.md).
+Reading, creating and rearranging PDFs with the skill's Python stack. Form
+filling has its own workflow: [pdf-forms.md](./pdf-forms.md). Rendering internals,
+extraction tuning and troubleshooting: [pdf-reference.md](./pdf-reference.md).
 
-## Quick Start
+## The stack
 
-```python
-from pypdf import PdfReader, PdfWriter
+| Library | Licence | What it is for here |
+|---------|---------|---------------------|
+| `pypdf` | BSD-3-Clause | Page-level surgery: merge, split, rotate, crop, watermark, metadata, encryption, form fields, annotations |
+| `pdfplumber` | MIT | Words, characters, rules and rectangles with coordinates; table extraction |
+| `reportlab` | BSD | Creating PDFs: canvas drawing and flowing documents |
+| `pypdfium2` | Apache-2.0 OR BSD-3-Clause | Rendering pages to images (PDFium), fast text access |
+| `Pillow` | MIT-CMU | Image handling: crop, resize, overlay drawing |
 
-# Read a PDF
-reader = PdfReader("document.pdf")
-print(f"Pages: {len(reader.pages)}")
+Everything is importable Python. No Node package, no poppler, no qpdf, no pdftk
+and no LibreOffice is needed for the operations on this page; the previous
+toolchain's JavaScript and command-line routes were dropped in favour of these
+five, and each recipe below states the Python equivalent.
 
-# Extract text
-text = ""
-for page in reader.pages:
-    text += page.extract_text()
-```
+## Reading
 
-## Python Libraries
-
-### pypdf - Basic Operations
-
-#### Merge PDFs
-
-```python
-from pypdf import PdfWriter, PdfReader
-
-writer = PdfWriter()
-for pdf_file in ["doc1.pdf", "doc2.pdf", "doc3.pdf"]:
-    reader = PdfReader(pdf_file)
-    for page in reader.pages:
-        writer.add_page(page)
-
-with open("merged.pdf", "wb") as output:
-    writer.write(output)
-```
-
-#### Split PDF
+### Page count and plain text
 
 ```python
-reader = PdfReader("input.pdf")
-for i, page in enumerate(reader.pages):
-    writer = PdfWriter()
-    writer.add_page(page)
-    with open(f"page_{i+1}.pdf", "wb") as output:
-        writer.write(output)
+from pypdf import PdfReader
+
+reader = PdfReader("report.pdf")
+print(len(reader.pages))
+text = "\n".join(page.extract_text() or "" for page in reader.pages)
 ```
 
-#### Extract Metadata
+`extract_text()` returns the page's text in content-stream order, which is not
+always reading order: multi-column layouts and tables can interleave. When the
+arrangement matters, use pdfplumber instead.
 
-```python
-reader = PdfReader("document.pdf")
-meta = reader.metadata
-print(f"Title: {meta.title}")
-print(f"Author: {meta.author}")
-print(f"Subject: {meta.subject}")
-print(f"Creator: {meta.creator}")
-```
-
-#### Rotate Pages
-
-```python
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
-
-page = reader.pages[0]
-page.rotate(90)  # Rotate 90 degrees clockwise
-writer.add_page(page)
-
-with open("rotated.pdf", "wb") as output:
-    writer.write(output)
-```
-
-### pdfplumber - Text and Table Extraction
-
-#### Extract Text with Layout
+### Layout-aware text and tables
 
 ```python
 import pdfplumber
 
-with pdfplumber.open("document.pdf") as pdf:
-    for page in pdf.pages:
-        text = page.extract_text()
-        print(text)
-```
-
-#### Extract Tables
-
-```python
-with pdfplumber.open("document.pdf") as pdf:
-    for i, page in enumerate(pdf.pages):
-        tables = page.extract_tables()
-        for j, table in enumerate(tables):
-            print(f"Table {j+1} on page {i+1}:")
+with pdfplumber.open("report.pdf") as pdf:
+    for number, page in enumerate(pdf.pages, start=1):
+        print(f"--- page {number} ---")
+        print(page.extract_text(layout=True))
+        for table in page.extract_tables():
             for row in table:
                 print(row)
 ```
 
-#### Advanced Table Extraction
+`extract_tables()` returns a list of tables, each a list of rows, each row a list
+of cell strings or `None`. Detection is driven by the page's rules and text
+alignment; a table drawn without rules needs the settings described in
+[pdf-reference.md](./pdf-reference.md).
+
+To hand the rows to another tool, write CSV with the standard library — no
+dataframe dependency is required:
 
 ```python
-import pandas as pd
+import csv
 
-with pdfplumber.open("document.pdf") as pdf:
-    all_tables = []
+with pdfplumber.open("report.pdf") as pdf, open("tables.csv", "w", newline="", encoding="utf-8") as out:
+    writer = csv.writer(out)
     for page in pdf.pages:
-        tables = page.extract_tables()
-        for table in tables:
-            if table:  # Check if table is not empty
-                df = pd.DataFrame(table[1:], columns=table[0])
-                all_tables.append(df)
-
-# Combine all tables
-if all_tables:
-    combined_df = pd.concat(all_tables, ignore_index=True)
-    combined_df.to_excel("extracted_tables.xlsx", index=False)
+        for table in page.extract_tables():
+            writer.writerows(table)
 ```
 
-### reportlab - Create PDFs
-
-#### Basic PDF Creation
+### Words and characters with coordinates
 
 ```python
-from reportlab.lib.pagesizes import letter
+import pdfplumber
+
+with pdfplumber.open("report.pdf") as pdf:
+    page = pdf.pages[0]
+    for word in page.extract_words()[:5]:
+        print(word["text"], word["x0"], word["top"], word["x1"], word["bottom"])
+```
+
+pdfplumber's coordinates are top-down: `top` is the distance from the page's top
+edge. This is the same space `extract_form_structure.py` reports in.
+
+## Creating
+
+### Drawing on a canvas
+
+```python
+from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-c = canvas.Canvas("hello.pdf", pagesize=letter)
-width, height = letter
-
-# Add text
-c.drawString(100, height - 100, "Hello World!")
-c.drawString(100, height - 120, "This is a PDF created with reportlab")
-
-# Add a line
-c.line(100, height - 140, 400, height - 140)
-
-# Save
-c.save()
+width, height = A4
+sheet = canvas.Canvas("invoice.pdf", pagesize=A4)
+sheet.setFont("Helvetica-Bold", 18)
+sheet.drawString(50, height - 60, "Invoice 12345")
+sheet.setFont("Helvetica", 11)
+sheet.drawString(50, height - 90, "Due on receipt")
+sheet.line(50, height - 100, width - 50, height - 100)
+sheet.showPage()          # finish the page; omit it and the last page is lost
+sheet.save()
 ```
 
-#### Create PDF with Multiple Pages
+Canvas coordinates are bottom-up PDF points, the same space `pypdf` uses. Call
+`showPage()` before `save()` or the final page is discarded.
+
+### Flowing documents
 
 ```python
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer
 
-doc = SimpleDocTemplate("report.pdf", pagesize=letter)
 styles = getSampleStyleSheet()
-story = []
-
-# Add content
-title = Paragraph("Report Title", styles['Title'])
-story.append(title)
-story.append(Spacer(1, 12))
-
-body = Paragraph("This is the body of the report. " * 20, styles['Normal'])
-story.append(body)
-story.append(PageBreak())
-
-# Page 2
-story.append(Paragraph("Page 2", styles['Heading1']))
-story.append(Paragraph("Content for page 2", styles['Normal']))
-
-# Build PDF
-doc.build(story)
+story = [
+    Paragraph("Quarterly report", styles["Title"]),
+    Spacer(1, 12),
+    Paragraph("Revenue grew across every region. " * 12, styles["BodyText"]),
+    PageBreak(),
+    Paragraph("Appendix", styles["Heading1"]),
+]
+SimpleDocTemplate("report.pdf", pagesize=A4).build(story)
 ```
 
-#### Subscripts and Superscripts
+Platypus handles wrapping, pagination and headings; the canvas does not. Use it
+for anything longer than a page.
 
-**IMPORTANT**: Never use Unicode subscript/superscript characters in ReportLab PDFs. The built-in fonts do not include these glyphs, causing them to render as solid black boxes.
+### Tables
 
-Instead, use ReportLab's XML markup tags in Paragraph objects:
+```python
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
+
+rows = [["Product", "Q1", "Q2"], ["Widgets", "120", "135"], ["Gadgets", "85", "92"]]
+table = Table(rows, hAlign="LEFT")
+table.setStyle(TableStyle([
+    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#DDDDDD")),
+    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+    ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+    ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
+]))
+SimpleDocTemplate("table.pdf").build([Paragraph("Sales", getSampleStyleSheet()["Title"]), table])
+```
+
+### Subscripts, superscripts and other glyphs
+
+The 14 standard PDF fonts carry a limited glyph set. Unicode subscript and
+superscript characters (₂, ²) are **not** in it and render as black boxes. Use
+Paragraph markup instead:
 
 ```python
 from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
 
-styles = getSampleStyleSheet()
-
-# Subscripts: use <sub> tag
-chemical = Paragraph("H<sub>2</sub>O", styles['Normal'])
-
-# Superscripts: use <super> tag
-squared = Paragraph("x<super>2</super> + y<super>2</super>", styles['Normal'])
+Paragraph("H<sub>2</sub>O and x<super>2</super>", styles["BodyText"])
 ```
 
-For canvas-drawn text (not Paragraph objects), manually adjust font the size and position rather than using Unicode subscripts/superscripts.
-
-## Command-Line Tools
-
-### pdftotext (poppler-utils)
-
-```bash
-# Extract text
-pdftotext input.pdf output.txt
-
-# Extract text preserving layout
-pdftotext -layout input.pdf output.txt
-
-# Extract specific pages
-pdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5
-```
-
-### qpdf
-
-```bash
-# Merge PDFs
-qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf
-
-# Split pages
-qpdf input.pdf --pages . 1-5 -- pages1-5.pdf
-qpdf input.pdf --pages . 6-10 -- pages6-10.pdf
-
-# Rotate pages
-qpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees
-
-# Remove password
-qpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf
-```
-
-### pdftk (if available)
-
-```bash
-# Merge
-pdftk file1.pdf file2.pdf cat output merged.pdf
-
-# Split
-pdftk input.pdf burst
-
-# Rotate
-pdftk input.pdf rotate 1east output rotated.pdf
-```
-
-## Common Tasks
-
-### Extract Text from Scanned PDFs
+For canvas text, draw the smaller glyph yourself at a raised or lowered baseline.
+For anything beyond Latin-1 — CJK, emoji, mathematical symbols — register a TrueType
+font that has the glyphs:
 
 ```python
-# Requires: pip install pytesseract pdf2image
-import pytesseract
-from pdf2image import convert_from_path
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-# Convert PDF to images
-images = convert_from_path('scanned.pdf')
-
-# OCR each page
-text = ""
-for i, image in enumerate(images):
-    text += f"Page {i+1}:\n"
-    text += pytesseract.image_to_string(image)
-    text += "\n\n"
-
-print(text)
+pdfmetrics.registerFont(TTFont("NotoSans", "/path/to/NotoSans-Regular.ttf"))
+sheet.setFont("NotoSans", 11)
 ```
 
-### Add Watermark
+## Rearranging
+
+### Merge and split
 
 ```python
 from pypdf import PdfReader, PdfWriter
 
-# Create watermark (or load existing)
-watermark = PdfReader("watermark.pdf").pages[0]
-
-# Apply to all pages
-reader = PdfReader("document.pdf")
 writer = PdfWriter()
+for name in ("first.pdf", "second.pdf"):
+    writer.append(name)
+with open("merged.pdf", "wb") as out:
+    writer.write(out)
 
-for page in reader.pages:
-    page.merge_page(watermark)
-    writer.add_page(page)
-
-with open("watermarked.pdf", "wb") as output:
-    writer.write(output)
+reader = PdfReader("merged.pdf")
+for index, page in enumerate(reader.pages, start=1):
+    single = PdfWriter()
+    single.add_page(page)
+    with open(f"page_{index}.pdf", "wb") as out:
+        single.write(out)
 ```
 
-### Extract Images
+`append()` accepts a path, a reader or a file object, and a `pages` argument to
+take a subset (a list of indices, or a half-open `(start, stop)` range).
 
-```bash
-# Using pdfimages (poppler-utils)
-pdfimages -j input.pdf output_prefix
-
-# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
-```
-
-### Password Protection
+### Rotate, crop, metadata
 
 ```python
 from pypdf import PdfReader, PdfWriter
 
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
-
-for page in reader.pages:
-    writer.add_page(page)
-
-# Add password
-writer.encrypt("userpassword", "ownerpassword")
-
-with open("encrypted.pdf", "wb") as output:
-    writer.write(output)
+writer = PdfWriter(clone_from=PdfReader("input.pdf"))
+page = writer.pages[0]
+page.rotate(90)                       # clockwise, must be a multiple of 90
+page.mediabox.left = 50               # crop by moving the box edges
+page.mediabox.bottom = 50
+page.mediabox.right = 550
+page.mediabox.top = 750
+writer.add_metadata({"/Title": "Cropped", "/Author": "ai-engine project"})
+with open("output.pdf", "wb") as out:
+    writer.write(out)
 ```
 
-### Convert PDF to Images
+Cropping changes the visible box, not the content: the clipped material is still
+in the file. Redaction needs the content removed, not hidden.
+
+### Watermark
+
+Attach the pages to a writer **before** merging onto them — pypdf 7 refuses to
+rewrite the content stream of a page that has no writer:
+
+```python
+from pypdf import PdfReader, PdfWriter
+
+stamp = PdfReader("stamp.pdf").pages[0]
+writer = PdfWriter(clone_from=PdfReader("input.pdf"))
+for page in writer.pages:
+    page.merge_page(stamp)            # over=True by default; False puts it behind
+with open("watermarked.pdf", "wb") as out:
+    writer.write(out)
+```
+
+Build `stamp.pdf` with reportlab at the same page size, and use
+`canvas.setFillAlpha(0.3)` for a translucent mark.
+
+### Password protection
+
+```python
+from pypdf import PdfReader, PdfWriter
+
+writer = PdfWriter(clone_from=PdfReader("input.pdf"))
+writer.encrypt(user_password="read-only", owner_password="full-control", algorithm="AES-256")
+with open("protected.pdf", "wb") as out:
+    writer.write(out)
+
+reader = PdfReader("protected.pdf")
+if reader.is_encrypted:
+    reader.decrypt("read-only")       # returns a PasswordType; 0 means failure
+print(reader.pages[0].extract_text())
+```
+
+The user password opens the document; the owner password controls permissions.
+An empty user password with a set owner password is the common "anyone may read,
+only the owner may change" arrangement. Encryption is access control, not
+redaction: anyone who can open the file can copy its content.
+
+## Rendering to images
+
+The skill's script renders every page, caps the long side at 1000 pixels and
+reports each file it wrote:
 
 ```bash
-python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py input.pdf output_dir/
+python ${SKILL_HOME}/scripts/pdf/convert_pdf_to_images.py input.pdf images/
 ```
 
-## Quick Reference
+Directly, when you need a different resolution or a single page:
 
-| Task | Best Tool | Command/Code |
-|------|-----------|--------------|
-| Merge PDFs | pypdf | `writer.add_page(page)` |
-| Split PDFs | pypdf | One page per file |
-| Extract text | pdfplumber | `page.extract_text()` |
-| Extract tables | pdfplumber | `page.extract_tables()` |
-| Create PDFs | reportlab | Canvas or Platypus |
-| Command line merge | qpdf | `qpdf --empty --pages ...` |
-| OCR scanned PDFs | pytesseract | Convert to image first |
-| Fill PDF forms | pdf-lib or pypdf | See `${SKILL_HOME}/references/pdf-forms.md` |
+```python
+import pypdfium2 as pdfium
 
-## Next Steps
+document = pdfium.PdfDocument("input.pdf")
+page = document[0]
+bitmap = page.render(scale=300 / 72)      # 300 dpi; PDF user space is 72/inch
+bitmap.to_pil().save("page_1.png")
+bitmap.close()
+page.close()
+document.close()
+```
 
-- For advanced pypdfium2 usage, see [`pdf-reference.md`](./pdf-reference.md)
-- For JavaScript libraries (pdf-lib), see [`pdf-reference.md`](./pdf-reference.md)
-- If you need to fill out a PDF form, follow the instructions in [`pdf-forms.md`](./pdf-forms.md)
-- For troubleshooting guides, see [`pdf-reference.md`](./pdf-reference.md)
+Rendering needs no external binary: PDFium is bundled with `pypdfium2`.
+
+### Scanned pages (OCR)
+
+A scan has no text layer, so extraction returns nothing. OCR is optional and
+needs the Tesseract binary plus its Python wrapper (both Apache-2.0):
+
+```python
+import pypdfium2 as pdfium
+import pytesseract                     # pip install pytesseract; tesseract must be on PATH
+
+document = pdfium.PdfDocument("scan.pdf")
+pages = []
+for page in document:
+    bitmap = page.render(scale=300 / 72)
+    pages.append(pytesseract.image_to_string(bitmap.to_pil()))
+    bitmap.close()
+document.close()
+text = "\n\n".join(pages)
+```
+
+Render at 300 dpi or better before OCR; the skill's 1000-pixel cap is for visual
+inspection and is too small for reliable recognition.
+
+## Recipe index
+
+| Task | Tool | Entry point |
+|------|------|-------------|
+| Page count, plain text | pypdf | `PdfReader(...).pages`, `page.extract_text()` |
+| Layout text, tables, word boxes | pdfplumber | `extract_text(layout=True)`, `extract_tables()`, `extract_words()` |
+| Create a PDF | reportlab | `canvas.Canvas`, `SimpleDocTemplate` |
+| Merge / split / page subset | pypdf | `PdfWriter.append`, `add_page` |
+| Rotate / crop / metadata | pypdf | `page.rotate`, `page.mediabox`, `add_metadata` |
+| Watermark | pypdf + reportlab | writer first, then `page.merge_page` |
+| Encrypt / decrypt | pypdf | `writer.encrypt`, `reader.decrypt` |
+| Pages as PNG | script | `convert_pdf_to_images.py` |
+| Render at a chosen dpi | pypdfium2 | `page.render(scale=dpi/72)` |
+| Fill a form | scripts | [pdf-forms.md](./pdf-forms.md) |
+| Recover a field-less form's geometry | script | `extract_form_structure.py` |
+| OCR a scan | pytesseract (optional) | render, then `image_to_string` |
+
+## Pitfalls worth remembering
+
+* **Writer first.** `merge_page`, `replace_contents` and other content rewrites
+  need the page attached to a `PdfWriter`; pypdf 7 raises `DeprecationError`
+  otherwise. `PdfWriter(clone_from=reader)` is the shortest way to get there.
+* **`showPage()` before `save()`** in reportlab, or the last page never lands.
+* **Extraction order is not reading order.** Use pdfplumber's layout mode or its
+  word boxes when column structure matters.
+* **Two y directions.** pypdf and reportlab are bottom-up; pdfplumber and
+  rendered images are top-down. Convert explicitly at every boundary.
+* **Standard fonts are Latin-1.** Register a TTF for other scripts; never rely on
+  Unicode sub/superscript glyphs.
+* **Encrypted input.** `reader.is_encrypted` then `reader.decrypt(password)`
+  before any page access; the skill's scripts try an empty password and report a
+  clear error when that fails.
+* **Close what you render.** PDFium bitmaps and pages hold native memory;
+  `close()` them (or use the script, which does) when looping over many pages.

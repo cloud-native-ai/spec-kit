@@ -1,180 +1,133 @@
-"""
-Helper for running LibreOffice (soffice) in environments where AF_UNIX
-sockets may be blocked (e.g., sandboxed VMs).  Detects the restriction
-at runtime and applies an LD_PRELOAD shim if needed.
+"""Run LibreOffice headless, and the three jobs this skill asks of it.
+
+Original implementation, MIT licensed. LibreOffice is an external program
+(LGPL/MPL, invoked as a subprocess, never imported); this module is the thin
+wrapper that makes an invocation reproducible:
+
+* ``get_soffice_env()`` — the environment a headless run needs. Side-effect
+  free, so a caller may build its own ``subprocess`` command line with it.
+* ``run_soffice(args)`` — run ``soffice`` with that environment and an isolated
+  user profile, so two conversions at the same time do not fight over one
+  profile directory.
+* ``convert()`` / ``thumbnail()`` / ``recalc()`` — the three entry points the
+  DOCX, PPTX and XLSX helpers use.
+
+Sandbox note: LibreOffice needs AF_UNIX sockets for its own IPC. Where a
+sandbox forbids them, ``af_unix_available()`` reports False and a conversion
+will fail with LibreOffice's own error; run the conversion in an environment
+that permits AF_UNIX. This wrapper no longer injects an LD_PRELOAD socket shim.
 
 Usage:
-    from office.soffice import run_soffice, get_soffice_env
-
-    # Option 1 – run soffice directly
-    result = run_soffice(["--headless", "--convert-to", "pdf", "input.docx"])
-
-    # Option 2 – get env dict for your own subprocess calls
-    env = get_soffice_env()
-    subprocess.run(["soffice", ...], env=env)
+    from office.soffice import run_soffice, get_soffice_env, convert
+    convert("report.docx", "pdf", outdir="out/")
 """
 
+from __future__ import annotations
+
 import os
+import shutil
 import socket
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+
+#: Where a LibreOffice install hides when it is not on PATH.
+KNOWN_BINARIES = (
+    "/usr/bin/soffice",
+    "/usr/local/bin/soffice",
+    "/opt/libreoffice/program/soffice",
+    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+)
 
 
 def get_soffice_env() -> dict:
+    """A copy of the environment with the headless VCL plugin selected."""
     env = os.environ.copy()
     env["SAL_USE_VCLPLUGIN"] = "svp"
-
-    if _needs_shim():
-        shim = _ensure_shim()
-        env["LD_PRELOAD"] = str(shim)
-
+    env["SAL_DISABLE_OPENCL"] = "1"
     return env
 
 
-def run_soffice(args: list[str], **kwargs) -> subprocess.CompletedProcess:
-    env = get_soffice_env()
-    return subprocess.run(["soffice"] + args, env=env, **kwargs)
+def find_soffice() -> str | None:
+    """The soffice executable, or None when LibreOffice is not installed."""
+    for name in ("soffice", "libreoffice"):
+        found = shutil.which(name)
+        if found:
+            return found
+    for candidate in KNOWN_BINARIES:
+        if Path(candidate).is_file() and os.access(candidate, os.X_OK):
+            return candidate
+    return None
 
 
-
-_SHIM_SO = Path(tempfile.gettempdir()) / "lo_socket_shim.so"
-
-
-def _needs_shim() -> bool:
+def af_unix_available() -> bool:
+    """Whether this host lets a process open an AF_UNIX socket."""
     try:
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.close()
-        return False
+        probe = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     except OSError:
-        return True
+        return False
+    probe.close()
+    return True
 
 
-def _ensure_shim() -> Path:
-    if _SHIM_SO.exists():
-        return _SHIM_SO
+@contextmanager
+def isolated_profile():
+    """A throwaway user profile directory, removed when the block exits."""
+    with tempfile.TemporaryDirectory(prefix="document-utils-lo-") as scratch:
+        yield Path(scratch) / "profile"
 
-    src = Path(tempfile.gettempdir()) / "lo_socket_shim.c"
-    src.write_text(_SHIM_SOURCE)
-    subprocess.run(
-        ["gcc", "-shared", "-fPIC", "-o", str(_SHIM_SO), str(src), "-ldl"],
-        check=True,
+
+def run_soffice(args, **kwargs) -> subprocess.CompletedProcess:
+    """Run soffice with the headless environment and a private user profile."""
+    executable = find_soffice()
+    if executable is None:
+        raise FileNotFoundError(
+            "LibreOffice (soffice) was not found on PATH or in a known install location"
+        )
+    args = list(args)
+    if any(str(arg).startswith("-env:UserInstallation") for arg in args):
+        return subprocess.run([executable] + args, env=get_soffice_env(), **kwargs)
+    with isolated_profile() as profile:
+        command = [executable, f"-env:UserInstallation=file://{profile}"] + args
+        return subprocess.run(command, env=get_soffice_env(), **kwargs)
+
+
+def convert(source, target_format: str = "pdf", outdir=None, timeout: int = 180):
+    """Convert one document; the result lands in ``outdir`` (default: beside it)."""
+    source = Path(source)
+    destination = Path(outdir) if outdir else source.parent
+    destination.mkdir(parents=True, exist_ok=True)
+    return run_soffice(
+        [
+            "--headless",
+            "--norestore",
+            "--convert-to",
+            target_format,
+            "--outdir",
+            str(destination),
+            str(source),
+        ],
         capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
     )
-    src.unlink()
-    return _SHIM_SO
 
 
+def thumbnail(source, outdir=None, timeout: int = 180):
+    """Render the first page/slide of a document as a PNG image."""
+    return convert(source, "png", outdir=outdir, timeout=timeout)
 
-_SHIM_SOURCE = r"""
-#define _GNU_SOURCE
-#include <dlfcn.h>
-#include <errno.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
-static int (*real_socket)(int, int, int);
-static int (*real_socketpair)(int, int, int, int[2]);
-static int (*real_listen)(int, int);
-static int (*real_accept)(int, struct sockaddr *, socklen_t *);
-static int (*real_close)(int);
-static int (*real_read)(int, void *, size_t);
+def recalc(workbook, outdir=None, timeout: int = 180):
+    """Re-save a workbook through Calc so its formula results are written out.
 
-/* Per-FD bookkeeping (FDs >= 1024 are passed through unshimmed). */
-static int is_shimmed[1024];
-static int peer_of[1024];
-static int wake_r[1024];            /* accept() blocks reading this */
-static int wake_w[1024];            /* close()  writes to this      */
-static int listener_fd = -1;        /* FD that received listen()    */
-
-__attribute__((constructor))
-static void init(void) {
-    real_socket     = dlsym(RTLD_NEXT, "socket");
-    real_socketpair = dlsym(RTLD_NEXT, "socketpair");
-    real_listen     = dlsym(RTLD_NEXT, "listen");
-    real_accept     = dlsym(RTLD_NEXT, "accept");
-    real_close      = dlsym(RTLD_NEXT, "close");
-    real_read       = dlsym(RTLD_NEXT, "read");
-    for (int i = 0; i < 1024; i++) {
-        peer_of[i] = -1;
-        wake_r[i]  = -1;
-        wake_w[i]  = -1;
-    }
-}
-
-/* ---- socket ---------------------------------------------------------- */
-int socket(int domain, int type, int protocol) {
-    if (domain == AF_UNIX) {
-        int fd = real_socket(domain, type, protocol);
-        if (fd >= 0) return fd;
-        /* socket(AF_UNIX) blocked – fall back to socketpair(). */
-        int sv[2];
-        if (real_socketpair(domain, type, protocol, sv) == 0) {
-            if (sv[0] >= 0 && sv[0] < 1024) {
-                is_shimmed[sv[0]] = 1;
-                peer_of[sv[0]]    = sv[1];
-                int wp[2];
-                if (pipe(wp) == 0) {
-                    wake_r[sv[0]] = wp[0];
-                    wake_w[sv[0]] = wp[1];
-                }
-            }
-            return sv[0];
-        }
-        errno = EPERM;
-        return -1;
-    }
-    return real_socket(domain, type, protocol);
-}
-
-/* ---- listen ---------------------------------------------------------- */
-int listen(int sockfd, int backlog) {
-    if (sockfd >= 0 && sockfd < 1024 && is_shimmed[sockfd]) {
-        listener_fd = sockfd;
-        return 0;
-    }
-    return real_listen(sockfd, backlog);
-}
-
-/* ---- accept ---------------------------------------------------------- */
-int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
-    if (sockfd >= 0 && sockfd < 1024 && is_shimmed[sockfd]) {
-        /* Block until close() writes to the wake pipe. */
-        if (wake_r[sockfd] >= 0) {
-            char buf;
-            real_read(wake_r[sockfd], &buf, 1);
-        }
-        errno = ECONNABORTED;
-        return -1;
-    }
-    return real_accept(sockfd, addr, addrlen);
-}
-
-/* ---- close ----------------------------------------------------------- */
-int close(int fd) {
-    if (fd >= 0 && fd < 1024 && is_shimmed[fd]) {
-        int was_listener = (fd == listener_fd);
-        is_shimmed[fd] = 0;
-
-        if (wake_w[fd] >= 0) {              /* unblock accept() */
-            char c = 0;
-            write(wake_w[fd], &c, 1);
-            real_close(wake_w[fd]);
-            wake_w[fd] = -1;
-        }
-        if (wake_r[fd] >= 0) { real_close(wake_r[fd]); wake_r[fd]  = -1; }
-        if (peer_of[fd] >= 0) { real_close(peer_of[fd]); peer_of[fd] = -1; }
-
-        if (was_listener)
-            _exit(0);                        /* conversion done – exit */
-    }
-    return real_close(fd);
-}
-"""
-
+    Calc evaluates formulas while loading, subject to its own recalculation
+    setting; this entry point re-saves the file in the Excel 2007 XML format so
+    the cached values a reader sees come from Calc rather than from the writer.
+    """
+    return convert(workbook, 'xlsx:"Calc MS Excel 2007 XML"', outdir=outdir, timeout=timeout)
 
 
 #
@@ -294,5 +247,6 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
     import sys
-    result = run_soffice(sys.argv[1:])
-    sys.exit(result.returncode)
+
+    completed = run_soffice(sys.argv[1:])
+    sys.exit(completed.returncode)

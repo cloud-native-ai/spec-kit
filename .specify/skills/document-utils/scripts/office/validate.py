@@ -1,110 +1,134 @@
-"""
-Command line tool to validate Office document XML files against XSD schemas and tracked changes.
+"""Check an Office package before it is handed to a reader.
+
+Original implementation, MIT licensed.
 
 Usage:
-    python validate.py <path> [--original <original_file>] [--auto-repair] [--author NAME]
+    python validate.py <path> [--original <original_file>] [--auto-repair]
+                       [--author NAME] [--verbose|-v]
 
-The first argument can be either:
-- An unpacked directory containing the Office document XML files
-- A packed Office file (.docx/.pptx/.xlsx) which will be unpacked to a temp directory
+``<path>`` is either an unpacked directory or a packed .docx/.pptx/.xlsx file,
+which is extracted to a temporary directory for the duration of the check. The
+format is taken from the suffix of ``--original`` when it is given, otherwise
+from ``<path>`` itself.
 
-Auto-repair fixes:
-- paraId/durableId values that exceed OOXML limits
-- Missing xml:space="preserve" on w:t elements with whitespace
+What is checked: XML well-formedness, namespace declarations, identifier
+uniqueness and ranges, relationship and content-type inventories, the format's
+own markup rules, and — when the format's Python library is installed — a round
+trip that re-packs the parts and opens them. Schema (XSD) validation is no
+longer part of this skill; the round trip and the structural checks replace it.
+
+``--auto-repair`` fixes what is mechanically fixable before checking: text runs
+whose edge whitespace needs ``xml:space="preserve"``, and Word identifiers that
+fall outside the ranges the format reserves. ``--author`` names whose tracked
+changes are compared against ``--original`` (DOCX only).
 """
 
 import argparse
 import sys
 import tempfile
-import zipfile
 from pathlib import Path
 
-from validators import DOCXSchemaValidator, PPTXSchemaValidator, RedliningValidator
+try:  # package-relative import, then the flat script directory
+    from . import ooxml as ox
+except ImportError:  # pragma: no cover - depends on how the caller set sys.path
+    import ooxml as ox
+
+try:
+    from .validators import DOCXValidator, PPTXValidator, RedliningValidator
+except ImportError:  # pragma: no cover - flat script directory
+    from validators import DOCXValidator, PPTXValidator, RedliningValidator
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate Office document XML files")
+    parser = argparse.ArgumentParser(
+        description="Validate an unpacked Office directory or a packed Office file",
+        add_help=False,
+    )
     parser.add_argument(
         "path",
-        help="Path to unpacked directory or packed Office file (.docx/.pptx/.xlsx)",
+        help="Unpacked directory, or a packed .docx/.pptx/.xlsx file",
     )
     parser.add_argument(
         "--original",
-        required=False,
         default=None,
-        help="Path to original file (.docx/.pptx/.xlsx). If omitted, all XSD errors are reported and redlining validation is skipped.",
+        help="Original package; enables the tracked-change comparison and names the format",
     )
     parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
-        help="Enable verbose output",
+        help="Report each check that passes as well as each that fails",
     )
     parser.add_argument(
         "--auto-repair",
         action="store_true",
-        help="Automatically repair common issues (hex IDs, whitespace preservation)",
+        help="Repair whitespace preservation and out-of-range identifiers before checking",
     )
     parser.add_argument(
         "--author",
         default="Claude",
-        help="Author name for redlining validation (default: Claude)",
+        help="Author whose tracked changes are compared with the original (default: Claude)",
     )
-    args = parser.parse_args()
+    parser.add_argument("-h", "--help", action="store_true", help="print this help and exit")
+    arguments = parser.parse_args()
+    if arguments.help:
+        parser.print_help()
+        sys.exit(0)
 
-    path = Path(args.path)
-    assert path.exists(), f"Error: {path} does not exist"
+    path = Path(arguments.path)
+    if not path.exists():
+        parser.error(f"{path} does not exist")
 
-    original_file = None
-    if args.original:
-        original_file = Path(args.original)
-        assert original_file.is_file(), f"Error: {original_file} is not a file"
-        assert original_file.suffix.lower() in [".docx", ".pptx", ".xlsx"], (
-            f"Error: {original_file} must be a .docx, .pptx, or .xlsx file"
+    original = None
+    if arguments.original:
+        original = Path(arguments.original)
+        if not original.is_file():
+            parser.error(f"{original} is not a file")
+        if original.suffix.lower() not in ox.OFFICE_SUFFIXES:
+            parser.error(f"{original} must be a .docx, .pptx, or .xlsx file")
+
+    suffix = (original or path).suffix.lower()
+    if suffix not in ox.OFFICE_SUFFIXES:
+        parser.error(
+            f"Cannot determine file type from {path}. "
+            "Use --original or provide a .docx/.pptx/.xlsx file."
         )
 
-    file_extension = (original_file or path).suffix.lower()
-    assert file_extension in [".docx", ".pptx", ".xlsx"], (
-        f"Error: Cannot determine file type from {path}. Use --original or provide a .docx/.pptx/.xlsx file."
-    )
+    with tempfile.TemporaryDirectory() as scratch:
+        if path.is_file():
+            try:
+                ox.extract_package(path, Path(scratch))
+            except Exception as exc:
+                print(f"Error: {path} is not a readable Office package: {exc}", file=sys.stderr)
+                sys.exit(2)
+            tree = Path(scratch)
+        elif path.is_dir():
+            tree = path
+        else:
+            parser.error(f"{path} is neither a directory nor an Office file")
 
-    if path.is_file() and path.suffix.lower() in [".docx", ".pptx", ".xlsx"]:
-        temp_dir = tempfile.mkdtemp()
-        with zipfile.ZipFile(path, "r") as zf:
-            zf.extractall(temp_dir)
-        unpacked_dir = Path(temp_dir)
-    else:
-        assert path.is_dir(), f"Error: {path} is not a directory or Office file"
-        unpacked_dir = path
-
-    match file_extension:
-        case ".docx":
-            validators = [
-                DOCXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
-            ]
-            if original_file:
-                validators.append(
-                    RedliningValidator(unpacked_dir, original_file, verbose=args.verbose, author=args.author)  
+        if suffix == ".docx":
+            checks = [DOCXValidator(tree, original, verbose=arguments.verbose)]
+            if original is not None:
+                checks.append(
+                    RedliningValidator(tree, original, verbose=arguments.verbose, author=arguments.author)
                 )
-        case ".pptx":
-            validators = [
-                PPTXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
-            ]
-        case _:
-            print(f"Error: Validation not supported for file type {file_extension}")
+        elif suffix == ".pptx":
+            checks = [PPTXValidator(tree, original, verbose=arguments.verbose)]
+        else:
+            print(f"Error: Validation not supported for file type {suffix}")
             sys.exit(1)
 
-    if args.auto_repair:
-        total_repairs = sum(v.repair() for v in validators)
-        if total_repairs:
-            print(f"Auto-repaired {total_repairs} issue(s)")
+        if arguments.auto_repair:
+            repairs = sum(check.repair() for check in checks)
+            if repairs:
+                print(f"Auto-repaired {repairs} issue(s)")
 
-    success = all(v.validate() for v in validators)
+        passed = all([check.validate() for check in checks])
 
-    if success:
+    if passed:
         print("All validations PASSED!")
-
-    sys.exit(0 if success else 1)
+    sys.exit(0 if passed else 1)
 
 
 #

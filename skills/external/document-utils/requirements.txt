@@ -1,0 +1,35 @@
+# document-utils runtime stack — original MIT implementation.
+# Every package below is permissively licensed; no GPL/AGPL package is imported.
+# Scripts import third-party libraries inside the functions that use them, so
+# -h / --help / --version answer on a host where none of these is installed.
+# Licences were read from distribution metadata and licence texts, not assumed;
+# the per-package readings are recorded in the commit that introduced this file.
+#
+# External programs, NOT pip packages (invoked via subprocess only):
+#   LibreOffice (soffice)  MPL-2.0  — conversion, thumbnails, formula recalculation
+#   Tesseract + pytesseract Apache-2.0 — optional OCR of scanned pages (pytesseract
+#     is imported by no script; install it only when the OCR route is used)
+
+# PDF: forms, page surgery, geometry, rendering, images, creation
+pypdf>=7            # BSD-3-Clause — field extraction/filling, annotations, merge/split/rotate/encrypt
+pdfplumber          # MIT — word/line/rectangle inventory, table extraction
+pypdfium2>=5        # Apache-2.0 OR BSD-3-Clause — PDFium page rendering (bundled PDFium BSD-3-Clause)
+Pillow              # MIT-CMU — validation overlays, crops, thumbnail grids
+reportlab           # BSD-3-Clause — PDF creation recipes
+
+# DOCX: creation and the validate.py / accept_changes.py round-trip check
+python-docx         # MIT — writes the package; optional for the unpack/edit/pack road
+
+# PPTX: reading a packaged deck (thumbnail.py) and deck creation
+python-pptx         # MIT — slide inventory, hidden-slide flag, text extraction
+
+# XLSX: workbook read/write and the recalc.py verdict
+openpyxl            # MIT — cached values and formula counts; never evaluates formulas
+
+# Optional XML hardening: used by office/ooxml.py when importable; without it the
+# stdlib path still refuses every DTD/entity declaration before parsing.
+defusedxml          # PSF-2.0
+
+# Transitive, pulled in by the above (listed for licence visibility, not pinned):
+#   lxml BSD-3-Clause, typing_extensions PSF-2.0, XlsxWriter BSD-2-Clause,
+#   pdfminer.six MIT, charset-normalizer MIT, cryptography Apache-2.0 OR BSD-3-Clause

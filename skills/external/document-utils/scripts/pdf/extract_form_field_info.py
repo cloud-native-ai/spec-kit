@@ -1,3 +1,242 @@
+#!/usr/bin/env python3
+"""Describe a PDF's interactive form fields as JSON, in reading order.
+
+Operands: input PDF, output JSON path. The result is a list with one record per
+fillable field, ordered by page and then top-to-bottom, left-to-right, so an
+agent can walk it the way a person reads the form. Every record carries:
+
+    field_id   qualified field name; a kid field is joined to its ancestors
+               with dots ("address.street"), which is the name a value must
+               be addressed by
+    type       "text", "checkbox", "choice", "radio_group", or "unknown (/FT)"
+    page       1-based page holding the field's widget
+    rect       [left, bottom, right, top] in PDF user space -- y=0 is the
+               BOTTOM of the page, unlike the top-down boxes of fields.json
+
+Type-specific members:
+
+    checkbox     checked_value / unchecked_value: the exact names to write,
+                 taken from the widget's appearance states ("/Yes", "/Off")
+    choice       choice_options: [{value, text}] -- value is what a filler
+                 writes, text is what the form displays
+    radio_group  radio_options: [{value, rect}] -- one entry per button, each
+                 with its own rectangle, because the buttons of one group are
+                 spread across the page
+
+A radio group is reported once, from its parent field, with every button as an
+option; a field whose widget cannot be found is reported on stdout and left out
+of the JSON, because a value addressed to it could not be placed.
+
+The sibling script fill_fillable_fields.py imports get_field_info() from this
+module to validate a value file against the same description, so the two always
+agree on names, pages and legal values.
+
+Exit 1 means nothing was written: wrong operand count, unreadable PDF, or a
+missing pypdf.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import json
+import sys
+
+USAGE = "Usage: extract_form_field_info.py [input pdf] [output json]"
+
+#: Ancestor walk limit: a malformed /Parent cycle must not hang the extraction.
+MAX_FIELD_DEPTH = 64
+OFF_STATE = "/Off"
+
+
+def _resolve(value):
+    """Follow an indirect reference; a direct object resolves to itself."""
+    return value.get_object() if hasattr(value, "get_object") else value
+
+
+def _open_reader(pdf_path):
+    from pypdf import PdfReader
+
+    reader = PdfReader(pdf_path)
+    if reader.is_encrypted:
+        reader.decrypt("")
+    return reader
+
+
+def get_full_annotation_field_id(annotation):
+    """Qualified name of a widget: its own /T behind every ancestor /T."""
+    parts = []
+    node = _resolve(annotation)
+    for _ in range(MAX_FIELD_DEPTH):
+        if node is None:
+            break
+        name = node.get("/T")
+        if name:
+            parts.append(str(name))
+        parent = node.get("/Parent")
+        node = _resolve(parent) if parent is not None else None
+    return ".".join(reversed(parts)) if parts else None
+
+
+def _choice_option(state) -> dict:
+    """One /Opt entry as {value, text}.
+
+    ISO 32000-1 allows an option to be a plain string or an [export, display]
+    pair. A plain string is both the value to write and the text shown.
+    """
+    if isinstance(state, (list, tuple)) and len(state) == 2:
+        return {"value": str(state[0]), "text": str(state[1])}
+    text = str(state)
+    return {"value": text, "text": text}
+
+
+def make_field_dict(field, field_id) -> dict:
+    """Shape one terminal field (text, checkbox or choice) without its location."""
+    record = {"field_id": field_id}
+    kind = field.get("/FT")
+    states = list(field.get("/_States_") or [])
+
+    if kind == "/Tx":
+        record["type"] = "text"
+    elif kind == "/Btn":
+        record["type"] = "checkbox"
+        names = [str(state) for state in states]
+        on = [name for name in names if name != OFF_STATE]
+        if len(names) == 2 and len(on) == 1:
+            record["checked_value"] = on[0]
+            record["unchecked_value"] = OFF_STATE
+        else:
+            print(
+                f"WARNING: checkbox `{field_id}` declares unexpected states {names}; "
+                "its checked and unchecked values may be wrong -- verify the result visually."
+            )
+            record["checked_value"] = names[0] if names else OFF_STATE
+            record["unchecked_value"] = names[1] if len(names) > 1 else OFF_STATE
+    elif kind == "/Ch":
+        record["type"] = "choice"
+        record["choice_options"] = [_choice_option(state) for state in states]
+    else:
+        record["type"] = f"unknown ({kind})"
+    return record
+
+
+def _on_states(widget) -> list:
+    """Selectable appearance states of one button widget, without /Off.
+
+    A radio button keeps one appearance per state in /AP/N; a widget with a
+    single appearance stream carries no state names at all and is skipped.
+    """
+    from pypdf.generic import StreamObject
+
+    appearance = widget.get("/AP")
+    if appearance is None:
+        return []
+    normal = _resolve(appearance).get("/N")
+    if normal is None:
+        return []
+    normal = _resolve(normal)
+    if isinstance(normal, StreamObject):
+        return []
+    return [str(key) for key in normal.keys() if str(key) != OFF_STATE]
+
+
+def _rect(value):
+    """A /Rect as a plain list, keeping the document's own numeric types."""
+    return list(value) if value is not None else None
+
+
+def _anchor_rect(record) -> list:
+    options = record.get("radio_options")
+    if options:
+        return options[0].get("rect") or [0, 0, 0, 0]
+    return record.get("rect") or [0, 0, 0, 0]
+
+
+def _reading_order(record):
+    """Page first, then top-to-bottom (PDF y grows upward), then left-to-right."""
+    rect = _anchor_rect(record)
+    return (record.get("page"), -rect[1], rect[0])
+
+
+def get_field_info(reader) -> list:
+    """Return every locatable field of an open PdfReader, in reading order."""
+    fields = reader.get_fields() or {}
+    records = {}
+    radio_parents = set()
+
+    for field_id, field in fields.items():
+        if field.get("/Kids"):
+            # A parent is not fillable itself. A button parent with kids is a
+            # radio group, whose options are the kids' widgets.
+            if field.get("/FT") == "/Btn":
+                radio_parents.add(field_id)
+            continue
+        records[field_id] = make_field_dict(field, field_id)
+
+    groups = {}
+    for page_index, page in enumerate(reader.pages):
+        for reference in page.get("/Annots") or []:
+            widget = _resolve(reference)
+            subtype = widget.get("/Subtype")
+            if subtype is not None and str(subtype) != "/Widget":
+                continue
+            field_id = get_full_annotation_field_id(widget)
+            if field_id in records:
+                records[field_id]["page"] = page_index + 1
+                records[field_id]["rect"] = _rect(widget.get("/Rect"))
+            elif field_id in radio_parents:
+                on = _on_states(widget)
+                if len(on) != 1:
+                    continue
+                group = groups.get(field_id)
+                if group is None:
+                    group = {
+                        "field_id": field_id,
+                        "type": "radio_group",
+                        "page": page_index + 1,
+                        "radio_options": [],
+                    }
+                    groups[field_id] = group
+                group["radio_options"].append({"value": on[0], "rect": _rect(widget.get("/Rect"))})
+
+    located = []
+    for record in records.values():
+        if "page" not in record:
+            print(f"Unable to determine location for field id: {record['field_id']}, ignoring")
+            continue
+        located.append(record)
+
+    combined = located + list(groups.values())
+    combined.sort(key=_reading_order)
+    return combined
+
+
+def write_field_info(pdf_path: str, json_output_path: str) -> list:
+    """Extract one PDF's fields to JSON; return the records that were written."""
+    records = get_field_info(_open_reader(pdf_path))
+    with open(json_output_path, "w", encoding="utf-8") as stream:
+        json.dump(records, stream, indent=2)
+    print(f"Wrote {len(records)} fields to {json_output_path}")
+    return records
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 2:
+        print(USAGE)
+        return 1
+    try:
+        write_field_info(args[0], args[1])
+    except ImportError as exc:
+        print(
+            f"ERROR: field extraction needs pypdf ({exc}). "
+            "Install it with: pip install pypdf",
+            file=sys.stderr,
+        )
+        return 1
+    except Exception as exc:  # unreadable PDF, unwritable output
+        print(f"ERROR: cannot extract fields from {args[0]}: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,125 +352,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-import json
-import sys
-
-from pypdf import PdfReader
-
-
-
-
-def get_full_annotation_field_id(annotation):
-    components = []
-    while annotation:
-        field_name = annotation.get('/T')
-        if field_name:
-            components.append(field_name)
-        annotation = annotation.get('/Parent')
-    return ".".join(reversed(components)) if components else None
-
-
-def make_field_dict(field, field_id):
-    field_dict = {"field_id": field_id}
-    ft = field.get('/FT')
-    if ft == "/Tx":
-        field_dict["type"] = "text"
-    elif ft == "/Btn":
-        field_dict["type"] = "checkbox"  
-        states = field.get("/_States_", [])
-        if len(states) == 2:
-            if "/Off" in states:
-                field_dict["checked_value"] = states[0] if states[0] != "/Off" else states[1]
-                field_dict["unchecked_value"] = "/Off"
-            else:
-                print(f"Unexpected state values for checkbox `${field_id}`. Its checked and unchecked values may not be correct; if you're trying to check it, visually verify the results.")
-                field_dict["checked_value"] = states[0]
-                field_dict["unchecked_value"] = states[1]
-    elif ft == "/Ch":
-        field_dict["type"] = "choice"
-        states = field.get("/_States_", [])
-        field_dict["choice_options"] = [{
-            "value": state[0],
-            "text": state[1],
-        } for state in states]
-    else:
-        field_dict["type"] = f"unknown ({ft})"
-    return field_dict
-
-
-def get_field_info(reader: PdfReader):
-    fields = reader.get_fields()
-
-    field_info_by_id = {}
-    possible_radio_names = set()
-
-    for field_id, field in fields.items():
-        if field.get("/Kids"):
-            if field.get("/FT") == "/Btn":
-                possible_radio_names.add(field_id)
-            continue
-        field_info_by_id[field_id] = make_field_dict(field, field_id)
-
-
-    radio_fields_by_id = {}
-
-    for page_index, page in enumerate(reader.pages):
-        annotations = page.get('/Annots', [])
-        for ann in annotations:
-            field_id = get_full_annotation_field_id(ann)
-            if field_id in field_info_by_id:
-                field_info_by_id[field_id]["page"] = page_index + 1
-                field_info_by_id[field_id]["rect"] = ann.get('/Rect')
-            elif field_id in possible_radio_names:
-                try:
-                    on_values = [v for v in ann["/AP"]["/N"] if v != "/Off"]
-                except KeyError:
-                    continue
-                if len(on_values) == 1:
-                    rect = ann.get("/Rect")
-                    if field_id not in radio_fields_by_id:
-                        radio_fields_by_id[field_id] = {
-                            "field_id": field_id,
-                            "type": "radio_group",
-                            "page": page_index + 1,
-                            "radio_options": [],
-                        }
-                    radio_fields_by_id[field_id]["radio_options"].append({
-                        "value": on_values[0],
-                        "rect": rect,
-                    })
-
-    fields_with_location = []
-    for field_info in field_info_by_id.values():
-        if "page" in field_info:
-            fields_with_location.append(field_info)
-        else:
-            print(f"Unable to determine location for field id: {field_info.get('field_id')}, ignoring")
-
-    def sort_key(f):
-        if "radio_options" in f:
-            rect = f["radio_options"][0]["rect"] or [0, 0, 0, 0]
-        else:
-            rect = f.get("rect") or [0, 0, 0, 0]
-        adjusted_position = [-rect[1], rect[0]]
-        return [f.get("page"), adjusted_position]
-    
-    sorted_fields = fields_with_location + list(radio_fields_by_id.values())
-    sorted_fields.sort(key=sort_key)
-
-    return sorted_fields
-
-
-def write_field_info(pdf_path: str, json_output_path: str):
-    reader = PdfReader(pdf_path)
-    field_info = get_field_info(reader)
-    with open(json_output_path, "w") as f:
-        json.dump(field_info, f, indent=2)
-    print(f"Wrote {len(field_info)} fields to {json_output_path}")
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: extract_form_field_info.py [input pdf] [output json]")
-        sys.exit(1)
-    write_field_info(sys.argv[1], sys.argv[2])
+    sys.exit(main())

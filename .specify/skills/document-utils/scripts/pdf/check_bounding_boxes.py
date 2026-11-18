@@ -1,59 +1,139 @@
-from dataclasses import dataclass
+#!/usr/bin/env python3
+"""Audit the geometry of a hand-authored fields.json before anything is filled.
+
+Operand: one fields.json path in the annotation-fill schema -- a top-level
+"form_fields" list whose entries carry page_number, description,
+label_bounding_box, entry_bounding_box and optionally entry_text.
+
+Rectangles are [x0, y0, x1, y1] with y growing downward. The audit is purely
+geometric, so it never needs to know whether the numbers are PDF points or
+pixels; it only requires that one file stays in one coordinate space. Two rules
+are enforced:
+
+  * rectangles sharing a page must not overlap -- a label may not sit inside its
+    own entry area, and no two fields may claim the same area;
+  * an entry rectangle must be at least as tall as the font size its text will
+    be drawn with, otherwise the text is clipped.
+
+Findings go to stdout, one per line: the field count first, then either a single
+SUCCESS line or FAILURE lines. The verdict lives in that text, not in the exit
+status -- a completed audit exits 0 even when it reports failures, so a caller
+reads the lines. Exit 1 means the audit could not run (wrong operand count,
+unreadable or malformed input). At most 20 lines are emitted; the audit then
+stops and says so, because a file with that many conflicts needs rewriting
+rather than more diagnostics.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
 import json
 import sys
+from dataclasses import dataclass
 
+USAGE = "Usage: check_bounding_boxes.py [fields.json]"
 
+#: Diagnostic budget: after this many lines the audit stops reporting.
+MESSAGE_LIMIT = 20
+STOP_LINE = "Aborting further checks; fix bounding boxes and try again"
+SUCCESS_LINE = "SUCCESS: All bounding boxes are valid"
+DEFAULT_FONT_SIZE = 14
 
 
 @dataclass
 class RectAndField:
-    rect: list[float]
+    """One rectangle, the role it plays ("label" or "entry") and its owner."""
+
+    rect: list
     rect_type: str
     field: dict
 
 
-def get_bounding_box_messages(fields_json_stream) -> list[str]:
-    messages = []
-    fields = json.load(fields_json_stream)
-    messages.append(f"Read {len(fields['form_fields'])} fields")
+def _overlaps(first, second) -> bool:
+    """True when two rectangles share interior area (touching edges do not)."""
+    apart_horizontally = first[0] >= second[2] or first[2] <= second[0]
+    apart_vertically = first[1] >= second[3] or first[3] <= second[1]
+    return not (apart_horizontally or apart_vertically)
 
-    def rects_intersect(r1, r2):
-        disjoint_horizontal = r1[0] >= r2[2] or r1[2] <= r2[0]
-        disjoint_vertical = r1[1] >= r2[3] or r1[3] <= r2[1]
-        return not (disjoint_horizontal or disjoint_vertical)
 
-    rects_and_fields = []
-    for f in fields["form_fields"]:
-        rects_and_fields.append(RectAndField(f["label_bounding_box"], "label", f))
-        rects_and_fields.append(RectAndField(f["entry_bounding_box"], "entry", f))
+def _conflict_line(left: RectAndField, right: RectAndField) -> str:
+    """Describe one overlap, naming both rectangles and their fields."""
+    if left.field is right.field:
+        return (
+            "FAILURE: intersection between label and entry bounding boxes for "
+            f"`{left.field['description']}` ({left.rect}, {right.rect})"
+        )
+    return (
+        f"FAILURE: intersection between {left.rect_type} bounding box for "
+        f"`{left.field['description']}` ({left.rect}) and {right.rect_type} "
+        f"bounding box for `{right.field['description']}` ({right.rect})"
+    )
 
-    has_error = False
-    for i, ri in enumerate(rects_and_fields):
-        for j in range(i + 1, len(rects_and_fields)):
-            rj = rects_and_fields[j]
-            if ri.field["page_number"] == rj.field["page_number"] and rects_intersect(ri.rect, rj.rect):
-                has_error = True
-                if ri.field is rj.field:
-                    messages.append(f"FAILURE: intersection between label and entry bounding boxes for `{ri.field['description']}` ({ri.rect}, {rj.rect})")
-                else:
-                    messages.append(f"FAILURE: intersection between {ri.rect_type} bounding box for `{ri.field['description']}` ({ri.rect}) and {rj.rect_type} bounding box for `{rj.field['description']}` ({rj.rect})")
-                if len(messages) >= 20:
-                    messages.append("Aborting further checks; fix bounding boxes and try again")
-                    return messages
-        if ri.rect_type == "entry":
-            if "entry_text" in ri.field:
-                font_size = ri.field["entry_text"].get("font_size", 14)
-                entry_height = ri.rect[3] - ri.rect[1]
-                if entry_height < font_size:
-                    has_error = True
-                    messages.append(f"FAILURE: entry bounding box height ({entry_height}) for `{ri.field['description']}` is too short for the text content (font size: {font_size}). Increase the box height or decrease the font size.")
-                    if len(messages) >= 20:
-                        messages.append("Aborting further checks; fix bounding boxes and try again")
-                        return messages
 
-    if not has_error:
-        messages.append("SUCCESS: All bounding boxes are valid")
+def _height_line(rect: RectAndField, font_size, height) -> str:
+    return (
+        f"FAILURE: entry bounding box height ({height}) for "
+        f"`{rect.field['description']}` is too short for the text content "
+        f"(font size: {font_size}). Increase the box height or decrease the font size."
+    )
+
+
+def get_bounding_box_messages(fields_json_stream) -> list:
+    """Return the audit lines for an open fields.json stream."""
+    fields = json.load(fields_json_stream)["form_fields"]
+    messages = [f"Read {len(fields)} fields"]
+
+    rectangles = []
+    for field in fields:
+        rectangles.append(RectAndField(field["label_bounding_box"], "label", field))
+        rectangles.append(RectAndField(field["entry_bounding_box"], "entry", field))
+
+    def report(line: str):
+        messages.append(line)
+        if len(messages) >= MESSAGE_LIMIT:
+            messages.append(STOP_LINE)
+            return True
+        return False
+
+    found_problem = False
+    for position, left in enumerate(rectangles):
+        for right in rectangles[position + 1:]:
+            if left.field["page_number"] != right.field["page_number"]:
+                continue
+            if not _overlaps(left.rect, right.rect):
+                continue
+            found_problem = True
+            if report(_conflict_line(left, right)):
+                return messages
+
+        if left.rect_type != "entry":
+            continue
+        entry_text = left.field.get("entry_text") or {}
+        font_size = entry_text.get("font_size", DEFAULT_FONT_SIZE)
+        height = left.rect[3] - left.rect[1]
+        if height < font_size:
+            found_problem = True
+            if report(_height_line(left, font_size, height)):
+                return messages
+
+    if not found_problem:
+        messages.append(SUCCESS_LINE)
     return messages
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 1:
+        print(USAGE)
+        return 1
+    try:
+        with open(args[0], encoding="utf-8") as stream:
+            messages = get_bounding_box_messages(stream)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print(f"ERROR: cannot audit {args[0]}: {exc}", file=sys.stderr)
+        return 1
+    for line in messages:
+        print(line)
+    return 0
 
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
@@ -171,10 +251,4 @@ if __name__ == "__main__":
 # script-interface:86:end
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: check_bounding_boxes.py [fields.json]")
-        sys.exit(1)
-    with open(sys.argv[1]) as f:
-        messages = get_bounding_box_messages(f)
-    for msg in messages:
-        print(msg)
+    sys.exit(main())

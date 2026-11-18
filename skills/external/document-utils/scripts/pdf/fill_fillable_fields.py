@@ -1,3 +1,200 @@
+#!/usr/bin/env python3
+"""Write values into a PDF's own interactive fields, refusing anything invalid.
+
+Operands: input PDF, field_values.json, output PDF. The value file is a list of
+records -- field_id, page, and optionally value -- where field_id and page must
+match what extract_form_field_info.py reported for the same document. A record
+without a value is checked but not written, which lets an author validate a
+partly-filled file.
+
+Validation runs before anything is written and covers three things: the field
+exists, the stated page is the page its widget lives on, and the value is legal
+for the field type (a checkbox takes one of its two state names, a radio group
+one of its option values, a choice one of its option values; text is free).
+Every problem prints one ERROR line naming the field and what was wrong; if
+there is any problem the script exits 1 and the output file is not created.
+
+On success the values are written into the document's own AcroForm, so the
+result stays fillable and editable. NeedAppearances is set, which asks the
+viewer to redraw each widget from its new value -- the reliable route for
+checkboxes, radio buttons and dropdowns across viewers.
+
+One pypdf quirk is handled locally: a list box appearance is built by joining
+/Opt entries as text, which fails when the document stores [export, display]
+pairs as ISO 32000-1 permits. For the duration of the update the affected fields
+are handed a string-only view of their options and their own pairs are restored
+immediately afterwards, so the written file keeps its original option list. No
+library global is patched.
+
+Exit 1 means the output was not written: wrong operand count, unreadable input,
+or a validation failure.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
+"""
+
+import contextlib
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+USAGE = "Usage: fill_fillable_fields.py [input pdf] [field_values.json] [output pdf]"
+
+#: The extractor next to this file owns the field description both scripts use.
+EXTRACTOR_PATH = Path(__file__).resolve().parent / "extract_form_field_info.py"
+
+
+def _resolve(value):
+    """Follow an indirect reference; a direct object resolves to itself."""
+    return value.get_object() if hasattr(value, "get_object") else value
+
+
+def _load_extractor():
+    """Load the sibling extractor by path, so any working directory works."""
+    spec = importlib.util.spec_from_file_location("_document_utils_field_info", EXTRACTOR_PATH)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def validation_error_for_field_value(field_info, field_value):
+    """Return an ERROR line when a value is illegal for this field, else None."""
+    field_id = field_info["field_id"]
+    kind = field_info["type"]
+    if kind == "checkbox":
+        checked = field_info.get("checked_value")
+        unchecked = field_info.get("unchecked_value")
+        if field_value not in (checked, unchecked):
+            return (
+                f'ERROR: Invalid value "{field_value}" for checkbox field "{field_id}". '
+                f'The checked value is "{checked}" and the unchecked value is "{unchecked}"'
+            )
+    elif kind == "radio_group":
+        allowed = [option["value"] for option in field_info.get("radio_options", [])]
+        if field_value not in allowed:
+            return (
+                f'ERROR: Invalid value "{field_value}" for radio group field "{field_id}". '
+                f"Valid values are: {allowed}"
+            )
+    elif kind == "choice":
+        allowed = [option["value"] for option in field_info.get("choice_options", [])]
+        if field_value not in allowed:
+            return (
+                f'ERROR: Invalid value "{field_value}" for choice field "{field_id}". '
+                f"Valid values are: {allowed}"
+            )
+    return None
+
+
+def _choice_fields(root):
+    """Yield every choice (/Ch) field dictionary in the document's field tree."""
+    acroform = root.get("/AcroForm")
+    if acroform is None:
+        return
+    pending = list(_resolve(acroform).get("/Fields") or [])
+    seen = set()
+    while pending:
+        field = _resolve(pending.pop())
+        if id(field) in seen:
+            continue
+        seen.add(id(field))
+        if field.get("/FT") == "/Ch":
+            yield field
+        pending.extend(field.get("/Kids") or [])
+
+
+@contextlib.contextmanager
+def _string_option_view(writer):
+    """Temporarily flatten paired /Opt arrays, then restore the document's own."""
+    from pypdf.generic import ArrayObject, NameObject, TextStringObject
+
+    saved = []
+    for field in _choice_fields(writer.root_object):
+        options = field.get("/Opt")
+        if not isinstance(options, list) or not options:
+            continue
+        if not all(isinstance(option, (list, tuple)) and len(option) == 2 for option in options):
+            continue
+        saved.append((field, options))
+        field[NameObject("/Opt")] = ArrayObject(
+            TextStringObject(str(option[0])) for option in options
+        )
+    try:
+        yield
+    finally:
+        for field, options in saved:
+            field[NameObject("/Opt")] = options
+
+
+def fill_pdf_fields(input_pdf_path: str, fields_json_path: str, output_pdf_path: str) -> int:
+    """Validate then write the values; return 0 on success, 1 on any problem."""
+    from pypdf import PdfReader, PdfWriter
+
+    with open(fields_json_path, encoding="utf-8") as stream:
+        requested = json.load(stream)
+
+    reader = PdfReader(input_pdf_path)
+    if reader.is_encrypted:
+        reader.decrypt("")
+    known = {record["field_id"]: record for record in _load_extractor().get_field_info(reader)}
+
+    problems = []
+    values_by_page = {}
+    for entry in requested:
+        field_id = entry["field_id"]
+        record = known.get(field_id)
+        if record is None:
+            problems.append(f"ERROR: `{field_id}` is not a valid field ID")
+            continue
+        if entry["page"] != record["page"]:
+            problems.append(
+                f"ERROR: Incorrect page number for `{field_id}` "
+                f"(got {entry['page']}, expected {record['page']})"
+            )
+            continue
+        if "value" not in entry:
+            continue
+        error = validation_error_for_field_value(record, entry["value"])
+        if error:
+            problems.append(error)
+            continue
+        values_by_page.setdefault(entry["page"], {})[field_id] = entry["value"]
+
+    if problems:
+        for line in problems:
+            print(line)
+        return 1
+
+    writer = PdfWriter(clone_from=reader)
+    with _string_option_view(writer):
+        for page_number, values in values_by_page.items():
+            writer.update_page_form_field_values(
+                writer.pages[page_number - 1], values, auto_regenerate=False
+            )
+    writer.set_need_appearances_writer(True)
+    with open(output_pdf_path, "wb") as stream:
+        writer.write(stream)
+    return 0
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    if len(args) != 3:
+        print(USAGE)
+        return 1
+    try:
+        return fill_pdf_fields(args[0], args[1], args[2])
+    except ImportError as exc:
+        print(
+            f"ERROR: form filling needs pypdf ({exc}). "
+            "Install it with: pip install pypdf",
+            file=sys.stderr,
+        )
+        return 1
+    except Exception as exc:  # unreadable PDF, malformed value file, unwritable output
+        print(f"ERROR: cannot fill {args[0]}: {exc}", file=sys.stderr)
+        return 1
+
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
@@ -113,101 +310,5 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-import json
-import sys
-
-from pypdf import PdfReader, PdfWriter
-
-from extract_form_field_info import get_field_info
-
-
-
-
-def fill_pdf_fields(input_pdf_path: str, fields_json_path: str, output_pdf_path: str):
-    with open(fields_json_path) as f:
-        fields = json.load(f)
-    fields_by_page = {}
-    for field in fields:
-        if "value" in field:
-            field_id = field["field_id"]
-            page = field["page"]
-            if page not in fields_by_page:
-                fields_by_page[page] = {}
-            fields_by_page[page][field_id] = field["value"]
-    
-    reader = PdfReader(input_pdf_path)
-
-    has_error = False
-    field_info = get_field_info(reader)
-    fields_by_ids = {f["field_id"]: f for f in field_info}
-    for field in fields:
-        existing_field = fields_by_ids.get(field["field_id"])
-        if not existing_field:
-            has_error = True
-            print(f"ERROR: `{field['field_id']}` is not a valid field ID")
-        elif field["page"] != existing_field["page"]:
-            has_error = True
-            print(f"ERROR: Incorrect page number for `{field['field_id']}` (got {field['page']}, expected {existing_field['page']})")
-        else:
-            if "value" in field:
-                err = validation_error_for_field_value(existing_field, field["value"])
-                if err:
-                    print(err)
-                    has_error = True
-    if has_error:
-        sys.exit(1)
-
-    writer = PdfWriter(clone_from=reader)
-    for page, field_values in fields_by_page.items():
-        writer.update_page_form_field_values(writer.pages[page - 1], field_values, auto_regenerate=False)
-
-    writer.set_need_appearances_writer(True)
-    
-    with open(output_pdf_path, "wb") as f:
-        writer.write(f)
-
-
-def validation_error_for_field_value(field_info, field_value):
-    field_type = field_info["type"]
-    field_id = field_info["field_id"]
-    if field_type == "checkbox":
-        checked_val = field_info["checked_value"]
-        unchecked_val = field_info["unchecked_value"]
-        if field_value != checked_val and field_value != unchecked_val:
-            return f'ERROR: Invalid value "{field_value}" for checkbox field "{field_id}". The checked value is "{checked_val}" and the unchecked value is "{unchecked_val}"'
-    elif field_type == "radio_group":
-        option_values = [opt["value"] for opt in field_info["radio_options"]]
-        if field_value not in option_values:
-            return f'ERROR: Invalid value "{field_value}" for radio group field "{field_id}". Valid values are: {option_values}' 
-    elif field_type == "choice":
-        choice_values = [opt["value"] for opt in field_info["choice_options"]]
-        if field_value not in choice_values:
-            return f'ERROR: Invalid value "{field_value}" for choice field "{field_id}". Valid values are: {choice_values}'
-    return None
-
-
-def monkeypatch_pydpf_method():
-    from pypdf.generic import DictionaryObject
-    from pypdf.constants import FieldDictionaryAttributes
-
-    original_get_inherited = DictionaryObject.get_inherited
-
-    def patched_get_inherited(self, key: str, default = None):
-        result = original_get_inherited(self, key, default)
-        if key == FieldDictionaryAttributes.Opt:
-            if isinstance(result, list) and all(isinstance(v, list) and len(v) == 2 for v in result):
-                result = [r[0] for r in result]
-        return result
-
-    DictionaryObject.get_inherited = patched_get_inherited
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: fill_fillable_fields.py [input pdf] [field_values.json] [output pdf]")
-        sys.exit(1)
-    monkeypatch_pydpf_method()
-    input_pdf = sys.argv[1]
-    fields_json = sys.argv[2]
-    output_pdf = sys.argv[3]
-    fill_pdf_fields(input_pdf, fields_json, output_pdf)
+    sys.exit(main())

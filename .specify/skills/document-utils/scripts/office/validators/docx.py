@@ -113,449 +113,293 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-"""
-Validator for Word document XML files against XSD schemas.
+"""WordprocessingML rules: text runs, tracked changes, identifiers, comments.
+
+Original implementation, MIT licensed. These are the DOCX-specific agreements a
+Word document relies on beyond the package structure its base class checks:
+whitespace that must be marked preserve, deleted text that must live in
+``w:delText``, identifiers that must fit the ranges Word reserves, and comment
+markers that must pair up and point at a real comment.
 """
 
 import random
 import re
-import tempfile
-import zipfile
+from pathlib import Path
 
-import defusedxml.minidom
-import lxml.etree
+try:  # package-relative import, then the flat script directory
+    from .. import ooxml as ox
+except ImportError:  # pragma: no cover - depends on how the caller set sys.path
+    import ooxml as ox
 
-from .base import BaseSchemaValidator
+from .base import BaseValidator
+
+PARA_ID_LIMIT = 0x80000000
+DURABLE_ID_LIMIT = 0x7FFFFFFF
+EDGE_WHITESPACE = re.compile(r"^[ \t\n\r]|[ \t\n\r]$")
 
 
-class DOCXSchemaValidator(BaseSchemaValidator):
+class DOCXValidator(BaseValidator):
+    """Structural and WordprocessingML checks for an unpacked .docx."""
 
-    WORD_2006_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-    W14_NAMESPACE = "http://schemas.microsoft.com/office/word/2010/wordml"
-    W16CID_NAMESPACE = "http://schemas.microsoft.com/office/word/2016/wordml/cid"
+    LIBRARY_MODULE = "docx"
+    LIBRARY_LABEL = "python-docx"
+    PACKAGE_SUFFIX = ".docx"
 
-    ELEMENT_RELATIONSHIP_TYPES = {}
-
-    def validate(self):
+    def validate(self) -> bool:
         if not self.validate_xml():
             return False
-
-        all_valid = True
-        if not self.validate_namespaces():
-            all_valid = False
-
-        if not self.validate_unique_ids():
-            all_valid = False
-
-        if not self.validate_file_references():
-            all_valid = False
-
-        if not self.validate_content_types():
-            all_valid = False
-
-        if not self.validate_against_xsd():
-            all_valid = False
-
-        if not self.validate_whitespace_preservation():
-            all_valid = False
-
-        if not self.validate_deletions():
-            all_valid = False
-
-        if not self.validate_insertions():
-            all_valid = False
-
-        if not self.validate_all_relationship_ids():
-            all_valid = False
-
-        if not self.validate_id_constraints():
-            all_valid = False
-
-        if not self.validate_comment_markers():
-            all_valid = False
-
+        checks = (
+            self.validate_namespaces,
+            self.validate_unique_ids,
+            self.validate_file_references,
+            self.validate_content_types,
+            self.validate_relationship_ids,
+            self.validate_whitespace_preservation,
+            self.validate_deletions,
+            self.validate_insertions,
+            self.validate_id_constraints,
+            self.validate_comment_markers,
+            self.validate_library_roundtrip,
+        )
+        verdicts = [check() for check in checks]
         self.compare_paragraph_counts()
+        return all(verdicts)
 
-        return all_valid
+    def open_package(self, package: Path):
+        import docx
 
-    def validate_whitespace_preservation(self):
+        return docx.Document(str(package))
+
+    # --- text runs --------------------------------------------------------- #
+    def _document_parts(self):
+        return [path for path in self.xml_files if path.name == "document.xml"]
+
+    def validate_whitespace_preservation(self) -> bool:
         errors = []
-
-        for xml_file in self.xml_files:
-            if xml_file.name != "document.xml":
+        for path in self._document_parts():
+            doc = self.part(path)
+            if doc is None:
                 continue
-
-            try:
-                root = lxml.etree.parse(str(xml_file)).getroot()
-
-                for elem in root.iter(f"{{{self.WORD_2006_NAMESPACE}}}t"):
-                    if elem.text:
-                        text = elem.text
-                        if re.search(r"^[ \t\n\r]", text) or re.search(
-                            r"[ \t\n\r]$", text
-                        ):
-                            xml_space_attr = f"{{{self.XML_NAMESPACE}}}space"
-                            if (
-                                xml_space_attr not in elem.attrib
-                                or elem.attrib[xml_space_attr] != "preserve"
-                            ):
-                                text_preview = (
-                                    repr(text)[:50] + "..."
-                                    if len(repr(text)) > 50
-                                    else repr(text)
-                                )
-                                errors.append(
-                                    f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                                    f"Line {elem.sourceline}: w:t element with whitespace missing xml:space='preserve': {text_preview}"
-                                )
-
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
+            for element in ox.iter_elements(doc.documentElement, "t"):
+                text = ox.text_of(element)
+                if not text or not EDGE_WHITESPACE.search(text):
+                    continue
+                if ox.get_attr(element, "space") == "preserve":
+                    continue
+                preview = repr(text)[:50] + ("..." if len(repr(text)) > 50 else "")
                 errors.append(
-                    f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
+                    f"  {self.rel(path)}: {element.tagName} with edge whitespace lacks "
+                    f"xml:space='preserve': {preview}"
                 )
+        return self.emit(
+            errors,
+            "Found {count} whitespace preservation violations:",
+            "All edge whitespace is marked preserve",
+        )
 
-        if errors:
-            print(f"FAILED - Found {len(errors)} whitespace preservation violations:")
-            for error in errors:
-                print(error)
-            return False
-        else:
-            if self.verbose:
-                print("PASSED - All whitespace is properly preserved")
-            return True
-
-    def validate_deletions(self):
+    def validate_deletions(self) -> bool:
+        """Deleted content belongs in w:delText / w:delInstrText, never w:t."""
         errors = []
-
-        for xml_file in self.xml_files:
-            if xml_file.name != "document.xml":
+        for path in self._document_parts():
+            doc = self.part(path)
+            if doc is None:
                 continue
-
-            try:
-                root = lxml.etree.parse(str(xml_file)).getroot()
-                namespaces = {"w": self.WORD_2006_NAMESPACE}
-
-                for t_elem in root.xpath(".//w:del//w:t", namespaces=namespaces):
-                    if t_elem.text:
-                        text_preview = (
-                            repr(t_elem.text)[:50] + "..."
-                            if len(repr(t_elem.text)) > 50
-                            else repr(t_elem.text)
-                        )
-                        errors.append(
-                            f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                            f"Line {t_elem.sourceline}: <w:t> found within <w:del>: {text_preview}"
-                        )
-
-                for instr_elem in root.xpath(
-                    ".//w:del//w:instrText", namespaces=namespaces
-                ):
-                    text_preview = (
-                        repr(instr_elem.text or "")[:50] + "..."
-                        if len(repr(instr_elem.text or "")) > 50
-                        else repr(instr_elem.text or "")
-                    )
+            for deletion in ox.iter_elements(doc.documentElement, "del"):
+                for element in ox.iter_elements(deletion):
+                    tag = ox.local_name(element)
+                    if tag not in ("t", "instrText"):
+                        continue
+                    preview = repr(ox.text_of(element))[:50]
+                    replacement = "w:delText" if tag == "t" else "w:delInstrText"
                     errors.append(
-                        f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                        f"Line {instr_elem.sourceline}: <w:instrText> found within <w:del> (use <w:delInstrText>): {text_preview}"
+                        f"  {self.rel(path)}: <{element.tagName}> inside <w:del> "
+                        f"(use {replacement}): {preview}"
                     )
+        return self.emit(
+            errors,
+            "Found {count} deletion validation violations:",
+            "No live text elements inside w:del",
+        )
 
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
-                errors.append(
-                    f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
-                )
-
-        if errors:
-            print(f"FAILED - Found {len(errors)} deletion validation violations:")
-            for error in errors:
-                print(error)
-            return False
-        else:
-            if self.verbose:
-                print("PASSED - No w:t elements found within w:del elements")
-            return True
-
-    def count_paragraphs_in_unpacked(self):
-        count = 0
-
-        for xml_file in self.xml_files:
-            if xml_file.name != "document.xml":
+    def validate_insertions(self) -> bool:
+        """w:delText inside w:ins is only legal when a w:del wraps it."""
+        errors = []
+        for path in self._document_parts():
+            doc = self.part(path)
+            if doc is None:
                 continue
+            for insertion in ox.iter_elements(doc.documentElement, "ins"):
+                for element in ox.iter_elements(insertion, "delText"):
+                    if any(ox.local_name(parent) == "del" for parent in self._ancestors(element)):
+                        continue
+                    errors.append(
+                        f"  {self.rel(path)}: <w:delText> inside <w:ins> without <w:del>: "
+                        f"{repr(ox.text_of(element))[:50]}"
+                    )
+        return self.emit(
+            errors,
+            "Found {count} insertion validation violations:",
+            "No stray w:delText inside w:ins",
+        )
 
-            try:
-                root = lxml.etree.parse(str(xml_file)).getroot()
-                paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
-                count = len(paragraphs)
-            except Exception as e:
-                print(f"Error counting paragraphs in unpacked document: {e}")
+    # --- identifiers ------------------------------------------------------- #
+    @staticmethod
+    def _id_attributes(element):
+        """Yield (attribute name, value) for the two Word identifier attributes."""
+        for index in range(element.attributes.length):
+            attr = element.attributes.item(index)
+            if ox.local_name(attr) in ("paraId", "durableId"):
+                yield attr.name, attr.value
 
-        return count
+    @staticmethod
+    def _id_violation(attr_name: str, value: str, part_name: str):
+        local = attr_name.rsplit(":", 1)[-1]
+        limit = PARA_ID_LIMIT if local == "paraId" else DURABLE_ID_LIMIT
+        base = 10 if (local == "durableId" and part_name == "numbering.xml") else 16
+        try:
+            number = int(value, base)
+        except ValueError:
+            return f"{attr_name}={value} must be {'decimal' if base == 10 else 'hexadecimal'} in {part_name}"
+        if number >= limit:
+            return f"{attr_name}={value} >= {limit:#x}"
+        return None
 
-    def count_paragraphs_in_original(self):
-        original = self.original_file
-        if original is None:
+    def validate_id_constraints(self) -> bool:
+        errors = []
+        for path in self.xml_files:
+            doc = self.part(path)
+            if doc is None:
+                continue
+            for element in ox.iter_elements(doc.documentElement):
+                for attr_name, value in self._id_attributes(element):
+                    problem = self._id_violation(attr_name, value, path.name)
+                    if problem:
+                        errors.append(f"  {path.name}: {problem}")
+        return self.emit(
+            errors,
+            "{count} ID constraint violations:",
+            "All paraId/durableId values are within their limits",
+        )
+
+    # --- comments ---------------------------------------------------------- #
+    def validate_comment_markers(self) -> bool:
+        errors = []
+        document = next((path for path in self._document_parts() if "word" in path.parts), None)
+        if document is None:
+            return self.emit([], "", "No document.xml to check for comment markers")
+        doc = self.part(document)
+        if doc is None:
+            return self.emit([f"  {self.rel(document)}: unreadable"], "{count} comment marker violations:", "")
+
+        def marker_ids(tag):
+            return {
+                ox.get_attr(node, "id")
+                for node in ox.iter_elements(doc.documentElement, tag)
+                if ox.get_attr(node, "id") is not None
+            }
+
+        starts = marker_ids("commentRangeStart")
+        ends = marker_ids("commentRangeEnd")
+        references = marker_ids("commentReference")
+
+        def ordered(values):
+            return sorted(values, key=lambda value: int(value) if value.isdigit() else 0)
+
+        for value in ordered(ends - starts):
+            errors.append(f'  document.xml: commentRangeEnd id="{value}" has no commentRangeStart')
+        for value in ordered(starts - ends):
+            errors.append(f'  document.xml: commentRangeStart id="{value}" has no commentRangeEnd')
+
+        comments = next((path for path in self.xml_files if path.name == "comments.xml"), None)
+        if comments is not None:
+            comments_doc = self.part(comments)
+            if comments_doc is not None:
+                known = {
+                    ox.get_attr(node, "id")
+                    for node in ox.iter_elements(comments_doc.documentElement, "comment")
+                }
+                for value in ordered((starts | ends | references) - known):
+                    errors.append(f'  document.xml: marker id="{value}" names no comment in comments.xml')
+        return self.emit(
+            errors,
+            "{count} comment marker violations:",
+            "All comment markers pair up and resolve",
+        )
+
+    # --- paragraph census -------------------------------------------------- #
+    def count_paragraphs_in_unpacked(self) -> int:
+        total = 0
+        for path in self._document_parts():
+            doc = self.part(path)
+            if doc is not None:
+                total += len(list(ox.iter_elements(doc.documentElement, "p")))
+        return total
+
+    def count_paragraphs_in_original(self) -> int:
+        if self.original_file is None:
+            return 0
+        try:
+            payload = ox.read_part(self.original_file, "word/document.xml")
+            if payload is None:
+                return 0
+            doc = ox.parse_string(payload)
+            return len(list(ox.iter_elements(doc.documentElement, "p")))
+        except Exception as exc:
+            print(f"Error counting paragraphs in original document: {exc}")
             return 0
 
-        count = 0
+    def compare_paragraph_counts(self) -> None:
+        before = self.count_paragraphs_in_original()
+        after = self.count_paragraphs_in_unpacked()
+        delta = after - before
+        signed = f"+{delta}" if delta > 0 else str(delta)
+        print(f"\nParagraphs: {before} -> {after} ({signed})")
 
-        try:
-            with tempfile.TemporaryDirectory() as temp_dir:
-                with zipfile.ZipFile(original, "r") as zip_ref:
-                    zip_ref.extractall(temp_dir)
-
-                doc_xml_path = temp_dir + "/word/document.xml"
-                root = lxml.etree.parse(doc_xml_path).getroot()
-
-                paragraphs = root.findall(f".//{{{self.WORD_2006_NAMESPACE}}}p")
-                count = len(paragraphs)
-
-        except Exception as e:
-            print(f"Error counting paragraphs in original document: {e}")
-
-        return count
-
-    def validate_insertions(self):
-        errors = []
-
-        for xml_file in self.xml_files:
-            if xml_file.name != "document.xml":
-                continue
-
-            try:
-                root = lxml.etree.parse(str(xml_file)).getroot()
-                namespaces = {"w": self.WORD_2006_NAMESPACE}
-
-                invalid_elements = root.xpath(
-                    ".//w:ins//w:delText[not(ancestor::w:del)]", namespaces=namespaces
-                )
-
-                for elem in invalid_elements:
-                    text_preview = (
-                        repr(elem.text or "")[:50] + "..."
-                        if len(repr(elem.text or "")) > 50
-                        else repr(elem.text or "")
-                    )
-                    errors.append(
-                        f"  {xml_file.relative_to(self.unpacked_dir)}: "
-                        f"Line {elem.sourceline}: <w:delText> within <w:ins>: {text_preview}"
-                    )
-
-            except (lxml.etree.XMLSyntaxError, Exception) as e:
-                errors.append(
-                    f"  {xml_file.relative_to(self.unpacked_dir)}: Error: {e}"
-                )
-
-        if errors:
-            print(f"FAILED - Found {len(errors)} insertion validation violations:")
-            for error in errors:
-                print(error)
-            return False
-        else:
-            if self.verbose:
-                print("PASSED - No w:delText elements within w:ins elements")
-            return True
-
-    def compare_paragraph_counts(self):
-        original_count = self.count_paragraphs_in_original()
-        new_count = self.count_paragraphs_in_unpacked()
-
-        diff = new_count - original_count
-        diff_str = f"+{diff}" if diff > 0 else str(diff)
-        print(f"\nParagraphs: {original_count} → {new_count} ({diff_str})")
-
-    def _parse_id_value(self, val: str, base: int = 16) -> int:
-        return int(val, base)
-
-    def validate_id_constraints(self):
-        errors = []
-        para_id_attr = f"{{{self.W14_NAMESPACE}}}paraId"
-        durable_id_attr = f"{{{self.W16CID_NAMESPACE}}}durableId"
-
-        for xml_file in self.xml_files:
-            try:
-                for elem in lxml.etree.parse(str(xml_file)).iter():
-                    if val := elem.get(para_id_attr):
-                        if self._parse_id_value(val, base=16) >= 0x80000000:
-                            errors.append(
-                                f"  {xml_file.name}:{elem.sourceline}: paraId={val} >= 0x80000000"
-                            )
-
-                    if val := elem.get(durable_id_attr):
-                        if xml_file.name == "numbering.xml":
-                            try:
-                                if self._parse_id_value(val, base=10) >= 0x7FFFFFFF:
-                                    errors.append(
-                                        f"  {xml_file.name}:{elem.sourceline}: "
-                                        f"durableId={val} >= 0x7FFFFFFF"
-                                    )
-                            except ValueError:
-                                errors.append(
-                                    f"  {xml_file.name}:{elem.sourceline}: "
-                                    f"durableId={val} must be decimal in numbering.xml"
-                                )
-                        else:
-                            if self._parse_id_value(val, base=16) >= 0x7FFFFFFF:
-                                errors.append(
-                                    f"  {xml_file.name}:{elem.sourceline}: "
-                                    f"durableId={val} >= 0x7FFFFFFF"
-                                )
-            except Exception:
-                pass
-
-        if errors:
-            print(f"FAILED - {len(errors)} ID constraint violations:")
-            for e in errors:
-                print(e)
-        elif self.verbose:
-            print("PASSED - All paraId/durableId values within constraints")
-        return not errors
-
-    def validate_comment_markers(self):
-        errors = []
-
-        document_xml = None
-        comments_xml = None
-        for xml_file in self.xml_files:
-            if xml_file.name == "document.xml" and "word" in str(xml_file):
-                document_xml = xml_file
-            elif xml_file.name == "comments.xml":
-                comments_xml = xml_file
-
-        if not document_xml:
-            if self.verbose:
-                print("PASSED - No document.xml found (skipping comment validation)")
-            return True
-
-        try:
-            doc_root = lxml.etree.parse(str(document_xml)).getroot()
-            namespaces = {"w": self.WORD_2006_NAMESPACE}
-
-            range_starts = {
-                elem.get(f"{{{self.WORD_2006_NAMESPACE}}}id")
-                for elem in doc_root.xpath(
-                    ".//w:commentRangeStart", namespaces=namespaces
-                )
-            }
-            range_ends = {
-                elem.get(f"{{{self.WORD_2006_NAMESPACE}}}id")
-                for elem in doc_root.xpath(
-                    ".//w:commentRangeEnd", namespaces=namespaces
-                )
-            }
-            references = {
-                elem.get(f"{{{self.WORD_2006_NAMESPACE}}}id")
-                for elem in doc_root.xpath(
-                    ".//w:commentReference", namespaces=namespaces
-                )
-            }
-
-            orphaned_ends = range_ends - range_starts
-            for comment_id in sorted(
-                orphaned_ends, key=lambda x: int(x) if x and x.isdigit() else 0
-            ):
-                errors.append(
-                    f'  document.xml: commentRangeEnd id="{comment_id}" has no matching commentRangeStart'
-                )
-
-            orphaned_starts = range_starts - range_ends
-            for comment_id in sorted(
-                orphaned_starts, key=lambda x: int(x) if x and x.isdigit() else 0
-            ):
-                errors.append(
-                    f'  document.xml: commentRangeStart id="{comment_id}" has no matching commentRangeEnd'
-                )
-
-            comment_ids = set()
-            if comments_xml and comments_xml.exists():
-                comments_root = lxml.etree.parse(str(comments_xml)).getroot()
-                comment_ids = {
-                    elem.get(f"{{{self.WORD_2006_NAMESPACE}}}id")
-                    for elem in comments_root.xpath(
-                        ".//w:comment", namespaces=namespaces
-                    )
-                }
-
-                marker_ids = range_starts | range_ends | references
-                invalid_refs = marker_ids - comment_ids
-                for comment_id in sorted(
-                    invalid_refs, key=lambda x: int(x) if x and x.isdigit() else 0
-                ):
-                    if comment_id:  
-                        errors.append(
-                            f'  document.xml: marker id="{comment_id}" references non-existent comment'
-                        )
-
-        except (lxml.etree.XMLSyntaxError, Exception) as e:
-            errors.append(f"  Error parsing XML: {e}")
-
-        if errors:
-            print(f"FAILED - {len(errors)} comment marker violations:")
-            for error in errors:
-                print(error)
-            return False
-        else:
-            if self.verbose:
-                print("PASSED - All comment markers properly paired")
-            return True
-
+    # --- repairs ----------------------------------------------------------- #
     def repair(self) -> int:
-        repairs = super().repair()
-        repairs += self.repair_durableId()
-        return repairs
+        return self.repair_whitespace_preservation() + self.repair_id_limits()
 
-    def repair_durableId(self) -> int:
+    def repair_id_limits(self) -> int:
+        """Rewrite out-of-range or malformed paraId/durableId values."""
         repairs = 0
-
-        for xml_file in self.xml_files:
+        for path in self.xml_files:
             try:
-                content = xml_file.read_text(encoding="utf-8")
-                dom = defusedxml.minidom.parseString(content)
-                modified = False
-
-                for elem in dom.getElementsByTagName("*"):
-                    if not elem.hasAttribute("w16cid:durableId"):
-                        continue
-
-                    durable_id = elem.getAttribute("w16cid:durableId")
-                    needs_repair = False
-
-                    if xml_file.name == "numbering.xml":
-                        try:
-                            needs_repair = (
-                                self._parse_id_value(durable_id, base=10) >= 0x7FFFFFFF
-                            )
-                        except ValueError:
-                            needs_repair = True
-                    else:
-                        try:
-                            needs_repair = (
-                                self._parse_id_value(durable_id, base=16) >= 0x7FFFFFFF
-                            )
-                        except ValueError:
-                            needs_repair = True
-
-                    if needs_repair:
-                        value = random.randint(1, 0x7FFFFFFE)
-                        if xml_file.name == "numbering.xml":
-                            new_id = str(value)  
-                        else:
-                            new_id = f"{value:08X}"  
-
-                        elem.setAttribute("w16cid:durableId", new_id)
-                        print(
-                            f"  Repaired: {xml_file.name}: durableId {durable_id} → {new_id}"
-                        )
-                        repairs += 1
-                        modified = True
-
-                if modified:
-                    xml_file.write_bytes(dom.toxml(encoding="UTF-8"))
-
+                doc = ox.parse_file(path)
             except Exception:
-                pass
-
+                continue
+            taken = set()
+            for element in ox.iter_elements(doc.documentElement):
+                for _, value in self._id_attributes(element):
+                    for base in (10, 16):
+                        try:
+                            taken.add(int(value, base))
+                        except ValueError:
+                            pass
+            changed = False
+            for element in ox.iter_elements(doc.documentElement):
+                for attr_name, value in list(self._id_attributes(element)):
+                    if not self._id_violation(attr_name, value, path.name):
+                        continue
+                    local = attr_name.rsplit(":", 1)[-1]
+                    limit = PARA_ID_LIMIT if local == "paraId" else DURABLE_ID_LIMIT
+                    number = random.randint(1, limit - 2)
+                    while number in taken:
+                        number = random.randint(1, limit - 2)
+                    taken.add(number)
+                    replacement = (
+                        str(number)
+                        if local == "durableId" and path.name == "numbering.xml"
+                        else f"{number:08X}"
+                    )
+                    element.setAttribute(attr_name, replacement)
+                    print(f"  Repaired: {path.name}: {attr_name} {value} -> {replacement}")
+                    repairs += 1
+                    changed = True
+            if changed:
+                ox.write_document(path, doc)
+                self._documents.pop(path, None)
         return repairs
 
 
 if __name__ == "__main__":
-    raise RuntimeError("This module should not be run directly.")
+    raise RuntimeError("This module is a library; run office/validate.py instead.")

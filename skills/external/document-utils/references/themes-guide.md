@@ -1,51 +1,94 @@
-# Document Themes Guide
+# Applying a Theme
 
-This skill provides a curated collection of professional font and color themes, each with carefully selected color palettes and font pairings. Once a theme is chosen, it can be applied to any artifact (slide decks, documents, reports, HTML pages, etc.).
+A theme is a small, fixed decision about colour and type: four colours with named
+roles, and one header/body face pairing. Ten presets ship with this skill under
+`${SKILL_HOME}/themes/`, one markdown file each. Once a preset is chosen, the same
+four colours and the same two faces go on every artifact of the job — deck,
+document, workbook or HTML page — so the pieces read as one set.
 
-Each theme includes:
-- A cohesive color palette with hex codes
-- Complementary font pairings for headers and body text
-- A distinct visual identity suitable for different contexts and audiences
+## What a preset declares
 
-## Usage Instructions
+Every preset file carries the same four fields, and the role names are the
+contract you apply:
 
-To apply styling to a slide deck or other artifact:
+| Role | What it paints |
+|------|----------------|
+| **Base** | Titles, section headers, table header bands |
+| **Surface** | The page or slide background |
+| **Body** | Running text, figures, captions |
+| **Accent** | The one thing to notice: callouts, rules, highlights, links |
 
-1. **Show the theme showcase**: Display the `${SKILL_HOME}/themes/theme-showcase.pdf` file to allow users to see all available themes visually. Do not make any modifications to it; simply show the file for viewing.
-2. **Ask for their choice**: Ask which theme to apply to the deck
-3. **Wait for selection**: Get explicit confirmation about the chosen theme
-4. **Apply the theme**: Once a theme has been chosen, apply the selected theme's colors and fonts to the deck/artifact
+Plus a **Typography** pair (headers and body text) and a **Best Used For** line
+that says which jobs the palette suits. Nothing else is introduced at apply
+time: no fifth colour, no third face, no gradient the preset did not declare.
 
-## Themes Available
+The preset file is the authority for its values. `theme-showcase.pdf` in the same
+directory is a generated preview of those files — one page per preset, swatches
+first and then the palette in use — and is never edited by hand. Its type samples
+are drawn with the PDF base-14 faces standing in for the named Office faces, so
+judge the colours from the preview and the faces from the preset's own names.
 
-The following 10 themes are available, each showcased in `${SKILL_HOME}/themes/theme-showcase.pdf`:
+## Choosing a preset
 
-1. **Ocean Depths** - Professional and calming maritime theme
-2. **Sunset Boulevard** - Warm and vibrant sunset colors
-3. **Forest Canopy** - Natural and grounded earth tones
-4. **Modern Minimalist** - Clean and contemporary grayscale
-5. **Golden Hour** - Rich and warm autumnal palette
-6. **Arctic Frost** - Cool and crisp winter-inspired theme
-7. **Desert Rose** - Soft and sophisticated dusty tones
-8. **Tech Innovation** - Bold and modern tech aesthetic
-9. **Botanical Garden** - Fresh and organic garden colors
-10. **Midnight Galaxy** - Dramatic and cosmic deep tones
+1. **Show the preview.** Display `${SKILL_HOME}/themes/theme-showcase.pdf` so the
+   choice is made by looking at the palettes, not by reading hex codes.
+2. **Ask which one.** Name the presets by their titles and let the reader pick.
+3. **Wait for the answer.** An explicit choice is required before anything is
+   styled; a guess is not a choice.
+4. **Apply it.** Read the chosen preset file and put its colours and faces on the
+   artifact, consistently, from the first page to the last.
 
-## Theme Details
+If none of the ten fits, write a custom preset (below) and run the same four
+steps with it.
 
-Each theme is defined in the `${SKILL_HOME}/themes/` directory with complete specifications including:
-- Cohesive color palette with hex codes
-- Complementary font pairings for headers and body text
-- Distinct visual identity suitable for different contexts and audiences
+## Applying the colours and faces
 
-## Application Process
+- Read the chosen file from `${SKILL_HOME}/themes/` and take the hex values and
+  face names from it verbatim; do not re-derive them from the preview image.
+- Paint by role: background from **Surface**, headings from **Base**, running
+  text from **Body**, emphasis from **Accent**. A dark preset such as Citrus
+  Terminal simply has a dark Surface and a light Body — the roles do not change.
+- Set the header face on titles and section heads and the body face everywhere
+  else. Two faces, not three.
+- Keep the accent rare. It marks what the reader must notice; used everywhere it
+  marks nothing.
+- Check readability on the surface you actually used. The contrast and type-size
+  criteria for slides are owned by [pptx-design.md](./pptx-design.md)
+  § Typography and § Palette starting points; apply them there rather than
+  inventing a second threshold here.
+- When the named face is missing on the host that renders the artifact (a PDF
+  engine, a headless converter), substitute the closest available face and say
+  so in the handover note; the named face remains what the document declares.
 
-After a preferred theme is selected:
-1. Read the corresponding theme file from the `${SKILL_HOME}/themes/` directory
-2. Apply the specified colors and fonts consistently throughout the deck
-3. Ensure proper contrast and readability
-4. Maintain the theme's visual identity across all slides
+For a deck, the preset's colours reach the file through its theme part
+(`ppt/theme/theme1.xml`) or through explicit shape and run formatting — see
+[pptx-creation.md](./pptx-creation.md) § Masters, layouts and themes. For a
+workbook, cell fills and font colours carry the same four roles; the
+financial-model colour conventions in
+[xlsx-financial-models.md](./xlsx-financial-models.md) still apply to input,
+formula and link cells and are not replaced by a theme.
 
-## Create your Own Theme
+## The ten presets
 
-To handle cases where none of the existing themes work for an artifact, create a custom theme. Based on provided inputs, generate a new theme similar to the ones above. Give the theme a similar name describing what the font/color combinations represent. Use any basic description provided to choose appropriate colors/fonts. After generating the theme, show it for review and verification. Following that, apply the theme as described above.
+| Preset | File | Character |
+|--------|------|-----------|
+| Harbour Graphite | `themes/harbour-graphite.md` | Cool slate and teal; settled, corporate |
+| Terracotta Ledger | `themes/terracotta-ledger.md` | Clay and ink on cream; printed-report warmth |
+| Meadow Signal | `themes/meadow-signal.md` | Hedge green on field white; growth subjects |
+| Indigo Blueprint | `themes/indigo-blueprint.md` | Drafting indigo; plans and specifications |
+| Citrus Terminal | `themes/citrus-terminal.md` | Dark surface, amber and mint; screens and demos |
+| Glacier Mint | `themes/glacier-mint.md` | Ice white and deep teal; neutral, clinical |
+| Copper Dusk | `themes/copper-dusk.md` | Copper on warm sand; brand and hospitality |
+| Orchid Press | `themes/orchid-press.md` | Aubergine on bone; editorial and cultural |
+| Sandstone Brief | `themes/sandstone-brief.md` | Olive stone on unbleached paper; procedural |
+| Newsprint Ink | `themes/newsprint-ink.md` | Ink on newsprint with one red; fast reading |
+
+## Writing a custom preset
+
+When the ten do not fit the job, author an eleventh file in the same shape: a
+title, one line of intent, the four role swatches with hex values and colour
+names, the header/body pair, and a Best Used For line. Choose the colours so that
+Body and Accent stay readable on the chosen Surface, name the file after what the
+palette represents, and show it for review before applying it. A custom preset
+lives with the job's artifacts, not in the skill directory; the shipped ten stay
+as they are.

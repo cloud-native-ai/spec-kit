@@ -1,173 +1,26 @@
-"""Add a new slide to an unpacked PPTX directory.
+"""Add one slide to an unpacked PPTX directory.
 
 Usage: python add_slide.py <unpacked_dir> <source>
 
-The source can be:
-  - A slide file (e.g., slide2.xml) - duplicates the slide
-  - A layout file (e.g., slideLayout2.xml) - creates from layout
+``<source>`` is either a slide part to copy (``slide2.xml``) or a layout part to
+start from (``slideLayout2.xml``).  Both forms write the next free
+``ppt/slides/slide<n>.xml``, give it a relationship file, register its content
+type, and add a relationship to ``ppt/_rels/presentation.xml.rels``.
 
-Examples:
-    python add_slide.py unpacked/ slide2.xml
-    # Duplicates slide2, creates slide5.xml
+The presentation part itself is left alone: slide order belongs to
+``<p:sldIdLst>``, and where the new slide belongs in that order is the caller's
+decision, not this script's.  The element to insert is printed on stdout.
 
-    python add_slide.py unpacked/ slideLayout2.xml
-    # Creates slide5.xml from slideLayout2.xml
+Nothing else in the tree is rewritten, so a hand-edited part keeps its own
+formatting, namespace prefixes and comments.
 
-To see available layouts: ls unpacked/ppt/slideLayouts/
-
-Prints the <p:sldId> element to add to presentation.xml.
+ai-engine project, MIT licensed -- see LICENSE.txt.
 """
 
-import re
-import shutil
+from __future__ import annotations
+
 import sys
 from pathlib import Path
-
-
-def get_next_slide_number(slides_dir: Path) -> int:
-    existing = [int(m.group(1)) for f in slides_dir.glob("slide*.xml")
-                if (m := re.match(r"slide(\d+)\.xml", f.name))]
-    return max(existing) + 1 if existing else 1
-
-
-def create_slide_from_layout(unpacked_dir: Path, layout_file: str) -> None:
-    slides_dir = unpacked_dir / "ppt" / "slides"
-    rels_dir = slides_dir / "_rels"
-    layouts_dir = unpacked_dir / "ppt" / "slideLayouts"
-
-    layout_path = layouts_dir / layout_file
-    if not layout_path.exists():
-        print(f"Error: {layout_path} not found", file=sys.stderr)
-        sys.exit(1)
-
-    next_num = get_next_slide_number(slides_dir)
-    dest = f"slide{next_num}.xml"
-    dest_slide = slides_dir / dest
-    dest_rels = rels_dir / f"{dest}.rels"
-
-    slide_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-  <p:cSld>
-    <p:spTree>
-      <p:nvGrpSpPr>
-        <p:cNvPr id="1" name=""/>
-        <p:cNvGrpSpPr/>
-        <p:nvPr/>
-      </p:nvGrpSpPr>
-      <p:grpSpPr>
-        <a:xfrm>
-          <a:off x="0" y="0"/>
-          <a:ext cx="0" cy="0"/>
-          <a:chOff x="0" y="0"/>
-          <a:chExt cx="0" cy="0"/>
-        </a:xfrm>
-      </p:grpSpPr>
-    </p:spTree>
-  </p:cSld>
-  <p:clrMapOvr>
-    <a:masterClrMapping/>
-  </p:clrMapOvr>
-</p:sld>'''
-    dest_slide.write_text(slide_xml, encoding="utf-8")
-
-    rels_dir.mkdir(exist_ok=True)
-    rels_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/{layout_file}"/>
-</Relationships>'''
-    dest_rels.write_text(rels_xml, encoding="utf-8")
-
-    _add_to_content_types(unpacked_dir, dest)
-
-    rid = _add_to_presentation_rels(unpacked_dir, dest)
-
-    next_slide_id = _get_next_slide_id(unpacked_dir)
-
-    print(f"Created {dest} from {layout_file}")
-    print(f'Add to presentation.xml <p:sldIdLst>: <p:sldId id="{next_slide_id}" r:id="{rid}"/>')
-
-
-def duplicate_slide(unpacked_dir: Path, source: str) -> None:
-    slides_dir = unpacked_dir / "ppt" / "slides"
-    rels_dir = slides_dir / "_rels"
-
-    source_slide = slides_dir / source
-
-    if not source_slide.exists():
-        print(f"Error: {source_slide} not found", file=sys.stderr)
-        sys.exit(1)
-
-    next_num = get_next_slide_number(slides_dir)
-    dest = f"slide{next_num}.xml"
-    dest_slide = slides_dir / dest
-
-    source_rels = rels_dir / f"{source}.rels"
-    dest_rels = rels_dir / f"{dest}.rels"
-
-    shutil.copy2(source_slide, dest_slide)
-
-    if source_rels.exists():
-        shutil.copy2(source_rels, dest_rels)
-
-        rels_content = dest_rels.read_text(encoding="utf-8")
-        rels_content = re.sub(
-            r'\s*<Relationship[^>]*Type="[^"]*notesSlide"[^>]*/>\s*',
-            "\n",
-            rels_content,
-        )
-        dest_rels.write_text(rels_content, encoding="utf-8")
-
-    _add_to_content_types(unpacked_dir, dest)
-
-    rid = _add_to_presentation_rels(unpacked_dir, dest)
-
-    next_slide_id = _get_next_slide_id(unpacked_dir)
-
-    print(f"Created {dest} from {source}")
-    print(f'Add to presentation.xml <p:sldIdLst>: <p:sldId id="{next_slide_id}" r:id="{rid}"/>')
-
-
-def _add_to_content_types(unpacked_dir: Path, dest: str) -> None:
-    content_types_path = unpacked_dir / "[Content_Types].xml"
-    content_types = content_types_path.read_text(encoding="utf-8")
-
-    new_override = f'<Override PartName="/ppt/slides/{dest}" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'
-
-    if f"/ppt/slides/{dest}" not in content_types:
-        content_types = content_types.replace("</Types>", f"  {new_override}\n</Types>")
-        content_types_path.write_text(content_types, encoding="utf-8")
-
-
-def _add_to_presentation_rels(unpacked_dir: Path, dest: str) -> str:
-    pres_rels_path = unpacked_dir / "ppt" / "_rels" / "presentation.xml.rels"
-    pres_rels = pres_rels_path.read_text(encoding="utf-8")
-
-    rids = [int(m) for m in re.findall(r'Id="rId(\d+)"', pres_rels)]
-    next_rid = max(rids) + 1 if rids else 1
-    rid = f"rId{next_rid}"
-
-    new_rel = f'<Relationship Id="{rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/{dest}"/>'
-
-    if f"slides/{dest}" not in pres_rels:
-        pres_rels = pres_rels.replace("</Relationships>", f"  {new_rel}\n</Relationships>")
-        pres_rels_path.write_text(pres_rels, encoding="utf-8")
-
-    return rid
-
-
-def _get_next_slide_id(unpacked_dir: Path) -> int:
-    pres_path = unpacked_dir / "ppt" / "presentation.xml"
-    pres_content = pres_path.read_text(encoding="utf-8")
-    slide_ids = [int(m) for m in re.findall(r'<p:sldId[^>]*id="(\d+)"', pres_content)]
-    return max(slide_ids) + 1 if slide_ids else 256
-
-
-def parse_source(source: str) -> tuple[str, str | None]:
-    if source.startswith("slideLayout") and source.endswith(".xml"):
-        return ("layout", source)
-
-    return ("slide", None)
-
 
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
@@ -225,6 +78,7 @@ def _bridge_main():
 
 _bridge_main()
 del _bridge_main
+
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
 # `shared/definitions/script-interface-definitions.md`, its executable form by
 # `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
@@ -284,27 +138,198 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python add_slide.py <unpacked_dir> <source>", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("Source can be:", file=sys.stderr)
-        print("  slide2.xml        - duplicate an existing slide", file=sys.stderr)
-        print("  slideLayout2.xml  - create from a layout template", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("To see available layouts: ls <unpacked_dir>/ppt/slideLayouts/", file=sys.stderr)
-        sys.exit(1)
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
-    unpacked_dir = Path(sys.argv[1])
-    source = sys.argv[2]
+import ooxml_parts as op  # noqa: E402 -- beside this file, after the path bootstrap
 
-    if not unpacked_dir.exists():
-        print(f"Error: {unpacked_dir} not found", file=sys.stderr)
-        sys.exit(1)
 
-    source_type, layout_file = parse_source(source)
+class AddSlideError(Exception):
+    """The operand names something this directory does not contain."""
 
-    if source_type == "layout" and layout_file is not None:
-        create_slide_from_layout(unpacked_dir, layout_file)
+
+def _slides_dir(root: Path) -> Path:
+    return root / "ppt" / "slides"
+
+
+def _next_slide_name(root: Path) -> str:
+    slides = _slides_dir(root)
+    names = [p.name for p in slides.glob("slide*.xml")] if slides.is_dir() else []
+    return f"slide{op.next_slide_number(names)}.xml"
+
+
+def _group_shape(doc, sp_tree):
+    """The mandatory ``<p:nvGrpSpPr>`` / ``<p:grpSpPr>`` pair of a shape tree."""
+    p, a = op.NS["p"], op.NS["a"]
+    nv = doc.createElementNS(p, "p:nvGrpSpPr")
+    identifier = doc.createElementNS(p, "p:cNvPr")
+    identifier.setAttribute("id", "1")
+    identifier.setAttribute("name", "")
+    nv.appendChild(identifier)
+    nv.appendChild(doc.createElementNS(p, "p:cNvGrpSpPr"))
+    nv.appendChild(doc.createElementNS(p, "p:nvPr"))
+    sp_tree.appendChild(nv)
+
+    props = doc.createElementNS(p, "p:grpSpPr")
+    xfrm = doc.createElementNS(a, "a:xfrm")
+    for tag in ("off", "chOff"):
+        node = doc.createElementNS(a, "a:" + tag)
+        node.setAttribute("x", "0")
+        node.setAttribute("y", "0")
+        xfrm.appendChild(node)
+    for tag in ("ext", "chExt"):
+        node = doc.createElementNS(a, "a:" + tag)
+        node.setAttribute("cx", "0")
+        node.setAttribute("cy", "0")
+        xfrm.appendChild(node)
+    props.appendChild(xfrm)
+    sp_tree.appendChild(props)
+
+
+def _blank_slide() -> "op.Document":
+    """A slide part with an empty shape tree, ready for the caller's content.
+
+    The shape tree still needs its group entry: a ``<p:spTree>`` without one is
+    not a valid PresentationML slide, and PowerPoint refuses the package.
+    """
+    doc = op.new_document(op.NS["p"], "p:sld")
+    root = doc.documentElement
+    root.setAttribute("xmlns:a", op.NS["a"])
+    root.setAttribute("xmlns:r", op.NS["r"])
+
+    common = doc.createElementNS(op.NS["p"], "p:cSld")
+    sp_tree = doc.createElementNS(op.NS["p"], "p:spTree")
+    _group_shape(doc, sp_tree)
+    common.appendChild(sp_tree)
+    root.appendChild(common)
+
+    override = doc.createElementNS(op.NS["p"], "p:clrMapOvr")
+    override.appendChild(doc.createElementNS(op.NS["a"], "a:masterClrMapping"))
+    root.appendChild(override)
+    return doc
+
+
+def _layout_relationships(layout_name: str) -> "op.Document":
+    doc = op.new_document(op.RELATIONSHIPS_NS, "Relationships")
+    op.add_relationship(doc, "rId1", op.RT_SLIDE_LAYOUT, f"../slideLayouts/{layout_name}")
+    return doc
+
+
+def create_from_layout(root: Path, layout_name: str) -> str:
+    """Write a new slide bound to ``layout_name``; return the new part's name."""
+    layout = root / "ppt" / "slideLayouts" / layout_name
+    if not layout.is_file():
+        raise AddSlideError(f"{layout} not found")
+
+    dest = _next_slide_name(root)
+    slides = _slides_dir(root)
+    rels = slides / "_rels"
+    rels.mkdir(parents=True, exist_ok=True)
+    op.write_part(slides / dest, _blank_slide())
+    op.write_part(rels / f"{dest}.rels", _layout_relationships(layout_name))
+    return dest
+
+
+def duplicate_slide(root: Path, source: str) -> str:
+    """Copy a slide part and its relationships; return the new part's name.
+
+    Speaker notes are not copied.  A notes slide belongs to one slide, and a
+    second slide pointing at the same notes part would make the notes show up
+    under both -- so the notes relationship is dropped and the notes part is
+    left for ``clean.py`` to reclaim if nothing else references it.
+    """
+    slides = _slides_dir(root)
+    src = slides / source
+    if not src.is_file():
+        raise AddSlideError(f"{src} not found")
+
+    dest = _next_slide_name(root)
+    (slides / dest).write_bytes(src.read_bytes())
+
+    src_rels = slides / "_rels" / f"{source}.rels"
+    if src_rels.is_file():
+        doc = op.parse_file(src_rels)
+        for rel in op.relationships(doc):
+            if op.relationship_type(rel) == op.RT_NOTES_SLIDE:
+                op.remove_element(rel)
+        rels_dir = slides / "_rels"
+        rels_dir.mkdir(parents=True, exist_ok=True)
+        op.write_part(rels_dir / f"{dest}.rels", doc)
+    return dest
+
+
+def register_part(root: Path, dest: str) -> str:
+    """Declare the new part's content type and relationship; return the rId."""
+    content_types = root / "[Content_Types].xml"
+    doc = op.parse_file(content_types)
+    if op.add_override(doc, f"ppt/slides/{dest}", op.SLIDE_CONTENT_TYPE):
+        op.write_part(content_types, doc)
+
+    pres_rels = root / "ppt" / "_rels" / "presentation.xml.rels"
+    doc = op.parse_file(pres_rels)
+    target = f"slides/{dest}"
+    existing = op.find_relationship(doc, op.RT_SLIDE, target)
+    if existing is not None:
+        return op.attr(existing, "Id")
+    rid = op.next_relationship_id(doc)
+    op.add_relationship(doc, rid, op.RT_SLIDE, target)
+    op.write_part(pres_rels, doc)
+    return rid
+
+
+def suggested_slide_id(root: Path) -> int:
+    """The id the printed ``<p:sldId>`` should carry."""
+    pres = root / "ppt" / "presentation.xml"
+    if not pres.is_file():
+        return op.FIRST_SLIDE_ID
+    return op.next_slide_id(op.parse_file(pres))
+
+
+def add_slide(root: Path, source: str) -> tuple[str, str, int]:
+    """Create the slide; return (new part name, relationship id, suggested id)."""
+    if op.is_layout_name(source):
+        dest = create_from_layout(root, source)
     else:
-        duplicate_slide(unpacked_dir, source)
+        dest = duplicate_slide(root, source)
+    rid = register_part(root, dest)
+    return dest, rid, suggested_slide_id(root)
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) != 2:
+        sys.stderr.write(
+            "Usage: python add_slide.py <unpacked_dir> <source>\n"
+            "\n"
+            "<source> is one of:\n"
+            "  slide2.xml        copy an existing slide\n"
+            "  slideLayout2.xml  start a new slide from a layout\n"
+            "\n"
+            "List the layouts with: ls <unpacked_dir>/ppt/slideLayouts/\n"
+        )
+        return 1
+
+    root = Path(argv[0])
+    if not root.is_dir():
+        sys.stderr.write(f"Error: {root} not found\n")
+        return 1
+
+    try:
+        dest, rid, slide_id = add_slide(root, argv[1])
+    except (AddSlideError, op.OoxmlError) as exc:
+        sys.stderr.write(f"Error: {exc}\n")
+        return 1
+    except OSError as exc:
+        sys.stderr.write(f"Error: {exc}\n")
+        return 1
+
+    print(f"Created {dest} from {argv[1]}")
+    print(
+        'Add to presentation.xml <p:sldIdLst>: '
+        f'<p:sldId id="{slide_id}" r:id="{rid}"/>'
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

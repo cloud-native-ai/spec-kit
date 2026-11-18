@@ -113,19 +113,22 @@ if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])
 # script-interface:86:end
 
-"""Unpack Office files (DOCX, PPTX, XLSX) for editing.
+"""Open an Office package for editing: unzip it, lay out the XML, tidy Word runs.
 
-Extracts the ZIP archive, pretty-prints XML files, and optionally:
-- Merges adjacent runs with identical formatting (DOCX only)
-- Simplifies adjacent tracked changes from same author (DOCX only)
+Original implementation, MIT licensed.
 
 Usage:
-    python unpack.py <office_file> <output_dir> [options]
+    python unpack.py <office_file> <output_dir> [--merge-runs true|false]
+                                                [--simplify-redlines true|false]
 
-Examples:
-    python unpack.py document.docx unpacked/
-    python unpack.py presentation.pptx unpacked/
-    python unpack.py document.docx unpacked/ --merge-runs false
+The parts are extracted under the destination directory (a member name that
+would escape it is refused), every XML part is indented for reading, and a
+DOCX additionally gets its revision wrappers and runs collapsed so an editor
+sees one span per visual span. Curly quotes are written as numeric character
+references on the way out, which keeps them stable across later re-saves.
+
+``pack.py`` reverses this: it removes the layout whitespace again and zips the
+tree back into a package.
 """
 
 import argparse
@@ -133,17 +136,17 @@ import sys
 import zipfile
 from pathlib import Path
 
-import defusedxml.minidom
+try:  # package-relative import, then the flat script directory
+    from . import ooxml as ox
+except ImportError:  # pragma: no cover - depends on how the caller set sys.path
+    import ooxml as ox
 
-from helpers.merge_runs import merge_runs as do_merge_runs
-from helpers.simplify_redlines import simplify_redlines as do_simplify_redlines
-
-SMART_QUOTE_REPLACEMENTS = {
-    "\u201c": "&#x201C;",  
-    "\u201d": "&#x201D;",  
-    "\u2018": "&#x2018;",  
-    "\u2019": "&#x2019;",  
-}
+try:
+    from .helpers.merge_runs import merge_runs as collapse_runs
+    from .helpers.simplify_redlines import simplify_redlines as collapse_revisions
+except ImportError:  # pragma: no cover - flat script directory
+    from helpers.merge_runs import merge_runs as collapse_runs
+    from helpers.simplify_redlines import simplify_redlines as collapse_revisions
 
 
 def unpack(
@@ -152,96 +155,87 @@ def unpack(
     merge_runs: bool = True,
     simplify_redlines: bool = True,
 ) -> tuple[None, str]:
-    input_path = Path(input_file)
-    output_path = Path(output_directory)
-    suffix = input_path.suffix.lower()
+    """Extract one package; return (None, message) — the message carries errors."""
+    source = Path(input_file)
+    destination = Path(output_directory)
 
-    if not input_path.exists():
+    if not source.exists():
         return None, f"Error: {input_file} does not exist"
-
-    if suffix not in {".docx", ".pptx", ".xlsx"}:
+    if source.suffix.lower() not in ox.OFFICE_SUFFIXES:
         return None, f"Error: {input_file} must be a .docx, .pptx, or .xlsx file"
 
     try:
-        output_path.mkdir(parents=True, exist_ok=True)
+        ox.extract_package(source, destination)
+        parts = ox.xml_parts(destination)
+        for part in parts:
+            _lay_out(part)
 
-        with zipfile.ZipFile(input_path, "r") as zf:
-            zf.extractall(output_path)
-
-        xml_files = list(output_path.rglob("*.xml")) + list(output_path.rglob("*.rels"))
-        for xml_file in xml_files:
-            _pretty_print_xml(xml_file)
-
-        message = f"Unpacked {input_file} ({len(xml_files)} XML files)"
-
-        if suffix == ".docx":
+        message = f"Unpacked {input_file} ({len(parts)} XML files)"
+        if source.suffix.lower() == ".docx":
             if simplify_redlines:
-                simplify_count, _ = do_simplify_redlines(str(output_path))
-                message += f", simplified {simplify_count} tracked changes"
-
+                revisions, _ = collapse_revisions(str(destination))
+                message += f", simplified {revisions} tracked changes"
             if merge_runs:
-                merge_count, _ = do_merge_runs(str(output_path))
-                message += f", merged {merge_count} runs"
+                runs, _ = collapse_runs(str(destination))
+                message += f", merged {runs} runs"
 
-        for xml_file in xml_files:
-            _escape_smart_quotes(xml_file)
-
+        for part in parts:
+            _reference_quotes(part)
         return None, message
-
     except zipfile.BadZipFile:
         return None, f"Error: {input_file} is not a valid Office file"
-    except Exception as e:
-        return None, f"Error unpacking: {e}"
+    except Exception as exc:
+        return None, f"Error unpacking: {exc}"
 
 
-def _pretty_print_xml(xml_file: Path) -> None:
+def _lay_out(part: Path) -> None:
+    """Indent one part; a part that cannot be parsed is left byte-identical."""
     try:
-        content = xml_file.read_text(encoding="utf-8")
-        dom = defusedxml.minidom.parseString(content)
-        xml_file.write_bytes(dom.toprettyxml(indent="  ", encoding="utf-8"))
+        doc = ox.parse_file(part)
     except Exception:
-        pass  
+        return
+    ox.indent_document(doc)
+    ox.write_document(part, doc)
 
 
-def _escape_smart_quotes(xml_file: Path) -> None:
+def _reference_quotes(part: Path) -> None:
     try:
-        content = xml_file.read_text(encoding="utf-8")
-        for char, entity in SMART_QUOTE_REPLACEMENTS.items():
-            content = content.replace(char, entity)
-        xml_file.write_text(content, encoding="utf-8")
-    except Exception:
-        pass
+        text = part.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return
+    part.write_text(ox.escape_smart_quotes(text), encoding="utf-8")
+
+
+def _boolean(value: str) -> bool:
+    return value.strip().lower() == "true"
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Unpack an Office file (DOCX, PPTX, XLSX) for editing"
-    )
+    parser = argparse.ArgumentParser(description="Unpack an Office file (DOCX, PPTX, XLSX) for editing")
     parser.add_argument("input_file", help="Office file to unpack")
-    parser.add_argument("output_directory", help="Output directory")
+    parser.add_argument("output_directory", help="Directory the parts are extracted into")
     parser.add_argument(
         "--merge-runs",
-        type=lambda x: x.lower() == "true",
+        type=_boolean,
         default=True,
         metavar="true|false",
-        help="Merge adjacent runs with identical formatting (DOCX only, default: true)",
+        help="Join adjacent runs with identical formatting (DOCX only, default: true)",
     )
     parser.add_argument(
         "--simplify-redlines",
-        type=lambda x: x.lower() == "true",
+        type=_boolean,
         default=True,
         metavar="true|false",
-        help="Merge adjacent tracked changes from same author (DOCX only, default: true)",
+        help="Join adjacent tracked changes by one author (DOCX only, default: true)",
     )
-    args = parser.parse_args()
+    arguments = parser.parse_args()
 
-    _, message = unpack(
-        args.input_file,
-        args.output_directory,
-        merge_runs=args.merge_runs,
-        simplify_redlines=args.simplify_redlines,
+    _, report = unpack(
+        arguments.input_file,
+        arguments.output_directory,
+        merge_runs=arguments.merge_runs,
+        simplify_redlines=arguments.simplify_redlines,
     )
-    print(message)
-
-    if "Error" in message:
+    print(report)
+    if "Error" in report:
         sys.exit(1)

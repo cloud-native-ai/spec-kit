@@ -1,5 +1,9 @@
-"""
-Validation modules for Word document processing.
+"""The Office package validators.
+
+Original implementation, MIT licensed. ``BaseValidator`` owns the checks every
+OPC package shares; ``DOCXValidator`` and ``PPTXValidator`` add their format's
+rules; ``RedliningValidator`` answers a different question (are one author's
+revisions the only difference from the original?) and is used only for DOCX.
 """
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
@@ -117,14 +121,9 @@ if __name__ == "__main__":
 # script-interface:86:end
 
 
-from .base import BaseSchemaValidator
-from .docx import DOCXSchemaValidator
-from .pptx import PPTXSchemaValidator
+from .base import BaseValidator
+from .docx import DOCXValidator
+from .pptx import PPTXValidator
 from .redlining import RedliningValidator
 
-__all__ = [
-    "BaseSchemaValidator",
-    "DOCXSchemaValidator",
-    "PPTXSchemaValidator",
-    "RedliningValidator",
-]
+__all__ = ["BaseValidator", "DOCXValidator", "PPTXValidator", "RedliningValidator"]

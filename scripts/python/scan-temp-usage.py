@@ -45,8 +45,6 @@ SELF_REL = Path("shared/guidelines/temp-directory-discipline.md")
 ALLOWLIST = {
     "shared/guidelines/temp-directory-discipline.md":
         "owner document quotes forbidden forms",
-    "skills/external/document-utils/*":
-        "third-party Office tooling manages its own OS temp",
     "skills/external/draw-diagram/references/types/plantuml/*":
         "jar discovery path, not agent-created scratch",
 }
