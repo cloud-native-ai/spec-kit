@@ -1,239 +1,292 @@
 #!/usr/bin/env python3
-"""
-Read-only MySQL query executor.
-Connects to configured databases and executes SELECT queries only.
+"""Read-only query runner for the MySQL wire protocol.
+
+Speaks to MySQL and MariaDB directly, and to the MySQL-compatible front ends of
+Apache Doris and SelectDB.  Two independent layers keep a run from writing: the
+statement is screened here before it is sent, and the server session is switched
+to read-only access mode so anything that slips past the screen is still refused.
+
+Driver: PyMySQL (MIT).  ai-engine project, MIT licensed -- see LICENSE.txt.
 """
 
+import argparse
 import json
 import os
 import re
 import stat
 import sys
-import argparse
 from pathlib import Path
 from typing import Optional
 
-try:
-    import mysql.connector
-except ImportError:
-    print("Error: mysql-connector-python not installed. Run: pip install mysql-connector-python")
-    sys.exit(1)
-
-# Constants
+# The skill root, i.e. the directory that holds SKILL.md and connections.json.
 SCRIPT_DIR = Path(__file__).parent.parent
 CONFIG_LOCATIONS = [
     SCRIPT_DIR / "connections.json",
     Path.home() / ".config" / "claude" / "mysql-connections.json",
 ]
+
 MAX_ROWS = 10000
 MAX_COLUMN_WIDTH = 100
 QUERY_TIMEOUT_MS = 30000
 CONNECTION_TIMEOUT_SEC = 10
 NULL_DISPLAY = "<NULL>"
 
+DEFAULT_PORT = 3306
+REQUIRED_FIELDS = ("name", "host", "database", "user", "password")
+SSL_FILE_FIELDS = ("ssl_ca", "ssl_cert", "ssl_key")
+
+# A statement is accepted on its leading keyword alone, after case folding and
+# trimming -- the same screen the server-side read-only mode backs up.
+_LEADING_KEYWORD = re.compile(r"^(SELECT|SHOW|DESCRIBE|EXPLAIN|WITH|DESC)")
+# SELECT ... INTO OUTFILE writes a server-side file and is not covered by the
+# read-only access mode, so it is refused outright.
+_SERVER_FILE_WRITE = re.compile(r"\bINTO\s+(OUTFILE|DUMPFILE)\b", re.IGNORECASE)
+_EXISTING_LIMIT = re.compile(r"\bLIMIT\s+\d+", re.IGNORECASE)
+
+_REFUSAL = "Error: Only read-only queries (SELECT, SHOW, DESCRIBE, EXPLAIN) are allowed."
+_MULTI_STATEMENT = "Error: Multiple statements not allowed. Execute queries separately."
+_AUTH_HINT = "Authentication failed. Check credentials in connections.json"
+
+_TABLES_SQL = (
+    "SELECT table_name, table_type, engine, table_rows "
+    "FROM information_schema.tables "
+    "WHERE table_schema = DATABASE() "
+    "ORDER BY table_name"
+)
+_SCHEMA_SQL = (
+    "SELECT c.table_name, c.column_name, c.data_type, c.column_type, "
+    "c.is_nullable, c.column_key, c.extra "
+    "FROM information_schema.columns c "
+    "JOIN information_schema.tables t "
+    "ON c.table_name = t.table_name AND c.table_schema = t.table_schema "
+    "WHERE c.table_schema = DATABASE() "
+    "ORDER BY c.table_name, c.ordinal_position"
+)
+
 
 def is_read_only(query: str) -> bool:
-    """Basic client-side check. Primary protection is READ ONLY transaction mode."""
-    query_upper = query.upper().strip()
-    safe_starts = ('SELECT', 'SHOW', 'DESCRIBE', 'EXPLAIN', 'WITH', 'DESC')
-    if not any(query_upper.startswith(cmd) for cmd in safe_starts):
+    """Screen a statement client side; the read-only session is the real barrier."""
+    folded = query.upper().strip()
+    if not _LEADING_KEYWORD.match(folded):
         return False
-
-    # Block SELECT INTO OUTFILE/DUMPFILE (writes to filesystem, bypasses READ ONLY)
-    if re.search(r'\bINTO\s+(OUTFILE|DUMPFILE)\b', query_upper):
-        return False
-
-    return True
+    return _SERVER_FILE_WRITE.search(folded) is None
 
 
 def validate_single_statement(query: str) -> bool:
-    """Check query contains only one statement."""
-    clean = query.rstrip().rstrip(';')
-    return ';' not in clean
+    """True when nothing but a trailing terminator separates one statement."""
+    trimmed = query.rstrip().rstrip(";")
+    return ";" not in trimmed
 
 
 def validate_config_permissions(path: Path) -> None:
-    """Warn if config file has insecure permissions (Unix only)."""
-    if os.name != 'nt':
-        mode = path.stat().st_mode
-        if bool(mode & stat.S_IRWXG) or bool(mode & stat.S_IRWXO):
-            print(f"WARNING: {path} has insecure permissions!")
-            print(f"Config contains credentials. Run: chmod 600 {path}")
+    """Warn about a credential file that group or other can reach (POSIX only)."""
+    if os.name == "nt":
+        return
+    mode = path.stat().st_mode
+    if mode & (stat.S_IRWXG | stat.S_IRWXO):
+        print(f"WARNING: {path} has insecure permissions!")
+        print(f"Config contains credentials. Run: chmod 600 {path}")
 
 
 def validate_db_config(db: dict) -> None:
-    """Validate required fields exist in database config."""
-    required = ['name', 'host', 'database', 'user', 'password']
-    missing = [f for f in required if f not in db]
-    if missing:
-        print(f"Error: Database config missing fields: {', '.join(missing)}")
+    """Exit unless every field a connection needs is present."""
+    absent = [field for field in REQUIRED_FIELDS if field not in db]
+    if absent:
+        print(f"Error: Database config missing fields: {', '.join(absent)}")
         sys.exit(1)
 
 
 def find_config() -> Optional[Path]:
-    """Find config file in supported locations."""
-    for path in CONFIG_LOCATIONS:
-        if path.exists():
-            return path
+    """First existing candidate, or None."""
+    for candidate in CONFIG_LOCATIONS:
+        if candidate.exists():
+            return candidate
     return None
 
 
+def _config_template() -> dict:
+    """The entry shape printed when no config could be located."""
+    return {
+        "databases": [{
+            "name": "mydb",
+            "description": "Description of database contents",
+            "host": "localhost",
+            "port": DEFAULT_PORT,
+            "database": "mydb",
+            "user": "user",
+            "password": "password",
+            "ssl_disabled": False,
+        }]
+    }
+
+
 def load_config(config_path: Optional[Path] = None) -> dict:
-    """Load database connections from JSON config."""
+    """Read the connection registry, or explain how to create one and exit 1."""
     path = config_path or find_config()
-    if not path:
+    if path is None:
         print("Config not found. Searched:")
-        for loc in CONFIG_LOCATIONS:
-            print(f"  - {loc}")
+        for candidate in CONFIG_LOCATIONS:
+            print(f"  - {candidate}")
         print("\nCreate connections.json with format:")
-        print(json.dumps({
-            "databases": [{
-                "name": "mydb",
-                "description": "Description of database contents",
-                "host": "localhost",
-                "port": 3306,
-                "database": "mydb",
-                "user": "user",
-                "password": "password",
-                "ssl_disabled": False
-            }]
-        }, indent=2))
+        print(json.dumps(_config_template(), indent=2))
         sys.exit(1)
 
     validate_config_permissions(path)
-
-    with open(path) as f:
-        return json.load(f)
+    with open(path) as handle:
+        return json.load(handle)
 
 
 def list_databases(config: dict) -> None:
-    """List all configured databases."""
+    """Print one block per configured entry."""
     print("Configured databases:\n")
     for db in config.get("databases", []):
         validate_db_config(db)
         print(f"  [{db['name']}]")
-        print(f"    Host: {db['host']}:{db.get('port', 3306)}")
+        print(f"    Host: {db['host']}:{db.get('port', DEFAULT_PORT)}")
         print(f"    Database: {db['database']}")
         print(f"    Description: {db.get('description', 'No description')}")
         print()
 
 
 def build_connection_kwargs(db_config: dict) -> dict:
-    """Build mysql.connector connection keyword arguments from config."""
+    """Translate a config entry into PyMySQL connection arguments."""
     kwargs = {
-        'host': db_config['host'],
-        'port': db_config.get('port', 3306),
-        'database': db_config['database'],
-        'user': db_config['user'],
-        'password': db_config['password'],
-        'connection_timeout': CONNECTION_TIMEOUT_SEC,
-        'autocommit': True,
+        "host": db_config["host"],
+        "port": db_config.get("port", DEFAULT_PORT),
+        "database": db_config["database"],
+        "user": db_config["user"],
+        "password": db_config["password"],
+        "charset": "utf8mb4",
+        "connect_timeout": CONNECTION_TIMEOUT_SEC,
+        "autocommit": True,
     }
-
-    # SSL configuration
-    if db_config.get('ssl_disabled'):
-        kwargs['ssl_disabled'] = True
-    else:
-        ssl_params = {}
-        if db_config.get('ssl_ca'):
-            ssl_params['ssl_ca'] = db_config['ssl_ca']
-        if db_config.get('ssl_cert'):
-            ssl_params['ssl_cert'] = db_config['ssl_cert']
-        if db_config.get('ssl_key'):
-            ssl_params['ssl_key'] = db_config['ssl_key']
-        if ssl_params:
-            kwargs.update(ssl_params)
-
+    if db_config.get("ssl_disabled"):
+        kwargs["ssl_disabled"] = True
+        return kwargs
+    for field in SSL_FILE_FIELDS:
+        if db_config.get(field):
+            kwargs[field] = db_config[field]
     return kwargs
 
 
+def _load_driver():
+    """Import PyMySQL on demand so the flag surface answers without it."""
+    try:
+        import pymysql
+    except ImportError:
+        print("Error: PyMySQL not installed. Run: pip install PyMySQL")
+        sys.exit(1)
+    return pymysql
+
+
+def _redact(message: str) -> str:
+    """Keep credential material out of the printed error."""
+    lowered = message.lower()
+    if "password" in lowered or "access denied" in lowered:
+        return _AUTH_HINT
+    return message
+
+
+def _apply_limit(query: str, limit: Optional[int]) -> str:
+    """Append a row cap only when the statement does not already carry one."""
+    if limit and not _EXISTING_LIMIT.search(query):
+        return query.rstrip(";") + f" LIMIT {limit}"
+    return query
+
+
+def _cell(value) -> str:
+    return NULL_DISPLAY if value is None else str(value)
+
+
+def _print_result(columns, rows) -> None:
+    """Render a fixed-width table with a per-column cap and a row-count footer."""
+    headings = [str(name)[:MAX_COLUMN_WIDTH] for name in columns]
+    body = [[_cell(value) for value in row] for row in rows]
+
+    widths = [len(heading) for heading in headings]
+    for cells in body:
+        for index, text in enumerate(cells):
+            widths[index] = max(widths[index], len(text))
+    widths = [min(width, MAX_COLUMN_WIDTH) for width in widths]
+
+    header = " | ".join(
+        heading.ljust(widths[index]) for index, heading in enumerate(headings)
+    )
+    print(header)
+    print("-" * len(header))
+
+    for cells in body:
+        rendered = []
+        for index, text in enumerate(cells):
+            if len(text) > MAX_COLUMN_WIDTH:
+                text = text[:MAX_COLUMN_WIDTH - 3] + "..."
+            rendered.append(text.ljust(widths[index]))
+        print(" | ".join(rendered))
+
+    footer = f"\n({len(rows)} rows)"
+    if len(rows) == MAX_ROWS:
+        footer += f" [truncated at {MAX_ROWS}]"
+    print(footer)
+
+
+def _prepare_session(cursor, driver) -> None:
+    """Read-only access mode is mandatory; the execution cap is best effort."""
+    cursor.execute("SET SESSION TRANSACTION READ ONLY")
+    try:
+        cursor.execute(f"SET SESSION max_execution_time = {QUERY_TIMEOUT_MS}")
+    except driver.Error:
+        # MariaDB and older MySQL builds do not know this variable.
+        pass
+
+
 def execute_query(db_config: dict, query: str, limit: Optional[int] = None) -> None:
-    """Execute a read-only query against the specified database."""
+    """Screen, run and render one read-only statement; exit 1 on any refusal."""
     if not is_read_only(query):
-        print("Error: Only read-only queries (SELECT, SHOW, DESCRIBE, EXPLAIN) are allowed.")
+        print(_REFUSAL)
         sys.exit(1)
-
     if not validate_single_statement(query):
-        print("Error: Multiple statements not allowed. Execute queries separately.")
+        print(_MULTI_STATEMENT)
         sys.exit(1)
 
-    # Apply limit using regex to avoid false positives from string content
-    if limit and not re.search(r'\bLIMIT\s+\d+', query, re.IGNORECASE):
-        query = f"{query.rstrip(';')} LIMIT {limit}"
-
+    statement = _apply_limit(query, limit)
+    driver = _load_driver()
     conn = None
     try:
-        conn = mysql.connector.connect(**build_connection_kwargs(db_config))
-
-        with conn.cursor() as cursor:
-            # Primary safety: read-only transaction mode prevents write operations
-            cursor.execute("SET SESSION TRANSACTION READ ONLY")
-            # Set query timeout (max_execution_time in milliseconds, MySQL 5.7.8+)
-            try:
-                cursor.execute(f"SET SESSION max_execution_time = {QUERY_TIMEOUT_MS}")
-            except mysql.connector.Error:
-                pass  # Older MySQL/MariaDB versions don't support this
-
-            cursor.execute(query)
-            if cursor.description:
-                columns = [desc[0] for desc in cursor.description]
-                rows = cursor.fetchmany(MAX_ROWS)
-                truncated = len(rows) == MAX_ROWS
-
-                # Calculate column widths with cap
-                widths = [min(len(col), MAX_COLUMN_WIDTH) for col in columns]
-                for row in rows:
-                    for i, val in enumerate(row):
-                        val_str = str(val) if val is not None else NULL_DISPLAY
-                        widths[i] = min(max(widths[i], len(val_str)), MAX_COLUMN_WIDTH)
-
-                # Print header
-                header = " | ".join(col[:MAX_COLUMN_WIDTH].ljust(widths[i]) for i, col in enumerate(columns))
-                print(header)
-                print("-" * len(header))
-
-                # Print rows
-                for row in rows:
-                    cells = []
-                    for i, val in enumerate(row):
-                        val_str = str(val) if val is not None else NULL_DISPLAY
-                        if len(val_str) > MAX_COLUMN_WIDTH:
-                            val_str = val_str[:MAX_COLUMN_WIDTH-3] + "..."
-                        cells.append(val_str.ljust(widths[i]))
-                    print(" | ".join(cells))
-
-                msg = f"\n({len(rows)} rows)"
-                if truncated:
-                    msg += f" [truncated at {MAX_ROWS}]"
-                print(msg)
-            else:
+        conn = driver.connect(**build_connection_kwargs(db_config))
+        cursor = conn.cursor()
+        try:
+            _prepare_session(cursor, driver)
+            cursor.execute(statement)
+            if not cursor.description:
                 print("Query executed (no result set returned)")
-
-    except mysql.connector.Error as e:
-        error_msg = str(e)
-        if 'password' in error_msg.lower() or 'access denied' in error_msg.lower():
-            error_msg = "Authentication failed. Check credentials in connections.json"
-        print(f"Database error: {error_msg}")
+            else:
+                columns = [field[0] for field in cursor.description]
+                _print_result(columns, cursor.fetchmany(MAX_ROWS))
+        finally:
+            cursor.close()
+    except (driver.Error, OSError) as exc:
+        print(f"Database error: {_redact(str(exc))}")
         sys.exit(1)
     finally:
-        if conn:
+        if conn is not None:
             conn.close()
 
 
 def find_database(config: dict, name: str) -> dict:
-    """Find database config by name (case-insensitive)."""
+    """Resolve an entry by name, ignoring case."""
+    wanted = name.lower()
     for db in config.get("databases", []):
-        if db.get('name', '').lower() == name.lower():
+        if db.get("name", "").lower() == wanted:
             validate_db_config(db)
             return db
-    available = [db.get('name', 'unnamed') for db in config.get("databases", [])]
+    known = [db.get("name", "unnamed") for db in config.get("databases", [])]
     print(f"Database '{name}' not found.")
-    print(f"Available: {', '.join(available)}")
+    print(f"Available: {', '.join(known)}")
     sys.exit(1)
 
 
 def main() -> None:
-    """Main entry point."""
+    """Parse the command line and dispatch to the selected read-only mode."""
     parser = argparse.ArgumentParser(
         description="Execute read-only MySQL queries",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -266,24 +319,9 @@ Examples:
     db_config = find_database(config, args.db)
 
     if args.tables:
-        query = """
-            SELECT table_name, table_type, engine, table_rows
-            FROM information_schema.tables
-            WHERE table_schema = DATABASE()
-            ORDER BY table_name
-        """
-        execute_query(db_config, query, args.limit)
+        execute_query(db_config, _TABLES_SQL, args.limit)
     elif args.schema:
-        query = """
-            SELECT c.table_name, c.column_name, c.data_type, c.column_type,
-                   c.is_nullable, c.column_key, c.extra
-            FROM information_schema.columns c
-            JOIN information_schema.tables t
-                ON c.table_name = t.table_name AND c.table_schema = t.table_schema
-            WHERE c.table_schema = DATABASE()
-            ORDER BY c.table_name, c.ordinal_position
-        """
-        execute_query(db_config, query, args.limit)
+        execute_query(db_config, _SCHEMA_SQL, args.limit)
     elif args.query:
         execute_query(db_config, args.query, args.limit)
     else:

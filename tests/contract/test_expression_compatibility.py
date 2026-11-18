@@ -848,6 +848,30 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "added_markers": True,
     },
+    "skills/external/database-utils/SKILL.md": {
+        "reason": (
+            "2026-11-18 ai-engine fork (P0a, user ruling: every license in the repository "
+            "becomes MIT, and a third party cannot be relicensed unilaterally, so the "
+            "vendored Apache-2.0 skill is REPLACED by an original MIT implementation rather "
+            "than annotated): the frontmatter moves to license MIT / author ai-engine "
+            "project / version 3.0, the body is rewritten, and the two drivers become "
+            "PyMySQL and pg8000. The caller-facing interface is preserved and pinned by "
+            "tests/unit/test_database_utils_{readonly_guard,config_routing,execution}.py — "
+            "option vocabulary, registry lookup and field set, protocol routing, read-only "
+            "screening, result layout, exit codes — as are the concurrency-obligation "
+            "pointer block and the compiled Wrap-up banner, both byte-identical. The "
+            "069a hash manifest stays the dated record it is; this entry records the "
+            "drift and authorizes nothing else."
+        ),
+        "markers": (
+            "license: MIT",
+            "author: ai-engine project",
+            'version: "3.0"',
+            "PyMySQL",
+            "pg8000",
+        ),
+        "added_markers": True,
+    },
 }
 
 # 2026-10-30 Feature 077 stage-wiring amendment. 069a's manifest is that slice's
@@ -889,9 +913,11 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
 # SKILL.md` and `templates/commands/history.md` left the tuple the same way: the
 # four-stage seam is authored drift, each carries its own entry above, and
 # `_banner_only_drift` now covers 33 rows.
+# 2026-11-18 (ai-engine fork, P0a): `skills/external/database-utils/SKILL.md` left the
+# tuple the same way — the MIT rewrite is authored drift, its own entry above wins, and
+# `_banner_only_drift` now covers 32 rows.
 _FEATURE_087_BANNER_ONLY = (
     "skills/external/create-pages/SKILL.md",
-    "skills/external/database-utils/SKILL.md",
     "skills/external/document-utils/SKILL.md",
     "skills/external/draw-diagram/SKILL.md",
     "skills/external/git-utils/SKILL.md",

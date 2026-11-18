@@ -8,10 +8,10 @@ description: |
   Triggers: "MySQL", "PostgreSQL", "database", "SQL", "query", "ClickHouse", "Doris", "SelectDB",
   "数据库", "查询", "SQL查询", "数据库查询", "表结构", "数据分析"
 skill_id: "<SKILL:.specify/skills/database-utils/SKILL.md>"
-license: Apache-2.0
+license: MIT
 metadata:
-  author: sanjay3290
-  version: "2.0"
+  author: ai-engine project
+  version: "3.0"
 classification: external
 ---
 
@@ -19,209 +19,281 @@ classification: external
 
 > **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
-
-Execute safe, read-only queries against configured MySQL and PostgreSQL protocol databases from a single unified interface.
-
 ## Overview
 
-This skill provides a unified command-line interface for querying databases that speak the MySQL or PostgreSQL wire protocols. A single `connections.json` config file holds all database entries with a `protocol` field that routes each query to the correct handler.
+This skill answers questions about data that lives in a relational server. It reads a registry of
+connections, picks the entry the caller named, works out which wire protocol that entry speaks, and
+runs one statement whose result is printed as a plain-text table. The deliverable is the query
+result: the skill writes nothing outside its own connection file, and it never issues a statement
+that could change data.
 
-Supported databases:
+Read-only is enforced twice, on purpose. The statement is screened in the client before it is sent,
+and the server session is then switched to read-only access mode, so a statement that the screen
+admits but that would still write is refused by the server. Neither layer is a substitute for the
+other, and neither is optional.
 
-| Database | Protocol | Default Port |
-|----------|----------|--------------|
-| MySQL | mysql | 3306 |
-| MariaDB | mysql | 3306 |
-| Apache Doris / SelectDB | mysql | 9030 |
-| PostgreSQL | postgres | 5432 |
-| ClickHouse (PG wire) | postgres | 9005 |
+Three entry points share one command surface:
 
-## Quick Reference
+- `scripts/query.py` — the dispatcher. Resolves the entry and routes to a protocol handler.
+- `scripts/query_mysql.py` — the MySQL-protocol handler, also usable on its own.
+- `scripts/query_postgres.py` — the PostgreSQL-protocol handler, also usable on its own.
 
-| Command | Description |
-|---------|-------------|
-| `--list` | List all configured databases with protocol |
-| `--db <name> --tables` | List tables in a database |
-| `--db <name> --schema` | Show full schema (columns, types, keys) |
-| `--db <name> --query "SQL"` | Execute a read-only SQL query |
-| `--db <name> --query "SQL" --limit N` | Limit result rows |
+## Reachable Servers
+
+| Server | Protocol value | Usual port |
+|--------|----------------|------------|
+| MySQL | `mysql` | 3306 |
+| MariaDB | `mysql` | 3306 |
+| Apache Doris / SelectDB | `mysql` | 9030 |
+| PostgreSQL | `postgres` | 5432 |
+| ClickHouse (PostgreSQL front end) | `postgres` | 9005 |
+
+A server belongs to a protocol family, not to a product name: anything that answers the MySQL wire
+protocol is reached with `mysql`, anything that answers the PostgreSQL wire protocol with `postgres`.
+
+## Command Surface
+
+Every entry point accepts the same options.
+
+| Option | Meaning |
+|--------|---------|
+| `--list` | Print each configured entry with its protocol, host, database and description |
+| `--db <name>`, `-d <name>` | Select an entry by name; matching ignores case |
+| `--tables`, `-t` | List the tables of the selected database |
+| `--schema`, `-s` | List the columns of the selected database with types and nullability |
+| `--query "<sql>"`, `-q "<sql>"` | Run one read-only statement |
+| `--limit <n>`, `-l <n>` | Cap the rows returned, unless the statement already carries a `LIMIT` |
+| `--config <path>`, `-c <path>` | Read the registry from an explicit file instead of searching |
+| `-h`, `--help` | Print the option vocabulary, the side-effect statement and the exit codes |
+| `--version` | Print the script name and the framework version |
+
+Mode precedence is `--list`, then `--tables`, then `--schema`, then `--query`. An undeclared option
+is rejected before anything runs. The flag surface answers even when no database driver is
+installed, so `--help`, `--version` and `--list` never depend on a reachable server.
 
 ## Requirements
 
-- Python 3.8+
-- `mysql-connector-python` (for MySQL protocol databases)
-- `psycopg2-binary` (for PostgreSQL protocol databases)
+- Python 3.8 or newer.
+- `PyMySQL` (MIT) for the MySQL protocol family.
+- `pg8000` (BSD-3-Clause) for the PostgreSQL protocol family.
 
-Install dependencies:
 ```bash
 pip install -r ${SKILL_HOME}/requirements.txt
 ```
 
+Only the driver for the protocol actually queried has to be present. A missing driver is reported
+with its install command when a connection is attempted, not at start-up.
+
 ## Setup
 
-1. Copy the example config:
+1. Create the registry from the shipped example:
+
 ```bash
 cp ${SKILL_HOME}/connections.example.json ${SKILL_HOME}/connections.json
 ```
 
-2. Edit `connections.json` and add your database entries. Each entry must include a `protocol` field (`mysql` or `postgres`) or use a standard port so the protocol can be inferred.
+2. Replace the example entries with the servers to reach. Give each entry a `description` that says
+   what data it holds — that field is what makes intent-based selection possible later.
 
-**Security**: The config file contains credentials. Restrict permissions:
+3. Restrict the file, because it holds credentials:
+
 ```bash
 chmod 600 ${SKILL_HOME}/connections.json
 ```
 
-The dispatcher searches for the config in these locations (first match wins):
+The dispatcher looks for the registry in this order and uses the first file that exists:
+
 1. `${SKILL_HOME}/connections.json`
 2. `${HOME}/.config/claude/db-connections.json`
 
-## Config Fields
+The two standalone handlers search the same first location and then their own protocol-specific
+file: `mysql-connections.json` for `query_mysql.py`, `postgres-connections.json` for
+`query_postgres.py`, both under `${HOME}/.config/claude/`. A file that group or other can read
+produces a warning naming the `chmod 600` repair; the warning does not stop the run.
 
-| Field | Required | Default | Protocol | Description |
-|-------|----------|---------|----------|-------------|
-| name | Yes | - | both | Database identifier (case-insensitive lookup) |
-| description | Yes | - | both | What data this database contains (used for intent matching) |
-| protocol | No | inferred | both | `mysql` or `postgres` — inferred from port if omitted |
-| host | Yes | - | both | Database hostname |
-| port | No | 3306/5432 | both | Port number (default depends on protocol) |
-| database | Yes | - | both | Database/schema name |
-| user | Yes | - | both | Username |
-| password | Yes | - | both | Password |
-| ssl_disabled | No | false | mysql | Set `true` to disable SSL |
-| ssl_ca | No | - | mysql | Path to CA certificate file |
-| ssl_cert | No | - | mysql | Path to client certificate file |
-| ssl_key | No | - | mysql | Path to client private key file |
-| sslmode | No | prefer | postgres | SSL mode: disable, allow, prefer, require, verify-ca, verify-full |
+## Connection Entry Fields
+
+Shared by both protocols:
+
+| Field | Required | Default | Meaning |
+|-------|----------|---------|---------|
+| `name` | yes | — | Entry identifier; lookup ignores case |
+| `description` | yes | — | What data the entry holds, used to match user intent |
+| `host` | yes | — | Server host name |
+| `database` | yes | — | Database or schema to attach to |
+| `user` | yes | — | Login name |
+| `password` | yes | — | Login password |
+| `protocol` | no | resolved from the port | `mysql`, `postgres` or `postgresql` |
+| `port` | no | 3306 / 5432 | Server port, by protocol |
+
+MySQL-protocol entries additionally accept:
+
+| Field | Default | Meaning |
+|-------|---------|---------|
+| `ssl_disabled` | `false` | `true` connects without TLS |
+| `ssl_ca` | — | CA certificate file |
+| `ssl_cert` | — | Client certificate file |
+| `ssl_key` | — | Client private key file |
+
+PostgreSQL-protocol entries additionally accept `sslmode` (default `prefer`), with the libpq
+vocabulary `disable`, `allow`, `prefer`, `require`, `verify-ca`, `verify-full`.
+
+`require` encrypts without authenticating the peer; `verify-ca` also validates the certificate
+chain; `verify-full` validates the chain and the host name. Wherever the server certificate can be
+validated, choose `verify-full`, or `verify-ca` with a CA bundle scoped to that server — the
+unverified modes exist for hosts with a private CA and are a per-entry choice, never a default
+imposed on the whole registry.
+
+## Protocol Resolution
+
+The dispatcher decides in three steps, stopping at the first that answers:
+
+1. An explicit `protocol` value, folded to lower case. `postgresql` is accepted as `postgres`.
+   Any other value is an error naming the two supported families.
+2. The port, when it is one of the known front-end ports in the table above.
+3. `mysql` as the fallback.
+
+State `protocol` explicitly for any server on a non-default port; inference is a convenience for
+the standard ports, not a detection mechanism.
 
 ## Usage
 
-### List all configured databases
 ```bash
+# What is configured, and over which protocol
 python3 ${SKILL_HOME}/scripts/query.py --list
-```
 
-### List tables
-```bash
+# Structure of one database
 python3 ${SKILL_HOME}/scripts/query.py --db production --tables
-```
-
-### Show schema
-```bash
 python3 ${SKILL_HOME}/scripts/query.py --db production --schema
-```
 
-### Execute a query
-```bash
-python3 ${SKILL_HOME}/scripts/query.py --db production --query "SELECT * FROM users LIMIT 10"
-```
+# One statement, with a row cap
+python3 ${SKILL_HOME}/scripts/query.py --db production --query "SELECT * FROM users" --limit 100
 
-### Limit results
-```bash
-python3 ${SKILL_HOME}/scripts/query.py --db production --query "SELECT * FROM orders" --limit 100
-```
-
-### Use a specific config file
-```bash
+# An explicit registry file
 python3 ${SKILL_HOME}/scripts/query.py --config /path/to/connections.json --db production --tables
-```
 
-### Call protocol-specific scripts directly
-```bash
+# A protocol handler on its own
 python3 ${SKILL_HOME}/scripts/query_mysql.py --db mysql-prod --tables
 python3 ${SKILL_HOME}/scripts/query_postgres.py --db pg-analytics --schema
 ```
 
-## Supported Databases
+`--tables` and `--schema` are ordinary read-only statements against `information_schema`, so they
+obey the same screening, the same row cap and the same rendering as `--query`. The MySQL variants
+report the current database; the PostgreSQL variants report every non-system schema.
 
-### MySQL (protocol: mysql)
-Standard MySQL and MariaDB databases. Uses `mysql-connector-python`. Safety enforced via `SET SESSION TRANSACTION READ ONLY`.
+## Choosing the Right Database
 
-### PostgreSQL (protocol: postgres)
-Standard PostgreSQL databases. Uses `psycopg2`. Safety enforced via `readonly=True` session mode.
+When the request names a topic rather than an entry, match the topic against each entry's
+`description`:
 
-### ClickHouse (protocol: postgres)
-ClickHouse exposes a PostgreSQL-compatible wire protocol on port 9005. Set `protocol: "postgres"` in the config entry.
+| The request is about | Look for a description mentioning |
+|----------------------|-----------------------------------|
+| people, accounts | users, accounts, customers |
+| purchases, revenue | orders, transactions, sales |
+| measurements, reporting | analytics, metrics, reports |
+| incidents, activity | logs, events, audit |
+| large-scale aggregation | warehouse, OLAP, data lake |
 
-### Apache Doris / SelectDB (protocol: mysql)
-Doris and SelectDB expose a MySQL-compatible wire protocol on port 9030. Set `protocol: "mysql"` in the config entry.
+If more than one entry fits, run `--list` and ask which one to use rather than guessing.
 
-## Database Selection
+## Read-only Enforcement
 
-When the user's intent maps to a database topic, match against the `description` field in each config entry:
+Client side, before a connection is opened:
 
-| User asks about | Look for description containing |
-|-----------------|--------------------------------|
-| users, accounts | users, accounts, customers |
-| orders, sales | orders, transactions, sales |
-| analytics, metrics | analytics, metrics, reports |
-| logs, events | logs, events, audit |
-| warehouse, OLAP | warehouse, OLAP, data lake |
+- The statement must begin with a read keyword. MySQL protocol: `SELECT`, `SHOW`, `DESCRIBE`,
+  `EXPLAIN`, `WITH`, `DESC`. PostgreSQL protocol: `SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN`, `WITH`,
+  and the psql `\D` meta-command.
+- MySQL protocol additionally refuses `INTO OUTFILE` and `INTO DUMPFILE`, which write a file on the
+  server and are not covered by read-only access mode.
+- One statement per invocation. A semicolon anywhere other than the trailing terminator is
+  refused, so `SELECT 1; DROP TABLE t` never reaches a server.
+- A row cap is appended only when the statement does not already contain `LIMIT <number>`.
 
-If the match is ambiguous, run `--list` and ask the user which database to query.
+Server side, on every connection:
 
-## Safety Features
+- MySQL protocol: `SET SESSION TRANSACTION READ ONLY`, then a best-effort
+  `max_execution_time` of 30 s (older servers that lack the variable are tolerated).
+- PostgreSQL protocol: session characteristics set to read-only transactions, then a best-effort
+  `statement_timeout` of 30 s (a compatible front end that lacks the setting is tolerated).
+- Both: a 10 s connection timeout, and the connection is closed even when the statement fails.
 
-- **Read-only sessions**: MySQL uses `SET SESSION TRANSACTION READ ONLY`; PostgreSQL uses `readonly=True` mode
-- **Query validation**: Only SELECT, SHOW, DESCRIBE, EXPLAIN, WITH queries allowed (client-side check)
-- **SELECT INTO blocked**: MySQL handler blocks `SELECT INTO OUTFILE/DUMPFILE`
-- **Single statement**: Multiple statements per query rejected (prevents injection like `SELECT 1; DROP TABLE`)
-- **Query timeout**: 30-second timeout enforced (MySQL `max_execution_time`, PostgreSQL `statement_timeout`)
-- **Connection timeout**: 10-second connection timeout
-- **Memory protection**: Max 10,000 rows per query to prevent OOM
-- **Column width cap**: 100 characters max per column for readable output
-- **Credential sanitization**: Error messages do not leak passwords or authentication details
-- **Config permissions**: Warning emitted if `connections.json` is readable by group or others
+The read-only session setting is never optional. Only the timeout is best effort, because a
+missing timeout is a performance concern while a missing read-only mode is a safety one.
 
-## Troubleshooting
+## Result Shape
 
-| Error | Solution |
-|-------|----------|
-| Config not found | Create `connections.json` in skill directory or `${HOME}/.config/claude/db-connections.json` |
-| Authentication failed | Check username/password in config |
-| Connection timeout | Verify host/port, check firewall/VPN |
-| MySQL SSL error | Try `"ssl_disabled": true` for local databases |
-| PostgreSQL SSL error | Try `"sslmode": "disable"` for local databases |
-| Permission warning | Run `chmod 600 connections.json` |
-| max_execution_time not supported | Upgrade to MySQL 5.7.8+ or MariaDB 10.1.1+ |
-| Unknown protocol | Add explicit `"protocol": "mysql"` or `"protocol": "postgres"` |
-| Handler not found | Ensure `query_mysql.py` and `query_postgres.py` exist in `scripts/` |
-| mysql-connector-python not installed | Run `pip install mysql-connector-python` |
-| psycopg2 not installed | Run `pip install psycopg2-binary` |
+Results print as a fixed-width table: a header row of column names, a rule of dashes, one line per
+row, then a blank line and `(N rows)`.
+
+- Values are rendered with `str()`; SQL `NULL` prints as `<NULL>`.
+- A column is at most 100 characters wide; a longer value is cut to 97 characters plus `...`.
+- At most 10,000 rows are fetched. When the fetch returns exactly that many, the footer adds
+  `[truncated at 10000]` — treat the result as incomplete and narrow the statement.
+- A statement that returns no result set prints `Query executed (no result set returned)`.
 
 ## Exit Codes
 
-- **0**: Success
-- **1**: Error (config missing, auth failed, invalid query, database error)
+| Code | Meaning |
+|------|---------|
+| 0 | The run completed, including a `--list`, `--help` or `--version` invocation |
+| 1 | A documented check failed: no registry, unknown entry or protocol, missing entry field, refused statement, driver absent, or a server error |
+| 2 | The command line itself was rejected (undeclared option or malformed argument) |
+
+Server errors print as `Database error: <message>`. A message that mentions a password or an
+authentication failure is replaced by a fixed hint pointing at the registry, so credentials never
+reach the output.
+
+## Troubleshooting
+
+| Symptom | Repair |
+|---------|--------|
+| `Config not found. Searched:` | Create `connections.json` in the skill directory, or pass `--config` |
+| `Database '<name>' not found.` | Run `--list`; the printed names are the accepted spellings |
+| `Database config missing fields:` | Add the named fields to that entry |
+| `Unknown protocol` | Set `protocol` to `mysql` or `postgres` |
+| `Handler not found` | Keep `query_mysql.py` and `query_postgres.py` beside `query.py` |
+| `Only read-only queries ... are allowed` | Rephrase as a read statement; writes are out of scope for this skill |
+| `Multiple statements not allowed` | Run each statement as its own invocation |
+| `Authentication failed.` | Correct `user` / `password` in the registry |
+| Connection timeout | Check host, port, firewall and VPN reachability |
+| MySQL TLS handshake failure | For a local server without TLS, set `"ssl_disabled": true` |
+| PostgreSQL TLS handshake failure | Set `"sslmode": "disable"` for a local server, or supply a CA for `verify-ca` |
+| `Unknown sslmode` | Use one of the six documented values |
+| Insecure-permissions warning | `chmod 600 connections.json` |
+| `PyMySQL not installed` / `pg8000 not installed` | `pip install -r ${SKILL_HOME}/requirements.txt` |
+| Result ends with `[truncated at 10000]` | Add a filter or a smaller `LIMIT` |
 
 ## Workflow
 
-1. Run `--list` to show available databases and their protocols
-2. Match user intent to a database by its description
-3. Run `--tables` or `--schema` to explore the database structure
-4. Execute the query with an appropriate `LIMIT`
-5. Present results to the user
+1. `--list` to see the entries and their protocols.
+2. Match the request to one entry by its description; ask when the match is ambiguous.
+3. `--tables`, then `--schema`, to learn the structure before writing SQL.
+4. Run the statement with a row cap appropriate to the question.
+5. Report the result, and say so explicitly when the footer marks it truncated.
 
 ## Path Conventions
 
-- `${SKILL_HOME}` — the skill root directory (where this SKILL.md lives)
-- `${SKILL_WORKDIR}` — the caller's working directory at invocation time
+- `${SKILL_HOME}` — the directory holding this SKILL.md.
+- `${SKILL_WORKDIR}` — the caller's working directory at invocation time.
 
-All script paths in this skill use `${SKILL_HOME}/scripts/` to remain portable.
+Every script path above is written against `${SKILL_HOME}` so the skill stays portable.
 
 ## Resources
 
-- `scripts/query.py` — unified dispatcher (routes to protocol-specific handler)
-- `scripts/query_mysql.py` — MySQL protocol handler
-- `scripts/query_postgres.py` — PostgreSQL protocol handler
-- `references/setup-and-usage.md` — setup and usage guide
-- `connections.example.json` — example config with MySQL, PostgreSQL, ClickHouse, and Doris entries
-- `requirements.txt` — Python dependencies
-- `LICENSE.txt` — Apache-2.0 license
+- `scripts/query.py` — dispatcher: entry selection and protocol routing.
+- `scripts/query_mysql.py` — MySQL-protocol handler.
+- `scripts/query_postgres.py` — PostgreSQL-protocol handler.
+- `references/setup-and-usage.md` — installation, registry authoring and worked invocations.
+- `connections.example.json` — one example entry per reachable server family.
+- `requirements.txt` — the two drivers.
+- `LICENSE.txt` — MIT license for this skill.
 
 ## Dependencies
 
-- `mysql-connector-python` — MySQL protocol driver
-- `psycopg2-binary` — PostgreSQL protocol driver
+- `PyMySQL` — MySQL wire protocol driver (MIT).
+- `pg8000` — PostgreSQL wire protocol driver (BSD-3-Clause).
+
+Both are pure Python and need no compiler or system client library.
 
 ## Wrap-up
 

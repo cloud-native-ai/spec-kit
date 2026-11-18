@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-"""
-Unified database query dispatcher.
-Routes queries to MySQL or PostgreSQL handlers based on connection config.
+"""Single entry point for read-only queries over either wire protocol.
+
+One registry (`connections.json`) describes every reachable database.  This
+dispatcher resolves the named entry, decides which protocol it speaks, and hands
+the statement to the matching handler next to this file.  The handlers own the
+read-only enforcement; the dispatcher owns selection and routing only.
+
+ai-engine project, MIT licensed -- see LICENSE.txt.
 """
 
+import argparse
+import importlib.util
 import json
 import os
 import stat
 import sys
-import argparse
-import importlib.util
 from pathlib import Path
 from typing import Optional
 
-# Constants
 SCRIPT_DIR = Path(__file__).parent
 SKILL_DIR = SCRIPT_DIR.parent
 CONFIG_LOCATIONS = [
@@ -21,94 +25,130 @@ CONFIG_LOCATIONS = [
     Path.home() / ".config" / "claude" / "db-connections.json",
 ]
 
-# Default port-to-protocol mapping for inference
+# Ports that identify a protocol when the entry does not name one.  9030 is the
+# MySQL front end of Apache Doris / SelectDB; 9005 is the PostgreSQL front end of
+# ClickHouse.
 PORT_PROTOCOL_MAP = {
     3306: "mysql",
-    9030: "mysql",   # Apache Doris / SelectDB
+    9030: "mysql",
     5432: "postgres",
-    9005: "postgres", # ClickHouse (PostgreSQL wire protocol)
+    9005: "postgres",
+}
+
+PROTOCOL_ALIASES = {"mysql": "mysql", "postgres": "postgres", "postgresql": "postgres"}
+FALLBACK_PROTOCOL = "mysql"
+DEFAULT_PORTS = {"mysql": 3306, "postgres": 5432}
+HANDLER_FILES = {"mysql": "query_mysql.py", "postgres": "query_postgres.py"}
+
+_TABLES_SQL = {
+    "mysql": (
+        "SELECT table_name, table_type, engine, table_rows "
+        "FROM information_schema.tables "
+        "WHERE table_schema = DATABASE() "
+        "ORDER BY table_name"
+    ),
+    "postgres": (
+        "SELECT table_schema, table_name, table_type "
+        "FROM information_schema.tables "
+        "WHERE table_schema NOT IN ('pg_catalog', 'information_schema') "
+        "ORDER BY table_schema, table_name"
+    ),
+}
+_SCHEMA_SQL = {
+    "mysql": (
+        "SELECT c.table_name, c.column_name, c.data_type, c.column_type, "
+        "c.is_nullable, c.column_key, c.extra "
+        "FROM information_schema.columns c "
+        "JOIN information_schema.tables t "
+        "ON c.table_name = t.table_name AND c.table_schema = t.table_schema "
+        "WHERE c.table_schema = DATABASE() "
+        "ORDER BY c.table_name, c.ordinal_position"
+    ),
+    "postgres": (
+        "SELECT c.table_schema, c.table_name, c.column_name, c.data_type, c.is_nullable "
+        "FROM information_schema.columns c "
+        "JOIN information_schema.tables t "
+        "ON c.table_name = t.table_name AND c.table_schema = t.table_schema "
+        "WHERE c.table_schema NOT IN ('pg_catalog', 'information_schema') "
+        "ORDER BY c.table_schema, c.table_name, c.ordinal_position"
+    ),
 }
 
 
 def validate_config_permissions(path: Path) -> None:
-    """Warn if config file has insecure permissions (Unix only)."""
-    if os.name != 'nt':
-        mode = path.stat().st_mode
-        if bool(mode & stat.S_IRWXG) or bool(mode & stat.S_IRWXO):
-            print(f"WARNING: {path} has insecure permissions!")
-            print(f"Config contains credentials. Run: chmod 600 {path}")
+    """Warn about a credential file that group or other can reach (POSIX only)."""
+    if os.name == "nt":
+        return
+    mode = path.stat().st_mode
+    if mode & (stat.S_IRWXG | stat.S_IRWXO):
+        print(f"WARNING: {path} has insecure permissions!")
+        print(f"Config contains credentials. Run: chmod 600 {path}")
 
 
 def find_config() -> Optional[Path]:
-    """Find config file in supported locations."""
-    for path in CONFIG_LOCATIONS:
-        if path.exists():
-            return path
+    """First existing candidate, or None."""
+    for candidate in CONFIG_LOCATIONS:
+        if candidate.exists():
+            return candidate
     return None
 
 
+def _config_template() -> dict:
+    """The entry shape printed when no config could be located."""
+    return {
+        "databases": [{
+            "name": "mydb",
+            "description": "Description of database contents",
+            "protocol": "mysql",
+            "host": "localhost",
+            "port": 3306,
+            "database": "mydb",
+            "user": "user",
+            "password": "password",
+        }]
+    }
+
+
 def load_config(config_path: Optional[Path] = None) -> dict:
-    """Load database connections from JSON config."""
+    """Read the connection registry, or explain how to create one and exit 1."""
     path = config_path or find_config()
-    if not path:
+    if path is None:
         print("Config not found. Searched:")
-        for loc in CONFIG_LOCATIONS:
-            print(f"  - {loc}")
+        for candidate in CONFIG_LOCATIONS:
+            print(f"  - {candidate}")
         print("\nCreate connections.json with format:")
-        print(json.dumps({
-            "databases": [{
-                "name": "mydb",
-                "description": "Description of database contents",
-                "protocol": "mysql",
-                "host": "localhost",
-                "port": 3306,
-                "database": "mydb",
-                "user": "user",
-                "password": "password"
-            }]
-        }, indent=2))
+        print(json.dumps(_config_template(), indent=2))
         sys.exit(1)
 
     validate_config_permissions(path)
-
-    with open(path) as f:
-        return json.load(f)
+    with open(path) as handle:
+        return json.load(handle)
 
 
 def determine_protocol(db: dict) -> str:
-    """Determine the database protocol from config entry.
-
-    Priority:
-    1. Explicit 'protocol' field
-    2. Infer from port number
-    3. Default to 'mysql'
-    """
-    protocol = db.get("protocol")
-    if protocol:
-        protocol = protocol.lower()
-        if protocol in ("mysql", "postgres", "postgresql"):
-            return "mysql" if protocol == "mysql" else "postgres"
-        print(f"Error: Unknown protocol '{protocol}'. Supported: mysql, postgres")
-        sys.exit(1)
+    """Resolve an entry's protocol: declared name first, then port, then mysql."""
+    declared = db.get("protocol")
+    if declared:
+        resolved = PROTOCOL_ALIASES.get(declared.lower())
+        if resolved is None:
+            print(f"Error: Unknown protocol '{declared.lower()}'. Supported: mysql, postgres")
+            sys.exit(1)
+        return resolved
 
     port = db.get("port")
-    if port and port in PORT_PROTOCOL_MAP:
+    if port in PORT_PROTOCOL_MAP:
         return PORT_PROTOCOL_MAP[port]
-
-    # Default fallback
-    return "mysql"
+    return FALLBACK_PROTOCOL
 
 
 def load_handler(protocol: str):
-    """Dynamically load the protocol-specific query module."""
-    if protocol == "mysql":
-        module_path = SCRIPT_DIR / "query_mysql.py"
-    elif protocol == "postgres":
-        module_path = SCRIPT_DIR / "query_postgres.py"
-    else:
+    """Import the sibling handler module for one protocol, by file path."""
+    filename = HANDLER_FILES.get(protocol)
+    if filename is None:
         print(f"Error: No handler for protocol '{protocol}'")
         sys.exit(1)
 
+    module_path = SCRIPT_DIR / filename
     if not module_path.exists():
         print(f"Error: Handler not found: {module_path}")
         sys.exit(1)
@@ -120,21 +160,32 @@ def load_handler(protocol: str):
 
 
 def list_databases(config: dict) -> None:
-    """List all configured databases with their protocol."""
+    """Print one block per configured entry, protocol included."""
     print("Configured databases:\n")
     for db in config.get("databases", []):
         protocol = determine_protocol(db)
-        default_port = 3306 if protocol == "mysql" else 5432
         print(f"  [{db.get('name', 'unnamed')}]")
         print(f"    Protocol: {protocol}")
-        print(f"    Host: {db.get('host', '?')}:{db.get('port', default_port)}")
+        print(f"    Host: {db.get('host', '?')}:{db.get('port', DEFAULT_PORTS[protocol])}")
         print(f"    Database: {db.get('database', '?')}")
         print(f"    Description: {db.get('description', 'No description')}")
         print()
 
 
+def _select_entry(config: dict, name: str) -> dict:
+    """Resolve an entry by name, ignoring case."""
+    wanted = name.lower()
+    for db in config.get("databases", []):
+        if db.get("name", "").lower() == wanted:
+            return db
+    known = [db.get("name", "unnamed") for db in config.get("databases", [])]
+    print(f"Database '{name}' not found.")
+    print(f"Available: {', '.join(known)}")
+    sys.exit(1)
+
+
 def main() -> None:
-    """Main entry point."""
+    """Parse the command line, route to a handler and run the selected mode."""
     parser = argparse.ArgumentParser(
         description="Execute read-only database queries (MySQL/PostgreSQL)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -165,62 +216,15 @@ Examples:
         print("Error: --db required. Use --list to see available databases.")
         sys.exit(1)
 
-    # Find the database entry
-    db_config = None
-    for db in config.get("databases", []):
-        if db.get("name", "").lower() == args.db.lower():
-            db_config = db
-            break
-
-    if not db_config:
-        available = [db.get("name", "unnamed") for db in config.get("databases", [])]
-        print(f"Database '{args.db}' not found.")
-        print(f"Available: {', '.join(available)}")
-        sys.exit(1)
-
-    # Determine protocol and load handler
+    db_config = _select_entry(config, args.db)
     protocol = determine_protocol(db_config)
     handler = load_handler(protocol)
-
-    # Validate config using handler's validator
     handler.validate_db_config(db_config)
 
     if args.tables:
-        if protocol == "mysql":
-            query = """
-                SELECT table_name, table_type, engine, table_rows
-                FROM information_schema.tables
-                WHERE table_schema = DATABASE()
-                ORDER BY table_name
-            """
-        else:
-            query = """
-                SELECT table_schema, table_name, table_type
-                FROM information_schema.tables
-                WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
-                ORDER BY table_schema, table_name
-            """
-        handler.execute_query(db_config, query, args.limit)
+        handler.execute_query(db_config, _TABLES_SQL[protocol], args.limit)
     elif args.schema:
-        if protocol == "mysql":
-            query = """
-                SELECT c.table_name, c.column_name, c.data_type, c.column_type,
-                       c.is_nullable, c.column_key, c.extra
-                FROM information_schema.columns c
-                JOIN information_schema.tables t
-                    ON c.table_name = t.table_name AND c.table_schema = t.table_schema
-                WHERE c.table_schema = DATABASE()
-                ORDER BY c.table_name, c.ordinal_position
-            """
-        else:
-            query = """
-                SELECT c.table_schema, c.table_name, c.column_name, c.data_type, c.is_nullable
-                FROM information_schema.columns c
-                JOIN information_schema.tables t ON c.table_name = t.table_name AND c.table_schema = t.table_schema
-                WHERE c.table_schema NOT IN ('pg_catalog', 'information_schema')
-                ORDER BY c.table_schema, c.table_name, c.ordinal_position
-            """
-        handler.execute_query(db_config, query, args.limit)
+        handler.execute_query(db_config, _SCHEMA_SQL[protocol], args.limit)
     elif args.query:
         handler.execute_query(db_config, args.query, args.limit)
     else:
