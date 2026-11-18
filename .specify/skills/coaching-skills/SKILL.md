@@ -1,7 +1,7 @@
 ---
 name: coaching-skills
 description: |
-  Coach a Skill or a slash-command (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md (or the resolved command template), observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee> [<work>]`.
+  Coach a Skill or a slash-command (the Trainee) through one real work item: state the expected outcome and process efficiency first, faithfully record the Trainee's own execution (the Trainee runs in its declared carrier; the coach is not its super agent, does not assign it tasks, and does not interrupt or alter its flow), then after the execution ends compare the record with the expectation and hand a micro-adjustment plan to improve-skills. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee> [<work>]`.
 skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"
 classification: external
 ---
@@ -13,16 +13,24 @@ classification: external
 ## Goal
 
 Coach one Trainee — a Skill or a slash-command — through one real work item: state the
-execution expectation first (outcome correctness and process efficiency), dispatch
-exactly one subagent to execute the Trainee's own `SKILL.md` (or its resolved command
-template), observe what actually happens, compare the two, and hand a micro-adjustment
-plan to the existing `improve-skills` entry. The Trainee's real work is the primary
-result; optimizing the Trainee is secondary.
+execution expectation first (outcome correctness and process efficiency), faithfully
+record the Trainee's own execution of its `SKILL.md` (or its resolved command template)
+**in the Trainee's declared carrier**, and after the execution ends compare the record
+with the expectation and hand a micro-adjustment plan to the existing `improve-skills`
+entry. The coach is **not** the Trainee's super agent: it does not dispatch the Trainee
+as a subagent, does not assign sub-tasks, does not re-task, and does not interrupt or
+alter the execution. The Trainee's real work is the primary result; optimizing the
+Trainee is secondary.
 
 ## Inputs
 
 Invocation: `coaching-skills <trainee> [<work>]`.
 
+- **Relationship**: coach ≠ super agent and Trainee ≠ coach-dispatched subagent. The
+  Trainee executes in its own declared carrier (for example a super-agent main session
+  for a skill that forbids nested driving); the coach only records that execution and
+  reviews it **after it ends**. The coach MUST NOT assign tasks inside the Trainee flow,
+  re-order it, or edit its artifacts during execution.
 - **One required positional parameter**: the Trainee reference. **`<work>` is
   OPTIONAL** — many skills and commands run without arguments (e.g. `/speckit.status`);
   an empty value dispatches the no-argument form and is never a missing parameter.
@@ -39,9 +47,9 @@ Invocation: `coaching-skills <trainee> [<work>]`.
   primary artifact is the changed target-skill file set or the Trainee's run report.
   Such a request MUST NOT be reclassified as "not a real work item", and the coach
   MUST NOT execute the Trainee's steps itself in its place.
-- `<work>` enters the run and the dispatch payload **verbatim** (an empty value stays
-  empty and is recorded as no-argument execution); never rewrite, summarize,
-  re-scope it, or fill it on the user's behalf.
+- `<work>` enters the run record **verbatim** (an empty value stays empty and is
+  recorded as no-argument execution); never rewrite, summarize, re-scope it, or fill it
+  on the user's behalf.
 - A missing **Trainee** parameter fails closed and names it; an empty `<work>` is
   legal. Missing-argument handling is a plain one-sentence clarification, then stop.
   It is not a confirmation step.
@@ -83,9 +91,9 @@ internal → canonical external → installed internal → installed external.
   directory without a readable `SKILL.md`, or a command without a readable template,
   or either with invalid frontmatter.
 - Reject a target that resolves to `coaching-skills` itself: recursion depth is 1 and
-  no dispatch happens.
+  no Trainee execution happens.
 - When the host can only load by explicit path, use the `run-skills` explicit-path
-  mode and record it in the DispatchRecord `mode`.
+  mode and record the resolution method in the run record.
 - Read the Trainee's `SKILL.md` and the reference files it needs; change nothing and
   trigger no Trainee side effect in this phase.
 
@@ -93,8 +101,8 @@ internal → canonical external → installed internal → installed external.
 
 A meta-skill Trainee may itself target the skill actually changed (`caller → Trainee →
 subject`). The four duties — the Trainee resolves the subject, expectation and verdict
-target the subject, the write lock follows the subject, and depth is one dispatch edge per
-perspective with claim-before-dispatch plus the subject guards — are owned in full by
+target the subject, the write lock follows the subject, and depth is one observation
+edge per perspective with claim-before-execution plus the subject guards — are owned in full by
 [`references/nested-runs.md`](./references/nested-runs.md); this body states the branch
 only and never a second copy.
 
@@ -104,6 +112,8 @@ Run these checks in order before writing any artifact:
 
 1. the Trainee parameter is present and resolves to exactly one executor — a command
    template or a skill hit — with valid frontmatter and a target other than this skill;
+   the Trainee's own declared carrier is honored (the coach does not choose or impose
+   one);
 2. `<work>` is optional: an empty value is legal (no-argument execution) and is never
    treated as a missing parameter;
 3. when the Trainee is a meta-skill, `<work>` names an identifiable subject to operate
@@ -134,8 +144,8 @@ Exactly four files, in this order:
 3. `deviations.md`
 4. `improvement-plan.md`
 
-- `expectation.md` MUST land on disk before the first action of the dispatched
-  subagent. The DispatchRecord field `dispatched-at` is the ordering evidence.
+- `expectation.md` MUST land on disk before the first action of the Trainee execution.
+  The `TraineeExecutionRecord` field `started-at` is the ordering evidence.
 - Observation, deviations and improvement plan follow in that order; a missing file
   fails the run regardless of how good the others are.
 - The two closed status values are recorded once, in `improvement-plan.md` § Run
@@ -148,71 +158,76 @@ Exactly four files, in this order:
   output or invocation record for a command.
 - Optimization MUST NOT be a precondition of execution and MUST NOT shorten, redirect,
   or simplify the execution to collect optimization material.
-- The coach MUST NOT run any Trainee step in parallel with the subagent.
+- The coach MUST NOT run, interrupt, re-task, or alter the Trainee's execution; it
+  records the execution as it happens and reviews it only after it ends.
 
-## Single Dispatch
+## Single Execution
 
-- Dispatch exactly one subagent per run. A failed, timed-out, or refused dispatch is
-  recorded as such and never retried inside the same run.
-- After a failed dispatch, continue into `deviations.md` and `improvement-plan.md` —
+- Record exactly **one Trainee execution** per run. The coach does not start, dispatch,
+  retry, or re-task the execution; it records what the Trainee actually does. A failed,
+  timed-out, refused, or interrupted execution is recorded as such and never retried
+  inside the same run.
+- After a failed execution, continue into `deviations.md` and `improvement-plan.md` —
   continue means exactly that and nothing more.
 - The coach never executes Trainee steps itself and never injects side effects into
-  the subagent's work.
+  the Trainee's work.
 
-## Dispatch Payload
+## Recording Contract
 
-The payload is a closed field set; anything not listed below is forbidden.
+When the Trainee's execution is observed remotely, the record is anchored by the
+following closed field set; anything not listed below is not part of the record. The
+coach does **not** send this as a task assignment — it records the Trainee's own
+execution against these fields.
 
 | Field | Content | Rule |
 |-------|---------|------|
 | `trainee` | resolved identifier, resolved path, executor kind (`skill` or `command`), and the layer for a skill | the exact path this run resolved; no alternatives offered |
-| `workdir` | the project root the Trainee must treat as `${SKILL_WORKDIR}` | a subagent does not inherit this conversation's cwd; omitting it leaves every `.specify/...` reference ambiguous |
+| `workdir` | the project root the Trainee must treat as `${SKILL_WORKDIR}` | recorded so every `.specify/...` reference is unambiguous |
 | `work` | `<work>` verbatim | byte-for-byte the second positional parameter; an empty value IS the no-argument form, never a missing parameter |
-| `instruction` | for a skill: "Follow the Trainee's own `SKILL.md` as the highest execution guidance"; for a command: "Execute the resolved command template exactly; `<work>` (possibly empty) is its argument set — an empty `<work>` is the no-argument form" | never replaced by a coach-authored procedure |
-| `return-contract` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state — plus, when the Trainee is a meta-skill: `subject {ref, path}`, the subject's changed files, and the claim taken or skipped | powers `self-report` when host events are unavailable |
-| `anomaly-line` | "State one explicit anomaly line on return; state `none` when there is none" | silence is not read as clean |
-| `fast-fail-clause` | the dispatcher's anomaly discipline | injected at dispatch time; a subagent does not inherit this conversation |
-| `confirmation-relay` | "If the Trainee flow reaches a destructive step **or needs a targeted clarification**, stop and report it back instead of approving or guessing" | the answer comes from the user; the subagent never self-approves and never substitutes a guess |
-| `reporting-cadence` | the tick value in force for this run, plus the attribution pair (structure slug + run stamp) the subordinate's own lines must carry | the value is the resolved profile's cadence; the subordinate reports its own progress on it and the coach reports the subordinate's state on it |
+| `carrier` | the Trainee's own declared carrier (for example `super-agent-main-session` where the Trainee forbids nested driving, or `external-subagent` where the Trainee permits it) | recorded as declared by the Trainee; the coach never chooses or imposes it |
+| `execution-basis` | the Trainee's own `SKILL.md` (or resolved command template) | the execution reference the Trainee follows; never replaced by a coach-authored procedure |
+| `record-fields` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state — plus, when the Trainee is a meta-skill: `subject {ref, path}`, the subject's changed files, and the claim taken or skipped | powers `self-report` when host events are unavailable |
+| `anomaly-line` | the Trainee's explicit anomaly line; `none` when there is none | silence is not read as clean |
+| `reporting-cadence` | the tick value in force for this run, plus the attribution pair (structure slug + run stamp) | the coach reports the Trainee's state on this cadence |
 
-The payload MUST NOT contain:
+The record MUST NOT contain:
 
 1. the expectation file, any `OC-*` / `PE-*` row, or a summary of them;
 2. the coach's deviation guesses or conclusions about `<work>`;
 3. a coach-authored simplification or reordering of the Trainee flow;
-4. any artifact path inside the run directory — the subagent writes Trainee outputs,
+4. any artifact path inside the run directory — the Trainee writes its own outputs,
    not coach records;
-5. the coach's own status lines or its expected subordinate-state conclusions — the
-   subordinate is never told what its state will be judged as.
+5. the coach's own status lines or its expected Trainee-state conclusions — the
+   Trainee is never told what its state will be judged as.
 
-Exactly one payload is dispatched per run. A failed dispatch is not re-sent with a
-modified payload; the failure is recorded instead.
+Exactly one execution is recorded per run. The coach does not re-send a modified task;
+the failure is recorded instead.
 
-On return, the anomaly line is written into the DispatchRecord unchanged. Self-reported
-steps become `self-report` rows, and anything the self-report does not cover becomes an
-`observation-gap` row rather than an inferred one. The Trainee's own reported state at
-return is recorded verbatim as a `self-report` row: when the coach's report cites that
+When the execution ends, the anomaly line is recorded unchanged. Self-reported steps
+become `self-report` rows, and anything the self-report does not cover becomes an
+`observation-gap` row rather than an inferred one. The Trainee's own reported terminal
+state is recorded verbatim as a `self-report` row: when the coach's report cites that
 state it cites `self-report`, and it MUST NOT infer the state from host events or from
-the silence of the Trainee's output. A return that claims completion
-without the Trainee's primary artifact is recorded as `partial`, not `completed`.
+the silence of the Trainee's output. A return that claims completion without the
+Trainee's primary artifact is recorded as `partial`, not `completed`.
 
-The transport — `native` host subagent tool, `run-agent-fallback`, or
-`run-skills-explicit-path` mode — is recorded in the DispatchRecord `mode` field, and the
-rendered payload is stored or referenced by `payload-ref`. The payload's raw text never
-enters the coach's user-facing report.
+The carrier is the Trainee's own, recorded in the `TraineeExecutionRecord` `carrier`
+field; the coach does not choose it. The record's raw text never enters the coach's
+user-facing report.
 
 ## Sub-flow Report
 
-The Trainee dispatch is the sub-flow this run reports. On the tick in force for the run,
-the coach reports that one dispatch — not an empty set, and not merely the coach's own
-progress — with its **identity** (the dispatch's label), its **state** and the **age** of
-its last observed activity. The state and the age come from the Trainee's own reported
-state at return once it is available, and from the artifact triplet the dispatch already
-declares before that; the coach cites `self-report` rather than inferring.
+The Trainee execution is the sub-flow this run reports. On the tick in force for the
+run, the coach reports that one execution — not an empty set, and not merely the
+coach's own progress — with its **identity** (the execution's label), its **state** and
+the **age** of its last observed activity. The state and the age come from the
+Trainee's own reported state after the execution ends, and from the artifact triplet
+the execution already declares before that; the coach cites `self-report` rather than
+inferring.
 
-An omission is a defect, not a sampling decision: a dispatch this run made and did not
-report on a tick is named by its label, and a failure or a stall crossing is reported
-before the next tick rather than waiting for the clock.
+An omission is a defect, not a sampling decision: an execution this run observed and
+did not report on a tick is named by its label, and a failure or a stall crossing is
+reported before the next tick rather than waiting for the clock.
 
 **This section demonstrates the duty; it does not define it.** Scope, cadence, the stall
 threshold and the transition classes are owned by
@@ -276,7 +291,7 @@ four artifact paths.
 ## Degradation Ladder
 
 - Host events available: steps carry `host-event`.
-- Host events unavailable but the subagent's structured return is available: steps
+- Host events unavailable but the Trainee's structured return is available: steps
   carry `self-report`.
 - Neither: the step is a row marked `observation-gap`, counted in the gap list, never
   invented.
@@ -285,24 +300,21 @@ four artifact paths.
 
 ## Boundaries
 
-- Dispatch mechanism: the **fork carrier** is first for same-family agents (a separate `qodercli`
-  child process through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` — prompt via
-  stdin, stream-json output, sentinel-judged completion); heterogeneous agents use the
-  **subprocess carrier** (an independent child process of the agent's own CLI). `run-agent` only
-  resolves and relays; `run-skills` only resolves and executes the Trainee and carries no dispatch
-  duty. The host-internal in-process subagent path is **BANNED** as a carrier — neither a default
-  nor a degradation option. No second mechanism is introduced; the mode used is recorded in the
-  DispatchRecord.
+- Carrier: the coach does **not** choose, impose, or transport a carrier. The Trainee
+  executes in its own declared carrier (for example `xuanji-dev` runs in the
+  super-agent main session and forbids nested driving; another Trainee may permit an
+  external subagent). The coach records host events when the execution is in-session,
+  and the Trainee's self-report/file evidence when it is remote. A Trainee's own
+  carrier prohibition is recorded, never overridden.
 - Governance: this skill stays `classification: external`. Relaying a destructive
   step that belongs to the Trainee's own flow is a governance-kept relay: state the
-  step to the user, obtain the answer, then dispatch; the subagent never
-  self-approves.
+  step to the user, obtain the answer, and let the Trainee continue; the coach never
+  self-approves and never substitutes a guess.
 - Dual independent context: the coach forms the expectation from its own reading of
-  `<work>`. The dispatch payload carries `<work>` verbatim, the Trainee target, and
-  the instruction to execute per the Trainee's own `SKILL.md`; it never carries the
-  expectation, deviation guesses, or the coach's conclusions. The coach never
-  pre-digests `<work>`; divergence is a reportable finding, not something to
-  eliminate.
+  `<work>`. The Trainee receives `<work>` from the user or its own carrier — not as a
+  coach-authored task — and the coach records the Trainee's own reading and execution.
+  The coach never pre-digests `<work>`; divergence is a reportable finding, not
+  something to eliminate.
 
 ## Resources
 

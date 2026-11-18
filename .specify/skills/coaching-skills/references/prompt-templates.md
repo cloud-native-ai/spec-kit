@@ -6,8 +6,8 @@ skeletons, the derivation method and the phase boundaries.
 ## Execution Expectation Template
 
 Path: `.specify/memory/coaching/<run-id>/expectation.md`. Write it **before any
-dispatch action**; the `dispatched-at` field of `observation.md` § Dispatch is the
-ordering evidence.
+Trainee execution action**; the `started-at` field of `observation.md` § Trainee
+Execution is the ordering evidence.
 
 ```markdown
 ## Run header
@@ -103,7 +103,7 @@ the only allowed interaction.
 ## Observation Record Template
 
 Path: `.specify/memory/coaching/<run-id>/observation.md`. Write it after the single
-dispatch and before `deviations.md`: it records what actually happened, never what the
+Trainee execution and before `deviations.md`: it records what actually happened, never what the
 expectation predicted.
 
 ```markdown
@@ -117,18 +117,18 @@ expectation predicted.
   `none-observed` when the subject is byte-identical; recorded as `file-evidence` steps>
 - observation-window: <first observed step at> .. <last observed step at>
 
-## Dispatch
-- mode: native | run-agent-fallback | run-skills-explicit-path
-- dispatched-at: <ISO-8601 UTC; later than the expectation.md mtime>
-- payload-ref: <path or hash of the rendered payload>
-- returned: completed | partial | failed | timeout | refused
-- anomaly-line: <the subagent's anomaly line, verbatim>
+## Trainee Execution
+- carrier: <the Trainee's own declared carrier; e.g. super-agent-main-session, external-subagent, command-surface>
+- started-at: <ISO-8601 UTC; later than the expectation.md mtime>
+- work-ref: <the `<work>` verbatim, or its hash>
+- returned: completed | partial | failed | timeout | refused | interrupted
+- anomaly-line: <the Trainee's anomaly line, verbatim>
 - failure-coordinates: <step id, error, completed portion; omit only when returned is completed>
 
 ## Steps
 | step | trigger/instruction | action | tool-call | state-change | artefact | elapsed | source | consistency |
 |---|---|---|---|---|---|---|---|---|
-| S1 | <Trainee instruction> | <what the subagent did> | <tool + key argument, or —> | <state delta> | <path, or —> | <duration> | host-event | on-critical-path: yes; vs-expected-steps: within |
+| S1 | <Trainee instruction> | <what the Trainee did> | <tool + key argument, or —> | <state delta> | <path, or —> | <duration> | host-event | on-critical-path: yes; vs-expected-steps: within |
 | S2 | <Trainee instruction> | <the step no channel carried> | — | — | — | — | observation-gap | on-critical-path: yes; vs-expected-steps: beyond |
 
 ## Gaps
@@ -143,15 +143,15 @@ expectation predicted.
 
 Rules for the record:
 
-- Section order is fixed: `## Run header` → `## Dispatch` → `## Steps` → `## Gaps` →
-  `## Result`. Exactly one dispatch block: a second one is a contract violation even when
-  the first dispatch failed.
+- Section order is fixed: `## Run header` → `## Trainee Execution` → `## Steps` → `## Gaps` →
+  `## Result`. Exactly one Trainee-execution block: a second one is a contract violation
+  even when the first execution failed.
 - `consistency` is an observation-only judgement with two closed sub-fields:
   `on-critical-path: yes|no` and `vs-expected-steps: within|beyond`. It MUST NOT execute
   the Trainee's verification logic — verifying the Trainee's output is the Trainee's job,
   not an observation side effect.
 - Every step row carries a `source`: `host-event` when the host reported the step,
-  `self-report` when only the subagent's structured return described it, `file-evidence`
+  `self-report` when only the Trainee's structured return described it, `file-evidence`
   when a read-only filesystem probe of the subject supplies the fact (never an inference),
   and `observation-gap` when no channel carried it. When two channels describe one step
   and disagree at field level, the `host-event` value wins.
@@ -159,9 +159,9 @@ Rules for the record:
   in plain prose and does not repeat the marker; it reports the count (`gap-count`) and
   the affected step ids. An unobservable step is never omitted and never reconstructed
   from the expectation.
-- A failed, timed-out, or refused dispatch keeps its coordinates: which step, which error,
-  which part completed. Gaps never mask a failure and the record never narrates an
-  incomplete run as completed.
+- A failed, timed-out, refused, or interrupted execution keeps its coordinates: which
+  step, which error, which part completed. Gaps never mask a failure and the record
+  never narrates an incomplete run as completed.
 - If no observation could be collected at all, the file still exists, `## Gaps` states the
   total absence, and `## Result` says so plainly; downstream `deviations.md` and
   `improvement-plan.md` carry `evidence: none` and the run stays `partial`.
