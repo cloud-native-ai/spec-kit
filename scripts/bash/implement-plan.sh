@@ -104,8 +104,17 @@ EOF
         }
     fi
 
-    # Get all paths and variables from common functions
-    eval $(get_feature_paths)
+    # Get all paths and variables from common functions.
+    # Capture, check the resolver's status, then eval the QUOTED output — the old
+    # `eval $(get_feature_paths)` let a value's own quote break out and run as code.
+    # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+    local _paths_output
+    _paths_output=$(get_feature_paths) || {
+        echo "ERROR: Failed to resolve feature paths" >&2
+        exit 1
+    }
+    eval "$_paths_output"
+    unset _paths_output
 
     # Check if we're on a proper feature branch (only for git repos)
     check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
@@ -280,7 +289,7 @@ EOF
             "$(json_escape "$IMPL_PLAN")" \
             "$(json_escape "$REQUIREMENTS_DIR")" \
             "$(json_escape "$CURRENT_BRANCH")" \
-            "$HAS_GIT" \
+            "$(json_escape "$HAS_GIT")" \
             "$(json_escape "$USER_INPUT")"
     else
         echo "FEATURE_SPEC: $FEATURE_SPEC"
@@ -301,9 +310,12 @@ EOF
     fi
 }
 
-# (the body above runs when this file is executed directly)
-main "$@"
-
+# Run the body once, and only when this file is the program. The unconditional
+# `main "$@"` that used to sit above this guard made a direct run execute the whole
+# workflow twice — two JSON documents on stdout, every artifact written twice — and
+# made sourcing the file run the workflow as a side effect. Every sibling script
+# (create-new-plan.sh, check-prerequisites.sh, research-project.sh) carries exactly
+# this guarded form.
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     main "$@"
 fi

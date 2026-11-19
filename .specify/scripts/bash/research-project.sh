@@ -62,8 +62,18 @@ main() {
     # Ensure UTF-8 locale for better Unicode handling
     ensure_utf8_locale || true
 
-    # Get all paths and variables from common functions
-    eval $(get_feature_paths)
+    # Get all paths and variables from common functions.
+    # Capture, check the resolver's status, then eval the QUOTED output — the old
+    # `eval $(get_feature_paths)` let a value's own quote break out and run as code.
+    # BRANCH_RESOLVED_FROM_SPEC_DIR is consumed by the JSON builder below and stays.
+    # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+    local _paths_output
+    _paths_output=$(get_feature_paths) || {
+        echo "ERROR: Failed to resolve feature paths" >&2
+        exit 1
+    }
+    eval "$_paths_output"
+    unset _paths_output
 
     # Ensure the feature directory exists. It sits on the writing path, below the argument
     # scan, so a flag riding with a write still writes nothing (C-11).

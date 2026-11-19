@@ -132,8 +132,19 @@ EOF
     # Ensure UTF-8 locale for better Unicode handling across tools
     ensure_utf8_locale || true
 
-    # Get feature paths and validate branch
-    eval $(get_feature_paths)
+    # Get feature paths and validate branch.
+    # Capture, check the resolver's status, then eval the QUOTED output. The old
+    # `eval $(get_feature_paths)` word-split the assignments and let a value's own
+    # single quote break out of its quoting and run as code; get_feature_paths now
+    # emits printf '%q' values and returns 1 when the spec directory is ambiguous.
+    # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+    local _paths_output
+    _paths_output=$(get_feature_paths) || {
+        echo "ERROR: Failed to resolve feature paths" >&2
+        exit 1
+    }
+    eval "$_paths_output"
+    unset _paths_output
     check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
 
     # Extract REQUIREMENT_ID from branch name (NOT feature name)
@@ -191,8 +202,23 @@ EOF
             # Minimal JSON paths payload (no validation performed)
             # Note: REQUIREMENT_ID is extracted from branch name, not FEATURE_ID
             # Feature metadata must be retrieved from .specify/features.md
+            # Every quoted value goes through json_escape (common.sh publishes the
+            # host-owned RFC 8259 escaper): FEATURE_NAME is free text read out of
+            # requirements.md, and a path or branch may carry a quote or a newline.
+            # WRITABLE stays raw — it is a JSON boolean, not a string.
+            # Adapted-from: 9c0c1446ecc7b8e92d866050b5cbc620d8a307e5
             printf '{"REPO_ROOT":"%s","BRANCH":"%s","REQUIREMENT_ID":"%s","REQUIREMENTS_DIR":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","MODE":"%s","WRITABLE":%s}\n' \
-                "$REPO_ROOT" "$CURRENT_BRANCH" "$REQUIREMENT_ID" "$REQUIREMENTS_DIR" "$FEATURE_ID" "$FEATURE_NAME" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$MODE" "$WRITABLE"
+                "$(json_escape "$REPO_ROOT")" \
+                "$(json_escape "$CURRENT_BRANCH")" \
+                "$(json_escape "$REQUIREMENT_ID")" \
+                "$(json_escape "$REQUIREMENTS_DIR")" \
+                "$(json_escape "$FEATURE_ID")" \
+                "$(json_escape "$FEATURE_NAME")" \
+                "$(json_escape "$FEATURE_SPEC")" \
+                "$(json_escape "$IMPL_PLAN")" \
+                "$(json_escape "$TASKS")" \
+                "$(json_escape "$MODE")" \
+                "$WRITABLE"
         else
             echo "REPO_ROOT: $REPO_ROOT"
             echo "BRANCH: $CURRENT_BRANCH"
@@ -274,16 +300,29 @@ EOF
 
     # Output results
     if $JSON_MODE; then
-        # Build JSON array of documents
+        # Build JSON array of documents. The names are literals today, but each is
+        # escaped individually so the array stays valid JSON if a name ever becomes
+        # dynamic — escaping the assembled array would escape its structural quotes.
+        # Adapted-from: 9c0c1446ecc7b8e92d866050b5cbc620d8a307e5
         if [[ ${#docs[@]} -eq 0 ]]; then
             json_docs="[]"
         else
-            json_docs=$(printf '"%s",' "${docs[@]}")
+            local _doc
+            json_docs=""
+            for _doc in "${docs[@]}"; do
+                json_docs+="\"$(json_escape "$_doc")\","
+            done
             json_docs="[${json_docs%,}]"
         fi
 
         printf '{"REQUIREMENTS_DIR":"%s","REQUIREMENT_ID":"%s","FEATURE_ID":"%s","FEATURE_NAME":"%s","AVAILABLE_DOCS":%s,"MODE":"%s","WRITABLE":%s}\n' \
-            "$REQUIREMENTS_DIR" "$REQUIREMENT_ID" "$FEATURE_ID" "$FEATURE_NAME" "$json_docs" "$MODE" "$WRITABLE"
+            "$(json_escape "$REQUIREMENTS_DIR")" \
+            "$(json_escape "$REQUIREMENT_ID")" \
+            "$(json_escape "$FEATURE_ID")" \
+            "$(json_escape "$FEATURE_NAME")" \
+            "$json_docs" \
+            "$(json_escape "$MODE")" \
+            "$WRITABLE"
     else
         # Text output
         echo "REQUIREMENTS_DIR:$REQUIREMENTS_DIR"

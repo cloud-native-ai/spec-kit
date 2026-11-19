@@ -120,8 +120,19 @@ main() {
     sys.stdout.write(escape_control(sys.argv[1]))
     " "$input"
         else
-            # Fallback: just echo the input (may not handle all control chars)
-            echo "$input"
+            # No python3: do NOT emit a half-escaped string. The bash substitutions
+            # above cover only \n \r \t, so a residual U+0001-U+001F would leave the
+            # payload unparseable, and `echo` would append a newline the python3 path
+            # (sys.stdout.write) does not. Report the inability instead of silently
+            # corrupting the JSON.
+            # Hardening shape adapted-from: 2e55bdd3f279849a4e499a4a7c1a0d63d39f117b
+            # (control characters must be encoded, never dropped or passed through).
+            # Note: scripts/bash/common.sh publishes the host-owned `json_escape`
+            # (cws-lib-bash profile.d/04_format.sh) for scripts that source common.sh.
+            # This file is standalone and does not source it, so the python3 path
+            # above stays this helper's own implementation.
+            echo "Error: json_escape_string requires python3 to escape control characters" >&2
+            return 1
         fi
     }
 

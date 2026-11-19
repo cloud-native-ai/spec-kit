@@ -149,10 +149,13 @@ find_feature_dir_by_prefix() {
     # Exactly one match - perfect!
     echo "$specs_dir/${matches[0]}"
   else
-    # Multiple matches - this shouldn't happen with proper naming convention
+    # Multiple matches - this shouldn't happen with proper naming convention.
+    # Fail instead of handing back a fallback path: a caller that cannot tell
+    # "resolved" from "guessed" writes into the wrong requirement directory.
+    # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
     echo "ERROR: Multiple spec directories found with prefix '$prefix': ${matches[*]}" >&2
     echo "Please ensure only one spec directory exists per numeric prefix." >&2
-    echo "$specs_dir/$branch_name" # Return something to avoid breaking the script
+    return 1
   fi
 }
 
@@ -174,28 +177,63 @@ get_feature_paths() {
       requirement_id="${BASH_REMATCH[1]}"
   fi
 
-  # Use prefix-based lookup to support multiple branches per spec
-  local feature_dir=$(find_feature_dir_by_prefix "$repo_root" "$current_branch")
+  # Use prefix-based lookup to support multiple branches per spec.
+  # `local x=$(...)` would mask the resolver's exit status, so the assignment is
+  # separate from the declaration and the failure is propagated to the caller.
+  # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+  local feature_dir
+  if ! feature_dir=$(find_feature_dir_by_prefix "$repo_root" "$current_branch"); then
+    echo "ERROR: Failed to resolve feature directory" >&2
+    return 1
+  fi
   if [[ -d $feature_dir ]]; then
     current_branch=$(basename "$feature_dir")
   fi
 
-  cat <<EOF
-REPO_ROOT='$repo_root'
-CURRENT_BRANCH='$current_branch'
-BRANCH_RESOLVED_FROM_SPEC_DIR=true
-REQUIREMENT_ID='$requirement_id'
-HAS_GIT='$has_git_repo'
-REQUIREMENTS_DIR='$feature_dir'
-FEATURE_SPEC='$feature_dir/requirements.md'
-IMPL_PLAN='$feature_dir/plan.md'
-TASKS='$feature_dir/tasks.md'
-RESEARCH='$feature_dir/research.md'
-DATA_MODEL='$feature_dir/data-model.md'
-QUICKSTART='$feature_dir/quickstart.md'
-CONTRACTS_DIR='$feature_dir/contracts'
-EOF
+  # printf '%q' emits a shell-quoted value, so a branch name or repo path carrying
+  # a quote, a newline or a metacharacter is data here and code nowhere. The old
+  # heredoc wrapped values in literal single quotes, which a value's own single
+  # quote breaks out of — and `eval $(get_feature_paths)` then executed the rest.
+  # Consumers MUST eval the QUOTED output and check this function's status first.
+  # Key names and the requirements.md artifact name are this project's contract
+  # and are deliberately NOT upstream's.
+  # Adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+  printf 'REPO_ROOT=%q\n' "$repo_root"
+  printf 'CURRENT_BRANCH=%q\n' "$current_branch"
+  printf 'BRANCH_RESOLVED_FROM_SPEC_DIR=%q\n' "true"
+  printf 'REQUIREMENT_ID=%q\n' "$requirement_id"
+  printf 'HAS_GIT=%q\n' "$has_git_repo"
+  printf 'REQUIREMENTS_DIR=%q\n' "$feature_dir"
+  printf 'FEATURE_SPEC=%q\n' "$feature_dir/requirements.md"
+  printf 'IMPL_PLAN=%q\n' "$feature_dir/plan.md"
+  printf 'TASKS=%q\n' "$feature_dir/tasks.md"
+  printf 'RESEARCH=%q\n' "$feature_dir/research.md"
+  printf 'DATA_MODEL=%q\n' "$feature_dir/data-model.md"
+  printf 'QUICKSTART=%q\n' "$feature_dir/quickstart.md"
+  printf 'CONTRACTS_DIR=%q\n' "$feature_dir/contracts"
 }
+
+# JSON string escaping — owner pointer, NOT a second implementation.
+#
+# The complete RFC 8259 escaper (backslash, double quote, \b \f \n \r \t, and every
+# remaining U+0001-U+001F as \uXXXX, never stripped) is owned by the host shell
+# library: ${CWS_LIB_BASH_HOME}/profile.d/04_format.sh, function json_escape.
+# This file PUBLISHES it through the library-link list at the bottom, which is what
+# makes it reachable from a caller that sources common.sh; report_error and
+# report_success below consume it, and any caller building its own printf JSON
+# payload calls it once per interpolated value.
+#
+# Why no definition here: the library-link captures each published name with
+# `declare -f` INSIDE a subshell that first sources the host library, so a
+# json_escape defined at this file's scope is shadowed by the host's before it is
+# ever captured — it would be dead code that only looks like a fix. Measured: the
+# published body is the host's, and it round-trips a 23-payload corpus (quotes,
+# backslashes, all named control escapes, residual U+0001-U+001F, multibyte UTF-8
+# and emoji) under both C.UTF-8 and C. Same boundary as git_repo_root / escape_sed.
+#
+# Fix shape adapted-from: 46bc65b1cefc487e507aa7b809ce4e48b96ba4ec
+# Fix shape adapted-from: 9c0c1446ecc7b8e92d866050b5cbc620d8a307e5
+# Fix shape adapted-from: 2e55bdd3f279849a4e499a4a7c1a0d63d39f117b
 
 check_file() { [[ -f $1 ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 check_dir() { [[ -d $1 && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
@@ -302,14 +340,16 @@ create_skill_structure() {
 
 # Report error
 # Usage: report_error "message" [json_mode]
+# The message is escaped by json_escape (the host-owned escaper this file publishes
+# — see the owner pointer above): doubling quotes alone left a backslash, a newline
+# or a control character producing a payload no JSON parser accepts.
+# Adapted-from: 9c0c1446ecc7b8e92d866050b5cbc620d8a307e5
 report_error() {
   local message="$1"
   local json_mode="${2:-false}"
 
   if [ "$json_mode" = true ]; then
-    # Escape quotes in message
-    local safe_msg="${message//\"/\\\"}"
-    echo "{\"status\": \"error\", \"message\": \"$safe_msg\"}"
+    echo "{\"status\": \"error\", \"message\": \"$(json_escape "$message")\"}"
   else
     echo "Error: $message" >&2
   fi
@@ -317,14 +357,18 @@ report_error() {
 
 # Report success
 # Usage: report_success "message" [data_fragment] [json_mode]
-# data_fragment should be valid JSON key-value pairs, e.g. '"path": "/foo"'
+# data_fragment should be valid JSON key-value pairs, e.g. '"path": "/foo"'.
+# It is caller-authored JSON and is passed through unchanged; only the message,
+# which carries arbitrary dynamic text, goes through json_escape.
+# Adapted-from: 9c0c1446ecc7b8e92d866050b5cbc620d8a307e5
 report_success() {
   local message="$1"
   local data="$2"
   local json_mode="${3:-false}"
 
   if [ "$json_mode" = true ]; then
-    local safe_msg="${message//\"/\\\"}"
+    local safe_msg
+    safe_msg=$(json_escape "$message")
     if [ -n "$data" ]; then
       echo "{\"status\": \"success\", \"message\": \"$safe_msg\", $data}"
     else
@@ -376,5 +420,5 @@ ensure_utf8_locale() {
 _script_interface_library_link \
   check_feature_branch get_feature_dir find_feature_dir_by_prefix get_feature_paths \
   git_repo_root git_current_branch is_git_repo gitignore_add_pattern gitignore_ensure_exists escape_sed \
-  check_file check_dir safe_quote validate_input is_valid_utf8 validate_skill_name \
+  check_file check_dir safe_quote json_escape validate_input is_valid_utf8 validate_skill_name \
   create_skill_structure report_error report_success ensure_utf8_locale check_dependency
