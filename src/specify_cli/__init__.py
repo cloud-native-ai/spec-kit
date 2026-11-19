@@ -18,6 +18,7 @@ Or install globally:
 import hashlib
 import json
 import os
+import platform
 import re
 import secrets
 import shlex
@@ -46,6 +47,7 @@ import typer
 from rich.align import Align
 from rich.console import Console
 from rich.live import Live
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -196,10 +198,12 @@ class AgentMetadataError(ValueError):
 
 
 def split_agent_frontmatter(text):
-    """Split an agent definition into (frontmatter_lines, body).
+    """Split a frontmatter-bearing document into (frontmatter_lines, body).
 
-    Frontmatter is the block between a leading '---' line and the next '---'
-    line. Returns ([], text) when no frontmatter is present.
+    Shared by agent definitions and command templates. Frontmatter is the
+    block between a leading '---' line and the next '---' line — a delimiter
+    is a whole line, so a '---' inside a value never closes the block.
+    Returns ([], text) when no frontmatter is present.
     """
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -630,7 +634,7 @@ def write_source_stamp(project_path) -> bool:
         return True
     except OSError as exc:
         console.print(
-            f"[yellow]Warning:[/yellow] Source stamp not written: {exc}")
+            f"[yellow]Warning:[/yellow] Source stamp not written: {escape(str(exc))}")
         return False
 
 
@@ -1462,9 +1466,9 @@ class StepTracker:
             "skipped": ("skip", "yellow"),
         }
         word, color = tags.get(step["status"], (step["status"], "white"))
-        detail = f": {step['detail']}" if step["detail"] else ""
+        detail = f": {escape(step['detail'])}" if step["detail"] else ""
         console.print(
-            f"[{color}]{word:>5}[/{color}] {step['label']}{detail}",
+            f"[{color}]{word:>5}[/{color}] {escape(step['label'])}{detail}",
             highlight=False,
         )
 
@@ -1478,8 +1482,8 @@ class StepTracker:
     def render(self):
         tree = Tree(f"[cyan]{self.title}[/cyan]", guide_style="grey50")
         for step in self.steps:
-            label = step["label"]
-            detail_text = step["detail"].strip() if step["detail"] else ""
+            label = escape(step["label"])
+            detail_text = escape(step["detail"].strip()) if step["detail"] else ""
 
             status = step["status"]
             if status == "done":
@@ -1599,6 +1603,84 @@ def rewrite_paths(content: str) -> str:
         content,
     )
     return content
+
+
+# ---------------------------------------------------------------------------
+# TOML command rendering helpers
+#
+# TOML forbids literal control characters in every string form, and a
+# multiline *basic* string ("""...""") processes backslash escapes — so a
+# command body carrying a Windows path or a control character must be routed
+# to a form that stays parseable. One implementation owns both rules.
+# Adapted-from: 034fbfcbb4c62de4f07dead3ace6b45477b81b42
+# Adapted-from: 94c7ec288fd34221e62fef50f3212f8a899eda95
+# ---------------------------------------------------------------------------
+
+
+def _has_illegal_toml_control(value: str) -> bool:
+    """True when *value* holds a character TOML forbids literally.
+
+    Tab and newline are allowed (newline only in the multiline forms); every
+    other control character (U+0000-U+001F, U+007F) must be \\u-escaped, which
+    only a basic string can do. A bare CR counts as illegal: a multiline
+    string reads it as a newline only when paired into CRLF.
+    """
+    length = len(value)
+    for i, ch in enumerate(value):
+        code = ord(ch)
+        if ch == "\r":
+            if i + 1 < length and value[i + 1] == "\n":
+                continue
+            return True
+        if (code < 0x20 and ch not in ("\t", "\n")) or code == 0x7F:
+            return True
+    return False
+
+
+def _escape_toml_basic(value: str) -> str:
+    """Render *value* as a single-line TOML basic string, escaping everything.
+
+    Always parseable: backslash and quote are escaped, the common control
+    characters use their short escapes, and any remaining control character
+    is emitted as a \\uXXXX sequence.
+    """
+    out: List[str] = []
+    for ch in value:
+        code = ord(ch)
+        if ch == "\\":
+            out.append("\\\\")
+        elif ch == '"':
+            out.append('\\"')
+        elif ch == "\n":
+            out.append("\\n")
+        elif ch == "\r":
+            out.append("\\r")
+        elif ch == "\t":
+            out.append("\\t")
+        elif code < 0x20 or code == 0x7F:
+            out.append(f"\\u{code:04x}")
+        else:
+            out.append(ch)
+    return '"' + "".join(out) + '"'
+
+
+def _render_toml_prompt(body: str) -> str:
+    """Render the `prompt` key of a generated TOML command file.
+
+    Prefer the multiline forms (they keep the body readable), then fall back
+    to the fully escaped basic string. A multiline basic string processes
+    backslash escapes, so a body containing one goes to the literal form
+    ('''...'''), which does not — unless it also contains that delimiter.
+    Control characters are illegal in every form, so they force the escaped
+    basic string. No trailing newline: the caller owns the file's last one.
+    """
+    if _has_illegal_toml_control(body):
+        return f"prompt = {_escape_toml_basic(body)}"
+    if '"""' not in body and "\\" not in body:
+        return 'prompt = """\n' + body + '\n"""'
+    if "'''" not in body:
+        return "prompt = '''\n" + body + "\n'''"
+    return f"prompt = {_escape_toml_basic(body)}"
 
 
 def generate_commands(
@@ -1760,12 +1842,17 @@ def generate_commands(
         # Reconstruct content without scripts sections
         cleaned_content = "\n".join(new_lines)
 
-        # Extract body (everything after the frontmatter)
-        body_parts = cleaned_content.split("---")
-        if len(body_parts) >= 3:
-            body = "---".join(body_parts[2:]).strip()
-        else:
-            body = cleaned_content.strip()
+        # Extract body (everything after the frontmatter). The closing
+        # delimiter is a *line* that is exactly `---`, never any `---`
+        # substring: splitting on the substring stops at a `---` embedded in a
+        # frontmatter value (e.g. `description: Separate sections with ---`)
+        # and spills the rest of the frontmatter into the body, and it also
+        # drops the leading body text of a template that has no frontmatter
+        # but two `---` rules. Reuse the line-anchored splitter agent
+        # definitions already use so one rule owns the delimiter.
+        # Adapted-from: 7873c447bd5ea8f919d7bdde8b118525c463d9c0
+        _, body = split_agent_frontmatter(cleaned_content)
+        body = body.strip()
 
         # Replace placeholders in the final body.
         # A multi-line `sh: |` block expands to a fenced ```bash block; the
@@ -1787,12 +1874,14 @@ def generate_commands(
             "edit the source template, then run scripts/python/regen-command-copies.py"
         )
         if ext == "toml":
+            # Both values are escaped: a raw description or a body inside a
+            # multiline basic string produces unparseable TOML as soon as it
+            # carries a quote, a backslash or a control character.
             toml_content = (
                 f"# {marker}\n"
-                + f'description = "{description}"\n\n'
-                + 'prompt = """\n'
-                + body
-                + '\n"""\n'
+                + f"description = {_escape_toml_basic(description)}\n\n"
+                + _render_toml_prompt(body)
+                + "\n"
             )
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(toml_content)
@@ -1913,7 +2002,9 @@ def configure_vscode_settings(
         if tracker:
             tracker.error("vscode-settings", str(e))
         else:
-            console.print(f"[red]Error configuring VS Code settings:[/red] {e}")
+            console.print(
+                f"[red]Error configuring VS Code settings:[/red] {escape(str(e))}"
+            )
 
 
 def ensure_specify_symlink(
@@ -2714,7 +2805,9 @@ def copy_local_templates(
         if tracker:
             tracker.error("local-templates", message)
         else:
-            console.print(f"[red]Error copying local templates:[/red] {message}")
+            console.print(
+                f"[red]Error copying local templates:[/red] {escape(message)}"
+            )
         # Clean up project directory if created and not current directory
         if not is_current_dir and project_path.exists():
             shutil.rmtree(project_path)
@@ -4739,9 +4832,55 @@ def show_banner():
     console.print()
 
 
+def version_payload() -> dict:
+    """The running CLI's version identity as one machine-readable record.
+
+    Reuses the migrate record owner (``migrate_target_record`` → distribution
+    version + framework source commit) so a second version implementation
+    cannot drift from it. Keys are camelCase like the other CLI JSON
+    envelopes; an unresolvable value stays "unavailable", never a guess.
+    Adapted-from: 8dfb15d9d8a2fb27343fe2e1140815e23f6ac718
+    """
+    record = migrate_target_record()
+    return {
+        "name": "specify-cli",
+        "cliVersion": record["cliVersion"],
+        "frameworkCommit": record["frameworkCommit"],
+        "commitOrigin": record["origin"],
+        "python": platform.python_version(),
+        "platform": sys.platform,
+        "architecture": platform.machine(),
+    }
+
+
+def _print_version_text() -> None:
+    """Human-readable version lines — no banner: this is a query, not a run."""
+    payload = version_payload()
+    console.print(f"[cyan]specify-cli[/cyan] {escape(payload['cliVersion'])}")
+    console.print(
+        f"framework commit: {escape(payload['frameworkCommit'])} "
+        f"({escape(payload['commitOrigin'])})"
+    )
+    console.print(
+        f"python: {escape(payload['python'])} on {escape(payload['platform'])} "
+        f"({escape(payload['architecture'])})"
+    )
+
+
 @app.callback()
-def callback(ctx: typer.Context):
+def callback(
+    ctx: typer.Context,
+    version_flag: bool = typer.Option(
+        False,
+        "--version",
+        help="Show the CLI version and exit (JSON: specify version --json).",
+        is_eager=True,
+    ),
+):
     """Show banner when no subcommand is provided."""
+    if version_flag:
+        _print_version_text()
+        raise typer.Exit()
     if (
         ctx.invoked_subcommand is None
         and "--help" not in sys.argv
@@ -4754,28 +4893,64 @@ def callback(ctx: typer.Context):
         console.print()
 
 
+@app.command()
+def version(
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit the version record as JSON on stdout (no banner, no styling).",
+    ),
+) -> None:
+    """Show the CLI version, framework source commit and runtime."""
+    if json_output:
+        sys.stdout.write(
+            json.dumps(version_payload(), ensure_ascii=False, indent=2) + "\n"
+        )
+        sys.stdout.flush()
+        return
+    _print_version_text()
+
+
 def run_command(
     cmd: List[str],
     check_return: bool = True,
     capture: bool = False,
     shell: bool = False,
 ) -> Optional[str]:
-    """Run a shell command and optionally capture output."""
+    """Run a command without invoking a shell, optionally capturing output.
+
+    ``shell`` stays in the signature so existing keyword callers do not raise
+    TypeError, but only the default ``shell=False`` is honoured: ``shell=True``
+    is rejected with ValueError rather than silently ignored, so the
+    unsupported mode fails loudly instead of running with a different meaning.
+    Adapted-from: 8e76ff3d5cd4796c4515bac84ed5c4479b2ab199
+    """
+    if shell:
+        raise ValueError(
+            "run_command() does not support shell=True; pass argv as a list"
+        )
+
     try:
         if capture:
             result = subprocess.run(
-                cmd, check=check_return, capture_output=True, text=True, shell=shell
+                cmd, check=check_return, capture_output=True, text=True
             )
             return result.stdout.strip()
         else:
-            subprocess.run(cmd, check=check_return, shell=shell)
+            subprocess.run(cmd, check=check_return)
             return None
     except subprocess.CalledProcessError as e:
         if check_return:
-            console.print(f"[red]Error running command:[/red] {' '.join(cmd)}")
+            # argv and process output are untrusted text: Rich reads any
+            # [...] in them as a style tag, swallowing it or failing to
+            # render. Escape the dynamic parts, keep the intentional markup.
+            # Adapted-from: 99dc915ae38a276ce6be542b97cf2fbd4efd048b
+            console.print(
+                f"[red]Error running command:[/red] {escape(' '.join(cmd))}"
+            )
             console.print(f"[red]Exit code:[/red] {e.returncode}")
             if hasattr(e, "stderr") and e.stderr:
-                console.print(f"[red]Error output:[/red] {e.stderr}")
+                console.print(f"[red]Error output:[/red] {escape(str(e.stderr))}")
             raise
         return None
 
@@ -4859,7 +5034,9 @@ def init_git_repo(
             error_msg += f"\nOutput: {e.stdout.strip()}"
 
         if not quiet:
-            console.print(f"[red]Error initializing git repository:[/red] {e}")
+            console.print(
+                f"[red]Error initializing git repository:[/red] {escape(str(e))}"
+            )
         return False, error_msg
     finally:
         os.chdir(original_cwd)
@@ -4917,7 +5094,7 @@ def ensure_executable_scripts(
         if failures:
             console.print("[yellow]Some scripts could not be updated:[/yellow]")
             for f in failures:
-                console.print(f"  - {f}")
+                console.print(f"  - {escape(f)}")
 
 
 @app.command()
@@ -5034,13 +5211,13 @@ def init(
         project_path = Path(project_name).resolve()
         if project_path.name == ".specify":
             console.print(
-                f"[red]Error:[/red] '{project_name}' resolves to a .specify runtime "
+                f"[red]Error:[/red] '{escape(project_name)}' resolves to a .specify runtime "
                 "dir, not a project root"
             )
             raise typer.Exit(1)
         if project_path.exists():
             console.print(
-                f"[red]Error:[/red] Directory '{project_name}' already exists"
+                f"[red]Error:[/red] Directory '{escape(project_name)}' already exists"
             )
             console.print(
                 "Choose a different project name or remove the existing directory."
@@ -5050,10 +5227,12 @@ def init(
     current_dir = Path.cwd()
 
     console.print("[cyan]Specify project setup[/cyan]", highlight=False)
-    console.print(f"  Project:      {project_path.name}", highlight=False)
-    console.print(f"  Working path: {current_dir}", highlight=False)
+    console.print(f"  Project:      {escape(project_path.name)}", highlight=False)
+    console.print(f"  Working path: {escape(str(current_dir))}", highlight=False)
     if not here:
-        console.print(f"  Target path:  {project_path}", highlight=False)
+        console.print(
+            f"  Target path:  {escape(str(project_path))}", highlight=False
+        )
 
     should_init_git = False
     if not no_git:
@@ -5066,7 +5245,7 @@ def init(
     if ai_assistant:
         if ai_assistant not in AGENT_CONFIG:
             console.print(
-                f"[red]Error:[/red] Invalid AI assistant '{ai_assistant}'. Choose from: {', '.join(AGENT_CONFIG.keys())}"
+                f"[red]Error:[/red] Invalid AI assistant '{escape(ai_assistant)}'. Choose from: {', '.join(AGENT_CONFIG.keys())}"
             )
             raise typer.Exit(1)
         selected_ai = ai_assistant
@@ -5095,7 +5274,7 @@ def init(
     if script_type:
         if script_type not in SCRIPT_TYPE_CHOICES:
             console.print(
-                f"[red]Error:[/red] Invalid script type '{script_type}'. Choose from: {', '.join(SCRIPT_TYPE_CHOICES.keys())}"
+                f"[red]Error:[/red] Invalid script type '{escape(script_type)}'. Choose from: {', '.join(SCRIPT_TYPE_CHOICES.keys())}"
             )
             raise typer.Exit(1)
         selected_script = script_type
@@ -5174,11 +5353,16 @@ def init(
             detail = "aborted by an earlier error (see messages above)"
         else:
             detail = f"{type(e).__name__}: {e}"
-        console.print(f"[red]Error:[/red] Initialization failed: {detail}")
+        console.print(
+            f"[red]Error:[/red] Initialization failed: {escape(detail)}"
+        )
         if debug:
-            console.print(traceback.format_exc().rstrip(), highlight=False)
             console.print(
-                f"Python {sys.version.split()[0]} on {sys.platform}, cwd: {Path.cwd()}",
+                escape(traceback.format_exc().rstrip()), highlight=False
+            )
+            console.print(
+                f"Python {sys.version.split()[0]} on {sys.platform}, "
+                f"cwd: {escape(str(Path.cwd()))}",
                 highlight=False,
             )
         else:
@@ -5194,11 +5378,11 @@ def init(
     if git_error_message:
         console.print(
             "[yellow]Warning:[/yellow] Git repository initialization failed: "
-            f"{git_error_message}"
+            f"{escape(git_error_message)}"
         )
         cd_target = project_path if not here else "."
         console.print(
-            f"Initialize manually: cd {cd_target} && git init && git add . "
+            f"Initialize manually: cd {escape(str(cd_target))} && git init && git add . "
             '&& git commit -m "Initial commit"',
             highlight=False,
         )
@@ -5217,7 +5401,7 @@ def init(
     step_num = 1
     if not here:
         console.print(
-            f"  {step_num}. Go to the project folder: cd {project_name}",
+            f"  {step_num}. Go to the project folder: cd {escape(project_name)}",
             highlight=False,
         )
         step_num += 1
@@ -5231,7 +5415,7 @@ def init(
         else:  # Unix-like systems
             cmd = f"export CODEX_HOME={quoted_path}"
         console.print(
-            f"  {step_num}. Set CODEX_HOME before running Codex: {cmd}",
+            f"  {step_num}. Set CODEX_HOME before running Codex: {escape(cmd)}",
             highlight=False,
         )
         step_num += 1
@@ -5329,14 +5513,16 @@ def render_agents(
     try:
         render_stats = render_agents_for_tool(project_path, ai_assistant)
     except AgentMetadataError as exc:
-        console.print(f"[bold red]Agent metadata error:[/bold red] {exc}")
+        console.print(
+            f"[bold red]Agent metadata error:[/bold red] {escape(str(exc))}"
+        )
         raise typer.Exit(code=1)
     summary = f"rendered {render_stats['rendered']} agent(s) for {ai_assistant}"
     if render_stats["backups"]:
         summary += f" ({len(render_stats['backups'])} hand-edited backups)"
     if render_stats["unmapped"]:
         summary += f"; unmapped intents on {len(render_stats['unmapped'])} agent(s)"
-    console.print(summary)
+    console.print(escape(summary))
 
 
 @app.command()
@@ -5406,7 +5592,29 @@ def migrate(
     )
 
 
+def _force_utf8_output_streams() -> None:
+    """Force UTF-8 stdout/stderr on Windows so glyphs never abort the CLI.
+
+    The default Windows code page (e.g. cp1252) cannot encode the banner and
+    box-drawing glyphs when output is piped or redirected, so the CLI would
+    raise UnicodeEncodeError instead of printing. Reconfigure with
+    errors="replace" so output degrades gracefully. No-op on POSIX, guarded so
+    stream setup can never make things worse, and called from the CLI entry
+    point only — importing this module as a library must not touch global
+    streams.
+    Adapted-from: 9e05195d246f94f867a13864836353d756074a30
+    """
+    if sys.platform != "win32":
+        return
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
 def main():
+    _force_utf8_output_streams()
     app()
 
 
