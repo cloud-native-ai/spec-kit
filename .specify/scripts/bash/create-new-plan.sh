@@ -94,15 +94,30 @@ main() {
         exit 1
     fi
 
-    # Copy plan template if it exists
+    # Copy the plan template. A missing OR empty template is a hard failure, not a
+    # warning: the old `touch "$IMPL_PLAN"` left a zero-byte plan.md that every
+    # downstream gate (check-prerequisites, implement) then accepted as a real plan.
+    # Both failure paths create nothing, so a rerun after restoring the template
+    # starts clean. The copy message goes to stderr in JSON mode so stdout stays a
+    # single parseable JSON document for the skill that reads it.
+    # Adapted-from: 3238fa9285694dc539aeb9829b337bfd6aed7317
+    #   (upstream setup-plan.sh; this file is master's twin of it)
     TEMPLATE="$REPO_ROOT/.specify/templates/plan-template.md"
-    if [[ -f "$TEMPLATE" ]]; then
-        cp "$TEMPLATE" "$IMPL_PLAN"
-        echo "Copied plan template to $IMPL_PLAN"
+    if [[ ! -f "$TEMPLATE" ]]; then
+        echo "ERROR: Plan template not found at $TEMPLATE; no new plan.md was created." >&2
+        echo "Restore a valid plan template and rerun plan setup." >&2
+        exit 1
+    fi
+    if [[ ! -s "$TEMPLATE" ]]; then
+        echo "ERROR: Plan template is empty at $TEMPLATE; no new plan.md was created." >&2
+        echo "Restore a valid plan template and rerun plan setup." >&2
+        exit 1
+    fi
+    cp "$TEMPLATE" "$IMPL_PLAN"
+    if $JSON_MODE; then
+        echo "Copied plan template to $IMPL_PLAN" >&2
     else
-        echo "Warning: Plan template not found at $TEMPLATE"
-        # Create a basic plan file if template doesn't exist
-        touch "$IMPL_PLAN"
+        echo "Copied plan template to $IMPL_PLAN"
     fi
 
     # Output results

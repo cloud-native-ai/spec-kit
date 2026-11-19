@@ -123,16 +123,35 @@ EOF
     # parsed arguments, so the tree is created only on the writing path.
     mkdir -p "$REQUIREMENTS_DIR"
 
-    # Copy plan template if it exists
+    # Progress and warning text belongs on stderr in JSON mode, so stdout stays a
+    # single parseable JSON document. Without this the phase chatter below precedes
+    # the payload and no consumer can json.loads(stdout).
+    _plan_status_echo() {
+        if $JSON_MODE; then
+            echo "$@" >&2
+        else
+            echo "$@"
+        fi
+    }
+
+    # Copy the plan template. A missing OR empty template is a hard failure, not a
+    # warning: the old `touch "$IMPL_PLAN"` left a zero-byte plan.md that every
+    # downstream gate then accepted as a real plan. Both failure paths create nothing.
+    # Adapted-from: 3238fa9285694dc539aeb9829b337bfd6aed7317
+    #   (upstream setup-plan.sh; this file carries the same Warning+touch twin)
     TEMPLATE="$REPO_ROOT/.specify/templates/plan-template.md"
-    if [[ -f "$TEMPLATE" ]]; then
-        cp "$TEMPLATE" "$IMPL_PLAN"
-        echo "Copied plan template to $IMPL_PLAN"
-    else
-        echo "Warning: Plan template not found at $TEMPLATE"
-        # Create a basic plan file if template doesn't exist
-        touch "$IMPL_PLAN"
+    if [[ ! -f "$TEMPLATE" ]]; then
+        echo "ERROR: Plan template not found at $TEMPLATE; no new plan.md was created." >&2
+        echo "Restore a valid plan template and rerun plan setup." >&2
+        exit 1
     fi
+    if [[ ! -s "$TEMPLATE" ]]; then
+        echo "ERROR: Plan template is empty at $TEMPLATE; no new plan.md was created." >&2
+        echo "Restore a valid plan template and rerun plan setup." >&2
+        exit 1
+    fi
+    cp "$TEMPLATE" "$IMPL_PLAN"
+    _plan_status_echo "Copied plan template to $IMPL_PLAN"
 
     # Phase 0: Handle user input and research requirements
     # Extract unknowns from Technical Context that need clarification
@@ -140,7 +159,7 @@ EOF
         local feature_spec="$1"
         local research_file="$2"
 
-        echo "Starting Phase 0: Research"
+        _plan_status_echo "Starting Phase 0: Research"
 
         # Create research.md if it doesn't exist
         if [[ ! -f "$research_file" ]]; then
@@ -161,7 +180,7 @@ EOF
 
         # Add research findings for special character handling
         if grep -q "NEEDS CLARIFICATION" "$feature_spec" 2>/dev/null; then
-            echo "Researching safe input handling for special characters and Unicode..."
+            _plan_status_echo "Researching safe input handling for special characters and Unicode..."
 
             # Append research findings
             cat >> "$research_file" <<EOF
@@ -186,7 +205,7 @@ EOF
 EOF
         fi
 
-        echo "Phase 0: Research completed"
+        _plan_status_echo "Phase 0: Research completed"
     }
 
     # Phase 1: Generate design artifacts
@@ -196,7 +215,7 @@ EOF
         local contracts_dir="$3"
         local quickstart_file="$4"
 
-        echo "Starting Phase 1: Design & Contracts"
+        _plan_status_echo "Starting Phase 1: Design & Contracts"
 
         # Create data-model.md
         if [[ ! -f "$data_model_file" ]]; then
@@ -255,25 +274,25 @@ Expected: Command handles both special chars and Unicode correctly
 EOF
         fi
 
-        echo "Phase 1: Design & Contracts completed"
+        _plan_status_echo "Phase 1: Design & Contracts completed"
     }
 
 
-    echo "Executing /speckit.plan workflow for branch: $CURRENT_BRANCH"
+    _plan_status_echo "Executing /speckit.plan workflow for branch: $CURRENT_BRANCH"
 
     # Load feature spec if it exists
     if [[ -f "$FEATURE_SPEC" ]]; then
-        echo "Loaded feature spec: $FEATURE_SPEC"
+        _plan_status_echo "Loaded feature spec: $FEATURE_SPEC"
     else
-        echo "Warning: Feature spec not found at $FEATURE_SPEC"
+        _plan_status_echo "Warning: Feature spec not found at $FEATURE_SPEC"
     fi
 
     # Load constitution if it exists
     CONSTITUTION_FILE="$REPO_ROOT/.specify/constitution.md"
     if [[ -f "$CONSTITUTION_FILE" ]]; then
-        echo "Loaded constitution: $CONSTITUTION_FILE"
+        _plan_status_echo "Loaded constitution: $CONSTITUTION_FILE"
     else
-        echo "Warning: Constitution file not found at $CONSTITUTION_FILE"
+        _plan_status_echo "Warning: Constitution file not found at $CONSTITUTION_FILE"
     fi
 
     # Execute Phase 0: Research
