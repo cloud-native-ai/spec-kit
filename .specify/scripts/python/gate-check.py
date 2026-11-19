@@ -11,7 +11,8 @@ Usage:
 Exit codes:
   0  all paths allowed
   1  at least one path requires human confirmation (none denied)
-  2  at least one path is denied
+  2  at least one path is denied, an option is undeclared, or the --stdin
+     payload exceeds its byte ceiling
   3  gate file missing or unparsable (fail-open is NOT assumed; caller decides)
 
 Gate file format (YAML subset: top-level keys with "- pattern" list items only,
@@ -77,6 +78,78 @@ def match(path: str, patterns: list[str]) -> str | None:
     return None
 
 
+#: Standard-input payload ceiling (Adapted-from upstream f8b3d604e, "fix: cap
+#: stdin read at 1 MiB to prevent DoS"). Same bound as
+#: ``memory-utils.py::MAX_STDIN_BYTES``; the two are pinned together by
+#: ``tests/unit/test_bounded_read_stdin.py`` so they cannot drift apart. This
+#: checker stays dependency-free, so it declares its own budget rather than
+#: importing the memory engine.
+MAX_STDIN_BYTES = 1 * 1024 * 1024
+STDIN_READ_CHUNK_BYTES = 64 * 1024
+
+
+class _StdinPayloadTooLarge(ValueError):
+    """The --stdin payload exceeded its byte ceiling.
+
+    A distinct type on purpose: the caller refuses ONLY this condition, so an
+    undecodable payload keeps failing exactly as it did before the ceiling
+    existed (the stream's own decode error), instead of being relabelled as an
+    over-limit payload.
+    """
+
+
+def _read_stdin_bounded(limit: int) -> str:
+    """Read stdin under a hard ceiling and decode it as the stream would.
+
+    The ceiling counts BYTES, so the binary buffer is read when the stream
+    exposes one and decoded with the stream's own encoding and error handler —
+    the same decoding text-mode iteration applied, so a non-UTF-8 locale keeps
+    its previous behaviour. A text-only stream (no ``.buffer``) is read directly,
+    with the ceiling counted in characters.
+
+    Requests are bounded and stop one unit past the ceiling: a single
+    ``read(limit)`` cannot prove the payload fit, because a stream may return
+    fewer units than requested while more are pending.
+    """
+    buffer = getattr(sys.stdin, "buffer", None)
+    target = sys.stdin if buffer is None else buffer
+    chunks = []
+    total = 0
+    while total <= limit:
+        chunk = target.read(min(STDIN_READ_CHUNK_BYTES, limit + 1 - total))
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > limit:
+            raise _StdinPayloadTooLarge(
+                f"stdin payload exceeds the {limit}-byte limit; pipe a smaller "
+                "path list or pass the paths as arguments")
+        chunks.append(chunk)
+    if buffer is None:
+        return "".join(chunks)
+    encoding = getattr(sys.stdin, "encoding", None) or "utf-8"
+    errors = getattr(sys.stdin, "errors", None) or "strict"
+    return b"".join(chunks).decode(encoding, errors)
+
+
+def read_stdin_paths(limit: int | None = None) -> list[str]:
+    """Candidate paths from stdin, one per line, under the byte ceiling.
+
+    Iterating ``sys.stdin`` line by line is unbounded in two ways: the line count
+    and the length of any single line (a payload with no newline is ONE line, so
+    the iterator buffers all of it). The payload is therefore bounded first and
+    split afterwards, on the same newline forms text mode translates.
+
+    Over-limit behaviour is refusal (exit 2), never truncation: a silently
+    dropped path would be reported as allowed, which is the one verdict this
+    checker must never invent. *limit* defaults to ``MAX_STDIN_BYTES`` resolved
+    at call time, so the module constant stays the single owner of the bound.
+    """
+    text = _read_stdin_bounded(MAX_STDIN_BYTES if limit is None else limit)
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    return [line.strip() for line in lines if line.strip()]
+
+
 # --version, wired through the one version source (C-8)
 #
 # `guard_argv()` answers `--version` (and rejects an undeclared option) BEFORE any parser
@@ -101,14 +174,16 @@ except ImportError:  # a skill-local or sandbox copy still runs its action
         return None
 
 
-_HELP = """usage: gate-check.py <path> [...] | --stdin
+_HELP = f"""usage: gate-check.py <path> [...] | --stdin
 options:
   -h, --help     print this help and exit
   --version      print <script-name> <framework-version> and exit
-  --stdin        read the candidate paths from standard input, one per line
+  --stdin        read the candidate paths from standard input, one per line; the payload is
+    capped at {MAX_STDIN_BYTES} bytes and an over-limit payload is refused, never truncated
 side-effects: none; reads the gate file and the named paths and writes nothing
 exit-codes: 0 all paths allowed; 1 at least one path requires confirmation; 2 at least one
-  path is denied or an option is undeclared; 3 the gate file is missing or unparsable
+  path is denied, an option is undeclared, or the --stdin payload is over its ceiling;
+  3 the gate file is missing or unparsable
 """
 
 
@@ -122,7 +197,11 @@ def main() -> int:
     args = sys.argv[1:]
     if "--stdin" in args:
         args.remove("--stdin")
-        args += [ln.strip() for ln in sys.stdin if ln.strip()]
+        try:
+            args += read_stdin_paths()
+        except _StdinPayloadTooLarge as exc:  # refuse the payload, never truncate it
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
     if not args:
         print("usage: gate-check.py <path> [...] | --stdin", file=sys.stderr)
         return 3

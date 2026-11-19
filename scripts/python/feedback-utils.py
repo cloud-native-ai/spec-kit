@@ -57,7 +57,9 @@ import hashlib
 import json
 import os
 import re
+import struct
 import sys
+import unicodedata
 import uuid
 import zipfile
 from datetime import datetime, timezone
@@ -1537,6 +1539,52 @@ ENVELOPE_KIND = "speckit.exec-quant-aggregated"  # data-model § E6
 IDENTITY_KEY_SEP = "\x1f"  # C-13 / D6 five-tuple separator
 UNKNOWN_PROJECT = "unknown-project"  # C-12 literal group (E2 enum value)
 
+# --------------------------------------------------------------------------- #
+# Inbound-archive read bounds
+# Adapted-from: upstream 118062eac ("harden: secure extension and preset archive
+# downloads") — its bounded ZIP member read and safe-member primitives, narrowed
+# to what this engine actually does with a package: read members into memory,
+# never extract. The caps above (MAX_PAYLOAD_RECORDS / MAX_PAYLOAD_BYTES, C-2)
+# bound what the package leg WRITES; these bound what an intake is willing to
+# READ from a bundle it did not produce. An inbound zip is untrusted input: a
+# crafted member can declare a tiny size yet inflate to gigabytes, and a crafted
+# central directory can exhaust memory inside ``ZipFile()`` before any member is
+# touched. Over-limit behaviour is declared at each call site (degradation for a
+# member, refusal for a whole archive) and projected into ``--package`` help.
+# --------------------------------------------------------------------------- #
+# One member's decompressed ceiling. An exec-quant record is one run's
+# measurements and the collection leg already caps a single record (its own
+# ``RECORD_SIZE_CAP_BYTES``), so this leaves generous headroom for a foreign or
+# older producer while staying far below the payload total. The collection
+# engine is deliberately not named or imported here: the feedback engine stays
+# engine-decoupled and reaches the quant store only through its locator.
+MAX_ARCHIVE_MEMBER_BYTES = 1 * 1024 * 1024
+# Whole-archive member ceiling. A conforming package carries at most
+# MAX_PAYLOAD_RECORDS payload records plus its feedback entries and
+# introspection reports; this keeps headroom over that while bounding the
+# member list ZipFile materializes.
+MAX_ARCHIVE_ENTRIES = 4096
+# ``ZipFile`` reads the whole central directory into memory. This ceiling leaves
+# roughly 8 KiB of filename/extra/comment metadata per allowed entry.
+MAX_ARCHIVE_CENTRAL_BYTES = 4 * 1024 * 1024
+# Member-name portability bounds (a name is validated, never used as a path).
+MAX_ARCHIVE_PATH_BYTES = 4096
+MAX_ARCHIVE_COMPONENT_BYTES = 255
+# Bounded-read granularity: one request never asks for more than the ceiling.
+ARCHIVE_READ_CHUNK_BYTES = 64 * 1024
+
+_ZIP_EOCD_SIGNATURE = b"PK\x05\x06"
+_ZIP_EOCD64_LOCATOR_SIGNATURE = b"PK\x06\x07"
+_ZIP_EOCD64_SIGNATURE = b"PK\x06\x06"
+_ZIP_EOCD = struct.Struct("<4s4H2LH")  # 22-byte end-of-central-directory record
+_ZIP_EOCD64_LOCATOR = struct.Struct("<4sLQL")  # 20 bytes, sits just before EOCD
+_ZIP_EOCD64 = struct.Struct("<4sQ2H2L4Q")  # 56-byte fixed part
+_ZIP_MAX_COMMENT_BYTES = (1 << 16) - 1  # EOCD comment is a 16-bit length
+_ZIP_UINT16_MAX = (1 << 16) - 1
+_ZIP_UINT32_MAX = (1 << 32) - 1
+# Characters no portable filename may carry (Windows' reserved set).
+_ARCHIVE_INVALID_NAME_CHARS = frozenset('<>:"|?*\\')
+
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 _PROJECT_NAME_RE = re.compile(
     r"^\s*(?:-\s*)?\*\*Project Name\*\*:\s*(.+?)\s*$", re.M)
@@ -1917,6 +1965,149 @@ def _intake_result(record_count: int, ingested: int, duplicates: int,
     }
 
 
+def _preflight_archive_bounds(zip_path: Path, label: str) -> None:
+    """Bound an inbound archive's central directory BEFORE ``ZipFile`` reads it.
+
+    Adapted-from upstream 118062eac (``open_zip_bounded``'s central-directory
+    preflight), reduced to the two declarations that decide memory use: the
+    member count and the directory size. Both live in the end-of-central-
+    directory record, which is read from a bounded tail window (the EOCD plus
+    its maximum comment) instead of letting ``ZipFile`` allocate first. A zip64
+    archive carries the real values in the EOCD64 record, reached through the
+    locator that precedes the EOCD.
+
+    Fail-open on uncertainty: a tail that cannot be located, parsed or
+    reconciled with the file size is left to ``ZipFile`` itself, which raises
+    ``BadZipFile`` on a genuine defect. This preflight therefore only ever
+    refuses a *confident* over-ceiling reading, never a merely unusual archive.
+
+    Raises ``FeedbackError`` (exit 2) when a ceiling is exceeded: the archive as
+    a whole cannot be processed, which is the C-16 "not executable" class.
+    """
+    try:
+        size = zip_path.stat().st_size
+        with zip_path.open("rb") as handle:
+            window = min(size, _ZIP_MAX_COMMENT_BYTES + _ZIP_EOCD.size)
+            handle.seek(size - window)
+            tail = handle.read(window)
+            index = tail.rfind(_ZIP_EOCD_SIGNATURE)
+            if index < 0 or index + _ZIP_EOCD.size > len(tail):
+                return
+            fields = _ZIP_EOCD.unpack_from(tail, index)
+            entries, central_bytes, central_offset = fields[4], fields[5], fields[6]
+            # A signature match inside member data is not an EOCD: the declared
+            # comment length must account for exactly the bytes that follow it.
+            if index + _ZIP_EOCD.size + fields[7] != len(tail):
+                return
+            if entries == _ZIP_UINT16_MAX or central_bytes == _ZIP_UINT32_MAX:
+                locator = index - _ZIP_EOCD64_LOCATOR.size
+                if locator < 0 or tail[locator:locator + 4] != _ZIP_EOCD64_LOCATOR_SIGNATURE:
+                    return
+                offset = _ZIP_EOCD64_LOCATOR.unpack_from(tail, locator)[2]
+                if offset + _ZIP_EOCD64.size > size:
+                    return
+                handle.seek(offset)
+                record = handle.read(_ZIP_EOCD64.size)
+                if len(record) < _ZIP_EOCD64.size or record[:4] != _ZIP_EOCD64_SIGNATURE:
+                    return
+                zip64 = _ZIP_EOCD64.unpack(record)
+                entries, central_bytes, central_offset = zip64[7], zip64[8], zip64[9]
+            if central_offset + central_bytes > size:
+                return  # inconsistent declaration: let ZipFile report it
+            if entries > MAX_ARCHIVE_ENTRIES:
+                raise FeedbackError(
+                    f"{label}: archive declares {entries} members, over the "
+                    f"{MAX_ARCHIVE_ENTRIES}-member ceiling: {zip_path}")
+            if central_bytes > MAX_ARCHIVE_CENTRAL_BYTES:
+                raise FeedbackError(
+                    f"{label}: archive central directory is {central_bytes} "
+                    f"bytes, over the {MAX_ARCHIVE_CENTRAL_BYTES}-byte ceiling: "
+                    f"{zip_path}")
+    except OSError:
+        return  # unreadable here == unreadable at ZipFile(); keep its message
+
+
+def _read_archive_member_limited(archive: zipfile.ZipFile, name: str,
+                                 max_bytes: int,
+                                 budget: Optional[int] = None) -> bytes:
+    """One archive member's bytes under a hard decompressed ceiling.
+
+    Adapted-from upstream 118062eac (``read_zip_member_limited``).
+    ``archive.read(name)`` is unbounded: a crafted member can declare a tiny
+    ``file_size`` yet inflate to gigabytes, exhausting memory before the caller
+    ever inspects the data. Both declarations are bounded here — the *declared*
+    size is checked first, then the stream is read in chunks that stop one byte
+    past the effective ceiling (``min(max_bytes, budget)``), so a header that
+    lies cannot get past it either.
+
+    ``budget`` is the caller's remaining total allowance; ``None`` means the
+    per-member ceiling alone applies. Refusal raises ``FeedbackError``, which is
+    a ``ValueError`` and therefore lands in the intake's existing per-member
+    degradation clause: an over-limit member is counted, never fatal (C-11 /
+    FR-010).
+    """
+    limit = max_bytes if budget is None else max(0, min(max_bytes, budget))
+    try:
+        info = archive.getinfo(name)
+    except KeyError as exc:
+        raise FeedbackError(f"archive member not found: {name!r}") from exc
+    if info.file_size > limit:
+        raise FeedbackError(
+            f"archive member {name!r} declares {info.file_size} bytes, over the "
+            f"{limit}-byte read ceiling")
+    chunks: List[bytes] = []
+    total = 0
+    with archive.open(name, "r") as source:
+        while total <= limit:
+            chunk = source.read(min(ARCHIVE_READ_CHUNK_BYTES, limit + 1 - total))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > limit:
+                raise FeedbackError(
+                    f"archive member {name!r} inflates past the {limit}-byte "
+                    f"read ceiling (declared {info.file_size} bytes)")
+            chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _is_safe_member_name(name: str) -> bool:
+    """Whether an archive member name is a portable relative path.
+
+    Adapted-from upstream 118062eac (``normalize_zip_member_name``), as a
+    predicate rather than a normalizer: payload recognition is the literal
+    ``exec-quant/`` prefix (C-11), so rewriting separators would change which
+    members are payload. The intake never extracts — envelope filenames are
+    minted locally — so this is not a traversal-write guard; it refuses to
+    *ingest* a record whose member name is absolute, drive-qualified, contains
+    ``.``/``..``/empty segments, NUL or control characters, reserved filename
+    characters, or an over-long path/component. Windows' reserved device stems
+    (CON, NUL, ...) are deliberately not checked: no member name is ever used as
+    a filename here.
+    """
+    if not name or "\x00" in name:
+        return False
+    try:
+        if len(name.encode("utf-8")) > MAX_ARCHIVE_PATH_BYTES:
+            return False
+    except UnicodeEncodeError:
+        return False
+    if name.startswith("/") or re.match(r"^[A-Za-z]:", name):
+        return False
+    parts = name.split("/")
+    if parts and parts[-1] == "":
+        parts = parts[:-1]  # the one-slash directory marker legitimate zips use
+    if not parts or any(part in ("", ".", "..") for part in parts):
+        return False
+    for part in parts:
+        if (len(part.encode("utf-8")) > MAX_ARCHIVE_COMPONENT_BYTES
+                or any(unicodedata.category(ch) == "Cc" for ch in part)
+                or any(ch in _ARCHIVE_INVALID_NAME_CHARS for ch in part)
+                or part.startswith(" ") or part.endswith((" ", "."))):
+            return False
+    return True
+
+
 def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
     """Unpack the ``exec-quant/`` payload of an inbound feedback bundle into
     the local aggregated layer (068 US2; intake-contract C-10..C-17).
@@ -1936,6 +2127,20 @@ def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
     the intake never triggers aggregate, C-17). Exit ladder: degradations
     complete with exit 0; ``--package`` missing/not a zip/an unwritable
     aggregated store is exit 2 (C-16/D10).
+
+    Untrusted-archive bounds (Adapted-from upstream 118062eac): the central
+    directory is preflighted before ``ZipFile`` allocates it, every member is
+    read under ``MAX_ARCHIVE_MEMBER_BYTES`` and the payload records together
+    under the package leg's own ``MAX_PAYLOAD_BYTES`` (C-2), and a member whose
+    name is not a portable relative path is not read at all. Over-limit behaviour
+    keeps the C-16 ladder: an over-limit/unsafe *member* is a non-blocking
+    degradation counted in ``skipped_unreadable`` (an over-limit manifest in
+    ``manifest_unreadable``), exit 0 — a payload problem never blocks the
+    feedback face (FR-010). An archive whose *structure* exceeds
+    ``MAX_ARCHIVE_ENTRIES`` / ``MAX_ARCHIVE_CENTRAL_BYTES`` cannot be processed
+    at all and is refused with exit 2, the same class as a zip that will not
+    open. No member name or content is echoed to stderr: the counters are the
+    disclosure surface, so the seven-key output face is unchanged.
     """
     if not getattr(args, "package", None):
         raise FeedbackError(
@@ -1945,6 +2150,7 @@ def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
     if not package_path.is_file():
         raise FeedbackError(
             f"ingest-exec-quant: --package file not found: {package_path}")
+    _preflight_archive_bounds(package_path, "ingest-exec-quant: --package")
     try:
         archive = zipfile.ZipFile(package_path)
     except (OSError, ValueError, zipfile.BadZipFile) as exc:
@@ -1959,6 +2165,11 @@ def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
     manifest_name = f"{prefix}{PAYLOAD_MANIFEST_NAME}"
     with archive:
         names = archive.namelist()
+        if len(names) > MAX_ARCHIVE_ENTRIES:
+            # Backstop for the archives the preflight declines to read (zip64).
+            raise FeedbackError(
+                f"ingest-exec-quant: --package carries {len(names)} members, "
+                f"over the {MAX_ARCHIVE_ENTRIES}-member ceiling: {package_path}")
         payload_members = sorted(
             name for name in names
             if name.startswith(prefix) and name != manifest_name)
@@ -1970,12 +2181,15 @@ def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
         manifest_unreadable = manifest_name not in names
         if not manifest_unreadable:
             try:
-                manifest = json.loads(archive.read(manifest_name)
-                                      .decode("utf-8"))
+                manifest = json.loads(
+                    _read_archive_member_limited(
+                        archive, manifest_name, MAX_ARCHIVE_MEMBER_BYTES)
+                    .decode("utf-8"))
                 if not isinstance(manifest, dict):
                     manifest, manifest_unreadable = None, True
             except (OSError, ValueError, UnicodeDecodeError,
                     zipfile.BadZipFile):
+                # ValueError covers the bounded-read refusal (FeedbackError).
                 manifest, manifest_unreadable = None, True
 
         # C-12: attribution from the manifest identity ONLY. A missing or
@@ -1993,14 +2207,26 @@ def action_ingest_exec_quant(args: argparse.Namespace) -> Dict[str, Any]:
         record_count = 0
         skipped = 0
         parsed: List[Dict[str, Any]] = []
+        # Total decompressed allowance for the payload records = the package
+        # leg's own byte cap (C-2 counts record bytes only, so the manifest is
+        # bounded by its per-member ceiling instead of eating this budget).
+        budget = MAX_PAYLOAD_BYTES
         for member in payload_members:
             record_count += 1
-            try:
-                obj = json.loads(archive.read(member).decode("utf-8"))
-            except (OSError, ValueError, UnicodeDecodeError,
-                    zipfile.BadZipFile):
+            if not _is_safe_member_name(member):
                 skipped += 1
                 continue
+            try:
+                raw = _read_archive_member_limited(
+                    archive, member, MAX_ARCHIVE_MEMBER_BYTES, budget)
+                obj = json.loads(raw.decode("utf-8"))
+            except (OSError, ValueError, UnicodeDecodeError,
+                    zipfile.BadZipFile):
+                # ValueError covers the bounded-read refusal (FeedbackError):
+                # an over-limit member degrades exactly like an unparsable one.
+                skipped += 1
+                continue
+            budget -= len(raw)
             if not isinstance(obj, dict) or obj.get("kind") != RECORD_KIND:
                 skipped += 1
                 continue
@@ -2300,8 +2526,18 @@ def action_cleanup(args: argparse.Namespace) -> Dict[str, Any]:
     if not zip_path.is_file():
         raise FeedbackError(f"package not found: {zip_path}")
 
+    # Inbound-archive bounds (Adapted-from upstream 118062eac), shared with the
+    # intake leg: cleanup reads member NAMES only, so its exposure is the
+    # central directory ``ZipFile`` materializes, not a member's inflated bytes.
+    # An over-ceiling archive is refused (exit 2); nothing is removed.
+    _preflight_archive_bounds(zip_path, "cleanup: --package")
     with zipfile.ZipFile(zip_path) as zf:
-        names = set(zf.namelist())
+        members = zf.namelist()
+        if len(members) > MAX_ARCHIVE_ENTRIES:
+            raise FeedbackError(
+                f"cleanup: package carries {len(members)} members, over the "
+                f"{MAX_ARCHIVE_ENTRIES}-member ceiling: {zip_path}")
+        names = set(members)
         if "MANIFEST.md" not in names:
             raise FeedbackError(f"package has no MANIFEST.md: {zip_path}")
         packaged = {n for n in names if n.endswith(".md")
@@ -2635,7 +2871,15 @@ def build_parser() -> argparse.ArgumentParser:
                         help="cleanup: path to the package zip (workspace-"
                              "relative or absolute), or 'latest'; "
                              "ingest-exec-quant: the inbound feedback bundle "
-                             "to unpack (required)")
+                             "to unpack (required). Archive reads are bounded: "
+                             f"{MAX_ARCHIVE_MEMBER_BYTES} bytes per member, "
+                             f"{MAX_PAYLOAD_BYTES} payload bytes in total, "
+                             f"{MAX_ARCHIVE_ENTRIES} members and "
+                             f"{MAX_ARCHIVE_CENTRAL_BYTES} central-directory "
+                             "bytes per archive. An over-limit or unsafe-named "
+                             "member counts as skipped_unreadable and the "
+                             "action still completes (exit 0); an archive over "
+                             "the structural ceilings is refused (exit 2)")
     parser.add_argument("--report-file", default=None,
                         help="introspect-register: path to the introspection "
                              "report file")

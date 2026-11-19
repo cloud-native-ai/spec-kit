@@ -65,6 +65,15 @@ MEMORY_SUBDIR = Path(".specify") / "memory"
 # mutating action.
 INDEX_NAME = "index.json"
 
+#: Standard-input payload ceiling (Adapted-from upstream f8b3d604e, "fix: cap
+#: stdin read at 1 MiB to prevent DoS"). An unbounded ``sys.stdin.read()`` lets a
+#: caller pipe gigabytes and exhaust memory before any validation runs. This is
+#: THIS engine's stdin budget; ``gate-check.py`` declares the same bound for its
+#: ``--stdin`` face, and the two are pinned together by
+#: ``tests/unit/test_bounded_read_stdin.py`` so they cannot drift apart.
+MAX_STDIN_BYTES = 1 * 1024 * 1024
+STDIN_READ_CHUNK_BYTES = 64 * 1024
+
 # A source is valid only when it names a Spec Kit command or skill.
 _SOURCE_RE = re.compile(r"^(?:/speckit\.[a-z0-9][a-z0-9._-]*|skill:[a-z0-9][a-z0-9._-]*)$")
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
@@ -158,13 +167,69 @@ def ensure_scope_dir(workspace_root: Path, scope: str) -> Path:
     return target
 
 
+def _read_stream_bounded(stream, limit: int, join):
+    """Accumulate at most *limit* units from *stream*, refusing one unit past it.
+
+    A single ``read(limit)`` cannot prove the payload fit: a stream may return
+    fewer units than requested while more are pending, so the bound is enforced
+    by asking for ``limit + 1`` in bounded requests and refusing as soon as the
+    extra unit arrives. Nothing beyond the ceiling is ever retained. *join*
+    combines the chunks (``b"".join`` for a binary stream, ``"".join`` for text).
+    """
+    chunks = []
+    total = 0
+    while total <= limit:
+        chunk = stream.read(min(STDIN_READ_CHUNK_BYTES, limit + 1 - total))
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > limit:
+            raise MemoryError(
+                f"stdin payload exceeds the {limit}-byte limit; "
+                "truncate or pipe a smaller payload")
+        chunks.append(chunk)
+    return join(chunks)
+
+
+def read_stdin_limited(limit: Optional[int] = None) -> str:
+    """Read the piped entry body under a hard ceiling, or refuse it.
+
+    Adapted-from upstream f8b3d604e. The ceiling counts BYTES, so the stream's
+    binary buffer is read when it exposes one and decoded with the stream's own
+    encoding and error handler — exactly the decoding ``sys.stdin.read()`` would
+    have applied, so a non-UTF-8 locale keeps its previous behaviour, and the
+    text layer's universal-newline translation is reproduced so a CRLF-piped
+    body keeps the endings it always had. A text-only stream (no ``.buffer``,
+    e.g. an injected ``StringIO``) is read directly, with the ceiling counted in
+    characters.
+
+    Over-limit behaviour is refusal, never truncation: a silently shortened body
+    would be stored as if it were the whole record. ``MemoryError`` is this
+    engine's user-facing validation error, so ``main`` reports it and exits 2.
+
+    *limit* defaults to ``MAX_STDIN_BYTES`` resolved at call time, so the module
+    constant stays the single owner of the bound.
+    """
+    ceiling = MAX_STDIN_BYTES if limit is None else limit
+    buffer = getattr(sys.stdin, "buffer", None)
+    if buffer is None:
+        return _read_stream_bounded(sys.stdin, ceiling, "".join)
+    raw = _read_stream_bounded(buffer, ceiling, b"".join)
+    encoding = getattr(sys.stdin, "encoding", None) or "utf-8"
+    errors = getattr(sys.stdin, "errors", None) or "strict"
+    # Reading the buffer bypasses the text layer, so its universal-newline
+    # translation (``newline=None`` on the standard streams) is reproduced here:
+    # a CRLF-piped body must land with the same \n endings it always did.
+    return raw.decode(encoding, errors).replace("\r\n", "\n").replace("\r", "\n")
+
+
 def read_content(args: argparse.Namespace) -> str:
     if args.content is not None:
         return args.content
     if args.content_file:
         return Path(args.content_file).read_text(encoding="utf-8")
     if not sys.stdin.isatty():
-        data = sys.stdin.read()
+        data = read_stdin_limited()
         if data.strip():
             return data
     raise MemoryError("record requires --content, --content-file, or piped stdin")
@@ -546,8 +611,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--scope", default="session")
     parser.add_argument("--source", default=None)
     parser.add_argument("--title", default=None)
-    parser.add_argument("--content", default=None)
-    parser.add_argument("--content-file", default=None)
+    parser.add_argument("--content", default=None,
+                        help="record: entry body. Without it (and without "
+                             "--content-file) the body is read from piped stdin, "
+                             f"capped at {MAX_STDIN_BYTES} bytes; an over-limit "
+                             "payload is refused with exit 2, never truncated")
+    parser.add_argument("--content-file", default=None,
+                        help="record: read the entry body from this file "
+                             "(alternative to --content or piped stdin)")
     parser.add_argument("--tags", default=None)
     parser.add_argument("--feature", default=None)
     parser.add_argument("--session-id", default=None)
