@@ -12,8 +12,13 @@ a hit**, never by the reference's shape.
 
 ## Scan coordinates
 
-Normalize first: strip one leading `/`; when the remainder starts with `speckit.`,
-also try the remainder with that prefix removed.
+Normalize by stripping **one leading `/` only**. The `speckit.` prefix is a **command
+namespace**, not a skill-name prefix:
+
+- **Skill list** scans the normalized name **with the prefix retained**: `/speckit.humanize`
+  does not match the `humanize` skill; `/humanize` does.
+- **Command list** scans the normalized name and, when it starts with `speckit.`, also
+  the prefix-stripped form mapped to `<name>.md`: `/speckit.humanize` → `humanize.md`.
 
 | List | Canonical coordinates | Installed aliases |
 |---|---|---|
@@ -31,7 +36,7 @@ executors carrying the same normalized name are two hits.
 | exactly one hit, command list | executor kind `command`; decision class `command` |
 | zero hits in both lists | fail closed naming the raw form and the searched coordinates of **both** lists |
 | two hits inside the skill ladder | fail closed naming both candidate paths — never pick the nearest |
-| one skill hit **and** one command hit with the same normalized name | fail closed naming both candidates: the reference is ambiguous and the user disambiguates (skill vs command surface) |
+| one skill hit **and** one command hit for the same raw normalized reference (a command hit obtained only by stripping `speckit.` does not make the skill hit ambiguous) | fail closed naming both candidates: the reference is ambiguous and the user disambiguates (skill vs command surface) |
 | the resolved executor is unreadable (no readable `SKILL.md`, no readable template) or its frontmatter is invalid | reject before the expectation phase, naming the path |
 
 The recursion guard still applies: a resolution that lands on this skill fails closed
