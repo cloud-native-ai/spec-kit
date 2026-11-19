@@ -7,54 +7,28 @@
 - **GitHub:** https://github.com/NousResearch/hermes-agent
 - **Captured:** 2026-07-11
 
-## Overview
+> **Link + summary page.** Original summary written for this project; no Nous
+> Research documentation text is reproduced here. Install routes, backends,
+> integrations and tool counts drift — read the official sources above before
+> acting on a detail. `Captured` records when this project last reviewed them.
 
-Hermes Agent is a self-improving autonomous AI agent built by Nous Research. Unlike
-an IDE-tethered copilot, it is designed to run anywhere — a $5 VPS, a GPU cluster,
-or serverless infrastructure (Daytona, Modal) — and grow more capable the longer it
-runs via a built-in **learning loop** that creates and improves skills from
-experience and builds persistent, cross-session memory.
+## What it is (summary)
 
-## Installation
+Hermes Agent is Nous Research's autonomous agent, designed to run unattended on
+infrastructure you choose — from a small VPS to a GPU cluster or a serverless
+runtime — rather than being tethered to an editor. Its distinguishing idea is a
+learning loop: the agent curates its own memory, creates and improves skills from
+experience, and recalls across sessions. It reaches users through messaging
+platforms via a gateway, can delegate work to isolated sub-agents, supports MCP
+and scheduled automations, and consumes skills in the open Agent Skills format.
 
-Desktop (Windows / macOS): download the Hermes Desktop installer from the website.
+## Read the official documentation for
 
-Command-line only:
-
-```bash
-# Linux / macOS / WSL2 / Android (Termux)
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
-
-# Windows (native, PowerShell)
-iex (irm https://hermes-agent.nousresearch.com/install.ps1)
-```
-
-Fastest path to a working agent — one OAuth covers a model plus the four Tool
-Gateway tools (web search, image generation, TTS, browser):
-
-```bash
-hermes setup --portal
-```
-
-## Key features
-
-- **Closed learning loop** — agent-curated memory with periodic nudges, autonomous
-  skill creation, skill self-improvement during use, FTS5 cross-session recall, and
-  Honcho dialectic user modeling.
-- **Runs anywhere** — 6 terminal backends: local, Docker, SSH, Daytona, Singularity,
-  Modal (Daytona/Modal offer serverless hibernation).
-- **Lives where you do** — 20+ messaging platforms from one gateway (Telegram,
-  Discord, Slack, WhatsApp, Signal, Matrix, Email, SMS, Feishu, WeCom, Teams…).
-- **Delegates & parallelizes** — spawn isolated subagents; Programmatic Tool Calling
-  via `execute_code`.
-- **Open standard skills** — compatible with agentskills.io; portable and shareable.
-- **MCP support**, voice mode, scheduled automations (built-in cron), and 60+
-  built-in tools.
-
-## Resources for LLMs
-
-- `/llms.txt` — curated index of doc pages (~17 KB).
-- `/llms-full.txt` — all doc pages concatenated (~1.8 MB).
+- Desktop and command-line installation, and the guided setup path.
+- Terminal backends and hosted/serverless execution options.
+- Messaging-platform integrations and the tool gateway.
+- Memory, skill creation and the learning loop.
+- Sub-agent delegation, MCP support and scheduling.
 
 ## Spec Kit integration
 

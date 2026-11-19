@@ -6,46 +6,26 @@
 - **Official docs:** https://opencode.ai/docs/
 - **Captured:** 2026-07-11
 
-## Overview
+> **Link + summary page.** Original summary written for this project; no opencode
+> documentation text is reproduced here. Install routes, provider setup and
+> keybindings drift — read the official documentation above before acting on a
+> detail. `Captured` records when this project last reviewed it.
 
-opencode is an open-source AI coding agent built for the terminal. It is also
-available as a desktop app and IDE extension, and works with any LLM provider you
-configure. A modern terminal emulator (WezTerm, Alacritty, Ghostty, Kitty) is
-recommended.
+## What it is (summary)
 
-## Installation
+opencode is an open-source AI coding agent built for the terminal, also offered
+as a desktop app and an IDE extension. It is provider-agnostic: you configure the
+LLM provider you want, and a curated model list is available for newcomers. The
+interaction model separates proposing a change from applying it (a plan mode and
+a build mode), and it keeps conversation-level undo/redo and sharing. Themes,
+keybindings, formatters and custom commands are configurable.
 
-```bash
-# install script
-curl -fsSL https://opencode.ai/install | bash
-```
+## Read the official documentation for
 
-Also available via Node package managers (`npm install -g opencode-ai`, Bun, pnpm,
-Yarn), Homebrew (`brew install anomalyco/tap/opencode`), Arch (`pacman`/AUR), and on
-Windows via Chocolatey, Scoop, npm, Mise, or Docker.
-
-## Configure & initialize
-
-opencode works with any LLM provider via API keys; OpenCode Zen is a curated,
-verified model list for newcomers.
-
-```bash
-# inside the TUI, connect a provider
-/connect
-
-cd /path/to/project
-opencode
-/init            # analyzes the project and writes AGENTS.md
-```
-
-## Usage highlights
-
-- **Ask questions** about the codebase using `@file` references.
-- **Plan mode** (toggle with `Tab`): proposes an implementation without making
-  changes; switch back to **Build mode** to apply it.
-- **Undo/redo** changes with `/undo` and `/redo`.
-- **Share** a conversation with `/share` (copies a link to your clipboard).
-- Customize themes, keybinds, formatters, and custom commands.
+- Installation routes per operating system and package manager.
+- Provider configuration and authentication.
+- Project initialization and the instruction file it writes.
+- Modes, custom commands, keybindings and sharing behaviour.
 
 ## Spec Kit integration
 

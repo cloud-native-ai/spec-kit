@@ -1,0 +1,134 @@
+ai-engine
+Copyright (c) 2026 Qiming Liu and ai-engine contributors
+
+This product includes software developed as an independent fork of
+GitHub Spec Kit (https://github.com/github/spec-kit), forked at commit
+926836e0f (2025-10-21). The upstream MIT License and copyright notice
+(Copyright GitHub, Inc.) are preserved verbatim in LICENSE. Git history
+retains the original upstream contributors' authorship. This project is
+not affiliated with or endorsed by GitHub.
+
+Component notices
+=================
+
+1. better-harness (scripts/js/better-harness/, mirrored at
+   .specify/scripts/js/better-harness/)
+
+   MIT License, Copyright (c) 2026 Qoder. Vendored collection-facts subset
+   of upstream v0.3.0 (baseline commit b2e621d, copied 2026-07-29). Its
+   LICENSE is preserved verbatim; the subset manifest, exclusions, local
+   modifications and resync policy are tracked in UPSTREAM.md beside it.
+   The subset uses node: built-ins exclusively and has zero npm
+   dependencies.
+
+2. database-utils (skills/external/database-utils/)
+
+   In-house MIT implementation by the ai-engine project (v3.0), replacing
+   the former Apache-2.0 component (author sanjay3290, v2.0). The
+   replacement preserves the query interface; no original code is
+   retained. Licence text: LICENSE.txt in that directory.
+
+3. document-utils (skills/external/document-utils/)
+
+   In-house MIT implementation by the ai-engine project (v3.0), replacing
+   the former proprietary component (Copyright 2025 Anthropic, PBC, all
+   rights reserved, governed by the user's Anthropic agreement). No
+   original code or documentation text is retained. Licence text:
+   LICENSE.txt in that directory.
+
+4. draw-diagram (skills/external/draw-diagram/)
+
+   Original work of the ai-engine project, including all six engine layers
+   (d3js / drawio / echarts / excalidraw / mermaid / plantuml). No
+   third-party diagram library is vendored: the self-hosted render servers
+   install their npm dependencies at run time, and the other engines are
+   reached through a rendering service or a CDN script tag.
+
+   Some reference pages render an engine's official documentation in
+   Chinese and carry the source URL plus a capture date. The upstream
+   project's own licence terms apply to that source material: d3 (ISC),
+   Apache ECharts (Apache-2.0), drawio (Apache-2.0), Excalidraw (MIT),
+   Mermaid (MIT). PlantUML is reached through a PlantUML server or a
+   user-installed local toolchain; see the upstream project for its terms.
+
+5. Runtime dependencies (not vendored; installed separately by the user)
+
+   CLI (pyproject.toml [project].dependencies):
+     typer (MIT), rich (MIT), httpx (BSD-3-Clause, with the socks extra),
+     platformdirs (MIT), readchar (MIT), truststore (MIT, Python >= 3.10).
+
+   database-utils (skills/external/database-utils/requirements.txt):
+     PyMySQL (MIT), pg8000 (BSD-3-Clause).
+
+   document-utils (skills/external/document-utils/requirements.txt):
+     pypdf (BSD-3-Clause), pdfplumber (MIT), pypdfium2 (Apache-2.0 OR
+     BSD-3-Clause; bundled PDFium BSD-3-Clause), Pillow (MIT-CMU),
+     reportlab (BSD-3-Clause), python-docx (MIT), python-pptx (MIT),
+     openpyxl (MIT), defusedxml (PSF-2.0), and optionally pytesseract
+     (Apache-2.0) for the OCR route.
+     Transitive, listed for licence visibility in that requirements file:
+     lxml (BSD-3-Clause), typing_extensions (PSF-2.0), XlsxWriter
+     (BSD-2-Clause), pdfminer.six (MIT), charset-normalizer (MIT),
+     cryptography (Apache-2.0 OR BSD-3-Clause).
+
+   git-utils fleet inventory (skills/external/git-utils/scripts/git_fleet.py):
+     PyYAML (MIT).
+
+   draw-diagram self-hosted render servers (optional, installed on demand):
+     mermaid server — mermaid (MIT), puppeteer-core (Apache-2.0);
+     excalidraw server — @excalidraw/excalidraw (MIT),
+     @excalidraw/mermaid-to-excalidraw (MIT), playwright-core (Apache-2.0),
+     esbuild (MIT, build step only).
+     Transitive npm licences are recorded in the mermaid server's
+     package-lock.json.
+
+6. External programs invoked as tools (not vendored, not linked)
+
+   LibreOffice / soffice (MPL-2.0) — document-utils conversion, thumbnails
+   and formula recalculation.
+   Tesseract (Apache-2.0) — optional OCR of scanned pages.
+   Node.js (MIT) and a headless Chromium (BSD-3-Clause) — local diagram
+   rendering, only after the user consents to a local backend.
+   Hugo (Apache-2.0) and the Hugo Book theme (MIT, alex-shpak/hugo-book) —
+   optional documentation-site rendering; create-pages fetches the theme
+   into the client project at run time, and no theme copy ships here.
+   git-delta (MIT) — optional diff viewer for code review.
+   git (GPL-2.0) — invoked as a command only.
+
+   Poppler, qpdf and pdftk are NOT required: document-utils renders and
+   manipulates PDFs through pypdfium2, pypdf and pdfplumber.
+
+7. Documentation (docs/)
+
+   docs/reference/: third-party product documentation is referenced by link
+   with attribution (source URL and capture date). The pages are original
+   summaries written for this project; no verbatim third-party documentation
+   text is redistributed there.
+
+   docs/concepts/: some pages are original distillations of third-party
+   publications and name their source in the page itself — security.md
+   distils Anthropic's "Alignment Risk Update: Claude Mythos Preview" report
+   (2026-04-07), and prompt-to-graph.md draws on Anthropic, OpenAI and Eigent
+   engineering articles with short attributed quotations and a reference
+   list. The underlying publications remain their authors' work.
+
+Original work
+=============
+
+The following are original work of the ai-engine project and are licensed
+under the MIT License: skills/internal/, agents/, memory/, shared/,
+scripts/ (except the vendored better-harness subset named in item 1),
+templates/, src/, docs/, and the 16 external skills that carry no
+third-party component notice:
+
+  coaching-skills, create-docs, create-pages, create-skills, draw-diagram,
+  git-utils, humanize-conclusion, improve-docs, improve-skills,
+  merge-skills, sdd-house-keeping, sdd-loop-driver, sdd-project-setup,
+  ssh-utils, study-code, study-online
+
+draw-diagram appears in that list as original authored work; item 4 records
+the attribution owed to the upstream engine documentation its reference
+pages summarise. database-utils and document-utils are the two external
+skills replaced by in-house MIT implementations (items 2 and 3). docs/ is
+original authored work; item 7 records the third-party publications its
+concept pages distil.

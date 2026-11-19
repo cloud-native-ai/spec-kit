@@ -4,64 +4,34 @@
 - **Tier:** 1
 - **Agent folder:** `.qoder/` (commands in `.qoder/commands`, `.md` files)
 - **Official docs:** https://docs.qoder.com/en/cli/quick-start
+- **Memory sources:** https://docs.qoder.com/cli/memory
 - **Product page:** https://qoder.com/
 - **Captured:** 2026-07-11 (memory sources corrected 2026-08-05 per docs.qoder.com/cli/memory)
 
+> **Link + summary page.** The product overview below is an original summary
+> written for this project; no Qoder documentation text is reproduced here.
+> Install routes, sign-in options and settings drift — read the official sources
+> above before acting on a detail. The two dated sections at the bottom are this
+> project's own verified records, not vendor documentation.
+
 > **Qoder CLI ≠ Qoder IDE.** They are two distinct tools that share the `.qoder/` folder. Spec Kit's `qoder` agent key targets the **CLI** (`qodercli` binary). The IDE's instruction format (`.qoder/project_rules.md`) is NOT read by the CLI — see "Project rules & memory sources" below.
 
-## Overview
+## What it is (summary)
 
-Qoder ( /ˈkoʊdər/ ) is an agentic coding platform for real software development,
-combining context engineering with intelligent agents. Beyond its Editor and Quest
-workspaces (IDE experience), the **Qoder CLI** lets you build, code, and automate
-complex tasks directly from the terminal.
+Qoder is an agentic coding platform; the **CLI** (`qodercli`) brings its agent to
+the terminal for multi-file generation, question answering and edits, alongside
+the Editor and Quest workspaces of the IDE experience. It supports autonomous
+delegation for longer multi-step tasks, MCP servers, and a knowledge engine that
+accumulates project knowledge. Installation, sign-in (browser or personal access
+token, with an environment-variable route for automation) and update behaviour
+are documented in the official quick start.
 
-## Installation
+## Read the official documentation for
 
-```bash
-# macOS / Linux
-curl -fsSL https://qoder.com/install | bash
-
-# Windows PowerShell
-irm https://qoder.com/install.ps1 | iex
-
-# Windows CMD
-curl -fsSL https://qoder.com/install.cmd -o install.cmd && install.cmd
-```
-
-Supported OS: macOS, Linux, Windows (Windows Terminal). Architectures: arm64, amd64
-(Windows on Arm not yet supported). Verify:
-
-```bash
-qodercli --version
-```
-
-## Sign in
-
-```bash
-qodercli
-/login          # then: login with browser OR personal access token
-```
-
-For automation, set an environment variable:
-
-```bash
-export QODER_PERSONAL_ACCESS_TOKEN="your_personal_access_token_here"
-```
-
-Get a token at https://qoder.com/account/integrations. `/logout` signs out.
-
-## Upgrade
-
-Auto-update is on by default. Manual: re-run the install script with `-s -- --force`,
-or `qodercli update`. Disable via `general.enableAutoUpdate: false` in
-`~/.qoder/settings.json`.
-
-## Key capabilities
-
-- Agentic, multi-file code generation, Q&A, and edits.
-- **Quest** autonomous delegation for long-running, multi-step tasks.
-- **MCP** support and a **Knowledge Engine** that accumulates business knowledge.
+- Installation per operating system and architecture, and version verification.
+- Sign-in, personal access tokens and automation credentials.
+- Auto-update and the settings file that controls it.
+- Quest delegation, MCP configuration and the knowledge engine.
 
 ## Project rules & memory sources (CLI)
 

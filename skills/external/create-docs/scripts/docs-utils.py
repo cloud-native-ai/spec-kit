@@ -39,7 +39,7 @@ INDEX_NAME = "index.md"
 # Tool/ecosystem-mandated ALL-CAPS names (constitution Principle X) that are
 # legitimate outside the registry.
 ALLOWED_SPECIAL = {
-    "LICENSE.md", "NOTICE.md", "SECURITY.md", "CODEOWNERS.md",
+    "LICENSE.md", "NOTICE.md", "SECURITY.md", "SUPPORT.md", "CODEOWNERS.md",
     "CODE_OF_CONDUCT.md", "AGENTS.md", "AGENT.md", "CLAUDE.md", "QODER.md",
     "GEMINI.md", "HERMES.md", "OPENCODE.md",
 }

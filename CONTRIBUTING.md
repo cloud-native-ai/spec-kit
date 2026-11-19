@@ -20,6 +20,18 @@
 - Constitution (`.specify/memory/constitution.md`) governs architecture and workflow constraints.
 - Docs follow the six-type taxonomy + uppercase special-name registry (see [ADR-0001](docs/decisions/0001-adopt-docs-taxonomy.md)); manage them with `/speckit.docs`.
 
+## License of Contributions
+
+Unless explicitly stated otherwise, any contribution intentionally submitted
+for inclusion in this project shall be licensed under the MIT License,
+without any additional terms or conditions.
+
+The project's licence face is [LICENSE](LICENSE) (upstream GitHub, Inc. notice
+preserved verbatim plus this project's copyright line) and [NOTICE](NOTICE)
+(component attribution). Do not submit third-party code, documentation text or
+assets you cannot license under MIT: an incompatible component is replaced by
+an original implementation, not relicensed.
+
 ## Deeper Reading
 
 - Dev setup → [docs/contribute/dev-setup.md](docs/contribute/dev-setup.md)

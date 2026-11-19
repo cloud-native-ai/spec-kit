@@ -1,103 +1,57 @@
-# Using Agent Skills in Vscode Github Copilot
+# Agent Skills in GitHub Copilot (VS Code) — source and summary
 
-Agent Skills are collections of instructions, scripts, and resources that GitHub Copilot can load when relevant to perform specialized tasks. Agent Skills is an open standard applicable to multiple AI agents, including GitHub Copilot in VS Code, GitHub Copilot CLI, and GitHub Copilot coding agents.
+- **Official documentation:** <https://code.visualstudio.com/docs> (Copilot → customization / Agent Skills)
+- **Copilot documentation:** <https://docs.github.com/en/copilot>
+- **Open standard:** <https://agentskills.io>
+- **Source licence:** VS Code documentation is published under its own Creative
+  Commons attribution terms (recorded as CC-BY-3.0-US at review time; confirm
+  against the source when online)
+- **Source reviewed:** 2026-11-19 (licence review). The earlier snapshot carried
+  no capture date.
+- **Licence of this page:** MIT (original work of the ai-engine project)
 
-Unlike Custom Instructions, which primarily define coding guidelines, Skills enable specialized capabilities and workflows that include scripts, examples, and other resources. The Skills you create are portable and work across any Skills-compatible agent.
+> This page is an **original summary**, not a copy of the vendor's documentation.
+> It reproduces no upstream documentation text. Preview status, setting names and
+> storage paths drift — verify anything you will act on against the official
+> documentation above.
 
-## Core Advantages
+## What the capability is, in outline
 
-*   **Copilot Specialization**: Tailor capabilities for domain-specific tasks without repeating context.
-*   **Reduce Repetition**: Create once and automatically use across all conversations.
-*   **Capability Composition**: Combine multiple Skills to build complex workflows.
-*   **Efficient Loading**: Only relevant content is loaded into context when needed.
+GitHub Copilot can load Agent Skills: packaged instructions plus optional scripts
+and resources that it pulls into context when a request matches a skill's
+description. Because the format is the open Agent Skills standard, the same skill
+directory is portable across Copilot in VS Code, Copilot CLI and other
+compatible agents.
 
-> **Note**: Agent Skills support in VS Code is currently in preview. You may need to enable the `chat.useAgentSkills` setting to use them.
+The distinction that matters when choosing between the two customization
+mechanisms: custom instructions state standing preferences (style, conventions)
+and apply broadly, while a skill teaches a task-specific capability and is
+loaded only when relevant. Skills compose — several can contribute to one
+workflow — and their resources are read on demand rather than up front.
 
-## Agent Skills vs. Custom Instructions
+## Storage locations in a Spec Kit project
 
-Both can customize Copilot's behavior, but serve different purposes:
+These are **this project's** conventions, not the vendor's defaults:
 
-| Feature | Agent Skills | Custom Instructions |
-| :--- | :--- | :--- |
-| **Purpose** | Teach specialized capabilities and workflows | Define coding standards and guidelines |
-| **Portability** | Universal across VS Code, Copilot CLI, Copilot Agent | VS Code and GitHub.com only |
-| **Content** | Instructions, scripts, examples, and resources | Instructions only |
-| **Scope** | Task-specific, loaded on demand | Always applied (or via glob patterns) |
-| **Standard** | Open standard (agentskills.io) | VS Code-specific |
+| Location | Role |
+|----------|------|
+| `.specify/skills/` | primary copy of every project skill |
+| `.github/skills/` | compatibility entry point only; never hosts primary content |
+| `${HOME}/.copilot/skills/` | user-level skills, outside the project |
 
-**Usage Comparison:**
+The alias model and its regeneration are owned by
+`shared/workflow/symlink-model.md`; never hand-edit a compatibility link.
 
-*   **Agent Skills**: Create reusable capabilities (e.g., testing, deployment workflows) with supporting scripts or examples.
-*   **Custom Instructions**: Define project-specific code style, framework conventions, or commit message formats.
+## Recorded at capture (verify upstream)
 
-## Creating Skills
+- Agent Skills support in VS Code was in preview and gated by the
+  `chat.useAgentSkills` setting.
+- Copilot selects a skill from its `name` and `description` frontmatter, then
+  reads the body, then reads referenced resources only when a step needs them.
 
-Skills are stored in directories with a `SKILL.md` file.
+## Attribution
 
-### Storage Locations
-
-*   **Project-Level Skills** (Recommended): The primary copy is stored in the workspace's `.specify/skills/` directory.
-*   **GitHub-Compatible Entry Point**: `.github/skills/` serves only as a compatibility entry point mapped to the primary copy and does not host primary content.
-*   **User-Level Skills** (Recommended): Stored in the `${HOME}/.copilot/skills/` directory of the user profile.
-
-### Directory Structure
-
-Each Skill should have its own subdirectory. For example, to create a Skill called `webapp-testing`:
-
-1.  Create directory `.specify/skills/webapp-testing/`
-2.  Create the `SKILL.md` file within it.
-3.  (Optional) Add scripts, templates, or example files.
-
-Example structure:
-```text
-.specify/skills/webapp-testing/
-├── SKILL.md           # Defines Skill behavior and metadata
-├── test-template.js   # Template file
-└── examples/          # Example scenarios
-```
-
-### SKILL.md File Format
-
-`SKILL.md` is a Markdown file with YAML frontmatter.
-
-**Frontmatter**
-
-```yaml
----
-name: skill-name
-description: Description of what the Skill does and when to use it
----
-```
-
-*   `name` (Required): Unique identifier, lowercase, using hyphens (e.g., `webapp-testing`).
-*   `description` (Required): Describes the Skill's functionality and usage scenarios. Copilot uses this description to decide when to load the Skill.
-
-**Body**
-
-Contains detailed instructions, guidelines, and examples for Copilot to follow when using the Skill.
-
-```markdown
-# Skill Instructions
-
-Write detailed instructions here...
-
-You can reference files within the directory, e.g.: `[Test Script](./test-template.js)`.
-```
-
-## How Copilot Uses Skills
-
-Skills use a Progressive Disclosure mechanism, loading content only when needed:
-
-1.  **Skill Discovery**: Copilot reads the names and descriptions of all available Skills.
-2.  **Instruction Loading**: When a user request matches a Skill description, Copilot loads the body of `SKILL.md`.
-3.  **Resource Access**: Copilot reads supporting files (scripts, examples) only when it needs to reference them.
-
-## Best Practices
-
-*   **Stay Focused**: Create separate Skills for different workflows rather than one massive all-in-one Skill.
-*   **Clear Descriptions**: Descriptions are critical for Copilot to determine when to invoke a Skill.
-*   **Use Examples**: Include input/output examples in `SKILL.md`.
-*   **Security**: Exercise caution when adding scripts and avoid hardcoding sensitive information.
-
----
-For more information, refer to the Agent Skills open standard: [agentskills.io](https://agentskills.io).
+VS Code and GitHub Copilot are products of Microsoft / GitHub. Their
+documentation is referenced here by link with attribution; the earlier verbatim
+snapshot was removed in the 2026-11-19 licence review so that no third-party
+documentation text is redistributed in this repository.

@@ -4,7 +4,9 @@
 
 **An open source toolkit built around Spec-Driven Development (SDD): requirements, plans, tasks, and implementation connect through structured templates and `/speckit.*` commands, so AI progresses around clear intent instead of one-off vague prompts.**
 
-Based on [github.com/github/spec-kit](https://github.com/github/spec-kit.git) with multiple custom extensions — thanks to the original contributors.
+ai-engine is an independent fork of [github/spec-kit](https://github.com/github/spec-kit)
+(MIT, Copyright GitHub, Inc.), forked at 926836e0f (2025-10-21).
+It is not affiliated with or endorsed by GitHub. Thanks to the original Spec Kit contributors.
 
 ## 📚 Documentation Navigation
 
@@ -42,8 +44,8 @@ See [docs/tutorials/installation.md](docs/tutorials/installation.md).
 
 ## 🤝 Contributing & Support
 
-See [CONTRIBUTING.md](CONTRIBUTING.md); support via the [upstream support guide](https://github.com/github/spec-kit/blob/main/SUPPORT.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md); support channels are listed in [SUPPORT.md](SUPPORT.md), and security reports go through [SECURITY.md](SECURITY.md).
 
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE).

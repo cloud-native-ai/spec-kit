@@ -4,10 +4,11 @@ Spec Kit's `specify` CLI can bootstrap its `/speckit.*` command surface into a
 number of AI coding agents. The authoritative list lives in `AGENT_CONFIG` and
 `_ASSISTANT_TIERS` in [src/specify_cli/__init__.py](../../../src/specify_cli/__init__.py).
 
-This directory collects a concise reference for each officially supported agent,
-distilled from the tool's **official documentation** (source URL noted at the top
-of each file). Docs were captured on 2026-07-11 — always confirm against the
-upstream source for the latest details.
+This directory collects a concise reference for each officially supported agent.
+Every per-tool page is an **original summary plus links** to the tool's official
+documentation (source URLs noted at the top of each file); no vendor documentation
+text is reproduced. Sources were last reviewed on 2026-07-11 — always confirm
+against the upstream source for the latest details.
 
 > **Terminology**: "tools" in this document means **AI agent CLIs** (Claude Code,
 > Codex CLI, …). It does *not* mean the **Tool definition records** owned by

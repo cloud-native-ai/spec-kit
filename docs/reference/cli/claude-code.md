@@ -7,49 +7,27 @@
 - **Product page:** https://code.claude.com/
 - **Captured:** 2026-07-11
 
-## Overview
+> **Link + summary page.** The text below is an original summary written for this
+> project, not a reproduction of Anthropic's documentation. Installation routes,
+> flags and feature lists change frequently: read the official source above for
+> anything you will act on. `Captured` records when this project last reviewed it.
 
-Claude Code is Anthropic's agentic coding tool. It reads your codebase, edits
-files, runs commands, and integrates with your development tools. It works across
-multiple files and surfaces: **terminal (CLI), IDE extensions (VS Code / JetBrains),
-desktop app, and the web**. Each surface connects to the same underlying engine, so
-`CLAUDE.md`, settings, and MCP servers work everywhere.
+## What it is (summary)
 
-## Installation
+Claude Code is Anthropic's agentic coding tool. It works against a real
+repository — reading code, editing files and running commands — and is reachable
+from several surfaces (terminal, IDE extensions, desktop and web) that share one
+engine, so project instructions, settings and MCP configuration carry across
+them. Beyond interactive use it supports non-interactive invocation for
+scripting and CI, and it can be extended with project memory files, skills and
+hooks.
 
-Terminal (native install — recommended):
+## Read the official documentation for
 
-```bash
-# macOS, Linux, WSL
-curl -fsSL https://claude.ai/install.sh | bash
-
-# Windows PowerShell
-irm https://claude.ai/install.ps1 | iex
-```
-
-Other options: Homebrew (`brew install --cask claude-code`), WinGet
-(`winget install Anthropic.ClaudeCode`), and Linux package managers (apt/dnf/apk).
-Native installs auto-update in the background.
-
-IDE: install the "Claude Code" extension for VS Code / Cursor / JetBrains.
-
-## Getting started
-
-```bash
-cd your-project
-claude          # prompts for login on first use
-```
-
-## Key capabilities
-
-- Build features and fix bugs from natural-language descriptions.
-- Automate tedious work (write tests, fix lint, resolve conflicts, update deps).
-- Git integration: stage changes, write commit messages, branch, open PRs.
-- **MCP** (Model Context Protocol) to connect external data/tools.
-- Customize with `CLAUDE.md` (memory), **skills** (`/review-pr`), and **hooks**.
-- Agent teams / sub-agents; background agents; the Agent SDK for custom agents.
-- Composable CLI (`claude -p "..."`) for piping, scripting, and CI use.
-- Scheduling via routines / `/loop`; multi-surface handoff (web, mobile, Slack).
+- Installation routes per operating system, and update behaviour.
+- Authentication and first-run setup.
+- The current flag set, non-interactive usage, hooks, skills and MCP support.
+- Sub-agent / agent-team and SDK capabilities.
 
 ## Spec Kit integration
 

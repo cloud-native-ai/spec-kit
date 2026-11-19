@@ -5,49 +5,31 @@
 - **Agent folder:** `.codex/` (commands in `.codex/commands`, `.md` files)
 - **Official repo / docs:** https://github.com/openai/codex
 - **Documentation:** https://developers.openai.com/codex
+- **IDE extension:** https://developers.openai.com/codex/ide
+- **Cloud agent (Codex Web):** https://chatgpt.com/codex
+- **Upstream licence:** Apache-2.0 (the product, not this page)
 - **Captured:** 2026-07-11
 
-## Overview
+> **Link + summary page.** Original summary written for this project; no OpenAI
+> documentation text is reproduced here. Install routes, authentication options
+> and flags drift — read the official sources above before acting on a detail.
+> `Captured` records when this project last reviewed them.
 
-Codex CLI is a lightweight coding agent from OpenAI that runs locally in your
-terminal. Companion surfaces exist: an IDE extension (VS Code, Cursor, Windsurf —
-see https://developers.openai.com/codex/ide), a desktop app (`codex app`), and the
-cloud-based **Codex Web** agent at https://chatgpt.com/codex.
+## What it is (summary)
 
-## Installation
+Codex CLI is OpenAI's lightweight coding agent for the terminal: it runs locally
+against the working repository and is driven by natural-language requests.
+Companion surfaces exist around the same agent — an IDE extension, a desktop
+app, and a cloud-hosted web agent — so a task can move between local and hosted
+execution. Authentication is oriented around a ChatGPT plan, with API-key usage
+also possible.
 
-```bash
-# macOS / Linux install script
-curl -fsSL https://chatgpt.com/codex/install.sh | sh
+## Read the official documentation for
 
-# Windows PowerShell
-powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
-```
-
-Package managers:
-
-```bash
-npm install -g @openai/codex        # npm
-brew install --cask codex           # Homebrew
-```
-
-Prebuilt binaries are also available on the latest GitHub Release (rename the
-extracted platform-specific binary to `codex`).
-
-## Getting started
-
-```bash
-codex           # select "Sign in with ChatGPT"
-```
-
-Recommended auth is signing in with a ChatGPT plan (Plus, Pro, Business, Edu, or
-Enterprise). Using an API key is also supported but requires extra setup.
-
-## Docs & resources
-
-- Codex Documentation, Contributing, and "Installing & building" guides linked
-  from the repository.
-- Licensed under Apache-2.0.
+- Installation routes (install script, package managers, prebuilt release binaries).
+- Sign-in options and the differences between plan-based and API-key access.
+- The current command/flag set, sandboxing and approval behaviour.
+- Contributing and building from source.
 
 ## Spec Kit integration
 
