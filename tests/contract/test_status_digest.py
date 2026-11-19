@@ -1140,14 +1140,15 @@ FORBIDDEN_CALLS = frozenset(
     }
 )
 
-#: The pre-change dependency list of ``pyproject.toml`` (measured at the feature's base commit and unchanged since:
-#: ``git diff 56f3f881..HEAD -- pyproject.toml`` is empty). The pin is on the *list*, not on a count, so a swap that
-#: keeps the length but changes a name still goes red.
+#: The sanctioned runtime dependency list of ``pyproject.toml``. It was this feature's pre-change list, measured
+#: at its base commit (``git diff 56f3f881..HEAD -- pyproject.toml`` was empty). On 2026-11-19 the P1 upstream port
+#: dropped ``platformdirs`` (Adapted-from: 531712f40 — declared, but imported by no shipped file), so the sanctioned
+#: list is now five entries; the guard below keeps every remaining entry load-bearing. The pin is on the *list*, not
+#: on a count, so a swap that keeps the length but changes a name still goes red, and an added entry still fails C-50.
 PRE_CHANGE_RUNTIME_DEPENDENCIES = (
     "typer",
     "rich",
     "httpx[socks]",
-    "platformdirs",
     "readchar",
     "truststore>=0.10.4; python_version >= '3.10'",
 )
@@ -1269,7 +1270,9 @@ def test_c50_no_optional_or_dev_dependency_group_was_introduced():
     Feature 086 (WP-A3) legitimately added the single ``[project.optional-dependencies] dev``
     group (pytest + pytest-xdist) for its concurrent test execution; that sanctioned group is
     fixed here, while any additional optional group or any ``[dependency-groups]`` entry still
-    fails. The runtime list pin above remains the C-50 no-new-dependency guard.
+    fails. The runtime list pin above remains the C-50 no-new-dependency guard. Its membership
+    grew once more on 2026-11-19: ``ruff`` joined the same ``dev`` group as the engine of the
+    local lint gate (Adapted-from: 24d76b5d9) — dev-only tooling, never a runtime import.
     """
     lists = _pyproject_dependency_lists()
     assert lists["optional"] == ["dev"], (
@@ -1278,6 +1281,81 @@ def test_c50_no_optional_or_dev_dependency_group_was_introduced():
     assert lists["dev"] == [], (
         "a dependency group was introduced: %r" % (lists["dev"],)
     )
+
+
+# --------------------------------------------------------------------------- #
+# P1 upstream port — a declared runtime dependency must be load-bearing
+#
+# Adapted-from: 531712f40 ("drop platformdirs, which is never imported"). The pin
+# above keeps the dependency list from *growing*; this partition keeps every entry
+# from being *dead weight*: a package every install pulls but no shipped file
+# imports. It is a port guard, not a C-50 clause — C-50 forbids new machinery on a
+# delivery path, while this forbids an unused entry in the shipping dependency set.
+# --------------------------------------------------------------------------- #
+
+#: The shipped Python surface: the CLI package plus the two payload roots that carry
+#: ``.py`` files into the wheel (``[tool.hatch.build.targets.wheel.force-include]``).
+SHIPPED_PY_ROOTS = ("src", "scripts", "skills")
+
+
+def _requirement_import_name(requirement: str) -> str:
+    """The top-level module a requirement string installs — extras, specifiers and markers are not part of a name."""
+    return re.split(r"[\[<>=!~;\s]", requirement.strip(), maxsplit=1)[0]
+
+
+def _imported_module_names(tree: ast.AST) -> set:
+    """Top-level module names an AST imports, absolute imports only (a relative import names no distribution)."""
+    names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names.update(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            names.add(node.module.split(".")[0])
+    return names
+
+
+def _shipped_imported_modules() -> set:
+    """Every module name the shipped Python surface imports, read from the files themselves."""
+    names = set()
+    for root in SHIPPED_PY_ROOTS:
+        for path in sorted((REPO_ROOT / root).rglob("*.py")):
+            names |= _imported_module_names(
+                ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            )
+    return names
+
+
+def test_every_declared_runtime_dependency_is_imported_by_the_shipped_code():
+    """Adapted-from 531712f40: a runtime dependency no shipped file imports is dead weight in every install."""
+    declared = [
+        _requirement_import_name(entry)
+        for entry in _pyproject_dependency_lists()["runtime"]
+    ]
+    assert declared, "the runtime dependency list is empty — the guard would pass vacuously"
+    imported = _shipped_imported_modules()
+    unused = sorted(name for name in declared if name not in imported)
+    assert not unused, (
+        "a runtime dependency is declared but never imported by the shipped code "
+        "(src/, scripts/, skills/): %r\n"
+        "Either remove the entry from pyproject.toml or import it; every install pays for it."
+        % (unused,)
+    )
+
+
+def test_the_unused_dependency_scan_measures_both_directions():
+    """A green check is a claim, not evidence: the scan sees a seeded importer and reports a name nothing imports."""
+    # The name extractor reduces a requirement string to the module it installs.
+    assert _requirement_import_name("httpx[socks]") == "httpx"
+    assert _requirement_import_name("truststore>=0.10.4; python_version >= '3.10'") == "truststore"
+    # A seeded importer is seen, so an empty scan cannot pass the guard above by measuring nothing.
+    seeded = ast.parse("import typer\nfrom rich.console import Console\n")
+    assert {"typer", "rich"} <= _imported_module_names(seeded), (
+        "the AST scan must see both import forms; got %r" % (_imported_module_names(seeded),)
+    )
+    # A relative import names no distribution, so it cannot make an unused entry look used.
+    assert _imported_module_names(ast.parse("from . import helper\n")) == set()
+    # The shipped surface really does not import the dropped package — the removal was measured, not assumed.
+    assert "platformdirs" not in _shipped_imported_modules()
 
 
 # --------------------------------------------------------------------------- #

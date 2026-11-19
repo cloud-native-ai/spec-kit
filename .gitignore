@@ -10,8 +10,11 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Root-anchored: hatchling reuses these patterns as build-exclusion rules, so an
+# unanchored `lib/` matches a nested source directory named lib/ at any depth and
+# silently drops that package from the built wheel.
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -66,3 +69,6 @@ src/specify_cli/_source_commit.json
 **/*.egg-info/
 .specify/tools/*.json
 .specify/instructions.md-*
+
+# Local lint gate cache (ruff — see [tool.ruff] in pyproject.toml)
+.ruff_cache/
