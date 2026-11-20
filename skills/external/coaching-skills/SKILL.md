@@ -61,10 +61,12 @@ lists, never by syntax.** A leading `/` is NOT a discriminator: skills
 (`/improve-skills`, `/coaching-skills`) and command surfaces (`/speckit.status`) both
 carry it.
 
-- **Scan both lists** with the leading `/` stripped: (a) the **Skill** set through the
-  position ladder below (directory name or frontmatter `name`); (b) the **Command** set
-  through the canonical templates `templates/commands/<name>.md` (a `speckit.` prefix
-  also maps to `<name>.md`), then their generated per-tool copies as aliases.
+- **Scan both lists** after stripping **one leading `/` only**. The `speckit.` prefix is a
+  **command namespace**, not a skill-name prefix: the Skill set is scanned with the
+  prefix retained (`/speckit.humanize` does not match the `humanize` skill); the Command
+  set is scanned through the canonical templates `templates/commands/<name>.md` and, when
+  the name starts with `speckit.`, its prefix-stripped form mapped to `<name>.md`, plus
+  the generated per-tool copies as aliases.
 - Exactly one hit decides the executor kind: a **Skill** (decision class `skill`
   internal/external/installed) or a **Command** (decision class `command`; the template
   body is its execution contract).
