@@ -60,11 +60,11 @@ WRITE_WORDING = "both WRITE"
 READONLY_WORDING = "only references it as a read-only target"
 ANTI_SILENCING = "never by deleting the cited path"
 
-# The owner of the failing-test baseline path is implement.md's `**Test runs**`
-# bullet. tasks.md must reach it by pointer and MUST NOT carry the literal —
+# The owner of the failing-test baseline path is the implement-feature skill's
+# `**Test runs**` bullet. tasks.md must reach it by pointer and MUST NOT carry the literal —
 # a second copy of that path is exactly the drift this asserts against.
 BASELINE_POINTER = "`**Test runs**`"
-BASELINE_OWNER_CMD = "templates/commands/implement.md"
+BASELINE_OWNER_CMD = "skills/internal/implement-feature/SKILL.md"
 BASELINE_PATH_LITERAL = "baseline-failed"
 
 NOTES_LANDING_POINTS = (
@@ -463,8 +463,8 @@ def test_c6_tasks_command_carries_the_write_target_adjudication_duty():
 def test_c7_tasks_command_points_at_the_baseline_owner_without_copying_it():
     text = _norm(TASKS_CMD.read_text(encoding="utf-8"))
     assert BASELINE_POINTER in text, (
-        "the tasks generation skill must point at implement.md's `**Test runs**` "
-        "bullet, the owner of the failing-test baseline path"
+        "the tasks generation skill must point at the implement-feature skill's "
+        "`**Test runs**` bullet, the owner of the failing-test baseline path"
     )
     assert BASELINE_OWNER_CMD in text, "the pointer must name the owner file"
     assert BASELINE_PATH_LITERAL not in text, (
@@ -522,4 +522,83 @@ def test_c10_tasks_premise_command_must_actually_run():
     assert "write the trap form down too" in text, (
         "when a more naive measurement form would give a different answer, the trap "
         "form must be written down alongside it"
+    )
+
+
+# --- C-11..C-13: path-token false positives (feedback F18) -----------------
+
+NUMERIC_AND_LEVEL_PAIR = [
+    "- [ ] T001 [P] Expose the probe on ports 80/443 and record level L2/L3.",
+    "- [ ] T002 [P] Document ports 80/443 and level L2/L3 for the same surface.",
+]
+
+
+def test_c11_numeric_and_level_tokens_are_not_paths(tmp_path):
+    """Ports and level labels are prose, not write targets (feedback F18)."""
+    mod = _load_validator()
+    path = _write_tasks(tmp_path, "numeric.md", NUMERIC_AND_LEVEL_PAIR)
+    _anti_vacuity(mod, path, {"T001", "T002"})
+
+    errors, warnings = mod.validate(path)
+    assert _parallel_warnings(warnings) == [], (
+        "port/level tokens were classified as paths and produced a parallel "
+        f"write conflict: {_parallel_warnings(warnings)}"
+    )
+    assert errors == []
+
+
+TRAILING_READONLY_PAIR = [
+    "- [ ] T001 [P] 段落引用 `shared/guidelines/token-efficiency.md`（只读）",
+    "- [ ] T002 [P] 复述 `shared/guidelines/token-efficiency.md` (read-only) 的口径",
+]
+
+
+def test_c12_trailing_readonly_marker_demotes_the_target(tmp_path):
+    """A read-only marker AFTER the token demotes it (feedback F18)."""
+    mod = _load_validator()
+    path = _write_tasks(tmp_path, "trailing.md", TRAILING_READONLY_PAIR)
+    _anti_vacuity(mod, path, {"T001", "T002"})
+
+    errors, warnings = mod.validate(path)
+    assert _parallel_warnings(warnings) == [], (
+        "a trailing read-only marker was invisible to the governor and two "
+        f"citations became a write conflict: {_parallel_warnings(warnings)}"
+    )
+    assert errors == []
+
+
+EXECUTOR_PAIR = [
+    "- [ ] T001 [P] Run `bin/cws_images_test` for the probe.",
+    "- [ ] T002 [P] Execute `bin/cws_images_test` for the second probe.",
+]
+
+
+def test_c13_executor_governor_demotes_command_paths(tmp_path):
+    """A command named after a run/execute verb is read-only, not a write target."""
+    mod = _load_validator()
+    path = _write_tasks(tmp_path, "executor.md", EXECUTOR_PAIR)
+    _anti_vacuity(mod, path, {"T001", "T002"})
+
+    errors, warnings = mod.validate(path)
+    assert _parallel_warnings(warnings) == [], (
+        "two rows executing the same command were reported as writers: "
+        f"{_parallel_warnings(warnings)}"
+    )
+    assert errors == []
+
+
+def test_c13b_executor_governor_does_not_hide_a_real_writer(tmp_path):
+    """The same rows still report a genuine shared write target."""
+    mod = _load_validator()
+    path = _write_tasks(tmp_path, "executor_writer.md", [
+        "- [ ] T001 [P] Run `bin/tool_test` before changing tests/contract/test_shared.py",
+        "- [ ] T002 [P] Add contract assertions to tests/contract/test_shared.py",
+    ])
+    _anti_vacuity(mod, path, {"T001", "T002"})
+
+    _, warnings = mod.validate(path)
+    hits = _parallel_warnings(warnings)
+    assert len(hits) == 1 and WRITE_WORDING in hits[0], (
+        "the executor governor hid a real shared write target: "
+        f"{hits}"
     )

@@ -54,14 +54,19 @@ HEADING = re.compile(r"^(#{1,6})\s+")
 
 FR_DEF = re.compile(r"^- \*\*FR-(\d{3})\*\*:")
 SC_DEF = re.compile(r"^- \*\*SC-(\d{3})\*\*:")
-TASK_DEF = re.compile(r"^- \[[ xX>~]\] (T\d{3})")
-CLAUSE_DEF = re.compile(r"^- \*\*([A-Z]{2,4}-\d{2})\b")
+TASK_DEF = re.compile(r"^- \[[ xX>~]\] (T\d{3}[A-Za-z]?)")
+# Clause ids follow the syntax owner (shared/definitions/contract-clause-definitions.md):
+# canonical `C-<digits>` (dotted sub-number allowed) plus the legacy prefixed form.
+CLAUSE_ID = r"(?:[A-Z]{2,4}-\d{2}|C-\d+)(?:\.\d+)*"
+CLAUSE_DEF = re.compile(r"^\s*(?:[-*+]\s+)?\*\*(" + CLAUSE_ID + r")\b")
+CLAUSE_HEADING = re.compile(r"^#{1,6}\s+(" + CLAUSE_ID + r")\b")
+CLAUSE_TABLE = re.compile(r"^\s*\|\s*\*\*(" + CLAUSE_ID + r")\*\*\s*\|")
 FR_REF = re.compile(r"\bFR-(\d{3})\b")
 SC_REF = re.compile(r"\bSC-(\d{3})\b")
-CLAUSE_REF = re.compile(r"\b([A-Z]{2,4}-\d{2})\b")
+CLAUSE_REF = re.compile(r"\b(" + CLAUSE_ID + r")\b")
 NON_CLAUSE_PREFIXES = {"FR", "SC", "SHA", "ISO", "UTF"}
 BLOCKED_BY = re.compile(r"\[blockedBy:\s*([^\]]+)\]")
-TASK_TOKEN = re.compile(r"^T\d{3}$")
+TASK_TOKEN = re.compile(r"^T\d{3}[A-Za-z]?$")
 
 COUNT_CLAIMS = (
     ("FR", re.compile(r"(?<![\w-])(\d{1,3})\s*FR\b")),
@@ -436,7 +441,8 @@ def definitions(files, spec_dir):
                         tasks[key] = (path, number)
                     continue
             if owner == "contracts":
-                match = CLAUSE_DEF.match(line)
+                match = (CLAUSE_DEF.match(line) or CLAUSE_HEADING.match(line)
+                         or CLAUSE_TABLE.match(line))
                 if match:
                     key = match.group(1)
                     if key in clauses:

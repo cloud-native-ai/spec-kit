@@ -197,3 +197,49 @@ def test_json_out_written(tmp_path):
     proc = _run(spec, "--json-out", str(out))
     assert proc.returncode == 1
     assert json.loads(out.read_text(encoding="utf-8"))["decision"] == "fail"
+
+
+def test_canonical_clause_form_is_parsed_and_dangling_fails(tmp_path):
+    """`**C-001**` is the syntax owner's canonical form (feedback F3)."""
+    spec = _spec(tmp_path, plan_extra="\nSee C-002 for the missing canonical clause.\n",
+                 contract_text="- **C-001**: canonical clause\n")
+    proc = _run(spec)
+    assert proc.returncode == 1
+    record = _record(proc)
+    assert record["summary"]["clauses"] == 1, (
+        "the canonical `**C-<digits>**` form was not counted as a clause"
+    )
+    assert any(f["check"] == "dangling-id" and "C-002" in f["message"]
+               for f in record["findings"])
+
+
+def test_canonical_heading_and_table_clause_forms_are_parsed(tmp_path):
+    """Legacy `md-heading` and table-first-cell forms stay recognizable (F3)."""
+    spec = _spec(tmp_path, plan_extra="\nSee C-002 for the missing clause.\n",
+                 contract_text="## C-001 heading form\n\n| **C-003** | table form |\n")
+    proc = _run(spec)
+    record = _record(proc)
+    assert record["summary"]["clauses"] == 2, (
+        "heading/table clause declarations were not counted: "
+        f"{record['summary']['clauses']}"
+    )
+    assert proc.returncode == 1
+    assert any(f["check"] == "dangling-id" and "C-002" in f["message"]
+               for f in record["findings"])
+
+
+def test_letter_suffixed_task_ids_are_distinct_and_resolvable(tmp_path):
+    """`T001A` is a distinct id and a concrete blockedBy token (feedback F3)."""
+    spec = _spec(
+        tmp_path,
+        task_extra="- [ ] T001A split of the first row (FR-001)\n"
+                   "- [ ] T003 third [blockedBy: T001A]\n")
+    proc = _run(spec)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    findings = _record(proc)["findings"]
+    assert not any(f["check"] == "duplicate-id" and "T001" in f["message"]
+                   for f in findings), "T001A was truncated to T001 and reported as a duplicate"
+    assert not any(f["check"] == "blocked-by" for f in findings), (
+        "a letter-suffixed blockedBy token was treated as non-concrete: "
+        f"{[f for f in findings if f['check'] == 'blocked-by']}"
+    )

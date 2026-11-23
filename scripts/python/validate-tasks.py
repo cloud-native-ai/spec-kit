@@ -98,9 +98,15 @@ PATH_TOKEN = re.compile(
 # ambiguous ones (`from`, `via`, `in`) also head write phrases, so a token they
 # govern keeps the default classification and the overlap is still reported.
 POINTER_GOVERNOR = re.compile(
-    r"(?:\b(?:per|see|against|cite|cited|cites|owner|owned)\b|"
-    r"read-only|readonly|只读|指向|参见|详见|MUST NOT edit|(?:do not|never) edit)"
+    r"(?:\b(?:per|see|against|cite|cited|cites|owner|owned|run|invoke|execute)\b|"
+    r"read-only|readonly|只读|指向|参见|详见|运行|执行|调用|MUST NOT edit|(?:do not|never) edit)"
     r"[\s`'\"(:,、。]*$",
+    re.IGNORECASE,
+)
+# A read-only marker immediately AFTER the token (`path` (只读), `path` read-only)
+# demotes it too; the preceding-window governors cannot see this placement.
+TRAILING_READONLY = re.compile(
+    r"^[`'\"\s]*(?:\(|（)?\s*(?:read-only|readonly|只读)",
     re.IGNORECASE,
 )
 # A read-only probe named in the window preceding the token also demotes it --
@@ -247,8 +253,15 @@ def _classify_paths(text: str):
         tok = m.group(0).strip(".,;:()")
         if "[" in tok or "]" in tok:  # template placeholder, not a real path
             continue
+        parts = [part for part in tok.replace("\\", "/").split("/") if part]
+        if parts and all(part.isdigit() for part in parts):
+            continue  # port / numeric fraction (80/443, 0/1/2), not a path
+        if re.fullmatch(r"[A-Za-z]\d+(?:/[A-Za-z]\d+)+", tok):
+            continue  # level pair (L2/L3, v1/v2), not a path
         before = text[max(0, m.start() - POINTER_WINDOW):m.start()]
-        governed = bool(POINTER_GOVERNOR.search(before))
+        after = text[m.end():m.end() + 24]
+        governed = (bool(POINTER_GOVERNOR.search(before))
+                    or bool(TRAILING_READONLY.match(after)))
         probed = bool(POINTER_CONTEXT.search(before)) and not WRITE_VERB.search(before)
         (pointer if (governed or probed) else write).add(tok)
     return write, pointer
