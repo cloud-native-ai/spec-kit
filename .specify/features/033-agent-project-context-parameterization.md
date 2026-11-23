@@ -2,22 +2,18 @@
 
 **Feature ID**: 033  
 **Name**: Agent Project Context Parameterization  
-**Description**: Make the `## Project Context` section of bundled role agents (`.specify/agents/*.agent.md`) generated per target project at init/refresh time, instead of shipping spec-kit's own hard-coded project facts into every consuming project.  
+**Description**: Render Worker capability Project Context from target-project facts instead of leaving placeholders unresolved.
 **Status**: Draft  
 **Created**: 2026-07-21  
-**Last Updated**: 2026-07-21 (draft registered from the interview-walkthrough rollout to xuanji-ui; no spec yet)
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The 7 built-in role agents (requirements-analyst, system-designer, module-designer, test-engineer, qa-engineer, knowledge-manager, ux-analyst) each carry a `## Project Context` section that is currently hard-coded to the **Spec Kit project itself** (project name, tech stack, existing spec inventory). Because `copy_local_templates()` copies `agents/` wholesale into every target project's `.specify/agents/`, any project installing Spec Kit inherits spec-kit's facts — the agent then reasons about the wrong tech stack, the wrong spec list, and the wrong project identity.
-
-This was observed when the interview-driven walkthrough flow (see `shared/workflow/interview-walkthrough.md`) was rolled out to xuanji-ui: the Requirements Analyst's workflow and shared sub-documents are fully project-neutral, but its Project Context section still described spec-kit, so the flow is not truly "开箱即用" in an arbitrary project.
-
-The fix belongs to the **installer/initializer behavior**, not the agent files: at `specify init` (and on instructions/agent refresh), rewrite only the `## Project Context` section of each installed role agent from facts detected in the target project — project name (directory/pyproject), tech stack (existing `detect_tech_stack`), and spec inventory (scan `.specify/specs/`). All other sections (identity, workflow, supervision, skill enablement) remain byte-identical to the shipped template. Re-init refreshes the section non-destructively, preserving user customizations elsewhere in the file.
+The seven Worker capability templates now contain `{{PROJECT_NAME}}`, `{{TECH_STACK}}`, `{{SPECS_DIR}}`, and related placeholders, and the generic agent renderer exists. The remaining gap is that init/render only rewrites paths and copies body text: it does not detect the target project, substitute those placeholders, or refresh only `## Project Context` while preserving edits elsewhere.
 
 ## Latest Review
 
-Not yet reviewed. Registered as Draft directly from field feedback (2026-07-21): interview-walkthrough rollout to xuanji-ui confirmed the agent behavioral content is project-neutral, with Project Context as the sole project-coupled remnant. Needs a `/speckit.requirements` spec to pin down: detection sources and precedence, section boundary markers for non-destructive rewrite, behavior when detection fails (fallback to placeholder vs. omit), and whether refresh is wired into `/speckit.instructions`, `specify init`, or both.
+2026-11-22 implementation audit: the earlier claim that templates still hard-code Spec Kit facts is outdated. Parameterized template text is delivered; target-project detection, placeholder resolution, and segment-level non-destructive refresh are not. `Draft` remains appropriate for the unfinished core behavior, but the record now distinguishes the delivered template work from the missing installer behavior.
 
 ## Key Changes (planned)
 
@@ -28,10 +24,10 @@ Not yet reviewed. Registered as Draft directly from field feedback (2026-07-21):
 
 ## Implementation Notes
 
-- Keep shipped `agents/*.agent.md` project-neutral outside the Project Context section — workflow, decision cards, and shared references must stay reusable as-is (template neutrality lesson).
-- The instructions template already solves an analogous problem (project-level facts rendered into `.specify/instructions.md` at generation time); prefer reusing that detection/rendering path over a second mechanism.
-- Mirror-sync discipline still applies: `agents/` ↔ `.specify/agents/` are independent git copies — the installer is the only writer of the installed copy's Project Context.
-- Detection-failure default must never silently fall back to spec-kit's own facts; a placeholder with an explicit "fill me" marker is safer than plausible-looking wrong data.
+- Current templates live at `skills/internal/create-agent/templates/agent-capacity-*-template.md` and already carry project placeholders.
+- `src/specify_cli/__init__.py` provides the shared renderer but currently leaves those placeholders unresolved; do not mistake template parameterization for target-project rendering.
+- A future implementation must update only `## Project Context` and preserve user edits outside that section.
+- Detection failure must never silently substitute Spec Kit's own project facts.
 
 ## Future Evolution Suggestions
 

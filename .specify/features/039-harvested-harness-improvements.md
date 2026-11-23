@@ -1,8 +1,19 @@
-# Feature 039: Harvested Harness Improvements
+# Feature Detail: Harvested Harness Improvements
+
+**Feature ID**: 039
+**Name**: Harvested Harness Improvements
+**Description**: Twelve harvested improvements for mirrors, gates, evidence, task graphs, teams, skills, and long-running implementation.
+**Status**: Implemented
+**Created**: 2026-07-30
+**Last Updated**: 2026-11-22
 
 ## Overview
 
 Twelve improvements (P1–P12) harvested from the 10 reference open-source projects in the `/cws_work` workspace, identified by the `cws-workspace-cluster` insight-harvest team (cycle 1 report: `.specify/teams/cws-workspace-cluster/runs/20260730T094500Z-report.md`) and adopted in three phases on 2026-07-30.
+
+## Latest Review
+
+2026-11-22 implementation audit: all twelve capabilities still exist, although several have moved from command templates into their owning skills. Current evidence includes mirror fan-out, gate checks, pressure testing, evidence-backed implementation, independent finding validation, task DAGs, worktree isolation, generated markers, skill-description constraints, Loop Cards, machine-checked promotion, and long-run implementation. `gate-check.py --stdin` now also enforces a 1 MiB bound and exits 2 rather than allowing an unread path.
 
 ## Key Changes
 

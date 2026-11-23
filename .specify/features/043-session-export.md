@@ -2,10 +2,10 @@
 
 **Feature ID**: 043  
 **Name**: Session Export  
-**Description**: AI agent CLI 会话的导出侧命名与资产化——`/speckit.session export --name <名称>` 导出当前(或指定)会话为用户命名目录 + 会话描述文档(元信息 + 结构化总结);执行面为通用化改造后的 `export-session` 技能(恰好六家 CLI 支持面)。  
+**Description**: Export named session directories and descriptions through archive-session with six CLI adapters.
 **Status**: Implemented  
 **Created**: 2026-08-12  
-**Last Updated**: 2026-08-12
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -13,10 +13,14 @@ Registered as Draft during `/speckit.clarify` for requirement 039 (2026-08-12), 
 
 Host AI agent CLIs expose no official session naming/renaming mechanism (sessions carry auto-generated IDs; only resume/continue by ID). This Feature lands the degraded route decided in the parked-todo disposition: **rename on the export side** — export the session's raw records into a user-named directory, plus a description document (script-extracted meta + agent-authored structured summary, degradable over budget).
 
+## Latest Review
+
+2026-11-22 implementation audit: `/speckit.session export` delegates to `archive-session` and exports raw records, `session-meta.json`, and `SESSION.md`. Six adapters remain; Copilot and Hermes honestly report no source with exit 4 when storage is unavailable. `export-session` is only a historical identifier.
+
 ## Scope (per requirement 039)
 
 - `/speckit.session` command (first subcommand: `export`), preview → confirm → execute gate, delegating to the skill.
-- `export-session` rework: support face converges to exactly six CLIs (claude-code / codex-cli / qoder-cli / copilot / opencode / hermes); six existing non-target adapters removed with zero residue; platform-specific dependencies removed (generic skill); zip → named-directory product shape; locate mechanisms and five-value exit codes preserved; Copilot/Hermes storage probed at implementation time (honest no-source declaration).
+- `archive-session` rework: support face converges to exactly six CLIs (claude-code / codex-cli / qoder-cli / copilot / opencode / hermes); six existing non-target adapters removed with zero residue; platform-specific dependencies removed (generic skill); zip → named-directory product shape; locate mechanisms and five-value exit codes preserved; Copilot/Hermes storage probed at implementation time (honest no-source declaration).
 - Session description doc: deterministic meta + faithful structured summary.
 - Team-run traceability linkage (dispatch label → exported session dir), P3.
 

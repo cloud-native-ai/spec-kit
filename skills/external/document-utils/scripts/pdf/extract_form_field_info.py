@@ -34,7 +34,7 @@ agree on names, pages and legal values.
 Exit 1 means nothing was written: wrong operand count, unreadable PDF, or a
 missing pypdf.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import json

@@ -2,42 +2,48 @@
 
 **Feature ID**: 011  
 **Name**: Research Command  
-**Description**: Gather context and dependencies.  
+**Description**: Research projects through code, knowledge-base, and online studies.
 **Status**: Completed  
 **Created**: 2026-02-10  
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Research Command enables gather context and dependencies. This is part of the Spec Kit CLI toolkit.
+`/speckit.research` supports two modes. In an SDD run, `research-feature` creates or incrementally updates `research.md`, and project research uses `study-code`. In standalone mode, the command selects `study-code`, `study-kb`, or `study-online` according to the research question.
 
 ## Latest Review
 
-Initial generation/refresh.
+2026-11-22 implementation audit: the former generic context-gathering text predated the three study carriers. The command now has an explicit SDD/standalone split, and the prerequisite script emits the feature path and documentation inventory as JSON.
 
 ## Key Changes
 
-1. Initial release/indexing.
+1. Generate or refresh implementation research through `research-feature` during SDD.
+2. Use stripped, evidence-indexed source investigation through `study-code`.
+3. Answer project-internal questions with `study-kb` and externally grounded questions with `study-online`.
+4. Resolve feature context and available documents through deterministic prerequisite output.
 
 ## Implementation Notes
 
-- Part of specify-cli reference implementation.
+- Primary surfaces: `templates/commands/research.md`, `skills/internal/research-feature/SKILL.md`, `skills/external/study-code/`, `skills/internal/study-kb/`, and `skills/external/study-online/`.
+- The standalone carriers are part of this feature's current capability and do not require separate registry rows.
 
 ## Future Evolution Suggestions
 
-- Continuous improvement based on usage.
+- Keep carrier selection and citation requirements aligned with newly added research sources.
 
 ## Related Files
 
-- Specification: .specify/specs/011-011-research-command/requirements.md
-- Feature Index: .specify/features.md
-- Feature Detail: .specify/features/011-research-command.md
-- Quality Checklist: .specify/specs/011-011-research-command/checklists/requirements.md
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/011-research-command.md`
+- Implementation: `templates/commands/research.md`, `skills/internal/research-feature/SKILL.md`
+- Specification: none registered for this legacy command row.
 
 ## Status Tracking
 
 - **Draft**: Concept defined.
-- **Planned**: Spec approved.
-- **Implemented**: Code written.
-- **Ready for Review**: Tests passing.
-- **Completed**: Merged and available.
+- **Planned**: Specification and design approved.
+- **Implemented**: Research workflow delivered and verified.
+- **Blocked**: A final-path acceptance criterion fails.
+- **Ready for Review**: Review evidence complete with no blocking code-review entry.
+- **Sealed**: Canonical seal criteria met.
+- **Completed** (legacy — current): Historical delivered status retained.

@@ -32,7 +32,7 @@ Defaults when entry_text omits them: font "Arial", font_size 14, font_color
 Exit 1 means the output was not written: wrong operand count, unreadable input,
 a page_number with no matching page record, or a missing pypdf.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import json

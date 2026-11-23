@@ -2,10 +2,14 @@
 
 **Feature ID**: 089
 **Name**: 脚本接口契约（Script Interface Contract）
-**Description**: 新增一条框架级通用治理规则：所有可直接执行的 `*.sh` / `*.py` 脚本 MUST 支持 `-h`/`--help` 与 `--version`，两者零副作用且判定先于主动作；未识别的选项 MUST 以非零退出码报错并给出用法，MUST NOT 被静默忽略后继续执行主动作；被 `source` / `import` 的纯库文件按机械判据豁免。规则落在五处（宪法模板、指令模板、本仓宪法、`manage-constitution` 的 MUST include 清单、镜像与双落地守卫计数 pin），并把本仓现存适用脚本补齐到契约。
+**Description**: Require help, version, no-side-effect, and unknown-option rejection for functional non-read-only `*.sh` / `*.py` scripts; pytest modules are exempt and read-only scripts are optional.
 **Status**: Implemented
 **Created**: 2026-11-06 (renumbered 086 → 089 on 2026-11-09 to avoid the remote 086 collision; content unchanged)
-**Last Updated**: 2026-11-06（tasks + checklist 阶段完成：`tasks.md` 87 行依赖任务、`validate-tasks.py` PASS（0 error / 62 warning）、`decomposition-check.py --mode tasks` = `proceed`（31 FR / 87 行，ceiling 120/160）、`account-clause-coverage.py --freeze` 落 `coverage-baseline.txt`（claimed clauses 38 / FR universe 31 / 573 冻结名，0 超基线）；两份 checklist：`checklists/requirements.md`（需求质量；checker 380 行 / 43 定义行 / 0 error）与 `checklists/contract-integrity-2026-11-06.md`（契约决策逻辑审计，C-1…C-38）；关键裁定：判据按运行语义（T-001）、镜像声明式投射替代逐字节相等（T-002）、宪法以 MINOR 增量随本特性落地（T-003）；`scripts/python/` 实测更正为 37 文件；状态保持 Planned。此前的 plan 阶段记录：`plan.md` + `research.md` R1–R13 + `data-model.md`（8 实体 / 22 规则）+ `contracts/` ×4（38 条款）+ `quickstart.md` S-0…S-8 + `feature-ref.md`；宪法动态检查 19/19 Pass；`pre-analyze-check.py --stage plan` `decision=pass`；`decomposition-check.py --mode plan` `proceed`；`validate-decision-tensions.py` 0 error / 3 记录）
+**Last Updated**: 2026-11-22（tasks + checklist 阶段完成：`tasks.md` 87 行依赖任务、`validate-tasks.py` PASS（0 error / 62 warning）、`decomposition-check.py --mode tasks` = `proceed`（31 FR / 87 行，ceiling 120/160）、`account-clause-coverage.py --freeze` 落 `coverage-baseline.txt`（claimed clauses 38 / FR universe 31 / 573 冻结名，0 超基线）；两份 checklist：`checklists/requirements.md`（需求质量；checker 380 行 / 43 定义行 / 0 error）与 `checklists/contract-integrity-2026-11-06.md`（契约决策逻辑审计，C-1…C-38）；关键裁定：判据按运行语义（T-001）、镜像声明式投射替代逐字节相等（T-002）、宪法以 MINOR 增量随本特性落地（T-003）；`scripts/python/` 实测更正为 37 文件；状态保持 Planned。此前的 plan 阶段记录：`plan.md` + `research.md` R1–R13 + `data-model.md`（8 实体 / 22 规则）+ `contracts/` ×4（38 条款）+ `quickstart.md` S-0…S-8 + `feature-ref.md`；宪法动态检查 19/19 Pass；`pre-analyze-check.py --stage plan` `decision=pass`；`decomposition-check.py --mode plan` `proceed`；`validate-decision-tensions.py` 0 error / 3 记录）
+
+## Latest Review
+
+2026-11-22 implementation audit: the runtime probe classifies scripts before applying the contract. Functional, non-read-only scripts must provide help/version, no-side-effect flag handling, and unknown-option rejection; pytest modules are exempt, and read-only scripts are optional/recommended. The earlier “all directly executable scripts” wording overstated the mandatory set.
 
 ## Overview
 
@@ -15,9 +19,7 @@
 
 本特性把规则本身作为交付物，并把本仓作为规则的第一批被检查对象：只写规则文字不补齐现存脚本，规则从第一天起就是假的。
 
-## Latest Review
-
-尚未进入 review。clarify 阶段（2026-11-06，模式 A）产出：9 条裁定、31 FR / 12 SC（10 `final` + 2 `supporting`）/ 7 用户故事 / 10 Assumptions；`validate-requirements.py` `status: ok`（374 行、43 定义行、0 error / 0 warning）；flow-class lookup 仍由声明行解析为 `execution`（exit 0）。
+Historical review — 尚未进入 review。clarify 阶段（2026-11-06，模式 A）产出：9 条裁定、31 FR / 12 SC（10 `final` + 2 `supporting`）/ 7 用户故事 / 10 Assumptions；`validate-requirements.py` `status: ok`（374 行、43 定义行、0 error / 0 warning）；flow-class lookup 仍由声明行解析为 `execution`（exit 0）。
 
 **clarify 的九条裁定（一句话各）**：
 

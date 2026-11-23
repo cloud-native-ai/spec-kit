@@ -1,5 +1,5 @@
-ai-engine
-Copyright (c) 2026 Qiming Liu and ai-engine contributors
+spec-kit
+Copyright (c) 2026 Qiming Liu and spec-kit contributors
 
 This product includes software developed as an independent fork of
 GitHub Spec Kit (https://github.com/github/spec-kit), forked at commit
@@ -23,14 +23,14 @@ Component notices
 
 2. database-utils (skills/external/database-utils/)
 
-   In-house MIT implementation by the ai-engine project (v3.0), replacing
+   In-house MIT implementation by the spec-kit project (v3.0), replacing
    the former Apache-2.0 component (author sanjay3290, v2.0). The
    replacement preserves the query interface; no original code is
    retained. Licence text: LICENSE.txt in that directory.
 
 3. document-utils (skills/external/document-utils/)
 
-   In-house MIT implementation by the ai-engine project (v3.0), replacing
+   In-house MIT implementation by the spec-kit project (v3.0), replacing
    the former proprietary component (Copyright 2025 Anthropic, PBC, all
    rights reserved, governed by the user's Anthropic agreement). No
    original code or documentation text is retained. Licence text:
@@ -38,7 +38,7 @@ Component notices
 
 4. draw-diagram (skills/external/draw-diagram/)
 
-   Original work of the ai-engine project, including all six engine layers
+   Original work of the spec-kit project, including all six engine layers
    (d3js / drawio / echarts / excalidraw / mermaid / plantuml). No
    third-party diagram library is vendored: the self-hosted render servers
    install their npm dependencies at run time, and the other engines are
@@ -115,7 +115,7 @@ Component notices
 Original work
 =============
 
-The following are original work of the ai-engine project and are licensed
+The following are original work of the spec-kit project and are licensed
 under the MIT License: skills/internal/, agents/, memory/, shared/,
 scripts/ (except the vendored better-harness subset named in item 1),
 templates/, src/, docs/, and the 16 external skills that carry no

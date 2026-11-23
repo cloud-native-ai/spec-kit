@@ -5,7 +5,7 @@
 **Description**: 在无人值守 SDD 驱动的阶段边界增加一等的工作拆解与配合层——把阶段拆成有界工作包并用确定性门校验，映射到既有团队席位与协作模式，按依赖图派发、独立验证、确定性集成；阶段哨兵、U4 与全部质量门不变，改进以相对基线的墙钟时间、返工率、并行效率与人工干预数度量。
 **Status**: Implemented
 **Created**: 2026-10-24
-**Last Updated**: 2026-10-25 (implement: 39/39 tasks, analyze rerun READY, review P0=0 with P1 resolved; closure full suite 18 failed / 0 new; SC-001/SC-002 waived by the user; merged at `ca8040f5`; no push)
+**Last Updated**: 2026-11-22 (implement: 39/39 tasks, analyze rerun READY, review P0=0 with P1 resolved; closure full suite 18 failed / 0 new; SC-001/SC-002 waived by the user; merged at `ca8040f5`; no push)
 
 ## Overview
 
@@ -15,7 +15,9 @@ Feature 058 的无人值守循环在阶段边界是串行且整体的：一个�
 
 ## Latest Review
 
-- 尚无实现或评审记录。2026-10-24 由 `/speckit.requirements`（无人值守）创建设本 Feature 并绑定；`requirements.md` 30 个 FR 定义行 / 8 个 SC / 5 个用户故事，确定性校验器 exit 0（0 error / 0 warning），大特性拆解门 `decision=proceed`（实测行数恰在上限 30），`pre-analyze-check.py --stage requirements` `decision=pass`（errors=0, advisories=0），质量清单 16/16。Feature 绑定与分支创建两处偏离按规格 Clarifications 显式记录。
+- 2026-11-22 implementation audit: WP DAG, output coverage, write ownership, slot and retry gates are delivered, with driver scheduling, independent verification, deterministic integration, and reporting. SC-001/SC-002 are waived and SC-006 is not_evaluated, so no full-benefit claim is made.
+
+Historical registration — 2026-10-24 由 `/speckit.requirements`（无人值守）创建设本 Feature 并绑定；`requirements.md` 30 个 FR 定义行 / 8 个 SC / 5 个用户故事，确定性校验器 exit 0（0 error / 0 warning），大特性拆解门 `decision=proceed`（实测行数恰在上限 30），`pre-analyze-check.py --stage requirements` `decision=pass`（errors=0, advisories=0），质量清单 16/16。Feature 绑定与分支创建两处偏离按规格 Clarifications 显式记录。
 - 2026-10-24 `/speckit.clarify`（无人值守）：9 项裁定全部落地——stage-team preset 的位置与 schema（驱动侧模板、不进 create-team 目录、不持久化团队）、WP plan/ledger 的 spine 围栏与 canonical plan_hash、wp-gate 接口与退出码、调度/槽位/本地-远端派发拓扑、独立验证者与 verdict 证据、每包重试 delta 与 U5 升级、指标/报告/基准方法与 `not_evaluated`、opt-out 字段与优先级、跨特性重叠裁决。30 个 FR 未增加，无 070b 延期项；`overlap-check.py` 返回 `clear`（plan 前无声明文件，另附 064/067/068 实际交付面人工裁决），`validate-requirements.py` 重跑 exit 0。详见 `notes/clarify-decisions.md`。
 - 2026-10-24 `/speckit.plan`（无人值守）：Draft → **Planned**。设计契约落盘——13 实体 / 91 条校验规则、7 份契约（110 条款）、7 个 quickstart 场景、feature-ref 的 30 FR / 8 SC 追溯与完整交付面。设计细化 12 项（DR1–DR12，均不新增 FR/SC、无 070b 延期项），关键为按尝试分离的证据文件名、可机械判定的收益规则、哨兵渲染规则、implement-off 与 067 part 纪律的和解。确定性预检 `pre-analyze-check.py --stage plan` 通过（0 error / 66 条 missing-path advisory，全部为 planned 新交付物）；`overlap-check.py` 返回 21 条关系（15 same-path + 6 nested-path），对 11 个已合入基线的先序特性逐组裁决，无 live writer、无归属转移，记录于 `notes/overlap-adjudication-plan.md`；镜像基线 clean（28 files）；定向既有驱动测试 65 passed。任务预算 35 步（上限 40）。
 - 2026-10-25 **implement / review / closure**：`/speckit.implement` 完成 T001–T039（39/39 `[x]`，0 deferred）；analyze 第二轮 **READY**（0 CRITICAL / 0 HIGH）；`/speckit.review` 报告 P0=0——P1 F1/F2 已解决、P2 F3 已回填，F4/F5 记为框架后续项；review 后 closure 全量套件 18 failed / 5674 passed / 1 skipped，`comm -13` 对 19-failure 基线 = 0 新增；用户于 2026-10-25 豁免 SC-001/SC-002（`notes/waiver-070.md`，机制/功能门已绿、可比基准延后），两项仍为 `not_evaluated` 且不声称达成，SC-006 仍为 `not_evaluated`；测试预算审计 `status=ok`；已合入 master `ca8040f5`（ff；未 push；worktree 保留）。状态 Planned → **Implemented**。
@@ -81,7 +83,7 @@ Feature 058 的无人值守循环在阶段边界是串行且整体的：一个�
 
 - **Draft**: requirement 070 created and bound, deterministic validator exit 0, registry row and this detail file landed (2026-10-24); clarify completed nine decisions (2026-10-24).
 - **Planned**: achieved 2026-10-24 via `/speckit.plan` — plan.md, research.md, data-model.md, contracts/ (7 files), quickstart.md, feature-ref.md, and the overlap adjudication landed; Constitution Check 16/16 Pass with no unjustified Fail row.
-- **Implemented**: pending `/speckit.implement` — requires zero open `[ ]` tasks and a status row for every Success Criterion in verification.md.
+- **Implemented**: achieved 2026-10-25 — 39/39 tasks closed and verification status rows complete; SC-001/SC-002 were explicitly waived and SC-006 remains not_evaluated.
 - **Ready for Review**: pending `/speckit.review` — requires all deferred items resolved or waived and review evidence produced.
 - **Completed**: human final acceptance.
 

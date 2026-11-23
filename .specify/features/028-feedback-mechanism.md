@@ -2,18 +2,20 @@
 
 **Feature ID**: 028  
 **Name**: Feedback Mechanism  
-**Description**: A distributed, local-scope feedback layer built on **Feedback Probes** (req 041): every wrap-up embed is an explicitly defined Probe Object (Class/Object two-layer, internal/external kind) in the truth source `shared/definitions/probe-definitions.md` — that registry is the authoritative roster and count, read it via `feedback-utils.py --action probes` rather than restating it here; entries inherit probe/kind/slice automatically and are filterable by slice/kind/disposition; the `/speckit.feedback` command is a **single entry point that judges where the accumulated feedback points and routes itself** to one of two paths — **Path A** digests in place what points at this project (intake, introspection(自省), routing to the owning local channel, dispose, cleanup), **Path B** packages what points at the framework upstream for manual delivery (incl. post-package cleanup) — with probe injection for a custom unit kept as an explicitly-requested capability; external probes target client-project custom units — their feedback stays local (Loop B), is routed by Path A, and is excluded from upstream packages; legacy entries converge via one-shot review migration (delete/re-register, logged); the four red lines hold, scoped by kind (internal = framework-targeted, external = client-project-local), with zero automated transmission throughout.  
+**Description**: Record local run feedback and route it through hat-first in-place digestion or manual upstream delivery with no automatic transmission.
 **Status**: Implemented  
 **Created**: 2026-07-13  
-**Last Updated**: 2026-09-20 (命令面优化:`/speckit.feedback` 五模式 → 两条自动分流路径;状态保持 **Implemented**,扩展不回退状态。此前:2026-08-27 requirement 047 绑定本 Feature;2026-08-14 requirement 041 IMPLEMENTED)
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-Every framework operation (commands, skills, agents) can carry latent defects. This feature introduces an in-flow feedback mechanism that, at the same wrap-up moment where flows already prompt for a Git commit, has the executing agent look back over the just-completed run — in light of the unit's declared purpose — and record concrete, unit-specific optimization points. Unlike `/speckit.review` (global, whole-project perspective), these Feedback Entries are strictly local to the current operation. To preserve efficiency the mechanism is deliberately selective: **every skill** carries feedback by default, but **only complex commands** (those that invoke third-party scripts/CLI tools, produce output consumed by another flow, or consume another flow's output) qualify; trivial/short flows never trigger it. Feedback accumulates in a dedicated store under `.specify/memory/feedback/`, and once it reaches a defined threshold the user is prompted once, in a consolidated way, to submit it to the Spec Kit developers.
+`/speckit.feedback` first determines whether the repository is the framework itself or a client project, then refines each entry's destination and routes it to Path A for in-place digestion or Path B for a manually delivered upstream bundle. Introspection, backlog routing, exec-quant packaging, and read-only client metrics are current capabilities. Probe registration and Wrap-up compilation now belong to `probe-utils.py`; feedback storage uses per-entry files and derived indexes under Feature 055.
 
 ## Latest Review
 
-Requirement `027-feedback-mechanism` drafted via `/speckit.requirements` and clarified via `/speckit.clarify` (Mode A). Four decisions resolved: (1) create new Feature 028; (2) persist feedback to `.specify/memory/feedback/` with a threshold-triggered consolidated submission prompt; (3) feedback is agent self-reflection, no user-solicited input; (4) command qualification = complex process-interaction criteria. Spec has 3 user stories (P1 skill feedback, P2 complex-command feedback, P3 selective triggering), 12 FRs, 7 SCs, and no remaining `[NEEDS CLARIFICATION]` markers.
+2026-11-22 implementation audit: `manage-feedback` now decides the repository hat before routing entries by destination; the 2026-09-20 `kind`-only description is historical. `probe-utils.py` owns probe queries, injection, Handler definitions, and Wrap-up compilation, while `feedback-utils.py` retains domain feedback actions and bounded archive reads. Requirement 047 is Implemented, and Feature 056 is also Implemented.
+
+Historical review — requirement `027-feedback-mechanism` drafted via `/speckit.requirements` and clarified via `/speckit.clarify` (Mode A). Four decisions resolved: (1) create new Feature 028; (2) persist feedback to `.specify/memory/feedback/` with a threshold-triggered consolidated submission prompt; (3) feedback is agent self-reflection, no user-solicited input; (4) command qualification = complex process-interaction criteria. Spec has 3 user stories (P1 skill feedback, P2 complex-command feedback, P3 selective triggering), 12 FRs, 7 SCs, and no remaining `[NEEDS CLARIFICATION]` markers.
 
 **Planned (2026-07-13)** via `/speckit.plan`. Design settled the two items the spec deferred: (a) **store format** — reuse the memory-as-files pattern with a new stdlib-only `feedback-utils.py` engine writing Markdown entries + `index.json` under `.specify/memory/feedback/`; (b) **threshold** — default **10** (overridable via `--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`). The feedback step is embedded by convention: a `## Feedback` section on `templates/skills-template.md` + all 21 skills, and a wrap-up feedback step on the **13 complex** commands only (4 simple commands — `agents`, `constitution`, `feature`, `team` — excluded). Dedup is keyed by `(unit_id, run_id)`. Artifacts: plan.md, data-model.md, quickstart.md, and contracts/ (engine CLI, entry/store schema, feedback-step convention, command classification). Constitution Check: all 7 principles Pass; Complexity Tracking N/A.
 
@@ -41,11 +43,11 @@ Requirement `027-feedback-mechanism` drafted via `/speckit.requirements` and cla
 
 ## Implementation Notes
 
-- Feedback is agent-generated self-reflection; the mechanism must not require soliciting content from the human user at wrap-up.
-- Selective triggering is a hard constraint — feedback on trivial flows is a defect; each qualifying unit produces at most one entry per run, with no duplication across nested invocations.
-- Aborted/failed flows must skip feedback or clearly label it as covering a partial run.
-- The exact accumulation threshold value and the store's on-disk format under `.specify/memory/feedback/` are to be settled during `/speckit.plan`.
-- Authoring surfaces (skill/command templates and their create/improve skills) should embed the feedback step by convention so new units inherit it rather than adding it ad hoc.
+- Feedback is agent-generated self-reflection and never requires soliciting feedback content from the user.
+- Path A handles in-place intake, introspection, routing, disposal, and cleanup; Path B creates a package for manual delivery only.
+- External client-project entries remain local and are excluded from upstream packages; no path transmits automatically.
+- `feedback-utils.py` includes bounded archive reads; Feature 055 owns per-entry storage, scan-on-read indexes, and mutable scalar files.
+- `probe-utils.py` owns the formerly embedded probe actions and Wrap-up compilation.
 
 ## Future Evolution Suggestions
 
@@ -72,6 +74,6 @@ Requirement `027-feedback-mechanism` drafted via `/speckit.requirements` and cla
   Quality Checklist: .specify/specs/027-feedback-mechanism/checklists/requirements.md
 - Specification: .specify/specs/041-refactor-feedback-probe/requirements.md (Probe 化重构, Implemented 2026-08-14)
   Verification: .specify/specs/041-refactor-feedback-probe/verification.md
-- Specification: .specify/specs/047-feedback-introspection/requirements.md (Feedback 自省流程:记录与上行之间的场景化深加工阶段,Draft 2026-08-27)
+- Specification: .specify/specs/047-feedback-introspection/requirements.md (Feedback 自省流程，Implemented 2026-08-28)
 - Cross-reference: Feature 046 Confirmation Gate Governance(requirement 044)——达阈值反馈提交提示将改为非阻塞一次性提示(绝不阻塞收尾、绝不自动传输),本 Feature 的"zero automated transmission"红线不变。
-- Cross-reference: Feature 056 Probe-Handler 体系（requirement 056, Draft 2026-10-13）——把本 Feature 建立的 Probe Class×Object 注册表扩格为全框架伞形真源，Feedback Probe 降为伞形下的域实例；probe 族查询动作（probes/map/probe-inject）自 feedback-utils.py 抽出至共享 probe-utils.py，feedback 引擎保留领域动作、行为不变。
+- Cross-reference: Feature 056 Probe-Handler 体系（Implemented 2026-10-14）——把本 Feature 建立的 Probe Class×Object 注册表扩格为全框架伞形真源；probe 查询、注入、Handler 与 Wrap-up 编译由共享 `probe-utils.py` 承担。

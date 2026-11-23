@@ -121,7 +121,7 @@ if __name__ == "__main__":
 # here before it is sent, and the session defaults to read-only transactions so anything
 # that slips past the screen is still refused by the server.
 #
-# Driver: pg8000 (BSD-3-Clause).  ai-engine project, MIT licensed -- see LICENSE.txt.
+# Driver: pg8000 (BSD-3-Clause).  spec-kit project, MIT licensed -- see LICENSE.txt.
 
 import argparse
 import json

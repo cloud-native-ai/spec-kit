@@ -5,7 +5,7 @@ The scripts in this package work on an unpacked OPC directory (``add_slide``,
 plumbing they share.  Each script is runnable on its own and importable as a
 module, so a caller can drive one slide operation without a subprocess.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 #
 # Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is

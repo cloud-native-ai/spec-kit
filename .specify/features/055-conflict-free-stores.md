@@ -1,6 +1,12 @@
-# Feature 055: 冲突无关的 Feedback/Memory 存储(Conflict-Free Stores)
+# Feature Detail: Conflict-Free Stores
 
-**Status**: Implemented(2026-10-08)
+**Feature ID**: 055
+**Name**: Conflict-Free Stores
+**Description**: Store feedback and memory entries as per-entry files with scan-derived indexes, isolated scalar state, atomic writes, and legacy migration.
+**Status**: Implemented
+**Created**: 2026-10-08
+**Last Updated**: 2026-11-22
+
 **Requirement**: `.specify/specs/055-conflict-free-stores/requirements.md`
 **Origin**: 用户报告——client 项目中 `.specify/memory/feedback/index.json` 频繁引发 git 合并冲突;「尽可能不要使用统一文件来记录可能被多个流程同时更新的信息」。
 
@@ -13,6 +19,10 @@ feedback 库与 memory 库(session/knowledge)此前都采用「逐条 .md + 单�
 - **每标量一文件**:feedback 库仅剩的三个可变标量各住一个微小 `state/` 文件(threshold/submitted-at/upstream-repo),缺文件=默认值;`record` 常规路径零 state 写入 → 并发 record 只触碰互不相交的文件。memory 应 index 本就 100% 派生,无 state/。
 - **首写自动迁移**:旧 index.json 读取侧只读回退(`legacy: true`),任一可变动作首次写入时把标量落 state 后退役该文件并在返回值披露 `migrated: true`;`reindex` 兼作显式幂等迁移入口。
 - **原子写**:`.part` + `os.replace` 覆盖全部写路径,失败时清理 `.part`。
+
+## Latest Review
+
+2026-11-22 implementation audit: feedback and memory use per-entry records, scan-on-read projections, isolated mutable scalar files, legacy-index migration, and atomic writes. The current engines also include bounded archive/stdin reads. Same-second records for the same unit can still collide on filename, so “conflict-free” means removal of the shared-index conflict class, not an absolute absence of all conflicts.
 
 ## Key Changes
 

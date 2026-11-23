@@ -2,20 +2,18 @@
 
 **Feature ID**: 019  
 **Name**: Agents Command  
-**Description**: Create or refine custom AI agents (.agent.md) for workspace-specific workflows.  
+**Description**: Create, refine, and run layered agents with rendered host registrations.
 **Status**: Implemented  
 **Created**: 2026-02-27  
-**Last Updated**: 2026-07-02
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Agents Command enables users to create and manage custom AI agents as reusable configuration files (.agent.md) in the `.github/agents/` directory. These agents can be invoked directly as commands or used as subagents in complex workflows, providing extensibility beyond the built-in Speckit commands. This feature supports both explicit agent creation with user-provided specifications and context-aware agent generation when no arguments are provided.
+`/speckit.agents` routes create, refine, and run intents across Agent Template and Agent Instance storage under `.specify/agents/`. `run-agent` resolves execution configuration and topology before dispatch, while `specify render-agents` projects neutral metadata into real Qoder, Claude, Copilot, and opencode registration files.
 
 ## Latest Review
 
-Implementation planning completed for `/speckit.agents` with clarified behavior contracts, data model, and quickstart validation.
-Task decomposition completed in `.specify/archive/specs/003-speckit-agents-command/tasks.md`, organized by US1/US2/US3 with MVP-first sequencing.
-New spec `014-agent-framework-refactor` refactors the agent workflow to use `.specify/agents/` as canonical directory with symlink bridging, shared references, and `specify init` bundling.
+2026-11-22 implementation audit: `/speckit.agents` now unifies create, refine, and run. Templates and instances live under `.specify/agents/`; `run-agent` owns configuration resolution, topology selection, dispatch, and fast-fail injection. `specify render-agents` writes actual host registration files with deterministic instance-over-template precedence. Older `.github/agents/` primary-storage, directory-symlink, and workspace-file claims below are historical, not the current contract.
 
 ## Key Changes
 
@@ -36,15 +34,11 @@ New spec `014-agent-framework-refactor` refactors the agent workflow to use `.sp
 
 ## Implementation Notes
 
-- Agent files must use kebab-case naming based on display names or roles
-- YAML frontmatter must include description, tool permissions, and invocation metadata
-- Agents should follow single responsibility principle with narrowly focused roles
-- System should handle cases where `.github/agents/` directory doesn't exist
-- Quality validation should prevent saving agents with contradictory constraints
-- Canonical agent directory is `.specify/agents/` — tool-specific directories are directory-level symlinks
-- `ensure_specify_symlink()` is a generalized module-level function handling both skills and agents symlinks
-- `specify init` copies bundled agents from the package's `agents/` directory to `.specify/agents/`
-- Workspace files (`AGENTS.md`, `MEMORY.md`, `SOUL.md`, `USER.md`) are created by `/speckit.agents` on first run, not by init
+- Canonical template and instance stores are `.specify/agents/templates/` and `.specify/agents/instances/`; host-specific files are rendered outputs, not symlinked primary storage.
+- `templates/commands/agents.md` routes to `create-agent`, `improve-agent`, and `run-agent` rather than implementing each operation inline.
+- `src/specify_cli/__init__.py` owns `render-agents` projection, manifest, backup, and stale-prune behavior; Qoder, Claude, Copilot, and opencode have real renderers.
+- `run-agent` injects the fast-fail clause at dispatch and resolves local or remote execution topology from the declared configuration layers.
+- Workspace files such as `AGENTS.md`, `MEMORY.md`, `SOUL.md`, and `USER.md` are not created by the current `/speckit.agents` flow.
 
 ## Latest Evolution
 
@@ -69,7 +63,7 @@ Spec 023 (agent-framework-redesign, Implemented 2026-07-10): Redesigns the Agent
 
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/019-agents-command.md
-- Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——其 US3 对 /speckit.agents 路由表做接线核查（run/create/refine 三行到既有 agent 技能），不新建 agent 系技能。
+- Cross-reference: Feature 057（命令技能化分解补全，`.specify/features/057-decompose-command-skills.md`）——其 US3 对 /speckit.agents 路由表做接线核查（run/create/refine 三行到既有 agent 技能），不新建 agent 系技能。
 
 ## Status Tracking
 
@@ -81,17 +75,8 @@ Spec 023 (agent-framework-redesign, Implemented 2026-07-10): Redesigns the Agent
 
 ## Related Specifications/Requirements
 
-- Specification: .specify/specs/003-speckit-agents-command/requirements.md
-  Quality Checklist: .specify/specs/003-speckit-agents-command/checklists/requirements.md
-- Plan: .specify/specs/003-speckit-agents-command/plan.md
-- Data Model: .specify/specs/003-speckit-agents-command/data-model.md
-- Contracts: .specify/specs/003-speckit-agents-command/contracts/agents-command.openapi.yaml
-- Quickstart: .specify/specs/003-speckit-agents-command/quickstart.md
-- Specification: .specify/specs/014-agent-framework-refactor/requirements.md
-  Quality Checklist: .specify/specs/014-agent-framework-refactor/checklists/requirements.md
-- Specification: .specify/specs/015-role-based-agents/requirements.md
-  Quality Checklist: .specify/specs/015-role-based-agents/checklists/requirements.md
-- Specification: .specify/specs/022-eei-agent-triad/requirements.md
-  Quality Checklist: .specify/specs/022-eei-agent-triad/checklists/requirements.md
-
-- 2026-11-09 consolidation: spec dir(s) archived to `.specify/archive/specs/` — 003-speckit-agents-command, 022-eei-agent-triad (see `.specify/archive/specs/CONSOLIDATION-LEDGER.md`).
+- Current Framework Specification: `.specify/specs/023-agent-framework-redesign/requirements.md`
+- Historical Specification: `.specify/archive/specs/003-speckit-agents-command/requirements.md`
+- Historical EEI Specification: `.specify/archive/specs/022-eei-agent-triad/requirements.md`
+- Implementation: `templates/commands/agents.md`, `skills/internal/run-agent/SKILL.md`, `src/specify_cli/__init__.py`
+- Consolidation ledger: `.specify/archive/specs/CONSOLIDATION-LEDGER.md`

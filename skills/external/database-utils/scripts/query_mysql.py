@@ -6,7 +6,7 @@ Apache Doris and SelectDB.  Two independent layers keep a run from writing: the
 statement is screened here before it is sent, and the server session is switched
 to read-only access mode so anything that slips past the screen is still refused.
 
-Driver: PyMySQL (MIT).  ai-engine project, MIT licensed -- see LICENSE.txt.
+Driver: PyMySQL (MIT).  spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import argparse

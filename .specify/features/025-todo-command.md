@@ -2,18 +2,18 @@
 
 **Feature ID**: 025  
 **Name**: Todo Command  
-**Description**: Discover marked TODO blocks in text files and turn them into reviewable execution plans.  
+**Description**: Discover, insert, execute, and park contextual TODO blocks with reviewable plans and JSON output.
 **Status**: Implemented
 **Created**: 2026-06-22  
-**Last Updated**: 2026-10-08
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Todo Command introduces `/speckit.todo` as a workflow command for harvesting explicitly marked, multiline TODO blocks from workspace text files. It converts those blocks and their source context into a reviewable todo plan so project notes can become bounded, executable work without manually searching through files.
+`/speckit.todo` provides List, Collection, Insertion, and Park modes. The scanner recognizes Markdown fences and source-comment markers, emits context and malformed-block diagnostics as JSON, converts blocks into bounded execution plans, removes completed blocks in the execution step, and stores parked ideas under `.specify/memory/todo/`.
 
 ## Latest Review
 
-Created from the 020-speckit-todo-command requirements specification. The requested scope is a new command that delegates TODO discovery to a search script, extracts fenced `SPECKIT TODO` blocks from text files, combines each block with surrounding context, and generates a todo plan for execution.
+2026-11-22 implementation audit: machine-readable output, comment-form detection, context completion, completed-block removal, and the Park lifecycle are all current behavior. The earlier Future Evolution entries for JSON output and source-marker cleanup were already delivered and have been removed.
 
 ## Key Changes
 
@@ -48,8 +48,6 @@ The TODO-in-Context discipline landed (owner: `.specify/shared/guidelines/todo-i
 ## Future Evolution Suggestions
 
 - Add filtering by path, marker priority, or TODO category.
-- Support machine-readable output for downstream automation.
-- Track completed TODO blocks back to their source markers for cleanup suggestions.
 
 ## Related Files
 

@@ -5,7 +5,7 @@
 **Description**: 把「涉及 harness 的流程」的载体从 `markdown + script` 两层升级为 `markdown + yaml + script` 三层：markdown 继续拥有「为什么 + 怎么读」（义务、判定顺序、边界叙事），新增的 yaml 声明层（`shared/declarations/`，一文一件、路径即身份）拥有**机器读得到的取值**（阈值、封闭集、有序算子表、映射、记录 schema），script 保留确定性执行与判决并**只从声明层读取值**、不再写第二份内联常量。范围不靠流程清单定义，而靠两条合取判据（D1 资产面 ∧ D2 机器面）加一条机械候选屏幕 S 在树上重算；每个候选单元要么被一条事实声明覆盖（三层齐备才 `complete`），要么持有一条封闭三值理由（`no-machine-fact`／`no-harness-asset`／`by-owner-decree`）且锚点可解析的排除记录。判定引擎 `scripts/python/harness-triple-check.py`（`coverage`／`verify`／`lookup`，stdlib-only、只读、无模型判断）挂在既有门宿主上，不新增门禁阶段。迁移分三批且每批独立可验收；兼容期不得变成永久态。非目标 N1–N7。
 **Status**: Completed
 **Created**: 2026-11-05
-**Last Updated**: 2026-11-06
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -25,6 +25,8 @@
 - **绑定新建 Feature 084**：复核 081／069／053／055 后无归属（依据 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules；`shared/declarations/` 树内零命中）。
 
 ## Latest Review
+
+2026-11-22 implementation audit: the declaration layer, shared reader, and coverage/verify/lookup engines are present, but the current `coverage` reading is red with 94 candidates, 0 pending, and 9 unclassified candidates. The legacy `Completed` status is retained because this run has no explicit user approval for a regression; the new coverage gap is a release and acceptance residual, not something this registry edit hides.
 
 - **2026-11-06 用户验收（Completed）**：用户接受为 `Completed`。三条件均满足——in-scope 集合内 `pending` 0；`sync-mirrors.py --check` 六对 ok（相对 T001 基线 0 差异）；closure 全量 23F/7250P/4S，对基线**新增 0**、修复 2（两条 mirror）。本地 `master` 快进 `3ffeb26e..e22688da` 并删除特性分支；推送 gitlab/github/gitee `master`（`origin` 上游只读，未推）。
 - **2026-11-05 clarify（`/speckit.clarify` Mode A，无人值守、零提问）**：Mode A 目标 `requirements.md`；A1–A10 逐条裁定（ratified 7／revised 2／A10 前半 ratified 后半 superseded），另含一处事实订正（台账 79 → 80，实测命令与读数在该条目内）。六条改变产物的决定写入 `## Clarifications` § Session 2026-11-05。核心裁定是 **A8 的拆分**：`Path` 取值域不越界（in-scope，FR-018 增补 `shared/workflow/acceptance-hardening.md` § Closure Verdict 并附「081 测试断言零改动、新增失败为 0」硬约束）、六个检查项标签集越界（不迁，N7，锚点 `validate-requirements.py:8` / `test_requirements_checker.py:105` / `test_checker_form.py:304`）。连带改写：FR-006 (i) 收窄、SC-006 封闭集由四脚本扩为五脚本（纳入 `closure-acceptance-check.py`）并把「既有测试文件零改动」写成可判定的 `git diff --stat` 读数、`## Initial Scope Adjudication` 的 requirements 单元行去掉「待 clarify 复核」尾巴。门禁实跑：`validate-requirements.py` `status: ok`（六判项全 pass，0 error／0 warning，282 行、25 定义行、14 shared strings）、`flow-class-check.py --action lookup` exit 0（`execution` / `source: declaration`）、`pre-analyze-check.py --stage requirements` 复跑读数见规格 `test-evidence/`。Feature 状态保持 `Draft`（`Draft → Planned` 归 `/speckit.plan`）。

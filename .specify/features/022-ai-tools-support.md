@@ -5,11 +5,13 @@
 **Description**: Ensure all officially supported AI tools receive complete initialization coverage and can coexist without overwriting shared Spec Kit core files.  
 **Status**: Implemented  
 **Created**: 2026-05-18  
-**Last Updated**: 2026-07-12  
+**Last Updated**: 2026-11-22
 
 ## Overview
 
 AI Tools Support broadens Spec Kit initialization from a GitHub Copilot-centered default experience to a consistent multi-tool onboarding model. It ensures every officially supported AI tool can be initialized with complete workflow coverage, while existing `.specify` core content remains the shared source of truth and is preserved when teams add or refresh additional tools.
+
+**Current state (2026-11-22)**: the official initialization set is Claude Code, Codex CLI, Qoder CLI, opencode, Hermes Agent, and GitHub Copilot—four Tier 1 CLI tools and two Tier 2 tools. Qwen and iFlow are no longer in the executable registry. Unified `AGENT_*` environment configuration currently applies to Claude, Codex, Qoder, and opencode only.
 
 **Evolution (2026-06-21)**: Feature 022 extended to encompass tiered support (Tier 1 / Tier 2). Spec 018-cli-priority-support introduces Codex CLI as a new officially supported tool, elevates Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, and opencode to Tier 1 priority support, and designates Qwen Code as Tier 2. A capability matrix auditing 6 support dimensions is added as the tier compliance mechanism.
 
@@ -24,6 +26,8 @@ AI Tools Support broadens Spec Kit initialization from a GitHub Copilot-centered
 **Implementation (2026-06-25)**: All 37 tasks completed (0 deferred). 37 contract tests pass across 3 test files. 7 target files updated with Agent-Specific Configuration sections. 8 agent reference documents created (claude-code-guide.md + copilot-guide.md × 4 skills). Centralized feedback directory at `.specify/memory/feedback/` created. Additive constraint verified: removing Agent-Specific Configuration sections leaves all core workflows intact.
 
 ## Latest Review
+
+2026-11-22 implementation audit: `_OFFICIAL_ASSISTANT_KEYS` contains six assistants and multi-assistant refresh preserves shared `.specify/` content. The earlier Qwen/iFlow tier records and six-tool unified-environment records below are dated evolution history; current unified configuration is limited to Claude, Codex, Qoder, and opencode.
 
 Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with test-first methodology. The implementation added centralized assistant support profiles, core asset preservation, result summary infrastructure, skills symlinks for all 5 assistants (including newly added Qwen and opencode symlinks), multi-tool coexistence validation, support-surface audits, and comprehensive test coverage across 17 test files.
 
@@ -79,7 +83,7 @@ Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with
 4. Require user-visible initialization summaries for created, reused, skipped, preserved, and attention-required assets.
 5. Require repeat-run and consistency validation across supported tools.
 6. Added planning artifacts for assistant support profiles, core workspace preservation, tool-specific asset isolation, initialization summaries, support-surface audits, and validation scenarios.
-7. Recorded a supporting script-path consistency issue discovered during planning: `.specify/scripts/bash/` helpers must resolve `.specify/specs/<requirements-key>/requirements.md` consistently.
+7. Recorded a supporting script-path consistency issue discovered during planning: `.specify/scripts/bash/` helpers must resolve each specification directory's `requirements.md` consistently.
 8. Identified Feature 020 (Qoder Support), Feature 021 (Claude Code Support), Feature 008 (Instructions Command), Feature 015 (CLI Interface), Feature 017 (Template Engine), Feature 019 (Agents Command), and Feature 013 (Skills Command) as integration references without merging or deprecating them.
 9. Generated implementation task breakdown for `011-ai-tools-support` (`tasks.md`) with MVP-first sequencing: new-project support parity, existing-project core preservation, and multi-tool coexistence/audit validation.
 10. Added explicit task coverage for tests before implementation across contract, integration, and unit suites, plus documentation/package/support-surface synchronization.
@@ -110,9 +114,6 @@ Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with
 - Data Model: .specify/specs/018-cli-priority-support/data-model.md
 - Contracts: .specify/specs/018-cli-priority-support/contracts/cli-priority-support.openapi.yaml
 - Quickstart: .specify/specs/018-cli-priority-support/quickstart.md
-- Previous Spec: .specify/specs/011-ai-tools-support/requirements.md (original Feature 022 implementation)
-- Feature References: .specify/specs/011-ai-tools-support/feature-ref.md
-- Tasks: .specify/specs/011-ai-tools-support/tasks.md
 - 交叉引用(2026-09-07,由需求 050 的 `/speckit.tasks` Feature 列表复审记录): **需求 050 Proactive Flow Trigger 的 T011 将闭合本 Feature 范围内的一处既有覆盖缺口** —— `_INSTRUCTIONS_FILE_MAP`(`src/specify_cli/__init__.py:1090–1097`)声明 6 条 agent 指令路径,而 `scripts/bash/generate-instructions.sh` 只生成 4 条,致 `_check_instructions`(L1115–1121)对 `hermes → HERMES.md` 与 `opencode → .opencode/instructions.md` **恒返回 fail**。050 因把指令文件定为主动触发的**唯一通道**,该缺口从审计瑕疵升级为硬前置,故由 050 的 T011 在生成脚本侧补齐两条 symlink(不改 `_INSTRUCTIONS_FILE_MAP` 声明)。**归属不变**:这仍属本 Feature「所有官方支持的 AI 工具获得完整初始化覆盖」的范围,050 只是交付方;本 Feature 的 Future Evolution #1(集中式 assistant 能力矩阵)与 050 Out of Scope 的原生 hook 通道同源,宜合并考虑。
 
 ## Status Tracking
@@ -125,10 +126,7 @@ Implemented Feature 022 on 2026-05-19. All phases completed across 59 tasks with
 
 ## Related Specifications/Requirements
 
-- Specification: .specify/specs/011-ai-tools-support/requirements.md
-  Quality Checklist: .specify/specs/011-ai-tools-support/checklists/requirements.md
-- Specification: .specify/specs/019-tier2-hermes-iflow/requirements.md
-  Quality Checklist: .specify/specs/019-tier2-hermes-iflow/checklists/requirements.md
+- Specification: .specify/specs/018-cli-priority-support/requirements.md
 - Specification: .specify/specs/021-agent-specific-config/requirements.md
   Quality Checklist: .specify/specs/021-agent-specific-config/checklists/requirements.md
 - Specification: .specify/specs/024-agent-env-config/requirements.md

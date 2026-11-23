@@ -2,25 +2,27 @@
 
 **Feature ID**: 037  
 **Name**: Docs Command  
-**Description**: `/speckit.docs` command that standardizes and manages the project documentation space (thin root-entry layer README/ARCHITECTURE/CONTRIBUTING/CHANGELOG + thick typed `docs/` layer concepts/tutorials/tasks/reference/decisions/contribute + lifecycle-constrained `notes/`), implemented as a single reconcile engine per `.specify/shared/patterns/reconcile-pattern.md` (scope resolution, R0–R6 loop, tolerance band, archive-not-delete, tiered confirmation, four mandatory artifacts). Includes ADR management, notes exit mechanism (frontmatter + state machine + deterministic lifecycle automation), a dogfooding run on Spec Kit itself (aggressive re-taxonomy of `docs/`), and the standard Feedback self-reflection step.  
+**Description**: Reconcile documentation structure through create-docs and improve-docs with deterministic lifecycle, audit, and link-repair actions.
 **Status**: Implemented  
 **Created**: 2026-07-28  
-**Last Updated**: 2026-09-06
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-`/speckit.docs` 把两份设计笔记（`docs/notes/docs-design.md` 的"K8s 基底 + ADR 机制 + 根目录索引"结构，`docs/notes/notes-design.md` 的 notes 退场机制）确立为文档空间期望态基线，并按调谐模式实现为单一引擎：观察 → 期望态 → 容忍带 → 干跑计划 + 分级确认 → 收敛（正式区只归档不删除，归档区在 `docs/` 内）→ 校验与残差报告（落盘运行产物在 `.specify/` 命令工作区）。含 notes 生命周期（frontmatter + draft/expired/archived 状态机 + 三条退场路径，删除仅限 notes 区且须人工确认）与 ADR 只追加管理。实现后对 Spec Kit 自身执行激进重组基调的 dogfooding 调谐，并经既有 Feedback 机制持续优化（复用 028/036，零新增循环机器）。
+`/speckit.docs` is a dual-skill orchestration layer: structural actions delegate to `create-docs`, and content actions delegate to `improve-docs`. The current `docs-utils.py` engine provides nine actions across notes lifecycle, validation, audit, link repair, and diagram-obligation checks. The managed target-structure declaration lives at `docs/.speckit/target-structure.md`, with run artifacts under `docs/.speckit/plans/` and `docs/.speckit/audit/`.
 
 ## Key Changes
 
-1. 新增 `/speckit.docs` 命令模板并分发到全部受支持 AI 工具，附命令参考文档。
-2. 文档期望态基线：薄层根目录（不超过一屏）+ 六类正式目录 + notes 临时区 + 文档生命周期流转 + **大写特殊名注册表**（README/ARCHITECTURE/CONTRIBUTING/CHANGELOG 固定语义，FR-010）。
-3. 单一调谐引擎：作用域判定（全量/单目标/扇出/bootstrap）+ 四件强制产物 + 期望态来源优先级。
-4. notes 退场机制：frontmatter 规范、状态机、确定性生命周期自动化（scan/expire/clean/archive-check/stats/validate/audit，docs-utils.py）。
-5. **文档同步评估步骤**（FR-011）：仿 feedback-step，`shared/workflow/docs-step.md` 单一事实源，注入 14 个复杂命令收尾（非阻断、增量评估）。
-6. Dogfooding：对 Spec Kit `docs/` 激进重组 + 两份设计笔记退场归档。
+1. Route structure operations to `create-docs` and per-document content operations to `improve-docs`.
+2. Manage the target-structure declaration at `docs/.speckit/target-structure.md` and preserve block-external bytes.
+3. Provide nine deterministic `docs-utils.py` actions for notes lifecycle, validation, audit, link repair, and diagram obligations.
+4. Support `fix-links` move maps with default dry-run, explicit `--apply`, anchor preservation, and unresolved reports.
+5. Store run plans and audits under `docs/.speckit/plans/` and `docs/.speckit/audit/`, not `.specify/docs/`.
+6. Preserve the dated taxonomy, ADR, notes-exit, and dogfooding history below.
 
 ## Latest Review
+
+2026-11-22 implementation audit: the command now delegates structure to `create-docs` and content to `improve-docs`; the engine has nine actions and current run artifacts live under `docs/.speckit/`. Historical `.specify/docs/target-structure.md` statements below are superseded.
 
 2026-09-06 upstream `master` merge reconciliation: upstream independently introduced `048-derive-command` / Feature 049, colliding with this requirement's original 048 directory. To restore globally unique active Requirement IDs, docs-reconcile was renumbered to `049-docs-reconcile`; Feature binding remains 037 and historical Clarifications/feedback retain the original 048 identity as dated records. Merge also advanced the command classification owner to 19 complex / 4 simple and merged both glossary term families. Validation: docs+derive+binding integration suite 334/334 pass; full suite 43 failed / 2495 passed / 1 skipped, zero new failures against docs-reconcile's 47-node baseline (4 baseline failures resolved); mirrors, command copies, and feedback probes validate cleanly.
 
@@ -44,9 +46,9 @@ Feature 状态**保持 Implemented**,不回退为 Planned:037 已交付能力仍
 
 ## Implementation Notes
 
-- 归档区在 `docs/` 内（读者可见）；运行产物（计划/审计日志等）在 `.specify/` 命令工作区（2026-07-28 澄清）。
-- 一般项目本地惯例优先；Spec Kit 自身 dogfooding 经用户指示采用激进基调（用户输入为期望态最高优先级来源）。
-- 复用关联：028 Feedback Mechanism（自省步骤载体）、036 Dogfooding Practice（治理原则依据）；不新建循环机器。
+- 归档区在 `docs/` 内；当前声明与运行产物分别在 `docs/.speckit/target-structure.md`、`docs/.speckit/plans/`、`docs/.speckit/audit/`。
+- 一般项目本地惯例优先；Spec Kit 自身 dogfooding 经用户指示采用激进基调。
+- 复用关联：028 Feedback Mechanism、036 Dogfooding Practice、087 Architecture-Diagram-Centric Documentation Space。
 
 ## Related Files
 
@@ -62,7 +64,7 @@ Feature 状态**保持 Implemented**,不回退为 Planned:037 已交付能力仍
 - **Ready for Review**: 全部 `[~]` 延期项解决或显式豁免，评审证据产出。
 - **Completed**: 人工最终验收通过。
 
-状态机权威定义见 `.specify/memory/features/036.md` § Canonical Status State Machine（单一事实源）。
+状态机权威定义见 `.specify/templates/feature-details-template.md` § Canonical Status State Machine（单一事实源）。
 
 ## Related Specifications/Requirements
 

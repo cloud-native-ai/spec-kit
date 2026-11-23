@@ -4,7 +4,7 @@
 
 **An open source toolkit built around Spec-Driven Development (SDD): requirements, plans, tasks, and implementation connect through structured templates and `/speckit.*` commands, so AI progresses around clear intent instead of one-off vague prompts.**
 
-ai-engine is an independent fork of [github/spec-kit](https://github.com/github/spec-kit)
+spec-kit is an independent fork of [github/spec-kit](https://github.com/github/spec-kit)
 (MIT, Copyright GitHub, Inc.), forked at 926836e0f (2025-10-21).
 It is not affiliated with or endorsed by GitHub. Thanks to the original Spec Kit contributors.
 
@@ -24,14 +24,25 @@ It is not affiliated with or endorsed by GitHub. Thanks to the original Spec Kit
 
 → See [ARCHITECTURE.md](ARCHITECTURE.md) (one page) and [docs/concepts/](docs/concepts/).
 
-## 🔧 Core Features
+## 🔧 Feature List
 
-- **Specification-Driven Development**: requirements → plan → tasks → implementation workflow
-- **AI Agent Integration**: 8 supported AI coding assistants
-- **Extensible Skills & Agents**: managed via `/speckit.skills` / `/speckit.agents`
-- **Documentation Management**: `/speckit.docs` reconcile engine ([ADR-0001](docs/decisions/0001-adopt-docs-taxonomy.md))
+### Functional
 
-Full feature roadmap: `.specify/features.md` (single source of truth).
+- **Specification-Driven Development**: requirements → plan → tasks → implementation → review → seal
+- **AI Agent Integration**: 6 supported AI coding assistants with shared-core initialization and real agent rendering
+- **Extensible Skills, Agents & Teams**: authoring, improvement, execution, and host-specific projections through `/speckit.*` commands
+- **Research & Knowledge Studies**: source-code, project knowledge-base, and online research carriers
+- **Documentation & Visualization**: documentation reconciliation, architecture diagrams, project summaries, and line-level status visibility
+- **Technical Debt Governance**: read-only debt inventory and phased governance planning, with cleanup routed to authorized flows
+
+### Non-functional
+
+- **Evidence-Backed Acceptance**: deterministic closure, four-segment review, acceptance reality checks, and archive admission
+- **Conflict-Free Records**: per-entry feedback and memory records with derived indexes and atomic writes
+- **Concurrency & Recovery**: explicit concurrency contracts, effective-overlap readings, stage evidence, and interruption snapshots
+- **Execution Efficiency & Security**: parallel-capable test runner, bounded input reads, and a local Ruff shell-security gate
+
+Full feature registry: `.specify/features.md` (single source of truth).
 
 ## 🤖 Supported AI Agents
 

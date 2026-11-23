@@ -5,7 +5,7 @@
 **Description**: 引入贯穿全部流程的一等分类轴「执行（execution）/ 表达（expression）」，以验收 oracle 而非介质为判据，并在该轴上重建文档型 SDD 路径——同一套八阶段与方法论骨架，只换门禁算子集；同构主张落成可核对的阶段映射与一份不可同构边界清单  
 **Status**: Implemented  
 **Created**: 2026-10-24  
-**Last Updated**: 2026-10-25 (review-fix F3：**索引状态列已由 `Planned` 推进为 `Implemented`**——069a / 069b 均 Implemented，Pre-Status-Flip 四项全过；`Ready for Review` 与 `Completed` 均未主张。切片 069b：`tasks.md` 29 行全 `[X]`；SC 状态 pass 4 / unknown 1（SC-004 的两名独立判定者未执行，不记达成）；名字级零 NEW；镜像字节等同；条款覆盖 52（plan 期 51 + review-fix F5 追加的 C-12）；结构面 violations 3（零新增）。)
+**Last Updated**: 2026-11-22 (review-fix F3：**索引状态列已由 `Planned` 推进为 `Implemented`**——069a / 069b 均 Implemented，Pre-Status-Flip 四项全过；`Ready for Review` 与 `Completed` 均未主张。切片 069b：`tasks.md` 29 行全 `[X]`；SC 状态 pass 4 / unknown 1（SC-004 的两名独立判定者未执行，不记达成）；名字级零 NEW；镜像字节等同；条款覆盖 52（plan 期 51 + review-fix F5 追加的 C-12）；结构面 violations 3（零新增）。)
 
 ## Overview
 
@@ -42,7 +42,7 @@
 - **六面门禁的既有 owner**：读者面 = `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议（A5 不新建第二套读者定义）；结构/链接/构建面 = `create-docs` 的 `skills/external/create-docs/scripts/docs-utils.py`（`--action validate` 管保留名与结构、`--action fix-links` 管链接、站点脚手架存在时由 `improve-docs` § Verify 跑 Hugo 构建）；需求清晰度面 = `validate-requirements.py` + 质量清单；事实一致性判据 = `shared/guidelines/one-source-of-truth.md`（本特性只加检查器）；评审面 = 既有评审流程。
 - **新增面的对象差异**：证据分级（实测 / 推断 / 引用）与 as-of 是本特性新增的**文档断言**属性，与 `shared/workflow/evidence-step.md` 的七态证据词汇（机制存在/接线/被使用，描述机制而非断言）、`shared/guidelines/single-run-evidence.md`（一次昂贵执行的记录留存）对象不同，MUST NOT 互相重定义或收窄取值域；as-of 的既有先例是 glossary「易变测量值」条对基线值的要求。
 - **三项基线的仪器**：门禁调用次数、人工确认次数、requirements→analyze 墙钟，全部取既有提交时间戳 / 运行与反馈记录 / exec-quant 通道（FR-032），不新增采集器；前瞻可用运行不足 3 次时记 not-evaluated，不记达成（与运行判定「测量而非印象」同向）。
-- **067 的登记缺口（实测，2026-10-24）**：`.specify/specs/067-loop-efficiency-hardening/` 存在且完整（plan/tasks/review/verification 齐全），但 `features.md` 无 067 行、`features/067.md` 不存在；requirements 原文「062/067/068 均已注册」因此不成立，已就地更正。该缺口是既有登记债，不在本特性范围，本特性也不得借机回填他特性注册。
+- **067 的当前归属（2026-11-22 复核）**：067 已作为 Feature 058 的演化规格登记在 `.specify/features/058-sdd-loop-driver.md`，并有实现记录；无需独立 Feature 行。此前的“登记缺口”是 dated record，不再是当前债务。
 - **逆向交叉引用的处置（偏离并披露）**：`clarify-taxonomy.md` § Mode A 要求新建 Feature 时向邻接 Feature 写逆向交叉引用。本次派发约束明确「与 062/067/068 只引用不改写」，故本 Feature 与 062（表达类首个成员）、068（度量通道）的承接关系只记录在本文件 § Related Specifications，不修改它们的记忆文件；该偏离在此登记为恢复点。
 - **plan 入口前置门实测（2026-10-24，clarify 收尾）**：`decomposition-check.py --mode plan --requirements .specify/specs/069-execution-expression-sdd/requirements.md` → `decision=split-required`（`fr_count=41` > `fr_ceiling=30`）。这是 decision-heavy clarify 的预期后果（新增 6 条落地口径 FR），不构成 requirements 缺陷；处置属 plan 阶段——按 065 的先例先写拆分记录并确认 `proposed_slices[]`，clarify 不预设切片。同一轮其余门：`validate-requirements.py` 0 error / 0 warning、`pre-analyze-check.py --stage requirements` pass（errors=0，2 条 advisory 均为尚未创建的 owner 文件）、`overlap-check.py` clear。
 - **未新建持久编号**：本阶段未引入 D-/OI-/REC- 等持久编号，10 项裁定以 `requirements.md` § Clarifications（Session 2026-10-24）为权威、按主题引用，故 register.md 无需新增行；若 plan 阶段为裁定取号，须按 ID Register 在取号当刻登记。
@@ -52,7 +52,7 @@
 - 表达类门禁的算子细化（读者面问卷化、as-of 过期自动提示），以及把「构建通过不等于内容正确」做成可复算的负向测试。
 - 项目侧自建流程的类别声明与读取面（本特性显式不建，属后续特性）。
 - 分类驱动的门禁成本度量推广到执行类（复用同一套三项基线口径）。
-- 067 等未登记规格的登记补齐（独立治理动作，不在本特性内）。
+- 067 的测量测试仍有归档路径残留：`tests/contract/test_measurement_instruments.py` 读取 `.specify/specs/069b-isomorphism-migration-metrics/`，实际文件在 `.specify/archive/specs/`；该实现测试问题不改为注册状态。
 - docs 同步（概念页：执行/表达轴、六面文档型门禁、同构映射与边界）在实现落地后由 `/speckit.docs` 收敛；本阶段按派发约束不改 `docs/` 正文，故本 run 的 docs-sync 评估结论为「需记录，移交后续」。
 
 ## Related Files

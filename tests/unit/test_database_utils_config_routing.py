@@ -510,7 +510,7 @@ def test_skill_declares_mit_and_the_framework_classification():
     assert "license: MIT" in front
     assert "classification: external" in front
     assert 'skill_id: "<SKILL:.specify/skills/database-utils/SKILL.md>"' in front
-    assert "author: ai-engine project" in front
+    assert "author: spec-kit project" in front
     assert 'version: "3.0"' in front
     assert "Apache-2.0" not in text
     assert "sanjay3290" not in text
@@ -519,7 +519,7 @@ def test_skill_declares_mit_and_the_framework_classification():
 def test_license_file_is_mit_with_the_project_copyright():
     text = (SKILL / "LICENSE.txt").read_text(encoding="utf-8")
     assert text.startswith("MIT License")
-    assert "Copyright (c) 2026 Qiming Liu and ai-engine contributors" in text
+    assert "Copyright (c) 2026 Qiming Liu and spec-kit contributors" in text
     assert "Apache" not in text
 
 

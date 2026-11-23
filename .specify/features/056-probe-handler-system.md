@@ -3,9 +3,9 @@
 **Feature ID**: 056  
 **Name**: Probe-Handler 体系  
 **Description**: 把 probe 泛化为全框架可查询、可修改的一等实体，并新增 Handler 层使一个探测点可挂接 N 个已注册反应。  
-**Status**: Planned  
+**Status**: Implemented
 **Created**: 2026-10-13  
-**Last Updated**: 2026-10-13
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -14,6 +14,8 @@ Probe 目前只在 feedback 域完成实体化（028 的 Class×Object 注册表
 本特性建立三层实体模型 Probe Class × Probe Object（既有，扩格为伞形）+ HandlerBinding（订阅+次序+模式）+ Handler（跨单元可复用反应），配共享引擎 `probe-utils.py` 的 `compile-embeds` 编译动作：从注册表渲染每单元单一 AUTO-GENERATED `## Wrap-up` 收尾段，由既有 regen/sync 机制传播。**加一个 wrap-up 反应 = 注册一行 + 重编译**。行为真源文件保持行为规则不动，注册表只接管接线。宿主项目对体系为只读（查询面可用，注册/编译写面仅框架侧）。
 
 ## Latest Review
+
+2026-11-22 implementation audit: the Probe umbrella registry, Handler/HandlerBinding validation, four lifecycle binding classes, and `compile-embeds` are delivered. The compiler generates one Wrap-up per unit, preserves handler order, and supports read-only drift checks. The header now matches the Implemented record already present in Status Tracking and the index.
 
 2026-10-13 /speckit.plan 规划完成（Draft → **Planned**）：plan.md（16 项 Constitution Check 全 Pass，经 fresh-context 只读子代理对照落盘产物复核——4 处证据指针缺陷就地修正）；Phase 1 产物 data-model.md（7 实体 + 漂移错误类封闭集 8 项 + MVP 种子 5 Handler / 5 Binding）、contracts/ ×4（probe-registry / handler-registry / compile-embeds / engine-action-sets）、quickstart.md（4 场景，引擎示例 route (b) 免责 + 契约测试预登记）、feature-ref.md（22 FR 全映射）。规划期实测：编译单元集 69（23 命令 + 35 内部技能 + 11 外部技能）；feedback-utils 14 action 分区 5/11（probe 族 3 迁出 + handlers/compile-embeds 2 新增）；SC-007 改前基线 853 非空行具名冻结于 plan.md；门控 total 23 / violations 0、镜像与命令副本改前基线全绿。2026-10-13 /speckit.clarify 澄清会话裁定六项：Q1 收尾段标题 `## Wrap-up`；Q2 绑定本 Feature（新建伞形）；Q3 行为真源冻结条款改写为行为规则维度（接线引用类最小编辑允许）；Q4 调用形式按 kind 固定派生 + `@point:` 字面语法 + lifecycle_point 封闭集；Q5 零生效 handler 单元不输出收尾段；Q6 宿主只读。
 

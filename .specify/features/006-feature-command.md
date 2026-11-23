@@ -5,39 +5,44 @@
 **Description**: Manage feature lifecycle and metadata.  
 **Status**: Completed  
 **Created**: 2026-02-10  
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Feature Command enables manage feature lifecycle and metadata. This is part of the Spec Kit CLI toolkit.
+`/speckit.feature` reconciles the feature index, per-feature detail files, and the README feature summary against repository reality. It supports full-registry reconciliation, commit or branch context mining, and single-target convergence.
 
 ## Latest Review
 
-Initial generation/refresh.
+2026-11-22 implementation audit: the command delegates all registry work to `manage-features`; its current reconcile model includes a tolerance band, archive-not-delete, status-regression protection, sequential identifier allocation, derived counts, and residual reporting.
 
 ## Key Changes
 
-1. Initial release/indexing.
+1. Reconcile functional and non-functional feature records with current implementation evidence.
+2. Preserve unchanged rows and historical records while refusing unapproved status regressions.
+3. Maintain detail files, the feature index, README summary, and derived feature count together.
 
 ## Implementation Notes
 
-- Part of specify-cli reference implementation.
+- Primary surfaces: `templates/commands/feature.md` and `skills/internal/manage-features/SKILL.md`.
+- Registry count and acceptance-state behavior are covered by existing contract tests.
 
 ## Future Evolution Suggestions
 
-- Continuous improvement based on usage.
+- Keep implementation-evidence extraction deterministic and avoid using historical status prose as proof of delivery.
 
 ## Related Files
 
-- Specification: .specify/specs/006-006-feature-command/requirements.md
-- Feature Index: .specify/features.md
-- Feature Detail: .specify/features/006-feature-command.md
-- Quality Checklist: .specify/specs/006-006-feature-command/checklists/requirements.md
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/006-feature-command.md`
+- Implementation: `templates/commands/feature.md`, `skills/internal/manage-features/SKILL.md`
+- Specification: none registered for this legacy command row.
 
 ## Status Tracking
 
 - **Draft**: Concept defined.
-- **Planned**: Spec approved.
-- **Implemented**: Code written.
-- **Ready for Review**: Tests passing.
-- **Completed**: Merged and available.
+- **Planned**: Specification and design approved.
+- **Implemented**: Registry workflow delivered and verified.
+- **Blocked**: A final-path acceptance criterion fails.
+- **Ready for Review**: Review evidence complete with no blocking code-review entry.
+- **Sealed**: Canonical seal criteria met.
+- **Completed** (legacy — current): Historical delivered status retained.
