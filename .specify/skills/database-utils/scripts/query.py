@@ -6,7 +6,7 @@ dispatcher resolves the named entry, decides which protocol it speaks, and hands
 the statement to the matching handler next to this file.  The handlers own the
 read-only enforcement; the dispatcher owns selection and routing only.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import argparse

@@ -14,7 +14,7 @@ decision, not this script's.  The element to insert is printed on stdout.
 Nothing else in the tree is rewritten, so a hand-edited part keeps its own
 formatting, namespace prefixes and comments.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 from __future__ import annotations

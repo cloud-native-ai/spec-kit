@@ -850,10 +850,10 @@ ALLOWED_POST_BASELINE_CHANGES = {
     },
     "skills/external/database-utils/SKILL.md": {
         "reason": (
-            "2026-11-18 ai-engine fork (P0a, user ruling: every license in the repository "
+            "2026-11-18 spec-kit fork (P0a, user ruling: every license in the repository "
             "becomes MIT, and a third party cannot be relicensed unilaterally, so the "
             "vendored Apache-2.0 skill is REPLACED by an original MIT implementation rather "
-            "than annotated): the frontmatter moves to license MIT / author ai-engine "
+            "than annotated): the frontmatter moves to license MIT / author spec-kit "
             "project / version 3.0, the body is rewritten, and the two drivers become "
             "PyMySQL and pg8000. The caller-facing interface is preserved and pinned by "
             "tests/unit/test_database_utils_{readonly_guard,config_routing,execution}.py — "
@@ -865,7 +865,7 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "markers": (
             "license: MIT",
-            "author: ai-engine project",
+            "author: spec-kit project",
             'version: "3.0"',
             "PyMySQL",
             "pg8000",
@@ -913,7 +913,7 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
 # SKILL.md` and `templates/commands/history.md` left the tuple the same way: the
 # four-stage seam is authored drift, each carries its own entry above, and
 # `_banner_only_drift` now covers 33 rows.
-# 2026-11-18 (ai-engine fork, P0a): `skills/external/database-utils/SKILL.md` left the
+# 2026-11-18 (spec-kit fork, P0a): `skills/external/database-utils/SKILL.md` left the
 # tuple the same way — the MIT rewrite is authored drift, its own entry above wins, and
 # `_banner_only_drift` now covers 32 rows.
 _FEATURE_087_BANNER_ONLY = (

@@ -25,7 +25,7 @@ refused. Its operands are positional; it declares no options of its own.
 Exit 1 means no image was written: wrong operand count, a page number that is
 not an integer, or unreadable input.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import json

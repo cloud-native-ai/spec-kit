@@ -23,7 +23,7 @@ unreadable or malformed input). At most 20 lines are emitted; the audit then
 stops and says so, because a file with that many conflicts needs rewriting
 rather than more diagnostics.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import json

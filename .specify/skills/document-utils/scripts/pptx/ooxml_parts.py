@@ -24,7 +24,7 @@ module owns it:
 
 Pure library: no command line, no writes, nothing happens on import.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 from __future__ import annotations

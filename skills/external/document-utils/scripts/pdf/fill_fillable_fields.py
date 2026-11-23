@@ -29,7 +29,7 @@ library global is patched.
 Exit 1 means the output was not written: wrong operand count, unreadable input,
 or a validation failure.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import contextlib

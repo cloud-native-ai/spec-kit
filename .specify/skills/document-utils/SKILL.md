@@ -12,7 +12,7 @@ description: |
 skill_id: "<SKILL:.specify/skills/document-utils/SKILL.md>"
 license: MIT
 metadata:
-  author: ai-engine project
+  author: spec-kit project
   version: "3.0"
 classification: external
 ---

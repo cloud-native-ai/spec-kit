@@ -15,7 +15,7 @@ to read.
 This is the template-analysis view: small cells, whole deck, one look.  For
 pixel-level QA render the slides full size instead -- see references/pptx-qa.md.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 from __future__ import annotations

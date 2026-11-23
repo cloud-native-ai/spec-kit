@@ -4,7 +4,7 @@
 
 **An open source toolkit built around Spec-Driven Development (SDD): requirements, plans, tasks, and implementation connect through structured templates and `/speckit.*` commands, so AI progresses around clear intent instead of one-off vague prompts.**
 
-ai-engine is an independent fork of [github/spec-kit](https://github.com/github/spec-kit)
+spec-kit is an independent fork of [github/spec-kit](https://github.com/github/spec-kit)
 (MIT, Copyright GitHub, Inc.), forked at 926836e0f (2025-10-21).
 It is not affiliated with or endorsed by GitHub. Thanks to the original Spec Kit contributors.
 

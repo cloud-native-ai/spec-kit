@@ -28,7 +28,7 @@ nothing.  Reachability is the union of every internal relationship target in the
 tree, which is what keeps a part alive while any surviving relationship still
 names it.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 from __future__ import annotations

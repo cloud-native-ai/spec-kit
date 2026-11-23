@@ -3,7 +3,7 @@
 - **Authoritative source:** <https://agentskills.io/specification>
 - **Upstream repository:** <https://github.com/agentskills/agentskills> (Apache-2.0)
 - **Validation tool:** [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref)
-- **Licence of this page:** MIT (original work of the ai-engine project)
+- **Licence of this page:** MIT (original work of the spec-kit project)
 
 > This page is an **original summary** written for this project. It reproduces no
 > upstream specification text. The upstream specification owns every exact

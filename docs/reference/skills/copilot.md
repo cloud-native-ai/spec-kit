@@ -8,7 +8,7 @@
   against the source when online)
 - **Source reviewed:** 2026-11-19 (licence review). The earlier snapshot carried
   no capture date.
-- **Licence of this page:** MIT (original work of the ai-engine project)
+- **Licence of this page:** MIT (original work of the spec-kit project)
 
 > This page is an **original summary**, not a copy of the vendor's documentation.
 > It reproduces no upstream documentation text. Preview status, setting names and

@@ -16,7 +16,7 @@ any value has been entered yet.
 Exit 1 means the question could not be answered: wrong operand count, missing
 file, or a PDF that pypdf cannot parse or decrypt.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import sys

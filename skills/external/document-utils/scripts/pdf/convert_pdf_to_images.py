@@ -19,7 +19,7 @@ Exit 1 means nothing was rendered: wrong operand count, unreadable PDF, or a
 missing renderer. The renderer is imported inside the function so that -h,
 --help and --version still answer on a host without pypdfium2.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 import os

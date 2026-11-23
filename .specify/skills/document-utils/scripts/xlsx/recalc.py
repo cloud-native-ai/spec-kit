@@ -20,7 +20,7 @@ The result is a JSON object on stdout:
 A run that could not start reports {"error": "..."} instead.  The exit status is
 0 for both shapes: the JSON is the result, and a caller reads the verdict there.
 
-ai-engine project, MIT licensed -- see LICENSE.txt.
+spec-kit project, MIT licensed -- see LICENSE.txt.
 """
 
 from __future__ import annotations

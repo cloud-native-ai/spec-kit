@@ -202,7 +202,7 @@ page.mediabox.left = 50               # crop by moving the box edges
 page.mediabox.bottom = 50
 page.mediabox.right = 550
 page.mediabox.top = 750
-writer.add_metadata({"/Title": "Cropped", "/Author": "ai-engine project"})
+writer.add_metadata({"/Title": "Cropped", "/Author": "spec-kit project"})
 with open("output.pdf", "wb") as out:
     writer.write(out)
 ```
