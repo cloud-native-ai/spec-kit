@@ -1,4 +1,11 @@
-# 093 — Concurrency by Default（subagent 并发作为框架基本属性）
+# Feature Detail: Concurrency by Default
+
+**Feature ID**: 093
+**Name**: Concurrency by Default
+**Description**: Declaration-driven concurrency classes, serial reasons, effective-overlap readings, coverage checks, and fail-closed capability probes; owner adjudication and real-run closure remain Blocked.
+**Status**: Blocked
+**Created**: 2026-11-09
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -58,7 +65,7 @@
 ## Related Specifications
 
 - `.specify/specs/093-concurrency-by-default/requirements.md` — 本特性规格（36 FR / 12 SC）
-- `.specify/specs/092-goal-team-parallel/requirements.md` — goal/team 平行模型（本特性处置对象之一；其 `notes/execution-lessons-2026-11-09.md` 记录了 092 的串行实测与平行线 worktree 隔离 addendum）
+- `.specify/specs/094-goal-team-parallel/requirements.md` — goal/team 平行模型（本特性处置对象之一；其 `notes/execution-lessons-2026-11-09.md` 记录了该线的串行实测与平行线 worktree 隔离 addendum）
 - `.specify/specs/070-subagent-task-teams/requirements.md` — Work Package 拆解与 `wp-gate.py`（被修订的门面）
 - `.specify/specs/064-subagent-concurrency/requirements.md` — 写线 / worktree / integration queue（并发底座）
 - `.specify/specs/086-efficient-test-execution/requirements.md` — 测试执行效率（并发语义的既有 owner 之一）

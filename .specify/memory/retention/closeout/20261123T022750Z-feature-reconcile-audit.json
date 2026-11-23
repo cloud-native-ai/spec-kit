@@ -1,0 +1,26 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "feature-reconcile-20261122-audit",
+  "artifact_commit": "4b624e879",
+  "records_commit": "ebc17e742",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261122T045953Z-run-determination-skill-manage-features-feature-reconcile-20.md",
+      "action": "committed",
+      "commit": "ebc17e742"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261122T050053001316Z-10cc2766.json",
+      "action": "committed",
+      "commit": "ebc17e742"
+    },
+    {
+      "path": ".specify/memory/feedback/20261122T050152Z-skill-manage-features.md",
+      "action": "committed",
+      "commit": "ebc17e742"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-23T02:27:50Z",
+  "note": "The receipt has its own commit because its per-row records-commit hash cannot exist before that commit is created."
+}

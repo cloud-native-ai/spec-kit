@@ -2,18 +2,20 @@
 
 **Feature ID**: 078  
 **Name**: Coaching Skills（教练技能）  
-**Description**: 把外部技能 `think-skills` 重命名为 `coaching-skills` 并重构为「教练」闭环——以 Trainee 技能 + 真实工作为参数，执行前产出双维度预期（结果正确性 / 过程效率），由子代理按 Trainee 原流程真实执行并在教练侧观测记录，最后产出偏差报告与提升计划并经 `improve-skills` 应用。  
-**Status**: Planned  
+**Description**: Coach a Trainee through real work in its own carrier with prior expectations, observed execution, deviation analysis, and improvement plans.
+**Status**: Blocked
 **Created**: 2026-10-30  
-**Last Updated**: 2026-10-30
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-原 `think-skills` 只做静态心智推演：给预期，但不看真实执行。本 Feature 把「教练」意象落到可执行闭环上：教练先在自己的上下文里给出预期（结果按**正确性**、过程按**效率**），再派发一个子代理在**独立上下文**中按 Trainee 自身流程完成真实工作，教练依据宿主事件（不可得时用子代理自报并标注来源）记录过程与结果，最后对比预期与实际、产出提升计划并调用 `improve-skills`。
+`coaching-skills` now executes the Trainee in its own declared carrier: the coach writes result-correctness and process-efficiency expectations first, records the Trainee's real execution without replacing it with a coach-created subagent workflow, compares expected and actual behavior, and hands the improvement plan to `improve-skills`. Command-side `speckit.` prefixes are stripped only in the command list; skill names are not rewritten through that namespace.
 
-主次原则是硬约束：**执行优先**——先按 Trainee 原流程把真实工作做完，优化只在执行闭环完成后进行；缺失观测证据时计划仍产出但标 `evidence: none`，`run: partial`。
+Execution remains primary. Optimization starts only after the real work finishes, and missing observation evidence is disclosed rather than fabricated.
 
 ## Latest Review
+
+2026-11-22 audit correction: the new carrier-observation model is present, but the two directed contract modules currently report **12 failed / 21 passed** because they still assert the retired dispatch model. The latest prefix fix exists in framework source but not in the installed coaching mirror. These facts falsify the previous `Implemented` claim, so the index and this detail land `Blocked` under the canonical Implemented → Blocked audit-correction exception. Evidence command: `PYTHONDONTWRITEBYTECODE=1 bash scripts/bash/run-tests.sh tests/contract/test_coaching_run_contract.py tests/contract/test_coaching_dispatch_contract.py -q -p no:cacheprovider`; result: **12 failed, 21 passed**. Complete raw stream: `.specify/.tmp/feature-reconcile-20261122/state/raw-feature-audit-H-audit.jsonl`; semantic comparison: `skills/external/coaching-skills/` versus `.specify/skills/coaching-skills/`.
 
 - 2026-10-30 `/speckit.implement`（4 段）：31/31 任务完成；162 passed / 0 failed（定向集），四冻结基线转绿；quickstart 场景 1–5 实跑（含真实教练闭环与 teardown）；新增行门 0 命中；SC-001/SC-005 因运行由脚本化 one-shot runner 驱动、观测全为 `self-report`，按 review F4 记为 `partial`（宿主原生派发通道未实测）。
 
@@ -61,7 +63,8 @@
 ## Status Tracking
 
 - **Draft**: requirements 已澄清，checker exit 0。
-- **Planned**: (current) plan.md + Phase 1 产物落盘，Constitution Check 无未证成 Fail。
-- **Implemented**: (current) tasks.md 31/31 `[X]`；verification.md 9/9 SC 状态行（7 pass + 2 partial：SC-001/SC-005 的宿主派发传输缺口）；定向集 162 passed/0 failed。
-- **Ready for Review**: deferred 解决/豁免；review 证据产出。
+- **Planned**: plan.md + Phase 1 产物落盘，Constitution Check 无未证成 Fail。
+- **Implemented**: previously recorded from 31/31 tasks and the earlier verification set; falsified for the current tree by the 2026-11-22 audit evidence above.
+- **Blocked** (current): current directed contracts fail and the source/installed mirror semantics are not synchronized.
+- **Ready for Review**: requires the contract and mirror gaps to be repaired and fresh review evidence produced.
 - **Completed**: 最终验收。

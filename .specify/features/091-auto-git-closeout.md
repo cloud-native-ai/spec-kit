@@ -1,4 +1,11 @@
-# 091 — Automatic git Close-out（自动收口）
+# Feature Detail: Automatic Git Close-out
+
+**Feature ID**: 091
+**Name**: Automatic Git Close-out
+**Description**: Declare and execute ordered git closeout lifecycles with receipts, explicit remote targets, and ask-before-push behavior.
+**Status**: Completed
+**Created**: 2026-11-09
+**Last Updated**: 2026-11-22
 
 ## Overview
 

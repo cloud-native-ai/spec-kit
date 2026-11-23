@@ -5,22 +5,22 @@
 **Description**: Structural validation and consistency enforcement across all command and skill templates.  
 **Status**: Draft  
 **Created**: 2026-06-05  
-**Last Updated**: 2026-06-05
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-Spec Kit's primary artifacts are markdown prompt templates that drive AI agent behavior. The quality and structural consistency of these templates directly determines the framework's reliability. This feature covers establishing validation rules, structural patterns, and quality gates that ensure all templates (command, skill, agent) follow consistent conventions and produce predictable AI agent behavior.
+Spec Kit's primary artifacts are Markdown prompt templates that drive AI agent behavior. This feature tracks a unified structural schema and author guidance for command, skill, and agent templates. The current repository already has several narrower validators, but they do not yet form the unified contract originally envisioned here.
 
 ## Latest Review
 
-Gap identified during project-intrinsic analysis. Command templates in `templates/commands/` follow informal conventions (User Input section, Actions section, Handoffs) but there is no automated validation or documented structural contract for template authors.
+2026-11-22 implementation audit: partial delivery exists through command `short-description` checks, role-template frontmatter and section checks, Agent metadata schema validation, and deterministic `skill-shape.py` validation. A unified all-template schema, complete handoff rules, and one authoring guide remain open. `Draft` is retained for that remaining unified scope; the earlier claim that no automated validation exists is false.
 
 ## Key Changes
 
-1. Define a structural schema for command templates (required sections, placeholder conventions, handoff format).
-2. Define a structural schema for skill templates (SKILL.md required fields, tools/ layout, references/ conventions).
-3. Add contract tests that validate all templates against their schemas on every change.
-4. Document the template authoring guide for contributors and skill creators.
+1. Delivered: validate Qoder command descriptions, role-template frontmatter and required sections, Agent metadata, and skill shape through existing contract surfaces.
+2. Remaining: define one structural schema for all command, skill, and agent templates, including placeholder and handoff conventions.
+3. Remaining: make the unified schema and contributor authoring guide the single owner rather than distributing rules across unrelated features.
+4. Remaining: run the complete unified validation set on every relevant change.
 
 ## Implementation Notes
 

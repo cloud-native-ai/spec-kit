@@ -2,16 +2,18 @@
 
 **Feature ID**: 059  
 **Name**: Agent+LLM 执行量化记录(Execution Quant Recording)  
-**Description**: 每个「agent 程序 + LLM」受测单元执行时,经既有 wrap-up probe 挂点自动落一条量化记录(agent 程序信息 / LLM 详细信息 / 质量指标与可选打分),由确定性引擎采集入项目 memory 层专属 durable 存储;本期 Recording Only  
+**Description**: Record per-unit and per-dispatch agent/LLM metrics in per-entry JSON files, with scoring, redaction, bounded reads, and explicit local aggregation.
 **Status**: Implemented  
 **Created**: 2026-10-16  
-**Last Updated**: 2026-10-16
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-为 spec-kit 增加「agent 程序 + LLM」执行的量化数据记录能力:任一受测单元(与运行判定同语义的 command / skill / custom-unit)完成一次执行,即在 wrap-up 挂点经确定性程序落一条量化记录,含 agent 程序信息、LLM 详细信息、质量指标(时长 / token 消耗 / 错误次数)与可选打分。核心纪律:**测量而非印象**——不可采字段以显式未采标记落库,零空缺、零臆造;与运行判定并行携带、标注来源、不重复测量;存储独立于 feedback store,结构性排除于反馈打包与一切上送路径。本期只做记录(Recording Only):积累可机读的执行遥测数据集;量化分析、报表、聚合口径、打分模型均为后续特性。
+The engine records per-unit and per-external-dispatch agent/LLM metrics with explicit `not_evaluated` for unavailable values, redaction, size limits, and non-blocking collection. Records now use per-entry JSON files with legacy JSONL retained as a read-only fallback. `collect-dispatch` binds metrics to execution-config snapshots, and `aggregate` produces an explicit, replayable, append-only local counts view without scoring, thresholds, or network transmission.
 
 ## Latest Review
+
+2026-11-22 implementation audit: `collect`, `list-records`, `score`, `collect-dispatch`, and `aggregate` are present. Storage is per-entry JSON with legacy JSONL read compatibility; dispatch collection binds config snapshots, and local aggregation is count-only, replayable, append-only, and network-free. The earlier plan-era `records.jsonl`/`scores.jsonl` design and “aggregation is future work” statements are superseded.
 
 - **2026-10-16 implemented via `/speckit.implement`**(Planned → Implemented,DoD Status green):16 任务全 [X];交付 = `scripts/python/exec-quant.py`(collect/list-records/score;D2 采纳窗口 90min、D8 父链归属、D6 origin 白名单、D7 qoder 配置面、D9 64KiB 封顶+凭据脱敏、V8 非阻塞)+ 注册表 1 Class + 4 Objects + h-exec-quant(order 15)+ Binding(all)+ `_ENGINE_SIBLINGS` 追加 + 056 对账面分区 + 72 编译面各 +1 行(431→503/预算 853)+ 契约测试 48 项;GATE-1..6 全绿(`comm -13` 对冻结基线为空、双 validate 0、双镜像 `--check` 0、预算/传播序测试绿);quickstart 五场景实跑留痕(SC-001 恰一条 adopted 记录 / SC-002 未采标记 5、零空缺 / SC-003 零新增失败名 / SC-004 打包零量化条目+凭据值级零命中);运行披露:compile-embeds 读 `.specify` 镜像注册表故注册表投影先行于编译(终态钉不变);US2 born-red 因 T005 引擎一次成型不可后补,以变异演练证明判别力(red-first-evidence.md 第三节)。
 - **2026-10-16 planned via `/speckit.plan`**(Draft → Planned):plan.md + Phase 1 产物落盘(data-model 6 实体 / 8 校验规则 V1–V8;contracts 2 份;quickstart 5 场景;feature-ref FR/SC 全映射)。Constitution v1.13.0 动态枚举 16 项全 Pass;同作者委托复评(fresh-context 只读子代理)发现 3 处缺陷(动作名 `list` 与 feedback 既有同名 / union 读取机制误述 / 窗口常量非合法重复),全部属 correction 就地修复并披露于 plan Re-check 行。实测基线:wrap-up 72 面 / 431 非空行 / 预算 853(余量 422);`sync-mirrors --check` 与 `regen-command-copies --check` 均 exit 0。
@@ -31,14 +33,15 @@
 - A6 组合裁决:与运行判定并行携带、标注来源,不重复测量;运行判定记录的 schema 与改进流程契约不变,其记录仍是时长/token 的唯一权威。
 - 采集可行性锚点(2026-10-16 同机实测,dated record 仅作可行性输入):agent 程序信息可全采;LLM 详细分级可采——env 端点变量均为候选而非生效,生效端点仅记可判定证据,未设置的 reasoning effort 不可测得,落显式未采标记。
 - 采集非阻塞:采集失败不使单元运行失败或劣化,失败在运行输出可见(同 feedback 非阻塞语义)。
-- plan 期裁决 D1–D12(权威落点 `.specify/specs/059-exec-quant-recording/plan.md` § Phase 0):引擎动作名 `collect / list-records / score` 与既有四引擎零交集;run_id 缺省采纳同单元最近判定记录(有界窗口,常量唯一裁决点在 plan D2);存储 = `records.jsonl` + `scores.jsonl` 双文件纯追加(打分 join 呈现,记录永不改写);provenance 词域 measured/carried/user-given + 显式未采标记;端点只录白名单 origin + 可判定连接证据(不判「生效」);qoder 配置面适配器未设 effort 不推断 CLI 默认;probe 注册 = 1 Class + 4 Objects + Handler(order 15)+ Binding(scope=all);`_ENGINE_SIBLINGS` 追加经 argparse choices 路径对账。
+- Current storage follows the conflict-free store pattern: one JSON file per record, legacy JSONL as a read-only fallback, and no shared mutable aggregate rewritten by concurrent runs.
+- `collect-dispatch` records only external dispatches and binds each record to an execution-config snapshot; `aggregate` derives local counts without altering the source records.
+- Unavailable values remain `not_evaluated`; collection failures stay visible but non-blocking, and sensitive values are redacted.
 
 ## Future Evolution Suggestions
 
-- 量化分析、报表与可视化、跨 run 聚合口径(本期显式排除,数据积累后的消费特性)。
-- 打分模型与阈值(本期只收打分数据,不产判分)。
-- 记录保留/清理策略(存储无界增长治理)。
-- 子步骤粒度采集(本期单元粒度 = 一次受测单元执行)。
+- Richer scoring models and visualization without changing the count-only local aggregate boundary.
+- Record retention and cleanup policies for the per-entry store.
+- Optional sub-step granularity when a unit requires more than one execution record.
 
 ## Related Files
 

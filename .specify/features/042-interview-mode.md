@@ -2,10 +2,10 @@
 
 **Feature ID**: 042  
 **Name**: Interview Mode  
-**Description**: Promote interview-style elicitation from a single agent's workflow into a framework-wide design pattern (`shared/patterns/interview-pattern.md`), usable from commands, skills, and agent/team definitions, plus `/speckit.interview` as the standalone entry.  
+**Description**: Run open-question Special and Informal interviews with a deterministic decision DAG, frontier ordering, and retraction.
 **Status**: Implemented  
 **Created**: 2026-08-06  
-**Last Updated**: 2026-08-06
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -17,7 +17,9 @@ This Feature names the mode once, with an explicit boundary against the neighbou
 
 ## Latest Review
 
-Not yet reviewed. Delivered directly (registered Feature + implement, no spec→plan→tasks track) at the user's direction after a research pass over the reference `grilling` / `grill-me` skills and a full survey of the project's ~20 commands, 26 skills, and 7 role agents.
+2026-11-22 implementation audit: Special and Informal interviews use open questions without options or recommended answers, clarify is a sibling flow rather than a bounded interview instance, and `interview-utils.py` provides the executable DAG. The former statement that this feature had no runtime engine is stale.
+
+Historical review — delivered directly (registered Feature + implement, no spec→plan→tasks track) at the user's direction after a research pass over the reference `grilling` / `grill-me` skills and a full survey of the project's commands, skills, and role agents.
 
 ## Key Changes
 
@@ -57,7 +59,7 @@ Not yet reviewed. Delivered directly (registered Feature + implement, no spec→
 - `templates/commands/interview.md` (+ mirror + 8 per-tool generated copies) — the command
 - `shared/workflow/interview-walkthrough.md` — the requirements-domain instance
 - `templates/commands/clarify.md`, `templates/commands/plan.md`, `templates/commands/goal.md` — integration points
-- `skills/internal/create-team/SKILL.md`, `agents/requirements-analyst.agent.md` — integration points
+- `skills/internal/create-team/SKILL.md`, `skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md` — integration points
 - `docs/reference/commands/interview.md`, `docs/tutorials/quickstart.md` — user-facing docs
 - `tests/contract/test_shared_reference_directory.py`, `tests/contract/test_shared_reference_rewrite.py`, `tests/contract/test_feedback_command_classification.py`, `tests/contract/test_docs_step_injection.py` — registration contracts
 

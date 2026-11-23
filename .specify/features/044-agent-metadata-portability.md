@@ -2,10 +2,10 @@
 
 **Feature ID**: 044  
 **Name**: Agent Metadata Portability  
-**Description**: Separate tool-agnostic metadata from the agent's own body in preset agent definitions, express the metadata in neutral vocabulary (removing the Qoder dialect embedded today), and render it at `specify init --ai <tool>` time into each supported tool's real agent format (real files, replacing the per-file symlink model); also canonically defines the difference between `agents/`, `skills/create-agent/templates/` and `skills/create-team/templates/agents/`.  
+**Description**: Render neutral agent metadata into Qoder, Claude, Copilot, and opencode files, with Codex and Hermes annotations.
 **Status**: Implemented  
 **Created**: 2026-08-13  
-**Last Updated**: 2026-10-08 (implemented via /speckit.implement — spec 054 `054-agent-registration-wiring`: all 31 tasks closed, zero deferred; SC-001..004 all pass (verification.md); deliverables = `specify render-agents --ai <tool>` narrow CLI subcommand delegating to the existing renderer + `team-scope` framework-only neutral key (seat provenance) + create-team seat-instantiation & render-trigger steps + improve-team modify-time opt-in backfill + three teaching surfaces re-teaching the real render model (F-A02 dead letter closed) + host-registration-surface concept in agent-definitions.md + Qoder IDE/CLI shared-path docs with provenance + 5 guard test files (35 tests) with source-side mutation drills; regression comm -13 empty at every phase boundary vs the 49-entry name-level baseline. Same day, planned via /speckit.plan — plan.md + data-model.md (4 entities: Seat Instance / Render Trigger Command / Host Registration Surface / Render Manifest) + 4 contracts (seat-instantiation / render-trigger-cli / modify-backfill / teaching-and-guards) + quickstart.md (3 scenarios) + feature-ref.md; Constitution v1.13.0 check 16/16 Pass via delegated fresh-context scoring (zero divergence); design = create-team seat instantiation through create-agent's AgentAuthoringRequest delegation + new narrow CLI subcommand `specify render-agents --ai <tool>` delegating to the existing renderer + improve-team modify-time opt-in backfill + three teaching-surface corrections (F-A02) + host-registration-surface concept owned in agent-definitions.md. Status stays Implemented. Earlier the same day: spec 054 bound via /speckit.clarify — the render chain's missing wiring: seat/capacity-class instantiation at team creation, render-trigger ownership in the create-team flow, retired-symlink-model teaching corrections, Qoder IDE agent-surface documentation. Status stays Implemented; 054 is a bound continuation spec, not a status regression. Earlier: 2026-08-13 (planned via /speckit.plan: plan.md + data-model.md + 4 contracts + quickstart.md + feature-ref.md; Constitution v1.9.1 check 12 Pass / 1 Partial (IX, justified). Earlier the same day: registered via /speckit.clarify; second clarify round revised scope to the directory-level Worker/Meta taxonomy — `agents/` becomes exclusively framework-maintenance Meta Agents, the 7 role definitions relocate to `skills/create-agent/templates/` as Worker capability templates)
+**Last Updated**: 2026-11-22 (implemented via /speckit.implement — spec 054 `054-agent-registration-wiring`: all 31 tasks closed, zero deferred; SC-001..004 all pass (verification.md); deliverables = `specify render-agents --ai <tool>` narrow CLI subcommand delegating to the existing renderer + `team-scope` framework-only neutral key (seat provenance) + create-team seat-instantiation & render-trigger steps + improve-team modify-time opt-in backfill + three teaching surfaces re-teaching the real render model (F-A02 dead letter closed) + host-registration-surface concept in agent-definitions.md + Qoder IDE/CLI shared-path docs with provenance + 5 guard test files (35 tests) with source-side mutation drills; regression comm -13 empty at every phase boundary vs the 49-entry name-level baseline. Same day, planned via /speckit.plan — plan.md + data-model.md (4 entities: Seat Instance / Render Trigger Command / Host Registration Surface / Render Manifest) + 4 contracts (seat-instantiation / render-trigger-cli / modify-backfill / teaching-and-guards) + quickstart.md (3 scenarios) + feature-ref.md; Constitution v1.13.0 check 16/16 Pass via delegated fresh-context scoring (zero divergence); design = create-team seat instantiation through create-agent's AgentAuthoringRequest delegation + new narrow CLI subcommand `specify render-agents --ai <tool>` delegating to the existing renderer + improve-team modify-time opt-in backfill + three teaching-surface corrections (F-A02) + host-registration-surface concept owned in agent-definitions.md. Status stays Implemented. Earlier the same day: spec 054 bound via /speckit.clarify — the render chain's missing wiring: seat/capacity-class instantiation at team creation, render-trigger ownership in the create-team flow, retired-symlink-model teaching corrections, Qoder IDE agent-surface documentation. Status stays Implemented; 054 is a bound continuation spec, not a status regression. Earlier: 2026-08-13 (planned via /speckit.plan: plan.md + data-model.md + 4 contracts + quickstart.md + feature-ref.md; Constitution v1.9.1 check 12 Pass / 1 Partial (IX, justified). Earlier the same day: registered via /speckit.clarify; second clarify round revised scope to the directory-level Worker/Meta taxonomy — `agents/` becomes exclusively framework-maintenance Meta Agents, the 7 role definitions relocate to `skills/create-agent/templates/` as Worker capability templates)
 
 ## Overview
 
@@ -24,7 +24,9 @@ Relationship to Feature 033 (Agent Project Context Parameterization): complement
 
 ## Latest Review
 
-Not yet reviewed. Registered as Draft from the clarify session of requirement 040 (2026-08-13): chosen over binding Feature 033 because the metadata/distribution pipeline is a host capability with its own consumers, consistent with the 037→041 and 039→043 new-Feature precedents.
+2026-11-22 implementation audit: neutral metadata validation, real-file rendering, manifests, manual-edit backups, and stale pruning are present. Qoder, Claude, Copilot, and opencode have project-level renderers; Codex and Hermes retain annotations rather than rendered agent files. `specify render-agents` exposes the narrow render trigger.
+
+Historical review — registered as Draft from the clarify session of requirement 040 (2026-08-13): chosen over binding Feature 033 because the metadata/distribution pipeline is a host capability with its own consumers, consistent with the 037→041 and 039→043 new-Feature precedents.
 
 ## Key Changes (planned)
 
@@ -53,16 +55,16 @@ Not yet reviewed. Registered as Draft from the clarify session of requirement 04
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/044-agent-metadata-portability.md
 - Bound requirement: .specify/specs/040-agent-metadata-portability/requirements.md
-- Bound requirement (continuation): .specify/specs/054-agent-registration-wiring/requirements.md
+- Bound requirement (continuation): .specify/archive/specs/054-agent-registration-wiring/requirements.md
 - Distribution code: src/specify_cli/__init__.py (`_AGENT_LINK_DIRS`, `ensure_per_file_agent_links()`, `ensure_agent_layer_dirs()`, `copy_local_templates()`)
 - Format documentation to update: docs/reference/agents/templates-and-agents.md
-- Complementary feature: .specify/memory/features/033.md (Agent Project Context Parameterization)
+- Complementary feature: `.specify/features/033-agent-project-context-parameterization.md` (Agent Project Context Parameterization)
 
 ## Status Tracking
 
 - **Draft**: Feature row first added to `.specify/memory/features.md`.
-- **Planned**: `plan.md` (and any design artifacts) exist for the bound spec; Constitution Check has no unjustified Fail rows. *(current state)*
-- **Implemented**: `tasks.md` has zero `[ ]` rows AND `verification.md` records a pass/deferred status for every Success Criterion.
+- **Planned**: `plan.md` (and any design artifacts) exist for the bound spec; Constitution Check has no unjustified Fail rows.
+- **Implemented**: `tasks.md` has zero `[ ]` rows AND `verification.md` records a pass/deferred status for every Success Criterion. *(current state)*
 - **Ready for Review**: All deferred tasks resolved/waived and review evidence produced.
 - **Completed**: Final acceptance / merged.
 

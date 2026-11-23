@@ -1,8 +1,19 @@
-# 090 — Re-Anchoring（不忘初心 · 温故而知新）
+# Feature Detail: Re-Anchoring
+
+**Feature ID**: 090
+**Name**: Re-Anchoring
+**Description**: Reload task and rule anchors through T0/T1/T2 evaluation, with Non-Disposable detection and review-confirmed disposition merged from 092.
+**Status**: Implemented
+**Created**: 2026-11-09
+**Last Updated**: 2026-11-22
 
 ## Overview
 
 把「开局加载一次规则」改为「每核心步骤按分层重载并评估」：agent 入口固化任务锚 + **规则锚**，每个核心步骤执行 compact → reload → evaluate，五问规则优先，三值判定。规则（如「无人值守」）被丢弃时不会在下一步显形，因此复习对象是规则而非目标。
+
+## Latest Review
+
+2026-11-22 implementation audit: rule anchors, T0/T1/T2 evaluation, rules-first checkpoint questions, and three-value verdicts are wired. The merged Non-Disposable capability also has a read-only detection engine, declaration-driven review roots, and the four-stage history flow. Root membership is owned only by `shared/declarations/facts/non-disposable-review-surface.yaml`; this detail no longer pins a numeric count.
 
 ## Key Changes
 
@@ -42,15 +53,15 @@ clarify → plan → tasks → checklist → analyze → implement → review co
 
 ## Non-Disposable（不可一次性处置，absorbed from 092）
 
-原 092 特性（`Non-Disposable`）按用户指令（2026-11-09，`.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md`）并入本特性，本段是本仓库该能力在 registry 中的唯一叙述入口；权威正文仍在 `.specify/specs/092-non-disposable/requirements.md` 与 `.specify/memory/features/092.md`（归档记录，状态标注 `merged into 090`）。
+原 092 特性（`Non-Disposable`）按用户指令（2026-11-09，`.specify/archive/specs/092-non-disposable/notes/refactor-anchoring-merge.md`）并入本特性，本段是本仓库该能力在 registry 中的唯一叙述入口；权威正文仍在 `.specify/archive/specs/092-non-disposable/requirements.md` 与 `.specify/features/092-non-disposable.md`（归档指针，状态标注 `merged into 090`）。
 
 **解决的问题**：一条记录一旦写出就倾向永远留在原地——它引用的文件被改名、它声明的计数被下一条特性改动、它的状态字段停在 `Planned` 而闭合裁决早已 `accept`。这些不是错误行，而是**没有被处置的状态**：没有人被要求为它们做决定，于是「什么都不做」成了唯一默认处置且不留痕迹。三个失效面各自需要机制承接——**检不出**（"过期/无用/延期"没有可观察定义与程序可读判据面）、**无处置词汇**（"先留着"不是一个值，却事实上是唯一结局）、**执行无形态**（`/speckit.history` 把会话蒸馏成文档，但没有"先回顾、再设计、经用户确认、最后执行"的四段形态）。
 
 **交付物（七面同批落地，owner 唯一）**：
 
 1. **唯一 owner 页** `shared/definitions/non-disposable-definitions.md`——八类检出闭集、四值处置集、豁免四字段与到期语义、处置桥映射表（与不可映射表）、取代与重编号协议、报告 schema、与 sanitize / history 的边界。
-2. **只读检出引擎** `scripts/python/non-disposable-check.py`——stdlib-only、零写盘、退出码三值（`0` 无检出 / `1` 有检出 / `2` 参数或环境错误），按声明读取十个回顾根、按 `--scope` 分片、确定性序列化、镜像投射块由 `sync-mirrors.py` 插入。
-3. **声明式回顾面事实** `shared/declarations/facts/non-disposable-review-surface.yaml`（`kind: closed-set`）——十个 `.specify/` 历史根的唯一来源，唯一读入口 `declaration_reader.py`；目录增删只改这一处。
+2. **只读检出引擎** `scripts/python/non-disposable-check.py`——stdlib-only、零写盘、退出码三值（`0` 无检出 / `1` 有检出 / `2` 参数或环境错误），按声明读取回顾根集、按 `--scope` 分片、确定性序列化、镜像投射块由 `sync-mirrors.py` 插入。
+3. **声明式回顾面事实** `shared/declarations/facts/non-disposable-review-surface.yaml`（`kind: closed-set`）——`.specify/` 历史根集的唯一来源，唯一读入口 `declaration_reader.py`；目录增删只改这一处，本详情不复制数量。
 4. **四段命令形态**——`skills/internal/manage-history/SKILL.md` 与 `templates/commands/history.md` 同批获得 回顾 → 设计 → 确认 → 执行 四段；回顾与设计零写盘（两次快照逐字节比较），确认粒度封闭三值，`unconfirmed` 可见，执行段逐组落盘并按四段证据文件留痕。
 5. **状态一致性复用既有裁决**——`status-unreadable` 类以子进程调用 `closure-acceptance-check.py --json` 并逐字复用其 `verdict` / reason code；MUST NOT 重建第二套裁决或第二套词表。
 6. **A–H 语料 35 条分档**——按类别判据：档 I 19 条（A1–A6、B1–B5、C1–C4、G1–G3）本特性首轮修复到名字级零；档 II 15 条（D1–D6、E1–E6、F1–F5、H1–H2）只检出 + 落移交标记，正文不动；H3（`.specify/.tmp/086-*`）登记为合法历史排除。

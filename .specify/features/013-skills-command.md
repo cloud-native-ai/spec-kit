@@ -2,18 +2,18 @@
 
 **Feature ID**: 013  
 **Name**: Skills Command  
-**Description**: Manage extensible skills/tools.  
+**Description**: Create, improve, merge, coach, and run skills with a two-layer installation model.
 **Status**: Implemented  
 **Created**: 2026-02-10  
-**Last Updated**: 2026-07-26
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Skills Command defines how Spec Kit creates, installs, describes, and reuses skills and related tool artifacts. It serves as the parent feature for deterministic identification, installation layout, and cross-tool compatibility behaviors that keep project-level skills reusable across assistant surfaces.
+`/speckit.skills` routes create, improve, merge, coach, and run intents to the owning skills. Creation supports Spec Kit and standalone targets; run resolution prefers canonical sources, enforces trust boundaries, and applies the runtime-mode gate. Installation exposes external skills through the flat discovery surface and internal skills through explicit nested paths.
 
 ## Latest Review
 
-Completed implementation for requirements iteration `008-create-skills-skill`: extracted creation playbook into `create-skills`, refactored `/speckit.skills` into orchestration-only routing, added quality checklist resources, and validated prompt-asset contract tests.
+2026-11-22 implementation audit: the current command routes create, improve, merge, coach, and run intents; `run-skills` and the two-layer installation model are current behavior, while `030-summarize-project` is only one historical consumer. The active specification is `057-decompose-command-skills`. Recent `document-utils` and `database-utils` rewrites are in-house MIT implementations with current unit coverage; they remain bundled skill capabilities rather than new command-routing features.
 
 ## Key Changes
 
@@ -26,7 +26,7 @@ Completed implementation for requirements iteration `008-create-skills-skill`: e
 7. Generated planning-phase artifacts for `007-skill-install-layout` (`plan.md`, `data-model.md`, `contracts/skill-install-layout.openapi.yaml`, `quickstart.md`) to drive implementation and task decomposition.
 8. Generated implementation task breakdown for `007-skill-install-layout` (`tasks.md`) with explicit MVP-first sequencing and migration/rollback verification gates.
 9. Delivered script-level layout refactor in both runtime and mirrored `.specify` script sets, including compatibility entrypoint creation (symlink-first, placeholder fallback), legacy directory migration with backup guardrails, and conflict error-code output.
-10. Added targeted regression coverage in `tests/contracts/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`, and `tests/unit/test_skills_utils_layout.py`; validated alongside existing resource-id and create-skill suites.
+10. Added targeted regression coverage in `tests/contract/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`, and `tests/unit/test_skills_utils_layout.py`; validated alongside existing resource-id and create-skill suites.
 11. Added a new requirements slice for delegating missing-Skill creation to `create-skills` and existing-Skill refinement to `improve-skills` from the skills command.
 12. Generated planning-phase artifacts for `008-create-skills-skill` (`plan.md`, `research.md`, `data-model.md`, `contracts/create-skills-workflow.openapi.yaml`, `quickstart.md`, `feature-ref.md`) to drive implementation and task decomposition.
 13. Generated implementation task breakdown for `008-create-skills-skill` (`tasks.md`) with MVP-first extraction, command routing refactor, quality-preservation checks, and regression validation tasks.
@@ -56,11 +56,11 @@ Completed implementation for requirements iteration `008-create-skills-skill`: e
 
 ## Implementation Notes
 
-- This feature spans both `/speckit.skills` and `/speckit.tools` flows when they create or reference reusable artifacts.
-- The current enhancement assumes canonical IDs are expressed as workspace-relative paths so they are human-readable and stable within the repository.
-- Historical artifacts may be upgraded incrementally when they are next refreshed or rewritten.
-- The current installation-layout iteration treats `.specify/skills/` as the single project-level source of truth and frames `.github/skills/` plus other tool-specific roots as compatibility surfaces.
-- The current create-skills iteration preserves `/speckit.skills` as the explicit orchestration entrypoint while moving reusable Skill-authoring knowledge into a dedicated Skill.
+- Primary sources: `templates/commands/skills.md`, `skills/external/create-skills/`, `skills/external/coaching-skills/`, and `skills/internal/run-skills/`.
+- External skills use the flat installed discovery surface; internal skills resolve through explicit nested paths and the `run-skills` exception.
+- Current distribution tests include `tests/contract/test_run_skills_wiring.py` and `tests/contract/test_skill_install_layout_contract.py`.
+- `skills/external/document-utils/` and `skills/external/database-utils/` are current MIT implementations with unit coverage; their mirrors must be regenerated rather than hand-edited.
+- The numbered entries above are dated evolution history; the current routing contract is defined by the Overview and Latest Review.
 
 ## Future Evolution Suggestions
 
@@ -72,17 +72,15 @@ Completed implementation for requirements iteration `008-create-skills-skill`: e
 ## Related Files
 
 - Cross-reference: Feature 048 Browser Utils Skill(浏览器自动化能力本体;本 Feature 仅覆盖技能管理编排,不含各技能能力内容)
-- Latest Specification: .specify/specs/030-summarize-project/requirements.md
-- Latest Quality Checklist: .specify/specs/030-summarize-project/checklists/requirements.md
-- Historical Specification: .specify/specs/017-consolidate-draft-skills/requirements.md
-- Historical Quality Checklist: .specify/specs/017-consolidate-draft-skills/checklists/requirements.md
+- Current Specification: .specify/specs/057-decompose-command-skills/requirements.md
+- Current Quality Checklist: .specify/specs/057-decompose-command-skills/checklists/requirements.md
+- Current Plan: .specify/specs/057-decompose-command-skills/plan.md
+- Current Tasks: .specify/specs/057-decompose-command-skills/tasks.md
+- Historical Specification: .specify/archive/specs/017-consolidate-draft-skills/requirements.md
+- Historical Quality Checklist: .specify/archive/specs/017-consolidate-draft-skills/checklists/requirements.md
 - Historical Specification: .specify/specs/013-portable-skill-creation/requirements.md
 - Historical Quality Checklist: .specify/specs/013-portable-skill-creation/checklists/requirements.md
-- Latest Plan: .specify/specs/030-summarize-project/plan.md
-- Latest Data Model: .specify/specs/030-summarize-project/data-model.md
-- Latest Contract: .specify/specs/030-summarize-project/contracts/visual-reporting-skills.openapi.yaml
-- Latest Quickstart: .specify/specs/030-summarize-project/quickstart.md
-- Latest Feature Reference: .specify/specs/030-summarize-project/feature-ref.md
+- Historical Summarize Project Specification: .specify/specs/030-summarize-project/requirements.md
 - Historical Plan: .specify/specs/013-portable-skill-creation/plan.md
 - Historical Data Model: .specify/specs/013-portable-skill-creation/data-model.md
 - Historical Contract: .specify/specs/013-portable-skill-creation/contracts/portable-skill-creation.openapi.yaml
@@ -98,32 +96,25 @@ Completed implementation for requirements iteration `008-create-skills-skill`: e
 - Latest Feature Reference: .specify/specs/012-skill-home-workdir/feature-ref.md
 - Latest Quality Checklist: .specify/specs/012-skill-home-workdir/checklists/requirements.md
 - Latest Tasks: .specify/specs/012-skill-home-workdir/tasks.md
-- Historical Specification: .specify/specs/008-create-skills-skill/requirements.md
-- Latest Quality Checklist: .specify/specs/008-create-skills-skill/checklists/requirements.md
-- Latest Plan: .specify/specs/008-create-skills-skill/plan.md
-- Latest Research: .specify/specs/008-create-skills-skill/research.md
-- Latest Data Model: .specify/specs/008-create-skills-skill/data-model.md
-- Latest Contract: .specify/specs/008-create-skills-skill/contracts/create-skills-workflow.openapi.yaml
-- Latest Quickstart: .specify/specs/008-create-skills-skill/quickstart.md
-- Latest Feature Reference: .specify/specs/008-create-skills-skill/feature-ref.md
-- Latest Tasks: .specify/specs/008-create-skills-skill/tasks.md
-- Historical Specification: .specify/specs/007-skill-install-layout/requirements.md
-- Historical Quality Checklist: .specify/specs/007-skill-install-layout/checklists/requirements.md
-- Historical Plan: .specify/specs/007-skill-install-layout/plan.md
-- Historical Data Model: .specify/specs/007-skill-install-layout/data-model.md
-- Historical Contract: .specify/specs/007-skill-install-layout/contracts/skill-install-layout.openapi.yaml
-- Historical Quickstart: .specify/specs/007-skill-install-layout/quickstart.md
-- Historical Tasks: .specify/specs/007-skill-install-layout/tasks.md
-- Historical Tasks: .specify/specs/005-tool-skill-ids/tasks.md
-- Historical Plan: .specify/specs/005-tool-skill-ids/plan.md
-- Historical Data Model: .specify/specs/005-tool-skill-ids/data-model.md
-- Historical Contract: .specify/specs/005-tool-skill-ids/contracts/deterministic-resource-ids.openapi.yaml
-- Historical Quickstart: .specify/specs/005-tool-skill-ids/quickstart.md
-- Historical Specification: .specify/specs/005-tool-skill-ids/requirements.md
-- Historical Specification: .specify/specs/013-013-skills-command/requirements.md
+- Historical Specification: .specify/archive/specs/008-create-skills-skill/requirements.md
+- Latest Quality Checklist: .specify/archive/specs/008-create-skills-skill/checklists/requirements.md
+- Latest Plan: .specify/archive/specs/008-create-skills-skill/plan.md
+- Latest Research: .specify/archive/specs/008-create-skills-skill/research.md
+- Latest Data Model: .specify/archive/specs/008-create-skills-skill/data-model.md
+- Latest Contract: .specify/archive/specs/008-create-skills-skill/contracts/create-skills-workflow.openapi.yaml
+- Latest Quickstart: .specify/archive/specs/008-create-skills-skill/quickstart.md
+- Latest Feature Reference: .specify/archive/specs/008-create-skills-skill/feature-ref.md
+- Latest Tasks: .specify/archive/specs/008-create-skills-skill/tasks.md
+- Historical Specification: .specify/archive/specs/007-skill-install-layout/requirements.md
+- Historical Quality Checklist: .specify/archive/specs/007-skill-install-layout/checklists/requirements.md
+- Historical Plan: .specify/archive/specs/007-skill-install-layout/plan.md
+- Historical Data Model: .specify/archive/specs/007-skill-install-layout/data-model.md
+- Historical Contract: .specify/archive/specs/007-skill-install-layout/contracts/skill-install-layout.openapi.yaml
+- Historical Quickstart: .specify/archive/specs/007-skill-install-layout/quickstart.md
+- Historical Tasks: .specify/archive/specs/007-skill-install-layout/tasks.md
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/013-skills-command.md
-- Cross-reference: Feature 057（命令技能化分解补全，.specify/memory/features/057.md）——新增 run-skills 承载 /speckit.skills 缺失的 run 语义；modify 族仍由 improve-skills/merge-skills/think-skills 承载，无新 modify 技能。
+- Cross-reference: Feature 057（命令技能化分解补全，`.specify/features/057-decompose-command-skills.md`）——新增 run-skills 承载 /speckit.skills 的 run 语义；当前 modify 族由 improve-skills、merge-skills 与 coaching-skills 承载。
 
 ## Status Tracking
 

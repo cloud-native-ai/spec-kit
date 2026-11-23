@@ -3,9 +3,9 @@
 **Feature ID**: 092
 **Name**: Non-Disposable（不可一次性处置）
 **Description**: 把「过期 / 无用 / 延期」从一种沉默的默认状态变成一种必须被处置的状态，并把 `/speckit.history` 从「把会话蒸馏成主题文档」升级为「回顾 → 设计（方案）→ 用户确认 → 执行」四段。交付物是一个 stdlib 只读确定性检出引擎、一份唯一 owner 文档（八类检出闭集 / 四值处置集 / 豁免四字段 / 处置桥 / 取代与重编号协议 / 报告 schema）、一份声明式回顾面事实，以及按档 I（首轮修复）/ 档 II（检出 + 移交标记）分档的 A–H 语料处置。
-**Status**: Planned
+**Status**: Relocated
 **Created**: 2026-11-09
-**Last Updated**: 2026-11-09（tasks 阶段：见 § Latest Review）
+**Last Updated**: 2026-11-22（merged into Feature 090；当前实现与归档归属已核对）
 
 ## Overview
 
@@ -24,7 +24,9 @@
 
 ## Latest Review
 
-尚未进入 review。本阶段（tasks，2026-11-09，无人值守）产出与读数：
+2026-11-22 implementation audit: the detection engine, declaration-driven review roots, and four-stage history flow are present in framework source, with ownership merged into Feature 090. This row is a `Relocated` archive pointer, not a current Planned feature. The review-root set is owned by `shared/declarations/facts/non-disposable-review-surface.yaml`; no numeric count is repeated here.
+
+Historical tasks record — 尚未进入 review。本阶段（tasks，2026-11-09，无人值守）产出与读数：
 
 - `tasks.md`：150 行依赖有序任务，按 plan 的 P1–P8 分包；`[green:]` 条款认领 54/54，**每条款恰好一处**。
 - `validate-tasks.py`：PASS，0 error / 0 warning（四个 green-* 检查全空）。
@@ -44,8 +46,8 @@
 ## Key Changes
 
 1. **唯一 owner 文档**：`shared/definitions/non-disposable-definitions.md` 持有八类检出闭集、四值处置集、豁免四字段与到期语义、处置桥映射表（与不可映射表）、取代协议与重编号判据面、报告 schema、与 sanitize/history 的边界。
-2. **只读检出引擎**：`scripts/python/non-disposable-check.py`，stdlib-only、零写盘、退出码三值（`0` 无检出 / `1` 有检出 / `2` 参数或环境错误），按声明读取十个回顾根、按 `--scope` 分片、确定性序列化、镜像投射块由 `sync-mirrors.py` 插入。
-3. **声明式回顾面**：`shared/declarations/facts/non-disposable-review-surface.yaml`（`kind: closed-set`）是十个 `.specify/` 历史根的唯一来源，经 `declaration_reader.py` 读取；目录增删只改这一处。
+2. **只读检出引擎**：`scripts/python/non-disposable-check.py`，stdlib-only、零写盘、退出码三值（`0` 无检出 / `1` 有检出 / `2` 参数或环境错误），按声明读取回顾根集、按 `--scope` 分片、确定性序列化、镜像投射块由 `sync-mirrors.py` 插入。
+3. **声明式回顾面**：`shared/declarations/facts/non-disposable-review-surface.yaml`（`kind: closed-set`）是 `.specify/` 历史根集的唯一来源，经 `declaration_reader.py` 读取；目录增删只改这一处，本详情不复制数量。
 4. **四段命令形态**：`/speckit.history` 的内核 `skills/internal/manage-history/SKILL.md` 与命令模板 `templates/commands/history.md` 同批获得 回顾 → 设计 → 确认 → 执行 四段；回顾与设计零写盘（两次快照逐字节比较），确认粒度封闭三值，`unconfirmed` 可见，执行段逐组落盘并按四段证据文件留痕。
 5. **状态一致性复用既有裁决**：`status-unreadable` 类以子进程调用 `closure-acceptance-check.py --json` 并逐字复用其 `verdict` / reason code，MUST NOT 重建第二套裁决或第二套词表。
 6. **A–H 语料分档**：35 条按类别判据分档——档 I 19 条（A1–A6、B1–B5、C1–C4、G1–G3）本特性首轮修复到名字级零；档 II 15 条（D1–D6、E1–E6、F1–F5、H1–H2）只检出 + 落移交标记，正文不动；H3（`.specify/.tmp/086-*`）登记为合法历史排除。
@@ -56,7 +58,7 @@
 - **两顶帽子**：`shared/`、`scripts/`、`templates/`、`skills/` 是源；`.specify/` 对应物由 `scripts/python/sync-mirrors.py` 生成，MUST NOT 手改（宪法 XI）。
 - **冻结源**：`templates/commands/history.md` 与 `skills/internal/manage-history/SKILL.md` 都在 `tests/contract/test_expression_compatibility.py` 的 069a 清单内，改动必须同趟带 `ALLOWED_POST_BASELINE_CHANGES` 登记，且 markers 是本次**新增**的。
 - **受保护闭集**：`scripts/python/sanitize-utils.py` 的 `CATEGORIES` / `DISPOSITIONS` / `STATES` / `DETECTIONS` 必须逐字节不变；两条宪法计数 pin 必须不动；`.specify/instructions.md` 必须在 `INSTRUCTIONS_BUDGET_BYTES` 内（本特性开工前实测 35,821 B，headroom 2,579 B）。
-- **证据落点**：运行时证据一律进 `.specify/specs/092-non-disposable/test-evidence/`（一次运行一个文件；四段 `readings` / `paths` / `corpus` / `dispositions`）。
+- **证据落点**：运行时证据一律进 `.specify/archive/specs/092-non-disposable/test-evidence/`（一次运行一个文件；四段 `readings` / `paths` / `corpus` / `dispositions`）。
 - **档 II 只读**：档 II 的正文属于接收特性线，本特性的 diff 里不得出现它们（RK-5）。
 - **条款分区**：`[green: <contract>#<clause>]` 每条款恰好一处；契约条款序在行序上 MUST NOT 倒退。
 
@@ -73,17 +75,18 @@
 - 规格：`.specify/archive/specs/092-non-disposable/requirements.md`（65 FR / 20 SC；clarify D-1…D-8）
 - 计划：`.specify/archive/specs/092-non-disposable/plan.md`（P1–P8、T-001…T-007、EP-001…008、RK-1…RK-6、Shift List、A–H 分档）
 - 任务：`.specify/archive/specs/092-non-disposable/tasks.md`
-- 契约：`.specify/specs/092-non-disposable/contracts/`（7 份 / 54 条款 C-101…C-707）
+- 契约：`.specify/archive/specs/092-non-disposable/contracts/`（7 份 / 54 条款 C-101…C-707）
 - 模型与走查：`.specify/archive/specs/092-non-disposable/data-model.md`、`quickstart.md`、`feature-ref.md`
 - 语料来源：`.specify/archive/specs/092-non-disposable/notes/input-review-080-090.md`
 - 门禁证据：`.specify/archive/specs/092-non-disposable/test-evidence/tasks-gates.txt`、`coverage-baseline.txt`
-- 团队：`.specify/specs/092-non-disposable/team/092-non-disposable/team.md`
+- 团队：`.specify/archive/specs/092-non-disposable/team/092-non-disposable/team.md`
 - owner 页（实现后落地）：`shared/definitions/non-disposable-definitions.md`
 
 ## Status Tracking
 
 - **Draft**: 特性行首次加入 `.specify/memory/features.md`（`/speckit.feature`）。
-- **Planned**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 齐备且宪法检查无未经论证的 Fail 行（`/speckit.plan`）。本特性当前处在此状态。
+- **Planned** (historical): `plan.md`、`data-model.md`、`contracts/`、`quickstart.md` 齐备且宪法检查无未经论证的 Fail 行；这是合并前的生命周期记录。
+- **Relocated** (current): 当前实现归属 Feature 090，本详情保留归档指针与历史证据。
 - **Implemented**: `tasks.md` 零开放行 + 每条 SC 有状态行 + 每条 `final` 路径 SC 为 `pass` + smoke 记录 `pass`，四者同时成立（`/speckit.implement`）。
 - **Blocked**: 任务已闭合但至少一条 `final` 路径判据未 `pass`（`/speckit.implement`）。
 - **Ready for Review**: 四条合取条件同时成立，含当前代码段记录无 `blocking` 条目（`/speckit.review`）。

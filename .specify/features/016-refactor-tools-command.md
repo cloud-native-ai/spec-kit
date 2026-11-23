@@ -2,18 +2,18 @@
 
 **Feature ID**: 016  
 **Name**: Tools Command  
-**Description**: Definition-first tool management: create, modify, and invoke tools with explicit behavioral rules, replacing discovery-driven approach.  
+**Description**: Define, modify, view, list, and invoke Tool records with explicit behavioral rules and environment applicability.
 **Status**: Implemented  
 **Created**: 2026-02-10  
-**Last Updated**: 2026-06-17
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Tools Command (`/speckit.tools`) provides a unified interface for defining, discovering, and managing reusable tool records across multiple source types (System binaries, Shell functions, and Project scripts). Originally scoped to MCP tool metadata, the feature evolved to a source-agnostic model after MCP was dropped as a dedicated tool category in favor of treating all tools uniformly.
+`/speckit.tools` is a definition-first router for project scripts, system binaries, shell functions, and webhook Tool records. Define and modify delegate to the authoring skills; view and list are read-only; invoke uses preview, confirmation, and execution gates. Persisted behavioral rules and environment applicability outrank improvised LLM commands.
 
 ## Latest Review
 
-Dropped MCP as a standalone tool category (commit 48cd498). The command now operates purely across System/Shell/Project sources with no MCP-specific handling. The `tool-mcp-call-template.md` was removed, and discovery/refresh scripts were simplified.
+2026-11-22 implementation audit: the delivered surface is define/modify/view/list/invoke across four Tool types, with behavioral rules, environment applicability, strict validation, Markdown round-trip, and preview → confirm → execute invocation. The index's deferred T022, T042, T043, and T046 still match `tasks.md`; script-level define, discovery-draft conversion, and the interactive quickstart are not claimed as complete.
 
 ## Key Changes
 
@@ -29,9 +29,10 @@ Dropped MCP as a standalone tool category (commit 48cd498). The command now oper
 ## Implementation Notes
 
 - Tool records reside under `.specify/memory/tools/` with workspace-relative canonical IDs.
-- The `/speckit.tools` command is an AI chat instruction, not a terminal command.
-- Discovery scripts output JSON for downstream template rendering.
-- Historical MCP-era tool records remain compatible but no new MCP-typed records are created.
+- The four current source types are project-script, system-binary, shell-function, and webhook; MCP is not a current type.
+- `scripts/python/tools-utils.py` owns validation and round-trip persistence; `shared/definitions/tool-definitions.md` owns terminology and environment applicability.
+- `/speckit.tools` is an AI chat instruction, and invocation remains gated by preview and confirmation.
+- Deferred rows T022, T042, T043, and T046 remain explicit in the index and current `tasks.md`.
 
 ## Key Changes (continued)
 
@@ -52,13 +53,9 @@ Dropped MCP as a standalone tool category (commit 48cd498). The command now oper
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/016-refactor-tools-command.md
 - Specification (current): .specify/specs/016-refactor-tools-command/requirements.md
-- Specification (historical): .specify/specs/004-speckit-tools-command/requirements.md
-- Quality Checklist: .specify/specs/004-speckit-tools-command/checklists/requirements.md
-- Plan: .specify/specs/004-speckit-tools-command/plan.md
-- Data Model: .specify/specs/004-speckit-tools-command/data-model.md
-- Contracts: .specify/specs/004-speckit-tools-command/contracts/tools-command.openapi.yaml
-- Quickstart: .specify/specs/004-speckit-tools-command/quickstart.md
-- Historical Specification: .specify/specs/002-mcp-tool-call/requirements.md
+- Quality Checklist: .specify/specs/016-refactor-tools-command/checklists/requirements.md
+- Tasks and deferred rows: .specify/specs/016-refactor-tools-command/tasks.md
+- Implementation: `templates/commands/tools.md`, `scripts/python/tools-utils.py`, `shared/definitions/tool-definitions.md`
 
 ## Status Tracking
 

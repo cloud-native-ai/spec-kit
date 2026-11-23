@@ -2,10 +2,10 @@
 
 **Feature ID**: 058  
 **Name**: 无人值守 SDD 循环驱动机制  
-**Description**: 以一条一遍性提示词驱动主代理完成「登录环境 → 以 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的完整闭环，全程循环自推进；机制由**自包含、可移植的 skill 唯一承载**（G1 修订裁决 2026-10-15）——固化阶段提示词骨架 / 五大执行机制 / 变体 / 纪律条款与自迭代·独立校验·卡死处置三硬需求运行规则，执行侧宿主 agent 零 `.specify/` 依赖即可加载运行，被驱动子代理所在的目标项目才需要 `.specify/`（执行 /speckit.* 阶段命令）。  
+**Description**: Drive U0–U6 through a host-agent manual with stage runners, watchers, deterministic gates, local/remote process carriers, independent verification, and the delivered efficiency model.
 **Status**: Implemented  
 **Created**: 2026-10-14  
-**Last Updated**: 2026-10-22
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -16,6 +16,8 @@
 - **一遍性入口（G4）与断点续跑默认（G6）**：入口只声明目标与起点；断点探测自动判定续跑阶段（含 review 后仅剩合并的收尾场景）。
 
 ## Latest Review
+
+2026-11-22 implementation audit: the driver is a host-agent operating manual, not a standalone binary. It carries U0–U6, per-stage runner/watcher evidence, deterministic work-package gates, local fork and remote external-CLI carriers, independent verification, and the 075 efficiency model. Checklist has a declared `skipped(fast-lane)` exception. Feature 065 currently supplies only snapshot/probe/self-test; recover and check-spine remain refused and are not part of this feature's delivered claims.
 
 2026-10-20 `/speckit.implement`（演化特性 075-sdd-loop-efficiency，**Implemented**）：T000–T052 全部闭合（53 行任务；DoD-1 无 open/claimed 行）；交付 24 项落盘（`references/efficiency-model.md` 四节 owner、5 个新脚本、watch-target 扩展、4 个单测 + 2 个集成测试、5 契约文件 / 50 条款、docs 页、SKILL.md `Efficiency Optimizations` 节、夹具与驱动侧卡死夹具、058 登记面）。证据：50/50 条款由具名测试覆盖 + 覆盖 meta-test 绿；七个变异目标组 / 24 个变异应用全部变红并还原；SC-010 以 `a1aac7e5` 行为基线（`initial_retries=0`、`exit_code={watcher,runner}`）录制并在收口零差异重放；本对镜像 0 drift、宽口径 62 DIFF 与冻结清单逐路径相同（零 NEW drift）、`probe-utils.py --action compile-embeds --check` 74 units 零漂移、064 唯一-owner 守卫 18/18 绿；E2 台账仅 1 个 implement baseline 槽位，closure 留给 review 后的驱动。**063 自身走完整链，不产生快车道记录；状态保持 `Implemented`，不回退。**
 2026-10-20 `/speckit.checklist`（演化特性 075-sdd-loop-efficiency，**checklist**；F-01 补记）：`checklists/efficiency.md` 落盘——39 项检查（31 pass / 8 recorded as not-pass，8 项交由 analyze 门处置）；既有 `checklists/requirements.md` 未改动。该阶段记录此前缺失，本行按 F-01 治理纠正补入；不改状态。
@@ -31,7 +33,7 @@
 4. 阶段校验双条件：尾标（`<STAGE>-DONE`）必要 + 独立校验产物核验（git log / spec 文件存在性 / 纪律合规）充分，伪完成判未完成。
 5. 卡死处置：阶段超时 / 重试上限 / budget / cadence 缺省值可入口覆盖；达上限停环、落线状态、出上送件（对齐快速失败纪律）。
 6. 双拓扑与变体：远端 ssh + su + 远端 qodercli 与本地直驱等价支持；本地简报文件先行；构建固化按角色分线经参数实例化。
-7. **（063 规划，未实现）** 运行效率优化：中型特性快车道（[[STR-006]] 显式启用、七判据 fail-closed、保留 analyze/review）；每线两槽位全量测试预算（implement 起点 baseline + 收口 closure，中间定向测试并留证据）；plan 完成后的只小修约束（编排层执行，U4 按最终 diff 分类，框架内部硬执行显式排除）；runner 默认 stream-json + 自包含派生实时日志 + 本地/远端 nohup 完全脱离。哨兵、判定状态机、退出码、确认门、独立校验与卡死处置不变。
+7. **（075/067 已交付）** 运行效率模型：fail-closed 快车道准入与 `checklist=skipped(fast-lane)` 例外、两槽位测试预算、plan 改动审计、stream-json 原始流与实时日志、本地/远端 nohup、工作包拆解与确定性预检；当前判据归 `references/efficiency-model.md`。
 
 ## Implementation Notes
 
@@ -77,7 +79,7 @@
 - Cross-reference: Feature 046 Confirmation Gate Governance——push / 远程分支操作维持破坏性门控分类，本机制不新增绕过缺省自动化（FR-013）。
 - Cross-reference: Feature 052 快速失败纪律——卡死处置的对齐真源（异常分流 / 上送件四要素 / 禁静默兜底）。
 - Cross-reference: Feature 064 Subagent 并发归属、CLI 能力档案与生命周期解耦——在本机制之上增加环境级 Line Registry、`line_id`/`run_id` 归属信封、同仓工作区隔离、CLI 能力档案与主/子会话生命周期解耦；U0–U6、状态脊、哨兵与 watcher 判定仍由本 Feature 拥有，064 引用不重定义。
-- Cross-reference: Feature 065 SDD 循环中断感知与状态恢复（2026-10-21 于 `/speckit.clarify` 新建并绑定）——在本机制之上增加只读状态聚合、八类中断检测、resume/retry/stop 恢复程序、watchbeat 与驱动者生命周期校验；U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由本 Feature 拥有，065 引用不重定义。
+- Cross-reference: Feature 065 SDD 循环中断感知与状态恢复——当前仅交付只读 snapshot/probe/self-test 与恢复建议；recover、check-spine、watchbeat 完整检测和恢复锁仍在后续切片，不能计为本 Feature 的已交付恢复能力。
 - Cross-reference: Feature 074 Goal/Team/Agent 与 SDD 开发流程统一（2026-10-28 于 `/speckit.clarify` 新建并绑定）——在 Goal/Team 层增加授权席位对 SDD 运行的有界嵌套调用、三值分流判据与 review 后交接；U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由本 Feature 拥有，074 引用不重定义；反嵌套谓词在既有 owner 中收窄为深度 2 链（virtual 成员不得承载）。
 - 结构先例：team preset `project-cluster`（continuous 跨项目集群）——本特性的状态脊 / 卡死处置缺省值形态以其为结构先例（G1 修订后不再新增 preset，skill 固化同类缺省值）。
 
