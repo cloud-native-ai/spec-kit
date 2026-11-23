@@ -1,0 +1,63 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-ui",
+    "source_commit": "d66447475b0f59007cb467aefdac0070e04c8812",
+    "identity_status": "identified",
+    "identity_key": "4c71137c7b90e294b4863ea222d2cbb3dc1622b8ded32c828e5f49966cf48932",
+    "content_hash": "92226e341b827e4e399337b2e8bc979b275a565648000d1a432e006383eaa71c",
+    "package_file": "feedback-xuanji-ui-20261123T185338.zip",
+    "ingested_at": "2026-11-23T11:54:55Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T150000Z-e5f6",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T12:44:55Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "dc25e0e39c45db3973ff9b2fe8165ae6775215cf671ab572ec3a6dcdce1b5652",
+    "content_hash": "416993adc8a5ce7794d2649823dabf891a244de70bd4398645c72b2a667d1c68",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118t024020z-impl016-s1",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T02:40:30Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S1（9 包中第 2 个，S1 契约断言迁移 M1，T009–T023，15 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`41c8938`（PKG-S0 门证与出口复验）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**（唯一源 `test-evidence/baseline-pre/freeze-commit.txt`）\n- 断点：PKG-S0 **包级校验 PASS**（驱动者独立复验：`git diff f7ecb97..HEAD -- src/main pom.xml` = 0 行；src 差异仅 3 条 `A`（contract/golden）；freeze 后 golden diff = 0；五制品 surefire-names 208 / jar-entries 339 / env-names 5 / runtime-shape 5 / http-contract 151；全量 224 用例 0 失败；门 pass 0 error）\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 你的包范围与写域\n\n**PKG-S1 = T009–T023**。主写文件：`src/test/java/com/aliyun/kangaroo/xuanji/contract/*ContractTest.java`、`TestSourceScannerSupport.java`、`src/test/resources/migration-map.json`、`test-evidence/s1-*.txt`、`notes/migration-drops.md`。\n**串行约束**：T009 先于 11 个模块任务；T021 必须在 T010–T020 之后；T022 依赖 T021；T023 最后。\n\n🛑 **三条铁律**\n1. **不得删除或移动任何 Python 文件**（`tests/**`、`scripts/*.py`、`pytest.ini`、`conifg/**`）——删除属 **S4**，且必须先迁后删。本包 Python 面**冻结为只读参照**。\n2. **不得修改三组黄金测试**（`contract/golden/**`）。若发现黄金断言与真实行为不符，**停下输出 `ANOMALY`，不得改黄金文件迁就**。出口须复验 `git diff \"$(cat …/freeze-commit.txt)\"..HEAD -- src/test/java/com/aliyun/kangaroo/xuanji/contract/golden` 为空。\n3. **不得改 `src/main/**`、`pom.xml`、`deploy/**`、`docs/**`**（分别属 S5/S4/S3）。\n\n## 逐任务要点\n\n- **T009** 创建 `TestSourceScannerSupport.java`（`*Support` 后缀，遵循 TM-09）：精确 token `@Test`/`@ParameterizedTest`/`@TestFactory` 按**词边界**匹配，形态 `(?<![A-Za-z])@Test(?!Configuration|[A-Za-z])`；**精确 `@Test` = 208**，前缀匹配会因 `@TestConfiguration` 误得 **209**，后者 MUST NOT 计入；产出 `FQCN#method` 名称索引。\n- **T010–T020** 11 个模块迁移，**逐模块行数必须精确等于**：\n  | 任务 | 源模块 | 行数 | 目标测试类 |\n  |---|---|---|---|\n  | T010 | `test_compose_manifest` | 11 | `ComposeManifestContractTest` |\n  | T011 | `test_echo_backend` | 13 | `EchoBackendContractTest` |\n  | T012 | `test_failure_matrix` | 15 | `FailureMatrixContractTest` |\n  | T013 | `test_hook_render` | 34 | `HookRenderContractTest` |\n  | T014 | `test_k8s_manifests` | 15 | `K8sManifestContractTest` |\n  | T015 | `test_network_isolation` | 10 | `NetworkIsolationContractTest` |\n  | T016 | `test_run_assertions` | 14 | `RunAssertionsContractTest` |\n  | T017 | `test_security_boundary` | 14 | `SecurityBoundaryContractTest` |\n  | T018 | `test_trust_mode_carrier` | 16 | `TrustModeCarrierContractTest` |\n  | T019 | `test_upstream_declaration` | 67 | `UpstreamDeclarationContractTest` |\n  | T020 | `test_cli_auth_contract` | 2 | `CliAuthContractTest` |\n  **合计 211**。每项断言必须**行为等价**迁移（不是照抄 Python 语法），oracle 用 **006 归档基线** `.specify/specs/006-test-framework/test-evidence/baselines/python.txt`（as_of 2026-11-16，**只读，不得重写**），**不得重跑 pytest**。\n- **T021** 生成 `src/test/resources/migration-map.json`：schema `migration-map/1`；`oracle.path` 逐字等于上述归档路径、`oracle.as_of=2026-11-16`；`rows` 长度 **211**，每行字段 `source_module`/`source_id`/`target`/`equivalence`/`status`/`rationale`；`source_id` 逐字出现在归档基线（`tests/contract/<module>.py::<name>` 形式）；`status=migrated` 的 `target` 必须是**可在 `src/test/java` 源码扫描索引中解析**的 `<FQCN>#<method>`。\n- **T022** 创建 `MigrationMapContractTest`：机检 MM-01…MM-08（顶层字段封闭、oracle 只读、rows=211、逐模块计数、source_id 逐字命中、target 可解析、status 封闭二值、014 名下 migrated ≥199、unmapped=0）。\n- **T023** S1 出口谓词：`rows=211`、`unmapped=0`、`migrated+dropped=211`、**014 名下 migrated ≥199**；**dropped ≤10 且仅限 014 名下**（012 的 2 项必须 migrated）；每个 dropped 的 rationale 含「理由 / 影响面 / 受影响特性验收状态」三要素并登记 `notes/migration-drops.md`（无 dropped 则记 `dropped=0`）。读数落 `test-evidence/s1-exit.txt`。\n\n## 等价性与诚实性要求\n\n- 迁移必须**保行为语义**：Python 侧的断言条件、边界值、失败判据逐项对应到 Java；不得把难迁的断言静默降级为「存在性检查」或删掉。\n- 若某项确实无法等价迁移，**只能走 `status=dropped` + 三要素 rationale + 审批登记**，且受 ≤10 与仅限 014 的约束；**不得伪造 migrated**。\n- `shellcheck` 相关断言：环境无 shellcheck 时按 FR-027 的 **`shellcheck-absent`** 原因码记 blocked，**blocked ≠ pass**，不得计为已迁移通过。\n- 红先绿后：新增契约测试先跑红（迁移前 Java 侧无该断言）再落绿，读数落 `notes/red-first-evidence.md`；首跑即绿的项如实标注性质。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。\n- **测试执行唯一入口 `./mvnw -B test`**；本包跑**定向集**（`-Dtest='*ContractTest,TestSourceScannerSupport*'` 一类）留证，**不得动用全量第二槽位**（slot-1 已由 S0 用掉，slot-2 留 S8/review）。若需全量核对 211 迁移后总数，记 `out-of-slot-exception` 并附 reason 与日志。\n- **不得执行 pytest**。只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/`、`.pytest_cache/` 一律不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`，读数落 `test-evidence/`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`feat(test): 016 PKG-S1 契约断言迁移 M1（211 项 + migration-map 机检）`（可按模块分组多提交）。\n\n## 输出预算\n\n报告 ≤70 行：11 模块逐行 `任务|模块|迁移行数|migrated|dropped|目标类`、migration-map 的 rows/unmapped/migrated+dropped 读数、014 migrated 数、T023 出口谓词逐项、定向集用例数与失败数、golden diff 与 Python 面零改动复验、门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S1-DONE`；无法完成则 `ANOMALY: <一句话事实>`。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "47.57.188.188:443",
+          "120.79.243.153:443",
+          "8.212.124.35:443",
+          "39.106.176.70:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-extension",
+    "source_commit": "f71fe69f164c53620ea9fd6c6e6e12e59e36ed78",
+    "identity_status": "identified",
+    "identity_key": "9d3db32a520f7ebc788651cb10d73c5f7f4351852a47147d91af976c5d661a1b",
+    "content_hash": "01cae96f58a43a17c225c84bf411f9efd263ef391837543d69aeb2c25435fb46",
+    "package_file": "feedback-xuanji-extension-20261123T185354.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.plan",
+    "unit_type": "command",
+    "run_id": "r20261028T160500Z-ed01",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T12:57:39Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 780000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

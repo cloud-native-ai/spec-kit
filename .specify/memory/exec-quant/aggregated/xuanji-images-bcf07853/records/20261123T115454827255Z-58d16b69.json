@@ -1,0 +1,126 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "fd7fed897b68e5ceafce2d252bedef9a5fe9e29df0168851c89fa2b1155ebf53",
+    "content_hash": "f4d8452b681568d4720228859960a39ff5333a0dc4c94b180d0419ae4c9bceda",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-impl-s3c",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T16:48:03Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：implement 第 3c 段（T017–T024，两叶构建与运行面验证）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `742af5da`；clean（6 个 untracked `docker-build.result` 为构建产物，不触碰/不提交）。\n- analyze 已清零；build inputs 已对齐 B：`service/api/pyproject.toml`、`service/ingest/package.json` + `bin.xuanji-doc-ingest`、`service/lightrag` submodule。\n- **源 pin（已推送、可达）**：`origin/023-xuanji-doc-architecture` @ `247b4482`。上一段因源提交不可达与 lightrag 子模块未初始化而停线；现在 origin 可达，lightrag 子模块可获取，fetcher 必须递归初始化 submodule（`--recurse-submodules` 或等价）。\n- 本段允许本机 docker 构建镜像，但**不 push 镜像**、不改 `docker-compose.yaml`、不切换运行中的 compose 容器。\n\n② 执行要求\n- 运行 `/speckit.implement`，**只实现 T017–T024**，按 tasks.md 顺序；到 T024 完成后停止，不进入 T025+。\n- 构建前按 tasks.md 运行生成器；生成物只能经生成器产出；不得手改 `generated/`。\n- 源获取必须初始化 `service/lightrag` submodule；若 submodule 不可达或 pin 不含它，记录 ANOMALY 并停止，不要用占位目录冒充。\n- 构建/验证证据（命令、退出码、关键输出、镜像 tag/digest、容器 id、source pin）落 `notes/`；失败时修根因重试，不得跳过断言或改弱门禁。\n- T023/T024 按 tasks.md 执行；四个 health 匿名 200/503；无秘密 fail-closed 只覆盖业务路由与 `/mcp/v1`。\n- 不修改 plan/research/data-model/contracts/quickstart（PLAN-EDIT: none）；实质变更 → ANOMALY 停线。\n- 每条任务完成即以 `[X]` 标记；只在其验证命令真实通过后翻转。\n- 不 push（含镜像）；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.implement`，run-id `r20261030T120500Z-b101-impl-s3c`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套 + `run-record-implement-s3c.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`IMPL-S3C-DONE`\n- 回传：完成的任务 ID、构建命令与镜像 tag/digest、路由/端口矩阵、source pin、证据路径、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "8.212.124.35:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 1500000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.unresolved_red",
+          "count": 1
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "aborted",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "336284f02797bd1f3976bf692fe6c71e752404f75d55d66052730fbe5b38db30",
+    "content_hash": "898629c997d04b01c0d853117cf3db1bc78d80aa229800ccbb30bd5f2d0d73d9",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-analyze",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T16:08:11Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：analyze（只读）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `633ea060`；clean。\n- spec 051：29 FR / 11 SC；plan `bf3af36c`；tasks `d0f688b0`（39 open）；Feature 048 Planned。\n- checklist：`checklists/build-chain.md`，49 项 — 35 PASS / 14 FAIL / 0 N/A。\n- 跨仓：消费 B（xuanji-doc 023）冻结入口命令/端口/卷；`api` 程序属 A 契约。冻结接口见 `/tmp/sdd-loop-multiline-20261030/README.md`。\n- 脏基线：仓库根 6 个 untracked `docker-build.result` —— 不触碰。\n\n② 执行要求\n- 运行 `/speckit.analyze`，对 requirements / plan / research / data-model / contracts / quickstart / tasks 与 Feature 048 登记做只读一致性分析。\n- 必须独立复核 checklist 的 14 项 FAIL（L1 转交豁免与嵌套 snippet 闭包、Node/pnpm 拆分、Python/cws_daemon/PG 驱动、graphicle 双二进制同 pin、源码清理、端口/卷宏与 services.yaml、supervisor 八程序与“其余七不重启”、nginx 路由/上传上限/MCP 超时、cgit 只读 repos、验证门禁、凭据与 UID、转换工具/OSS 禁令）：逐项维持/降级/撤销 + `file:line` 证据。\n- 覆盖重点：两叶 `FROM images-daemon-alios-8`（彻底移除 `images-builder-tools-hugo-alios-8`）、同样 L0/L1、仅 L2 差异、`CWS_MICRO_PORT`/`CWS_MICRO_VOLUME`、生成物不手改、Layer-1/Layer-2 门禁、与 B 冻结接口逐项对齐。\n- 输出写入 `.specify/specs/051-xuanji-doc-build-chain/run-record-analyze.md`（findings 表：ID / severity / 位置 / 摘要 / 建议），并打印 severity 汇总。\n- 不做任何修复；除该 run-record 与记账外不得写文件；不 push；禁止 `git add -A`。\n- 记账：`/speckit.analyze`，run-id `r20261030T120500Z-b101-analyze`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-DONE`\n- 回传：CRITICAL/HIGH/MEDIUM/LOW 计数、14 项 checklist FAIL 的维持/降级/撤销统计、top 5 findings、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.211.206:443",
+          "47.116.36.231:443",
+          "106.14.225.66:443",
+          "47.116.44.184:443",
+          "47.57.188.188:443",
+          "120.24.170.126:443",
+          "8.223.13.163:443",
+          "39.106.176.70:443",
+          "47.106.172.117:443",
+          "101.132.70.5:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "8.212.124.35:443",
+          "59.110.214.247:443",
+          "47.107.125.11:443",
+          "39.106.96.116:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

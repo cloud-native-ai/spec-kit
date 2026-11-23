@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "692cef77be8821e5ec57b2496c35219ed582e7d718f4d83a8884c2e44e1cc624",
+    "content_hash": "77cd5585568a13b1c0e68d8250e1d5bd1850325016b71f8863ce72092958a793",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.clarify",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-clarify",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T11:29:44Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：clarify。\n\n① 背景与权威文档\n- 项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 39b27c47；工作树 clean。\n- Spec：`.specify/specs/021-code-cgit-urls/requirements.md`（9 FR / 8 SC / 5 US / 3 markers / 9 open questions）；Feature 026（Draft）。\n- 用户目标：代码文件路径直接使用 cgit URL，而不是本地文件路径。\n- 权威：constitution（II/III/XI/XII/XIV/XVI/XIX/XX/XXI）、instructions、docs/code-retrieval.md、docs/code-storage.md、docs/kb.md。\n- 已知事实：代码查询活跃面是外部 `graphicle mcp`；仓库内无 graphicle 包装器；cgit 仅见 runtime hook 端口 45972/45973 与 “/cgit/ prefix, basic auth” 注释，运行态无 cgit 服务；compose 无 cgit env；repos.json 的 local_path 是 macOS 路径，不可作为映射依据。\n\n② 执行要求（默认纪律）\n- 运行 `/speckit.clarify` 对 9 个 open questions 做裁决：Q-001 cgit 基址/协议/可达性；Q-002 映射来源与维护；Q-003 ref 策略与不一致披露；Q-004 行锚点与 end_line；Q-005 输出面范围；Q-006 降级表示；Q-007 凭据注入与脱敏；Q-008 实现位置；Q-009 是否交付 cgit 服务。\n- 无人值守：访谈式问题自行裁决并记录假设；不得停等用户。裁决原则：\n  - 不硬编码主机/端口/凭据；基址用配置项（env/配置文件），部署时注入；默认值只可来自已有事实（45972/45973 + `/cgit/` 前缀），并明确标注为待部署确认的 assumption。\n  - 不得暴露本地绝对路径；URL 不得携带 token；basic auth 与 URL 分离。\n  - ref 优先使用已发布索引的 commit（manifest/watermark），缺失时显式降级；URL 必须可追溯到具体 ref。\n  - 输出面以“最小侵入 + wrapper 优先（宪法 XIX）”裁决：优先新增 stdio MCP wrapper（保持 tools/list 与既有字段不变，附加 web_url 字段）；CLI/doctor/网关是否纳入明确写“纳入/不纳入”。\n  - 无映射/不可构造时省略 URL 字段或 null + reason，绝不回退本地绝对路径、绝不伪造 URL（宪法 XVI）。\n  - Q-009 默认“本特性只做 URL 映射，不交付 cgit 服务”，并把 cgit 服务部署列为部署前置/外部依赖。\n- 写回 requirements.md 的 Clarifications 与受影响 FR/SC；更新 checklist（如需要）；不改 plan/tasks/代码/compose/镜像。\n- 只提交本特性产物（spec + 可能 Feature 026 注记 + 运行记录）；既有脏文件不提交不还原；不 push。\n- 只推进 clarify；不要进入 plan。\n- 输出纪律：文件分段写入。\n- Wrap-up 记账（必需）：Run Determination / Exec Quant / Feedback Record，unit-id `/speckit.clarify`，run-id `r20261028T083000Z-7c1a-clarify`，`--feature 021-code-cgit-urls --feature-id 026`。本分支 `.specify` 若缺 run-determination/exec-quant 引擎，使用主仓 `/storage/project/kangaroo-xuanji/xuanji-doc/.specify/scripts/python/` 的脚本并显式 `--workspace-root` 指向本 worktree（不改框架/主仓）。无法写入 → `WRAPUP-DEFERRED: <原因>`。\n- 异常必须显式 `ANOMALY: <事实>`。\n\n③ 完成尾标与回传\n- 最后一行必须是且仅是：CLARIFY-DONE\n- 回传：逐 Q 裁决、FR/SC 变化、假设清单、提交哈希、记账路径、校验结果。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "8.223.13.163:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

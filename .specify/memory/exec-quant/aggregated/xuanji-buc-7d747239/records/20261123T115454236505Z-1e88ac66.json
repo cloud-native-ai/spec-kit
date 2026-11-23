@@ -1,0 +1,95 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "223b027b260ab5b072200a10cbc7757da495fceb724fb819827b27811c3af4e1",
+    "content_hash": "e4ee60f6926a15a660c96975f36899eda14afc5ecc839200f73fb45d2b790bfb",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:sdd-loop-driver",
+    "unit_type": "skill",
+    "run_id": "r20261111T161259Z-a17c",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-11T19:34:09Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--dangerously-skip-permissions"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "8.223.13.163:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

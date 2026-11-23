@@ -1,0 +1,119 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "165a807fa6032e52afab34fd11059f617b7f71dbe885705675e6d992681e93e0",
+    "content_hash": "5dd4f65a64c851cc8a7890a65798beb646a1d3387fad162ca4a916a1393ae983",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118t025919z-impl016-s2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T02:59:50Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S2（9 包中第 3 个，S2 能力等价物，T024–T031 + T094–T095，10 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`dab5b77`（PKG-S1，211 项迁移）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**（唯一源 `test-evidence/baseline-pre/freeze-commit.txt`）\n- 断点：PKG-S1 **包级校验 PASS**（驱动者独立核算 `migration-map.json`：rows=**211**、status 全 **migrated**、dropped=**0**、逐模块 2/11/13/15/34/15/10/14/14/16/67 合计 211、oracle path/as_of 逐字一致；golden diff=0、`src/main`+`pom.xml` diff=0、Python 面 0 改动；定向集 233/0；门 pass）\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 你的包范围与写域\n\n**PKG-S2 = T024–T031、T094–T095**。主写文件：`bin/verify-all.sh`、`src/test/resources/test-assets.json`、`src/test/resources/tool-selftest-disposition.json`、`src/test/resources/baselines/java-tests.txt`、5 个能力契约测试（T026/T028/T029/T030/T095）、`test-evidence/s2-*.txt`。\n**串行约束**：T024 先于 T025/T029；T025 先于 T026；T027 先于 T028；T094 先于 T095；**T031 最后，blockedBy T025–T030 与 T094/T095**（此边是 analyze CRITICAL 修复项，不得弱化）。\n\n🛑 **四条铁律**\n1. **不得删除或移动任何 Python 文件**（`tests/**`、`scripts/*.py`、`scripts/verify-all.sh`、`pytest.ini`、`conifg/**`）——删除属 **S4**。本包**新建 `bin/verify-all.sh` 单轨版**，`scripts/verify-all.sh` **保持原样不动**，两者并存到 S4。\n2. **不得修改三组黄金测试**（`contract/golden/**`）；发现不符必须 `ANOMALY` 停线。出口复验 golden diff = 0。\n3. **不得改 `src/main/**`、`pom.xml`、`deploy/**`、`docs/**`、`conifg/**`**（分属 S5/S4/S3）。\n4. **不得改 S1 已交付的 11 个 `*ContractTest` 与 `migration-map.json` 的 211 行**（除非发现真实缺陷，且须登记理由）。\n\n## 本包要交付的「006 四项能力 Java 单轨等价物」（不得缩水）\n\n1. **可机检测试清单** `src/test/resources/test-assets.json`：按**文件级资产计数**，kind 三类 `test` / `support` / `integration`。遵循 `contracts/test-manifest.contract.md`：TM-01 顶层字段封闭、TM-02/03 行级字段封闭（**v2 删除 `naming_compliant` 额外字段**，命名合规归 TM-09）、**TM-04 的 integration 条目集 ⊇ VA-06 的 `INTEGRATION_ENTRIES`**（clarify3 已裁决放宽为超集，磁盘 4 个 integration 入口不得静默退出对账面）、TM-07 缺口码封闭四值、**TM-08「无测试方法的测试类」复用 `unregistered-test-class` 码，不得新增第五码**。\n2. **名称级基线** `src/test/resources/baselines/java-tests.txt`：**由源码扫描产生，不读 Surefire 报告**（BL-04）；扫描器用 S1 的 `TestSourceScannerSupport`，**词边界**精确 token（`@Test`/`@ParameterizedTest`/`@TestFactory`），**`@TestConfiguration` MUST NOT 计入**。\n3. **聚合退出码 + 空车道守卫** `bin/verify-all.sh`：退出码 **0/1/2** 语义按 `contracts/verify-all.contract.md`；**名称级空车道守卫**按 clarify3 修复后的口径（**不得按参数化展开计数**，否则会掩盖删除）；失败行格式固定（失败 ID + 重跑命令）；**不短路**（Java 车道失败也要跑完并聚合）；`--with-integration` 分支按清单驱动 `deploy/verify/auth-it/run-it.sh`（该脚本 S4 才就位，本包只写调用契约与缺位时的诚实 blocked 记录）。\n4. **失败诊断与证据保留**：失败 ID + 重跑命令输出、证据落 `test-evidence/`。\n\n**BL-07/BL-08 算子（clarify3 已交换，必须按此实现并双向钉死）**：`missing = 基线集 − 当前扫描集` → **rc=1**；`added = 当前扫描集 − 基线集` → **rc=0**。`TestBaselineContractTest` 必须做**双向演练**：删除一个测试名 → rc=1；新增一个测试名 → rc=0。**不得写反**（写反会把新增判红、把删除静默放行）。\n\n**BL-03/BL-04 口径（clarify3 已钉死）**：基线 = **源码全集**（含 blocked 用例名）；blocked 排除只发生在**执行面**（VA-11 从 missing 中扣除 blocked_names 属防御性），不得在生成侧排除。\n\n## T094–T095：62 项工具自测处置载体\n\n- **T094** 创建 `src/test/resources/tool-selftest-disposition.json`：schema `tool-selftest-disposition/1`，**62 行**，模块计数按**「模块=计数」配对**书写：`test_baseline=19`、`test_manifest=24`、`pytest_config=3`、`verify_all=16`（合计 62）；`source_id` 必须 ∈ 006 归档基线；每行处置为 `replaced`（`covered_by` 必须可解析到 Java 目标）或 `deleted`（`covered_by` 为空 + 理由）。\n- **T095** 创建 `ToolSelftestDispositionContractTest` 机检上述 schema 与计数、`covered_by` 可解析性。\n- 这 62 项**不在 211 行 migration-map 内**（模块枚举排除四模块），两个载体边界不得混淆或重复计数。\n\n## T031 出口谓词（S2 出口，必须全绿）\n\n`test-assets.json` 与 `baselines/java-tests.txt` 与 `tool-selftest-disposition.json` 三载体齐备且机检通过；`bin/verify-all.sh` 可执行且退出码语义正确；5 个能力契约测试全绿；**blocked ≠ pass**（`shellcheck-absent`、integration 入口缺位等按 FR-027 的 8 值原因码记 blocked 并如实登记）。读数落 `test-evidence/s2-exit.txt`。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。红先绿后，读数落 `notes/red-first-evidence.md`；首跑即绿如实标注。\n- **测试执行唯一入口 `./mvnw -B test`**；本包跑**定向集**留证，**不得动用 slot-2**（留 S8/review）。若需全量核对记 `out-of-slot-exception` + reason + 日志；**若全量命令被权限分类器拦截，如实记 not-run 并给算术对账，不得伪造读数**（S1 先例）。\n- **不得执行 pytest**。只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/`、`.pytest_cache/` 不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`feat(test): 016 PKG-S2 测试框架能力 Java 单轨等价物（清单/基线/聚合守卫/62 项处置）`。\n\n## 输出预算\n\n报告 ≤70 行：T024–T031/T094/T095 逐条状态一行、三载体行数与 kind 分布、62 项逐模块计数、BL-07/08 双向演练读数（删除 rc / 新增 rc）、`bin/verify-all.sh` 退出码演练、定向集用例数与失败数、golden/Python/生产代码三处 diff 复验、门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S2-DONE`；无法完成则 `ANOMALY: <一句话事实>`。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

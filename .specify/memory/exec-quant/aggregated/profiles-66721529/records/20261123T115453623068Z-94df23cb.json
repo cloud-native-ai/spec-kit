@@ -1,0 +1,63 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "profiles",
+    "source_commit": "33838baadd5b9f1bfe1ff7ecc0f31dabca1c653d",
+    "identity_status": "identified",
+    "identity_key": "5ea17f7ef376d0c74eb5f7706e43e1536336dec5c7f5764b74ae53967bc27027",
+    "content_hash": "daa88fbb397673d098ded6503db78bd9e2985338c541d0b2665b3b21c06935c2",
+    "package_file": "feedback-profiles-20261123T185630.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:create-skills",
+    "unit_type": "skill",
+    "run_id": "20261113T1055-profiles-services",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-13T02:54:46Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

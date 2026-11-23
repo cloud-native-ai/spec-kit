@@ -1,0 +1,123 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "3a234aa5ee61afccb46c5ea6701cec703d07212635bb7bc30a7d69d6f701e9fe",
+    "content_hash": "18f117459983bd19e875c731555edf68332964f7a03a29316fd3dee391a0c605",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-analyze",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T12:44:28Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：analyze（**严格只读**）。\n\n① 背景与权威文档\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `48c289d3`；工作树 clean。\n- Spec：`.specify/specs/022-citation-architecture/`：requirements（28 FR / 12 SC / 7 US / STR-001…STR-031 / A-001…A-023）、plan（344 行；§ Implementation Boundary A/B、Known Spec Tension）、research（R-1…R-10）、data-model（9 实体）、**7 contracts / 186 条 C-N**、quickstart、tasks（33 任务：31 open + 2 deferred `[~]`；外部义务 E-1…E-7）、`checklists/citation-architecture-quality.md`（11 类 / 50 项已作答；**Findings HIGH 3 / MEDIUM 8 / LOW 3**）。\n- Feature 027：`Planned`（`features.md` / `features/027.md` / `feature-ref.md`）。plan constraint **active**（`plan_commit=cd66f205`）。\n- 已知张力（规格自述）：FR-022 vs FR-023 的 409 范围；SC-001 在 v1 查询面“空真”；`[[STR-029]]` 载体；`entry_type` 加性 provenance；契约条款语法不被主仓 `clause_extract.py` 识别。\n\n② 执行要求\n- 运行 `/speckit.analyze`，做**跨产物只读一致性分析**（requirements ↔ plan ↔ research ↔ data-model ↔ contracts ↔ quickstart ↔ tasks ↔ Feature registry）；**不得修改任何文件内容**（唯一写盘是第 5 条的运行记录与记账）。\n- 独立复核 checklist 的 14 条 findings：逐条给 `CONFIRMED` / `REJECTED` / `ADJUSTED` + 证据（`文件:行`），不得盲信；同样独立复核 5 条已知张力，并检查是否有 checklist 未覆盖的新问题。\n- 检查维度（至少）：重复/冲突（同一谓词两个 owner）、歧义与欠指定、宪法冲突（II/III/XI/XII/XIV/XVI/XIX/XX/XXI）、FR/SC 覆盖缺口（plan 覆盖表、tasks 认领、quickstart 度量）、契约内部一致性与 186 条记账（含语法可解析性）、tasks 依赖/顺序/`[blockedBy]`/并行标注/DoD、外部义务 E-1…E-7 的边界、Feature 027 三面一致、加性/冻结与开关逐字节一致的可判定性。\n- 输出发现：ID（F-001…）、严重度 `CRITICAL|HIGH|MEDIUM|LOW`、类别、位置、证据、影响、建议（给 analyze-fix 的可执行方向，但**不要动手修**）。判定口径：CRITICAL=阻断实现/不可判定；HIGH=规格矛盾或验收面不可度量；MEDIUM=一致性问题/归属错误；LOW=措辞/工具缺口。\n- 末尾给出门禁结论：`CRITICAL=n / HIGH=n / MEDIUM=n / LOW=n` 与 `GATE=pass|fail`（任一 CRITICAL/HIGH → fail，阻断 implement）。\n- 只写：`.specify/specs/022-citation-architecture/run-record-analyze.md`（发现摘要 + 复核表 + 门禁结论）与记账三件套；**只提交这些记录文件**（`.specify/memory/{feedback,session,exec-quant}/**` + run-record-analyze.md）；不得提交 requirements/plan/research/data-model/contracts/quickstart/tasks/checklists/Feature registry 的任何修改；不得改 `service/**`/`view/**`/`model/**`/`docs/**`；不 push；禁 `git add -A`。\n- 不进入 analyze-fix/implement。\n- 输出纪律：分段写入报告。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.analyze`，run-id `r20261028T162000Z-c1a2-analyze`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移；失败写 `WRAPUP-DEFERRED`。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-DONE`\n- 回传：发现计数（C/H/M/L）、GATE、checklist 14 条复核结果（确认/否决/调整 数）、新发现、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.96.116:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "47.107.125.11:443",
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "47.116.44.184:443",
+          "106.14.225.66:443",
+          "120.24.170.126:443",
+          "39.106.211.206:443",
+          "39.106.176.70:443",
+          "47.106.172.117:443",
+          "59.110.214.247:443",
+          "47.116.36.231:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "b3cfb42d443b1ee12d87c81348d19acf929a87c074fe785a7d8f6696a9c9f484",
+    "content_hash": "36f600868d5b1c271e230d92ee873642f61b513a92bd6f72eaa741cb96eebcb1",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.checklist",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-checklist",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T12:22:05Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：checklist。\n\n① 背景与权威文档\n- 项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 20e2ce63；工作树 clean（node_modules 为本地测试软链，已 git-exclude）。\n- Spec：`.specify/specs/021-code-cgit-urls/`（requirements 9 FR/8 SC；plan/research/data-model/4 contracts/quickstart；tasks 21 项）。\n- Feature 026（Planned）；用户目标：代码文件路径直接使用 cgit URL，而不是本地文件路径。\n- Plan constraint **active**（plan_commit=394f26a5）：plan-owned 产物（plan/research/data-model/contracts/quickstart）只允许 minor 修改并声明 PLAN-EDIT；实质变更 → ANOMALY。\n- 关键设计：MCP wrapper `service/code-graph/cgit-mcp.ts`；5 键配置；manifest commit ref；`{base}/{repo}/tree/{path}?id={ref}[#n{line}]`；`web_url:null` + 三值 reason；零凭据/零网络；禁用态透传。\n\n② 执行要求\n- 运行 `/speckit.checklist`，产出需求质量/可靠性检查清单（`checklists/` 下，按项目模板与命名），覆盖：\n  - 配置 5 键/ fail-fast / 禁用语义；\n  - URL 编码/锚点/end_line/非法 path；\n  - manifest ref 解析与竞态；\n  - MCP wrapper 透传、tools/list 不变、工具结果只增字段、fake upstream；\n  - 降级矩阵（unmapped_repo/unresolved_ref/invalid_path）与“不得泄露本地绝对路径/凭据”；\n  - 文档/部署注入/回滚（ENABLED=false）；\n  - 与 `/api/kb/*`、doctor/sync、既有 MCP 字段的零变更边界。\n- 清单项应为可判定问题（是/否/证据），不要写实现步骤；不实现代码；不改 docs/service/view/compose。\n- 只提交本特性产物（checklists + 运行记录）；既有脏文件不提交不还原；不 push。\n- 只推进 checklist；不要进入 analyze。\n- Wrap-up 记账（必需）：`/speckit.checklist`，run-id `r20261028T083000Z-7c1a-checklist`，`--feature 021-code-cgit-urls --feature-id 026`。若本分支 `.specify` 缺新版引擎，使用主仓脚本 + `--workspace-root`。无法写入 → `WRAPUP-DEFERRED`。\n- 异常必须显式 `ANOMALY: <事实>`。\n\n③ 完成尾标与回传\n- 最后一行必须是且仅是：CHECKLIST-DONE\n- 回传：清单文件与条目数、分类、PLAN-EDIT（如有）、提交哈希、记账路径。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.116.44.184:443",
+          "47.57.243.249:443",
+          "47.116.36.231:443",
+          "8.212.124.35:443",
+          "47.106.172.117:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443",
+          "39.106.211.206:443",
+          "8.223.13.163:443",
+          "59.110.214.247:443",
+          "120.24.170.126:443",
+          "39.106.96.116:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

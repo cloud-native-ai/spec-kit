@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "c24b8242af592518b8ebf7045e2fcd5d5baf58b28ddc14b6d11c282de11ab5f7",
+    "content_hash": "a829ae795090f610d6b0c36d4962a012d4813d9daab7e240f22e5e8127831b98",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.checklist",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-checklist",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T15:52:01Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：checklist。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `d0f688b0`；clean。\n- spec 051：29 FR / 11 SC；39 tasks；Feature 048 Planned；plan constraint active。\n\n② 执行要求\n- 运行 `/speckit.checklist`，产出 `.specify/specs/051-xuanji-doc-build-chain/checklists/` 下的质量清单；35–50 项，逐项 PASS/FAIL/N/A + 证据。\n- 覆盖：新构造链不再 FROM hugo builder；dev/project/service 分层；Hugo/Node/Python/cws_daemon/PG 驱动/nginx/cgit/转换工具 snippets；graphicle+graphicle-graph 同源构建与双二进制安装；CWS_MICRO_PORT/VOLUME 与 services.yaml；内部端口不发布；supervisor 八程序无依赖；nginx Basic/路由/上传/MCP；cgit 只读 repos；生成物一致性/Layer-1/构建顺序/smoke；权限/凭据/源码清理。\n- 末尾 Findings；不改 requirements/plan/contracts/tasks；不构建；不 push；不 `git add -A`；不触碰主 checkout 未跟踪 build result。\n- 记账：`/speckit.checklist`，run-id `r20261030T120500Z-b101-checklist`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`CHECKLIST-DONE`\n- 回传：类别/条目数、PASS/FAIL/NA、Findings、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443",
+          "47.107.125.11:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

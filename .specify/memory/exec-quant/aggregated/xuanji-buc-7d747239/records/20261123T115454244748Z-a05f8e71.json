@@ -1,0 +1,120 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "070eb8aa43c24ec880cca10111e1167e1cf495ae8e3506919324be9aa3b61ab7",
+    "content_hash": "035f186dbf5e5f84714f02136003f789f60eaeb982e6dd7465656e2572c23aff",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118T035449Z-impl016-s5",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T03:55:25Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S5（9 包中第 6 个，S5 Spring Boot 配置方案，T051–T059，9 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`4470a19`（PKG-S4 删除与目录归并，41 files，+721/−6054）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**（唯一源 `test-evidence/baseline-pre/freeze-commit.txt`）\n- 断点：PKG-S4 **包级校验 PASS**（驱动者独立复算：T050 八项出口全成立；Python 栈已删净——`test_*.py` 0 行、`pytest.ini`/`.pytest_cache` 双缺失、受控 `.py` 恰 1 行 `deploy/verify/backend/echo_backend.py`；bare `conifg` rc=1；顶层 23 项业务目录只剩 `deploy`/`docs`/`src`/`bin`；机检 45/0 绿，`MM-08 rows=211 unmapped=0 dropped=0`、`baseline=428 missing=0 added=0`、LO-01…08 `violations=0`；golden / `src/main`+`pom.xml` / CS-11 三处 diff 全 0；门 rc=0）。逐项读数见 `test-evidence/s4-exit.txt`\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 本包性质：第一次获准改动生产代码与 pom.xml\n\nS0–S4 全程冻结 `src/main/**` 与 `pom.xml`；**S5 是唯一获准改动它们的包**，因此等价性纪律最严。\n\n🛑 **六条铁律**\n1. **T051 必须先于一切配置改动**：`env-contract.txt` 基线（应用侧变量名 **5 行**）要在**第一次改配置之前**抽取落盘，否则 CS-09 的\"重抽逐行相等\"失去参照。\n2. **三组黄金测试只读**。特别是 `ConfigSurfaceGoldenTest`——S0 的 T006 已刻意让它**按 properties/YAML 双通道读取 19 键**，正是为了本包切换载体时冻结面不破。出口须复验该文件 diff = 0；**若发现必须改黄金测试才能通过，停下输出 `ANOMALY`，不得自行改冻结面**。\n3. **19 键逐键逐值等价翻译**：不新增键、不删键、不改默认值、**占位符 fallback 链逐字保持** `${SPRING_BUC_*:${BUC_*:<default>}}`。**不建 `application-prod.yml`**。\n4. **`deploy/compose/**`、`deploy/k8s/**`、`deploy/image/**` 仍属 CS-11 冻结面**，出口 diff 必须为空。配置载体切换**不得**外溢成部署面改动。\n5. **不得删除或改名任何既有测试方法**（BL-07 删除方向会 rc=1 点名，出口须 `missing=0`）。⚠️ **基线计数不是冻结常量**：S4 已确立纠正规则——`baselines/java-tests.txt` 必须**等于扫描器实测值**，新建 `ConfigSurfaceContractTest` 须按 **BL-08 / TM-04 append-only 同提交登记**（S4 已使基线 419→**428**、清单 77→**78 assets**），出口如实报 `added=` 与 `missing=0`。**先探针取红再登记转绿**，读数落 `notes/red-first-evidence.md`；禁止手工填数或为凑计数删测试。\n6. **S1–S4 已交付物不得改**：迁移契约测试、`migration-map.json`、三载体、`LayoutContractTest` 与 `layout-allowlist.json`。\n\n## 驱动者已做的编译安全性预检（可直接采信，不必重查）\n\n`git grep -ln \"XuanjiBucEnvironmentValidator\" -- src/test` → **零命中**；\n`git grep -ln \"validateRequiredConfiguration\" -- src` → 只有 `XuanjiBucAutoConfiguration.java` 自身。\n→ **T054/T055 的删除不会造成编译断裂**。若某个上下文加载类测试的**行为**因此改变（例如原先 `ApplicationReadyEvent` 触发 `System.exit(1)`），如实披露并在本包写域内处置，**不得靠删测试方法消音**。\n\n## 逐任务要求（按依赖序）\n\n- **T051**（先于一切配置改动）用 **CS-08 命令**从 `deploy/compose`、`deploy/k8s`、`deploy/image` 抽取**应用侧**变量名，排序去重 → `src/test/resources/baselines/env-contract.txt`（**5 行**）。命令与口径以 `contracts/config-surface.contract.md` 的 CS-08 原文为准。\n- **T052** 新建 `src/main/resources/application.yml`：**19 键**逐键逐值等价翻译，覆盖 `logging` / `spring.mvc`+`spring.web` / `spring.buc`（含 `cli-auth`/`cli-acl`）/ `spring.threads`；fallback 链逐字保持；不新增键、不建 `application-prod.yml`。\n- **T053** 删除 `src/main/resources/application.properties`。\n- **T054** 删除整类 `src/main/java/com/aliyun/kangaroo/xuanji/config/XuanjiBucEnvironmentValidator.java`（`ApplicationReadyEvent` + `System.exit(1)` 的旧校验路径）。\n- **T055** 删除 `XuanjiBucAutoConfiguration#validateRequiredConfiguration()` **及其调用**；**保留仍在使用的私有助手** `isBlank` / `maskSensitiveInfo` / `addIfNotNull`（删前先确认各自仍被引用，不得顺手清理）。\n- **T056** 修正 `src/main/resources/META-INF/spring.factories` 的 FailureAnalyzer 注册为 `com.aliyun.kangaroo.xuanji.config.XuanjiBucConfigFailureAnalyzer`（须 `Class.forName` 可解析）。\n- **T057** 改 `pom.xml`：删除 `test` Maven profile；删除 `spring-boot-maven-plugin` 的 `<profiles>${spring.profiles.active}</profiles>` 传参；`prod` profile **降级为空打包标记**（不设置任何 `spring.profiles.active`）。出口 `grep -c 'spring.profiles.active' pom.xml` 必须 **0**。\n- **T058** 新建 `src/test/java/com/aliyun/kangaroo/xuanji/contract/ConfigSurfaceContractTest.java`，机检 **CS-01…CS-11**：yml 存在 / properties 不存在、键等价、**恰三个绑定 + `@Value`=0**、两处重复校验不在源码树、`spring.factories` FQCN 可解析（`Class.forName` + 逐字双断言）、**缺失必填项启动失败并点名**、`env-contract.txt` 重抽逐行相等、**反向孤儿断言**、`deploy/**` diff 空、无 `application-prod.yml`。\n- **T059**（出口，落 `test-evidence/s5-exit.txt`）配置契约测试绿 + `grep -c 'spring.profiles.active' pom.xml` = 0 + env-contract 重抽相等 + `git diff <freeze>..HEAD -- …/golden/ConfigSurfaceGoldenTest.java` 为空。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。**T051 基线落盘后才允许改第一行配置**。\n- 断言**红先绿后**：CS 各条先制造违反态确认能红并点名，再恢复复绿；读数落 `notes/red-first-evidence.md`。\"缺失必填项启动失败并点名\"与\"反向孤儿断言\"两条必须有真实演练证据。\n- **测试预算**：本包跑**定向集**（契约 + 黄金，`-Dtest='*ContractTest,*GoldenTest'`）确认无回归；**slot-2 仍保留给 S8/review**，不得动用。若本包确需全量，须具名记 `out-of-slot-exception reason=<事实>`；被权限分类器拦截则如实记录并回退定向集，**MUST NOT 编造全量读数**。\n- **不得执行 pytest**（Python 栈已于 S4 移除）。\n- 只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/` 不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`refactor(config): 016 PKG-S5 配置载体切换为 Spring Boot YAML 并收敛重复校验`。\n\n## 输出预算\n\n报告 ≤50 行：T051 基线 5 行读数与抽取时点；T052 的 19 键逐键等价对账（键名清单 + fallback 链保持证明）；T053–T057 逐条一行（含保留的三个私有助手各自仍被引用的证据、`spring.profiles.active` 计数 0）；T058 的 CS-01…CS-11 逐条结果 + 两条演练读数；T059 四项出口；`baselines/java-tests.txt` 计数变化（`added=`/`missing=`）；golden 三文件与 `deploy/**` diff 复验；门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S5-DONE`；无法完成则 `ANOMALY: <一句话事实>`（尤其黄金测试与配置切换冲突、19 键无法等价翻译、或 CS-11 冻结面被牵动时）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "8.212.124.35:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "47.107.125.11:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443",
+          "39.106.211.206:443",
+          "8.223.13.163:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "profiles",
+    "source_commit": "33838baadd5b9f1bfe1ff7ecc0f31dabca1c653d",
+    "identity_status": "identified",
+    "identity_key": "e618e9031c918b7cf7e8406ad0354a6d63f420480ad5e25fb9665d4ae89a1511",
+    "content_hash": "d7005872eed359f7b4d42a1230ac8d899f63b0b3b2455795de5a42d6b9779f28",
+    "package_file": "feedback-profiles-20261123T185630.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:improve-skills",
+    "unit_type": "skill",
+    "run_id": "20261116T030831Z-profiles-code",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-16T03:31:32Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "cws-lib-iac",
+    "source_commit": "1dbd615c0c86ec6ae463a808a90929a8b96e4dd6",
+    "identity_status": "identified",
+    "identity_key": "9398301abb32402215dbc131c08304f4ec3d94f2246b50fe3b8ad7b8340df80d",
+    "content_hash": "7700ff5c54010d1cdf50811b6fea67ef2009437d68fbb0f8b1dab58f806724a9",
+    "package_file": "feedback-cws-lib-iac-20261123T185558.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:sdd-loop-driver",
+    "unit_type": "skill",
+    "run_id": "r20261105T050000Z-d001",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-05T04:52:56Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.83",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--dangerously-skip-permissions"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_data/cws-lib-iac",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "203.107.1.33:80",
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "203.107.1.35:80",
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

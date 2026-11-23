@@ -1,0 +1,123 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "10306eb172001a93e02cbe68f14bc2d8737a540d9139752cca31a52943d04368",
+    "content_hash": "963f98571d5f77cda6aa6baac9592fa2fe7312a1dc360871e9a9cc37d952816a",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-analyze-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T16:41:13Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：analyze-fix（有界对齐 analyze 的 CRITICAL/HIGH）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `d3a71177`；clean。\n- analyze 记录：`.specify/specs/023-xuanji-doc-architecture/run-record-analyze.md`（28 findings：CRITICAL 4 / HIGH 7 / MEDIUM 9 / LOW 8）。\n- 跨线真源（只读）：A = `/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010` HEAD `6b6804e0d`（契约已含 `rerank_enabled`）；C = `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051` HEAD `fcef5570`。\n- **CON-01（宪法 VIII）不在本阶段修复范围**：修订需 maintainer 批准；保留为开放 CRITICAL，不得声称 VIII 合规，也不得删除 T036 的修订提案。\n\n② 执行要求（对齐 A/C owner 文本；逐条处置以下 3 CRITICAL + 7 HIGH）\n1) INC-01（A 域/所有权）：域归属以 A 为准——`knowledge` 承载 ingest/pull/jobs/cancel/audit，`documents` 只有 query/resolve/health；补齐 023 对 `documents/query`、`documents/resolve`、`system/openapi.json` 的消费性要求（引用 A，不复制 wire）；删除/改写与 A 冲突的域分配与「MCP 不建模」措辞；同步 C-08/C-11/FR-013/tasks。\n2) INC-02（A Error/admin wire）：采用 A 的扁平 `Error {code,message,request_id,details}`、`X-Request-Id`、封闭 15 码（无 429）、admin `400 invalid_request`（`read_only_field`/`unknown_field`）与 `config_version` 乐观并发；把 admin 可写集对齐 A 的四项（`citation_enabled`、`doc_url_enabled`、`rerank_enabled`、`query_defaults{mode,min_score}`）。\n3) INC-03（C 存储权限）：裁决为「C 提供 ingest 可写 `config/ingest/` 子树（UID 1100）」；在 023 侧写明该目录的 owner/用途/保留策略，并作为 External Obligation 记录（C 侧随后补条款）；增加 program→mount 表。\n4) INC-04（auth 矩阵）：admin 有效 Bearer → 403；四个 health 在 nginx 免 Basic 匿名；Basic/Bearer 均取 `cws_context_key`；删除 Q-01 的 `CWS_PASS`/`SVC_TOKEN`；同步 FR-003/C-03/C-14/SC-002。\n5) INC-05（job schema）：采用 A 的六值状态（含 `partial`），删除「五态 + 派生 marker」；同步 FR-011/C-36/C-37/data-model E7/tasks。\n6) INC-06（C repos/cgit）：`repos/` 写者为 ingest UID 1100（与 C 对齐）；cgit 关闭 clone/snapshot 能力（作为 C 的 External Obligation）；同步 FR-022/C-48/SC-009。\n7) INC-07（C 边缘面）：记录 C 发布 `{80,443,10022}` 与八程序的基础设施例外（10022/sshd、第八程序为基础设施）；把 301/method/Accept 规则作为 C 的 External Obligation 并引用其 nginx 契约；同步 SC-001/T011/A-001。\n8) INC-08（路由回退）：定义 SPA 路由集（六个页面的 URL 前缀列表）；把 FR-001 限定为非 SPA 路径；为未命中的非 HTML GET/静态资源补显式 404（JSON/静态）规则；同步 C-02/T008/T009。\n9) INC-09（docs 挂载）：把 C-07 的只读挂载限定到 hugo/api/cgit，ingest 为 rw；增加 program→mount 表；同步 FR-017/FR-025。\n10) INC-10（citation URL）：把「禁止主机名」限定到 `citation_id`/`locator`/`version`/`kind`/原因字段；`web_url` 交给 022/A（绝对 http(s) + 非空 hostname，可为 null+原因）；同步 FR-028/C-57/SC-008。\n- 每次修改 contracts/tasks/plan/research/data-model/quickstart 声明 `PLAN-EDIT:`；实质 plan 结构变更 → ANOMALY 停线。\n- 修复后运行 `validate-requirements`、`validate-tasks`、`pre-analyze-check` 与 `account-clause-coverage`（只读），记录结果。\n- 产出 `.specify/specs/023-xuanji-doc-architecture/analyze-fix-dispositions.md`（逐条：finding → 决定 → 改动位置 → 验证证据；CON-01 标注 `OPEN — maintainer decision required`）。\n- 不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.analyze`，run-id `r20261030T120500Z-d101-analyze-fix`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套 + `run-record-analyze-fix.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-FIX-DONE`\n- 回传：13 条（3 CRITICAL + 10 HIGH 中的非 CON-01）处置与证据、CON-01 的开放记录、验证命令结果、提交哈希、记账路径、PLAN-EDIT 列表、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.211.206:443",
+          "47.116.36.231:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "47.57.188.188:443",
+          "59.110.214.247:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "120.24.170.126:443",
+          "47.116.44.184:443",
+          "39.106.96.116:443",
+          "47.106.172.117:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

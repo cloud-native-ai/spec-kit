@@ -1,0 +1,60 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "kangaroo-xuanji",
+    "source_commit": "c2643e86f06c11b76dd372f34dc2063bb31237d2",
+    "identity_status": "identified",
+    "identity_key": "4b6b38d852cc405811a22ec93fa8e11c99655fe0a54806da0e3434736b80cd61",
+    "content_hash": "5bd5820fb4d14871e78588742b52e11636d8a5d39998461d9ff67e5ce764fbad",
+    "package_file": "feedback-kangaroo-xuanji-20261123T185201.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.checklist",
+    "unit_type": "command",
+    "run_id": "r20261101T072100Z-l2chk",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-01T07:21:19Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

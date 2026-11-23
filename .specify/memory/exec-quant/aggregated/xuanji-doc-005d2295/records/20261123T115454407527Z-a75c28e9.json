@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "058495ca3f1c920e35388bfba105ff4bbb45909713ee8e6046302899ea8616d5",
+    "content_hash": "f9c92f1821c0b6e7770cbe494dea6a1a8088a07607e28a3f7a9813f873e910f7",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-analyze2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T12:51:08Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：analyze 第二轮（严格只读，门禁最终判定）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD e5ee9db0；工作树 clean。\nSpec：`.specify/specs/021-code-cgit-urls/` 全产物（requirements 9 FR/8 SC；plan/research/data-model；contracts C=10/U=19/W=24；tasks 21；checklists 40）。\nPlan constraint active（plan_commit=394f26a5；analyze-fix 的 6 条 PLAN-EDIT 已声明）。\n\n任务：\n1. 复核上一轮 10 项 finding（INC-01、AMB-01、DEP-01/02/03、AMB-02、COV-01、FEAT-01/02、COV-02、OWN-01）是否全部闭环；逐项给证据。\n2. 扫描修复是否引入新问题：契约 pin 计数与 tasks 覆盖、SC→Task/FR→pin 表、DoD/零变更边界、脱敏口径、endLine 谓词、Feature 阶段记录。\n3. 判定门禁：0 CRITICAL / 0 HIGH 才通过；列出 C/H 阻断项（若有）。\n4. 严格只读：不修改制品、不提交、不 push。\n5. Wrap-up 记账（必需）：`/speckit.analyze`，run-id `r20261028T083000Z-7c1a-analyze2`，`--feature 021-code-cgit-urls --feature-id 026`；沿用 analyze-fix 的**非迁移**记账方式（主仓引擎 + `--workspace-root`，但不得删除 tracked `feedback/index.json`、不得新建 `feedback/state/` 或留下 lock；若会触发迁移则改用不迁移方式或停止并说明）。无法写入 → `WRAPUP-DEFERRED`。\n\n最后一行必须是且仅是：ANALYZE-DONE\n回传：findings 计数（C/H/M/L）、逐项闭环结论、最终门禁判定、记账路径。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "106.14.225.66:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

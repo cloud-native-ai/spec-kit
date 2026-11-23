@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "46d729e587d05e779d12abd7aa34c27bc1fd29da23f37a2b67735046ffdf5ec1",
+    "content_hash": "9f75286058b501e42393d754ff1efd407f54f984748c4d8740b2c7a6ec4a36a7",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:manage-constitution",
+    "unit_type": "skill",
+    "run_id": "r20261030T120500Z-d101-constitution",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T02:42:30Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：constitution amendment（maintainer 已批准）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `54a2f147`；clean。\n- CON-01（CRITICAL）：宪法 VIII 要求两阶段入库（`doc-ingest` → `model/draft` → 审阅 → `doc-summary` → `model/content`），与已确认的新架构（`ingest` 直接写标准 Hugo page bundle 到 docs volume、无人工审阅）冲突。\n- **maintainer 已于 2026-10-31 明确批准修订第八条**（本会话 AskUserQuestion 选择「批准修订（推荐）」）。\n\n② 执行要求\n- 运行 `/speckit.constitution`，对 `.specify/memory/constitution.md` 做**最小修订**：把 Principle VIII 的「两阶段 + 人工审阅」改为「统一标准化入库工作流 + 可配置审阅门」；明确 `ingest` 是 docs volume 的唯一写者，产出标准 Hugo page bundle；保留 legacy 两阶段模式作为可选审阅模式（不删除其能力描述）；离线入库与分类/放置要求保持不变。\n- 版本按治理规则升 MINOR（当前 `2.1.0.1` → `2.2.0.1`），更新 `Last Amended: 2026-10-31`，写 Sync Impact Report（受影响原则/模板/工作流、迁移影响），记录 maintainer approval（2026-10-31，用户批准）。\n- 同步更新 `plan.md` 的 Constitution Check：VIII 从 `⚠ Partial` 改为 PASS；更新 `tasks.md` T036（修订提案已完成 → 勾选并写证据）；如 023 的 FR-009/FR-011/FR-012 或 contracts 有「待修订」措辞，改为引用已批准条款。\n- 不改其他原则；不实现代码；不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.constitution`，run-id `r20261030T120500Z-d101-constitution`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套 + `run-record-constitution.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`CONSTITUTION-DONE`\n- 回传：修订摘要、版本号、Sync Impact Report 路径、plan/tasks 同步结果、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443",
+          "120.79.243.153:443",
+          "101.132.70.5:443",
+          "47.57.243.249:443",
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "89137d39c8de32a3d3477057586434cf797041427f3331df056bf203f78c5d56",
+    "content_hash": "bf67a866fd7647ac1a875bb279b37bcd4ec48f0ae124902dc2542f7b481d96a9",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-review-fix8",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T20:27:06Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：review-fix8（缺少密钥时的 locked 模式）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `e6d88761`（已合入 main）；clean。\n- C 的 T025 实测：缺少秘密时 api 进程退出，nginx 对四个 health 返回 502、业务与 MCP 返回 502，与 C-30/SC-005 的「health 200/503、业务/MCP 401/403」不符。\n\n② 执行要求\n- 实现 **locked 模式**：秘密缺失/不可读时 api 必须**启动成功**而非退出；四个 health 返回 503（`Health` 形状，无敏感数据）；`/api/v1/**` 业务与 `/mcp/v1/**` 返回 401/403 且无业务内容；绝不匿名回退；日志/响应不得泄漏秘密。\n- 更新启动逻辑、错误映射与测试（缺秘密、空秘密、不可读秘密三种）；同步 C-30/SC-005/Edge Case 的措辞（以本仓为 api 行为 owner）。\n- 不改宪法；每次修改声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 `pnpm api:test`、`pnpm ingest:test`、`pnpm api:query:parity`、`pnpm api:openapi:check`、`OPENAPI_OWNER_PATH=... pnpm api:openapi:verify`、validate-tasks、account-clause-coverage，记录退出码。\n- 产出/追加 `.specify/specs/023-xuanji-doc-architecture/review-fix-dispositions.md` + `run-record-review-fix8.md`。\n- 不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-d101-review-fix8`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX8-DONE`\n- 回传：locked 模式与测试证据、契约同步、测试结果、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "39.106.211.206:443",
+          "47.57.188.188:443",
+          "106.14.225.66:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

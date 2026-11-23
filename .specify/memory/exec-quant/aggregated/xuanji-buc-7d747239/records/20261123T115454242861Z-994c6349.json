@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "ba5ad1887fb256e6ecdb270e0665c8d7adfbb41d6cff2ec8759e8fe7308ac6d4",
+    "content_hash": "94c7b42918499d036f0742b27a0aa46295de3543a0c7b8f6a184d7f42e93f0e7",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "20261117T200000Z-ana016-delta",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T02:08:56Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：analyze（**delta 复核轮，只读**）。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`（只读参照）\n- 上一阶段提交：`28c937f`（clarify 第 3 轮，清偿 analyze 阻断项，22 files 仅制品）\n- 断点：analyze 首轮 62 findings（**1 CRITICAL / 9 HIGH** / 20 M / 32 L）→ clarify3 声称 62/62 有落点。**本轮独立复核是否真清偿，不采信自报。**\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n\n## touched-loci（本轮检测域 = `28c937f` 改动的 22 个文件）\n\n`.specify/features.md`、`.specify/features/016-java-project-standardization.md`、spec `007-java-project-standardization/` 下的：requirements.md、plan.md、tasks.md、data-model.md、research.md、quickstart.md、contracts/{baseline,config-surface,layout,migration-map,test-manifest,verify-all}.contract.md、checklists/{quality-gates,requirements,recheck-2026-11-18-clarify-r2,recheck-2026-11-18-analyze-fix}.md、test-evidence/4 份。\n**未触碰域**：`src/**`、`pom.xml`、`deploy/**`、`scripts/**`、`tests/**`、`conifg/**`、`.specify/constitution.md`、`.specify/instructions.md` —— 这些域首轮已由 W3 实读核验（覆盖数学 1327/1819→1310/1770→+106、@Test 208/209、conifg 16/14、Python 19→1、env 5 变量、properties 19 键、@Value 0），**本轮复用该结论，不重复实读**；若发现制品改动使这些结论失效，才重新核验并说明。\n\n## 必须逐条独立验证的 10 个阻断项（给「已清偿 / 未清偿 / 部分」+ 证据行号）\n\n1. **W2a-F01（CRITICAL）**：`tasks.md` T031 是否已 `blockedBy` 含 **T025–T030**（逐个核对，不能只写「已补」）；S2 出口是否还有其它可空转路径。\n2. **W2a-F02（HIGH）**：T044 是否含 T025；T045 是否含 T025/T027/T028；tasks.md:447 附近的「先移后删边审计」段是否与真实图一致（不再声称反向传递）。\n3. **W1-F01（HIGH）**：SC-001 / FR-009 / FR-017 / A-13 / data-model E-8 是否已拆 `tracked-must-exist` 与 `ambient-tolerated`；`.git`/`.vscode`/`target` 是否不再被要求「必须出现在 git ls-files」；「越界为 0」是否仍以 git ls-files 为准。\n4. **W1-F02（HIGH）**：FR-035 与 plan 的配置载体是否已统一（.yml 限 main 或 test 也改 .yml，二选一）；YAML 示例是否补 `xuanji.sts`/`xuanji.dpop` 或标注节选。\n5. **W3-F-001（HIGH）**：`baseline.contract.md` BL-07/BL-08 算子是否已交换为 `missing = 基线−扫描` rc=1、`added = 扫描−基线` rc=0；`TestBaselineContractTest` 是否要求双向演练（删除 rc=1、新增 rc=0）。\n6. **W3-F-002（HIGH）**：`config-surface.contract.md` CS-10 别名集是否含 4 个裸名（`BUC_CLI_AUTH_TOKEN_TTL`/`BUC_CLI_AUTH_CONSENT_TTL`/`BUC_ACL_CREDENTIAL`/`BUC_ACL_TIMEOUT`）或改为只提取最外层 `${NAME:...}`；CS-09 措辞是否同步。\n7. **W2b-F01（HIGH）**：quickstart S9 归档路径与同文件边界句是否已一致（改临时目录或限定 `--evidence-dir`）。\n8. **W2b-F02（HIGH）**：research R-10 是否改为名称集合差 `missing_names`，与 VA-11 同口径。\n9. **W2b-F03（HIGH）**：`baseline-pre/` 五制品与 freeze-commit 是否已有**可直接复制执行、无占位符**的逐条命令。\n10. **W2b-F04（HIGH）**：recheck 中「入口脚本 MUST NOT 记 blocked」是否已限定为入口级 status 行、允许脚本内部 blocked 子记录，且与 FR-015/VA-06 一致。\n\n## 另需抽查（防「修一处漏一片」）\n\n- **门禁类 MEDIUM 是否真落**：E-6 原因码 8 值含 `shellcheck-absent`；T009←T008；6 个阶段出口 blockedBy；PKG-S0 内边；STR 表头 13；`coverage-baseline.txt` 与 `red-first-evidence.md` 有创建/填充任务；TM-04 与 VA-06 的 integration 资产数裁决；`.pytest_cache` 双口径 + S4 删除步骤。\n- **反向引用扫描**：被改事实（+106、13 STR、bare conifg 16 行、S0 冻结 SHA、8 值原因码、别名集）在**全部制品**中是否还有旧值残留（+89 / 12 STR / 14 行 / f7ecb97 作黄金基准 / 7 值 / 旧别名集）。逐处 grep 给命中数。\n- **新引入矛盾**：本轮改动是否造成新的编号断裂、悬空引用、任务数超 160、包超 16。\n- **确定性门全量复跑兜底**：`pre-analyze-check.py --stage tasks`、`decomposition-check.py --mode tasks`、`validate-tasks.py`、`validate-requirements.py`，给 exit code 与 errors 数。\n\n## 输出预算（硬约束）\n\n- **最多 20 行 findings**，每条一行：`D-F<NN> | <CRITICAL|HIGH|MEDIUM|LOW> | <文件>:<行> | <问题≤40字> | <建议≤40字>`\n- 10 个阻断项的复核结论用**一行一项**：`<id>=CLEARED|NOT-CLEARED|PARTIAL | <证据文件:行>`\n- 末尾两行：`BLOCKING C=<n> H=<n>`（**新发现 + 未清偿的合计**）与 `GATES pre=<rc> dec=<rc> vt=<rc> vr=<rc>`\n- **总输出 ≤70 行**，禁散文、禁复述规格、禁罗列全部任务。\n\n## 纪律\n\n产物只读：不改制品、不提交、不 push、不写状态脊、不派子任务、不执行 pytest。临时文件只落 `.specify/.tmp/`。\n**Wrap-up 记账必需**：三步引擎，unit-id `/speckit.analyze`，`--feature 007-java-project-standardization`，run-id `20261117T200000Z-ana016-delta`，`--complexity` 取 `complex|simple`；若引擎被权限拦截则最后一行输出 `WRAPUP-DEFERRED: <原因>`（驱动者会补跑）。\n\n## 尾标\n\n最后一行必须是且仅是 `ANALYZE-DONE`；无法完成则 `ANOMALY: <一句话事实>`。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "120.79.243.153:443",
+          "47.107.125.11:443",
+          "47.57.188.188:443",
+          "47.57.243.249:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "8.223.13.163:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

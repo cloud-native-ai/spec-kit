@@ -1,0 +1,138 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "cws-lib-python",
+    "source_commit": "0b3be55d6a73ad4e2888adef3b98448af39dfb86",
+    "identity_status": "identified",
+    "identity_key": "ed372eb3d1f9be0d98a0788242d03bf9643bb1f07c7188e61a01e82984be1113",
+    "content_hash": "4060bf1877e13c7e40b926ca757290ab4253ad3a4486bf7254546723d437cedb",
+    "package_file": "feedback-cws-lib-python-20261123T185613.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261022T105618Z-7c2a",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T05:45:46Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-p",
+          "--model",
+          "DeepSeek-Flash",
+          "--reasoning-effort",
+          "max",
+          "--context-window",
+          "1000000",
+          "-w",
+          "/storage/project/cloud-native-tools/cws-lib-python",
+          "--permission-mode",
+          "auto",
+          "--settings",
+          "/home/agent/.local/state/spec-kit/runs/cws-logger-unification-20261022-105618/hook-settings-review.json",
+          "--output-format",
+          "stream-json"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/cloud-native-tools/cws-lib-python",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.13.70:443",
+          "47.107.125.11:443",
+          "39.106.176.70:443",
+          "8.212.124.35:443",
+          "8.223.13.163:443",
+          "101.132.70.5:443",
+          "47.103.9.44:443",
+          "47.103.128.242:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "39.107.85.235:443",
+          "39.108.79.164:443",
+          "106.14.225.66:443",
+          "39.107.242.82:443",
+          "39.106.211.206:443",
+          "8.212.20.107:443",
+          "47.106.88.164:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 613000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

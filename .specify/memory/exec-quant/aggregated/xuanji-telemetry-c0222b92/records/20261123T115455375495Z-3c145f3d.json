@@ -1,0 +1,63 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-telemetry",
+    "source_commit": "f541025a288fe901444d5f6293e7f5c65ad8ee65",
+    "identity_status": "identified",
+    "identity_key": "ad65ac23481784703a7d1ec4d185ce9e80953b0d4ce7ca194a094e8a2ab0b2a7",
+    "content_hash": "1a8d066a6a42aba01aec64f6529dfcd8dbc346bc2db0b92fa941c3c80e8ec9af",
+    "package_file": "feedback-xuanji-telemetry-20261123T185014.zip",
+    "ingested_at": "2026-11-23T11:54:55Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:manage-constitution",
+    "unit_type": "skill",
+    "run_id": "20261112T0018Z-constitution-broker",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-11T16:18:25Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

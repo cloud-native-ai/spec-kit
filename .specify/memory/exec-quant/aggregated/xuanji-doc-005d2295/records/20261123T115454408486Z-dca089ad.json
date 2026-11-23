@@ -1,0 +1,121 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "f987f54dc5768834f20b85b19c24d353180c0ca4e835da37a3b7a3d55769d5e7",
+    "content_hash": "ad7e7b20fb8e23b82aef3d4142ed88799e3628a9a2335492bf97463ad515efda",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-implement-p3",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T13:46:30Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 implement 阶段分段 p3 子代理（只做本段，不越段）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 0046c194；工作树 clean。\n本段 part_scope：**T011、T012、T013、T014**（降级 + 安全）。不执行 T015+（docs 属 p4）。\n必读：tasks.md 这 4 条完整条目；contracts/cgit-url.md、mcp-wrapper.md（§9 降级矩阵、§10 脱敏）、compatibility.md；plan/research/data-model；p2 已实现的 cgit-* 模块与测试。\n环境：`node_modules` 软链（tsx v4.23.0；不要 `pnpm install`）；Node 26 waiver；无 graphicle（用 fake fixture）。\n\n执行纪律（TDD）：\n- T011 降级单元用例（W-06/W-07 + 优先级 unmapped_repo > unresolved_ref > invalid_path）。\n- T012 降级 E2E 矩阵（§9 全行，含禁用态字段缺席）。\n- T013 凭据脱敏（C-09；W-17/W-21；stdout 构造零凭据、stderr `redact()`、失败固定占位符）。\n- T014 安全静态/运行时扫描（W-16/W-18：无本地绝对路径、无凭据/网络）。\n- 只改本段需要的源码/测试/证据；不改 docs/package.json/规格；不 push；既有脏文件不提交不还原。\n- 输出纪律：文件分段写入；每任务跑定向测试并记录证据。\n- 提交 `feat(021): implement p3 T011-T014`（显式路径；≤3 提交）。\n- Plan constraint active：plan-owned 只读；minor 修改需 PLAN-EDIT。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.implement`，run-id `r20261028T083000Z-7c1a-implement-p3`，`--feature 021-code-cgit-urls --feature-id 026`；session + exec-quant + feedback 全部写入并提交（feedback 用本 worktree 旧引擎；其余主仓引擎 + `--workspace-root`；不得迁移）。\n- 异常显式 `ANOMALY: <事实>`。\n最后一行必须是且仅是：PART3-DONE\n回传：T011–T014 逐条证据、记账路径、工作树状态、未完成项。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "101.132.70.5:443",
+          "47.57.188.188:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 487000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

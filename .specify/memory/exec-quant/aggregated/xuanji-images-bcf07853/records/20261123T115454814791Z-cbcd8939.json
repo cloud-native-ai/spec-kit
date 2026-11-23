@@ -1,0 +1,112 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "7716965fae24bc71b8dfb27579d4c74db6c034513e561a06432c571134de0486",
+    "content_hash": "7b906dd9f035e97e060baf456e7fa9965ce817cdafcb1eb646bdb9da5100b7f6",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261027T092533Z-abcc-review-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T02:49:21Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.79",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-images-optimizations",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 review-fix 子代理（独立于 review 执行者），只修 046 本地项；框架级 P1 记录为上游 backlog，不修改客户端 `.specify` 框架副本。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-images-optimizations；分支 046-image-factory-build-optimizations；HEAD 984b39f7。\n输入：`.specify/specs/046-image-factory-build-optimizations/review.md`（F1–F11）、verification.md、tasks.md、research.md、test-evidence/**、`.specify/memory/features/044.md`、`.specify/memory/register.md`。\n\n本地修复项：\n1. **F4**：新增 `test-evidence/review-fix-dispositions.md`，逐条处置 F1–F11；N-01（research.md:93 旧句）改为指针；N-02（analyze-fix3-dispositions §3 措辞过窄）修正；N-03 守卫在 T031 的 notes/证据中登记（保持 37 任务，不新增任务），并在 FR-027 追溯/N-03 处补覆盖指针。\n2. **F6**：tasks.md 的 `DoD Status: pending` 按模板语义改为 `green-with-void`（Layer-2 延期属 void）并在 DoD 段注明 deferred 归属；不得虚报 `green`；不改 DoD 行内容与任务计数。\n3. **F5（046 本地闭合）**：dispositions 记录 p7 实测 D 外 4882 项（revision 2440 + 根路径 2442）→ D4 投影后残差 0，声明 F-14 在 046 上由测量闭合；“analyze 需测量或风险行”的框架规则标 `upstream-framework`。\n4. **F7**：`.specify/memory/features/044.md` 的 Status / Last Updated 按 canonical 状态机更新（P0 切片 implemented + Layer-2 deferred；若状态机不允许则保守 In Progress 并注明依据）。\n5. **F8**：`.specify/memory/register.md` 增补 046 的 ID 指针行（D1–D4、F-14…F-18、N-01…N-03、ANOMALY-1、L2-1…L2-3），一行一条、指向 spec 文件/章节，不复述内容。\n6. **F9**：`test-evidence/regeneration-idempotency.txt` 追加 dated 前向指针（不改原始测量值），指向 `implement-fix1-dispositions.md`。\n7. **F10**：verification.md 的 FR-029 改为 `partial` 并引用 open-anomaly 行；其余 FR 行按模板补 satisfied/partial 状态（只改状态口径，不改事实）。\n8. **F11**：`contracts/layer2-evidence.md` 增加 host 谓词（status=deferred 时 host 必须为授权面或 `none`/`deferred`，reason 只述已发生事实）；L2-1..L2-3 的 host 改为 `deferred`/`none`；`test/unit/test_layer2_evidence_contract.py` 增加该谓词测试。\n9. **框架级 F1/F2/F3 与 F4 的框架半侧**：在 dispositions 中标记 `upstream-framework`，给出 spec-kit 落点（文件/函数/模板），不修改客户端 `.specify` 框架副本。\n\n纪律：不实现功能代码；不改 `images/**`；不 push；显式路径提交，禁止 `git add -A`；脏文件不提交不还原。\n校验并回报：validate-requirements（0/0）、validate-tasks（0 error/1 既有 WARN）、account-clause-coverage（45/45）、decomposition（30/37 proceed）、`git status --porcelain`。\n提交 `docs(046): review-fix P1/P2 dispositions`（可 ≤2 提交）。\n记账（必需）：unit-id `/speckit.review`（或 `skill:review-sdd-process`），run-id `r20261027T092533Z-abcc-review-fix`，`--feature 046-image-factory-build-optimizations`。无法写入 → `WRAPUP-DEFERRED: <原因>`。\n最后一行必须是且仅是：REVIEW-FIX-DONE"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-images-optimizations",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443",
+          "47.107.125.11:443",
+          "39.106.176.70:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

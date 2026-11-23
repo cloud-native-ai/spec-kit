@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "aa44e3b97388c3b67d79f204c47d3684ff3c8258aa23400a67a91a9a08f77352",
+    "content_hash": "ba3d57e7b98dee87047914137d007478c7cd9bd1fe0b45efd3bdcff275839fef",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.tasks",
+    "unit_type": "command",
+    "run_id": "r20261117T172128Z-9205",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-17T18:22:04Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的无人值守 SDD 特性开发，当前阶段：tasks。\n\n- 项目终态权威文档：本仓 `.specify/constitution.md` / `.specify/instructions.md` + 用户四项改造要求（已固化在 `requirements.md`）+ Maven 标准布局与 Spring Boot 4.0.4 parent 约定\n- 项目宪法：`/cws_work/xuanji-buc/.specify/constitution.md`（合规底线）\n- 上一阶段完成提交：`f3b1257`（plan 阶段，续作基线）\n- 当前断点判定：plan **U4 PASS**（`pre-analyze-check --stage plan` = pass，0 error / 37 advisory（均为待创建交付物）；`wp-gate --stage plan --check plan` = single-package，0 findings；宪法 8 条全 Pass；2 个 fresh-context 只读评审员 16 条 findings 全修；三步记账齐备）\n- 状态脊：STATE_SPINE_PATH=`.specify/state/buc-java-standardization.md`（**必读 U1 Probe Evidence、requirements/clarify/plan 的 Verdict 节与 plan fence**）\n- 证据目录：EVIDENCE_DIR=`.specify/specs/007-java-project-standardization/test-evidence`\n- 状态脊写入模式：SPINE_WRITE_MODE=direct\n- 本线类别（四元组）：flow_class=execution；source=declaration；marker=-；error=-\n\n## 本阶段任务\n\n执行 **`/speckit.tasks`**，基于 `plan.md`（511 行，S0–S8 阶段图）、`research.md`、`data-model.md`、**6 份契约 59 条**、`quickstart.md` 与 `requirements.md`（49 FR / 5 NFR / 17 SC / 12 RS / 12 STR）产出 `tasks.md`。**本阶段不写实现代码、不做实际删除或移动。**\n\n## 硬性结构要求\n\n1. **按 S0–S8 阶段图组织任务族**，并**按模块建 11 个迁移任务**（014 的 10 个模块 + 012 的 1 个），逐模块行数必须对齐 MM-04 的 **11/13/15/34/15/10/14/14/16/67/2 = 211**。\n2. **硬前置边必须写进 `blockedBy`，不得只写散文**：`S0→S1`（黄金测试先冻结）、`S1→S4`、`S2→S4`（迁移与能力等价物先绿，删除才允许）、`S4→S5→S6→S7→S8`；S3 与 S2 可并行但不早于 S1 出口。**禁止拓扑：任何删除动作早于 S1/S2 出口**。每条「写测试 → 实现 → 最终回归」的边都要有 `blockedBy` 覆盖。\n3. **任务总数预算约 133 行，必须 < 160**（拆分门上限）。若实测超限，**按 plan R-12 的预案切分为 S0–S2 / S3–S4 / S5–S8 三片**，并在 tasks.md 显式登记切片与各片验收边界；不得把 200+ 任务压成单线。\n4. **plan↔tasks 零漂移**：plan / contracts / quickstart 中引用的**每个测试套件名、脚本名、制品路径**都必须在 tasks 里有**创建任务**（例如 `BehaviorContractGoldenTest`、`RuntimeShapeGoldenTest`、`ConfigSurfaceGoldenTest`、`MigrationMapContractTest`、`src/test/resources/migration-map.json`、`src/test/resources/test-assets.json`、`src/test/resources/baselines/java-tests.txt`、`bin/verify-all.sh`、`deploy/verify/auth-it/run-it.sh`、`env-contract.txt`、`baseline-pre/` 五制品）。逐条自检，不得留「plan 提到但 tasks 无创建任务」的悬空引用。\n5. **三向追溯闭合**：49 FR 每条至少一个任务承载；17 SC 每条有验证任务与用例；12 RS 与 12 STR 的落点可核对。Traceability 表含 NFR 维度（5 条 NFR 不得成孤儿）。\n6. **每包 ≤16 任务**，给出 Package Map（含「主写文件」与「串行约束」两列），供 implement 期切包；写域重叠的包必须标串行。\n\n## 必须落进任务的关键判据（不得弱化）\n\n- **S0 取证冻结**：三组黄金契约测试先提交并跑绿；采集 `test-evidence/baseline-pre/{surefire-names.txt,jar-entries.txt,env-names.txt,runtime-shape.txt,http-contract.txt}` 五制品各带采集命令；记录冻结提交 SHA；**黄金测试文件进入只读清单**，此后 `git diff <冻结提交>..HEAD -- <golden files>` 必须为空。S0 出口还要求 `git diff f7ecb97..HEAD -- src pom.xml` 为空（代码基线等价）。\n- **基线扫描器按词边界**：精确 `@Test` [masked-credential:kv_assignment] `@TestConfiguration` 误得 209）；`com/aliyun` 覆盖 **1327/1819 = 72.95%**，删类后分母 ≈1770、达 **≥80% 需 +89 行**；测试名目标 **≥232**。这些数字必须写进对应任务的验收判据。\n- **S4 删除边的机器判据**：`MigrationMapContractTest` 报 `rows=211 unmapped=0` 且 `./mvnw -B test` 全绿，**同时** `find` 为 0 行、`pytest.ini` 不存在——两者缺一不得进 S4。`migration-map.json` 的 oracle 只读指向 `006-test-framework/test-evidence/baselines/python.txt`（as_of 2026-11-16），**不得重写 oracle**；`status` 封闭二值 `migrated`/`dropped`，`dropped` 的 rationale 必须含「理由 / 影响面 / 受影响特性验收状态」三要素；014 名下 `migrated` **≥199**。\n- **006 四项能力等价物**：清单按文件级资产计数（test/support/integration）、基线由**源码扫描**而非 Surefire 报告、聚合退出码 **0/1/2 + 名称级空车道守卫**（注意 plan 评审已修「按参数化展开计数会掩盖删除」的缺陷，任务判据须按修复后的口径）、失败行格式固定。\n- **集成测试执行**：`deploy/verify/auth-it/run-it.sh` 由 `bin/verify-all.sh --with-integration` 按清单驱动，**不进 surefire、不计覆盖与基线**，不引入 failsafe/tag 分层；SC-015 的 5 条防「移走没人跑」判据各有验证任务。\n- **布局与引用闭环**：`conifg/nginx` → `deploy/nginx`（引用面复算命令实测 16 行）、`scripts` → `bin`、`tests/sts/verify-deployment.sh` → `deploy/verify/sts/`、删 `.pytest_cache` 并补 gitignore、**保留 `target/`**（布局 oracle = `git ls-files`）；「活动文件 `conifg` 命中 0」有断言任务；**镜像两段归属不动**。\n- **配置面**：不建生产 profile 文件；删 Maven `test` profile 与插件 `<profiles>`；校验收敛 `@Validated` + FailureAnalyzer 并**删两处重复校验**；`spring.factories` 正名；环境变量零改动用黄金文件 `env-contract.txt` 断言。\n- **echo 后端**：`deploy/verify/backend/echo_backend.py` 终态保留 Python（`user-waived`），无 `python3` 时记 `blocked:python-runtime-absent`，**blocked ≠ 已验证**，不得写成已验证。\n- **测试执行唯一入口 `./mvnw -B test`**；不得用即将废止的 pytest 轨，采集基线用 006 归档制品不重跑 pytest。\n\n## 完成要求\n\n- 重跑仓内门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`；并跑 `.specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements <spec>/requirements.md --tasks <spec>/tasks.md` 确认 **proceed**（非 split-required）。逐字输出追加到 `test-evidence/`（保留既有证据）。\n- 执行 Wrap-up 三步记账，**unit-id 带斜杠** `/speckit.tasks`，`--feature 007-java-project-standardization`，run-id 用本轮真实值；**首次落盘即写正确值**；无法写记账时最后一行输出 `WRAPUP-DEFERRED: <原因>`。\n- 创建本阶段提交，只纳入本特性产物。message：`feat(spec): 016 tasks 任务分解（S0-S8 阶段族 + 11 模块迁移 + 三向追溯）`。**不要 push**；既有脏文件与 `.specify/memory/` 记账记录不提交不还原。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；访谈式问题自行裁决并记录假设（落 Assumptions 节或提交说明）。\n- 只提交本特性产物。不要 push。只推进当前阶段，不得自行越阶段或开始实际删除/移动。\n- 临时文件只落 `.specify/.tmp/`。\n\n## 完成尾标与回传契约\n\n- 报告必须列出：任务总数与是否 < 160、11 个迁移任务的逐模块行数核对（合计 211）、硬前置边清单、plan↔tasks 悬空引用自检结果（应为 0）、三向追溯闭合读数、Package Map 包数与每包任务数、两道门读数。\n- 不得伪造绿；判据不可满足时如实记录真实读数并指明修正归属。\n- 完成时，你输出的最后一行必须是且仅是完成哨兵：`TASKS-DONE`\n- 若无法完成，最后一行输出显式异常行：`ANOMALY: <一句话事实>`\n- 最后一行既不是哨兵也不是异常行 = 卡死信号。异常必须显式回传，静默不被接受。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "39.106.176.70:443",
+          "8.223.13.163:443",
+          "47.57.188.188:443",
+          "47.57.243.249:443",
+          "47.107.125.11:443",
+          "106.14.225.66:443",
+          "120.79.243.153:443",
+          "39.106.211.206:443",
+          "8.212.124.35:443",
+          "101.132.70.5:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "f06e4c9238894a7c104be12afc8281c71ac67e9eddac6a3e22a93ebff7f7edb5",
+    "content_hash": "54f22bc2ea727cfeaeb46140d2ef681aabbfb5a104b1b5287763897a00fef026",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.tasks",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-tasks",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T15:31:56Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：tasks。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `a7f5c95f`；clean。\n- spec 023：30 FR / 20 SC；plan + 8 contracts；Feature 029 Planned；plan constraint active（plan_commit `a7f5c95f`）。\n- 目标：把新架构分解为依赖有序、可执行的 tasks.md；不写实现。\n\n② 执行要求\n- 运行 `/speckit.tasks`，产出 `.specify/specs/023-xuanji-doc-architecture/tasks.md`；Tests Mode 按宪法推导并打印。\n- 任务覆盖：nginx 入口/SPA/`/docs/`；`api` 四域 + MCP + auth；`ingest` push/pull/转换/Job/docs volume；query 迁移 + citation/score；Hugo server；SPA 页面；cgit/graphicle；存储/迁移/回滚；FR/SC 全覆盖、8 契约条款逐条认领。\n- 外部义务（xuanji-api 契约 pin、xuanji-images 镜像）单列，不写成仓内实现任务；任务数 ≤40；每条含显式路径、验证命令/断言。\n- plan constraint：plan/research/data-model/contracts/quickstart 只允许 minor 修改并声明 `PLAN-EDIT`；实质变更 ANOMALY 停线。\n- 只改本 spec 与 Feature 029；不实现；不 push；不 `git add -A`。\n- 记账：`/speckit.tasks`，run-id `r20261030T120500Z-d101-tasks`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`TASKS-DONE`\n- 回传：任务数、FR/SC/条款覆盖、Tests Mode、PLAN-EDIT、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.107.125.11:443",
+          "47.106.172.117:443",
+          "39.106.96.116:443",
+          "8.212.124.35:443",
+          "59.110.214.247:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "120.24.170.126:443",
+          "47.116.44.184:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443",
+          "47.116.36.231:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

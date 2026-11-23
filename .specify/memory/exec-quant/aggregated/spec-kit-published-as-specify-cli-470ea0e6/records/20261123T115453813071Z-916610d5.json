@@ -1,0 +1,66 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "spec-kit (published as `specify-cli`)",
+    "source_commit": "4b21801ec8b0bd22536fa47fac71296927daf889",
+    "identity_status": "identified",
+    "identity_key": "11276b40542470bdd5131d68c22788993d65f2e68ac36a2644b49a307522f36d",
+    "content_hash": "337fff36213eeeddae3538be962876fe18cd33f2d0c1effdf7d6236a11c11994",
+    "package_file": "feedback-spec-kit-20261123T185456.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:clarify-artifact",
+    "unit_type": "skill",
+    "run_id": "r20261106T033959Z-086a",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-06T04:11:25Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 382000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

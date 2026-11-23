@@ -1,0 +1,127 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "f98e82dcdcdec54cc24ba25f8eab531f7316d40ba2c9225eb00582a7b835e4c4",
+    "content_hash": "5aff80f9d7d8f2c61eb4a525e4c7c8c70406f7742af9b54f4b44e6004a2c1967",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-implement-p2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T13:32:23Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 implement 阶段分段 p2 子代理（只做本段，不越段）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 85e8ef27；工作树 clean。\n本段 part_scope：**T005、T006、T007、T008、T009、T010**（US2/US1 核心）。不执行 T011+，不改 docs（p4）。\n必读：tasks.md 这 6 条完整条目；contracts/cgit-config.md、cgit-url.md、mcp-wrapper.md、compatibility.md；plan/research/data-model；T003 fixture。\n环境：`node_modules` 为软链（tsx v4.23.0；**不要运行 `pnpm install`**，直接用 `./node_modules/.bin/tsx` / `pnpm code-graph:check`）；Node v26.7.0（waiver W-2026-10-28-CGIT）；无 graphicle（E2E 用 fake fixture）。\n\n执行纪律（TDD）：\n- T005 `service/code-graph/cgit-config.ts`：5 键 loadCgitConfig（C-01…07），红→绿。\n- T006 代理 bootstrap + 会话身份派生（C-08,10；W-01…04,19,20,23），复用 T003 fixture。\n- T007 `cgit-url.ts`：buildCgitUrl（U-01…19），红→绿。\n- T008 `cgit-ref.ts`：resolveManifestRef（§6），红→绿。\n- T009 `cgit-rewrite.ts`：rewriteToolResult（W-10…13,24），红→绿。\n- T010 启用态 E2E + entry wiring（W-05,08,09,14,15）。\n- 只改本段需要的源码/测试；不实现 T019 package scripts、不改 docs/service 其余面、不改规格；不 push；既有脏文件不提交不还原。\n- 输出纪律：文件分段写入；每任务跑定向测试并记录证据。\n- 提交 `feat(021): implement p2 T005-T010`（显式路径；禁止 git add -A；可按任务分组 ≤5 提交）。\n- Plan constraint active：plan-owned 产物只读；如需 minor 修改，声明 PLAN-EDIT。\n- **Wrap-up 记账（必需，三件套一次完成）**：`/speckit.implement`，run-id `r20261028T083000Z-7c1a-implement-p2`，`--feature 021-code-cgit-urls --feature-id 026`；session + exec-quant + feedback **全部**写入并随提交（feedback 用本 worktree 旧引擎；exec-quant/session 用主仓引擎 + `--workspace-root`；不得触发 store 迁移/删除 tracked index）。无法写入 → `WRAPUP-DEFERRED`。\n- 异常必须显式 `ANOMALY: <事实>`。\n最后一行必须是且仅是：PART2-DONE\n回传：T005–T010 逐条证据（文件/测试名/红→绿/提交哈希）、记账三件套路径、工作树状态、未完成项。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.116.36.231:443",
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "59.110.214.247:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "47.106.172.117:443",
+          "120.24.170.126:443",
+          "39.106.96.116:443",
+          "39.106.176.70:443",
+          "47.116.44.184:443",
+          "106.14.225.66:443",
+          "47.107.125.11:443",
+          "120.79.243.153:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 736000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

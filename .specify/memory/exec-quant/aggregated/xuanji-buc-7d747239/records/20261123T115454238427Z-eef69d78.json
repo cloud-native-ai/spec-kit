@@ -1,0 +1,119 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "d69ee3559cd56711e97ee8785da34f8f5587efbdd95772522a79683163badf9c",
+    "content_hash": "21b4886493124b853ee252852d48b1a9abee478d3c57e79dba878c1309498546",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:review-feature-quality",
+    "unit_type": "skill",
+    "run_id": "r20261112T1028Z-c",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-12T10:35:51Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/usr/local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/sdd-worktrees/deployment-sts",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "--model",
+          "DeepSeek-Flash",
+          "--thinking",
+          "auto",
+          "--reasoning-effort",
+          "max",
+          "--context-window",
+          "1000000",
+          "--output-format",
+          "stream-json"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/sdd-worktrees/deployment-sts",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 1380000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

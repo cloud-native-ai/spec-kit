@@ -1,0 +1,46 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "spec-kit (published as `specify-cli`)",
+    "source_commit": "4b21801ec8b0bd22536fa47fac71296927daf889",
+    "identity_status": "identified",
+    "identity_key": "f3de9bb68cb7bd1ecef5975aa1d27d7e6e6f789cb1edbb70c40eb438dc55e64d",
+    "content_hash": "cd5bf85101f8dfe033b4b744916403f3fde8e90f25a199225ea17a93937af4b8",
+    "package_file": "feedback-spec-kit-20261123T185456.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 1,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "speckit-analyze-20261018T015833Z",
+    "run_id_resolution": "synthesized",
+    "collected_at": "2026-10-18T01:58:33Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

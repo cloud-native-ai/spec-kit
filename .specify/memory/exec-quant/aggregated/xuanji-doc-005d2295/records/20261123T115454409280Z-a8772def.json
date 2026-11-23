@@ -1,0 +1,112 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "616105105afd8cc5b28b82769197de735af6807e6bff5221a6565638cc190af7",
+    "content_hash": "c0c332cf92533a13de0572268166c0e0dc4f33f42957b543595e49698e417a56",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-review-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T16:09:42Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 review-fix 子代理（只修过程/记录/文本，不实现代码）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 52367eb4；工作树 clean。\n输入：`.specify/specs/021-code-cgit-urls/review.md`（0 P0 / 3 P1 / 6 P2）；verification.md；test-evidence；Feature 026。\nPlan constraint active：plan-owned 修改逐项 `PLAN-EDIT`。\n\n修复项：\n1. **F1（P1）**：回答 `checklists/cgit-url-quality.md` 全部 40 项（pass/fail + 证据指针）；不能判定的写 waiver（含理由与风险）到 `waivers.md`；在 verification.md 记录 checklist 门结果。不得静默勾选。\n2. **F2（P1）**：将 5 条 implement session 记录中 4 条 `settled_at:null` settle（用会话/记忆引擎或等价受控更新，保留原记录内容）；在 `review-fix-dispositions.md` 披露根因（worktree 缺 run-determination/exec-quant 引擎；主仓 feedback 引擎会迁移 tracked index.json→state/）与修复方式。\n3. **F3（P1）**：在当前 HEAD 跑 `pnpm storage:test`（或等价命令）并留证；在 verification/dispositions 记录“p2–p4 分段边界未跑全量回归、p5 才发现并修复”的处置与未来门禁建议。\n4. **F4（P2）**：修正 SC-007 note：T018 row1/row2 实际注入键数（3/1，而非全 5 键）。\n5. **F5（P2）**：对齐 Feature 026 index/detail/binding 生命周期（Ready for Review 一致）。\n6. **F6（P2）**：为 analyze 首轮 16 findings → analyze-fix 10 groups/11 IDs 中 6 项未台账的处置补台账。\n7. **F7（P2）**：在 RED 证据说明中标注 module-not-found 属预期 RED、T012 临时回退重建已复核。\n8. **F8（P2）**：更新 plan.md 过期行数/校验和（plan-owned → PLAN-EDIT）；或改为指针，避免活文档存过时数字。\n9. **F9（P2）**：在 dispositions 记录 storage T-04 守卫把注释/测试标题当违规的误报与当前处置（不改守卫行为/不弱化）。\n- 只改 checklist/waivers/verification/review-fix dispositions/Feature 记录/plan 数字（PLAN-EDIT）；不改源码/测试行为/docs/compose；不 push；工作树 clean。\n- 提交 `docs(021): review-fix P1/P2 convergence`（可 ≤2 提交；显式路径）。\n- 记账：`/speckit.review`，run-id `r20261028T083000Z-7c1a-review-fix`，`--feature 021-code-cgit-urls --feature-id 026`；非迁移。无法写入 → `WRAPUP-DEFERRED`。\n最后一行必须是且仅是：REVIEW-FIX-DONE\n回传：F1–F9 逐项处置、checklist 结果（pass/fail/waiver 数）、settled 记录、storage:test 计数、提交哈希、记账路径。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

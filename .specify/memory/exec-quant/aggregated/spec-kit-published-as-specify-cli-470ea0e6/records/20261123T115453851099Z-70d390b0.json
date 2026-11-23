@@ -1,0 +1,127 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "spec-kit (published as `specify-cli`)",
+    "source_commit": "4b21801ec8b0bd22536fa47fac71296927daf889",
+    "identity_status": "identified",
+    "identity_key": "27db735739f95b8a0026fed3a5121ffe11da4d472ccefdf4ecf951604ed6cb84",
+    "content_hash": "2352747b7a36638897d90352cc228bb092471a70d4dfc53c006cea9084d6fd7a",
+    "package_file": "feedback-spec-kit-20261123T185456.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.checklist",
+    "unit_type": "command",
+    "run_id": "062-humanize-command-checklist-20261019",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-19T08:14:08Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.73",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/cloud-native-ai/spec-kit",
+          "--permission-mode",
+          "auto",
+          "--agent",
+          "SDD Executor",
+          "--model",
+          "DeepSeek-Flash",
+          "--reasoning-effort",
+          "max",
+          "--context-window",
+          "1000000",
+          "-p",
+          "/speckit.checklist 当前特性：062-humanize-command。聚焦需求质量（“需求写作的单元测试”）：清晰性、完整性、可测试性、一致性、边界与术语；不是实现验证。规格与设计见 .specify/specs/062-humanize-command/（requirements.md、plan.md、tasks.md、data-model.md、contracts/）。\n\n## 阶段背景与权威文档\n\n你在推进 /storage/project/cloud-native-ai/spec-kit 的无人值守 SDD 特性开发，当前阶段：CHECKLIST。\n- 项目终态权威文档：/tmp/sdd-humanize/brief.md（需求语义权威；源需求 /tmp/req.txt 已全文收录）\n- 项目宪法：/storage/project/cloud-native-ai/spec-kit/.specify/memory/constitution.md（合规底线）\n- 上一阶段完成提交：e14d9a0a（tasks 完成提交，续作基线）\n- 当前断点判定：requirements → clarify → plan → tasks 均已完成并校验；进入 checklist 质量门。\n- 特性切片：新增 `/speckit.humanize` 命令——将内容、结论或外部文档做人性化描述改写。\n- 已知环境事实：cws-lib-bash 依赖缺失（tasks.md § Environment Prerequisites 已记录）；本阶段不受影响，不要放宽或改写任何基线。\n\n## 执行要求\n\n- 直接执行不要确认；访谈式问题自行裁决并记录假设。\n- 本阶段只产出新的质量检查清单文件（`checklists/` 下新增），不修改 requirements/plan/tasks 的实质内容；检查项针对需求文本质量，不针对实现代码。\n- 只提交本特性产物；既有脏文件不提交不还原。\n- 不要 push——远程推送属破坏性操作。\n- 只推进当前阶段；下一阶段由主代理派发，不要自行越阶段。\n- 并发隔离：本线独占该工作树，无其他并发线；不要读写或提交与本特性无关的既有内容。\n- 使用项目既有 checklist 工作流与模板；清单项编号连续、可判定、可追溯。\n- 快速失败注入子句（原样遵守——执行中发现与已记录预期不符的状态时）：\n  先问一个问题：解决它需要**纠正**还是**裁定**？纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。\n  纠正 ⇒ 就地修完，并在回传中披露。裁定（须在两种以上读法间选择，或须发明工件未记录的意图）⇒ 停在本层、回抛编排者，MUST NOT 就地修平后继续。\n  回传 MUST 含一条显式异常行：有异常则逐条以行首 `ANOMALY:` 列出；无异常则明写 `未发现异常`。缺该行即回传不完整，沉默 MUST NOT 被读作干净。\n  判据、两份封闭清单与上送件形态的唯一真源：/storage/project/cloud-native-ai/spec-kit/.specify/shared/guidelines/fast-fail.md。\n\n## 完成尾标与回传契约\n\n- 完成时，你输出的最后一行必须是且仅是完成哨兵：CHECKLIST-DONE。\n- 若本阶段无法完成（阻塞、发现规格矛盾、环境缺失），最后一行输出显式异常行：`ANOMALY: <一句话事实>`。\n- 最后一行既不是完成哨兵也不是显式异常行 = 卡死信号，主代理将按卡死程序处置。\n- 回传正文请给出：清单文件路径、检查项数量与分组、发现的问题摘要、提交号、以及 `未发现异常` 或逐条异常行。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/cloud-native-ai/spec-kit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "47.57.188.188:443",
+          "39.106.211.206:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443",
+          "8.223.13.163:443",
+          "47.57.243.249:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

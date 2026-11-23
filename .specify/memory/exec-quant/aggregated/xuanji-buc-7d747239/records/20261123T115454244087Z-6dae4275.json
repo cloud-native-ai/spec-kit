@@ -1,0 +1,114 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "c2479cb960cb5ced13ae7883e9a0344bb5ac57b440deacdfd8db763966812ed2",
+    "content_hash": "1690c6730cfe6bb222066c7da29fc8f204cb9969803e1842bd17227a5360d0bd",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118t031229z-impl016-s3",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T03:13:10Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S3（9 包中第 4 个，S3 文档与口径切换，T032–T037，6 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`9d9df54`（PKG-S2 能力等价物）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**\n- 断点：PKG-S2 **包级校验 PASS**（驱动者独立核算：`test-assets.json` assets=**77**（test 63 / support 10 / integration 4）；`tool-selftest-disposition.json` **62** 行（baseline_tool 19 / manifest_tool 24 / verify_all_program 16 / pytest_config_contract 3），replaced 59 / deleted 3；`baselines/java-tests.txt` **419** 名；golden / `src/main`+`pom.xml` / Python 面 / `migration-map.json` 四处 diff 均 **0**；宽定向集 301/301；门 pass）\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 你的包范围与写域\n\n**PKG-S3 = T032–T037**，全部 `blockedBy: T023`（S1 出口已达成），**T037 blockedBy T032–T036**。\n主写文件：`docs/testing.md`、`docs/design/index.md`、`deploy/README.md`、`.specify/skills/config-nginx-for-buc/SKILL.md` 与 `references/nginx-config-reference.md`、`README.md`、`docs/architecture.md`、`test-evidence/s3-*.txt`。\n\n🛑 **五条铁律**\n1. **不得删除或移动任何文件**（删除与目录迁移属 **S4**）。本包只改**文本口径**。\n2. **不得修改三组黄金测试**；出口复验 golden diff = 0。\n3. **不得改 `src/main/**`、`src/test/**`、`pom.xml`、`conifg/**`、`tests/**`、`scripts/**`、`pytest.ini`**。\n4. **`deploy/image/**` 属 CS-11 冻结面**（镜像两段归属：nginx+JDK+supervisord 基础结构由 xuanji-images 工厂提供，应用仓只做简单 Dockerfile 定制）。T036 对 `deploy/image/README.md` **只核对与记录读数**；若发现必须改动才能消除旧路径，**停下输出 `ANOMALY` 说明冲突，不得自行改冻结面**。\n5. **不得改 S1/S2 已交付的契约测试、`migration-map.json`、三载体**。\n\n## 逐任务要求\n\n- **T032** 重写 `docs/testing.md` 为 **Java 单轨唯一说明载体**：唯一入口 `./mvnw -B test`、聚合入口 `bin/verify-all.sh`、退出码 0/1/2 语义、四层判层 oracle 与落点、清单（`test-assets.json`，文件级 test/support/integration）与基线（`baselines/java-tests.txt`，**源码扫描、词边界、419 名**）机制、blocked 语义与 **8 值封闭原因码**（含 `shellcheck-absent`）、覆盖率与确定性/并行规则、新增测试三步。**MUST NOT 残留 pytest / 双车道 / `tests/contract` 口径**。\n- **T033** 改写 `docs/design/index.md`：**11 行**旧 nginx 目录路径事实改为 `deploy/nginx`；§2.5 的「不改名」裁决改写为「**已纠正**」并**保留复算命令**。⚠️ **改写文本以「历史拼写错误」指代旧名，MUST NOT 复写该字面串**（否则活动面 bare 旧名无法归零）。\n- **T034** 清理 `deploy/README.md`：删除 `.specify/scripts/bash/run-tests.sh tests/contract --serial` 旧入口表述，改为 `bin/verify-all.sh`；旧路径引用归零。\n- **T035** 改 `.specify/skills/config-nginx-for-buc/SKILL.md`（**1 处**）与 `references/nginx-config-reference.md`（**2 处**）的旧 nginx 路径文本为 `deploy/nginx`；**重跑 `python3 .specify/scripts/python/sync-mirrors.py --check`**，确认相对基线**不新增 MISS/ORPHAN/DRIFT**，读数落证据。（技能文档属活动面，clarify3 已在 LO-06/非目标中明示可随改名同步。）\n- **T036** 核对并同步 `README.md`、`docs/architecture.md`、`deploy/image/README.md` 对脚本/测试/nginx 参考片段的引用；**无旧路径则记录复核读数**（不要为改而改）；`deploy/image/README.md` 受铁律 4 约束。\n- **T037** S3 出口取证：\n  - 活动面 `pytest` / `tests/contract` / `tests/registry` / `scripts/test-*` 命中**只余 S4 删除面**\n  - `docs/testing.md` 只描述 Java 单轨\n  - **`run-tests\\.sh` 白名单外命中只有 S4 删除面**（`pytest.ini` / `scripts/**` / `tests/**`）；白名单 = 8 个 agent 投影（`.claude`/`.github`/`.opencode`/`.qoder` × coordinator/executor）+ `.specify/**` 框架/历史；**`docs/testing.md` 与 `deploy/README.md` 必须已归零**\n  - 按 **LO-06 命令**复算活动面 bare 旧 nginx 目录名命中（S3 后应只剩 S4 删除面与 java 测试硬编码 1 处，后者归 T040）\n  - 输出落 `test-evidence/s3-exit.txt`\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。文档类改动若有可测断言，红先绿后读数落 `notes/red-first-evidence.md`；纯文本核对如实记「无断言可红」。\n- **测试执行唯一入口 `./mvnw -B test`**；本包跑**定向集**（契约 + 黄金）确认无回归即可，**不得动用 slot-2**（留 S8/review）。**不得执行 pytest**（`sync-mirrors.py --check` 是框架校验脚本，非 pytest，允许）。\n- 只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/`、`.pytest_cache/` 不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`docs(testing): 016 PKG-S3 文档与口径切换为 Java 单轨（nginx 路径纠正 + 旧入口归零）`。\n\n## 输出预算\n\n报告 ≤50 行：T032–T037 逐条状态一行、T037 四项取证读数（活动面命中分布 / run-tests 白名单外命中 / LO-06 复算 / docs 归零）、`sync-mirrors.py --check` 读数、定向集用例数与失败数、golden 与生产代码与 Python 面 diff 复验、门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S3-DONE`；无法完成则 `ANOMALY: <一句话事实>`（尤其 `deploy/image` 冻结面冲突时）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "120.79.243.153:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443",
+          "8.223.13.163:443",
+          "39.106.176.70:443",
+          "101.132.70.5:443",
+          "47.57.243.249:443",
+          "106.14.225.66:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

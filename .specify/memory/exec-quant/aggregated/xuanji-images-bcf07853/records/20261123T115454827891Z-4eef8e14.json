@@ -1,0 +1,132 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "711da0bf8aa00aa466d45ee8af3604d76b78c8ea6481c628d02039e5883d9dee",
+    "content_hash": "ffe09c180e660fcb60551c618c2c2b5c02e2f5515af50ef8df5936e38febf4a3",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-impl-s3e",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T19:13:20Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：implement 第 3e 段（最终源重建 + T023 补验）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `8b37f325`；tracked clean（untracked 构建产物不触碰）。\n- B 已通过 review7（P0 0 / P1 0）并合并入 xuanji-doc main；**最终源提交 = `e6d88761`（origin 分支与本地 main 同提交）**。\n- s3d 已成功构建两叶：project `0f5de0766e90`、service `d0d868429d36`；T017/T018/T019/T022/T024 通过。T023 停因为：① 旧源 `247b4482` 的 POST 路由（B 已在 `b8906232` 改为 GET）；② `/docs/` 在 Hugo 服务下 404。\n- Hugo 0.148.2 mirror 资产已补齐；lightrag 子模块可获取。\n\n② 执行要求\n- 运行 `/speckit.implement`，用最终源 `e6d88761` 重建 T017/T020/T021/T022，并补验 T018/T019/T023/T024；到 T024 完成后停止。\n- **T023 重点**：用 GET `/api/v1/documents/query` 重验；并诊断 `/docs/` 404 的根因（Hugo server 的 `--baseURL`/路由 vs nginx `location /docs/` 代理/重写）。属于 C 侧（nginx/supervisor）则修根因；属于 B 侧（Hugo 配置/站点结构）则记录 ANOMALY 并停线，不得改弱断言。\n- 其余端口/健康/认证矩阵按 tasks.md；四个 health 匿名 200/503；无秘密 fail-closed 只覆盖业务路由与 `/mcp/v1`。\n- 构建前按 tasks.md 运行生成器；生成物只能经生成器产出；证据落 `notes/`（tag/digest、source pin、矩阵输出）。\n- 不修改 plan/research/data-model/contracts/quickstart（PLAN-EDIT: none）；实质变更 → ANOMALY 停线。\n- 每条任务完成即以 `[X]` 标记；只在其验证命令真实通过后翻转（T023 未过则保持 `[~]`）。\n- 不 push（含镜像）；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.implement`，run-id `r20261030T120500Z-b101-impl-s3e`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套 + `run-record-implement-s3e.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`IMPL-S3E-DONE`\n- 回传：任务状态、镜像 tag/digest、source pin、T023 矩阵与 `/docs/` 根因、证据路径、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.212.124.35:443",
+          "59.110.214.247:443",
+          "39.106.211.206:443",
+          "8.223.13.163:443",
+          "106.14.225.66:443",
+          "47.106.172.117:443",
+          "101.132.70.5:443",
+          "39.106.96.116:443",
+          "120.24.170.126:443",
+          "39.106.176.70:443",
+          "47.116.36.231:443",
+          "47.116.44.184:443",
+          "47.107.125.11:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 1800000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.unresolved_red",
+          "count": 1
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "partial",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

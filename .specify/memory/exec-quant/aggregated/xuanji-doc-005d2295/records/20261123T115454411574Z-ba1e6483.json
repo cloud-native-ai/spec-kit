@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "765f2ec85deba7b6a958b6989a939d87bc488353b89e56582848699927d320d0",
+    "content_hash": "f3bdcea2771cb2806abc492a759bc26858552019b8e52268210c49a7b2d720b0",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-review",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T18:06:37Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：**review（SDD 过程评审，非代码评审）**。\n\n① 背景与现状\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `d1ec6d17`；工作树 clean；未 push。\n- 特性：022-citation-architecture / Feature 027（`Ready for Review`）。规模：**29 FR / 12 SC / 7 US / 195 条契约条款 / 33 任务（31 `[X]` + 2 `[~]`：T019 真实 OpenAPI pin、T033 live bundle）/ 外部义务 E-1…E-7**。\n- 阶段链：requirements → clarify（Q-001…Q-008）→ plan（plan/research/data-model/7 contracts/quickstart）→ tasks → checklist（50 项）→ analyze（3 HIGH）→ analyze-fix（29/29 处置）→ analyze2（0 HIGH, 4 MEDIUM/4 LOW）→ implement p1–p5 → implement 收尾（`verification.md`、owner docs、Feature Ready for Review）。\n- 关键事实：`kb:citation:test` 206（205 pass / 1 skip=T019）；gateway 142/128/14（14 个 `EADDRINUSE 44145` 环境基线、零新增）；React 17/17；`kb:openapi:check` skipped；p4/p5 两次提交被工具层分类器拦截、由驱动补提交 `41050755`/`d1ec6d17`；`yaml` lockfile 延迟（D-003/D-016）。\n- 权威：`.specify/specs/022-citation-architecture/**`（含 `run-record-*.md`、`test-evidence/**`）、Feature 027 三面、`.specify/memory/{feedback,session,exec-quant}` 记录、宪法/instructions。\n\n② 执行要求\n- 运行 `/speckit.review`，评审**本特性的 SDD 过程与产物**（不是业务代码质量），输出 `.specify/specs/022-citation-architecture/review.md`：\n  1. 阶段链完整性与门禁真实性（sentinel/提交/记账三件套、analyze 两轮、plan constraint、U4 门禁）。\n  2. 需求↔plan↔契约↔tasks↔实现的追溯与漂移（含 195 条条款认领、FR 29/SC 12、外部义务边界）。\n  3. 测试与证据的诚实性（off 逐字节、live/deferred 不记 pass、环境性失败披露、skip 理由）。\n  4. 偏差与 ANOMALY 的处置质量（D-001…D-030、A-1…A-3、F-101…F-108 的残留）。\n  5. 宪法/治理符合性（III/XI/XII/XIV/XVI/XIX/XX/XXI；单一 owner；冻结面；零凭据）。\n  6. 过程改进点（可移植到 spec-kit 的教训）。\n- 每条发现给 `P0/P1/P2` + 位置 + 证据 + 建议；P0=阻断交付（安全/数据/契约破坏/虚假完成），P1=应在本特性内修复，P2=记录即可。**不得为通过而放水**；也不得把 P2 升格为 P0/P1 以扩大范围。\n- 门禁：`P0=0 且 P1=0` → 可进入 U6；否则进入 review-fix（有界）。\n- 只写 `review.md`、`run-record-review.md` 与记账三件套；**不改** requirements/plan/contracts/tasks/verification/docs/代码；不 push；禁 `git add -A`。\n- 记账：Unit `/speckit.review`，run-id `r20261028T162000Z-c1a2-review`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-DONE`\n- 回传：P0/P1/P2 计数与清单、门禁结论、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

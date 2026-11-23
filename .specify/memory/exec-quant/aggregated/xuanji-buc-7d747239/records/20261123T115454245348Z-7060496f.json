@@ -1,0 +1,121 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "f6ab3b76f678516d39e483cfe223f82a3f0967dcf9de2930912d6834664f44e1",
+    "content_hash": "e8300aa93a7b5ea10399ed15406925aee4594bdf02e7498eba4b4f7a88927b52",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118T043032Z-impl016-s7",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T04:30:41Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S7（9 包中第 8 个，S7 聚合验证程序收敛与演练，T076–T081，6 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`8539aaf`（PKG-S6 单元测试补齐，18 files，+2071/−1）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**（唯一源 `test-evidence/baseline-pre/freeze-commit.txt`）\n- 断点：PKG-S6 **包级校验 PASS**（驱动者独立复算：全量 **583/0/0/0 BUILD SUCCESS**；从 `jacoco.csv` 复算 **1625/1749 = 0.929102**（15 个 `com.aliyun*` 包，唯一排除 `LoggerInit` 0/41），远超 0.80 阈值；基线 **507**、清单 **91 assets**（test 77/support 10/integration 4）；golden / `src/main`+`pom.xml` / `deploy/**` / 框架面四处 diff 全 **0**；门 `decision=pass errors=0`）。逐项读数见 `test-evidence/s6-exit.txt` 与 `s6-coverage.txt`\n- **当前基线**：`baselines/java-tests.txt` = **507 名**，`test-assets.json` = **91 assets**\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 本包写域\n\n`bin/verify-all.sh`、`src/test/java/.../contract/VerifyAllProgramContractTest.java`（**扩展**）、`docs/testing.md`、\n`src/test/resources/{test-assets.json,baselines/java-tests.txt}`（**仅 append-only 登记**）、`test-evidence/s7-*.txt`。\n\n🛑 **六条铁律**\n1. **三组黄金测试只读**，出口 golden diff = 0。\n2. **`src/main/**`、`pom.xml` 禁改**（S5 后重新冻结）；**`deploy/**` 全冻结**（CS-11），出口 diff 空。\n3. **不得删除或改名任何既有测试方法**（出口 `missing=0`）。T077 是**扩展**既有 `VerifyAllProgramContractTest`（只加方法）。\n4. **基线计数不是冻结常量**：新增方法按 **BL-08 / TM-04 append-only 同提交登记**，出口报 `added=` / `missing=0`，先探针取红再转绿。\n5. **`.specify/scripts|shared|templates|agents` 框架面禁改**（T089 会复核 diff 空）；`.github/` 不得新增工作流。\n6. **blocked ≠ pass**：环境受限项以 blocked 记录表达，**MUST NOT 在任何证据中记为已验证**。\n\n## 环境前置（tasks § Environment Prerequisites，2026-11-18 实测，可直接采信）\n\n| 依赖 | 状态 | 对本包的影响 |\n|------|------|-------------|\n| docker daemon | **unavailable**（`docker info`） | T078/T079 blocked 演练的**预期来源** |\n| docker compose CLI | available v5.5.1 | 只做 `compose config` 静态判定，不启动容器 |\n| Kubernetes cluster | **unavailable**（`kubectl cluster-info`） | T079 blocked 预期来源 |\n| 兄弟仓 `../xuanji-service` | **absent** | T078/T079 blocked 预期来源 |\n| shellcheck | available `/cws_app/shellcheck/0.11.0/bin/shellcheck` | 不触发 `shellcheck-absent` |\n| JDK 21 + Maven wrapper | available | 全部 Java 车道 |\n\n→ `--with-integration` 的三个入口**预期全部 blocked**（`docker-cli-absent` / `k8s-cluster-unavailable` / `sibling-repo-absent`），\n**rc 仍为 0**（blocked 不改退出码），且 blocked 时该入口**未被实际执行**。这是正确行为，不是缺陷。\n\n## 逐任务要求\n\n- **T076** 收敛 `bin/verify-all.sh` 最终形态：\n  - 覆盖判定按 **VA-07**（阈值 **0.80**、失败行与测量记录）\n  - **空车道守卫按 VA-11 名称集合**——⚠️ **参数化展开只影响执行计数，MUST NOT 用于守卫比较**（S2 已确立名称级口径，不得回退成参数化展开级）\n  - 失败行按 **VA-09** 格式\n  - `--with-integration` 按 **VA-04/VA-06**\n  - 证据目录按 **VA-10**（仓库内 → rc=2）\n- **T077** **扩展** `VerifyAllProgramContractTest`，新增：\n  - `withIntegrationRecordsBlockedWithoutChangingExitCode`（blocked 不改退出码、**无 pass 伪造**）\n  - **守卫名称级演练**（用例消失 **MUST NOT 静默返回 0**）\n  - **失败行格式断言**（VA-09）\n- **T078** **SC-011 四次演练**，输出归档 `test-evidence/s7-drills.txt`：\n  1. `--dry-run` → 恰五步、**无执行**、不落盘\n  2. **rc=0** 正常路径\n  3. **rc=1**：受控临时删除**一个非黄金测试方法** → 基线契约失败 → 恢复\n  4. **rc=2**：`--evidence-dir` 指向**仓库内**\n  ⚠️ **第 3 次演练的破坏性动作严格受限**：只删**一个**、**非黄金**、**非契约**的普通测试方法；\n  恢复只用 **`git checkout -- <该具体文件路径>`**，**MUST NOT** 用 `git checkout .` / `git restore .` / `git reset --hard` 等广谱命令；\n  恢复后必须确认 **`git diff --stat` 为空**并把该读数写进证据。黄金三文件与契约测试**全程不得触碰**。\n- **T079** **SC-015 blocked 演练与五判据核对**：`bin/verify-all.sh --with-integration` **rc=0**、\n  每项入口**一行** `status=blocked reason=<code>`、blocked 时该入口**未被实际执行**\n  （**唯一 owner = 预检**，入口脚本不自行记录该行）；另核对：文件存在且可执行、清单登记且 `findings=0`、\n  dry-run 打印入口步骤、`docs/testing.md` 给出命令、blocked 不改退出码。\n- **T080** 对齐 `docs/testing.md` 与 SC-015：命令小节给出 `bin/verify-all.sh --with-integration`，\n  明确声明 **integration 不进 `./mvnw -B test`、不计覆盖与基线**。\n- **T081**（出口，落 `test-evidence/s7-exit.txt`）dry-run **5 步且无执行**、**0/1/2 三档读数齐备**、\n  blocked 演练通过、清单 `findings=0`。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。\n- 断言**红先绿后**，读数落 `notes/red-first-evidence.md`；四次演练与名称级守卫演练必须留**真实输出**（含 rc），不得纸面推演。\n- **测试预算**：本包跑**定向集**（契约 + 黄金）；**slot-2 仍保留给 S8/review**。若需全量须具名记 `out-of-slot-exception reason=<事实>`；被权限分类器拦截则如实记录并回退定向集，**MUST NOT 编造全量读数**。\n- **不得执行 pytest**（Python 栈已于 S4 移除）。`shellcheck` 可用，脚本改动后应跑一次静态检查。\n- 只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/` 不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`test(verify): 016 PKG-S7 收敛聚合验证程序并完成 0/1/2 与 blocked 演练`。\n\n## 输出预算\n\n报告 ≤45 行：T076 五项收敛逐条（尤其 VA-11 名称级口径未回退的证明）；T077 新增方法数与三条断言结果；**T078 四次演练逐次 rc + 第 3 次的删除/恢复读数（`git diff --stat` 空）**；T079 五判据逐条 + 三个 blocked reason 码；T080 docs 对齐读数；T081 四项出口；基线/清单登记增量（`added=`/`missing=0`）；golden / `src/main`+`pom.xml` / `deploy/**` / 框架面 diff 复验；门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S7-DONE`；无法完成则 `ANOMALY: <一句话事实>`（尤其演练无法在受限环境取得真实 rc、或黄金/冻结面被牵动时）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "120.24.170.126:443",
+          "47.57.243.249:443",
+          "59.110.214.247:443",
+          "8.212.124.35:443",
+          "39.106.211.206:443",
+          "47.106.172.117:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "39.106.96.116:443",
+          "47.116.36.231:443",
+          "101.132.70.5:443",
+          "47.116.44.184:443",
+          "47.107.125.11:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "fe340101a75435be9783d7cbba4150757543c89d872fb763b54a88198adef688",
+    "content_hash": "3ca4323fa8f35a270e0603f959947a38e82d093ec402c85748f2c66fd75c58f3",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-requirements-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T12:47:29Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：requirements-fix（有界，只收敛 FR 数量）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `a933842f`；clean。\n- `.specify/specs/023-xuanji-doc-architecture/requirements.md` 现有 **34 FR / 20 SC**；decomposition plan gate 返回 `split-required`（FR 34 > 30）。\n- 目标：在**不丢失任何规范性内容**的前提下，把 FR 收敛到 ≤30（优先合并同一组件/同一验证面的相邻 FR），保持 SC/Assumptions/Clarifications/Shared Strings 自洽。\n\n② 执行要求\n- 合并原则：同一组件（如 nginx 入口与鉴权、api 域与 MCP、ingest push/pull、Hugo/SPA 静态边界）可合并为复合 FR；保留所有 MUST/MUST NOT/降级/边界；不得降低可测试性；不得新增范围。\n- 更新所有被合并 FR 的编号引用（SC/Assumptions/Clarifications/契约指针）；保持 ID 连续性；不得改变 clarify 裁决语义。\n- 复跑 `validate-requirements.py`（0 error/0 warning）与 `decomposition-check.py --mode plan`（必须 `proceed`）；Feature 029 保持 Draft。\n- 只改 `.specify/specs/023-xuanji-doc-architecture/requirements.md` 与必要的运行记录；不进入 plan；不实现；不 push；不 `git add -A`。\n- 记账：`/speckit.requirements`（fix），run-id `r20261030T120500Z-d101-requirements-fix`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REQUIREMENTS-FIX-DONE`\n- 回传：合并映射、最终 FR/SC 数、门禁结果、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

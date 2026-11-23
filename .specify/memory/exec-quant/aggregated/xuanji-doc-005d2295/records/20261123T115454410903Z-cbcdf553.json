@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "a5400ad19eb0920725bf1560eb18d223c2a0ca8fdcc2f5919087618625fcfbaa",
+    "content_hash": "f64e011fc26b8c826dc09b241de43850ee522e79cb30248623f4b8c1f20c9141",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-analyze-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T13:02:50Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：**analyze-fix（有界一轮，只修规格文本与记账，不实现代码）**。\n\n① 背景与门禁\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `5878b788`；工作树 clean。\n- analyze 结论：**CRITICAL=0 / HIGH=3 / MEDIUM=14 / LOW=12，GATE=fail**，阻断 implement。报告：`.specify/specs/022-citation-architecture/run-record-analyze.md`（F-001…F-029 全文+证据+建议，务必逐条读）。\n- **授权**：本阶段是门禁后的授权修复轮。plan-owned 产物（plan/research/data-model/contracts/quickstart）只允许为修复下述 finding 而改，并逐条声明 `PLAN-EDIT: <文件/条款> — <finding 与理由>`；不得借机重构或扩大范围。除 F-019 的最小追溯条款外不得新增 FR；不得新增配置键（仅 4 个新键 + 5 个 `CODE_GRAPH_CGIT_*`）。\n- 不得改变 Q-001–Q-008 的裁决方向；如某 finding 的建议与裁决冲突，以 finding 的“唯一 owner + 显式降级”原则做最小调和并记录。\n\n② 必改（3 HIGH + 9 需修复项，按以下裁决执行）\n1. **F-001（HIGH）**：在 **ingest 持久化边界**把扁平 `citation` 归一化为嵌套 `locator`，让 FR-007 ① 可执行。`kind=doc` 时 `locator={doc_path,lang,heading,anchor}`（可空字段显式 null）；IngestRecord 同时保存请求原文与规范化 locator（字段名清晰，如 `citation_request` / `citation_locator`）；`citation-model.md` C-33 改为“读规范化 locator”，并定义扁平→locator 的组装规则与测试。同步 `data-model.md`、`research.md` 指针。\n2. **F-002（HIGH）**：在 `doc-url.md` 增加 heading/anchor **存在性校验**分支（用同一 `DocSource` 读取目标文档的 ATX 标题）：\n   - 文档可读 + `heading` 非空但标题不存在 → `web_url=null` + `[[STR-019]]`；\n   - 文档可读 + 显式 `anchor` 不在该文档计算出的 heading ID 集合 → null + `[[STR-019]]`；\n   - 文档不可读 → null + `[[STR-029]]`（见第 3 条），`version_relation=[[STR-006]]`；\n   - 补 fixture：标题不存在/显式 anchor 不存在/文档不可读 三类。同步 `citation-model.md` C-28 的 current/stale 范围。\n3. **F-005 + F-006 + F-008（MEDIUM）**：给文档 URL 增加原因 **`[[STR-029]]`（`source_unavailable`）**，修订 FR-010 的文档原因封闭集；存储不可用时 `web_url=null` + `[[STR-029]]`（不再构造可能断链的 URL）。**单文档** manifest 缺失只影响该引用（null + `[[STR-029]]`），**不得**产生 `degradation`、不得遮蔽 graph/vector；`degradation` 仅表达全局能力（graph/vector/backend）。同步 FR-017/FR-020、`contracts/{doc-url,storage-capabilities,query-response,citation-model}.md`、`data-model.md` §8 与 SC-002/SC-009 的度量口径。\n4. **F-003（HIGH）**：解决 C-20 与 C-30 的 409 抵消。引入 `version_source ∈ {explicit, backfilled, none}`：唯一约束/409 只对 **explicit** 版本生效；网关回填版本（backfilled）不触发 `version_conflict`，但参与 `version_relation`/幂等键。更新 `ingest-citation.md` 的 C-20/C-30/§5.3 与部分唯一索引条件、FR-023 表述、plan Known Spec Tension；补 fixture：同 citation、同 doc、不同 text、省略 version（含分片）。\n5. **F-004（MEDIUM）**：SC-001 的度量口径改为：代码 URL 能力由 **Feature 026 MCP 套件**承接；022 查询面不产出 code citation，`[[STR-022]]` 在 v1 无查询产出面（可加 `projectCodeCitation()` 纯函数测试但不改变 026 禁用语义）。同步 FR-009 注记、`citation-model.md` C-19、tasks T017 的 done-when。\n6. **F-007（MEDIUM）**：扩展 plan §B E-1：OpenAPI 1.1.0 必须调和 `file_source` pattern（接受非 `kb://` 或明确仅描述子集）与 `track_id` 非空；`openapi-pin.md` 明确 drift 检查范围（请求体 pattern 是否纳入）；加一条非 `kb://` 请求的契约测试任务/验收。\n7. **F-009（MEDIUM）**：tasks 的内联 `(clauses)` 与 186 条 owner 表**以表为准**——删除内联列表或按表重生成；在 Format 中明确 `[verify]` 行可拥有条款（T017 的 3 条合法），同步 DoD-2/GATE-10 措辞。\n8. **F-012（MEDIUM）**：`data-model.md` 的 `OpenAPIContract.consistency` 枚举改为**指针**（owner：`contracts/openapi-pin.md` C-18），删除重复枚举。\n9. **F-013（MEDIUM）**：`query-response.md` C-26 补齐完整截断算法：先截正文 → 再尝试追加**完整**引用行 → 放不下则**整行丢弃**，绝不切断 URL；同步 E-2 的 Acceptance evidence 与 robot fixture 验收。\n10. **F-014（MEDIUM）**：4 组重复谓词各保留单一 owner（建议：能力 gating→query-response §4；off 逐字节一致→query-response §5；`STR-014` fail-fast→query-response §6；`STR-012=off`→doc-url §5），另一处改为纯指针；同步 plan Gate 4 与 Constitution Check XIV 证据。\n11. **F-015（MEDIUM）**：`[[STR-021]]` 作为“特性关闭”**短路优先级最高**（与代码 `[[STR-022]]` 对称），写入 C-16 表并在 C-15/C-19 对齐；补 fixture：未找到+off、未映射+off。\n12. **F-016（MEDIUM）**：拆分 C-28：仓内 `pnpm kb:ingest`/`service/gateway/batch-ingest.mjs`/doc-summary 旧 payload 兼容 → 新增或并入仓内任务（脚本级 fixture）；xuanji-function 连接器 → 保留 E-3。\n13. **F-017（MEDIUM）**：T001 增加“确定基线 fixture”：fake 引擎 + 固定时钟固定 `response_time`、`track_id` 用哨兵值；T009/T030 引用该 fixture；SC-008 的“逐字节一致”限定为**规范化 JSON**（固定字段顺序 + 固定值），无法固定的字段显式排除并写明理由。\n\n③ 其余 12 条（LOW）逐项裁决\n- 允许的处置：`fixed`（最小修）/ `deferred`（记录理由、无隐藏 HIGH 风险）/ `acceptable`（明确不改并说明为何不构成缺陷）。逐条写入 `analyze-fix-dispositions.md`（F-018…F-029），不得留空。\n- 建议方向：F-018 明确 v1 不处理 future/expired（或补判定）；F-019 最小追溯条款补 `entry_type`（枚举/缺省/400）；F-020 保留一次性脚本并注明非标准引擎结论（不改 7 份契约语法以免大范围重写）；F-021 Known Spec Tension 记 `track_id` 空串→`trk_`；F-022 补语言根普通 `<name>.md` 映射；F-023 两个 Edge Case 指定 owner 或显式无 owner；F-024 给 T032 加 `[blockedBy]`；F-025 去重规则改为“只从 `references[].citation` 渲染”；F-026 定义 `label=null` 回退；F-027 区分 structural 186/186 与 executable 184+2 deferred；F-028 拆分 C-20/C-21 的仓内/部署义务；F-029 补 ingest 分支完整性。\n\n④ 收尾与门\n- 新增/修改契约条款时保持 `C-N` 连续、每条块尾带 `(FR-…, SC-…)` 引用；同步 tasks 的条款认领表与总数（如新增条款/任务，必须重算并写明 `claimed/total`，任务总数 ≤40）。\n- 复跑并记录：`validate-requirements.py`、`validate-tasks.py`、`checklists/requirements-structure-check.py`、`pre-analyze-check.py --stage tasks`、`decomposition-check.py --mode tasks`、条款认领脚本；全绿（advisory 可保留并说明）。\n- 产物：`analyze-fix-dispositions.md`、`run-record-analyze-fix.md`、被修规格文件；Feature 027 保持 `Planned`。\n- 只改 `.specify/specs/022-citation-architecture/**`、`.specify/memory/{features.md,features/027.md}` 与记账；不改 `service/**`/`view/**`/`model/**`/`docs/**`；不实现；不 push；禁 `git add -A`。\n- 记账：Unit `/speckit.analyze`，run-id `r20261028T162000Z-c1a2-analyze-fix`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移。\n- 不进入 analyze 第二轮/implement。\n\n⑤ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-FIX-DONE`\n- 回传：逐 finding 处置（fixed/deferred/acceptable）、新增/修改条款数、tasks 总数与认领、门禁结果、`PLAN-EDIT` 清单、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "59.110.214.247:443",
+          "8.212.124.35:443",
+          "47.57.188.188:443",
+          "47.57.243.249:443",
+          "39.106.176.70:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "120.24.170.126:443",
+          "47.116.44.184:443",
+          "120.79.243.153:443",
+          "39.106.96.116:443",
+          "39.106.211.206:443",
+          "106.14.225.66:443",
+          "47.116.36.231:443",
+          "47.106.172.117:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

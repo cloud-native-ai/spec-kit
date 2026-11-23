@@ -1,0 +1,126 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-api",
+    "source_commit": "0b0944a6e17e855e8387968b9011979d0df33a0f",
+    "identity_status": "identified",
+    "identity_key": "b6c11e9b89071780521f66249fc90fa3559ce25cdffcebcadf0f83a0d88c0c1b",
+    "content_hash": "e6be0f19a420961394bdcd5f2c12fbc4139c6194a89ebdd72944fc7a403efd1c",
+    "package_file": "feedback-xuanji-api-20261123T185250.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-a101",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T12:15:01Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-api 的无人值守 SDD 开发，当前阶段：requirements。\n\n① 背景与权威文档\n- 项目 worktree：`/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010`；分支 `010-xuanji-doc-stable-api`；base `master` `5ead49394`；工作树 clean。\n- 目标：为 xuanji-doc 新架构提供**唯一稳定的对外 API 契约**（OpenAPI v1），xuanji-doc 的 `api`（cws_daemon）按此实现；底层组件可变，契约稳定。\n- 权威：`.specify/memory/constitution.md`、`.specify/instructions.md`、`README.md`、`design/api/`（现有 `kb/openapi.yaml`、`service/openapi.yaml`）、`src/bash/build.sh`。\n- 跨线冻结接口（必须遵守，见 `/Users/liuqiming.lqm/project/profiles/data/projects/04_知识管理/tmp/sdd-loop-multiline-20261030/README.md`）：程序名 `hugo/cgit/graphicle/lightrag/api/ingest/nginx`；端口 hugo 1313、cgit 28080、graphicle 8854、lightrag 9621、api 8900、ingest 44145，nginx 唯一发布；volume `/srv/knowledge/{docs,git,config}`；routes `/` SPA、`/docs/`、`/cgit/`、`/api/v1/`、`/mcp/v1/`，无 `/api/kb`；认证 Basic `cws:cws_context_key` + 服务 Bearer。\n\n② 执行要求\n- 运行 `/speckit.requirements`，绑定 Feature **018**，规格 **010**；产出 `.specify/specs/010-xuanji-doc-stable-api/requirements.md` 与质量清单、Feature 详情/索引行（Draft）。\n- 范围（设计/契约，不写运行时）：\n  1. 新增 `design/api/xuanji-doc/openapi.yaml`（OpenAPI 3.0.3，info.version 1.0.0），覆盖 knowledge（query/push/pull/jobs/{id}/cancel/health）、documents（query/resolve/health）、code（search/resolve/repos/health）、admin（config GET/PUT）、system（health、openapi.json）。\n  2. 统一 schema：Citation（沿用 xuanji-doc Feature 028 字段）、Reference、QueryResponse、PushMetadata（multipart 中 JSON 字符串）、PullRequest、Job、DocumentResolve、CodeReference、AdminConfig、Error（稳定错误码）、Health。\n  3. push 使用 `multipart/form-data`（files[] + metadata），文档化大小/数量上限与 413；pull 支持 `source_type=oss|local`、`auth_ref`、include/exclude、dry_run、异步 job。\n  4. 认证：`bearerAuth`（服务用 `cws_context_key`）、`basicAuth`（浏览器/SPA，用户 cws）；admin 只接受 Basic；health 可免鉴权；错误码/401 明确。\n  5. 将 `design/api/kb/openapi.yaml` 标记 deprecated（不再作为 xuanji-doc 对外契约），新增 `design/api/xuanji-doc/README.md` 说明 owner、版本策略、pinned 校验与 SDK 生成边界。\n  6. 校验路径：给出可执行的 lint/validate 方案（redocly 或现有工具链），不引入与 `design/api/service/openapi.yaml` 的 SDK 冲突。\n- 约束：FR 控制在 ≤30（超出则给出切片建议，不得自行拆特性）；不改运行时源码/生成 SDK/`generated/`；不改 xuanji-doc / xuanji-images；不 push；不 `git add -A`；只提交本特性产物。\n- 输出纪律：分段写入；需求必须可被 xuanji-doc 的 `api` 实现直接消费（字段、错误码、示例、边界明确）。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.requirements`，run-id `r20261030T120500Z-a101`，`--feature 010-xuanji-doc-stable-api --feature-id 018`；feedback 用本 worktree 旧引擎；session/exec-quant 用本仓/主仓引擎按既有约定；不得触发 store 迁移；失败写 `WRAPUP-DEFERRED`。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REQUIREMENTS-DONE`\n- 回传：FR/SC 数、关键裁决、契约文件清单、Feature 状态、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "120.79.243.153:443",
+          "39.106.211.206:443",
+          "8.212.124.35:443",
+          "101.132.70.5:443",
+          "47.57.243.249:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "8.223.13.163:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": {
+        "value": 0,
+        "provenance": "carried"
+      },
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

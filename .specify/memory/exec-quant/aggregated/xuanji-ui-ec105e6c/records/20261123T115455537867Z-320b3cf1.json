@@ -1,0 +1,110 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-ui",
+    "source_commit": "d66447475b0f59007cb467aefdac0070e04c8812",
+    "identity_status": "identified",
+    "identity_key": "04601976c5e62a3e14556f72abff6dc7987f7a686a6c4bbaaaef13d9b014175b",
+    "content_hash": "8687b30ae87a5c17d17930699e97779001bb5e4be9845d5536bdf440fbfde190",
+    "package_file": "feedback-xuanji-ui-20261123T185338.zip",
+    "ingested_at": "2026-11-23T11:54:55Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.clarify",
+    "unit_type": "command",
+    "run_id": "clarify-007-20261022",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T04:21:44Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.71",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 `xuanji-ui`（容器 /cws_work/xuanji-ui，develop）的无人值守 SDD 特性，当前阶段：**clarify**。\n\n## ① 背景与权威文档\n- 特性目录：`.specify/specs/007-s2-contract-alignment/`（requirements 已提交 `40b2315`：20 FR / 8 SC）\n- 需求简报：`/tmp/ui-s2-requirements-brief.md`（§2/§3 为 16 函数与模型形状权威；亦可读 `/cws_work/ui-s2-requirements-brief.md`）\n- 契约：`api/design/api/service/openapi.yaml`（统一基线；API 线并行就绪化）\n- 宪法：`.specify/memory/constitution.md`；前端架构：`docs/architecture.md`\n- 状态脊：`STATE_SPINE_PATH=/tmp/spine-ui-s2.md`（transport 模式）\n- 证据目录：`EVIDENCE_DIR=.specify/specs/007-s2-contract-alignment/test-evidence`\n- 范围红线：仅 Change/Risk/Knowledge 16 个客户端函数与模型；资源运维域不在本特性。\n\n## ② 执行要求\n执行 /speckit.clarify 的语义，聚焦并裁决：\n1. 模型派生策略：以 OpenAPI 生成客户端类型为唯一派生源，还是保留手写 models？二者边界与重复字段的收敛规则。\n2. 现有 `src/services/api/{change,risks,knowledge}.ts` 与 16 函数的差异面（路径/方法/分页参数/封套解包）如何最小改动对齐。\n3. `risks.ts` 已知的宽松类型收敛：哪些字段必须派生、哪些允许本地扩展。\n4. `ApiError`/严格解包在写接口（sync/create/update/delete/handle/qa）与非 2xx 错误封套上的统一映射。\n5. 页面不变约束：允许改 services/models，禁止改页面行为与路由；S1 18 函数不回归。\n6. 测试与构建验收：tsc/Jest/E2E 的最小必跑集与契约生成物校验。\n7. 与 API/service 线的交付次序依赖（implement 前需最终契约与 service 端点就绪；不得以占位/mock 通过）。\n将裁决写回 requirements.md 的 `## Clarifications` / `### Session`，更新相关 FR/Edge Cases/Assumptions 与 checklists；更新 registry；追加 E3 stage-status 与 spine 行。\n- 直接执行不要确认；访谈式问题自行裁决并记录假设。\n- 只提交本特性产物与必要 registry；容器既有脏文件不提交不还原；不 push；只推进当前阶段。\n- 并发隔离：只读写 `/cws_work/xuanji-ui`。\n- 完成前 `[NEEDS CLARIFICATION:` 为零。\n\n## ③ 完成尾标\n- 完成时最后一行必须且仅是：`CLARIFY-DONE`\n- 无法完成时最后一行：`ANOMALY: <一句话事实>`"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-ui",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "gfmodel",
+        "provenance": "measured"
+      },
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "39.106.211.206:443",
+          "120.79.243.153:443",
+          "8.223.13.163:443",
+          "8.212.20.107:443",
+          "39.107.85.235:443",
+          "47.107.125.11:443",
+          "47.57.13.70:443",
+          "39.107.242.82:443",
+          "39.106.176.70:443",
+          "101.132.70.5:443",
+          "47.103.128.242:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "106.14.225.66:443",
+          "39.108.79.164:443",
+          "47.106.88.164:443",
+          "47.103.9.44:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

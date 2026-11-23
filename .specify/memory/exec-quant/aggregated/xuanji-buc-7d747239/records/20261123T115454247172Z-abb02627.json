@@ -1,0 +1,119 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "e84dfcf726b890ab370c489a4f41b3024d5d046c47c3f380232f3f6f0d0107d6",
+    "content_hash": "514845422c2139a9cb837dbe300527f6482ad794b8c588a9fd2416b05517db86",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:code-review",
+    "unit_type": "skill",
+    "run_id": "20261118t055400z-rev016-w3",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T05:25:09Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：**review**（特性 007 / 登记号 016，implement 九包 + 阶段收口已全部完成）。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；指令：`.specify/instructions.md`\n- 特性目录：`.specify/specs/007-java-project-standardization/`\n- 审查范围：**`git diff f7ecb97..HEAD`**（特性基线 → 当前 HEAD），当前 HEAD = `0946536`（implement 九包 + 阶段收口全部完成，哨兵 `IMPLEMENT-DONE` 已发）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 你的任务：执行 `/speckit.review` 并完成有界修复循环\n\n按框架 `/speckit.review` 的既有流程产出 **`review.md` 与 `code-review.md` 两份载体**，给出**可合并 / 不可合并**裁决与 P0/P1/P2 分级。\n**不要自创评审格式**，以框架命令的产物规格为准。\n\n### 评审范围（用户 2026-11-03 明确确立，不得只做流程回顾或只看代码）\n\n判定对象**必须包括当前 SDD 的质量与各阶段产物本身**，按五段组织：\n\n1. **过程段**：SDD 流程本身的改进点（review-sdd-process）。\n2. **产物段**：`requirements.md` / `plan.md` / `tasks.md` / `contracts/*` / `data-model.md` / `quickstart.md` /\n   `verification.md` 的**完整性与一致性**；**FR → task → SC → 证据**四级链路是否逐条可达；\n   依赖边与验收诚实性（blocked 是否被写成 pass、`[~]` 是否被写成 `[x]`）。\n3. **实现段**：`git diff f7ecb97..HEAD` 对照 requirements/tasks，跑 smoke。\n4. **代码段**：code-review 六级分级。\n5. **Acceptance Reality Check（ARC）**：**final-path 实际计数 vs 声称状态**——\n   例如声称 96 任务闭合，就实际数 `tasks.md` 的标记分布与 `tasks-closure-map.md` 行数；\n   声称 17 SC 全 pass，就实际数 SC 编号与证据文件是否存在非空。\n\n**P0/P1 阻断合并，P2 记录不阻断**；`code-review.md` 的 `blocking` 与过程段 P0/P1 **不互转**。\n\n🛑 **评审纪律（五条）**\n1. **不得轻信前序报告的数字**：凡引用计数（任务数、用例数、覆盖行数、基线名数、SC 条数、证据指针），\n   **必须当场独立复算**。历史教训：本仓 review 曾出现**编造计数**与**自伤式改动**，最终被撤回。\n   算不出来就写 `not_evaluated`，**绝不以估计或 0 替代**。\n2. **不得为通过而放宽门禁**：不许改阈值、不许删断言、不许把 `blocked` 写成 `pass`、不许把 `[~]` 改成 `[x]`。\n   发现门禁与事实冲突 → **如实登记为 finding**，由驱动者/用户裁决。\n3. **黄金三文件只读**；`deploy/compose|k8s|image`（CS-11）与框架面 `.specify/scripts|shared|templates|agents` 只读。\n   若评审认为必须改这些面才能收敛，**登记 finding 并停下**，不得自行改冻结面。\n4. **P0/P1 必须修完再给可合并裁决**；修复走**有界循环**（每轮只改可归因的最小面，改完重跑受影响门禁）。\n   P2 可登记为后续项，不阻断合并。\n5. **不要 push**；临时文件只落 `.specify/.tmp/`。\n\n## 驱动者点名必须复核的三处（前序包已如实披露，评审须独立判定其证明力）\n\n1. **S6 红先演练方法降级**：13 条演练均取得 rc=1，但**生产侧注入被权限分类器按「`src/main` 冻结」规则拦截**，\n   执行者回退为**测试侧 oracle 翻转 + 逐字节恢复**。\n   → 评审须判定：这**能否证明断言可失败**？是否等价于生产变异测试？\n   **不得把「测试侧翻转」表述为「生产变异已验证」**。若判定证明力不足，登记为 finding 并给出补强路径（不强制本轮补做）。\n2. **S8 的 17 条 SC 结论与证据指针**：逐条核对 `s8-sc-summary.txt` 的\n   **结论 / 命令 / as-of / 证据路径**四要素是否齐备，**证据文件是否真实存在且非空**，\n   命令是否真能复现该结论（抽查至少 5 条，含 SC-013 秘密扫描）。\n   `blocked`/`void` 结论**不得**被写成 pass。\n3. **implement 收口的勾选态诚实性**：`notes/tasks-closure-map.md` 的 96 行映射是否**逐条可复核**；\n   `[~][orchestrator]` 项是否都带 blocker/unlock/owner；有无**无据打勾**。\n   抽查至少 10 个任务，直接对照磁盘交付物与证据读数。\n\n## 另需独立复核的既成读数（驱动者已复算，评审再确认一次即可，不必重复劳动）\n\n- 覆盖率 **1625/1749 = 0.929102**（15 个 `com.aliyun*` 包；唯一排除 `com.alibaba.buc.sso.client.logger` 0/41）\n- 基线名数与清单 assets（收口时实测值见 `implement-stage-status.md`）\n- 聚合程序四档退出码 0/1/2 与 blocked 不改 rc\n- **计数口径（驱动者曾在此犯错，已纠正，评审须以纠正后事实为准）**：\n  同一 HEAD 下 **Maven 控制台 `Tests run` 与 Surefire XML 求和完全一致 = 586**（77 个 XML 文件）。\n  驱动者先前把「586 vs 583」解释为 Surefire 聚合口径差异，**该解释是错的**：\n  583 测于 **S6 HEAD `8539aaf`**、586 测于 **S7 HEAD `adae774`**，差值 3 = S7 的 T077 新增方法数（基线 507→510）。\n  收束单元已纠正 `.specify/features.md` 与 `s8-baseline-diff.txt` 中的该句。\n  **评审须复核这两处纠正确已落地且表述正确**，不得沿用旧解释。\n- **`# verify-all: coverage … status=pass`** 是覆盖率判定行，**不是 integration 入口伪造** → 不得据此判红。\n\n## 必须补齐的证据载体（驱动者已实测缺口，属本阶段职责）\n\n驱动者补写状态脊的 test-budget fence 后跑 `audit-test-budget.py --stage-check implement`，得：\n`slots=baseline:1 closure:0 exceptions:12 unknown=6`、**`stages=6 complete=0`、`status=fail`**，\n六条 reason 均为 `<stage>: stage evidence file missing`。fence 本身已正确（槽位与例外数无误），\n**缺的是六个阶段证据 JSONL**。本阶段须补齐：\n\n1. **六份 `<spec-dir>/test-evidence/{clarify,plan,tasks,checklist,analyze,review}.jsonl`**，\n   各含一条完整 `stage-status` 记录。**按真实执行记录做确定性投影，不得新增事实**：\n   - 已发生的五个阶段（clarify/plan/tasks/checklist/analyze）从既有证据与提交路径投影\n     （`pre-analyze-*.txt`、`decomposition-*.txt`、`flow-class-lookup*.txt`、各阶段提交）；\n     纯文档阶段用 `not-run-docs-only` + `changed_paths`；只读 analyze 的 `changed_paths` 用证据文件自身。\n   - `review.jsonl` 由本阶段真实运行产生。\n   - 取不到的字段记 `not_evaluated`，**绝不以 0 或估计替代**。\n2. **名称级证据文件**（本线目前缺专用文件，closure 审计需要）：\n   - `test-evidence/baseline-names.txt`：起点名称集合（源 `baseline-pre/surefire-names.txt`，208 名）\n   - `test-evidence/closure-names.txt`：review 后全量的名称集合\n   - `test-evidence/review-failed-names.txt`：本次全量失败名称（预期**空文件**）\n   - `test-evidence/review-baseline-compare.txt`：含字面 **`new failures: []`** 与 `comm -13` 口径的名称级对比\n3. 补齐后**重跑** `audit-test-budget.py --spine .specify/state/buc-java-standardization.md --spec-dir <spec-dir> --stage-check implement`\n   并记录真实读数。**注意：状态脊只读，你不得写它**；closure 行由驱动者在 review 通过后追加。\n   若仍 fail，如实记录剩余 reason，**不得伪造投影或改审计脚本**。\n\n## 测试预算\n\n- **slot-2（review 后全量）在本阶段消耗**：修复循环收敛后跑**一次** `./mvnw -B test` 全量，\n  记录用例数/失败数/耗时，并与 implement 起点基线做**名称级对比**（`new failures:` 须为 `[]`）。\n- 修复过程中间轮次用**定向集**，不要每轮全量。\n- 全量读数落 `test-evidence/review-full.txt`；名称级对比落 `test-evidence/review-baseline-compare.txt`。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。\n- 只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/` 不提交不还原。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.review`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`review(spec): 016 特性评审与 P0/P1 修复收敛`（若无需修复则 `review(spec): 016 特性评审结论与证据复核`）。\n\n## 输出预算\n\n报告 ≤60 行：**裁决（可合并/不可合并）**；P0/P1/P2 计数与逐条一行（编号 + 事实 + path:line + 处置）；\n**五段各自结论一行**（过程 / 产物 / 实现 / 代码 / ARC）；\n三处点名复核的**独立判定结论**；抽查的 SC 条目与任务号及结果；\n**T078/T079 标 `[~]` 是否过度保守的判定**（T079 的五判据在 S7 已全数实测通过，只有 integration 实机执行被环境阻断——\n该任务本身是否应记 `[x]`？给出判定，**不得自行改标记**，登记为 finding 由驱动者裁决）；\n六份阶段 JSONL 与四份名称级文件的产出读数 + `audit-test-budget.py` 重跑真实读数；\nslot-2 全量读数与名称级对比（`new failures:`）；修复轮次与每轮改动面；\ngolden / CS-11 / 框架面 diff 复验；门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `REVIEW-DONE`；无法完成则 `ANOMALY: <一句话事实>`。\n若评审裁决为**不可合并**且存在需用户裁决的语义矛盾，仍输出 `REVIEW-DONE`，并在报告中明确列出阻断项与可选处置。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

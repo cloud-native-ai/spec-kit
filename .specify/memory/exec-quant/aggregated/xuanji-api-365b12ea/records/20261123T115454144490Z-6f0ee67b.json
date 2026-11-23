@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-api",
+    "source_commit": "0b0944a6e17e855e8387968b9011979d0df33a0f",
+    "identity_status": "identified",
+    "identity_key": "37c3b434cc34fedc414d65a417fb3d82141aa5ddcd4e8c45d1c8b4332bfd4618",
+    "content_hash": "783b8ef5b6ab9e5eee3a698085ca5d3d2b96c57d30433097406da9129f8d60dc",
+    "package_file": "feedback-xuanji-api-20261123T185250.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-a101-review",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T18:23:09Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-api 的无人值守 SDD 开发，当前阶段：review（只读批判性评审）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010`；分支 `010-xuanji-doc-stable-api`；HEAD `c763ca78c`；clean。\n- 40/40 tasks 完成，DoD met；独立 driver 核验：redocly lint 有效、17 ops、0 `/api/kb`、受保护路径 0 改动。\n- 评审对象是 **SDD 过程与产物**（requirements/plan/tasks/contracts/checklists/analyze/implement 证据与流程），不评审业务代码实现细节本身；证据以 `file:line` 给出。\n\n② 执行要求\n- 运行 `/speckit.review`，产出 `.specify/specs/010-xuanji-doc-stable-api/review.md`；findings 按 P0/P1/P2 分级，P0/P1 必须可行动并附证据；不得做修复。\n- 覆盖：需求/契约/任务/实现证据的闭环、analyze 与 checklist 处置是否真正落地、GATE-1…GATE-6 与 DoD 的证据是否可复现、跨仓 B/C 义务是否显式、流程规范（只读/提交纪律/记账）是否遵守。\n- 除 review.md 与记账外不写文件；不 push；禁止 `git add -A`；不触碰 5 个 modified generated DDL。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-a101-review`，`--feature 010-xuanji-doc-stable-api --feature-id 018`；三件套 + `run-record-review.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-DONE`\n- 回传：P0/P1/P2 计数与 top findings、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "120.24.170.126:443",
+          "47.116.36.231:443",
+          "39.106.96.116:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "59.110.214.247:443",
+          "39.106.211.206:443",
+          "47.116.44.184:443",
+          "8.223.13.163:443",
+          "47.106.172.117:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

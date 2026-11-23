@@ -1,0 +1,60 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-iac",
+    "source_commit": "4da89896080fba7829bbcc09ffe8a69380efffb1",
+    "identity_status": "identified",
+    "identity_key": "1d9447aab6aa9e8091e088ac549eb2435b35286a2f5a07c8c4ae07dec0cda3c0",
+    "content_hash": "e59de9759ce7b7869f98f32aa99726d9667170bde9d8c57f5ac9e3bc01a3d468",
+    "package_file": "feedback-xuanji-iac-20261123T185114.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "skill:draw-diagram",
+    "unit_type": "skill",
+    "run_id": "skill-draw-diagram-20261019T124937Z",
+    "run_id_resolution": "synthesized",
+    "collected_at": "2026-10-19T12:49:37Z",
+    "agent": {
+      "name": "not_evaluated",
+      "version": "not_evaluated",
+      "binary": "not_evaluated",
+      "argv": "not_evaluated",
+      "cwd": "not_evaluated",
+      "resolution": "unresolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": "not_evaluated",
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": "not_evaluated",
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": "not_evaluated"
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

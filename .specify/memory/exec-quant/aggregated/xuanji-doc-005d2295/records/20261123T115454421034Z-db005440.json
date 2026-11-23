@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "59e9119215033fb61561e12a72ce7858a71b6c8ca60f8e552cb5e974780fca5a",
+    "content_hash": "9e7d13d1bdc7e3a0e69ede4a8b5433ce26b1b26df3a80f8e58be83d48e15b9be",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-review8",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T20:41:04Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：review8（只读复核 locked 模式）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `31439e4b`（已推送、已 FF 合入 main）；clean。\n- review7：P0 0 / P1 0 / P2 4（GO）；之后 review-fix8 新增 locked 模式（缺密钥启动、health 503、业务/MCP 401/403）并同步 C-15/C-13/C-03 与文档。\n\n② 执行要求\n- 运行 `/speckit.review` 只读复核：验证 locked 模式实现、契约同步、测试覆盖（缺/空/不可读秘密、health 503 形状、业务与 MCP 401/403、无匿名回退、无秘密泄漏）是否闭合；全量重扫新的 P0/P1。\n- 输出 `.specify/specs/023-xuanji-doc-architecture/review8.md`；给出 P0/P1/P2 重算与合并建议。\n- 不做修复；除 review8.md 与记账外不写文件；不 push；禁止 `git add -A`。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-d101-review8`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套 + `run-record-review8.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW8-DONE`\n- 回传：locked 模式复核结论、P0/P1/P2 重算、合并建议、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "8.212.124.35:443",
+          "39.106.96.116:443",
+          "47.116.36.231:443",
+          "59.110.214.247:443",
+          "8.223.13.163:443",
+          "47.116.44.184:443",
+          "47.57.188.188:443",
+          "120.24.170.126:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "47.106.172.117:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

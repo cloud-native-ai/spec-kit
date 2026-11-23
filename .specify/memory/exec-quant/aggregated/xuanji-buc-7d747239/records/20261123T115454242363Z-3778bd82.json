@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "314cfa3860d283cac140a9ed1a2a4c6584de6c2cd989151f0982bfb9a2f1ece2",
+    "content_hash": "3da735460015ad7d4ebd866ae4376341d5bae470da1a340d050e84dbe9b5af7c",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "20261117T193000Z-ana016-w2b",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-17T19:27:50Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：analyze（**只读 Worker W2b**，因原 W2 触发输出上限按文件重切）。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`（只读参照）\n- 上一阶段提交：`e1a7a3a`（clarify 第 2 轮）；断点：clarify2 U4 PASS（proceed 49 FR / 96 任务）\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n\n## 读域（封闭，MUST NOT 越界）\n\n只读 `.specify/specs/007-java-project-standardization/` 下：**quickstart.md（130 行）、research.md（174 行）、checklists/quality-gates.md（146 行）、checklists/recheck-2026-11-18-clarify-r2.md（54 行）、checklists/requirements.md（71 行）**。\n**不得读 tasks.md**（属 W2a）与 requirements/plan/contracts/data-model（属其它 Worker）。\n\n## 输出预算（硬约束，违反即未完成单元）\n\n- **最多 15 条 findings**，**每条一行**，格式严格为：\n  `W2b-F<NN> | <CRITICAL|HIGH|MEDIUM|LOW> | <文件>:<行号> | <问题一句话 ≤40字> | <修正建议一句话 ≤40字>`\n- 末尾一行计数：`COUNT C=<n> H=<n> M=<n> L=<n>`\n- **禁止**长篇散文、禁止复述规格、禁止逐条罗列 40 条 CHK、禁止表格或多行解释。总输出 ≤60 行。\n- 无问题的检查面**不要输出 PASS 段落**。\n\n## 检查面（只查这些）\n\n1. **quickstart 可复现性**：S1…S9 示例命令是否可实际执行、路径/脚本是否存在或明确标注为待创建；`./mvnw -B test` 是否唯一测试入口；`bin/verify-all.sh --with-integration` 与 `VERIFY_ALL_LIB_ONLY=1`（source 缝非 CLI）说明是否自洽；有无引用已废止的 pytest 入口。\n2. **research 实测与结论一致**：R-1…R-12 / M-1…M-16 的读数是否自洽（覆盖 1327/1819→1310/1770→+106、`@Test` 208/209 词边界、conifg 16/14、Python 19→1、env 5 变量、properties 19 键、`@Value` 0）；有无残留 +89 或旧口径。\n3. **清单可判定性**：40 条 CHK 是否每条单判据单证据落点、有无「基本符合」类措辞、有无一条捆绑多判据；证据落点是否指向真实或明确待创建的制品。\n4. **recheck R-1…R-9 处置一致性**：与 quickstart/research 的表述是否一致；`TestSourceScannerSupport` 更名是否全文一致；`shellcheck-absent` 第 8 码是否在清单侧同步。\n5. **checklists/requirements.md 过期计数**：是否仍写 15 SC / 旧 STR 数且无 superseded 指针（现行 17 SC / 13 STR）。\n6. **诚实降级**：`blocked:python-runtime-absent`、`[~][orchestrator]`、L2 前置是否写明 blocked ≠ 已验证；有无把 not-run 当 pass。\n7. **黄金冻结与基线制品**：quickstart/research 中 `baseline-pre/` 五制品与 `freeze-commit.txt` 的采集命令是否齐备且可执行。\n\n## 纪律\n\n产物只读：不改制品、不提交、不 push、不写状态脊、不派子任务、不执行 pytest。临时文件只落 `.specify/.tmp/`。\n**Wrap-up 记账必需**：三步引擎，unit-id `/speckit.analyze`，`--feature 007-java-project-standardization`，run-id `20261117T193000Z-ana016-w2b`；duplicate 如实披露；无法写则最后一行 `WRAPUP-DEFERRED: <原因>`。\n\n## 尾标\n\n最后一行必须是且仅是 `ANALYZE-DONE`；无法完成则 `ANOMALY: <一句话事实>`。**先 findings 与计数，再记账说明（≤3 行），最后一行哨兵。**"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

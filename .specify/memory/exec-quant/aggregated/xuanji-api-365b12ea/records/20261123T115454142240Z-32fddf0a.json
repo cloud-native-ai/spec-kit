@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-api",
+    "source_commit": "0b0944a6e17e855e8387968b9011979d0df33a0f",
+    "identity_status": "identified",
+    "identity_key": "b74f55c5171da9c39713528296be08e4435aa08b1ee109f8f042487bfed3b1eb",
+    "content_hash": "a4e7112d3925f138f972b06750d19be1be9e72eb9e1b52b6a8a65d1bb2f40988",
+    "package_file": "feedback-xuanji-api-20261123T185250.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.tasks",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-a101-tasks",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T15:32:50Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-api 的无人值守 SDD 开发，当前阶段：tasks。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010`；分支 `010-xuanji-doc-stable-api`；HEAD `7bbacf9a2`；clean。\n- spec 010：28 FR / 28 SC；plan + 6 contracts；Feature 018 Planned；plan constraint active（plan_commit `7bbacf9a2`）。\n- 目标：把 plan/contracts 分解为依赖有序、可执行的 tasks.md；不写实现。\n\n② 执行要求\n- 运行 `/speckit.tasks`，产出 `.specify/specs/010-xuanji-doc-stable-api/tasks.md`；Tests Mode 按宪法推导并打印。\n- 任务覆盖：`design/api/xuanji-doc/openapi.yaml`、README/owner/版本策略、KB 旧契约 deprecated、push multipart 上限、pull jobs、错误码/request_id、Citation 指针、lint/validate、pinned 副本与 CI 边界；FR/SC 全覆盖、契约条款逐条认领；外部义务（xuanji-doc 实现、SDK 生成）单列，不写成仓内任务。\n- 任务数 ≤40；每条任务含显式路径、验证命令/断言；`[P]` 仅在真正可并行时使用。\n- plan constraint：plan/research/data-model/contracts/quickstart 只允许 minor 修改并声明 `PLAN-EDIT`；实质变更 ANOMALY 停线。\n- 只改本 spec 与 Feature 018；不实现；不 push；不 `git add -A`。\n- 记账：`/speckit.tasks`，run-id `r20261030T120500Z-a101-tasks`，`--feature 010-xuanji-doc-stable-api --feature-id 018`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`TASKS-DONE`\n- 回传：任务数、FR/SC/条款覆盖、Tests Mode、PLAN-EDIT、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "120.79.243.153:443",
+          "8.212.124.35:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

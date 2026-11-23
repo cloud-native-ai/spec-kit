@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "fe4c2d6dcb27e61f8d105bdbeed8c13ef52771ac884dd5d83369d2586e647294",
+    "content_hash": "10ef9d5c7eb1651092572d84288e7554a297f5087d5ff27d415e3da66e85e5b0",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-review-fix3",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T06:21:08Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：review-fix3（补齐可执行入口点，供镜像构建消费）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `c6e68627`；clean。\n- 事实：`service/ingest` 只有库代码与 `http/push.ts`，**没有 HTTP server 入口**、package.json 无 `bin`/`start`；`service/api` 有 `app.main` 与 cws_daemon 启动序列，但无 console script。\n- 跨线：xuanji-images（C 051）需要可执行入口来构建镜像与 supervisor 命令。\n\n② 执行要求\n1) 新增 `service/ingest/src/server.ts`：Node HTTP server，绑定 `INGEST_BIND`（默认 127.0.0.1）与 `INGEST_PORT`（默认 44145），路由按契约：push multipart、pull 创建、jobs 查询/取消、health；复用现有 handler；不得提供查询代理。\n2) `service/ingest/package.json` 增加 `\"bin\": {\"xuanji-doc-ingest\": \"src/server.ts\"}` 与 `\"start\": \"node --import tsx src/server.ts\"`；保持 engines 声明。\n3) `service/api/pyproject.toml` 增加 `[project.scripts] xuanji-doc-api = \"app.main:main\"`（若无 `main()` 则补一个绑定 127.0.0.1:8900 的入口），并在 README/契约中写明启动命令。\n4) 测试：ingest server 启动 + health 的 smoke test；api console script 的 smoke（`xuanji-doc-api --help` 或启动即退出探针）；记录 red/green。\n5) 把两个入口命令写入跨仓义务（供 C 的 supervisor/构建使用），并同步 `contracts/ingest-pipeline.md`/`cross-repo-obligations.md` 的相关行。\n- 不改宪法；每次修改声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 `pnpm api:test`、`pnpm ingest:test`、validate-tasks，记录退出码。\n- 产出/追加 `.specify/specs/023-xuanji-doc-architecture/review-fix-dispositions.md` + `run-record-review-fix3.md`。\n- 不 push；禁止 `git add -A`；只显式路径提交；不得修改 `model/`、`service/lightrag/`、`view/site/themes/`。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-d101-review-fix3`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX3-DONE`\n- 回传：入口点实现与命令、测试结果、提交哈希、记账路径、PLAN-EDIT、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.243.249:443",
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "39.106.176.70:443",
+          "47.116.36.231:443",
+          "39.106.96.116:443",
+          "47.116.44.184:443",
+          "120.79.243.153:443",
+          "101.132.70.5:443",
+          "120.24.170.126:443",
+          "39.106.211.206:443",
+          "59.110.214.247:443",
+          "47.106.172.117:443",
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

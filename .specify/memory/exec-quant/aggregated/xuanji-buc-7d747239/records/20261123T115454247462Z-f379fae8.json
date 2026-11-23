@@ -1,0 +1,121 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "a1a36a3c8a1e55846bb21b8e180b28335d622da885e323a5d355b269bece70c9",
+    "content_hash": "d45eaa0f5c2fbe2babc4f4512517d9c9aab2474a38db18e4a178bdd051a1bd3c",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118T053547Z-cls016",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T05:35:54Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，**执行收尾单元 U6-CLOSING**（特性 007 / 登记号 016）。\nimplement 九包 + 阶段收口 + review 全部完成，review 裁决**可合并**，closure 验收门 **accept**。\n本单元只落地驱动者的两项裁决与收尾记账，**不是新的实现包**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`\n- 特性目录：`.specify/specs/007-java-project-standardization/`（下称 `<spec>`）\n- 当前 HEAD = `eb8231b`；**黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**；特性基线 = `f7ecb97`\n- 状态脊：`.specify/state/buc-java-standardization.md`（**只读，不得写**；其「U6 驱动者裁决」节是你的指令来源）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得加载驱动/循环技能\n\n🛑 **铁律**\n1. **实现代码一律禁改**：`src/**`、`pom.xml`、`bin/**`、`deploy/**`、`docs/**` 零改动。\n2. **黄金三文件只读**；**CS-11**（`deploy/compose|k8s|image`）与**框架面**（`.specify/scripts|shared|templates|agents`）diff 必须保持 **0**。\n3. **006 / 013 / 014 / 015 四个 feature 的状态字段一字不动**（T082 约束继续生效）。\n4. **不得 push**（本线推送尚未取得用户授权）。临时文件只落 `.specify/.tmp/`。\n5. **不得抹掉真实的验收空缺**（见裁决一）。\n6. **不得删除任何记账记录**（分类器禁止）；无效读数只能**标注 superseded**。\n\n## 裁决一：T078 / T079 由 `[~][orchestrator]` 翻为 `[x]`\n\n**驱动者依据**（S7 亲测 + review 独立判定一致）：T078 的行内判据是 SC-011 **四次演练**（dry-run/rc0/rc1/rc2，四档全实测）；\nT079 的行内判据是 SC-015 **blocked 演练与五判据**（S7 全数通过），且其**第③条恰恰要求 blocked 入口「未被实际执行」**\n——**blocked 是这两个任务的通过条件，不是降级**。被环境阻断的 integration 实机执行从来不是它们的验收内容。\n\n**动作**：\n1. `<spec>/tasks.md` 的 **T078、T079** 两行：`[~]` → `[x]`，移除 `[orchestrator]` 与 `<!-- deferred: … -->` 注释，\n   **其余行内文字（判据、blockedBy、FR 引用）一字不动**。\n2. `<spec>/notes/tasks-closure-map.md`：同步这两行的标记与判据，并把统计行改为 **`[x]` = 96 / `[~]` = 0 / 未完成 = 0**；\n   在这两行注明「驱动者 U6 裁决翻转，依据=行内判据已全数实测；integration 实机空缺移至 verification.md 验收空缺段」。\n3. **⚠️ 必须保留真实空缺**：`<spec>/verification.md` 的 `deferred_tasks=` **清空这两项**，\n   但在**验收空缺 / deferred acceptance** 段明确记录：\n   > integration 三入口（`deploy/verify/auth-it/run-it.sh`、`deploy/verify/sts/verify-deployment.sh`）**实机端到端执行未验证**；\n   > blocker = `docker-daemon-unavailable` / `k8s-cluster-unavailable` / `sibling-repo-absent`；\n   > unlock = 环境就绪后重跑 `bin/verify-all.sh --with-integration` 并取得非 blocked 的真实执行日志；\n   > owner = orchestrator/environment；对应 review finding **I1 / P2「集成仅结构性证明」**。\n   **不得把该空缺一并抹掉，也不得把它写成已验证。**\n\n## 裁决二：feature 016 状态 `Planned` → `Implemented`\n\n**依据**：`closure-acceptance-check` **verdict=accept**、`final_path pass=12/12`、`deferred=0`、`reason: none`；\nreview 可合并、`gate=allow`、`blocking_entries=0`。016 非 `Blocked`，故该转换合法。\n\n**动作**：只改 **016 自己**的状态——`.specify/features.md` 行 016 与\n`.specify/features/016-java-project-standardization.md`（**注意真实文件名无 `feature-detail` 中缀**）：\n`Planned` → `Implemented`，并追加一行收束结论（九包 + 收口 + review 的提交 SHA、17 SC 全 pass、\n覆盖率 1625/1749=0.9291、基线 510、`new failures: []`、integration 实机空缺仍在）。\n**006/013/014/015 四者状态一字不动**；改完用 `git diff --numstat` 自证改动面。\n\n## 收尾记账与证据\n\n1. **closure 证据**：新建 `<spec>/test-evidence/closure-verdict.txt`，落**真实命令与输出**：\n   ```\n   python3 .specify/scripts/python/closure-acceptance-check.py \\\n     --spec-dir .specify/specs/007-java-project-standardization --repo . \\\n     --feature-detail .specify/features/016-java-project-standardization.md\n   ```\n   → 期望 rc=0 / `verdict: accept` / `final_path pass=12 … total=12`。\n   **必须显式传 `--feature-detail`**：框架缺陷 **F3** 会按 spec 目录数字前缀错配到\n   `007-feature-detail-ci-cd-pipeline.md`（Draft）。在证据里注明该绕行与 F3 登记，**不得改框架脚本**。\n2. **无效读数标注**：review 首批 `-w1` 记录因 `--names-current` 误传全量名集合而得 `regressed`，**该读数无效**。\n   分类器禁止删除 → 在 `.specify/memory/` 对应记录**就地追加标注**（或按框架允许的 superseded 机制）：\n   `superseded_by=20261118t055400z-rev016-w3`、`reason=--names-current 误传全量名集合，regressed 读数无效`。\n   **只认 `-w3`**。**不得删除 `-w1/-w2`**。\n3. **审计复跑**（状态脊已由驱动者补好 closure 行 seq14，你只读不写）：\n   `python3 .specify/skills/sdd-loop-driver/scripts/audit-test-budget.py --spine .specify/state/buc-java-standardization.md --spec-dir <spec> --stage-check closure`\n   → 期望 `status=ok`、`baseline:1 closure:1`、`stages=6 complete=6`。记录真实读数。\n4. **门复跑**：`pre-analyze-check.py --spec-dir <spec> --stage tasks --repo .` → 须 exit 0。\n5. **定向集**：`./mvnw -B test -Dtest='*ContractTest,*GoldenTest'` → 须全绿（记用例数）。\n   **不得再跑全量**（slot-1/slot-2 均已消耗且各恰一次，再跑会破坏预算台账）。\n6. **冻结面复验**：golden / CS-11 / 框架面 / `eb8231b..HEAD -- src pom.xml bin deploy docs` 四处 diff 均须 **0**。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。\n- 只提交本特性产物；`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/` 不提交不还原。\n  `.specify/memory/` 的 superseded 标注**按框架允许的方式处理**（若不可提交则如实说明并留在工作区）。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**（收尾沿用 implement 单元）或框架规定的 closure 单元名，\n  `--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；\n  被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`chore(closure): 016 收尾（T078/T079 标记裁决 + 状态 Implemented + closure 验收证据）`。\n\n## 输出预算\n\n报告 ≤35 行：裁决一落地读数（两行标记 + 映射统计 96/0/0 + **verification.md 验收空缺段仍在的证明**）；\n裁决二落地读数（016 状态 + 四者未动的 numstat 自证）；closure 证据 rc 与 verdict 逐字；\n`-w1` superseded 标注结果；audit closure 真实读数；门 rc；定向集用例数；四处 diff 复验；\n**未 push 确认**。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `CLOSURE-DONE`；无法完成则 `ANOMALY: <一句话事实>`。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.116.44.184:443",
+          "47.57.188.188:443",
+          "47.106.172.117:443",
+          "39.106.96.116:443",
+          "47.107.125.11:443",
+          "8.223.13.163:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "59.110.214.247:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443",
+          "47.116.36.231:443",
+          "120.24.170.126:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

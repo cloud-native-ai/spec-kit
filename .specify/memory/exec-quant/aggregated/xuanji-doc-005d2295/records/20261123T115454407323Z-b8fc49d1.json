@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "ee5a25b8baf6518ec3868ac68911bf7c58e0b43fb5bccecc0a759c8df9e0d259",
+    "content_hash": "fd5d7713ee89fc95667d36f66a5c46e13456bad56b87d6166c42596e676b62b2",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-analyze-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T12:41:36Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 analyze-fix 子代理（只修规格文本与记账，不实现代码）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 88266164。\n当前工作树有 analyze 记账副作用：`D .specify/memory/feedback/index.json`、`?? .specify/memory/exec-quant/.write.lock`、`?? .specify/memory/feedback/20261028T123150Z-speckit-analyze.md`、`?? .specify/memory/exec-quant/records/20261028T123200959943Z-9b71db04.json`（可能还有 `state/threshold.json`）。\nPlan constraint active（plan_commit=394f26a5）：plan-owned（plan/research/data-model/contracts/quickstart）只允许 minor 修改并逐项声明 `PLAN-EDIT: <file>:<lines> <一句话>`。\n\nA. 修复 analyze findings（逐条）\n1. **INC-01**：tasks.md DoD-1 恢复“运行时代码或配置”限定语（与 compatibility §1 一致），或把 verification.md/test-evidence/feature registry 明确列入豁免；保持 DoD 语义不变。\n2. **AMB-01**：在 FR-005 或 mcp-wrapper §7 明确“stdout 新字段由构造保证零凭据；redact() 作用于 stderr”；修正 §10 的非 owner 指针。\n3. **DEP-01**：T018 增加 `blockedBy: T019`（或把 T019 提前）；任务数仍 21。\n4. **AMB-02**：data-model/requirements 引用 cgit-url §5 的精确谓词（`endLine` NaN/Infinity → 不加锚点）；新增 U-04c/U-19 pin 并在 tasks 覆盖。\n5. **COV-01**：为 batch 数组透传、无法解析行透传、已有 `web_url` 不覆盖、`_meta` 不改写补齐 W 编号 pin（W-23/W-24 或扩展既有条款）；T003 fixture 加 batch/坏行用例。\n6. **FEAT-01**：features/026.md 标记 end_line 张力 resolved，引用 FR-002 与 plan §Known Spec Tension。\n7. **COV-02**：补全 SC→Task（SC-002→T014；SC-004→T008/T010）与 FR→pin（FR-001→C-10；FR-003→W-11/W-14），或显式标注“仅主证据、非穷尽”。\n8. **FEAT-02**：features.md / features/026.md 写入 tasks/checklist 阶段记录与 run-id；统一评审计数（13 vs 7）。\n9. **DEP-02/DEP-03**：T008 补 `blockedBy: T006`；T003/T004 补 `blockedBy: T001`（LOW，建议做）。\n10. **OWN-01（可选）**：默认值单一 owner 指向 cgit-config §2，其余改引用。\n\nB. 修复记账副作用（只处理本次 analyze 产生的）\n- 恢复 tracked `.specify/memory/feedback/index.json`（`git restore -- .specify/memory/feedback/index.json`）；\n- 删除 0 字节 `.specify/memory/exec-quant/.write.lock`；\n- 若 `.specify/memory/state/threshold.json` 为本次迁移新建（untracked/ignored），删除；不要动既有文件；\n- 保留 analyze 的 feedback/session/exec-quant 记录，并随本次提交。\n\nC. 纪律与校验\n- 不实现代码；不改 docs/service/view/compose/镜像；不 push；显式路径提交；禁止 `git add -A`。\n- 校验：validate-requirements 0/0；validate-tasks 0 error；decomposition `--mode tasks` → proceed（21 tasks）；pre-analyze `--stage tasks` → pass；contract 条款计数与 tasks claim 一致；plan-owned diff 仅 PLAN-EDIT。\n- 提交：`docs(021): analyze-fix cgit URL findings`（可 ≤2 提交）；工作树 clean。\n- 记账：`/speckit.analyze`，run-id `r20261028T083000Z-7c1a-analyze-fix`，`--feature 021-code-cgit-urls --feature-id 026`；使用主仓引擎 + `--workspace-root`，但**不要**再触发 store 迁移（若会迁移则用本分支旧引擎或跳过迁移并说明）。无法写入 → `WRAPUP-DEFERRED`。\n\n最后一行必须是且仅是：ANALYZE-FIX-DONE"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "120.79.243.153:443",
+          "59.110.214.247:443",
+          "47.116.36.231:443",
+          "39.106.96.116:443",
+          "39.106.211.206:443",
+          "47.57.243.249:443",
+          "8.212.124.35:443",
+          "39.106.176.70:443",
+          "47.116.44.184:443",
+          "47.106.172.117:443",
+          "101.132.70.5:443",
+          "47.107.125.11:443",
+          "120.24.170.126:443",
+          "47.57.188.188:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

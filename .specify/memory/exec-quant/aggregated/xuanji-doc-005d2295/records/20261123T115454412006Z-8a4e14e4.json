@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "85f249b14d6833d539ea0b0ae2661ffc903b23e75c76800221266a5ba19ec637",
+    "content_hash": "3482709d1d50a675edbeaa99f4b4c89a3e04b271eec37bd888bf26d453edf10a",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T12:15:29Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：requirements。\n\n① 背景与权威文档\n- 项目 worktree：`/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；base `main` `c536ca97`；工作树 clean。\n- 目标：把 xuanji-doc 从「Node 网关单栈」重构为「nginx 单入口 + cws_daemon 稳定 API + 多条独立领域链路」：\n  - 前端：`/` React SPA（扩展 `view/app`，单机控制台 + 知识服务）、`/docs/` Hugo server、`/cgit/` cgit、`/api/v1/`、`/mcp/v1/`。\n  - 后端：`hugo`、`cgit`、`graphicle`、`lightrag` 四服务并列独立；`api`（cws_daemon）做稳定 OpenAPI/MCP；`ingest`（Node，保留）只做入库，push/pull 并将多格式文档转为标准 Hugo Markdown 写入 docs volume。\n  - 存储：docs volume（仅 ingest 写）、git volume（`repos/` + `graphicle/`，cgit 只读 repos）、PostgreSQL（vector+graph）。\n  - 删除 `/api/kb/*`；query 从 Node 网关迁到 `api` + LightRAG；ingest 保留 Node。\n- 权威：`.specify/memory/constitution.md`、`.specify/instructions.md`、`docs/kb.md`、`docs/architecture.md`、`docs/code-retrieval.md`、`docs/code-storage.md`、`docs/memory.md`、`docs/design.md`；现有 `service/gateway`、`service/code-graph`、`view/app`、`view/site`；`.specify/specs/022-citation-architecture/`（Citation 契约）。\n- 跨线冻结接口：见 `/Users/liuqiming.lqm/project/profiles/data/projects/04_知识管理/tmp/sdd-loop-multiline-20261030/README.md`（程序名/端口/volume/命令/路由/认证）。requirements 必须与之一致；如需变更先记录并停线。\n\n② 执行要求\n- 运行 `/speckit.requirements`，绑定 Feature **029**，规格 **023**；产出 `.specify/specs/023-xuanji-doc-architecture/requirements.md`、质量清单、Feature 详情/索引行（Draft）。\n- 需求必须覆盖（按可验证 FR 组织）：\n  1. nginx 单入口：`/` SPA、`/docs/` Hugo、`/cgit/`、`/api/v1/`、`/mcp/v1/`；`/` 与 `/docs/` Basic（nginx 层），admin 仅 Basic cws；无 `/api/kb`。\n  2. `api` 稳定层：cws_daemon 的 knowledge/documents/code/admin/system 域；REST + MCP；OpenAPI 投影与 pinned 校验；底层组件可替换。\n  3. `ingest`：只入库；push（multipart，md/txt/html/docx/pptx/pdf/图片）与 pull（阿里云 OSS / 本地挂载目录）；统一转标准 Hugo Markdown（page bundle）、front matter、资产提取、原子写 docs volume、LightRAG 索引、job 状态/取消/幂等/审计；默认无 OCR。\n  4. query 迁移：`api` 直连 LightRAG，Python 侧实现 score 与 Citation 装配（022 契约），保证与现状字段级兼容。\n  5. Hugo：`hugo server` 在 supervisor 下，`/docs/` 首页，监听 docs volume 热更新；不再 dist 构建/同步。\n  6. SPA：扩展 `view/app`，Dashboard/Knowledge/Documents/Code/Ingest/Config；同一 `/api/v1`；配置分部署只读与运行时可写，secret 仅引用。\n  7. code：`graphicle serve`（8854，HTTP MCP）+ cgit（只读 repos）；code adapter 输出稳定 search/resolve/repos。\n  8. 存储/权限：docs volume 单写；git volume 分目录；PG 为向量/图/registry；cgit 只读；引用 URL 与存储路径解耦。\n  9. 兼容/迁移：破坏性切换 `/api/kb`；consumer（React/robot）迁移；回滚开关与降级。\n- 约束：FR ≤30；若不可避免超出，给出**切片建议**（不得自行拆特性，等待 decomposition gate）；不改 xuanji-api / xuanji-images；不实现代码；不 push；不 `git add -A`；不触碰 worktree 之外的仓库。\n- 输出纪律：分段写入；每个 FR 可测试、含边界/降级；引用 022 契约时用指针不复制字段表。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.requirements`，run-id `r20261030T120500Z-d101`，`--feature 023-xuanji-doc-architecture --feature-id 029`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移；失败写 `WRAPUP-DEFERRED`。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REQUIREMENTS-DONE`\n- 回传：FR/SC 数、切片建议（如有）、关键裁决、Feature 状态、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "47.57.243.249:443",
+          "8.212.124.35:443",
+          "8.223.13.163:443",
+          "47.57.188.188:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

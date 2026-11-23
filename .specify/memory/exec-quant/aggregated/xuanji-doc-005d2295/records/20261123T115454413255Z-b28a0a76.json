@@ -1,0 +1,123 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "9c63e6aa242492135e80718535ee07f309c5755bafb329d021e8ed76c3891cfe",
+    "content_hash": "d8fc692dcf6249f13f669b284ce88bc49442496f1a913ec5c8fda71548f1c962",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-analyze",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T16:19:41Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：analyze（只读）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `7e2cd11f`；clean。\n- spec 023：30 FR / 20 SC；plan `a7f5c95f` + 8 contracts；tasks `0d3c6114`（38 open）；Feature 029 Planned。\n- checklist：`checklists/architecture.md`，48 项 — 34 PASS（含 4 项带注记）/ 14 FAIL；Findings HIGH 6 / MEDIUM 9 / LOW 5。\n- 跨仓：消费 A（xuanji-api 010）契约；C（xuanji-images 051）实现入口。冻结接口见 `/tmp/sdd-loop-multiline-20261030/README.md`。\n- worktree 无脏基线。\n\n② 执行要求\n- 运行 `/speckit.analyze`，对 requirements / plan / research / data-model / contracts / quickstart / tasks 与 Feature 029 登记做只读一致性分析。\n- 必须独立复核 checklist 的 14 项 FAIL（路由回退矛盾、STR 尾斜杠、volume 写者冲突、auth 秘密命名、nginx 超时/上限、score 语义、citation 022 对齐、Hugo 热更新隔离等）：逐项维持/降级/撤销 + `file:line` 证据。\n- 覆盖重点：单一入口路由与 SPA 深链、四服务独立与降级、`api` 五域/MCP/auth、`ingest` push/pull/转换/page bundle/单写/幂等、query 迁移与 citation/score 字段级兼容、`/api/kb` 零残留、volumes 与迁移回滚、跨仓 A 契约 pin 与 C 入口命令一致性。\n- 输出写入 `.specify/specs/023-xuanji-doc-architecture/run-record-analyze.md`（findings 表：ID / severity / 位置 / 摘要 / 建议），并打印 severity 汇总。\n- 不做任何修复；除该 run-record 与记账外不得写文件；不 push；禁止 `git add -A`。\n- 记账：`/speckit.analyze`，run-id `r20261030T120500Z-d101-analyze`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-DONE`\n- 回传：CRITICAL/HIGH/MEDIUM/LOW 计数、14 项 checklist FAIL 的维持/降级/撤销统计、top 5 findings、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "106.14.225.66:443",
+          "47.116.36.231:443",
+          "39.106.96.116:443",
+          "120.24.170.126:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "8.223.13.163:443",
+          "47.57.188.188:443",
+          "59.110.214.247:443",
+          "47.116.44.184:443",
+          "47.106.172.117:443",
+          "39.106.176.70:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "423200bd00a9f39dc80b7c79cc312753a08d56deef9697091da8d29056274896",
+    "content_hash": "e813b6333fdb276efd9d9d19e2f7f82ada20381bdb28b69bb14acebba2ede3eb",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118t032340z-impl016-s4",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T03:41:23Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S4（9 包中第 5 个，S4 删除与归并，T038–T050 + T096，14 任务）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；上一包提交：`2a8c617`（PKG-S3 文档口径切换）\n- **黄金冻结 SHA = `2f66cd77d14354e557517a758d44bb882eba1d77`**（唯一源 `test-evidence/baseline-pre/freeze-commit.txt`）\n- 断点：PKG-S3 **包级校验 PASS**（驱动者独立复算：golden / `src/main`+`pom.xml` / `deploy/compose|k8s|image` / Python 面四处 diff 均 **0**；门 `decision=pass errors=0`；`sync-mirrors.py --check` MISS=3 / ORPHAN=137 / DRIFT=1 与改前逐项一致无新增；宽定向集 301/301）\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 本包性质：这是全特性唯一的破坏性包\n\nS4 之前所有包都只**新增**；S4 第一次**删除与移动**。因此顺序纪律高于一切：\n\n🛑 **六条铁律**\n1. **T038 必须先于一切删除与移动**。三项谓词**同时成立**才允许动手；任一不成立 → **立即停，输出 `ANOMALY`，一个文件都不许删/移**。\n2. **三组黄金测试只读**；出口 golden diff = 0。不符即 `ANOMALY`。\n3. **`src/main/**` 与 `pom.xml` 仍禁改**（属 S5）。本包唯一允许的 Java 改动是 **T040 的单个路径常量**与 **T048/T096 新建 `LayoutContractTest`**。\n4. **`deploy/compose/**`、`deploy/k8s/**`、`deploy/image/**` 属 CS-11 冻结面**（镜像两段归属：nginx+JDK+supervisord 基础结构由 xuanji-images 工厂提供，应用仓只做简单 Dockerfile 定制）。**`deploy/nginx/` 是独立新目录，MUST NOT 合并进 `deploy/image/**`**。T050 的冻结 diff 是**出口必跑项**。\n5. **S1/S2 已交付物不得改**：11 个迁移契约测试 + `MigrationMapContractTest` + S2 五套件、`migration-map.json`(211 行)、`test-assets.json`(77)、`tool-selftest-disposition.json`(62)、`baselines/java-tests.txt`(**419 名，T040 后必须仍是 419**)。\n6. **先移后删、先改后删**：T042 移出 `tests/sts/verify-deployment.sh` 之后才允许 T044 删 `tests/**`；T024/T025/T027/T028 能力已就位才允许 T045 删 `scripts/**`。\n\n## 必须消费的上一包 Finding 1（S3 上送，硬约束）\n\nS3 的 LO-07 活动面旧测试栈扫描得 **466 行**，分布已查清：\n- **168 行 = 本包删除面**（`pytest.ini` / `scripts/**` / `tests/**`）→ 删完自然归零；\n- **298 行 = S1/S2 逐字载体**：`migration-map.json` **211** + `tool-selftest-disposition.json` **70** + 契约测试注释 **17**。这些旧路径字面由 **MM-05 / FR-032 强制逐字保留**（记录\"从哪迁来\"），受铁律 5 冻结，**不得删改**；\n- `docs/` `deploy/` `.specify/skills/` 命中 **0**。\n\n→ **T048/T096 的 `LayoutContractTest` MUST 按同源分类排除这 298 行**，否则 LO-07 会把合规的逐字迁移记录误判越界。要求：\n- 排除**按载体同源精确成立**（migration-map 的源路径字段 / disposition 的源条目 / 契约测试中引用旧路径的注释），**不得**用\"整文件跳过扫描\"或\"凡 contract 目录一律放行\"这类粗粒度豁免；\n- 排除后**仍必须能抓到新增越界**：在 `notes/red-first-evidence.md` 留一次**反向注入演练**（临时在活动面制造一处白名单外旧栈引用 → 断言失败点名 → 撤销 → 复绿，`git diff` 归零）；\n- 排除依据写进测试注释，并把「466 = 168 删除 + 298 逐字」的对账落 `s4-exit.txt`。\n\n另：S3 复算 LO-06 bare 旧 nginx 目录名余 **2 行** = `GatewayExposureGuardTest.java:25`（**T040 修**）+ `tests/sts/verify-deployment.sh:29`（**T042 迁移时同步改**）。S4 出口须归零。\n\n## 逐任务要求（按依赖序执行）\n\n- **T038**（入口门，先于一切）`./mvnw -B test -Dtest=MigrationMapContractTest` 报 `rows=211`、`unmapped=0`、`migrated+dropped=211`、014 `migrated≥199`（当前 209；dropped=0）；`./mvnw -B test` 全绿；`git status --porcelain tests scripts pytest.ini` 为空。三项读数落 `test-evidence/s4-entry.txt`。\n- **T039** 移动 `conifg/nginx/` **5 个片段**（3 location + 1 snippets + 1 upstream 模板）到 `deploy/nginx/`，**内容逐字不变**（`git diff -M` 应识别为 rename、无内容变更）；旧 `conifg/` 目录随移动消失；`deploy/image/nginx/` 边界不动。\n- **T040** 改 `src/test/java/com/aliyun/kangaroo/xuanji/sts/caller/GatewayExposureGuardTest.java` 的目录遍历常量 `conifg/nginx` → `deploy/nginx`。**只改内部常量**：方法数不变、`baselines/java-tests.txt` 仍 **419**、不得触及 BL 基线文件本身。\n- **T041** 移动 `src/test/integration/auth-it/` → `deploy/verify/auth-it/`（`run-it.sh`、`Issuer.java`、`nginx-it.conf`、`RESULTS.md`、`NEXT-STEPS.md`）；`run-it.sh` 用 `git rev-parse --show-toplevel` 自定位仓库根、删除 `/storage/...` 硬编码、补可执行位（git mode **100644 → 100755**）；**入口级 blocked status 行只由 `bin/verify-all.sh` 预检唯一输出，脚本 MUST NOT 输出该行**（脚本内部既有子记录语义原状保留）；`src/test/integration/` 目录消失。\n- **T042** 移动 `tests/sts/verify-deployment.sh` → `deploy/verify/sts/verify-deployment.sh`；自定位仓库根；脚本内 `grep -R -n '/token' deploy/image/nginx conifg/nginx` **同步改为** `deploy/image/nginx deploy/nginx`（不保留 `conifg` 字面）；JSON 结构不变；同样 MUST NOT 输出入口级 blocked status 行。\n- **T043** 删除 `pytest.ini` 与 `.pytest_cache/`（后者以 `rm -rf .pytest_cache` 执行，**不运行 pytest**）；`.gitignore` 增 `.pytest_cache/`（`target/` 保持忽略，`__pycache__/` 条目可保留）。缺失判定**双口径**：`git ls-files` 零条目 **且** `test ! -e .pytest_cache`。\n- **T044** 删除 `tests/**`（15 个 `test_*.py`、`conftest.py`、`tests/registry/test-assets.json`、残留 `__pycache__`）。迁移内容已由 T010–T021 落盘、registry 已由 T025 承接、`verify-deployment.sh` 已由 T042 移出。\n- **T045** 删除 `scripts/**`（`verify-all.sh`、`test-baseline.py`、`test-manifest.py`、`__pycache__`）。能力已由 T024/T025/T027/T028 承接。\n- **T046** 活动文件残留引用归零：`deploy/README.md`、`docs/**`、`bin/verify-all.sh` 注释中对 `tests/contract`、`tests/registry`、`scripts/test-*`、旧 verify 入口的引用。\n- **T047** 新建 `src/test/resources/layout-allowlist.json`：**tracked-must-exist**（业务目录 `deploy`/`docs`/`src`/`bin` + 功能目录与根文件**封闭清单**）与 **ambient-tolerated**（`.git`/`.vscode`/`target`，不要求存在，`.vscode` 取 ignored 口径）两类；含禁止集合、兼容链接类别、`target/` 生成物放行。\n- **T048** 新建 `src/test/java/com/aliyun/kangaroo/xuanji/contract/LayoutContractTest.java`，机检 **LO-01…LO-08**：`git ls-files` 顶层集合、禁止集合逐一不存在、`src/test` 只 `java/` 与 `resources/`、四兼容链接指向 `.specify/instructions.md`、bare `conifg` 与旧测试栈引用清零、移动后路径存在且可执行。**失败逐条点名越界路径**。LO-07 按上文 Finding 1 做同源排除。\n- **T049** 核对 `deploy/verify/backend/echo_backend.py` 仍在位、**未被计入测试栈**、不入产品镜像（`deploy/image` 零引用），其 13 项断言由 T011 承接，**blocked ≠ 已验证**。只核对与记录，不改该文件。\n- **T096** 在 `LayoutContractTest` 增 **LO-07 `run-tests.sh` 白名单断言**：具名白名单 = **8 个 agent 投影**（`.claude`/`.github`/`.opencode`/`.qoder` 各 2）+ `.specify/**`（templates/shared/scripts/skills/agents 与历史记录）；**白名单外命中 MUST 为 0**；删除面（`pytest.ini`/`scripts/**`/`tests/**`）**不算白名单**。\n- **T050**（出口，全部必跑，落 `test-evidence/s4-exit.txt`）\n  1. `./mvnw -B test` 绿\n  2. `find . -name 'test_*.py' -not -path './.specify/*'` → **0 行**\n  3. `test ! -f pytest.ini`、`test ! -e .pytest_cache`\n  4. `git ls-files '*.py' -- ':!.specify/**'` → **恰 1 行**（`deploy/verify/backend/echo_backend.py`）\n  5. `git grep -n 'conifg' -- ':!.specify/specs' ':!.specify/features' ':!.specify/memory' ':!.specify/archive' ':!.specify/history' ':!.specify/state' ':!.specify/features.md'` → **退出 1**（bare 唯一模式）\n  6. `LayoutContractTest` `violations=0`（含 LO-07 白名单方法）\n  7. `git ls-files | cut -d/ -f1 | sort -u` 只含允许集\n  8. `git diff \"$(cat …/freeze-commit.txt)\"..HEAD -- deploy/compose deploy/k8s deploy/image` → **空**（CS-11）\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。**删除前先把 T038 读数落盘**，再动手。\n- **测试预算例外（驱动者显式授权，具名）**：T038/T050 的全量 `./mvnw -B test` 属 tasks 原文强制的**删除等价面门**，本包准予执行，记 `out-of-slot-exception reason=s4-deletion-equivalence-gate` 于 entry/exit 两份证据；**slot-2 仍保留给 S8/review**，本包不得声称已用 slot-2。若全量被权限分类器拦截，**如实记录拦截**并回退宽定向集 `-Dtest='*ContractTest,*GoldenTest'` + 算术对账，**MUST NOT 编造全量读数**。\n- **不得执行 pytest**。`sync-mirrors.py --check` 属框架校验脚本，允许；改 `.specify/skills/**` 后须重跑并确认相对 MISS=3/ORPHAN=137/DRIFT=1 **不新增**。\n- 新建/改动的断言**红先绿后**，读数落 `notes/red-first-evidence.md`；LO-07 反向注入演练必须留证并撤销干净。\n- 只提交本特性产物；`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/`、`.pytest_cache/` 不提交不还原。\n- **不要 push**。临时文件只落 `.specify/.tmp/`。\n- 完成后重跑门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 本轮真实值，`--complexity` 取 `complex|simple`；被拦截则最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 提交 message：`refactor(layout): 016 PKG-S4 移除 Python 测试栈并归并目录至 Java 标准布局`。\n\n## 输出预算\n\n报告 ≤60 行：T038 三项入口读数；T039–T046 逐条一行（含 rename 是否被 git 识别、mode 变更、删除计数）；T047/T048/T096 的 LO 逐条结果与 **466=168+298 对账**、反向注入演练读数；T049 核对结论；**T050 八项出口逐项读数**；`baselines/java-tests.txt` 仍 419 的复验；golden / `src/main`+`pom.xml` / CS-11 三处 diff；门读数。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S4-DONE`；无法完成则 `ANOMALY: <一句话事实>`（尤其 T038 谓词不成立、黄金/冻结面冲突、或 LO-07 无法在不豁免逐字载体的前提下归零时）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.57.243.249:443",
+          "106.14.225.66:443",
+          "47.107.125.11:443",
+          "39.106.176.70:443",
+          "39.106.211.206:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "8.212.124.35:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

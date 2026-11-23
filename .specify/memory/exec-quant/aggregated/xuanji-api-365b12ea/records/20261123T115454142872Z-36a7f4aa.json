@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-api",
+    "source_commit": "0b0944a6e17e855e8387968b9011979d0df33a0f",
+    "identity_status": "identified",
+    "identity_key": "40426fe7b87520338f955fb1d3bf8523954ca80203769475f805dc9832dafec2",
+    "content_hash": "1c9a090103550ba015ed52636841f9f36e0c079b696be1cc1786a3a7b902a457",
+    "package_file": "feedback-xuanji-api-20261123T185250.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-a101-analyze-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T16:26:42Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-api 的无人值守 SDD 开发，当前阶段：analyze-fix（有界修复 analyze 的 HIGH）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010`；分支 `010-xuanji-doc-stable-api`；HEAD `79ce6ef46`；clean。\n- analyze 记录：`.specify/specs/010-xuanji-doc-stable-api/run-record-analyze.md`（25 findings：CRITICAL 0 / HIGH 3 / MEDIUM 14 / LOW 8）。\n- 脏基线：仓库根 5 个 modified generated DDL —— 不触碰。\n\n② 执行要求（只修 3 条 HIGH + 直接连带的 F-07，不扩面）\n1) F-01（lint 命令 cwd）：文档化的 redocly 命令在仓库根不可解析（`pnpm --dir src/nodejs exec` 的 cwd 是 `src/nodejs`）。选定一种从仓库根可重复执行的写法（如把 `design/...` 改为相对 `src/nodejs` 的 `../../design/...`，config 同理），连续执行两次均 exit 0，并归档命令与输出。同步修正 requirements（2 处）、contracts/01 与 06、quickstart、tasks（3 处）共 6 处。\n2) F-02（code/resolve 禁用态互斥）：单点裁决为「cgit 禁用只影响 citation 的 `web_url`」：`CodeResolve` 仍返回定位（found/path/line），从 `CodeResolve.reason` 与 edge case 删除 `code_url_disabled`，只在 citation 的 `web_url_reason` 保留；同步改写 C-53/C-54、requirements（122/564/1002 附近）、data-model:82、quickstart 与 tasks 断言。\n3) F-03（跨线 admin 可写集）：在 `AdminConfigUpdate` 增加 `rerank_enabled: boolean`，并把运行时可写集明确为四项：`citation_enabled`、`doc_url_enabled`、`rerank_enabled`、`query_defaults{mode,min_score}`（以本契约为 wire owner；023 C-18/FR-015 需按其字段名引用）。同步 requirements Schema Matrix、contracts/05-admin-system、data-model、tasks 的 admin 断言；在 Assumptions 与 tasks 的 External Obligations 记录与 023 的对齐项。\n4) F-07（连带）：把 SC-012 限定为「010-owned wire 语义」，并为跨线 3 项 ANOMALY 写明闭环门禁与证据；不得继续以字面「未决语义问题数为 0」断言。\n- 不得修改实现代码、generated/、design/ API 定义本体（本阶段是契约文本修复）；plan/research/data-model/contracts/quickstart 的每次修改声明 `PLAN-EDIT:`；实质 plan 结构变更 → ANOMALY 停线。\n- 修复后运行 `validate-requirements` 与 pre-analyze-check，记录 0 error 或说明。\n- 产出 `.specify/specs/010-xuanji-doc-stable-api/analyze-fix-dispositions.md`（逐条：finding → 决定 → 改动位置 → 验证证据）。\n- 不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.analyze`，run-id `r20261030T120500Z-a101-analyze-fix`，`--feature 010-xuanji-doc-stable-api --feature-id 018`；三件套 + `run-record-analyze-fix.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-FIX-DONE`\n- 回传：3 条 HIGH 的处置与证据、F-07 处置、验证命令结果、提交哈希、记账路径、PLAN-EDIT 列表、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "47.116.36.231:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "39.106.96.116:443",
+          "106.14.225.66:443",
+          "47.116.44.184:443",
+          "8.223.13.163:443",
+          "120.24.170.126:443",
+          "59.110.214.247:443",
+          "47.106.172.117:443",
+          "39.106.176.70:443",
+          "39.106.211.206:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

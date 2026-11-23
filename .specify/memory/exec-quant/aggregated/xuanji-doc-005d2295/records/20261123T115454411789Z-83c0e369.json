@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "93e7ca0fe650fc164e68d32cdaff25524bb6c8528d490877c41a8a7a80ffbba4",
+    "content_hash": "99efec6f0e3c463e2d84a2b106b71681d2d3a85b6341de9966c6f3e5b55bb3c0",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-review-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T18:17:49Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：**review-fix（有界一轮，只修规格/台账/文档层，不改行为代码）**。\n\n① 背景与门禁\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `a2b4754c`；工作树 clean。\n- review 结论：**P0=0 / P1=4 / P2=8 → U6 blocked**。报告：`.specify/specs/022-citation-architecture/review.md`（F1–F12 全文）。\n- 只修 P1（F1–F4）；P2（F5–F12）只做 `deferred`/`recorded` 处置，不修代码。\n\n② 必改\n1. **F1（状态机越权 + `partial` 词表）**：\n   - 把 `verification.md` 中 4 处 `SC-*-status=partial` 改为 owner 词表的 `deferred`（或 `pass` 仅当 SC 自身证据完整）；live 证据用 `pending(live)` 注记，不得写 `partial`。\n   - 在 `feature-ref.md` §7、`.specify/memory/features/027.md` Status Tracking、`verification.md` § Deferred registry 记录 **T019/T033 的显式豁免**（理由：xuanji-api 1.1.0 未发布 / Hugo-cgit-ADBPG-OSS-nginx live 层不可得；解除条件 E-1 与各环境；“豁免≠完成”）。\n   - `.specify/memory/features.md` 的 027 行 `Last Updated` 追加 ` (deferred: T019,T033)`；Feature 027 保持 `Ready for Review`（豁免后满足 owner 状态机：deferred 显式豁免 + review 证据已产生）。\n2. **F2（`[X]`/DoD 夸大）**：\n   - `tasks.md` 新增 `[~] T001b`（`pnpm install --frozen-lockfile` 基线，原因：共享 node_modules 符号链接）与 `[~] T002b`（`yaml@^2.8.2` devDependency + lockfile，解除并入 T019）；任务总数 ≤40。\n   - `tasks.md` 的 **DoD Status** 改为 `met with recorded exceptions`，逐条列出 RED 缺口（T010/T012/T015/T023；D-008/D-023a）与 D-001/D-002/D-003/D-016；不得声称全量 RED 已完成。\n   - 同步 `tasks.md` § Clause Claim Accounting 的任务总数/claims 头（新增 `[~]` 不新增条款）。\n3. **F3（plan Gate 2 残留）**：\n   - `plan.md` Gate 2 的唯一索引谓词改为 `WHERE version IS NOT NULL AND version_source = 'explicit'`；负向测试改为“explicit 同版本不同正文 → 409；backfilled/省略 version → 不 409”。\n   - 在 `review-fix-dispositions.md` 记录流程教训：**被 analyze 明确标 `must-fix` 的 MEDIUM 阻断 implement 或需书面 waiver**，不得用“MEDIUM 不阻断”覆盖。\n4. **F4（凭据谓词双 owner）**：\n   - `contracts/deployment-auth.md` C-18 为唯一 owner（URL/`citation_id`/日志/错误/health detail/浏览器资产的凭据 0 出现）。\n   - `contracts/storage-capabilities.md` C-21 改为纯指针（“owner: deployment-auth.md C-18；本文件不重述”）。\n   - `contracts/citation-model.md` C-2 限定为“字段不透明性”，并指向 C-18 作为 surface 不变量的 owner。\n   - `plan.md` Gate 4 的凭据行补 `storage-capabilities.md` C-21 为 pointer。\n5. **P2 处置**：F5–F12 逐条写入 `review-fix-dispositions.md`（`recorded`/`deferred` + 理由 + 后续落点），不改代码/契约正文；其中 F5/F6 若为纯文本且低风险可顺手修正并在 dispositions 标 `fixed-text`（不得扩大范围）。\n6. **复跑**：`validate-requirements.py`、`validate-tasks.py`、`requirements-structure-check.py`、`pre-analyze-check.py --stage tasks`、`decomposition-check.py --mode tasks`、条款认领脚本（claims 总数与 tasks 头一致）；全绿。\n7. 写 `review-fix-dispositions.md`、`run-record-review-fix.md`；只提交 `.specify/**`（spec 台账、Feature、记账）；**不改** `service/**`/`view/**`/`model/**`/`docs/**`；不 push；禁 `git add -A`。\n8. 记账：Unit `/speckit.review`（review-fix），run-id `r20261028T162000Z-c1a2-review-fix`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX-DONE`\n- 回传：F1–F4 修复落点、F5–F12 处置、任务总数/claims、门禁结果、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "39.106.176.70:443",
+          "8.212.124.35:443",
+          "120.79.243.153:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

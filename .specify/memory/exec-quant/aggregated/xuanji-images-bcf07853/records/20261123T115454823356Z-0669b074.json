@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "db939357686a97dedc177bbc283238de3fb7f21f33c373d8ea878d48bb278521",
+    "content_hash": "1d09c1b992f80ac3ec18defe86499e785126b93b0ccd4ee7e36c00e232a873a8",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T12:12:31Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：requirements。\n\n① 背景与权威文档\n- 项目 worktree：`/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；base `main` `376cf087`；工作树 clean。\n- 目标：**重新设计 xuanji-doc 的整条镜像构造链（开发/项目镜像 + 服务镜像）**，按最新模块设计重构；`FROM images-builder-tools-hugo-alios-8` **不再适用**。\n- 新架构：nginx 单入口（SPA `/`、Hugo `/docs/`、cgit `/cgit/`、api `/api/v1`+`/mcp/v1`）；四服务并列独立 `hugo/cgit/graphicle/lightrag`；`api`（cws_daemon）+ `ingest`（Node）由 xuanji-doc 交付；存储 docs/git/config 三个 volume；只发布 nginx 80/443。\n- 权威：`.specify/memory/constitution.md`、`.specify/instructions.md`、`docs/design/image-authoring.md`、`docs/micro/port-and-volume.md`、`docs/scripts/usage.md`、`docs/design/compose.md`；现有 `images/project/css/kangaroo-xuanji/xuanji-doc/`、`images/service/xuanji/xuanji-doc/`、`images/builder/tools/graphicle/`、`snippets/docker/**`。\n- 跨线冻结接口：见 `/Users/liuqiming.lqm/project/profiles/data/projects/04_知识管理/tmp/sdd-loop-multiline-20261030/README.md`（程序名/端口/卷/命令/路由/认证）。镜像脚本必须使用冻结命令。\n\n② 执行要求\n- 运行 `/speckit.requirements`，绑定 Feature **048**，规格 **051**；产出 `.specify/specs/051-xuanji-doc-build-chain/requirements.md`、质量清单、Feature 详情/索引行（Draft）。\n- 需求必须覆盖：\n  1. **新构造链**：不再 FROM `images-builder-tools-hugo-alios-8`；设计 runtime base + 模块化 install snippets（Hugo 二进制、Node、Python/cws_daemon/PG 驱动、nginx、cgit、转换工具、graphicle+graphicle-graph）。\n  2. **开发/项目镜像**：完整运行栈（hugo/cgit/graphicle/lightrag/api/ingest/nginx），源码开发态；服务镜像：只带运行产物与配置。\n  3. **graphicle 源码构建**：使用 `images/builder/tools/graphicle`，同源构建 `graphicle` 与 `graphicle-graph`，install snippet 同步安装并验证；builder 变更对下游镜像保持加性。\n  4. **CWS MICRO 标记**：`CWS_MICRO_PORT` 标记 nginx 发布端口（http/https）；`CWS_MICRO_VOLUME` 标记 `/srv/knowledge/docs`、`/srv/knowledge/git`、`/srv/knowledge/config`；内部端口不发布。\n  5. **supervisor 程序**：`hugo`、`cgit`、`graphicle`、`lightrag`、`api`、`ingest`、`nginx`、`sshd`；四服务无启动依赖；脚本 source 环境、不可执行凭据泄漏。\n  6. **nginx**：Static SPA、`/docs/` proxy、`/cgit/` proxy、`/api/v1`、`/mcp/v1`；Basic auth 复用 cws_context_key htpasswd；上传大小/MCP buffering/超时。\n  7. **cgit**：安装与配置（virtual-root=/cgit/、scan-path=/srv/knowledge/git/repos）、只读挂载。\n  8. **构建与验证**：生成物/模板一致性、builder→project→service 构建、Layer-1 守卫、运行时 smoke（端口/程序/路由/volume 权限）；不 push 镜像。\n- 约束：FR ≤30；超出给切片建议；不改 xuanji-doc / xuanji-api 源码；不直接改生成 Dockerfile（只改 `.tpl`/snippets/services.yaml 后重新生成）；不构建镜像（requirements 阶段）；不 push；不 `git add -A`；不触碰主 checkout 的 6 个未跟踪 build result。\n- 输出纪律：分段写入；使用现有 MICRO 语法示例：`# MICRO: CWS_MICRO_PORT http://NGINX_HTTP_PORT # ...`、`# MICRO: CWS_MICRO_VOLUME DOCS_DATA_ROOT volume:///srv/knowledge/docs # ...`。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.requirements`，run-id `r20261030T120500Z-b101`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移；失败写 `WRAPUP-DEFERRED`。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REQUIREMENTS-DONE`\n- 回传：FR/SC 数、切片建议（如有）、构造链分层、宏清单、Feature 状态、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "39.106.96.116:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "47.116.36.231:443",
+          "47.116.44.184:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "47.107.125.11:443",
+          "47.106.172.117:443",
+          "47.57.188.188:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "59.110.214.247:443",
+          "120.24.170.126:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

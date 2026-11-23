@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "dfbbbc3373bd93a9201939eb15c1a1e58b654bfbb3ead9e47dfe242795f32a8c",
+    "content_hash": "89916e3ed9cd4def7d4855ff3f2ac76da413c3e69451ec776758567e6095697d",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.plan",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-plan",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T12:01:33Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 plan 阶段 attempt 2（finalize-only：文本对齐 + 补记账，不改设计/代码）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD 5f01fad3。\n背景：attempt 1 已产出 plan/research/data-model/4 contracts/quickstart 并推进 Feature 026 → Planned；但 ① requirements 的 Edge Cases 与 FR-002 在 `end_line` 锚点规则上冲突（plan 已按 Edge Cases 设计）；② U4 记账核验缺 session run-determination 与 exec-quant。\n\n任务：\n1. **文本对齐（最小）**：按 Edge Cases 语义修订 requirements.md 的 FR-002 末句——`end_line` 不进入 URL；当 `end_line` 为数值且 `< line` 时抑制锚点（与 Edge Cases 一致）。检查 plan/research/contracts 是否已一致，若只差指针则补指针；不改设计决策。\n2. **补记账**：核对 `.specify/memory/session/` 与 `.specify/memory/exec-quant/records/` 是否已有 unit-id `/speckit.plan`、run-id `r20261028T083000Z-7c1a-plan` 的记录；缺失则用主仓 `.specify/scripts/python/` 的引擎 + 显式 `--workspace-root` 指向本 worktree 运行：\n   python3 <main>/.specify/scripts/python/run-determination.py --action determine --unit-id \"/speckit.plan\" --unit-type command --run-id \"r20261028T083000Z-7c1a-plan\" --complexity complex\n   python3 <main>/.specify/scripts/python/exec-quant.py --action collect --unit-id \"/speckit.plan\" --unit-type command --run-id \"r20261028T083000Z-7c1a-plan\"\n3. 核对 feedback 条目 `20261028T115825Z-speckit-plan.md` 是否含 `feature: 021-code-cgit-urls` / `feature_id: \"026\"`；缺失则用新 run-id `...-plan-accounting` 补一条，不删旧条目。\n4. 只提交新增/修改的文本与记账（显式路径；禁止 git add -A）；消息 `docs(021): plan wrap-up accounting and end_line alignment`。\n5. 不改 service/view/docs/compose；不 push；工作树 clean。\n无法补齐时最后一行 `ANOMALY: <事实>`。\n最后一行必须是且仅是：PLAN-DONE"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "39.106.176.70:443",
+          "101.132.70.5:443",
+          "47.57.188.188:443",
+          "106.14.225.66:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

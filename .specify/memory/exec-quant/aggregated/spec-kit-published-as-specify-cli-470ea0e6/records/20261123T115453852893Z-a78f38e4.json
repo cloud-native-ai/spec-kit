@@ -1,0 +1,126 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "spec-kit (published as `specify-cli`)",
+    "source_commit": "4b21801ec8b0bd22536fa47fac71296927daf889",
+    "identity_status": "identified",
+    "identity_key": "e42f5ad587a75ba947116d3b54ad1224842966cb75374f4ce768bfd02891805c",
+    "content_hash": "88c13671190df806a5b8b75c6a6f7c33f2056e221137a18af7b973f863c0864c",
+    "package_file": "feedback-spec-kit-20261123T185456.zip",
+    "ingested_at": "2026-11-23T11:54:53Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.plan",
+    "unit_type": "command",
+    "run_id": "063-review-p1-governance-plan-20261019",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-19T13:15:32Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.73",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/cloud-native-ai/spec-kit",
+          "--permission-mode",
+          "auto",
+          "--agent",
+          "SDD Executor",
+          "--model",
+          "DeepSeek-Flash",
+          "--reasoning-effort",
+          "max",
+          "--context-window",
+          "1000000",
+          "-p",
+          "/speckit.plan 当前特性：063-review-p1-governance。需求上下文见 /tmp/sdd-review-p1/brief.md；权威评审报告见 `.specify/specs/062-humanize-command/review.md`；规格见 `.specify/specs/063-review-p1-governance/requirements.md`（Feature 063 已绑定，clarify 已完成）。\n\n## 阶段背景与权威文档\n\n你在推进 /storage/project/cloud-native-ai/spec-kit 的无人值守 SDD 特性开发，当前阶段：PLAN。\n- 项目终态权威文档：/tmp/sdd-review-p1/brief.md 与 `.specify/specs/062-humanize-command/review.md`（P1 findings 与证据）\n- 项目宪法：/storage/project/cloud-native-ai/spec-kit/.specify/memory/constitution.md（合规底线）\n- 上一阶段完成提交：c5b3d1fc（clarify 收尾，续作基线）\n- 当前断点判定：requirements 与 clarify 已完成；Feature 063 已绑定；进入 plan。\n- 特性切片：Review P1 治理——F1–F8 的框架机制修复；不重做 062，不修改 062 规格/任务/报告。\n- 已知事实：两条决策 E1/E2 已在 Clarifications 裁决；`skill:sdd-loop-driver` probe 对象与监控改进已由维护项 2/4 合入。\n\n## 执行要求\n\n- 直接执行不要确认；访谈式问题自行裁决并记录假设。\n- 只提交本特性产物；本阶段不实现代码，不越阶段进入 tasks/implement。\n- 产出 plan.md 与 Phase 1 设计产物（data-model/contracts/quickstart/feature-ref 等，按工作流）；宪法检查逐项判定；测试基线在改动前冻结；模板/机制类特性按宪法 VII template-only 门正当化。\n- 设计必须落在框架源侧（shared/templates/skills/scripts/tests/docs），`.specify/` 经 sync 落位（两顶帽子）；计数/枚举程序派生或引用 owner。\n- 不得修改 062 的规格、tasks、review 报告；不得回滚已合入的监控/plate 改进。\n- 仓库既有脏文件不提交不还原；不要 push。\n- 只推进当前阶段；tasks 由主代理派发。\n- 并发隔离：本线独占该工作树。\n- 快速失败注入子句（原样遵守——执行中发现与已记录预期不符的状态时）：\n  先问一个问题：解决它需要**纠正**还是**裁定**？纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。\n  纠正 ⇒ 就地修完，并在回传中披露。裁定（须在两种以上读法间选择，或须发明工件未记录的意图）⇒ 停在本层、回抛编排者，MUST NOT 就地修平后继续。\n  回传 MUST 含一条显式异常行：有异常则逐条以行首 `ANOMALY:` 列出；无异常则明写 `未发现异常`。缺该行即回传不完整，沉默 MUST NOT 被读作干净。\n  判据、两份封闭清单与上送件形态的唯一真源：/storage/project/cloud-native-ai/spec-kit/.specify/shared/guidelines/fast-fail.md。\n\n## 完成尾标与回传契约\n\n- 完成时，你输出的最后一行必须是且仅是完成哨兵：PLAN-DONE。\n- 若本阶段无法完成（阻塞、发现规格矛盾、环境缺失），最后一行输出显式异常行：`ANOMALY: <一句话事实>`。\n- 最后一行既不是完成哨兵也不是显式异常行 = 卡死信号，主代理将按卡死程序处置。\n- 回传正文请给出：plan/Phase 1 产物路径、宪法检查结论、基线冻结结果、FR/SC 映射、提交号、以及 `未发现异常` 或逐条异常行。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/cloud-native-ai/spec-kit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.211.206:443",
+          "8.223.13.163:443",
+          "101.132.70.5:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "106.14.225.66:443",
+          "39.106.176.70:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

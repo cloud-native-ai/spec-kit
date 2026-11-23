@@ -1,0 +1,110 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-ui",
+    "source_commit": "d66447475b0f59007cb467aefdac0070e04c8812",
+    "identity_status": "identified",
+    "identity_key": "d4356261004835442af39da5eb43096f7f5b36606eed9ebfd5e64fe1f687ee5f",
+    "content_hash": "8301e5e321380961b9f13a31db1b86d913bbf5fc351a54ee42dc99ae2145d2eb",
+    "package_file": "feedback-xuanji-ui-20261123T185338.zip",
+    "ingested_at": "2026-11-23T11:54:55Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "007-s2-analyze-r3-20261022",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T10:22:43Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.71",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 `xuanji-ui`（容器 /cws_work/xuanji-ui，develop）的无人值守 SDD 特性，当前阶段：**analyze（第 3 轮，最后一轮门内回环后的重过门）**。\n\n## ① 背景\n- 特性目录：`.specify/specs/007-s2-contract-alignment/`（… → plan `1fa831e` → tasks `712b681` → 修订 `732e661` → CRITICAL/HIGH 修订 `1770c33`）\n- `1770c33` 已修：C-01（plan row V / requirements TDD 行披露继承性 E2E 缺口 + G4 豁免口径）、F-01（T023 白名单补 tasks.md/registry + quickstart 红线同步）、F-02（场景 5 的 mock 选项标注仅本地调试、不得作为 G5 证据）；顺带 MEDIUM F-03/F-04/F-05/F-06/E-02/F-09/F-10。\n- 范围红线：仅 Change/Risk/Knowledge 16 函数与模型；页面行为不变。\n- 契约基线：API 线 S2 契约 `1aa6b9ead`（UI 子模块 bump 由集成方在 implement 前执行）。\n- 状态脊：`STATE_SPINE_PATH=/tmp/spine-ui-s2.md`；证据目录：`EVIDENCE_DIR=.specify/specs/007-s2-contract-alignment/test-evidence`\n\n## ② 执行要求\n执行 /speckit.analyze 的语义（**严格只读**）：\n- 复核 C-01/F-01/F-02 是否已真实清零（逐条给 文件:行 证据），并完整重跑跨产物一致性分析。\n- 输出 CRITICAL / HIGH / MEDIUM / LOW；**CRITICAL 与 HIGH 必须为 0 或明确已处置**——这是最后一轮，若仍非零请直接以 `ANOMALY:` 回传（勿再建议循环）。\n- 不修文件、不改契约、不跑生成/构建、不提交；唯一写操作=EVIDENCE_DIR 追加 E3 行（`not-run-docs-only`）。\n- 并发隔离：只读写 `/cws_work/xuanji-ui`。\n\n## ③ PLAN CONSTRAINT（已生效）\nPLAN CONSTRAINT: plan_constraint=active since 2026-10-22T13:19+08:00 (plan_commit=1fa831e; approved_baseline_commit=1fa831e). Analyze read-only; end with `PLAN-EDIT: none`.\n\n## ④ 完成尾标\n- 完成时最后一行必须且仅是：`ANALYZE-DONE`\n- 仍有 CRITICAL/HIGH：`ANOMALY: <一句话事实>`"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-ui",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "gfmodel",
+        "provenance": "measured"
+      },
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.103.9.44:443",
+          "106.14.225.66:443",
+          "39.108.79.164:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443",
+          "47.103.128.242:443",
+          "47.57.13.70:443",
+          "39.107.85.235:443",
+          "47.107.125.11:443",
+          "47.106.88.164:443",
+          "101.132.70.5:443",
+          "39.107.242.82:443",
+          "39.106.176.70:443",
+          "47.57.188.188:443",
+          "39.106.211.206:443",
+          "8.212.20.107:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

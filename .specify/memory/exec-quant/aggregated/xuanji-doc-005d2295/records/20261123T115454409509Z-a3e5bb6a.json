@@ -1,0 +1,121 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "9c525f0c74d5326365cba2ad19f930443c89c309c0c234e050e3cbad0e9c7a7d",
+    "content_hash": "fd1a3ea859adb247d9216a28ce625285aa82664dba95ee716f7c4ce73ba61fe1",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-requirements",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T10:25:31Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：requirements。\n\n① 背景与权威文档\n- 项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation（worktree）；分支 022-citation-architecture；基线 021-code-cgit-urls（e7d9988e）；工作树 clean。\n- 特性：Feature **027**（新，索引最大 026）；spec 目录 `.specify/specs/022-citation-architecture/`；requirement key `022-citation-architecture`。\n- 用户目标：在 cgit 基础上增加静态网站链接；知识引用的关键痛点是“引用可回到原文”——代码片段可经 cgit 打开源码，知识文档引用可打开文档原文。为 xuanji-doc 设计**完整前后端架构**：\n  1) 前端：cgit 静态代码查看；Hugo 静态文档查看；xuanji-robot 钉钉查询入口；基于裸 OpenAPI 的查询接口。\n  2) 后端：代码存储与索引（文件系统或 OSS-based FS）；原始文档与索引（FS / OSS-based FS / OSS 对象存储）；PostgreSQL/ADB PG 的向量与图存储。\n  3) 中间件：基于 xuanji-function 的知识入口流程；基于 ingest 接口的知识入口流程。\n- 权威：constitution（II/III/XI/XII/XIV/XVI/XIX/XX/XXI）、instructions、`docs/architecture.md`、`docs/kb.md`、`docs/code-retrieval.md`、`docs/code-storage.md`、`docs/memory.md`、`docs/design.md`、`README.md`；现有实现 `service/gateway`、`view/site`、`view/app`、`service/code-graph`；关联 xuanji-robot / xuanji-function / xuanji-api。\n\nU1 已知事实（必须作为需求约束）：\n- 前端：Hugo `view/site`（contentDir=model/content/{zh,en}，baseURL=\"/\"，Pages 部署）；React 只 POST `/api/kb/query`，references 仅 file_path/content 纯文本；cgit 仅镜像 dev hook（/cgit/ + basic auth，45972/45973），**当前无服务**；021 `web_url` 仅 MCP；robot KBReference{Source,Score} 无 URL；xuanji-doc 无 OpenAPI，xuanji-api `design/api/kb/openapi.yaml` 覆盖 /api/kb/{query,ingest,health} 但实现指针过时。\n- 后端：代码本地 FS（graphicle/snapshots/manifests/repos/worktrees/locks），**OSS 非目标**；文档真实适配器未实现（024 B/C）；dev pgvector+AGE，ADBPG FastANN 无 AGE；KB Registry 表齐全但 citations 多为 null、file_path 不可寻址；运行态 /srv/code-graph 为空。\n- 中间件：ingest 唯一链 doc-summary→kb:ingest→POST /api/kb/ingest（{text,file_source,trust}）；xuanji-function 是 OSS→MySQL 管道，不接 KB；robot 只 query。\n- 运行态：doc-service 44145 + robot-service 27777 + postgres；无 OSS/ADBPG；KB_API_KEY 缺省空；cgit 未运行。\n\n② 执行要求（默认纪律）\n- 运行 `/speckit.requirements`，产出 `requirements.md` + `checklists/requirements.md`；绑定 Feature 027（若注册表无 027，按项目规则新增条目与详情）。\n- **架构设计优先**：本特性交付架构/契约/迁移路线；运行时实现由 plan/tasks 判定（若需要，优先接口层）。FR 控制在 **≤30**（若超出，按框架拆分门记录切片候选，不要硬塞）。\n- 需求必须覆盖：\n  1. 引用对象模型：代码引用（repo/path/line/ref）与文档引用（doc path/heading/anchor/version）；稳定引用 ID/URL；与查询返回字段的关系。\n  2. 前端：cgit URL 契约；Hugo 文档 URL 契约；robot 回复/卡片链接渲染；裸 OpenAPI 查询接口（以 xuanji-api 为 owner 或仓内新增，需裁决）。\n  3. 后端：代码存储/索引（FS 或 OSS-based FS）、文档原文/索引（FS/OSS-FS/OSS 对象）、PG/ADBPG 向量与图；一致性与降级；引用元数据（citations/file_path 可寻址）。\n  4. 中间件：xuanji-function 知识入口；ingest 接口扩展（引用元数据）；两条入口的统一契约与幂等。\n  5. 部署/安全：静态站点托管（Pages vs 容器 nginx）、cgit 服务与 basic auth、`/api/kb` 鉴权、OSS/ADBPG 选型、回滚/降级。\n- 8 个未知项写入 Assumptions/NEEDS CLARIFICATION（勿擅自定案）：① cgit/Hugo URL 形态与基址；② 文档引用字段（doc_url/doc_ref/kb://）；③ 机器人链接渲染与冻结面；④ OpenAPI owner 与引用字段；⑤ OSS 后端选择；⑥ PG vs ADBPG 分工/降级；⑦ ingest 入口协议与引用元数据；⑧ 静态站点托管/鉴权。\n- 只提交本特性产物（spec + Feature 027 + 运行记录）；既有脏文件不提交不还原；不 push。\n- 只推进 requirements；不进入 clarify/plan。\n- 输出纪律：文件分段写入。\n- **Wrap-up 记账（三件套一次完成）**：`/speckit.requirements`，run-id `r20261028T162000Z-c1a2-requirements`，`--feature 022-citation-architecture --feature-id 027`；session + exec-quant + feedback 全部写入并提交（feedback 用本 worktree 旧引擎；其余主仓引擎 + `--workspace-root`；不得触发 store 迁移/删除 tracked index）。无法写入 → `WRAPUP-DEFERRED`。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：REQUIREMENTS-DONE\n- 回传：spec 路径、FR/SC/US 计数、Feature 027 注册位置、未知项、提交哈希、记账路径、校验结果。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.107.125.11:443",
+          "47.106.172.117:443",
+          "120.79.243.153:443",
+          "59.110.214.247:443",
+          "47.57.243.249:443",
+          "47.116.44.184:443",
+          "120.24.170.126:443",
+          "47.57.188.188:443",
+          "106.14.225.66:443",
+          "47.116.36.231:443",
+          "39.106.176.70:443",
+          "39.106.96.116:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": "not_evaluated",
+    "truncated": []
+  }
+}

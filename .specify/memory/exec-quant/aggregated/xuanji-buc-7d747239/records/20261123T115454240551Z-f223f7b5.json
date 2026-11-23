@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "7b45b4604a00639b0112098c0f781d72534f61ce9fd1f766796255b985b4ca91",
+    "content_hash": "c32ee92aea9c463c4f67270d5ab97179b2abdf1313d414ce2b87beaa3763e513",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261117T172128Z-9205",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-17T17:33:01Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的无人值守 SDD 特性开发，当前阶段：requirements。\n\n- 项目终态权威文档：本仓 `.specify/constitution.md` 与 `.specify/instructions.md`（含 AGENTS/CLAUDE/QODER/QWEN 兼容链接）+ **用户本轮四项改造要求**（逐字见下）+ Maven 标准目录布局与 Spring Boot 4.0.4 parent 既有约定\n- 项目宪法：`/cws_work/xuanji-buc/.specify/constitution.md`（合规底线，所有取舍不得违反）\n- 上一阶段完成提交：`f7ecb97`（续作基线，分支 `main`，工作树干净）\n- 当前断点判定：**新特性线，从 requirements 起**（U1 探测：无同主题既有 spec；本仓无活跃并行写者）\n- 状态脊：STATE_SPINE_PATH=`.specify/state/buc-java-standardization.md`（**必读 U1 Probe Evidence 节**）\n- 证据目录：EVIDENCE_DIR=`<spec-dir>/test-evidence`\n- 状态脊写入模式：SPINE_WRITE_MODE=direct\n- 本线类别（四元组）：flow_class=-；source=default；marker=；error=owner-unavailable\n\n## 一、用户本轮四项要求（逐字，最高权威）\n\n> 需要以一个 java 项目最佳实践的方式改造当前项目，包括但不限于：\n> 1) 移除 pytest.ini 和 tests 等 python 技术栈；\n> 2) 重新整理目录，顶层根目录只包含 deploy, docs, src, bin 等目录，除了 .qoder 和 .specify 等功能性目录外，其他目录都应该作为上述目录的子目录。最后以一个标准 java+maven 标准项目的方式进行清理和重构；\n> 3) 添加基于 junit5 的单元测试；\n> 4) 基于 spring boot 的配置方案。\n\n## 二、领域约束（用户既往确认，不得违反）\n\n- **xuanji-buc 是可插拔 BUC 认证组件**：其他应用通过**纯配置**方式把基于 BUC 认证的 http(s) 流量转发给该组件完成认证，不是代码接口集成；组件同时保留独立使用能力。改造不得破坏该定位。\n- **交付镜像两段归属**：nginx + JDK + supervisord 的一体化基础结构由 **xuanji-images 工厂**提供；应用仓**不重建**这套基础结构，只用一个简单 Dockerfile 针对该基础镜像做定制。目录重构不得把 nginx 基础结构搬进应用仓，也不得破坏 `deploy/image` 的定制关系。\n- 端点契约不变：`/checkBucInfo`（200 + `x-xuanji-user-info`/`x-xuanji-user-token`；401 + `x-xuanji-buc-login-uri`）、BUC 内置回调（根级 `/sendBucSSOToken.do` 等）、`/cli-auth*`、STS `/token` 只在 `127.0.0.1:17741`（主端口恒 404）。**本次是工程化重构，不是行为变更**；任何行为差异必须显式登记为 breaking change 并给迁移说明。\n\n## 三、U1 已实测事实（作为需求输入，不要重复探测已确认项）\n\n- **Java 栈已在位**：`pom.xml` parent = `spring-boot-starter-parent 4.0.4`，packaging jar；依赖 starter-web / starter-security / starter-validation / buc.sso.client / normandy-credential-sdk / nimbus-jose-jwt 9.47 / json-smart 2.5.2 / **starter-test** / reload4j；插件 spring-boot-maven-plugin + **jacoco 0.8.13**。Java 21 Dragonwell，`mvnw` 可用。\n- **JUnit 5 已在用**：`src/test` 下 53 个 `.java`，**43 个用 `org.junit.jupiter`，0 个用 JUnit 4**。⇒ 要求③的实质是「**巩固 JUnit 5 为唯一测试栈 + 补齐覆盖缺口**」，不是从零引入；需求必须基于此事实，不得写成「新增 JUnit 5 依赖」。\n- **非标准布局**：`src/test/` 下除 `java`、`resources` 外另有 **`integration`** 目录（Maven 标准只认 java/resources）⇒ 必须收敛为标准布局或用 surefire/failsafe 显式声明，给出裁决。\n- **Python 栈面（要求①的删除对象）**：`pytest.ini`、`tests/{contract,registry,sts}`、`scripts/test-baseline.py`、`scripts/test-manifest.py`、`scripts/__pycache__`、`.pytest_cache`。`.gitignore` 已含 `target/`、`__pycache__/`，**未含 `.pytest_cache`**。\n- **顶层待归位目录**：`conifg`（**拼写错误**，内含 `nginx`）、`scripts`（`verify-all.sh` + 2 个 python + `__pycache__`）、`tests`、`target`（构建产物，已 gitignore）、`.pytest_cache`。`deploy/` 已结构化（compose / image / k8s / README.md / verify）。\n- `pom.xml` 中 `pytest|python|tests/|exec-maven|surefire|junit` **零命中**（surefire/junit 由 Boot parent 管理）。\n- 分支模型：`.specify/workflow/git.md` 的 Workflow model 声明为 `None yet.`（未填）；观测事实 = 在 `main` 上工作。**不要自造分支模型**，按观测事实在 main 上推进。\n\n## 四、必须显式裁决的重大重叠（不得静默删除）\n\n**Feature 006「Automated Test Suite」于 2026-11-16 由 `/speckit.implement` 推进 Planned → Implemented**（spec `006-test-framework`，38 任务），其交付物正是**双轨测试框架**：\n`scripts/verify-all.sh`（固定 Java→Python 程序、不短路、聚合退出码、失败 ID + 重跑命令）、`scripts/test-manifest.py` + `tests/registry/test-assets.json`（63 资产、findings=0、coverage_ratio=1.0）、`scripts/test-baseline.py` + 名称级基线（**java 208 / python 273**）、4 个新契约模块（62 测试）、`pytest.ini` marker 注册、compose 分阶段隔离、FM-4 拓扑重写、JaCoCo report-only、`docs/testing.md`、fixture 合成数据与 0 命中秘密扫描。\n\n⇒ **要求①直接反转 006 的双轨设计**。需求必须：\n1. 显式裁决 006 的归属（**取代 / 部分修订 / 边界切分**），写明理由与生效范围，并在注册表与特性详情登记状态转移；\n2. 逐件列出 006 交付物的处置（删除 / 迁移到 `bin/` / 改写为 Java 单轨 / 保留），**特别是 `verify-all.sh`、资产清单与基线机制**——不得让「可机检测试清单 + 名称级基线 + 不短路聚合退出码」这些**有价值的能力随 Python 一起消失**，应给出 Java 单轨等价物；\n3. 登记对 **007（CI 流水线）/ 009（Containerization）/ 014（Upstream Injection，Blocked，199 契约测试绿）/ 015（Deployment STS）** 的影响：它们的验收载体、脚本路径、契约测试是否落在被删除的 `tests/` 内；**014 的 199 个契约测试若是 Python 实现，删除即摧毁其验收证据**，必须给出迁移或显式降级裁决，不得静默丢失。\n\n## 五、本阶段任务\n\n执行 **`/speckit.requirements`**，产出 `requirements.md`（FR / NFR / SC / Assumptions / Out of Scope / 归属裁决）。范围至少覆盖：\n\n1. **Python 栈移除**：删除面清单（逐文件/目录）、删除前的等价能力迁移方案、`.gitignore` 与构建/CI 引用的同步清理、`docs/testing.md` 改写。\n2. **目录重构到 Maven 标准**：顶层只留 `deploy` `docs` `src` `bin` 等目录 + 功能性目录（`.qoder` `.specify` `.git` `.github` `.mvn` `.claude` `.opencode` `.qwen` 等）与必要根文件（`pom.xml` `mvnw` `mvnw.cmd` `README.md` 及兼容链接）；给出**逐目录映射表**（`conifg/nginx` → ?、`scripts` → `bin`、`tests` → 删除/迁移、`src/test/integration` → ?、`target` 与 `.pytest_cache` 处置），并说明 `target/` 作为 Maven 默认构建产物目录是否保留（保留则须 gitignore，迁移则须改 pom build directory 并评估插件兼容）。**拼写错误 `conifg` 必须纠正**，且所有引用点（Dockerfile / compose / k8s / 脚本 / 文档）同步。\n3. **JUnit 5 单测**：以现有 43 个 jupiter 测试为基线，给出覆盖缺口清单与补齐目标（可度量）、测试分层（unit / integration）与 Maven 标准布局落点、surefire/failsafe 与 JaCoCo 策略、禁用 JUnit 4 与 vintage 引擎的断言、测试命名与并行安全/确定性要求。\n4. **Spring Boot 配置方案**：`application.yml` 与 profile 分层、`@ConfigurationProperties` 取代散落 `@Value`（含类型安全与校验）、外部化配置与环境变量映射、启动期 fail-fast 校验、秘密不入仓、与既有 `deploy/compose`、`deploy/k8s`、`deploy/image` 注入方式的兼容。\n5. **行为不变性**：端点契约、端口（17740 主 / 17741 STS 回环）、nginx 与 Java 双进程形态、可插拔集成方式均不变；任何差异显式登记 breaking change + 迁移说明。\n6. **验收可度量**：每条 SC 给可执行判据与采集方式（构建/测试/静态断言/目录断言），不得写「基本符合」。\n\n### 强制产物要求（避免确定性门失败）\n\n- **必须包含 `## Runtime Stack & Dependency Ownership` 章节**（本线为 execution 类，该章节强制；形状权威见 `.specify/shared/workflow/acceptance-hardening.md`）：数据行用 `RS-NNN`，`Form` 取值域 `in-scope` / `signed-contract` / `user-waived`，填齐 FR / Premises / Contract 等列，**零数据行同样判失败**。运行时依赖至少含 JDK 21、Spring Boot 4.0.4 与 starter 系列、buc.sso.client、normandy-credential-sdk、nimbus-jose-jwt、JaCoCo、Maven wrapper 与内网仓。\n- **`**Feature ID**` 必须落定真实编号**（注册表现有至 015，按 `/speckit.feature` 规则取下一个可用号），不得留 `Need clarification` 一类占位；`## Related Feature` 与特性绑定节对齐同一编号。\n- 不得留任何占位符（`Need clarification` / `TBD` / `待补充`）。\n\n## 六、执行要求（默认纪律）\n\n- 直接执行不要确认；访谈式问题自行裁决并记录假设（落 spec 的 Assumptions 节或提交说明）。\n- 只提交本特性产物。**既有脏文件不提交不还原**。\n- **不要 push**（远程推送属破坏性操作，未授权）。\n- 只推进当前阶段；下一阶段由主代理派发，不要自行越阶段，**本阶段不写实现代码、不做实际删除或移动**。\n- **测试执行唯一入口 `./mvnw test`**（本仓为 Java + Maven；`run-tests.sh` 属即将被移除的 pytest 轨，不得作为入口）；不得直接调用解释器级测试命令。\n- 临时文件只落 `.specify/.tmp/`（已被 gitignore 覆盖），不要新建 ad-hoc 目录。\n- 完成后跑仓内确定性门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir <spec-dir> --stage requirements --repo .`（若该路径不存在，用 `.specify/scripts/python/` 下同名脚本），逐字输出落 `test-evidence/`。\n- 执行 Wrap-up 三步记账，**unit-id 必须带斜杠** `/speckit.requirements`（引擎身份词表只接受带斜杠形式），`--feature <spec-key>`，run-id 用本轮真实值；**首次落盘即写正确值，不要用 `--partial` 后再手改字段**；无法写记账时最后一行输出 `WRAPUP-DEFERRED: <原因>`。\n- 创建本阶段提交，只纳入本特性产物（spec 目录 + 注册表/详情中本特性那一行）。message：`feat(spec): 016 xuanji-buc Java 工程化重构需求规格（requirements 阶段）`（编号以实际落定为准）。\n\n## 七、完成尾标与回传契约\n\n- 完成时，你输出的最后一行必须是且仅是完成哨兵：`REQUIREMENTS-DONE`\n- 若本阶段无法完成（阻塞、发现规格矛盾、环境缺失），最后一行输出显式异常行：`ANOMALY: <一句话事实>`\n- 最后一行既不是完成哨兵也不是显式异常行 = 卡死信号，将按卡死程序处置。\n- 异常必须显式回传，静默是不被接受的输出。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "101.132.70.5:443",
+          "47.107.125.11:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "8.212.124.35:443",
+          "39.106.211.206:443",
+          "47.57.243.249:443",
+          "39.106.176.70:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

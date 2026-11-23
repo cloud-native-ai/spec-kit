@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "05d1da78760fe20376bb56291f478f9579461061fae22ba5a2fc366a0bbbdf8e",
+    "content_hash": "21abac8b4f24e33b59cbb4b3795cfabc04d081d68b10fa4c9d041bb84ac636de",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-analyze2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T13:19:25Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：**analyze 第二轮（严格只读，最终门禁）**。\n\n① 背景与现状\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `a1754a26`；工作树 clean。\n- 第一轮 analyze（HEAD `5878b788`）：CRITICAL=0 / HIGH=3 / MEDIUM=14 / LOW=12，GATE=fail；报告 `.specify/specs/022-citation-architecture/run-record-analyze.md`（F-001…F-029）。\n- analyze-fix（HEAD `a1754a26`）：`analyze-fix-dispositions.md` 声明 **29/29 处置**（fixed 28 / acceptable 1（F-020）/ deferred 0 / rejected 0），`PLAN-EDIT` 9 文件。\n- 规格现状：**FR 29 / SC 12 / US 7；tasks 33**；7 契约（条款有增补/重编号）；`checklists/citation-architecture-quality.md`（50 项）；Feature 027 `Planned`。\n- 复跑门禁（analyze-fix 自报）：validate-requirements 0/0；validate-tasks 0/0；structure PASS（FR=29 SC=12 markers=0）；pre-analyze(tasks) pass 0/0；decomposition(tasks) proceed（29/33）。\n\n② 执行要求\n- 运行 `/speckit.analyze`（第二轮），**严格只读**：只复核与发现，不改任何规格/代码。\n- **处置复核（必做）**：对 F-001…F-029 逐条读取 dispositions 声明的落点文件与行，判定 `LANDED` / `PARTIAL` / `NOT-LANDED`，并给证据（`文件:行`）。特别核验 3 条 HIGH：C-31 `citation_locator` 组装、C-24 heading/anchor 存在性、`version_source` 唯一性/409。\n- **回归扫描（必做）**：修复是否引入新矛盾——\n  1. 7 份契约条款编号是否连续/唯一，跨契约引用是否仍指向正确条款；tasks 条款认领表与总数是否与契约一致（新增/重编号后重算）。\n  2. 新增 **FR-029**（`entry_type`）是否在 plan 覆盖表、tasks 覆盖、SC/验收、Shared Strings 中得到承接；FR 29 是否仍 ≤ 30。\n  3. `STR-029` 加入文档原因集后，FR-010/FR-017/FR-020/SC-002/SC-009、doc-url/storage-capabilities/query-response/citation-model 是否一致；单文档缺失不产生 `degradation` 是否在 C-10 选择顺序中一致。\n  4. `version_source` 是否贯穿 DDL、契约为、幂等键、FR-023/SC-007、tasks 与 fixture。\n  5. Owner Map 拆行后是否仍有“docs/kb.md §6 拥有 schema”的残留；4 组单 owner 谓词是否真的只剩纯指针。\n  6. tasks 删除内联条款后，`[verify]` 归属、DoD-2/GATE-10、T032 blockedBy、T001 基线 fixture 是否自洽。\n  7. Feature 027 三面、`PLAN-EDIT` 声明与 plan constraint 是否自洽；是否有未记录的 plan-owned 实质改动。\n- 输出：`F-1xx` 新发现（如无则明说），严重度 CRITICAL/HIGH/MEDIUM/LOW，位置+证据+影响+建议；末尾门禁结论 `CRITICAL=n / HIGH=n / MEDIUM=n / LOW=n` 与 `GATE=pass|fail`。\n- 裁定口径：CRITICAL/HIGH 阻断 implement；MEDIUM/LOW 不阻断但必须列明。**不得为追求 pass 而下调已确认的 HIGH**；不确定按严格处理。\n- 只写 `.specify/specs/022-citation-architecture/run-record-analyze2.md` 与记账三件套；只提交这些记录文件；不改 requirements/plan/research/data-model/contracts/quickstart/tasks/checklists/Feature registry；不改 `service/**`/`view/**`/`model/**`/`docs/**`；不 push；禁 `git add -A`。\n- 不进入 implement。\n- 记账：Unit `/speckit.analyze`，run-id `r20261028T162000Z-c1a2-analyze2`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移。\n- 异常显式 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-DONE`\n- 回传：29 条处置复核计数（LANDED/PARTIAL/NOT-LANDED）、新发现计数（C/H/M/L）、GATE、提交哈希、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.96.116:443",
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "47.106.172.117:443",
+          "39.106.211.206:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "59.110.214.247:443",
+          "47.116.36.231:443",
+          "120.24.170.126:443",
+          "47.116.44.184:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

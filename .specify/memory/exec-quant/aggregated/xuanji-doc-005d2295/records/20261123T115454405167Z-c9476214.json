@@ -1,0 +1,124 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "cb8e1f53bbf4b2029655d180d9ec0d45fa58e5000bc0c2b5447560958151f8a5",
+    "content_hash": "cde90fff79e270fba8f8614fda9ba2c1256166a6eff0eb80d6572b81b93d64d2",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "r20261028T083000Z-7c1a-requirements",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-28T11:17:09Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你是 requirements 阶段 attempt 2（finalize-only：只补记账，不改规格）。\n\n项目：/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit；分支 021-code-cgit-urls；HEAD ab17b7d0。\n背景：attempt 1 已提交 spec 021 / Feature 026 / feedback，但 U4 记账核验发现 session run-determination 与 exec-quant 记录缺失，判 INCOMPLETE。\n\n任务（只做记账）：\n1. 只读核对 `.specify/memory/session/` 与 `.specify/memory/exec-quant/records/` 是否已存在 unit-id `/speckit.requirements` 且 run-id `r20261028T083000Z-7c1a-requirements` 的记录；已有则不改。\n2. 缺失则运行：\n   python3 .specify/scripts/python/run-determination.py --action determine --unit-id \"/speckit.requirements\" --unit-type command --run-id \"r20261028T083000Z-7c1a-requirements\" --complexity complex\n   python3 .specify/scripts/python/exec-quant.py --action collect --unit-id \"/speckit.requirements\" --unit-type command --run-id \"r20261028T083000Z-7c1a-requirements\"\n3. 读 `.specify/memory/feedback/20261028T111335Z-speckit-requirements.md` 的 frontmatter：是否含 `feature: 021-code-cgit-urls` 与 `feature_id: \"026\"`。缺失则用新 run-id `r20261028T083000Z-7c1a-requirements-accounting` 重新 record 一条（review 说明“attempt 2 补特征归属”，points 记录实际缺口），不删除旧条目。\n4. 只提交新增/修改的记账文件（显式路径；禁止 git add -A）；消息 `docs(021): requirements wrap-up accounting`。\n5. 不改 spec/Feature/代码/compose；不 push；工作树 clean；输出新增记录路径与提交哈希。\n无法补齐时最后一行 `ANOMALY: <事实>`。\n最后一行必须是且仅是：REQUIREMENTS-DONE"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-cgit",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-0dhim4owr2yd0f0q.cn-beijing.maas.aliyuncs.com",
+        "DASHSCOPE_API_URL": "https://dashscope.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "47.116.36.231:443",
+          "120.24.170.126:443",
+          "39.106.96.116:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443",
+          "39.106.211.206:443",
+          "47.57.243.249:443",
+          "39.106.176.70:443",
+          "47.106.172.117:443",
+          "59.110.214.247:443",
+          "47.116.44.184:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

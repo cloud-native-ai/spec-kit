@@ -1,0 +1,118 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "26fe683ba1fb30be239ee61bc92ce87faaac04e91b01a6eed46bcdc1f941c5bb",
+    "content_hash": "3fe29f1095072a7887f224ece18be395befb1ca40571519b62934197a4202c42",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-review-fix2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T06:07:28Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：review-fix2（收敛 review2 的 3 个 P1）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `65651728`；clean。\n- review2：`.specify/specs/023-xuanji-doc-architecture/review2.md` — P0 0 / **P1 3（R2-01/R2-02/R2-03）** / P2 4。\n\n② 执行要求（逐条落地到运行时，不只改契约）\n1) R2-01（审阅门未接入 ingest 运行时）：在 `service/ingest/src/service.ts` 的发布路径接入 `INGESTION_REVIEW_MODE`——`direct` 写 docsRoot；`legacy` 写入隔离草稿区（如 `config/ingest/drafts/` 或 `model/draft/`，明确选择并写入 C-30/data-model），不进 docs/content、不被 Hugo/LightRAG 看到；更新 `review-mode.test.ts` 为端到端断言（提交产物落点 + 不可见性）；同步 C-30 与 data-model E7。\n2) R2-02（Health wire 形状/依赖数）：`system` 健康按 A 的 `Health` 形状（`status`、`service`、`version`、`checks[]`、`timestamp`）输出；admin 健康作为 `checks[]` 的一项，不新增第五个 health 端点；`checks[]` 覆盖六个依赖（lightrag、graphicle、cgit、hugo、ingest、postgres）与 profile/reason；更新 `service/api/app/runtime.py`、`test_adapters_health.py` 与 C-13/E12/Q-05 对齐。\n3) R2-03（job/audit 读取路径）：`knowledge` 域的 job 状态与审计读取改为经 `api` 对 `config/ingest/` 的只读挂载（文件级读取），删除经 ingest 适配器的查询；更新 `domains/knowledge.py`、`adapters/ingest.py` 与相关测试；C-11/C-48/CHK010/UND-01 同步。\n- 不改宪法；每次修改声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 `pnpm api:test`、`pnpm ingest:test`、`pnpm api:query:parity`、`CI=true pnpm utils:test:react`、`pnpm api:openapi:check`、validate-tasks、account-clause-coverage，记录退出码。\n- 产出/追加 `.specify/specs/023-xuanji-doc-architecture/review-fix-dispositions.md`（R2-01…03：决定 → 改动位置 → 验证证据）+ `run-record-review-fix2.md`。\n- 不 push；禁止 `git add -A`；只显式路径提交；不得修改 `model/`、`service/lightrag/`、`view/site/themes/`。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-d101-review-fix2`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX2-DONE`\n- 回传：R2-01/02/03 处置与证据、测试结果、提交哈希、记账路径、PLAN-EDIT、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "39.106.176.70:443",
+          "120.79.243.153:443",
+          "106.14.225.66:443",
+          "8.212.124.35:443",
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "39.106.211.206:443",
+          "47.57.243.249:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

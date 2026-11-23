@@ -1,0 +1,122 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "82b5227d4a2c65387da758d86ba2bf63fbc0d263509c7ab0b63d393628a24ebb",
+    "content_hash": "669188d4f37ef582a874ff2645d738a5c118c25ff59975344bef535db1e38c34",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-review-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T22:26:47Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：review-fix（收敛 review 的 6 个 P1 + 4 个 P2）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `2262c004`；clean。\n- review：`.specify/specs/051-xuanji-doc-build-chain/review.md` — P0 0 / **P1 6（F1–F6）** / P2 4（F7–F10）。\n\n② 执行要求（逐条落地，不留 prose 残项）\n1) F1：用**真正的 pre-implement 提交**重算基线（记录 commit、计数、命令输出），GATE-1 对比改为该基线；删除“pre-implement”错标。\n2) F2：把 15 条 `.log` 证据转为可入库形式（解除 notes/*.log 的忽略或改为文本证据并附 hash），确保 fresh checkout 可复核；同步 GATE 证据路径。\n3) F3：三个 `[~]` 行逐条复验——通过则翻 `[X]`，不通过则写具名 waiver（owner/范围/到期/验证点）。\n4) F4：把 C-24 与实际 supervisor 命令对齐（graphicle `--listen` 等），并修正守卫使其不再强制矛盾文本。\n5) F5：C-42 的 argv 声明必须被程序实际读取（补代码或测试），否则改条款与绿账状态。\n6) F6：为 FR-006 的下游动态链接验证补契约条款、任务行与证据（或具名 waiver）。\n7) F7：新增 `analyze-carryover.md`（C 版），对 analyze/analyze2/…/fix5 的 MEDIUM/LOW 逐条 disposition（fixed / waived / covered-by）；F8：更新 fix5 的 F5-04/F5-05 为已解除（mirror 已补、T017–T024 已闭合）；F9：为 GATE-6 清理构建副产物补任务/裁决记录；F10：把镜像↔B 源绑定写成归档探针（镜像 digest + B commit + 验证命令输出）。\n- 不改宪法；每次修改声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 Layer-1 守卫、validate-requirements、validate-tasks、pre-analyze-check、`cws_images_generate_all --check`，记录退出码。\n- 产出 `.specify/specs/051-xuanji-doc-build-chain/review-fix-dispositions.md` + `run-record-review-fix.md`。\n- 不 push（含镜像）；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-b101-review-fix`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX-DONE`\n- 回传：F1–F10 处置与证据、门禁结果、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.243.249:443",
+          "39.106.176.70:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "120.79.243.153:443",
+          "8.223.13.163:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "954c9a2467b081a9a9d613c68e172f689e85ea0198081a16c477f113d1c07d99",
+    "content_hash": "4617368ac4c3b1350de017fad80ba77d72f5dd1c31d459d21b0f254c4ed7e41e",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "20261117T191000Z-ana016-w3",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-17T19:14:16Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的无人值守 SDD 特性开发，当前阶段：analyze（**只读 Worker W3 / 共 3 个并发**）。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`（只读参照）；终态权威：用户四项改造要求 + Maven/Spring Boot 标准\n- 上一阶段完成提交：`e1a7a3a`（clarify 第 2 轮机械对齐）\n- 断点判定：clarify attempt 2 **U4 PASS**（proceed 49 FR / 96 任务；pre-analyze pass 0 error）\n- 状态脊：STATE_SPINE_PATH=`.specify/state/buc-java-standardization.md`\n- 证据目录：EVIDENCE_DIR=`.specify/specs/007-java-project-standardization/test-evidence`\n- 状态脊写入模式：SPINE_WRITE_MODE=direct\n- 本线类别（四元组）：flow_class=execution；source=declaration；marker=-；error=-\n\n## 背景（已落地事实）\n\nxuanji-buc 是**可插拔 BUC 认证组件**（其他应用纯配置转发集成），交付镜像**两段归属**：nginx+JDK+supervisord 基础结构由 xuanji-images 工厂提供，应用仓只做简单 Dockerfile 定制。本特性是**工程化重构而非行为变更**：移除 Python 栈、目录标准化、巩固 JUnit 5、Spring Boot 配置方案。现状：Boot 4.0.4 parent、Java 21、`src/test` 53 个测试文件中 43 个用 jupiter、0 个 JUnit 4、精确 `@Test` [masked-credential:kv_assignment] 0.8.13。\n\n## 你的读域（文件级封闭集，MUST NOT 越界）\n\n只读：`.specify/specs/007-java-project-standardization/contracts/` **6 份契约**（baseline / config-surface / layout / migration-map / test-manifest / verify-all）+ **仓库现实面**：`pom.xml`、`src/main/**`、`src/test/**`（含 `src/test/integration`）、`deploy/**`、`docs/testing.md`、`scripts/**`、`conifg/**`、`tests/**`、`pytest.ini`、`.gitignore`、`bin/`（若存在）。\n**不得读** W1 域（requirements.md / plan.md / data-model.md / feature-ref.md / features 注册表）与 W2 域（tasks.md / quickstart.md / research.md / checklists/）。\n\n## 任务：执行 `/speckit.analyze` 的只读分析，从契约与代码现实侧核对可实现性\n\n1. **契约↔现实可实现性**：6 份契约 59 条逐条核对——每条断言在**当前仓库现实**下是否可实施、可判定；有无契约要求的能力在现有依赖/插件下不可达（如 JaCoCo 阈值判定、surefire 串行、词边界扫描）。\n2. **覆盖数学复核（独立实读）**：读 `target/site/jacoco/jacoco.csv`（若存在）核实 `com/aliyun` 的 missed/covered，验证 **1327/1819**、删 `XuanjiBucEnvironmentValidator`（49 行 / 17 covered / 32 missed）后 **1310/1770**、80% 需 1416 → **+106** 是否成立；若 csv 不存在则如实记 not-evaluated 并给出采集命令，**不得估算冒充实读**。\n3. **`@Test` 词边界**：实测精确 token 计数是否为 **208**，前缀匹配是否确实误得 209（`@TestConfiguration`）；`TestSourceScannerSupport` 的扫描口径契约是否写死词边界。\n4. **Python 面真实清单**：`git ls-files '*.py'` **排除 `.specify/**`** 后的真实行数（clarify 称当前 19 行 → 实现后 1 行，即 `deploy/verify/backend/echo_backend.py`）；`tests/` 下 15 个 `test_*.py` + `conftest.py` + `registry/test-assets.json` 是否与迁移映射的 11 模块对齐；`scripts/test-baseline.py`、`scripts/test-manifest.py`、`scripts/verify-all.sh` 的实际耦合点。\n5. **`conifg` 引用面复算**：按 bare `conifg`（区分大小写、不限定斜杠）复算活动面命中行数是否为 **16**（docs/design 11、skills 3、java 1、tests/sts 1），`conifg/` 子集是否 14；列出逐文件命中，供布局契约 LO-06 校验。\n6. **`run-tests.sh` 残留面**：全仓命中位置是否恰为 8 个 agent 投影（`.claude/.github/.opencode/.qoder` × coordinator/executor）+ `.specify/**` 框架/历史；有无白名单外的真实调用点（CI、docs、deploy 脚本）。\n7. **`src/test/integration` 现状**：其内容、是否被 pom 声明为测试源根、迁往 `deploy/verify/auth-it` 后由 `run-it.sh` 驱动的可行性；有无 Maven 侧隐式依赖会导致迁移后编译失败。\n8. **配置面现实**：`@Value` 散落点清单、`XuanjiBucProperties`/`XuanjiDpopProperties` 现状、`spring.factories` 注册与实际类名是否一致（FailureAnalyzer 正名需求）、两处重复校验的具体位置、Maven `test` profile 与插件 `<profiles>` 的实际影响面、`application.yml` 是否真不存在。\n9. **行为不变性风险**：端点（`/checkBucInfo`、根级 `/sendBucSSOToken.do`、`/cli-auth*`）、端口（17740 主 / 17741 STS 回环且主端口恒 404）、nginx+Java 双进程形态在重构中的破损风险点；`deploy/image` 的 Dockerfile 定制是否会被目录迁移破坏（**两段归属不得动**）。\n10. **顶层封闭集合可行性**：按 `git ls-files` 口径列出现有顶层目录与根文件，核对「只留 deploy/docs/src/bin + 功能目录 + 必要根文件」是否可达；`target/` 保留与 `.pytest_cache` 删除的 gitignore 现状。\n\n## 输出要求（只读变体）\n\n- **产物只读**：不修改制品、不提交、不 push、**不写状态脊**。允许只读探测命令（`git ls-files`、`grep`、`find`、读 csv）；如需编译验证只允许 `./mvnw -B -q -DskipTests compile` 一类只读探测，不得改制品。\n- findings 正文输出在日志里，每条含 `id`（**必须以 `W3-F` 开头**）、`severity`、`locus`（文件 + 行）、`problem`、`recommendation`。按 severity 降序、同级 id 字典序；末尾给计数汇总。\n- **Wrap-up 记账必需**：unit-id **`/speckit.analyze`**，`--feature 007-java-project-standardization`，run-id `20261117T191000Z-ana016-w3`；duplicate 属引擎去重语义，如实披露。无法写记账时最后一行 `WRAPUP-DEFERRED: <原因>`。\n- 不派发子任务、不推进后续阶段。临时文件只落 `.specify/.tmp/`。**不得执行 pytest**。\n\n## 完成尾标\n\n- 最后一行必须是且仅是：`ANALYZE-DONE`；无法完成时：`ANOMALY: <一句话事实>`。既非哨兵也非异常行 = 卡死信号。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "47.57.243.249:443",
+          "120.24.170.126:443",
+          "47.107.125.11:443",
+          "47.57.188.188:443",
+          "39.106.176.70:443",
+          "39.106.96.116:443",
+          "8.223.13.163:443",
+          "59.110.214.247:443",
+          "101.132.70.5:443",
+          "47.116.36.231:443",
+          "120.79.243.153:443",
+          "47.116.44.184:443",
+          "39.106.211.206:443",
+          "106.14.225.66:443",
+          "47.106.172.117:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

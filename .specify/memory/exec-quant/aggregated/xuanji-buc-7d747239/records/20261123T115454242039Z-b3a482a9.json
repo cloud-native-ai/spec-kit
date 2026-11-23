@@ -1,0 +1,120 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "17ecdde46a175913dbb0b811336bfa60e95e8efd783ff1e23892167563c702ef",
+    "content_hash": "006fe0d35f550231a10887951773333b0e7d10db1aeb0fe0fa8ffbc409ff0cc9",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "20261117T191000Z-ana016-w1",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-17T19:16:07Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的无人值守 SDD 特性开发，当前阶段：analyze（**只读 Worker W1 / 共 3 个并发**）。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；终态权威：本线 requirements + 用户四项改造要求 + Maven/Spring Boot 标准\n- 上一阶段完成提交：`e1a7a3a`（clarify 第 2 轮机械对齐）\n- 断点判定：clarify attempt 2 **U4 PASS**（`decomposition-check --mode tasks` proceed，49 FR / 96 任务；`pre-analyze-check --stage tasks` pass 0 error / 111 advisory；`validate-tasks` PASS 0/0；`validate-requirements` ok 0/0；wp-gate single-package 0 findings）\n- 状态脊：STATE_SPINE_PATH=`.specify/state/buc-java-standardization.md`\n- 证据目录：EVIDENCE_DIR=`.specify/specs/007-java-project-standardization/test-evidence`\n- 状态脊写入模式：SPINE_WRITE_MODE=direct\n- 本线类别（四元组）：flow_class=execution；source=declaration；marker=-；error=-\n\n## 你的读域（文件级封闭集，MUST NOT 越界）\n\n只读：`.specify/specs/007-java-project-standardization/` 下的 **requirements.md、plan.md、data-model.md、feature-ref.md** + `.specify/constitution.md` + `.specify/features/016-java-project-standardization.md` + `.specify/features.md`。\n**不得读** W2 域（tasks.md / checklists/ / quickstart.md / research.md）与 W3 域（contracts/ / pom.xml / src/ / deploy/ / docs/ / scripts/）。\n\n## 任务：执行 `/speckit.analyze` 的只读分析，限定读域\n\n重点核查（本轮 clarify 刚做过机械对齐，须验证对齐是否彻底、有无新引入矛盾）：\n\n1. **覆盖数学一致性**：`com/aliyun` 基线 1327/1819=72.95%；删 `XuanjiBucEnvironmentValidator`（49 行 / 17 covered / 32 missed）后 **1310/1770=74.01%**，80% 需 1416 → **+106**。核查 requirements/plan/data-model 中**所有**覆盖数字是否统一为 +106，有无残留 +89 或 +129 被当作目标（+129 只能是 pre-deletion 参考）。\n2. **SC-016 黄金冻结基准**：是否已统一为 **S0 冻结提交 SHA**（唯一变量源 `test-evidence/baseline-pre/freeze-commit.txt`），有无残留 `git diff f7ecb97..HEAD -- <golden>` 的不可满足写法；FR-046 / A-25 / plan S0 段是否一致。\n3. **`conifg` 唯一口径**：是否统一为 **bare `conifg`**（基线 16 行 / rc=0，实现后 0 行 / rc=1），`conifg/` 的 14 行是否只作为斜杠子集说明而**未另立判据**；SC-012 与现状核验节是否一致。\n4. **S1/S4 谓词一致**：`rows=211`、`unmapped=0`、`migrated+dropped=211`、014 `migrated≥199`、**dropped ≤10 且仅限 014 名下**（012 两项必须 migrated）、三要素 rationale + `notes/migration-drops.md` 审批。FR-033 / SC-017 / plan S1 是否同一口径。\n5. **62 项工具自测载体**：FR-032 与 STR-013 是否指向 `src/test/resources/tool-selftest-disposition.json`（schema `tool-selftest-disposition/1`，62 行，模块 19/24/16/3），与 211 行 migration-map 的边界是否清晰不重叠。\n6. **`notes/` 锚定**：是否全部固定为 spec 目录下，无仓库根写法残留（FR-009 顶层封闭集合）。\n7. **`run-tests.sh` 白名单**：FR-005 / SC-012 是否枚举 8 个 agent 投影 + `.specify/**`，白名单外命中 0；删除面与白名单是否被混为一谈。\n8. **宪法符合性**：plan 的 8 条原则判定是否与宪法实际条款相符，有无漏判或过期引用。\n9. **编号与引用完整性**：49 FR / 5 NFR / 17 SC / 12 RS / 13 STR 编号连续、交叉引用可解析；Clarifications 两轮裁决与正文有无冲突；Assumptions（含 A-21/A-25/A-07）与 FR 是否一致。\n10. **不可满足判据扫描**：任何 SC 的计量单位/采集方式是否可实际满足；有无「与现状相同」类循环判据残留。\n\n## 输出要求（只读变体）\n\n- **产物只读**：不修改制品、不提交、不 push、**不写状态脊**。\n- findings 正文输出在你的日志里，每条含 `id`（**必须以 `W1-F` 开头**，两位序号）、`severity`（CRITICAL/HIGH/MEDIUM/LOW）、`locus`（文件 + 行/节）、`problem`（一句话事实）、`recommendation`（可执行修正，指明改哪个文件哪一处）。按 severity 降序、同级 id 字典序；末尾给各 severity 计数。\n- **Wrap-up 记账必需**（唯一获准写面）：三步引擎，unit-id **`/speckit.analyze`**（带斜杠），`--feature 007-java-project-standardization`，run-id 用 `20261117T191000Z-ana016-w1`。引擎按 (unit,run) 去重返回 duplicate 属正常，如实披露即可。无法写记账时最后一行输出 `WRAPUP-DEFERRED: <原因>`。\n- 不派发子任务、不推进后续阶段。临时文件只落 `.specify/.tmp/`。测试入口 `./mvnw -B test`（本阶段只读，通常无需跑）。\n\n## 完成尾标\n\n- 最后一行必须是且仅是：`ANALYZE-DONE`\n- 无法完成时最后一行：`ANOMALY: <一句话事实>`\n- 既非哨兵也非异常行 = 卡死信号。异常必须显式回传。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "39.106.96.116:443",
+          "47.106.172.117:443",
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "47.57.243.249:443",
+          "47.116.36.231:443",
+          "8.223.13.163:443",
+          "47.57.188.188:443",
+          "47.107.125.11:443",
+          "120.24.170.126:443",
+          "47.116.44.184:443",
+          "39.106.176.70:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "59.110.214.247:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

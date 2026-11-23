@@ -1,0 +1,120 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-buc",
+    "source_commit": "c398a64f3e90e7a0ede2e1dd255646f918e0483b",
+    "identity_status": "identified",
+    "identity_key": "5a09b7bdfc4edd1ca1d8b4d1a3069c2b842c89975066be0a6c494de2c14df1e3",
+    "content_hash": "77a4cae3be9ea55e69f4ae002e556a5ac8680aad8f32f6cdd998290d1d3436c4",
+    "package_file": "feedback-xuanji-auth-20261123T185410.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "20261118t022100z-impl016-s0",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-18T02:21:31Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.76",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/cws_work/xuanji-buc",
+          "--permission-mode",
+          "auto",
+          "--add-dir",
+          "/home/develop/.m2",
+          "--add-dir",
+          "/tmp",
+          "-p",
+          "你在推进 xuanji-buc 的 SDD 特性开发，阶段：implement，**执行包 PKG-S0（9 包中第 1 个，S0 取证冻结，T001–T008）**。\n\n- 宪法：`/cws_work/xuanji-buc/.specify/constitution.md`；终态权威：本线 requirements + 用户四项改造要求 + Maven/Spring Boot 标准\n- 上一阶段提交：`28c937f`（clarify 第 3 轮）；代码基线 **`f7ecb97`**\n- 断点判定：**analyze delta = 0 CRITICAL / 0 HIGH**（10 个阻断项全 CLEARED 并给证据行号；四道门 rc 全 0；反向引用扫描无实质残留）→ implement 已解锁\n- 状态脊：`.specify/state/buc-java-standardization.md`（只读，**不得写**）\n- 证据目录：`.specify/specs/007-java-project-standardization/test-evidence`\n- 本线类别四元组：flow_class=execution；source=declaration；marker=-；error=-\n- 并发与写隔离：slot_cap=1，shared-tree，**你是当前唯一写者**；不得派发子任务、不得写状态脊、不得加载驱动/循环技能\n\n## 你的包范围与写域（PKG-S0，8 任务）\n\n**主写文件**：`src/test/java/com/aliyun/kangaroo/xuanji/contract/golden/**`、`test-evidence/baseline-pre/**`、`.specify/specs/007-java-project-standardization/notes/**`、`test-evidence/s0-*.txt`。\n**串行约束（已入 blockedBy，必须遵守）**：T001/T002 先于 T003；T003 先于 T004–T006；T007 先于 T008。\n\n🛑 **S0 铁律：不得改动 `src/main/**` 与 `pom.xml`**。T008 出口必须证明 `git diff f7ecb97..HEAD -- src/main pom.xml` **为空**，且 `git diff --name-status f7ecb97..HEAD -- src` **只含 `contract/golden` 的新增 `A` 行**。任何其它 src 改动都会破坏 S0 的「代码基线等价」前提。\n\n## 逐任务要求（照 tasks.md T001–T008 执行，要点复述）\n\n- **T001** 预检 S0 入口：`git diff f7ecb97..HEAD -- src pom.xml`（期望空）+ `git status --porcelain`（除 `.specify/memory/` 记账外为空），读数原文落 `test-evidence/s0-entry.txt`。\n- **T002** 在 **spec 目录下** `notes/` 创建四个骨架：`pre-change-measurements.md`（冻结读数与命令：**43 个 `*Test.java`、52 个 `.java`、208 个精确 `@Test` token、`com/aliyun` 行覆盖 1327/1819、`conifg` 引用 16 行（bare 唯一模式）、`application.properties` 19 键、deploy 清单 5 个应用侧变量**）、`red-first-evidence.md`、`migration-drops.md`（无 dropped 则记 `dropped=0`）、`quickstart-run.md`。**MUST NOT 落仓库根**（否则击穿 FR-009 顶层封闭集合）。\n- **T003** 采集 `test-evidence/baseline-pre/` **五制品 + README.md**，每制品附**可直接复制执行的采集命令**、as-of 与源提交 `f7ecb97`：\n  - `surefire-names.txt`：`./mvnw -B test` 后从 `target/surefire-reports/TEST-*.xml` 抽 **208** 个 `classname`+`name` 排序去重\n  - `jar-entries.txt`：`./mvnw -B package -DskipTests` + `jar tf target/xuanji-buc-1.0.0.jar` + `META-INF/MANIFEST.MF`\n  - `env-names.txt`：CS-08 抽取命令的 **5 行**输出\n  - `runtime-shape.txt`：17740/17741 常量、`deploy/image/Dockerfile` 的 `FROM` 与 `JAVA_TOOL_OPTIONS`、`find . -name 'supervisord*'` **0 行**\n  - `http-contract.txt`：端点断言运行输出\n  逐步可抄命令见 `quickstart.md` §S0（clarify3 已补齐，无占位符）。\n- **T004** `BehaviorContractGoldenTest.java`：逐字断言 `/checkBucInfo` 成功 200 + `x-xuanji-user-info`/`x-xuanji-user-token`、未认证 401 + `x-xuanji-buc-login-uri`、`/cli-auth*` 回归、STS `/token` 主端口 404 与 17741 回环、日志键值字段（`source`/`result`/`reason`/`path`）。\n- **T005** `RuntimeShapeGoldenTest.java`：断言 17740/17741 常量、`JAVA_TOOL_OPTIONS=-Dserver.address=127.0.0.1`、`FROM ...:amd64-2026-11`、`HEALTHCHECK` 与 `/buc-gateway/readyz` 路由、**仓内无 supervisord 配置**。\n- **T006** `ConfigSurfaceGoldenTest.java`：断言环境变量名集合（**5 个应用侧变量**）、三个绑定前缀 `spring.buc`/`xuanji.dpop`/`xuanji.sts`、`application.properties` 的 **19 键**键面。\n- **T007** 跑 `./mvnw -B test` 使三组黄金测试与既有 **208** 用例全绿，原始读数落 `test-evidence/s0-golden-green.txt`；逐项断言读数写入 `notes/red-first-evidence.md`（**黄金测试是行为基线，首跑即绿属预期性质，如实标注；若有失败→修复轨迹则逐条记录，不得伪造红**）。\n- **T008** S0 出口：提交黄金测试与 `baseline-pre/`，把**冻结提交的 40 位 SHA** 单独写入 `test-evidence/baseline-pre/freeze-commit.txt`（**唯一变量源**），README 记同值 SHA、采集源提交 `f7ecb97` 与**黄金文件只读清单**；记录上述两条 git diff 判据读数。\n\n🛑 **黄金冻结不可破**：三组黄金测试文件自 T008 冻结提交起**进入只读清单，此后任何阶段不得修改**（SC-016 判据 = `git diff \"$(cat …/freeze-commit.txt)\"..HEAD -- <golden files>` 为空）。后续包若发现黄金断言写错，**必须停下上报 ANOMALY，不得自行改黄金文件**。\n\n## 绑定一行修正（analyze delta 唯一新发现 D-F01，MEDIUM）\n\n`plan.md:242` 的 S3 入口写「S1、S2 出口」，与同文件 235 行「S3 与 S2 可并行」及 tasks 的 `S3←T023` blockedBy 边矛盾。**改为「S1 出口」**，与 235 行/blockedBy 同源。这是唯一读法的机械修正，随本包提交一并落，并在 `notes/` 或提交说明留痕。\n\n## 执行要求（默认纪律）\n\n- 直接执行不要确认；自行裁决并记录假设。\n- **测试执行唯一入口 `./mvnw -B test`**（打包用 `./mvnw -B package -DskipTests`）；**不得执行 pytest**、不得用 `run-tests.sh`。\n- **两槽位测试预算**：本包的 `./mvnw -B test` 属 **S0 基线采集**，记为 **slot-1（implement 起点基线）**；后续包只用定向集，**第二槽位留给 S8/review 后**。读数与用途写进证据与台账。\n- 只提交本特性产物（golden 测试、baseline-pre、notes、s0 证据、plan.md 一行修正）。**既有脏文件不提交不还原**：`.specify/memory/` 记账、`.specify/tmp/`、`.specify/.tmp/`、`.specify/state/`、`target/`、`.pytest_cache/` 一律不提交。\n- **不要 push**。**不得删除或移动任何现有文件**（删除属 S4，且必须先迁后删）。不得改 `src/main/**`、`pom.xml`、`deploy/**`、`docs/**`、`scripts/**`、`tests/**`、`conifg/**`。\n- 临时文件只落 `.specify/.tmp/`。\n- 完成后重跑仓内门至 exit 0：`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/007-java-project-standardization --stage tasks --repo .`，逐字输出落 `test-evidence/`。\n- Wrap-up 三步记账，unit-id **`/speckit.implement`**，`--feature 007-java-project-standardization`，run-id 用本轮真实值，`--complexity` 取 `complex|simple`；首次即写正确值；被权限拦截则最后一行 `WRAPUP-DEFERRED: <原因>`（驱动者补跑）。\n- 提交 message：`feat(test): 016 PKG-S0 取证冻结（三组黄金契约 + baseline-pre 五制品 + freeze SHA）`。\n\n## 输出预算\n\n报告 ≤60 行：T001–T008 逐条状态一行、五制品行数与 208/19/5/16 等关键读数、两条 git diff 判据读数、freeze SHA、`./mvnw -B test` 用例总数与失败数、门读数、D-F01 修正落点。**禁长篇散文。**\n\n## 尾标\n\n最后一行必须是且仅是 `PKG-S0-DONE`；无法完成则 `ANOMALY: <一句话事实>`（例如黄金断言与真实行为不符时**必须停线上报，不得改黄金文件迁就**）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-buc",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

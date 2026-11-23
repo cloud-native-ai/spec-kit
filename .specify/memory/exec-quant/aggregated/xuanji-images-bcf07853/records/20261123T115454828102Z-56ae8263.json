@@ -1,0 +1,127 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-images",
+    "source_commit": "d7d169743fdd5db298b10c799dc26ee5f3c95381",
+    "identity_status": "identified",
+    "identity_key": "3fc0d877972c950c13390a755a4867f7c4252831a63c335ab32d529e3574920c",
+    "content_hash": "9430130140d20695dcc7572e055245dae06578d17aa4019173cbdad5fe04909d",
+    "package_file": "feedback-xuanji-images-20261123T185322.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-b101-impl-s3f",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-31T19:38:06Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-images 的无人值守 SDD 开发，当前阶段：implement 第 3f 段（修复 `/docs/` 路由并补验 T023）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051`；分支 `051-xuanji-doc-build-chain`；HEAD `1cc9a1e7`；tracked clean。\n- 最终源 `e6d88761` 重建成功（project `4d7083c55951`、service `1e8ef445038c`）；T023 仅剩 `/docs/` = 404。\n- 根因（notes/T023-docs-diagnosis-s3e.log）：`hugo server` 的 `baseURL=/docs/` 无主机名，无法路由该前缀；nginx 按冻结契约原样代理 `/docs/`（`proxy_pass http://127.0.0.1:1313;`），不能改前缀。\n\n② 执行要求\n- 修 C 侧 supervisor `images/shared/service/config/xuanji-doc/supervisor/programs/hugo.sh`（精确参数由 C 拥有）：把 Hugo 启动改为能在 `/docs/` 前缀下服务的形式（例如 `--baseURL http://127.0.0.1:1313/docs/`，必要时配合 `--appendPort=false`）；不得改 nginx 的冻结前缀/重写。\n- 重建服务叶（T022），复验完整 T023 矩阵：匿名 `/`、`/docs/`、`/cgit/` = 401；`cws:<key>` = 200；四个 health 匿名 200/503；业务 GET 匿名 401/403、Bearer 200；`/mcp/v1/` 握手；`/api/kb/query` = 404；`/docs/` 返回 200 且内容为站点页面。\n- 同时复验 T024；全部通过后才把 T023 翻 `[X]`，否则保持 `[~]` 并记录。\n- 证据落 `notes/T023-*s3f*`；不得跳断言或改弱门禁。\n- 不修改 plan/research/data-model/contracts/quickstart（PLAN-EDIT: none）；实质变更 → ANOMALY 停线。\n- 不 push（含镜像）；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.implement`，run-id `r20261030T120500Z-b101-impl-s3f`，`--feature 051-xuanji-doc-build-chain --feature-id 048`；三件套 + `run-record-implement-s3f.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`IMPL-S3F-DONE`\n- 回传：hugo 启动参数改动、T023/T024 矩阵结果、镜像 tag/digest、提交哈希、记账路径、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-images-051",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "101.132.70.5:443",
+          "47.116.36.231:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "39.106.176.70:443",
+          "39.106.211.206:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "8.223.13.163:443",
+          "47.116.44.184:443",
+          "47.106.172.117:443",
+          "39.106.96.116:443",
+          "8.212.124.35:443",
+          "120.24.170.126:443",
+          "59.110.214.247:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 1500000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "72d077c719ec19301865270f05cd334b99c13ebdb9da09dd01c3c4d4378bc2db",
+    "content_hash": "e3d158a024832604b79c1bcd06cc1250769067d2238c46810356bdd556620202",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.analyze",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-d101-analyze-fix2",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T17:06:14Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 开发，当前阶段：analyze-fix2（收敛 N-01 HIGH）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023`；分支 `023-xuanji-doc-architecture`；HEAD `e1a4a5c` 附近（以 `git log -1` 为准）；clean。\n- analyze2：`.specify/specs/023-xuanji-doc-architecture/run-record-analyze2.md` — CRITICAL 1（CON-01 open）/ **HIGH 1（N-01）** / MEDIUM 9 / LOW 9。\n- N-01：INC-01 规范面已闭合，但副本未收敛——`plan.md:137`、`research.md:44,52,159`、`data-model.md:59`、`tasks.md:228` 仍写「MCP 工具目录/schema 归 xuanji-api」。\n\n② 执行要求（只修 N-01，不扩面）\n- 统一口径：MCP 工具名与 schema 由本仓（023 / `api` 的 MCP 面）拥有；A（010）只在 REST OpenAPI 面建模、不建模 MCP。逐处改写上述 5 个副本，使 `grep` 不再出现「MCP … 归 xuanji-api」类表述。\n- 不改 CON-01、不修宪、不改 T036；不处理 MEDIUM/LOW。\n- 每次修改声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 validate-requirements、validate-tasks、pre-analyze-check，记录结果。\n- 追加 `.specify/specs/023-xuanji-doc-architecture/analyze-fix-dispositions.md`（N-01：决定 → 改动位置 → 验证证据）。\n- 不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.analyze`，run-id `r20261030T120500Z-d101-analyze-fix2`，`--feature 023-xuanji-doc-architecture --feature-id 029`；三件套 + `run-record-analyze-fix2.md`；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`ANALYZE-FIX2-DONE`\n- 回传：N-01 处置与证据、验证命令结果、提交哈希、记账路径、PLAN-EDIT、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-doc-023",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "39.106.211.206:443",
+          "47.57.188.188:443",
+          "101.132.70.5:443",
+          "39.106.176.70:443",
+          "47.107.125.11:443",
+          "47.57.243.249:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

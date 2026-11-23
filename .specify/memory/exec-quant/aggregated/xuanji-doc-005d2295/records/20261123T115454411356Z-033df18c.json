@@ -1,0 +1,122 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-doc",
+    "source_commit": "f6892cc6f19062a8d0df9a508ec79707ad37a73c",
+    "identity_status": "identified",
+    "identity_key": "3034e93dca062886daa5b7d32ef078058a07f0bfaf42d52e48c384bf4e9032dd",
+    "content_hash": "be6a09d3c8b39a4938e95c01157b994fea52892c1a1cbafa5bb34f070a77f460",
+    "package_file": "feedback-xuanji-doc-20261123T185232.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.implement",
+    "unit_type": "command",
+    "run_id": "r20261028T162000Z-c1a2-implement",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-29T17:52:46Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-doc 的无人值守 SDD 特性开发，当前阶段：**implement p5（收尾：T031–T033）**。\n\n① 背景与环境\n- 项目：`/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation`；分支 `022-citation-architecture`；HEAD `41050755`；工作树 clean。\n- p1–p4 已完成（T001–T030，T019 仍 `[~]`）；`kb:citation:test` 206（205 pass / 1 skip）。\n- 工具：共享 `node_modules`；不要裸 `pnpm install`；端口 44145 被占用（gateway 14 个 `EADDRINUSE` 为零新增基线）；分类器偶发拦截 `git add`（p4 曾发生），处理见第 5 条。\n- 权威：`tasks.md` **T031–T033** 原文；plan § Implementation Boundary I-9；contracts。\n\n② 执行要求\n1. **T031 owner 文档（只写指针，不复制规范表）**：\n   - `docs/kb.md` §5/§6：引用行为、4 键指针、ingest 幂等/provenance、capabilities/degradation、auth 边界；\n   - `docs/code-retrieval.md` §13：指向 citation model 的单一指针；\n   - `docs/configuration.md`：仅 4 键来源指针；\n   - `docs/architecture.md`：引用层摘要指针。\n   - verify：四文件相对链接全部可解析；`grep` 证明新事实是 pointer 而非复制的表/枚举；OpenAPI owner 仍指 xuanji-api。\n2. **T032 verification 台账 + 最终门禁**：`verification.md` 写入 `SC-001`…`SC-012` 的 status/value/note、实体/不变量证据块、条款认领结论；运行并记录：`pnpm kb:citation:test`、`pnpm gateway:test`、`pnpm utils:test:react`、`pnpm kb:openapi:check`、`validate-tasks.py`、`requirements-structure-check.py`。deferred/live 项用 `pending(live)` 或 `skipped`，绝不写成 pass；T019/T033 保持 `[~]` + 原因。\n3. **T033**：保持 `[~]`，写 `test-evidence/live-verification.md`（每项：命令/环境/未执行原因/解除条件；未执行一律 skipped/not-run）。\n4. **Feature 027 → `Ready for Review`**：更新 `.specify/memory/features.md` 行、`features/027.md`（Implementation Notes 摘要 + 状态）、`feature-ref.md` 状态节；三面一致。\n5. **提交**：只 `git add` 显式路径，禁 `git add -A`；建议一次收尾提交 `docs(022-citation-architecture): wire owner docs, verification ledger and implement closure (027)`。若再次被工具层分类器拦截：**不要重试超过 2 次**，保留工作树，回传 `COMMIT-BLOCKED` + 完整显式路径清单，由驱动补提交。\n6. **记账三件套（整段 implement 一次）**：Unit `/speckit.implement`，run-id `r20261028T162000Z-c1a2-implement`，`--feature 022-citation-architecture --feature-id 027`；feedback 用本 worktree 旧引擎；session/exec-quant 用主仓引擎 + `--workspace-root`；不得触发 store 迁移。另写 `run-record-implement.md`：分段 p1–p5 范围、提交列表、测试汇总、p4 分类器异常与驱动补提交事实、偏差 D-001…D-030 索引。\n7. 边界：不改 requirements/plan/research/data-model/contracts/quickstart；不改 `model/content/**`；不动 compose/镜像；不 push；不进入 review。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`IMPLEMENT-DONE`\n- 回传：T031–T032 状态、T033 deferred、最终门禁结果、Feature 状态、提交哈希（或 `COMMIT-BLOCKED` + 路径）、记账路径、ANOMALY（如有）。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/xuanji-doc-worktrees/xuanji-doc-citation",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "8.223.13.163:443",
+          "106.14.225.66:443",
+          "47.57.188.188:443",
+          "47.57.243.249:443",
+          "39.106.211.206:443",
+          "101.132.70.5:443",
+          "120.79.243.153:443",
+          "47.107.125.11:443",
+          "39.106.176.70:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

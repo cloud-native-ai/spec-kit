@@ -1,0 +1,123 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-api",
+    "source_commit": "0b0944a6e17e855e8387968b9011979d0df33a0f",
+    "identity_status": "identified",
+    "identity_key": "d2b20d396efd367acd38b365569762c652785ec3844ea62b69d7da928116b080",
+    "content_hash": "be4772fdc7552f64d659173e4e7151792f51a8c5b359cf5ed4a448cc312a118b",
+    "package_file": "feedback-xuanji-api-20261123T185250.zip",
+    "ingested_at": "2026-11-23T11:54:54Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "r20261030T120500Z-a101-review-fix",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-30T18:41:37Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.80",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "/home/agent/.local/bin/qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-w",
+          "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 xuanji-api 的无人值守 SDD 开发，当前阶段：review-fix（收敛 review 的 8 条 P1）。\n\n① 背景\n- worktree `/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010`；分支 `010-xuanji-doc-stable-api`；HEAD `e46ae2793`；clean。\n- review：`.specify/specs/010-xuanji-doc-stable-api/review.md` — P0 0 / **P1 8（F1–F8）** / P2 3（F9–F11）。\n- 脏基线：仓库根 5 个 modified generated DDL —— 不触碰、不提交、不还原。\n\n② 执行要求（F1–F8 逐条处置；P2 可顺手但不强制）\n1) F1（C-09 与三个开放对象 schema）：为 C-09 增加具名 carve-out（`rerank`、`layer_filter`、`Error.details`），或为其定义显式形状；同步 requirements/contracts/data-model；恢复被收窄的 T 断言并如实标注 clause 绿。\n2) F2（analyze MEDIUM/LOW 无处置账）：新增 `.specify/specs/010-xuanji-doc-stable-api/analyze-carryover.md`，逐条列 analyze/analyze2 的 MEDIUM/LOW → 处置（fixed / waived / deferred-to-review），并在 tasks 引用；不得把未处置项算作绿。\n3) F3（GATE-5 被改写为文本替代）：恢复 accountant gate，或记录具名 ratified waiver（owner、范围、证据、到期/复审条件），并在 GATE-5 与 tasks 中如实表述，不得静默改写门禁语义。\n4) F4（两套 PLAN-EDIT 规则冲突 + quickstart 已知假场景）：统一规则文本；修正 quickstart 中的已知假场景或将其移出验收。\n5) F5（lint 靠忽略 1 个 error 变绿）：记录被忽略规则的具名 waiver（规则、原因、owner、复审条件），或修复该规则使忽略项为 0；GATE-1 的声明必须计入忽略项。\n6) F6（C 义务未登记）：把「051 SC-005 引用 010 契约」作为 External Obligation 写入 tasks，并注明验证点。\n7) F7（REC 注册目标不存在）：创建/补全 `.specify/memory/register.md` 并把本轮 REC 编号登记为指针形（ID → 一行含义 → 权威路径 → 状态），或记录该 register 缺失的已裁决 waiver。\n8) F8（Feature 018 仍 Planned）：按 feature integration 协议把 `.specify/memory/features.md` 与 `features/018.md` 更新到 implement 后状态（Implement 记录），状态迁移遵循协议。\n- 不修改 spec-kit 框架本体（F3/F5/F7/F11 的框架级观察写入 dispositions 的 framework-feedback 段）。\n- 每次修改 plan/research/data-model/contracts/quickstart 声明 `PLAN-EDIT:`；实质结构变更 → ANOMALY 停线。\n- 修复后运行 GATE-1…GATE-6 与 validate-requirements/validate-tasks/pre-analyze-check，记录结果。\n- 产出 `.specify/specs/010-xuanji-doc-stable-api/review-fix-dispositions.md`（F1–F8：决定 → 改动位置 → 验证证据）+ `run-record-review-fix.md`。\n- 不 push；禁止 `git add -A`；只显式路径提交。\n- 记账：`/speckit.review`，run-id `r20261030T120500Z-a101-review-fix`，`--feature 010-xuanji-doc-stable-api --feature-id 018`；三件套；失败 `WRAPUP-DEFERRED`。\n- 异常 `ANOMALY: <事实>`。\n\n③ 完成尾标\n- 最后一行必须是且仅是：`REVIEW-FIX-DONE`\n- 回传：F1–F8 处置与证据、GATE 结果、提交哈希、记账路径、framework-feedback 条目、ANOMALY。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/storage/project/kangaroo-xuanji/worktrees/xuanji-api-010",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.243.249:443",
+          "120.79.243.153:443",
+          "101.132.70.5:443",
+          "8.212.124.35:443",
+          "39.106.176.70:443",
+          "120.24.170.126:443",
+          "47.116.36.231:443",
+          "8.223.13.163:443",
+          "47.106.172.117:443",
+          "39.106.96.116:443",
+          "39.106.211.206:443",
+          "47.116.44.184:443",
+          "106.14.225.66:443",
+          "59.110.214.247:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

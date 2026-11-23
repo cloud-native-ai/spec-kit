@@ -1,0 +1,114 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-ui",
+    "source_commit": "d66447475b0f59007cb467aefdac0070e04c8812",
+    "identity_status": "identified",
+    "identity_key": "3c9f9114e77be08192de6733438d03098c1aa84b075eff099aadce5316935bff",
+    "content_hash": "380e0065bb1d95f982c1ee349506c6435b3dff0a54d0ce67fceb4b40d279e10c",
+    "package_file": "feedback-xuanji-ui-20261123T185338.zip",
+    "ingested_at": "2026-11-23T11:54:55Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "007-s2-review-20261022",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T13:55:33Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.71",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--permission-mode",
+          "auto",
+          "-p",
+          "你在推进 `xuanji-ui`（容器 /cws_work/xuanji-ui，develop）的无人值守 SDD 特性，当前阶段：**review**。\n\n## ① 背景与权威文档\n- 特性目录：`.specify/specs/007-s2-contract-alignment/`（requirements `40b2315` → clarify `a66e0c6` → plan `1fa831e` → tasks `712b681` → 修订 `732e661`/`1770c33` → F-16 修正 `3d6049d` → 指针 `f16bede` → implement `0617f26`/`8f0ade7`/`b3754f5`/`8424cf2`/`f04041d`/`dd50b4c`）\n- 交付摘要：16 函数严格解包与 ApiError；S2 模型从契约 components 派生；risks 脱 axios；FR-014 仅 RiskIdentificationPage 动作槽位；tsc rc=0、build rc=0、定向 78/78；红集合守恒（新增失败 0，最终 39 ⊆ 基线−预期转绿）；S1 审计 delta ⊆ 白名单；契约冻结 `1aa6b9ead`。\n- **G5 真实联调已由编排方补测**：从 UI 容器经 compose 网络访问 `http://xuanji-service:29080`，6 个 S2 读端点（environments/changes/risks/cases/documents+categories）全部 **200**；请把该结果写入 `verification.md` G5 证据（标记 orchestrator-verified），并核验其与 UI 客户端路径一致性。\n- **前提证伪已知**：T022「三承载文件逐文件零红」不成立（RM/KM index 基线即红，属 Feature 027 面）；SC-004 记 partial + deferred_reason；T003 证伪「小写 risk-management/ 不存在」。\n- 状态脊：`STATE_SPINE_PATH=/tmp/spine-ui-s2.md`；证据目录：`EVIDENCE_DIR=.specify/specs/007-s2-contract-alignment/test-evidence`\n\n## ② 执行要求\n执行 /speckit.review 的语义（批判性评审本特性 SDD 过程与实现交付）：\n- 评审维度：16 函数与契约一致性（路径/方法/参数/封套/严格解包）；模型派生与去重；risks 迁移；envelope 增量与 S1 行为零变更；FR-014 页面白名单；tsc/build/定向测试证据；红集合守恒推导的可靠性；S1 不回归；G5 真实联调证据（含编排方补测）；纪律（未 push、子模块指针、脏文件未提交）。\n- 发现分级 P0/P1/P2/P3；**P0/P1 必须修复或显式豁免留证**；只在证据/文档级修复，不改实现。\n- 产出 `.specify/specs/007-s2-contract-alignment/review.md` 并提交；G5 证据更新到 `verification.md`。\n- 直接执行不要确认；访谈式问题自行裁决并记录假设。\n- 只提交本特性产物与必要 registry；容器既有脏文件不提交不还原；不 push；只推进当前阶段。\n- 并发隔离：只读写 `/cws_work/xuanji-ui`。\n- 测试预算：定向集（不跑第二次全量）；E3 记录。\n\n## ③ PLAN CONSTRAINT（已生效）\nPLAN CONSTRAINT: plan_constraint=active since 2026-10-22T13:19+08:00 (plan_commit=1fa831e; approved_baseline_commit=1aa6b9ead). Declare every plan-owned touch before the sentinel:\n  PLAN-EDIT: <path> — <reason>；分类=minor|substantive\n无需触碰时写 `PLAN-EDIT: none`。实质改动须停止并只回传 `ANOMALY: <一句话事实>`。\n\n## ④ 完成尾标\n- 完成时最后一行必须且仅是：`REVIEW-DONE`\n- 无法完成时最后一行：`ANOMALY: <一句话事实>`"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-ui",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "gfmodel",
+        "provenance": "measured"
+      },
+      "context_window": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "106.14.225.66:443",
+          "8.212.124.35:443",
+          "47.103.9.44:443",
+          "39.108.79.164:443",
+          "101.132.70.5:443",
+          "47.103.128.242:443",
+          "47.57.243.249:443",
+          "39.107.242.82:443",
+          "8.223.13.163:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "47.106.88.164:443",
+          "39.106.211.206:443",
+          "8.212.20.107:443",
+          "39.107.85.235:443",
+          "47.107.125.11:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": [
+        {
+          "source": "run-determination.failed_set_diff",
+          "count": 0
+        }
+      ],
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}
