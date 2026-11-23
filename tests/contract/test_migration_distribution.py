@@ -51,6 +51,7 @@ drift-detection duplicate under
 """
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -65,6 +66,7 @@ PYPROJECT = REPO_ROOT / "pyproject.toml"
 INIT_PY = REPO_ROOT / "src" / "specify_cli" / "__init__.py"
 HATCH_BUILD = REPO_ROOT / "src" / "hatch_build.py"
 MEMORY_DIR = REPO_ROOT / ".specify" / "memory"
+EXEC_QUANT_STORE = MEMORY_DIR / "exec-quant"  # Feature 068 recording-only telemetry
 SPEC_DIR = REPO_ROOT / ".specify" / "archive" / "specs" / "069b-isomorphism-migration-metrics"
 SAMPLES = SPEC_DIR / "notes" / "migration-samples.md"
 QUICKSTART = SPEC_DIR / "notes" / "quickstart-run.md"
@@ -353,6 +355,18 @@ def test_owner_and_engine_payloads_exist() -> None:
 # --------------------------------------------------------------------------- #
 # C-4 — zero project-side storage, zero project-side read points
 # --------------------------------------------------------------------------- #
+def _has_flow_class_key(node: object) -> bool:
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if re.search(r"flow[-_]class", str(key)):
+                return True
+            if _has_flow_class_key(value):
+                return True
+    elif isinstance(node, list):
+        return any(_has_flow_class_key(value) for value in node)
+    return False
+
+
 def test_memory_tree_stores_no_unit_to_class_mapping() -> None:
     offenders: list[str] = []
     for path in sorted(MEMORY_DIR.rglob("*")):
@@ -361,6 +375,19 @@ def test_memory_tree_stores_no_unit_to_class_mapping() -> None:
         rel = path.relative_to(REPO_ROOT).as_posix()
         if re.search(r"flow[-_]class", path.name):
             offenders.append(f"{rel} (category-store file name)")
+            continue
+        # C-4 governs a unit→class mapping store. The exec-quant tree is Feature 068's
+        # recording-only telemetry: a client dispatch brief quoted inside a record may
+        # mention flow_class in prose without being a mapping. Only a structured
+        # flow_class KEY counts as a category store; unparsable JSON stays an offender.
+        if EXEC_QUANT_STORE in path.parents and path.suffix in STRUCTURED_SUFFIXES:
+            try:
+                data = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+            except Exception:
+                offenders.append(f"{rel} (unparsable structured file)")
+                continue
+            if _has_flow_class_key(data):
+                offenders.append(f"{rel} (structured flow_class key)")
             continue
         if path.suffix in STRUCTURED_SUFFIXES:
             text = path.read_text(encoding="utf-8", errors="ignore")
