@@ -8,9 +8,12 @@ probe: "skill-manage-features-wrapup"
 kind: "internal"
 slice: "skills"
 feature_id: "006"
+disposition: "processed"
 partial: false
 created: "2026-11-22T05:01:52Z"
 summary: "Reconciled 100 registry rows: 64 existing rows changed, 35 tolerated, and Feature 103 added. Registry/state checks passed 33 and direct debt-governance guards passed 32; the combined run had 3 histori"
+introspection_ref: "introspection-20261123T115631Z#F-01"
+disposition_reason: "introspection:introspection-20261123T115631Z#F-01"
 ---
 
 ## Review

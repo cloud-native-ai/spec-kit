@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-manage-feedback-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-16T16:31:01Z"
 summary: "Digested 167 open entries: 48 findings / 136 members / 31 excluded; report introspection-20261116T141525Z confirmed; 46 routing backlog rows; 0 open remain."
+disposition_reason: "clean-run-no-points"
 ---
 
 ## Review

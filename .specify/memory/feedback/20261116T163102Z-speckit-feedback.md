@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-16T16:31:02Z"
 summary: "Framework-hat routing: Path A selected for all 502 local entries (0 bundles); Path B not selected. Digest confirmed and disposed 167 open entries; 46 backlog rows carry owed channels."
+disposition_reason: "clean-run-no-points"
 ---
 
 ## Review
