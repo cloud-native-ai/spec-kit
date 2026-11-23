@@ -1,0 +1,26 @@
+{
+  "kind": "speckit.closeout.receipt",
+  "run_id": "git-closeout-feature-compare-20261123",
+  "artifact_commit": null,
+  "records_commit": "4e677875b",
+  "covered": [
+    {
+      "path": ".specify/memory/session/20261123T023521Z-run-determination-skill-git-utils-git-closeout-feature-compa.md",
+      "action": "committed",
+      "commit": "4e677875b"
+    },
+    {
+      "path": ".specify/memory/exec-quant/records/20261123T023538879918Z-3dd488a3.json",
+      "action": "committed",
+      "commit": "4e677875b"
+    },
+    {
+      "path": ".specify/memory/feedback/20261123T023550Z-skill-git-utils.md",
+      "action": "committed",
+      "commit": "4e677875b"
+    }
+  ],
+  "reader_pointer": "run-determination: .specify/scripts/python/run-determination.py --action history; exec-quant: .specify/scripts/python/exec-quant.py --action list-records; feedback: .specify/scripts/python/feedback-utils.py --action status; retention lane owner: .specify/memory/retention/ (record-retention.py)",
+  "created_at": "2026-11-23T02:36:24Z",
+  "note": "This read-only comparison produced records but no new artifact. The receipt has its own commit so the records-commit hash can be recorded."
+}
