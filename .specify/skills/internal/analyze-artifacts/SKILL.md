@@ -21,9 +21,9 @@ The skill is **strictly read-only on artifacts**: it modifies no artifact. (The 
 sanctioned exception is the wrap-up engine entries — Run Determination / Exec Quant /
 Feedback Record — local bookkeeping, not an artifact modification.)
 
-Canonical extraction source: `templates/commands/analyze.md` § Execution Steps 1–7,
-Operating Principles, and the do-not-flag list. The command template keeps entry +
-delegation only.
+Canonical extraction source: `templates/commands/analyze.md` — the command template
+keeps entry + delegation only; the executable content (Execution Steps, Operating
+Principles, do-not-flag list) lives in this skill.
 
 ## Rounds
 

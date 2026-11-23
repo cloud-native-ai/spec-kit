@@ -367,10 +367,10 @@ path. Without a written landing point each tasks round imitates a neighbouring s
 each implement round has to guess where the previous phase put the file:
 
 - **Failing-test baseline name list** — its path, its capture flag, and its name-level
-  comparison form are owned by `/speckit.implement` step 6's `**Test runs**` bullet
-  (`templates/commands/implement.md`). MUST NOT be restated, re-derived, or given a second
-  path here; a Setup/Foundational row that captures or consumes that baseline points at
-  that owner.
+  comparison form are owned by `/speckit.implement`'s `**Test runs**` bullet
+  (`skills/internal/implement-feature/SKILL.md`). MUST NOT be restated, re-derived, or given
+  a second path here; a Setup/Foundational row that captures or consumes that baseline
+  points at that owner.
 - `<spec-dir>/notes/red-first-evidence.md` — for every test that MUST go red before its
   subject exists: the command, its real output, and its exit status. When the note binds
   a claim to a gate, it MUST quote the gate row verbatim — id + name + check command;

@@ -225,7 +225,7 @@ the 5 tool dirs.
   Never leave deferred work as `[ ]`. When a `[~]` makes the Completion Gate (step 8) fail,
   that fail is an EXPECTED outcome — it MUST NOT be turned green by rewriting the task
   description or relaxing the gate criteria (the task-side disposition forms are owned by
-  `templates/commands/tasks.md`).
+  `templates/tasks-template.md` § Task State Sigil).
 - **Evidence-backed closure — Gate Function (IDENTIFY→RUN→READ→VERIFY→CLAIM)**: only mark
   `[X]` for work you have actually executed and verified. Before every completion claim:
   IDENTIFY the command that proves the work (test id, build, grep, diff of the named target
@@ -416,8 +416,8 @@ gate's approval routing in step 8). After implementation, generate commit comman
   this skill's Pre-Status-Flip Gate passes; the gate protocol itself is owned by
   `.specify/shared/workflow/feature-integration.md` (pointer, never restatement).
 - **Task-side disposition forms** (how a `[~]` is recorded and dispositioned on the task
-  side) are owned by `templates/commands/tasks.md` — this skill only consumes and updates
-  `tasks.md` rows per the rules above.
+  side) are owned by `templates/tasks-template.md` § Task State Sigil — this skill only
+  consumes and updates `tasks.md` rows per the rules above.
 - **Standalone scope clarification** (a clarify pass outside a running implementation)
   belongs to `/speckit.clarify`; only the mid-run adaptation above lives here.
 - **The mechanical write-gate engine stays an invocation instruction**: this skill carries

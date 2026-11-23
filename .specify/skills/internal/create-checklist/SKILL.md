@@ -17,8 +17,9 @@ tests the *specification*, not the implementation. Every item is a question abou
 something is defined, specified, bounded or quantified — so that answering it is a
 judgement about the requirement text, never a run of the product.
 
-Canonical extraction source: `templates/commands/checklist.md` § Checklist Purpose and
-§ Execution Steps 1–7. The command template keeps entry + delegation only.
+Canonical extraction source: `templates/commands/checklist.md` — the command template
+keeps entry + delegation only; the executable content (Checklist Purpose, Execution
+Steps) lives in this skill.
 
 ## Input Contract
 

@@ -18,9 +18,7 @@ phase artifact and leaves it self-consistent, or — when the user has re-scoped
 feature — executes the Scope Revision Protocol instead of a clarification run.
 
 Owning command: `/speckit.clarify`. Canonical extraction source:
-`templates/commands/clarify.md` § Phase 0 (Phase Detection & Context Setup), § Taxonomy
-& Coverage Scan, § Question Generation & Interactive Loop, § Report, § Behavior Rules,
-and § Scope Revision Protocol. Content moved here verbatim in substance; the command
+`templates/commands/clarify.md` — content moved here verbatim in substance; the command
 template keeps entry, wiring, and lifecycle delegation only.
 
 ## Input Contract
