@@ -2,18 +2,20 @@
 
 **Feature ID**: 027  
 **Name**: Team Management  
-**Description**: Dedicated team domain for multi-agent configuration — `/speckit.team` as the sole entry point, `create-team` + `improve-team` skills, and single-agent vs team separation.  
+**Description**: Create, modify, and run multi-agent teams with persistent definitions and indexed summaries.
 **Status**: Implemented  
 **Created**: 2026-07-13  
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-Team Management establishes a first-class **team** domain that owns everything multi-agent, mirroring the single-agent domain. It introduces `/speckit.team` as the sole entry point with three modes (create / modify / run), backed by `create-team` (renamed from `organize-agents`, retaining orchestration + execution) and a new `improve-team` skill. The multi-agent Conceptual Model and the inherently multi-agent authoring constructs (EEI triad, team-supervisor, orchestration templates) move out of `create-agent`, leaving the single-agent skills strictly single-agent. Teams persist as `.specify/teams/<slug>.team.md` so they can be modified and run across sessions. The run mode renders the team's static (Role×Stage×Type) and dynamic (pattern/parallelism/flow diagram) structure and executes only after explicit user confirmation.
+`/speckit.team` routes create, modify, and run to `create-team`, `improve-team`, and `run-team`. Teams persist as `.specify/teams/<slug>/team.md`; creation supports Anchor-driven targets and `focus_target`, while summaries are indexed by team and by `.specify/anchoring/<slug>/summary/`. Ordinary teams execute after a disclosed preview, while continuous loops retain their specific governance gates.
 
 ## Latest Review
 
-Planning completed for requirement `036-team-summary` via `/speckit.plan` (2026-08-04). Requirement advances Draft→Planned; Feature 027 stays `Implemented` per the no-status-regression gate.
+2026-11-22 implementation audit: `run-team` now owns run orchestration, the old file-per-team layout and universal explicit-confirmation description are stale, and the summary index follows the current Anchor layout. The historical planning and implementation records below remain dated evidence.
+
+Historical review — planning completed for requirement `036-team-summary` via `/speckit.plan` (2026-08-04). Requirement advances Draft→Planned; Feature 027 stays `Implemented` per the no-status-regression gate.
 
 **Phase 0 was execution-verified, not asserted.** The `summarize-project` script chain was run against a form derived from the real `cws-workspace-cluster` team: `validate → project-db --load → --check → progress-engine` all exit 0, with `status: ready` and `missing_required: []`. This proves the mechanism's central feasibility claim — the invoked skill's R-tier (project name, baseline date, and at least one of work-items/milestones non-empty) is satisfiable from tracked team artifacts alone, with zero manual form entry. The same run produced four further findings: the DDL rejects identifiers containing spaces or non-ASCII characters with exit 3 (so derived identities must be hashed, not titled); the engine itself returns `progress_pct = null` rather than 0 when there is no countable basis; absent schedule material suppresses the Gantt chart upstream; and `coverage` is null unless the form supplies it — which would fail the CG-COVERAGE gate on every run that draws a work-breakdown diagram, a requirement with no corresponding FR and now carried in `research.md` § O.
 
@@ -33,7 +35,7 @@ Artifact deltas: requirements.md 29→36 FR, 12→15 SC, 5→6 user stories, `[[
 
 Implemented via `/speckit.implement` (2026-08-04). **119/120 tasks closed, 1 deferred.** Nine phases: Setup, Foundational, then US1–US6 and Polish.
 
-**Delivered.** A goal-indexed summary layer over the team domain: `skills/internal/create-team/references/summary-mapping.md` as the FR-001 mapping single source of truth; `skills/create-team/scripts/build-summary-input.py` as the deterministic form generator (`--goal`/`--team`, exit 0/2/3/4); a tracked append-only `items.jsonl` ledger per team; `goal_slug` + `config.summary` in the persisted team schema; a `Summary Refresh (all patterns)` section with per-pattern trigger boundaries, the budget→cadence→material gate order, the four-value status line and first-activation disclosure; confirmation-gate cost disclosure across all five per-tool command copies; `config.summary` in the three shipped presets; `improve-team` gained the tuning surface; `docs/reference/commands/team.md` documents the mechanism.
+**Delivered.** A goal-indexed summary layer over the team domain: `skills/internal/create-team/references/summary-mapping.md` as the FR-001 mapping single source of truth; `skills/internal/create-team/scripts/build-summary-input.py` as the deterministic form generator (`--goal`/`--team`, exit 0/2/3/4); a tracked append-only `items.jsonl` ledger per team; `goal_slug` + `config.summary` in the persisted team schema; a `Summary Refresh (all patterns)` section with per-pattern trigger boundaries, the budget→cadence→material gate order, the four-value status line and first-activation disclosure; confirmation-gate cost disclosure across all five per-tool command copies; `config.summary` in the three shipped presets; `improve-team` gained the tuning surface; `docs/reference/commands/team.md` documents the mechanism.
 
 **Evidence.** 201 new tests (5 contract files, 5 integration files) all green, with **zero new failures vs the recorded baseline** at every phase boundary (39 → 39 by name; passes 1108 → 1309). All four real teams produce a validated form from tracked artifacts alone (`status=ready`, `missing_required=0`) where the baseline was 0/4. A real byte-invariance audit fingerprinted 776 files across the five protected groups with 0 changed. Three consecutive real refreshes byte-identical. Real WBS render produced SVG+PNG with 12 depth≥2 nodes, inside the CG-6 threshold of 15. All 8 Completion Gate items re-validated against the tree rather than trusted from task state.
 
@@ -51,20 +53,19 @@ Planning completed for requirement `026-agent-team-management`. Clarifications r
 
 ## Key Changes
 
-1. Add `/speckit.team` command (source `templates/commands/team.md`) with create/modify/run modes and a run-mode preview→confirm→execute gate.
-2. Rename skill `organize-agents` → `create-team`; add new skill `improve-team`; complete the team create→improve lifecycle.
-3. Extract the Conceptual Model out of `create-agent/SKILL.md` into `create-team/references/conceptual-model.md` (single source of truth).
-4. Relocate multi-agent templates (team-supervisor, triad stages, triad/parallel/serial orchestration, workflow schema) from `create-agent/templates/` to `create-team/templates/`.
-5. Re-scope `create-agent`/`improve-agent` to single-agent modes only; scope `/speckit.agents` off team operations.
-6. Persist teams under `.specify/teams/<slug>.team.md` (framework-internal; no per-tool symlink).
-7. Update references/registries/tests (NON_DECLARABLE set, create-skills non-declarable list, docs/agents, per-tool command copies) and regenerate `.specify/instructions.md`.
+1. Route `/speckit.team` create, modify, and run intents to `create-team`, `improve-team`, and `run-team`.
+2. Persist each team as `.specify/teams/<slug>/team.md` and support Anchor-driven creation with `focus_target`.
+3. Render static and dynamic team structures before ordinary team execution; keep continuous-loop governance explicit.
+4. Maintain team and `.specify/anchoring/<slug>/summary/` indexes through deterministic summary-input generation.
+5. Keep multi-agent concepts and orchestration templates in the team domain, separate from single-agent authoring.
+6. Preserve the dated implementation history below without treating its old paths and confirmation semantics as current.
 
 ## Implementation Notes
 
-- Backward-incompatible rename is acceptable (internal framework, no external consumers); zero `organize-agents` references may remain in active paths.
-- `create-team` owns both team definition and execution (inherited from `organize-agents`); the command's `run` mode adds the confirmation gate.
-- Guard tests (Test-First): zero dangling reference, single Conceptual Model, single-agent purity, command routing, skill presence.
-- Feature 019 (Agents Command) scope is reduced (multi-agent responsibilities move to 027); note this in 019 when 027 is implemented.
+- Current sources: `templates/commands/team.md`, `skills/internal/create-team/`, `skills/internal/improve-team/`, and `skills/internal/run-team/`.
+- `create-team` authors team definitions; `run-team` owns preflight, disclosed preview, dispatch, cadence reporting, and run reports.
+- Ordinary team execution follows the current reversible-action governance; continuous loops retain their own approval and operating constraints.
+- Feature 019 remains single-agent scoped, while Feature 101 owns the current Anchor terminology and archive layout.
 
 ## Future Evolution Suggestions
 
@@ -87,15 +88,8 @@ Planning completed for requirement `026-agent-team-management`. Clarifications r
 
 ## Related Specifications/Requirements
 
-- Cross-referenced Feature: .specify/memory/features/041.md — Feature 041 (Goal Registry, Draft 2026-08-05) owns the `goal` concept itself. It supplies the definition source behind the `goal_slug` key that requirement 036 introduced here, and relocates 036's goal-indexed delivery directory from `.specify/project/goal/<goal-slug>/` to `.specify/goal/<goal-slug>/summary/`. 027 keeps the team side of the binding; 036's aggregation semantics and identity grammar are preserved unchanged.
-- Follow-up Feature: .specify/memory/features/057.md — Feature 057（命令技能化分解补全，Draft 2026-10-14）把本 Feature 记录中 create-team 保留的 run 编排提取为独立 run-team 技能（team.md § Run Mode 真源移交，行为平价基线）；create/modify 语义与执行引擎引用不变，本 Feature 范围记录无需修订。
-- Extended Specification: .specify/specs/042-goal-team-creation/requirements.md (Draft 2026-08-17; **planned 2026-08-17** — plan.md + data-model.md + 4 contracts + quickstart.md + feature-ref.md, Constitution v1.10.0 check 12 Pass / 1 Partial (IX, justified: goal-utils +`--check`/`resolve_effective_target` deterministic surfaces + verify-territory-disjoint.py thin wrapper reusing the 036/037 overlap grammar)) — goal-based creation branch in `/speckit.team` create: recognition of an archived goal → goal content analysis (advisory, not a gate) → Target decomposition proposal set ratified through `/speckit.goal targets --add` (goal side unchanged) → one team per Target carrying a `focus_target` default focus plus pairwise-disjoint territory proposals. Concept anchors stay in Feature 041 / `shared/definitions/goal-definitions.md`. **Implemented 2026-08-17** via /speckit.implement — 33/33 tasks, SC-001..006 pass, zero new failures vs baseline (name-level), mirror table verified; evidence: `.specify/specs/042-goal-team-creation/verification.md`.
-- Latest Specification: .specify/specs/036-team-summary/requirements.md
-- Latest Quality Checklist: .specify/specs/036-team-summary/checklists/requirements.md
-- Historical Specification: .specify/specs/.archive/026-agent-team-management/requirements.md
-- Historical Quality Checklist: .specify/specs/.archive/026-agent-team-management/checklists/requirements.md
-- Historical Plan: .specify/specs/.archive/026-agent-team-management/plan.md
-- Historical Data Model: .specify/specs/.archive/026-agent-team-management/data-model.md
-- Historical Contracts: .specify/specs/.archive/026-agent-team-management/contracts/{team-command,create-team-skill,improve-team-skill,team-migration}-contract.md
-- Historical Quickstart: .specify/specs/.archive/026-agent-team-management/quickstart.md
-- Cross-reference: Feature 046 Confirmation Gate Governance(requirement 044)——team 创建/运行/收尾的确认门控将由其按"可逆动作自动执行"判据治理,本 Feature 描述中"executes only after explicit user confirmation"的既有语义以 046 落地后的形态为准。
+- Team Summary Specification: `.specify/specs/036-team-summary/requirements.md`
+- Anchor-Driven Creation Specification: `.specify/specs/042-goal-team-creation/requirements.md`
+- Run Decomposition: `.specify/features/057-decompose-command-skills.md`
+- Anchor / Goal Successor: `.specify/features/101-anchor-goal-realignment.md`
+- Implementation: `templates/commands/team.md`, `skills/internal/run-team/SKILL.md`, `skills/internal/create-team/scripts/build-summary-input.py`

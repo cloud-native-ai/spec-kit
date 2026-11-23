@@ -2,10 +2,10 @@
 
 **Feature ID**: 048  
 **Name**: Browser Utils Skill  
-**Description**: 浏览器自动化与 Web 应用测试能力:能力三分层(Tier 1 内置浏览器 / Tier 2 脚本自动化 / Tier 3 MCP 连接器)、脚本自动化双方向(页面级模拟 / 请求级调用)、按 domain 键控的站点记忆与四态生命周期(探索期/优化期/验证期/sealed)。  
-**Status**: Implemented  
+**Description**: Historical browser automation and site-memory capability, relocated to xuanji-extension and no longer distributed by Spec Kit.
+**Status**: Relocated
 **Created**: 2026-08-23  
-**Last Updated**: 2026-08-24
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -15,7 +15,7 @@ browser-utils 是 Spec Kit 的浏览器自动化技能。本 Feature 承载其�
 
 ## Latest Review
 
-(尚无评审记录)
+2026-11-22 implementation audit: no browser skill, site-memory engine, or browser contract-test source remains in this repository. The row and detail are retained only as relocation history; the external xuanji-extension implementation was not evaluated. The `Relocated` disposition was already present in the index and is now mirrored here.
 
 ## Key Changes
 
@@ -26,10 +26,9 @@ browser-utils 是 Spec Kit 的浏览器自动化技能。本 Feature 承载其�
 
 ## Implementation Notes
 
-- 技能源在 `skills/browser-utils/`,镜像到 `.specify/skills/browser-utils/`(双副本同步;sync-mirrors skills 对 exclude_parts={"site"})
-- 关键引用:references/playwright-patterns.md(运行模式/SPA 遍历)、references/mcp-browser-tools.md、references/extension-bridge-patterns.md、scripts/bridge/(WebSocket↔MV3 桥,已具页面内 evaluate 能力)
-- 站点记忆引擎落点(需求 046):`skills/browser-utils/scripts/site-memory.py`(7 actions,stdlib-only,原子写,脱敏强制);契约测试 `tests/contract/test_browser_site_memory.py`(引擎 35 用例)与 `tests/contract/test_browser_site_exclusions.py`(分发排除 9 用例)
-- 分发排除机制:`.gitignore` 两行 + sync-mirrors exclude_parts + `src/hatch_build.py` `_stage_skills()`(hatchling target exclude 不过滤 force-include,故改为暂存拷贝注册;见 research.md R2)
+- The former `skills/browser-utils/` source, `.specify/skills/browser-utils/` projection, `site-memory.py`, and browser contract tests are absent from the current tree.
+- The only retained implementation-adjacent surface is the generic `site` staging exclusion in `src/hatch_build.py`; it is not evidence that browser-utils still ships.
+- Capability ownership and future implementation belong to xuanji-extension. This detail preserves history only and makes no claim about that external repository.
 
 ## Future Evolution Suggestions
 
@@ -40,7 +39,7 @@ browser-utils 是 Spec Kit 的浏览器自动化技能。本 Feature 承载其�
 
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/048-browser-utils-skill.md
-- 需求 046: .specify/specs/046-browser-site-memory/requirements.md
+- 需求 046（归档）: .specify/archive/specs/046-browser-site-memory/requirements.md
 - 邻近 Feature: 013 Skills Command(技能管理编排,不含能力本体)
 
 ## Status Tracking

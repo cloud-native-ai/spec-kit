@@ -2,10 +2,10 @@
 
 **Feature ID**: 065
 **Name**: SDD 循环中断感知与状态恢复
-**Description**: 在无人值守 SDD 循环中，为驱动者提供确定性的状态感知、中断检测与状态恢复：只读聚合状态脊、四件套、watchbeat、阶段产物、git 提交与 watcher 判定；识别八类中断形态；按判定执行 resume / retry / stop；并把驱动者生命周期约束固化为可校验规则。
+**Description**: Deliver read-only loop snapshots, probes, and recovery recommendations; recover, check-spine, heartbeat-stalled, lifecycle validation, salvage, and apply locks remain Planned.
 **Status**: Planned
 **Created**: 2026-10-21
-**Last Updated**: 2026-10-22
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -14,6 +14,8 @@
 本 Feature 在 Feature 058 的 U0–U6、每线状态脊、阶段哨兵与 watcher 判定之上增加四层增量：A 只读状态聚合入口（`loop-state.py snapshot`）；B 八类中断形态检测与驱动者生命周期校验（`check-spine`）；C 按判定执行 `resume / retry / stop` 的恢复程序；D watchbeat 驱动者存在标记与同线恢复锁。它不改变 watcher 判定、不改各 `/speckit.*` 命令内部流程、不引入常驻服务或新运行时依赖。
 
 ## Latest Review
+
+2026-11-22 implementation audit: only `snapshot`, `--probe`, and `--self-test` are delivered. The snapshot aggregates state evidence and returns recovery suggestions while detecting six of the eight declared interruption classes. `recover` and `check-spine` still return structured refusals; heartbeat-stalled and lifecycle-spine-violation are not clearly emitted, and recovery apply, salvage, and the apply lock remain unimplemented. `Planned` is therefore retained.
 
 2026-10-21 `/speckit.requirements` 创建规格：52 FR / 10 SC / 5 user stories / 10 key entities / 5 shared strings；`validate-requirements.py` 0 error / 0 warning；质量清单 16/16；源简报逐字归档为 dated record。
 
@@ -31,12 +33,11 @@
 
 ## Key Changes
 
-1. 新增 `loop-state.py` 三动作引擎：`snapshot`（只读聚合）、`recover`（默认 dry-run、`--apply` 落地）、`check-spine`（状态脊校验），外加 `--self-test`；Python 3 标准库、零外部依赖。
-2. 八类中断形态：`unwatched / dead-no-exit-record / deadline-overrun-live / heartbeat-stalled / artifacts-without-completion / stale-signal / lifecycle-spine-violation / remote-unreachable`；每类带证据指针与落脊建议，多条并存时按确定性优先级裁决。
-3. 恢复动作封闭集 `none / watch / verify / resume / retry / stop`：resume 只补提交并交回 U4；retry 原子隔离旧信号后允许下一次派发；stop 写 `stalled` 并生成四要素上送件，不杀进程、不删 worktree。
-4. watchbeat 驱动者存在标记（每窗口开始/返回原子覆盖），只证明驱动者存在，不参与完成/存活判定；同线 `recover --apply` 使用独立原子锁，后到者返回 `locked`。
-5. 状态脊有界机读段（`<!-- loop-state:begin -->` … `<!-- loop-state:end -->`、`spine_schema: v1`、`spine_` 前缀键）与 `check-spine` 校验器；legacy 状态脊降级求值，缺字段记 `unknown`，不猜测。
-6. 驱动者生命周期硬规则：U2 派发与首个 U3 监听窗口 MUST 在同一回合启动；退出前 MUST 落 `stalled` / `reentry-required` 并显式上报；静默退出不是合法输出。
+1. Delivered: `loop-state.py snapshot`, `--probe`, and `--self-test` aggregate state-spine, runner, watchbeat, artifact, git, and watcher evidence into a read-only recovery recommendation.
+2. Delivered: the snapshot detects six declared interruption classes; this is not evidence that all eight classes or recovery actions work.
+3. Remaining: implement `recover` and `check-spine` instead of their current structured refusals.
+4. Remaining: emit and test `heartbeat-stalled` and `lifecycle-spine-violation`, then implement apply, salvage, and the same-line recovery lock.
+5. Remaining: close the 065b/065c slices and re-evaluate the parent Feature status with fresh final-path evidence.
 
 ## Implementation Notes
 
@@ -87,10 +88,10 @@
   Plan: .specify/specs/065a-state-awareness/plan.md
   Tasks: .specify/specs/065a-state-awareness/tasks.md（2026-10-21 tasks 阶段；当前活动执行基线）
   Bind: 2026-10-21 `/speckit.plan`（共享 Feature 065；切片目录独立）
-- Historical Slice (archived 2026-10-22): .specify/specs/066-loop-state-awareness-a/requirements.md
-  Quality Checklist: .specify/specs/066-loop-state-awareness-a/checklists/requirements.md
-  Parent FR Mapping: .specify/specs/066-loop-state-awareness-a/notes/parent-fr-mapping.md
-  Plan: .specify/specs/066-loop-state-awareness-a/plan.md
+- Historical Slice (archived 2026-10-22): .specify/archive/specs/066-loop-state-awareness-a/requirements.md
+  Quality Checklist: .specify/archive/specs/066-loop-state-awareness-a/checklists/requirements.md
+  Parent FR Mapping: .specify/archive/specs/066-loop-state-awareness-a/notes/parent-fr-mapping.md
+  Plan: .specify/archive/specs/066-loop-state-awareness-a/plan.md
   Bind: 2026-10-21 `/speckit.clarify`（共享 Feature 065）；2026-10-22 **archived** — 065a 为 active 执行基线，066 不再实施/分析（见 `notes/historical.md`）
 - Cross-reference: Feature 058 无人值守 SDD 循环驱动机制——U0–U6、状态脊、哨兵、U4/U5 与 watcher 判定仍由 058 拥有；065 只增加观测、恢复与生命周期校验。
 - Cross-reference: Feature 064 Subagent 并发归属、CLI 能力档案与生命周期解耦——Line Registry / lease / reservation / ownership 仍由 064 拥有；065 只读 Registry 作为证据来源。

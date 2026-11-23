@@ -2,10 +2,10 @@
 
 **Feature ID**: 031  
 **Name**: Glossary Mechanism  
-**Description**: Single project-wide glossary (`.specify/memory/glossary.md`) that anchors project vocabulary and corrects voice/dictated input (homophones, easily-confused words); initialized at instruction generation, ambient to all commands, progressively enriched with user-confirmed conflict handling.  
+**Description**: Single project-wide glossary (`.specify/glossary.md`) that anchors project vocabulary and corrects voice/dictated input (homophones, easily-confused words); initialized at instruction generation, ambient to all commands, progressively enriched with user-confirmed conflict handling.
 **Status**: Implemented  
 **Created**: 2026-07-16  
-**Last Updated**: 2026-07-16 (implemented: engine + template + protocol + init hook + ambient wiring; 23 tests pass, 0 regressions)
+**Last Updated**: 2026-11-22 (implementation audit: current glossary path and six-action engine verified)
 
 ## Overview
 
@@ -13,11 +13,13 @@ Voice/dictated input frequently corrupts domain terms into phonetically similar 
 
 ## Latest Review
 
-Not yet reviewed. Spec (029-glossary-mechanism) clarified 2026-07-16 (feature binding → new Feature 031; ambient-context integration; single project-wide scope); plan + Phase 1 design artifacts generated the same day. Constitution Check: all gates pass (Principle IV justified Partial — template-heavy feature).
+2026-11-22 implementation audit: the active artifact is `.specify/glossary.md`, not the historical `.specify/memory/glossary.md`. `glossary-utils.py` provides init/list/add/remove/detect-conflict/validate, and instruction generation plus core commands are wired to the current path.
+
+Historical review — Spec (029-glossary-mechanism) clarified 2026-07-16; plan and Phase 1 design artifacts were generated the same day.
 
 ## Key Changes
 
-1. New glossary artifact `.specify/memory/glossary.md` (one per project) seeded from `templates/glossary-template.md` (dual-written to `.specify/templates/`).
+1. New glossary artifact `.specify/glossary.md` (one per project) seeded from `templates/glossary-template.md` (dual-written to `.specify/templates/`).
 2. Initialization hook in `scripts/bash/generate-instructions.sh` — non-destructive create-if-absent, preserving user-authored entries across re-runs.
 3. Ambient wiring: Documentation Map row in `templates/instructions-template.md` → glossary loaded by every agent through the `.specify/instructions.md` symlinks (same mechanism as the constitution).
 4. Shared protocol `shared/workflow/glossary.md` (mirrored) + a lightweight `## Glossary` reference step on `requirements`/`plan`/`tasks`/`implement` command templates (modeled on the `## Feedback` step): correction/anchoring, checkpoint enrichment, conflict detection + mandatory user confirmation, user precedence.

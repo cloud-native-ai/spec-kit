@@ -5,7 +5,7 @@
 **Description**: `/speckit.humanize` 是动作输出的人类友好化命令——调用者给一条指令，命令派发恰好一个执行体跑完它，再由主会话结合动作证据、项目治理与会话上下文写成五节结构化报告（结论/关键变化/证据/风险/下一步）；裸文本=待执行指令，改写既有文本须显式 --file/--inline；默认零写入，失败与确认缺失如实报告  
 **Status**: Implemented  
 **Created**: 2026-10-19  
-**Last Updated**: 2026-10-31
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -15,17 +15,19 @@
 
 ## Latest Review
 
-- 2026-10-31 `/speckit.tasks`（079 扩展登记核对，implement 阶段补记）：tasks 阶段产出本规格 36 行任务，88 条款由 § Contract Coverage Map 人工指派到 31 行（IP/EX/RP/CM/WC），并由 T036 的 `test_wc12_clause_test_map_is_total` 承担「条款 id ↔ 测试名」机器核对（实现期执行）；五个红先行测试行（T005/T013/T019/T024/T036）先于实现行落笔，主契约套件载体是 `tests/contract/test_humanize_command_surface.py`；US4 实现由 T025–T032 落定（内容模式保留入口、两模式共有防线、run-mode § Output、派生面再生成、docs 重定位与登记追加）。状态保持 Implemented（扩展不回退，FR-029）。
+2026-11-22 implementation audit: bare text enters run-then-report mode, while explicit `--file` / `--inline` selects content rewriting. One temporary executor, seven-state envelopes, denied/missing-confirmation handling, concurrency placeholders, five-section reports, and atomic `--output` are current behavior. The extension is Feature 080; earlier `079` references in this file were numbering errors and have been corrected.
 
-- 2026-10-30 `/speckit.tasks`（079 H-06 传播修复，analyze 第二轮唯一 HIGH）：把 requirements 已定义的 `denied`（用户明确拒绝确认）接到任务与验收面——`tasks.md` T010 的 status 改为**七值**并补 `denied` 语义（不执行该步、无替代动作、verdict 取 `aborted`、文案写「用户拒绝确认」与未执行范围），T004 新增 `denied/envelope.md` 夹具，T019 新增拒绝确认断言组（`test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope`）并把 T019 补进 SC-004 覆盖行（T021 保留为确认缺失实现行），quickstart S6 补「用户拒绝确认」场景（S6-B）与完成判据行；同批关闭 M-22（Shared Strings 计数 15）、M-23（本文件与索引计数 36 任务 / 31 指派行）、L-01（H1 采用新名称）、L-02（T014 改引 FR-019）、M-24（SC-010 三组注入夹具由 `run/injection/` 两组补齐）。任务编号保持连续，总数 36（≤40）；`validate-tasks.py` / `decomposition-check.py` / `pre-analyze-check.py` 复跑读数见 `test-evidence/`。状态保持 Implemented。
+- 2026-10-31 `/speckit.tasks`（080 扩展登记核对，implement 阶段补记）：tasks 阶段产出本规格 36 行任务，88 条款由 § Contract Coverage Map 人工指派到 31 行（IP/EX/RP/CM/WC），并由 T036 的 `test_wc12_clause_test_map_is_total` 承担「条款 id ↔ 测试名」机器核对（实现期执行）；五个红先行测试行（T005/T013/T019/T024/T036）先于实现行落笔，主契约套件载体是 `tests/contract/test_humanize_command_surface.py`；US4 实现由 T025–T032 落定（内容模式保留入口、两模式共有防线、run-mode § Output、派生面再生成、docs 重定位与登记追加）。状态保持 Implemented（扩展不回退，FR-029）。
 
-- 2026-10-30 `/speckit.plan`（079 analyze 修复轮 1）：按 `test-evidence/analyze-fix-brief.md` 的 plan/contracts 归属关闭 H-05（三条 Decision Tension 的 `expected_sacrifice` 各绑定恰一个 `SC-NNN Source ↓`；`validate-decision-tensions.py` 0 error / 0 warning）与 M-04/M-07/M-17/M-19；契约对齐 FR-019（verdict 唯一 owner）、FR-024（运行模式输出与文件内元数据）、FR-025（回传字段与产物内容的注入面）、FR-004（`--audience` 空值 = 未提供）；`data-model` E2/E3/E5/E6/E7 同步（`denied`、`not-read`、语言域 `zh`/`en`）；quickstart S3 改为「一次派发 + `dispatches: 1` + Evidence `none`」；Constitution Check IV 与 `tasks.md` 统一为 Partial（template-only 门）。条款数不变（88），FR/SC 数不变（30/10）。
+- 2026-10-30 `/speckit.tasks`（080 H-06 传播修复，analyze 第二轮唯一 HIGH）：把 requirements 已定义的 `denied`（用户明确拒绝确认）接到任务与验收面——`tasks.md` T010 的 status 改为**七值**并补 `denied` 语义（不执行该步、无替代动作、verdict 取 `aborted`、文案写「用户拒绝确认」与未执行范围），T004 新增 `denied/envelope.md` 夹具，T019 新增拒绝确认断言组（`test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope`）并把 T019 补进 SC-004 覆盖行（T021 保留为确认缺失实现行），quickstart S6 补「用户拒绝确认」场景（S6-B）与完成判据行；同批关闭 M-22（Shared Strings 计数 15）、M-23（本文件与索引计数 36 任务 / 31 指派行）、L-01（H1 采用新名称）、L-02（T014 改引 FR-019）、M-24（SC-010 三组注入夹具由 `run/injection/` 两组补齐）。任务编号保持连续，总数 36（≤40）；`validate-tasks.py` / `decomposition-check.py` / `pre-analyze-check.py` 复跑读数见 `test-evidence/`。状态保持 Implemented。
 
-- 2026-10-30 `/speckit.tasks`（079 扩展）：产出 `.specify/specs/080-humanize-run-output/tasks.md`（36 行任务 / 7 相位 / 0 error 0 warning；`decomposition-check.py --mode tasks` 报 `proceed`，`task_count=36 ≤ 40`；`pre-analyze-check.py --stage tasks` 报 `pass`、`errors=0`，21 条 missing-path advisory 全部命名本特性将新建的路径）。组织按四个用户故事（US1/US2 为 P1、US3/US4 为 P2），Foundational 只放技能模式分叉与运行夹具集；四个红先行测试行分别承载 IP/EX/RP/WC、RP、EX/IP、CM/IP/RP 的断言组，证据落 `notes/red-first-evidence.md`。条款覆盖由 § Contract Coverage Map 人工指派承担（88 条各指派给恰一行），**不使用 `[green:]`**：五份契约使用 `IP`/`EX`/`RP`/`CM`/`WC` 两字母命名空间，`clause_extract.py` 实测 `form=md-none`，声明 `[green:]` 会判 `green-dangling`（066/067 先例）。本阶段为 docs-only 测试预算（`test-evidence/tasks-test-budget.txt` 记 `status=not-run-docs-only`）。状态保持 Implemented（扩展不回退，FR-029）。
+- 2026-10-30 `/speckit.plan`（080 analyze 修复轮 1）：按 `test-evidence/analyze-fix-brief.md` 的 plan/contracts 归属关闭 H-05（三条 Decision Tension 的 `expected_sacrifice` 各绑定恰一个 `SC-NNN Source ↓`；`validate-decision-tensions.py` 0 error / 0 warning）与 M-04/M-07/M-17/M-19；契约对齐 FR-019（verdict 唯一 owner）、FR-024（运行模式输出与文件内元数据）、FR-025（回传字段与产物内容的注入面）、FR-004（`--audience` 空值 = 未提供）；`data-model` E2/E3/E5/E6/E7 同步（`denied`、`not-read`、语言域 `zh`/`en`）；quickstart S3 改为「一次派发 + `dispatches: 1` + Evidence `none`」；Constitution Check IV 与 `tasks.md` 统一为 Partial（template-only 门）。条款数不变（88），FR/SC 数不变（30/10）。
 
-- 2026-10-30 `/speckit.plan`（079 扩展）：设计产物落盘——`plan.md`（宪法检查 18 行动态枚举、三处 Decision Tensions：派发载体 T-001 / 并发观测 T-002 / 复杂度分类 T-003、镜像基线实测干净）、`data-model.md`（8 实体 + 26 校验规则 + 运行状态机）、`contracts/` ×5（88 条款：IP 17 / EX 21 / RP 20 / CM 10 / WC 20）、`quickstart.md`（7 场景，行为类逐例前提清单 + docs-only 未执行标注）、`feature-ref.md`（062 扩展绑定）。基线读数冻结于 `test-evidence/stage-plan-baselines.txt`（regen/mirror 干净、probe 75 单元零漂移、门控 27/0、技能正文 ≈4090/5000 tokens）。状态保持 Implemented（扩展不回退，FR-029）。
+- 2026-10-30 `/speckit.tasks`（080 扩展）：产出 `.specify/specs/080-humanize-run-output/tasks.md`（36 行任务 / 7 相位 / 0 error 0 warning；`decomposition-check.py --mode tasks` 报 `proceed`，`task_count=36 ≤ 40`；`pre-analyze-check.py --stage tasks` 报 `pass`、`errors=0`，21 条 missing-path advisory 全部命名本特性将新建的路径）。组织按四个用户故事（US1/US2 为 P1、US3/US4 为 P2），Foundational 只放技能模式分叉与运行夹具集；四个红先行测试行分别承载 IP/EX/RP/WC、RP、EX/IP、CM/IP/RP 的断言组，证据落 `notes/red-first-evidence.md`。条款覆盖由 § Contract Coverage Map 人工指派承担（88 条各指派给恰一行），**不使用 `[green:]`**：五份契约使用 `IP`/`EX`/`RP`/`CM`/`WC` 两字母命名空间，`clause_extract.py` 实测 `form=md-none`，声明 `[green:]` 会判 `green-dangling`（066/067 先例）。本阶段为 docs-only 测试预算（`test-evidence/tasks-test-budget.txt` 记 `status=not-run-docs-only`）。状态保持 Implemented（扩展不回退，FR-029）。
 
-- 2026-10-30 `/speckit.clarify`（079 扩展）：把命令从「文本转换」重构为「动作输出的人类友好化」——裸文本=待执行指令，经 run-agent 派发一个子代理执行，主会话结合动作证据/项目治理/会话上下文产出五节报告；确认缺失 fail-closed；`--file`/`--inline` 保留为显式备用。状态保持 Implemented（扩展不回退）。
+- 2026-10-30 `/speckit.plan`（080 扩展）：设计产物落盘——`plan.md`（宪法检查 18 行动态枚举、三处 Decision Tensions：派发载体 T-001 / 并发观测 T-002 / 复杂度分类 T-003、镜像基线实测干净）、`data-model.md`（8 实体 + 26 校验规则 + 运行状态机）、`contracts/` ×5（88 条款：IP 17 / EX 21 / RP 20 / CM 10 / WC 20）、`quickstart.md`（7 场景，行为类逐例前提清单 + docs-only 未执行标注）、`feature-ref.md`（062 扩展绑定）。基线读数冻结于 `test-evidence/stage-plan-baselines.txt`（regen/mirror 干净、probe 75 单元零漂移、门控 27/0、技能正文 ≈4090/5000 tokens）。状态保持 Implemented（扩展不回退，FR-029）。
+
+- 2026-10-30 `/speckit.clarify`（080 扩展）：把命令从「文本转换」重构为「动作输出的人类友好化」——裸文本=待执行指令，经 run-agent 派发一个子代理执行，主会话结合动作证据/项目治理/会话上下文产出五节报告；确认缺失 fail-closed；`--file`/`--inline` 保留为显式备用。状态保持 Implemented（扩展不回退）。
 
 2026-10-19：implement 完成，状态 **Planned → Implemented**。`/speckit.implement` 完成 T001–T033（33/33，0 deferred）：T031 按 quickstart 实跑 S1–S8（生成面零漂移、镜像触碰对字节一致且零 NEW drift、编译面 74 单元零漂移、测试名字级 `comm -13` 对冻结 71 名单为 0 新增——当前 64 failed / 3951 passed、35/35 条款与 29/29 FR 覆盖、S8 确定性抽检全部 exit 0），全量命令/输出/退出码见 `notes/quickstart-run.md`；T032 将 SC-001..SC-011 全量汇总为 pass 并记录证据路径（`verification.md` § T032），`validate-requirements.py` 与 `validate-tasks.py` 均 exit 0（33 任务 / 35 green 认领 / 0 collision）；17 项交付面逐项实存核对 17/17。实现证据路径：`verification.md`、`notes/quickstart-run.md`、`notes/e8-run/`、`tests/fixtures/humanize/`、`tests/contract/test_humanize_command_surface.py`。analyze2 的四项顺带发现（U-08/F-07/L-04/L-05）经核对均已在工作树修复。
 
@@ -43,10 +45,10 @@
 4. 输入与文件安全默认：单输入源、默认不写文件、显式输出路径 + 覆盖确认、输出格式跟随输入（FR-018 至 FR-023）。
 5. 分发、登记与诚实性：逐命令参考文档、注册表登记、确定性契约检查 + 行为夹具、不承诺检测器结果的明确声明、零新增失败与零新增漂移基线（FR-025 至 FR-028，SC-007 至 SC-010）。
 6. 输入内容安全（提示注入防线）：输入一律按数据处理，指令式文本不改变命令行为、不跳过保真/拒收/零外传、不触发外部动作，逐字保留或按原样改写并在会话报告提示（FR-029、SC-011、C-35）。
-7. 079 扩展（2026-10-30）：输入契约改为「指令执行 + 报告改写」，新增五节报告、执行安全边界与迁移提示；旧内容模式保留为显式入口。plan 补充：运行模式经 run-agent 派发会话级临时执行体（T-001）、并发用受制裁临时根下的一次性占位（T-002）、命令复杂度分类保持 Simple（T-003）；技能正文只加路由，细则落 `references/`。
-8. 079 tasks 阶段（2026-10-30）：任务清单把 88 条条款指派到 31 行（IP/EX/RP/CM/WC 五组），四份故事各自的红先行行与定向集落点固定；条款核算的形态缺口（`form=md-none`）如实记录并交 analyze 裁定，不以人工覆盖表冒充实测覆盖。
-9. 079 tasks 传播修复（2026-10-30，H-06）：把 `denied`（用户拒绝确认）接入夹具、测试断言、SC-004 覆盖行与 quickstart S6-B（无副作用、`denied`→`aborted`、拒绝原因与未执行范围）；`status` 记为七值并由 FR-012 拥有；SC-010 的运行模式与回传注入样本落 `run/injection/`；Feature 062 仍为 `Implemented`，任务总数 36（31 行指派）。
-10. 079 implement（2026-10-31）：内容模式落定为保留的既有入口（不是兼容垫片）并补两模式共有防线（注入防护、保真底线、检测器诚实）；运行模式新增 § Output 目标语义（扩展名封闭集、完整五节报告 + 会话摘要、原子写与 `--force`）；四份按工具副本与技能镜像由再生成入口重建；docs 页与登记面同步到「动作输出人类友好化」口径，状态保持 `Implemented`。
+7. 080 扩展（2026-10-30）：输入契约改为「指令执行 + 报告改写」，新增五节报告、执行安全边界与迁移提示；旧内容模式保留为显式入口。plan 补充：运行模式经 run-agent 派发会话级临时执行体（T-001）、并发用受制裁临时根下的一次性占位（T-002）、命令复杂度分类保持 Simple（T-003）；技能正文只加路由，细则落 `references/`。
+8. 080 tasks 阶段（2026-10-30）：任务清单把 88 条条款指派到 31 行（IP/EX/RP/CM/WC 五组），四份故事各自的红先行行与定向集落点固定；条款核算的形态缺口（`form=md-none`）如实记录并交 analyze 裁定，不以人工覆盖表冒充实测覆盖。
+9. 080 tasks 传播修复（2026-10-30，H-06）：把 `denied`（用户拒绝确认）接入夹具、测试断言、SC-004 覆盖行与 quickstart S6-B（无副作用、`denied`→`aborted`、拒绝原因与未执行范围）；`status` 记为七值并由 FR-012 拥有；SC-010 的运行模式与回传注入样本落 `run/injection/`；Feature 062 仍为 `Implemented`，任务总数 36（31 行指派）。
+10. 080 implement（2026-10-31）：内容模式落定为保留的既有入口（不是兼容垫片）并补两模式共有防线（注入防护、保真底线、检测器诚实）；运行模式新增 § Output 目标语义（扩展名封闭集、完整五节报告 + 会话摘要、原子写与 `--force`）；四份按工具副本与技能镜像由再生成入口重建；docs 页与登记面同步到「动作输出人类友好化」口径，状态保持 `Implemented`。
 
 ## Implementation Notes
 

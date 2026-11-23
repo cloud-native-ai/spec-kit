@@ -1,4 +1,11 @@
-# 094 — Goal/Team Parallel（目标/施工队 × spec 并行）
+# Feature Detail: Goal/Team Parallel
+
+**Feature ID**: 094
+**Name**: Goal/Team Parallel
+**Description**: Deliver binding, writability, unified archive migration, handoff, and territory checks; Feature 101 continues the model as anchor_slug and anchor.md.
+**Status**: Ready for Review
+**Created**: 2026-11-09
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -10,6 +17,10 @@
 
 上游 2026-11-09 已把全局 goal 档案目录从 `.specify/goal/` 改名为 `.specify/anchoring/`（定义文件名仍
 `goal.md`）；本特性按该实况重述路径词汇（D4），并把「临时/全局」从分类判据改为由 binding 回答的归属。
+
+## Latest Review
+
+2026-11-22 implementation audit: binding records, writability checks, unified archive migration, handoff, and territory refusal are delivered. Feature 101 continues the current model as `anchor_slug` and `anchor.md`; the two disclosed supporting partial criteria do not alter the existing Ready for Review status.
 
 ## Key Changes
 

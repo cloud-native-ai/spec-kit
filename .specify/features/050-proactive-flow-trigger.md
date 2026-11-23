@@ -2,10 +2,10 @@
 
 **Feature ID**: 050  
 **Name**: Proactive Flow Trigger(主动触发机制)  
-**Description**: 在每个受支持 agent 的必经指令路径上埋设主动触发点:每回合接续既有 constitution 合规分析做情境评估,主动建议"现在该执行哪个流程"并给出确切调用形式,使用户不必记得任何 `/speckit.*` 命令名或技能名;建议的采纳/拒绝被记录,同一规则连续采纳达阈值后晋升为免确认自动执行(破坏性流程永不晋升),触发规则本身作为数据依证据持续调优。  
+**Description**: Assess each turn from handoff and owning-section seeds, suggest the next flow, and promote repeated adoptions to autoExecute=true suggestions without executing them.
 **Status**: Implemented  
 **Created**: 2026-09-07  
-**Last Updated**: 2026-09-08
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -13,9 +13,11 @@
 
 反转思路是把"用户去找能力"改成"能力在必经路径上找用户":`specify init` / `/speckit.instructions` 生成指令文件时写入一段主动触发指令,经既有 symlink 模型抵达每个 agent 的必读文件;agent 每回合在同一趟分析里先完成既有的 constitution 合规检查、再据此判断当前项目状态下该执行哪个流程,并以一行非阻塞建议给出用途与**确切可复制的调用形式**。用户只需说"好"或忽略。
 
-机制的另一半是**自我收敛**:建议的采纳/拒绝被记录为证据,同一(情境→流程)规则连续采纳达阈值(默认 3)后晋升为免确认自动执行,把"提醒"升级为"代办";而触发规则本身是数据而非散文,可依命中率/拒绝率/误报/漏报提议调优,经确认后生效。两条硬边界贯穿始终:**破坏性/不可逆流程永不晋升**(判据归确认门控治理,学习计数不得覆盖),以及**建议永不阻塞用户当前请求**(回流约束)。
+机制的另一半是**自我收敛**:建议的采纳/拒绝被记录为证据,同一可逆规则连续采纳达阈值后可给出 `autoExecute=true` 的晋升建议;引擎本身从不执行该流程。触发规则是数据而非散文,可依证据提议调优并经确认后生效。两条硬边界贯穿始终:**破坏性/不可逆流程永不晋升**,以及**建议永不阻塞用户当前请求**。
 
 ## Latest Review
+
+2026-11-22 implementation audit: current seeds have `handoffs` and `owning-section` provenance. Three consecutive adoptions can produce an `autoExecute=true` suggestion for a reversible rule; destructive rules never promote, and the engine never executes the suggested flow. Earlier claims of direct automatic execution and Handoffs-only seeds are superseded.
 
 **2026-09-07 `/speckit.plan`(需求 050 → Feature 050,Draft → Planned)**:Constitution v1.11.0 ~~14/14 Pass,Complexity Tracking N/A~~ → **2026-09-08 订正为 13 Pass / 1 Partial(XIV),Complexity Tracking 已填**(见下方 analyze 条目;原判定把种子规则集误归入 `one-source-of-truth.md` 的合法副本类别)。设计取向是主动**收缩制品面**——零新命令、零新技能、零新确认门控、零新依赖、零 `src/` 逻辑改动,唯一新制品是一个 stdlib 引擎,其必要性由 Program-First 强制(计数/阈值/身份解析/漂移检出都是固定规则判定,不得交给 LLM)。
 
@@ -52,7 +54,7 @@
 1. **触发段进入指令模板与生成链**:`templates/instructions-template.md` 新增主动触发章节(挂载在 Documentation Map 常驻指令邻近位置),经 `generate-instructions.sh` 的 additive reconcile 落入 `.specify/instructions.md`,并由既有 symlink 抵达各 agent;引用式表达流程清单,不复制命令/技能枚举
 2. **全 agent 必经路径覆盖修复**:补齐 `_INSTRUCTIONS_FILE_MAP` 声明却未生成的 `hermes → HERMES.md` 与 `opencode → .opencode/instructions.md`(或显式裁定不支持并从声明移除)——指令文件既是唯一通道,此缺口即等于这两个 agent 完全没有本机制
 3. **每回合情境评估 + 两级证据预算**:默认只消费已在上下文中的环境信息(近零增量成本),不足时才升级到确定性探测程序的摘要输出;评估静默,**评估节奏与建议节奏分离**
-4. **出厂种子规则集**:随 `templates/` 分发,使新项目第一天即产出建议;规则**从 25 个命令模板既有的 `## Handoffs` 条件式派生**,不另撰第二份 situation→flow 知识
+4. **出厂种子规则集**:随 `templates/` 分发,使新项目第一天即产出建议;规则具有 `handoffs` 与 `owning-section` 两类 provenance,不另撰无来源的 situation→flow 知识
 5. **触发学习状态**:项目本地机器维护状态,承载规则集(含来源:种子/学习)、晋升态、建议事件与每回合遥测;与指令文件分离故再生不吞状态;遥测有保留窗口、可轮转
 6. **阈值晋升 + 破坏性豁免**:连续采纳达阈值(默认 3,可配置)晋升为免确认自动执行,一次拒绝即重置;破坏性流程永不晋升;自动执行仍出三段式执行报告;用户可复位单条或全局降级
 7. **规则证据驱动优化**:依命中率/拒绝率/误报/漏报提议收紧·抑制·新增,附证据(指标+样本数),经用户确认后生效并留可回查关联;样本不足不得提议变更
@@ -66,7 +68,7 @@
 - **只挂每回合轻量 constitution 义务**:框架的 constitution 遵从分两级——每回合的 Documentation Map 常驻指令(「ALWAYS check the relevant document from the map above first」)与 plan 期的完整逐原则枚举门控(`plan-template.md:31–33` GATE)。本特性只挂前者;把后者每回合化会同时违反 Principle IX 与 token 效率纪律(FR-005b ②)
 - **情境身份必须是粗粒度受控词表**:以完整制品状态指纹作身份会使指纹近乎每次唯一 → 连续计数永不到阈值 → 晋升与 US3 整体失效。词表扩展只经用户确认通道,禁止 agent 临场造词
 - **晋升计数是规则上的聚合态**:不得由原始遥测行重算,否则一次遥测轮转即清空全部学习结果(SC-015 为判别该缺陷而设)
-- **种子规则派生而非撰写**:`## Handoffs` 已是 situation→flow 知识的既有真源(25/25 命令模板覆盖);另撰一份即造出第二真源,违反 Principle XIV。种子与学习规则同构,只在来源与可覆盖性上有别;**用户已确认的调优不得被后续种子更新覆盖回退**
+- **种子规则派生而非撰写**:当前种子具有 `handoffs` 与 `owning-section` 两类 provenance;种子与学习规则同构,只在来源与可覆盖性上有别,**用户已确认的调优不得被后续种子更新覆盖回退**
 - **漏报为已接受风险**:指令文件是唯一通道,无确定性触发保证(长上下文稀释、agent 忽略常驻指令都会导致整回合零评估)。补偿控制是漏报检测(用户手动调用某流程而当时无建议 → 提议新增/收紧规则),使漏报可观察可收敛而非静默失效
 - **计数-阈值机制复用既有范式**:与 `feedback-utils.py` 的 `resolve_threshold` / `should_prompt` 同构(优先级:显式配置 > 环境变量 > 存储 > 默认),不新建平行引擎(FR-021 单引擎坍缩)。标识符预留已核查:`PROACTIVE` / `AUTO_TRIGGER` / `SUGGEST*` 零占用;须避让 `SPECKIT_FEEDBACK_THRESHOLD`、`should_prompt`、`resolve_threshold`、`--action introspect-register`、`INTROSPECTION_DIRNAME`、`AUTO-GENERATED` 标记、`GIT_WORKFLOW_START/END`
 - **术语不得复用既有两词**:项目词汇表里"埋点/插点"锚定 **Feedback Probe**(wrap-up 事实捕获,记录**已发生**运行)、"自省"锚定 **Feedback Introspection**(需求 047,对已积累条目的深加工)。本 Feature 用**主动触发点 / 情境评估**,与之分属不同概念

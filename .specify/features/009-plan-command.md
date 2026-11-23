@@ -2,42 +2,48 @@
 
 **Feature ID**: 009  
 **Name**: Plan Command  
-**Description**: Create implementation plans from specs.  
+**Description**: Create implementation plans and design artifacts from requirements.
 **Status**: Completed  
 **Created**: 2026-02-10  
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The Plan Command enables create implementation plans from specs. This is part of the Spec Kit CLI toolkit.
+`/speckit.plan` turns a validated requirements specification into `plan.md` and the Phase 1 design set: research, data model, contracts, quickstart, and feature-reference mapping. Planning includes a dynamic Constitution Check and artifact-completeness gates.
 
 ## Latest Review
 
-Initial generation/refresh.
+2026-11-22 implementation audit: the current `create-plan` flow includes decision-tension records, execution-premise checks, and scaffold safeguards. `create-new-plan.sh` now refuses a missing or empty plan template instead of touching `plan.md`.
 
 ## Key Changes
 
-1. Initial release/indexing.
+1. Fill the plan template from validated requirements and project governance.
+2. Generate the Phase 1 design artifacts and requirement-to-delivery mapping.
+3. Enforce dynamic Constitution Check, decomposition, and artifact-completeness gates.
+4. Fail before modification when the source plan template is missing or empty.
 
 ## Implementation Notes
 
-- Part of specify-cli reference implementation.
+- Primary surfaces: `templates/commands/plan.md`, `skills/internal/create-plan/SKILL.md`, and `scripts/bash/create-new-plan.sh`.
+- The audit found one `plan.md` handoff entry missing `send`; this is a current metadata residual.
 
 ## Future Evolution Suggestions
 
-- Continuous improvement based on usage.
+- Repair the incomplete handoff entry while preserving the planning workflow contract.
 
 ## Related Files
 
-- Specification: .specify/specs/009-009-plan-command/requirements.md
-- Feature Index: .specify/features.md
-- Feature Detail: .specify/features/009-plan-command.md
-- Quality Checklist: .specify/specs/009-009-plan-command/checklists/requirements.md
+- Feature Index: `.specify/features.md`
+- Feature Detail: `.specify/features/009-plan-command.md`
+- Implementation: `templates/commands/plan.md`, `skills/internal/create-plan/SKILL.md`
+- Specification: none registered for this legacy command row.
 
 ## Status Tracking
 
 - **Draft**: Concept defined.
-- **Planned**: Spec approved.
-- **Implemented**: Code written.
-- **Ready for Review**: Tests passing.
-- **Completed**: Merged and available.
+- **Planned**: Specification and design approved.
+- **Implemented**: Planning workflow delivered and verified.
+- **Blocked**: A final-path acceptance criterion fails.
+- **Ready for Review**: Review evidence complete with no blocking code-review entry.
+- **Sealed**: Canonical seal criteria met.
+- **Completed** (legacy — current): Historical delivered status retained.

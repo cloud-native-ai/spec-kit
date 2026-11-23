@@ -2,18 +2,18 @@
 
 **Feature ID**: 026  
 **Name**: Agent Skill Enablement  
-**Description**: Empower the framework's built-in role agents to prefer installed framework skills for role-relevant operations, since skills and agent definitions install together.  
+**Description**: Wire the seven Worker capability templates to prefer relevant installed skills through declared mappings.
 **Status**: Implemented
 **Created**: 2026-07-13  
-**Last Updated**: 2026-07-13
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-Skills and agent definitions install together in Spec Kit, so every built-in agent can invoke any framework-provided skill. This feature wires that capability into the seven built-in role agents so that each one prefers a role-relevant skill over improvising the same operation manually. Each agent declares, in a consistent format, the subset of installed skills chosen from its role definition (e.g. Requirements Analyst → `draw-plantuml` for UML use-case diagrams; Module Designer → `analysis-project` for project-structure analysis), while all installed skills remain invocable as a fallback.
+The seven `agent-capacity-*-template.md` Worker capability templates under `skills/internal/create-agent/templates/` declare non-empty `skills:` mappings and a shared `## Skill Enablement` protocol. Each template prefers an applicable framework skill over improvising the same operation, while contract tests ensure that referenced skills exist and that forbidden meta-skills are not declared.
 
 ## Latest Review
 
-Created from the 025-agent-skill-enablement requirements specification. Clarified via `/speckit.clarify` (Session 2026-07-13): bound to a new Feature 026; scope limited to the 7 persistent role agents (EEI stage sub-agents inherit their parent role's skills); skill selection is a role-definition-driven curated subset with all skills invocable as fallback.
+2026-11-22 implementation audit: Feature 044 changed the actual carrier from `agents/*.agent.md` to the seven Worker capability templates. Current behavior is validated by `tests/contract/test_agent_skill_enablement.py`; older draw-plantuml, analysis-project, and think-skills mapping examples are historical, not the current roster.
 
 ## Key Changes
 
@@ -31,11 +31,10 @@ Created from the 025-agent-skill-enablement requirements specification. Clarifie
 
 ## Implementation Notes
 
-- Skill availability is guaranteed by synchronized install of skills and agent definitions; the declared set is a curated, role-derived subset while all installed skills remain invocable.
-- Only the persistent role agents under `.specify/agents/` are in scope; transient EEI stage sub-agents inherit the parent role's skill context.
-- Declaration format should follow existing agent-definition conventions (agent frontmatter skill field + body guidance), not a newly invented format.
-- The change must not alter existing tool access, supervision/EEI loops, role scope, or handoffs.
-- No new skills are authored by this feature; it only wires existing installed skills into agents.
+- Current carrier: `skills/internal/create-agent/templates/agent-capacity-*-template.md`; the old `agents/*.agent.md` paths are historical.
+- The shared protocol snippet is `agent-skill-enablement.md`; declarations use each template's `skills:` frontmatter and `## Skill Enablement` body.
+- `tests/contract/test_agent_skill_enablement.py` checks non-empty mappings, existing skill references, and the forbidden meta-skill set.
+- Earlier role-agent and skill-mapping examples in the numbered delivery history are not a current path or roster authority.
 
 ## Future Evolution Suggestions
 

@@ -2,10 +2,10 @@
 
 **Feature ID**: 085
 **Name**: SDD 临时 Goal / 临时 Team 与多 Agent 并发（SDD Temporary Goal/Team and Multi-Agent Concurrency）
-**Description**: 把 Goal 与 Team 机制反向融入 SDD 开发流程：requirements U4 后在 spec 下撰写 Temporary Goal，clarify+plan U4 后创建绑定该 Goal 的 Temporary Team；8 个 SDD 阶段使用阶段专用 agent，按阶段负载与默认 24 并发动态决定数量与类型；写 agent 使用独立 worktree，提交经既有 line registry 与集成队列串行集成；每阶段 checkpoint 协同产物核验、Goal 进度、至多一条 team 配置提案与下一阶段并发/roster 决策；删除泛化 sdd-executor，所有保留的框架 agent 统一 run-turn-budget 500。Global Goal/Team 层级保持不变。
+**Description**: Preserve stage-specialized agents, worktree isolation, integration queues, and checkpoints; spec-local Temporary Goal/Team is superseded by the unified Anchor-bound archive model.
 **Status**: Ready for Review
 **Created**: 2026-11-06
-**Last Updated**: 2026-11-06（requirements + plan + tasks + implement + review：smoke 43/43；final-path SC 7/7 pass；SC-009 pass（24 项失败在基线 aafbf5a8 复现）；SC-010 partial（未跑完整 driver dogfood）；`review.md` 落盘，code segment `not-evaluated`（评审早于最终提交；feature commit `2cb68c44` 已落盘）；当前 **Ready for Review**）
+**Last Updated**: 2026-11-22（requirements + plan + tasks + implement + review：smoke 43/43；final-path SC 7/7 pass；SC-009 pass（24 项失败在基线 aafbf5a8 复现）；SC-010 partial（未跑完整 driver dogfood）；`review.md` 落盘，code segment `not-evaluated`（评审早于最终提交；feature commit `2cb68c44` 已落盘）；当前 **Ready for Review**）
 
 ## Overview
 
@@ -17,12 +17,12 @@
 
 ## Latest Review
 
-尚未进入 review。requirements 阶段已完成：50 FR / 10 SC；runtime stack 5 行；无 clarification marker；scope、临时 Goal/Team、并发、worktree/集成队列、checkpoint、agent 清理与 maxTurns 500 均已落为可测条目。
+2026-11-22 implementation audit: stage-specialized roles, the default 24-agent cap, child worktrees, integration queues, and 500-turn role definitions remain. The original spec-local Temporary Goal/Team model has been superseded by 094/101: `spec` and `global` scope values are rejected, and current teams bind Anchor. `Ready for Review` remains the lifecycle status; the old spec-local text below is historical.
 
 ## Key Changes
 
-1. **Temporary Goal / Temporary Team 概念与 spec-local 存储**：`.specify/specs/<NNN-slug>/goal/goal.md` 与 `team/team.md`；Global Goal/Team 不变，`goal-definitions.md` 与 create-team 概念模型各增一节并互相引用。
-2. **Scope 解析**：`goal-utils.py resolve-scope` 成为 global/spec/auto 路径规则的唯一所有者；`/speckit.goal`、`/speckit.team`、`run-checks`、`sdd-route authorize`、create/run/improve/evidence 全部复用。
+1. **阶段并发与角色族**：保留阶段专用 coordinator / worker / verifier / integrator、默认 24 agent cap、500-turn budget、checkpoint 与配置提案。
+2. **当前归档与绑定**：原 spec-local Temporary Goal/Team 已由 094/101 的统一归档和 Anchor 绑定取代；退役的 `spec` / `global` scope 不再被接受。
 3. **SDD 阶段接入**：U0 记录并发度（默认 24）与临时 scope 字段；requirements U4 后建 Temporary Goal；clarify+plan U4 后建 Temporary Team；tasks/implement/review 按有效并发扩张 agent。
 4. **阶段专用 agent 角色语法**：coordinator / worker / verifier / integrator；用户点名 `sdd-requirement-analyzer`、`sdd-plan-coordinator`、`sdd-plan-executor`；数量与类型动态决定；删除泛化 `sdd-executor`。
 5. **每 agent worktree + 集成队列**：child line 携带 `parent_line_id`/`line_role=agent-write`，独立 worktree/branch/territory；`SPECIFY_AGENT_CONCURRENCY_CAP` 默认 24；集成顺序来自工作包声明。
@@ -64,4 +64,4 @@
 - **Blocked**: 任务关闭但至少一条 `final` 路径未 pass。
 - **Ready for Review**: `review.md` 流水线四段 + ARC 完成；ARC `accept`，final-path 7/7；code segment `not-evaluated`（评审早于最终提交；feature commit `2cb68c44` 已落盘）；当前状态。
 - **Completed**: 人工/治理最终验收。
-- **Planned / Implemented / Blocked / Ready for Review / Completed 的权威迁移表**归 `.specify/templates/feature-details-template.md` § Canonical Status State Machine；本文件不复述——当前 **Draft**。
+- **Ready for Review** (current): review 与 ARC 已完成，final-path 7/7 pass；SC-010 supporting partial 已披露。原 spec-local Temporary Goal/Team 设计由 094/101 接续，状态不回退。

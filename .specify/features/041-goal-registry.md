@@ -2,10 +2,10 @@
 
 **Feature ID**: 041  
 **Name**: Goal Registry  
-**Description**: Promote `goal` from a per-team field into a project-level first-class concept: an authored definition archive under `.specify/goal/`, referenced by teams via `goal_slug` instead of copied, consolidating requirement 036's goal-indexed summary delivery directory under the same single goal index.  
+**Description**: Original Goal registry, Targets, team bindings, and indexed summaries; its current successor is the Anchor model delivered by Features 094 and 101.
 **Status**: Implemented  
 **Created**: 2026-08-05  
-**Last Updated**: 2026-08-05 (implemented via /speckit.implement across 8 phases: 72/72 tasks closed, 0 deferred; verification.md records 17 SC pass / 1 partial (SC-016's after-ratification half needs a live human-gated coordinate run) / 0 fail; full suite 39 failed / 1480 passed / 1 skipped — zero new failures vs baseline; sync-mirrors --check exit 0; Constitution 12 Pass / 1 Partial unchanged)
+**Last Updated**: 2026-11-22 (implementation audit: current Anchor successor and two implementation residuals recorded)
 
 ## Overview
 
@@ -17,7 +17,9 @@ This Feature archives the goal **definition** (narrative + verifiable success cr
 
 ## Latest Review
 
-Not yet reviewed. Registered as Draft during `/speckit.clarify` for requirement 037 (2026-08-05), which resolved four decisions: new Feature (rather than binding into 027 Team Management), `/speckit.goal` as the sole authoring entry, host-CLI integration out of scope, and the `goal.md` + `summary/` in-directory layout. A second clarify pass the same day conformed the spec to `shared/definitions/goal-definitions.md` (the read-only concept authority): of 17 concept points, 8 already matched, 3 conflicted (four-state lifecycle, five-part composition, "different layers" wording implying a hierarchy the definitions deny) and 6 were missing (outcome-not-tasklist, per-goal singularity, unrestricted object, measured-by-degree, disjoint criteria authority, no structural link). A third pass added **multi-team coordination** (US5, FR-033…FR-042): the goal level now records a derived roster of participating teams and detects scope overlap between them, lifting the existing intra-team Territory Division discipline one level up. Needs `/speckit.plan` to settle: the definition file schema, the progress representation implied by measured-by-degree, the team-level `territory` field shape (path plus typed non-path entries) and its path-normalization rules, the two-level territory consistency check, the migration mechanics for 036's 37 referencing files, the Principle IX justification for the new command surface, and whether the coordination group is its own phase or its own requirement slice given the spec now carries 42 FR.
+2026-11-22 implementation audit: the original Goal archive, Targets, team binding, and summary behavior now have their current successor in `/speckit.anchor`, `anchor_slug`, and the `.specify/anchoring/<slug>/summary/` layout delivered by Features 094 and 101. `Implemented` remains the historical lifecycle status. Two current implementation conflicts are recorded rather than silently repaired: create still permits zero success criteria although the Anchor definition requires at least one, and create does not write the declared binding record. Their owner is the 101/094 implementation flow.
+
+Historical review — not yet reviewed at the original registration. Registered as Draft during `/speckit.clarify` for requirement 037 (2026-08-05), which resolved four decisions: new Feature (rather than binding into 027 Team Management), `/speckit.goal` as the sole authoring entry, host-CLI integration out of scope, and the `goal.md` + `summary/` in-directory layout. A second clarify pass the same day conformed the spec to `shared/definitions/goal-definitions.md` (the read-only concept authority): of 17 concept points, 8 already matched, 3 conflicted (four-state lifecycle, five-part composition, "different layers" wording implying a hierarchy the definitions deny) and 6 were missing (outcome-not-tasklist, per-goal singularity, unrestricted object, measured-by-degree, disjoint criteria authority, no structural link). A third pass added **multi-team coordination** (US5, FR-033…FR-042): the goal level now records a derived roster of participating teams and detects scope overlap between them, lifting the existing intra-team Territory Division discipline one level up. Needs `/speckit.plan` to settle: the definition file schema, the progress representation implied by measured-by-degree, the team-level `territory` field shape (path plus typed non-path entries) and its path-normalization rules, the two-level territory consistency check, the migration mechanics for 036's 37 referencing files, the Principle IX justification for the new command surface, and whether the coordination group is its own phase or its own requirement slice given the spec now carries 42 FR.
 
 **038-goal-target planned (2026-08-11)**: the Target decomposition extension — a run-assignable scope-slice sub-concept under Goal — passed `/speckit.plan` with Constitution 13/13 Pass (no Complexity Tracking entries). Design artifacts: `plan.md` + `data-model.md` + 3 contracts (targets-engine / run-target-assignment / target-ref-ledger) + `quickstart.md` + `feature-ref.md` under `.specify/specs/038-goal-target/`. It extends this Feature's implemented surface in place (goal-utils `targets` action group, `/speckit.team` run `--target` parameter, `items.jsonl` optional `target_ref` + slice-axis rollup) with zero new commands, skills, or script files; the binding axis (team ↔ Goal, static) and all GI invariants are preserved. Status stays `Implemented` for the 037 surface; the 038 slice advances through tasks → implement.
 
@@ -58,8 +60,8 @@ Not yet reviewed. Registered as Draft during `/speckit.clarify` for requirement 
 - Feature Detail: .specify/features/041-goal-registry.md
 - Concept authority (read-only for this Feature): shared/definitions/goal-definitions.md (mirrored to .specify/shared/definitions/) — defines the Goal concept, its boundary against Requirement, criteria authority, singularity, and the Goal–Team binding; this Feature owns the file layout inside `<goal-slug>/`, which that document explicitly delegates.
 - Bound requirement: .specify/specs/037-goal-registry/requirements.md
-- Upstream aggregation mechanism (Feature 027 / requirement 036): .specify/specs/036-team-summary/requirements.md, skills/create-team/references/summary-mapping.md
-- Generator to migrate: skills/create-team/scripts/build-summary-input.py
+- Upstream aggregation mechanism (Feature 027 / requirement 036): .specify/specs/036-team-summary/requirements.md, skills/internal/create-team/references/summary-mapping.md
+- Generator to migrate: skills/internal/create-team/scripts/build-summary-input.py
 
 ## Status Tracking
 

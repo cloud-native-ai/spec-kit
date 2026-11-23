@@ -5,7 +5,7 @@
 **Description**: 把 sdd-loop-driver 与 sdd-project-setup 各自内联的「驱动子代理」机制按 057 技能化分解方法上收为框架级公用机制——以 Agent 三层分类法（Template→Instance→Execution）为骨架深化层界语义，增强 create-agent/improve-agent/run-agent 三技能承接面，两技能改为委派三技能完成驱动子代理任务，内联副本坍缩为引用  
 **Status**: Implemented  
 **Created**: 2026-10-16  
-**Last Updated**: 2026-10-16
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -17,13 +17,21 @@ sdd-loop-driver 与 sdd-project-setup 都涉及"驱动子代理"调用 speckit �
 
 三技能承接面：create-agent（创建+生命周期）、run-agent（派发+前置检查+处置链）、improve-agent（执行证据回流）；两技能（sdd-loop-driver / sdd-project-setup）保留各自编排本体（六阶段循环 / 调协五步），机制段按 057 行为平价搬家清零。
 
+## Latest Review
+
+2026-11-22 implementation audit: the current delivery uses stage-specific SDD role families rather than only the early generic `sdd-executor` shape. Three-layer Agent wiring, dual-topology configuration, five preflight families, external dispatch, and per-dispatch quantification are present; driver and setup retain orchestration while delegating create/run/improve operations.
+
 ## Key Changes
 
-- （Draft 阶段，暂无实现变更——本节自 implement 起记录）
+1. Deepen Agent Template → Instance → Execution boundaries and stage-specific role families.
+2. Route creation, refinement, and dispatch through create-agent, improve-agent, and run-agent.
+3. Share dual-topology execution configuration, five preflight families, external-dispatch governance, and quant collection.
+4. Keep SDD loop and project-setup orchestration in their owning skills while collapsing duplicated dispatch guidance to references.
 
 ## Implementation Notes
 
-- （Draft 阶段，暂无）
+- Current sources include `shared/definitions/agent-definitions.md`, `skills/internal/run-agent/`, `agents/sdd-*.agent.md`, and `scripts/python/execution-config.py`.
+- The earlier generic-executor and Draft placeholders are historical; the current role family and dispatch contract are authoritative.
 
 ## Related Files
 
@@ -40,5 +48,5 @@ sdd-loop-driver 与 sdd-project-setup 都涉及"驱动子代理"调用 speckit �
 ## Status Tracking
 
 - **Draft**: requirement 060 已澄清（4 问全答，validator exit 0，22 定义行），注册行与本详情文件已落册（2026-10-16，clarify 会话顺延登记）。
-- **Planned**: (current) plan.md + Phase 1 产物落盘（2026-10-16，/speckit.plan）——data-model 6 实体 + 13 校验规则 / contracts ×3（条款计数以 clause_extract 派生为准，本文件不复写）+ 义务平价映射 P 表 / quickstart 5 场景（3 实跑基线 + 2 免责→T034..T036 实跑承载）/ feature-ref FR16+SC6 全映射 + 14 项交付清单；宪法 16 项 = 15 Pass + IV Partial 依 VII template-only 门正当化（Complexity Tracking 已填），同作者门委派 fresh-context 评分者 16/16 判定一致；基线实测：sync-mirrors 五对全 ok（既有漂移 1 条 instructions-template 不属本面）、compile-embeds 73 units 零漂移、副本归零检索基线已冻结（判据成组共现 + 框架源侧 scope）。
+- **Planned**: plan.md + Phase 1 产物落盘（2026-10-16，/speckit.plan）——data-model 6 实体 + 13 校验规则 / contracts ×3（条款计数以 clause_extract 派生为准，本文件不复写）+ 义务平价映射 P 表 / quickstart 5 场景（3 实跑基线 + 2 免责→T034..T036 实跑承载）/ feature-ref FR16+SC6 全映射 + 14 项交付清单；宪法 16 项 = 15 Pass + IV Partial 依 VII template-only 门正当化（Complexity Tracking 已填），同作者门委派 fresh-context 评分者 16/16 判定一致；基线实测：sync-mirrors 五对全 ok（既有漂移 1 条 instructions-template 不属本面）、compile-embeds 73 units 零漂移、副本归零检索基线已冻结（判据成组共现 + 框架源侧 scope）。
 - **Implemented**: (current) implement run 2026-10-17——36/36 任务 [X] 零 deferred；8 相位提交（b4222e6b → 9c1daa72）；交付=真源深化 / sdd-executor 模板+双实例 / 三技能增强 / dispatch-preflight.md 上收 / 两技能坍缩引用+委派节 / P 表填实 / docs 归属说明；SC-001..006 全 pass（SC-002/004 真实派发实跑：qodercli 1.1.72 本地拓扑，沙箱完成 /speckit.constitution——哨兵+产物+诚实 ANOMALY+反嵌套审计零命中）；GATE-1..5 全绿；披露：instructions-template DIFF 收敛、钉住测试蓄意更新 8 处、他會話並行改動未納入。任务面（tasks.md 2026-10-16 /speckit.tasks 生成；2026-10-17 /speckit.analyze 17 项发现全部按建议应用——H-01 写目标改框架源侧、H-02 新增 T034..T036 实跑承载、H-04 nohup 权威落点裁定 loop-driver 保留差异段、C-01/C-02 计数去重与表头递增、其余 M/L 项见注册表行 remediation 记录）。

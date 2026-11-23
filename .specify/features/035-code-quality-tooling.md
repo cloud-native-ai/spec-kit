@@ -5,21 +5,22 @@
 **Description**: Python linting, formatting, and type checking configuration for consistent codebase maintenance.  
 **Status**: Draft  
 **Created**: 2026-07-22  
-**Last Updated**: 2026-07-22
+**Last Updated**: 2026-11-22
 
 ## Overview
 
-The project has no linter, formatter, or type checker configuration in `pyproject.toml` or any other config file. For a Python project with a growing codebase (`src/specify_cli/`, `scripts/python/`, `tests/`), automated code quality tooling prevents style drift, catches common bugs early, and reduces review friction. The modern Python ecosystem standard is `ruff` (linting + formatting) and optionally `mypy` or `pyright` for type checking.
+The project now has a development-only Ruff gate over `src`, `scripts`, and `skills`, targeted at Python 3.8 and limited to the S602/S604/S605 shell-security rules. Contract tests prove both that the current tree passes and that seeded violations are rejected. Formatting, mypy/pyright type checking, canonical-runner integration, and CI enforcement remain undelivered.
 
 ## Latest Review
 
-Gap identified during full-registry feature reconcile: no linter/formatter config found in `pyproject.toml`; no `.flake8`, `.pylintrc`, `ruff.toml`, or `mypy.ini` present.
+2026-11-22 implementation audit: the earlier “no linter configuration” premise is false. The delivered scope is a local security lint gate, not the full linting/formatting/type-checking feature. `Draft` is retained for the remaining scope and no CI claim is made because Feature 034 still has no workflow implementation.
 
 ## Key Changes
 
-1. Add `ruff` configuration (linting + formatting) to `pyproject.toml`.
-2. Optionally add `mypy` or `pyright` for type checking on `src/specify_cli/`.
-3. Integrate with CI/CD pipeline (feature 034) as a quality gate.
+1. Delivered: add dev-only Ruff configuration and the three-rule shell-security gate to `pyproject.toml`.
+2. Delivered: add positive and seeded-negative contract coverage in `tests/contract/test_lint_gate.py`.
+3. Remaining: decide and implement formatting and type-checking scope.
+4. Remaining: integrate the quality gate with the canonical runner and a real CI pipeline.
 
 ## Implementation Notes
 

@@ -5,7 +5,7 @@
 **Description**: 推导式架构生成:`/speckit.derive` 强制联网核实权威来源,提取其思维方式为可复用的思维算子,在可校验的完整性规则下构建推导链,逐步推导出每个元素都可溯源的完整架构;前提耗尽处记为未决问题而非静默填空。  
 **Status**: Implemented  
 **Created**: 2026-09-05  
-**Last Updated**: 2026-09-05
+**Last Updated**: 2026-11-22
 
 ## Overview
 
@@ -15,11 +15,11 @@
 
 ## Latest Review
 
-(尚无评审记录)
+2026-11-22 implementation audit: `/speckit.derive`, the six-action engine, operator library, single link-probe transport seam, and `derived-from` integrity checks are present. The current model has six record schemas and A1–A16, including Criterion and Decision Point records.
 
 ## Key Changes
 
-1. 新概念锚 `shared/definitions/derivation-definitions.md`:四套记录 schema(Source / Reasoning Move / Derivation Step / Architecture Element)、四级溯源等级、链完整性规则 C1–C7、自审集 A1–A14、封闭的禁用论证字面量集、能力降级规则,以及与 Research / Plan 的边界表
+1. 新概念锚 `shared/definitions/derivation-definitions.md`:六套记录 schema(Source / Reasoning Move / Derivation Step / Architecture Element / Criterion / Decision Point)、四级溯源等级、链完整性规则、自审集 A1–A16、封闭的禁用论证字面量集、能力降级规则,以及与 Research / Plan 的边界表
 2. 新命令 `templates/commands/derive.md`:复杂命令(带 `## Feedback` + `## Documentation`),全程自动执行 + 执行报告(产物可逆,零确认门控)
 3. 新引擎 `scripts/python/derive-utils.py`(stdlib-only,六 action:init / validate / moves-list / moves-add / probe-links / stats),承担身份发放、结构校验、去重、链接探活与计数;语义判断留在 agent
 4. 新顶层存储根 `.specify/derive/`:`moves.md`(项目级累积算子库,引擎独写)+ `<topic-slug>/derive.md`(每主题推导档案),均 git 跟踪——算子不可重新推导,丢失即丢失累积的推理资本
