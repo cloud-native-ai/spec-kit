@@ -31,7 +31,7 @@ The no-argument section MUST describe the current sequence — list existing age
 
 **C-29** `command-and-skills.md` becomes three-capability.
 
-`docs/reference/agents/command-and-skills.md` MUST: describe the command as create / refine / run; state that the single-agent work is done by **three** skills; carry a run row in its intent-routing table; cover run in its routing flow; and add a `run-agent` section that describes resolve → present → dispatch → external collect → report **by pointer to its output contract**, without copying rule text. `[[STR-006]]`-class two-capability statements and `[[STR-005]]` MUST appear 0 times. (FR-019, SC-004)
+`docs/reference/agents/command-and-skills.md` MUST: describe the command as create / refine / run; state that the single-agent work is done by **three** skills; carry a run row in its intent-routing table; cover run in its routing flow; and add a `run-agent` section that describes resolve → present → dispatch → external collect → report **by pointer to its output contract**, without copying rule text. The two-capability statement class is a closed member set of exactly two forms, and both MUST appear 0 times: `[[STR-006]]` verbatim and its measured bold variant `creates or refines **one** agent` (measured once at `command-and-skills.md:11` on 2026-11-24; the bold markers are part of the literal). `[[STR-005]]` MUST appear 0 times. (FR-019, SC-004)
 
 **C-30** `overview.md` gains run and the third skill.
 
@@ -57,6 +57,7 @@ Measured baselines (2026-11-24) and the required after-state across the seven na
 |-----------|----------------|-------|
 | `[[STR-005]]` | 4 (commands ref 2, command-and-skills 1, routing scenario 1) | 0 |
 | `[[STR-006]]` | 2 (commands ref 2) | 0 |
+| `creates or refines **one** agent` (bold variant of `[[STR-006]]`, measured) | 1 (command-and-skills) | 0 |
 | `[[STR-007]]` | 2 (installation 1, quickstart 1) | 0 |
 | `[[STR-008]]` | 2 (commands ref 2) | 0 |
 | case-insensitive `generate role-based agents` | commands ref, quickstart, installation | 0 |

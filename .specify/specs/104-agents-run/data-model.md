@@ -18,7 +18,7 @@ This model names the objects the run intent produces or consumes. It **adds no e
 | `task_text` | The remainder | Optional at parse; required before dispatch |
 | `parse_outcome` | Closed outcome set | `explicit-run` / `missing-agent-name` / `team-intent` / `empty` / `ambiguous` / `create` / `refine` / `unsupported` |
 
-**Rules**: an explicit verb wins over context inference (FR-002); `team-intent` never routes to run — it reports the `/speckit.team` redirect; `empty` executes the no-argument listing behaviour; `ambiguous` reports three capabilities (create / refine / run) and requests the intent; `--target` inside a run request is a team parameter and is reported as a mode/parameter conflict, never silently dropped (Edge Cases).
+**Rules**: an explicit verb wins over context inference (FR-002); `team-intent` never routes to run — it reports the `/speckit.team` redirect; `empty` executes the no-argument listing behaviour; `ambiguous` reports three capabilities (create / refine / run) and requests the intent; a team-command option in a run request is reported with the named sentence `team parameter not accepted by run: <option>` plus the `/speckit.team` redirect, never silently dropped — the team-option class is closed by reference to `templates/commands/team.md` (measured members 2026-11-24: `--target`, `--scope`, `--spec-dir`), and any unlisted `--` option in option position follows the same conflict rule (Edge Cases).
 
 ## E2 — Agent Resolution Result（定义解析结果）
 

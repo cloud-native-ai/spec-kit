@@ -1,0 +1,62 @@
+# Analyze Repair Round — 104-agents-run (2026-11-24)
+
+- Stage: analyze-repair (text-level repair of `/speckit.analyze` Round 1 findings)
+- Base: `0412749af` (checklist closeout); Round 1 report: `test-evidence/analyze-report.md`
+- Scope: 2 HIGH + 4 MEDIUM, text-level only; no implementation, no new mechanism
+- Category quadruple: flow_class=execution; source=declaration; marker=; error=-
+
+## Dispositions
+
+### F-01 (HIGH, closed-set containment claim) — repaired
+- `requirements.md` SC-005: 比较单元 = `git diff <base>..HEAD --name-status` 输出**限定到五类产品面根**（命令模板 `templates/commands/`；技能 `skills/internal/`；文档 `docs/reference/commands/` + `docs/reference/agents/` + `docs/tutorials/`；测试 `tests/`；再生成镜像与工具命令副本 `.claude/commands/speckit.agents*` / `.github/prompts/speckit.agents*` / `.qoder/commands/speckit.agents*` / `.opencode/command/speckit.agents*` / `.specify/skills/internal/run-agent/**`）。
+- 流程 / 证据 / 登记路径显式声明在比较单元之外、MUST NOT 被补集断言检查（`.specify/specs/104-agents-run/**` 含 `verification.md` / `notes/**` / `test-evidence/**` / `checklists/**` / `coverage-baseline.txt`、`.specify/features.md`、`.specify/features/019-agents-command.md`、`.specify/memory/**`、`.specify/state/**`）；补集断言限于比较单元内。
+- `tasks.md` T014 / T029: 复用的 diff 措辞同步限定到 SC-005 五根，并声明流程/证据/登记路径不进入补集断言。
+
+### C-01 (HIGH, zero-occurrence class predicate) — repaired
+- `contracts/agents-run-docs.contract.md` C-29: 两能力陈述类封闭为**恰两形**——`[[STR-006]]` 原文与实测粗体变体 `creates or refines **one** agent`（2026-11-24 实测 1 次于 `command-and-skills.md:11`；粗体标记属于字面量），两者 MUST 0 次；`[[STR-005]]` 仍 MUST 0 次。
+- C-34 谓词表新增一行：`creates or refines **one** agent` | Before 1 (command-and-skills) | After 0。
+- `requirements.md` FR-019 对齐同一两形封闭成员集，删去无成员枚举的「一类」措辞。
+- `tasks.md` 中四处依赖「八条」行数的表述改为「C-34 全表」（T001 / US4 Independent Test / T016 / T023），不再在任务文本复制谓词行数。
+- `research.md` B-05 已含粗体实测形，无需改动（未触碰）。
+- 测试钉住留给 implement 的 `tests/contract/test_agents_run_docs_contract.py`（T016 红先 / T018 编辑）。
+
+### B-01 (MEDIUM, team parameter ambiguity) — repaired
+- `requirements.md` § Edge Cases: 团队参数类 = `/speckit.team` 声明的命令选项（owner `templates/commands/team.md`；2026-11-24 实测封闭成员 `--target` / `--scope` / `--spec-dir`）；具名响应句 `team parameter not accepted by run: <option>`（固定字面段 + 原样选项 token）+ `/speckit.team` 归属指引；未列入的 `--` 选项（含未来新增团队选项）统一走同一冲突规则。
+- `data-model.md` E1 Rules: 同步封闭类引用与具名响应句（plan-owned，minor）。
+- `tasks.md` T013: 增加 run-agent 文本的选项处置义务（团队参数封闭集 + 未列入 `--` 选项 → 具名冲突句），作为该规则的 implement 载体。
+
+### E-01 (MEDIUM, FR-023 coverage 13/24) — repaired
+- `requirements.md` FR-023: 新增分类默认规则——两份清单之外的 FR 默认按制品类文本钉住（逐条给出 9 条未分类 FR 的文本/结构面），除非另行具名；该默认 MUST NOT 把运行期行为声称为被契约测试覆盖。
+- 具名例外 FR-024：取证路线 = 唯一入口测试执行记录（`scripts/bash/run-tests.sh` 退出码 + 名字级失败基线差分，落 SC-007 / T032），既非制品类文本断言、也非行为类演练。
+
+### F-02 (MEDIUM, blind gate GATE-8) — repaired
+- `tasks.md` GATE-8: 改为指向 `tests/contract/test_agents_run_docs_contract.py`（C-34 全表逐行断言的完整检查；谓词表唯一 owner 为 docs 契约 C-34，GATE 不复述谓词集），并明令 MUST NOT 以任何子集 grep 的绿色冒充零集证据。
+
+### G-01 (MEDIUM, feature stage record) — repaired
+- `.specify/features.md` 019 行 Last Updated 单元格: 追加 checklist 阶段注记（40 项 / 7 维；requirements 阶段清单未覆盖；状态保持 `Implemented`）。
+- `.specify/features/019-agents-command.md` § Latest Review: 新增 checklist 条目（E3 `test-evidence/checklist.jsonl`、`validate-requirements.py` 读数、无状态迁移权）。
+- 状态未改（`Implemented`）；未新增 Feature 行。
+
+## PLAN-EDIT declarations (plan-owned, minor)
+
+- `PLAN-EDIT: contracts/agents-run-docs.contract.md` — C-29 具名实测粗体字面量并新增 C-34 谓词行（C-01 修复）；仅谓词封闭集精度补全，不改条款语义；分类=minor
+- `PLAN-EDIT: data-model.md` — E1 Rules 将开放的「`--target` 例示」补为团队选项封闭类引用 + 具名冲突响应句（B-01 修复）；行级规则精度补全，实体 / 字段 / 不变式不变；分类=minor
+
+## Gates (post-repair readings)
+
+| Gate | Command | rc | Summary |
+|---|---|---|---|
+| G-REQ | `python3 .specify/scripts/python/validate-requirements.py .specify/specs/104-agents-run/requirements.md` | 0 | status ok；0 error / 0 warning；281 行 / 31 definition rows / 8 shared strings |
+| G-TASKS | `python3 .specify/scripts/python/validate-tasks.py .specify/specs/104-agents-run/tasks.md` | 0 | PASS (with warnings)；0 error / 1 warning——`green-cross-phase` C-10(T009) vs C-06(T017)，即既有已裁定例外，未新增 |
+| G-PRE-PLAN | `python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/104-agents-run --stage plan --repo .` | 0 | decision=pass；errors=0 / advisories=57（全部为既有 advisory：五支新测试待 implement 创建 + data-model INV 命名空间引用） |
+| G-PRE-TASKS | 同引擎 `--stage tasks` | 0 | decision=pass；errors=0 / advisories=57（同上） |
+| G-COV (extra, read-only) | `python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/104-agents-run` | 0 | status ok；claimed clauses 35；FR 24/24；0 beyond baseline；既有 `clause-unparsable (108)` 语料级告警不变 |
+
+## Commit
+
+- 本修复轮单提交（哈希见阶段回传）：requirements.md / tasks.md / contracts/agents-run-docs.contract.md / data-model.md / .specify/features.md / .specify/features/019-agents-command.md / 本文件。
+- 未提交且未还原：既有脏文件 `.specify/skills/coaching-skills/**`；analyze 阶段自身产物（`test-evidence/analyze-report.md`、`analyze.jsonl`、`analyze-findings.jsonl`、`journal.md`）与未跟踪的 memory 记录。
+
+## Anomalies
+
+未发现异常。

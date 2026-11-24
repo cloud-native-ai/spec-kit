@@ -137,7 +137,7 @@
 
 ### Edge Cases
 
-- **`run` 携带团队参数**（如 `--target`）：报告「该参数属于 /speckit.team」并请求澄清，不静默丢弃、不把 run 改写成团队运行。
+- **`run` 携带团队参数**（团队参数类 = `/speckit.team` 声明的命令选项，owner `templates/commands/team.md`；2026-11-24 实测封闭成员集：`--target`、`--scope`、`--spec-dir`）：MUST 输出具名冲突句 `team parameter not accepted by run: <option>`（固定字面段 `team parameter not accepted by run:`，`<option>` 为原样选项 token）并请求澄清、点名 `/speckit.team` 为归属命令；不静默丢弃、不把 run 改写成团队运行。**未列入的 `--` 选项**（含未来新增的团队选项）统一走同一冲突规则，不猜测归属；任务文本按既有规则不被解析为选项（与本条不冲突）。
 - **同一 agent 被连续 run 且前一个仍在运行**：允许；各自独立执行与 label；旧尝试的迟到返回按既有归因规则不消费。
 - **双角色执行体调用 run**：它在父边仍是 subagent、在新边成为 superagent；上行职责不减，返回父边时仍须五要素回传。
 - **virtual 模式（宿主无子代理能力）**：单次委派可 virtual 执行，但仍须呈现角色关系与完整回传；virtual MUST NOT 被当作并发载体，MUST NOT 承载 SDD 运行。
@@ -181,14 +181,14 @@
 #### D. 文档与发现性
 
 - **FR-018**: `docs/reference/commands/agents.md` MUST 合并为**单份正文**（前提纠正 P-1：当前 `^# /speckit.agents` 计数为 3），并同步：描述行从 [[STR-006]] 更正为三能力；Syntax 块加入显式 run；意图表加入 run 行；技能清单列出 run / create / refine 三技能；无参行为更正为列举 + 建议（删除 [[STR-008]] 一类「无参生成七个角色代理」的陈述）；`capabilities (create / refine)`（[[STR-005]]）不再出现。
-- **FR-019**: `docs/reference/agents/command-and-skills.md` MUST 同步为三能力：描述句不再写「creates or refines one agent」一类只含两能力的陈述；意图路由表加入 run 行；路由流覆盖 run；单代理技能清单由两个扩为三个，并为 `run-agent` 增加一节（解析 → 呈现 → 派发 → external 收集 → 报告，按指针引用其输出契约，不复制规则）。
+- **FR-019**: `docs/reference/agents/command-and-skills.md` MUST 同步为三能力：描述句 MUST 不再出现 [[STR-006]] 及其具名粗体变体 `creates or refines **one** agent`（两能力陈述的封闭成员集恰为此两形；粗体变体 2026-11-24 实测于该文件 L11，零出现断言见 `contracts/agents-run-docs.contract.md` C-29 / C-34）；意图路由表加入 run 行；路由流覆盖 run；单代理技能清单由两个扩为三个，并为 `run-agent` 增加一节（解析 → 呈现 → 派发 → external 收集 → 报告，按指针引用其输出契约，不复制规则）。
 - **FR-020**: 同批同步其余能力枚举面（封闭清单：`docs/reference/agents/overview.md`、`docs/reference/agents/design.md`、`docs/tutorials/installation.md`、`docs/tutorials/quickstart.md`，2026-11-24 扫描固定；另按本条程序于同阶段补入 `tests/scenarios/agents-command/single-entry-routing-scenario.md`，其 `create / refine one agent` 能力范围与路由样例 MUST 更新为三能力并含显式 run，该路径已在 SC-005 的 `tests/**` 允许集内）：overview / design 的能力陈述 MUST 含 run，且技能计数陈述（如 overview 的「两个单 Agent 技能」）MUST 更新为三技能；installation / quickstart 的命令表行 MUST 含 run，且其中的陈旧无参陈述（[[STR-007]] 及同句式变体）MUST 被更正为与当前模板一致；`docs/reference/history/` 的 dated record MUST NOT 被改写。README 当前无 `/speckit.agents` 能力枚举行（2026-11-24 扫描 0 命中），不在本清单；若 plan 阶段扫描发现新增枚举面，MUST 先把其路径并入本 FR 的清单并同步 SC-005 允许集，再编辑。
 - **FR-021**: 本特性 MUST NOT 新增 glossary 词条；`Super Agent`、`Agent Execution`、`role-transition` 等术语 MUST 按既有词条与 owner 引用，MUST NOT 新造同义词或为 `run` 建立项目域定义。
 
 #### E. 质量与测试
 
 - **FR-022**: 契约测试 MUST 机械固定：① 模板 frontmatter `argument-hint`、意图表 run 行与三技能路径；② 技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件与快速失败注入的**指针**（不得复制 owner 规则文本）；③ 命名文档的单副本计数、run 出现与陈旧字面量计数为 0；④ 无新增持久化根/registry/渲染器；⑤ 变更源面与其运行时镜像字节一致（重生成后）。既有守卫（`test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面）MUST 相对 implement 入口的名字级失败基线不得新增失败；基线既有红 MUST 逐条点名（相对判据，不要求「全绿」）。
-- **FR-023**: 行为类条款（FR-007 呈现披露、FR-008 载荷内容、FR-010 回传完整性、FR-011 运行期 label 唯一性、FR-016 探针条件的执行、FR-017 读数记录）MUST 在 plan / contracts 中被逐条标注为行为类，并以真源文本 + 评审 + 变异演练取证；MUST NOT 声称其由契约测试「覆盖」。制品类条款（FR-001 / FR-003 / FR-004 / FR-018 / FR-019 / FR-020 / FR-022）由契约测试机械断言。
+- **FR-023**: 行为类条款（FR-007 呈现披露、FR-008 载荷内容、FR-010 回传完整性、FR-011 运行期 label 唯一性、FR-016 探针条件的执行、FR-017 读数记录）MUST 在 plan / contracts 中被逐条标注为行为类，并以真源文本 + 评审 + 变异演练取证；MUST NOT 声称其由契约测试「覆盖」。制品类条款（FR-001 / FR-003 / FR-004 / FR-018 / FR-019 / FR-020 / FR-022）由契约测试机械断言。**分类默认规则**：两份清单之外的 FR 默认按制品类文本钉住——断言其文本 / 结构面（FR-002 路由样例文本、FR-005 解析规则文本、FR-006 角色边文本、FR-009 载荷自检项文本、FR-012 可见性指针、FR-013 隔离规则文本、FR-014 单代理文本、FR-015 零新增结构面、FR-021 glossary 零新增面），除非本条或其它条款另行具名；该默认 MUST NOT 把任何条目的运行期行为声称为被契约测试覆盖。**具名例外 FR-024**：取证路线 = 唯一入口测试执行记录（`scripts/bash/run-tests.sh` 的退出码与名字级失败基线差分，落 SC-007 / T032），既非制品类文本断言、也非行为类演练。
 - **FR-024**: 新增测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 一次执行并退出 0；既有相关测试 MUST 相对 implement 入口的名字级失败基线零新增失败（基线既有红逐条点名，不声称全绿）；MUST NOT 直接调用解释器级测试命令。
 
 ### Key Entities *(include if requirement involves data)*
@@ -225,7 +225,7 @@
 - **SC-002**: 同一 parent 下两次 run 产生两条独立边：以同一父身份与两个不同 child label 的夹具运行只读角色判定引擎，报告 2 条子代边、深度 1、无违例；label 重用/重试按新尝试处理、旧产物保留、迟到返回不被消费；把两次派发压成同一 label 或消费旧返回时测试转红 **Path**: final
 - **SC-003**: 派发面接线契约在位：技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件、快速失败注入与反嵌套红线的指针；删除任一项时对应契约检查转红；既有守卫 `test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面相对 implement 入口基线零新增名字级失败（基线既有红逐条点名） **Path**: supporting
 - **SC-004**: 文档同源：`docs/reference/commands/agents.md` 的 `^# /speckit.agents` 计数 = 1（改前 3）；run 语法与 run 意图行在该文件出现；[[STR-005]] / [[STR-006]] / [[STR-007]] / [[STR-008]] 在命名文件中的实时出现数为 0；`docs/reference/agents/command-and-skills.md` 的能力集为三项且含 `run-agent` 小节；overview / design 的能力单行与教程命令表行含 run **Path**: supporting
-- **SC-005**: 零第二机制与变更集包含性：基线参照物 = implement 阶段提交的父提交；比较单元 = `git diff <base>..HEAD --name-status` 的路径集，按产物类分组（命令模板 / 技能 / 文档 / 测试 / 再生成的镜像与工具命令副本）；允许差异集由被编辑源面的扇出闭包机械导出并由测试逐类断言（`templates/commands/agents.md`、`skills/internal/run-agent/**`、FR-018 / FR-019 / FR-020 点名的文档、`tests/**`，以及 `sync-mirrors.py` / `regen-command-copies.py` 的再生成产物；FR-020 于 2026-11-24 plan 阶段补入的 `tests/scenarios/agents-command/single-entry-routing-scenario.md` 本来就在 `tests/**` 内，允许集无需扩增）；补集侧断言该区间不出现上列之外的路径；集合内断言无新增持久化根 / registry / 渲染器 / 调度器；镜像与源逐字节一致 **Path**: supporting
+- **SC-005**: 零第二机制与变更集包含性：基线参照物 = implement 阶段提交的父提交；**比较单元** = `git diff <base>..HEAD --name-status` 输出限定到五类产品面根之后的路径集，按产物类分组（① 命令模板 `templates/commands/`；② 技能 `skills/internal/`；③ 文档 `docs/reference/commands/`、`docs/reference/agents/`、`docs/tutorials/`；④ 测试 `tests/`；⑤ 再生成的镜像与工具命令副本 `.claude/commands/speckit.agents*`、`.github/prompts/speckit.agents*`、`.qoder/commands/speckit.agents*`、`.opencode/command/speckit.agents*`、`.specify/skills/internal/run-agent/**`）；**流程 / 证据 / 登记路径在比较单元之外、MUST NOT 被补集断言检查**：`.specify/specs/104-agents-run/**`（含 `verification.md`、`notes/**`、`test-evidence/**`、`checklists/**`、`coverage-baseline.txt`）、`.specify/features.md`、`.specify/features/019-agents-command.md`、`.specify/memory/**`、`.specify/state/**`；允许差异集由被编辑源面的扇出闭包机械导出并由测试逐类断言（`templates/commands/agents.md`、`skills/internal/run-agent/**`、FR-018 / FR-019 / FR-020 点名的文档、`tests/**`，以及 `sync-mirrors.py` / `regen-command-copies.py` 的再生成产物；FR-020 于 2026-11-24 plan 阶段补入的 `tests/scenarios/agents-command/single-entry-routing-scenario.md` 本来就在 `tests/**` 内，允许集无需扩增）；**补集侧断言限于比较单元内**——该区间在五类产品面根内不出现上列之外的路径；集合内断言无新增持久化根 / registry / 渲染器 / 调度器；镜像与源逐字节一致 **Path**: supporting
 - **SC-006**: 变异演练 4/4：删除 `argument-hint` → 模板契约转红；删除 run 意图行 → 模板契约转红；删除七字段下行指针 → 技能契约转红；复制出第二份命令参考正文 → 文档契约转红；逐项复原后转绿；演练读数记录到 `test-evidence/` **Path**: supporting
 - **SC-007**: 新增测试经 `scripts/bash/run-tests.sh` 一次执行退出 0；既有相关测试相对 implement 入口的名字级失败基线零新增失败；基线既有红逐条点名、不声称全绿 **Path**: supporting
 
