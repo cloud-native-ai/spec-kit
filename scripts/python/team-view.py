@@ -15,7 +15,8 @@ Usage:
 
 Exit codes:
   0  rendering produced (single team, overview, empty archive, dangling binding)
-  2  input error (undeclared option, invalid --scope, extra positional, no-slug --scope auto)
+  2  input error (undeclared option, invalid --scope, extra positional, no-slug --scope auto,
+     no-slug --spec-dir)
   3  team not found (single mode)
   4  definition corrupt (single mode: team.md missing, unreadable or unparseable)
   5  rendered, but a required fact group is unreadable because an engine read failed
@@ -702,10 +703,16 @@ def _max_mtime_iso(paths) -> str:
 # --------------------------------------------------------------------------- #
 # Engine composition (C-25): the three declared reads only, never a write action
 # --------------------------------------------------------------------------- #
-def engine_read(repo_root: Path, *args):
-    """Run one declared read of the sibling ``goal-utils.py`` engine."""
+def engine_read(repo_root: Path, *args, spec_dir=None):
+    """Run one declared read of the sibling ``goal-utils.py`` engine.
+
+    ``spec_dir`` is forwarded verbatim; the engine owns whether the value is
+    servable (`spec-dir-unresolvable` is its refusal), so no rule is duplicated here.
+    """
     script = Path(__file__).resolve().parent / "goal-utils.py"
     command = [sys.executable, str(script), *args, "--json", "--repo-root", str(repo_root)]
+    if spec_dir is not None:
+        command.extend(["--spec-dir", str(spec_dir)])
     try:
         proc = subprocess.run(command, capture_output=True, text=True, timeout=120)
     except OSError as exc:
@@ -722,9 +729,10 @@ def engine_read(repo_root: Path, *args):
     return proc.returncode, payload, note
 
 
-def read_binding(repo_root: Path, slug: str):
+def read_binding(repo_root: Path, slug: str, spec_dir=None):
     """E2 binding: engine answer only, never parsed from the definition file."""
-    code, payload, note = engine_read(repo_root, "binding", "team", slug)
+    code, payload, note = engine_read(
+        repo_root, "binding", "team", slug, spec_dir=spec_dir)
     if code == 0 and isinstance(payload, dict):
         return {
             "owner": _text(payload.get("owner")),
@@ -1016,7 +1024,7 @@ def build_latest(persistence: dict) -> dict:
     }
 
 
-def assemble_single(repo_root: Path, slug: str) -> dict:
+def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
     """One extraction shared by the default rendering and the ``--json`` envelope."""
     team_dir = repo_root / ".specify" / "teams" / slug
     if not team_dir.is_dir():
@@ -1035,7 +1043,7 @@ def assemble_single(repo_root: Path, slug: str) -> dict:
             "reason": problems.get("frontmatter") or problems.get("slug"),
         }
 
-    binding, binding_error = read_binding(repo_root, slug)
+    binding, binding_error = read_binding(repo_root, slug, spec_dir)
     definition = build_definition(front, problems, slug)
     definition["binding"] = binding
     definition["binding_error"] = binding_error
@@ -1297,7 +1305,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--spec-dir",
         default=None,
-        help="forwarded to engine reads that accept it; never decides a landing point",
+        help="forwarded to the binding engine read; a no-slug overview performs no "
+             "engine read and refuses the value with exit 2; never decides a landing point",
     )
     parser.add_argument(
         "--json",
@@ -1597,7 +1606,7 @@ def build_envelope(view: dict, repo_root: Path, requested_scope: str) -> dict:
 def emit_view(args, mode: str, repo_root: Path, scope: str) -> int:
     """Render one view: the six-group reading for one team, or the sorted overview."""
     if mode == "single":
-        view = assemble_single(repo_root, args.team_slug)
+        view = assemble_single(repo_root, args.team_slug, args.spec_dir)
         if view["state"] == "not-found":
             print(render_not_found(repo_root, args.team_slug))
             return EXIT_NOT_FOUND
@@ -1638,6 +1647,15 @@ def main(argv=None) -> int:
 
     repo_root = resolve_repo_root(args.repo_root)
     mode = "overview" if args.team_slug is None else "single"
+
+    if args.spec_dir is not None and mode == "overview":
+        print(
+            "error: --spec-dir 无法被概览消费：无 slug 的概览不发起任何引擎读动作，"
+            "该值没有接收者；请提供一个 <team-slug>（值将透传给 binding 读）"
+            "或移除 --spec-dir",
+            file=sys.stderr,
+        )
+        return EXIT_INPUT
 
     if scope == "auto" and not (repo_root / ".specify" / "teams" / args.team_slug).is_dir():
         print(

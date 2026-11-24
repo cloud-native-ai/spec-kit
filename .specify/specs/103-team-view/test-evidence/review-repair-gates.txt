@@ -1,0 +1,38 @@
+# Repair round gate readings (review P1 A1 fix touched tasks.md; I1 touched the program)
+# Date: 2026-11-24
+
+# Command 1: python3 .specify/scripts/python/validate-tasks.py .specify/specs/103-team-view/tasks.md
+PASS: .specify/specs/103-team-view/tasks.md — 0 error(s), 0 warning(s)
+# rc: 0
+
+# Command 2: python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/103-team-view --stage tasks --repo . (summary line)
+"summary": {"errors": 0, "advisories": 47, "waived": 0, "fr": 21, "sc": 7, "tasks": 44, "clauses": 38, "files": 12}
+# rc: 0
+
+# Command 3: python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/103-team-view/requirements.md --tasks .specify/specs/103-team-view/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 21, "task_count": 44, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-24T05:07:47Z"}
+# rc: 0
+
+# Command 4: per-FR citation counts over the 44 task rows
+      5 FR-001
+      3 FR-002
+      3 FR-003
+      3 FR-004
+      2 FR-005
+      3 FR-006
+      3 FR-007
+      3 FR-008
+      3 FR-009
+      2 FR-010
+      3 FR-011
+      3 FR-012
+      3 FR-013
+      3 FR-014
+      4 FR-015
+      2 FR-016
+      3 FR-017
+      2 FR-018
+     12 FR-019
+      2 FR-020
+     18 FR-021
+# rows citing FR-018: 2

@@ -107,6 +107,34 @@ class TestInputRejection:
         assert layer in (result.stderr + result.stdout).lower()
 
 
+class TestSpecDirConsumption:
+    """C-26 / FR-005: the declared option is consumed or refused, never silently ignored."""
+
+    def test_unservable_spec_dir_is_reported_on_the_single_team_path(self, archive):
+        result = run_program(
+            "team-a", "--spec-dir", str(archive / "not-under-specify-specs"),
+            "--repo-root", str(archive))
+        assert result.returncode == 5
+        assert "spec-dir-unresolvable" in result.stdout
+        assert "不可读" in result.stdout
+
+    def test_servable_spec_dir_is_forwarded_without_changing_the_reading(self, archive):
+        baseline = run_program("team-a", "--repo-root", str(archive))
+        assert baseline.returncode == 0, baseline.stderr
+        forwarded = run_program(
+            "team-a", "--spec-dir", ".specify/specs/103-demo", "--repo-root", str(archive))
+        assert forwarded.returncode == 0, forwarded.stderr
+        assert forwarded.stdout == baseline.stdout
+
+    def test_overview_cannot_consume_spec_dir_and_refuses(self, archive):
+        before = snapshot(archive)
+        result = run_program(
+            "--spec-dir", ".specify/specs/103-demo", "--repo-root", str(archive))
+        assert result.returncode == 2
+        assert "--spec-dir" in result.stderr
+        assert snapshot(archive) == before
+
+
 class TestExitCodeClosedSet:
     def test_behavioural_exits_stay_inside_the_closed_set(self, archive):
         # a missing/unstartable program must not look green through a coincidental exit 2

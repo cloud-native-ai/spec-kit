@@ -5,6 +5,7 @@ baseline_date=2026-11-24
 baseline_branch=103-team-view
 implementation_date=2026-11-24
 post_change_commit=5f169622f (P3 close; this file and the P4 evidence/close-out land with the package-4 commit)
+# note (review-repair round, 2026-11-24): this pointer names the last implementation commit before this record's carrier — this file itself lands with 328847007 (P4 close) and the close-out evidence with a5b81b881, so a post-change delta must be recomputed from that carrier pair, not from this pointer alone
 
 # -- Smoke test record (exactly one per feature) --
 

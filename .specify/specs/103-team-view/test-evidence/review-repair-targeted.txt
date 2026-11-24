@@ -1,0 +1,21 @@
+# Repair round: review P1 I1 fix — targeted test reading (final, after docstring alignment)
+# Date: 2026-11-24
+# Command 1: bash scripts/bash/run-tests.sh tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.......................................                                  [100%]
+39 passed in 6.51s
+# rc: 0
+
+# Command 2 (new tests only): bash scripts/bash/run-tests.sh tests/contract/test_team_view_program_contract.py -q -k SpecDirConsumption
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_team_view_program_contract.py -q -k SpecDirConsumption
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 6.50s
+# rc: 0

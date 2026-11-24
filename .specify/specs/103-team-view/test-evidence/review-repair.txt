@@ -1,0 +1,52 @@
+# Review Repair Round — 103-team-view (2026-11-24)
+
+Scope: the two P1 defects named by `review.md` (I1 implementation, A1 artifact) plus two
+P2 items (plan.md retrospective counts, verification.md pointer note). The process-segment
+F1/F2/F3 findings are framework improvement items and are untouched.
+
+## I1 — `--spec-dir` was declared, never consumed (fixed)
+
+- Defect reproduced before the fix (same fixture as the review): `team-view.py team-a --spec-dir /nonexistent/spec --repo-root <.specify/.tmp fixture>` → rc 0, empty stderr, rendering byte-identical to the no-option run — a silent ignore of a declared option (violates FR-005 / C-13 / C-26).
+- Fix shape: forward (option 1 of the brief) on the single-team path; explicit refusal (option 2) where no engine read exists to consume the value.
+  - `scripts/python/team-view.py:705` `engine_read(..., spec_dir=None)` appends `--spec-dir <value>` verbatim to the engine invocation; the engine owns servability (`spec-dir-unresolvable` is its refusal), so no validation rule is duplicated.
+  - `scripts/python/team-view.py:731` `read_binding(..., spec_dir=None)` is the one declared read that receives it (`goal-utils.py binding`).
+  - `scripts/python/team-view.py:1026` `assemble_single(..., spec_dir=None)`; `:1608` `emit_view` passes `args.spec_dir`.
+  - `scripts/python/team-view.py:1650` a no-slug overview performs no engine read, so `--spec-dir` is refused with exit 2 and an explicit message (FR-005: a value the team archive cannot serve is reported, never ignored).
+  - Help text (`:1307`) and the module exit-code note state the new input-error member.
+- Behavior matrix (measured 2026-11-24 on a fixture team in `.specify/.tmp/`, since removed):
+  - single team + unservable value → rc 5, rendering carries `绑定（binding）: 不可读（spec-dir-unresolvable: --spec-dir must name a directory under .specify/specs/: …）` (explicit report through the existing degraded path, C-28 exit 5);
+  - single team + servable value (`.specify/specs/103-demo`) → rc 0, stdout byte-identical to the baseline run (forwarded, no behavior change);
+  - overview + any value → rc 2, stderr names `--spec-dir`, zero writes (snapshot identical).
+- Targeted test added: `tests/contract/test_team_view_program_contract.py` class `TestSpecDirConsumption` (3 tests; unservable → reported, servable → forwarded unchanged, overview → exit 2 + zero writes).
+- Readings (unique entry `scripts/bash/run-tests.sh`, targeted set only, no full suite):
+  - `test-evidence/review-repair-targeted.txt` — command 1: **39 passed, rc 0** (contract + integration files); command 2 (`-k SpecDirConsumption`): **3 passed, rc 0**.
+- Mirror: `test-evidence/review-repair-mirror.txt` — `sync-mirrors.py --write --only scripts` then `--check --only scripts` → `ok scripts/ == .specify/scripts/ (132 files, byte-identical)`, full `--check` rc 0, `diff -q` empty.
+
+## A1 — FR-018 had zero citing task rows (fixed)
+
+- Before: 44 rows, FR-018 = 0 citations; every other FR ≥ 2 (review measurement re-confirmed by `grep -o "FR-0[0-9][0-9]" tasks.md | sort | uniq -c`).
+- Fix (rows whose duty genuinely carries the FR-018 surface; no invented coverage):
+  - `tasks.md:216` T040 (scope audit) — the delivery-surface allow-list already names `.specify/features.md` and `.specify/features/027-team-management.md` (the two paths FR-018 mandates syncing); citation parenthetical now `（FR-018, FR-019）`.
+  - `tasks.md:220` T044 (explicit-path commit) — its add list already carries `Feature 注册面`; the cell now reads `Feature 注册面（FR-018 的同步产物）`.
+- After: FR-018 = 2 citations (T040, T044); all 21 FRs ≥ 2; row count unchanged at 44.
+- `.specify/features/027-team-management.md:16` — condition in the brief was “fix if still inaccurate”: that sentence ("every FR-001…FR-021 is quoted by at least one task row") is now true of the repaired `tasks.md`, so no edit was made. The registry close-out entry itself remains the driver's L-1 write, not this repair.
+- Gates re-run after the edit: `test-evidence/review-repair-gates.txt` — `validate-tasks.py` PASS (0/0, rc 0); `pre-analyze-check --stage tasks` decision=pass errors=0 advisories=47 (unchanged), summary `fr=21 tasks=44`; `decomposition-check --mode tasks` proceed, rc 0.
+
+## P2 items
+
+- `plan.md:43` (Constitution row IV): “mapped to four new test files” → “mapped to three new test files” (matches the three test files named by `data-model.md` § FR-021 Fixture Map).
+- `plan.md:162`: “18-entry delivery surface” → “20-entry delivery surface” (feature-ref.md items 1–20).
+- PLAN-EDIT declaration 1: `PLAN-EDIT: .specify/specs/103-team-view/plan.md — minor: Constitution row IV retrospective count four→three test files, aligned to data-model.md § FR-021 Fixture Map`
+- PLAN-EDIT declaration 2: `PLAN-EDIT: .specify/specs/103-team-view/plan.md — minor: artifact inventory retrospective count 18→20 delivery-surface entries, aligned to feature-ref.md items 1–20`
+- `verification.md:8`: one in-place note added under `post_change_commit`: the pointer names the last implementation commit before this record's carrier; the file itself lands with `328847007` (P4 close) and the close-out evidence with `a5b81b881`, so a post-change delta must be recomputed from that carrier pair (P2 fix without re-pointing the historical value).
+
+## Out-of-scope observations (not fixed here)
+
+- `tasks.md:7` still says `feature-ref.md（Feature 027 绑定 + 19 路径交付面）` — a tasks-stage snapshot phrase; not in the authorized fix list of this round.
+- `contracts/team-view-program.contract.md` C-26/C-28 enumerations were left as written: the new overview refusal stays inside C-28's closed exit set (exit 2) and is FR-005's “cannot serve → report” branch; contracts are plan-owned and outside this round's authorized edit list.
+- `verification.md` notes line about “tasks.md count references updated 19→20” was not revisited (out of scope).
+
+## Discipline readings
+
+- Committed paths: this round's products only (program + its mirror, the contract test file, tasks.md / plan.md / verification.md edits, and the four `review-repair-*.txt` evidence files); the pre-existing dirty files (coaching-skills pair, settled session records, 081 smoke evidence) are neither committed nor reverted; nothing pushed.
+- Fast-fail line: 未发现异常。
