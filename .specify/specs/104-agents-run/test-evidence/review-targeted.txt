@@ -1,0 +1,75 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_agents_run_command_contract.py tests/contract/test_agents_run_docs_contract.py tests/contract/test_agents_run_skill_wiring.py tests/contract/test_agents_run_multi_child_edges.py tests/contract/test_agents_run_scope_contract.py tests/contract/test_run_skills_wiring.py tests/contract/test_team_command_routing.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [219 items]
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+..................................................................FF.F.. [ 98%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+__________________ test_x22_cross_discipline_change_recorded ___________________
+[gw176] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_x22_cross_discipline_change_recorded():
+        """C-22: this is the only change to a Feature-051-owned artifact, traced in four places."""
+        traces = (
+            SPEC_DIR / "plan.md",
+            SPEC_DIR / "feature-ref.md",
+            ROOT / ".specify" / "memory" / "features" / "051.md",
+            ROOT / ".specify" / "memory" / "features" / "052.md",
+        )
+        for tr in traces:
+>           assert tr.is_file(), f"C-22: trace location missing: {tr.relative_to(ROOT)}"
+E           AssertionError: C-22: trace location missing: .specify/memory/features/051.md
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/memory/features/051.md').is_file
+
+tests/contract/test_fast_fail_discipline.py:1427: AssertionError
+_______________ test_i10_channel_two_factory_presets_byte_equal ________________
+[gw187] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_i10_channel_two_factory_presets_byte_equal():
+        """C-10: every framework agent preset carries exactly one pair, byte-identical to the owner."""
+        owner = _clause_interval(_text(DOC))
+        assert len(FACTORY_PRESETS) == 18, f"C-10: expected 18 framework agent presets, the constant holds {len(FACTORY_PRESETS)}"  # 087: + reporter; 096: + sdd-observer
+>       assert sorted(ROOT.glob("agents/*.agent.md")) == sorted(FACTORY_PRESETS), (
+            "C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately"
+        )
+E       AssertionError: C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately
+E       assert [PosixPath('/...ent.md'), ...] == [PosixPath('/...ent.md'), ...]
+E         
+E         At index 4 diff: PosixPath('/storage/project/cloud-native-ai/spec-kit/agents/sdd-debt-fixer.agent.md') != PosixPath('/storage/project/cloud-native-ai/spec-kit/agents/sdd-implement-coordinator.agent.md')
+E         Left contains 2 more items, first extra item: PosixPath('/storage/project/cloud-native-ai/spec-kit/agents/skill-verifier.agent.md')
+E         Use -v to get more diff
+
+tests/contract/test_fast_fail_discipline.py:1589: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 31; the integer headroom on the budget is 0
+E       assert 31 == 23
+
+tests/contract/test_fast_fail_discipline.py:2006: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+======================== 3 failed, 216 passed in 7.35s =========================
+# failed-name list written: .specify/specs/104-agents-run/test-evidence/review-failed.txt (3 entries) passes=1
