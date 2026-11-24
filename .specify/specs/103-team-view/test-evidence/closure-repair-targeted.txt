@@ -87,3 +87,13 @@ action: restored the HEAD content (erroneous worktree copy preserved at
         .specify/.tmp/sdd-loop/tmp/103-team-view/smoke-081.worktree-before-restore.txt)
 reading: git hash-object = 6277b6999a051e90a0e383d083a532a3dc8087da
          == protected-paths-entry.txt row, and git status for the path is clean
+
+===== final exact-10 rerun =====
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_concurrency_coverage.py::test_every_command_and_skill_carries_the_pointer tests/contract/test_expression_compatibility.py::test_c1_skill_inventory_is_frozen tests/contract/test_flow_class_ledger.py::test_check_reports_79_units_and_zero_gaps tests/contract/test_flow_class_ledger.py::test_ledger_has_79_rows_covering_inventory_bidirectionally tests/contract/test_flow_class_ledger.py::test_templates_and_skills_never_assign_class_key tests/contract/test_migration_distribution.py::test_skill_name_set_matches_frozen_baseline tests/contract/test_run_skills_wiring.py::test_c12_no_duplicate_semantic_skill_dirs tests/contract/test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_75_units tests/contract/test_skill_layer_visibility_guards.py::test_flat_discovery_surfaces_external_layer_only tests/integration/test_101_protected_paths.py::test_every_baseline_protected_path_is_unchanged_and_present -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 6.67s
+rc=0
