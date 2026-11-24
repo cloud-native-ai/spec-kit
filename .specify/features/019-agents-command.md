@@ -3,7 +3,7 @@
 **Feature ID**: 019  
 **Name**: Agents Command  
 **Description**: Create, refine, and run layered agents with rendered host registrations.
-**Status**: Implemented  
+**Status**: Ready for Review  
 **Created**: 2026-02-27  
 **Last Updated**: 2026-11-24
 
@@ -12,6 +12,8 @@
 `/speckit.agents` routes create, refine, and run intents across Agent Template and Agent Instance storage under `.specify/agents/`. `run-agent` resolves execution configuration and topology before dispatch, while `specify render-agents` projects neutral metadata into real Qoder, Claude, Copilot, and opencode registration files.
 
 ## Latest Review
+
+2026-11-24 review (`104-agents-run`): four-segment review completed — P0 = 0; process / artifact / implementation / code segments all `pass`; code gate `allow`; acceptance reality check `final_path` 2/2 `pass` (SC-001, SC-002 with smoke evidence); the transition `Implemented → Ready for Review` was judged allowed (four conjunctive conditions) and **landed by the driver** (this row + this entry + index row). Carried as framework-improvement P1s: F1 `targeted-set-v1` stem matching, F2 plan-change audit scope (basename collision), F3 one-shot clause in the stage-prompt skeleton, F4 implement evidence-capture rules. Closure (full suite + merge) follows on the line.
 
 2026-11-24 checklist: `checklists/run-command-2026-11-24.md` landed for `104-agents-run` — 40 requirement-quality items across seven dimensions (traceability 40/40, soft cap 40), with the requirements-phase `checklists/requirements.md` left untouched; `validate-requirements.py` reported 0 error / 0 warning (281 lines, 24 FR / 7 SC / 8 shared strings); E3 `test-evidence/checklist.jsonl` carries exactly one `stage-status` row (`status=not-run-docs-only`). Feature status stays `Implemented` — the checklist phase precedes `/speckit.implement` and holds no status-transition authority.
 
