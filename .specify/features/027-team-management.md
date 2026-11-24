@@ -5,13 +5,15 @@
 **Description**: Create, modify, and run multi-agent teams with persistent definitions and indexed summaries.
 **Status**: Implemented  
 **Created**: 2026-07-13  
-**Last Updated**: 2026-11-22
+**Last Updated**: 2026-11-24
 
 ## Overview
 
 `/speckit.team` routes create, modify, and run to `create-team`, `improve-team`, and `run-team`. Teams persist as `.specify/teams/<slug>/team.md`; creation supports Anchor-driven targets and `focus_target`, while summaries are indexed by team and by `.specify/anchoring/<slug>/summary/`. Ordinary teams execute after a disclosed preview, while continuous loops retain their specific governance gates.
 
 ## Latest Review
+
+2026-11-24 clarify binding: requirement `103-team-view` was bound directly to Feature 027. It adds a read-only fourth mode (`view`) to the same `/speckit.team` command surface and team archive layer — the same relation 036 (team summary) and 042 (goal-based create) already have to this Feature. Feature status stays `Implemented` under the no-status-regression gate; the new spec advances its own lifecycle independently. Binding record and rationale: `.specify/specs/103-team-view/requirements.md` § Related Feature / § Clarifications.
 
 2026-11-22 implementation audit: `run-team` now owns run orchestration, the old file-per-team layout and universal explicit-confirmation description are stale, and the summary index follows the current Anchor layout. The historical planning and implementation records below remain dated evidence.
 
@@ -89,6 +91,7 @@ Planning completed for requirement `026-agent-team-management`. Clarifications r
 ## Related Specifications/Requirements
 
 - Team Summary Specification: `.specify/specs/036-team-summary/requirements.md`
+- Team View Specification: `.specify/specs/103-team-view/requirements.md`（2026-11-24 `/speckit.clarify` 直接绑定：`/speckit.team` 第四模式 `view`，只读呈现团队结构与状态；027 状态不回退）
 - Anchor-Driven Creation Specification: `.specify/specs/042-goal-team-creation/requirements.md`
 - Run Decomposition: `.specify/features/057-decompose-command-skills.md`
 - Anchor / Goal Successor: `.specify/features/101-anchor-goal-realignment.md`

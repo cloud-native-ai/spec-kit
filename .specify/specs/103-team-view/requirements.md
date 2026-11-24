@@ -13,8 +13,9 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 027
+**Feature Name**: Team Management
+**Binding basis**: 027 owns the `/speckit.team` command surface (create / modify / run) and the team archive layer; this spec adds the fourth, read-only mode (`view`) to the same surface and is therefore a direct follow-on specification of the same Feature (precedent: 036 team-summary and 042 goal-based create both bound directly to 027). Bind branch applied — no new Feature created; 027 status stays `Implemented` (no-status-regression gate).
 
 ## Overview
 
@@ -45,16 +46,16 @@
 | **A-7** | **view 不渲染五查预检与 `blocked` 判定**：那是 run 预览的职责。view 只呈现已持久化状态与绑定事实（含「绑定悬空」这一事实），不冒充运行前置判定。 | 防止 view 被读成 run 的替代预览面；两种模式的职责不混。 |
 | **A-8** | **状态诚实**：未记录 ≠ 无异常；缺失 / 为空 / 不可读三态必须区分，禁止静默省略或编造零值。 | 与反馈/证据纪律一致：沉默不得被读作干净。 |
 | **A-9** | **既有文档漂移在同一变更中校正（前提纠正 P-1）**：`docs/reference/commands/team.md` 把 run 委派写成 `create-team`（执行路径）且把预览描述为阻断确认门；而模板自 057 起路由到 `run-team` 技能、预览是披露而非门禁。以模板/技能为唯一记录意图，同步更正。 | 唯一读法与记录意图一致（run-team 技能存在）；编辑同一文档时保留已知漂移违反根因修复纪律。 |
-| **A-10** | **Feature 绑定留待 `/speckit.clarify`**：`Related Feature` 保持默认 `Need clarification`。 | `create-requirements` 技能约定：本阶段不查表、不建 Feature。 |
+| **A-10** | **Feature 绑定留待 `/speckit.clarify`**：`Related Feature` 保持默认 `Need clarification`。→ **已完成**：clarify（2026-11-24）绑定 Feature 027（Team Management），见 `Related Feature` 与 `## Clarifications`。 | `create-requirements` 技能约定：本阶段不查表、不建 Feature；绑定按 Feature Binding Rules 的 bind 分支在 clarify 执行。 |
 | **A-11** | **不新增 glossary 词条**：`view` 是通用词，且 anchor/goal 的 view 模式均未登记词条；「Team View」不是新实体，只是既有 `/speckit.team` 的第四模式。 | 词汇表只登记项目域术语；遵循既有先例，避免为模式名单列实体。 |
 | **A-12** | **view 无自身状态**：不写缓存、快照、索引或运行记录；每次运行从定义与引擎实时读取。 | 零新增 store/registry 的合规底线。 |
 | **A-13** | **渲染语言**：沿用项目双语表述——字段标识（slug、pattern、lifecycle 取值、路径、模式名）保留原样，说明用中文；受 user-facing comprehension 的行话与上下文规则约束。 | 用户可读性与双语表述纪律。 |
 | **A-14** | **输入校正**：「子team命令」→「/speckit.team 命令」（笔误，语义不变）。 | 事实与逻辑检查；不改变需求含义。 |
-| **A-15** | **两顶帽子**：源面为 `templates/commands/team.md`、`skills/internal/view-team/**`、确定性读取程序（路径由 plan 定稿）、`docs/reference/commands/team.md`、`tests/**`；`.specify/**` 镜像由 `scripts/python/sync-mirrors.py` 再生成，不手改。 | 本仓为 framework source；手改镜像会在同步时丢失且破坏单一来源。 |
-| **A-16** | **确定性读取程序**：候选路径 `scripts/python/team-view.py`（只读、组合引擎读动作）；名称/路径由 plan 定稿。若实现选择扩展 `goal-utils.py` 的只读动作，同样满足 FR-014，但 MUST NOT 改变既有动作语义。 | 固定规则提取归程序（Program-First）；路径留给 plan 以免 requirements 硬编码猜测。 |
+| **A-15** | **两顶帽子**：源面为 `templates/commands/team.md`、`skills/internal/view-team/**`、确定性读取程序 `scripts/python/team-view.py`（A-16 定稿）、`docs/reference/commands/team.md`、`tests/**`；`.specify/**` 镜像由 `scripts/python/sync-mirrors.py` 再生成，不手改。 | 本仓为 framework source；手改镜像会在同步时丢失且破坏单一来源。 |
+| **A-16** | **确定性读取程序**：新增独立只读程序 `scripts/python/team-view.py`（只读、组合引擎读动作）；clarify（2026-11-24）定稿该路径与形态。否决「扩展 `goal-utils.py` 只读动作」备选——它与 RS-004 的「本特性对该引擎文件零修改」承诺冲突；读取程序是本特性唯一新增执行面。 | 固定规则提取归程序（Program-First）；FR-021 的测试必须点名可执行路径，留给 plan 会让测试与契约硬编码一个猜测（先例 102 A-16）。 |
 | **A-17** | **最新报告摘要按报表契约读取**（owner：`skills/internal/create-team/SKILL.md` § Report contract），旧报告缺段按「未记录」标注，不推断。 | 报表段名与字段有唯一 owner；view 只消费不定义。 |
 | **A-18** | **Type 维度取自定义文件的 `## Static Structure` 授权矩阵**：frontmatter `members` 不含 type，view 不推断；正文矩阵与 frontmatter 名册不一致时，view 呈现差异而不裁决。 | 概念模型定义 Type 由矩阵表达；view 是呈现面，不是校正面。 |
-| **A-19** | **需求门禁修复（attempt 2）**：按 `execution` 类必填补齐 `### Runtime Stack & Dependency Ownership`——五行均机械可判定：RS-001 CPython / RS-002 pytest / RS-003 bash 测试入口（既有消费）/ RS-004 既有 `goal-utils.py` 只读动作面（零修改）/ RS-005 本特性交付的确定性读取程序（`in-scope`）；`Contract` 各为单一仓内路径；`Premises` 的 `EP-001`…`EP-003` 留待 plan 阶段 `## Execution Premises` 定义。 | 门禁 `pre-analyze-check.py --stage requirements` 对 `execution` 类要求该节；表中均为本特性真实消费或交付的运行时面，未新增依赖，与 A-16 的「读取程序路径由 plan 定稿」一致。 |
+| **A-19** | **需求门禁修复（attempt 2）**：按 `execution` 类必填补齐 `### Runtime Stack & Dependency Ownership`——五行均机械可判定：RS-001 CPython / RS-002 pytest / RS-003 bash 测试入口（既有消费）/ RS-004 既有 `goal-utils.py` 只读动作面（零修改）/ RS-005 本特性交付的确定性读取程序（`in-scope`）；`Contract` 各为单一仓内路径；`Premises` 的 `EP-001`…`EP-003` 留待 plan 阶段 `## Execution Premises` 定义。 | 门禁 `pre-analyze-check.py --stage requirements` 对 `execution` 类要求该节；表中均为本特性真实消费或交付的运行时面，未新增依赖，与 A-16 的路径定稿（`scripts/python/team-view.py`）一致。 |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -130,6 +131,7 @@
 - **最新报告缺少报表契约中的必填段**（如 Verification）：按「未记录」标注该段，不以其它段内容代替。
 - **团队正文矩阵与 frontmatter 名册不一致**：并列呈现差异，view 不裁决哪一方正确。
 - **锚点目录存在、绑定锚点终态（achieved/abandoned）**：呈现锚点状态；view 只报事实，不做运行许可判定。
+- **无 slug 概览遇到损坏定义**（团队目录存在但 `team.md` 缺失或不可读）：MUST 列入概览并以「定义损坏」标注其路径，不静默跳过；排序仍按目录 slug。
 
 ## Requirements *(mandatory)*
 
@@ -148,7 +150,7 @@
 - **FR-011**: 单团队 view MUST 呈现持久化位置与产物清单：团队目录、`runs/` 报告清单（全部报告文件名，逆时序，附总数；若设显示上限 MUST 报省略条数）、`items.jsonl` 的存在性、行数、按状态的计数与非终态行（状态值域读自台账 owner）、持续运营脊柱文件（`constraints.md` / `STATE.md` / `run-log.jsonl`）的存在性、以及 summary 送达位置（按声明呈现；缺省语义按 owner 指针抵达）。
 - **FR-012**: 单团队 view MUST 呈现最近运行状态的有界摘要：最新报告的 Outcome 字段、`**Target 指派**` 行、Result Summary 摘录、Verification 的存在性与摘录、Nested SDD Runs 段的 anomalies 值；各段按报表契约读取，缺失段 MUST 显式标注「未记录」；「未记录异常」MUST NOT 被渲染成「无异常」。
 - **FR-013**: 单团队 view MUST 呈现归档层引用：存在 `handoff_ref` 时呈现其路径；绑定锚点可解析时呈现其 lifecycle、判据数量与 Target 列表（经引擎读动作），不可解析时呈现原因；MUST NOT 复制锚点的 objective 或判据正文（身份而非内容），需要时指向 `/speckit.anchor view`。
-- **FR-014**: view 依赖的固定规则提取（定义解析、团队档案枚举、运行报告清单、台账聚合、最新报告摘要）MUST 由一个确定性只读程序完成，该程序 MUST 组合引擎的声明读动作、MUST NOT 重新实现定义/生命周期/Target 语义；若以脚本交付，MUST 遵守 Script Interface Contract（`-h` / `--version` 无副作用、拒绝未声明选项）；具体路径与名称由 plan 定稿。
+- **FR-014**: view 依赖的固定规则提取（定义解析、团队档案枚举、运行报告清单、台账聚合、最新报告摘要）MUST 由确定性只读程序 `scripts/python/team-view.py` 完成，该程序 MUST 组合引擎的声明读动作、MUST NOT 重新实现定义/生命周期/Target 语义；MUST 遵守 Script Interface Contract（`-h` / `--version` 无副作用、拒绝未声明选项）。
 - **FR-015**: 每个必需信息组在无数据时 MUST 区分「缺失（文件/目录不存在）」「为空（存在但无条目）」「不可读（存在但解析失败）」三态并显式标注；MUST NOT 静默省略、MUST NOT 以零值或占位值冒充数据；台账坏行与不可读报告 MUST 计数披露且不中断整次查看。
 - **FR-016**: view MUST 声明其数据的 as-of 参照（所用文件时间戳与最新报告时间戳）；MUST NOT 声称实时探测或实时状态。
 - **FR-017**: `docs/reference/commands/team.md` MUST 同步为四模式：描述行、When to Use、Syntax、模式表与 view 小节；同一变更中 MUST 校正两处既有 run 模式陈述漂移——run 委派对象改为 `run-team` 技能、预览改为「披露而非阻断门禁」，与命令模板和 run-team 技能一致。
@@ -176,9 +178,9 @@
 | RS-002 | `pytest` 测试运行器（模板 / 技能 / 文档接线的契约测试与读取程序 fixture 测试） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `scripts/bash/run-tests.sh` 运行新增 `contract` / `integration` / `unit` 测试，结果集相对 implement 入口基线零新增红 | FR-021 | EP-001 |
 | RS-003 | POSIX `bash` 运行时（唯一测试入口 `scripts/bash/run-tests.sh` 的执行环境） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 不新增显式版本下限；本特性不改动该入口，其现有形态即消费契约 | `scripts/bash/run-tests.sh` | 新增测试全部经该入口执行且一次退出 0；本特性不直接调用解释器级测试命令 | FR-021 | EP-001 |
 | RS-004 | 既有 `goal-utils.py` 引擎的只读动作面（`binding`、`list`、`targets --list`） | signed-contract | 既有 anchor / goal 引擎（本特性只读消费，不修改其动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 `--help` 声明的动作集固定 | `scripts/python/goal-utils.py` | 绑定与锚点事实只经这三个读动作取得（FR-008 / FR-013），读取程序不含第二套解析路径；本特性对该引擎文件零修改 | FR-008, FR-013, FR-014 | EP-002 |
-| RS-005 | 确定性只读读取程序（定义解析、团队档案枚举、运行报告清单、台账聚合、最新报告摘要；候选路径 `scripts/python/team-view.py`，plan 定稿） | in-scope | 本特性自身新增的 framework 源程序 | 不适用（无外部版本面）；交付形态与路径由 plan 定稿（A-16） | `scripts/python/team-view.py` | `-h` / `--version` 退出 0 且零写盘；在完整 / 最小 / 未知 slug / 空档案 / 损坏定义 fixture 上输出只读读数；运行前后工作树哈希一致 | FR-014, FR-021 | EP-003 |
+| RS-005 | 确定性只读读取程序（定义解析、团队档案枚举、运行报告清单、台账聚合、最新报告摘要；路径 `scripts/python/team-view.py`，A-16 定稿） | in-scope | 本特性自身新增的 framework 源程序 | 不适用（无外部版本面）；交付形态与路径已定稿（A-16） | `scripts/python/team-view.py` | `-h` / `--version` 退出 0 且零写盘；在完整 / 最小 / 未知 slug / 空档案 / 损坏定义 fixture 上输出只读读数；运行前后工作树哈希一致 | FR-014, FR-021 | EP-003 |
 
-**Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-005` 指向本特性的候选交付面（A-16，路径由 plan 定稿；若 plan 改选既有引擎的只读扩展，`Contract` 随 plan 更新为目标路径），不是第二契约。`RS-004` 的引擎本特性零修改，义务只在其既有只读契约上被消费与断言。
+**Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-005` 指向本特性的交付面 `scripts/python/team-view.py`（A-16 已定稿），不是第二契约。`RS-004` 的引擎本特性零修改，义务只在其既有只读契约上被消费与断言。
 
 ## Success Criteria *(mandatory)*
 
@@ -219,3 +221,10 @@
 This section will be populated by /speckit.clarify command with questions and answers.
 Format: - Q: <question> → A: <answer>
 -->
+
+### Session 2026-11-24
+
+- 无人值守裁决：本轮不发起阻塞式提问；候选问题按「Recommended」自裁决并逐条写回对应节（`Related Feature`、A-10、A-16、FR-014、RS-005、Edge Cases），再在下方记录。同作者检测门未触发：`requirements.md` 由上一阶段的另一执行体产出，本阶段读取的是独立作者的产物，无需再委派覆盖扫描。
+- Q: 本特性绑定哪个 Feature？ → A: 绑定既有 **Feature 027（Team Management）**。027 拥有 `/speckit.team` 命令面与团队档案层；本特性是同一命令面的第四模式与只读呈现；036 / 042 直接绑定 027 的先例成立（binding-precedent heuristic），按规则「匹配即绑定、不新建」。027 状态保持 `Implemented` 不回退（no-status-regression）；索引行与 027 详情文件在同一批次履行绑定义务。
+- Q: 确定性读取程序的形态与路径本阶段定稿还是交 plan？ → A: **本阶段定稿**为新增独立只读程序 `scripts/python/team-view.py`（A-16）；否决「扩展 `goal-utils.py` 只读动作」备选——它与 RS-004 的零修改承诺冲突。FR-014 与 RS-005 同步为定稿形态。
+- Q: 无 slug 概览遇到「目录存在但 `team.md` 缺失/不可读」时如何呈现？ → A: 列入概览并显式标注「定义损坏」及路径，不静默跳过；排序仍按目录 slug（A-8 状态诚实；Edge Cases 已补条目）。
