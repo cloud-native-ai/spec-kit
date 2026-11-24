@@ -187,6 +187,10 @@ Every user-facing output must be readable by someone who did not take part in th
 
 If the owner is missing, it ships with the framework: re-run the CLI's project initialization to restore `.specify/shared/guidelines/`. Do not reconstruct its rules from memory or act on a summary of them.
 
+## User-Facing Output
+
+User-facing output belongs to the session holding the user; subagent activity is not user-facing. Echo commands render at a boundary in one stable envelope. Full discipline: `.specify/shared/guidelines/user-facing-output.md` (do NOT copy its rules; reference the file).
+
 ## Root-Cause Problem Solving
 
 A problem is solved only when the whole run is correct, never because one step turned green. Symptom suppression MUST NOT be used as a fix: commenting out the code that fails to compile, skipping or muting a failing command, or excluding a failing check all make a step look green while leaving the problem in place — repair the root cause or report the problem. Under version control, a file that should go MUST be deleted rather than kept as `.bak` / `.backup` / `.orig`: history is an unambiguous backup and a random copy is not. Owner: the project constitution's quality and remediation principles.

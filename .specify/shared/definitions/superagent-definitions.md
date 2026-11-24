@@ -47,6 +47,8 @@ When an executor enters the SDD carrying chain, the three conditions, the three 
 
 **Message classes.** Edge messages are classified into one closed set of four tokens: `ack`, `answer`, `result`, `attention-escalation`. Unclassified progress MUST NOT travel up an edge; an executor's activity stays visible through the existing liveness carriers (artifact triplet and `watch-model.md`). This model adds no attention mechanism, channel or notification service.
 
+**User-facing output.** User-facing output is not an edge message: only the root executor composes it, and its channel, boundary and envelope are owned by `shared/guidelines/user-facing-output.md`. A child's return is an input to that output, never the output itself, and a child does not write user-facing text.
+
 **Waiting.** Waiting is bounded and observable through the existing watch model (`watch-model.md`); a human abort or redirect stays servable; slow versus stalled uses the existing thresholds.
 
 **Attempts.** Each retry is a new dispatch attempt with a new label. The old attempt's artifacts are kept; a stale attempt's return is identified by the existing attribution values owned by `watch-model.md` § 11 and MUST NOT be consumed as the current result.

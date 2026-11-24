@@ -580,20 +580,30 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "markers": ("sdd-requirement-analyzer", "sdd-plan-coordinator"),
     },
     "templates/commands/goal.md": {
-        "reason": "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local goals",
-        "markers": ("--scope", "--spec-dir"),
+        "reason": (
+            "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local "
+            "goals; 2026-11-24 adds the view-mode echo declaration (user-facing output)"
+        ),
+        "markers": ("--scope", "--spec-dir", "user-facing-output.md"),
     },
     "templates/commands/team.md": {
-        "reason": "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local teams",
-        "markers": ("--scope", "--spec-dir"),
+        "reason": (
+            "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local "
+            "teams; 2026-11-24 adds the view-mode echo declaration (user-facing output)"
+        ),
+        "markers": ("--scope", "--spec-dir", "user-facing-output.md"),
     },
     "skills/internal/create-team/SKILL.md": {
         "reason": "2026-10-29 Feature 074b adds the mandatory `## Nested SDD Runs` report section (report contract)",
         "markers": ("## Nested SDD Runs", "Nested SDD Runs section"),
     },
     "skills/internal/run-agent/SKILL.md": {
-        "reason": "2026-10-29 Feature 074a wires the pre-dispatch governance probe to sdd-route.py authorize",
-        "markers": ("sdd-invocation", "authorize"),
+        "reason": (
+            "2026-10-29 Feature 074a wires the pre-dispatch governance probe to "
+            "sdd-route.py authorize; 2026-11-24 adds the no-argument echo declaration "
+            "and the user-facing output channel disclosure (user-facing output)"
+        ),
+        "markers": ("sdd-invocation", "authorize", "user-facing-output.md"),
     },
     "skills/internal/manage-features/SKILL.md": {
         "reason": (
@@ -983,6 +993,22 @@ ALLOWED_POST_BASELINE_CHANGES["templates/commands/research.md"] = {
     ),
     "markers": ("study-code", "Standalone mode"),
 }
+
+# 2026-11-24 user-facing output: three banner-only paths gain authored content — the
+# list/view echo declaration and the dispatch-start disclosure. Declared here so the
+# allowance states what the drift is instead of riding on the banner-only shape.
+for _rel in (
+    "skills/internal/run-team/SKILL.md",
+    "templates/commands/todo.md",
+    "templates/commands/tools.md",
+):
+    ALLOWED_POST_BASELINE_CHANGES[_rel] = {
+        "reason": (
+            "2026-11-24 user-facing output: the echo declaration and the "
+            "dispatch-start output-channel disclosure (user-facing output)"
+        ),
+        "markers": ("user-facing-output.md",),
+    }
 
 # The historical baseline stays; a later amendment that legitimately edits an
 # untouchable path records itself here with the content it must carry.

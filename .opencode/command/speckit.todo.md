@@ -45,6 +45,8 @@ Consult the project glossary (`.specify/glossary.md`, ambient via the Documentat
 - **Insertion** — a conforming block (fence form for markdown-family targets, comment form for source files) at the exact location it refers to; never creates files.
 - **Park** — a parked record under `.specify/memory/todo/` (capture, not commitment) plus its later lifecycle transitions (promoted / retired / dropped).
 
+**Output class (list)**: echo — in a superagent session the list product is printed verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The other modes are not echo commands.
+
 **Delegated memory face (unchanged)**: pre-collection recall → native `memory-recall` skill; wrap-up record → native `memory-record` skill (the skill invokes both; their logic is not absorbed). The skill also owns the six-rule safety veto set and the post-execution git-commit offer.
 
 Run the skill's mode workflows as written.

@@ -11,9 +11,12 @@ process / evidence / registry paths (`.specify/specs/104-agents-run/**`,
 `.specify/features.md`, `.specify/features/019-agents-command.md`, `.specify/memory/**`,
 `.specify/state/**`) sit outside that unit and never enter the complement assertion.
 
-The live judgement runs `git diff <base>..HEAD`, base = the implement-entry commit recorded
-in `notes/pre-change-measurements.md`; the closure stage re-runs the same module after every
-product commit has landed, so the final reading covers the whole change set.
+The live judgement runs `git diff <base>..<end>`, base = the implement-entry commit and
+end = the closure commit, both recorded in `notes/pre-change-measurements.md`. The range is
+bounded by the closure SHA on purpose: a closed feature's live `base..HEAD` guard goes red
+on every later change to the same paths, judging work the feature never saw (the 051
+`FEATURE_END_SHA` precedent). An absent end bound fails loudly instead of silently
+degrading to the live worktree.
 
 Clause-class honesty (FR-023): this module pins structural facts only (path sets, added-file
 censuses, owner-file invariance); it does not claim contract coverage of runtime behaviour.
@@ -108,9 +111,26 @@ def _base_commit() -> str:
     return match.group(1)
 
 
+def _end_commit() -> str:
+    """Closure SHA: the upper bound of this feature's product commit span.
+
+    Required, not optional: without it the guard silently degrades to
+    ``git diff base..HEAD`` against the live worktree, judging every later change to the
+    same paths (the 051 ``FEATURE_END_SHA`` precedent). A missing bound fails loudly here.
+    """
+    text = PRE_CHANGE_NOTE.read_text(encoding="utf-8")
+    match = re.search(r"^FEATURE_END_SHA=([0-9a-f]{40})$", text, re.M)
+    assert match, (
+        "FEATURE_END_SHA is not recorded in notes/pre-change-measurements.md — the "
+        "feature's comparison range has no upper bound, so the guard would judge the "
+        "live worktree instead of this feature's commit span"
+    )
+    return match.group(1)
+
+
 def _change_set() -> list[tuple[str, str]]:
     result = subprocess.run(
-        ["git", "diff", "--name-status", f"{_base_commit()}..HEAD"],
+        ["git", "diff", "--name-status", f"{_base_commit()}..{_end_commit()}"],
         cwd=str(REPO_ROOT),
         capture_output=True,
         text=True,

@@ -160,3 +160,13 @@ rc=1
   `seq=1`, `slot=baseline`, `selection_basis=full-suite`, `merge_source`/`merged_at=na`.
 - The baseline is **not full green**: 222 failures pre-exist this feature. Zero-new-failure
   claims are name-level (`comm -13 baseline current`), never count-level.
+
+## Closure bound (2026-11-24)
+
+The feature's product surface closed at this commit; the containment guard
+(`tests/contract/test_agents_run_scope_contract.py`) judges `BASE_SHA..FEATURE_END_SHA`,
+never the live worktree. A later change to the same paths belongs to its own change set.
+
+```console
+FEATURE_END_SHA=7950dab5a6523e5de322d2489dde67c5fdd1d39c
+```

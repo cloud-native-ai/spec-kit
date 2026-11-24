@@ -34,6 +34,7 @@ skill_id: "<SKILL:.specify/skills/internal/view-team/SKILL.md>"
 
 把程序的输出**原样**呈现（单团队六组 / 概览 / 错误渲染皆同）：
 
+- **重发规则（re-emission）**：程序 stdout MUST 作为**本会话自己的消息**逐字重发；**工具结果不算呈现**（宿主可能折叠长输出，用户看不到）。MUST NOT 以「已在上方」「见工具输出」「已逐字呈现」代替正文；先发完整输出块，再发降级说明（exit 5 等），说明 MUST NOT 替代、删减或重排六组信息。stdout 是正文；stderr 与错误导航在正文之外。
 - MUST NOT 删除、重排或合并任何一组；
 - MUST NOT 把缺失态标签（`缺失` / `为空` / `不可读` / `未记录`）替换成 `0`、占位符或推断值；
 - 至多追加一行框定语，说明模式（single / overview）与 as-of 指针。

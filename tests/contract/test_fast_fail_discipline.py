@@ -760,9 +760,13 @@ def test_a7_section_counts_20_to_21_and_21_to_22():
     ambient section, so the correct bump from the measured tree is 36 -> 37 template
     and 37 -> 38 live (the task row's 35 -> 36 / 36 -> 37 arithmetic had read the
     stale pin, not the tree). Both corrections land in the section's own commit.
+
+    Bump (2026-11-24, user-facing output): the `## User-Facing Output` ambient
+    section is added to the template and carried into live in the same change
+    (37 -> 38 template, 38 -> 39 live).
     """
-    TPL_EXPECTED = 37  # 095 T042: +1 ambient section on top of the un-bumped Agent Anti-Patterns section
-    LIVE_EXPECTED = 38  # the reconcile carries that same section into the live file
+    TPL_EXPECTED = 38  # 2026-11-24 user-facing output: +1 ambient section
+    LIVE_EXPECTED = 39  # the reconcile carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
     assert tpl == TPL_EXPECTED, (

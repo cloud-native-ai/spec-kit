@@ -65,6 +65,8 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 
 Read-only, never mutating:
 
+**Output class (view, list)**: echo — in a superagent session the view/list product is printed verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The other modes are not echo commands.
+
 - **view** — load the record and display its full definition: fields, parameters, returns, behavioral rules, aliases, `status`, `discovery_origin`, and `tool_id`. If no record exists, report "no definition found" and offer to `define` it.
 - **list** — display a summary table of all records under `.specify/memory/tools/`. Distinguish `Draft` from `Verified` so incomplete records are visible.
 

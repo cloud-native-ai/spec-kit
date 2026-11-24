@@ -106,6 +106,11 @@ MUST NOT merge or normalize configuration itself:
    § The super↔sub Protocol) and are referenced by pointer, never restated here. The role
    is decided only by the dispatch edge: no activation switch, role entity, fourth agent
    category or second role definition is introduced by this skill.
+   When this session is a superagent (it holds at least one active dispatch edge), the
+   presentation also declares the user-facing output channel: this root is its only writer;
+   child activity is not user-facing; an echo command's product is emitted at a presentation
+   boundary inside the stable envelope owned by
+   `.specify/shared/guidelines/user-facing-output.md` (disclosure, not a gate).
 3. **Dispatch** — launch as a subagent with its configured `capability-tools`, `model-tier`,
    `run-turn-budget`, and system prompt. Choose the execution mode per
    `.specify/shared/definitions/subagent-definitions.md`: **native** when the runtime supports
@@ -166,6 +171,11 @@ declared). No new child list, registry, renderer or state store is added.
    `effective_reason`); and the returning executor's identity. A return missing any element
    is **incomplete**: the parent MUST NOT consume its conclusion and MUST NOT backfill the
    missing fields.
+   **Return channel output boundary (owner by pointer)**: a child's return is an input to
+   the root's user-facing output, never the output itself; the child does not write
+   user-facing text. A tool result is not user-facing presentation — the root re-emits the
+   engine's stdout as its own message inside the envelope
+   (`.specify/shared/guidelines/user-facing-output.md`).
 
 **Dispatch-time injection (mandatory)**: before dispatching, verify the outgoing prompt
 carries the fast-fail injection clause — its owner literal lives in
@@ -239,6 +249,11 @@ named conflict sentence `team parameter not accepted by run: <option>` and point
 follows the User Input rules and is not parsed as options.
 
 ### Default Behavior (No Arguments)
+
+**Output class (no-argument listing)**: echo — the listing is printed verbatim as this
+session's own message inside the stable envelope owned by
+`.specify/shared/guidelines/user-facing-output.md` at a presentation boundary when this
+session is a superagent; a tool result is not user-facing presentation.
 
 When `/speckit.agents` receives empty arguments it MUST execute this sequence instead of
 routing to a mode:

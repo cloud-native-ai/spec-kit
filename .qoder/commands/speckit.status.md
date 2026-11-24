@@ -48,6 +48,8 @@ Run the action the input selects, print the script's output verbatim, and report
 paraphrase a digest, re-render a line, re-judge a proposition, or soften `nothing-running` into an empty result: an
 idle repository answers explicitly with status `3`, and that is the correct answer, not a failure.
 
+**Output class (digest, guard)**: echo — in a superagent session, print the engine's stdout verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The `report` action is a reporting line owned by `.specify/shared/guidelines/reporting-obligations.md` and is not wrapped as a block. Never delegate this command to a subagent.
+
 **Single source**: line visibility comes solely from the Line Registry — the digest's liveness probe is limited to PIDs already recorded on a registry entry and never discovers an unregistered process, so it MUST NOT be changed to discover unregistered processes; the obligation is owned by `.specify/shared/guidelines/reporting-obligations.md` § 九 and is reached by path, never restated here.
 
 ## Wrap-up

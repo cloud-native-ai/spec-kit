@@ -57,6 +57,8 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 
 (表单真源:`skills/internal/create-team/SKILL.md` → Summary Refresh)
 
+**User-facing output channel**: when this run dispatches seats, this root is the only writer of user-facing output; seat activity is not user-facing; an echo command's product is emitted at a presentation boundary inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` (disclosure, not a gate). The run report and the periodic reporting line are the user-facing output; seat streams stay in their artifact paths. A tool result is not user-facing presentation.
+
 ### 6. Orchestrate(按团队 pattern 编排)
 
 - **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess，定义 owner：`.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes）且预算允许，本次运行 MUST 并发派发席位；串行 MUST 给出 `shared/declarations/facts/serial-reason.yaml` 的具名理由码与依据。运行报告 MUST 记录 `requested` / `effective` / `effective_reason` 三元组（字段 owner：`shared/declarations/facts/effective-concurrency.yaml`；`effective` 取席位派发/返回区间的最大重叠数，区间缺失记字面量 `not_evaluated`，MUST NOT 写 0 或估计值）。宿主内建 in-process subagent 路径 BANNED，不计为并发机制。

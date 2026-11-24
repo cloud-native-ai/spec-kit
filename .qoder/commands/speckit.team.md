@@ -88,6 +88,8 @@ The **run** mode delegates entirely to the `run-team` skill — `.specify/skills
 
 The **view** mode delegates entirely to the read-only skill `view-team` — `.specify/skills/internal/view-team/SKILL.md` — which owns the input contract, the single delegation and the error navigation. The fixed-rule extraction (definition facts, static/dynamic structure, persistence inventory, latest run state, archive references) runs in `.specify/scripts/python/team-view.py`; this template carries no rendering logic and enumerates none of that program's output fields.
 
+**Output class (view)**: echo — in a superagent session the view product is printed verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The other modes are not echo commands.
+
 - **严格只读**: view 不写定义、运行报告、台账、summary、anchor、registry 或 state，不派发席位，不登记 run line。
 - **输入**: 无 slug = 全团队概览（按 slug 升序）；有 slug = 精确目录匹配的完整呈现；未知 slug 报告 **"team not found"** 并建议走 `create`；损坏定义（目录存在而 `team.md` 缺失、不可读或不可解析）报告带精确路径的「定义损坏」，绝不与「不存在」互换。
 - **`--target` 冲突**: view 携带 `--target` 是模式/参数冲突（`--target` 只属于 run），必须显式报告，MUST NOT 静默丢弃或改道到 run。
