@@ -186,7 +186,7 @@
 
 #### E. 质量与测试
 
-- **FR-022**: 契约测试 MUST 机械固定：① 模板 frontmatter `argument-hint`、意图表 run 行与三技能路径；② 技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件与快速失败注入的**指针**（不得复制 owner 规则文本）；③ 命名文档的单副本计数、run 出现与陈旧字面量计数为 0；④ 无新增持久化根/registry/渲染器；⑤ 变更源面与其运行时镜像字节一致（重生成后）。既有守卫（`test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面）MUST 保持绿。
+- **FR-022**: 契约测试 MUST 机械固定：① 模板 frontmatter `argument-hint`、意图表 run 行与三技能路径；② 技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件与快速失败注入的**指针**（不得复制 owner 规则文本）；③ 命名文档的单副本计数、run 出现与陈旧字面量计数为 0；④ 无新增持久化根/registry/渲染器；⑤ 变更源面与其运行时镜像字节一致（重生成后）。既有守卫（`test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面）MUST 相对 implement 入口的名字级失败基线不得新增失败；基线既有红 MUST 逐条点名（相对判据，不要求「全绿」）。
 - **FR-023**: 行为类条款（FR-007 呈现披露、FR-008 载荷内容、FR-010 回传完整性、FR-011 运行期 label 唯一性、FR-016 探针条件的执行、FR-017 读数记录）MUST 在 plan / contracts 中被逐条标注为行为类，并以真源文本 + 评审 + 变异演练取证；MUST NOT 声称其由契约测试「覆盖」。制品类条款（FR-001 / FR-003 / FR-004 / FR-018 / FR-019 / FR-020 / FR-022）由契约测试机械断言。
 - **FR-024**: 全部新增与既有相关测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 执行并退出 0；MUST NOT 直接调用解释器级测试命令；相对 implement 入口的**名字级**失败基线零新增失败（基线既有红逐条点名，不声称全绿）。
 
@@ -222,7 +222,7 @@
 
 - **SC-001**: 显式 run 语法在三个面（模板 `argument-hint` [[STR-001]]、run-agent 输入契约、命令参考 Syntax）逐字一致；路由样例集（显式 run ≥2 条、create、refine、团队、空参数、歧义）逐条命中预期，错误路由数为 0；不存在 agent（[[STR-002]]）、缺 agent 名（[[STR-003]]）、缺任务（[[STR-004]]）三条路径各按契约停止且派发数为 0 **Path**: final
 - **SC-002**: 同一 parent 下两次 run 产生两条独立边：以同一父身份与两个不同 child label 的夹具运行只读角色判定引擎，报告 2 条子代边、深度 1、无违例；label 重用/重试按新尝试处理、旧产物保留、迟到返回不被消费；把两次派发压成同一 label 或消费旧返回时测试转红 **Path**: final
-- **SC-003**: 派发面接线契约在位：技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件、快速失败注入与反嵌套红线的指针；删除任一项时对应契约检查转红；既有守卫 `test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面保持绿 **Path**: supporting
+- **SC-003**: 派发面接线契约在位：技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件、快速失败注入与反嵌套红线的指针；删除任一项时对应契约检查转红；既有守卫 `test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面相对 implement 入口基线零新增名字级失败（基线既有红逐条点名） **Path**: supporting
 - **SC-004**: 文档同源：`docs/reference/commands/agents.md` 的 `^# /speckit.agents` 计数 = 1（改前 3）；run 语法与 run 意图行在该文件出现；[[STR-005]] / [[STR-006]] / [[STR-007]] / [[STR-008]] 在命名文件中的实时出现数为 0；`docs/reference/agents/command-and-skills.md` 的能力集为三项且含 `run-agent` 小节；overview / design 的能力单行与教程命令表行含 run **Path**: supporting
 - **SC-005**: 零第二机制与变更集包含性：基线参照物 = implement 阶段提交的父提交；比较单元 = `git diff <base>..HEAD --name-status` 的路径集，按产物类分组（命令模板 / 技能 / 文档 / 测试 / 再生成的镜像与工具命令副本）；允许差异集由被编辑源面的扇出闭包机械导出并由测试逐类断言（`templates/commands/agents.md`、`skills/internal/run-agent/**`、FR-018 / FR-019 / FR-020 点名的文档、`tests/**`，以及 `sync-mirrors.py` / `regen-command-copies.py` 的再生成产物）；补集侧断言该区间不出现上列之外的路径；集合内断言无新增持久化根 / registry / 渲染器 / 调度器；镜像与源逐字节一致 **Path**: supporting
 - **SC-006**: 变异演练 4/4：删除 `argument-hint` → 模板契约转红；删除 run 意图行 → 模板契约转红；删除七字段下行指针 → 技能契约转红；复制出第二份命令参考正文 → 文档契约转红；逐项复原后转绿；演练读数记录到 `test-evidence/` **Path**: supporting
