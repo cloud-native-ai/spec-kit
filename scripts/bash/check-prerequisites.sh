@@ -53,6 +53,48 @@ main() {
     if [ -f "$SCRIPT_DIR/common.sh" ]; then
         # shellcheck source=/dev/null
         source "$SCRIPT_DIR/common.sh"
+
+        # Host-library fallbacks (backlog F1, 2026-11-23). When CWS_LIB_BASH_HOME is
+        # unset, common.sh's library-link publishes no host helpers; the --json path
+        # still needs these four. They are defined only when the host did not publish
+        # a function of the same name, so the host library remains the owner when
+        # present. The escaper mirrors the scaffold-path precedent in
+        # create-new-requirements.sh (RFC 8259, complete and byte-wise under LC_ALL=C).
+        if ! declare -F git_repo_root >/dev/null 2>&1; then
+            git_repo_root() { git rev-parse --show-toplevel 2>/dev/null; }
+        fi
+        if ! declare -F git_current_branch >/dev/null 2>&1; then
+            git_current_branch() { git rev-parse --abbrev-ref HEAD 2>/dev/null; }
+        fi
+        if ! declare -F is_git_repo >/dev/null 2>&1; then
+            is_git_repo() { git rev-parse --is-inside-work-tree >/dev/null 2>&1; }
+        fi
+        if ! declare -F json_escape >/dev/null 2>&1; then
+            json_escape() {
+                local s="$1"
+                s="${s//\\/\\\\}"
+                s="${s//\"/\\\"}"
+                s="${s//$'\n'/\\n}"
+                s="${s//$'\t'/\\t}"
+                s="${s//$'\r'/\\r}"
+                s="${s//$'\b'/\\b}"
+                s="${s//$'\f'/\\f}"
+                # LC_ALL=C makes ${#s} count bytes and ${s:$i:1} yield single bytes,
+                # so multi-byte UTF-8 sequences pass through intact.
+                local LC_ALL=C
+                local i char code
+                for (( i=0; i<${#s}; i++ )); do
+                    char="${s:$i:1}"
+                    printf -v code '%d' "'$char" 2>/dev/null || code=256
+                    if (( code >= 1 && code <= 31 )); then
+                        printf '\\u%04x' "$code"
+                    else
+                        printf '%s' "$char"
+                    fi
+                done
+            }
+        fi
+
         # Ensure UTF-8 locale for better Unicode handling
         ensure_utf8_locale || true
     fi

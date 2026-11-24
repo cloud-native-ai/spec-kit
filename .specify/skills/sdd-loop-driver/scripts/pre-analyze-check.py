@@ -1226,6 +1226,32 @@ def apply_waivers(findings, waivers):
     return waived
 
 
+def resolve_repo_root(spec_dir, requested):
+    """The repo root a declared-path check resolves against.
+
+    An explicit ``--repo`` always wins. Without it, derive the root from the nearest
+    ancestor carrying a ``.specify/`` child: the standard spec tree is
+    ``<repo>/.specify/specs/<NNN-slug>/``, so its repo root is unambiguous. Deriving it
+    here closes the old false green where an omitted ``--repo`` silently disabled every
+    path check. Pure Python: this gate makes no subprocess call outside the opt-in
+    ``--triple-structure`` delegation.
+    """
+    if requested:
+        return os.path.abspath(requested)
+    current = os.path.abspath(spec_dir)
+    while True:
+        if os.path.isdir(os.path.join(current, ".specify")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    sys.stderr.write(
+        "pre-analyze-check: warning: repo root not resolved (no .specify ancestor); "
+        "declared-path checks are skipped; pass --repo to judge them\n")
+    return ""
+
+
 def run(args):
     spec_dir = os.path.abspath(args.spec_dir)
     if not os.path.isdir(spec_dir):
@@ -1234,7 +1260,7 @@ def run(args):
     for name in stage_inputs:
         if not os.path.isfile(os.path.join(spec_dir, name)):
             raise InputError("%s stage requires %s" % (args.stage, name))
-    repo = os.path.abspath(args.repo) if args.repo else ""
+    repo = resolve_repo_root(spec_dir, args.repo)
 
     files = formal_files(spec_dir)
     fr, sc, tasks, clauses, duplicates = definitions(files, spec_dir)
@@ -1304,7 +1330,8 @@ def main(argv=None):
     parser.add_argument("--spec-dir", required=True)
     parser.add_argument("--stage", choices=tuple(STAGES), default="tasks")
     parser.add_argument("--repo", default="",
-                        help="repo root for declared-path existence checks")
+                        help="repo root for declared-path existence checks; defaults to the "
+                             "nearest ancestor .specify directory's parent")
     parser.add_argument("--strict", action="store_true",
                         help="treat missing-path advisories as blocking")
     parser.add_argument("--waive", action="append", default=[],
