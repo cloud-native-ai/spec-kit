@@ -39,7 +39,7 @@ The pre-dispatch probe section MUST state that `sdd-route.py --action authorize`
 
 **C-19** The run stays a single unit — *artifact-class boundary / behavior-class reading*.
 
-The section MUST keep the exact sentence `**Scope boundary**: Run mode executes a **single** agent on a **single** task.` and state that one run MUST NOT fan out multiple agents, that multiple runs are multiple command invocations, and that each run records the `requested` / `effective` / `effective_reason` triple with `single-unit` naming the serial reason and `not_evaluated` where intervals are absent — never `0` and never an estimate. (FR-014, FR-017, A-13)
+The section MUST keep the exact sentence `**Scope boundary**: Run mode executes a **single** agent on a **single** task.` and state that one run MUST NOT fan out multiple agents, that multiple runs are multiple command invocations, and that each run records the `requested` / `effective` / `effective_reason` triple with `single-unit` naming the serial reason and `not_evaluated` where intervals are absent — never `0` and never an estimate. (FR-013, FR-014, FR-017, A-13)
 
 **C-20** Anti-nesting red lines are preserved — *artifact-class*.
 
@@ -51,4 +51,4 @@ The skill text MUST NOT introduce an activation switch, a role entity, a fourth 
 
 **C-22** Zero second mechanism and clause-class honesty — *artifact-class*.
 
-The skill MUST NOT introduce a second dispatch mechanism, scheduler, queue, transport, notification channel or persistence root; every capability is reached through the existing `run-agent` workflow, `execution-config.py`, `dispatch.sh`, `exec-quant.py` and `role-edge-check.py`. The behavior-class label on C-11 / C-12 / C-13 / C-15 / C-16 / C-18 / C-19 is normative: a contract test MUST NOT be described as covering those runtime behaviors. (FR-015, FR-023)
+The skill MUST NOT introduce a second dispatch mechanism, scheduler, queue, transport, notification channel or persistence root; every capability is reached through the existing `run-agent` workflow, `execution-config.py`, `dispatch.sh`, `exec-quant.py` and `role-edge-check.py`. The behavior-class label on C-11 / C-12 / C-13 / C-15 / C-16 / C-18 / C-19 is normative: a contract test MUST NOT be described as covering those runtime behaviors. (FR-015, FR-021, FR-023)

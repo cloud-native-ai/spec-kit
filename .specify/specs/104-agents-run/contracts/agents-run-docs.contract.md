@@ -68,4 +68,4 @@ Measured baselines (2026-11-24) and the required after-state across the seven na
 
 **C-35** Mutation drill (4/4) is exercised and recorded.
 
-Each of the four mutations MUST turn its pinned check red, and restoration MUST turn it green: delete `argument-hint` → C-01 of the command contract red; delete the run intent row → C-02 of the command contract red; delete the seven-field downlink pointer → C-12 of the dispatch contract red; duplicate the command reference body → C-23 of this contract red. The red/green readings are recorded in `test-evidence/` (SC-006 source). (SC-006)
+Each of the four mutations MUST turn its pinned check red, and restoration MUST turn it green: delete `argument-hint` → C-01 of the command contract red; delete the run intent row → C-02 of the command contract red; delete the seven-field downlink pointer → C-12 of the dispatch contract red; duplicate the command reference body → C-23 of this contract red. The red/green readings are recorded in `test-evidence/` (SC-006 source). (SC-006, FR-024)
