@@ -1,0 +1,148 @@
+"""Contract tests for the `/speckit.team view` command wiring (103-team-view, T007).
+
+Contract: `.specify/specs/103-team-view/contracts/team-view-command.contract.md`
+C-01 (frontmatter), C-02 (four-row mode table), C-03 (stale literal), C-06 (View Mode
+delegation), C-11 (read-only at the command level). FR-001…FR-004.
+
+This first segment pins the command template only; the docs page, routing flow and the
+per-tool copies are pinned by the US3 segment appended later (T026). The template source
+is `templates/commands/team.md`; per-tool copies are generated and never hand-edited.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+TEMPLATE = REPO_ROOT / "templates" / "commands" / "team.md"
+
+pytestmark = pytest.mark.contract
+
+STR_001 = "team not found"
+STR_003 = "[create|modify|run|view] [team-slug] [--target <T-<nnn>>]"
+STR_004 = "exactly three modes"
+
+VIEW_MODE_DELEGATE = ".specify/skills/internal/view-team/SKILL.md"
+FIXED_EXTRACTION = "scripts/python/team-view.py"
+
+
+def read_template() -> str:
+    return TEMPLATE.read_text(encoding="utf-8")
+
+
+def frontmatter_of(text: str) -> dict:
+    lines = text.splitlines()
+    assert lines and lines[0].strip() == "---", "template carries no frontmatter"
+    end = lines.index("---", 1)
+    data = {}
+    for line in lines[1:end]:
+        key, sep, value = line.partition(":")
+        if not sep:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        data[key.strip()] = value
+    return data
+
+
+def section_after(text: str, heading: str) -> str:
+    start = text.find(heading)
+    assert start >= 0, "missing heading: %s" % heading
+    rest = text[start + len(heading):]
+    following = re.search(r"^#{2,3} ", rest, re.MULTILINE)
+    return rest[:following.start()] if following else rest
+
+
+def mode_rows(text: str) -> list:
+    section = section_after(text, "### Modes → Capability Routing")
+    rows = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if not cells or set(cells[0]) <= set("-: "):
+            continue
+        rows.append(cells)
+    return rows[1:]  # drop the header row
+
+
+class TestFrontmatter:
+    def test_description_names_the_four_team_operations(self):
+        data = frontmatter_of(read_template())
+        description = data.get("description", "").lower()
+        for token in ("create", "modify", "run", "view"):
+            assert token in description, "description lacks %s" % token
+
+    def test_short_description_names_four_modes(self):
+        data = frontmatter_of(read_template())
+        short = data.get("short-description", "").lower()
+        for token in ("create", "modify", "run", "view"):
+            assert token in short, "short-description lacks %s" % token
+
+    def test_argument_hint_is_the_shared_grammar(self):
+        data = frontmatter_of(read_template())
+        assert data.get("argument-hint") == STR_003
+
+
+class TestModeTable:
+    def test_exactly_four_rows_in_order(self):
+        rows = mode_rows(read_template())
+        assert len(rows) == 4, "mode table must carry exactly four rows: %r" % rows
+        modes = [re.sub(r"[*`]", "", row[0]).strip() for row in rows]
+        assert modes == ["create", "modify", "run", "view"]
+
+    def test_view_row_recognizes_view_intents_and_delegates(self):
+        rows = mode_rows(read_template())
+        view_row = " | ".join(rows[-1])
+        for token in ("查看", "概览", "inspect", "show"):
+            assert token in view_row, "view row lacks intent token %s" % token
+        assert "view-team" in view_row
+
+    def test_other_rows_keep_their_routing_targets(self):
+        rows = mode_rows(read_template())
+        joined = [" | ".join(row) for row in rows]
+        assert "create-team" in joined[0]
+        assert "improve-team" in joined[1]
+        assert "run-team" in joined[2]
+        for row in rows[:3]:
+            assert "view-team" not in " | ".join(row), "view leaked into another row"
+
+    def test_stale_three_modes_literal_is_gone_from_the_template(self):
+        assert STR_004 not in read_template()
+
+
+class TestViewModeSection:
+    def test_view_mode_section_exists_and_delegates(self):
+        view = section_after(read_template(), "### View Mode")
+        assert VIEW_MODE_DELEGATE in view
+        assert FIXED_EXTRACTION in view
+
+    def test_view_mode_states_read_only_boundary(self):
+        view = section_after(read_template(), "### View Mode")
+        assert "只读" in view
+        assert "run line" in view
+        assert "席位" in view
+
+    def test_view_mode_states_the_missing_team_and_corrupt_paths(self):
+        view = section_after(read_template(), "### View Mode")
+        assert STR_001 in view
+        assert "定义损坏" in view
+        assert "create" in view
+        assert "概览" in view
+
+    def test_view_mode_keeps_the_five_check_preview_out(self):
+        view = section_after(read_template(), "### View Mode")
+        assert "run-team" in view
+        assert "blocked" in view
+
+    def test_view_target_conflict_declared(self):
+        view = section_after(read_template(), "### View Mode")
+        conflict_lines = [
+            line for line in view.splitlines()
+            if "--target" in line and "冲突" in line
+        ]
+        assert conflict_lines, "View Mode must declare view+--target as a mode/parameter conflict"

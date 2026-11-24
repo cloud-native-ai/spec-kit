@@ -1,0 +1,20 @@
+# Implement entry baseline — 103-team-view (P1, T001-T010)
+
+- Captured at: 2026-11-24T03:55Z (run started 2026-11-24T03:53Z, finished 2026-11-24T03:55Z)
+- Command (the only full-suite run of this stage; the baseline slot):
+  bash scripts/bash/run-tests.sh --full --names-out .specify/specs/103-team-view/baseline-failed.txt
+- Mode lines observed: two passes composed into one name list
+  (`# failed-name list written: .specify/specs/103-team-view/baseline-failed.txt (222 entries) passes=2`)
+- Parallel pass summary (verbatim): `222 failed, 9818 passed, 3 skipped, 1152 warnings in 65.04s (0:01:05)`
+- Serial pass summary (verbatim): `1 passed, 10043 deselected, 6 warnings in 18.38s`
+- Composed readings: failed = 222, passed = 9819 (9818 + 1), skipped = 3
+- rc: 1 — derived, not re-measured. The capture pipeline (`| tail -40`) masked the
+  runner's own exit status (its exit was `tail`'s 0); the runner's documented exit rule
+  ("exit code still reflects the passes' own results") plus the observed
+  `222 failed` summary make pytest exit 1 the only consistent value. No second full
+  suite was run to re-capture the code (the stage budget forbids one).
+- Failed-name list: `.specify/specs/103-team-view/baseline-failed.txt`
+  (222 names, 222 unique — the GATE-1 comparison surface)
+- Interpretation: these 222 failures are the entry baseline of the tree (pre-existing,
+  unrelated to this feature — the feature's four test files do not exist yet); GATE-1
+  compares by name-level set difference (`comm -13 baseline current`), never by count.
