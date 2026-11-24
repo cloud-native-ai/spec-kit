@@ -393,3 +393,109 @@ rc=0
 
 All five `test_us5_*` legs and the pre-existing C-11…C-22 legs green in one run; zero failed
 names. Function-level reading: 17 collected, 17 passed.
+
+## T029 — SC-005 change-set structural audit (post-commit tree)
+
+Full transcript: `test-evidence/sc005-audit.txt`. Base = `b6907ee53` (implement entry).
+
+```console
+$ git diff b6907ee53..HEAD --name-status   # 23 rows; product-root slice below
+M	.claude/commands/speckit.agents.md
+M	.github/prompts/speckit.agents.prompt.md
+M	.opencode/command/speckit.agents.md
+M	.qoder/commands/speckit.agents.md
+M	.specify/skills/internal/run-agent/SKILL.md
+M	docs/reference/agents/command-and-skills.md
+M	docs/reference/agents/design.md
+M	docs/reference/agents/overview.md
+M	docs/reference/commands/agents.md
+M	docs/tutorials/installation.md
+M	docs/tutorials/quickstart.md
+M	skills/internal/run-agent/SKILL.md
+M	templates/commands/agents.md
+A	tests/contract/test_agents_run_command_contract.py
+A	tests/contract/test_agents_run_docs_contract.py
+A	tests/contract/test_agents_run_multi_child_edges.py
+A	tests/contract/test_agents_run_scope_contract.py
+A	tests/contract/test_agents_run_skill_wiring.py
+M	tests/scenarios/agents-command/single-entry-routing-scenario.md
+```
+
+Grouped by artifact class: ① command template 1; ② skills source 1 + mirror 1; ③ docs 6;
+④ tests 5 added + 1 scenario; ⑤ regenerated copies 4. Every path is inside the SC-005
+allowed closure; the complement inside the five product roots is empty (scope module's live
+leg). Outside the comparison unit only the process/evidence paths changed
+(`.specify/specs/104-agents-run/**`), which the contract excludes.
+
+```console
+$ git diff b6907ee53..HEAD --name-status -- scripts/ src/ shared/ .specify/shared/ templates/ .specify/glossary.md
+M	templates/commands/agents.md
+```
+
+The single row is the edited source template (allowed); zero engine / shared-owner / glossary
+edits. Zero new persistence root, registry, renderer, scheduler or queue: the only added files
+under product roots are the five declared test modules.
+
+```console
+$ python3 .specify/scripts/python/flow-class-check.py --action check
+flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]
+coverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39
+rc=0
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_scope_contract.py -q
+9 passed in 6.22s   (rc=0; zero failed names)
+```
+
+## T030–T031 — mutation drill and behavior-class evidence
+
+Drill transcript: `test-evidence/mutation-drill.md`. Four mutations, each turned exactly its
+pinned check red and the exact restore turned it green with an empty `git diff`:
+
+- M1 delete `argument-hint` → `test_c01_template_declares_the_argument_grammar` red (C-01);
+  restored literal count = 1, empty diff, re-run 10 passed.
+- M2 delete the template run intent row → `test_c02_three_skill_rows_and_run_row_carries_the_explicit_form`
+  red (C-02; C-08/C-09 also red for the same removed row); restore count = 1, empty diff,
+  re-run 10 passed.
+- M3 delete the seven-field downlink pointer → `test_c12_downlink_names_the_seven_role_fields`
+  red (C-12); restore count = 1, empty diff, re-run 17 passed.
+- M4 duplicate the command reference body → `test_c23_one_command_reference_body` red (C-23);
+  restore heading count = 1, empty diff, re-run 12 passed.
+
+In-passing repair disclosed: M1's first restore used bare `cp` and the interactive alias
+no-opped the overwrite; the restore assertion caught it before any reading, and the alias-proof
+`\cp -f` restore plus the empty-diff check repaired it. Same trap for the other restores —
+all used `\cp -f`.
+
+Behavior-class route: `test-evidence/behavior-class-evidence.md` maps C-11 / C-12 / C-13 / C-15 /
+C-16 / C-18 / C-19 and FR-007 / FR-008 / FR-010 / FR-011 / FR-016 / FR-017 to truth-source text
+(pinned) + review + the drill; it does not claim the modules exercise any runtime behaviour.
+
+## T032 — closing targeted run (nine modules, unique entry)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_command_contract.py tests/contract/test_agents_run_docs_contract.py tests/contract/test_agents_run_skill_wiring.py tests/contract/test_agents_run_multi_child_edges.py tests/contract/test_agents_run_scope_contract.py tests/contract/test_run_skills_wiring.py tests/contract/test_team_command_routing.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py --names-out .specify/specs/104-agents-run/test-evidence/final-failed.txt > .specify/specs/104-agents-run/test-evidence/final-targeted-suite.txt 2>&1; rc=$?
+rc=1
+3 failed, 216 passed in 7.34s
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+```
+
+Name-level regression against the implement-entry baseline (`baseline-failed.txt`, 222 names):
+
+```console
+$ comm -13 .specify/specs/104-agents-run/baseline-failed.txt .specify/specs/104-agents-run/test-evidence/final-failed.txt
+(empty — zero new failed names)
+$ comm -12 …   # the three residuals named above are baseline members, named one by one
+```
+
+Clause coverage (same stage):
+
+```console
+$ python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/104-agents-run
+claimed clauses 35, scanned files 322, clause universe 2410, FR universe 24
+FR claimed: 24 · FR uncovered: 0 · uncovered beyond baseline: 0
+[clause-uncovered] pass (785) · [fr-uncovered] pass (0) · [coverage-baseline-delta] pass (0)
+[clause-unparsable] fail (108) — corpus-level pre-existing fact, unchanged by this feature
+0 error(s), 1 warning(s) · status: ok · rc=0
+```

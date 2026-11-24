@@ -1,0 +1,8 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_agents_run_skill_wiring.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.................                                                        [100%]
+17 passed in 6.25s
+# failed-name list written: /tmp/pkg3-us5-green.txt (0 entries) passes=1

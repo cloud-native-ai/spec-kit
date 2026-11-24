@@ -1,0 +1,74 @@
+$ git diff b6907ee53..HEAD --name-status
+M	.claude/commands/speckit.agents.md
+M	.github/prompts/speckit.agents.prompt.md
+M	.opencode/command/speckit.agents.md
+M	.qoder/commands/speckit.agents.md
+M	.specify/skills/internal/run-agent/SKILL.md
+A	.specify/specs/104-agents-run/baseline-failed.txt
+A	.specify/specs/104-agents-run/notes/pre-change-measurements.md
+A	.specify/specs/104-agents-run/notes/red-first-evidence.md
+M	.specify/specs/104-agents-run/tasks.md
+A	.specify/specs/104-agents-run/test-evidence/implement-baseline-full-run.txt
+A	.specify/specs/104-agents-run/test-evidence/implement.jsonl
+M	docs/reference/agents/command-and-skills.md
+M	docs/reference/agents/design.md
+M	docs/reference/agents/overview.md
+M	docs/reference/commands/agents.md
+M	docs/tutorials/installation.md
+M	docs/tutorials/quickstart.md
+M	skills/internal/run-agent/SKILL.md
+M	templates/commands/agents.md
+A	tests/contract/test_agents_run_command_contract.py
+A	tests/contract/test_agents_run_docs_contract.py
+A	tests/contract/test_agents_run_multi_child_edges.py
+A	tests/contract/test_agents_run_scope_contract.py
+A	tests/contract/test_agents_run_skill_wiring.py
+M	tests/scenarios/agents-command/single-entry-routing-scenario.md
+
+$ git diff b6907ee53..HEAD --name-status | grep -E "^(A|M)\s+(templates/|skills/internal/|docs/reference/commands/|docs/reference/agents/|docs/tutorials/|tests/|\.claude/commands/speckit\.agents|\.github/prompts/speckit\.agents|\.qoder/commands/speckit\.agents|\.opencode/command/speckit\.agents|\.specify/skills/internal/run-agent/)"
+M	.claude/commands/speckit.agents.md
+M	.github/prompts/speckit.agents.prompt.md
+M	.opencode/command/speckit.agents.md
+M	.qoder/commands/speckit.agents.md
+M	.specify/skills/internal/run-agent/SKILL.md
+M	docs/reference/agents/command-and-skills.md
+M	docs/reference/agents/design.md
+M	docs/reference/agents/overview.md
+M	docs/reference/commands/agents.md
+M	docs/tutorials/installation.md
+M	docs/tutorials/quickstart.md
+M	skills/internal/run-agent/SKILL.md
+M	templates/commands/agents.md
+A	tests/contract/test_agents_run_command_contract.py
+A	tests/contract/test_agents_run_docs_contract.py
+A	tests/contract/test_agents_run_multi_child_edges.py
+A	tests/contract/test_agents_run_scope_contract.py
+A	tests/contract/test_agents_run_skill_wiring.py
+M	tests/scenarios/agents-command/single-entry-routing-scenario.md
+
+$ git diff b6907ee53..HEAD --name-status -- scripts/ src/ shared/ .specify/shared/ templates/ .specify/glossary.md
+M	templates/commands/agents.md
+(no rows above = zero engine/owner/glossary edits; templates/commands/agents.md excluded by the path list? -- verify)
+
+$ git diff b6907ee53..HEAD --name-status -- templates/
+M	templates/commands/agents.md
+
+$ python3 .specify/scripts/python/flow-class-check.py --action check
+flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]
+coverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39
+rc=0
+
+$ added paths under product roots (status A)
+tests/contract/test_agents_run_command_contract.py
+tests/contract/test_agents_run_docs_contract.py
+tests/contract/test_agents_run_multi_child_edges.py
+tests/contract/test_agents_run_scope_contract.py
+tests/contract/test_agents_run_skill_wiring.py
+(only the five declared test modules appear above; no new template/skill/doc file)
+
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_scope_contract.py -q --names-out /tmp/pkg3-scope.txt
+rc=0
+
+.........                                                                [100%]
+9 passed in 6.22s
+# failed-name list written: /tmp/pkg3-scope.txt (0 entries) passes=1
