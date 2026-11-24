@@ -80,6 +80,14 @@ HISTORICAL_LINE = re.compile(
 COUNT_SKIP_LINE = re.compile(
     r"(?i)\bgiven\b|\bwhen\b|\bthen\b|fixture|夹具|示例|例如|举例|e\.g\.|"
     r"interval|区间|范围|threshold|ceiling|上限|下限|端点")
+# F18 residual (2026-11-24): a GATE row quotes a shell count command and a DoD row
+# states a completion condition. Neither is a claim about how many tasks the feature
+# defines, so a number next to `任务行` / `tasks` there is not a count claim. Only the
+# row-start marker is skipped: a task row or prose line that merely mentions a GATE
+# id keeps its claim.
+GATE_DOD_ROW = re.compile(
+    r"^\s*(?:[-*+]\s+)?(?:\[[ xX>~]\]\s+)?(?:\*\*)?(?:GATE|DoD)-\d+",
+    re.IGNORECASE)
 
 BACKTICK = re.compile(r"`([^`\n]+)`")
 PATH_TOKEN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+/?$")
@@ -519,7 +527,8 @@ def check_counts(files, fr, sc, tasks, findings, spec_dir):
     for path in files:
         rel = os.path.relpath(path, spec_dir)
         for number, line in live_lines(read_file(path)):
-            if HISTORICAL_LINE.search(line) or COUNT_SKIP_LINE.search(line):
+            if (HISTORICAL_LINE.search(line) or COUNT_SKIP_LINE.search(line)
+                    or GATE_DOD_ROW.match(line)):
                 continue
             for kind, pattern in COUNT_CLAIMS:
                 expected = actual[kind]
