@@ -120,3 +120,42 @@ would be a defect. Both runs above went through the unique entry; rc captured di
 One wording correction during T004: the template's ambiguity sentence said "request the
 missing intent" while the contract requires "requests the missing intent"; the template was
 corrected to the contract's wording (correction, not a decision).
+
+## P1 guard reading (four named guards + the run-agent mirror param)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_run_skills_wiring.py tests/contract/test_team_command_routing.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py -q
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_role_transition_payload.py::test_wired_surface_mirror_is_identical[skills/internal/run-agent/SKILL.md]
+4 failed, 163 passed in 7.21s
+rc=1
+```
+
+Classification against `baseline-failed.txt` (name-level):
+
+- The three `test_fast_fail_discipline.py` failures are **in the baseline** (pre-existing; not this feature's).
+- `test_role_transition_payload.py::test_wired_surface_mirror_is_identical[skills/internal/run-agent/SKILL.md]`
+  is **new at this point of the line** — it asserts the source↔mirror pair is byte-identical, and
+  the mirror is regenerated only in the Polish phase (T028; plan § Mirror Obligations defers
+  regeneration until every source edit has landed). Same cause, second param:
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_mirror_parity_suite.py -k 'run-agent' -q
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/run-agent/SKILL.md->.specify/skills/internal/run-agent/SKILL.md]
+1 failed, 1 passed in 6.42s
+rc=1
+```
+
+Both are the **planned mirror-regeneration ordering transient**, not a subject or assertion
+defect: T028 runs `sync-mirrors.py --write --only skills/internal` and then `--check`; the two
+params turn green at that point and the closure name-level diff is taken after it. No hand edit
+of the mirror was made (a hand edit would be the defect this pair exists to catch).
+
+Note on `targeted-set-v1` sufficiency: the literal algorithm (module stem `SKILL` and short
+name `agents-run`) selects 381 test files, i.e. nearly the whole contract/integration surface,
+which would collide with the one-full-suite budget. The package therefore ran the task rows'
+explicitly named verification sets (the two new modules, then the four named guards plus the
+narrow mirror param) and records that deviation openly; the closure slot owns the full
+name-level comparison.
