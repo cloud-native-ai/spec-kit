@@ -34,6 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 PRE_CHANGE_NOTE = (
     REPO_ROOT / ".specify" / "specs" / "104-agents-run" / "notes" / "pre-change-measurements.md"
 )
+SKILL = REPO_ROOT / "skills" / "internal" / "run-agent" / "SKILL.md"
 
 # SC-005 comparison unit: the five product-surface roots (closed set).
 PRODUCT_ROOTS = (
@@ -136,6 +137,11 @@ def _exempt(path: str) -> bool:
     return path in PROCESS_EVIDENCE_REGISTRY_EXACT or any(
         path.startswith(prefix) for prefix in PROCESS_EVIDENCE_REGISTRY_PREFIXES
     )
+
+
+def _norm(text: str) -> str:
+    """Collapse whitespace so a phrase assertion is not defeated by line wrapping."""
+    return " ".join(text.split())
 
 
 def judge_change_set(entries: list[tuple[str, str]]) -> list[str]:
@@ -273,4 +279,31 @@ def test_behavior_class_honesty_label():
                 offenders.append(f"{relative}:{lineno}: {line.strip()}")
     assert offenders == [], (
         "a module claims runtime coverage as contract-level:\n" + "\n".join(offenders)
+    )
+
+
+def test_team_parameter_conflict_sentence_is_pinned():
+    """requirements.md § Edge Cases: a run carrying a team option reports the named conflict."""
+    text = _norm(SKILL.read_text(encoding="utf-8"))
+    assert "team parameter not accepted by run: <option>" in text, (
+        "the named team-parameter conflict sentence was lost or reworded"
+    )
+    assert "`--target` / `--scope` / `--spec-dir`" in text, (
+        "the closed team-option class lost a measured member"
+    )
+    assert "templates/commands/team.md" in text, (
+        "the option class is no longer carried by its owner pointer"
+    )
+    assert "unlisted `--` option in option position" in text, (
+        "the unlisted-option rule was lost"
+    )
+    assert "points at `/speckit.team`" in text, (
+        "the conflict sentence no longer points at /speckit.team"
+    )
+    assert "never silently dropped" in text, "the never-silently-dropped rule is missing"
+    assert "never rewritten into a team run" in text, (
+        "the never-rewritten-into-a-team-run rule is missing"
+    )
+    assert "Task text follows the User Input rules and is not parsed as options" in text, (
+        "task text is no longer fenced off option parsing"
     )
