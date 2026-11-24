@@ -1,0 +1,6 @@
+== headings ==
+1
+== stamp ==
+1
+== residual placeholders ==
+0
