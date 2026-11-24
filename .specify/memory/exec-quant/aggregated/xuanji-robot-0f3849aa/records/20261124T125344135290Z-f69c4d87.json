@@ -1,0 +1,116 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-robot",
+    "source_commit": "74402c99c194f4715954c7bbac82e7dc9f8847c7",
+    "identity_status": "identified",
+    "identity_key": "d245950a4c13032a3ed991f1ff94b990bb8eaeba30ee7e7864576b5f6cf325e6",
+    "content_hash": "8afc86af61ab782156eda8c846c34141b3861efa1032f9cc4248e7a58835d988",
+    "package_file": "feedback-xuanji-robot-20261124T122403.zip",
+    "ingested_at": "2026-11-24T12:53:44Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.requirements",
+    "unit_type": "command",
+    "run_id": "req-011-20261022",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T07:06:32Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.74",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--dangerously-skip-permissions",
+          "-p",
+          "你在推进 xuanji-robot 的无人值守 SDD 特性开发，当前阶段：REQUIREMENTS。\n- 项目终态权威文档：`.specify/memory/features/017.md`（特性定义）+ `.specify/memory/constitution.md`（Security Requirements、原则 I/II/VII）+ 相关特性 003/008/016/018/019/020/021\n- 项目宪法：/cws_work/xuanji-robot/.specify/memory/constitution.md（合规底线）\n- 上一阶段完成提交：无（本特性首个阶段；续作基线 = main @ 7df4908）\n- 当前断点判定：specs 现有 001–010，无 Feature 017 对应目录 → 从 requirements 起步（预计编号 011；绑定既有 Feature 017，编号以创建脚本判定为准）\n- 需求简报：/tmp/xuanji-robot-017-brief.md —— 开始前请完整阅读\n\n先完整阅读简报，然后执行 /speckit.requirements（特性描述以简报为准）。\n\n- 直接执行不要确认；访谈式问题自行裁决并记录假设（假设记录位置：spec 文件的 Assumptions 节或提交说明）。\n- 只提交本特性产物。\n- 工作树应干净；若存在无关改动不提交不还原。\n- 不要 push（除非明确授权）——远程推送属破坏性操作。\n- 只推进当前阶段；下一阶段由主代理派发，不要自行越阶段。\n- 并发隔离：`.specify/memory/feedback/` 与 `.specify/memory/session/`、`.specify/memory/exec-quant/` 为引擎产物，不提交、不还原（允许引擎追加）。\n- 审后提交边界：本线只做阶段产物提交，审后由主会话统一提交本线收尾件。\n\n- 完成时，你输出的最后一行必须是且仅是完成哨兵：REQUIREMENTS-DONE。\n- 若本阶段无法完成（阻塞、发现规格矛盾、环境缺失），最后一行输出显式异常行：`ANOMALY: <一句话事实>`。\n- 最后一行既不是完成哨兵也不是显式异常行 = 卡死信号，主代理将按卡死程序处置。\n- 对齐说明：本回传契约与快速失败纪律（fast-fail）的子代理派发注入义务一致——异常必须显式回传，静默是不被接受的输出。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-robot",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "8.212.124.35:443",
+          "106.14.225.66:443",
+          "47.57.243.249:443",
+          "39.108.79.164:443",
+          "39.107.242.82:443",
+          "39.106.211.206:443",
+          "47.57.188.188:443",
+          "8.212.20.107:443",
+          "8.223.13.163:443",
+          "47.107.125.11:443",
+          "101.132.70.5:443",
+          "47.57.13.70:443",
+          "47.103.128.242:443",
+          "120.79.243.153:443",
+          "39.106.176.70:443",
+          "47.106.88.164:443",
+          "39.107.85.235:443",
+          "47.103.9.44:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-robot",
+    "source_commit": "74402c99c194f4715954c7bbac82e7dc9f8847c7",
+    "identity_status": "identified",
+    "identity_key": "930b342a5a14c9e7837ff8d7da7ba44823bc0614361cc47d4935fd353b8955a5",
+    "content_hash": "3d9ce16fc4e5608e1a49eacc712c3ac888e3771f367368adb6581d8f13a3884d",
+    "package_file": "feedback-xuanji-robot-20261124T122403.zip",
+    "ingested_at": "2026-11-24T12:53:44Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.review",
+    "unit_type": "command",
+    "run_id": "011-api-auth-rate-limit-review-20261022",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-10-22T09:22:30Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.74",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "--dangerously-skip-permissions",
+          "-p",
+          "你在推进 xuanji-robot 的无人值守 SDD 特性开发，当前阶段：REVIEW。\n- 特性规格目录：`.specify/specs/011-api-auth-rate-limit/`（requirements/plan/tasks/checklists/contracts/data-model/quickstart/feature-ref/research/verification/notes）\n- 实现提交：`ad3455b`（68/68 任务；GATE-1..8 PASS，GATE-9 生产前门）；分支 `011-api-auth-rate-limit`\n- 验证证据：`verification.md`、`notes/benchmark.md`、`notes/quickstart-run.md`、`notes/red-first-evidence.md`\n- 项目宪法：/cws_work/xuanji-robot/.specify/memory/constitution.md\n- 当前断点判定：implement 已完成（analyze 第 2 轮 PASS；全量测试/race/vet/gofmt 绿）→ review（批判性评审本特性的 SDD 过程，产出改进导向报告）\n- 需求简报：/tmp/xuanji-robot-017-brief.md\n\n先完整阅读规格、实现提交与验证证据，然后执行 /speckit.review。\n\n- 评审对象是本特性的 SDD 过程（规格/计划/任务/质量门/实现治理），不是重新做代码安全评审；发现按 P0/P1/P2 分级，结论先行。\n- 可在容器内运行只读检查与测试（本环境 Go 1.26.5 可用）；不要 push。\n- 只产出评审报告（写入规格目录的 review 产物）；只提交本特性产物。\n- 工作树应干净；若存在无关改动不提交不还原。\n- 并发隔离：`.specify/memory/feedback/`、`session/`、`exec-quant/` 为引擎产物，不提交、不还原。\n- 完成后最后一行必须是且仅是：REVIEW-DONE；无法完成则 `ANOMALY: <一句话事实>`。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_work/xuanji-robot",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "DeepSeek-Flash",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": {
+        "value": "max",
+        "provenance": "measured"
+      },
+      "config_source": {
+        "value": "/home/develop/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": "not_evaluated",
+      "connection_evidence": {
+        "value": [
+          "47.103.9.44:443",
+          "47.106.88.164:443",
+          "39.106.211.206:443",
+          "39.107.242.82:443",
+          "8.212.124.35:443",
+          "39.107.85.235:443",
+          "47.107.125.11:443",
+          "39.106.176.70:443",
+          "101.132.70.5:443",
+          "8.223.13.163:443",
+          "8.212.20.107:443",
+          "120.79.243.153:443",
+          "39.108.79.164:443",
+          "47.103.128.242:443",
+          "47.57.243.249:443",
+          "47.57.188.188:443",
+          "106.14.225.66:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": "not_evaluated",
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}
