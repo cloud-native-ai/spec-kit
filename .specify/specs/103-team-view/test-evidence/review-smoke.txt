@@ -1,0 +1,12 @@
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_program.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...................                                                      [100%]
+19 passed in 6.45s
+# failed-name list written: .specify/specs/103-team-view/test-evidence/us4-failed.txt (0 entries) passes=1
+
+real	0m8.170s
+user	1m58.400s
+sys	0m31.955s
