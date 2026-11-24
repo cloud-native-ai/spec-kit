@@ -13,6 +13,8 @@
 
 ## Latest Review
 
+2026-11-24 plan for requirement `103-team-view`: the design set landed — `plan.md`, `research.md`, `data-model.md`, three contracts (38 clauses), `quickstart.md`, `feature-ref.md`. The plan adds the fourth, read-only mode `view` through a new `view-team` skill and the deterministic program `scripts/python/team-view.py`; it changes no engine action (`goal-utils.py` stays untouched) and keeps create / modify / run semantics byte-equivalent. Gates: `pre-analyze-check --stage plan` decision=pass (errors=0), `validate-decision-tensions` ok, plan integrity (one heading, Requirement → Feature stamp, zero placeholders). Feature status stays `Implemented` under the no-status-regression gate; the spec advances its own lifecycle independently.
+
 2026-11-24 clarify binding: requirement `103-team-view` was bound directly to Feature 027. It adds a read-only fourth mode (`view`) to the same `/speckit.team` command surface and team archive layer — the same relation 036 (team summary) and 042 (goal-based create) already have to this Feature. Feature status stays `Implemented` under the no-status-regression gate; the new spec advances its own lifecycle independently. Binding record and rationale: `.specify/specs/103-team-view/requirements.md` § Related Feature / § Clarifications.
 
 2026-11-22 implementation audit: `run-team` now owns run orchestration, the old file-per-team layout and universal explicit-confirmation description are stale, and the summary index follows the current Anchor layout. The historical planning and implementation records below remain dated evidence.

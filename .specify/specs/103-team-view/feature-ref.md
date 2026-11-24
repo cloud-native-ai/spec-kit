@@ -1,0 +1,54 @@
+# Feature Reference — 103-team-view
+
+**Bound Feature**: 027 — Team Management (`Implemented`; no status regression).
+**Binding basis**: 027 owns the `/speckit.team` command surface (create / modify / run) and the team archive layer. This feature adds the fourth, read-only mode `view` to the same surface — the same direct-follow-on relation 036 (team summary) and 042 (goal-based create) already have to 027. Binding record and rationale: `.specify/specs/103-team-view/requirements.md` § Related Feature / § Clarifications.
+**Parent detail**: `.specify/features/027-team-management.md`.
+
+## How this plan maps to Feature 027
+
+| Plan element | Feature 027 element it serves | Direction |
+|--------------|-------------------------------|-----------|
+| `templates/commands/team.md` fourth mode + `argument-hint` | the single `/speckit.team` entry and its mode routing | additive: one mode, no change to the three existing routes |
+| `view-team` skill | the team domain's skill split (create-team / improve-team / run-team) | additive: a read-only fourth skill, no write or execute authority |
+| `team-view.py` | the archive layer's read surface (`.specify/teams/<slug>/`) | additive: read-only program, no engine change |
+| `docs/reference/commands/team.md` four modes + drift repair | the command's user-facing reference | correction: the docs follow the template/skill (run → `run-team`; preview = disclosure) |
+| Six-group rendering | the persisted team's structure and run state | presentation only; no new schema field, no new store |
+
+The feature does **not** change `goal-utils.py` (RS-004 zero modification), does not change create / modify / run semantics or write authority, does not add a team schema key, and does not add a summary or ledger field.
+
+## Delivery surface
+
+Authored framework sources:
+
+1. `scripts/python/team-view.py` (new)
+2. `skills/internal/view-team/SKILL.md` (new; plus references if the skill needs them)
+3. `templates/commands/team.md` (edit: frontmatter, mode table, routing flow, default/ambiguous capability lists, View Mode section)
+4. `docs/reference/commands/team.md` (edit: four modes, View Mode section, run-mode drift corrections)
+
+Tests (new):
+
+5. `tests/fixtures/team_view_fixtures.py`
+6. `tests/unit/test_team_view_parsers.py`
+7. `tests/contract/test_team_view_command.py`
+8. `tests/contract/test_team_view_program_contract.py`
+9. `tests/integration/test_team_view_program.py`
+
+Generated mirrors and copies (never hand-edited):
+
+10. `.specify/scripts/python/team-view.py`
+11. `.specify/skills/internal/view-team/**`
+12. `.claude/commands/speckit.team.md`
+13. `.github/prompts/speckit.team.prompt.md`
+14. `.qoder/commands/speckit.team.md`
+15. `.opencode/command/speckit.team.md`
+
+This spec directory:
+
+16. `.specify/specs/103-team-view/**` (plan stage: plan / research / data-model / contracts / quickstart / feature-ref / test-evidence)
+
+Lifecycle registration:
+
+17. `.specify/features.md` (027 row note: plan landed; status stays `Implemented`)
+18. `.specify/features/027-team-management.md` (plan note; status unchanged)
+
+**Explicitly outside the delta**: `scripts/python/goal-utils.py` (zero modification, RS-004), `skills/internal/create-team/**`, `skills/internal/improve-team/**`, `skills/internal/run-team/**`, `templates/teams/**`, `README.md` (carries no team mode enumeration — FR-018), `.specify/glossary.md` (no new entry, A-11), and the pre-existing dirty files under `.specify/skills/coaching-skills/` and the settled run-determination session records (neither committed nor reverted).
