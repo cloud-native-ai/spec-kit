@@ -1,6 +1,6 @@
 # Red-first evidence — 103-team-view (T009)
 
-- Captured: 2026-11-24T04:0xZ, BEFORE any implementation file existed
+- Captured: 2026-11-24T03:59Z, BEFORE any implementation file existed
   (`scripts/python/team-view.py` absent; `templates/commands/team.md` still three-mode)
 - Command (the unique entry; no pipeline, stdout+stderr captured whole):
   `bash scripts/bash/run-tests.sh tests/unit/test_team_view_parsers.py tests/contract/test_team_view_program_contract.py tests/contract/test_team_view_command.py tests/integration/test_team_view_program.py -q`
