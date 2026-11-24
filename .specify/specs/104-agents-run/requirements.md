@@ -13,8 +13,9 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 019
+**Feature Name**: Agents Command
+**Binding basis**: 019 owns the `/speckit.agents` command surface and the agent definition/execution layer（索引描述：Create, refine, and run layered agents with rendered host registrations）；019 的详情文件 Related Specifications 显示其已连续吸收同主题 spec（003 / 014 / 022 / 023）。候选扫描（2026-11-24）：019 `Implemented`（直接匹配）；095 `Ready for Review`（superagent 角色定义 owner——本特性按 A-2 只引用、不重定义，故不绑定）；057 `Implemented`（仅做命令路由核查，非命令面 owner）。按 Feature Binding Rules 的 bind 分支「匹配即绑定、不新建」：绑定 019，不创建新 Feature；019 状态保持 `Implemented`（no-status-regression gate），索引行与 019 详情文件的绑定义务同批履行。
 
 ## Overview
 
@@ -45,7 +46,7 @@
 | **A-9** | **委派载体不变**：不新增技能；命令模板保持「只路由」；本特性编辑既有 `run-agent` 技能（及其 `references/` 如需）以完成接线。 | 单一职责拆分已成立（run-agent 持有 run 模式与无参行为）；新建技能会造出第二派发面。 |
 | **A-10** | **不新增 glossary 词条**：`run` 是通用词；`Super Agent`（superagent）与 `Agent Execution`（子代理）均已登记；`role-transition` 等术语按 owner 引用。 | 词汇表只登记项目域术语；遵循 103 的 A-11 先例。 |
 | **A-11** | **两顶帽子**：源面为 `templates/commands/agents.md`、`skills/internal/run-agent/**`、`docs/**`、`tests/**`；`.specify/**` 镜像与各工具命令副本由 `scripts/python/sync-mirrors.py` / `scripts/python/regen-command-copies.py` 再生成，不手改。 | 本仓为 framework source；手改镜像会在同步时丢失。 |
-| **A-12** | **Feature 绑定留待 `/speckit.clarify`**：`Related Feature` 保持默认 `Need clarification`；`create-requirements` 不建 Feature。 | Feature Binding Rules 的 bind 分支在 clarify 执行；Feature 019（Agents Command）为候选，不在本阶段裁决。 |
+| **A-12** | **Feature 绑定留待 `/speckit.clarify`**（**已履行 2026-11-24**：绑定 Feature 019，见 `Related Feature` 与 clarify 会话）：`create-requirements` 不建 Feature。 | Feature Binding Rules 的 bind 分支在 clarify 执行；019 为候选，本阶段按 bind 分支裁决绑定并履行 registry 义务。 |
 | **A-13** | **并发读数**：一次 run 只有一个可表示单元，按 `single-unit` 记录读数三元组（`requested` / `effective` / `effective_reason`）；用户多次调用 run 是多次独立命令运行，不是单一执行体内扇出；一次 run MUST NOT 扇出多个 agent。 | owner：`subagent-definitions.md` § The Concurrency Obligation、`serial-reason.yaml`；单次委派允许 native，单单元是具名事实。 |
 | **A-14** | **行为类条款须自陈**：呈现披露、载荷内容、回传完整性、运行期 label 唯一性属行为类（无独立制品可观测面），MUST 声明为行为类并以真源文本 + 评审 + 变异演练取证；MUST NOT 声称被契约测试「覆盖」。制品类条款（模板字段、文档字面量、计数）由契约测试机械断言。 | 052 的制品类/行为类二分；把行为类当制品类断言是盲检。 |
 
@@ -166,7 +167,7 @@
 - **FR-008**: 派发载荷 MUST 物理携带：① 七字段下行（字段集与语义 owner：`.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol，本规格不复述字段表）；② 既有四项注入（快速失败子句、并发义务、汇报义务、re-anchoring 锚摘要）按各自 owner 以指针携带；③ 当派发授予派发职责（`dispatch_duty: granted`）时，`role-transition` 稳定标识与九项指针清单。载荷 MUST NOT 指示子代加载任何技能、MUST NOT 点名任何驱动技能、MUST NOT 含循环逻辑（反嵌套，owner 按 `subagent-definitions.md` § Dispatch-Time Governance Obligation）。
 - **FR-009**: 派发前自检 MUST 在既有形态上扩展为逐项判定：`role-transition` 标识与九个 item-id slug 逐项在场（授职派发时），以及七字段下行逐项在场；缺标识或缺任一 slug/字段 MUST 作为载荷构造缺陷在派发前阻断，MUST NOT 进入派发。
 - **FR-010**: 每个回传 MUST 满足 owner 的五要素上行（结果或交付物路径、证据指针、显式异常行、并发读数三元组、返回执行体身份）；缺任一项即 incomplete，父侧 MUST NOT 消费其结论、MUST NOT 代填缺失字段；无异常时 MUST 显式写「未发现异常」。
-- **FR-011**: 每次 run 派发 MUST 使用唯一 child label（派发尝试标识）；同一 superagent 下多次 run MUST 产生互不相同的 label；重试 MUST 是新尝试并保留旧尝试产物；旧尝试的迟到返回 MUST NOT 被当作当前结果消费（归因规则按既有 watch model owner）。
+- **FR-011**: 每次 run 派发 MUST 使用唯一 child label（派发尝试标识）；同一 superagent 下多次 run MUST 产生互不相同的 label；重试 MUST 是新尝试并保留旧尝试产物；旧尝试的迟到返回 MUST NOT 被当作当前结果消费（归因规则按既有 watch model owner）。child label MUST 复用既有 dispatch label 约定——`dispatch.sh <label>` 的 label 原样作为该次派发的 `run_id` 交给 `exec-quant.py --action collect-dispatch --run-id <label>`，external artifact triplet 以 `<label>.live.log` / `.jsonl` / `.status` 命名；MUST NOT 新增 label 生成器、子代清单或 registry。
 - **FR-012**: 多子代 MUST 仅经既有载体可见：external 派发的 artifact triplet（`.live.log` / `.jsonl` / `.status`）与 `exec-quant` 记录、状态摘要的角色视图（`parent` / `roles` / `role_set_marker` / `depth`）与运行记录；本特性 MUST NOT 新增子代清单、registry、第二渲染器或第二状态存储。
 - **FR-013**: 同一 Instance 可被多次执行（顺序或并发），每次执行 MUST 与定义及其它执行隔离；run MUST NOT 修改 agent 定义、MUST NOT 跨执行共享可变状态。
 
@@ -181,7 +182,7 @@
 
 - **FR-018**: `docs/reference/commands/agents.md` MUST 合并为**单份正文**（前提纠正 P-1：当前 `^# /speckit.agents` 计数为 3），并同步：描述行从 [[STR-006]] 更正为三能力；Syntax 块加入显式 run；意图表加入 run 行；技能清单列出 run / create / refine 三技能；无参行为更正为列举 + 建议（删除 [[STR-008]] 一类「无参生成七个角色代理」的陈述）；`capabilities (create / refine)`（[[STR-005]]）不再出现。
 - **FR-019**: `docs/reference/agents/command-and-skills.md` MUST 同步为三能力：描述句不再写「creates or refines one agent」一类只含两能力的陈述；意图路由表加入 run 行；路由流覆盖 run；单代理技能清单由两个扩为三个，并为 `run-agent` 增加一节（解析 → 呈现 → 派发 → external 收集 → 报告，按指针引用其输出契约，不复制规则）。
-- **FR-020**: 同批同步其余能力枚举面：`docs/reference/agents/overview.md` 与 `design.md` 的能力单行 MUST 含 run；`docs/tutorials/installation.md` 与 `quickstart.md` 的命令表行 MUST 含 run，且其中的陈旧无参陈述（[[STR-007]] 及同句式变体）MUST 被更正为与当前模板一致；`docs/reference/history/` 的 dated record MUST NOT 被改写。实现若发现其它能力枚举面（README、索引、教程）MUST 同步。
+- **FR-020**: 同批同步其余能力枚举面（2026-11-24 扫描固定的封闭清单：`docs/reference/agents/overview.md`、`docs/reference/agents/design.md`、`docs/tutorials/installation.md`、`docs/tutorials/quickstart.md`）：overview / design 的能力陈述 MUST 含 run，且技能计数陈述（如 overview 的「两个单 Agent 技能」）MUST 更新为三技能；installation / quickstart 的命令表行 MUST 含 run，且其中的陈旧无参陈述（[[STR-007]] 及同句式变体）MUST 被更正为与当前模板一致；`docs/reference/history/` 的 dated record MUST NOT 被改写。README 当前无 `/speckit.agents` 能力枚举行（2026-11-24 扫描 0 命中），不在本清单；若 plan 阶段扫描发现新增枚举面，MUST 先把其路径并入本 FR 的清单并同步 SC-005 允许集，再编辑。
 - **FR-021**: 本特性 MUST NOT 新增 glossary 词条；`Super Agent`、`Agent Execution`、`role-transition` 等术语 MUST 按既有词条与 owner 引用，MUST NOT 新造同义词或为 `run` 建立项目域定义。
 
 #### E. 质量与测试
@@ -195,7 +196,7 @@
 - **Agent Definition（Agent Template / Agent Instance）**: 被解析并派发的定义，位于 `.specify/agents/{instances,templates}/<name>.agent.md`；三层分类法与字段语义 owner 是 `shared/definitions/agent-definitions.md`，本特性只消费。
 - **Agent Execution**: 一次 run 产生的运行形态；三种执行模式与可见性契约 owner 是 `shared/definitions/subagent-definitions.md`，本特性不新增执行层实体。
 - **Role Edge**: 一次派发产生的 `parent → child` 关系；是既有载体的投影（owner：`superagent-definitions.md` § Role Edges），不是新存储；本特性只为 run 派发补齐七字段下行与身份解析。
-- **Child Label（派发尝试标识）**: 子代在既有派发 label 约定下的身份，用于区分同一 superagent 的多个子代与重试；不是新实体，落在既有 artifact triplet / run_id / 记录字段。
+- **Child Label（派发尝试标识）**: 子代在既有派发 label 约定下的身份，用于区分同一 superagent 的多个子代与重试；具体形态 = `dispatch.sh <label>` 的 label（原样作为派发 `run_id` 与 artifact triplet 前缀；owner：`skills/internal/run-agent/SKILL.md` / `exec-quant.py --action collect-dispatch`），不是新实体，不新增生成器或清单。
 - **Return Record**: 子代回传，承载五要素上行；owner 是 `superagent-definitions.md` § The super↔sub Protocol。
 - 本特性不新增数据实体、持久化根或 registry；以上实体均为既有载体的读取或投影。
 
@@ -264,3 +265,11 @@
 - Q: SDD 授权探针是否阻断普通 run？ → A: 否；探针只在载荷指派/点名 SDD 驱动时适用，普通 run 不因缺 team/seat 被阻断（A-7 / FR-016）。
 - Q: 是否新增 glossary 词条？ → A: 否；`Super Agent` / `Agent Execution` 已登记，按既有词条与 owner 引用（A-10 / FR-021）。
 - 同作者检测门：本 `requirements.md` 由本阶段单一执行体自撰；后续 `/speckit.analyze` / 评审若在同一会话内分析本文件，须按 `.specify/shared/workflow/objective-analysis-gate.md` 委派 fresh-context 只读子代理。
+
+### Session 2026-11-24（无人值守 clarify 阶段，自行裁决并记录）
+
+- Q: 本特性绑定哪个 Feature？ → A: 绑定既有 **Feature 019（Agents Command）**。候选证据：019 `Implemented`（"Create, refine, and run layered agents with rendered host registrations"，直接拥有 `/speckit.agents` 命令面）；095 `Ready for Review` 是 superagent 角色定义 owner，本特性按 A-2 只引用不重定义，不绑定；057 `Implemented` 仅做路由核查。019 详情显示其已吸收 003 / 014 / 022 / 023 等同主题 spec（binding-precedent heuristic 成立）。按 bind 分支「匹配即绑定、不新建」，不创建新 Feature。
+- Q: 「child label（派发尝试标识）」采用什么既有约定？ → A: 复用既有 dispatch label 约定：`dispatch.sh <label>` 的 label 原样作为该次派发的 `run_id`（owner：`skills/internal/run-agent/SKILL.md`），并交给 `exec-quant.py --action collect-dispatch --run-id <label>`；external artifact triplet 以 `<label>.live.log` / `.jsonl` / `.status` 命名。唯一性由「每次 run 生成新 label、重试即新 label」保证；MUST NOT 新增 label 生成器、子代清单或 registry。写回 FR-011 与 Key Entities 的 Child Label 行。
+- Q: FR-020 的「实现若发现其它能力枚举面」条件句如何可判定？ → A: 以 2026-11-24 仓库扫描固定封闭清单：`docs/reference/agents/overview.md`、`docs/reference/agents/design.md`、`docs/tutorials/installation.md`、`docs/tutorials/quickstart.md`（均在 FR-018 / FR-019 之外）；README 扫描 0 命中，不列入。overview / design 的**技能计数陈述**（如「两个单 Agent 技能」）一并纳入 MUST 更新为三技能。若 plan 阶段扫描发现新增枚举面，MUST 先把路径并入 FR-020 清单并同步 SC-005 允许集再编辑（closed-set-claims：封闭集须可判定）。写回 FR-020。
+- Q: Feature Registry 的绑定机械义务如何履行？ → A: 019 状态保持 `Implemented` 不回退（clarify 无状态迁移权；no-status-regression）；同批更新索引行：Spec Path → `.specify/specs/104-agents-run/requirements.md`、Last Updated 跟随绑定注记；019 详情文件 Related Specifications 增列本 spec 并记录绑定理由、Last Updated 改为 2026-11-24；`Total Features` 与行数不变（不新增行）。A-12 标记为已履行。
+- 同作者检测门：本阶段执行体与 requirements 作者不是同一会话（requirements 由上一阶段独立执行体自撰），门未触发，未委派 fresh-context 检测子代理；本次覆盖扫描由本执行体直接完成，关键前提（H1 计数 = 3、陈旧字面量命中文件、README 0 命中、argument-hint 现状）均以仓库检索当场取证。

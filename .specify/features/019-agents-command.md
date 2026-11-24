@@ -5,13 +5,15 @@
 **Description**: Create, refine, and run layered agents with rendered host registrations.
 **Status**: Implemented  
 **Created**: 2026-02-27  
-**Last Updated**: 2026-11-22
+**Last Updated**: 2026-11-24
 
 ## Overview
 
 `/speckit.agents` routes create, refine, and run intents across Agent Template and Agent Instance storage under `.specify/agents/`. `run-agent` resolves execution configuration and topology before dispatch, while `specify render-agents` projects neutral metadata into real Qoder, Claude, Copilot, and opencode registration files.
 
 ## Latest Review
+
+2026-11-24 clarify binding: requirement `104-agents-run` was bound directly to Feature 019. It adds the explicit `run` subcommand to the same `/speckit.agents` command surface and wires the 095 superagent/subagent role model into dispatch-time presentation, payload, and return contract — the same relation its predecessors (003 / 014 / 022 / 023) already have to this Feature. Feature status stays `Implemented` under the no-status-regression gate; the new spec advances its own lifecycle independently. Binding record and rationale: `.specify/specs/104-agents-run/requirements.md` § Related Feature / § Clarifications.
 
 2026-11-22 implementation audit: `/speckit.agents` now unifies create, refine, and run. Templates and instances live under `.specify/agents/`; `run-agent` owns configuration resolution, topology selection, dispatch, and fast-fail injection. `specify render-agents` writes actual host registration files with deterministic instance-over-template precedence. Older `.github/agents/` primary-storage, directory-symlink, and workspace-file claims below are historical, not the current contract.
 
@@ -75,6 +77,7 @@ Spec 023 (agent-framework-redesign, Implemented 2026-07-10): Redesigns the Agent
 
 ## Related Specifications/Requirements
 
+- Agents Run Specification: `.specify/specs/104-agents-run/requirements.md`（2026-11-24 `/speckit.clarify` 直接绑定：显式 run 子命令与 superagent/subagent 架构自动接线；019 状态不回退）
 - Current Framework Specification: `.specify/specs/023-agent-framework-redesign/requirements.md`
 - Historical Specification: `.specify/archive/specs/003-speckit-agents-command/requirements.md`
 - Historical EEI Specification: `.specify/archive/specs/022-eei-agent-triad/requirements.md`
