@@ -1,0 +1,42 @@
+# US1 mirror projections — package 2 (T018 / T019)
+
+Captured: 2026-11-24, after T017's green targeted run.
+
+## T018 — program mirror (`scripts` pair)
+
+  python3 scripts/python/sync-mirrors.py --write --only scripts
+    scope --only: scripts
+    ... (projected rows for the version-bridge and bash-guard files: ok)
+    write rc: 0
+
+  python3 scripts/python/sync-mirrors.py --check --only scripts
+    scope --only: scripts
+    ok    scripts/ == .specify/scripts/ (132 files, byte-identical)
+    ... (per-file projected rows: ok)
+    check rc: 0
+
+  diff -q scripts/python/team-view.py .specify/scripts/python/team-view.py
+    (no output) rc: 0
+
+## T019 — skill mirror (`skills/internal` pair)
+
+  python3 scripts/python/sync-mirrors.py --write --only skills/internal
+    scope --only: skills/internal
+    MISS  .specify/skills/internal/view-team/SKILL.md
+    sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+    write rc: 0
+
+  python3 scripts/python/sync-mirrors.py --check --only skills/internal
+    scope --only: skills/internal
+    ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+    check rc: 0
+
+  diff -rq skills/internal/view-team .specify/skills/internal/view-team
+    (no output) rc: 0
+
+## Scope note
+
+Both checks are scoped to this package's pairs. The whole-tree distribution gate
+(including the per-tool command copies, which this package's T016 template edit
+intentionally leaves for the US3 regeneration at T030) is T039's job and was not
+run here; the T003 baseline file remains the comparison face for it.

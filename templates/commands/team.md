@@ -1,6 +1,7 @@
 ---
-description: Single entry point for all team operations — create, modify, and run agent teams via intent routing.
-short-description: 团队操作统一入口：按意图路由创建、修改或运行代理团队
+description: Single entry point for all team operations — create, modify, run, and view agent teams via intent routing.
+short-description: 团队操作统一入口（四模式 create / modify / run / view）：按意图路由创建、修改、运行或只读查看代理团队
+argument-hint: "[create|modify|run|view] [team-slug] [--target <T-<nnn>>]"
 handoffs:
   - label: Update Instructions
     agent: speckit.instructions
@@ -26,15 +27,16 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 
 ### Modes → Capability Routing
 
-`/speckit.team` exposes **exactly three modes**:
+`/speckit.team` exposes **four modes**:
 
 | Mode | Recognized intent | Delegates to skill |
 |------|-------------------|--------------------|
 | **create** | "创建团队", "组织一个团队", "组建团队", "new team", "build a team" | `create-team` |
 | **modify** | "修改团队", "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
 | **run** | "运行团队", "执行团队", "run/execute team", "跑一遍"(可选 `--target T-<nnn>` 指定目标切片) | `run-team` |
+| **view** | "查看团队", "展示团队", "呈现结构", "团队状态", "团队详情", "概览", "overview", "status", "inspect", "show" | `view-team` |
 
-**Scope**: pass `--scope` and `--spec-dir <path>` through to the team operations. The closed scope value set, what each member names, and the archive layers are owned by `.specify/shared/definitions/goal-definitions.md` § Archive Layers — this template cites that owner and enumerates none of it. A team is an ordinary definition in the team archive layer `.specify/teams/<slug>/team.md`; there is no second team store and no lifetime-property kind (concept owner: `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model). The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+**Scope**: pass `--scope` and `--spec-dir <path>` through to the team operations. The closed scope value set, what each member names, and the archive layers are owned by `.specify/shared/definitions/anchor-definitions.md` § Archive Layers — this template cites that owner and enumerates none of it. A team is an ordinary definition in the team archive layer `.specify/teams/<slug>/team.md`; there is no second team store and no lifetime-property kind (concept owner: `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model). The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
 
 **Routing flow**:
 
@@ -70,7 +72,7 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 
 ### Goal-Based Create — deterministic entry (create path)
 
-When a token in `$ARGUMENTS` exactly matches an archived `<slug>` in the goal archive `.specify/anchoring/`, the create path enters the **goal-based branch** directly. The entry is deterministic and engine-driven — recognition runs `python3 scripts/python/goal-utils.py list --json` (the archive-layer read is scoped by the engine's declared value set — pointer: `.specify/shared/definitions/goal-definitions.md` § Archive Layers) and exact-matches the token (or a path to its `goal.md`); it MUST NOT be asserted from memory or semantics, and the branch decision is disclosed in the run output rather than gated on confirmation. Two rejections stop without writing: a **dangling reference** (user-named but absent from `list`) errors with the verbatim prefix `goal 未定义:` and points to `/speckit.goal create`; a **terminal goal** (`achieved`/`abandoned`) is reported and refused. Everything after entry — loading via `parse_goal` (objective, criteria incl. the `None provided.` missing state, status, targets, history), the four-element analysis, the decomposition proposal with batch approval, territory discipline, and team derivation/落盘 — is the skill's branch procedure: `skills/internal/create-team/references/create-mode.md` → *Goal-based create branch*.
+When a token in `$ARGUMENTS` exactly matches an archived `<slug>` in the goal archive `.specify/anchoring/`, the create path enters the **goal-based branch** directly. The entry is deterministic and engine-driven — recognition runs `python3 scripts/python/goal-utils.py list --json` (the archive-layer read is scoped by the engine's declared value set — pointer: `.specify/shared/definitions/anchor-definitions.md` § Archive Layers) and exact-matches the token (or a path to its `goal.md`); it MUST NOT be asserted from memory or semantics, and the branch decision is disclosed in the run output rather than gated on confirmation. Two rejections stop without writing: a **dangling reference** (user-named but absent from `list`) errors with the verbatim prefix `goal 未定义:` and points to `/speckit.goal create`; a **terminal goal** (`achieved`/`abandoned`) is reported and refused. Everything after entry — loading via `parse_goal` (objective, criteria incl. the `None provided.` missing state, status, targets, history), the four-element analysis, the decomposition proposal with batch approval, territory discipline, and team derivation/落盘 — is the skill's branch procedure: `skills/internal/create-team/references/create-mode.md` → *Goal-based create branch*.
 
 ### `goal` key — the bound goal's identity
 
@@ -84,6 +86,15 @@ The **run** mode delegates entirely to the `run-team` skill — `skills/internal
 - **Outputs**: run report at `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (with `## Verification` and, on target-assigned runs, the `**Target 指派**` field) and ledger entries carrying `"target_ref"`.
 
 **`--target` invariants**: Goal–Team binding, identity resolution, and the summary delivery directory are unchanged by `--target` — it is this run's focus slice, not a rebinding or a write-domain declaration.
+
+### View Mode
+
+The **view** mode delegates entirely to the read-only skill `view-team` — `.specify/skills/internal/view-team/SKILL.md` — which owns the input contract, the single delegation and the error navigation. The fixed-rule extraction (definition facts, static/dynamic structure, persistence inventory, latest run state, archive references) runs in `scripts/python/team-view.py`; this template carries no rendering logic and enumerates none of that program's output fields.
+
+- **严格只读**: view 不写定义、运行报告、台账、summary、anchor、registry 或 state，不派发席位，不登记 run line。
+- **输入**: 无 slug = 全团队概览（按 slug 升序）；有 slug = 精确目录匹配的完整呈现；未知 slug 报告 **"team not found"** 并建议走 `create`；损坏定义（目录存在而 `team.md` 缺失、不可读或不可解析）报告带精确路径的「定义损坏」，绝不与「不存在」互换。
+- **`--target` 冲突**: view 携带 `--target` 是模式/参数冲突（`--target` 只属于 run），必须显式报告，MUST NOT 静默丢弃或改道到 run。
+- **不是 run 预览**: 五查预检与 `blocked` 判决归 `run-team`，不属于 view；需要运行判定的读者走 `/speckit.team run`。
 
 ### Persistence
 

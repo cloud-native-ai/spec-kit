@@ -1,0 +1,34 @@
+# US1 targeted run — package 2 (T017)
+
+Captured: 2026-11-24, immediately after T011–T016 landed.
+Unique entry (no pipeline; stdout+stderr redirected whole, exit code preserved):
+
+  bash scripts/bash/run-tests.sh tests/unit/test_team_view_parsers.py tests/contract/test_team_view_program_contract.py tests/contract/test_team_view_command.py tests/integration/test_team_view_program.py -q --names-out .specify/specs/103-team-view/test-evidence/us1-failed.txt
+
+Runner mode line (verbatim):
+  # test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+
+Readings (verbatim tail):
+  ....................................................................     [100%]
+  68 passed in 6.57s
+  # failed-name list written: .specify/specs/103-team-view/test-evidence/us1-failed.txt (0 entries) passes=1
+
+- rc: 0
+- passed: 68
+- failed: 0
+- skipped: 0 (tier=fast, excluded_slow=0)
+- duration: 6.57s (pytest's own line)
+- failed-name list: .specify/specs/103-team-view/test-evidence/us1-failed.txt — 0 entries (the file exists and is empty; the runner's own line distinguishes it from a missing list)
+- full capture of this run: .specify/.tmp/us1-run.out (stage-local, not committed)
+
+Selection basis: targeted-set-v1 — the four team-view test files exist in the tree and
+cover the package's whole surface (parsers, program CLI/envelope, command wiring,
+integration rendering + read-only snapshot). The implement-entry baseline
+(.specify/specs/103-team-view/baseline-failed.txt, 222 names) was NOT re-run in this
+package; new-failure attribution is a name-level set difference against that baseline
+(the targeted set is a subset of the collected suite, so an empty current list implies
+an empty `comm -13 baseline current` diff for these ids).
+
+Before this run the same four files read: 38 failed / 1 passed / 192 errors (T009
+red-first, subject absent) and 52 failed / 16 passed (P1 package end). The remaining
+reds after P1 all map to this package's T011–T016 and are now green.
