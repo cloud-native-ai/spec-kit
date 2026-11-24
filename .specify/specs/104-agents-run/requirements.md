@@ -57,12 +57,12 @@
 
 **Why this priority**: 这是用户原话的核心——显式 run 与架构的自动应用；没有它，其余都是附属。
 
-**Independent Test**: 契约测试断言模板 `argument-hint`、意图表 run 行与技能输入契约三处语法一致；结构断言断言技能文本含七字段下行、五要素上行、呈现三要素与快速失败注入的指针；一次 run 演练（可执行路径存在时）检查返回含五要素且无缺项消费。
+**Independent Test**: 契约测试断言模板 `argument-hint`、意图表 run 行与技能输入契约三处语法一致；结构断言检查技能文本含七字段下行、五要素上行、呈现三要素与快速失败注入的指针；一次 run 演练（可执行路径存在时）检查返回含五要素且无缺项消费。
 
 **Acceptance Scenarios**:
 
 1. **Given** 一个存在于 `.specify/agents/instances/` 的 agent 定义，**When** 执行 `run <agent-name> <task>`，**Then** 命令路由到 run-agent，呈现包含 agent 名/层、任务、角色关系（本 session = superagent/根、child label、回传通道）与生效配置，随后派发一个独立执行；返回含五要素。
-2. **Given** 同名定义同时存在于 instances 与 templates，**When** 执行 run，**Then** instance 勝出并被派发，呈现披露被遮蔽的 template 身份；不静默择一。
+2. **Given** 同名定义同时存在于 instances 与 templates，**When** 执行 run，**Then** instance 胜出并被派发，呈现披露被遮蔽的 template 身份；不静默择一。
 3. **Given** 用户未给出任务，**When** 执行 `run <agent-name>`，**Then** 呈现解析后的 agent 并请求任务，不派发空简报。
 4. **Given** 用户只输入 `run` 而未给出 agent 名，**When** 命令处理输入，**Then** 输出 [[STR-003]]、能力清单与用法，不派发。
 
@@ -188,7 +188,7 @@
 
 - **FR-022**: 契约测试 MUST 机械固定：① 模板 frontmatter `argument-hint`、意图表 run 行与三技能路径；② 技能文本含七字段下行、五要素上行、呈现三要素、label 唯一性、SDD 探针适用条件与快速失败注入的**指针**（不得复制 owner 规则文本）；③ 命名文档的单副本计数、run 出现与陈旧字面量计数为 0；④ 无新增持久化根/registry/渲染器；⑤ 变更源面与其运行时镜像字节一致（重生成后）。既有守卫（`test_run_skills_wiring.py` C-11、`test_team_command_routing.py` M6、`test_role_transition_payload.py`、`test_fast_fail_discipline.py` 的 agents 面）MUST 相对 implement 入口的名字级失败基线不得新增失败；基线既有红 MUST 逐条点名（相对判据，不要求「全绿」）。
 - **FR-023**: 行为类条款（FR-007 呈现披露、FR-008 载荷内容、FR-010 回传完整性、FR-011 运行期 label 唯一性、FR-016 探针条件的执行、FR-017 读数记录）MUST 在 plan / contracts 中被逐条标注为行为类，并以真源文本 + 评审 + 变异演练取证；MUST NOT 声称其由契约测试「覆盖」。制品类条款（FR-001 / FR-003 / FR-004 / FR-018 / FR-019 / FR-020 / FR-022）由契约测试机械断言。
-- **FR-024**: 全部新增与既有相关测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 执行并退出 0；MUST NOT 直接调用解释器级测试命令；相对 implement 入口的**名字级**失败基线零新增失败（基线既有红逐条点名，不声称全绿）。
+- **FR-024**: 新增测试 MUST 经唯一入口 `scripts/bash/run-tests.sh` 一次执行并退出 0；既有相关测试 MUST 相对 implement 入口的名字级失败基线零新增失败（基线既有红逐条点名，不声称全绿）；MUST NOT 直接调用解释器级测试命令。
 
 ### Key Entities *(include if requirement involves data)*
 
@@ -226,7 +226,7 @@
 - **SC-004**: 文档同源：`docs/reference/commands/agents.md` 的 `^# /speckit.agents` 计数 = 1（改前 3）；run 语法与 run 意图行在该文件出现；[[STR-005]] / [[STR-006]] / [[STR-007]] / [[STR-008]] 在命名文件中的实时出现数为 0；`docs/reference/agents/command-and-skills.md` 的能力集为三项且含 `run-agent` 小节；overview / design 的能力单行与教程命令表行含 run **Path**: supporting
 - **SC-005**: 零第二机制与变更集包含性：基线参照物 = implement 阶段提交的父提交；比较单元 = `git diff <base>..HEAD --name-status` 的路径集，按产物类分组（命令模板 / 技能 / 文档 / 测试 / 再生成的镜像与工具命令副本）；允许差异集由被编辑源面的扇出闭包机械导出并由测试逐类断言（`templates/commands/agents.md`、`skills/internal/run-agent/**`、FR-018 / FR-019 / FR-020 点名的文档、`tests/**`，以及 `sync-mirrors.py` / `regen-command-copies.py` 的再生成产物）；补集侧断言该区间不出现上列之外的路径；集合内断言无新增持久化根 / registry / 渲染器 / 调度器；镜像与源逐字节一致 **Path**: supporting
 - **SC-006**: 变异演练 4/4：删除 `argument-hint` → 模板契约转红；删除 run 意图行 → 模板契约转红；删除七字段下行指针 → 技能契约转红；复制出第二份命令参考正文 → 文档契约转红；逐项复原后转绿；演练读数记录到 `test-evidence/` **Path**: supporting
-- **SC-007**: 新增与既有相关测试经 `scripts/bash/run-tests.sh` 一次执行退出 0；相对 implement 入口的名字级失败基线零新增失败；基线既有红逐条点名、不声称全绿 **Path**: supporting
+- **SC-007**: 新增测试经 `scripts/bash/run-tests.sh` 一次执行退出 0；既有相关测试相对 implement 入口的名字级失败基线零新增失败；基线既有红逐条点名、不声称全绿 **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
@@ -234,7 +234,7 @@
 - **SC-002 Source**: 边记录夹具上 `role-edge-check.py` 的报告输出（边数、深度、违例集），加上 label 重用/重试变异实测；读数记录到 `test-evidence/`。
 - **SC-003 Source**: 契约测试的逐项断言输出与删项后的转红实测；既有守卫的同一批次执行结果。
 - **SC-004 Source**: 文档契约测试的计数输出（标题计数、字面量计数、能力集断言）。
-- **SC-005 Source**: 变更集结构审计（新增持久化根/registry/渲染器/调度器计数）、抽样文本比对与 `sync-mirrors.py --check` 读数。
+- **SC-005 Source**: 变更集结构审计（新增持久化根/registry/渲染器/调度器计数）、被编辑源面的扇出闭包逐类枚举断言与 `sync-mirrors.py --check` 读数。
 - **SC-006 Source**: 变异演练逐项的红/绿实测记录，落在 `test-evidence/`。
 - **SC-007 Source**: `scripts/bash/run-tests.sh` 的退出码、测试汇总与名字级失败基线差分。
 

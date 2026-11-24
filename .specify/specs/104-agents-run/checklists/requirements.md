@@ -32,7 +32,7 @@
 
 ## Notes
 
-- Checker run (authoritative for structural propositions; counts below derive from this run, never hand-typed): `python3 scripts/python/validate-requirements.py .specify/specs/104-agents-run/requirements.md` → `status: ok`, `0 error(s), 0 warning(s)`, scanned **267 lines, 31 definition rows (24 FR + 7 SC), 8 shared strings**; the final re-run after the last text edits (SC-005 containment hardening + relative-green wording in FR-022 / SC-003) returned the same verdict.
+- Checker run (authoritative for structural propositions; counts below derive from this run, never hand-typed): `python3 scripts/python/validate-requirements.py .specify/specs/104-agents-run/requirements.md` → `status: ok`, `0 error(s), 0 warning(s)`, scanned **267 lines, 31 definition rows (24 FR + 7 SC), 8 shared strings**; the final re-run after the last text edits (SC-005 containment hardening, relative-green wording in FR-022 / FR-024 / SC-003 / SC-007, wording cleanup) returned the same verdict, and `pre-analyze-check --stage requirements` re-ran `decision=pass`.
 - Flow-class read (one read for this stage, after the `**Flow Class**` declaration): `flow-class-check.py --action lookup --unit-id "spec:104-agents-run"` → `flow_class: execution`, `source: declaration`.
 - Driver gate: `pre-analyze-check.py --stage requirements` → `decision=pass errors=0 advisories=0` (24 FR / 7 SC; `§ Runtime Stack & Dependency Ownership` present with 8 rows for the `execution` class).
 - Sanctioned variant applied: no `[NEEDS CLARIFICATION]` markers were needed; in-session adjudications are recorded under `## Clarifications` > `### Session 2026-11-24`, and the checklist passes green on its first stamped pass.
