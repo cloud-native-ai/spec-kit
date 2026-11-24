@@ -54,6 +54,7 @@
 | **A-16** | **确定性读取程序**：候选路径 `scripts/python/team-view.py`（只读、组合引擎读动作）；名称/路径由 plan 定稿。若实现选择扩展 `goal-utils.py` 的只读动作，同样满足 FR-014，但 MUST NOT 改变既有动作语义。 | 固定规则提取归程序（Program-First）；路径留给 plan 以免 requirements 硬编码猜测。 |
 | **A-17** | **最新报告摘要按报表契约读取**（owner：`skills/internal/create-team/SKILL.md` § Report contract），旧报告缺段按「未记录」标注，不推断。 | 报表段名与字段有唯一 owner；view 只消费不定义。 |
 | **A-18** | **Type 维度取自定义文件的 `## Static Structure` 授权矩阵**：frontmatter `members` 不含 type，view 不推断；正文矩阵与 frontmatter 名册不一致时，view 呈现差异而不裁决。 | 概念模型定义 Type 由矩阵表达；view 是呈现面，不是校正面。 |
+| **A-19** | **需求门禁修复（attempt 2）**：按 `execution` 类必填补齐 `### Runtime Stack & Dependency Ownership`——五行均机械可判定：RS-001 CPython / RS-002 pytest / RS-003 bash 测试入口（既有消费）/ RS-004 既有 `goal-utils.py` 只读动作面（零修改）/ RS-005 本特性交付的确定性读取程序（`in-scope`）；`Contract` 各为单一仓内路径；`Premises` 的 `EP-001`…`EP-003` 留待 plan 阶段 `## Execution Premises` 定义。 | 门禁 `pre-analyze-check.py --stage requirements` 对 `execution` 类要求该节；表中均为本特性真实消费或交付的运行时面，未新增依赖，与 A-16 的「读取程序路径由 plan 定稿」一致。 |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -164,6 +165,20 @@
 - **Run Report**: 每次运行落盘的 `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md`；段名与字段 owner 是 `skills/internal/create-team/SKILL.md` § Report contract。
 - **Item Ledger**: 团队目录下的 `items.jsonl`（追加式台账）；字段与状态值域 owner 是 `skills/internal/create-team/references/execution-guide.md` 与 `summary-mapping.md` § 6.5。
 - **Continuous Operating Spine**: `continuous` 团队的三件持续运营文件（`constraints.md` / `STATE.md` / `run-log.jsonl`）；owner 是 `skills/internal/create-team/references/operating-loops.md`。
+
+### Runtime Stack & Dependency Ownership
+
+`execution` 类特性必填；本特性不新增运行时依赖、不新增第三方包——它交付命令模板、只读技能、一个确定性只读读取程序与测试，并消费既有的 Python 解释器、pytest 运行器、唯一测试入口与既有 `goal-utils.py` 引擎的只读动作。每行可机械判定，零散文声明。表中 `Premises` 引用的 `EP-NNN` 由 plan 阶段 `## Execution Premises` 定义（本阶段不建 premises 表）。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | CPython `>=3.8` 标准库（确定性读取程序的目录遍历、Markdown / frontmatter 解析与台账聚合；测试夹具生成） | signed-contract | CPython 上游（本仓只消费，不打包） | `pyproject.toml` 既有 `requires-python` 下限；本特性零新增第三方依赖 | `pyproject.toml` | 读取程序与新增测试在 `>=3.8` 解释器上经唯一入口 `scripts/bash/run-tests.sh` 通过；本特性新增第三方 import 为零 | FR-014, FR-021 | EP-001 |
+| RS-002 | `pytest` 测试运行器（模板 / 技能 / 文档接线的契约测试与读取程序 fixture 测试） | signed-contract | pytest 上游（本仓只消费） | `pyproject.toml` 既有 pytest 声明；本特性零新增依赖 | `pyproject.toml` | `scripts/bash/run-tests.sh` 运行新增 `contract` / `integration` / `unit` 测试，结果集相对 implement 入口基线零新增红 | FR-021 | EP-001 |
+| RS-003 | POSIX `bash` 运行时（唯一测试入口 `scripts/bash/run-tests.sh` 的执行环境） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 不新增显式版本下限；本特性不改动该入口，其现有形态即消费契约 | `scripts/bash/run-tests.sh` | 新增测试全部经该入口执行且一次退出 0；本特性不直接调用解释器级测试命令 | FR-021 | EP-001 |
+| RS-004 | 既有 `goal-utils.py` 引擎的只读动作面（`binding`、`list`、`targets --list`） | signed-contract | 既有 anchor / goal 引擎（本特性只读消费，不修改其动作集与退出码闭集） | 仓内既有实现，无外部版本面；pin 由 `--help` 声明的动作集固定 | `scripts/python/goal-utils.py` | 绑定与锚点事实只经这三个读动作取得（FR-008 / FR-013），读取程序不含第二套解析路径；本特性对该引擎文件零修改 | FR-008, FR-013, FR-014 | EP-002 |
+| RS-005 | 确定性只读读取程序（定义解析、团队档案枚举、运行报告清单、台账聚合、最新报告摘要；候选路径 `scripts/python/team-view.py`，plan 定稿） | in-scope | 本特性自身新增的 framework 源程序 | 不适用（无外部版本面）；交付形态与路径由 plan 定稿（A-16） | `scripts/python/team-view.py` | `-h` / `--version` 退出 0 且零写盘；在完整 / 最小 / 未知 slug / 空档案 / 损坏定义 fixture 上输出只读读数；运行前后工作树哈希一致 | FR-014, FR-021 | EP-003 |
+
+**Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-005` 指向本特性的候选交付面（A-16，路径由 plan 定稿；若 plan 改选既有引擎的只读扩展，`Contract` 随 plan 更新为目标路径），不是第二契约。`RS-004` 的引擎本特性零修改，义务只在其既有只读契约上被消费与断言。
 
 ## Success Criteria *(mandatory)*
 
