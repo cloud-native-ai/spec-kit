@@ -1,0 +1,48 @@
+# Polish close-out gates — package 4 (T043)
+
+Captured: 2026-11-24. One block per gate: exact command, rc, raw output head.
+
+## GATE-3 ① validate-tasks
+
+    python3 .specify/scripts/python/validate-tasks.py .specify/specs/103-team-view/tasks.md
+
+rc: 0
+first raw line:
+
+    PASS: .specify/specs/103-team-view/tasks.md — 0 error(s), 0 warning(s)
+
+## GATE-3 ② pre-analyze-check
+
+    python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/103-team-view --stage tasks --repo .
+
+rc: 0
+first raw line:
+
+    pre-analyze-check: stage=tasks decision=pass errors=0 advisories=47 waived=0
+
+(The 47 advisories are the plan-stage external-clause / missing-path classes carried forward:
+INV-NN ids belong to `data-model.md`'s external namespace, and the three missing-path rows name
+`.specify/templates/commands/` — the deliberately retired mirror — and the quickstart fixture
+paths. No error-severity row.)
+
+## GATE-3 ③ decomposition-check
+
+    python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/103-team-view/requirements.md --tasks .specify/specs/103-team-view/tasks.md
+
+rc: 0
+first raw line:
+
+    {"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 21, "task_count": 44, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-24T04:38:26Z"}
+
+## Supplemental — closure verdict (`/speckit.implement` Step 9 mandate)
+
+    python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/103-team-view --repo .
+
+Reading at capture time: verdict=**block**, the single reason
+`status-claims-implemented-but-blocked`, with `final_path` = pass 2 / blocked 0 / deferred 0 /
+partial 0 / fail 0 / unknown 0 (total 2) and completion conditions
+`every_final_path_pass=true`, `status_row_per_criterion=true`, `smoke_record_pass=true`,
+`no_open_rows=false` — the block is exactly the three still-open rows (T042/T043/T044) at that
+instant, not a status or smoke defect. The verdict is re-run after every row is checked (before
+the T044 commit) and its final reading is appended in `polish-commit.txt`; the driver re-runs
+closure again after review.

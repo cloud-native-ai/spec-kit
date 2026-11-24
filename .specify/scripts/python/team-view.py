@@ -1154,6 +1154,37 @@ def build_overview_row(repo_root: Path, slug: str) -> dict:
     return row
 
 
+def available_slugs(repo_root: Path) -> list:
+    """Sorted directory names under the team archive; the not-found navigation source."""
+    teams_root = repo_root / ".specify" / "teams"
+    try:
+        return sorted(
+            path.name for path in teams_root.iterdir()
+            if path.is_dir() and not path.name.startswith(".")
+        )
+    except OSError:
+        return []
+
+
+def render_not_found(repo_root: Path, slug: str) -> str:
+    """Not-found navigation: shared string, bounded list, create suggestion (C-31, FR-006)."""
+    names = available_slugs(repo_root)
+    lines = ["team not found: %s" % slug]
+    if not names:
+        lines.append("No teams found")
+    else:
+        shown = names[:SLUG_LIST_CAP]
+        omitted = len(names) - len(shown)
+        header = "可用 slug（available slugs；共 %d，显示 %d" % (len(names), len(shown))
+        if omitted:
+            header += "，省略 %d" % omitted
+        lines.append(header + "）:")
+        for name in shown:
+            lines.append("  - %s" % name)
+    lines.append("建议（next step）: /speckit.team create %s" % slug)
+    return "\n".join(lines)
+
+
 def assemble_overview(repo_root: Path) -> dict:
     """Scan the archive layer; a corrupt directory is counted, never silently dropped."""
     teams_root = repo_root / ".specify" / "teams"
@@ -1191,27 +1222,40 @@ def assemble_overview(repo_root: Path) -> dict:
 def render_overview(view: dict) -> str:
     if view["empty"]:
         return "No teams found"
+    header = "Team Overview: %d teams" % (view["total"] + view["corrupt_total"])
+    if view["corrupt_total"]:
+        header += "（其中 %d %s）" % (view["corrupt_total"], STATE_CORRUPT)
     lines = [
-        "Team Overview: %d teams · as-of: %s（文件时间；非实时探测）" % (
-            view["total"], view["as_of"]),
+        header + " · as-of: %s（文件时间；非实时探测）" % view["as_of"],
         "",
         "| " + " | ".join(OVERVIEW_HEADERS) + " |",
         "|" + "|".join("---" for _ in OVERVIEW_HEADERS) + "|",
     ]
-    for row in view["rows"]:
-        lifecycle = row["lifecycle"]
-        lifecycle_text = lifecycle["value"] if lifecycle["declared"] else (
-            lifecycle["value"] + "（" + STATE_UNDECLARED + "）")
-        anchor = row["anchor_identity"]
-        cells = (
-            row["slug"],
-            row["name"] or STATE_UNRECORDED,
-            row["pattern"] or STATE_UNRECORDED,
-            lifecycle_text,
-            "%s — %s" % (anchor["kind"], anchor["value"]),
-            row["updated"] or STATE_UNRECORDED,
-            row["latest_run"] or STATE_UNRECORDED,
-        )
+    for row in sorted(view["rows"] + view["corrupt_rows"], key=lambda item: item["slug"]):
+        if row["state"] == STATE_CORRUPT:
+            cells = (
+                row["slug"],
+                "%s（%s）" % (STATE_CORRUPT, row["path"]),
+                STATE_UNRECORDED,
+                STATE_UNRECORDED,
+                STATE_UNRECORDED,
+                STATE_UNRECORDED,
+                STATE_UNRECORDED,
+            )
+        else:
+            lifecycle = row["lifecycle"]
+            lifecycle_text = lifecycle["value"] if lifecycle["declared"] else (
+                lifecycle["value"] + "（" + STATE_UNDECLARED + "）")
+            anchor = row["anchor_identity"]
+            cells = (
+                row["slug"],
+                row["name"] or STATE_UNRECORDED,
+                row["pattern"] or STATE_UNRECORDED,
+                lifecycle_text,
+                "%s — %s" % (anchor["kind"], anchor["value"]),
+                row["updated"] or STATE_UNRECORDED,
+                row["latest_run"] or STATE_UNRECORDED,
+            )
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
 
@@ -1555,7 +1599,7 @@ def emit_view(args, mode: str, repo_root: Path, scope: str) -> int:
     if mode == "single":
         view = assemble_single(repo_root, args.team_slug)
         if view["state"] == "not-found":
-            print("team not found: %s" % args.team_slug)
+            print(render_not_found(repo_root, args.team_slug))
             return EXIT_NOT_FOUND
         if view["state"] == "corrupt":
             print("定义损坏: %s" % view["path"])

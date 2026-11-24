@@ -1,0 +1,179 @@
+# Polish scope audit — package 4 (T040)
+
+Captured: 2026-11-24. Delivery surface owner: `.specify/specs/103-team-view/feature-ref.md`
+§ Delivery surface (20 items after the declared minor PLAN-EDIT adding item 20 —
+`shared/definitions/flow-class-definitions.md` + mirror — at this stage).
+
+## Change set definition (task text, verbatim form)
+
+    full = git diff --name-only "$(git merge-base master HEAD)"  ∪  git ls-files -o --exclude-standard
+    merge-base(master, HEAD) = df1b204f5ba6ad696e7bb330a2cfb418961bb0b4
+    full = 108 files (tracked-diff 70 / untracked 38)
+
+Filtered to the delivery-surface path prefixes named in T040
+(`scripts/ skills/ shared/ templates/ tests/ docs/reference/commands/ .claude/ .github/ .qoder/
+.opencode/ .specify/scripts/ .specify/skills/ .specify/shared/ .specify/specs/103-team-view/
+.specify/features.md .specify/features/027-team-management.md`):
+75 files.
+
+## Filtered set → delivery-surface item (one line per file)
+
+12                   .claude/commands/speckit.team.md
+13                   .github/prompts/speckit.team.prompt.md
+15                   .opencode/command/speckit.team.md
+14                   .qoder/commands/speckit.team.md
+17                   .specify/features.md
+18                   .specify/features/027-team-management.md
+10                   .specify/scripts/python/team-view.py
+20                   .specify/shared/definitions/flow-class-definitions.md
+19                   .specify/shared/definitions/probe-definitions.md
+pre-existing-dirty   .specify/skills/coaching-skills/SKILL.md
+pre-existing-dirty   .specify/skills/coaching-skills/references/trainee-resolution.md
+11                   .specify/skills/internal/view-team/SKILL.md
+16                   .specify/specs/103-team-view/baseline-failed.txt
+16                   .specify/specs/103-team-view/checklists/requirements.md
+16                   .specify/specs/103-team-view/checklists/team-view.md
+16                   .specify/specs/103-team-view/contracts/team-view-command.contract.md
+16                   .specify/specs/103-team-view/contracts/team-view-program.contract.md
+16                   .specify/specs/103-team-view/contracts/view-team-skill.contract.md
+16                   .specify/specs/103-team-view/coverage-baseline.txt
+16                   .specify/specs/103-team-view/data-model.md
+16                   .specify/specs/103-team-view/feature-ref.md
+16                   .specify/specs/103-team-view/final-failed.txt
+16                   .specify/specs/103-team-view/journal.md
+16                   .specify/specs/103-team-view/notes/pre-change-measurements.md
+16                   .specify/specs/103-team-view/notes/quickstart-run.md
+16                   .specify/specs/103-team-view/notes/red-first-evidence.md
+16                   .specify/specs/103-team-view/plan.md
+16                   .specify/specs/103-team-view/quickstart.md
+16                   .specify/specs/103-team-view/requirements.md
+16                   .specify/specs/103-team-view/research.md
+16                   .specify/specs/103-team-view/tasks.md
+16                   .specify/specs/103-team-view/test-evidence/analyze-findings.jsonl
+16                   .specify/specs/103-team-view/test-evidence/analyze-report.md
+16                   .specify/specs/103-team-view/test-evidence/analyze.jsonl
+16                   .specify/specs/103-team-view/test-evidence/checklist-stage-2026-11-24.md
+16                   .specify/specs/103-team-view/test-evidence/checklist.jsonl
+16                   .specify/specs/103-team-view/test-evidence/clarify.jsonl
+16                   .specify/specs/103-team-view/test-evidence/implement-baseline.txt
+16                   .specify/specs/103-team-view/test-evidence/implement-p1.jsonl
+16                   .specify/specs/103-team-view/test-evidence/implement-p2.jsonl
+16                   .specify/specs/103-team-view/test-evidence/implement-p3.jsonl
+16                   .specify/specs/103-team-view/test-evidence/mirror-baseline.txt
+16                   .specify/specs/103-team-view/test-evidence/p1-intermediate-failed.txt
+16                   .specify/specs/103-team-view/test-evidence/p3-failed.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/clause-extract.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/decision-tensions.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/pre-analyze-plan.json
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/pre-analyze-plan.stderr.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/regen-command-copies-check.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-gates/sync-mirrors-check.txt
+16                   .specify/specs/103-team-view/test-evidence/plan-stage-2026-11-24.md
+16                   .specify/specs/103-team-view/test-evidence/plan.jsonl
+16                   .specify/specs/103-team-view/test-evidence/polish-distribution.txt
+16                   .specify/specs/103-team-view/test-evidence/polish-targeted-suite.txt
+16                   .specify/specs/103-team-view/test-evidence/tasks-stage-2026-11-24.md
+16                   .specify/specs/103-team-view/test-evidence/tasks.jsonl
+16                   .specify/specs/103-team-view/test-evidence/us1-failed.txt
+16                   .specify/specs/103-team-view/test-evidence/us1-green.txt
+16                   .specify/specs/103-team-view/test-evidence/us1-mirrors.txt
+16                   .specify/specs/103-team-view/test-evidence/us2-failed.txt
+16                   .specify/specs/103-team-view/test-evidence/us2-green.txt
+16                   .specify/specs/103-team-view/test-evidence/us3-green.txt
+16                   .specify/specs/103-team-view/test-evidence/us4-failed.txt
+16                   .specify/specs/103-team-view/test-evidence/us4-green.txt
+4                    docs/reference/commands/team.md
+1                    scripts/python/team-view.py
+20                   shared/definitions/flow-class-definitions.md
+19                   shared/definitions/probe-definitions.md
+2                    skills/internal/view-team/SKILL.md
+3                    templates/commands/team.md
+7                    tests/contract/test_team_view_command.py
+8                    tests/contract/test_team_view_program_contract.py
+5                    tests/fixtures/team_view_fixtures.py
+9                    tests/integration/test_team_view_program.py
+6                    tests/unit/test_team_view_parsers.py
+
+**Result: every filtered file maps to a feature-ref § Delivery surface item (1–20) except the two
+pre-existing dirty files listed below, which the filter admits only because they sit under
+`.specify/skills/` but which predate this line.**
+
+## Out-of-surface items — explicit disposition (T040 "越界项显式处置")
+
+| Path | Disposition |
+|------|-------------|
+| `.specify/skills/coaching-skills/SKILL.md` | Pre-existing dirty file from another change line (recorded in `notes/pre-change-measurements.md` § Existing dirty / untracked files, entries captured before T001). Not committed, not reverted. |
+| `.specify/skills/coaching-skills/references/trainee-resolution.md` | Same as above. |
+
+## Dropped by the path filter (33 files) — none is a feature artifact
+
+These are machine-managed records or records of other lines; the filter drops them before the
+surface comparison, and they are neither committed nor reverted by this feature:
+
+    .specify/agents/instances/sdd-observer-103-team-view.agent.md
+    .specify/memory/exec-quant/records/20261124T025528953265Z-90c2b785.json
+    .specify/memory/exec-quant/records/20261124T025605320389Z-a347161a.json
+    .specify/memory/exec-quant/records/20261124T030152178165Z-932d68bd.json
+    .specify/memory/exec-quant/records/20261124T031021634137Z-87c94bdb.json
+    .specify/memory/exec-quant/records/20261124T031021962251Z-92fbc8cb.json
+    .specify/memory/exec-quant/records/20261124T032626220707Z-faf6cb93.json
+    .specify/memory/exec-quant/records/20261124T033614513281Z-c062874e.json
+    .specify/memory/exec-quant/records/20261124T034025149109Z-0eb737cd.json
+    .specify/memory/exec-quant/records/20261124T035107748712Z-88045b8e.json
+    .specify/memory/feedback/20261124T025602Z-speckit-requirements.md
+    .specify/memory/feedback/20261124T025611Z-skill-create-requirements.md
+    .specify/memory/feedback/20261124T030159Z-speckit-requirements.md
+    .specify/memory/feedback/20261124T031029Z-speckit-clarify.md
+    .specify/memory/feedback/20261124T031033Z-skill-clarify-artifact.md
+    .specify/memory/feedback/20261124T032631Z-speckit-plan.md
+    .specify/memory/feedback/20261124T033621Z-speckit-tasks.md
+    .specify/memory/feedback/20261124T034111Z-speckit-checklist.md
+    .specify/memory/feedback/20261124T035115Z-speckit-analyze.md
+    .specify/memory/session/20261110T083655Z-run-determination-skill-clarify-artifact-r20261110t081104z-b.md
+    .specify/memory/session/20261116T085759Z-run-determination-speckit-clarify-r20261116t075500z-102a.md
+    .specify/memory/session/20261116T092824Z-run-determination-speckit-tasks-r20261116t075500z-102a.md
+    .specify/memory/session/20261116T102430Z-run-determination-speckit-analyze-r20261116t102425z-47c2.md
+    .specify/memory/session/20261124T025526Z-run-determination-speckit-requirements-r20261124t024654z-7c3.md
+    .specify/memory/session/20261124T025604Z-run-determination-skill-create-requirements-r20261124t024654.md
+    .specify/memory/session/20261124T030144Z-run-determination-speckit-requirements-r20261124t025733z-a2.md
+    .specify/memory/session/20261124T031015Z-run-determination-speckit-clarify-r20261124t024654z-7c3e.md
+    .specify/memory/session/20261124T031018Z-run-determination-skill-clarify-artifact-r20261124t024654z-7.md
+    .specify/memory/session/20261124T032625Z-run-determination-speckit-plan-r20261124t024654z-7c3e.md
+    .specify/memory/session/20261124T033612Z-run-determination-speckit-tasks-r20261124t024654z-7c3e.md
+    .specify/memory/session/20261124T034023Z-run-determination-speckit-checklist-r20261124t024654z-7c3e.md
+    .specify/memory/session/20261124T035055Z-run-determination-speckit-analyze-r20261124t024654z-7c3e.md
+    .specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt
+
+## Commit history and push check
+
+    git log --oneline master..HEAD        # 10 commits, all 103-team-view feature commits
+    124f2d962 docs(103-team-view): add team view requirements
+    e6230672d docs(103-team-view): add runtime stack ownership section for requirements gate
+    a873907b5 docs(103-team-view): clarify requirements and bind Feature 027
+    9b57ba59d docs(103-team-view): add team view plan and design artifacts
+    d89c91fd3 docs(103-team-view): add dependency-ordered tasks list
+    1ed62808c docs(103-team-view): add requirements-quality checklist
+    6bab4a0ed feat(103-team-view): add view program interface and red-first tests (T001-T010)
+    5ae5b3358 docs(103-team-view): record the red-first capture time exactly
+    90d178698 feat(103-team-view): implement single-team view, view-team skill, probe registration and team command entry (T011-T019)
+    5f169622f feat(103-team-view): add team overview, view routing and doc alignment (T020-T031)
+
+    git status -sb | head -1              # "## 103-team-view" — no upstream, so no push product;
+                                          # this stage never pushed.
+
+Readings are reproducible with the same two git commands plus the prefix filter above.
+
+## Post-audit re-read (same day, after T041–T043 evidence landed, before the T044 commit)
+
+Re-ran the same two git commands plus the same prefix filter once more, after the package's last
+evidence files (`verification.md`, `polish-gates.txt`, `polish-zero-machinery.txt`,
+`polish-scope.txt` itself) existed:
+
+    full change set: 112 files (was 108 at the first read; +4 spec-directory evidence files)
+    filtered to the delivery-surface prefixes: 79 files
+    outside the 20-item surface: none (the two coaching-skills dirty files remain labelled
+    pre-existing-dirty, not feature artifacts)
+
+Every filtered file still maps to a feature-ref § Delivery surface item; the audit conclusion is
+unchanged. `implement-p4.jsonl` and `polish-commit.txt` are created after this re-read and both
+live under item 16 (`.specify/specs/103-team-view/**`).

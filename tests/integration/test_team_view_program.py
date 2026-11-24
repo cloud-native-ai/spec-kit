@@ -252,6 +252,89 @@ class TestOverview:
         assert "No teams found" in result.stdout
 
 
+class TestErrorPaths:
+    """US4 (T032): actionable navigation on the error paths — FR-005, FR-006, FR-015;
+    SC-004; C-28 (exit 3 vs 4 never interchanged), C-31 (shared strings, bounded list);
+    INV-05 (exact slug), INV-06 (corrupt / not-found split)."""
+
+    def test_unknown_slug_reports_not_found(self, tmp_path):
+        build_team(tmp_path, "alpha-team")
+        build_team(tmp_path, "bravo-team")
+        before = snapshot(tmp_path)
+        result = view(tmp_path, "no-such-team")
+        assert result.returncode == 3, result.stderr + result.stdout
+        assert snapshot(tmp_path) == before, "the not-found path wrote to the tree"
+        output = result.stdout
+        assert "team not found" in output
+        assert "no-such-team" in output
+        assert "- alpha-team" in output and "- bravo-team" in output
+        assert "省略" not in output, "a list within the cap must not announce omissions"
+        assert "/speckit.team create" in output
+
+    def test_unknown_slug_in_empty_archive_reports_no_teams_found(self, tmp_path):
+        result = view(tmp_path, "no-such-team")
+        assert result.returncode == 3, result.stderr + result.stdout
+        output = result.stdout
+        assert "team not found" in output
+        assert "No teams found" in output
+        assert "/speckit.team create" in output
+
+    def test_unknown_slug_list_is_bounded_with_omitted_count(self, tmp_path):
+        for index in range(21):
+            build_team(tmp_path, "team-%02d" % index)
+        result = view(tmp_path, "no-such-team")
+        assert result.returncode == 3, result.stderr + result.stdout
+        output = result.stdout
+        assert "team not found" in output
+        assert "省略 1" in output
+        assert "- team-00" in output
+        assert "- team-20" not in output
+        assert "/speckit.team create" in output
+
+    def test_corrupt_definition_is_not_not_found(self, tmp_path):
+        build_team(tmp_path, "broken-team", corrupt="missing-team-md")
+        result = view(tmp_path, "broken-team")
+        assert result.returncode == 4, result.stderr + result.stdout
+        output = result.stdout
+        assert "定义损坏" in output
+        expected_path = (tmp_path / ".specify" / "teams" / "broken-team" / "team.md").resolve()
+        assert str(expected_path) in output
+        assert "team not found" not in output
+        assert "## 1. 身份与绑定" not in output
+        build_team(tmp_path, "unparsable-team", corrupt="unparseable-frontmatter")
+        result = view(tmp_path, "unparsable-team")
+        assert result.returncode == 4, result.stderr + result.stdout
+        assert "定义损坏" in result.stdout
+        assert "team not found" not in result.stdout
+
+    def test_overview_lists_every_team_sorted(self, tmp_path):
+        build_team(tmp_path, "alpha-team")
+        build_team(tmp_path, "bravo-team")
+        build_team(tmp_path, "broken-team", corrupt="missing-team-md")
+        before = snapshot(tmp_path)
+        result = view(tmp_path)
+        assert result.returncode == 0, result.stderr
+        assert snapshot(tmp_path) == before, "the overview wrote to the tree"
+        output = result.stdout
+        table = [line for line in output.splitlines() if line.strip().startswith("|")]
+        for slug in ("alpha-team", "bravo-team", "broken-team"):
+            assert any(line.strip().startswith("| " + slug + " |") for line in table), (
+                "overview skipped row %s" % slug)
+        positions = [
+            next(index for index, line in enumerate(table) if line.strip().startswith("| " + slug + " |"))
+            for slug in ("alpha-team", "bravo-team", "broken-team")
+        ]
+        assert positions == sorted(positions), "overview rows are not slug-ascending"
+        broken_row = next(line for line in table if line.strip().startswith("| broken-team |"))
+        assert "定义损坏" in broken_row
+
+    def test_near_miss_slug_does_not_match(self, tmp_path):
+        build_team(tmp_path, "alpha-team")
+        result = view(tmp_path, "alpha-tea")
+        assert result.returncode == 3, result.stderr + result.stdout
+        assert "team not found" in result.stdout
+
+
 class TestEnvelopeAndReadOnly:
     def test_json_and_default_render_share_one_extraction(self, tmp_path):
         complete_team(tmp_path)

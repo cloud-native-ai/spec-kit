@@ -1,0 +1,102 @@
+# Polish distribution consistency — package 4 (T039)
+
+Captured: 2026-11-24, after T038 and the flow-class ledger repair (delivery-surface item 20).
+Comparison face: `test-evidence/mirror-baseline.txt` (T003, captured 2026-11-24 before any edit) —
+the gates judge "no NEW drift relative to that baseline", never an absolute all-green claim.
+
+## 1. sync-mirrors.py --check (rc 0)
+
+Verbatim output:
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (394 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (132 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (114 files, byte-identical)
+```
+
+Baseline comparison (T003 → now; every delta is this feature's own deliverable, produced by the
+generator, not drift):
+
+| Pair | T003 baseline | Now | Delta attribution |
+|------|---------------|-----|-------------------|
+| `scripts/` ↔ `.specify/scripts/` | 131 files, ok | 132 files, ok | +1 `scripts/python/team-view.py` (T018/T025/T036) |
+| `skills/internal/` ↔ `.specify/skills/internal/` | 138 files, ok | 139 files, ok | +1 `view-team/SKILL.md` (T019) |
+| `shared/` ↔ `.specify/shared/` | 114 files, ok | 114 files, ok | same count; one file regenerated (`definitions/flow-class-definitions.md`, item 20) |
+| `templates/` / `skills/external/` / `agents/` pairs | ok | ok | untouched |
+| six projected rows | ok | ok | untouched |
+
+No pair regressed to a drift state; the three pairs this feature touches are `ok` and byte-identical.
+
+## 2. regen-command-copies.py --check (rc 0)
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+## 3. probe-utils.py --action compile-embeds --check (rc 0)
+
+```text
+compile-embeds --check: 86 units, zero drift
+```
+
+Baseline was `85 units, zero drift`; the +1 unit is `skill:view-team`'s generated `## Wrap-up`
+(T014/T015).
+
+## 4. probe-utils.py --action probes --validate (rc 0)
+
+```text
+Probe registry valid: 11 classes, 130 internal + 0 external objects
+```
+
+Baseline was 129 internal objects; +1 is the `skill-view-team-wrapup` object (T015).
+
+## 5. probe-utils.py --action probes --reconcile (rc 0)
+
+```text
+Probe registry reconciled zero-gap: 11 classes, 130 internal + 0 external objects, 87 embeds
+```
+
+Baseline was 86 embeds zero-gap; +1 is the `skill:view-team` wrap-up embed. Zero-gap holds.
+
+## 6. flow-class-check.py --action check (rc 0)
+
+First run in this package was **rc 1** with one real finding:
+`[missing] skill:view-team — inventory unit has no ledger row` (92 inventory units / 91 ledger rows).
+The owner (`shared/definitions/flow-class-definitions.md` § 覆盖范围 / 台账) requires two-way
+zero-gap coverage for every skill, and T039 mandates this gate green, so the ledger row was added:
+
+```text
+| skill:view-team | execution | behavior-oracle |  | 交付一次团队结构与状态的只读呈现（六组 / 概览 / 错误导航）；组覆盖、三态标签与退出码由脚本与测试复算判定 |
+```
+
+Classification follows the two-step criterion (main deliverable = the viewed rendering; its defects —
+missing group, wrong label, wrong exit code — surface on the machine face and are recomputed by the
+script/tests), the same reading `/speckit.status` carries in this ledger. The source row landed in
+`shared/definitions/flow-class-definitions.md` and the mirror was regenerated with
+`sync-mirrors.py --write --only shared` (never hand-edited). This is a registry-completeness repair
+declared as delivery-surface item 20 (`feature-ref.md`, minor PLAN-EDIT), the same class as item 19.
+
+Final reading:
+
+```text
+flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]
+coverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39
+```
+
+## 7. doc-consistency-check.py — not-evaluated
+
+Status: `not-evaluated` (never recorded as a pass). Reason: the checker's declared faces
+(reader / evidence / duplicate / count; structure action) apply to expression-class artifacts and
+command-spec documents entering plan-stage structure checks; this feature is `execution`-class and its
+plan carries no Document Structure section — the same disposition the plan stage recorded
+(`test-evidence/plan.jsonl` → `doc_consistency_check.status=not-evaluated`).

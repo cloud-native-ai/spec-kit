@@ -75,3 +75,25 @@ The passing 22 are the US1 wiring assertions (`C-01`/`C-02`/`C-06`/`C-11` segmen
 template-side mode-count row — the template already carries four modes from T016, so the
 US3 reds are exactly the not-yet-synchronised surfaces (routing steps, default/ambiguous
 lists, docs page, four generated copies).
+
+## US4 segment — error-path navigation (T033)
+
+- Captured: 2026-11-24 (package 4, before the not-found navigation and the corrupt overview
+  row landed)
+- Command (unique entry; stdout+stderr redirected whole, no pipeline):
+  `bash scripts/bash/run-tests.sh tests/integration/test_team_view_program.py -q`
+- rc: **1** · summary: **4 failed, 15 passed in 6.47s**
+- Full capture: `.specify/.tmp/us4-red.out` (stage-local; not committed)
+
+| New test | Red shape | Decisive excerpt (verbatim) |
+|----------|-----------|-----------------------------|
+| `TestErrorPaths::test_unknown_slug_reports_not_found` | the not-found path prints only the shared string; no available-slug list, no create suggestion | `assert '- alpha-team' in 'team not found: no-such-team\n'` |
+| `TestErrorPaths::test_unknown_slug_in_empty_archive_reports_no_teams_found` | empty archive leg lacks [[STR-002]] and the create suggestion | `'No teams found' not in 'team not found: no-such-team\n'` |
+| `TestErrorPaths::test_unknown_slug_list_is_bounded_with_omitted_count` | no bounded list, therefore no omitted count | `assert '省略 1' in 'team not found: no-such-team\n'` |
+| `TestErrorPaths::test_overview_lists_every_team_sorted` | the overview drops the corrupt directory instead of labelling its row | `AssertionError: overview skipped row broken-team` |
+
+The two remaining new tests pass because the behaviour they pin already landed with US1:
+`test_corrupt_definition_is_not_not_found` (single-mode exit 4 + named path + no six-group
+body, built in T010/T013) and `test_near_miss_slug_does_not_match` (exact-directory
+resolution, built in T010). Their green is a truthfully recorded reading, not a red claimed
+as such; the four reds above are exactly the surfaces T034 still owes.

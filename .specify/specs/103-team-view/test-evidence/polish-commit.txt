@@ -1,0 +1,68 @@
+# Polish commit — package 4 (T044)
+
+Captured: 2026-11-24. Explicit paths only (`git add <path>…`, no `git add -A`); pre-existing
+dirty files not committed and not reverted; no push.
+
+## Closure verdict immediately before the commit (all 44 rows checked)
+
+    python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/103-team-view --repo . --json
+
+rc: 0 · verdict: **accept** · reasons: [] · completion conditions: `no_open_rows=true`,
+`status_row_per_criterion=true`, `every_final_path_pass=true`, `smoke_record_pass=true` ·
+`final_path`: pass=2 blocked=0 deferred=0 partial=0 fail=0 unknown=0 (total 2).
+
+(For the record, the Step-9 run taken while T042–T044 were still open returned `block` with the
+single reason `status-claims-implemented-but-blocked` and `no_open_rows=false` — the only unmet
+condition at that instant, as documented in `polish-gates.txt` § Supplemental.)
+
+## Staged manifest (explicit paths)
+
+Commit 1 — feature artifacts and this package's evidence (24 files):
+
+    scripts/python/team-view.py
+    .specify/scripts/python/team-view.py
+    shared/definitions/flow-class-definitions.md
+    .specify/shared/definitions/flow-class-definitions.md
+    tests/integration/test_team_view_program.py
+    .specify/specs/103-team-view/tasks.md
+    .specify/specs/103-team-view/feature-ref.md
+    .specify/specs/103-team-view/verification.md
+    .specify/specs/103-team-view/final-failed.txt
+    .specify/specs/103-team-view/notes/red-first-evidence.md
+    .specify/specs/103-team-view/notes/quickstart-run.md
+    .specify/specs/103-team-view/test-evidence/analyze-findings.jsonl
+    .specify/specs/103-team-view/test-evidence/analyze-report.md
+    .specify/specs/103-team-view/test-evidence/analyze.jsonl
+    .specify/specs/103-team-view/test-evidence/implement-p1.jsonl
+    .specify/specs/103-team-view/test-evidence/implement-p4.jsonl
+    .specify/specs/103-team-view/test-evidence/us4-failed.txt
+    .specify/specs/103-team-view/test-evidence/us4-green.txt
+    .specify/specs/103-team-view/test-evidence/polish-targeted-suite.txt
+    .specify/specs/103-team-view/test-evidence/polish-distribution.txt
+    .specify/specs/103-team-view/test-evidence/polish-scope.txt
+    .specify/specs/103-team-view/test-evidence/polish-zero-machinery.txt
+    .specify/specs/103-team-view/test-evidence/polish-gates.txt
+    .specify/specs/103-team-view/test-evidence/polish-commit.txt
+
+Commit 2 — this file with the recorded hash (1 file):
+
+    .specify/specs/103-team-view/test-evidence/polish-commit.txt
+
+`implement-p1.jsonl` carries the corrected `changed_paths` entry (`.specify/specs/103-team-view/
+baseline-failed.txt`) that the P1 verifier asked to land in the implement close-out commit.
+
+Deliberately not staged: the pre-existing dirty files (`.specify/skills/coaching-skills/SKILL.md`,
+`.specify/skills/coaching-skills/references/trainee-resolution.md`, the four run-determination
+session records, `.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt`), the
+observer's `journal.md`, and the machine-managed `.specify/memory/{exec-quant,feedback,session}/`
+records — none is this feature's artifact.
+
+## Commit 1 message (single line, per `templates/commit-template.md`)
+
+    feat(103-team-view): add error navigation, quickstart run and close-out evidence (T032-T044)
+
+## Result
+
+commit_1_hash: $(git rev-parse HEAD) recorded below after the commit
+commit_2_hash: this file's own commit (recorded in the stage return and the state spine)
+push: not performed (`git status -sb` had no upstream before and after)

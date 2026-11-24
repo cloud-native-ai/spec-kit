@@ -1,0 +1,41 @@
+# US4 targeted run — package 4 (T035)
+
+Captured: 2026-11-24, immediately after T034 (error classification + not-found navigation +
+corrupt overview rows) landed.
+Unique entry (no pipeline; stdout+stderr redirected whole, exit code preserved):
+
+  bash scripts/bash/run-tests.sh tests/integration/test_team_view_program.py -q --names-out .specify/specs/103-team-view/test-evidence/us4-failed.txt
+
+Readings (verbatim tail):
+  ...................                                                      [100%]
+  19 passed in 6.46s
+  # failed-name list written: .specify/specs/103-team-view/test-evidence/us4-failed.txt (0 entries) passes=1
+
+- rc: 0
+- passed: 19
+- failed: 0
+- duration: 6.46s (pytest's own line)
+- failed-name list: `.specify/specs/103-team-view/test-evidence/us4-failed.txt` — 0 entries
+  (file exists and is empty; the runner's own line distinguishes it from a missing list)
+- full capture of this run: `.specify/.tmp/us4-green.out` (stage-local, not committed)
+- red-first counterpart: `notes/red-first-evidence.md` § US4 segment — 4 failed / 15 passed
+  before the navigation and corrupt-row behaviour landed; the four reds are now green.
+
+## What the four reds became (SC-004, FR-006, FR-015)
+
+| New test | Now asserts |
+|----------|-------------|
+| `TestErrorPaths::test_unknown_slug_reports_not_found` | STR-001, the two real slugs, no omission notice under the cap, the `/speckit.team create` suggestion, exit 3, tree byte-identical |
+| `TestErrorPaths::test_unknown_slug_in_empty_archive_reports_no_teams_found` | STR-001 + STR-002 + create suggestion, exit 3 |
+| `TestErrorPaths::test_unknown_slug_list_is_bounded_with_omitted_count` | 21-team archive → first 20 listed, `省略 1`, create suggestion, exit 3 |
+| `TestErrorPaths::test_overview_lists_every_team_sorted` | corrupt directory keeps its row labelled `定义损坏` with its path, rows stay slug-ascending, exit 0, tree byte-identical |
+
+The two already-green rows (`test_corrupt_definition_is_not_not_found`, `test_near_miss_slug_does_not_match`)
+pin behaviour that landed with US1 (single-mode exit 4 + named path; exact-directory resolution) and
+stayed green here — recorded as such, not reclassified as reds.
+
+Selection basis: targeted-set-v1 — this package's US4 surface is exactly the program's
+not-found / corrupt / overview-row branches; the pinning file is the integration test file.
+The implement-entry baseline (`.specify/specs/103-team-view/baseline-failed.txt`, 222 names) was
+NOT re-run in this package; this run produced 0 failing tests, so the selected ids contribute no
+new failures.

@@ -233,6 +233,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:study-kb | expression | reader-oracle |  | 交付知识库调查报告；结论由读者对照知识库路径与现役复核判定 |
 | skill:study-online | expression | reader-oracle |  | 交付联网调查报告；结论由读者与外部事实判定（与 /speckit.docs 的读者+外部事实面同类） |
 | skill:summarize-project | expression | reader-oracle |  | 交付项目总结报告；呈现是否可用由读者判定 |
+| skill:view-team | execution | behavior-oracle |  | 交付一次团队结构与状态的只读呈现（六组 / 概览 / 错误导航）；组覆盖、三态标签与退出码由脚本与测试复算判定 |
 
 台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `scripts/python/flow-class-check.py --action check` 执行）。
 同一单元在台账中 MUST 恰好一行；两行同值 → 重复，两行反值 → 双类冲突。

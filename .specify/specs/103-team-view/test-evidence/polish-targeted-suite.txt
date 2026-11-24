@@ -1,0 +1,46 @@
+# Polish targeted suite — package 4 (T038)
+
+Captured: 2026-11-24, after T037 (quickstart transcript).
+Unique entry (no pipeline; stdout+stderr redirected whole, exit code preserved):
+
+  bash scripts/bash/run-tests.sh --names-out .specify/specs/103-team-view/final-failed.txt tests/unit/test_team_view_parsers.py tests/contract/test_team_view_command.py tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q
+
+Readings (verbatim, tail):
+
+  # test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_team_view_parsers.py tests/contract/test_team_view_command.py tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q
+  # test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+  103 passed in 6.62s
+  # failed-name list written: .specify/specs/103-team-view/final-failed.txt (0 entries) passes=1
+
+- rc: 0
+- passed: 103
+- failed: 0
+- skipped: 0 (tier=fast, excluded_slow=0)
+- duration: 6.62s (pytest's own line)
+- failed-name list: `.specify/specs/103-team-view/final-failed.txt` — 0 entries (file exists and
+  is empty; the runner's own line distinguishes it from a missing list)
+- full capture of this run: `.specify/.tmp/targeted-final.out` (stage-local, not committed)
+
+## GATE-1 name-level reading (comm -13, one locale on both sides)
+
+The implement-entry baseline `.specify/specs/103-team-view/baseline-failed.txt` (package 1,
+full-suite capture, 222 names) is the comparison side; no second full run was performed in this
+package (baseline slot consumed by package 1; closure full-suite belongs to the driver after
+review). Commands and readings:
+
+    LC_ALL=C sort .specify/specs/103-team-view/baseline-failed.txt > <sorted baseline>   # 222 names
+    LC_ALL=C sort .specify/specs/103-team-view/final-failed.txt  > <sorted current>      # 0 names
+    LC_ALL=C comm -13 <sorted baseline> <sorted current>                                   # rc 0
+    → 0 lines
+
+Zero new failure names. The comparison is name-level (`comm -13`), never a count comparison;
+the locale is pinned on both the sort and the comm side so the reading is reproducible
+(when `LC_ALL=C` is applied to `sort` only, `comm` compares under the ambient locale and
+reports "file 1 is not in sorted order" — a tooling artifact, not a failure).
+
+## Read-only oracle inside this run
+
+The 103 passing tests include `tests/integration/test_team_view_program.py::test_view_leaves_tree_byte_identical`
+(the S-6 oracle: path+sha256 snapshot before/after one view, plus the `--json` leg), which also
+ran green in the error-path variants added by T032 (not-found and overview paths snapshot the
+fixture tree before/after and assert equality).
