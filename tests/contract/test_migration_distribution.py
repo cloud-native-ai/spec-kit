@@ -106,6 +106,9 @@ ENGINE_REF = "flow-class-check.py"
 # 2026-11-12 (Feature 101): 31 -> 32 commands and 58 -> 59 skills. `/speckit.anchor`
 # (FR-010) and `skill:manage-anchor` (FR-012) ship inside the same staged payload, so
 # both rosters and both pinned lengths move together again.
+# 2026-11-24 (Feature 103): 59 -> 60 skills. `skill:view-team` (FR-018, the
+# `/speckit.team view` carrier) ships inside the same staged payload; the skill
+# roster and its pinned length move together while the 32-command roster is unchanged.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "anchor", "analyze", "checklist", "clarify", "constitution", "derive",
@@ -133,11 +136,11 @@ SKILL_BASELINE = frozenset(
         "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
         "run-team", "sanitize-materials", "seal-artifact", "self-improvement", "study-code",
-        "study-online", "study-kb", "summarize-project",
+        "study-online", "study-kb", "summarize-project", "view-team",
     }
 )
 assert len(COMMAND_BASELINE) == 32
-assert len(SKILL_BASELINE) == 59
+assert len(SKILL_BASELINE) == 60
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

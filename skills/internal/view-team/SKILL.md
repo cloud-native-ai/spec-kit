@@ -7,6 +7,8 @@ skill_id: "<SKILL:.specify/skills/internal/view-team/SKILL.md>"
 
 # view-team — 团队结构与状态只读呈现（从 /speckit.team view 提取）
 
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+
 ## Goal
 
 把 `/speckit.team` 的 **view** 语义完整落成一条只读呈现路径：解析输入、委派确定性程序、逐字呈现程序输出、按闭集给出错误导航。团队概念（anchor + Static Structure + Dynamic Structure + 持久化布局）的真源是 `skills/internal/create-team/references/conceptual-model.md`；Anchor–Team 绑定、lifecycle 与 Target 语义的真源是 `.specify/shared/definitions/anchor-definitions.md`；报告段与台账字段的真源是 `skills/internal/create-team/SKILL.md` § Report contract 与 `references/summary-mapping.md` § 6。本技能只呈现，不重推上述任何语义。

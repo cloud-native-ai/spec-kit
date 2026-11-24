@@ -70,6 +70,9 @@ INTERNAL_SKILLS = {
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
     "sanitize-materials",
     "self-improvement", "study-kb", "summarize-project",
+    # 2026-11-24 (Feature 103): +1 internal unit — `view-team`, the `/speckit.team
+    # view` carrier; it nests under internal/ and never surfaces on the flat face.
+    "view-team",
 }
 
 
@@ -115,8 +118,10 @@ def test_flat_discovery_surfaces_external_layer_only():
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
     # 2026-11-11：Feature 099 新增 internal/seal-artifact（`/speckit.seal` 内部技能），内部 38 -> 39
     # 2026-11-12：Feature 101 新增 internal/manage-anchor（`/speckit.anchor` 七模式内部技能），39 -> 40
-    assert len(internal_nested) == 41, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 41 — "
+    # （101 之后又有若干内部单元落地，磁盘实测为 41；本行按实测重新锚定。）
+    # 2026-11-24：Feature 103 新增 internal/view-team（`/speckit.team view` 只读呈现技能），41 -> 42
+    assert len(internal_nested) == 42, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 42 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

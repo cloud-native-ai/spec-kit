@@ -237,6 +237,9 @@ FROZEN_SKILLS = (
     "internal/study-kb",
     "external/study-code",
     "internal/summarize-project",
+    # 2026-11-24 (Feature 103): +1 internal unit — `view-team`, the `/speckit.team view`
+    # carrier skill. The frozen roster and the on-disk inventory move together.
+    "internal/view-team",
 )
 
 # C-5: no engine, no owner document may be named outside the wiring surface.
