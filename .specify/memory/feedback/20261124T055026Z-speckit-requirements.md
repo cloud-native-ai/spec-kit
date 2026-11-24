@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "104-agents-run"
+disposition: "processed"
 partial: false
 created: "2026-11-24T05:50:26Z"
 summary: "Requirements run completed at wrap-up: created .specify/specs/104-agents-run/requirements.md and checklists/requirements.md; validate-requirements.py status=ok (0 errors / 0 warnings; 24 FR / 7 SC / 8"
+introspection_ref: "introspection-20261124T151412Z#F-10"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-10"
 ---
 
 ## Review

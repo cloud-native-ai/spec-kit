@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "104-agents-run"
+disposition: "processed"
 partial: false
 created: "2026-11-24T05:57:22Z"
 summary: "Clarify run completed at wrap-up: bound Feature 019 (Agents Command) under the Feature Binding Rules bind branch — no new Feature, status kept Implemented under the no-status-regression gate; four sel"
+introspection_ref: "introspection-20261124T151412Z#F-04"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-04"
 ---
 
 ## Review

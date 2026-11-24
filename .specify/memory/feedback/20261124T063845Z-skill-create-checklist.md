@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-create-checklist-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-24T06:38:45Z"
 summary: "Internal skill create-checklist executed as the body of /speckit.checklist for spec 104-agents-run: produced a 40-item, 100%-traceable requirements-quality checklist (CHK001…CHK040) in a new dated fil"
+disposition_reason: "introspection:introspection-20261124T151412Z excluded positive/already-fixed/client-only"
 ---
 
 ## Review

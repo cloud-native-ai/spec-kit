@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-24T05:41:30Z"
 summary: "Full unattended SDD line 103-team-view driven end to end: requirements (with one gate repair round), clarify, plan, tasks, checklist, analyze (0 C/H), implement in 4 bounded packages each independentl"
+introspection_ref: "introspection-20261124T151412Z#F-01"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-01"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "skill-review-feature-quality-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T04:54:28Z"
 summary: "产物段 10/10 覆盖，实现段 78 文件 base..head、定向 103 passed、smoke 19 passed；各一条 P1（A1 / I1）"
+introspection_ref: "introspection-20261124T151412Z#F-02"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-02"
 ---
 
 ## Review

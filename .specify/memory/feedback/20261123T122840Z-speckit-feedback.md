@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-23T12:28:40Z"
 summary: "Framework-hat Path A consume of 30 inbound bundles (1,184 entries / 2,228 points). Identity: one self-delivery copy (feedback-spec-kit, 346 byte-identical entries; 555 points counted once), no orphans"
+introspection_ref: "introspection-20261124T151412Z#F-06"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-06"
 ---
 
 ## Review

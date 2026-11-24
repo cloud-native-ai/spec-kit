@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-24T06:38:39Z"
 summary: "Checklist stage completed on spec 104-agents-run: a NEW requirements-quality checklist checklists/run-command-2026-11-24.md landed with 40 items CHK001…CHK040 across 7 quality-dimension sections (synt"
+disposition_reason: "introspection:introspection-20261124T151412Z excluded positive/already-fixed/client-only"
 ---
 
 ## Review

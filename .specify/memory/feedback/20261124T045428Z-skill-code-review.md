@@ -8,9 +8,12 @@ probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T04:54:28Z"
 summary: "代码段 triage=run、receipt 78/6/72/0、gate allow；7 条意见（1 important / 2 suggestion / 1 nitpick / 1 question / 2 praise）"
+introspection_ref: "introspection-20261124T151412Z#F-02"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-02"
 ---
 
 ## Review

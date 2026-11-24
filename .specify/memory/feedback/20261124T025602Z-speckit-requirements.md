@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T02:56:02Z"
 summary: "Requirements run completed for 103-team-view: scaffolded branch 103-team-view, wrote a 207-line requirements spec (21 FR / 7 SC / 4 STR) grounded in the conceptual model, team.md schema, goal-utils re"
+introspection_ref: "introspection-20261124T151412Z#F-05"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-05"
 ---
 
 ## Review

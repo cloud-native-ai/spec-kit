@@ -8,9 +8,12 @@ probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T04:54:28Z"
 summary: "过程段完成：14 段时间线、8 条过程发现（P1×5 / P2×3）、P0 零（P0 验证波空满足）"
+introspection_ref: "introspection-20261124T151412Z#F-03"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-03"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-24T08:01:50Z"
 summary: "Process segment pass with no P0: 4 P1 (targeted-set-v1 stem over-selection; audit-plan-changes basename collision; one-shot clause not owned by the stage-prompt skeleton; bare /tmp evidence capture wi"
+introspection_ref: "introspection-20261124T151412Z#F-07"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-07"
 ---
 
 ## Review

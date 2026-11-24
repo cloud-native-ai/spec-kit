@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "104-agents-run"
 feature_id: "019"
+disposition: "ignored"
 partial: false
 created: "2026-11-24T06:52:25Z"
 summary: "Analyze stage completed read-only on spec 104-agents-run (Round 1): 6 findings — 2 HIGH (F-01 SC-005 comparison unit vs allowed-delta scope; C-01 C-29 STR-006-class predicate lacks an enumerated set),"
+disposition_reason: "introspection:introspection-20261124T151412Z excluded positive/already-fixed/client-only"
 ---
 
 ## Review

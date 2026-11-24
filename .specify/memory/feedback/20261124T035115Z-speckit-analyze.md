@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "103-team-view"
 feature_id: "027"
+disposition: "processed"
 partial: false
 created: "2026-11-24T03:51:15Z"
 summary: "Analyze round 1 on 103-team-view (unattended, read-only): 0 CRITICAL / 0 HIGH / 4 MEDIUM / 2 LOW. E-01 coverage baseline absent (accountant status=baseline-missing) while the Feature 027 row says it i"
+introspection_ref: "introspection-20261124T151412Z#F-03"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-03"
 ---
 
 ## Review

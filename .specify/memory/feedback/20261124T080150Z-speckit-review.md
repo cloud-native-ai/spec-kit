@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-24T08:01:50Z"
 summary: "Four-segment review completed at 8fb64953a: process pass (4 P1 / 3 P2, 0 P0); artifact 15/15 with one P2; implementation pass (smoke re-run rc 0; 216 passed / 3 baseline failures, comm -13 empty); cod"
+introspection_ref: "introspection-20261124T151412Z#F-08"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-08"
 ---
 
 ## Review

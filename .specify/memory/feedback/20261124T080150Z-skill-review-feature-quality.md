@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-feature-quality-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-24T08:01:50Z"
 summary: "Artifact segment 15/15 with one P2 (residual no-argument generation paraphrase outside the C-34 closed predicate set); implementation segment pass (base e61df738a..head 8fb64953a; smoke triple verifie"
+introspection_ref: "introspection-20261124T151412Z#F-09"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-09"
 ---
 
 ## Review

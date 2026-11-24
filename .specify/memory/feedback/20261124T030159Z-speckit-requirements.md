@@ -8,9 +8,11 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "103-team-view"
+disposition: "ignored"
 partial: false
 created: "2026-11-24T03:01:59Z"
 summary: "Requirements repair round 2 for 103-team-view: added ### Runtime Stack & Dependency Ownership (RS-001...RS-005, one in-scope row for the delivered read program) and recorded A-19; pre-analyze-check.py"
+disposition_reason: "introspection:introspection-20261124T151412Z excluded positive/already-fixed/client-only"
 ---
 
 ## Review

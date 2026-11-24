@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T03:10:29Z"
 summary: "Clarify 103-team-view (unattended): bound Related Feature to 027 Team Management (direct follow-on spec; 036/042 precedent; parent status held at Implemented under no-status-regression), fixed the det"
+introspection_ref: "introspection-20261124T151412Z#F-05"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-05"
 ---
 
 ## Review

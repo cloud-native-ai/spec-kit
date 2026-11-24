@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T02:56:11Z"
 summary: "create-requirements carried the 103-team-view requirements generation end to end: glossary anchoring first (no new term registered, following the anchor/goal view precedent), deterministic scaffold, c"
+introspection_ref: "introspection-20261124T151412Z#F-05"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-05"
 ---
 
 ## Review

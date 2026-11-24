@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-24T08:14:34Z"
 summary: "Drove line 104-agents-run end to end: full stage chain with two bounded completion/repair rounds at plan (one-shot subagent ended its turn waiting) and analyze (2 HIGH text-level fixes then incrementa"
+introspection_ref: "introspection-20261124T151412Z#F-01"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-01"
 ---
 
 ## Review

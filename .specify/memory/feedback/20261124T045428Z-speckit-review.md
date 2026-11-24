@@ -8,9 +8,12 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "103-team-view"
+disposition: "processed"
 partial: false
 created: "2026-11-24T04:54:28Z"
 summary: "四段评审 + ARC 一次通过：base/triage/receipt/report/capture 与 closure checker 均为确定性读数；定向 103 passed、smoke 19 passed"
+introspection_ref: "introspection-20261124T151412Z#F-02"
+disposition_reason: "introspection:introspection-20261124T151412Z#F-02"
 ---
 
 ## Review
