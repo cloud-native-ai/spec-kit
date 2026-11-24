@@ -25,7 +25,9 @@ template keeps entry + delegation only.
 
 ## Input Contract
 
-- **Intent**: `run <agent-name> [task]`, or empty (no-argument listing behaviour).
+- **Intent**: `run <agent-name> [task]`, or empty (no-argument listing behaviour). The
+  command-level argument grammar is `[create|refine|run] [agent-name] [task]`; the
+  run-specific form is `run <agent-name> [task]`.
 - **Agent resolution**: by `name` from the request or conversation context. Load
   `.specify/agents/instances/<name>.agent.md`, falling back to
   `.specify/agents/templates/<name>.agent.md` (**instance wins on collision**); apply
@@ -35,8 +37,12 @@ template keeps entry + delegation only.
   `.specify/shared/definitions/agent-definitions.md`). If the layer is ambiguous, ask; never
   guess silently.
 
-Agent not found → report **"agent not found"** and offer to `create` it. Do not improvise a
-one-off prompt in its place.
+Agent not found → report **"agent not found"** and offer to `create` it — no dispatch. Do not
+improvise a one-off prompt in its place.
+
+`run <agent-name>` without task text presents the resolved agent (name, layer, description),
+reports **"missing task"**, and requests the task; it MUST NOT dispatch an empty task brief
+and MUST NOT fall into the no-argument listing behaviour.
 
 ## Workflow
 
@@ -86,6 +92,13 @@ MUST NOT merge or normalize configuration itself:
 1. **Resolve the target agent** — per the Input Contract above.
 2. **Present & dispatch** — present the agent's `name`, `description`, and the task, then
    dispatch directly. The presentation is **disclosure, not a blocking gate**（用户可随时叫停）.
+   Beside the config disclosure, the presentation carries the role relation of this
+   dispatch: **this session is the edge's superagent (root)**, the **child label** of the
+   attempt, and the **return channel** for the result. The role relation and its protocol
+   are owned by `.specify/shared/definitions/superagent-definitions.md` (§ Role Edges,
+   § The super↔sub Protocol) and are referenced by pointer, never restated here. The role
+   is decided only by the dispatch edge: no activation switch, role entity, fourth agent
+   category or second role definition is introduced by this skill.
 3. **Dispatch** — launch as a subagent with its configured `capability-tools`, `model-tier`,
    `run-turn-budget`, and system prompt. Choose the execution mode per
    `.specify/shared/definitions/subagent-definitions.md`: **native** when the runtime supports
@@ -103,6 +116,17 @@ MUST NOT merge or normalize configuration itself:
    For **remote** topology, run `resolve` (before) and `collect-dispatch` (after) on the
    **target project side** through the same `ssh` family, so the snapshot, logs, and store
    belong to the target project.
+   **Role-edge downlink (seven fields, by pointer)**: the outgoing payload carries the seven
+   fields `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`,
+   `depth_position`, `authority_ref` and `return_channel`; their semantics are owned by
+   `.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol and are
+   never copied here. A missing field blocks the dispatch.
+   **Four pre-existing injections (by pointer)**: the same payload carries the fast-fail
+   clause (`shared/guidelines/fast-fail.md` § 子代理派发注入, injected verbatim — see the
+   dispatch-time injection below), the concurrency obligation
+   (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation), the
+   reporting duty (`shared/guidelines/reporting-obligations.md`) and the re-anchoring anchor
+   digest (`shared/definitions/re-anchoring-definitions.md`).
 4. **Collect (external only)** — after `dispatch.sh` returns, invoke
    `python3 .specify/scripts/python/exec-quant.py --action collect-dispatch --unit-id
    agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>
@@ -110,6 +134,13 @@ MUST NOT merge or normalize configuration itself:
    change the dispatch result, re-run the dispatch, or delete any artifact.
 5. **Report** — relay the result back to the user. If the subagent fails or hits its turn
    limit, report the **partial result and the failure reason** — not a summary that hides it.
+   **Five-element uplink (owner by pointer)**: every return MUST carry the five elements
+   owned by `.specify/shared/definitions/superagent-definitions.md` § The super↔sub
+   Protocol — the result or deliverable path; the evidence pointer(s); an explicit anomaly
+   line (`未发现异常` when none); the concurrency reading triple (`requested` / `effective` /
+   `effective_reason`); and the returning executor's identity. A return missing any element
+   is **incomplete**: the parent MUST NOT consume its conclusion and MUST NOT backfill the
+   missing fields.
 
 **Dispatch-time injection (mandatory)**: before dispatching, verify the outgoing prompt
 carries the fast-fail injection clause — its owner literal lives in
