@@ -63,6 +63,14 @@ records — none is this feature's artifact.
 
 ## Result
 
-commit_1_hash: $(git rev-parse HEAD) recorded below after the commit
+commit_1_hash: 32884700798d9cd64328e82fcc3d1a9fc65029c9
 commit_2_hash: this file's own commit (recorded in the stage return and the state spine)
 push: not performed (`git status -sb` had no upstream before and after)
+
+## Post-commit re-run (same day)
+
+    python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/103-team-view --repo . --json
+
+rc: 0 · verdict: accept · reasons: [] · final_path: pass=2 blocked=0 deferred=0 partial=0
+fail=0 unknown=0 (total 2). `git status` after commit 1 shows only the known pre-existing dirty
+files plus this file's pending hash record (commit 2) and the observer's `journal.md`.
