@@ -1,0 +1,63 @@
+# US2 targeted run — package 3 (T024)
+
+Captured: 2026-11-24, immediately after T023 (overview extraction + rendering) landed.
+Unique entry (no pipeline; stdout+stderr redirected whole, exit code preserved):
+
+  bash scripts/bash/run-tests.sh tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q --names-out .specify/specs/103-team-view/test-evidence/us2-failed.txt
+
+Runner mode line (verbatim):
+  # test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+
+Readings (verbatim tail):
+  ..............................                                           [100%]
+  30 passed in 6.51s
+  # failed-name list written: .specify/specs/103-team-view/test-evidence/us2-failed.txt (0 entries) passes=1
+
+- rc: 0
+- passed: 30
+- failed: 0
+- skipped: 0 (tier=fast, excluded_slow=0)
+- duration: 6.51s (pytest's own line)
+- failed-name list: `.specify/specs/103-team-view/test-evidence/us2-failed.txt` — 0 entries (file exists and is empty; the runner's own line distinguishes it from a missing list)
+- full capture of this run: `.specify/.tmp/us2-green.out` (stage-local, not committed)
+- red-first counterpart: `notes/red-first-evidence.md` § US2 segment — 3 failed / 27 passed before the overview landed; the three reds are the three new US2 rows and are now green.
+
+Selection basis: targeted-set-v1 — this package changes exactly one executable path
+(`scripts/python/team-view.py`) and two test files; the overview behaviour is exercised by
+the program-contract file (envelope) and the program-integration file (rendering). The
+implement-entry baseline (`.specify/specs/103-team-view/baseline-failed.txt`, 222 names) was
+NOT re-run in this package; new-failure attribution stays a name-level set difference, and
+the current failed-name list is empty (0 entries), so the selected ids contribute no new
+failures.
+
+## Sanity reading on the live archive (read-only, supplemental)
+
+    python3 scripts/python/team-view.py            # → "Team Overview: 20 teams · as-of: 2026-11-20T10:27:20Z（文件时间；非实时探测）"
+    python3 scripts/python/team-view.py --json | … # → mode=overview total=20 corrupt_total=0 degraded=false
+
+`git status --short .specify/teams/` stayed empty after both invocations — the live overview
+reads and writes nothing (INV-01). The live latest-run cell for `cws-workspace-cluster`
+reads `20260730T094500Z`, matching the newest `runs/*-report.md` filename token; an
+undeclared lifecycle reads `active（未声明）` (owner default, disclosed).
+
+## Mirror re-sync (T025, verbatim)
+
+    python3 scripts/python/sync-mirrors.py --write --only scripts   # rc 0; projected .specify/scripts/python/team-view.py
+    python3 scripts/python/sync-mirrors.py --check --only scripts   # rc 0
+      ok    scripts/ == .specify/scripts/ (132 files, byte-identical)
+    diff -q scripts/python/team-view.py .specify/scripts/python/team-view.py   # empty output
+
+The mirror was produced by the generator only; no hand edit.
+
+## Cross-references recorded with this reading
+
+- **F-03 (test-name correspondence)**: `quickstart.md` S-2 pins the final name
+  `tests/integration/test_team_view_program.py::test_overview_lists_every_team_sorted`.
+  That name lands with the US4 segment (T032), which subsumes the sorted-overview claim and
+  adds the corrupt-row leg; the US2 segment carries the same claim as
+  `::TestOverview::test_overview_lists_two_teams_sorted_with_seven_fields`. No plan-owned
+  file was edited for this note.
+- **E-03 (SC-006 bearer)**: the tri-state / `未记录` readings are borne by the T008 segment
+  in the same integration file (`test_minimal_team_marks_missing_without_fabricated_zeros`,
+  `test_missing_report_segments_are_unrecorded_never_no_anomaly`), which stayed green in
+  this run; no requirement change follows.

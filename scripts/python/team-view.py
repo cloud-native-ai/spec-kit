@@ -776,20 +776,27 @@ def _declared_block_map(value) -> dict:
     return {"state": STATE_MALFORMED}
 
 
-def build_definition(front, problems: dict, slug: str) -> dict:
-    lifecycle_raw = front.get("lifecycle_state")
-    if lifecycle_raw is None:
-        lifecycle = {"value": "active", "declared": False}
-    else:
-        lifecycle = {"value": _text(lifecycle_raw), "declared": True}
+def anchor_identity_of(front, slug: str) -> dict:
+    """Identity resolution order owned by create-mode § Schema notes (C-36, FR-020)."""
     anchor_slug = front.get("anchor_slug")
     goal_slug = front.get("goal_slug")
     if anchor_slug:
-        anchor_identity = {"kind": "declared", "value": _text(anchor_slug)}
-    elif goal_slug:
-        anchor_identity = {"kind": "legacy", "value": _text(goal_slug)}
-    else:
-        anchor_identity = {"kind": "inferred", "value": slug}
+        return {"kind": "declared", "value": _text(anchor_slug)}
+    if goal_slug:
+        return {"kind": "legacy", "value": _text(goal_slug)}
+    return {"kind": "inferred", "value": slug}
+
+
+def lifecycle_of(front) -> dict:
+    value = front.get("lifecycle_state")
+    if value is None:
+        return {"value": "active", "declared": False}
+    return {"value": _text(value), "declared": True}
+
+
+def build_definition(front, problems: dict, slug: str) -> dict:
+    lifecycle = lifecycle_of(front)
+    anchor_identity = anchor_identity_of(front, slug)
     other_keys = []
     for key in front:
         if key not in SCHEMA_KEYS:
@@ -1088,6 +1095,125 @@ def assemble_single(repo_root: Path, slug: str) -> dict:
             if persistence["reports"]["shown"] else None
         ),
     }
+
+
+# --------------------------------------------------------------------------- #
+# Overview (E8): one linear pass over .specify/teams/*/, no engine call (R-04)
+# --------------------------------------------------------------------------- #
+OVERVIEW_HEADERS = (
+    "slug",
+    "name",
+    "pattern",
+    "lifecycle",
+    "绑定锚点（anchor）",
+    "updated",
+    "最近运行（latest run）",
+)
+
+
+def _latest_report_token(team_dir: Path):
+    runs = team_dir / "runs"
+    if not runs.is_dir():
+        return None
+    try:
+        names = [path.name for path in runs.iterdir() if path.is_file()]
+    except OSError:
+        return None
+    tokens = [match.group(1) for match in map(REPORT_NAME_RE.match, names) if match]
+    return max(tokens) if tokens else None
+
+
+def build_overview_row(repo_root: Path, slug: str) -> dict:
+    team_dir = repo_root / ".specify" / "teams" / slug
+    definition_path = team_dir / "team.md"
+    row = {
+        "slug": slug,
+        "name": None,
+        "pattern": None,
+        "lifecycle": {"value": "active", "declared": False},
+        "anchor_identity": {"kind": "inferred", "value": slug},
+        "updated": None,
+        "latest_run": None,
+        "state": STATE_CORRUPT,
+        "path": str(definition_path),
+    }
+    try:
+        text = definition_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return row
+    front, problems = parse_frontmatter(text)
+    if is_definition_corrupt(problems):
+        return row
+    row["state"] = "ok"
+    row["name"] = _text(front.get("name"))
+    row["pattern"] = _text(front.get("pattern"))
+    row["lifecycle"] = lifecycle_of(front)
+    row["anchor_identity"] = anchor_identity_of(front, slug)
+    row["updated"] = _text(front.get("updated"))
+    row["latest_run"] = _latest_report_token(team_dir)
+    return row
+
+
+def assemble_overview(repo_root: Path) -> dict:
+    """Scan the archive layer; a corrupt directory is counted, never silently dropped."""
+    teams_root = repo_root / ".specify" / "teams"
+    try:
+        directories = sorted(
+            path for path in teams_root.iterdir()
+            if path.is_dir() and not path.name.startswith(".")
+        )
+    except OSError:
+        directories = []
+    rows = []
+    corrupt_rows = []
+    consumed = []
+    for team_dir in directories:
+        row = build_overview_row(repo_root, team_dir.name)
+        if row["state"] == "ok":
+            rows.append(row)
+            consumed.append(team_dir / "team.md")
+        else:
+            corrupt_rows.append(row)
+    return {
+        "mode": "overview",
+        "rows": rows,
+        "total": len(rows),
+        "corrupt_total": len(corrupt_rows),
+        "corrupt_rows": corrupt_rows,
+        "empty": not directories,
+        "as_of": _max_mtime_iso(consumed),
+        "latest_report_timestamp": None,
+        "degraded": False,
+        "errors": [],
+    }
+
+
+def render_overview(view: dict) -> str:
+    if view["empty"]:
+        return "No teams found"
+    lines = [
+        "Team Overview: %d teams · as-of: %s（文件时间；非实时探测）" % (
+            view["total"], view["as_of"]),
+        "",
+        "| " + " | ".join(OVERVIEW_HEADERS) + " |",
+        "|" + "|".join("---" for _ in OVERVIEW_HEADERS) + "|",
+    ]
+    for row in view["rows"]:
+        lifecycle = row["lifecycle"]
+        lifecycle_text = lifecycle["value"] if lifecycle["declared"] else (
+            lifecycle["value"] + "（" + STATE_UNDECLARED + "）")
+        anchor = row["anchor_identity"]
+        cells = (
+            row["slug"],
+            row["name"] or STATE_UNRECORDED,
+            row["pattern"] or STATE_UNRECORDED,
+            lifecycle_text,
+            "%s — %s" % (anchor["kind"], anchor["value"]),
+            row["updated"] or STATE_UNRECORDED,
+            row["latest_run"] or STATE_UNRECORDED,
+        )
+        lines.append("| " + " | ".join(cells) + " |")
+    return "\n".join(lines)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1401,6 +1527,12 @@ def build_envelope(view: dict, repo_root: Path, requested_scope: str) -> dict:
             "latest": view["latest"],
             "archive": view["archive"],
         }
+    else:
+        overview = {
+            "rows": view["rows"],
+            "total": view["total"],
+            "corrupt_total": view["corrupt_total"],
+        }
     return {
         "tool": "team-view",
         "version": framework_version(),
@@ -1419,16 +1551,25 @@ def build_envelope(view: dict, repo_root: Path, requested_scope: str) -> dict:
 
 
 def emit_view(args, mode: str, repo_root: Path, scope: str) -> int:
-    """Render one view: the single-team six-group reading (overview lands with US2)."""
-    if mode != "single":
-        raise NotImplementedError("overview extraction and rendering land with US2")
-    view = assemble_single(repo_root, args.team_slug)
-    if view["state"] == "not-found":
-        print("team not found: %s" % args.team_slug)
-        return EXIT_NOT_FOUND
-    if view["state"] == "corrupt":
-        print("定义损坏: %s" % view["path"])
-        return EXIT_CORRUPT
+    """Render one view: the six-group reading for one team, or the sorted overview."""
+    if mode == "single":
+        view = assemble_single(repo_root, args.team_slug)
+        if view["state"] == "not-found":
+            print("team not found: %s" % args.team_slug)
+            return EXIT_NOT_FOUND
+        if view["state"] == "corrupt":
+            print("定义损坏: %s" % view["path"])
+            return EXIT_CORRUPT
+        if args.json:
+            print(json.dumps(
+                build_envelope(view, repo_root, scope),
+                ensure_ascii=False,
+                indent=2,
+            ))
+        else:
+            print(render_single(view))
+        return EXIT_DEGRADED if view["degraded"] else EXIT_OK
+    view = assemble_overview(repo_root)
     if args.json:
         print(json.dumps(
             build_envelope(view, repo_root, scope),
@@ -1436,8 +1577,8 @@ def emit_view(args, mode: str, repo_root: Path, scope: str) -> int:
             indent=2,
         ))
     else:
-        print(render_single(view))
-    return EXIT_DEGRADED if view["degraded"] else EXIT_OK
+        print(render_overview(view))
+    return EXIT_OK
 
 
 def main(argv=None) -> int:

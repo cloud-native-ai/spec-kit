@@ -149,15 +149,15 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T020 [P] [US2] 追加概览集成测试段到 `tests/integration/test_team_view_program.py`：两团队 fixture 每团队一行且 slug 升序、列覆盖七个字段、无运行团队 `最近运行: 未记录`、空档案输出 [[STR-002]] 且 exit 0；使用 T004 的 builder 与 snapshot helper（C-29、C-31、C-32；FR-007；INV-04）。write: `tests/integration/test_team_view_program.py` [blockedBy: T017]
-- [ ] T021 [P] [US2] 追加概览 envelope 断言到 `tests/contract/test_team_view_program_contract.py`：`--json` 的 `mode=overview`、`overview.rows[].slug` 升序、`overview.total` / `overview.corrupt_total` 键在位（C-29；FR-007；E9）。write: `tests/contract/test_team_view_program_contract.py` [blockedBy: T017]
-- [ ] T022 [US2] 先跑 T020 / T021 并把红读数（概览尚未实现）写入 `notes/red-first-evidence.md`（FR-021）。write: `.specify/specs/103-team-view/notes/red-first-evidence.md` [blockedBy: T020,T021]
+- [X] T020 [P] [US2] 追加概览集成测试段到 `tests/integration/test_team_view_program.py`：两团队 fixture 每团队一行且 slug 升序、列覆盖七个字段、无运行团队 `最近运行: 未记录`、空档案输出 [[STR-002]] 且 exit 0；使用 T004 的 builder 与 snapshot helper（C-29、C-31、C-32；FR-007；INV-04）。write: `tests/integration/test_team_view_program.py` [blockedBy: T017]
+- [X] T021 [P] [US2] 追加概览 envelope 断言到 `tests/contract/test_team_view_program_contract.py`：`--json` 的 `mode=overview`、`overview.rows[].slug` 升序、`overview.total` / `overview.corrupt_total` 键在位（C-29；FR-007；E9）。write: `tests/contract/test_team_view_program_contract.py` [blockedBy: T017]
+- [X] T022 [US2] 先跑 T020 / T021 并把红读数（概览尚未实现）写入 `notes/red-first-evidence.md`（FR-021）。write: `.specify/specs/103-team-view/notes/red-first-evidence.md` [blockedBy: T020,T021]
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] 在 `scripts/python/team-view.py` 实现概览模式：扫描 `.specify/teams/*/` 的目录名作为排序键，每目录一行 E8（名称/pattern/lifecycle 缺省读 active/绑定锚点身份含 legacy 与 inferred 披露/updated/最新报告文件名时间戳或 `未记录`），空档案输出 [[STR-002]] 且 exit 0；概览不调用引擎读动作（R-04；C-31、C-32；FR-007）。write: `scripts/python/team-view.py` [blockedBy: T022]
-- [ ] T024 [US2] 经唯一入口转绿并记录读数：`bash scripts/bash/run-tests.sh tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q --names-out .specify/specs/103-team-view/test-evidence/us2-failed.txt`，rc 与读数写入 `us2-green.txt`（FR-021）。write: `.specify/specs/103-team-view/test-evidence/us2-green.txt` [blockedBy: T023]
-- [ ] T025 [US2] 复同步程序镜像并验证：`python3 scripts/python/sync-mirrors.py --write --only scripts` 后 `--check --only scripts` 为 `ok`、`diff -q` 空输出（FR-019）。write: `.specify/scripts/python/team-view.py` [blockedBy: T024]
+- [X] T023 [US2] 在 `scripts/python/team-view.py` 实现概览模式：扫描 `.specify/teams/*/` 的目录名作为排序键，每目录一行 E8（名称/pattern/lifecycle 缺省读 active/绑定锚点身份含 legacy 与 inferred 披露/updated/最新报告文件名时间戳或 `未记录`），空档案输出 [[STR-002]] 且 exit 0；概览不调用引擎读动作（R-04；C-31、C-32；FR-007）。write: `scripts/python/team-view.py` [blockedBy: T022]
+- [X] T024 [US2] 经唯一入口转绿并记录读数：`bash scripts/bash/run-tests.sh tests/contract/test_team_view_program_contract.py tests/integration/test_team_view_program.py -q --names-out .specify/specs/103-team-view/test-evidence/us2-failed.txt`，rc 与读数写入 `us2-green.txt`（FR-021）。write: `.specify/specs/103-team-view/test-evidence/us2-green.txt` [blockedBy: T023]
+- [X] T025 [US2] 复同步程序镜像并验证：`python3 scripts/python/sync-mirrors.py --write --only scripts` 后 `--check --only scripts` 为 `ok`、`diff -q` 空输出（FR-019）。write: `.specify/scripts/python/team-view.py` [blockedBy: T024]
 
 **Checkpoint**: 无 slug 的概览在 fixture 上确定排序、空档案显式声明——US2 可独立验证（MVP 后半）。
 
@@ -171,15 +171,15 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T026 [US3] 追加路由与文档断言段到 `tests/contract/test_team_view_command.py`：C-09 七条路由样例的确定性代理断言（每条样例的特征 token 出现在其期望模式的表行、view 特征 token 不出现在 create/modify/run 行）、C-04 三条不变量（create/modify/run 不落 view、歧义非空输入只报四项能力且不执行、`--target` 视为模式/参数冲突）、C-05 默认行为能力摘要四模式、C-07 文档四模式 + `## View Mode` 小节 + Companion Skills 含 `view-team`、C-08 两处漂移与三个假断言字面量各 0 次、C-10 两文件四模式且 [[STR-004]] 0 次、C-12 不存在 `.specify/templates/commands/` 镜像；测试名 `test_view_target_conflict_declared` 与路由样例逐条覆盖（FR-002, FR-017；SC-003, SC-005；C-04、C-05、C-07、C-08、C-09、C-10、C-12）。write: `tests/contract/test_team_view_command.py` [blockedBy: T017]
-- [ ] T027 [US3] 先跑 T026 并把红读数（路由流、默认行为与文档尚未同步）写入 `notes/red-first-evidence.md`（FR-021）。write: `.specify/specs/103-team-view/notes/red-first-evidence.md` [blockedBy: T026]
+- [X] T026 [US3] 追加路由与文档断言段到 `tests/contract/test_team_view_command.py`：C-09 七条路由样例的确定性代理断言（每条样例的特征 token 出现在其期望模式的表行、view 特征 token 不出现在 create/modify/run 行）、C-04 三条不变量（create/modify/run 不落 view、歧义非空输入只报四项能力且不执行、`--target` 视为模式/参数冲突）、C-05 默认行为能力摘要四模式、C-07 文档四模式 + `## View Mode` 小节 + Companion Skills 含 `view-team`、C-08 两处漂移与三个假断言字面量各 0 次、C-10 两文件四模式且 [[STR-004]] 0 次、C-12 不存在 `.specify/templates/commands/` 镜像；测试名 `test_view_target_conflict_declared` 与路由样例逐条覆盖（FR-002, FR-017；SC-003, SC-005；C-04、C-05、C-07、C-08、C-09、C-10、C-12）。write: `tests/contract/test_team_view_command.py` [blockedBy: T017]
+- [X] T027 [US3] 先跑 T026 并把红读数（路由流、默认行为与文档尚未同步）写入 `notes/red-first-evidence.md`（FR-021）。write: `.specify/specs/103-team-view/notes/red-first-evidence.md` [blockedBy: T026]
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] 在 `templates/commands/team.md` 补路由（author-section）：Routing flow 首步模式分类加入 `view`、新增 view → `view-team` 的委派步与 `--target` 冲突步；Default Behavior 第 3 步能力摘要列出 create/modify/run/view 四模式（默认行为仍是信息序列，不得变成隐式 view 执行）；Ambiguous 能力清单加 view 一项并保持「不猜」契约（C-04、C-05；FR-001, FR-002）。write: `templates/commands/team.md` [blockedBy: T027]
-- [ ] T029 [US3] 同步 `docs/reference/commands/team.md`（author-section）：开头段与 When to Use 改为四模式、Syntax 与四行模式表加入 view、run 委派单元格改为 `run-team`、新增 `## View Mode` 小节（只读 / 无 slug 概览 / 精确 slug / `team not found` + create 建议 / 损坏定义点名路径 / 不是 run 预览的边界）、Companion Skills 加 `view-team`；同一变更内校正两处 run 模式漂移——run 委派对象改为 `run-team` 技能、预览改为「披露而非阻断门禁」，删除三个假断言字面量（C-07、C-08；FR-017；SC-005）。write: `docs/reference/commands/team.md` [blockedBy: T027]
-- [ ] T030 [US3] 经生成器再生成四个 per-tool 命令副本：`python3 scripts/python/regen-command-copies.py --write` 产出 `.claude/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.qoder/commands/speckit.team.md`、`.opencode/command/speckit.team.md`，随后 `--check` rc 0；四个副本各含 `view` 且 [[STR-004]] 0 次，副本不得手改（C-12；FR-001, FR-017）。write: `.claude/commands/speckit.team.md`, `.github/prompts/speckit.team.prompt.md`, `.qoder/commands/speckit.team.md`, `.opencode/command/speckit.team.md` [blockedBy: T028]
-- [ ] T031 [US3] 经唯一入口把接线契约转绿并记录 SC-005 复算读数：`bash scripts/bash/run-tests.sh tests/contract/test_team_view_command.py -q` 全绿（该文件此时含 C-01/C-02/C-03/C-06 段与 C-04…C-12 段）；对两个具名文件以程序统计模式数与 [[STR-004]] 出现数（各 4 / 各 0）写入 `us3-green.txt`（FR-021；SC-003, SC-005）。write: `.specify/specs/103-team-view/test-evidence/us3-green.txt` [blockedBy: T029,T030]
+- [X] T028 [US3] 在 `templates/commands/team.md` 补路由（author-section）：Routing flow 首步模式分类加入 `view`、新增 view → `view-team` 的委派步与 `--target` 冲突步；Default Behavior 第 3 步能力摘要列出 create/modify/run/view 四模式（默认行为仍是信息序列，不得变成隐式 view 执行）；Ambiguous 能力清单加 view 一项并保持「不猜」契约（C-04、C-05；FR-001, FR-002）。write: `templates/commands/team.md` [blockedBy: T027]
+- [X] T029 [US3] 同步 `docs/reference/commands/team.md`（author-section）：开头段与 When to Use 改为四模式、Syntax 与四行模式表加入 view、run 委派单元格改为 `run-team`、新增 `## View Mode` 小节（只读 / 无 slug 概览 / 精确 slug / `team not found` + create 建议 / 损坏定义点名路径 / 不是 run 预览的边界）、Companion Skills 加 `view-team`；同一变更内校正两处 run 模式漂移——run 委派对象改为 `run-team` 技能、预览改为「披露而非阻断门禁」，删除三个假断言字面量（C-07、C-08；FR-017；SC-005）。write: `docs/reference/commands/team.md` [blockedBy: T027]
+- [X] T030 [US3] 经生成器再生成四个 per-tool 命令副本：`python3 scripts/python/regen-command-copies.py`（无参就地再生）产出 `.claude/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.qoder/commands/speckit.team.md`、`.opencode/command/speckit.team.md`，随后 `--check` rc 0；四个副本各含 `view` 且 [[STR-004]] 0 次，副本不得手改（C-12；FR-001, FR-017）。write: `.claude/commands/speckit.team.md`, `.github/prompts/speckit.team.prompt.md`, `.qoder/commands/speckit.team.md`, `.opencode/command/speckit.team.md` [blockedBy: T028]
+- [X] T031 [US3] 经唯一入口把接线契约转绿并记录 SC-005 复算读数：`bash scripts/bash/run-tests.sh tests/contract/test_team_view_command.py -q` 全绿（该文件此时含 C-01/C-02/C-03/C-06 段与 C-04…C-12 段）；对两个具名文件以程序统计模式数与 [[STR-004]] 出现数（各 4 / 各 0）写入 `us3-green.txt`（FR-021；SC-003, SC-005）。write: `.specify/specs/103-team-view/test-evidence/us3-green.txt` [blockedBy: T029,T030]
 
 **Checkpoint**: 四模式接线与文档一致、路由样例全绿、陈旧字面量清零——US3 可独立验证。
 

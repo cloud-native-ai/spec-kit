@@ -34,3 +34,44 @@ preserve. It is expected to keep passing after the implementation lands.
   `test_behavioural_exits_stay_inside_the_closed_set` first requires a real `--version`
   answer (`team-view.py <version>`). The capture above is of the tightened files.
 - No test was skipped, xfailed, muted or retried to reach these readings.
+
+## US2 segment — overview (T022)
+
+- Captured: 2026-11-24 (package 3, before the overview implementation landed)
+- Command (unique entry; stdout+stderr redirected whole, no pipeline):
+  `bash scripts/bash/run-tests.sh tests/integration/test_team_view_program.py tests/contract/test_team_view_program_contract.py -q`
+- rc: **1** · summary: **3 failed, 27 passed in 6.51s**
+- Full capture: `.specify/.tmp/us2-red.out` (stage-local; not committed)
+
+| New test | Red shape | Decisive excerpt (verbatim) |
+|----------|-----------|-----------------------------|
+| `tests/integration/test_team_view_program.py::TestOverview::test_overview_lists_two_teams_sorted_with_seven_fields` | the no-slug path is not implemented | `NotImplementedError: overview extraction and rendering land with US2` |
+| `tests/integration/test_team_view_program.py::TestOverview::test_empty_archive_reports_no_teams_found` | same | `assert 1 == 0` on the subprocess returncode with the same traceback |
+| `tests/contract/test_team_view_program_contract.py::TestOverviewEnvelope::test_overview_envelope_carries_mode_sorting_and_counts` | same | `NotImplementedError: overview extraction and rendering land with US2` |
+
+The reds are attributable to the subject being absent (the overview branch raises by
+design), not to fragile assertions: every existing US1 test in the same two files passed
+(27 passed), so the new failures are exactly the three US2 rows.
+
+## US3 segment — routing, docs and per-tool copies (T027)
+
+- Captured: 2026-11-24 (package 3, before the routing flow / docs page / copy regeneration landed)
+- Command (unique entry; stdout+stderr redirected whole, no pipeline):
+  `bash scripts/bash/run-tests.sh tests/contract/test_team_view_command.py -q`
+- rc: **1** · summary: **16 failed, 22 passed in 6.27s**
+- Full capture: `.specify/.tmp/us3-red.out` (stage-local; not committed)
+
+| Red group | Tests | Decisive excerpt (verbatim) |
+|-----------|-------|-----------------------------|
+| routing flow (`TestNoGuessRouting`) | 2 failed | no `view → view-team` routing step; no view+`--target` conflict line in the routing flow |
+| ambiguous input (`TestRoutingSamples`) | 1 failed | `ambiguous capability list lacks view` / no `MUST NOT execute any mode` line |
+| default behavior (`TestDefaultBehaviorModes`) | 1 failed | `default-behavior summary lacks` the fourth mode; summary still says "three modes" |
+| docs page (`TestDocsPage`) | 5 failed | `AssertionError: missing heading: ## View Mode`; docs still `exposes **exactly three modes**` |
+| docs run drift (`TestDocsRunDrift`) | 2 failed | run row still delegates to `create-team` (execution path); the three false-claim literals still present |
+| docs mode counts (`TestNamedFilesModeCounts[docs]`) | 1 failed | `'exactly three modes'` still in the docs page |
+| per-tool copies (`TestPerToolCopies`) | 4 failed | each of the four copies still carries `exactly three modes` |
+
+The passing 22 are the US1 wiring assertions (`C-01`/`C-02`/`C-06`/`C-11` segments) plus the
+template-side mode-count row — the template already carries four modes from T016, so the
+US3 reds are exactly the not-yet-synchronised surfaces (routing steps, default/ambiguous
+lists, docs page, four generated copies).

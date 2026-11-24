@@ -121,7 +121,7 @@ tests/integration/test_team_view_program.py    # six groups, tri-state, ordering
 |----------------------|---------------------------------------------------|--------|
 | `scripts/python/team-view.py` (new) | `.specify/scripts/python/team-view.py` (pair `scripts` ↔ `.specify/scripts`) | `sync-mirrors.py --write --only scripts` then `--check`; `diff -q` on this pair empty; baseline pairs stay `ok` |
 | `skills/internal/view-team/SKILL.md` (new, plus any references) | `.specify/skills/internal/view-team/**` (pair `skills/internal` ↔ `.specify/skills/internal`) | `sync-mirrors.py --write --only skills/internal` then `--check`; `ok skills/internal/ == .specify/skills/internal/`; `diff -q` empty |
-| `templates/commands/team.md` | `.claude/commands/speckit.team.md`; `.github/prompts/speckit.team.prompt.md`; `.qoder/commands/speckit.team.md`; `.opencode/command/speckit.team.md` (via `regen-command-copies.py`; NO `.specify/templates/commands/` mirror — retired) | `regen-command-copies.py --write` then `--check` rc 0; the four copies contain `view` and no `exactly three modes` |
+| `templates/commands/team.md` | `.claude/commands/speckit.team.md`; `.github/prompts/speckit.team.prompt.md`; `.qoder/commands/speckit.team.md`; `.opencode/command/speckit.team.md` (via `regen-command-copies.py`; NO `.specify/templates/commands/` mirror — retired) | `regen-command-copies.py` (no argument regenerates in place) then `--check` rc 0; the four copies contain `view` and no `exactly three modes` |
 
 `docs/reference/commands/team.md`, `tests/**`, `.specify/features*` and this spec directory have no mirror; `.specify/features*` are single-owner registries and are never split.
 

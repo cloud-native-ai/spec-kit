@@ -208,6 +208,50 @@ class TestSingleTeamRendering:
         assert "无异常" not in output
 
 
+class TestOverview:
+    """US2 (T020): the no-slug overview — FR-007, INV-04; C-29, C-31, C-32."""
+
+    def test_overview_lists_two_teams_sorted_with_seven_fields(self, tmp_path):
+        build_team(tmp_path, "alpha-team")
+        frontmatter = default_frontmatter("bravo-team")
+        frontmatter["anchor_slug"] = "bravo-anchor"
+        build_team(
+            tmp_path,
+            "bravo-team",
+            frontmatter=frontmatter,
+            reports=[("20260102T000000Z-report.md", report_text())],
+        )
+        before = snapshot(tmp_path)
+        result = view(tmp_path)
+        assert result.returncode == 0, result.stderr
+        assert snapshot(tmp_path) == before, "the overview wrote to the tree"
+        output = result.stdout
+        assert "alpha-team" in output and "bravo-team" in output
+        assert output.index("| alpha-team") < output.index("| bravo-team"), "rows are not slug-ascending"
+        table = [line for line in output.splitlines() if line.strip().startswith("|")]
+        assert len(table) >= 4, "overview table missing header/separator/data rows"
+        header = [cell.strip() for cell in table[0].strip().strip("|").split("|")]
+        assert len(header) == 7, "overview row must cover seven fields: %r" % header
+        for label in ("slug", "name", "pattern", "lifecycle", "updated", "最近运行"):
+            assert label in table[0], "overview header lacks %s" % label
+        alpha_row = next(line for line in table if "| alpha-team" in line)
+        alpha_cells = [cell.strip() for cell in alpha_row.strip().strip("|").split("|")]
+        assert len(alpha_cells) == 7
+        for value in ("Fixture Team alpha-team", "serial", "active", "inferred", "2026-01-02", "未记录"):
+            assert value in alpha_row, "alpha row lacks %r: %r" % (value, alpha_row)
+        bravo_row = next(line for line in table if "| bravo-team" in line)
+        bravo_cells = [cell.strip() for cell in bravo_row.strip().strip("|").split("|")]
+        assert len(bravo_cells) == 7
+        for value in ("Fixture Team bravo-team", "serial", "active", "declared", "bravo-anchor", "20260102T000000Z"):
+            assert value in bravo_row, "bravo row lacks %r: %r" % (value, bravo_row)
+        assert re.search(r"as-of: \S+（文件时间；非实时探测）", output)
+
+    def test_empty_archive_reports_no_teams_found(self, tmp_path):
+        result = view(tmp_path)
+        assert result.returncode == 0, result.stderr
+        assert "No teams found" in result.stdout
+
+
 class TestEnvelopeAndReadOnly:
     def test_json_and_default_render_share_one_extraction(self, tmp_path):
         complete_team(tmp_path)

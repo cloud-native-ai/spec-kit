@@ -1,12 +1,13 @@
 # /speckit.team
 
-The single entry point for **all team operations** — create, modify, and run agent teams. `/speckit.team` is the multi-agent analogue of `/speckit.agents`: it recognizes your intent and routes it to the owning team skill. Single-agent authoring lives in `/speckit.agents`; team operations live here.
+The single entry point for **all team operations** — create, modify, run, and view agent teams. `/speckit.team` is the multi-agent analogue of `/speckit.agents`: it recognizes your intent and routes it to the owning team skill. Single-agent authoring lives in `/speckit.agents`; team operations live here.
 
 ## When to Use
 
-- When you want to organize several agents into a collaborative **team** (parallel / serial / iteration / continuous)
-- When you want to **run** an existing team behind a preview → confirm gate
-- When you want to **adjust or optimize** an existing team (add/remove members, tune thresholds, repartition territories)
+- When you want to **create** a team — organize several agents into a collaborative structure (parallel / serial / iteration / continuous)
+- When you want to **run** an existing team (the preview is disclosure, then execution)
+- When you want to **modify or optimize** an existing team (add/remove members, tune thresholds, repartition territories)
+- When you want a **read-only view** of one team's structure and status (six information groups), or an overview of every team
 
 ## Conceptual Model
 
@@ -23,20 +24,22 @@ Persistent teams own a directory `.specify/teams/<slug>/` — the definition liv
 
 ```text
 /speckit.team                      # infer intent from context
+/speckit.team view [team-slug]     # read-only view: no slug = overview, slug = six groups
 /speckit.team [intent]             # natural-language intent → routed to the matching mode/skill
 ```
 
 ## Modes → Intent Routing
 
-`/speckit.team` exposes **exactly three modes**:
+`/speckit.team` exposes **four modes**:
 
 | Mode | Recognized intent | Skill |
 |------|-------------------|-------|
 | **create** | "组织一个团队", "创建团队", "build a team" | `create-team` |
 | **modify** | "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
-| **run** | "运行团队", "执行团队", "run/execute team" | `create-team` (execution path) |
+| **run** | "运行团队", "执行团队", "run/execute team" | `run-team` |
+| **view** | "查看团队", "展示团队", "团队状态", "概览", "overview", "status", "show" | `view-team` |
 
-The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the three recognized capabilities (create / modify / run) and requests the missing intent — it never guesses silently. A `modify`/`run` targeting a team that does not exist reports **"team not found"** and offers to `create` it.
+The command **delegates to skills** and never renders templates inline. On ambiguous or unsupported intent it reports the four recognized capabilities (create / modify / run / view) and requests the missing intent — it never guesses silently, and it executes no mode until the intent resolves. A `modify`/`run`/`view` targeting a team that does not exist reports **"team not found"** and offers to `create` it.
 
 ### Anchor-based creation (create with an archived anchor)
 
@@ -49,14 +52,14 @@ When the input names an anchor that is already archived under `.specify/anchorin
 
 Concepts (Anchor / Target / binding) are defined once in `.specify/shared/definitions/anchor-definitions.md`; decomposition is owned by `skills/internal/create-team/references/conceptual-model.md`.
 
-## Run Mode: preview → confirm → execute
+## Run Mode: preview → execute (disclosure, not a gate)
 
-The **run** mode never executes before you confirm:
+The **run** mode delegates to the `run-team` skill. It loads the team, renders both structures, and then executes directly — the preview is disclosure, not a blocking gate (`shared/guidelines/confirmation-gates.md`); **continuous** loops are the exception and keep their tiered gates.
 
 1. **Load** the team from `.specify/teams/<slug>/team.md`.
 2. **Render Static Structure** — the Role × Stage × Type roster matrix.
 3. **Render Dynamic Structure** — the pattern, its parallelism/DAG/loop settings, and an execution flow diagram.
-4. **Confirmation gate** — you review the anchor and both structures and explicitly confirm. Only then does orchestration run (territory validation for parallel, DAG no-cycle + per-handoff verification for serial, max-iteration cap for iteration, and — for **continuous** — read `constraints.md` + budget + kill-switch and run exactly **one cycle** at the declared maturity level with an independent verifier at L2+; file-path-only handoff throughout). Declining stops without executing.
+4. **Disclose, then execute** — the preview discloses the resolved anchor, both structures, the Target assignment and the summary decision, and orchestration then runs directly (territory validation for parallel, DAG no-cycle + per-handoff verification for serial, max-iteration cap for iteration, and — for **continuous** — read `constraints.md` + budget + kill-switch and run exactly **one cycle** at the declared maturity level with an independent verifier at L2+; file-path-only handoff throughout).
 5. **Report** — after execution, a dated report is written to `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md` (anchor, timing, result summary, process detail). Run intermediates stay in the git-ignored `.specify/teams/.work/<slug>/`; deliverables go only to their declared target paths.
 
 ### Target-focused runs (`--target`)
@@ -65,9 +68,33 @@ The **run** mode never executes before you confirm:
 /speckit.team run <team-slug> --target T-001
 ```
 
-A run MAY focus on one authorized **Target** (scope slice) of the bound anchor — see [`/speckit.anchor`](anchor.md) → Targets for the authorization side. The parameter is validated in preview, before the gate: dangling references stop with a pointer to `/speckit.anchor targets --add`; cross-anchor references and terminal anchors are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.anchor targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. On success the gate discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 anchor 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior. **All five preview checks are available as one machine-readable, zero-write call** — `python3 scripts/python/goal-utils.py run-checks <team-slug> [--target <T-<nnn>>] --json` — whose exit code IS the verdict (`0` pass / `2` bad argument / `3` no such team / `4` definition unusable / `5` blocked), with a per-check `not-evaluated` value for any check whose precondition did not hold. The five checks, their judgment order and the meaning of each verdict are owned by the `/speckit.team` command reference and the engine; this page names the call rather than restating a second criterion.
+A run MAY focus on one authorized **Target** (scope slice) of the bound anchor — see [`/speckit.anchor`](anchor.md) → Targets for the authorization side. The parameter is validated in preview, before execution: dangling references stop with a pointer to `/speckit.anchor targets --add`; cross-anchor references and terminal anchors are refused; a **terminal-state Target** (`done`/`dropped`) stops for the **review bifurcation** — verify by hand: if it is genuinely done, the run ends with a report; if the evidence contradicts, reopen it via `/speckit.anchor targets <slug> --set open --id <T-nnn>` and re-issue the run. There is no terminal-execution bypass. The preview discloses `本次 Target: T-<nnn> — <statement>(open)` (or `本次 Target: 无(对 anchor 整体运行)` when omitted), the report carries `**Target 指派**: …`, and new ledger entries carry `target_ref`. The assignment never rebinds the team, never changes identity resolution, and never moves the summary delivery directory; without `--target` the whole flow is byte-equivalent to the pre-038 behavior. **All five preview checks are available as one machine-readable, zero-write call** — `python3 scripts/python/goal-utils.py run-checks <team-slug> [--target <T-<nnn>>] --json` — whose exit code IS the verdict (`0` pass / `2` bad argument / `3` no such team / `4` definition unusable / `5` blocked), with a per-check `not-evaluated` value for any check whose precondition did not hold. The five checks, their judgment order and the meaning of each verdict are owned by the `/speckit.team` command reference and the engine; this page names the call rather than restating a second criterion.
 
 **Default focus (`focus_target`, 042).** A team created through the anchor-based branch may declare `focus_target: T-<nnn>` in its frontmatter — the team's default focus Target. Resolution order is **explicit `--target` > `focus_target` > none**: a run without `--target` resolves to the declared Target and discloses the source with the `(团队默认)` marker (`本次 Target: T-003 — <statement>(open)(团队默认)`); an explicit `--target` always overrides; teams without the field behave exactly as before (byte-equivalent). `focus_target` is a prefill of `--target` — not a write-scope claim and not a binding change; the five preview checks apply unchanged to the resolved value (a terminal default Target is intercepted the same way; re-focus via `improve-team`, reopen via `/speckit.anchor`).
+
+## View Mode
+
+`/speckit.team view [team-slug]` is a **strictly read-only** presentation: it writes no
+definition, run report, ledger, summary, anchor, registry or state file, dispatches no seat
+and registers no run line. The mode delegates to the `view-team` skill, whose deterministic
+reader is `scripts/python/team-view.py`; the command renders nothing itself.
+
+- **No slug = overview** — one row per team in the archive, sorted by slug ascending, with
+  slug / name / pattern / lifecycle / bound-anchor identity / updated / latest run.
+- **One slug = six information groups** — identity & binding, static structure, dynamic
+  structure, persistence inventory, recent run state, archive references; every missing
+  fact is labelled (`缺失` / `为空` / `不可读` / `未记录`), never filled with a fabricated
+  value.
+- **Exact slug match only** — a near-miss is never resolved by prefix or fuzzy match. An
+  unknown slug reports **"team not found"**, the available slugs (bounded, with an omitted
+  count) and a `/speckit.team create` suggestion.
+- **Corrupt definition** — a directory that exists but whose `team.md` is missing,
+  unreadable or unparseable is reported as `定义损坏` with its exact path; it is never
+  reported as "not found".
+- **Not a run preview** — the five-check preflight and the `blocked` verdict belong to
+  `run-team`. View presents persisted state and binding facts only; a reader who wants the
+  run judgement goes to `/speckit.team run`. `--target` carried by view is a
+  mode/parameter conflict and is reported, never silently dropped or rerouted.
 
 ## Collaboration Patterns
 
@@ -122,8 +149,8 @@ Summary: produced | skipped(cadence) | skipped(budget) | declined(no-material)
 ```
 
 That line is mandatory: it is what makes "not observed" distinguishable from "observed,
-no progress". The run-mode confirmation gate discloses the summary decision, the resolved
-anchor identity, and the target directory before you confirm, so the cost is known up front.
+no progress". The run-mode preview discloses the summary decision, the resolved anchor
+identity, and the target directory before execution, so the cost is known up front.
 
 ### Configuration
 
@@ -147,6 +174,8 @@ Details: `skills/internal/create-team/references/summary-mapping.md`.
 
 - `create-team` — define a team (static + dynamic structure), persist it, and execute it (parallel / serial / iteration / continuous)
 - `improve-team` — apply targeted, evidence-based, structure-preserving edits to an existing team
+- `run-team` — run an existing team: five-check preview, structure render, present & execute, run report
+- `view-team` — read-only view: six information groups for one team, or an overview of every team
 
 ## Prerequisites
 

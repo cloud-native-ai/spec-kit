@@ -40,13 +40,14 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 
 **Routing flow**:
 
-1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, `run`, or `view`.
 2. **create** → `create-team`: establish the goal first (check the **Goal-Based Create** branch below first), then derive the roster (static) + pattern config (dynamic) from it — preset matching runs `python3 skills/internal/create-team/scripts/match-team-preset.py`, pattern selection follows the decision tree in `skills/internal/create-team/references/patterns.md`. The full create-mode procedure (derive, 直接落盘 `.specify/teams/<slug>/team.md` without a blocking wait per `shared/guidelines/confirmation-gates.md`, then present the definition and the modify path, and close per the execution-report convention — `shared/guidelines/confirmation-gates.md` § 执行报告) is the skill's create-mode procedure: `skills/internal/create-team/references/create-mode.md`.
 3. **modify** → `improve-team`: targeted, evidence-based, structure-preserving edits to any of the team's three parts — the **goal** (redefining it is a first-class edit that realigns both structures), the **static structure**, or the **dynamic structure**. Re-persist and bump `updated`.
 4. **run** → `run-team`: the run flow (load → five-check preview via the goal-utils engine → goal restatement → structure render → present & execute → report) is the skill's procedure — `skills/internal/run-team/SKILL.md`; inputs are the team slug and the optional `--target`, outputs are the run report and ledger entries.
-5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
-6. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
-7. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
+5. **view** → `view-team`: read-only presentation — no slug yields the overview of every team, one slug yields the six information groups; the input contract, the single delegation and the error navigation are the skill's procedure — `.specify/skills/internal/view-team/SKILL.md`. view 携带 `--target` 是模式/参数冲突（`--target` 只属于 run），必须显式报告，MUST NOT 静默丢弃或改道到 run。
+6. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
+7. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
+8. **modify / run / view targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it; view additionally lists the available slugs (bounded, omissions counted) through its skill.
 
 ### Default Behavior (No Arguments)
 
@@ -58,7 +59,7 @@ When `$ARGUMENTS` is empty, the command MUST execute the following sequence inst
    - A team whose structure seems outdated relative to recent changes → suggest `modify <slug>`.
    - No teams exist or no team fits the current need → suggest `create` with a proposed goal derived from context.
    Suggestions MUST be grounded in observable context (conversation history, repo state, team definitions), NOT fabricated.
-3. **Show capability summary** — briefly list the three modes (create / modify / run) so the user knows what operations are available.
+3. **Show capability summary** — briefly list the four modes (create / modify / run / view) so the user knows what operations are available.
 
 This behavior is informational and non-destructive: it MUST NOT create, modify, or run any team without explicit user instruction.
 
@@ -69,6 +70,9 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 - **create** — establish the team's **goal**, then author a new team (static + dynamic structure) organized around it and persist it → `create-team`
 - **modify** — adjust/optimize an existing team — reshape its structure, or **redefine its goal** and realign the structure to the new goal → `improve-team`
 - **run** — restate the **goal**, render the team's structure, and execute it directly (preview is disclosure, not a gate) → `run-team`
+- **view** — 只读查看：无 slug 时给出全团队概览，有 slug 时呈现六组结构/状态；不写盘、不派发席位 → `view-team`
+
+It MUST NOT execute any mode (including view) until the intent resolves.
 
 ### Goal-Based Create — deterministic entry (create path)
 

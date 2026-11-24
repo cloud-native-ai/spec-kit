@@ -167,3 +167,26 @@ class TestJsonEnvelope:
         assert payload["mode"] == "single"
         assert payload["scope"]["requested"] == "teams"
         assert payload["degraded"] is False
+
+
+class TestOverviewEnvelope:
+    """US2 (T021): the no-slug envelope — C-29, FR-007, data model E9."""
+
+    def test_overview_envelope_carries_mode_sorting_and_counts(self, tmp_path):
+        build_team(tmp_path, "bravo-team")
+        build_team(tmp_path, "alpha-team")
+        result = run_program("--repo-root", str(tmp_path), "--json")
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert set(payload) == ENVELOPE_KEYS
+        assert payload["mode"] == "overview"
+        assert payload["team"] is None
+        overview = payload["overview"]
+        assert "rows" in overview
+        assert "total" in overview
+        assert "corrupt_total" in overview
+        slugs = [row["slug"] for row in overview["rows"]]
+        assert slugs == sorted(slugs), "overview rows are not slug-ascending: %r" % slugs
+        assert slugs == ["alpha-team", "bravo-team"]
+        assert overview["total"] == 2
+        assert overview["corrupt_total"] == 0

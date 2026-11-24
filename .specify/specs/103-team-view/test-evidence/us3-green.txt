@@ -1,0 +1,67 @@
+# US3 targeted run — package 3 (T031)
+
+Captured: 2026-11-24, after T028 (template routing flow / default / ambiguous lists),
+T029 (docs page four modes + run drift corrections) and T030 (per-tool copy regeneration)
+landed.
+Unique entry (no pipeline; stdout+stderr redirected whole, exit code preserved):
+
+  bash scripts/bash/run-tests.sh tests/contract/test_team_view_command.py -q
+
+Readings (verbatim tail):
+  ......................................                                   [100%]
+  38 passed in 6.23s
+
+- rc: 0
+- passed: 38
+- failed: 0
+- duration: 6.23s (pytest's own line)
+- full capture of this run: `.specify/.tmp/us3-green.out` (stage-local, not committed)
+- red-first counterpart: `notes/red-first-evidence.md` § US3 — 16 failed / 22 passed before
+  the routing flow, docs page and copies landed; those 16 are now green.
+
+## SC-003 routing sample coverage (deterministic proxy, all green)
+
+The 38 passing tests include the C-09 sample set (6 parametrized sample→expected-mode rows,
+the view-token exclusion across create/modify/run rows, and the bare-`team` capabilities +
+no-execute assertion), C-04 (classification + `view → view-team` routing step + `--target`
+conflict line + ambiguous four-capability listing), C-05 (default-behavior four-mode summary
+and the no-implicit-view assertion), C-07/C-08 (docs page and drift corrections), C-10
+(named-file counts) and C-03/C-12 (four generated copies, retired mirror absent).
+
+## SC-005 program count on the two named files (verbatim script output)
+
+    templates/commands/team.md | mode_rows=4 | modes=create,modify,run,view | 'exactly three modes' count=0
+    docs/reference/commands/team.md | mode_rows=4 | modes=create,modify,run,view | 'exactly three modes' count=0
+
+Both named files: exactly 4 mode rows (`create,modify,run,view`) and 0 occurrences of the
+stale literal — a fixed-pattern count with an empty allowed increment (C-10).
+
+## T030 per-tool copy regeneration (verbatim)
+
+`regen-command-copies.py` declares only `--check`; the no-argument invocation regenerates in
+place (per its `--help`; `--write` is not a declared option). Executed form:
+
+    python3 scripts/python/regen-command-copies.py          # rc 0
+      Regenerated command copies for 4 tools.
+      Fixed drift:
+        .github/prompts/speckit.team.prompt.md
+        .claude/commands/speckit.team.md
+        .opencode/command/speckit.team.md
+        .qoder/commands/speckit.team.md
+    python3 scripts/python/regen-command-copies.py --check  # rc 0
+      OK: all per-tool command copies match the source templates.
+
+Per-copy readings (`view-team` occurrences / `exactly three modes` count):
+
+    .claude/commands/speckit.team.md:          4 / 0
+    .github/prompts/speckit.team.prompt.md:    4 / 0
+    .qoder/commands/speckit.team.md:           4 / 0
+    .opencode/command/speckit.team.md:         4 / 0
+
+The four copies were produced by the generator only; no copy was hand-edited (C-12).
+
+Selection basis: targeted-set-v1 — this package's US3 surface is exactly the command template,
+the docs page and the four generated copies; the single pinning file is
+`tests/contract/test_team_view_command.py`. The implement-entry baseline
+(`.specify/specs/103-team-view/baseline-failed.txt`, 222 names) was NOT re-run in this
+package; this run produced 0 failing tests, so the selected ids contribute no new failures.
