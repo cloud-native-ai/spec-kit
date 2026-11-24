@@ -159,3 +159,163 @@ which would collide with the one-full-suite budget. The package therefore ran th
 explicitly named verification sets (the two new modules, then the four named guards plus the
 narrow mirror param) and records that deviation openly; the closure slot owns the full
 name-level comparison.
+
+## T010 — `tests/contract/test_agents_run_multi_child_edges.py` (regression guard, one run)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_multi_child_edges.py -q
+# test runner: python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_agents_run_multi_child_edges.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 6.23s
+rc=0
+```
+
+The module guards pre-existing engine behaviour (migration/regression exception): the fixture
+builds same-parent dispatch records in the shape `exec-quant.py --action collect-dispatch`
+declares (`unit_type=agent` / `unit_id=agent:root` / `run_id=<label>`) plus the external
+triplet, then runs the read-only `role-edge-check.py`. Reading inside the fixture:
+2 edges (children `alpha` / `beta`, both depth 1, parent `root` depth 0), 0 violations,
+0 conflicts. Mutation leg: two records collapsed onto one label snapshot to **1 edge** (the
+red form — the report no longer presents two independent edges). Retry leg: both attempts'
+triplets survive byte-identically. The fourth assertion pins `watch-model.md` § 11: the
+`stale-run` attribution class and its consumption rule (only `own` events count for verdict,
+state and current progress). SC-002 readings are these four assertions' decisive outputs.
+
+## T012 — US2 turn-green reading (T010 + T011 landed)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_multi_child_edges.py tests/contract/test_agents_run_skill_wiring.py -q > /tmp/p2-us2-run.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_c22_zero_second_mechanism_and_clause_class_honesty
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_c18_sdd_probe_applicability_is_narrowed
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_c19_run_stays_a_single_unit_and_records_the_reading
+3 failed, 13 passed in 6.29s
+```
+
+C-16 / C-17 first turn green in this run (claimed at T011); the multi-child module is 4/4.
+The 3 residual failures are exactly the allowed US3 set (C-18 / C-19 / C-22) — no failure
+outside it. Process note: the first invocation of this set piped its output through `tail`,
+which masked the runner's exit code; the rc above was re-captured on a second invocation with
+direct redirection (same selection, same result) — a measurement-form error, disclosed.
+
+## T015 — US3 turn-green reading + structural audits (T013 + T014 landed)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_scope_contract.py tests/contract/test_agents_run_skill_wiring.py -q > /tmp/p2-us3-run.txt 2>&1; rc=$?
+rc=0
+....................                                                     [100%]
+20 passed in 6.28s
+```
+
+C-18 … C-22 all green; the scope module green. One test-side authoring defect was found and
+repaired before this reading: the behavior-class honesty scanner matched its own detector
+source lines (the phrase appeared in its assertion messages); the phrase is now assembled
+from two fragments, so the scanner keeps scanning every new module including itself.
+
+Structural audits:
+
+```console
+$ python3 .specify/scripts/python/flow-class-check.py --action check; echo rc=$?
+flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]
+coverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39
+rc=0
+```
+
+`.specify/state/` and `.specify/memory/` read-only file/root-set comparison against the T001
+baseline (`notes/pre-change-measurements.md`): baseline = tracked file set at `b6907ee53`
+under `.specify/memory/` + the five untracked files named in the T001 `git status` snapshot,
+ancestor-closed for directories; current = `find` over both roots.
+
+- New directories (persistence roots) vs baseline: **0** (ancestor-closed comparison).
+- New files under `.specify/memory/`: **2** — `exec-quant/.write.lock` and
+  `exec-quant/aggregated/.write.lock`. Both are transient lock files written by the existing
+  `exec-quant` mechanism (not records, not stores); 0 new record files.
+- `.specify/state/` is git-ignored runtime state; files added since T001 are this line's
+  existing stage-runner artifacts (`prompt-` / `status-` / `heartbeat-` / `log-` / `runner-log-` /
+  `raw-` prefixed with `104-agents-run` and the stage name). No new storage class or root.
+
+Fast-fail disclosure (measurement-form correction): a first pass compared `git ls-tree -d`
+output (top-level entries only) with a recursive `find`, reporting 13 "new" directories;
+every one was an intermediate parent of a path already present in the baseline. The
+ancestor-closed recomputation above is the corrected reading — a derivation defect on the
+measurement side, not a tree defect.
+
+## T016 — `tests/contract/test_agents_run_docs_contract.py` (red)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_docs_contract.py -q > /tmp/p2-t016-red.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c23_one_command_reference_body
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c24_opening_description_names_three_capabilities
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c25_syntax_block_carries_the_explicit_run_form
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c26_intent_table_run_row_and_three_way_ambiguity
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c27_companion_skills_lists_three_skills
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c28_no_argument_behaviour_matches_the_template
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c29_command_and_skills_becomes_three_capability
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c30_overview_gains_run_and_the_third_skill
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c31_design_gains_run_and_the_third_skill
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c32_tutorials_carry_run_and_drop_the_stale_claims
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c33_routing_scenario_is_three_capability
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c34_stale_literal_set_is_empty_and_history_is_untouched
+12 failed in 6.24s
+```
+
+Red for the right reason: the command reference is still the three-copy concatenation (heading
+count 3, measured before the T017 merge) and every named surface still carries the stale or
+two-capability forms. Clause-per-function: C-23…C-34 each one named test, all collected, none
+import- or collection-error.
+
+## T017–T020 — US4 front-half reading (four reference surfaces landed)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_docs_contract.py tests/contract/test_agents_run_command_contract.py -q > /tmp/p2-docs-mid.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c33_routing_scenario_is_three_capability
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c32_tutorials_carry_run_and_drop_the_stale_claims
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c34_stale_literal_set_is_empty_and_history_is_untouched
+FAILED tests/contract/test_agents_run_command_contract.py::test_c09_per_tool_copies_are_generated_and_carry_the_run_form
+4 failed, 18 passed in 6.61s
+```
+
+Green set: C-23 … C-31 (nine docs clauses) and the command contract's C-06 (three syntax faces
+agree verbatim — the docs Syntax face now carries [[STR-001]] and the explicit run line).
+Residual set is exactly the package boundary: C-32 (tutorials — T021), C-33 (routing scenario —
+T022), C-34 (closed stale set — T023) and C-09 (per-tool copies drift until T027 regenerates).
+No failure outside it.
+
+Measured after-states for the four edited files (occurrence counts, `grep -oF | wc -l`):
+
+- `docs/reference/commands/agents.md`: `^# /speckit.agents` heading count = **1** (was 3);
+  STR-005 = 0, STR-006 = 0, bold variant = 0, STR-008 = 0, ci `generate role-based agents` = 0.
+- `docs/reference/agents/command-and-skills.md`: STR-005 = 0, STR-006 = 0, bold variant = 0,
+  ci `generate role-based agents` = 0; "three skills" statement in place; run row + routing
+  step + `run-agent` section (by pointer) in place.
+- `docs/reference/agents/overview.md`: command capability line names 创作 / 优化 / 运行; prose
+  "三个技能"; navigation row "三个单 Agent 技能"; the entry diagram's skill layer carries
+  `run-agent`.
+- `docs/reference/agents/design.md`: capability line, workflow step 4 and the §6.2 single-agent
+  skill list carry `run-agent`.
+
+Fast-fail note: none of the four edits required a plan-owned change; the merged reference keeps
+copy 1 as its base (deletions d2/d3 per the contract), so no `PLAN-EDIT:` declaration applies.
+
+## Package-2 closing reading (all five agents-run modules)
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_command_contract.py tests/contract/test_agents_run_docs_contract.py tests/contract/test_agents_run_skill_wiring.py tests/contract/test_agents_run_multi_child_edges.py tests/contract/test_agents_run_scope_contract.py -q > /tmp/p2-package-run.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c34_stale_literal_set_is_empty_and_history_is_untouched
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c33_routing_scenario_is_three_capability
+FAILED tests/contract/test_agents_run_docs_contract.py::test_c32_tutorials_carry_run_and_drop_the_stale_claims
+FAILED tests/contract/test_agents_run_command_contract.py::test_c09_per_tool_copies_are_generated_and_carry_the_run_form
+4 failed, 42 passed in 6.71s
+```
+
+The four residual failures are exactly the declared package-3 surface (T021 tutorials /
+T022 routing scenario / T023 C-34 close-out / T027 copy regeneration); everything else green.
+`validate-tasks.py`: PASS with 0 errors and the one pre-adjudicated C-06/C-10 ordering warning
+(tasks.md line 19 records that adjudication).

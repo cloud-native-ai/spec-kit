@@ -8,7 +8,7 @@ are owned by a separate command (`/speckit.team`) and the team skills (`create-t
 
 ## The single-agent entry point: `/speckit.agents`
 
-`/speckit.agents` is the **only** single-agent command. It creates or refines **one** agent;
+`/speckit.agents` is the **only** single-agent command. It creates, refines, or **runs** one agent;
 team operations (organize / run several agents) are directed to `/speckit.team`. Its contract:
 
 - It **recognizes intent**, then **routes to the owning skill**.
@@ -22,20 +22,23 @@ team operations (organize / run several agents) are directed to `/speckit.team`.
 
 | Recognized intent | Capability | Delegates to skill |
 |-------------------|------------|--------------------|
+| Run an existing agent on a task | execution | `run-agent` |
 | Create a new agent | authoring | `create-agent` |
 | Refine / improve an existing agent | authoring | `improve-agent` |
 | Organize / run a team of agents | out of scope | redirect to `/speckit.team` |
 
 **Routing flow:**
 
-1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context — is this
-   single-agent *authoring* (create/refine), or a *team* request?
-2. **Authoring** → check whether `.specify/agents/{templates,instances}/<name>.agent.md` exists: absent →
+1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context — is this a
+   single-agent *run*, single-agent *authoring* (create/refine), or a *team* request?
+2. **Run** → hand the request to `run-agent`, which resolves the definition, presents the
+   agent and the role relation, dispatches one independent execution and relays the return.
+3. **Authoring** → check whether `.specify/agents/{templates,instances}/<name>.agent.md` exists: absent →
    `create-agent`; present → `improve-agent`. Build the `AgentAuthoringRequest`, handle
    backup/preservation, write to the target layer's store under `.specify/agents/`, verify per-file symlinks.
-3. **Team request** → do **not** handle it here; direct the user to `/speckit.team` and stop.
-4. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized single-agent
-   capabilities (create / refine) and request the missing intent (FR-019).
+4. **Team request** → do **not** handle it here; direct the user to `/speckit.team` and stop.
+5. **Ambiguous / unsupported** → do **not** guess silently. Report the recognized single-agent
+   capabilities (create / refine / run) and request the missing intent (FR-019).
 
 ### Team topologies (owned by `/speckit.team`)
 
@@ -46,7 +49,7 @@ the team domain — the `create-team` skill via `/speckit.team`. Operational det
 
 ## The single-agent skills
 
-`/speckit.agents` owns no logic of its own beyond routing; the work is done by two skills.
+`/speckit.agents` owns no logic of its own beyond routing; the work is done by three skills.
 
 ### `create-agent` — authoring engine
 
@@ -82,6 +85,18 @@ cases, behavioral drift). It first classifies the target, then routes:
 
 Changes must be **evidence-based** and **minimal**, preserving established structure. To adjust
 a multi-agent **team** (stages, orchestration, thresholds), use `improve-team` via `/speckit.team`.
+
+### `run-agent` — dispatch engine
+
+Turns an existing definition into a live, independent execution: it **resolves** the
+definition across the layers (instance wins on collision), **presents** the agent, the role
+relation (this session is the edge's superagent/root) and the effective execution config,
+**dispatches** one independent Agent Execution (native / virtual / external per
+`shared/definitions/subagent-definitions.md`), collects the **external** artifact triplet and
+quantification record, and **reports** a return that satisfies the five-element uplink. The
+output contract, the seven-field downlink, the child-label convention and the no-argument
+listing behaviour are owned by `skills/internal/run-agent/SKILL.md` and referenced here by
+pointer — this page does not restate its rules.
 
 > **Team orchestration**: organizing and running multiple agents is owned by the team domain —
 > the `create-team` skill via `/speckit.team`. It selects a pattern (parallel / serial /

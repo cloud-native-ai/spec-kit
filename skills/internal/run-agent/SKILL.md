@@ -132,6 +132,23 @@ MUST NOT merge or normalize configuration itself:
    agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>
    --workspace-root <project-dir>`. A non-zero exit is reported with its reason and MUST NOT
    change the dispatch result, re-run the dispatch, or delete any artifact.
+
+**Child label convention（子代身份，复用既有 dispatch label）**: every run is a new dispatch
+attempt with its own child label — the `dispatch.sh <label>` value, passed verbatim as this
+dispatch's `run_id` (`exec-quant.py --action collect-dispatch --run-id <label>`). The external
+artifact triplet is named `<label>.live.log` / `<label>.jsonl` / `<label>.status`. Every run
+uses a **new label**; a retry is a **new attempt** and the **old** attempt's artifacts are
+kept — a stale attempt's late return MUST NOT be consumed as the current result and is
+attributed per `.specify/skills/sdd-loop-driver/references/watch-model.md` § 11. No label
+generator, child list or registry is introduced: uniqueness is the per-run label, not a
+maintained inventory.
+
+**Multi-child visibility（多子代可见性，仅既有载体）**: several children under one superagent
+are read from the existing carriers only — the external **artifact triplet** (liveness and
+completion per child), the `exec-quant` dispatch records (`unit_type=agent` /
+`unit_id=agent:<parent>` / `run_id=<label>`, parent linkage), and the existing read-only
+`status-digest.py` role view (`parent` / `roles` / `role_set_marker` / `depth`, truncation
+declared). No new child list, registry, renderer or state store is added.
 5. **Report** — relay the result back to the user. If the subagent fails or hits its turn
    limit, report the **partial result and the failure reason** — not a summary that hides it.
    **Five-element uplink (owner by pointer)**: every return MUST carry the five elements
@@ -172,7 +189,13 @@ referenced here, never restated. A stage executor stays a leaf: a dispatch promp
 MUST NOT name a driver.
 
 **Pre-dispatch probe (fail-closed)**: the probe resolves the two declared halves by calling the
-engine, never by re-reading the definitions in prose:
+engine, never by re-reading the definitions in prose.
+
+**Applicability (探针适用条件)**: the probe runs **only when** the dispatch payload assigns or
+names an **SDD driver** — the narrowed predicate owned by
+`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation. A
+normal run assignment (no SDD driver named) MUST NOT invoke the probe and MUST NOT be blocked by
+a missing team/seat.
 
 ```console
 $ python3 .specify/scripts/python/sdd-route.py --action authorize \
@@ -192,9 +215,20 @@ Topology defect fix (2026-10-16); obligation declared in
 
 **Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2` concurrent units MUST NOT be handed to a body that cannot dispatch. Before dispatch, judge the recipient's dispatch capability from its **existing** `capability-tools` frontmatter key (the `capability` action of `scripts/python/concurrency-check.py` reads the same list; no frontmatter key is introduced here). When the recipient is incapable, the framework MUST route the duty to a capable executor — the orchestrator/main agent itself, a capable sibling, or the driver — and **record the routing decision** (recipient, capability reading, routed-to, reason) in the run record. A coordinator whose own toolset lacks dispatch still emits its partition (each package naming its scope, inputs and output path) so the capable executor can run the packages without re-deriving them; a duty silently serialised inside an incapable body is a defect, not a degradation. The candidate carrier for any dispatched execution is one of the two legal process carriers named by `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes (fork for same-family agents, subprocess for heterogeneous agents); the host-internal in-process subagent path is not a concurrency carrier.
 
-**Scope boundary**: Run mode executes a **single** agent on a **single** task. For
-multi-agent orchestration (parallel dispatch, serial chains, iteration loops, long-running
-loops), use `/speckit.team` — not this skill.
+**Scope boundary**: Run mode executes a **single** agent on a **single** task. One run MUST
+NOT fan out multiple agents; multiple runs are multiple command invocations — concurrency is
+measured across those invocations, never inside one. Each run records the concurrency reading
+triple `requested` / `effective` / `effective_reason`; this dispatch is named `single-unit`,
+and where an interval is absent the reading MUST record `not_evaluated` — MUST NOT record `0`
+and MUST NOT estimate. For multi-agent orchestration (parallel dispatch, serial chains,
+iteration loops, long-running loops), use `/speckit.team` — not this skill.
+
+**Team parameters（团队参数冲突）**: the team-command option class is closed by the owner
+`templates/commands/team.md` (measured members `--target` / `--scope` / `--spec-dir`). A run
+request carrying any of them — or any unlisted `--` option in option position — reports the
+named conflict sentence `team parameter not accepted by run: <option>` and points at
+`/speckit.team`; it is never silently dropped and never rewritten into a team run. Task text
+follows the User Input rules and is not parsed as options.
 
 ### Default Behavior (No Arguments)
 
@@ -285,6 +319,10 @@ contradictions block save.
   `create-agent` / `improve-agent`, reached through the command's intent routing.
 - **Team operations** (organize or run several agents together) are not this skill and not
   this command — route to `/speckit.team`.
+- **Zero second mechanism**（零第二机制）: this skill introduces no second dispatch mechanism,
+  scheduler, queue, transport or notification channel, and no new persistence root — every
+  capability is reached through the existing `run-agent` workflow, `execution-config.py`,
+  `dispatch.sh`, `exec-quant.py` and `role-edge-check.py`.
 - **Lifecycle distinction**: *temporary* agents live only in conversation context and are
   never written to the agent directory; *persistent* agents are written under
   `.specify/agents/{templates,instances}/` and made available to all officially supported

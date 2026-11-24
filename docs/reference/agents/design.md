@@ -124,15 +124,16 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 单 Agent 与团队操作有各自的命令入口：
 
-- `/speckit.agents` 是**单 Agent** 操作的唯一入口——创作或优化**一个** Agent；不新增其他单 Agent 命令，本身不内联渲染模板。
+- `/speckit.agents` 是**单 Agent** 操作的唯一入口——创作、优化或运行**一个** Agent；不新增其他单 Agent 命令，本身不内联渲染模板。
 - `/speckit.team` 是**团队**操作的唯一入口——组织或运行多个 Agent（parallel / serial / iteration / continuous）。
 
 单 Agent 命令工作流程：
 
-1. **识别用户意图**：分析用户输入，判断是创作还是优化单个 Agent。
+1. **识别用户意图**：分析用户输入，判断是创作、优化还是运行单个 Agent。
 2. **调用 `create-agent` 技能**：按模板创建对应工具的 Agent 配置。
 3. **调用 `improve-agent` 技能**：基于反馈优化已有 Agent。
-4. **团队意图重定向**：若用户请求组织 / 运行多个 Agent，重定向至 `/speckit.team`，不在此处理。
+4. **调用 `run-agent` 技能**：把已有定义派发为一个独立的 Agent Execution（运行单个 Agent；多 Agent 编排不在此承接）。
+5. **团队意图重定向**：若用户请求组织 / 运行多个 Agent，重定向至 `/speckit.team`，不在此处理。
 
 命令与路由细节见 [command-and-skills.md](./command-and-skills.md)。
 
@@ -142,6 +143,7 @@ qoder 覆盖内置专家用的同名 `.md`）**并存**。目录与发现细节�
 
 - **`create-agent`**：创作引擎——按 `Role × Stage × Type` 从模板生成 role / supervisor / custom / project-custom 等**单个** Agent。
 - **`improve-agent`**：优化引擎——基于真实使用反馈精炼**单个** Agent 制品（角色模板 / 监督片段 / 自定义 Agent）。
+- **`run-agent`**：运行引擎——把已定义 Agent 派发为一个独立的 Agent Execution（resolve → present → dispatch → external collect → report；输出契约见 `skills/internal/run-agent/SKILL.md`，按指针引用）。
 
 团队域（`/speckit.team`）：
 

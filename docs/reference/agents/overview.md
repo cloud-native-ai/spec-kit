@@ -8,27 +8,28 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 
 ## 框架是什么
 
-一个 **Agent** 由三个正交属性维度完整描述，由两种结构组织，由一个命令驱动，由两个技能产出：
+一个 **Agent** 由三个正交属性维度完整描述，由两种结构组织，由一个命令驱动，由三个技能产出：
 
 - **模型（Model）**：每个 Agent 都是 `Role × Stage × Type`；静态排布为 **Team**（Role×Stage
   矩阵），动态展开为 **Loop**（跨阶段迭代）。
-- **命令（Command）**：`/speckit.agents` 是单 Agent 工作的**唯一**入口——它识别意图并委派，
-  从不内联渲染模板；多 Agent 团队（组织 / 运行多个 Agent）归 `/speckit.team`。
-- **技能（Skills）**：`create-agent`（创作单个 Agent）、`improve-agent`（优化单个 Agent）；
-  团队编排（parallel / serial / iteration / continuous）由团队域的 `create-team` /
-  `improve-team` 承载。
+- **命令（Command）**：`/speckit.agents` 是单 Agent 工作的**唯一**入口——创作、优化与运行
+  单个 Agent；它识别意图并委派，从不内联渲染模板；多 Agent 团队（组织 / 运行多个 Agent）
+  归 `/speckit.team`。
+- **技能（Skills）**：`create-agent`（创作单个 Agent）、`improve-agent`（优化单个 Agent）、
+  `run-agent`（运行单个 Agent）；团队编排（parallel / serial / iteration / continuous）由
+  团队域的 `create-team` / `improve-team` 承载。
 - **制品（Artifacts）**：可复用模板位于 `skills/internal/create-agent/templates/`，持久化 Agent 位于
   `.specify/agents/templates/`（预置角色）与 `.specify/agents/instances/`（项目实例），经逐文件软链接暴露给每个受支持工具。
 
 ```
          /speckit.agents  (single-agent entry)        /speckit.team  (team entry)
                  │                                            │
-        ┌────────┴────────┐                          ┌────────┴────────┐
-        ▼                 ▼                          ▼                 ▼
-   create-agent      improve-agent               create-team      improve-team
-   (author)          (refine)                    (define|run:              (refine team: stages/
-        │                 │                        parallel|serial|          thresholds/maturity)
-        ▼                 ▼                        iteration|continuous)
+        ┌────────┼─────────┐                        ┌────────┴────────┐
+        ▼        ▼         ▼                        ▼                 ▼
+  create-agent improve-agent run-agent        create-team      improve-team
+   (author)     (refine)   (run: one          (define|run:     (refine team: stages/
+        │        │         execution per       parallel|serial|  thresholds/maturity)
+        ▼        ▼         run)                iteration|continuous)
    skills/internal/create-agent/templates/*        .specify/agents/{templates,instances}/*.agent.md  ──(per-file symlink)──▶ .qoder/agents/, .github/agents/, …
    (Role × Stage × Type source)           (persisted Team members)
 ```
@@ -38,7 +39,7 @@ Agent 为准——这里描述的是当前**已实现**的机制，而非提案�
 | 文档 | 覆盖内容 |
 |------|----------|
 | [design.md](./design.md) | **权威概念模型与设计**——Role / Stage / Type、Type 由 Stage 决定、Team 矩阵、Loop，以及唯一的 Team Supervisor。**从这里开始。** |
-| [command-and-skills.md](./command-and-skills.md) | `/speckit.agents` 单一入口、意图→能力路由、两个单 Agent 技能、临时 / 持久生命周期与工具集成。 |
+| [command-and-skills.md](./command-and-skills.md) | `/speckit.agents` 单一入口、意图→能力路由、三个单 Agent 技能、临时 / 持久生命周期与工具集成。 |
 | [templates-and-agents.md](./templates-and-agents.md) | 规范模板目录与命名、七个预置角色 Agent + Team Supervisor、`.specify/agents/` 分层布局（templates/instances/execution）与发现机制。 |
 | [quality-loop.md](./quality-loop.md) | Executor-Evaluator-Optimizer（EEI）质量闭环与角色域监督者（单 Agent）。 |
 
