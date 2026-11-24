@@ -235,3 +235,72 @@ def test_c22_zero_second_mechanism_and_clause_class_honesty():
     own_source = Path(__file__).read_text(encoding="utf-8")
     assert "Behavior-class clauses (C-11 / C-12 / C-13 / C-15 /" in own_source
     assert "this module does not claim contract coverage of those runtime behaviours" in own_source
+
+
+# --- US5: failure and partial results are reported honestly (T024) ---
+# Red-first (Constitution IV): authored at T024 while the skill text still lacks the bounded
+# available list, the corrupt-definition branch, the no-hand-assembly rule and the timeout
+# reading. The five legs below pin the text; the runtime conduct of each path is
+# behavior-class and is not claimed as covered here.
+
+
+def test_us5_not_found_reports_a_bounded_list_with_a_create_suggestion():
+    """US5: [[STR-002]] + bounded available list (omission declared) + create suggestion + stop."""
+    body = _norm(_section(_read(SKILL), "## Input Contract"))
+    assert "agent not found" in body, "[[STR-002]] is missing from the resolution path"
+    assert "bounded available list" in body, "the not-found path lost its bounded list"
+    assert "omission count" in body, "the list truncation does not declare the omission count"
+    assert "suggestion" in body and "create" in body, (
+        "the not-found path lost its create suggestion"
+    )
+    assert "no dispatch" in body, "the not-found path is not a zero-dispatch stop"
+
+
+def test_us5_corrupt_definition_is_named_and_never_merged_with_not_found():
+    """US5: a directory with a missing/unreadable definition is `corrupt`, named, never absent."""
+    body = _norm(_section(_read(SKILL), "## Input Contract"))
+    assert "corrupt" in body, "the corrupt-definition branch is missing"
+    assert "定义损坏/不可读" in body, "the corrupt verdict literal is missing"
+    assert "named path" in body, "the corrupt verdict does not name the definition path"
+    assert "missing or unreadable" in body, "the corrupt trigger condition is not stated"
+    assert "MUST NOT be merged with" in body and "not-found" in body, (
+        "corrupt and not-found are not kept as distinct verdicts"
+    )
+
+
+def test_us5_config_resolution_failure_stops_without_hand_assembly():
+    """US5: a failed resolve stops the dispatch and reports the engine's message, never a fallback."""
+    body = _run_mode()
+    assert "stops the dispatch" in body, "a failed resolve does not stop the dispatch"
+    assert "field/support-set message" in body, (
+        "the engine's field/support-set message is not the reported failure"
+    )
+    assert "MUST NOT hand-assemble" in body, (
+        "a failed resolve must not be worked around by assembling arguments by hand"
+    )
+    assert "MUST NOT merge or normalize configuration itself" in body, (
+        "the single-resolver rule is missing"
+    )
+
+
+def test_us5_child_failure_reports_the_partial_result_and_the_reason():
+    """US5: failure, timeout and turn-limit all report partial result + reason, never a clean summary."""
+    body = _run_mode()
+    assert "partial result" in body and "failure reason" in body, (
+        "the child-failure reading lost partial result + failure reason"
+    )
+    assert "times out" in body, "the timeout path is missing from the failure reading"
+    assert "turn limit" in body, "the turn-limit path is missing from the failure reading"
+    assert "not a summary that hides it" in body, (
+        "the failure reading may still be summarized away"
+    )
+
+
+def test_us5_incomplete_return_is_not_consumed_nor_backfilled():
+    """US5: a return missing any of the five elements (incl. the anomaly line) is incomplete."""
+    body = _run_mode()
+    assert "missing any element" in body, "the incomplete-return trigger is not stated"
+    assert "incomplete" in body, "the return-completeness verdict is missing"
+    assert "anomaly line" in body, "the anomaly line is not part of the completeness check"
+    assert "MUST NOT consume" in body, "an incomplete return may still be consumed"
+    assert "MUST NOT backfill" in body, "the parent may backfill missing return elements"

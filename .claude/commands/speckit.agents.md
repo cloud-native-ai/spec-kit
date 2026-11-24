@@ -9,11 +9,13 @@
 $ARGUMENTS
 ```
 
-Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, execute the **Default Behavior (No Arguments)** owned by the run-agent skill (below). If non-empty but intent is ambiguous or unsupported, report capabilities and request the missing intent (do NOT guess silently).
+Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). If empty, execute the **Default Behavior (No Arguments)** owned by the run-agent skill (below). If non-empty but intent is ambiguous or unsupported, report the three capabilities (create / refine / run) and request the missing intent (do NOT guess silently).
+
+An explicit `run` with no agent name reports `missing agent name`, the three capabilities (create / refine / run) and the usage line, and dispatches nothing: it MUST NOT infer an agent from conversation context and MUST NOT fall into the no-argument listing behaviour.
 
 ## Delegation
 
-`/speckit.agents` is the single entry point for every **single-agent** operation. It recognizes intent from `$ARGUMENTS` and conversation/repo context, routes to the owning skill, and delegates — it does not render any operation inline. Team operations (organize / run multiple agents) are out of scope here → `/speckit.team`.
+`/speckit.agents` is the single entry point for every **single-agent** operation. It recognizes intent from `$ARGUMENTS` and conversation/repo context, routes to the owning skill, and delegates — it does not render any operation inline. An **explicit leading verb** (`run` / `create` / `refine`) wins over context inference. A multi-agent or team intent (parallel / serial / iteration / continuous — "organize/run several agents") MUST NOT be served by this command. Team operations (organize / run multiple agents) are out of scope here → `/speckit.team`.
 
 Load skills by their runtime path (internal skills are path-referenced by the workflow):
 
@@ -23,7 +25,7 @@ Load skills by their runtime path (internal skills are path-referenced by the wo
 | **create** a new agent | `.specify/skills/internal/create-agent/SKILL.md` | The `AgentAuthoringRequest` (layer/kind: `role` / `supervisor` / `custom` / `project-custom`; ask ONE elicitation question if the mode is genuinely ambiguous; layer resolved if unambiguous); existence check across `.specify/agents/{templates,instances}/<name>.agent.md` — absent → create; an existing definition is never silently overwritten (reuse-first / refine instead, per the skill) | The authored definition written to the layer's canonical store (`.specify/agents/{templates,instances}/`); trigger teaching — reach the host registration surface via `specify render-agents --ai <tool>` (init is the first-install entry, not the re-render path) |
 | **refine** an existing agent | `.specify/skills/internal/improve-agent/SKILL.md` | The target artifact (`.specify/agents/templates/<name>.agent.md`, `.specify/agents/instances/<name>.agent.md`, or `.specify/agents/execution/configs/<name>.yaml` — layer mandatory and explicit) + evidence of what to improve | Targeted, evidence-based edits applied to the definition, taking effect on subsequent `run` invocations |
 
-Ambiguous or unsupported intent → report the three capabilities (create / refine / run) and request the missing intent; for teams direct to `/speckit.team`.
+Ambiguous or unsupported intent → reports the three capabilities (create / refine / run) and requests the missing intent without executing any mode; for teams direct to `/speckit.team`.
 
 The authoring baseline (frontmatter vocabulary, valid file locations, validation rules, Role × Stage × Type conceptual model) is owned by these skills and `.specify/shared/definitions/agent-definitions.md` — it is not restated in this template.
 

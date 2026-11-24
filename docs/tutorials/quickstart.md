@@ -60,15 +60,21 @@ Agents are rendered for your AI tool as real files (translated from the neutral 
 
 Skills directories still use the symlink model (whole-directory links).
 
-### Generate Role-Based Agents
+### List and Run Agents
 
-After initialization, run `/speckit.agents` (no arguments) to generate seven development workflow agents tailored to your project:
+After initialization, run `/speckit.agents` with no arguments to list the existing agents with grounded suggestions and the three-mode capability summary (create / refine / run):
 
 ```text
 /speckit.agents
 ```
 
-This generates:
+Run an existing agent on a bounded task with the explicit run form:
+
+```text
+/speckit.agents run <agent-name> [task]
+```
+
+The installed role agent templates include:
 
 | Agent | File | Role |
 |-------|------|------|
@@ -79,7 +85,7 @@ This generates:
 | QA Engineer | `qa-engineer.agent.md` | Validates system quality against design and requirements |
 | Knowledge Manager | `knowledge-manager.agent.md` | Maintains documentation and project knowledge |
 
-Each agent is populated with your project's actual context (tech stack, directory structure, constitution, features).
+Each installed agent is populated with your project's actual context (tech stack, directory structure, constitution, features).
 
 ---
 
@@ -218,7 +224,7 @@ The following commands are **prompt instructions** for your AI Agent. For detail
 |---------|---------|---------|
 | `/speckit.constitution` | Manage project constitution and governance rules | [details →](../reference/commands/constitution.md) |
 | `/speckit.feature` | Manage feature registry (ID, name, status) | [details →](../reference/commands/feature.md) |
-| `/speckit.agents` | Generate role-based agents or create custom agents | [details →](../reference/commands/agents.md) |
+| `/speckit.agents` | Single entry point for single-agent operations — create, refine, run | [details →](../reference/commands/agents.md) |
 | `/speckit.team` | Organize and run multi-agent teams (create / modify / run) | [details →](../reference/commands/team.md) |
 | `/speckit.anchor` | Author project-level Anchor definitions; Targets, migration, archive migration and team-coordination modes | [details →](../reference/commands/anchor.md) |
 | `/speckit.goal` | Author action-level Goal guidance — short-horizon steps with a verifiable completion condition | [details →](../reference/commands/goal.md) |
@@ -267,7 +273,7 @@ Commands follow a natural order. The table below shows common prerequisites and 
 This flowchart shows three phases with role-based agents as auxiliary aids:
 
 1.  **Phase 1 — Setup**: Run `specify init` to create the `.specify/` structure, then run `/speckit.instructions`. The second step is **required, not optional**: `specify init` distributes resources but never writes `.specify/instructions.md` and never creates any agent symlink (`CLAUDE.md`, `AGENTS.md`, `QODER.md`, `HERMES.md`, `.github/copilot-instructions.md`, `.opencode/instructions.md`, and the IDE-side `project_rules.md` links). Until `/speckit.instructions` runs — which invokes `scripts/bash/generate-instructions.sh` — no agent has an instruction file to read. `/speckit.constitution` remains optional at this point.
-2.  **Phase 2 — Customize (Optional)**: Run `/speckit.agents` to generate role-based agents for your project. Use `create-agent` or `create-skills` to define custom agents or skills. Or skip this phase and use the defaults.
+2.  **Phase 2 — Customize (Optional)**: Run `/speckit.agents` to list the available role agents and their capabilities. Use `create-agent` or `create-skills` to define custom agents or skills. Or skip this phase and use the defaults.
 3.  **Phase 3 — Core Development Lifecycle**:
     *   `1. /speckit.feature`: Create/select a feature registry entry.
     *   `2. /speckit.requirements`: Create/update the requirements specification (WHAT/WHY). The `@requirements-analyst` agent can help translate business language.
@@ -306,7 +312,7 @@ Here's a complete walkthrough using the three-phase model.
 uvx --from git+https://github.com/github/spec-kit.git specify init taskify --ai copilot
 ```
 
-Then generate role-based agents:
+Then list the available agents:
 
 ```text
 /speckit.agents
@@ -359,7 +365,7 @@ For each project, create 5-15 tasks randomly distributed across columns, with at
 - Keep specifications focused on WHAT and WHY, not HOW
 - Limit clarifications to critical decisions only
 - Maintain constitutional compliance throughout the workflow
-- Run `/speckit.agents` after `specify init` to generate project-aware role agents
+- Run `/speckit.agents` after `specify init` to list the project-aware role agents and dispatch one on a bounded task
 - Use agents as consultants for their role perspective, not as required gatekeepers
 - Use `create-agent` and `improve-agent` to evolve agent templates based on real usage feedback
 - Use `create-skills` and `improve-skills` to codify workflows you run more than once

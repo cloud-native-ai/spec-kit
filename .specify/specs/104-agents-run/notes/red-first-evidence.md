@@ -319,3 +319,77 @@ The four residual failures are exactly the declared package-3 surface (T021 tuto
 T022 routing scenario / T023 C-34 close-out / T027 copy regeneration); everything else green.
 `validate-tasks.py`: PASS with 0 errors and the one pre-adjudicated C-06/C-10 ordering warning
 (tasks.md line 19 records that adjudication).
+
+## T021–T023 — US4 closing reading (tutorials + routing scenario; C-34 closed)
+
+Editing actions: `docs/tutorials/installation.md` command-table row became the three-capability
+statement and the no-argument "next step" now describes list + grounded suggestions + the
+three-mode summary; `docs/tutorials/quickstart.md` renamed its no-argument section to
+"List and Run Agents", added the explicit `run <agent-name> [task]` form, and dropped every
+generation claim; `tests/scenarios/agents-command/single-entry-routing-scenario.md` became
+create / refine / run with explicit-run and natural-language run routing samples and a three-way
+ambiguity expectation.
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_docs_contract.py tests/contract/test_agents_run_command_contract.py -q --names-out /tmp/pkg3-us4-names.txt > /tmp/pkg3-us4-run.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_command_contract.py::test_c09_per_tool_copies_are_generated_and_carry_the_run_form
+1 failed, 21 passed in 6.62s
+```
+
+C-32 / C-33 / C-34 first turn green here; the single residual is C-09 (generated copies drift
+until T027 regenerates them — no hand edit was made). Measured after-states:
+
+```console
+$ grep -cE '^# /speckit.agents' docs/reference/commands/agents.md
+1
+
+C-34 closed-set reading over the seven named files (occurrence counts; ci forms lowercased):
+STR-005=0
+STR-006=0
+bold variant of STR-006=0
+STR-007=0
+STR-008=0
+ci: generate role-based agents=0
+ci: generate project-aware role agents=0
+ci: generate seven=0
+line with 'no arguments' and 'generate'=0
+```
+
+## T024–T026 — US5 error paths (red → green)
+
+Red-first authoring: five named `test_us5_*` functions were appended to
+`tests/contract/test_agents_run_skill_wiring.py` before the skill text carried the bounded
+list, the corrupt branch, the no-hand-assembly rule and the timeout reading.
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_skill_wiring.py -q --names-out /tmp/pkg3-us5-red.txt > /tmp/pkg3-us5-red-run.txt 2>&1; rc=$?
+rc=1
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_us5_not_found_reports_a_bounded_list_with_a_create_suggestion
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_us5_child_failure_reports_the_partial_result_and_the_reason
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_us5_corrupt_definition_is_named_and_never_merged_with_not_found
+FAILED tests/contract/test_agents_run_skill_wiring.py::test_us5_config_resolution_failure_stops_without_hand_assembly
+4 failed, 13 passed in 6.24s
+```
+
+Red for the right reason: the four failing legs name exactly the missing texts (bounded list
+with omission count, `定义损坏/不可读` branch, field/support-set-without-hand-assembly,
+timeout reading); the incomplete-return leg already held (the C-15 five-element text).
+
+T025 edits to `skills/internal/run-agent/SKILL.md` § Input Contract and § Report:
+not-found now reports a bounded available list with the omission count declared plus the
+create suggestion and the zero-dispatch stop; a corrupt definition (layer directory exists,
+definition missing or unreadable) reports `定义损坏/不可读` with the named path and MUST NOT be
+merged with `not-found`; a failed `resolve` stops the dispatch, reports the engine's
+field/support-set message and MUST NOT hand-assemble arguments or fall back to inline defaults;
+the Report step now reads "fails, times out, or hits its turn limit" with the partial result and
+failure reason carried by the same rule.
+
+```console
+$ bash scripts/bash/run-tests.sh tests/contract/test_agents_run_skill_wiring.py -q --names-out /tmp/pkg3-us5-green.txt > /tmp/pkg3-us5-green-run.txt 2>&1; rc=$?
+rc=0
+17 passed in 6.25s
+```
+
+All five `test_us5_*` legs and the pre-existing C-11…C-22 legs green in one run; zero failed
+names. Function-level reading: 17 collected, 17 passed.

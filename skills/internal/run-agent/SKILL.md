@@ -37,8 +37,13 @@ template keeps entry + delegation only.
   `.specify/shared/definitions/agent-definitions.md`). If the layer is ambiguous, ask; never
   guess silently.
 
-Agent not found → report **"agent not found"** and offer to `create` it — no dispatch. Do not
-improvise a one-off prompt in its place.
+Agent not found → report **"agent not found"** ([[STR-002]]) with a **bounded available list**
+(the omission count is declared when entries are left out) and a `create` suggestion — no
+dispatch. Do not improvise a one-off prompt in its place.
+
+A **corrupt** definition is a distinct verdict: when the layer's directory exists while the
+`<name>.agent.md` definition is missing or unreadable, report **定义损坏/不可读** with the
+**named path**. It MUST NOT be merged with `not-found` — a broken store is not an absent agent.
 
 `run <agent-name>` without task text presents the resolved agent (name, layer, description),
 reports **"missing task"**, and requests the task; it MUST NOT dispatch an empty task brief
@@ -86,7 +91,9 @@ MUST NOT merge or normalize configuration itself:
   `model / reasoning_effort / context_window`, `source_chain`, `skipped_layers`,
   `quantification.{requested,resolved}`, and `requires_external`.
 - **Stop on resolve failure**: a non-zero `resolve` exit stops the dispatch — report the
-  engine's field/support-set message. A missing defaults layer points at `specify init`.
+  engine's field/support-set message. A missing defaults layer points at `specify init`. A
+  failed resolve MUST NOT hand-assemble the dispatch arguments and MUST NOT fall back to
+  inline defaults — the engine's message is the report.
 - Keep the returned `snapshot` path and `config_id` for the post-dispatch record.
 
 1. **Resolve the target agent** — per the Input Contract above.
@@ -149,8 +156,9 @@ completion per child), the `exec-quant` dispatch records (`unit_type=agent` /
 `unit_id=agent:<parent>` / `run_id=<label>`, parent linkage), and the existing read-only
 `status-digest.py` role view (`parent` / `roles` / `role_set_marker` / `depth`, truncation
 declared). No new child list, registry, renderer or state store is added.
-5. **Report** — relay the result back to the user. If the subagent fails or hits its turn
-   limit, report the **partial result and the failure reason** — not a summary that hides it.
+5. **Report** — relay the result back to the user. If the subagent fails, times out, or hits
+   its turn limit, report the **partial result and the failure reason** — not a summary that
+   hides it.
    **Five-element uplink (owner by pointer)**: every return MUST carry the five elements
    owned by `.specify/shared/definitions/superagent-definitions.md` § The super↔sub
    Protocol — the result or deliverable path; the evidence pointer(s); an explicit anomaly

@@ -149,7 +149,7 @@ After initialization, you should see the following structure and commands:
 | `/speckit.analyze` | Cross-artifact consistency checks |
 | `/speckit.implement` | Execute tasks with built-in validation |
 | `/speckit.review` | Review implementation against specs and plan |
-| `/speckit.agents` | Generate role-based agents or create custom agents |
+| `/speckit.agents` | Single entry point for single-agent operations — create, refine, run |
 | `/speckit.team` | Organize and run multi-agent teams (create / modify / run) |
 | `/speckit.anchor` | Author project-level Anchor definitions; Targets, migration, archive migration and team-coordination modes |
 | `/speckit.goal` | Author action-level Goal guidance — short-horizon steps with a verifiable completion condition |
@@ -163,7 +163,7 @@ After initialization, you should see the following structure and commands:
 | `/speckit.sanitize` | Detect stale framework material and clean it under the two-level criteria |
 | `/speckit.session` | Export the current session to a user-named directory |
 
-**Next step**: Run `/speckit.agents` (no arguments) in your AI agent to generate seven role-based development workflow agents tailored to your project's context.
+**Next step**: Run `/speckit.agents` (no arguments) in your AI agent to list the available agents, get grounded suggestions and see the three-mode summary (create / refine / run).
 
 ## Troubleshooting
 

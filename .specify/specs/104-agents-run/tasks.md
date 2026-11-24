@@ -201,9 +201,9 @@
 - [X] T018 [P] [US4] [blockedBy: T004,T016] 编辑 `docs/reference/agents/command-and-skills.md`：描述句改为三能力（create / refine / run）并删除两能力陈述；意图路由表加 run 行；路由流覆盖 run；单代理技能清单两→三，并为 `run-agent` 增加一节（解析 → 呈现 → 派发 → external 收集 → 报告，按指针引用其输出契约，不复制规则）；per `templates/commands/agents.md` 与只读 `skills/internal/run-agent/SKILL.md` 校准。 [green: contracts/agents-run-docs.contract.md#C-29]
 - [X] T019 [P] [US4] [blockedBy: T004,T016] 编辑 `docs/reference/agents/overview.md`：命令能力陈述加 run；技能计数陈述两→三（正文句与导航行两处）；入口图的技能层加 `run-agent`。 [green: contracts/agents-run-docs.contract.md#C-30]
 - [X] T020 [P] [US4] [blockedBy: T004,T016] 编辑 `docs/reference/agents/design.md`：命令能力行加 run；单代理命令工作流加 run 步；单代理技能清单加 `run-agent`。 [green: contracts/agents-run-docs.contract.md#C-31]
-- [ ] T021 [US4] [blockedBy: T004,T016] 编辑 `docs/tutorials/installation.md` 与 `docs/tutorials/quickstart.md`：命令表行含 create / refine / run；删除 STR-007 与 C-34 的陈旧无参谓词（「生成七个角色代理」一类及其同句式变体）；per `templates/commands/agents.md` 校准无参行为。 [green: contracts/agents-run-docs.contract.md#C-32]
-- [ ] T022 [P] [US4] [blockedBy: T004,T016] 编辑 `tests/scenarios/agents-command/single-entry-routing-scenario.md`：单 Agent 范围改 create / refine / run；路由表加显式 run 样例（含 `run <agent-name> [task]` 与自然语言「运行代理」形态）；歧义期望改三能力并删 STR-005；per `templates/commands/agents.md`。 [green: contracts/agents-run-docs.contract.md#C-33]
-- [ ] T023 [US4] [blockedBy: T017,T018,T019,T020,T021,T022] US4 转绿与取证：运行 `tests/contract/test_agents_run_docs_contract.py` 与运行 `tests/contract/test_agents_run_command_contract.py`（唯一入口，`-q`）全绿（C-06 三面一致在此收口）；把标题计数、C-34 全表封闭谓词计数与命令输出写入 `notes/red-first-evidence.md`；本行认领 C-34（陈旧字面量封闭集在七个命名文件中为 0）。 [green: contracts/agents-run-docs.contract.md#C-34]
+- [X] T021 [US4] [blockedBy: T004,T016] 编辑 `docs/tutorials/installation.md` 与 `docs/tutorials/quickstart.md`：命令表行含 create / refine / run；删除 STR-007 与 C-34 的陈旧无参谓词（「生成七个角色代理」一类及其同句式变体）；per `templates/commands/agents.md` 校准无参行为。 [green: contracts/agents-run-docs.contract.md#C-32]
+- [X] T022 [P] [US4] [blockedBy: T004,T016] 编辑 `tests/scenarios/agents-command/single-entry-routing-scenario.md`：单 Agent 范围改 create / refine / run；路由表加显式 run 样例（含 `run <agent-name> [task]` 与自然语言「运行代理」形态）；歧义期望改三能力并删 STR-005；per `templates/commands/agents.md`。 [green: contracts/agents-run-docs.contract.md#C-33]
+- [X] T023 [US4] [blockedBy: T017,T018,T019,T020,T021,T022] US4 转绿与取证：运行 `tests/contract/test_agents_run_docs_contract.py` 与运行 `tests/contract/test_agents_run_command_contract.py`（唯一入口，`-q`）全绿（C-06 三面一致在此收口）；把标题计数、C-34 全表封闭谓词计数与命令输出写入 `notes/red-first-evidence.md`；本行认领 C-34（陈旧字面量封闭集在七个命名文件中为 0）。 [green: contracts/agents-run-docs.contract.md#C-34]
 
 **Checkpoint**: US4 独立可验——文档契约全绿，且命令契约的 C-06 三面一致收口。
 
@@ -215,9 +215,9 @@
 
 **Independent Test**: `test_agents_run_skill_wiring.py` 的错误路径函数全绿；缺异常行的回传夹具判 incomplete。
 
-- [ ] T024 [US5] [blockedBy: T003] 在 `tests/contract/test_agents_run_skill_wiring.py` 追加 US5 错误路径断言（每条一个具名函数）：不存在 agent → STR-002 + 有界可用项提示（声明省略条数）+ create 建议且零派发；定义目录存在而定义文件缺失 / 不可读 → 「定义损坏 / 不可读」+ 点名路径，MUST NOT 与 not-found 混同；配置解析失败 → 停止派发并报引擎的字段 / 支持集消息、不手工拼参数；子代失败 / 超时 / 触轮次上限 → 报部分结果与失败原因；回传缺五要素任一项（含缺异常行）→ 判 incomplete、不消费结论、不代填；红跑同一入口（当前技能文本缺有界列表与损坏分支，故红）并把命令、真实输出、退出码追加 `notes/red-first-evidence.md`。
-- [ ] T025 [US5] [blockedBy: T024] 编辑 `skills/internal/run-agent/SKILL.md` § Input Contract 的解析失败路径：not-found 分支补有界可用项提示（声明省略条数）与 create 建议、零派发；新增 corrupt 分支（定义目录存在而定义文件缺失 / 不可读 → 「定义损坏 / 不可读」+ 点名路径，MUST NOT 与 not-found 混同）；§ Report 保留部分结果与失败原因的上报读法（超时 / 轮次上限同读法）；措辞 per `data-model.md` E2 的规则。
-- [ ] T026 [US5] [blockedBy: T024,T025] US5 转绿与取证：`bash scripts/bash/run-tests.sh tests/contract/test_agents_run_skill_wiring.py -q` — 错误路径函数与既有 C-11…C-22 函数全绿；逐函数结果与错误路径文本摘录写入 `notes/red-first-evidence.md`。
+- [X] T024 [US5] [blockedBy: T003] 在 `tests/contract/test_agents_run_skill_wiring.py` 追加 US5 错误路径断言（每条一个具名函数）：不存在 agent → STR-002 + 有界可用项提示（声明省略条数）+ create 建议且零派发；定义目录存在而定义文件缺失 / 不可读 → 「定义损坏 / 不可读」+ 点名路径，MUST NOT 与 not-found 混同；配置解析失败 → 停止派发并报引擎的字段 / 支持集消息、不手工拼参数；子代失败 / 超时 / 触轮次上限 → 报部分结果与失败原因；回传缺五要素任一项（含缺异常行）→ 判 incomplete、不消费结论、不代填；红跑同一入口（当前技能文本缺有界列表与损坏分支，故红）并把命令、真实输出、退出码追加 `notes/red-first-evidence.md`。
+- [X] T025 [US5] [blockedBy: T024] 编辑 `skills/internal/run-agent/SKILL.md` § Input Contract 的解析失败路径：not-found 分支补有界可用项提示（声明省略条数）与 create 建议、零派发；新增 corrupt 分支（定义目录存在而定义文件缺失 / 不可读 → 「定义损坏 / 不可读」+ 点名路径，MUST NOT 与 not-found 混同）；§ Report 保留部分结果与失败原因的上报读法（超时 / 轮次上限同读法）；措辞 per `data-model.md` E2 的规则。
+- [X] T026 [US5] [blockedBy: T024,T025] US5 转绿与取证：`bash scripts/bash/run-tests.sh tests/contract/test_agents_run_skill_wiring.py -q` — 错误路径函数与既有 C-11…C-22 函数全绿；逐函数结果与错误路径文本摘录写入 `notes/red-first-evidence.md`。
 
 **Checkpoint**: US5 独立可验——五类失败路径的文本与断言成对在位。
 
@@ -227,8 +227,8 @@
 
 **Purpose**: 再生成镜像与副本、结构面审计、变异演练、行为类取证与收口验证——跨故事、不可提前的收尾面。
 
-- [ ] T027 [blockedBy: T023,T026] 再生成四份逐工具命令副本：`python3 scripts/python/regen-command-copies.py` 后 `--check` exit 0，并逐份断言含 `run <agent-name> [task]`（副本只投影正文，frontmatter `argument-hint` 不是副本面）；MUST NOT 手改副本。 [green: contracts/agents-run-command.contract.md#C-09]
-- [ ] T028 [blockedBy: T026] 再生成技能镜像：`python3 scripts/python/sync-mirrors.py --write --only skills/internal` 后 `--check` exit 0；`diff -q skills/internal/run-agent/SKILL.md .specify/skills/internal/run-agent/SKILL.md` 空输出；零手改镜像。
+- [X] T027 [blockedBy: T023,T026] 再生成四份逐工具命令副本：`python3 scripts/python/regen-command-copies.py` 后 `--check` exit 0，并逐份断言含 `run <agent-name> [task]`（副本只投影正文，frontmatter `argument-hint` 不是副本面）；MUST NOT 手改副本。 [green: contracts/agents-run-command.contract.md#C-09]
+- [X] T028 [blockedBy: T026] 再生成技能镜像：`python3 scripts/python/sync-mirrors.py --write --only skills/internal` 后 `--check` exit 0；`diff -q skills/internal/run-agent/SKILL.md .specify/skills/internal/run-agent/SKILL.md` 空输出；零手改镜像。
 - [ ] T029 [blockedBy: T027,T028] SC-005 变更集结构审计：以 implement 起点（T001 记录的 HEAD）为 base，`git diff <base>..HEAD --name-status` 限定到 SC-005 的五类产品面根后按产物类分组核对允许集闭包与补集为空（流程 / 证据 / 登记路径在比较单元之外，不进入补集断言；复跑 `bash scripts/bash/run-tests.sh tests/contract/test_agents_run_scope_contract.py -q` 佐证），并核对零新增持久化根 / registry / 渲染器 / 调度器 / 队列、零新增 glossary 词条；命令与真实输出写入 `notes/red-first-evidence.md`。
 - [ ] T030 [blockedBy: T029] SC-006 变异演练 4/4（逐项红 / 绿实测并复原）：① 删除 `templates/commands/agents.md` 的 `argument-hint` → 运行 `tests/contract/test_agents_run_command_contract.py`（唯一入口，`-q`）转红（C-01）；② 删除模板 run 意图行 → 同模块转红（C-02）；③ 删除 `skills/internal/run-agent/SKILL.md` 的七字段下行指针 → 运行 `tests/contract/test_agents_run_skill_wiring.py`（唯一入口，`-q`）转红（C-12）；④ 复制出第二份命令参考正文 → 运行 `tests/contract/test_agents_run_docs_contract.py`（唯一入口，`-q`）转红（C-23）；逐项复原后各自转绿；红 / 绿读数写入 `test-evidence/mutation-drill.md`。 [green: contracts/agents-run-docs.contract.md#C-35]
 - [ ] T031 [blockedBy: T030] 行为类条款取证记录（FR-023 / quickstart S-7）：在 `test-evidence/behavior-class-evidence.md` 逐条列出 C-11 / C-12 / C-13 / C-15 / C-16 / C-18 / C-19 的行为类半边与 FR-007 / FR-008 / FR-010 / FR-011 / FR-016 / FR-017，声明取证路线 = 真源文本（已被契约测试钉住的指针部分）+ 评审 + SC-006 变异演练读数，MUST NOT 声称契约测试覆盖运行期行为；引 `test-evidence/mutation-drill.md` 为证据指针。

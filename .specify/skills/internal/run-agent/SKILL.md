@@ -25,7 +25,9 @@ template keeps entry + delegation only.
 
 ## Input Contract
 
-- **Intent**: `run <agent-name> [task]`, or empty (no-argument listing behaviour).
+- **Intent**: `run <agent-name> [task]`, or empty (no-argument listing behaviour). The
+  command-level argument grammar is `[create|refine|run] [agent-name] [task]`; the
+  run-specific form is `run <agent-name> [task]`.
 - **Agent resolution**: by `name` from the request or conversation context. Load
   `.specify/agents/instances/<name>.agent.md`, falling back to
   `.specify/agents/templates/<name>.agent.md` (**instance wins on collision**); apply
@@ -35,8 +37,17 @@ template keeps entry + delegation only.
   `.specify/shared/definitions/agent-definitions.md`). If the layer is ambiguous, ask; never
   guess silently.
 
-Agent not found → report **"agent not found"** and offer to `create` it. Do not improvise a
-one-off prompt in its place.
+Agent not found → report **"agent not found"** ([[STR-002]]) with a **bounded available list**
+(the omission count is declared when entries are left out) and a `create` suggestion — no
+dispatch. Do not improvise a one-off prompt in its place.
+
+A **corrupt** definition is a distinct verdict: when the layer's directory exists while the
+`<name>.agent.md` definition is missing or unreadable, report **定义损坏/不可读** with the
+**named path**. It MUST NOT be merged with `not-found` — a broken store is not an absent agent.
+
+`run <agent-name>` without task text presents the resolved agent (name, layer, description),
+reports **"missing task"**, and requests the task; it MUST NOT dispatch an empty task brief
+and MUST NOT fall into the no-argument listing behaviour.
 
 ## Workflow
 
@@ -80,12 +91,21 @@ MUST NOT merge or normalize configuration itself:
   `model / reasoning_effort / context_window`, `source_chain`, `skipped_layers`,
   `quantification.{requested,resolved}`, and `requires_external`.
 - **Stop on resolve failure**: a non-zero `resolve` exit stops the dispatch — report the
-  engine's field/support-set message. A missing defaults layer points at `specify init`.
+  engine's field/support-set message. A missing defaults layer points at `specify init`. A
+  failed resolve MUST NOT hand-assemble the dispatch arguments and MUST NOT fall back to
+  inline defaults — the engine's message is the report.
 - Keep the returned `snapshot` path and `config_id` for the post-dispatch record.
 
 1. **Resolve the target agent** — per the Input Contract above.
 2. **Present & dispatch** — present the agent's `name`, `description`, and the task, then
    dispatch directly. The presentation is **disclosure, not a blocking gate**（用户可随时叫停）.
+   Beside the config disclosure, the presentation carries the role relation of this
+   dispatch: **this session is the edge's superagent (root)**, the **child label** of the
+   attempt, and the **return channel** for the result. The role relation and its protocol
+   are owned by `.specify/shared/definitions/superagent-definitions.md` (§ Role Edges,
+   § The super↔sub Protocol) and are referenced by pointer, never restated here. The role
+   is decided only by the dispatch edge: no activation switch, role entity, fourth agent
+   category or second role definition is introduced by this skill.
 3. **Dispatch** — launch as a subagent with its configured `capability-tools`, `model-tier`,
    `run-turn-budget`, and system prompt. Choose the execution mode per
    `.specify/shared/definitions/subagent-definitions.md`: **native** when the runtime supports
@@ -103,13 +123,49 @@ MUST NOT merge or normalize configuration itself:
    For **remote** topology, run `resolve` (before) and `collect-dispatch` (after) on the
    **target project side** through the same `ssh` family, so the snapshot, logs, and store
    belong to the target project.
+   **Role-edge downlink (seven fields, by pointer)**: the outgoing payload carries the seven
+   fields `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`,
+   `depth_position`, `authority_ref` and `return_channel`; their semantics are owned by
+   `.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol and are
+   never copied here. A missing field blocks the dispatch.
+   **Four pre-existing injections (by pointer)**: the same payload carries the fast-fail
+   clause (`shared/guidelines/fast-fail.md` § 子代理派发注入, injected verbatim — see the
+   dispatch-time injection below), the concurrency obligation
+   (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation), the
+   reporting duty (`shared/guidelines/reporting-obligations.md`) and the re-anchoring anchor
+   digest (`shared/definitions/re-anchoring-definitions.md`).
 4. **Collect (external only)** — after `dispatch.sh` returns, invoke
    `python3 .specify/scripts/python/exec-quant.py --action collect-dispatch --unit-id
    agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>
    --workspace-root <project-dir>`. A non-zero exit is reported with its reason and MUST NOT
    change the dispatch result, re-run the dispatch, or delete any artifact.
-5. **Report** — relay the result back to the user. If the subagent fails or hits its turn
-   limit, report the **partial result and the failure reason** — not a summary that hides it.
+
+**Child label convention（子代身份，复用既有 dispatch label）**: every run is a new dispatch
+attempt with its own child label — the `dispatch.sh <label>` value, passed verbatim as this
+dispatch's `run_id` (`exec-quant.py --action collect-dispatch --run-id <label>`). The external
+artifact triplet is named `<label>.live.log` / `<label>.jsonl` / `<label>.status`. Every run
+uses a **new label**; a retry is a **new attempt** and the **old** attempt's artifacts are
+kept — a stale attempt's late return MUST NOT be consumed as the current result and is
+attributed per `.specify/skills/sdd-loop-driver/references/watch-model.md` § 11. No label
+generator, child list or registry is introduced: uniqueness is the per-run label, not a
+maintained inventory.
+
+**Multi-child visibility（多子代可见性，仅既有载体）**: several children under one superagent
+are read from the existing carriers only — the external **artifact triplet** (liveness and
+completion per child), the `exec-quant` dispatch records (`unit_type=agent` /
+`unit_id=agent:<parent>` / `run_id=<label>`, parent linkage), and the existing read-only
+`status-digest.py` role view (`parent` / `roles` / `role_set_marker` / `depth`, truncation
+declared). No new child list, registry, renderer or state store is added.
+5. **Report** — relay the result back to the user. If the subagent fails, times out, or hits
+   its turn limit, report the **partial result and the failure reason** — not a summary that
+   hides it.
+   **Five-element uplink (owner by pointer)**: every return MUST carry the five elements
+   owned by `.specify/shared/definitions/superagent-definitions.md` § The super↔sub
+   Protocol — the result or deliverable path; the evidence pointer(s); an explicit anomaly
+   line (`未发现异常` when none); the concurrency reading triple (`requested` / `effective` /
+   `effective_reason`); and the returning executor's identity. A return missing any element
+   is **incomplete**: the parent MUST NOT consume its conclusion and MUST NOT backfill the
+   missing fields.
 
 **Dispatch-time injection (mandatory)**: before dispatching, verify the outgoing prompt
 carries the fast-fail injection clause — its owner literal lives in
@@ -141,7 +197,13 @@ referenced here, never restated. A stage executor stays a leaf: a dispatch promp
 MUST NOT name a driver.
 
 **Pre-dispatch probe (fail-closed)**: the probe resolves the two declared halves by calling the
-engine, never by re-reading the definitions in prose:
+engine, never by re-reading the definitions in prose.
+
+**Applicability (探针适用条件)**: the probe runs **only when** the dispatch payload assigns or
+names an **SDD driver** — the narrowed predicate owned by
+`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation. A
+normal run assignment (no SDD driver named) MUST NOT invoke the probe and MUST NOT be blocked by
+a missing team/seat.
 
 ```console
 $ python3 .specify/scripts/python/sdd-route.py --action authorize \
@@ -161,9 +223,20 @@ Topology defect fix (2026-10-16); obligation declared in
 
 **Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2` concurrent units MUST NOT be handed to a body that cannot dispatch. Before dispatch, judge the recipient's dispatch capability from its **existing** `capability-tools` frontmatter key (the `capability` action of `scripts/python/concurrency-check.py` reads the same list; no frontmatter key is introduced here). When the recipient is incapable, the framework MUST route the duty to a capable executor — the orchestrator/main agent itself, a capable sibling, or the driver — and **record the routing decision** (recipient, capability reading, routed-to, reason) in the run record. A coordinator whose own toolset lacks dispatch still emits its partition (each package naming its scope, inputs and output path) so the capable executor can run the packages without re-deriving them; a duty silently serialised inside an incapable body is a defect, not a degradation. The candidate carrier for any dispatched execution is one of the two legal process carriers named by `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes (fork for same-family agents, subprocess for heterogeneous agents); the host-internal in-process subagent path is not a concurrency carrier.
 
-**Scope boundary**: Run mode executes a **single** agent on a **single** task. For
-multi-agent orchestration (parallel dispatch, serial chains, iteration loops, long-running
-loops), use `/speckit.team` — not this skill.
+**Scope boundary**: Run mode executes a **single** agent on a **single** task. One run MUST
+NOT fan out multiple agents; multiple runs are multiple command invocations — concurrency is
+measured across those invocations, never inside one. Each run records the concurrency reading
+triple `requested` / `effective` / `effective_reason`; this dispatch is named `single-unit`,
+and where an interval is absent the reading MUST record `not_evaluated` — MUST NOT record `0`
+and MUST NOT estimate. For multi-agent orchestration (parallel dispatch, serial chains,
+iteration loops, long-running loops), use `/speckit.team` — not this skill.
+
+**Team parameters（团队参数冲突）**: the team-command option class is closed by the owner
+`templates/commands/team.md` (measured members `--target` / `--scope` / `--spec-dir`). A run
+request carrying any of them — or any unlisted `--` option in option position — reports the
+named conflict sentence `team parameter not accepted by run: <option>` and points at
+`/speckit.team`; it is never silently dropped and never rewritten into a team run. Task text
+follows the User Input rules and is not parsed as options.
 
 ### Default Behavior (No Arguments)
 
@@ -254,6 +327,10 @@ contradictions block save.
   `create-agent` / `improve-agent`, reached through the command's intent routing.
 - **Team operations** (organize or run several agents together) are not this skill and not
   this command — route to `/speckit.team`.
+- **Zero second mechanism**（零第二机制）: this skill introduces no second dispatch mechanism,
+  scheduler, queue, transport or notification channel, and no new persistence root — every
+  capability is reached through the existing `run-agent` workflow, `execution-config.py`,
+  `dispatch.sh`, `exec-quant.py` and `role-edge-check.py`.
 - **Lifecycle distinction**: *temporary* agents live only in conversation context and are
   never written to the agent directory; *persistent* agents are written under
   `.specify/agents/{templates,instances}/` and made available to all officially supported

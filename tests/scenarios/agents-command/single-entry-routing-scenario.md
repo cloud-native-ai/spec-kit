@@ -16,9 +16,16 @@ running several agents) are NOT served here; they are directed to `/speckit.team
 
 ```yaml
 command: /speckit.agents
-scope: single-agent only              # create / refine one agent
+scope: single-agent only              # create / refine / run one agent
 delegates_to_skills: true             # never renders templates inline
 team_ops: out_of_scope                # organize / run a team → /speckit.team
+```
+
+### Explicit Syntax
+
+```text
+/speckit.agents [create|refine|run] [agent-name] [task]
+/speckit.agents run <agent-name> [task]
 ```
 
 ### Intent → Capability Routing Table (A2)
@@ -31,6 +38,12 @@ routes:
   - intent: "refine / improve an existing agent"
     capability: authoring
     skill: improve-agent
+  - intent: "explicit run: /speckit.agents run <agent-name> [task]"
+    capability: execution
+    skill: run-agent
+  - intent: "natural language: 运行代理 / run an agent on a task"
+    capability: execution
+    skill: run-agent
   - intent: "organize / run a team of agents"
     capability: out_of_scope
     redirect: /speckit.team
@@ -40,8 +53,9 @@ routes:
 
 - I1: "Create a security-review agent" → authoring / create-agent
 - I2: "Improve the qa-engineer agent" → authoring / improve-agent
-- I3 (team): "Organize a parallel dispatch of three reviewers" → redirected to `/speckit.team`
-- I4 (ambiguous): "do the agent thing" → capability report + intent request
+- I3 (explicit run): "/speckit.agents run qa-engineer 审查当前 diff" → execution / run-agent
+- I4 (team): "Organize a parallel dispatch of three reviewers" → redirected to `/speckit.team`
+- I5 (ambiguous): "do the agent thing" → capability report + intent request
 
 ## Expected Behavior
 
@@ -53,31 +67,36 @@ routes:
 1. Command detects an existing agent target.
 2. Routes to `improve-agent`.
 
-### E3: Team Intent (I3)
+### E3: Run Intent (I3)
+1. Command recognizes an execution intent for one named agent and routes to `run-agent`.
+2. `run-agent` resolves the definition (instance wins over template), presents the agent and the role relation, dispatches exactly one execution, and reports the five-element uplink.
+
+### E4: Team Intent (I4)
 1. Command recognizes a multi-agent/team request.
 2. Does NOT handle it; directs the user to `/speckit.team` and stops.
 
-### E4: Ambiguous Intent (I4)
+### E5: Ambiguous Intent (I5)
 1. Command does NOT guess silently and does NOT fail without a message.
-2. Reports recognized single-agent capabilities (create / refine) and requests the missing intent.
+2. Reports the recognized single-agent capabilities (create / refine / run) and requests the missing intent.
 
 ## Verification Points
 
 ### V1: Single Entry (A1, SC-001, FR-001)
 - [ ] `/speckit.agents` is the single entry point for single-agent operations
-- [ ] All create / refine operations are reachable through it
+- [ ] All create / refine / run operations are reachable through it
 - [ ] Team operations are directed to `/speckit.team`, not served here
 
 ### V2: Intent Routing (A2, FR-002)
 - [ ] Create intent routes to `create-agent`
 - [ ] Refine intent routes to `improve-agent`
-- [ ] Team/organize/run intents are redirected to `/speckit.team`
+- [ ] Explicit run syntax and natural-language run intents route to `run-agent`
+- [ ] Team/organize intents are redirected to `/speckit.team`
 
 ### V3: Delegation (A2)
 - [ ] Command delegates to skills and does NOT render templates inline
 
 ### V4: Ambiguous / Unsupported Intent (A3, FR-019)
-- [ ] On ambiguous intent, single-agent capabilities are reported and the missing intent is requested
+- [ ] On ambiguous intent, the three single-agent capabilities (create / refine / run) are reported and the missing intent is requested
 - [ ] The command never guesses silently or fails without a message
 
 ### V5: Provider Whitelist (A6)
@@ -85,7 +104,7 @@ routes:
 
 ## Success Criteria
 
-- Every **single-agent** operation is reachable through `/speckit.agents` alone (SC-001).
+- Every **single-agent** operation (create / refine / run) is reachable through `/speckit.agents` alone (SC-001).
 - Each intent routes to the correct skill with no inline template rendering.
 - Team operations are cleanly redirected to `/speckit.team` (Feature 027 separation).
 - Ambiguous input yields a capability report, never a silent guess (FR-019).
