@@ -515,3 +515,32 @@ cmp_rc=0 (0 = byte-identical, no output)
   open form at executor hand-back; tasks.md is on this seat's forbidden-write list, so row marking
   and the GATE-8 evaluation belong to the driver after it collects the writebacks.
 - All readings: `test-evidence/t041-final-gate.txt`.
+
+## P5R — migrate resume supersession (bounded repair)
+
+- Date: 2026-11-25 · run `r20261125T022857Z-06dd` · base commit `6b442ed97`
+- Trigger: P5 disclosed a reachable idempotence gap — after a crashed apply is resumed to
+  completion, a third `--apply` still selected the interrupted receipt as the resume oracle,
+  re-emitted the store items and reported `applied` instead of `clean` (M-6 idempotence /
+  FR-014 / FR-016).
+- Adjudication implemented (driver, recorded): a **completed** receipt whose `resumedFrom`
+  names a `running`/`aborted` receipt supersedes that receipt for resume selection; the
+  supersession is read-only — `load_migrate_resume_state` only declines to offer a receipt a
+  completed receipt records as resumed (no rewrite, no deletion, no other supersession rule).
+- New test: `tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes`
+  — apply with an injected OSError on the 2nd store move → `aborted`; resume → `completed`
+  (`resumedFrom` = interrupted run); third `--apply` → `clean`, zero items, zero store moves,
+  empty third-receipt `items`/`archives`, interrupted receipt bytes intact.
+- Red (final test version against the pre-fix HEAD source):
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes -q`
+  → exit **1**, `AssertionError: … assert 'applied' == 'clean'` (the third apply replayed the
+  stale receipt).
+- Green after the fix: same command → `1 passed in 10.58s`, exit **0**.
+- Focused suite (US1/US2 + US3/US6 + planner + engine contract): **37 passed** in 10.60 s,
+  exit **0**. Feature 097 resume consumer (`test_migrate_us3_crossversion.py`): **5 passed**,
+  exit **0**.
+- Readings (probe over the same fixture sequence): apply1 exit 3 `blocked` / receipt
+  `aborted`; apply2 exit 0 `applied`, 31 store moves, receipt `completed` with
+  `resumedFrom`=<run1>; apply3 exit 0 `clean`, 0 store moves, third receipt `items=0`
+  `archives=0` `resumedFrom=None`, store bytes unchanged, interrupted receipt intact.
+- Evidence: `test-evidence/p5r-resume-idempotence.txt`.

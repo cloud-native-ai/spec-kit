@@ -358,3 +358,101 @@ def test_rerun_after_success_is_clean_with_one_receipt_per_run(tmp_path):
     assert not (workspace / ".specify" / "memory").exists(), (
         "the rerun re-created the retired container"
     )
+
+
+# ---------------------------------------------------------------------------
+# US2 / M-6: a completed resume supersedes the interrupted receipt it resumed
+# from, so a third apply is clean instead of replaying the stale receipt
+# ---------------------------------------------------------------------------
+
+
+def _receipt_payloads(workspace):
+    return [
+        json.loads(path.read_text(encoding="utf-8")) for path in _receipts(workspace)
+    ]
+
+
+def test_third_apply_after_resume_is_clean_because_completed_supersedes(
+    tmp_path, monkeypatch
+):
+    builders = _builders()
+    workspace = builders.build_legacy(tmp_path / "resume-supersede")
+    retired = workspace / builders.retired_rel()
+
+    real_move = shutil.move
+    injected = {"storeMoves": 0}
+
+    def crashing_move(source, destination, *args, **kwargs):
+        source_path = Path(str(source))
+        if source_path == retired or retired in source_path.parents:
+            injected["storeMoves"] += 1
+            if injected["storeMoves"] == 2:
+                raise OSError("injected: simulated crash on store move 2")
+        return real_move(source, destination, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(specify_cli.shutil, "move", crashing_move)
+        first = _json_payload(_apply(workspace), 3)
+
+    assert first["outcome"] == "blocked"
+    assert injected["storeMoves"] == 2, "the injected crash never fired on a store move"
+    interrupted = _receipt_payloads(workspace)
+    assert len(interrupted) == 1
+    interrupted = interrupted[0]
+    assert interrupted["status"] == "aborted"
+    assert interrupted["resumedFrom"] is None
+
+    resumed = _json_payload(_apply(workspace), 0)
+
+    assert resumed["outcome"] == "applied"
+    assert not retired.exists(), "the resume did not converge the retired container"
+    completing = [
+        receipt
+        for receipt in _receipt_payloads(workspace)
+        if receipt["status"] == "completed"
+    ]
+    assert len(completing) == 1
+    completing = completing[0]
+    assert completing["resumedFrom"] == interrupted["runId"]
+    interrupted_file = _receipts(workspace)[0]
+    interrupted_bytes = interrupted_file.read_bytes()
+
+    # A run's own receipt is transaction bookkeeping inside the `migrate` store,
+    # not store content (same exclusion as the US2 byte-identity test).
+    def content_files(name):
+        return {
+            rel: digest
+            for rel, digest in _store_files(workspace / ".specify" / name).items()
+            if not rel.startswith("receipts/")
+        }
+
+    store_files_before = {
+        name: content_files(name) for name in builders.store_names()
+    }
+
+    third = _json_payload(_apply(workspace), 0)
+
+    assert third["outcome"] == "clean", (
+        "a completed run that resumed the interrupted receipt must supersede it; "
+        "the third apply replayed the stale receipt instead of seeing convergence"
+    )
+    assert third["items"] == []
+    assert third["summary"]["total"] == 0
+    receipts = _receipts(workspace)
+    assert len(receipts) == 3
+    third_receipt = next(
+        receipt
+        for receipt in _receipt_payloads(workspace)
+        if receipt["runId"] not in {interrupted["runId"], completing["runId"]}
+    )
+    assert third_receipt["status"] == "completed"
+    assert third_receipt["resumedFrom"] is None
+    assert third_receipt["items"] == []
+    assert third_receipt["archives"] == []
+    assert interrupted_file.read_bytes() == interrupted_bytes, (
+        "supersession is read-only; the interrupted receipt was rewritten"
+    )
+    for name in builders.store_names():
+        assert content_files(name) == store_files_before[name], (
+            f"the third apply moved bytes in store {name!r}"
+        )

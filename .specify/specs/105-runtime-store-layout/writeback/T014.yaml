@@ -2,4 +2,5 @@ task: T014
 outcome: done
 run_id: r20261125T022857Z-06dd
 evidence: failure surface implemented — symlink-source/symlink-target, path-collision:<relpath>, permission-denied, unknown-residue (every remaining path listed and preserved), destructive-without-recovery blocked; OSError/digest mismatch -> failed + receipt status=aborted with moved entries kept; fault-injection probe (OSError on 5th move) run1 blocked/aborted, run2 resumed from the aborted receipt to applied with zero duplicate entries and the container removed
+addendum: "P5R repair — completed receipts now supersede the interrupted receipt they resumed from in load_migrate_resume_state (read-only, no receipt mutation); a third --apply after resume is clean/0 items. Test: tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes; readings: test-evidence/p5r-resume-idempotence.txt; notes/red-first-evidence.md § P5R"
 at: 2026-11-25T05:56:00Z

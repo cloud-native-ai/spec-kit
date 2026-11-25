@@ -1,0 +1,44 @@
+# P5R — migrate resume supersession: third apply after resume is `clean`
+# Date: 2026-11-25 · run: r20261125T022857Z-06dd · base commit: 6b442ed97
+# Contract: contracts/migrate-store-layout.contract.md M-6 (receipt and resume,
+# idempotence) · requirements FR-014/FR-016 · driver adjudication (brief-implement-p5r.md):
+# a completed receipt whose `resumedFrom` names an interrupted receipt supersedes that
+# receipt for resume selection — read-only, no receipt mutation.
+# Test: tests/integration/test_store_layout_migration_us1_us2.py::
+#       test_third_apply_after_resume_is_clean_because_completed_supersedes
+# Fault injection: an OSError raised on the 2nd `shutil.move` whose source lives under
+# the retired container (constants derived from the fixture declaration, never literals).
+
+== RED — final test version against the pre-fix HEAD source (git show HEAD:src/specify_cli/__init__.py) ==
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes -q
+exit=1
+E       AssertionError: a completed run that resumed the interrupted receipt must supersede it; the third apply replayed the stale receipt instead of seeing convergence
+E       assert 'applied' == 'clean'
+E         - clean
+E         + applied
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes
+1 failed in 10.56s
+
+== READINGS — probe over the same fixture sequence (declaration-driven builders) ==
+FIXTURE kind=client stores=14 retired=.specify/memory
+APPLY1 (injected OSError on store move 2): exit=3 outcome=blocked storeMoves=2 receipts=1 status=aborted
+APPLY2 (resume): exit=0 outcome=applied storeMoves=31 receipts=2 completing.status=completed completing.resumedFrom=20261125T072312Z-11cf416a container_absent=True
+APPLY3 (third): exit=0 outcome=clean store_items=0 total_items=0 storeMoves=0 receipts=3 third.status=completed third.resumedFrom=None third.items=0 third.archives=0 store_bytes_unchanged=True interrupted_receipt_intact=True
+
+== GREEN — the regression test after the fix ==
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_store_layout_migration_us1_us2.py::test_third_apply_after_resume_is_clean_because_completed_supersedes -q
+1 passed in 10.58s — exit=0
+
+== GREEN — focused module suite (brief step 3) ==
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_store_layout_migration_us1_us2.py \
+    tests/integration/test_store_layout_migration_us3_us6.py \
+    tests/unit/test_migrate_planner.py tests/contract/test_migrate_engine_contract.py -q
+37 passed in 10.60s — exit=0
+
+== GREEN — pre-existing resume consumer (feature 097) ==
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_migrate_us3_crossversion.py -q
+5 passed in 12.54s — exit=0

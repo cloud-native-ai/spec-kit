@@ -3354,15 +3354,17 @@ def load_migrate_resume_state(workspace):
 
     A crashed apply leaves its receipt ``running`` (or ``aborted`` after a
     store-layout failure); the next run continues from that receipt's own items
-    and ``archiveTo`` paths — never from paths the new run computes. Read-only:
-    the interrupted run's file is not modified. The pre-105 receipt location is
-    read as a declaration-derived transition input (M-6/A-8).
+    and ``archiveTo`` paths — never from paths the new run computes. A receipt
+    that a completed receipt records as ``resumedFrom`` is superseded and never
+    offered again (read-only: no receipt is rewritten or deleted). The pre-105
+    receipt location is read as a declaration-derived transition input (M-6/A-8).
     """
     scan_dirs = [migrate_receipts_dir(workspace)]
     legacy = migrate_legacy_receipts_dir(workspace)
     if legacy is not None:
         scan_dirs.append(legacy)
     candidates = []
+    superseded = set()
     seen_runs = set()
     for receipts in scan_dirs:
         if not receipts.is_dir():
@@ -3374,7 +3376,13 @@ def load_migrate_resume_state(workspace):
                 continue
             if not isinstance(payload, dict):
                 continue
-            if payload.get("status") not in ("running", "aborted"):
+            status = payload.get("status")
+            if status == "completed":
+                resumed_from = payload.get("resumedFrom")
+                if isinstance(resumed_from, str) and resumed_from:
+                    superseded.add(resumed_from)
+                continue
+            if status not in ("running", "aborted"):
                 continue
             run_id = str(payload.get("runId") or path.stem)
             if run_id in seen_runs:
@@ -3383,8 +3391,9 @@ def load_migrate_resume_state(workspace):
             started = str(payload.get("startedAt") or "")
             # A still-running receipt outranks an aborted one; within a class the
             # most recent start wins (M-6: "the last aborted").
-            rank = 1 if payload.get("status") == "running" else 0
+            rank = 1 if status == "running" else 0
             candidates.append((rank, started, run_id, path, payload))
+    candidates = [entry for entry in candidates if entry[2] not in superseded]
     if not candidates:
         return None
     _rank, started, run_id, path, payload = max(candidates, key=lambda entry: entry[:3])
