@@ -1,0 +1,10 @@
+== deliberation markers ==
+none
+
+== executed-today examples ==
+legacy D headings: 39
+3-digit record-form headings: 0
+base corpus diff lines: 0
+sync-mirrors rc=0
+regen-copies rc=0
+violations (reversible gates still blocking): 0

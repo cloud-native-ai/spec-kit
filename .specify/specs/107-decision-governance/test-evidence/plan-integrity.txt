@@ -1,0 +1,8 @@
+== residual UPPER_SNAKE placeholders ==
+none
+== H1 headings ==
+1
+== Requirement→Feature stamp ==
+1
+== template note removed ==
+0

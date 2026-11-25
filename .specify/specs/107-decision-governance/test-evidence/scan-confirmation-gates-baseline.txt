@@ -1,0 +1,6 @@
+blocking confirmation gates: 31
+  destructive: 23
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+rc=0
