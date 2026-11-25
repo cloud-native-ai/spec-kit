@@ -1,0 +1,28 @@
+# Goal/Team activation — 106-background-silent-failure (after tasks U4, 2026-11-25)
+
+## Handoff decision (engine)
+$ python3 scripts/python/goal-utils.py handoff-decision --tasks .specify/specs/106-background-silent-failure/tasks.md --repo-root . --json
+{"decision": "handoff", "task_count": 37, "threshold": 10, "creation": {"on_direct": "none", "on_handoff": "after-tasks-u4"}}
+
+## Definitions
+- Anchor: .specify/anchoring/106-background-silent-failure/anchor.md (engine: `goal-utils.py create`)
+- Team: .specify/teams/106-background-silent-failure/team.md (serial, 5 seats: implement-coordinator, implement-executor, stage-verifier, stage-integrator, reporter)
+- Handoff: .specify/specs/106-background-silent-failure/handoff.md (handoff/v1, active, T001–T037, SC-001…SC-009)
+
+## Engine checks
+$ python3 scripts/python/goal-utils.py handoff-ref --repo-root . --handoff .specify/specs/106-background-silent-failure/handoff.md --json
+  refs: anchor changed=true; team changed=false (team already carried handoff_ref)
+$ python3 skills/internal/create-team/scripts/validate-roster.py .specify/teams/106-background-silent-failure/team.md
+  conforming: team 106-background-silent-failure carries exactly one reporter seat (agent: reporter)
+$ python3 scripts/python/goal-utils.py run-checks 106-background-silent-failure --repo-root . --json
+  verdict: ok; blocked: false (goal-binding ok; goal-terminal ok; target checks not-evaluated — no Target declared)
+$ python3 scripts/python/goal-utils.py validate 106-background-silent-failure --scope anchor --repo-root . --json
+  valid: true; problems: []
+
+## Render
+$ specify render-agents --ai qoder
+  rendered 25 agent(s) for qoder; unmapped intents on 25 agent(s)
+  side effect: .specify/agents/.render-manifest.json updated; .qoder/agents/sdd-debt-governor.agent.md re-rendered (pre-existing template drift surfaced by the render, committed as a generated surface)
+
+## Correction to U0
+The U0 `goal_team: none` line was a misreading: the declaration's direct-vs-handoff axis is decided by the engine's task-count decision, which returned `handoff` (37 > 10). Activation therefore happened after tasks U4 as the declaration requires. Recorded as a correction, not silent drift.
